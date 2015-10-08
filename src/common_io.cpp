@@ -121,7 +121,7 @@ std::string CommonIO::getProgramPath()
     // Remove Executable
     program_path = current_path;
     std::string::size_type position;
-    position = program_path.rfind("/obv2");
+    position = program_path.rfind("/xrm-server");
     if(position != std::string::npos)
         program_path.erase(position+1,program_path.size()-1);
 
@@ -155,12 +155,13 @@ std::string CommonIO::getProgramPath()
 
     const char* t = " \t\n\r\f\v";
     program_path = exe_path;
+    std::cout << "ORIG PATH: " << program_path << std::endl;
     program_path = program_path.erase(program_path.find_last_not_of(t) + 1);
     program_path += "/";
 
     // Remove Executable
     std::string::size_type position;
-    position = program_path.rfind("/obv2");
+    position = program_path.rfind("/xrm-server");
     if(position != std::string::npos)
         program_path.erase(position+1,program_path.size()-1);
 
@@ -225,7 +226,7 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str)
     std::string character;
     bool utf_found = false;
     int  char_value = 0;
-    std::string::size_type i = 0;    
+    std::string::size_type i = 0;
 
     using namespace boost::locale;
     boundary::ssegment_index::iterator p,e;
@@ -342,7 +343,7 @@ std::string CommonIO::eraseString(const std::string &str,
                                   std::string::size_type start_position,
                                   std::string::size_type end_position)
 {
-   // std::cout << "StringERASE: " << str << " : " << str.size() << std::endl;
+    // std::cout << "StringERASE: " << str << " : " << str.size() << std::endl;
     std::string new_string = str;
     std::string::size_type count = 0;
     std::string::size_type string_size = new_string.size();
@@ -1252,11 +1253,11 @@ void CommonIO::parseLocalMCI(std::string &AnsiString, std::string mcicode, std::
 void CommonIO::readinAnsi(std::string FileName, std::string &buff)
 {
     std::string path = TEXTFILE_PATH;
-    #ifdef _WIN32
+#ifdef _WIN32
     path.append("\\");
-    #else
+#else
     path.append("/");
-    #endif
+#endif
     path += FileName;
 
     FILE *fp;
@@ -1280,14 +1281,13 @@ void CommonIO::readinAnsi(std::string FileName, std::string &buff)
     // Clear then Also goto [1,1] Home Cursor Position.
     //do
     //{
-        //id1 = buff.find("\x1b[2J",0);
-        //if (id1 != std::string::npos)
-        //{
-        //    buff.replace(id1,4,"|CS");
-        //}
+    //id1 = buff.find("\x1b[2J",0);
+    //if (id1 != std::string::npos)
+    //{
+    //    buff.replace(id1,4,"|CS");
+    //}
     //}
     //while(id1 != std::string::npos);
 
     fclose(fp);
 }
-

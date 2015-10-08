@@ -1,4 +1,14 @@
 
+Change Log Update (00.00.02)
+* 2015-10-08
++ Ported To Linux for cross compiler testing.
++ Create new Makefile(s) for linux builds
+  - make -f Makefile-linux will build all (3) projects in order.
+     - SqliteWrapped, xrm-server, xrm-unittests
+  - Requires Boost, Pthreads, Sqlite3 libs.  Tested in Ubuntu/Mint
+  - Moved compiler flags down from 14 to 11 standards.
++ Made small updates via compiling in linux to code.
+
 Change Log Update (00.00.01)
 * 2015-10-08 UnitTests
 + Commented out Tests already pre-written.  I need to go through

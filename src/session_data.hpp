@@ -49,7 +49,7 @@ public:
         , m_is_session_logged_in(false)
         , m_is_leaving(false)
         , m_is_esc_timer(false)
-        , m_raw_data("")
+        , m_raw_data()
         , m_parsed_data("")
     {
         std::cout << "SessionData" << std::endl;
@@ -192,7 +192,7 @@ private:
      * @param timer
      */
     void handleEscTimer(boost::asio::deadline_timer* timer);
-    
+
 public:
 
     connection_ptr    m_tcp_connection;
