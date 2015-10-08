@@ -41,8 +41,8 @@ public:
     }
     ~BroadCaster();
 
-    void join(session_ptr session); //, session_data_ptr participant);
-    void leave(int node_number); //session_data_ptr participant);
+    void join(session_ptr session);
+    void leave(int node_number);
     void deliver(std::string msg);
 
     int connections();

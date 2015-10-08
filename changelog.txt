@@ -1,6 +1,10 @@
 
+Change Log Update (00.00.03)
+* 2015-10-08 Code Cleanup.
++ Cleaned up some comments and fixed any left over tab spacing.
+
 Change Log Update (00.00.02)
-* 2015-10-08
+* 2015-10-08 Added Makefiles for Linux.
 + Ported To Linux for cross compiler testing.
 + Create new Makefile(s) for linux builds
   - make -f Makefile-linux will build all (3) projects in order.
@@ -15,7 +19,7 @@ Change Log Update (00.00.01)
   and update all tests to the current layout.
 
 Change Log Update (00.00.00)
-* 2015-10-08 Cleanup and Git
+* 2015-10-08 Cleanup and Git.
 * Moved all Source files to src subfolder.
 + Cleaned up files no longer part of the project.
 + Renamed project files from test to something more descriptive.

@@ -8,11 +8,18 @@
 #include <vector>
 #include <map>
 
+/**
+ * @class ScreenPixel
+ * @author Michael Griffin
+ * @date 10/8/2015
+ * @file ansi_processor.hpp
+ * @brief Managers Characters and their attributes
+ */
 typedef struct ScreenPixel
 {
-	unsigned char c;
-	int x_position;
-	int y_position;
+    unsigned char c;
+    int x_position;
+    int y_position;
     int attribute;
     int foreground;
     int background;
@@ -22,6 +29,14 @@ typedef struct ScreenPixel
 
 } ScreenPixel;
 
+
+/**
+ * @class AnsiProcessor
+ * @author Michael Griffin
+ * @date 10/8/2015
+ * @file ansi_processor.hpp
+ * @brief Processes Screen data into a Screen Buffer
+ */
 class AnsiProcessor
 {
 public:
@@ -33,7 +48,6 @@ public:
     bool m_is_screen_cleared;
     bool m_is_line_wrapping;
 
-    // Ansi Term
     int m_position;
     int m_y_position;
     int m_number_lines;             // TERM Height

@@ -683,12 +683,6 @@ bool CommonIO::isDigit(const std::string &str)
     return is_digit;
 }
 
-
-/*
- * This is setup for STDIO, when we start using this, will need to
- * convert this to a buffer for passing back!
- */
-
 /**
  * @brief Used for printing output multibyte (Unicode Translations)
  * @param wide_string
@@ -752,12 +746,6 @@ std::string CommonIO::translateUnicode(const std::string &standard_string)
     }
     return output;
 }
-
-
-
-
-
-
 
 /**
  * @brief Return the Escape Sequence Parsed.
@@ -985,7 +973,6 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
     return character_buffer;
 }
 
-
 /**
 * @brief Returns the InputFieldBuffer
 * @return
@@ -1094,9 +1081,6 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
     {
         if(m_line_buffer.size() > 0)
         {
-            // This should be looking the number of characters!!! GRRRR it's gone.. haha
-            //std::cout << "Received CTRL + Y !!!!! size: " << m_line_buffer.size() << " : " << numberOfChars(m_line_buffer) << std::endl;
-            // ERROR In unicode!!! but testing
             for(int i = numberOfChars(m_line_buffer); i > 0; i--)
             {
                 output_buffer += "\x1b[D \x1b[D";

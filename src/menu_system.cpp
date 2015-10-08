@@ -259,7 +259,6 @@ std::string MenuSystem::buildLightBars()
         if(m_loaded_menu_options[i].PulldownID > 0)
         {
             // Parse for X/Y Position and colors
-            //light_bars.append("      \x1b[6D"); // Notthe bset way, LETS PARSE THE ANSI, and remove %## codes.
             light_bars.append(m_ansi_process.buildPullDownBars(m_loaded_menu_options[i].PulldownID, active_lightbar));
             active_lightbar = false;
 
@@ -314,7 +313,7 @@ void MenuSystem::startupMenu()
 
     // Reset the Pulldown ID for new menus.
     /**
-     *  @brief IMPORTANT,m TEHRE IS A MENU COMMAND TO OVERIDE THIS CHECK FOR IT!
+     *  @brief IMPORTANT, THERE IS A MENU COMMAND TO OVERIDE THIS CHECK FOR IT!
      */
     m_active_pulldownID = 0;
 
@@ -349,7 +348,7 @@ void MenuSystem::startupMenu()
         }
     }
 
-    //if (MenuInfo clear the scrren etc.. )
+    //if (MenuInfo clear the scrren etc.. feature to add! )
     //m_session_data->deliver("\x1b[2J\x1b[1;1H");
 
     // Finally parse the ansi screen and remove pipes
@@ -386,17 +385,11 @@ void MenuSystem::startupMenu()
     }
     m_session_data->deliver(output);
 
-
-
     using namespace boost::locale;
     using namespace std;
     generator gen;
     locale loc=gen("");
-    // Create system default locale
-
     locale::global(loc);
-    // Make it system global
-
     cout.imbue(loc);
 
     // Now loop and scan for first cmd and each time
@@ -592,9 +585,9 @@ void MenuSystem::processMenuOptions(std::string &input)
                 std::cout << "NORMAL HOT KEY MATCH and EXECUTE! " << key << std::endl;
             }
         }
-    }
-    
+    }    
 }
+
 
 /**
  * @brief Default Menu Input Processing.

@@ -259,7 +259,7 @@ public:
     }
 
     int                 m_session_state;
-    connection_ptr		m_tcp_connection;
+    connection_ptr	    m_tcp_connection;
     menu_manager_ptr    m_menu_manager;
     session_data_ptr    m_session_data;
     tcp::resolver       m_resolv;

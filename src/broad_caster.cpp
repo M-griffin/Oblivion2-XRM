@@ -18,9 +18,9 @@ BroadCaster::~BroadCaster()
  */
 void BroadCaster::join(session_ptr session) //, session_data_ptr participant)
 {
-    std::cout << "join chat room" << std::endl;
+    std::cout << "join room" << std::endl;
     m_sessions.insert(session);
-    //deliver("\r\nThis Bitch Connected to the chat room");
+    //deliver("\r\nConnected to the room");
 }
 
 /**
@@ -29,8 +29,8 @@ void BroadCaster::join(session_ptr session) //, session_data_ptr participant)
  */
 void BroadCaster::leave(int node_number)
 {
-    std::cout << "leave chat room" << std::endl;
-    deliver("\r\nThis Bitch left the chat room");
+    std::cout << "nleft room" << std::endl;
+    deliver("\r\nleft the room");
 
     // Clear Session
     std::cout << "disconnecting Node Session: " << node_number << std::endl;
@@ -54,7 +54,7 @@ void BroadCaster::deliver(std::string msg)
     if(msg.size() == 0)
         return;
 
-    std::cout << "deliver chat room notices: " << msg << std::endl;
+    std::cout << "deliver room notices: " << msg << std::endl;
     std::for_each(m_sessions.begin(), m_sessions.end(),
                   boost::bind(&Session::deliver, _1, boost::ref(msg)));
 }

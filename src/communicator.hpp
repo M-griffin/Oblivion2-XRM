@@ -89,7 +89,6 @@ public:
         m_room = room;
     }
 
-
     /**
      * @brief Searchs and picks first free node number not in use.
      * @return

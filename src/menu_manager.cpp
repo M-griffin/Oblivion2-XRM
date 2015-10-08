@@ -126,7 +126,6 @@ void MenuManager::popState()
     m_the_state.back()->resume();
 }
 
-
 /**
  * @brief Main Entertrance for Adding, Switching to new States.
  */

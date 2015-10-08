@@ -16,7 +16,10 @@ Communicator* Communicator::m_globalInstance = nullptr;
  * @return
  */
 Communicator::Communicator()
-{ }
+{
+    std::cout << "Communicator" << std::endl;
+}
+
 Communicator::~Communicator()
 {
     std::cout << "~Communicator" << std::endl;
@@ -30,7 +33,6 @@ void Communicator::loadSystemConfig()
 {
     // Should move this into a seperate class for ConfigIO!
 
-
     // Clear then load the record.
     memset(&m_config_record, 0, sizeof(ConfigRec));
     if (!readConfigurationRecord(&m_config_record, "CONFIG.BBS", 0))
@@ -43,8 +45,7 @@ void Communicator::loadSystemConfig()
         std::cout << "Configuration File Loaded." << std::endl;
     }
 
-    // m_common_io.PascalToCString(m_config_record.Name);
-    // m_common_io.boolAlpha(o.Hidden)
+    // Convert only Pascal Strings to Cstrings
     m_common_io.PascalToCString(m_config_record.BBSDir);
     m_common_io.PascalToCString(m_config_record.TextDir);
     m_common_io.PascalToCString(m_config_record.BoardDir);
@@ -148,5 +149,4 @@ void Communicator::loadSystemConfig()
     m_common_io.PascalToCString(m_config_record.WFCOption[7].Title);
     m_common_io.PascalToCString(m_config_record.WFCOption[8].BatchFile);
     m_common_io.PascalToCString(m_config_record.WFCOption[8].Title);
-
 }
