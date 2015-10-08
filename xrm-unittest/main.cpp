@@ -1,20 +1,10 @@
-/***************************************************************************
- *   Enthral BBS Alpha 2 - UNIT TESTS                                      *
- *   Copyright (C) 2015 by Michael Griffin                                 *
- *   mrmisticismo@hotmail.com                                              *
- *                                                                         *
- *   Purpose:                                                              *
- *                                                                         *
- *                                                                         *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- ***************************************************************************/
+/**
+ *   Oblivion/2 XRM - UNIT TESTS
+ *   Copyright (C) 2015 by Michael Griffin
+ */
 
-#include "CommonIO_Test.hpp"
-#include "StandardIO_Test.hpp"
+//#include "CommonIO_Test.hpp"
+//#include "StandardIO_Test.hpp"
 
 #include <unittest++/UnitTest++.h>
 
@@ -29,7 +19,7 @@
 
 
 /*
- * These Unit Tests are To test the core busniess logic of classes and methods.
+ * These Unit Tests are To test the core logic of classes and methods.
  * Any method that hit IO, Database, File, Network, is considered an Integration Test
  * and will be setup in seperate Tests Suite or done manaully through the interface.
  */

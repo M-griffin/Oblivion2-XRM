@@ -1,4 +1,9 @@
 
+Change Log Update (00.00.01)
+* 2015-10-08 UnitTests
++ Commented out Tests already pre-written.  I need to go through
+  and update all tests to the current layout.
+
 Change Log Update (00.00.00)
 * 2015-10-08 Cleanup and Git
 * Moved all Source files to src subfolder.
@@ -9,7 +14,7 @@ Change Log Update (00.00.00)
   is completed.
 + Marking change logs with versions to match GIT
 + Some Cleanup and code break out of the MenuSystem.  Built extension files
-  to sepeate specific menu operations.
+  to separate specific menu operations.
 - Starting on LanguageFile imports and string editor for all configurable 
   prompts.
 
