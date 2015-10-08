@@ -1,0 +1,512 @@
+
+Change Log Update (00.00.00)
+* 2015-10-08 Cleanup and Git
+* Moved all Source files to src subfolder.
++ Cleaned up files no longer part of the project.
++ Renamed project files from test to something more descriptive.
++ Added in Unittest++ to start creating and using unit tests.
++ Checked in initial version to GIT. Github will come once more of the base
+  is completed.
++ Marking change logs with versions to match GIT
++ Some Cleanup and code break out of the MenuSystem.  Built extension files
+  to sepeate specific menu operations.
+- Starting on LanguageFile imports and string editor for all configurable 
+  prompts.
+
+Change Log Update
+* 2015-10-07 MenuSystem WIP
++ Initial Light bar display and movement, and selection are all working
++ Menu handling now working for FIRSTCMD and EVERY on menu  
+  returns.
++ Split out Menu DataFile Templates for obv/2 data files to new 
+  MenuData Class.  MenuSystem is growing as the core and need to keep
+  everything organized.
++ Each Menu Loaded will have a fresh AnsiProcessor instance. 
+  This instance keeps track of all pull-down / template screen for 
+  parsing special MCI function codes by parsing and building an std::map
+  to make a Key Value store of each screen pixel position, pixel in this
+  context in a single character on the screen with color, attribute and 
+  position data.
+
+- NOTES: Right now up and left move to previous, and down and right
+  move to next light bar.  OBV/2 has overwrite for left and right so assign
+  with menu commands.. so you can have up and down, or left and right
+  toggle bars.. or split out to other menu commands.  Need to add this in.
+- Need to Add menu command for override of starting pull-down ID.
+- Add Cursor Toggle to hide the cursor when displaying light bars 
+  And/Or move to Menu Prompt location.  Also pull in selected menu
+  prompt if available.
+
+Change Log Update
+* 2015-10-06 MenuSystem
++ Building the light bar menu processing for handling input and hotkeys
+  menu items.  Stacked command triggers.  ENTER on light bar selections
+  and arrow key movements with HOME and END to jump beginning/end
+  of command options.
++ Completed methods for Menu Screen redraws without re-processing.
+  Clear screen, Draw out initial light bars. Method of redrawing
+  light bar movement updates.  
++ Started handling of FIRSTCMD and EACH command keys for executing
+  menu commands the first time menu loads, or EACH TIME a command
+  completes and returns back to the menu. 
+
+* Items on the next Todo list:
+-------------------------------------
+- Still a lot more menu system work.  Handling normal menus without 
+  pull- down and field input. 
+- Access Control Systems with security levels and flags.
+- handling menu prompts defaults and sets.
+- handling menu themes defaults and sets.
+
+Change Log Update
+* 2015-10-05 Code Cleanup and Refactoring
++ Cleaning up some initial dev code for AnsiProcessor and ScreenBuffer.
+
+Change Log Update
+* 2015-10-05 Internal Screen Buffer - WIP
++ Completed screen buffer parsing.  Now have X/Y Coords and Colors of 
+  Special MCI sequences for Light bars in menu screen
++ System is now processing the MATRIX Menu for pull down commands
+  then parsing the ANSI for the X/Y Coords and colors of each 
+  light bar state.  on/off.. 
+- Can layout the low-light bars and active for the high-light bar.  
+  Need to add a looping to change back and forth between commands
+  then setup command execution and processing.
+- Verify OBV/2 light bar ordering.  Does is height by order in menu options
+  or does it order by pulldownID index.  My bet is on the first one. 
+
+Change Log Update
+* 2015-10-04 Internal ANSI Parser - WIP
++ Screen buffer is processing menu ANSI now. With redraw of screen
+  from the buffer.  
+- Working on parsing character buffer for light bar position for cycling them
+  in a menu.
+
+Change Log Update
+* 2015-09-29 Internal ANSI Parser - WIP
++ Reworking to maintain internal x/y Coords and colors attributes
+  of the users screen. Rewriting the color ESC sequence parsing.
+- Finished Color and Attribute Tracking. Implementing Clear Screen,
+  (3) Ways, Entire, from cursor and above, from cursor and below.
+  Then adding in Erase from Cursor to End of Line, From Cursor to begging.
+- Add in pre-search in Pipe2Ansi for MCI codes so we know when to pull 
+  color and position attributes from the screen buffer.
+
+Change Log Update
+* 2015-09-28 StateSystem & Internal Ansi Parser
++ Reconfigured the Session->StateMachine->State->MenuSystem hierarchy.
+  Cleaned up to Session->MenuManager->MenuSystem
+  The MenuSystem is a now a State itself which easily inherits the 
+  SessionData Class when created through MenuManager.  This keeps it
+  nice and clean without circular dependencies tripping up.
++ a Modified StateSystem will now be used from the MenuSystem
+  When calling out to other interfaces that need to be instantiated
+  and kept alive once the system returns for the next async_input loop.
+- Started on Internal ANSI screen buffer.  This is needed to process
+  all ANSI screens for special MCI position codes which tell the system
+  where and what colors to place lightbars or input boundaries for 
+  splitscreen chat.
+
+Change Log Update
+* 2015-09-27 Menu System
++ Completed new Dynamic function mapping for the menu system.
+  Each menu function will have (2) functions to work asynchronously.
+  a startup...() method for each system will be used to switch over the 
+  input index to the selected system and also handle any initial setup 
+  and screen displays for that specific interface. While state->update() 
+  method passing input to the menu system will do a lookup and pass 
+  all incoming data for processing to the specific method awaiting input.
+
++ Tested switching back and forth between the default menu input and menu 
+  editor input without any issues.  Fast and smooth! 
+- Now that the base of the menu system is laid out. Work is starting on the 
+  actual interfaces for both the default menu, and menu editor.
+
+Change Log Update  
+* 2015-09-25 MCI Codes
++ New Parser is up to speed with the old one parsing all menu prompt
+  Codes for movement and colors along with ClearScreen and NewLines.
+
+Change Log Update
+* 2015-09-24 IPv6 and IPv4
++ Server will now listens and accepts both IPv6 and IPv4 connections.
+  If the system doesn't support IPv6, it will default to an IPv4 listener only.
+
+Change Log Update
+* 2015-09-23 MCI Codes Parsing and Regex
++ Completed the initial parsing of MCI Codes with new Regex Parser
+  Thanks Bryan for the extra help and cool validator site!
++ Added Enum system to the MCI Codes parser, some interfaces and 
+  screens have different MCI Codes, for examples menu prompts,
+  status screen, upload checked. This will parsed for specific codes
+  per interface.
++ Broke out parsing for PipesColors to separate function.
+- Finished Parsing Pipe Colors.
+- Parser is still a WIP at this time will finish up the general codes
+  for colors and positions to move back to building the Editors.
+- Regex parser is also important for ACS Levels and Flags once the menu
+  system is going.
+
+Change Log Update
+* 2015-09-22 Communicator
++ Adding System wide configuration struct to the singleton.  
+  This is for global configuration variable access to all sessions.
++ Moved PascalToCString, CStringToPascal, BoolToString to CommonIO.
++ Added Functions to Communicator to read the CONFIG.BBS record.
++ Started Exit Error Codes, First is if the Config file can not be loaded.
++ Completed import for Config record with updates from Pascal to 
+   C-Strings.
++ Changed MenuIO to SessionIO as it's more generalized for all interfaces.
+   With Pipe2Ansi, and MCI Code Parsing and GetKey, GetInputField ...
+TODO Notes:
+- Break out MenuEditor to new Object from MenuSystem
+  + Break out Read/Write Functions to MenuIO
+- Break out ConfigEditor to new Object from Communicator
+  + Break out Read/Write Functions to ConfigIO
+Making these Objects callable from the MenuSystem itself.
+
+Change Log Update
+* 2015-09-21 MenuIO.
++ Created New MenuIO object with SessionData
++ Added High Level GetKey, GetInputField, 
+  CreateInputField: generates ANSI background color at specified length
+  for Inputting data for specific amount of characters.
+  pipe2ansi for MCI and Pipes sequence parser.
+  Ansi foreground and background colors method for pipe2ansi.
++ Input Fields will have override for Foreground/Background colors with
+  MCI codes along with Field Length.
++ Some minor code refactoring to keep naming the same across the
+  board
++ Ran CppCheck to clean up any thing missed and unused variables.
+
+- Looking at the best way to handle function calls in the menu system
+  Looking at a map of function pointers to dynamically shift
+  what methods receive input and to shift what is active.
+- Also looking into Output Deadline timer for timing out of delayed ANSI
+  Screen.  This will include long scrollers and Ansimation.
+  Might need to add this to a separate thread so other nodes are not
+  delayed as well as the node displaying the ANSI on a timer.
+
+Change Log Update
+* 2015-09-21 SessionData Object and Core IO Working.
++ All Core IO and Deadline timer session objects are now in SessionData.
+  SessionData is now working nicely being passed through the states.
+  Clean shutdown of the system through the Singleton to loop each session
+  and disconnect all connections properly is completed for maint shutdowns.
++ Getline/Field Input is done.  Add a Hotkey toggle with easy to use functions 
+  for handing input.
+
+Next Initial Items to complete:
+- WIP - Pass SessionData to menu system now
+- WIP - Add Output i/o for Esc Sequences, MCI Code Parsing and ANSI Screens.
+- Test CP437 to UTF-8 output translations for *Nix/OSX terminal display.
+- Finish building Menu Editor and System Configuration
+- Start on Feature of the core menu system reading and handling commands
+  And light bars.  Initial menu will start on Matrix for testing.
+
+Change Log Update
+* 2015-09-20 SessionData Object And Core IO - WIP.
++ Most of the core IO has been moved over from the base Session class.
+  Session data will link the StateMachine with session so that it 
+  can change the state from within any interface. The Base Sessions
+  keep pointers through the session alive and are kept alive itself via 
+  the Broad_caster.
+- Lots of work to rewrite the shutdown process. Now that the core IO is 
+  In the SessionDate, this allows it to be passed and used through the entire system.  
+  However, it now keep has it own Broad_caster link to keep node communication available.  
+  Since this link is in both the Session and SessionData,  we can't just stop 
+  and let all of the destructors work down. We now have to loop through all 
+  connections and disconnect them all first to properly release the smart pointers, 
+  then we can call the final io_service shutdown. Working some difference ideas 
+  to handle this now after researching.
+
+Change Log Update
+* 2015-09-19 Start of new SessionData Object
++ Doing callbacks in the main Session Class loop then passing buffers
+  through each state and retrieving output back the same way with several 
+  layers is very cumbersome! The new SessionData object using smart 
+  pointers spawning per session and link the base io_session, and hold all 
+  session specific data. This new object will then be passed through to 
+  each state, then off to each menu, menu's method so that IO can be used 
+  and accessed easily within the direct methods instead of data passed 
+  through several layers.  This is how I envisioned the IO would work, just 
+  took quite some time to get here properly learning ASIO since all examples
+  work with the base class, it took some time to learn creating, passing
+  with enabled_share_this() to other areas.
+- Initial Output tested good, can now try moving the input to the new object
+  with a Deadline timer for ESC sequence parsing.  Then add in pipe2ansi
+  functions for colorizing the output.
+
+Change Log Update
+* 2015-09-17 InputField processing III
++ Fixed InputField Issue, Not a bug in EtherTerm.  Issue was with fast key
+  presses, the buffer had more then one key press.  The new system loops
+  each incoming key and waits for a return from the method to push to the 
+  screen if it's a valid key and not in the middle of ESC sequence. So 
+  This now catches characters in the middle of loop.. to make sure it
+  catches everything to output.
+
+Change Log Update
+* 2015-09-17 InputField processing II
++ Found bug in EntherTerm! GetLine processing is working correctly.
++ Working on InputField Generate, which will take the prompt, add a lightbar
+  Input field after the string for the length of the field, and pre-populate 
+  with any text like when sending an email.. Email to: Mercyful Fate  will 
+  then pre populate The input field with a foreground and back color.
+
+Change Log Update
+* 2015-09-17 InputField processing I
++ Added Conversion from ESC Sequence to named string, ie ESC[A = up_arrow.
+  Makes translations from different key mapping easier to handle.
+  Thanks to Bryan for the extra rxvt sequences.
++ Completed single Key / ESC Sequence GetKey functions.
+  Input is parsed for ESC determining is ESC has followup sequence.  If
+  a sequence is detected it continues gathering the remainder of the 
+  sequence returning an ESC to notify either ESC key or Sequence.
+  When it's a sequence the m_escape_sequence buffer will be empty for 
+  a single ESC key, or populated with the string translation ie.. up_arrow.
+- WIP InputField Processing. This uses the above GetKey Translations 
+  and loops input on fields until an [ENTER] is received.  Handles ESC 
+  to Abort field, CTRL+Y Clear and start over and BS/DEL to erase 
+  characters.  Working out ASCII and UTF-8 friendly support.  
+  WIP BS/DEL or erasing needs a little more tweaking. Made lots of progress.
+
+Change Log Update
+* 2015-09-16 Async ESC Sequence Parsing
+- Working out issues with breaking data asynchronously into ESC sequence
+  patterns when characters are originally split first by ASCII vs UTF-8, 
+  are only sent through one at a time. A Mechanism needs to be used to 
+  notify if there is more data to determine if its an ESC vs. start of a 
+  sequence.  
+  NOTE: I don't like passing flags through classes for this.
++ Worked out ESC issue, on lone ESC key, we'll follow-up with a null '\0'
+  right after to ESC to signal it's a lone ESC key after deadline checking.
+  NULLS are parsed out on all incoming data, so this is perfect to
+  single the end of a special character internally.
++ ESC vs ESC Sequences tested good with single and multiple sequences.
+  With and without deadline checking. Looks like were good to continue
+  more interface work at last!
+
+Change Log Update
+* 2015-09-15 Menu Editor
+- Working on the Menu Editor input handling.  Added toggle for line or
+  Hotkey input.  Default in OBV/2 is line input in most menus with
+  Hotkey during pulldown menus.  This will be a toggle for an added 
+  feature.
+
+Change Log Update
+* 2015-09-14 Input Processing
++ Added a Deadline timer per session. This is needed when the last char
+  received is an ESC.  We need the ability to detect single ESC vs
+  an ESC sequence. Lag over the internet can receive broken sequences
+  ESC in one read(), then [A in the next read().  With the timer, any
+  time we receive an ESC by itself we wait 400 milliseconds for any follow 
+  up sequence.  Otherwise it's registered as a lone ESC key.
+  Without this, function key sequence can register as an ESC and exit alot
+  of interfaces causing issues!  
+
+Change Log Update
+* 2015-09-13 Menu Editor
++ Working on Menu Editor and Input parsing, with toggle for line or hotkey
+  input for menu interfaces.  Still WIP.
+
+Change Log Update
+* 2015-09-08 Smart Pointers
++ Worked out some smart pointer passing issues with the state
+  machine and passing session data from interfaces back to the users
+  from inside different states.
+
+Change Log Update
+* 2015-09-07 Menu Editor
++ Complete Initial Menu Directory parsing, and formatting the screen to 
+  dynamically display all available menus for editing.
+  Working on Edit, Save, Add, Delete options now.
+
+Change Log Update
+* 2015-09-06 Started Menu I/O
++ Reading of MenuInfo and MenuOption Structs in .MNU files completed.
+- Started working on Editor, will add some extra options for ? in CKeys
+  to list all available with small descriptions when there is time.
+  Makes it easier to mod. 
+
+Change Log Update
+* 2015-09-04 More State Machine and I/O
++ Worked out functionality of StateMachine will derive a menu system
+  States will now involve more complete systems instead of sub modules
+  Eg.. System State (bbs), Chat State (Sysop/Teleconference, 
+  WFC State (Waiting for Callers, stats, node snooping).
+  Each state will have a Menu system for handing commands and lightbars.
++ The State/MenuManager will loop incoming strings of data, parse single 
+  ASCII characters vs UTF-8 multi-byte characters and feed them one
+  at a time through to each interface. Interfaces will then be able to 
+  parse sequences ASCII, ESC, or multi-byte sequences as needed.
++ Added some basic Node Tracking for sessions.  This way we can tell  who is 
+  on which node, and also match these numbers to sessions for notifications 
+  and chat and door games.
++ Started adding output for default out and translated CP347 to UTF-8 for
+  terminals.  Eventually will look at encoding for other 8 bit types like
+  ISO-8859-1, etc.. However, most of these do not do block and line
+  drawing for ANSI.  At this time i'm keeping CP437 and UTF-8 with 
+  possible expansions later on. (Keep it simple for now).
++ Starting on Menu Editor that will read and edit original OBV/2 menu files
+  Goal is to handle menus and data exactly as OBV/2 does, then expand later
+  on as needed and enrich it.  To also allow full working menu from OBV/2 
+  systems with compatibility for all mods and custom work.
+
+Change Log Update
+* 2015-09-02 Working on Sessions and State Machine
++ Each session now includes its own State Machine.  In this instance a state 
+  Machine contains a base class, while each module will become a derived 
+  class.  For Example, CONFIG, LOGIN, MESSAGES, FILES will each have its own 
+  state and become a derived state class.
++ After lots of tinkering it's been decided (with possible future changes)
+  to handle each state module in the following as we do not want to loop for
+  Data or input inside any of the state modules.  The Session will pass all
+  client input through the update() method.  The update() method will then
+  process the input and return all output to the state_machine 
+  or ie..The Manager.  which will then send all outback to the screen for
+  the user to see the interaction awaiting input.
+- Question on Changing the State from within a state.  Looking at the best
+  way to handle state switching.  If we want to keep communication with a list 
+  of each session, and when their state changes.  This way when in multi-node
+  or who's on, we can easily list the users, and which state/module or action
+  they are in.  I'm leaning more towards this, but need to test this out.
+
+Change Log Update
+* 2015-09-01 Working in Input character decoding.
++ Working on Input Parsing.  WIP
+  - Completed Loop that reads buffer after Telnet Opts are parsed out
+  - Next Checks for complete single characters ASCII vs UTF-8
+  - Returns char commands or ESC with buffered ESC sequence for Function Keys
+  - Tricky as original code was looking at TTY in *nix, now rewriting to 
+    read buffered socket data directly.
++ Cleaned up some File naming
++ WIP handle_character_sequencing(), this need to loop all incoming data
+  splitting out characters from sequences.  But also need to keep static 
+  track of where it left off so no sequences or multi-byte characters 
+  are lost.
++ Working on State Machine, each interface will be separated into states
+  where the sessions will be passed and update() will be looped to process 
+  input when data is received.
+- NOTE: Still need to research async_wait() within a session and not main 
+  thread. Need to add timeouts per session.
+
+Change Log Update
+* 2015-08-31 OBV/2 Data Structure (Initial Version 2.30) 2.35, 2.4x will follow
+  For Data Conversions.
++ Completed Data Structures for MenuInfo, MenuOption, FileArea, 
+  FileRecord, Protocol
++ Structures Completed so far w/ read/write function template:
+  Statistics
+  WFCO
+  InfoformData
+  ConfigRecord
+  FDesAttrType
+  EmailMessageRecord
+  UserRecord
+  MenuOption
+  MenuInfo
+  FileArea
+  FileRecord
+  Protocol
+
+Change Log Update
+* 2015-08-30 Session State
++ Adding Session State to tell if incoming data is for commands or 
+  session/global chat.
++ Added session tracking for input and output character encoding
+  Sessions start with CP437 default. I will try to test and add support
+  for other options such as ISO-8859-1 etc.. Although they don't display ANSI
+  options are nice to have later on.  Otherwise the main defaults are CP437 
+  and UTF-8.
++ Output encoding will default to CP437 on ANSI term detection, UTF-8 on XTERM
+  With global toggles between the two output translations.  Input will default to 
+  UTF-8, with toggles for CP437 for pasting ANSI graphics characters.  
+
+Change Log Update
+* 2015-08-29 Encryption support for internal and user passwords.
++ Data should be encrypted before saved to sqlite3.
+
+Change Log Update
+* 2015-08-28 SQlite3 support for data.
++ Working in custom version of SqliteWrapped. Initial compile is now building
+  in Windows, now testing reading and writing Unicode strings to the database.
+
+Change Log Update
+* 2015-08-27 Unicode or UTF-8 Internal support.
++ Started adding experimental methods for UTF-8. Originally tested in Linux
+  and ported to Windows for OBV/2. Custom build of Boost with ICU for Boost 
+  boundary and translations for Windows.  Allot of extra work to compile with 
+  MingW32.
+
+Change Log Update
+* 2015-08-25 Working on Telnet Command and Option Replies and Responses.
++ Worked out TELNET OPTS for TTYPE, NAWS, LINEMODE toggle off for Linux.
+  completed connect tests in windows, Linux and OS/x terminals.
+
+Change Log Update
+* 2015-08-17 Started logging updates and changes
++ Added Communicator Class with SafeQueue for global messaging between 
+  sessions and the system operator.
++ Updated Telnet Option Parsing, Added Containers for Reply and Active.
+  Waiting for reply avoid sending reply's on responses. Active will heep track
+  of options agreed upon between client and server.
++ Working on adding TTYPE and NAWS parsing. Have initial stages completed.
+
+Ideas: 
++ Global Trivial that can display random questions and let users answer from 
+  any subsystem. Also keeping ongoing totals and counts through the week 
+  pre-determined time frame.
+
++ Global Chat / Teleconference like IRC where users can chat, ANSI draw together,
+  and transfer files.  
+
+
+===============================================================================
+
+MAIN GOAL 
+Need to create Configuration editors for System / Menus.  
+Have to be able to edit menus and commands!
+
+Post of Initial Change Log, and some extra ideas.. for later reference.. :) 
+Short term and some Long term goals, the idea is to hit as many of the short
+term as possible to get the initial interfaces going.
+
+Completed:
+1. Initial Telnet Server
+
+2. Telnet Command/Option Parsing 
+   + Negotiations for Terminal Type, Screen Size, and Key at a Time input.
+   + Individual Sessions in single thread with asynchronous i/o.
+   + global communication room for sending messages to all users connected.
+   + ability for sysop console to send messages to all nodes.
+   - WIP, need to separate this out to chat per sessions and sysop per 
+     individual session.
+
+Short Term Goals:
+1. Get Full Incoming Data parsing completed.
+   + CP437 -> Utf8 
+   + Parse ESC and Function Keys Sequences
+   + Toggles for Output Encoding
+   + Toggles for Key-map encoding for BS/DEL between Windows and *Nix platforms.
+
+2. ANSI and output Translations
+   + ANSI output from screens w/ Delay on MCI code for welcome and various screens
+   + Translations for CP437 ANSI files to UTF-8 for Terminals and international clients.
+
+3. Basic Menu system to Mimic the Matrix login
+   + Goal is to handle commands parsing, MCI code parsing and light-bars.
+
+4. Global chat room interface, and split screen sysop/user chat.
+
+5. WFC (Waiting for Caller) Interface for configuration and node chat/viewing.
+
+Long Term Goals:
+1. Telnet server options for ignoring bad ip's and too many connections from the 
+   same ip address.
+2. Full OBV/2 Menu command and light-bar emulations.
+   Support for Stacked commands along with fall back menu
+   - Extra new support added for listing descriptive commands top/down in 
+     scrolling interface.
+3. Full OBV/2 Data Area support for custom mods
+4. Full Message and File Area with transfer protocols.

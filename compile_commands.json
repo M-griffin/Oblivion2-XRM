@@ -1,0 +1,81 @@
+[{
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\sqlitewrap\\Database.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2\\sqlitewrap",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\sqlitewrap\\Database.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\sqlitewrap\\Database.cpp.o  -Wfatal-errors  -g  -O0  -W  -std=c++14  -Wall  -static -I. -I. -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\sqlitewrap\\Query.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2\\sqlitewrap",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\sqlitewrap\\Query.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\sqlitewrap\\Query.cpp.o  -Wfatal-errors  -g  -O0  -W  -std=c++14  -Wall  -static -I. -I. -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\sqlitewrap\\StderrLog.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2\\sqlitewrap",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\sqlitewrap\\StderrLog.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\sqlitewrap\\StderrLog.cpp.o  -Wfatal-errors  -g  -O0  -W  -std=c++14  -Wall  -static -I. -I. -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\sqlitewrap\\SysLog.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2\\sqlitewrap",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\sqlitewrap\\SysLog.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\sqlitewrap\\SysLog.cpp.o  -Wfatal-errors  -g  -O0  -W  -std=c++14  -Wall  -static -I. -I. -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\main.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\main.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\main.cpp.o  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++14  -Wall  -Wno-deprecated -Wno-unused-local-typedefs -I. -I. -IC:/boost/include/boost-1_58 -IC:/boost_1_58_0/boost -IC:/boost/include -IC:/Users/Blue/Desktop/Test2/sqlitewrap -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\communicator.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\communicator.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\communicator.cpp.o  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++14  -Wall  -Wno-deprecated -Wno-unused-local-typedefs -I. -I. -IC:/boost/include/boost-1_58 -IC:/boost_1_58_0/boost -IC:/boost/include -IC:/Users/Blue/Desktop/Test2/sqlitewrap -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\common_io.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\common_io.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\common_io.cpp.o  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++14  -Wall  -Wno-deprecated -Wno-unused-local-typedefs -I. -I. -IC:/boost/include/boost-1_58 -IC:/boost_1_58_0/boost -IC:/boost/include -IC:/Users/Blue/Desktop/Test2/sqlitewrap -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\telnet_decoder.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\telnet_decoder.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\telnet_decoder.cpp.o  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++14  -Wall  -Wno-deprecated -Wno-unused-local-typedefs -I. -I. -IC:/boost/include/boost-1_58 -IC:/boost_1_58_0/boost -IC:/boost/include -IC:/Users/Blue/Desktop/Test2/sqlitewrap -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\menu_system.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\menu_system.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\menu_system.cpp.o  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++14  -Wall  -Wno-deprecated -Wno-unused-local-typedefs -I. -I. -IC:/boost/include/boost-1_58 -IC:/boost_1_58_0/boost -IC:/boost/include -IC:/Users/Blue/Desktop/Test2/sqlitewrap -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\chat_state.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\chat_state.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\chat_state.cpp.o  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++14  -Wall  -Wno-deprecated -Wno-unused-local-typedefs -I. -I. -IC:/boost/include/boost-1_58 -IC:/boost_1_58_0/boost -IC:/boost/include -IC:/Users/Blue/Desktop/Test2/sqlitewrap -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\system_state.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\system_state.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\system_state.cpp.o  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++14  -Wall  -Wno-deprecated -Wno-unused-local-typedefs -I. -I. -IC:/boost/include/boost-1_58 -IC:/boost_1_58_0/boost -IC:/boost/include -IC:/Users/Blue/Desktop/Test2/sqlitewrap -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\struct.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\struct.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\struct.cpp.o  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++14  -Wall  -Wno-deprecated -Wno-unused-local-typedefs -I. -I. -IC:/boost/include/boost-1_58 -IC:/boost_1_58_0/boost -IC:/boost/include -IC:/Users/Blue/Desktop/Test2/sqlitewrap -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\broad_caster.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\broad_caster.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\broad_caster.cpp.o  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++14  -Wall  -Wno-deprecated -Wno-unused-local-typedefs -I. -I. -IC:/boost/include/boost-1_58 -IC:/boost_1_58_0/boost -IC:/boost/include -IC:/Users/Blue/Desktop/Test2/sqlitewrap -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\session_data.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\session_data.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\session_data.cpp.o  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++14  -Wall  -Wno-deprecated -Wno-unused-local-typedefs -I. -I. -IC:/boost/include/boost-1_58 -IC:/boost_1_58_0/boost -IC:/boost/include -IC:/Users/Blue/Desktop/Test2/sqlitewrap -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\session_io.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\session_io.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\session_io.cpp.o  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++14  -Wall  -Wno-deprecated -Wno-unused-local-typedefs -I. -I. -IC:/boost/include/boost-1_58 -IC:/boost_1_58_0/boost -IC:/boost/include -IC:/Users/Blue/Desktop/Test2/sqlitewrap -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\menu_manager.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\menu_manager.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\menu_manager.cpp.o  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++14  -Wall  -Wno-deprecated -Wno-unused-local-typedefs -I. -I. -IC:/boost/include/boost-1_58 -IC:/boost_1_58_0/boost -IC:/boost/include -IC:/Users/Blue/Desktop/Test2/sqlitewrap -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\ansi_processor.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\ansi_processor.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\ansi_processor.cpp.o  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++14  -Wall  -Wno-deprecated -Wno-unused-local-typedefs -I. -I. -IC:/boost/include/boost-1_58 -IC:/boost_1_58_0/boost -IC:/boost/include -IC:/Users/Blue/Desktop/Test2/sqlitewrap -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\menu_system_editor.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\menu_system_editor.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\menu_system_editor.cpp.o  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++14  -Wall  -Wno-deprecated -Wno-unused-local-typedefs -I. -I. -IC:/boost/include/boost-1_58 -IC:/boost_1_58_0/boost -IC:/boost/include -IC:/Users/Blue/Desktop/Test2/sqlitewrap -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\menu_system_prompts.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\menu_system_prompts.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\menu_system_prompts.cpp.o  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++14  -Wall  -Wno-deprecated -Wno-unused-local-typedefs -I. -I. -IC:/boost/include/boost-1_58 -IC:/boost_1_58_0/boost -IC:/boost/include -IC:/Users/Blue/Desktop/Test2/sqlitewrap -IC:/sqlite3/include"
+ }, {
+  "file": "C:\\Users\\Blue\\Desktop\\Test2\\language_prompts.cpp",
+  "directory": "C:\\Users\\Blue\\Desktop\\Test2",
+  "command": "C:/MinGW-5.1.0/mingw32/bin/g++.exe -c C:\\Users\\Blue\\Desktop\\Test2\\language_prompts.cpp -o C:\\Users\\Blue\\Desktop\\Test2\\language_prompts.cpp.o  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++14  -Wall  -Wno-deprecated -Wno-unused-local-typedefs -I. -I. -IC:/boost/include/boost-1_58 -IC:/boost_1_58_0/boost -IC:/boost/include -IC:/Users/Blue/Desktop/Test2/sqlitewrap -IC:/sqlite3/include"
+ }]

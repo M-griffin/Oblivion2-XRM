@@ -1,0 +1,221 @@
+
+#ifndef SESSION_DATA_HPP
+#define SESSION_DATA_HPP
+
+#include "struct.hpp"
+#include "tcp_connection.hpp"
+#include "telnet_decoder.hpp"
+#include "broad_caster.hpp"
+
+#include <boost/asio.hpp>
+#include <boost/asio/deadline_timer.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
+#include <boost/smart_ptr/weak_ptr.hpp>
+
+#include <string>
+
+using boost::asio::deadline_timer;
+using boost::asio::ip::tcp;
+
+class MenuManager;
+typedef boost::shared_ptr<MenuManager>	menu_manager_ptr;
+
+/**
+ * @class SessionData
+ * @author Blue
+ * @date 9/19/2015
+ * @file session_data.hpp
+ * @brief Used for passing Session Data to and From States.
+ */
+class SessionData
+    : public boost::enable_shared_from_this<SessionData>
+{
+public:
+
+    SessionData(connection_ptr           tcp_connection,
+                board_caster_ptr         room,
+                boost::asio::io_service& io_service,
+                menu_manager_ptr         menu_manager)
+        : m_tcp_connection(tcp_connection)
+        , m_room(room)
+        , m_telnet_state(new TelnetDecoder(tcp_connection))
+        , m_input_deadline(io_service)
+        , m_menu_manager(menu_manager)
+        , m_user_record()
+        , m_node_number(0)
+        , m_input_encoding("cp437")
+        , m_output_encoding("cp437")
+        , m_is_session_logged_in(false)
+        , m_is_leaving(false)
+        , m_is_esc_timer(false)
+        , m_raw_data("")
+        , m_parsed_data("")
+    {
+        std::cout << "SessionData" << std::endl;
+    }
+
+    ~SessionData()
+    {
+        std::cout << "~SessionData" << std::endl;
+    }
+
+    /**
+     * @brief Data Handler for incoming Data (From Client)
+     */
+    void waitingForData()
+    {
+        // Important, clear out buffer before each read.
+        memset(&m_raw_data, 0, max_length);
+        m_tcp_connection->m_socket.async_read_some(boost::asio::buffer(m_raw_data, max_length),
+                boost::bind(&SessionData::handleRead, shared_from_this(),
+                            boost::asio::placeholders::error,
+                            boost::asio::placeholders::bytes_transferred));
+    }
+
+    /**
+     * @brief Handle Telnet Options in incoming data
+     * raw data is read in from socket
+     * m_parsed_data is filled with parsed out options.
+     */
+    void handleTeloptCodes()
+    {
+        unsigned char ch = 0;
+
+        for(unsigned char c : m_raw_data)
+        {
+            try
+            {
+                // Enter the Telnet_State and handle parsing options.
+                ch = m_telnet_state->telnetOptionParse(c);
+            }
+            catch(std::exception& e)
+            {
+                std::cout << "Exception telnet_process_char: " << e.what() << std::endl;
+            }
+
+            // Skip any incoming nulls, nulls are also return on Telnet options received
+            // So we know that there is no valid text data to send to the client.
+            if(ch == '\0')
+            {
+                continue;
+            }
+
+            // Incoming Buffer is filled and Telnet options are parsed out.
+            m_parsed_data += ch;
+        }
+        // Clear the Session's Socket Buffer for next set of data.
+        memset(&m_raw_data, 0, max_length);
+    }
+
+    /**
+     * @brief Callback after data received. handles telnet options
+     * Then parses out normal text data from client to server.
+     * @param error
+     * @param bytes_transferred
+     */
+    void handleRead(const boost::system::error_code& error, size_t bytes_transferred);
+
+
+    /**
+     * @brief delivers text data to client
+     * @param msg
+     */
+    void deliver(const std::string &msg)
+    {
+        if(msg.size() == 0 || msg[0] == '\0')
+        {
+            return;
+        }
+
+        // std::cout << "session struct: [" << msg << "]" << std::endl; // TEST
+        if(m_tcp_connection->m_socket.is_open())
+        {
+            boost::asio::async_write(m_tcp_connection->m_socket,
+                                     boost::asio::buffer(msg, msg.size()),
+                                     boost::bind(&SessionData::handleWrite, shared_from_this(),
+                                                 boost::asio::placeholders::error));
+        }
+    }
+
+
+    /**
+     * @brief Callback after Writing Data, If error/hangup notifies
+     * everything this person has left.
+     * @param error
+     */
+    void handleWrite(const boost::system::error_code& error)
+    {
+        if(error)
+        {
+            std::cout << "async_write error: " << error.message() << std::endl;
+            std::cout << "Session Closed()" << std::endl;
+        }
+
+        board_caster_ptr room = m_room.lock();
+        if(room && error && (!m_is_leaving))
+        {
+            m_is_leaving = true;
+
+            // Disconenct the session.
+            room->leave(m_node_number);
+
+            if(m_tcp_connection->m_socket.is_open())
+            {
+                std::cout << "Leaving 111 Peer IP: "
+                          << m_tcp_connection->m_socket.remote_endpoint().address().to_string()
+                          << std::endl;
+
+                m_tcp_connection->m_socket.shutdown(tcp::socket::shutdown_both);
+                m_tcp_connection->m_socket.close();
+            }
+        }
+    }
+
+    /**
+     * @brief Start ESC Key input timer
+     */
+    void startEscapeTimer()
+    {
+        // Add Deadline Timer for .400 milliseconds for complete ESC Sequences.
+        // Is no other input or part of ESC Sequecnes ie.. [A following the ESC
+        // Then it's an ESC key, otherwise capture the rest of the sequence.
+        m_input_deadline.expires_from_now(boost::posix_time::milliseconds(400));
+        m_input_deadline.async_wait(
+            boost::bind(&SessionData::handleEscTimer, shared_from_this(), &m_input_deadline));
+    }
+
+private:
+
+    /**
+     * @brief Deadline Input Timer for ESC vs ESC Sequence.
+     * @param timer
+     */
+    void handleEscTimer(boost::asio::deadline_timer* timer);
+    
+public:
+
+    connection_ptr    m_tcp_connection;
+    board_caster_wptr m_room;
+    telnet_ptr        m_telnet_state;
+    deadline_timer    m_input_deadline;
+    menu_manager_ptr  m_menu_manager;
+    UserRec           m_user_record;
+
+    int               m_node_number;
+    std::string       m_input_encoding;
+    std::string       m_output_encoding;
+    bool              m_is_session_logged_in;
+    bool              m_is_leaving;
+    bool              m_is_esc_timer;
+
+
+    enum { max_length = 4096 };
+    char m_raw_data[max_length];  // Raw Incoming
+    std::string m_parsed_data;    // Telnet Opts parsed out
+
+};
+
+typedef boost::shared_ptr<SessionData> session_data_ptr;
+
+#endif // SESSION_DATA_HPP
