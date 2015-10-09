@@ -9,7 +9,7 @@ Oblivion/2 XRM
 ===============
 
 A text based bulletin board system served over Telnet.  
-XRM for (Extreme Remake) is my attempt to recreate and emulate one of the most popular DOS basesd BBS software with its once of a kind interface and configurability.
+XRM for (Extreme Remake) is my attempt to recreate and emulate one of the most popular DOS basesd BBS software with its one of a kind interface and configurability.
 
 
 
