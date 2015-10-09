@@ -35,6 +35,13 @@
     <File Name="../src/common_io.cpp"/>
     <File Name="common_io_ut.cpp"/>
     <File Name="session_io_ut.cpp"/>
+    <File Name="../src/session_io.cpp"/>
+    <File Name="../src/session_io.hpp"/>
+    <File Name="../src/broad_caster.cpp"/>
+    <File Name="../src/broad_caster.hpp"/>
+    <File Name="ansi_processor_ut.cpp"/>
+    <File Name="../src/ansi_processor.cpp"/>
+    <File Name="../src/ansi_processor.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

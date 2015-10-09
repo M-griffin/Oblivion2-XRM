@@ -1,10 +1,8 @@
-
 /**
  * @brief Oblivion/2 XRM Unit Tests for SessionIO.
  * @return
  */
 
-//#include "session_io_ut.hpp"
 #include "session_io.hpp"
 
 #ifdef _WIN32
@@ -19,7 +17,7 @@
 #include <stdexcept>
 
 
-SUITE(EnthralSessionIO)
+SUITE(XRMSessionIO)
 {
     // We Can only test some of the inital setup here.
     // The Rest of the functions all rely on STDIO

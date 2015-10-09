@@ -1,4 +1,3 @@
-
 /**
  * @brief Oblivion/2 XRM Unit Tests for CommonIO.
  * @return
@@ -21,7 +20,7 @@
  * @brief Test Suit for CommonIO Class.
  * @return
  */
-SUITE(EnthralCommonIO)
+SUITE(XRMCommonIO)
 {
     // Test the Program Path is being read correctly.
     TEST(ProgramPath)
