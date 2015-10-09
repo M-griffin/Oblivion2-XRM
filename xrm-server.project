@@ -20,6 +20,47 @@
   </Plugins>
   <Description/>
   <Dependencies/>
+  <VirtualDirectory Name="src">
+    <File Name="src/ansi_processor.cpp"/>
+    <File Name="src/ansi_processor.hpp"/>
+    <File Name="src/broad_caster.cpp"/>
+    <File Name="src/broad_caster.hpp"/>
+    <File Name="src/chat_state.cpp"/>
+    <File Name="src/chat_state.hpp"/>
+    <File Name="src/common_io.cpp"/>
+    <File Name="src/common_io.hpp"/>
+    <File Name="src/communicator.cpp"/>
+    <File Name="src/communicator.hpp"/>
+    <File Name="src/language_prompts.cpp"/>
+    <File Name="src/language_prompts.hpp"/>
+    <File Name="src/main.cpp"/>
+    <File Name="src/menu_data.hpp"/>
+    <File Name="src/menu_manager.cpp"/>
+    <File Name="src/menu_manager.hpp"/>
+    <File Name="src/menu_system.cpp"/>
+    <File Name="src/menu_system.hpp"/>
+    <File Name="src/menu_system_editor.cpp"/>
+    <File Name="src/menu_system_prompts.cpp"/>
+    <File Name="src/messageQueue.hpp"/>
+    <File Name="src/safe_queue.hpp"/>
+    <File Name="src/server.hpp"/>
+    <File Name="src/session.hpp"/>
+    <File Name="src/session_data.cpp"/>
+    <File Name="src/session_data.hpp"/>
+    <File Name="src/session_io.cpp"/>
+    <File Name="src/session_io.hpp"/>
+    <File Name="src/state_machine.cpp"/>
+    <File Name="src/state_machine.hpp"/>
+    <File Name="src/struct.cpp"/>
+    <File Name="src/struct.hpp"/>
+    <File Name="src/system_state.cpp"/>
+    <File Name="src/system_state.hpp"/>
+    <File Name="src/tcp_connection.hpp"/>
+    <File Name="src/telnet.hpp"/>
+    <File Name="src/telnet_decoder.cpp"/>
+    <File Name="src/telnet_decoder.hpp"/>
+    <File Name="src/the_state.hpp"/>
+  </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
   <Settings Type="Executable">
@@ -136,45 +177,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="src">
-    <File Name="src/ansi_processor.cpp"/>
-    <File Name="src/ansi_processor.hpp"/>
-    <File Name="src/broad_caster.cpp"/>
-    <File Name="src/broad_caster.hpp"/>
-    <File Name="src/chat_state.cpp"/>
-    <File Name="src/chat_state.hpp"/>
-    <File Name="src/common_io.cpp"/>
-    <File Name="src/common_io.hpp"/>
-    <File Name="src/communicator.cpp"/>
-    <File Name="src/communicator.hpp"/>
-    <File Name="src/language_prompts.cpp"/>
-    <File Name="src/language_prompts.hpp"/>
-    <File Name="src/main.cpp"/>
-    <File Name="src/menu_data.hpp"/>
-    <File Name="src/menu_manager.cpp"/>
-    <File Name="src/menu_manager.hpp"/>
-    <File Name="src/menu_system.cpp"/>
-    <File Name="src/menu_system.hpp"/>
-    <File Name="src/menu_system_editor.cpp"/>
-    <File Name="src/menu_system_prompts.cpp"/>
-    <File Name="src/messageQueue.hpp"/>
-    <File Name="src/safe_queue.hpp"/>
-    <File Name="src/server.hpp"/>
-    <File Name="src/session.hpp"/>
-    <File Name="src/session_data.cpp"/>
-    <File Name="src/session_data.hpp"/>
-    <File Name="src/session_io.cpp"/>
-    <File Name="src/session_io.hpp"/>
-    <File Name="src/state_machine.cpp"/>
-    <File Name="src/state_machine.hpp"/>
-    <File Name="src/struct.cpp"/>
-    <File Name="src/struct.hpp"/>
-    <File Name="src/system_state.cpp"/>
-    <File Name="src/system_state.hpp"/>
-    <File Name="src/tcp_connection.hpp"/>
-    <File Name="src/telnet.hpp"/>
-    <File Name="src/telnet_decoder.cpp"/>
-    <File Name="src/telnet_decoder.hpp"/>
-    <File Name="src/the_state.hpp"/>
-  </VirtualDirectory>
 </CodeLite_Project>

@@ -3,10 +3,14 @@
  *   Copyright (C) 2015 by Michael Griffin
  */
 
-//#include "CommonIO_Test.hpp"
+//#include "common_io_ut.hpp"
 //#include "StandardIO_Test.hpp"
 
+#ifdef _WIN32
+#include <UnitTest++.h>
+#else
 #include <unittest++/UnitTest++.h>
+#endif
 
 // C Standard
 #include <cstdio>
@@ -17,6 +21,10 @@
 #include <vector>
 #include <stdexcept>
 
+std::string BBS_PATH = "";
+std::string DATA_PATH = "";
+std::string MENU_PATH = "";
+std::string TEXTFILE_PATH = "";
 
 /*
  * These Unit Tests are To test the core logic of classes and methods.

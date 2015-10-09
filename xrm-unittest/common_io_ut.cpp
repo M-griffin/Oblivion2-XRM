@@ -1,275 +1,302 @@
-/***************************************************************************
- *   Enthral BBS Alpha 2 - UNIT TESTS                                      *
- *   Copyright (C) 2004-2015 by Michael Griffin                            *
- *   mrmisticismo@hotmail.com                                              *
- *                                                                         *
- *   Purpose:                                                              *
- *                                                                         *
- *                                                                         *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- ***************************************************************************/
 
-#include "CommonIO_Test.hpp"
-#include "CommonIO.hpp"
+/**
+ * @brief Oblivion/2 XRM Unit Tests for CommonIO.
+ * @return
+ */
 
+#include "common_io.hpp"
+
+#ifdef _WIN32
+#include <UnitTest++.h>
+#else
 #include <unittest++/UnitTest++.h>
+#endif
 
-// C Standard
-//#include <cstdio>
-//#include <cstring>
 // C++ Standard
 #include <iostream>
 #include <string>
-//#include <vector>
 #include <stdexcept>
 
+/**
+ * @brief Test Suit for CommonIO Class.
+ * @return
+ */
 SUITE(EnthralCommonIO)
 {
     // Test the Program Path is being read correctly.
     TEST(ProgramPath)
     {
-        std::string myPath = common::GetProgramPath();
+        CommonIO common;
+        std::string myPath = common.getProgramPath();
         CHECK(!myPath.empty());
     }
 
     TEST(NumberOfCharacters)
     {
+        CommonIO common;
         std::string temp = "testing";
-        int length = common::NumberOfChars(temp);
+        int length = common.numberOfChars(temp);
         CHECK_EQUAL(length,7);
     }
 
     TEST(NumberOfCharactersEmpty)
     {
+        CommonIO common;
         std::string temp = "";
-        int length = common::NumberOfChars(temp);
+        int length = common.numberOfChars(temp);
         CHECK_EQUAL(length,0);
     }
 
     TEST(NumberOfCharactersUTF8)
     {
+        CommonIO common;
         std::string temp = "あにま! Linux";
-        int length = common::NumberOfChars(temp);
+        int length = common.numberOfChars(temp);
         CHECK_EQUAL(length,10);
     }
 
     TEST(LeftTrim)
     {
+        CommonIO common;
         std::string temp = "   Linux   ";
-        std::string left_temp = common::LeftTrim(temp);
+        std::string left_temp = common.leftTrim(temp);
         CHECK_EQUAL(left_temp,"Linux   ");
     }
 
     TEST(LeftTrimEmpty)
     {
+        CommonIO common;
         std::string temp = "";
-        std::string left_temp = common::LeftTrim(temp);
+        std::string left_temp = common.leftTrim(temp);
         CHECK_EQUAL(left_temp,"");
     }
 
     TEST(RightTrim)
     {
+        CommonIO common;
         std::string temp = "   Linux   ";
-        std::string right_temp = common::RightTrim(temp);
+        std::string right_temp = common.rightTrim(temp);
         CHECK_EQUAL(right_temp,"   Linux");
     }
 
     TEST(RightTrimEmpty)
     {
+        CommonIO common;
         std::string temp = "";
-        std::string right_temp = common::RightTrim(temp);
+        std::string right_temp = common.rightTrim(temp);
         CHECK_EQUAL(right_temp,"");
     }
 
     TEST(Trim)
     {
+        CommonIO common;
         std::string temp = "   Linux   ";
-        std::string trim_temp = common::Trim(temp);
+        std::string trim_temp = common.trim(temp);
         CHECK_EQUAL(trim_temp,"Linux");
     }
 
     TEST(TrimEmpty)
     {
+        CommonIO common;
         std::string temp = "";
-        std::string trim_temp = common::Trim(temp);
+        std::string trim_temp = common.trim(temp);
         CHECK_EQUAL(trim_temp,"");
     }
 
     TEST(EraseString)
     {
+        CommonIO common;
         std::string temp = "   Linux----";
-        std::string trim_temp = common::EraseString(temp, 6);
+        std::string trim_temp = common.eraseString(temp, 6);
         CHECK_EQUAL(trim_temp,"   Lin");
     }
 
     TEST(EraseString0)
     {
+        CommonIO common;
         std::string temp = "   Linux----";
-        std::string trim_temp = common::EraseString(temp, 0);
+        std::string trim_temp = common.eraseString(temp, 0);
         CHECK_EQUAL(trim_temp,"");
     }
 
     TEST(EraseStringEmpty)
     {
+        CommonIO common;
         std::string temp = "";
-        std::string trim_temp = common::EraseString(temp, 6);
+        std::string trim_temp = common.eraseString(temp, 6);
         CHECK_EQUAL(trim_temp,"");
     }
 
     TEST(EraseStringRange)
     {
+        CommonIO common;
         std::string temp = "testing";
-        std::string trim_temp = common::EraseString(temp, 0, 4);
+        std::string trim_temp = common.eraseString(temp, 0, 4);
         std::cout << "[" << trim_temp << "]" << std::endl;
         CHECK_EQUAL(trim_temp,"ing");
     }
 
     TEST(EraseStringRangePast)
     {
+        CommonIO common;
         std::string temp = "testing";
-        std::string trim_temp = common::EraseString(temp, 2, 20);
+        std::string trim_temp = common.eraseString(temp, 2, 20);
         std::cout << "[" << trim_temp << "]" << std::endl;
         CHECK_EQUAL(trim_temp,"te");
     }
 
     TEST(EraseStringRangeUTF8)
     {
+        CommonIO common;
         std::string temp = "あにま! Lin";
-        std::string trim_temp = common::EraseString(temp, 0, 2);
+        std::string trim_temp = common.eraseString(temp, 0, 2);
         std::cout << "[" << trim_temp << "]" << std::endl;
         CHECK_EQUAL(trim_temp,"ま! Lin");
     }
 
     TEST(EraseStringRangeUTF8_2)
     {
+        CommonIO common;
         std::string temp = "あにま! Lin";
-        std::string trim_temp = common::EraseString(temp, 1, 4);
+        std::string trim_temp = common.eraseString(temp, 1, 4);
         std::cout << "[" << trim_temp << "]" << std::endl;
         CHECK_EQUAL(trim_temp,"あLin");
     }
 
     TEST(RightPadding)
     {
+        CommonIO common;
         std::string temp = "---";
-        std::string padd_temp = common::RightPadding(temp, 6);
+        std::string padd_temp = common.rightPadding(temp, 6);
         CHECK_EQUAL(padd_temp,"---   ");
     }
 
     TEST(RightPaddingTruncate)
     {
+        CommonIO common;
         std::string temp = "------";
-        std::string padd_temp = common::RightPadding(temp, 3);
+        std::string padd_temp = common.rightPadding(temp, 3);
         CHECK_EQUAL(padd_temp,"---");
     }
 
     TEST(RightPaddingEmpty)
     {
+        CommonIO common;
         std::string temp = "";
-        std::string padd_temp = common::RightPadding(temp, 3);
+        std::string padd_temp = common.rightPadding(temp, 3);
         CHECK_EQUAL(padd_temp,"");
     }
 
     TEST(RightPadding0)
     {
+        CommonIO common;
         std::string temp = "---";
-        std::string padd_temp = common::RightPadding(temp, 0);
+        std::string padd_temp = common.rightPadding(temp, 0);
         CHECK_EQUAL(padd_temp,"---");
     }
 
     TEST(LeftPadding)
     {
+        CommonIO common;
         std::string temp = "---";
-        std::string padd_temp = common::LeftPadding(temp, 6);
+        std::string padd_temp = common.leftPadding(temp, 6);
         CHECK_EQUAL(padd_temp,"   ---");
     }
 
     TEST(LeftPaddingTruncate)
     {
+        CommonIO common;
         std::string temp = "------ ";
-        std::string padd_temp = common::LeftPadding(temp, 3);
+        std::string padd_temp = common.leftPadding(temp, 3);
         CHECK_EQUAL(padd_temp,"-- ");
     }
 
     TEST(LeftPaddingEmpty)
     {
+        CommonIO common;
         std::string temp = "";
-        std::string padd_temp = common::LeftPadding(temp, 3);
+        std::string padd_temp = common.leftPadding(temp, 3);
         CHECK_EQUAL(padd_temp,"");
     }
 
     TEST(LeftPadding0)
     {
+        CommonIO common;
         std::string temp = "---";
-        std::string padd_temp = common::LeftPadding(temp, 0);
+        std::string padd_temp = common.leftPadding(temp, 0);
         CHECK_EQUAL(padd_temp,"---");
     }
 
     TEST(MaskStringEmpty)
     {
+        CommonIO common;
         std::string temp = "";
-        std::string mask_temp = common::MaskString(temp);
+        std::string mask_temp = common.maskString(temp);
         CHECK_EQUAL(mask_temp,"");
     }
 
     TEST(MaskString)
     {
+        CommonIO common;
         std::string temp = "testing";
-        std::string mask_temp = common::MaskString(temp);
+        std::string mask_temp = common.maskString(temp);
         CHECK_EQUAL(mask_temp,"*******");
     }
 
     TEST(IsDigitBadPreceeding)
     {
+        CommonIO common;
         std::string temp = "a1";
-        bool result = common::IsDigit(temp);
+        bool result = common.isDigit(temp);
         CHECK_EQUAL(result, false);
     }
 
     TEST(IsDigitBadAfter)
     {
+        CommonIO common;
         std::string temp = "1a";
-        bool result = common::IsDigit(temp);
+        bool result = common.isDigit(temp);
         CHECK_EQUAL(result, false);
     }
 
     TEST(IsDigit)
     {
+        CommonIO common;
         std::string temp = "1";
-        bool result = common::IsDigit(temp);
+        bool result = common.isDigit(temp);
         CHECK_EQUAL(result, true);
     }
 
     TEST(IsDigitMultiple)
     {
+        CommonIO common;
         std::string temp = "125";
-        bool result = common::IsDigit(temp);
+        bool result = common.isDigit(temp);
         CHECK_EQUAL(result, true);
     }
 
     TEST(IsDigitUnicodeBadAfter)
     {
+        CommonIO common;
         std::string temp = "६a";
-        bool result = common::IsDigit(temp);
+        bool result = common.isDigit(temp);
         CHECK_EQUAL(result, false);
     }
 
     TEST(isDigitUnicodeMultiple)
     {
+        CommonIO common;
         std::string temp = "६೬";
-        bool result = common::IsDigit(temp);
+        bool result = common.isDigit(temp);
         CHECK_EQUAL(result, true);
     }
 
     TEST(isDigitUnicodeBadPreceeding)
     {
+        CommonIO common;
         std::string temp = "a६ ೬";
-        bool result = common::IsDigit(temp);
+        bool result = common.isDigit(temp);
         //std::cout << "[" << padd_temp << "]" << std::endl;
         CHECK_EQUAL(result, false);
     }
-
 }

@@ -1,4 +1,14 @@
 
+Change Log Update (00.00.04)
+* 2015-10-09 Unit Tests and Linux Makefiles
++ Updated support and dependencies for Unit Testing.
++ Converted and updated 34 Unit tests for CommonIO.
+- Next is to add NEW tests for SessionIO and MenuIO.
++ Updates Linux Makefile(s) for unit tests.  Also removed any
+  static paths that were generated from the project.
++ Added missing <stdint.h> in Common_io.hpp.
++ Make sure all unit test cross compile on Linux as well.
+
 Change Log Update (00.00.03)
 * 2015-10-08 Code Cleanup.
 + Cleaned up some comments and fixed any left over tab spacing.
