@@ -1,4 +1,3 @@
-
 #ifndef MENU_DATA_HPP
 #define MENU_DATA_HPP
 

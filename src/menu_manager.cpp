@@ -1,4 +1,3 @@
-
 #include "menu_manager.hpp"
 
 #include <boost/locale.hpp>

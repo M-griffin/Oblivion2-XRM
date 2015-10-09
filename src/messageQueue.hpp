@@ -1,12 +1,5 @@
-
 #ifndef MESSAGEQUEUE_HPP
 #define MESSAGEQUEUE_HPP
-
-// EtherTerm SVN: $Id$
-// Source: $HeadURL$
-// $LastChangedDate$
-// $LastChangedRevision$
-// $LastChangedBy$
 
 #include <iostream>
 #include <vector>
@@ -31,6 +24,5 @@ public:
         m_text.erase();
     }
 };
-
 
 #endif // MESSAGEQUEUE_HPP

@@ -1,4 +1,3 @@
-
 #include "chat_state.hpp"
 #include "session.hpp"
 

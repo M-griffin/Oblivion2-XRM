@@ -1,4 +1,3 @@
-
 #ifndef SYSTEM_STATE_HPP
 #define SYSTEM_STATE_HPP
 

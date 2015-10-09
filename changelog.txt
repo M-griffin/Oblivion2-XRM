@@ -1,4 +1,11 @@
 
+Change Log Update (00.00.05)
+* 2015-10-09 Unit Tests 
++ Completed Started Units Test on SessionIO
+- Class only 10% covered so far. more to go.
++ Completed 52 passing unit tests.
++ Various tweaks while working unit tests.
+
 Change Log Update (00.00.04)
 * 2015-10-09 Unit Tests and Linux Makefiles
 + Updated support and dependencies for Unit Testing.

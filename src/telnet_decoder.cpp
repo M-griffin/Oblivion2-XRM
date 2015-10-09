@@ -1,4 +1,3 @@
-
 #include "telnet_decoder.hpp"
 #include "telnet.hpp"
 

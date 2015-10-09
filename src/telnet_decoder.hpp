@@ -1,4 +1,3 @@
-
 #ifndef __TELNET_DECODER_H_
 #define __TELNET_DECODER_H_
 

@@ -1,4 +1,3 @@
-
 #ifndef ANSI_PROCESSOR_HPP
 #define ANSI_PROCESSOR_HPP
 

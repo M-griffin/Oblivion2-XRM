@@ -1,4 +1,3 @@
-
 #include "ansi_processor.hpp"
 #include "common_io.hpp"
 #include "struct.hpp"

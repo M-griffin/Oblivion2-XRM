@@ -1,4 +1,3 @@
-
 #include "session_data.hpp"
 #include "menu_manager.hpp"
 #include "broad_caster.hpp"

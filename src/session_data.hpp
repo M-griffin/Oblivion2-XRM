@@ -1,4 +1,3 @@
-
 #ifndef SESSION_DATA_HPP
 #define SESSION_DATA_HPP
 

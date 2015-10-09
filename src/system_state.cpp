@@ -1,4 +1,3 @@
-
 #include "system_state.hpp"
 #include "session.hpp"
 #include "menu_system.hpp"

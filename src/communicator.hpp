@@ -1,4 +1,3 @@
-
 #ifndef COMMUNICATOR_HPP
 #define COMMUNICATOR_HPP
 

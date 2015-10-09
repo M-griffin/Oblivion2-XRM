@@ -1,4 +1,3 @@
-
 #ifndef SESSION_IO_HPP
 #define SESSION_IO_HPP
 
@@ -22,7 +21,10 @@ public:
     ~SessionIO();
 
     /**
-     * @brief Single Key Input or Esc Sequence
+     * @brief Single Key Input or Esc Sequence parser.
+     *        Only Accepts single characters at a time then passes through.
+     *        Bascially all input passes through till there is something to display
+     *        Nothing loop on input in these functions to keep async.
      * @param character_buffer
      * @return
      */

@@ -1,4 +1,3 @@
-
 #ifndef BROAD_CASTER_HPP
 #define BROAD_CASTER_HPP
 

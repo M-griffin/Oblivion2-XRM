@@ -1,4 +1,3 @@
-
 #ifndef COMMONIO_HPP
 #define COMMONIO_HPP
 

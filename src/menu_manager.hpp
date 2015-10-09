@@ -1,4 +1,3 @@
-
 #ifndef MENU_MANAGER_HPP
 #define MENU_MANAGER_HPP
 

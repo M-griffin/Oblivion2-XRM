@@ -1,4 +1,3 @@
-
 #ifndef CHAT_STATE_HPP
 #define CHAT_STATE_HPP
 

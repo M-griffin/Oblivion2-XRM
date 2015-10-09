@@ -1,4 +1,3 @@
-
 #ifndef SAFE_QUEUE_HPP
 #define SAFE_QUEUE_HPP
 

@@ -1,4 +1,3 @@
-
 #ifndef SESSION_HPP
 #define SESSION_HPP
 
@@ -9,7 +8,6 @@
 #include "broad_caster.hpp"
 #include "telnet_decoder.hpp"
 #include "communicator.hpp"
-// New Session Data for Passing IO.
 #include "session_data.hpp"
 
 #include <boost/enable_shared_from_this.hpp>

@@ -1,4 +1,3 @@
-
 #ifndef THE_STATE_HPP
 #define THE_STATE_HPP
 

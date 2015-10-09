@@ -1,4 +1,3 @@
-
 #ifndef TELNET_HPP
 #define TELNET_HPP
 

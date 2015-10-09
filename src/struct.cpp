@@ -1,4 +1,3 @@
-
 #include "struct.hpp"
 
 #include <cstdio>

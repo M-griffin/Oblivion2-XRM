@@ -1,5 +1,3 @@
-
-
 #include "state_machine.hpp"
 
 #include <boost/locale.hpp>

@@ -1,4 +1,3 @@
-
 #include "common_io.hpp"
 #include "struct.hpp"
 
@@ -765,11 +764,27 @@ std::string CommonIO::getEscapeSequence()
 
 /**
  * @brief Parses Input and breaks out ESC Sequences.
+ *        Sequences are handled 1 character at a time.
  * @return
  */
 std::string CommonIO::parseInput(const std::string &character_buffer)
 {
     //std::cout << "character_buffer: " << character_buffer << std::endl;
+    int num = numberOfChars(character_buffer);
+    if (num == 0 && m_is_escape_sequence)
+    {
+        // This a null after an ESC..
+        m_is_escape_sequence = false;
+        m_escape_sequence.erase();
+        m_string_buffer.erase();
+        return "\x1b";
+    }
+    else if (num != 1)
+    {    
+        std::cout << "This function only expects single characters, text or unicode multi-byte."
+                  << std::endl;
+        return "";
+    }
 
     // Don't process concurent multiple esc sequences.
     // if we get a second, return the first and check if we
@@ -792,16 +807,6 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
             m_string_buffer.erase();
             return "\x1b";
         }
-    }
-
-    // If we have an ESC Character in the buffer and we get a null
-    // That means we received a single ESC key, return ESC
-    if(m_is_escape_sequence && character_buffer[0] == '\0')
-    {
-        m_is_escape_sequence = false;
-        m_escape_sequence.erase();
-        m_string_buffer.erase();
-        return "\x1b";
     }
 
     // Reset, handle if we got a second Escape or two ESC keys in a row.
@@ -1014,7 +1019,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         m_line_buffer += leadoff;
 
         // Trim if were past the length limit
-        if ((signed)numberOfChars(m_line_buffer) > length)
+        if((signed)numberOfChars(m_line_buffer) > length)
         {
             std::string temp = leftPadding(m_line_buffer, length);
             m_line_buffer = std::move(temp);
@@ -1180,7 +1185,7 @@ void CommonIO::CStringToPascal(int8_t *string)
     newstring[0] = length;
 
     // Pascal Strings can't be longer then 254 with first byte length.
-    if (length >= 255) length = 254;
+    if(length >= 255) length = 254;
     for(auto i = 1; i <= length; i++)
     {
         newstring += string[i];
@@ -1221,13 +1226,13 @@ void CommonIO::parseLocalMCI(std::string &AnsiString, std::string mcicode, std::
     {
         // Parse New Message's MCI Code
         id1 = AnsiString.find(mcicode, 0);
-        if (id1 != std::string::npos)
+        if(id1 != std::string::npos)
         {
             AnsiString.replace(id1, mcicode.size(), replacement);
             id1 = AnsiString.find(mcicode, 0);
         }
     }
-    while (id1 != std::string::npos);
+    while(id1 != std::string::npos);
 }
 
 
@@ -1248,7 +1253,7 @@ void CommonIO::readinAnsi(std::string FileName, std::string &buff)
     std::string::size_type id1 = 0;
 
     int c = 0;
-    if ((fp = fopen(path.c_str(), "r+")) ==  NULL)
+    if((fp = fopen(path.c_str(), "r+")) ==  NULL)
     {
         std::cout << "<ERROR> ANSI not found: " << path << std::endl;
         return;
@@ -1256,10 +1261,10 @@ void CommonIO::readinAnsi(std::string FileName, std::string &buff)
     do
     {
         c = getc(fp);
-        if (c != EOF)
+        if(c != EOF)
             buff += c;
     }
-    while (c != EOF);
+    while(c != EOF);
 
     // If we have clear, replace with MCI code so it will add
     // Clear then Also goto [1,1] Home Cursor Position.

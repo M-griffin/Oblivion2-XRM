@@ -2,7 +2,6 @@
 #define STATE_MACHINE_HPP
 
 #include "the_state.hpp"
-//#include "struct.hpp"
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>

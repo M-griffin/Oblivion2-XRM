@@ -1,4 +1,3 @@
-
 #include "communicator.hpp"
 #include "struct.hpp"
 
