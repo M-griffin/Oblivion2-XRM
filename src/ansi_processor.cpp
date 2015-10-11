@@ -431,13 +431,13 @@ void AnsiProcessor::screenBufferClearRange(int start, int end)
 
 /**
  * @brief Parses screen data into the Screen Buffer.
- * @param buff
  * @return
  */
-std::string AnsiProcessor::parseAnsiScreen(char *buff)
+void AnsiProcessor::parseAnsiScreen(char *buff)
 {
-//    std::string outchar;
-//    std::string output_screen; // Finished ANSI Screen
+    if (strlen(buff) == 0)
+        return;
+
     std::string esc_sequence;
 
     int  param[10]             = {0};
@@ -924,6 +924,4 @@ std::string AnsiProcessor::parseAnsiScreen(char *buff)
             esc_sequence.erase();
         }
     }   // end while !feof
-
-    return "";
 }

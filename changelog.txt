@@ -1,17 +1,25 @@
 
+Change Log Update (00.00.07)
+* 2015-10-09
++ Working on next method for SessionIO, Added start of 
+  ScreenBuffer testing for AnsiProcessor.
++ 63 Unit Tests so far. Only had a little time tonight
++ Various updates to Session and ConsoleIO
+
+
 Change Log Update (00.00.06)
 * 2015-10-09 Unit Tests & Start ARM Makefiles
-+ Updates some Test Names, and started UnitTests for AnsiProcessor.
++ Updates some Test Names, and Started UnitTests for AnsiProcessor.
 + Testing and working on ARM Makefiles for Pi/2 in Raspbian.
   More preliminary researching on what needs to be done.
 - Small issues with outdated packages, Sqlite3 is 3.7.13, and 
   we need at least 3.7.14 for sqlite3_close_v2 UTF8 version.
-  This is from 2012, a little outdated Debian, I think so!
+  This is from 2012,  a little outdated Debian, I think so!
 - gcc also needs to be at least 4.8.x for c++11 support.
-  default is like 4.6 maybe 4.7. I upgrade this a long time ago.
+  default is like 4.6 maybe 4.7.  I upgraded this a long time ago.
 - Will eventually put together some apt-get install command lines
   that will pull all required dependency packages for quick builds.
-  However, ARM builds will take some manual updating.
+  However, ARM builds will take some manual updating. :)
 
 Change Log Update (00.00.05)
 * 2015-10-09 Unit Tests 

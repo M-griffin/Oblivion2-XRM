@@ -38,7 +38,25 @@ SUITE(XRMSessionIO)
      *        session_data also keeps track of
      * @return
      */
-    TEST(InputKeyNormalCharacter)
+
+
+     /**
+     * @brief Input Key Tetes, Receives Characters 1 at a time, stores and processes.
+     *        Only passing through or building esc sequences.
+     * @return
+     */
+    TEST(InputKey_Empty)
+    {
+        // Normal Characters and sequences should pass through
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer = "";
+        std::string result = sess.getKeyInput(character_buffer);
+        CHECK(result.compare(character_buffer) == 0);
+    }
+
+    TEST(InputKey_Normal_Character)
     {
         // Normal Characters and sequences should pass through
         session_data_ptr session_data;
@@ -49,7 +67,7 @@ SUITE(XRMSessionIO)
         CHECK(result.compare(character_buffer) == 0);
     }
 
-    TEST(InputKeyDoubleCharacterExpectEmpty)
+    TEST(InputKey_Double_Character_Expect_Empty)
     {
         session_data_ptr session_data;
         SessionIO sess(session_data);
@@ -59,7 +77,7 @@ SUITE(XRMSessionIO)
         CHECK(result.compare("") == 0);
     }
 
-    TEST(InputKeyUniCodeCharacter)
+    TEST(InputKey_UniCode_Character)
     {
         // Normal Unicode Characters and sequences should pass through
         session_data_ptr session_data;
@@ -70,7 +88,7 @@ SUITE(XRMSessionIO)
         CHECK(result.compare(character_buffer) == 0);
     }
 
-    TEST(InputKeyTwoUniCodeCharacterExpectEmpty)
+    TEST(InputKey_Two_UniCode_Character_Expect_Empty)
     {
         session_data_ptr session_data;
         SessionIO sess(session_data);
@@ -80,7 +98,7 @@ SUITE(XRMSessionIO)
         CHECK(result.compare("") == 0);
     }
 
-    TEST(InputKeyMixNormalAndUniCodeCharacterExpectEmpty)
+    TEST(InputKey_Mix_Normal_And_UniCode_Character_Expect_Empty)
     {
         session_data_ptr session_data;
         SessionIO sess(session_data);
@@ -90,7 +108,7 @@ SUITE(XRMSessionIO)
         CHECK(result.compare("") == 0);
     }
 
-    TEST(InputKeyMixNormalAndUniCodeCharacter2ExpectEmpty)
+    TEST(InputKey_Mix_Normal_And_UniCode_Characters2_Expect_Empty)
     {
         session_data_ptr session_data;
         SessionIO sess(session_data);
@@ -100,7 +118,7 @@ SUITE(XRMSessionIO)
         CHECK(result.compare("") == 0);
     }
 
-    TEST(InputKeyMixNormalAndUniCodeCharacter3ExpectEmpty)
+    TEST(InputKey_Mix_Normal_And_UniCode_Character3_Expect_Empty)
     {
         session_data_ptr session_data;
         SessionIO sess(session_data);
@@ -110,7 +128,7 @@ SUITE(XRMSessionIO)
         CHECK(result.compare("") == 0);
     }
 
-    TEST(InputKeyEscapeExpectEmptyThenEsc)
+    TEST(InputKey_Escape_Expect_Empty_Then_Esc)
     {
         // First ESC waits for \0 to signal it's single ESC key
         session_data_ptr session_data;
@@ -126,9 +144,8 @@ SUITE(XRMSessionIO)
         CHECK((result.compare("\x1b") == 0));
     }
 
-    TEST(InputKeyEscapeSequenceUpArrowFailure)
+    TEST(InputKey_Escape_Sequence_Up_Arrow_Failure)
     {
-        // One key per sequence at a time.
         session_data_ptr session_data;
         SessionIO sess(session_data);
 
@@ -137,9 +154,8 @@ SUITE(XRMSessionIO)
         CHECK((result.compare("") == 0));
     }
 
-    TEST(InputKeyEscapeSequenceUpArrowSequence)
+    TEST(InputKey_Escape_Sequence_Up_Arrow_Sequence)
     {
-        // One key per sequence at a time.
         session_data_ptr session_data;
         SessionIO sess(session_data);
 
@@ -156,9 +172,8 @@ SUITE(XRMSessionIO)
         CHECK((result.compare("\x1b""up_arrow") == 0));
     }
 
-    TEST(InputKeyEscapeSequenceDnArrowSequence)
+    TEST(InputKey_Escape_Sequence_Dn_Arrow_Sequence)
     {
-        // One key per sequence at a time.
         session_data_ptr session_data;
         SessionIO sess(session_data);
 
@@ -172,13 +187,11 @@ SUITE(XRMSessionIO)
 
         character_buffer = "B";
         result = sess.getKeyInput(character_buffer);
-        std::cout << "\n RESULT: [" << result << "]" << std::endl;
         CHECK((result.compare("\x1b""dn_arrow") == 0));
     }
 
-    TEST(InputKeyEscapeSequenceLtArrowSequence)
+    TEST(InputKey_Escape_Sequence_Lt_Arrow_Sequence)
     {
-        // One key per sequence at a time.
         session_data_ptr session_data;
         SessionIO sess(session_data);
 
@@ -192,13 +205,11 @@ SUITE(XRMSessionIO)
 
         character_buffer = "D";
         result = sess.getKeyInput(character_buffer);
-        std::cout << "\n RESULT: [" << result << "]" << std::endl;
         CHECK((result.compare("\x1b""lt_arrow") == 0));
     }
 
-    TEST(InputKeyEscapeSequenceRtArrowSequence)
+    TEST(InputKey_Escape_Sequence_Rt_Arrow_Sequence)
     {
-        // One key per sequence at a time.
         session_data_ptr session_data;
         SessionIO sess(session_data);
 
@@ -212,13 +223,11 @@ SUITE(XRMSessionIO)
 
         character_buffer = "C";
         result = sess.getKeyInput(character_buffer);
-        std::cout << "\n RESULT: [" << result << "]" << std::endl;
         CHECK((result.compare("\x1b""rt_arrow") == 0));
     }
 
-    TEST(InputKeyEscapeSequenceHardwareUpArrowSequence)
+    TEST(InputKey_Escape_Sequence_Hardware_Up_Arrow_Sequence)
     {
-        // One key per sequence at a time.
         session_data_ptr session_data;
         SessionIO sess(session_data);
 
@@ -235,9 +244,8 @@ SUITE(XRMSessionIO)
         CHECK((result.compare("\x1b""up_arrow") == 0));
     }
 
-    TEST(InputKeyEscapeSequenceHardwareDnArrowSequence)
+    TEST(InputKey_Escape_Sequence_Hardware_Dn_Arrow_Sequence)
     {
-        // One key per sequence at a time.
         session_data_ptr session_data;
         SessionIO sess(session_data);
 
@@ -254,9 +262,8 @@ SUITE(XRMSessionIO)
         CHECK((result.compare("\x1b""dn_arrow") == 0));
     }
 
-    TEST(InputKeyEscapeSequenceHardwareLtArrowSequence)
+    TEST(InputKey_Escape_Sequence_Hardware_Lt_Arrow_Sequence)
     {
-        // One key per sequence at a time.
         session_data_ptr session_data;
         SessionIO sess(session_data);
 
@@ -273,9 +280,8 @@ SUITE(XRMSessionIO)
         CHECK((result.compare("\x1b""lt_arrow") == 0));
     }
 
-    TEST(InputKeyEscapeSequenceHardwareRtArrowSequence)
+    TEST(InputKey_Escape_Sequence_Hardware_Rt_Arrow_Sequence)
     {
-        // One key per sequence at a time.
         session_data_ptr session_data;
         SessionIO sess(session_data);
 
@@ -292,10 +298,8 @@ SUITE(XRMSessionIO)
         CHECK((result.compare("\x1b""rt_arrow") == 0));
     }
 
-
-    TEST(InputKeyEscapeSequenceEscTwiceReturnsEsc)
+    TEST(InputKey_Escape_Sequence_Esc_Twice_Returns_Esc)
     {
-        // One key per sequence at a time.
         session_data_ptr session_data;
         SessionIO sess(session_data);
 
@@ -305,9 +309,93 @@ SUITE(XRMSessionIO)
 
         character_buffer = "\x1b";
         result = sess.getKeyInput(character_buffer);
-        std::cout << "\n RESULT: [" << result << "]" << std::endl;
         CHECK((result.compare("\x1b") == 0));
     }
+
+
+    /**
+     * @brief Create Input Field Tests
+     * @return
+     */
+    TEST(createInputField_Empty_Returns_Empty)
+    {
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer = "";
+        int length = 0;
+        sess.createInputField(character_buffer, length);
+        CHECK((character_buffer.compare("") == 0));
+    }
+
+    TEST(createInputField_0_Length_Retuns_Field_Name)
+    {
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer = "Testing";
+        int length = 0;
+        sess.createInputField(character_buffer, length);
+        CHECK((character_buffer.compare("Testing") == 0));
+    }
+
+    TEST(createInputField_1_Length_Retuns_Field_Name_1_Length_ANSI_Field)
+    {
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer = "Testing ";
+        int length = 1;
+        sess.createInputField(character_buffer, length);
+        CHECK((character_buffer.compare("Testing |00|19 \x1b[2D") == 0));
+    }
+
+    TEST(createInputField_10_Length_Retuns_Field_Name_10_Length_ANSI_Field)
+    {
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer = "Testing ";
+        int length = 10;
+        sess.createInputField(character_buffer, length);
+        CHECK((character_buffer.compare("Testing |00|19          \x1b[11D") == 0));
+    }
+
+    TEST(createInputField_10_Length_Retuns_Field_Name_Override_Input_Length)
+    {
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer = "Testing %IN17";
+        int length = 10;
+        sess.createInputField(character_buffer, length);
+        CHECK((character_buffer.compare("Testing |00|19                 \x1b[18D") == 0));
+    }
+
+    TEST(createInputField_10_Length_Retuns_Field_Name_Override_Input_Length_And_Color)
+    {
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer = "Testing %IN17%FB0116";
+        int length = 10;
+        sess.createInputField(character_buffer, length);
+        std::cout << "\n RESULT: [" << character_buffer << "]" << std::endl;
+        CHECK((character_buffer.compare("Testing |01|16                 \x1b[18D") == 0));
+    }
+
+    TEST(createInputField_10_Length_Retuns_Field_Name_Override_Color_Only)
+    {
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer = "Testing: %FB0116";
+        int length = 10;
+        sess.createInputField(character_buffer, length);
+        std::cout << "\n RESULT: [" << character_buffer << "]" << std::endl;
+        CHECK((character_buffer.compare("Testing: |01|16          \x1b[11D") == 0));
+    }
+
 
 
 

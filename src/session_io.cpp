@@ -96,8 +96,11 @@ void SessionIO::createInputField(std::string &text, int &len)
                 sTmp[1] = text[position+4];
                 text.erase(position, 5);
                 tempLength = atoi(sTmp);
-                if((signed)tempLength < len)
+                if((signed)tempLength > 0)
+                {
                     len = tempLength; // Set new Length
+                }
+
             }
             else
                 text.erase(position, 3);
@@ -106,9 +109,12 @@ void SessionIO::createInputField(std::string &text, int &len)
 
     // Overide Foreground/Background Input Field Colors
     position = text.find("%FB",0);
+
+    std::cout << "position: " <<  position << std::endl;
+    std::cout << "compare : " << position+4 << " " <<  stringSize << std::endl;
+
     if(position != std::string::npos)
     {
-
         // (Unit Test Notes)
         // Need to Test if isDigit!  And only if, both are
         // Then we cut these out and erase!,  Otherwise
@@ -146,15 +152,14 @@ void SessionIO::createInputField(std::string &text, int &len)
     // Set Default Input Color if none was passed.
     if(!isColorOverRide)
     {
-        sprintf(INPUT_COLOR,"|00|19");
+        sprintf(INPUT_COLOR,"|00|19"); // make theme
     }
 
     // Format Input Field
-    sprintf(formatted, "%s|07|16[%s%s|07|16]%s\x1b[%iD",
+    sprintf(formatted, "%s%s%s\x1b[%iD",
             (char *)text.c_str(), // Field Name
             INPUT_COLOR,          // Field Fg,Bg Color
             repeat.c_str(),       // Padding length of Field
-            INPUT_COLOR,          // Reset Input
             len+1);               // Move back to starting position of field.
 
     text = formatted;
@@ -348,19 +353,19 @@ std::string SessionIO::pipeColors(const std::string &color_string)
     std::istringstream ss(str);
     int color_index = 0;
     ss >> color_index;
-    if (ss.fail())
+    if(ss.fail())
     {
         return "";
     }
 
     // Foreground Colors
-    if (color_index >= 0 && color_index < 16)
+    if(color_index >= 0 && color_index < 16)
     {
         esc_sequence = std::move(pipeReplaceForground(color_index));
         return esc_sequence;
     }
     // Background Colors
-    else if (color_index >= 16 && color_index < 24)
+    else if(color_index >= 16 && color_index < 24)
     {
         esc_sequence = std::move(pipeReplaceBackground(color_index));
         return esc_sequence;
@@ -378,40 +383,40 @@ std::string SessionIO::parsePipeWithCharsDigits(const std::string &code, int val
     std::string sequence = "";
 
     // Check Single letter Sequences
-    if (code.size() == 1)
+    if(code.size() == 1)
     {
-        switch (code[0])
+        switch(code[0])
         {
             case 'U': // Up
-                if (value == 0 || value == 1)
+                if(value == 0 || value == 1)
                     sequence = "\x1b[A";
                 else
                     sequence = "\x1b[" + std::to_string(value) + "A";
                 break;
 
             case 'D': // Down
-                if (value == 0 || value == 1)
+                if(value == 0 || value == 1)
                     sequence = "\x1b[B";
                 else
                     sequence = "\x1b[" + std::to_string(value) + "B";
                 break;
 
             case 'F': // Forward
-                if (value == 0 || value == 1)
+                if(value == 0 || value == 1)
                     sequence = "\x1b[C";
                 else
                     sequence = "\x1b[" + std::to_string(value) + "C";
                 break;
 
             case 'B': // Backwards
-                if (value == 0 || value == 1)
+                if(value == 0 || value == 1)
                     sequence = "\x1b[D";
                 else
                     sequence = "\x1b[" + std::to_string(value) + "D";
                 break;
 
             case 'X': // Absolute X Position
-                if (value == 0 || value == 1)
+                if(value == 0 || value == 1)
                     sequence = "\x1b[G";
                 else
                     sequence = "\x1b[" + std::to_string(value) + "G";
@@ -441,7 +446,7 @@ std::string SessionIO::seperatePipeWithCharsDigits(const std::string &pipe_code)
     int alpha_chars  = 0;
 
     // Figure out if were dealing with 1 or 2 Digit Character Codes.
-    if (isdigit(str[1]))  // |Xxx ?
+    if(isdigit(str[1]))   // |Xxx ?
     {
         alpha_chars = 1;
     }
@@ -460,7 +465,7 @@ std::string SessionIO::seperatePipeWithCharsDigits(const std::string &pipe_code)
     std::istringstream ss(str);
     int pipe_index = 0;
     ss >> pipe_index;
-    if (ss.fail())
+    if(ss.fail())
     {
         return "";
     }
@@ -481,10 +486,10 @@ std::string SessionIO::parsePipeWithChars(const std::string &pipe_code)
 
     // Make this more dynamic?!?
 
-    switch (pipe_code[1])
+    switch(pipe_code[1])
     {
-        // Most likely will break these out later bye pipe[1] and send [2] to other functions
-        // To Keep small and compact!
+            // Most likely will break these out later bye pipe[1] and send [2] to other functions
+            // To Keep small and compact!
         case 'C':
             switch(pipe_code[2])
             {
@@ -530,7 +535,7 @@ std::string SessionIO::parsePipeWithChars(const std::string &pipe_code)
  * @return
  */
 std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
-{    
+{
     // Contains all matches found so we can iterate and reaplace
     // Without Multiple loops through the string.
     MapType my_matches;
@@ -599,7 +604,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
     // All Global MCI Codes likes standard screens and colors will
     // He handled here, then specific interfaces will break out below this.
     // Break out parsing on which pattern was matched.
-    while (code_map.size() > 0)
+    while(code_map.size() > 0)
     {
         // Loop Backwards to perserve string offsets on replacement.
         my_matches = code_map.back();
@@ -611,7 +616,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
             case 1: // Pipe w/ 2 DIDIT Colors
                 {
                     std::string result = std::move(pipeColors(my_matches.m_code));
-                    if (result.size() != 0)
+                    if(result.size() != 0)
                     {
                         // Replace the string
                         ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
@@ -626,7 +631,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
             case 2: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
                 {
                     std::string result = std::move(seperatePipeWithCharsDigits(my_matches.m_code));
-                    if (result.size() != 0)
+                    if(result.size() != 0)
                     {
                         // Replace the string
                         ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
@@ -639,7 +644,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
                 // Pass the original string becasue of |DE for delay!
                 {
                     std::string result = std::move(parsePipeWithChars(my_matches.m_code));
-                    if (result.size() != 0)
+                    if(result.size() != 0)
                     {
                         // Replace the string
                         ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
@@ -658,7 +663,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
                 break;
 
             case 5: // Pipe w/ 2 Chars and 4 Digits
-                    // Mainly used for absolute XY position |XY0101
+                // Mainly used for absolute XY position |XY0101
                 {
                     ansi_string.replace(my_matches.m_offset, my_matches.m_length, "       ");
                 }
@@ -693,4 +698,3 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
     std::vector<MapType>().swap(code_map);
     return ansi_string;
 }
-

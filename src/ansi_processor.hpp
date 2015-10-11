@@ -138,7 +138,7 @@ public:
     void screenBufferClear();
 
     // Process ANSI screen inserts into the Screen Buffer
-    std::string parseAnsiScreen(char *buff);  // 1
+    void parseAnsiScreen(char *buff);  // 1
 
 };
 

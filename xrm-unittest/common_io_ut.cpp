@@ -22,7 +22,6 @@
  */
 SUITE(XRMCommonIO)
 {
-    // Test the Program Path is being read correctly.
     TEST(ProgramPath)
     {
         CommonIO common;
@@ -54,6 +53,10 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(length,10);
     }
 
+    /**
+     * @brief Left of string, remove spaces.
+     * @return
+     */
     TEST(LeftTrim)
     {
         CommonIO common;
@@ -70,6 +73,10 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(left_temp,"");
     }
 
+    /**
+     * @brief Right of String Remove spaces
+     * @return
+     */
     TEST(RightTrim)
     {
         CommonIO common;
@@ -86,6 +93,10 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(right_temp,"");
     }
 
+    /**
+     * @brief Remove all spaces left or right of text.
+     * @return
+     */
     TEST(Trim)
     {
         CommonIO common;
@@ -102,6 +113,10 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(trim_temp,"");
     }
 
+    /**
+     * @brief Erase Data in a String w/ start, end range.
+     * @return
+     */
     TEST(EraseString)
     {
         CommonIO common;
@@ -118,7 +133,7 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(trim_temp,"");
     }
 
-    TEST(EraseStringEmpty)
+    TEST(EraseString_Empty)
     {
         CommonIO common;
         std::string temp = "";
@@ -126,7 +141,7 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(trim_temp,"");
     }
 
-    TEST(EraseStringRange)
+    TEST(EraseString_Range)
     {
         CommonIO common;
         std::string temp = "testing";
@@ -135,7 +150,7 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(trim_temp,"ing");
     }
 
-    TEST(EraseStringRangePast)
+    TEST(EraseString_Range_Past)
     {
         CommonIO common;
         std::string temp = "testing";
@@ -144,7 +159,7 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(trim_temp,"te");
     }
 
-    TEST(EraseStringRangeUTF8)
+    TEST(EraseString_Range_UTF8)
     {
         CommonIO common;
         std::string temp = "あにま! Lin";
@@ -153,7 +168,7 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(trim_temp,"ま! Lin");
     }
 
-    TEST(EraseStringRangeUTF8_2)
+    TEST(EraseString_Range_UTF8_2)
     {
         CommonIO common;
         std::string temp = "あにま! Lin";
@@ -162,6 +177,10 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(trim_temp,"あLin");
     }
 
+    /**
+     * @brief Pad Sapces on the right of the string, also truncates for absolute field lengths.
+     * @return
+     */
     TEST(RightPadding)
     {
         CommonIO common;
@@ -170,7 +189,7 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(padd_temp,"---   ");
     }
 
-    TEST(RightPaddingTruncate)
+    TEST(RightPadding_Truncate)
     {
         CommonIO common;
         std::string temp = "------";
@@ -178,7 +197,7 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(padd_temp,"---");
     }
 
-    TEST(RightPaddingEmpty)
+    TEST(RightPadding_Empty)
     {
         CommonIO common;
         std::string temp = "";
@@ -194,6 +213,10 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(padd_temp,"---");
     }
 
+    /**
+     * @brief Pad Sapces on the Left of the string, also truncates for absolute field lengths.
+     * @return
+     */
     TEST(LeftPadding)
     {
         CommonIO common;
@@ -202,7 +225,7 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(padd_temp,"   ---");
     }
 
-    TEST(LeftPaddingTruncate)
+    TEST(LeftPadding_Truncate)
     {
         CommonIO common;
         std::string temp = "------ ";
@@ -210,7 +233,7 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(padd_temp,"-- ");
     }
 
-    TEST(LeftPaddingEmpty)
+    TEST(LeftPadding_Empty)
     {
         CommonIO common;
         std::string temp = "";
@@ -226,7 +249,11 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(padd_temp,"---");
     }
 
-    TEST(MaskStringEmpty)
+    /**
+     * @brief Masks Field data returned, for passwords etc..
+     * @return
+     */
+    TEST(MaskString_Empty)
     {
         CommonIO common;
         std::string temp = "";
@@ -242,7 +269,11 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(mask_temp,"*******");
     }
 
-    TEST(IsDigitBadPreceeding)
+    /**
+     * @brief Tests if string is a digit or number value.
+     * @return
+     */
+    TEST(IsDigit_Bad_Preceeding)
     {
         CommonIO common;
         std::string temp = "a1";
@@ -250,7 +281,7 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(result, false);
     }
 
-    TEST(IsDigitBadAfter)
+    TEST(IsDigit_Bad_After)
     {
         CommonIO common;
         std::string temp = "1a";
@@ -266,7 +297,7 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(result, true);
     }
 
-    TEST(IsDigitMultiple)
+    TEST(IsDigit_Multiple)
     {
         CommonIO common;
         std::string temp = "125";
@@ -274,7 +305,7 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(result, true);
     }
 
-    TEST(IsDigitUnicodeBadAfter)
+    TEST(IsDigit_Unicode_Bad_After)
     {
         CommonIO common;
         std::string temp = "६a";
@@ -282,7 +313,7 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(result, false);
     }
 
-    TEST(isDigitUnicodeMultiple)
+    TEST(isDigit_Unicode_Multiple)
     {
         CommonIO common;
         std::string temp = "६೬";
@@ -290,12 +321,11 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(result, true);
     }
 
-    TEST(isDigitUnicodeBadPreceeding)
+    TEST(isDigit_Unicode_Bad_Preceeding)
     {
         CommonIO common;
         std::string temp = "a६ ೬";
         bool result = common.isDigit(temp);
-        //std::cout << "[" << padd_temp << "]" << std::endl;
         CHECK_EQUAL(result, false);
     }
 }
