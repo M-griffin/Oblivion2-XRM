@@ -328,4 +328,75 @@ SUITE(XRMCommonIO)
         bool result = common.isDigit(temp);
         CHECK_EQUAL(result, false);
     }
+
+     /**
+     * @brief Parses Input char at a time.
+     * @return
+     */
+
+    TEST(parseInput_Normal_Character_Should_Return_Same)
+    {
+        CommonIO common;
+        std::string temp = "T";
+        std::string result = common.parseInput(temp);
+        CHECK_EQUAL(result, "T");
+    }
+
+    TEST(parseInput_ESC_Character_Should_Return_Empty)
+    {
+        CommonIO common;
+        std::string temp = "\x1b";
+        std::string result = common.parseInput(temp);
+        CHECK_EQUAL(result, "");
+    }
+
+    TEST(parseInput_ESC_Character_Should_Return_Empty_Null_Returns_ESC)
+    {
+        CommonIO common;
+        std::string temp = "\x1b";
+        std::string result = common.parseInput(temp);
+        CHECK_EQUAL(result, "");
+
+        temp = "\0";
+        result = common.parseInput(temp);
+        CHECK_EQUAL(result, "\x1b");
+    }
+
+    TEST(parseInput_Multiple_Characters_Returns_Empty)
+    {
+        CommonIO common;
+        std::string temp = "AB";
+        std::string result = common.parseInput(temp);
+        CHECK_EQUAL(result, "");
+    }
+
+    TEST(parseInput_Unicode_Character_Returns_Unicode_Character)
+    {
+        CommonIO common;
+        std::string temp = "あ";
+        std::string result = common.parseInput(temp);
+        CHECK_EQUAL(result, "あ");
+    }
+
+    TEST(parseInput_Multiple_Unicode_Character_Returns_Empty)
+    {
+        CommonIO common;
+        std::string temp = "ああ";
+        std::string result = common.parseInput(temp);
+        CHECK_EQUAL(result, "");
+    }
+
+    TEST(parseInput_ESC_With_Termination_Null_Returns_ESC)
+    {
+        CommonIO common;
+        std::string temp = "\x1b";
+        std::string result = common.parseInput(temp);
+        CHECK_EQUAL(result, "");
+
+        temp = "\0";
+        result = common.parseInput(temp);
+        CHECK_EQUAL(result, "\x1b");
+    }
+
+    
 }

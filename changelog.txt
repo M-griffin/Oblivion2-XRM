@@ -1,11 +1,16 @@
 
+Change Log Update (00.00.08)
+* 2015-10-12 Unit Tests & Code Refactoring.
++ Completed 17 more unit tests for a total of 80 passing.
++ Continue to refine IO classes to make sure all input is processed correct
+  This is for both standard CP437 and UTF-8.
+
 Change Log Update (00.00.07)
-* 2015-10-09
+* 2015-10-11 Unit Tests & Code Refactoring.
 + Working on next method for SessionIO, Added start of 
   ScreenBuffer testing for AnsiProcessor.
 + 63 Unit Tests so far. Only had a little time tonight
-+ Various updates to Session and ConsoleIO
-
++ Various updates to Session and CommonIO
 
 Change Log Update (00.00.06)
 * 2015-10-09 Unit Tests & Start ARM Makefiles

@@ -54,10 +54,10 @@ std::string SessionIO::getKeyInput(const std::string &character_buffer)
 
 /**
  * @brief Generates an input field with ANSI color background
- * @param text {Is the Field Name, preceeds the field like 'Mail From: '}
+ * @param field_name {Is the Field Name, preceeds the field like 'Mail From: '}
  * @param len
  */
-void SessionIO::createInputField(std::string &text, int &len)
+void SessionIO::createInputField(std::string &field_name, int &len)
 {
     std::string repeat;
     char formatted[1024]= {0};
@@ -73,14 +73,14 @@ void SessionIO::createInputField(std::string &text, int &len)
     char INPUT_COLOR[255]= {0};
     bool isColorOverRide = false; //found input color
 
-    stringSize = text.size()-1;
+    stringSize = field_name.size()-1;
     if(len == 0)
     {
         return;
     }
 
     // Overide Input Length for Ansi
-    position = text.find("%IN", 0);
+    position = field_name.find("%IN", 0);
     if(position != std::string::npos)
     {
         // Make sure we don't go past the bounds
@@ -90,25 +90,31 @@ void SessionIO::createInputField(std::string &text, int &len)
             // Need to Test if idDigit!  And only if, both are
             // Then we cut these out and erase!,  Otherwise
             // We only remove the |IN pipe sequence.
-            if(isdigit(text[position+3]) && isdigit(text[position+4]))
+            if(isdigit(field_name[position+3]) && isdigit(field_name[position+4]))
             {
-                sTmp[0] = text[position+3];
-                sTmp[1] = text[position+4];
-                text.erase(position, 5);
+                sTmp[0] = field_name[position+3];
+                sTmp[1] = field_name[position+4];
+                field_name.erase(position, 5);
                 tempLength = atoi(sTmp);
-                if((signed)tempLength > 0)
+                if((signed)tempLength > 0 && (signed)tempLength <= len)
                 {
                     len = tempLength; // Set new Length
                 }
-
+                else
+                {
+                    std::cout << "createInputField() Incorrect %IN field length.  Length cannot be larger than "
+                              << "max size of the field, which is: "
+                              << len
+                              << std::endl;
+                }
             }
             else
-                text.erase(position, 3);
+                field_name.erase(position, 3);
         }
     }
 
     // Overide Foreground/Background Input Field Colors
-    position = text.find("%FB",0);
+    position = field_name.find("%FB",0);
 
     std::cout << "position: " <<  position << std::endl;
     std::cout << "compare : " << position+4 << " " <<  stringSize << std::endl;
@@ -125,20 +131,20 @@ void SessionIO::createInputField(std::string &text, int &len)
         // Make sure we don't go past the bounds
         if(position+6 <= stringSize)
         {
-            if(isdigit(text[position+3]) && isdigit(text[position+4]) &&
-                    isdigit(text[position+5]) && isdigit(text[position+6]))
+            if(isdigit(field_name[position+3]) && isdigit(field_name[position+4]) &&
+                    isdigit(field_name[position+5]) && isdigit(field_name[position+6]))
             {
-                sTmp[0]  = text[position+3]; // Foreground 00-15
-                sTmp[1]  = text[position+4];
-                sTmp2[0] = text[position+5]; // Background 16-23
-                sTmp2[1] = text[position+6];
-                text.erase(position, 7);
+                sTmp[0]  = field_name[position+3]; // Foreground 00-15
+                sTmp[1]  = field_name[position+4];
+                sTmp2[0] = field_name[position+5]; // Background 16-23
+                sTmp2[1] = field_name[position+6];
+                field_name.erase(position, 7);
                 sprintf(INPUT_COLOR, "|%s|%s", sTmp, sTmp2);
                 isColorOverRide = true;
             }
             else
             {
-                text.erase(position, 3);
+                field_name.erase(position, 3);
             }
         }
     }
@@ -152,17 +158,18 @@ void SessionIO::createInputField(std::string &text, int &len)
     // Set Default Input Color if none was passed.
     if(!isColorOverRide)
     {
+        // Make this a theme color to set a variable...
         sprintf(INPUT_COLOR,"|00|19"); // make theme
     }
 
     // Format Input Field
     sprintf(formatted, "%s%s%s\x1b[%iD",
-            (char *)text.c_str(), // Field Name
+            (char *)field_name.c_str(), // Field Name
             INPUT_COLOR,          // Field Fg,Bg Color
             repeat.c_str(),       // Padding length of Field
             len+1);               // Move back to starting position of field.
 
-    text = formatted;
+    field_name = formatted;
 }
 
 /**
@@ -203,10 +210,12 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
         if(string_data[0] == 27 && string_data.size() == 1)
         {
             std::string esc_sequence = m_common_io.getEscapeSequence();
-            if(esc_sequence.size() == 0)
+            if(esc_sequence.size() == 0 && character_buffer[0] == '\0')
             {
                 //std::cout << "ESC -> Field Input aborted!" << std::endl;
                 is_leadoff = true;    // Reset for next run
+                esc_sequence.erase();
+                string_data.erase();
                 return "aborted";
             }
         }
@@ -215,6 +224,7 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
         {
             result = m_common_io.getInputBuffer();
             //std::cout << "Field: " << result << std::endl;
+            string_data.erase();
             is_leadoff = true;    // Reset for next run
             return "\n";
         }

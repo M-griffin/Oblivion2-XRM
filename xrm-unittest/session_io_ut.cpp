@@ -361,7 +361,7 @@ SUITE(XRMSessionIO)
         CHECK((character_buffer.compare("Testing |00|19          \x1b[11D") == 0));
     }
 
-    TEST(createInputField_10_Length_Retuns_Field_Name_Override_Input_Length)
+    TEST(createInputField_10_Length_Retuns_Default_Becasue_IN17_Larger_Than_length20)
     {
         session_data_ptr session_data;
         SessionIO sess(session_data);
@@ -369,18 +369,50 @@ SUITE(XRMSessionIO)
         std::string character_buffer = "Testing %IN17";
         int length = 10;
         sess.createInputField(character_buffer, length);
+        CHECK((character_buffer.compare("Testing |00|19          \x1b[11D") == 0));
+    }
+
+    TEST(createInputField_10_Length_Retuns_Default_Becasue_IN10_Larger_Than_length20)
+    {
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer = "Testing %IN10";
+        int length = 10;
+        sess.createInputField(character_buffer, length);
+        CHECK((character_buffer.compare("Testing |00|19          \x1b[11D") == 0));
+    }
+
+    TEST(createInputField_10_Length_Retuns_Default_Becasue_IN10_Larger_Than_length20_Failure)
+    {
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer = "Testing %IN10";
+        int length = 11;
+        sess.createInputField(character_buffer, length);
+        CHECK((!character_buffer.compare("Testing |00|19          \x1b[12D") == 0));
+    }
+
+    TEST(createInputField_20_Length_Retuns_Field_Name_Override_Input_Length)
+    {
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer = "Testing %IN17";
+        int length = 20;
+        sess.createInputField(character_buffer, length);
         CHECK((character_buffer.compare("Testing |00|19                 \x1b[18D") == 0));
     }
 
-    TEST(createInputField_10_Length_Retuns_Field_Name_Override_Input_Length_And_Color)
+    TEST(createInputField_20_Length_Retuns_Field_Name_Override_Input_Length_And_Color)
     {
         session_data_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing %IN17%FB0116";
-        int length = 10;
+        int length = 20;
         sess.createInputField(character_buffer, length);
-        std::cout << "\n RESULT: [" << character_buffer << "]" << std::endl;
         CHECK((character_buffer.compare("Testing |01|16                 \x1b[18D") == 0));
     }
 
@@ -392,11 +424,230 @@ SUITE(XRMSessionIO)
         std::string character_buffer = "Testing: %FB0116";
         int length = 10;
         sess.createInputField(character_buffer, length);
-        std::cout << "\n RESULT: [" << character_buffer << "]" << std::endl;
         CHECK((character_buffer.compare("Testing: |01|16          \x1b[11D") == 0));
     }
 
+    /**
+     * @brief Get Input Field Tests
+     * @return
+     */
+
+    TEST(getInputField_Test_Field_Return_No_LF)
+    {
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer;
+        std::string result = "";
+        int length = 10;
+
+        character_buffer = "T";
+        std::string value = sess.getInputField(character_buffer, result, length);
+
+        // Value is always returned to display back to the user.
+        CHECK((value.compare("T") == 0));
+
+        character_buffer = "E";
+        sess.getInputField(character_buffer, result, length);
+
+        character_buffer = "S";
+        sess.getInputField(character_buffer, result, length);
+
+        character_buffer = "T";
+        sess.getInputField(character_buffer, result, length);
+
+        character_buffer = "\n";
+        sess.getInputField(character_buffer, result, length);
+        CHECK((result.compare("TEST") == 0));
+    }
+
+    TEST(getInputField_Test_Field_Return_No_LF_Received_Return_Empty)
+    {
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer;
+        std::string result = "";
+        int length = 10;
+
+        character_buffer = "T";
+        sess.getInputField(character_buffer, result, length);
+
+        character_buffer = "E";
+        sess.getInputField(character_buffer, result, length);
+
+        character_buffer = "S";
+        sess.getInputField(character_buffer, result, length);
+
+        character_buffer = "T";
+        sess.getInputField(character_buffer, result, length);
+        CHECK((result.compare("") == 0));
+    }
+
+    TEST(getInputField_Test_Field_Return_Aborted_On_ESC)
+    {
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer;
+        std::string result = "";
+        int length = 10;
+
+        character_buffer = "\x1b";
+        sess.getInputField(character_buffer, result, length);
+        CHECK((result.compare("") == 0));
+
+        character_buffer = "\0";
+        result.clear();
+        std::string value = sess.getInputField(character_buffer, result, length);
+
+        CHECK_EQUAL(value, "aborted"); // String Aborted Return on ESC Press.
+        CHECK_EQUAL(result, "");       // // Result Blank on Aborts only returns data after ENTER
+    }
+
+    TEST(getInputField_Test_Field_Return_Aborted_On_ESC_Mid_Field)
+    {
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer;
+        std::string result = "";
+        int length = 10;
+
+        character_buffer = "T";
+        std::string value = sess.getInputField(character_buffer, result, length);
+        CHECK((value.compare("T") == 0));
+
+        character_buffer = "E";
+        sess.getInputField(character_buffer, result, length);
+
+        character_buffer = "S";
+        sess.getInputField(character_buffer, result, length);
+
+        character_buffer = "T";
+        sess.getInputField(character_buffer, result, length);
 
 
+        character_buffer = "\x1b";
+        sess.getInputField(character_buffer, result, length);
+        CHECK((result.compare("") == 0));
 
+        character_buffer = "\0";
+        result.clear();
+        value = sess.getInputField(character_buffer, result, length);
+
+        CHECK_EQUAL(value, "aborted"); // String Aborted Return on ESC Press.
+        CHECK_EQUAL(result, "");       // Result Blank on Aborts only returns data after ENTER
+    }
+
+    TEST(getInputField_Test_Field_Returns_Empty_On_ESC_Squences_Returns_Following_Character)
+    {
+        // We want to make sure ESC sequences, arrow keys etc..
+        // will not be mistaken for ESC and abort the field.
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer;
+        std::string result = "";
+        int length = 10;
+
+        character_buffer = "T";
+        sess.getInputField(character_buffer, result, length);
+
+        character_buffer = "E";
+        sess.getInputField(character_buffer, result, length);
+
+        character_buffer = "S";
+        sess.getInputField(character_buffer, result, length);
+
+        character_buffer = "T";
+        sess.getInputField(character_buffer, result, length);
+
+
+        character_buffer = "\x1b";
+        std::string value = sess.getInputField(character_buffer, result, length);
+        CHECK_EQUAL(value, "");  // String Aborted Return on ESC Press.
+        CHECK_EQUAL(result, "");        // Result Blank on Aborts
+
+        character_buffer = "[";
+        result.clear();
+        value = sess.getInputField(character_buffer, result, length);
+        CHECK_EQUAL(value, "");  // String Aborted Return on ESC Press.
+        CHECK_EQUAL(result, "");        // Result Blank on Aborts
+
+        character_buffer = "A";
+        result.clear();
+        value = sess.getInputField(character_buffer, result, length);
+        CHECK_EQUAL(value, "");  // String Aborted Return on ESC Press.
+        CHECK_EQUAL(result, "");        // Result Blank on Aborts
+
+        // Now return the character after the ESC Sequence.
+        character_buffer = "A";
+        result.clear();
+        value = sess.getInputField(character_buffer, result, length);
+        CHECK_EQUAL(value, "A");  // String Aborted Return on ESC Press.
+        CHECK_EQUAL(result, "");  // Result Blank on Aborts only returns data after ENTER
+    }
+
+    TEST(getInputField_Test_Field_Returns_Result_String_On_Enter)
+    {
+        // We want to make sure ESC sequences, arrow keys etc..
+        // will not be mistaken for ESC and abort the field.
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer;
+        std::string result = "";
+        int length = 10;
+
+        character_buffer = "T";
+        sess.getInputField(character_buffer, result, length);
+
+        character_buffer = "E";
+        sess.getInputField(character_buffer, result, length);
+
+        character_buffer = "S";
+        sess.getInputField(character_buffer, result, length);
+
+        character_buffer = "T";
+        sess.getInputField(character_buffer, result, length);
+
+        character_buffer = "\n";
+        std::string value = sess.getInputField(character_buffer, result, length);
+        CHECK_EQUAL(value, "\n");  // String Aborted Return on ESC Press.
+        CHECK_EQUAL(result, "TEST");        // Result Blank on Aborts
+    }
+
+
+    TEST(getInputField_Test_Field_Incomplete_ESC_ignored_Returns_Empty)
+    {
+        // We want to make sure ESC sequences, arrow keys etc..
+        // will not be mistaken for ESC and abort the field.
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        std::string character_buffer;
+        std::string result = "";
+        int length = 10;
+
+
+        character_buffer = "\x1b";
+        std::string value = sess.getInputField(character_buffer, result, length);
+        CHECK_EQUAL(value, "");    // String Aborted Return on ESC Press.
+        CHECK_EQUAL(result, "");   // Result Blank on Aborts
+
+        character_buffer = "\n";
+        value = sess.getInputField(character_buffer, result, length);
+        std::cout << "RESULT: " << result << " : " << value << std::endl;
+        CHECK_EQUAL(value, "\n");  // String Aborted Return on ESC Press.
+        CHECK_EQUAL(result, "");   // Result Blank on Aborts
+    }
+
+    /*
+    std::string SessionIO::getInputField(const std::string &character_buffer,
+                                     std::string &result,
+                                     int length,
+                                     std::string leadoff,
+                                     bool hidden)
+                                      */
 }

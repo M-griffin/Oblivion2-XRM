@@ -682,6 +682,9 @@ bool CommonIO::isDigit(const std::string &str)
     return is_digit;
 }
 
+// Extended
+
+
 /**
  * @brief Used for printing output multibyte (Unicode Translations)
  * @param wide_string
@@ -771,7 +774,9 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
 {
     //std::cout << "character_buffer: " << character_buffer << std::endl;
     int num = numberOfChars(character_buffer);
-    if (num == 0 && m_is_escape_sequence)
+    if((num == 0  ||  character_buffer[0] == '\x1b') &&
+            m_is_escape_sequence &&
+            m_string_buffer.size() == 1)
     {
         // This a null after an ESC..
         m_is_escape_sequence = false;
@@ -779,8 +784,8 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
         m_string_buffer.erase();
         return "\x1b";
     }
-    else if (num != 1)
-    {    
+    else if(num != 1)
+    {
         std::cout << "This function only expects single characters, text or unicode multi-byte."
                   << std::endl;
         return "";
@@ -826,14 +831,6 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
             return "";
         }
 
-        // Check for Consecutive ESC sequences, if so exit on ESC
-        if(character_buffer[0] == 27 && m_string_buffer.size() == 0)
-        {
-            m_escape_sequence.erase();
-            m_string_buffer.erase();
-            return "\x1b";
-        }
-
         // Parse ESC Sequence for Match on bracket [ or O.
         // First Bracket overwrite the ESC in the buffer for easier matching.
         if((character_buffer[0] == '[' && m_string_buffer[0] == '\x1b') ||
@@ -850,6 +847,10 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
         {
             switch(character_buffer[0])
             {
+                case '\n': // Handle Bad Sequences with ENTER following
+                    m_escape_sequence.erase();
+                    return "\n";
+
                 case '[': // [[ Double Brackets F1 Keys.
                     if(m_string_buffer == "[")
                     {
@@ -1025,13 +1026,15 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
             m_line_buffer = std::move(temp);
         }
     }
+
     // Gets Parsed input by Char, Multibyte or ESC Sequence.
+    // Catch Aborts here!
     character_buffer = parseInput(line);
     if(character_buffer.size() == 0 || character_buffer[0] == '\0')
     {
         // No data or in mid ESC sequence
         // Need to wait for next character.
-        return ""; // ""
+        return "\x1b"; // ""
     }
     // If we got an ENTER CR/LF then were done!
     // Set the Flag, so on next call to method, we reset, not before

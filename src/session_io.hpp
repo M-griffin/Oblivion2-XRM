@@ -32,10 +32,10 @@ public:
 
     /**
      * @brief Generates an input field with ANSI color background
-     * @param text
+     * @param field_name
      * @param len
      */
-    void createInputField(std::string &text, int &len);
+    void createInputField(std::string &field_name, int &len);
 
     /**
     * @brief Input Field, returns output for keypresses, completed field returns in result
