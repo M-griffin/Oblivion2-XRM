@@ -55,11 +55,15 @@
     <File Name="src/struct.hpp"/>
     <File Name="src/system_state.cpp"/>
     <File Name="src/system_state.hpp"/>
-    <File Name="src/tcp_connection.hpp"/>
     <File Name="src/telnet.hpp"/>
     <File Name="src/telnet_decoder.cpp"/>
     <File Name="src/telnet_decoder.hpp"/>
     <File Name="src/the_state.hpp"/>
+    <File Name="src/server_ssl.hpp"/>
+    <File Name="src/safe_set.hpp"/>
+    <File Name="src/connection_ssl.hpp"/>
+    <File Name="src/connection_tcp.hpp"/>
+    <File Name="src/connection_base.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
@@ -81,6 +85,7 @@
         <IncludePath Value="C:/boost/include"/>
         <IncludePath Value="C:/Users/Blue/Desktop/Test2/sqlitewrap"/>
         <IncludePath Value="C:/sqlite3/include"/>
+        <IncludePath Value="C:/OpenSSL-Win32/include"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
@@ -88,6 +93,8 @@
         <LibraryPath Value="C:/msys/1.0/icu/source/lib"/>
         <LibraryPath Value="C:/Users/Blue/Desktop/Test2/sqlitewrap/Debug"/>
         <LibraryPath Value="C:/sqlite3/lib"/>
+        <LibraryPath Value="C:/OpenSSL-Win32/lib/MinGW"/>
+        <LibraryPath Value="C:\OpenSSL-Win32\lib\"/>
         <Library Value="libboost_system-mgw51-mt-1_58"/>
         <Library Value="libboost_thread-mgw51-mt-1_58"/>
         <Library Value="libboost_chrono-mgw51-mt-1_58"/>
@@ -103,6 +110,8 @@
         <Library Value="libicuin.dll.a"/>
         <Library Value="libSqliteWrapped.a"/>
         <Library Value="libsqlite3.a"/>
+        <Library Value="ssleay32.a"/>
+        <Library Value="libeay32.a"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>

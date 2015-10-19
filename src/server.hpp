@@ -3,7 +3,7 @@
 
 #include "broad_caster.hpp"
 #include "session.hpp"
-#include "tcp_connection.hpp"
+#include "connection_tcp.hpp"
 #include "communicator.hpp"
 
 #include <boost/asio.hpp>
@@ -27,7 +27,9 @@ public:
         , m_acceptor_v4(io_service)
         , m_room(new BroadCaster())
         , m_is_using_ipv6(true)
+        , m_context(boost::asio::ssl::context::sslv23)
     {
+        std::cout << "Server" << std::endl;
 
         // Defaults v6_Only to false to accept both v4 and v6 connections.
         boost::asio::ip::v6_only v6_only(false);
@@ -68,7 +70,7 @@ public:
                 std::cout << "Error: Unable to use IPv4 acceptor, No connections will be accepted." << std::endl;
                 exit(2);
             }
-        }        
+        }
 
         // Give a notice on connection protocols.
         if (m_is_using_ipv6)
@@ -84,8 +86,13 @@ public:
         // And send messages to other nodes.
         TheCommunicator::Instance()->setupServer(m_room);
 
-        std::cout << "Waiting for Connections." << std::endl;
+        std::cout << "Server TCP Telnet Ready." << std::endl;
         wait_for_connection();
+    }
+
+    ~Server()
+    {
+        std::cout << "~Server" << std::endl;
     }
 
     /**
@@ -93,7 +100,7 @@ public:
      */
     void wait_for_connection()
     {
-        connection_ptr new_connection(new tcp_connection(m_io_service));
+        connection_ptr new_connection(new tcp_connection(m_io_service, m_context, false));
 
         /*  Looks like UDP only!
         // Setup connections to allow Both ipv4 and ipv6!
@@ -104,7 +111,7 @@ public:
         // Accept The Connection
         if (m_is_using_ipv6)
         {
-            m_acceptor_v6.async_accept(new_connection->socket(),
+            m_acceptor_v6.async_accept(new_connection->m_normal_socket,
                                 boost::bind(&Server::handle_accept, this,
                                             new_connection,
                                             boost::asio::placeholders::error));
@@ -112,7 +119,7 @@ public:
         }
         else
         {
-            m_acceptor_v4.async_accept(new_connection->socket(),
+            m_acceptor_v4.async_accept(new_connection->m_normal_socket,
                                 boost::bind(&Server::handle_accept, this,
                                             new_connection,
                                             boost::asio::placeholders::error));
@@ -130,9 +137,9 @@ private:
     {
         if(!error)
         {
-            std::cout << "Connection accepted" << std::endl;
-            session_ptr session = Session::create(m_io_service, new_connection, m_room);
-            m_room->join(session);
+            std::cout << "TCP Connection accepted" << std::endl;
+            session_ptr new_session = Session::create(m_io_service, new_connection, m_room);
+            m_room->join(new_session);
             wait_for_connection();
         }
         else
@@ -141,12 +148,14 @@ private:
         }
     }
 
-    boost::asio::io_service& m_io_service;
-    tcp::acceptor m_acceptor_v6;
-    tcp::acceptor m_acceptor_v4;
-    board_caster_ptr m_room;
-
+    boost::asio::io_service&    m_io_service;
+    tcp::acceptor               m_acceptor_v6;
+    tcp::acceptor               m_acceptor_v4;
+    board_caster_ptr            m_room;
     bool m_is_using_ipv6;
+
+    // Place Holder Not used!
+    boost::asio::ssl::context   m_context;
 };
 
 

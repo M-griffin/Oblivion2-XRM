@@ -4,7 +4,7 @@
   <Environment>
     <![CDATA[]]>
   </Environment>
-  <Project Name="xrm-server" Path="xrm-server.project" Active="No"/>
+  <Project Name="xrm-server" Path="xrm-server.project" Active="Yes"/>
   <Project Name="xrm-unittest" Path="xrm-unittest/xrm-unittest.project" Active="No"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="yes">

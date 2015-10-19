@@ -69,30 +69,30 @@ bool MenuSystem::onEnter()
 {
     std::cout << "OnEnter() MenuSystem\n";
 
-/*
- *
- * possiable uses right now..  need to double check on where i really want to
- * execute this stuff from
- */
+    /*
+     *
+     * possiable uses right now..  need to double check on where i really want to
+     * execute this stuff from
+     */
 
     // Access any needed global configuration values
-    if (TheCommunicator::Instance()->m_config_record.UseWelcome)
+    if(TheCommunicator::Instance()->m_config_record.UseWelcome)
     {
         // Display random welcome or default welcome.ans here.
     }
 
-    if (TheCommunicator::Instance()->m_config_record.DailyFlagChange)
+    if(TheCommunicator::Instance()->m_config_record.DailyFlagChange)
     {
         // Reset A Users Faild Flags
     }
 
-    if (TheCommunicator::Instance()->m_config_record.SpecialLogin)
+    if(TheCommunicator::Instance()->m_config_record.SpecialLogin)
     {
         // Needed for MATRIX MENU STARTUP!
     }
 
 
-    if (TheCommunicator::Instance()->m_config_record.SpecialLogin)
+    if(TheCommunicator::Instance()->m_config_record.SpecialLogin)
     {
         // Needed for MATRIX MENU STARTUP!
     }
@@ -229,7 +229,7 @@ std::string MenuSystem::loadMenuScreen()
 
     // NOTES: check for themes here!!!
 
-    if (pull_down_filename.size() == 0)
+    if(pull_down_filename.size() == 0)
     {
         // Load ansi by Menu Name, remove .MNU and Add .ANS
         std::string screen_file = m_current_menu.substr(0, m_current_menu.size()-4) + ".ANS";
@@ -501,7 +501,7 @@ void MenuSystem::processMenuOptions(std::string &input)
             // Process
             std::cout << "FOUND EACH! EXECUTE: " << m_loaded_menu_options[i].CKeys << std::endl;
             continue;
-        }        
+        }
 
         // Check for ESC sequence, and next/prev lightbar movement.
         else if(input[0] == '\x1b' && input.size() > 2)
@@ -550,7 +550,7 @@ void MenuSystem::processMenuOptions(std::string &input)
 
         // Then check other keys.
         else if(input.compare(key) == 0 || (m_is_active_pulldown_menu && is_enter))
-        {            
+        {
             // We have the command, start the work
             if(m_is_active_pulldown_menu)
             {
@@ -584,7 +584,7 @@ void MenuSystem::processMenuOptions(std::string &input)
                 std::cout << "NORMAL HOT KEY MATCH and EXECUTE! " << key << std::endl;
             }
         }
-    }    
+    }
 }
 
 
@@ -722,4 +722,3 @@ void MenuSystem::menuEditorInput(const std::string &character_buffer, bool is_ut
         }
          */
 }
-

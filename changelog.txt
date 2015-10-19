@@ -1,4 +1,40 @@
 
+Change Log Update (00.00.09)
+* 2015-10-19 XRM-WFC and SSL Connections
++ Large rework on the Session, SessionData and Connection objects
+  Worked new SSL connections into exiting Session and SessionData
+  Classes over the same pipes normal sessions.
++ Connections are now Stable over both TCP and SSL at the same time
+  after combining sessions.
+- Some more SSL client testing.
+- Linux Makefiles are out of date with new files, and includes
+  These Makefiles will need to be remade as time permits.
+
+* 2015-10-17 SQL ORM Research
++ Looking into several different sqlite3 wrappers for some ORM
+  or Object Relational Mapping.  After hours of compiling and
+  some initial testing I'm decide to use the current SqliteWrapped
+  wrapper which gives full query control.  ICO the lib I checked out
+  seemed to have several issues when working with classes and exceptions
+  which killed the program every time.
+
+* 2015-10-16 XRM-WFC and SSL Connections
++ SSL Connections are now working correctly with signed cert's.
++ XRM-WFC client is able to send and receive messages from the 
+  BBS server over SSL. And will have both a server and client.
+  Sysop's will be able to connect up and join a global sysop
+  chat, link systems, transfer mail over secure connections.
+  That is the idea, still more to come!
+- Still in initial test stages, needs quite a bit more refinement.
+  Also look at Database ORM's SOCI is looking pretty nice and is
+  under the boost licence as well.
+
+* 2015-10-15 Added SSL Secure System to System Connections.
++ Started Oblivion/2 XRM Client_SSL Test will merge into the 
+  Waiting for Caller remote admin Interface.
+  - This is for local system configuration, viewing users only, 
+    Internal Sysop messaging network possibly a lot more.
+
 Change Log Update (00.00.08)
 * 2015-10-12 Unit Tests & Code Refactoring.
 + Completed 17 more unit tests for a total of 80 passing.

@@ -19,6 +19,7 @@
 
 #include "struct.hpp"
 #include "server.hpp"
+#include "server_ssl.hpp"
 #include "communicator.hpp"
 #include "common_io.hpp"
 
@@ -90,6 +91,9 @@ void run(boost::asio::io_service& io_service)
         //tcp::endpoint endpoint(tcp::v6(), 6023);
         Server serv(io_service); //, endpoint);
 
+        // Initial Testing of SSL Seure Connections ipv4, update to ipv6 with support for 4 lateron.
+        ServerSSL serv_ssl(io_service, 6022);
+
         // Setup first timer.
         //    int count = 0;
         //    boost::asio::deadline_timer timer(io_service, boost::posix_time::seconds(1));
@@ -123,7 +127,8 @@ void run(boost::asio::io_service& io_service)
 auto main() -> int
 {
     std::cout << "Oblivion/2 XRM Server (c) 2015 Michael Griffin." << std::endl;
-    std::cout << "Listening for connections on port 6023." << std::endl;
+    std::cout << "Listening for client connections on port 6023." << std::endl;
+    std::cout << "Listening for wfc system connections on port 6022." << std::endl;
 
     CommonIO common;
     BBS_PATH = common.getProgramPath();

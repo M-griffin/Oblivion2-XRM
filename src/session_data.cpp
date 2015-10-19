@@ -78,7 +78,7 @@ void SessionData::handleRead(const boost::system::error_code& error, size_t byte
             // Restart Callback to wait for more data.
             // If this step is skipped, then the node will exit
             // since io_service will have no more work!
-            if(m_tcp_connection->m_socket.is_open())
+            if(m_connection->is_open())
             {
                 waitingForData();
             }
@@ -99,20 +99,38 @@ void SessionData::handleRead(const boost::system::error_code& error, size_t byte
                     room->leave(m_node_number);
                     // m_session_state = SESSION_STATE::STATE_DONE;
 
-                    if(m_tcp_connection->m_socket.is_open())
+                    if(m_connection->is_open())
                     {
-                        std::cout << "Leaving (SESSION_DATA) Peer IP: "
-                                  << m_tcp_connection->m_socket.remote_endpoint().address().to_string()
-                                  << std::endl << "Host-name: "
-                                  //<< boost::asio::ip::host_name() // Local host_name
-                                  << m_tcp_connection->m_socket.remote_endpoint()
-                                  << std::endl
-                                  << "Bytes: "
-                                  << bytes_transferred
-                                  << std::endl;
+                        if(m_connection->m_is_secure)
+                        {
+                            std::cout << "Leaving (SECURE SESSION_DATA) Client IP: "
+                                      << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
+                                      << std::endl << "Host-name: "
+                                      //<< boost::asio::ip::host_name() // Local host_name
+                                      << m_connection->m_secure_socket.lowest_layer().remote_endpoint()
+                                      << std::endl
+                                      << "Bytes: "
+                                      << bytes_transferred
+                                      << std::endl;
 
-                        m_tcp_connection->m_socket.shutdown(tcp::socket::shutdown_both);
-                        m_tcp_connection->m_socket.close();
+                            m_connection->m_secure_socket.lowest_layer().shutdown(tcp::socket::shutdown_both);
+                            m_connection->m_secure_socket.lowest_layer().close();
+                        }
+                        else
+                        {
+                            std::cout << "Leaving (SESSION_DATA) Client IP: "
+                                      << m_connection->m_normal_socket.remote_endpoint().address().to_string()
+                                      << std::endl << "Host-name: "
+                                      //<< boost::asio::ip::host_name() // Local host_name
+                                      << m_connection->m_normal_socket.remote_endpoint()
+                                      << std::endl
+                                      << "Bytes: "
+                                      << bytes_transferred
+                                      << std::endl;
+
+                            m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
+                            m_connection->m_normal_socket.close();
+                        }
                     }
                 }
             }
@@ -124,6 +142,59 @@ void SessionData::handleRead(const boost::system::error_code& error, size_t byte
     }
 }
 
+
+/*
+ * @brief Start Secutiry handshake.
+ */
+void SessionData::handshake()
+{
+    std::cout << "SSL handshake!" << std::endl;
+    if(m_connection->is_open() && m_connection->m_is_secure)
+    {
+        m_connection->m_secure_socket.async_handshake(boost::asio::ssl::stream_base::server,
+                boost::bind(&SessionData::handleHandshake,
+                            shared_from_this(),
+                            boost::asio::placeholders::error));
+    }
+    else
+    {
+         std::cout << "ERROR: SSL handshake!" << std::endl;
+    }
+
+}
+
+/**
+ * @brief Handles setting up the first read() after successful handshake.
+ * @param error
+ */
+void SessionData::handleHandshake(const boost::system::error_code& error)
+{
+    std::cout << "handle_handshake()!" << std::endl;
+    memset(&m_raw_data, 0, max_length);
+    if(!error)
+    {
+        if(m_connection->is_open() && m_connection->m_is_secure)
+        {
+            m_connection->m_secure_socket.async_read_some(
+                boost::asio::buffer(m_raw_data, max_length),
+                boost::bind(&SessionData::handleRead,
+                            shared_from_this(),
+                            boost::asio::placeholders::error,
+                            boost::asio::placeholders::bytes_transferred));
+
+            std::cout << "handle_handshake() completed" << std::endl;
+        }
+        else
+        {
+            std::cout << "Error handle_handshake()" << std::endl;
+        }
+
+    }
+    else
+    {
+        std::cout << "handle_handshake()! ERROR" << std::endl;
+    }
+}
 
 /**
  * @brief Deadline Input Timer for ESC vs ESC Sequence.

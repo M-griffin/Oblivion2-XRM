@@ -1,5 +1,6 @@
 #include "broad_caster.hpp"
 #include "session.hpp"
+#include "server_ssl.hpp"
 #include "session_data.hpp"
 #include "server.hpp"
 
@@ -15,12 +16,13 @@ BroadCaster::~BroadCaster()
  * @brief Notifies that a user has joined the room
  * @param participant
  */
-void BroadCaster::join(session_ptr session) //, session_data_ptr participant)
+void BroadCaster::join(session_ptr session)
 {
-    std::cout << "join room" << std::endl;
+    std::cout << "joined BroadCaster" << std::endl;
     m_sessions.insert(session);
-    //deliver("\r\nConnected to the room");
+    //deliver("\r\nConnected to the BroadCaster");
 }
+
 
 /**
  * @brief Notifies that a user has left the room
@@ -28,8 +30,8 @@ void BroadCaster::join(session_ptr session) //, session_data_ptr participant)
  */
 void BroadCaster::leave(int node_number)
 {
-    std::cout << "nleft room" << std::endl;
-    deliver("\r\nleft the room");
+    std::cout << "nleft BroadCaster" << std::endl;
+    deliver("\r\nleft the BroadCaster");
 
     // Clear Session
     std::cout << "disconnecting Node Session: " << node_number << std::endl;
@@ -41,7 +43,7 @@ void BroadCaster::leave(int node_number)
             std::cout << "disconnecting Session completed." << std::endl;
             break;
         }
-    }    
+    }
 }
 
 /**
@@ -53,7 +55,7 @@ void BroadCaster::deliver(std::string msg)
     if(msg.size() == 0)
         return;
 
-    std::cout << "deliver room notices: " << msg << std::endl;
+    std::cout << "deliver BroadCaster notices: " << msg << std::endl;
     std::for_each(m_sessions.begin(), m_sessions.end(),
                   boost::bind(&Session::deliver, _1, boost::ref(msg)));
 }
@@ -81,8 +83,17 @@ void BroadCaster::shutdown()
 {
     for(auto it = begin(m_sessions); it != end(m_sessions); ++it)
     {
-        (*it)->m_tcp_connection->m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-        (*it)->m_tcp_connection->m_socket.close();
+        if ((*it)->m_connection->m_is_secure)
+        {
+            (*it)->m_connection->m_secure_socket.lowest_layer().shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+            (*it)->m_connection->m_secure_socket.lowest_layer().close();
+        }
+        else
+        {
+            (*it)->m_connection->m_normal_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+            (*it)->m_connection->m_normal_socket.close();
+        }
+        
         m_sessions.erase(it);
     }
 }

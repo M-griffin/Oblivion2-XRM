@@ -4,7 +4,7 @@
 #include "chat_state.hpp"
 #include "system_state.hpp"
 #include "menu_manager.hpp"
-#include "tcp_connection.hpp"
+#include "connection_tcp.hpp"
 #include "broad_caster.hpp"
 #include "telnet_decoder.hpp"
 #include "communicator.hpp"
@@ -38,7 +38,7 @@ typedef boost::shared_ptr<Session> session_ptr;
  * @author Michael Griffin
  * @date 15/08/2015
  * @file chat_session.hpp
- * @brief handles individual connections
+ * @brief handles TCP and SSL individual connection Sessions.
  */
 class Session
     : public boost::enable_shared_from_this<Session>
@@ -59,49 +59,66 @@ public:
      * @param room
      * @return
      */
-    static session_ptr create(boost::asio::io_service& io_service, connection_ptr tcp_connection, board_caster_ptr room)
+    static session_ptr create(boost::asio::io_service& io_service, connection_ptr connection, board_caster_ptr room)
     {
-        session_ptr session(new Session(io_service, tcp_connection, room));
-        session->m_session_data->waitingForData();
+        session_ptr new_session(new Session(io_service, connection, room));
 
-        // On initial Session Connection,  setup and send TELNET Options to
-        // start the negotiation of client features.
-        std::cout << "send initial IAC sequences started." << std::endl;
+        if(connection->is_open())
+        {
+            if(connection->m_is_secure)
+            {
+                // Secure Sessions do handshake first!!
+                new_session->m_session_data->handshake();
+            }
+            else
+            {
+                new_session->m_session_data->waitingForData();
+            }
+        }
 
-        // Need to negotiate this first, then turn off for Linux/osx to switch
-        // Otherwise they both ignore the DONT and do not turn it off.
-        session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_LINEMODE);
-        session->m_session_data->m_telnet_state->addReply(TELOPT_LINEMODE);
+        // Send out Telnet Negoiation Options
+        if(connection->is_open() && !connection->m_is_secure)
+        {
+            // On initial Session Connection,  setup and send TELNET Options to
+            // start the negotiation of client features.
+            std::cout << "send initial IAC sequences started." << std::endl;
 
-        // Don't need to tell other DO when we say we WILL!
-        //session->m_telnet_state->send_iac(DO, TELOPT_BINARY);
-        //session->m_telnet_state->add_reply(TELOPT_BINARY);
+            // Need to negotiate this first, then turn off for Linux/osx to switch
+            // Otherwise they both ignore the DONT and do not turn it off.
+            new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_LINEMODE);
+            new_session->m_session_data->m_telnet_state->addReply(TELOPT_LINEMODE);
 
-        session->m_session_data->m_telnet_state->sendIACSequences(WILL, TELOPT_BINARY);
-        session->m_session_data->m_telnet_state->addReply(TELOPT_BINARY);
+            // Don't need to tell other DO when we say we WILL!
+            //session->m_telnet_state->send_iac(DO, TELOPT_BINARY);
+            //session->m_telnet_state->add_reply(TELOPT_BINARY);
 
-        session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_SGA);
-        session->m_session_data->m_telnet_state->addReply(TELOPT_SGA);
+            new_session->m_session_data->m_telnet_state->sendIACSequences(WILL, TELOPT_BINARY);
+            new_session->m_session_data->m_telnet_state->addReply(TELOPT_BINARY);
 
-        // Don't need to tell other DON'T when we say we WILL!
-        //session->m_telnet_state->send_iac(DONT, TELOPT_ECHO);
-        //session->m_telnet_state->add_reply(TELOPT_ECHO);
+            new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_SGA);
+            new_session->m_session_data->m_telnet_state->addReply(TELOPT_SGA);
 
-        session->m_session_data->m_telnet_state->sendIACSequences(WILL, TELOPT_ECHO);
-        session->m_session_data->m_telnet_state->addReply(TELOPT_ECHO);
+            // Don't need to tell other DON'T when we say we WILL!
+            //session->m_telnet_state->send_iac(DONT, TELOPT_ECHO);
+            //session->m_telnet_state->add_reply(TELOPT_ECHO);
 
-        session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_TTYPE);
-        session->m_session_data->m_telnet_state->addReply(TELOPT_TTYPE);
+            new_session->m_session_data->m_telnet_state->sendIACSequences(WILL, TELOPT_ECHO);
+            new_session->m_session_data->m_telnet_state->addReply(TELOPT_ECHO);
 
-        session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_NAWS);
-        session->m_session_data->m_telnet_state->addReply(TELOPT_NAWS);
+            new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_TTYPE);
+            new_session->m_session_data->m_telnet_state->addReply(TELOPT_TTYPE);
 
-        // No replies, this can really not be used, only informational.
-        session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_NEW_ENVIRON);
-        session->m_session_data->m_telnet_state->addReply(TELOPT_NEW_ENVIRON);
+            new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_NAWS);
+            new_session->m_session_data->m_telnet_state->addReply(TELOPT_NAWS);
 
-        std::cout << "send initial IAC sequences ended." << std::endl;
-        return session;
+            // No replies, this can really not be used, only informational.
+            new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_NEW_ENVIRON);
+            new_session->m_session_data->m_telnet_state->addReply(TELOPT_NEW_ENVIRON);
+
+            std::cout << "send initial IAC sequences ended." << std::endl;
+        }
+
+        return new_session;
     }
 
     /**
@@ -132,7 +149,7 @@ public:
     }
 
     /**
-     * @brief delivers text data to client
+     * @brief Callback from The Broadcaster to write data to the active sessions.
      * @param msg
      */
     void deliver(const std::string &msg)
@@ -142,13 +159,22 @@ public:
             return;
         }
 
-        // std::cout << "session struct: [" << msg << "]" << std::endl; // TEST
-        if(m_tcp_connection->m_socket.is_open())
+        if(m_connection->is_open())
         {
-            boost::asio::async_write(m_tcp_connection->m_socket,
-                                     boost::asio::buffer(msg, msg.size()),
-                                     boost::bind(&Session::handleWrite, shared_from_this(),
-                                                 boost::asio::placeholders::error));
+            if(m_connection->m_is_secure)
+            {
+                boost::asio::async_write(m_connection->m_secure_socket,
+                                         boost::asio::buffer(msg, msg.size()),
+                                         boost::bind(&Session::handleWrite, shared_from_this(),
+                                                     boost::asio::placeholders::error));
+            }
+            else
+            {
+                boost::asio::async_write(m_connection->m_normal_socket,
+                                         boost::asio::buffer(msg, msg.size()),
+                                         boost::bind(&Session::handleWrite, shared_from_this(),
+                                                     boost::asio::placeholders::error));
+            }
         }
     }
 
@@ -174,14 +200,27 @@ public:
             // Disconenct the session.
             room->leave(m_session_data->m_node_number);
 
-            if(m_tcp_connection->m_socket.is_open())
+            if(m_connection->is_open())
             {
-                std::cout << "Leaving (SESSION) Peer IP: "
-                          << m_tcp_connection->m_socket.remote_endpoint().address().to_string()
-                          << std::endl;
+                if(m_connection->m_is_secure)
+                {
+                    std::cout << "Leaving (SECURE SESSION) Client IP: "
+                              << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
+                              << std::endl;
 
-                m_tcp_connection->m_socket.shutdown(tcp::socket::shutdown_both);
-                m_tcp_connection->m_socket.close();
+                    m_connection->m_secure_socket.lowest_layer().shutdown(tcp::socket::shutdown_both);
+                    m_connection->m_secure_socket.lowest_layer().close();
+
+                }
+                else
+                {
+                    std::cout << "Leaving (NORMAL SESSION) Client IP: "
+                              << m_connection->m_normal_socket.remote_endpoint().address().to_string()
+                              << std::endl;
+
+                    m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
+                    m_connection->m_normal_socket.close();
+                }
             }
         }
     }
@@ -212,24 +251,22 @@ public:
      * @param room
      * @return
      */
-    Session(boost::asio::io_service& io_service, connection_ptr tcp_connection, board_caster_ptr room)
+    Session(boost::asio::io_service& io_service, connection_ptr connection, board_caster_ptr room)
         : m_session_state(SESSION_STATE::STATE_CMD)
-        , m_tcp_connection(tcp_connection)
+        , m_connection(connection)
         , m_menu_manager(new MenuManager())
-        , m_session_data(new SessionData(tcp_connection, room, io_service, m_menu_manager))
+        , m_session_data(new SessionData(connection, room, io_service, m_menu_manager))
         , m_resolv(io_service)
 
     {
 
-        /*
+        /* TESTING
         std::string server =  m_tcp_connection->m_socket.remote_endpoint().address().to_string();
         std::string::size_type idx = server.rfind(":", server.size());
         if (idx != std::string::npos)
             server.erase(0, idx+1);
 
         std::cout << "ipv6: " << server << std::endl;
-
-
         tcp::resolver::query query(server, "");
 
         //resolv.async_resolve(endpoint, resolve_handler);
@@ -239,13 +276,23 @@ public:
                                            boost::asio::placeholders::iterator));
         */
 
-
-        // Testing some Info.
-        std::cout << " ! New Session ! "  << std::endl;
-        std::cout << "Client IP Address: "
-                  << m_tcp_connection->m_socket.remote_endpoint().address().to_string() << std::endl;
-
-        std::cout << "Testing State Machine "  << std::endl;
+        if(m_connection->is_open())
+        {
+            if(m_connection->m_is_secure)
+            {
+                std::cout << "New TCP Session ! " << std::endl;
+                std::cout << "Client IP Address: "
+                          << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
+                          << std::endl;
+            }
+            else
+            {
+                std::cout << "New Secure Session ! " << std::endl;
+                std::cout << "Client IP Address: "
+                          << m_connection->m_normal_socket.remote_endpoint().address().to_string()
+                          << std::endl;
+            }
+        }
 
         // Get The First available node number.
         m_session_data->m_node_number = TheCommunicator::Instance()->getNodeNumber();
@@ -257,7 +304,7 @@ public:
     }
 
     int                 m_session_state;
-    connection_ptr	    m_tcp_connection;
+    connection_ptr	    m_connection;
     menu_manager_ptr    m_menu_manager;
     session_data_ptr    m_session_data;
     tcp::resolver       m_resolv;
@@ -265,4 +312,4 @@ public:
 };
 
 
-#endif // CHAT_SESSION_HPP
+#endif // SESSION_HPP

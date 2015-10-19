@@ -2,7 +2,7 @@
 #define SESSION_DATA_HPP
 
 #include "struct.hpp"
-#include "tcp_connection.hpp"
+#include "connection_base.hpp"
 #include "telnet_decoder.hpp"
 #include "broad_caster.hpp"
 
@@ -32,13 +32,13 @@ class SessionData
 {
 public:
 
-    SessionData(connection_ptr           tcp_connection,
+    SessionData(connection_ptr           connection,
                 board_caster_ptr         room,
                 boost::asio::io_service& io_service,
                 menu_manager_ptr         menu_manager)
-        : m_tcp_connection(tcp_connection)
+        : m_connection(connection)
         , m_room(room)
-        , m_telnet_state(new TelnetDecoder(tcp_connection))
+        , m_telnet_state(new TelnetDecoder(connection))
         , m_input_deadline(io_service)
         , m_menu_manager(menu_manager)
         , m_user_record()
@@ -66,11 +66,25 @@ public:
     {
         // Important, clear out buffer before each read.
         memset(&m_raw_data, 0, max_length);
-        m_tcp_connection->m_socket.async_read_some(boost::asio::buffer(m_raw_data, max_length),
-                boost::bind(&SessionData::handleRead, shared_from_this(),
-                            boost::asio::placeholders::error,
-                            boost::asio::placeholders::bytes_transferred));
+        if(m_connection->is_open())
+        {
+            if(m_connection->m_is_secure)
+            {
+                m_connection->m_secure_socket.async_read_some(boost::asio::buffer(m_raw_data, max_length),
+                        boost::bind(&SessionData::handleRead, shared_from_this(),
+                                    boost::asio::placeholders::error,
+                                    boost::asio::placeholders::bytes_transferred));
+            }
+            else
+            {
+                m_connection->m_normal_socket.async_read_some(boost::asio::buffer(m_raw_data, max_length),
+                        boost::bind(&SessionData::handleRead, shared_from_this(),
+                                    boost::asio::placeholders::error,
+                                    boost::asio::placeholders::bytes_transferred));
+            }
+        }
     }
+
 
     /**
      * @brief Handle Telnet Options in incoming data
@@ -127,13 +141,23 @@ public:
             return;
         }
 
-        // std::cout << "session struct: [" << msg << "]" << std::endl; // TEST
-        if(m_tcp_connection->m_socket.is_open())
+        if(m_connection->is_open())
         {
-            boost::asio::async_write(m_tcp_connection->m_socket,
-                                     boost::asio::buffer(msg, msg.size()),
-                                     boost::bind(&SessionData::handleWrite, shared_from_this(),
-                                                 boost::asio::placeholders::error));
+            if(m_connection->m_is_secure)
+            {
+                boost::asio::async_write(m_connection->m_secure_socket,
+                                         boost::asio::buffer(msg, msg.size()),
+                                         boost::bind(&SessionData::handleWrite, shared_from_this(),
+                                                     boost::asio::placeholders::error));
+
+            }
+            else
+            {
+                boost::asio::async_write(m_connection->m_normal_socket,
+                                         boost::asio::buffer(msg, msg.size()),
+                                         boost::bind(&SessionData::handleWrite, shared_from_this(),
+                                                     boost::asio::placeholders::error));
+            }
         }
     }
 
@@ -159,18 +183,41 @@ public:
             // Disconenct the session.
             room->leave(m_node_number);
 
-            if(m_tcp_connection->m_socket.is_open())
+            if(m_connection->is_open())
             {
-                std::cout << "Leaving 111 Peer IP: "
-                          << m_tcp_connection->m_socket.remote_endpoint().address().to_string()
-                          << std::endl;
+                if(m_connection->m_is_secure)
+                {
+                    std::cout << "Leaving 111 Peer IP: "
+                              << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
+                              << std::endl;
 
-                m_tcp_connection->m_socket.shutdown(tcp::socket::shutdown_both);
-                m_tcp_connection->m_socket.close();
+                    m_connection->m_secure_socket.lowest_layer().shutdown(tcp::socket::shutdown_both);
+                    m_connection->m_secure_socket.lowest_layer().close();
+                }
+                else
+                {
+                    std::cout << "Leaving 111 Peer IP: "
+                              << m_connection->m_normal_socket.remote_endpoint().address().to_string()
+                              << std::endl;
+
+                    m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
+                    m_connection->m_normal_socket.close();
+                }
             }
         }
     }
 
+    /*
+     * @brief Start Secutiry handshake.
+     */
+    void handshake();
+    
+    /**
+     * @brief Handles setting up the first read() after successful handshake.
+     * @param error
+     */
+    void handleHandshake(const boost::system::error_code& error);
+    
     /**
      * @brief Start ESC Key input timer
      */
@@ -194,7 +241,7 @@ private:
 
 public:
 
-    connection_ptr    m_tcp_connection;
+    connection_ptr    m_connection;
     board_caster_wptr m_room;
     telnet_ptr        m_telnet_state;
     deadline_timer    m_input_deadline;

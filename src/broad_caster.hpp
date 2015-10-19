@@ -23,6 +23,9 @@ typedef boost::shared_ptr<SessionData> session_data_ptr;
 class Session;
 typedef boost::shared_ptr<Session> session_ptr;
 
+class SessionSSL;
+typedef boost::shared_ptr<SessionSSL> session_ssl_ptr;
+
 /**
  * @class BroadCaster
  * @author Michael Griffin
@@ -40,7 +43,12 @@ public:
     }
     ~BroadCaster();
 
+    /**
+     * @brief OverRides for Conencting TCP and SSL Sessions
+     * @param Session
+     */
     void join(session_ptr session);
+
     void leave(int node_number);
     void deliver(std::string msg);
 
@@ -48,8 +56,9 @@ public:
     void shutdown();
 
 private:
-    //std::set<session_data_ptr> m_participants;
+
     std::set<session_ptr> m_sessions;
+    std::set<session_ssl_ptr> m_sessions_ssl;
 };
 
 typedef boost::shared_ptr<BroadCaster>	board_caster_ptr;
