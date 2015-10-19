@@ -14,7 +14,7 @@ Change Log Update (00.00.09)
 + Looking into several different sqlite3 wrappers for some ORM
   or Object Relational Mapping.  After hours of compiling and
   some initial testing I'm decide to use the current SqliteWrapped
-  wrapper which gives full query control.  ICO the lib I checked out
+  wrapper which gives full query control. SOCI I checked out more and
   seemed to have several issues when working with classes and exceptions
   which killed the program every time.
 
