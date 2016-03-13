@@ -51,8 +51,6 @@
     <File Name="src/session_io.hpp"/>
     <File Name="src/state_machine.cpp"/>
     <File Name="src/state_machine.hpp"/>
-    <File Name="src/struct.cpp"/>
-    <File Name="src/struct.hpp"/>
     <File Name="src/system_state.cpp"/>
     <File Name="src/system_state.hpp"/>
     <File Name="src/telnet.hpp"/>
@@ -64,6 +62,18 @@
     <File Name="src/connection_ssl.hpp"/>
     <File Name="src/connection_tcp.hpp"/>
     <File Name="src/connection_base.hpp"/>
+    <File Name="src/structures.hpp"/>
+    <File Name="src/struct_compat.hpp"/>
+    <File Name="xrm-import/pascal_types.hpp"/>
+    <File Name="sqlitewrap/libSqliteWrapped.h"/>
+    <VirtualDirectory Name="data">
+      <File Name="src/data/config.hpp"/>
+      <File Name="src/data/users.hpp"/>
+      <File Name="src/data/config_dao.cpp"/>
+      <File Name="src/data/config_dao.hpp"/>
+      <File Name="src/data/users_dao.hpp"/>
+      <File Name="src/data/users_dao.cpp"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
@@ -91,10 +101,10 @@
         <LibraryPath Value="."/>
         <LibraryPath Value="C:/boost/lib"/>
         <LibraryPath Value="C:/msys/1.0/icu/source/lib"/>
-        <LibraryPath Value="C:/Users/Blue/Desktop/Test2/sqlitewrap/Debug"/>
         <LibraryPath Value="C:/sqlite3/lib"/>
+        <LibraryPath Value="C:/Users/Blue/Desktop/Test2/sqlitewrap/Debug"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/MinGW"/>
-        <LibraryPath Value="C:\OpenSSL-Win32\lib\"/>
+        <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>
         <Library Value="libboost_system-mgw51-mt-1_58"/>
         <Library Value="libboost_thread-mgw51-mt-1_58"/>
         <Library Value="libboost_chrono-mgw51-mt-1_58"/>

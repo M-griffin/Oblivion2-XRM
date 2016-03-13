@@ -1,5 +1,5 @@
 #include "communicator.hpp"
-#include "struct.hpp"
+#include "struct_compat.hpp"
 
 #include <iostream>
 #include <string>

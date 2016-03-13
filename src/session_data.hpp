@@ -1,7 +1,9 @@
 #ifndef SESSION_DATA_HPP
 #define SESSION_DATA_HPP
 
-#include "struct.hpp"
+
+#include "structures.hpp"
+#include "struct_compat.hpp"
 #include "connection_base.hpp"
 #include "telnet_decoder.hpp"
 #include "broad_caster.hpp"
@@ -211,13 +213,13 @@ public:
      * @brief Start Secutiry handshake.
      */
     void handshake();
-    
+
     /**
      * @brief Handles setting up the first read() after successful handshake.
      * @param error
      */
     void handleHandshake(const boost::system::error_code& error);
-    
+
     /**
      * @brief Start ESC Key input timer
      */
@@ -246,6 +248,8 @@ public:
     telnet_ptr        m_telnet_state;
     deadline_timer    m_input_deadline;
     menu_manager_ptr  m_menu_manager;
+
+    // Temp while testing.
     UserRec           m_user_record;
 
     int               m_node_number;

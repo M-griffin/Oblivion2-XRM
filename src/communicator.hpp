@@ -1,7 +1,8 @@
 #ifndef COMMUNICATOR_HPP
 #define COMMUNICATOR_HPP
 
-#include "struct.hpp"
+#include "structures.hpp"
+#include "struct_compat.hpp"
 #include "safe_queue.hpp"
 #include "broad_caster.hpp"
 #include "common_io.hpp"
@@ -217,7 +218,9 @@ public:
     // ThreadSafe Message Queue
     SafeQueue<std::string> m_queue;
     board_caster_ptr       m_room;
-    ConfigRec              m_config_record;
+
+    // This is temp while testing.
+    ConfigRec             m_config_record;
 
 private:
     mutable std::mutex    m_node_mutex;

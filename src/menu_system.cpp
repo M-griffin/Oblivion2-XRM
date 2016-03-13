@@ -1,6 +1,6 @@
 #include "menu_system.hpp"
 #include "ansi_processor.hpp"
-#include "struct.hpp"
+#include "struct_compat.hpp"
 #include "common_io.hpp"
 #include "communicator.hpp"
 

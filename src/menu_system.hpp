@@ -1,7 +1,7 @@
 #ifndef MENU_SYSTEM_HPP
 #define MENU_SYSTEM_HPP
 
-#include "struct.hpp"
+#include "struct_compat.hpp"
 #include "the_state.hpp"
 #include "menu_data.hpp"
 #include "session_io.hpp"
@@ -42,9 +42,12 @@ public:
     std::string      m_current_menu;       // Name of current menu loaded.
     std::string      m_previous_menu;      // Name of Previous Menu for Gosub
     int              m_input_index;        // Menu Input Index, for Forwarding to current function.
+
+    // Temp
     MenuPrompt       m_menu_prompt;        // Hold the currently loaded menu prompt.
     MenuInfo         m_menu_info;          // Menu Info
     MenuOption       m_menu_options;       // Menu Commands
+
     AnsiProcessor    m_ansi_process;       // Instance for AnsiProcess Methods
     int              m_active_pulldownID;  // Active Lightbar Position.
 
@@ -120,7 +123,7 @@ public:
     */
     void redisplayMenuScreen();
 
-    
+
     // Menu System will be a (2) Function system 1st setups up and displays
     // The Second handles all I/O for the menu options, this is dynamic since
     // Input is passed through to it, then the function returns for the next input

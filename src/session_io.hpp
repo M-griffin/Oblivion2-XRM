@@ -1,7 +1,7 @@
 #ifndef SESSION_IO_HPP
 #define SESSION_IO_HPP
 
-#include "struct.hpp"
+#include "structures.hpp"
 #include "session_data.hpp"
 #include "common_io.hpp"
 
@@ -90,7 +90,7 @@ public:
      * @param pipe_code
      * @return
      */
-    std::string parsePipeWithChars(const std::string &pipe_code);    
+    std::string parsePipeWithChars(const std::string &pipe_code);
 
     /**
      * @brief Parses MCI/Pipe Codes to ANSI Sequences.

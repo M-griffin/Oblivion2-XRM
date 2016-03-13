@@ -5,11 +5,11 @@ Introduction
 .. image:: https://dl.dropboxusercontent.com/u/92792939/XRM.jpg
    :alt: Screenshot
 
-Oblivion/2 XRM 
+Oblivion/2 XRM
 ===============
 
-A text based bulletin board system served over Telnet.  
-XRM for (Extreme Remake) is my attempt to recreate and emulate one of the most popular DOS basesd BBS software with its one of a kind interface and configurability.
+A text based bulletin board system served over Telnet.
+XRM for (Extreme Remake) is my attempt to recreate and emulate one of the most popular DOS based BBS software with its one of a kind interface and configurability.
 
 
 
@@ -17,15 +17,15 @@ XRM for (Extreme Remake) is my attempt to recreate and emulate one of the most p
 Project details
 ===============
 
-The system is still in very early development.  
+The system is still in very early development.  This is now a working system as of yet and is still being put together.
 You can follow the **changelog** in the root folder for progress updates.
 
-Main development is current under Windows with releases planned for Linux, OSX, ARM. 
+Main development is current under Windows with releases planned for Linux, OSX, ARM.
 
 Built under C++ with Boost and compiles under g++ MingW32/64 5.1.0 using latest c++14.
 Makefiles(2) are now added for compiling in Linux.  At this time they are only tested with Ubuntu, Mint.
- 
- 
+
+
 More items will be added on the current progress and a todo list as time permits.
 
 Acknowledgments and Thanks

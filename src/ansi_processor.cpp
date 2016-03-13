@@ -1,6 +1,6 @@
 #include "ansi_processor.hpp"
 #include "common_io.hpp"
-#include "struct.hpp"
+#include "structures.hpp"
 
 #include <cstdio>
 #include <cstdlib>

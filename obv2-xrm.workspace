@@ -8,13 +8,11 @@
   <Project Name="xrm-unittest" Path="xrm-unittest/xrm-unittest.project" Active="No"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="yes">
-      <Project Name="xrm-server" ConfigName="Debug"/>
       <Project Name="SqliteWrapped" ConfigName="Debug"/>
       <Project Name="xrm-server" ConfigName="Debug"/>
       <Project Name="xrm-unittest" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Release" Selected="yes">
-      <Project Name="xrm-server" ConfigName="Release"/>
       <Project Name="SqliteWrapped" ConfigName="Release"/>
       <Project Name="xrm-server" ConfigName="Release"/>
       <Project Name="xrm-unittest" ConfigName="Release"/>

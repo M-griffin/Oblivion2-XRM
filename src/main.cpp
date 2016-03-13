@@ -17,13 +17,19 @@
  *
  */
 
-#include "struct.hpp"
+#include "data/config.hpp"
+#include "data/config_dao.hpp"
+
+#include "data/users.hpp"
+#include "data/users_dao.hpp"
+
+#include "struct_compat.hpp"
 #include "server.hpp"
 #include "server_ssl.hpp"
 #include "communicator.hpp"
 #include "common_io.hpp"
 
-//#include "libsqlitewrapped.h" // testing
+#include "libSqliteWrapped.h"
 //#include "menu_system.hpp"
 
 #include <cstdlib>
@@ -86,7 +92,7 @@ void handler(const boost::system::error_code& /*e*/,
 void run(boost::asio::io_service& io_service)
 {
     try
-    {        
+    {
         //tcp::endpoint endpoint(tcp::v4(), 6023);
         //tcp::endpoint endpoint(tcp::v6(), 6023);
         Server serv(io_service); //, endpoint);
@@ -142,32 +148,16 @@ auto main() -> int
     // Load System Configuration
     TheCommunicator::Instance()->loadSystemConfig();
 
-    // Database is working!  just testing.
-    /*
-    Database::Mutex mutex; // not really necessary here at all
-	StderrLog log;
-	Database db(mutex, "test3.db", &log);
-	Query q(db);
+    // NEW Loading and saving default Configuration file to XML
+    config_ptr config(new Config());
 
-	// create a test3 table
-	q.execute("create table test3 ( num integer, name string )");
+    ConfigDAO cfg(config, BBS_PATH);
+    cfg.saveConfig();
 
-	// fill test3 with some data
-	q.execute("insert into test3 values(1, 'Anders')");
-	q.execute("insert into test3 values(2, 'Grymse')");
 
-	// retrieve data
-	q.get_result("select * from test3");
-	while (q.fetch_row())
-	{
-		long num = q.getval();
-		std::string name = q.getstr();
-		printf("#%ld: %s\n", num, name.c_str());
-	}
-	q.free_result();
-    */
-
+    // Start System Services and Main Loop.
     boost::asio::io_service io_service;
+
     // start io_service.run( ) in separate thread
     auto t = std::thread(&run, std::ref(io_service));
 

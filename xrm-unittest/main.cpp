@@ -3,9 +3,6 @@
  *   Copyright (C) 2015 by Michael Griffin
  */
 
-//#include "common_io_ut.hpp"
-//#include "StandardIO_Test.hpp"
-
 #ifdef _WIN32
 #include <UnitTest++.h>
 #else

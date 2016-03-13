@@ -1,5 +1,5 @@
 #include "common_io.hpp"
-#include "struct.hpp"
+#include "structures.hpp"
 
 #include <unistd.h>
 #include <sys/types.h>

@@ -1,5 +1,5 @@
 #include "menu_system.hpp"
-#include "struct.hpp"
+#include "struct_compat.hpp"
 
 #include <boost/locale.hpp>
 #include <boost/filesystem.hpp>

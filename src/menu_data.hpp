@@ -1,7 +1,7 @@
 #ifndef MENU_DATA_HPP
 #define MENU_DATA_HPP
 
-#include "struct.hpp"
+#include "structures.hpp"
 #include <string>
 
 /**

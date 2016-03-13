@@ -1,7 +1,7 @@
 #ifndef CHAT_STATE_HPP
 #define CHAT_STATE_HPP
 
-#include "struct.hpp"
+#include "struct_compat.hpp"
 #include "the_state.hpp"
 
 /*
@@ -14,7 +14,7 @@
  * This keeps the system running asynchronously, we should never
  * be looking and waiting for data in these modules.
  */
- 
+
 /**
  * @class ChatState
  * @author Michael Griffin

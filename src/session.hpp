@@ -204,22 +204,35 @@ public:
             {
                 if(m_connection->m_is_secure)
                 {
-                    std::cout << "Leaving (SECURE SESSION) Client IP: "
-                              << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
-                              << std::endl;
+                    try
+                    {
+                        std::cout << "Leaving (SECURE SESSION) Client IP: "
+                                  << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
+                                  << std::endl;
 
-                    m_connection->m_secure_socket.lowest_layer().shutdown(tcp::socket::shutdown_both);
-                    m_connection->m_secure_socket.lowest_layer().close();
-
+                        m_connection->m_secure_socket.lowest_layer().shutdown(tcp::socket::shutdown_both);
+                        m_connection->m_secure_socket.lowest_layer().close();
+                    }
+                    catch(std::exception ex)
+                    {
+                        std::cout << "Exception closing socket(): " << ex.what() << std::endl;
+                    }
                 }
                 else
                 {
-                    std::cout << "Leaving (NORMAL SESSION) Client IP: "
-                              << m_connection->m_normal_socket.remote_endpoint().address().to_string()
-                              << std::endl;
+                    try
+                    {
+                        std::cout << "Leaving (NORMAL SESSION) Client IP: "
+                                  << m_connection->m_normal_socket.remote_endpoint().address().to_string()
+                                  << std::endl;
 
-                    m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
-                    m_connection->m_normal_socket.close();
+                        m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
+                        m_connection->m_normal_socket.close();
+                    }
+                    catch(std::exception ex)
+                    {
+                        std::cout << "Exception closing socket(): " << ex.what() << std::endl;
+                    }
                 }
             }
         }
@@ -278,19 +291,35 @@ public:
 
         if(m_connection->is_open())
         {
-            if(m_connection->m_is_secure)
+            if(!m_connection->m_is_secure)
             {
-                std::cout << "New TCP Session ! " << std::endl;
-                std::cout << "Client IP Address: "
-                          << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
-                          << std::endl;
+                try
+                {
+                    std::cout << "New TCP Session ! " << std::endl;
+                    std::cout << "Client IP Address: "
+                              << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
+                              << std::endl;
+                }
+                catch(std::exception ex)
+                {
+                    std::cout << "Exception remote_endpoint(): " << ex.what() << std::endl;
+                }
             }
             else
             {
-                std::cout << "New Secure Session ! " << std::endl;
-                std::cout << "Client IP Address: "
-                          << m_connection->m_normal_socket.remote_endpoint().address().to_string()
-                          << std::endl;
+                try
+                {
+                    std::cout << "New Secure Session ! " << std::endl;
+                    std::cout << "Client IP Address: "
+                              << m_connection->m_normal_socket.remote_endpoint().address().to_string()
+                              << std::endl;
+                }
+                catch(std::exception ex)
+                {
+                    std::cout << "Exception remote_endpoint(): " << ex.what() << std::endl;
+                }
+
+
             }
         }
 

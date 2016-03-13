@@ -1,4 +1,52 @@
 
+Change Log Update (00.00.11)
+* 2016-03-13 Long Break is Over
++ Started laying out Database Tables, decided to stick with custom version of SqliteWrapped.
+* SqliteWrapped:
++ Makes lots of updates and have been rewriting SqliteWrapped to work a little 
+  easer with classes and help make some ORM related adjustments for pulling data 
+  in and out of classes easier.
++ Added transactional inserts, updates, and creates, failures can no be rolled back
+  and makes for quicker inserts of large data sets, and also creating tables and indexes together.
+* XRM: 
++ Created a new Data Sub folder and initial data classes for Config and Users.
+  Also created Config_Dao, and Users_Dao which will maintain the API for reading and writing data.
++ Config file is setup as a serialization class that will read and write to an XML file.
++ Users is setup to use the custom SQLite Wrappers API and updated features and methods.
+- Work has been a little start as my time is still limited.  I have to rip out allot of the 
+  flat file stuff I did and start writing interfaces for the data, then later on write conversions 
+  from the flat files to the new data layouts.
+- Then i also need to decide what format the menu files will be in.  It's kind of silly to use a 
+  database for menu files. So either XML, JSON, or something that is quick and easy to edit and use. 
+
+Change Log Update (00.00.10)
++ Note, SSL ipv6, and Telnet Options.
+
+* 2015-11-05 Import to Slqite
++ Starting on Inital Functions for Inport.
+- Started on Menu while also look through and testing Sqlitewrapped.
+  Need to do some testing on writting and retrieving Dates from
+  The Database.
+
+* 2015-11-01 Obv2 Data Files
++ Breaking out functions for reading original obv/2 data files
+  to a new update2xrm sub folder.  This is will be used for 
+  upgrading legacy obv2 systems to the new xrm format once 
+  it's completed.  Namespaecs will be created for different
+  obv/2 versions as needed.  Default is 2.30, plans for adding
+  2.4 etc for Black Flag and more.
+
+* 2015-10-26 Sqlite3 Schema.
++ Worked on more tables and splitting out sections.
++ Working on some database inserts and performance testing.
+- Goal is squeeze out the best layout that will run optimly on Pi/2 ARM
+  and be well otimized for all platforms there after.
+
+* 2015-10-22 Sqlite3 Schema.
++ Currently Breaking down the User And System Records into Tables
+  Pretty tedious but need to normalized it out.
+
+
 Change Log Update (00.00.09)
 * 2015-10-19 XRM-WFC and SSL Connections
 + Large rework on the Session, SessionData and Connection objects

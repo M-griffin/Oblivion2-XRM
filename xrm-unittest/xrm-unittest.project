@@ -42,6 +42,7 @@
     <File Name="ansi_processor_ut.cpp"/>
     <File Name="../src/ansi_processor.cpp"/>
     <File Name="../src/ansi_processor.hpp"/>
+    <File Name="users_dao_ut.cpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -63,6 +64,7 @@
         <IncludePath Value="C:/boost/include"/>
         <IncludePath Value="C:/Users/Blue/Desktop/Test2/sqlitewrap"/>
         <IncludePath Value="C:/sqlite3/include"/>
+        <IncludePath Value="C:/OpenSSL-Win32/include"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
@@ -72,6 +74,8 @@
         <LibraryPath Value="C:/Users/Blue/Desktop/Test2/sqlitewrap/Debug"/>
         <LibraryPath Value="C:/sqlite3/lib"/>
         <LibraryPath Value="C:/UnitTest++-1.3/Debug"/>
+        <LibraryPath Value="C:/OpenSSL-Win32/lib/MinGW"/>
+        <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>
         <Library Value="libboost_system-mgw51-mt-1_58"/>
         <Library Value="libboost_thread-mgw51-mt-1_58"/>
         <Library Value="libboost_chrono-mgw51-mt-1_58"/>
@@ -88,6 +92,8 @@
         <Library Value="libSqliteWrapped.a"/>
         <Library Value="libsqlite3.a"/>
         <Library Value="libUnitTest++.a"/>
+        <Library Value="ssleay32.a"/>
+        <Library Value="libeay32.a"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
