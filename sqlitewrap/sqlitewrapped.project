@@ -63,7 +63,11 @@
       </Debugger>
       <PreBuild/>
       <PostBuild>
+        <Command Enabled="no"># Linux /OSX / BSD</Command>
+        <Command Enabled="no">#cat IError.h StderrLog.h SysLog.h Database.h Query.h &gt; lib$(ProjectName).h</Command>
         <Command Enabled="yes"/>
+        <Command Enabled="no"># Windows</Command>
+        <Command Enabled="yes">type IError.h StderrLog.h SysLog.h Database.h Query.h &gt; lib$(ProjectName).h</Command>
       </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>

@@ -1,0 +1,25 @@
+
+Change Log Update (00.00.02) 3/13/2016
+- Added new Templates for building fields to match up class variables.
+  translateFieldName() to build insert and update queries.
+- Added Transactions for multiple Creations, Inserts, and Updates.
+- Added a little more RAII for Query cleanup
+- Query is working good as a self destruction smart pointer.  
+- Database still has to be a normal object that is passed.
+
+Change Log Update (00.00.01) 2/19/2016
+- Renamed Namespace from SQLITEW_NAMESPACE to SQLW.
+  Also setup the default to use the namespace.
+- Reformatting all code to make it cleaner
+- Started Refactoring Functions and Method Names, make things more clearer and consistent.
+  Only Initial Phase 1 is completed.  
+- Added new templates to pull results by field name, by the type passed.
+  ex.. std::string first_name = query.getFieldByName("sFirstName", first_name);
+  This pulls the column sFirstName as a std::string.
+
+Change Log Update (00.00.00)
+- Updated Sqlite3 calls to use v2 functions for Open, Prepare, Close
+- Also Redid all formatting from TAB to spaces to keep formatting proper.
+
+SqlWrapped Initial Version Fork Version 1.3.1 Released 2008-06-29 
+Copyright (C) 2013 by Anders Hedström <http://www.alhem.net/>
