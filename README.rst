@@ -17,7 +17,8 @@ XRM for (Extreme Remake) is my attempt to recreate and emulate one of the most p
 Project details
 ===============
 
-The system is still in very early development.  This is now a working system as of yet and is still being put together.
+**The system is still in very early development and is not a working system as of yet.**
+
 You can follow the **changelog** in the root folder for progress updates.
 
 Main development is current under Windows with releases planned for Linux, OSX, ARM.
