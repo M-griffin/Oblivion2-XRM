@@ -2,7 +2,7 @@
  * Oblivion/2 XRM (c) 2015 Michael Griffin
  * A Telnet Server and BBS system modeled after Oblivion/2 bbs software.
  *
- * XRM = X-Treme Remake!  :)
+ * XRM = Extreme Remake!
  * Compiles under MingW32/64 5.1.0 g++
  *
  * LIBS:
@@ -20,16 +20,12 @@
 #include "data/config.hpp"
 #include "data/config_dao.hpp"
 
-#include "data/users.hpp"
-#include "data/users_dao.hpp"
-
-#include "struct_compat.hpp"
 #include "server.hpp"
 #include "server_ssl.hpp"
 #include "communicator.hpp"
 #include "common_io.hpp"
 
-#include "libSqliteWrapped.h"
+//#include "libSqliteWrapped.h"
 //#include "menu_system.hpp"
 
 #include <cstdlib>
@@ -53,6 +49,10 @@ std::string MENU_PATH = "";
 std::string TEXTFILE_PATH = "";
 
 using boost::asio::ip::tcp;
+
+// Setup Handles to Services.
+typedef boost::shared_ptr<Server>	 server_telnet_ptr;
+typedef boost::shared_ptr<ServerSSL> server_ssl_ptr;
 
 /* NOTES
 
@@ -90,15 +90,37 @@ void handler(const boost::system::error_code& /*e*/,
  * @param io_service
  */
 void run(boost::asio::io_service& io_service)
-{
-    try
-    {
-        //tcp::endpoint endpoint(tcp::v4(), 6023);
-        //tcp::endpoint endpoint(tcp::v6(), 6023);
-        Server serv(io_service); //, endpoint);
+{    
+    // Create Handles to Services
+    server_telnet_ptr serverTelnet;
+    server_ssl_ptr    serverSSL;
 
-        // Initial Testing of SSL Seure Connections ipv4, update to ipv6 with support for 4 lateron.
-        ServerSSL serv_ssl(io_service, 6022);
+    // Grab Lock and Create Instance of accessable configuration.
+    config_ptr cfg(TheCommunicator::Instance()->getConfig().lock());
+    if (!cfg)
+    {
+        std::cout << "Error: getConfig.lock()" << std::endl;
+        assert(false);
+    }
+    
+    // Service Startup Here.
+    try
+    {        
+        // Startup Telnet Server
+        if (cfg->use_service_telnet)
+        {
+            std::cout << "Listening for telnet connections on port "
+                      << cfg->port_telnet << std::endl;
+            serverTelnet.reset(new Server(io_service, cfg->port_telnet));
+        }
+
+        // Initial Testing of SSL Server.
+        if (cfg->use_service_ssl)
+        {
+            std::cout << "Listening for service connections on port "
+                      << cfg->port_ssl << std::endl;
+            serverSSL.reset(new ServerSSL(io_service, cfg->port_ssl));
+        }
 
         // Setup first timer.
         //    int count = 0;
@@ -133,8 +155,6 @@ void run(boost::asio::io_service& io_service)
 auto main() -> int
 {
     std::cout << "Oblivion/2 XRM Server (c) 2015 Michael Griffin." << std::endl;
-    std::cout << "Listening for client connections on port 6023." << std::endl;
-    std::cout << "Listening for wfc system connections on port 6022." << std::endl;
 
     CommonIO common;
     BBS_PATH = common.getProgramPath();
@@ -145,18 +165,32 @@ auto main() -> int
     MENU_PATH = BBS_PATH + "MENU";
     TEXTFILE_PATH = BBS_PATH + "TEXTFILE";
 
-    // Load System Configuration
-    TheCommunicator::Instance()->loadSystemConfig();
+    // Start System Services and Main Loop.
+    boost::asio::io_service io_service;
 
     // NEW Loading and saving default Configuration file to XML
     config_ptr config(new Config());
+    if (!config)
+    {
+        std::cout << "Unable to allocate config structure" << std::endl;
+        assert(false);
+    }
 
-    ConfigDAO cfg(config, BBS_PATH);
-    cfg.saveConfig();
 
+    // Handle to Data Access Object.
+    ConfigDao cfg(config, BBS_PATH);
 
-    // Start System Services and Main Loop.
-    boost::asio::io_service io_service;
+    // Try to read configuration file, if it doesn't exist create with defaults.
+    if (!cfg.loadConfig())
+    {
+        // If config file doesn't exist. then save a default, and reopen.
+        std::cout << "Unable to Load, or Recreate missing xrm-config.xml file." << std::endl;
+        assert(false);
+    }
+
+    // Load BBS Configuration here into Global Singleton.
+    TheCommunicator::Instance()->attachConfig(config);
+
 
     // start io_service.run( ) in separate thread
     auto t = std::thread(&run, std::ref(io_service));

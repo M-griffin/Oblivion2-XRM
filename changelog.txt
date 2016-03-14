@@ -1,4 +1,16 @@
 
+Change Log Update (00.00.12)
+* 2016-03-13
++ Config file will auto generate with defaults if it doesn't exist.
++ Using new Config Class and DAO to read config file. Remove references to Config.BBS
+  which wasn't being used.
++ Telnet and SSL Sockets listeners are now swapped depending on configuration settings.
+* 2016-03-14
++ Reworked the Configuration a bit more, removed passing configurations though the servers to the sessions
+  This could cause sessions to stick with smart pointers, instead worked it into the Global Communicator
+  Which will pass back a weak pointer of the config anytime it's needed since it's global and static.
++ Also added mutex and lock guards to the configuration.
+
 Change Log Update (00.00.11)
 * 2016-03-13 Long Break is Over
 + Started laying out Database Tables, decided to stick with custom version of SqliteWrapped.

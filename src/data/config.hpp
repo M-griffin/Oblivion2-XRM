@@ -986,7 +986,7 @@ public:
         , password_system("")
         , password_sysop("")
         , password_newuser("")
-        , port_telnet(23)
+        , port_telnet(6023)      // Default for Testing
         , port_ssl(443)
         , use_service_telnet(true)
         , use_service_ssl(false)
@@ -1073,7 +1073,7 @@ public:
 
 
 typedef boost::shared_ptr<Config> config_ptr;
-typedef boost::weak_ptr<Config>   config_weak_ptr;
+typedef boost::weak_ptr<Config>   config_wptr;
 
 //BOOST_CLASS_VERSION(Config, 1)
 //BOOST_CLASS_IS_WRAPPER(Config)

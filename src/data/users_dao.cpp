@@ -106,6 +106,7 @@ UsersDao::UsersDao(SQLW::Database &database)
 
 UsersDao::~UsersDao()
 {
+    std::cout << "~UsersDao" << std::endl;
 }
 
 /**
