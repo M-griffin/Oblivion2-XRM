@@ -1,6 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+#include "data/config.hpp"
 #include "broad_caster.hpp"
 #include "session.hpp"
 #include "connection_tcp.hpp"
@@ -21,7 +22,7 @@ class Server
 {
 
 public:
-    Server(boost::asio::io_service& io_service) //, const tcp::endpoint& endpoint)
+    Server(boost::asio::io_service& io_service, int port) //, const tcp::endpoint& endpoint)
         : m_io_service(io_service)
         , m_acceptor_v6(io_service)
         , m_acceptor_v4(io_service)
@@ -29,7 +30,7 @@ public:
         , m_is_using_ipv6(true)
         , m_context(boost::asio::ssl::context::sslv23)
     {
-        std::cout << "Server" << std::endl;
+        std::cout << "Starting Telnet Server" << std::endl;
 
         // Defaults v6_Only to false to accept both v4 and v6 connections.
         boost::asio::ip::v6_only v6_only(false);
@@ -44,7 +45,7 @@ public:
 
             // Listen to localhost connections only
             //m_acceptor_v6.bind(tcp::endpoint(ip::address::from_string("127.0.0.1"), "5555"));
-            m_acceptor_v6.bind(tcp::endpoint(boost::asio::ip::tcp::v6(), 6023));
+            m_acceptor_v6.bind(tcp::endpoint(boost::asio::ip::tcp::v6(), port));
             m_acceptor_v6.listen();
         }
         else
@@ -61,7 +62,7 @@ public:
             {
                 // Listen to localhost connections only
                 //m_acceptor_v4.bind(tcp::endpoint(ip::address::from_string("127.0.0.1"), "5555"));
-                m_acceptor_v4.bind(tcp::endpoint(boost::asio::ip::tcp::v4(), 6023));
+                m_acceptor_v4.bind(tcp::endpoint(boost::asio::ip::tcp::v4(), port));
                 m_acceptor_v4.listen();
             }
             else
@@ -86,7 +87,7 @@ public:
         // And send messages to other nodes.
         TheCommunicator::Instance()->setupServer(m_room);
 
-        std::cout << "Server TCP Telnet Ready." << std::endl;
+        std::cout << "Telnet Server Ready." << std::endl;
         wait_for_connection();
     }
 

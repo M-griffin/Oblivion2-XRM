@@ -1,8 +1,7 @@
 #ifndef COMMUNICATOR_HPP
 #define COMMUNICATOR_HPP
 
-#include "structures.hpp"
-#include "struct_compat.hpp"
+#include "data/config.hpp"
 #include "safe_queue.hpp"
 #include "broad_caster.hpp"
 #include "common_io.hpp"
@@ -141,93 +140,37 @@ public:
     }
 
     /**
-     * @brief Writing Binary Data Records to Disk
-     * @param t
-     * @param filename
-     * @param idx
-     * @return
+     * @brief Attach the system configuration.
+     * @param config
      */
-    template <typename T>
-    int writeConfigurationRecord(T *t, std::string filename, int idx)
+    void attachConfig(config_ptr config)
     {
-        std::string path = BBS_PATH;
-        #ifdef _WIN32
-            path.append("\\");
-        #else
-            path.append("/");
-        #endif
-        path.append(filename);
-
-        int x = 0;
-        FILE *stream = fopen(path.c_str(), "rb+");
-        if(stream == nullptr)
-        {
-            // Create File if it doesn't exist.
-            stream = fopen(path.c_str(), "wb");
-            if(stream == nullptr)
-            {
-                std::cout << "Error writting " << filename << std::endl;
-                return x;
-            }
-        }
-        if(fseek(stream, (int)idx * sizeof(T), SEEK_SET) == 0)
-            x = fwrite(t, sizeof(T), 1, stream);
-        fclose(stream);
-        return x;
-    }
-
-    template <typename T>
-    int readConfigurationRecord(T *t, std::string filename, int idx)
-    {
-        std::string path = BBS_PATH;
-        #ifdef _WIN32
-            path.append("\\");
-        #else
-            path.append("/");
-        #endif
-        path.append(filename);
-
-        int x = 0;
-        FILE *stream = fopen(path.c_str(), "rb+");
-        if(stream == nullptr)
-        {
-            // Create File if it doesn't exist.
-            std::cout << "Error Reading, Re-creating file. " << filename << std::endl;
-            stream = fopen(path.c_str(), "wb");
-            if(stream == nullptr)
-            {
-                std::cout << "Error Reading " << filename << std::endl;
-                return x;
-            }
-        }
-        fclose(stream);
-
-        stream = fopen(path.c_str(), "rb");
-        if(fseek(stream, (int)idx * sizeof(T), SEEK_SET) == 0)
-            x = fread(t, sizeof(T), 1, stream);
-        fclose(stream);
-        return x;
+        std::lock_guard<std::mutex> lock(m_config_mutex);
+        m_config = config;
     }
 
     /**
-     * @brief Loads the System configuration
+     * @brief Return a Read Only Instance of the Configuration.
+     * @param config
      */
-    void loadSystemConfig();
-
-
+    config_wptr getConfig() const
+    {
+        std::lock_guard<std::mutex> lock(m_config_mutex);
+        return config_wptr(m_config);
+    }
+    
     // ThreadSafe Message Queue
     SafeQueue<std::string> m_queue;
     board_caster_ptr       m_room;
 
-    // This is temp while testing.
-    ConfigRec             m_config_record;
-
 private:
     mutable std::mutex    m_node_mutex;
     mutable std::mutex    m_data_mutex;
+    mutable std::mutex    m_config_mutex;
     std::vector<int>      m_node_array;
     static Communicator*  m_globalInstance;
     CommonIO              m_common_io;
+    config_ptr            m_config;
 
     Communicator();
     ~Communicator();

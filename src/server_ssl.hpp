@@ -1,4 +1,5 @@
 
+#include "data/config.hpp"
 #include "broad_caster.hpp"
 #include "communicator.hpp"
 #include "connection_base.hpp"
@@ -24,15 +25,15 @@
 class ServerSSL
 {
 public:
-    ServerSSL(boost::asio::io_service& io_service, unsigned short port)
+    ServerSSL(boost::asio::io_service& io_service, int port)
         : m_io_service(io_service)
         , m_acceptor(io_service
                      , boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4()
-                             , port))
+                     , port))
         , m_context(boost::asio::ssl::context::sslv23)
         , m_room(new BroadCaster())
     {
-        std::cout << "ServerSSL" << std::endl;
+        std::cout << "Starting SSL Server" << std::endl;
         m_context.set_options(
             boost::asio::ssl::context::default_workarounds
             | boost::asio::ssl::context::no_sslv2
@@ -48,7 +49,7 @@ public:
         // And send messages to other nodes.
         TheCommunicator::Instance()->setupServer(m_room);
 
-        std::cout << "Server SSL Ready." << std::endl;
+        std::cout << "SSL Server Ready." << std::endl;
         wait_for_connection();
     }
 

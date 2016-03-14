@@ -75,6 +75,7 @@ bool MenuSystem::onEnter()
      * execute this stuff from
      */
 
+/*
     // Access any needed global configuration values
     if(TheCommunicator::Instance()->m_config_record.UseWelcome)
     {
@@ -95,7 +96,7 @@ bool MenuSystem::onEnter()
     if(TheCommunicator::Instance()->m_config_record.SpecialLogin)
     {
         // Needed for MATRIX MENU STARTUP!
-    }
+    }*/
 
     m_is_active = true;
     return true;
