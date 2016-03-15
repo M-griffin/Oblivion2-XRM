@@ -87,7 +87,7 @@ void AnsiProcessor::screenBufferDisplayTest()
     std::string character = "";
 
     if(m_is_screen_cleared)
-        m_ansi_output.append("\x1b[2J\x1b[1;1H");
+        m_ansi_output.append("\x1b[1;1H\x1b[2J");
 
     int count = 1;
     for(auto &buff : m_screen_buffer)
@@ -146,7 +146,7 @@ std::string AnsiProcessor::buildPullDownBars(int pulldown_id, bool active)
     std::map<int, ScreenPixel>::iterator it;
     it = m_pull_down_options.find(pulldown_id);
 
-    // If We have  the pulldown ID
+    // If We have the pulldown ID
     if(it != m_pull_down_options.end())
     {
         // First Position

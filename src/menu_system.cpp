@@ -3,6 +3,7 @@
 #include "struct_compat.hpp"
 #include "common_io.hpp"
 #include "communicator.hpp"
+#include "data/config.hpp"
 
 #include <boost/locale.hpp>
 #include <boost/filesystem.hpp>
@@ -14,6 +15,7 @@
 #include <fstream>
 #include <algorithm>
 #include <functional>
+
 
 const std::string MenuSystem::m_menuID = "MENU_SYSTEM";
 
@@ -63,40 +65,27 @@ void MenuSystem::update(std::string character_buffer, bool is_utf8)
 
 /**
  * @brief Startup class, setup initial screens / interface, flags etc..
+ *        This is only called when switch to the state, not for menu instances.
  * @return
  */
 bool MenuSystem::onEnter()
 {
     std::cout << "OnEnter() MenuSystem\n";
 
-    /*
-     *
-     * possiable uses right now..  need to double check on where i really want to
-     * execute this stuff from
-     */
+    // Grab handle to the system configuration
+    config_ptr cfg(TheCommunicator::Instance()->getConfig().lock());
+    if (!cfg)
+    {
+        std::cout << "Error: getConfig.lock()" << std::endl;
+        assert(false);
+    }
 
-/*
     // Access any needed global configuration values
-    if(TheCommunicator::Instance()->m_config_record.UseWelcome)
+    // For Example...
+    if(cfg->use_matrix_login)
     {
-        // Display random welcome or default welcome.ans here.
+        // etc..  still work in progress!
     }
-
-    if(TheCommunicator::Instance()->m_config_record.DailyFlagChange)
-    {
-        // Reset A Users Faild Flags
-    }
-
-    if(TheCommunicator::Instance()->m_config_record.SpecialLogin)
-    {
-        // Needed for MATRIX MENU STARTUP!
-    }
-
-
-    if(TheCommunicator::Instance()->m_config_record.SpecialLogin)
-    {
-        // Needed for MATRIX MENU STARTUP!
-    }*/
 
     m_is_active = true;
     return true;
@@ -232,7 +221,7 @@ std::string MenuSystem::loadMenuScreen()
 
     if(pull_down_filename.size() == 0)
     {
-        // Load ansi by Menu Name, remove .MNU and Add .ANS
+        // Load ansi by Menu Name, remove .MNU and Add .ANS, maybe .UTF for utf8 native?
         std::string screen_file = m_current_menu.substr(0, m_current_menu.size()-4) + ".ANS";
         m_common_io.readinAnsi(screen_file, screen_data);
     }
@@ -252,7 +241,8 @@ std::string MenuSystem::buildLightBars()
 
     for(int i = 0; i < (signed)m_loaded_menu_options.size(); i++)
     {
-        // Always start on Initial or first arrived lightbar.
+        // Always start on Initial or first indexed lightbar.
+        // Might need to verify if we need to check for lowest ID, and start on that!
         if(m_active_pulldownID == i && m_active_pulldownID > 0)
             active_lightbar = true;
 
@@ -290,7 +280,8 @@ void MenuSystem::redisplayMenuScreen()
         m_ansi_process.screenBufferToString();
 
         // Process buffer for PullDown Codes.
-        std::string result = std::move(m_ansi_process.screenBufferParse());  // only if we want result, ignore..
+        // only if we want result, ignore.., result just for testing at this time!
+        std::string result = std::move(m_ansi_process.screenBufferParse());
 
         // Now Build the Light bars
         std::string light_bars = buildLightBars();
@@ -311,10 +302,6 @@ void MenuSystem::startupMenu()
     // 1. Make sure the Input is set to the
     m_input_index = MENU_INPUT;
 
-    // Reset the Pulldown ID for new menus.
-    /**
-     *  @brief IMPORTANT, THERE IS A MENU COMMAND TO OVERIDE THIS CHECK FOR IT!
-     */
     m_active_pulldownID = 0;
 
     // Read in the Menu ANSI
@@ -333,19 +320,23 @@ void MenuSystem::startupMenu()
     std::vector<int> pull_down_id;
 
     // Get Pulldown menu commands, Load all from menu options (disk)
-    for(int i = 0; i < (signed)m_loaded_menu_options.size(); i++)
+    //for(int i = 0; i < (signed)m_loaded_menu_options.size(); i++)
+    for (auto &m : m_loaded_menu_options)
     {
-        if(m_loaded_menu_options[i].PulldownID > 0)
+        if (m.PulldownID > 0)
         {
-            // Set First ID as Active.
-            m_active_pulldownID = m_loaded_menu_options[i].PulldownID;
+            pull_down_id.push_back(m.PulldownID);
 
-            // Setup ID's for pull Ansi Processor
-            pull_down_id.push_back(m_loaded_menu_options[i].PulldownID);
-
-            // Get Actual Options with Descriptiosn for Lightbars.
-            m_loaded_pulldown_options.push_back(m_loaded_menu_options[i]);
+            // Get Actual Options with Descriptions for Lightbars.
+            m_loaded_pulldown_options.push_back(m);
         }
+    }
+
+    // Set the lowest pulldown ID as Active
+    if (pull_down_id.size() > 0)
+    {
+        auto id = std::min_element(pull_down_id.begin(), pull_down_id.end());
+        m_active_pulldownID = *id;
     }
 
     //if (MenuInfo clear the scrren etc.. feature to add! )
@@ -360,7 +351,6 @@ void MenuSystem::startupMenu()
         /**
           * @brief Set Default, however check menu command for override.
           */
-        m_active_pulldownID = 1;
 
         m_is_active_pulldown_menu = true;
 
@@ -393,23 +383,27 @@ void MenuSystem::startupMenu()
     cout.imbue(loc);
 
     // Now loop and scan for first cmd and each time
-    for(int i = 0; i < (signed)m_loaded_menu_options.size(); i++)
+    //for(int i = 0; i < (signed)m_loaded_menu_options.size(); i++)
+    for (auto &m : m_loaded_menu_options)
     {
         // Process all First Commands}
-        std::string key = (char *)m_loaded_menu_options[i].Keys;
+        //std::string key = (char *)m_loaded_menu_options[i].Keys;
+        std::string key = (char *)m.Keys;
         key = to_upper(key);
 
         if(key == "FIRSTCMD")
         {
             // Process
-            std::cout << "FOUND FIRSTCMD! EXECUTE: " << m_loaded_menu_options[i].CKeys << std::endl;
+            //std::cout << "FOUND FIRSTCMD! EXECUTE: " << m_loaded_menu_options[i].CKeys << std::endl;
+            std::cout << "FOUND FIRSTCMD! EXECUTE: " << m.CKeys << std::endl;
         }
 
         // Next Process EVERY Commands}
         else if(key == "EACH")
         {
             // Process
-            std::cout << "FOUND EACH! EXECUTE: " << m_loaded_menu_options[i].CKeys << std::endl;
+            //std::cout << "FOUND EACH! EXECUTE: " << m_loaded_menu_options[i].CKeys << std::endl;
+            std::cout << "FOUND EACH! EXECUTE: " << m.CKeys << std::endl;
         }
     }
 }
