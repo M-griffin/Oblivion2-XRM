@@ -1,4 +1,10 @@
 
+Change Log Update (00.00.13)
+* 2016-03-15
++ Cleaned up some Menu System Items
++ Need to add startup to matrix, and test for configuration value if it's enabled.
++ Start building out matrix menu, and new user application next!
+
 Change Log Update (00.00.12)
 * 2016-03-13
 + Config file will auto generate with defaults if it doesn't exist.
@@ -34,10 +40,10 @@ Change Log Update (00.00.11)
 Change Log Update (00.00.10)
 + Note, SSL ipv6, and Telnet Options.
 
-* 2015-11-05 Import to Slqite
-+ Starting on Inital Functions for Inport.
+* 2015-11-05 Import to Sqlite
++ Starting on Initial Functions for Import.
 - Started on Menu while also look through and testing Sqlitewrapped.
-  Need to do some testing on writting and retrieving Dates from
+  Need to do some testing on writing and retrieving Dates from
   The Database.
 
 * 2015-11-01 Obv2 Data Files
@@ -51,8 +57,8 @@ Change Log Update (00.00.10)
 * 2015-10-26 Sqlite3 Schema.
 + Worked on more tables and splitting out sections.
 + Working on some database inserts and performance testing.
-- Goal is squeeze out the best layout that will run optimly on Pi/2 ARM
-  and be well otimized for all platforms there after.
+- Goal is squeeze out the best layout that will run optimally on Pi/2 ARM
+  and be well optimized for all platforms there after.
 
 * 2015-10-22 Sqlite3 Schema.
 + Currently Breaking down the User And System Records into Tables
@@ -146,12 +152,12 @@ Change Log Update (00.00.03)
 Change Log Update (00.00.02)
 * 2015-10-08 Added Makefiles for Linux.
 + Ported To Linux for cross compiler testing.
-+ Create new Makefile(s) for linux builds
++ Create new Makefile(s) for Linux builds
   - make -f Makefile-linux will build all (3) projects in order.
      - SqliteWrapped, xrm-server, xrm-unittests
   - Requires Boost, Pthreads, Sqlite3 libs.  Tested in Ubuntu/Mint
   - Moved compiler flags down from 14 to 11 standards.
-+ Made small updates via compiling in linux to code.
++ Made small updates via compiling in Linux to code.
 
 Change Log Update (00.00.01)
 * 2015-10-08 UnitTests
@@ -160,10 +166,10 @@ Change Log Update (00.00.01)
 
 Change Log Update (00.00.00)
 * 2015-10-08 Cleanup and Git.
-* Moved all Source files to src subfolder.
+* Moved all Source files to src sub folder.
 + Cleaned up files no longer part of the project.
 + Renamed project files from test to something more descriptive.
-+ Added in Unittest++ to start creating and using unit tests.
++ Added in Unit test++ to start creating and using unit tests.
 + Checked in initial version to GIT. Github will come once more of the base
   is completed.
 + Marking change logs with versions to match GIT
@@ -198,7 +204,7 @@ Change Log Update
 
 Change Log Update
 * 2015-10-06 MenuSystem
-+ Building the light bar menu processing for handling input and hotkeys
++ Building the light bar menu processing for handling input and hotkey's
   menu items.  Stacked command triggers.  ENTER on light bar selections
   and arrow key movements with HOME and END to jump beginning/end
   of command options.
@@ -252,7 +258,7 @@ Change Log Update
   color and position attributes from the screen buffer.
 
 Change Log Update
-* 2015-09-28 StateSystem & Internal Ansi Parser
+* 2015-09-28 StateSystem & Internal ANSI Parser
 + Reconfigured the Session->StateMachine->State->MenuSystem hierarchy.
   Cleaned up to Session->MenuManager->MenuSystem
   The MenuSystem is a now a State itself which easily inherits the 
@@ -264,7 +270,7 @@ Change Log Update
 - Started on Internal ANSI screen buffer.  This is needed to process
   all ANSI screens for special MCI position codes which tell the system
   where and what colors to place lightbars or input boundaries for 
-  splitscreen chat.
+  split screen chat.
 
 Change Log Update
 * 2015-09-27 Menu System
@@ -308,7 +314,7 @@ Change Log Update
 
 Change Log Update
 * 2015-09-22 Communicator
-+ Adding System wide configuration struct to the singleton.  
++ Adding System wide configuration Structs to the singleton.  
   This is for global configuration variable access to all sessions.
 + Moved PascalToCString, CStringToPascal, BoolToString to CommonIO.
 + Added Functions to Communicator to read the CONFIG.BBS record.
@@ -331,7 +337,7 @@ Change Log Update
   CreateInputField: generates ANSI background color at specified length
   for Inputting data for specific amount of characters.
   pipe2ansi for MCI and Pipes sequence parser.
-  Ansi foreground and background colors method for pipe2ansi.
+  ANSI foreground and background colors method for pipe2ansi.
 + Input Fields will have override for Foreground/Background colors with
   MCI codes along with Field Length.
 + Some minor code refactoring to keep naming the same across the
@@ -394,7 +400,7 @@ Change Log Update
   with enabled_share_this() to other areas.
 - Initial Output tested good, can now try moving the input to the new object
   with a Deadline timer for ESC sequence parsing.  Then add in pipe2ansi
-  functions for colorizing the output.
+  functions for colonizing the output.
 
 Change Log Update
 * 2015-09-17 InputField processing III
@@ -419,7 +425,7 @@ Change Log Update
   Makes translations from different key mapping easier to handle.
   Thanks to Bryan for the extra rxvt sequences.
 + Completed single Key / ESC Sequence GetKey functions.
-  Input is parsed for ESC determining is ESC has followup sequence.  If
+  Input is parsed for ESC determining is ESC has follow up sequence.  If
   a sequence is detected it continues gathering the remainder of the 
   sequence returning an ESC to notify either ESC key or Sequence.
   When it's a sequence the m_escape_sequence buffer will be empty for 
@@ -450,18 +456,18 @@ Change Log Update
 * 2015-09-15 Menu Editor
 - Working on the Menu Editor input handling.  Added toggle for line or
   Hotkey input.  Default in OBV/2 is line input in most menus with
-  Hotkey during pulldown menus.  This will be a toggle for an added 
+  Hotkey during pull down menus.  This will be a toggle for an added 
   feature.
 
 Change Log Update
 * 2015-09-14 Input Processing
 + Added a Deadline timer per session. This is needed when the last char
   received is an ESC.  We need the ability to detect single ESC vs
-  an ESC sequence. Lag over the internet can receive broken sequences
+  an ESC sequence. Lag over the Internet can receive broken sequences
   ESC in one read(), then [A in the next read().  With the timer, any
   time we receive an ESC by itself we wait 400 milliseconds for any follow 
   up sequence.  Otherwise it's registered as a lone ESC key.
-  Without this, function key sequence can register as an ESC and exit alot
+  Without this, function key sequence can register as an ESC and exit allot
   of interfaces causing issues!  
 
 Change Log Update
@@ -492,7 +498,7 @@ Change Log Update
 * 2015-09-04 More State Machine and I/O
 + Worked out functionality of StateMachine will derive a menu system
   States will now involve more complete systems instead of sub modules
-  Eg.. System State (bbs), Chat State (Sysop/Teleconference, 
+  Eg.. System State (BBS), Chat State (Sysop/Teleconference, 
   WFC State (Waiting for Callers, stats, node snooping).
   Each state will have a Menu system for handing commands and lightbars.
 + The State/MenuManager will loop incoming strings of data, parse single 
@@ -505,7 +511,7 @@ Change Log Update
 + Started adding output for default out and translated CP347 to UTF-8 for
   terminals.  Eventually will look at encoding for other 8 bit types like
   ISO-8859-1, etc.. However, most of these do not do block and line
-  drawing for ANSI.  At this time i'm keeping CP437 and UTF-8 with 
+  drawing for ANSI.  At this time I'm keeping CP437 and UTF-8 with 
   possible expansions later on. (Keep it simple for now).
 + Starting on Menu Editor that will read and edit original OBV/2 menu files
   Goal is to handle menus and data exactly as OBV/2 does, then expand later

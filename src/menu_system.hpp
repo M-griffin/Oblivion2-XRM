@@ -89,16 +89,16 @@ public:
 
 
     /**
-    * @brief Read Menu Data File for Info and all Options
-    */
+     * @brief Read Menu Data File for Info and all Options
+     */
     void readInMenuData();
     void writeOutMenuData();
     void readMenuOptions();
     void writeMenuOptions();
 
     /**
-    * @brief MenuSystemPrompts
-    */
+     * @brief MenuSystemPrompts
+     */
     void clearAllMenuPrompts();
     void readMenuAllPrompts();
     void readMenuPrompts(int menu_index);
@@ -119,8 +119,8 @@ public:
     std::string buildLightBars();
 
     /**
-    * @brief De parse and display current menu system.
-    */
+     * @brief De parse and display current menu system.
+     */
     void redisplayMenuScreen();
 
 

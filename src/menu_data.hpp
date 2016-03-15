@@ -20,6 +20,19 @@ public:
     ~MenuData()
     { }
 
+    /**
+     * @brief Appending forward or backspash to path
+     * @param path
+     */
+    void pathSeperator(std::string &path)
+    {
+#ifdef _WIN32
+        path.append("\\");
+#else
+        path.append("/");
+#endif
+    }
+
     /*
      * Menu Info is a header record in each menu. It should be read first.
      * All following menu options must skip past the initial MenuInfo Size.
@@ -46,11 +59,8 @@ public:
             // Else we want to read MENUPROMPT.DAT in DATA Folder
             path.append(DATA_PATH);
         }
-#ifdef _WIN32
-        path.append("\\");
-#else
-        path.append("/");
-#endif
+
+        pathSeperator(path);
         path.append(filename);
 
         int x = 0;
@@ -75,11 +85,7 @@ public:
     int recordWriteOption(T *t, std::string filename, int idx)
     {
         std::string path = MENU_PATH;
-#ifdef _WIN32
-        path.append("\\");
-#else
-        path.append("/");
-#endif
+        pathSeperator(path);
         path.append(filename);
 
         int x = 0;
@@ -121,11 +127,8 @@ public:
             // Else we want to read MENUPROMPT.DAT in DATA Folder
             path.append(DATA_PATH);
         }
-#ifdef _WIN32
-        path.append("\\");
-#else
-        path.append("/");
-#endif
+
+        pathSeperator(path);
         path.append(filename);
 
         int x = 0;
@@ -154,11 +157,7 @@ public:
     int recordReadOption(T *t, std::string filename, int idx)
     {
         std::string path = MENU_PATH;
-#ifdef _WIN32
-        path.append("\\");
-#else
-        path.append("/");
-#endif
+        pathSeperator(path);
         path.append(filename);
 
         int x = 0;
