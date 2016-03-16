@@ -47,7 +47,7 @@ public:
         , m_node_number(0)
         , m_input_encoding("cp437")
         , m_output_encoding("cp437")
-        , m_is_session_logged_in(false)
+        , m_is_session_authorized(false)
         , m_is_leaving(false)
         , m_is_esc_timer(false)
         , m_raw_data()
@@ -255,7 +255,7 @@ public:
     int               m_node_number;
     std::string       m_input_encoding;
     std::string       m_output_encoding;
-    bool              m_is_session_logged_in;
+    bool              m_is_session_authorized;
     bool              m_is_leaving;
     bool              m_is_esc_timer;
 

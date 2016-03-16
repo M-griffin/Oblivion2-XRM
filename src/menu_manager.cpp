@@ -138,6 +138,8 @@ void MenuManager::changeState(state_ptr &the_state)
         }
         m_the_state.back()->onExit();
 
+        // Rework this lateron,  lets allow multiple states,, the most recent state will be active
+        // Allowing the main state to keep all information!
         std::cout << "Deleteing Current MenuSystem!: " << m_the_state.size() << std::endl;
         m_the_state.pop_back();
 
