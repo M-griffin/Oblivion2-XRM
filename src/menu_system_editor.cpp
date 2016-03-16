@@ -1,5 +1,6 @@
 #include "menu_system.hpp"
-#include "struct_compat.hpp"
+
+#include "data/struct_compat.hpp"
 
 #include <boost/locale.hpp>
 #include <boost/filesystem.hpp>
@@ -15,6 +16,7 @@
 
 /**
  * @brief Menu Editor, Read and Modify Menus
+ * Remake of the orignal Menu Editor Screen
  */
 std::string MenuSystem::displayMenus()
 {
@@ -64,7 +66,7 @@ std::string MenuSystem::displayMenus()
         ++total_rows;
 
     // Could re-calc this on screen width lateron.
-    int max_cols  = 73;
+    int max_cols  = 73; // out of 80
 
     // Vector or Menus, Loop through
     iterator i = result_set.begin();

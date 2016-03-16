@@ -1,13 +1,14 @@
 #ifndef MENU_SYSTEM_HPP
 #define MENU_SYSTEM_HPP
 
-#include "struct_compat.hpp"
 #include "the_state.hpp"
-#include "menu_data.hpp"
 #include "session_io.hpp"
 #include "common_io.hpp"
 #include "session_data.hpp"
 #include "ansi_processor.hpp"
+
+#include "data/struct_compat.hpp"
+#include "data/menu_dao.hpp"
 
 #include <stdint.h>
 #include <string>
@@ -17,7 +18,7 @@
 
 class MenuSystem
     : public TheState
-    , public MenuData
+    , public MenuDao
 {
 public:
     MenuSystem(session_data_ptr session_data);
@@ -41,6 +42,7 @@ public:
     bool             m_use_hotkey;         // Toggle for Single Hotkey or GetLine input. - Not used yet!
     std::string      m_current_menu;       // Name of current menu loaded.
     std::string      m_previous_menu;      // Name of Previous Menu for Gosub
+    std::string      m_fallback_menu;      // Fallback, this can set as a Global Fall Back and changed via menu command
     int              m_input_index;        // Menu Input Index, for Forwarding to current function.
 
     // Temp
@@ -59,10 +61,12 @@ public:
     //int m_next_state;
     static const std::string m_menuID;
 
+    // This matches the index for menu_functions.push_back
     enum
     {
         MENU_INPUT,
-        MENU_EDITOR_INPUT
+        MENU_EDITOR_INPUT,
+        USER_LOGIN_INPUT
     };
 
     // Holds all menu options/commands.
@@ -150,7 +154,18 @@ public:
     void menuInput(const std::string &character_buffer, bool is_utf8);
 
     void startupMenuEditor();
-    void menuEditorInput(const std::string &character_buffer, bool is_utf8);
+    void menuEditorInput(const std::string &character_buffer, bool);
+
+    /**
+     * @brief Start up the Normal Login Process.
+     */
+    void startupUserLogin();
+
+    /**
+     * @brief Handles parsing input for userLogins
+     * might need to rethink some of this...
+     */
+    void userLoginInput(const std::string &character_buffer, bool);
 
 };
 

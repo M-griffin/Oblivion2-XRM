@@ -1,5 +1,6 @@
 #include "communicator.hpp"
-#include "struct_compat.hpp"
+
+#include "data/struct_compat.hpp"
 
 #include <iostream>
 #include <string>

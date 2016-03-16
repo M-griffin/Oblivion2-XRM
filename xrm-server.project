@@ -34,7 +34,6 @@
     <File Name="src/language_prompts.cpp"/>
     <File Name="src/language_prompts.hpp"/>
     <File Name="src/main.cpp"/>
-    <File Name="src/menu_data.hpp"/>
     <File Name="src/menu_manager.cpp"/>
     <File Name="src/menu_manager.hpp"/>
     <File Name="src/menu_system.cpp"/>
@@ -62,8 +61,6 @@
     <File Name="src/connection_ssl.hpp"/>
     <File Name="src/connection_tcp.hpp"/>
     <File Name="src/connection_base.hpp"/>
-    <File Name="src/structures.hpp"/>
-    <File Name="src/struct_compat.hpp"/>
     <File Name="xrm-import/pascal_types.hpp"/>
     <File Name="sqlitewrap/libSqliteWrapped.h"/>
     <VirtualDirectory Name="data">
@@ -73,6 +70,9 @@
       <File Name="src/data/config_dao.hpp"/>
       <File Name="src/data/users_dao.hpp"/>
       <File Name="src/data/users_dao.cpp"/>
+      <File Name="src/menu_dao.hpp"/>
+      <File Name="src/structures.hpp"/>
+      <File Name="src/struct_compat.hpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
