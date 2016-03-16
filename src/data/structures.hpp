@@ -33,7 +33,8 @@ typedef struct MapType
 /**
  * @brief State of the Current Session I/O
  */
-enum SESSION_STATE {
+enum SESSION_STATE
+{
     STATE_CMD,  // Command / BBS
     STATE_CHAT, // Chat Global / Sysop
     STATE_DONE  // Done exit!
@@ -42,7 +43,8 @@ enum SESSION_STATE {
 /**
  * @brief State of the Current Machine Module
  */
-enum MACHINE_STATE {
+enum MACHINE_STATE
+{
     SYSTEM_STATE,
     CHAT_STATE,
     WFC_STATE,

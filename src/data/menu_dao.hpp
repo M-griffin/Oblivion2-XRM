@@ -1,5 +1,5 @@
-#ifndef MENU_DATA_HPP
-#define MENU_DATA_HPP
+#ifndef MENU_DAO_HPP
+#define MENU_DAO_HPP
 
 #include "structures.hpp"
 #include <string>
@@ -11,13 +11,13 @@
  * @file menu_data.hpp
  * @brief Halds Binary funcations for reading .MNU Data Files.
  */
-class MenuData
+class MenuDao
 {
 public:
-    MenuData()
+    MenuDao()
     { }
 
-    ~MenuData()
+    ~MenuDao()
     { }
 
     /**

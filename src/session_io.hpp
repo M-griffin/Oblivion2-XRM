@@ -1,9 +1,10 @@
 #ifndef SESSION_IO_HPP
 #define SESSION_IO_HPP
 
-#include "structures.hpp"
 #include "session_data.hpp"
 #include "common_io.hpp"
+
+#include "data/structures.hpp"
 
 #include <string>
 

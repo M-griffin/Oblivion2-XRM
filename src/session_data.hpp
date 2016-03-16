@@ -1,12 +1,12 @@
 #ifndef SESSION_DATA_HPP
 #define SESSION_DATA_HPP
 
-
-#include "structures.hpp"
-#include "struct_compat.hpp"
 #include "connection_base.hpp"
 #include "telnet_decoder.hpp"
 #include "broad_caster.hpp"
+
+#include "data/structures.hpp"
+#include "data/struct_compat.hpp"
 
 #include <boost/asio.hpp>
 #include <boost/asio/deadline_timer.hpp>

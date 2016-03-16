@@ -14,6 +14,13 @@ public:
     LanguagePrompts();
     ~LanguagePrompts();
 
+    // Do we want to support multiple languages and/or themes?
+
+    // User needs a index of language propmt selection
+
+    //
+
+
 };
 
 #endif // LANGUAGE_PROMPTS_HPP

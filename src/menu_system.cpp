@@ -1,8 +1,9 @@
 #include "menu_system.hpp"
 #include "ansi_processor.hpp"
-#include "struct_compat.hpp"
 #include "common_io.hpp"
 #include "communicator.hpp"
+
+#include "data/struct_compat.hpp"
 #include "data/config.hpp"
 
 #include <boost/locale.hpp>
@@ -26,6 +27,7 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     , m_use_hotkey(false)
     , m_current_menu("")
     , m_previous_menu("")
+    , m_fallback_menu("")
     , m_input_index(MENU_INPUT)
     , m_menu_prompt()
     , m_menu_info()
@@ -42,6 +44,7 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     // Setup std::function array with available options to pass input to.
     menu_functions.push_back(std::bind(&MenuSystem::menuInput, this, std::placeholders::_1, std::placeholders::_2));
     menu_functions.push_back(std::bind(&MenuSystem::menuEditorInput, this, std::placeholders::_1, std::placeholders::_2));
+    menu_functions.push_back(std::bind(&MenuSystem::userLoginInput, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 MenuSystem::~MenuSystem()
@@ -324,11 +327,11 @@ void MenuSystem::redisplayMenuScreen()
 }
 
 /**
- * @brief Startup and Switch to Menu Input
+ * @brief Startup And load the Menu File
+ *        Default Menu Startup sets Input to MenuInput processing.
  */
 void MenuSystem::startupMenu()
 {
-
     // Check Configuration here,  if use SpecialLogin (Matrix Menu)
     // Then load it, otherwise jump to Entering UserID / P
     std::cout << "Loading Matrix Menu -  Menu Input " << std::endl;
@@ -385,6 +388,8 @@ void MenuSystem::startupMenu()
         /**
           * @brief Set Default, however check menu command for override.
           */
+
+        // m_menu_info.PulldownFN
 
         m_is_active_pulldown_menu = true;
 
@@ -702,6 +707,7 @@ void MenuSystem::processMenuOptions(std::string &input)
 
 /**
  * @brief Default Menu Input Processing.
+ *        Handles Processing for Loaded Menus Hotkey and Lightbars
  */
 void MenuSystem::menuInput(const std::string &character_buffer, bool is_utf8)
 {
@@ -726,7 +732,7 @@ void MenuSystem::menuInput(const std::string &character_buffer, bool is_utf8)
     }
     else if(result[0] == '\x1b' && result.size() == 1)
     {
-        // Check ESC KEY
+        // Check Single ESC KEY
         input = "ESC";
     }
     // Process CommandOptions Matching the Key Input.
@@ -742,7 +748,7 @@ void MenuSystem::startupMenuEditor()
 
     std::cout << "Entering MenuEditor Input " << std::endl;
 
-    // 1. Make sure the Input is set to the
+    // Setup the input processor
     m_input_index = MENU_EDITOR_INPUT;
 
     // 2. Handle any init and startup Screen Displays
@@ -754,31 +760,69 @@ void MenuSystem::startupMenuEditor()
 /**
  * @brief Menu Editor, Read and Modify Menus
  */
-void MenuSystem::menuEditorInput(const std::string &character_buffer, bool is_utf8)
-{
-
-    // Menu Editor is mocked to test input fields..
-    // Q then loads the matrix menu!  lets make this complete now!
-
-
-    // Test jump to Matrix Menu
-    if(character_buffer[0] == 'Q' && !is_utf8)
+void MenuSystem::menuEditorInput(const std::string &character_buffer, bool)
+{    
+    // If were not using hot keys, loop input untill we get ENTER
+    // Then handle only the first key in the buffer.  Other "SYSTEMS"
+    // Will parse for entire line for matching Command Keys.
+    if (!m_use_hotkey)
     {
-        // Switch back to Default Menu System.
-        m_current_menu = "MATRIX.MNU";
-        startupMenu();
-        return;
+        // Received ENTER, grab the previous input.
+        if (!(character_buffer[0] == 13))
+        {
+            m_line_buffer += character_buffer[0];
+            m_session_data->deliver(m_line_buffer);
+            //return output_buffer;
+        }
+    }
+    else
+    {
+        m_line_buffer += character_buffer[0];
     }
 
-    // Test Input field here, display leadoff when displaying the input field.
-    // Leadoff in getline is just for extra padding and to add to the buffer.
+    std::string output_buffer = "";
+    switch (std::toupper(m_line_buffer[0]))
+    {
+        case 'A': // Add
+            output_buffer = "Enter Menu Name to Add : ";
+            break;
+        case 'C': // Change/Edit
+            output_buffer = "Enter Menu Name to Change : ";
+            break;
+        case 'D': // Delete
+            output_buffer = "Enter Menu to Delete : ";
+            break;
+        case 'Q': // Quit
+            // Reload fall back, or gosub to last menu!
 
-    // NOTE, Getline doesn't handle ESC sequences!  it's raw!
-    if(is_utf8)
-        std::cout << "unicode" << std::endl;
-    else
-        std::cout << "ascii" << std::endl;
 
+            return;
+        default : // Return
+            return;
+    }
+
+    m_session_data->deliver(output_buffer);
+}
+
+/**
+ * @brief Start up the Normal Login Process.
+ */
+void MenuSystem::startupUserLogin()
+{
+    // Setup the input processor
+    m_input_index = USER_LOGIN_INPUT;
+
+    // Display and Login screens here
+
+    // Then pull language prompts and display them for Login / Password
+}
+
+/**
+ * @brief Handles parsing input for userLogins
+ * might need to rethink some of this...
+ */
+void MenuSystem::userLoginInput(const std::string &character_buffer, bool)
+{
     /*  Hotkey input working!
     std::cout << "getKeyInput" << std::endl;
     std::string result = m_menu_io.getKeyInput(character_buffer);
@@ -786,56 +830,23 @@ void MenuSystem::menuEditorInput(const std::string &character_buffer, bool is_ut
     m_session_data->deliver(result);
     */
 
-    std::cout << "getInputField" << std::endl;
-    std::string field = "";
-    std::string result = m_session_io.getInputField(character_buffer, field);
+    // std::cout << "getInputField" << std::endl;
+    std::string input = "";
+    std::string result = m_session_io.getInputField(character_buffer, input);
     if(result == "aborted")
+    {
         std::cout << "aborted!" << std::endl;
+    }
     else if(result[0] == '\n')
-        m_session_data->deliver(field);
+    {
+        // Send back the entire string.  TESTING
+        // This should then be processed becasue ENTER was hit.
+        m_session_data->deliver(input);
+    }
     else
+    {
+        // Send back the single input received TESTING
         m_session_data->deliver(result);
+    }
 
-    return;
-    /*
-
-        // Only valid editor input ASCII.
-        if (!is_utf8)
-        {
-            // If were not using hot keys, loop input untill we get ENTER
-            // Then handle only the first key in the buffer.  Other "SYSTEMS"
-            // Will parse for entire line for matching Command Keys.
-            if (!m_use_hotkey)
-            {
-                // Received ENTER, grab the previous input.
-                if (!(character_buffer[0] == 13))
-                {
-                    m_line_buffer += character_buffer[0];
-                    return output_buffer;
-                }
-            }
-            else
-            {
-                m_line_buffer += character_buffer[0];
-            }
-
-            switch (std::toupper(m_line_buffer[0]))
-            {
-                case 'A': // Add
-                    output_buffer = "Enter Menu Name to Add : ";
-                    break;
-                case 'C': // Change/Edit
-                    output_buffer = "Enter Menu Name to Change : ";
-                    break;
-                case 'D': // Delete
-                    output_buffer = "Enter Menu to Delete : ";
-                    break;
-                case 'Q': // Quit
-                    // Reload fall back, or gosub to last menu!
-                    break;
-                default : // Return
-                    break;
-            }
-        }
-         */
 }
