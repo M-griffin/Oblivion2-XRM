@@ -70,24 +70,50 @@ void MenuSystem::update(std::string character_buffer, bool is_utf8)
  */
 bool MenuSystem::onEnter()
 {
-    std::cout << "OnEnter() MenuSystem\n";
+    std::cout << "OnEnter() MenuSystem" << std::endl;
 
     // Grab handle to the system configuration
     config_ptr cfg(TheCommunicator::Instance()->getConfig().lock());
-    if (!cfg)
+    if(!cfg)
     {
         std::cout << "Error: getConfig.lock()" << std::endl;
         assert(false);
     }
 
-    // Access any needed global configuration values
-    // For Example...
-    if(cfg->use_matrix_login)
+    // Check if the current user has been logged in yet.
+    if (!m_session_data->m_is_session_authorized)
     {
-        // etc..  still work in progress!
+        std::cout << "!m_is_session_authorized" << std::endl;
+
+        // Access any needed global configuration values
+        // For Example...
+        if(cfg->use_matrix_login)
+        {
+            // Setup Matrix Menu
+            std::cout << "cfg->use_matrix_login" << std::endl;
+
+            m_current_menu = "MATRIX.MNU";
+            startupMenu();
+        }
+        else
+        {
+            // Use input propmpt login
+            std::cout << "!cfg->use_matrix_login" << std::endl;
+
+            //m_current_menu = "MATRIX.MNU";
+            //startupMenu();
+        }
+    }
+    else
+    {
+        std::cout << "m_is_session_authorized" << std::endl;
     }
 
     m_is_active = true;
+
+    // Need to startup starting interface here!
+
+    // menu input is default
     return true;
 }
 
@@ -233,27 +259,32 @@ std::string MenuSystem::loadMenuScreen()
     return screen_data;
 }
 
+/**
+ * @brief Build Light Bars Strings for Display
+ *        NOTE, need to check if codes don't exist in ansi screen, we need to skip!
+ * @return
+ */
 std::string MenuSystem::buildLightBars()
 {
     // Test setup and display lightbars
     std::string light_bars = "";
     bool active_lightbar = false;
 
-    for(int i = 0; i < (signed)m_loaded_menu_options.size(); i++)
+    for(auto &m : m_loaded_menu_options)
     {
         // Always start on Initial or first indexed lightbar.
         // Might need to verify if we need to check for lowest ID, and start on that!
-        if(m_active_pulldownID == i && m_active_pulldownID > 0)
+        if(m_active_pulldownID > 0 && m_active_pulldownID == m.PulldownID)
             active_lightbar = true;
 
-        if(m_loaded_menu_options[i].PulldownID > 0)
+        if(m.PulldownID > 0)
         {
             // Parse for X/Y Position and colors
-            light_bars.append(m_ansi_process.buildPullDownBars(m_loaded_menu_options[i].PulldownID, active_lightbar));
+            light_bars.append(m_ansi_process.buildPullDownBars(m.PulldownID, active_lightbar));
             active_lightbar = false;
 
             // Add the Option Description
-            light_bars.append((char *)m_loaded_menu_options[i].OptName);
+            light_bars.append((char *)m.OptName);
 
             // Clear and reset so we end the lightbar
             light_bars.append("\x1b[0m");
@@ -297,6 +328,9 @@ void MenuSystem::redisplayMenuScreen()
  */
 void MenuSystem::startupMenu()
 {
+
+    // Check Configuration here,  if use SpecialLogin (Matrix Menu)
+    // Then load it, otherwise jump to Entering UserID / P
     std::cout << "Loading Matrix Menu -  Menu Input " << std::endl;
 
     // 1. Make sure the Input is set to the
@@ -317,15 +351,15 @@ void MenuSystem::startupMenu()
 
     // Clear!
     std::vector<MenuOption>().swap(m_loaded_pulldown_options);
-    std::vector<int> pull_down_id;
+    std::vector<int> pull_down_ids;
 
     // Get Pulldown menu commands, Load all from menu options (disk)
     //for(int i = 0; i < (signed)m_loaded_menu_options.size(); i++)
-    for (auto &m : m_loaded_menu_options)
+    for(auto &m : m_loaded_menu_options)
     {
-        if (m.PulldownID > 0)
+        if(m.PulldownID > 0)
         {
-            pull_down_id.push_back(m.PulldownID);
+            pull_down_ids.push_back(m.PulldownID);
 
             // Get Actual Options with Descriptions for Lightbars.
             m_loaded_pulldown_options.push_back(m);
@@ -333,9 +367,9 @@ void MenuSystem::startupMenu()
     }
 
     // Set the lowest pulldown ID as Active
-    if (pull_down_id.size() > 0)
+    if(pull_down_ids.size() > 0)
     {
-        auto id = std::min_element(pull_down_id.begin(), pull_down_id.end());
+        auto id = std::min_element(pull_down_ids.begin(), pull_down_ids.end());
         m_active_pulldownID = *id;
     }
 
@@ -346,7 +380,7 @@ void MenuSystem::startupMenu()
     std::string output = m_session_io.pipe2ansi(buffer);
 
     // If active pull_down id's found, mark as active pulldown menu.
-    if(pull_down_id.size() > 0)
+    if(pull_down_ids.size() > 0)
     {
         /**
           * @brief Set Default, however check menu command for override.
@@ -384,7 +418,7 @@ void MenuSystem::startupMenu()
 
     // Now loop and scan for first cmd and each time
     //for(int i = 0; i < (signed)m_loaded_menu_options.size(); i++)
-    for (auto &m : m_loaded_menu_options)
+    for(auto &m : m_loaded_menu_options)
     {
         // Process all First Commands}
         //std::string key = (char *)m_loaded_menu_options[i].Keys;
@@ -394,7 +428,6 @@ void MenuSystem::startupMenu()
         if(key == "FIRSTCMD")
         {
             // Process
-            //std::cout << "FOUND FIRSTCMD! EXECUTE: " << m_loaded_menu_options[i].CKeys << std::endl;
             std::cout << "FOUND FIRSTCMD! EXECUTE: " << m.CKeys << std::endl;
         }
 
@@ -402,7 +435,6 @@ void MenuSystem::startupMenu()
         else if(key == "EACH")
         {
             // Process
-            //std::cout << "FOUND EACH! EXECUTE: " << m_loaded_menu_options[i].CKeys << std::endl;
             std::cout << "FOUND EACH! EXECUTE: " << m.CKeys << std::endl;
         }
     }
@@ -447,6 +479,90 @@ void MenuSystem::lightbarUpdate(int previous_pulldown_id)
 }
 
 /**
+ * @brief Process Command Keys passed from menu selection
+ * @param input
+ */
+void MenuSystem::executeMenuOptions(MenuOption &option)
+{
+    /* Run through the case and switch over the new interface.
+    std::string mnuOption = option.CKeys;
+    std::string mnuString = option.CString;
+    std::string mnuAccess = option.Acs; */
+
+    // If Invalid then return
+    if(strlen((const char *)option.CKeys) != 2)
+    {
+        return;
+    }
+
+    // Run through Comamnd Keys for Method
+    switch(option.CKeys[0])
+    {
+        case '-':
+            switch(option.CKeys[1])
+            {
+                    // Turns on Pulldown Menu Re-entrance
+                    // This option returns to the selected option
+                    // when the user re-enters the pulldown menu.
+                    // This works ONLY if the command that the user
+                    // executed does not go to another menu.
+                case '\'':
+                    break;
+
+                    // Turns off Pulldown Menu Re-Entrance
+                case '`':
+                    break;
+            }
+            break;
+
+            // Matrix Menu Commands
+        case '{':
+            switch(option.CKeys[1])
+            {
+                    // Logon
+                case 'S':
+                    break;
+
+                    // Apply
+                case 'A':
+                    std::cout << "Executing New User Application" << std::endl;
+                    break;
+
+                    // Check
+                case 'C':
+                    break;
+
+                    // Feedback
+                case 'F':
+                    break;
+
+                    // Chat
+                case 'P':
+                    break;
+
+                    // Logoff
+                case 'G':
+                    break;
+            }
+            break;
+
+            // Sysop Commands
+        case '*':
+            switch(option.CKeys[1])
+            {
+                    // Menu Editor
+                case '#':
+                    break;
+
+                    // Configuration Menu
+                case 'C':
+                    break;
+            }
+            break;
+    }
+}
+
+/**
  * @brief Processes Menu Commands with input.
  * @param input
  */
@@ -468,11 +584,12 @@ void MenuSystem::processMenuOptions(std::string &input)
     bool is_enter = false;
 
     // Test jump to Menu Editor
+    /*
     if(input[0] == 'G')
     {
         startupMenuEditor();
         return;
-    }
+    }*/
 
     if(input == "ENTER")
     {
@@ -485,16 +602,16 @@ void MenuSystem::processMenuOptions(std::string &input)
 
     // Check for loaded menu commands.
     // Get Pulldown menu commands, Load all from menu options (disk)
-    for(int i = 0; i < (signed)m_loaded_menu_options.size(); i++)
+    for(auto &m : m_loaded_menu_options)
     {
-        std::string key = (char *)m_loaded_menu_options[i].Keys;
+        std::string key = (char *)m.Keys;
         key = to_upper(key);
 
         // Next Process EVERY Commands}
         if(key == "EACH")
         {
             // Process
-            std::cout << "FOUND EACH! EXECUTE: " << m_loaded_menu_options[i].CKeys << std::endl;
+            std::cout << "FOUND EACH! EXECUTE: " << m.CKeys << std::endl;
             continue;
         }
 
@@ -554,7 +671,7 @@ void MenuSystem::processMenuOptions(std::string &input)
                 {
                     // Process the current active pull down ID.
                     // Check Pull down commands
-                    if(m_loaded_menu_options[i].PulldownID == m_active_pulldownID)
+                    if(m.PulldownID == m_active_pulldownID)
                     {
                         // Then we have a match!  Execute the Menu Command with this ID!
                         std::cout << "Menu Command Executed for: " << key << std::endl;
@@ -640,6 +757,10 @@ void MenuSystem::startupMenuEditor()
 void MenuSystem::menuEditorInput(const std::string &character_buffer, bool is_utf8)
 {
 
+    // Menu Editor is mocked to test input fields..
+    // Q then loads the matrix menu!  lets make this complete now!
+
+
     // Test jump to Matrix Menu
     if(character_buffer[0] == 'Q' && !is_utf8)
     {
@@ -710,6 +831,7 @@ void MenuSystem::menuEditorInput(const std::string &character_buffer, bool is_ut
                     output_buffer = "Enter Menu to Delete : ";
                     break;
                 case 'Q': // Quit
+                    // Reload fall back, or gosub to last menu!
                     break;
                 default : // Return
                     break;

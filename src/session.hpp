@@ -134,12 +134,15 @@ public:
                     m_menu_manager->changeState(new_state);
                     break;
                 }
+
+            /* Not working chat state at this time!
+             * Probably Change to Services or something else!
             case MACHINE_STATE::CHAT_STATE:
                 {
                     state_ptr new_state(new ChatState(m_session_data));
                     m_menu_manager->changeState(new_state);
                     break;
-                }
+                }*/
             default:
                 {
                     std::cout << "Error, Invalid state for switch_satates in Session." << std::endl;

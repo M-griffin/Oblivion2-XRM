@@ -139,6 +139,13 @@ public:
      * @brief Updates current and next lightbar positions.
      */
     void lightbarUpdate(int previous_pulldown_id);
+
+    /**
+     * @brief Process Command Keys passed from menu selection
+     * @param input
+     */
+    void executeMenuOptions(MenuOption &option);
+
     void processMenuOptions(std::string &input);
     void menuInput(const std::string &character_buffer, bool is_utf8);
 

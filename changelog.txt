@@ -1,4 +1,15 @@
 
+Change Log Update (00.00.14)
+* 2016-03-16
++ Reworking the Menu System and Ironing out the functionality
++ Created executeMenuOptions() to handle processing command keys from input.
++ Setting processMenuOptions() to taken input and pass to execute
+- Working default startup to check configuration for Matrix or normal logon.
+  Then setting up the startup menu properly.  
+- Building initial login with apply as new first
+- Looking at best way to handle language file for prompts, thinking key value map
+  is much better then int indexes, don't have to worry about order ever!
+
 Change Log Update (00.00.13)
 * 2016-03-15
 + Cleaned up some Menu System Items
