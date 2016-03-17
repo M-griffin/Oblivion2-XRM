@@ -23,12 +23,14 @@ bool ModLogon::update(const std::string &character_buffer, const bool &)
     
     // Handle Input processing here
 
-     /*  Hotkey input working!
+
+    // Initial testing that were getting here properly and delivering output!
+    //*  Hotkey input working!
     std::cout << "getKeyInput" << std::endl;
-    std::string result = m_menu_io.getKeyInput(character_buffer);
+    std::string result = m_session_io.getKeyInput(character_buffer);
     std::cout << "m_session_data->deliver(result);" << std::endl;
     m_session_data->deliver(result);
-    */
+
 
     // std::cout << "getInputField" << std::endl;
     /*

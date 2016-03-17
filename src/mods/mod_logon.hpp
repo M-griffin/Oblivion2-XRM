@@ -3,6 +3,8 @@
 
 #include "mod_base.hpp"
 
+#include "../session_io.hpp"
+
 /**
  * @class ModLogin
  * @author Michael Griffin
@@ -16,6 +18,7 @@ class ModLogon
 public:
     ModLogon(session_data_ptr session_data)
         : ModBase(session_data)
+        , m_session_io(session_data)
     {
         std::cout << "ModLogon" << std::endl;
     }
@@ -31,6 +34,7 @@ public:
 
 private:
 
+    SessionIO   m_session_io;
 
 };
 

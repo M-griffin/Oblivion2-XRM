@@ -4,7 +4,6 @@
 #include "the_state.hpp"
 
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <iostream>
 #include <string>
@@ -18,7 +17,6 @@
  * @brief State Manager to load the Menu System and pass session data connections.
  */
 class MenuManager
-    : public boost::enable_shared_from_this<MenuManager>
 {
 public:
     MenuManager()

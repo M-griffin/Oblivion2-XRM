@@ -25,7 +25,7 @@ const std::string MenuSystem::m_menuID = "MENU_SYSTEM";
 
 MenuSystem::MenuSystem(session_data_ptr session_data)
     : TheState(session_data)
-    , m_session_io(m_session_data)
+    , m_session_io(session_data)
     , m_line_buffer("")
     , m_use_hotkey(false)
     , m_current_menu("")
@@ -35,12 +35,11 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     , m_menu_prompt()
     , m_menu_info()
     , m_menu_options()
-    , m_ansi_process(m_session_data->m_telnet_state->getTermRows(),
-                     m_session_data->m_telnet_state->getTermCols())
+    , m_ansi_process(session_data->m_telnet_state->getTermRows(),
+                     session_data->m_telnet_state->getTermCols())
     , m_active_pulldownID(0)
     , m_fail_flag(false)
     , m_pulldown_reentrace_flag(false)
-
 {
     std::cout << "MenuSystem" << std::endl;
 
@@ -53,6 +52,10 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
 MenuSystem::~MenuSystem()
 {
     std::cout << "~MenuSystem" << std::endl;
+
+    // Pop off the stack to deaallocate any active modules.
+    std::vector<module_ptr>().swap(m_module);
+
 }
 
 /**
@@ -103,11 +106,10 @@ bool MenuSystem::onEnter()
         }
         else
         {
-            // Use input propmpt login
+            // Setup the login Module for normal login sequence.
             std::cout << "!cfg->use_matrix_login" << std::endl;
 
-            //m_current_menu = "MATRIX.MNU";
-            //startupMenu();
+            startupModuleLogon();
         }
     }
     else
@@ -131,6 +133,13 @@ bool MenuSystem::onExit()
 {
     std::cout << "OnExit() MenuSystem\n";
     m_is_active = false;
+
+    // Clear any lingering modules if were shutting down.
+    // Pop off the stack to deaallocate.
+
+    // Test if this is needed here or the destructor!
+    //std::vector<module_ptr>().swap(m_module);
+
     return true;
 }
 
@@ -861,6 +870,9 @@ void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is
     // Finished modules processing.
     if (!result)
     {
+        // Do module shutdown
+        m_module[0]->onExit();
+
         // First pop the module off the stack to deallocate
         m_module.pop_back();
 
