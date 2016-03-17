@@ -267,5 +267,6 @@ public:
 };
 
 typedef boost::shared_ptr<SessionData> session_data_ptr;
+typedef boost::weak_ptr<SessionData> session_data_wptr;
 
 #endif // SESSION_DATA_HPP
