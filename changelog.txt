@@ -1,4 +1,11 @@
 
+Change Log Update (00.00.17)
+* 2016-03-17
++ Added popping modules off stack when menu system is closed down!
++ Added new shutdown state cleaning in the Session Destructor to make sure the 
+  Menu System and all active modules are shutdown per RAII properly.
++ Update Module Login to pass Instantiate SessionIO class for handle key input
+
 Change Log Update (00.00.16)
 * 2016-03-17
 + Created new Mods Sub folder to store system modules

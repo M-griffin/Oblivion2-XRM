@@ -50,6 +50,10 @@ public:
         // Free the Node Number from this session.
         TheCommunicator::Instance()->freeNodeNumber(m_session_data->m_node_number);
         std::cout << "~Session, Node: " << m_session_data->m_node_number << std::endl;
+
+        // Free the menu system state and modules when session closes.
+        m_menu_manager->clean();
+        std::cout << "m_menu_manager->clean() Completd!" << std::endl;
     }
 
     /**
