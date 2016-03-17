@@ -10,7 +10,7 @@ const std::string SystemState::m_menuID = "SYSTEM";
 /**
  * @brief Handles Updates or Data Input from Client
  */
-void SystemState::update(std::string character_buffer, bool is_utf8)
+void SystemState::update(const std::string &character_buffer, const bool &is_utf8)
 {
     if (!m_is_active)
     {

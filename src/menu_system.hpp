@@ -9,6 +9,7 @@
 
 #include "data/struct_compat.hpp"
 #include "data/menu_dao.hpp"
+#include "mods/mod_base.hpp"
 
 #include <stdint.h>
 #include <string>
@@ -24,7 +25,7 @@ public:
     MenuSystem(session_data_ptr session_data);
     ~MenuSystem();
 
-    virtual void update(std::string character_buffer, bool is_utf8);
+    virtual void update(const std::string &character_buffer, const bool &is_utf8);
     virtual bool onEnter();
     virtual bool onExit();
 
@@ -66,7 +67,7 @@ public:
     {
         MENU_INPUT,
         MENU_EDITOR_INPUT,
-        USER_LOGIN_INPUT
+        MODULE_INPUT
     };
 
     // Holds all menu options/commands.
@@ -79,8 +80,11 @@ public:
     std::vector<MenuOption> m_loaded_pulldown_options;
 
     // Function Input Vector.
-    std::vector<std::function<void(std::string, bool is_utf8)>> menu_functions;
+    std::vector<std::function< void(const std::string &, const bool &is_utf8)> > menu_functions;
 
+    // Handle to modules being executed.
+    std::vector<module_ptr> m_module;
+    
    /**
     * @brief Reads a Specific Menu, Info and Options { Called From readInMenuData() }
     */
@@ -151,21 +155,23 @@ public:
     void executeMenuOptions(MenuOption &option);
 
     void processMenuOptions(std::string &input);
-    void menuInput(const std::string &character_buffer, bool is_utf8);
+    void menuInput(const std::string &character_buffer, const bool &is_utf8);
 
     void startupMenuEditor();
-    void menuEditorInput(const std::string &character_buffer, bool);
+    void menuEditorInput(const std::string &character_buffer, const bool &);
+
+    // Each system will have it's own module that is allocated and pushed to the
+    // m_module container to easily push and pop from the stack.
 
     /**
-     * @brief Start up the Normal Login Process.
+     * @brief Starts up Logon Module
      */
-    void startupUserLogin();
+    void startupModuleLogon();
 
     /**
-     * @brief Handles parsing input for userLogins
-     * might need to rethink some of this...
+     * @brief Handles parsing input for current module.
      */
-    void userLoginInput(const std::string &character_buffer, bool);
+    void moduleInput(const std::string &character_buffer, const bool &is_utf8);
 
 };
 

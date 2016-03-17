@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Blue
-Date                   :=3/13/2016
+Date                   :=3/17/2016
 CodeLitePath           :="C:\Program Files (x86)\CodeLite"
 LinkerName             :=C:/MinGW-5.1.0/mingw32/bin/g++.exe
 SharedObjectLinkerName :=C:/MinGW-5.1.0/mingw32/bin/g++.exe -shared -fPIC
@@ -64,7 +64,7 @@ AS       := C:/MinGW-5.1.0/mingw32/bin/as.exe
 CodeLiteDir:=C:\Program Files (x86)\CodeLite
 UNIT_TEST_PP_SRC_DIR:=C:\UnitTest++-1.3
 Objects0=$(IntermediateDirectory)/src_ansi_processor.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_broad_caster.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_chat_state.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_communicator.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_language_prompts.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_system.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_system_editor.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_menu_system_prompts.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_data.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_state_machine.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_system_state.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_telnet_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_data_config_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_data_users_dao.cpp$(ObjectSuffix) 
+	$(IntermediateDirectory)/src_menu_system_prompts.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_data.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_state_machine.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_system_state.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_telnet_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_data_config_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_data_users_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_mods_mod_logon.cpp$(ObjectSuffix) 
 
 
 
@@ -238,6 +238,14 @@ $(IntermediateDirectory)/src_data_users_dao.cpp$(DependSuffix): src/data/users_d
 
 $(IntermediateDirectory)/src_data_users_dao.cpp$(PreprocessSuffix): src/data/users_dao.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_data_users_dao.cpp$(PreprocessSuffix) "src/data/users_dao.cpp"
+
+$(IntermediateDirectory)/src_mods_mod_logon.cpp$(ObjectSuffix): src/mods/mod_logon.cpp $(IntermediateDirectory)/src_mods_mod_logon.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/Test2/src/mods/mod_logon.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_mods_mod_logon.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_mods_mod_logon.cpp$(DependSuffix): src/mods/mod_logon.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_mods_mod_logon.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_mods_mod_logon.cpp$(DependSuffix) -MM "src/mods/mod_logon.cpp"
+
+$(IntermediateDirectory)/src_mods_mod_logon.cpp$(PreprocessSuffix): src/mods/mod_logon.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_mods_mod_logon.cpp$(PreprocessSuffix) "src/mods/mod_logon.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

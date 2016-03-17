@@ -1,4 +1,21 @@
 
+Change Log Update (00.00.16)
+* 2016-03-17
++ Created new Mods Sub folder to store system modules
+  All modules will be containers of system functions like mod_login for login procedures
+  mod_messages for message, mod_files for files, mod_bbslist etc.. 
+  Each module will contain it's own asynchronous input processing and output
+  And everything will pass through from Session->MenuSystem->Modules
++ Bit of rework on the Menu System, changes passing character_buffer and bools to const references.
++ Added new startupModuleLogon() and moduleInput() for dynamic and asynchronous processing. 
+
+Change Log Update (00.00.15)
+* 2016-03-16
++ Moved Menu and Structures to Data Folder
++ Rename MenuData to MenuDao for Data Access Object.
++ Working out how the login process will work from the menu system
+- Also need to determine layout for language files, multiple languages / themes.
+
 Change Log Update (00.00.14)
 * 2016-03-16
 + Reworking the Menu System and Ironing out the functionality

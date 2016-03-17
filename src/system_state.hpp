@@ -39,7 +39,7 @@ public:
         std::cout << "~SystemState" << std::endl;
     }
 
-    virtual void update(std::string character_buffer, bool is_utf8);
+    virtual void update(const std::string &character_buffer, const bool &is_utf8);
     virtual bool onEnter();
     virtual bool onExit();
 

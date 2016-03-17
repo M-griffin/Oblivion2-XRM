@@ -3,7 +3,6 @@
 
 #include "session_data.hpp"
 
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <iostream>
@@ -17,7 +16,6 @@
  * @brief Virtual Class to manager Individual Interfaces
  */
 class TheState
-    : public boost::enable_shared_from_this<TheState>
 {
 public:
 
@@ -25,7 +23,7 @@ public:
     {
         std::cout << "~TheState." << std::endl;
     }
-    virtual void update(std::string character_buffer, bool is_utf8)  = 0;
+    virtual void update(const std::string &character_buffer, const bool &is_utf8)  = 0;
     virtual bool onEnter() = 0;
     virtual bool onExit()  = 0;
     virtual void resume() {}

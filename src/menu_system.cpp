@@ -6,6 +6,9 @@
 #include "data/struct_compat.hpp"
 #include "data/config.hpp"
 
+#include "mods/mod_base.hpp"
+#include "mods/mod_logon.hpp"
+
 #include <boost/locale.hpp>
 #include <boost/filesystem.hpp>
 
@@ -44,7 +47,7 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     // Setup std::function array with available options to pass input to.
     menu_functions.push_back(std::bind(&MenuSystem::menuInput, this, std::placeholders::_1, std::placeholders::_2));
     menu_functions.push_back(std::bind(&MenuSystem::menuEditorInput, this, std::placeholders::_1, std::placeholders::_2));
-    menu_functions.push_back(std::bind(&MenuSystem::userLoginInput, this, std::placeholders::_1, std::placeholders::_2));
+    menu_functions.push_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 MenuSystem::~MenuSystem()
@@ -55,7 +58,7 @@ MenuSystem::~MenuSystem()
 /**
  * @brief Handles Updates or Data Input from Client
  */
-void MenuSystem::update(std::string character_buffer, bool is_utf8)
+void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8)
 {
     if(!m_is_active)
     {
@@ -709,7 +712,7 @@ void MenuSystem::processMenuOptions(std::string &input)
  * @brief Default Menu Input Processing.
  *        Handles Processing for Loaded Menus Hotkey and Lightbars
  */
-void MenuSystem::menuInput(const std::string &character_buffer, bool is_utf8)
+void MenuSystem::menuInput(const std::string &character_buffer, const bool &is_utf8)
 {
     // Check key input, if were in a sequence get the complete sequence
     std::string result = m_session_io.getKeyInput(character_buffer);
@@ -760,7 +763,7 @@ void MenuSystem::startupMenuEditor()
 /**
  * @brief Menu Editor, Read and Modify Menus
  */
-void MenuSystem::menuEditorInput(const std::string &character_buffer, bool)
+void MenuSystem::menuEditorInput(const std::string &character_buffer, const bool &)
 {    
     // If were not using hot keys, loop input untill we get ENTER
     // Then handle only the first key in the buffer.  Other "SYSTEMS"
@@ -807,46 +810,64 @@ void MenuSystem::menuEditorInput(const std::string &character_buffer, bool)
 /**
  * @brief Start up the Normal Login Process.
  */
-void MenuSystem::startupUserLogin()
+void MenuSystem::startupModuleLogon()
 {
     // Setup the input processor
-    m_input_index = USER_LOGIN_INPUT;
+    m_input_index = MODULE_INPUT;
 
-    // Display and Login screens here
+    // Allocate the Module here and push to container
+    module_ptr module(new ModLogon(m_session_data));
+    if (!module)
+    {
+        std::cout << "ModLogon Allocation Error!" << std::endl;
+        assert(false);
+    }
 
-    // Then pull language prompts and display them for Login / Password
+    // First clear any left overs if they exist.
+    if (m_module.size() > 0)
+    {
+        std::vector<module_ptr>().swap(m_module);
+    }
+
+    // Run the startup for the module
+    module->onEnter();
+
+    // Push to stack now the new module.
+    m_module.push_back(module);
 }
 
 /**
- * @brief Handles parsing input for userLogins
- * might need to rethink some of this...
+ * @brief Handles parsing input for modules
+ *
  */
-void MenuSystem::userLoginInput(const std::string &character_buffer, bool)
+void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is_utf8)
 {
-    /*  Hotkey input working!
-    std::cout << "getKeyInput" << std::endl;
-    std::string result = m_menu_io.getKeyInput(character_buffer);
-    std::cout << "m_session_data->deliver(result);" << std::endl;
-    m_session_data->deliver(result);
-    */
-
-    // std::cout << "getInputField" << std::endl;
-    std::string input = "";
-    std::string result = m_session_io.getInputField(character_buffer, input);
-    if(result == "aborted")
+    // Make sure we have an allocated module before processing.
+    if (m_module.size() == 0)
     {
-        std::cout << "aborted!" << std::endl;
-    }
-    else if(result[0] == '\n')
-    {
-        // Send back the entire string.  TESTING
-        // This should then be processed becasue ENTER was hit.
-        m_session_data->deliver(input);
-    }
-    else
-    {
-        // Send back the single input received TESTING
-        m_session_data->deliver(result);
+        return;
     }
 
+    // Make sure we have data
+    if (character_buffer.size() == 0)
+    {
+        return;
+    }
+
+    // Execute the modules update passing through input.
+    // result = true, means were still active, false means completed, return to menu!
+    bool result = m_module[0]->update(character_buffer, is_utf8);
+
+    // Finished modules processing.
+    if (!result)
+    {
+        // First pop the module off the stack to deallocate
+        m_module.pop_back();
+
+        // Reset the Input back to the Menu System
+        m_input_index = MENU_INPUT;
+
+        // Redisplay,  may need to startup() again, but menu data should still be active and loaded!
+        redisplayMenuScreen();
+    }
 }
