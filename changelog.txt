@@ -1,4 +1,11 @@
 
+Change Log Update (00.00.18)
+* 2016-03-18
++ Remove Initial Stub for Language File
+  Change this to Prompts_Dao, Moved to Data Folder, working on reading the OBV/2 
+  Language file for prompts so I can convert this to an easier format to work
+  With, later on will write an update for existing prompts.
+
 Change Log Update (00.00.17)
 * 2016-03-17
 + Added popping modules off stack when menu system is closed down!
