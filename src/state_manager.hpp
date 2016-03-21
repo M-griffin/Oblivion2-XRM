@@ -1,5 +1,5 @@
-#ifndef MENU_MANAGER_HPP
-#define MENU_MANAGER_HPP
+#ifndef STATE_MANAGER_HPP
+#define STATE_MANAGER_HPP
 
 #include "the_state.hpp"
 
@@ -10,24 +10,24 @@
 #include <vector>
 
 /**
- * @class StateMachine
+ * @class StateManager
  * @author Michael Griffin
  * @date 9/1/2015
- * @file menu_manager.hpp
+ * @file state_manager.hpp
  * @brief State Manager to load the Menu System and pass session data connections.
  */
-class MenuManager
+class StateManager
 {
 public:
-    MenuManager()
+    StateManager()
         : m_is_state_changed(false)
     {
-        std::cout << "MenuManager Created" << std::endl;
+        std::cout << "StateManager Created" << std::endl;
     }
 
-    ~MenuManager()
+    ~StateManager()
     {
-        std::cout << "~MenuManager" << std::endl;
+        std::cout << "~StateManager" << std::endl;
         if(!m_the_state.empty())
         {
             m_the_state.back()->onExit();
@@ -58,6 +58,6 @@ private:
 
 };
 
-typedef boost::shared_ptr<MenuManager>	menu_manager_ptr;
+typedef boost::shared_ptr<StateManager>	state_manager_ptr;
 
 #endif

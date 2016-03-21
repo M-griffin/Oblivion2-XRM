@@ -1,4 +1,4 @@
-#include "menu_manager.hpp"
+#include "state_manager.hpp"
 
 #include <boost/locale.hpp>
 #include <string>
@@ -6,7 +6,7 @@
 /**
  * @brief Removed the Current State from the session
  */
-void MenuManager::clean()
+void StateManager::clean()
 {
     if(!m_the_state.empty())
     {
@@ -23,7 +23,7 @@ void MenuManager::clean()
  * @brief Parses Incoming Strings, Sepeates into single character
  * strings of single ASCII charactrs or UTF-8 multi-byte sequence
  */
-void MenuManager::update()
+void StateManager::update()
 {
     using namespace boost::locale;
     generator gen;
@@ -106,7 +106,7 @@ void MenuManager::update()
 /**
  * @brief Appends a new state then run the onEnter()
  */
-void MenuManager::pushState(state_ptr &the_state)
+void StateManager::pushState(state_ptr &the_state)
 {
     m_the_state.push_back(the_state);
     m_the_state.back()->onEnter();
@@ -115,7 +115,7 @@ void MenuManager::pushState(state_ptr &the_state)
 /**
  * @brief Runs onExit(), Then Removes the Last Added State.
  */
-void MenuManager::popState()
+void StateManager::popState()
 {
     if(!m_the_state.empty())
     {
@@ -128,7 +128,7 @@ void MenuManager::popState()
 /**
  * @brief Main Entertrance for Adding, Switching to new States.
  */
-void MenuManager::changeState(state_ptr &the_state)
+void StateManager::changeState(state_ptr &the_state)
 {
     if(!m_the_state.empty())
     {

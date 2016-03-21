@@ -6,37 +6,28 @@
 
 /**
  * @brief Handles Updates or Data Input from Client
- * @return Bool {False = Module is completed, True Means still processing}
+ * @return bool, not used anymore?!?
  */
 bool ModLogon::update(const std::string &character_buffer, const bool &)
 {
-    // Make sure system is active.
+    // Make sure system is active, when system is done, success or failes
+    // We change this is inactive to single the login process is completed.
     if (!m_is_active)
     {
         return false;
     }
 
+    // Return True when were keeping module active / else false;
     if (character_buffer.size() == 0)
     {
         return true;
     }
-    
-    // Handle Input processing here
-
-
-    // Initial testing that were getting here properly and delivering output!
-    //*  Hotkey input working!
-    std::cout << "getKeyInput" << std::endl;
-    std::string result = m_session_io.getKeyInput(character_buffer);
-    std::cout << "m_session_data->deliver(result);" << std::endl;
-    m_session_data->deliver(result);
-
 
     // std::cout << "getInputField" << std::endl;
-    /*
+
     std::string input = "";
     std::string result = m_session_io.getInputField(character_buffer, input);
-    if(result == "aborted")
+    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
     {
         std::cout << "aborted!" << std::endl;
     }
@@ -44,14 +35,18 @@ bool ModLogon::update(const std::string &character_buffer, const bool &)
     {
         // Send back the entire string.  TESTING
         // This should then be processed becasue ENTER was hit.
-        m_session_data->deliver(input);
+        //m_session_data->deliver(input);
+        m_session_data->deliver(result);
+
+        // Process the completed input for the string.
+        m_mod_functions[m_mod_function_index](input);
     }
     else
     {
         // Send back the single input received TESTING
         m_session_data->deliver(result);
-    }*/
-
+    }
+  
     return true;
 }
 
@@ -63,6 +58,12 @@ bool ModLogon::onEnter()
 {
     std::cout << "OnEnter() ModLogin\n";
     m_is_active = true;
+
+    m_setup_functions[m_mod_function_index]();
+
+    // Grab ANSI Screen, display,
+
+    // Read in Text Prompts, display.
 
     return true;
 }
@@ -78,3 +79,115 @@ bool ModLogon::onExit()
     return true;
 }
 
+
+/**
+ * @brief Sets an indivdual module index.
+ * @param mod_function_index
+ */
+void ModLogon::changeModule(int mod_function_index)
+{
+    // Set, and Execute the Setup module.
+    m_mod_function_index = mod_function_index;
+    m_setup_functions[m_mod_function_index]();
+}
+
+
+/**
+ * @brief Validates user Logon
+ * @return
+ */
+void ModLogon::setupLogon()
+{
+
+}
+
+
+/**
+ * @brief Validates user logon password
+ * @return
+ */
+void ModLogon::setupPassword()
+{
+
+}
+
+/**
+ * @brief Validates user logon password challenge questions
+ * @return
+ */
+void ModLogon::setupPasswordChallenge()
+{
+
+}
+
+/**
+ * @brief Chanes user logon password
+ * @return
+ */
+void ModLogon::setupPasswordChange()
+{
+
+}
+
+
+
+/**
+ * @brief Validates user Logon
+ * @return
+ */
+bool ModLogon::logon(const std::string &input)
+{
+    bool result = false;
+    if (input.size() != 0)
+    {
+
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Validates user logon password
+ * @return
+ */
+bool ModLogon::password(const std::string &input)
+{
+    bool result = false;
+    if (input.size() != 0)
+    {
+
+    }
+
+    return result;
+}
+
+/**
+ * @brief Validates user logon password challenge questions
+ * @return
+ */
+bool ModLogon::passwordChallenge(const std::string &input)
+{
+    bool result = false;
+    if (input.size() != 0)
+    {
+
+    }
+
+    return result;
+}
+
+/**
+ * @brief Chanes user logon password
+ * @return
+ */
+bool ModLogon::passwordChange(const std::string &input)
+{
+    bool result = false;
+    if (input.size() != 0)
+    {
+
+    }
+
+    return result;
+}

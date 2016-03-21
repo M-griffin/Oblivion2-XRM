@@ -44,14 +44,17 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     std::cout << "MenuSystem" << std::endl;
 
     // Setup std::function array with available options to pass input to.
-    menu_functions.push_back(std::bind(&MenuSystem::menuInput, this, std::placeholders::_1, std::placeholders::_2));
-    menu_functions.push_back(std::bind(&MenuSystem::menuEditorInput, this, std::placeholders::_1, std::placeholders::_2));
-    menu_functions.push_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
+    m_menu_functions.push_back(std::bind(&MenuSystem::menuInput, this, std::placeholders::_1, std::placeholders::_2));
+    m_menu_functions.push_back(std::bind(&MenuSystem::menuEditorInput, this, std::placeholders::_1, std::placeholders::_2));
+    m_menu_functions.push_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 MenuSystem::~MenuSystem()
 {
     std::cout << "~MenuSystem" << std::endl;
+
+    // Pop Functions off the stack.
+    std::vector<std::function< void(const std::string &, const bool &is_utf8)> >().swap(m_menu_functions);
 
     // Pop off the stack to deaallocate any active modules.
     std::vector<module_ptr>().swap(m_module);
@@ -69,7 +72,7 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
     }
 
     // This simplily passed through the input to the current system fuction were at.
-    menu_functions[m_input_index](character_buffer, is_utf8);
+    m_menu_functions[m_input_index](character_buffer, is_utf8);
 }
 
 /**
@@ -865,10 +868,13 @@ void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is
 
     // Execute the modules update passing through input.
     // result = true, means were still active, false means completed, return to menu!
-    bool result = m_module[0]->update(character_buffer, is_utf8);
+    //bool result = m_module[0]->update(character_buffer, is_utf8);
+
+    // Don't need return result on this.
+    m_module[0]->update(character_buffer, is_utf8);
 
     // Finished modules processing.
-    if (!result)
+    if (!m_module[0]->m_is_active)
     {
         // Do module shutdown
         m_module[0]->onExit();

@@ -32,8 +32,6 @@
     <File Name="src/communicator.cpp"/>
     <File Name="src/communicator.hpp"/>
     <File Name="src/main.cpp"/>
-    <File Name="src/menu_manager.cpp"/>
-    <File Name="src/menu_manager.hpp"/>
     <File Name="src/menu_system.cpp"/>
     <File Name="src/menu_system.hpp"/>
     <File Name="src/menu_system_editor.cpp"/>
@@ -46,8 +44,6 @@
     <File Name="src/session_data.hpp"/>
     <File Name="src/session_io.cpp"/>
     <File Name="src/session_io.hpp"/>
-    <File Name="src/state_machine.cpp"/>
-    <File Name="src/state_machine.hpp"/>
     <File Name="src/system_state.cpp"/>
     <File Name="src/system_state.hpp"/>
     <File Name="src/telnet.hpp"/>
@@ -77,6 +73,10 @@
       <File Name="src/mods/mod_logon.hpp"/>
       <File Name="src/mods/mod_logon.cpp"/>
     </VirtualDirectory>
+    <VirtualDirectory Name="compat"/>
+    <File Name="src/state_manager.cpp"/>
+    <File Name="src/state_manager.hpp"/>
+    <VirtualDirectory Name="model"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
@@ -99,6 +99,7 @@
         <IncludePath Value="C:/Users/Blue/Desktop/Test2/sqlitewrap"/>
         <IncludePath Value="C:/sqlite3/include"/>
         <IncludePath Value="C:/OpenSSL-Win32/include"/>
+        <IncludePath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/include"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
@@ -108,6 +109,7 @@
         <LibraryPath Value="C:/Users/Blue/Desktop/Test2/sqlitewrap/Debug"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/MinGW"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>
+        <LibraryPath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/build"/>
         <Library Value="libboost_system-mgw51-mt-1_58"/>
         <Library Value="libboost_thread-mgw51-mt-1_58"/>
         <Library Value="libboost_chrono-mgw51-mt-1_58"/>
@@ -125,6 +127,7 @@
         <Library Value="libsqlite3.a"/>
         <Library Value="ssleay32.a"/>
         <Library Value="libeay32.a"/>
+        <Library Value="yaml-cpp.dll"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
