@@ -3,7 +3,7 @@
 
 #include "chat_state.hpp"
 #include "system_state.hpp"
-#include "menu_manager.hpp"
+#include "state_manager.hpp"
 #include "connection_tcp.hpp"
 #include "broad_caster.hpp"
 #include "telnet_decoder.hpp"
@@ -274,7 +274,7 @@ public:
     Session(boost::asio::io_service& io_service, connection_ptr connection, board_caster_ptr room)
         : m_session_state(SESSION_STATE::STATE_CMD)
         , m_connection(connection)
-        , m_menu_manager(new MenuManager())
+        , m_menu_manager(new StateManager())
         , m_session_data(new SessionData(connection, room, io_service, m_menu_manager))
         , m_resolv(io_service)
 
@@ -341,7 +341,7 @@ public:
 
     int                 m_session_state;
     connection_ptr	    m_connection;
-    menu_manager_ptr    m_menu_manager;
+    state_manager_ptr    m_menu_manager;
     session_data_ptr    m_session_data;
     tcp::resolver       m_resolv;
 

@@ -32,17 +32,35 @@ typedef uint16_t Word;      // 0 .. 65535	               2
 typedef int32_t  LongInt;   // -2147483648 .. 2147483647   4
 typedef uint32_t LongWord;  // 0 .. 4294967295             4
 
+// Undetermined length, much check String[0] for length.
+typedef int8_t  *String;
+
 const   Byte MaxMesLines  = 150;
 const   Byte NumPrompts   = 205;
 const   Byte NumNodes     = 15;
 const   Byte NumLast      = 20;
 
 
+
+/**
+ * @class TextPrompt
+ * @author Michael Griffin
+ * @date 3/17/2016
+ * @brief Language File Text Prompts
+ */
+#pragma pack(push, 1)
+typedef struct TextPrompt
+{
+    LStr    Desc;
+    String  Prompt; // Not determined length, might parse manually on String[0]
+} TextPrompt;
+#pragma pack(pop)
+
+
 /**
  * @class MenuPrompt
  * @author Michael Griffin
  * @date 9/22/2015
- * @file struct.hpp
  * @brief Menu Promt Record
  */
 #pragma pack(push, 1)

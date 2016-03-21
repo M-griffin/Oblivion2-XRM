@@ -20,7 +20,7 @@
  * @author Michael Griffin
  * @date 9/1/2015
  * @file system_state.hpp
- * @brief System Interface State.
+ * @brief System Interface Binds the MenuSystem And the SessionData.
  */
 class SystemState
     : public TheState

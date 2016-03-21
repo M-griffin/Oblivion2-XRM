@@ -19,8 +19,8 @@
 using boost::asio::deadline_timer;
 using boost::asio::ip::tcp;
 
-class MenuManager;
-typedef boost::shared_ptr<MenuManager>	menu_manager_ptr;
+class StateManager;
+typedef boost::shared_ptr<StateManager>	state_manager_ptr;
 
 /**
  * @class SessionData
@@ -37,7 +37,7 @@ public:
     SessionData(connection_ptr           connection,
                 board_caster_ptr         room,
                 boost::asio::io_service& io_service,
-                menu_manager_ptr         menu_manager)
+                state_manager_ptr         menu_manager)
         : m_connection(connection)
         , m_room(room)
         , m_telnet_state(new TelnetDecoder(connection))
@@ -243,21 +243,21 @@ private:
 
 public:
 
-    connection_ptr    m_connection;
-    board_caster_wptr m_room;
-    telnet_ptr        m_telnet_state;
-    deadline_timer    m_input_deadline;
-    menu_manager_ptr  m_menu_manager;
+    connection_ptr     m_connection;
+    board_caster_wptr  m_room;
+    telnet_ptr         m_telnet_state;
+    deadline_timer     m_input_deadline;
+    state_manager_ptr  m_menu_manager;
 
     // Temp while testing.
-    UserRec           m_user_record;
+    UserRec            m_user_record;
 
-    int               m_node_number;
-    std::string       m_input_encoding;
-    std::string       m_output_encoding;
-    bool              m_is_session_authorized;
-    bool              m_is_leaving;
-    bool              m_is_esc_timer;
+    int                m_node_number;
+    std::string        m_input_encoding;
+    std::string        m_output_encoding;
+    bool               m_is_session_authorized;
+    bool               m_is_leaving;
+    bool               m_is_esc_timer;
 
 
     enum { max_length = 4096 };

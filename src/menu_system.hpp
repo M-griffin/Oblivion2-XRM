@@ -80,7 +80,7 @@ public:
     std::vector<MenuOption> m_loaded_pulldown_options;
 
     // Function Input Vector.
-    std::vector<std::function< void(const std::string &, const bool &is_utf8)> > menu_functions;
+    std::vector<std::function< void(const std::string &, const bool &is_utf8)> > m_menu_functions;
 
     // Handle to modules being executed.
     std::vector<module_ptr> m_module;

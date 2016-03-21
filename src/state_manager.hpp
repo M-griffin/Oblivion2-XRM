@@ -1,35 +1,33 @@
-#ifndef STATE_MACHINE_HPP
-#define STATE_MACHINE_HPP
+#ifndef STATE_MANAGER_HPP
+#define STATE_MANAGER_HPP
 
 #include "the_state.hpp"
 
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <iostream>
 #include <string>
 #include <vector>
 
 /**
- * @class StateMachine
+ * @class StateManager
  * @author Michael Griffin
  * @date 9/1/2015
- * @file state_machine.hpp
- * @brief State Machine, Manages Interfaces and Switching
+ * @file state_manager.hpp
+ * @brief State Manager to load the Menu System and pass session data connections.
  */
-class StateMachine
-    : public boost::enable_shared_from_this<StateMachine>
+class StateManager
 {
 public:
-    StateMachine()
+    StateManager()
         : m_is_state_changed(false)
     {
-        std::cout << "StateMachine Created" << std::endl;
+        std::cout << "StateManager Created" << std::endl;
     }
 
-    ~StateMachine()
+    ~StateManager()
     {
-        std::cout << "~StateMachine" << std::endl;
+        std::cout << "~StateManager" << std::endl;
         if(!m_the_state.empty())
         {
             m_the_state.back()->onExit();
@@ -60,6 +58,6 @@ private:
 
 };
 
-typedef boost::shared_ptr<StateMachine>	state_machine_ptr;
+typedef boost::shared_ptr<StateManager>	state_manager_ptr;
 
 #endif

@@ -4,14 +4,48 @@
 # Custom for Visual Studio
 *.cs     diff=csharp
 
+# Explicitly declare text files you want to always be normalized and converted
+# to native line endings on checkout.
+*.c text
+*.h text
+*.cpp text
+*.hpp text
+
+*.txt text
+*.xml text
+*.ini text
+*.cfg text
+*.json text
+*.mk text
+
+*.a binary
+*.lib binary
+*.dll binary
+*.exe binary
+*.db3 binary
+*.DAT binary
+*.dat binary
+
 # Standard to msysgit
-*.doc	 diff=astextplain
-*.DOC	 diff=astextplain
+*.doc  diff=astextplain
+*.DOC  diff=astextplain
 *.docx diff=astextplain
 *.DOCX diff=astextplain
 *.dot  diff=astextplain
 *.DOT  diff=astextplain
 *.pdf  diff=astextplain
-*.PDF	 diff=astextplain
-*.rtf	 diff=astextplain
-*.RTF	 diff=astextplain
+*.PDF  diff=astextplain
+*.rtf  diff=astextplain
+*.RTF  diff=astextplain
+
+*.asc	eol=crlf
+*.ASC	eol=crlf
+*.ans	eol=crlf
+*.ANS	eol=crlf
+*.txt	eol=crlf
+*.TXT	eol=crlf
+*.diz	eol=crlf
+*.DIZ	eol=crlf
+*.UTF	eol=crlf
+*.utf	eol=crlf
+

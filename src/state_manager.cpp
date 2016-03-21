@@ -1,4 +1,4 @@
-#include "state_machine.hpp"
+#include "state_manager.hpp"
 
 #include <boost/locale.hpp>
 #include <string>
@@ -6,7 +6,7 @@
 /**
  * @brief Removed the Current State from the session
  */
-void StateMachine::clean()
+void StateManager::clean()
 {
     if(!m_the_state.empty())
     {
@@ -23,7 +23,7 @@ void StateMachine::clean()
  * @brief Parses Incoming Strings, Sepeates into single character
  * strings of single ASCII charactrs or UTF-8 multi-byte sequence
  */
-void StateMachine::update()
+void StateManager::update()
 {
     using namespace boost::locale;
     generator gen;
@@ -106,9 +106,8 @@ void StateMachine::update()
 /**
  * @brief Appends a new state then run the onEnter()
  */
-void StateMachine::pushState(state_ptr &the_state)
+void StateManager::pushState(state_ptr &the_state)
 {
-    std::string screen_buffer = "";
     m_the_state.push_back(the_state);
     m_the_state.back()->onEnter();
 }
@@ -116,9 +115,8 @@ void StateMachine::pushState(state_ptr &the_state)
 /**
  * @brief Runs onExit(), Then Removes the Last Added State.
  */
-void StateMachine::popState()
+void StateManager::popState()
 {
-    std::string screen_buffer = "";
     if(!m_the_state.empty())
     {
         m_the_state.back()->onExit();
@@ -127,13 +125,11 @@ void StateMachine::popState()
     m_the_state.back()->resume();
 }
 
-
 /**
  * @brief Main Entertrance for Adding, Switching to new States.
  */
-void StateMachine::changeState(state_ptr &the_state)
+void StateManager::changeState(state_ptr &the_state)
 {
-    std::string screen_buffer = "";
     if(!m_the_state.empty())
     {
         if(m_the_state.back()->getStateID() == the_state->getStateID())
@@ -142,11 +138,13 @@ void StateMachine::changeState(state_ptr &the_state)
         }
         m_the_state.back()->onExit();
 
-        std::cout << "Deleteing Current StateMachine!: " << m_the_state.size() << std::endl;
+        // Rework this lateron,  lets allow multiple states,, the most recent state will be active
+        // Allowing the main state to keep all information!
+        std::cout << "Deleteing Current MenuSystem!: " << m_the_state.size() << std::endl;
         m_the_state.pop_back();
 
         // Clear the Memory!
-        std::cout << "Clearing Memory of StateMachine!: " << m_the_state.size() << std::endl;
+        std::cout << "Clearing Memory of MenuSystem!: " << m_the_state.size() << std::endl;
         std::vector<state_ptr>().swap(m_the_state);
     }
 
