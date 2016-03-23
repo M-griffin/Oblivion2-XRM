@@ -1,4 +1,10 @@
 
+Change Log Update (00.00.21)
+* 2016-03-23
++ Moved OBV/2 DAO's to compat sub folder to separate data access to original OBV/2 data files vs
+  the current new data access objects.
++ These functions will be used later on for writing conversions.
+
 Change Log Update (00.00.20)
 * 2016-03-23
 + Created new Model sub folder to separate structures from data access objects.

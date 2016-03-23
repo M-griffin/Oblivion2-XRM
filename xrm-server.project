@@ -61,15 +61,16 @@
       <File Name="src/data/config_dao.hpp"/>
       <File Name="src/data/users_dao.hpp"/>
       <File Name="src/data/users_dao.cpp"/>
-      <File Name="src/data/menu_dao.hpp"/>
-      <File Name="src/data/prompts_dao.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
       <File Name="src/mods/mod_base.hpp"/>
       <File Name="src/mods/mod_logon.hpp"/>
       <File Name="src/mods/mod_logon.cpp"/>
     </VirtualDirectory>
-    <VirtualDirectory Name="compat"/>
+    <VirtualDirectory Name="compat">
+      <File Name="src/compat/menu_dao.hpp"/>
+      <File Name="src/compat/prompts_dao.hpp"/>
+    </VirtualDirectory>
     <File Name="src/state_manager.cpp"/>
     <File Name="src/state_manager.hpp"/>
     <VirtualDirectory Name="model">
