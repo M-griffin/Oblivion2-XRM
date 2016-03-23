@@ -1,14 +1,5 @@
-#ifndef BROAD_CASTER_HPP
-#define BROAD_CASTER_HPP
-
-/*
- *
- * Need to work out issue, can't have session, then sessiondata populated in here.
- * When it links there is no way to cleany shutdown both!
- *
- * Possibly, if and only if all sessions are disconnect first!  then
- * we proceddure with the shutdown!  look into this more!
- */
+#ifndef SESSION_MANAGER_HPP
+#define SESSION_MANAGER_HPP
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
@@ -27,21 +18,21 @@ class SessionSSL;
 typedef boost::shared_ptr<SessionSSL> session_ssl_ptr;
 
 /**
- * @class BroadCaster
+ * @class SessionManager
  * @author Michael Griffin
  * @date 15/08/2015
- * @file boad_caster.hpp
+ * @file session_manager.hpp
  * @brief Main Channel of Communications between Sessions
  * Also Very Import, keeps handle on Active Sessions and keeps smart pointers alive!
  */
-class BroadCaster
+class SessionManager
 {
 public:
-    BroadCaster()
+    SessionManager()
     {
-        std::cout << "Global BroadCaster Created." << std::endl;
+        std::cout << "SessionManager" << std::endl;
     }
-    ~BroadCaster();
+    ~SessionManager();
 
     /**
      * @brief OverRides for Conencting TCP and SSL Sessions
@@ -61,7 +52,7 @@ private:
     std::set<session_ssl_ptr> m_sessions_ssl;
 };
 
-typedef boost::shared_ptr<BroadCaster>	board_caster_ptr;
-typedef boost::weak_ptr<BroadCaster>	board_caster_wptr;
+typedef boost::shared_ptr<SessionManager> session_manager_ptr;
+typedef boost::weak_ptr<SessionManager>	  session_manager_wptr;
 
 #endif // CHAT_ROOM_HPP
