@@ -7,7 +7,7 @@
 #include "session_data.hpp"
 #include "ansi_processor.hpp"
 
-#include "data/struct_compat.hpp"
+#include "model/struct_compat.hpp"
 #include "data/menu_dao.hpp"
 #include "mods/mod_base.hpp"
 

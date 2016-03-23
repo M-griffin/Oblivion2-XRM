@@ -1,15 +1,15 @@
 #ifndef MENU_DAO_HPP
 #define MENU_DAO_HPP
 
-#include "structures.hpp"
+#include "../model/structures.hpp"
 #include <string>
 
 /**
- * @class MenuData
+ * @class MenuDao
  * @author Michael Griffin
  * @date 10/6/2015
  * @file menu_data.hpp
- * @brief Halds Binary funcations for reading .MNU Data Files.
+ * @brief Holds Binary funcations for reading .MNU Data Files.
  */
 class MenuDao
 {

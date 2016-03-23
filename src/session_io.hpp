@@ -4,7 +4,7 @@
 #include "session_data.hpp"
 #include "common_io.hpp"
 
-#include "data/structures.hpp"
+#include "model/structures.hpp"
 
 #include <string>
 

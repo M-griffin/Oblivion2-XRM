@@ -1,7 +1,7 @@
 #ifndef COMMUNICATOR_HPP
 #define COMMUNICATOR_HPP
 
-#include "data/config.hpp"
+#include "model/config.hpp"
 #include "safe_queue.hpp"
 #include "broad_caster.hpp"
 #include "common_io.hpp"

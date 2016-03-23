@@ -1,7 +1,8 @@
 #ifndef PROMPT_DAO_HPP
 #define PROMPT_DAO_HPP
 
-#include "struct_compat.hpp"
+#include "../model/structures.hpp"
+#include "../model/struct_compat.hpp"
 #include <string>
 
 /**
@@ -46,7 +47,7 @@ public:
      * @return
      */
     template <typename T>
-    int recordWriteInfo(T *t, std::string filename, int idx)
+    int recordWrite(T *t, std::string filename, int idx)
     {
         std::string path = "";
         path.append(DATA_PATH);
@@ -79,7 +80,7 @@ public:
      * @return
      */
     template <typename T>
-    int recordReadInfo(T *t, std::string filename, int idx)
+    int recordRead(T *t, std::string filename, int idx)
     {
         std::string path = "";
         path.append(DATA_PATH);
@@ -106,7 +107,7 @@ public:
             x = fread(t, sizeof(T), 1, stream);
         fclose(stream);
         return x;
-    }   
+    }
 };
 
 #endif // PROMPT_DAO_HPP

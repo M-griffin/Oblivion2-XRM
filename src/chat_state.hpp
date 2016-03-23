@@ -3,7 +3,7 @@
 
 #include "the_state.hpp"
 
-#include "data/struct_compat.hpp"
+#include "model/struct_compat.hpp"
 
 /*
  * NOTES,  Each State is like a module or subsystem.

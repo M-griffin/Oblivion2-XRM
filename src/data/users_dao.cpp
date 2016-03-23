@@ -1,5 +1,5 @@
 #include "users_dao.hpp"
-#include "users.hpp"
+#include "../model/users.hpp"
 
 #include "libSqliteWrapped.h"
 #include <sqlite3.h>

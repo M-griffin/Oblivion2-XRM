@@ -1,7 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "data/config.hpp"
+#include "model/config.hpp"
 #include "broad_caster.hpp"
 #include "session.hpp"
 #include "connection_tcp.hpp"

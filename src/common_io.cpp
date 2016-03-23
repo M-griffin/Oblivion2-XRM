@@ -1,6 +1,6 @@
 #include "common_io.hpp"
 
-#include "data/structures.hpp"
+#include "model/structures.hpp"
 
 #include <unistd.h>
 #include <sys/types.h>
