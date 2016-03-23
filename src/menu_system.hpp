@@ -7,8 +7,8 @@
 #include "session_data.hpp"
 #include "ansi_processor.hpp"
 
+#include "compat/menu_dao.hpp"
 #include "model/struct_compat.hpp"
-#include "data/menu_dao.hpp"
 #include "mods/mod_base.hpp"
 
 #include <stdint.h>

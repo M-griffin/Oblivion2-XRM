@@ -17,9 +17,9 @@
  *
  */
 
+#include "compat/prompts_dao.hpp"  // testing
 #include "model/config.hpp"
 #include "data/config_dao.hpp"
-#include "data/prompts_dao.hpp"  // testing
 
 #include "server.hpp"
 #include "server_ssl.hpp"
