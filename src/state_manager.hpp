@@ -1,7 +1,7 @@
 #ifndef STATE_MANAGER_HPP
 #define STATE_MANAGER_HPP
 
-#include "the_state.hpp"
+#include "state_base.hpp"
 
 #include <boost/enable_shared_from_this.hpp>
 
@@ -38,7 +38,7 @@ public:
             m_the_state.clear();
         }
     }
-    
+
     void update();
     void pushState(state_ptr &the_state);
     void changeState(state_ptr &the_state);

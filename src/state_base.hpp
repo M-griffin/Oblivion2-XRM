@@ -9,19 +9,19 @@
 #include <string>
 
 /**
- * @class TheState
+ * @class StateBase
  * @author Michael Griffin
  * @date 9/1/2015
- * @file the_state.hpp
+ * @file state_base.hpp
  * @brief Virtual Class to manager Individual Interfaces
  */
-class TheState
+class StateBase
 {
 public:
 
-    virtual ~TheState()
+    virtual ~StateBase()
     {
-        std::cout << "~TheState." << std::endl;
+        std::cout << "~StateBase." << std::endl;
     }
     virtual void update(const std::string &character_buffer, const bool &is_utf8)  = 0;
     virtual bool onEnter() = 0;
@@ -29,7 +29,7 @@ public:
     virtual void resume() {}
     virtual std::string getStateID() const = 0;
 
-    TheState(session_data_ptr session_data)
+    StateBase(session_data_ptr session_data)
         : m_session_data(session_data)
         , m_is_active(false)
     { }
@@ -43,8 +43,8 @@ public:
     // Checked after each stage, onEnter, Update, onExit    
 };
 
-typedef boost::shared_ptr<TheState>	state_ptr;
-typedef boost::weak_ptr<TheState>	state_wptr;
+typedef boost::shared_ptr<StateBase> state_ptr;
+typedef boost::weak_ptr<StateBase>	 state_wptr;
 
 
 #endif // THE_STATE_HPP

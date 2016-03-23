@@ -1,7 +1,7 @@
 #ifndef SYSTEM_STATE_HPP
 #define SYSTEM_STATE_HPP
 
-#include "the_state.hpp"
+#include "state_base.hpp"
 #include "menu_system.hpp"
 
 /*
@@ -19,24 +19,24 @@
  * @class SystemState
  * @author Michael Griffin
  * @date 9/1/2015
- * @file system_state.hpp
+ * @file state_system.hpp
  * @brief System Interface Binds the MenuSystem And the SessionData.
  */
-class SystemState
-    : public TheState
+class StateSystem
+    : public StateBase
 {
 public:
-    SystemState(session_data_ptr session_data)
-        : TheState(session_data)
+    StateSystem(session_data_ptr session_data)
+        : StateBase(session_data)
         , m_next_state(0)
         , m_menu_state(session_data)
     {
-        std::cout << "SystemState" << std::endl;
+        std::cout << "StateSystem" << std::endl;
     }
 
-    virtual ~SystemState()
+    virtual ~StateSystem()
     {
-        std::cout << "~SystemState" << std::endl;
+        std::cout << "~StateSystem" << std::endl;
     }
 
     virtual void update(const std::string &character_buffer, const bool &is_utf8);

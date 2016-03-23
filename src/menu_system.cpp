@@ -24,7 +24,7 @@
 const std::string MenuSystem::m_menuID = "MENU_SYSTEM";
 
 MenuSystem::MenuSystem(session_data_ptr session_data)
-    : TheState(session_data)
+    : StateBase(session_data)
     , m_session_io(session_data)
     , m_line_buffer("")
     , m_use_hotkey(false)

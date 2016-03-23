@@ -5,12 +5,12 @@
 #include <iostream>
 #include <string>
 
-const std::string SystemState::m_menuID = "SYSTEM";
+const std::string StateSystem::m_menuID = "SYSTEM";
 
 /**
  * @brief Handles Updates or Data Input from Client
  */
-void SystemState::update(const std::string &character_buffer, const bool &is_utf8)
+void StateSystem::update(const std::string &character_buffer, const bool &is_utf8)
 {
     if (!m_is_active)
     {
@@ -26,7 +26,7 @@ void SystemState::update(const std::string &character_buffer, const bool &is_utf
  * @brief Startup class, setup and display initial screens / interface.
  * @return
  */
-bool SystemState::onEnter()
+bool StateSystem::onEnter()
 {
     std::cout << "OnEnter() SystemState\n";
     m_is_active = true;
@@ -39,7 +39,7 @@ bool SystemState::onEnter()
  * @brief Exit, close down, display screens to change over data.
  * @return
  */
-bool SystemState::onExit()
+bool StateSystem::onExit()
 {
     std::cout << "OnExit() SystemState\n";
     m_is_active = false;
