@@ -1,5 +1,5 @@
 
-#include "data/config.hpp"
+#include "model/config.hpp"
 #include "broad_caster.hpp"
 #include "communicator.hpp"
 #include "connection_base.hpp"

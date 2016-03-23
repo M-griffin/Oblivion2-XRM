@@ -57,15 +57,11 @@
     <File Name="src/connection_base.hpp"/>
     <File Name="sqlitewrap/libSqliteWrapped.h"/>
     <VirtualDirectory Name="data">
-      <File Name="src/data/config.hpp"/>
-      <File Name="src/data/users.hpp"/>
       <File Name="src/data/config_dao.cpp"/>
       <File Name="src/data/config_dao.hpp"/>
       <File Name="src/data/users_dao.hpp"/>
       <File Name="src/data/users_dao.cpp"/>
       <File Name="src/data/menu_dao.hpp"/>
-      <File Name="src/data/struct_compat.hpp"/>
-      <File Name="src/data/structures.hpp"/>
       <File Name="src/data/prompts_dao.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
@@ -76,7 +72,12 @@
     <VirtualDirectory Name="compat"/>
     <File Name="src/state_manager.cpp"/>
     <File Name="src/state_manager.hpp"/>
-    <VirtualDirectory Name="model"/>
+    <VirtualDirectory Name="model">
+      <File Name="src/model/config.hpp"/>
+      <File Name="src/model/struct_compat.hpp"/>
+      <File Name="src/model/structures.hpp"/>
+      <File Name="src/model/users.hpp"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

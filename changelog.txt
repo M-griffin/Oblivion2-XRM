@@ -1,4 +1,13 @@
 
+Change Log Update (00.00.20)
+* 2016-03-23
++ Created new Model sub folder to separate structures from data access objects.
++ Updated all files to the new model path
++ Added NewUserApplication stub for ModLogin 
++ Currently building out text prompt reading, Initial idea is to have single function in dao.
+  Then each mod will have it's own separate file of prompts which it will pass to the dao
+  to quick read module specific text prompts.
+
 Change Log Update (00.00.19)
 * 2016-03-21
 + Rename MenuManager to StateManager to reflect what it does.

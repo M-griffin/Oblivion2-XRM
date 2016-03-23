@@ -3,8 +3,8 @@
 #include "common_io.hpp"
 #include "communicator.hpp"
 
-#include "data/struct_compat.hpp"
-#include "data/config.hpp"
+#include "model/struct_compat.hpp"
+#include "model/config.hpp"
 
 #include "mods/mod_base.hpp"
 #include "mods/mod_logon.hpp"

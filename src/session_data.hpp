@@ -5,8 +5,8 @@
 #include "telnet_decoder.hpp"
 #include "broad_caster.hpp"
 
-#include "data/structures.hpp"
-#include "data/struct_compat.hpp"
+#include "model/structures.hpp"
+#include "model/struct_compat.hpp"
 
 #include <boost/asio.hpp>
 #include <boost/asio/deadline_timer.hpp>
@@ -37,7 +37,7 @@ public:
     SessionData(connection_ptr           connection,
                 board_caster_ptr         room,
                 boost::asio::io_service& io_service,
-                state_manager_ptr         menu_manager)
+                state_manager_ptr        menu_manager)
         : m_connection(connection)
         , m_room(room)
         , m_telnet_state(new TelnetDecoder(connection))

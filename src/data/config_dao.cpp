@@ -1,5 +1,5 @@
 #include "config_dao.hpp"
-#include "config.hpp"
+#include "../model/config.hpp"
 
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>

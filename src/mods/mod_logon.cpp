@@ -1,7 +1,11 @@
 #include "mod_logon.hpp"
 
+#include <yaml-cpp/yaml.h>
+
 #include <iostream>
 #include <string>
+
+
 
 
 /**
@@ -129,6 +133,16 @@ void ModLogon::setupPasswordChange()
 
 }
 
+/**
+ * @brief Creates New User Account
+ * @return
+ */
+void ModLogon::setupNewUserApplication()
+{
+
+
+
+}
 
 
 /**
@@ -182,6 +196,21 @@ bool ModLogon::passwordChallenge(const std::string &input)
  * @return
  */
 bool ModLogon::passwordChange(const std::string &input)
+{
+    bool result = false;
+    if (input.size() != 0)
+    {
+
+    }
+
+    return result;
+}
+
+/**
+ * @brief Creation of new user account
+ * @return
+ */
+bool ModLogon::newUserApplication(const std::string &input)
 {
     bool result = false;
     if (input.size() != 0)

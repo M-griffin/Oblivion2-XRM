@@ -34,11 +34,13 @@ public:
         m_setup_functions.push_back(std::bind(&ModLogon::setupPassword, this));
         m_setup_functions.push_back(std::bind(&ModLogon::setupPasswordChallenge, this));
         m_setup_functions.push_back(std::bind(&ModLogon::setupPasswordChange, this));
+        m_setup_functions.push_back(std::bind(&ModLogon::setupNewUserApplication, this));
 
         m_mod_functions.push_back(std::bind(&ModLogon::logon, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModLogon::password, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModLogon::passwordChallenge, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModLogon::passwordChange, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModLogon::newUserApplication, this, std::placeholders::_1));
     }
 
     virtual ~ModLogon()
@@ -58,7 +60,8 @@ public:
         MOD_LOGON,
         MOD_PASSWORD,
         MOD_FORGOT_PASSWORD,
-        MOD_CHANGE_PASSWORD
+        MOD_CHANGE_PASSWORD,
+        MOD_NEW_USER
     };
 
     /**
@@ -91,6 +94,12 @@ public:
      */
     void setupPasswordChange();
 
+    /**
+     * @brief Creates New User Account
+     * @return
+     */
+    void setupNewUserApplication();
+
 private:
 
     /**
@@ -116,6 +125,12 @@ private:
      * @return
      */
     bool passwordChange(const std::string &input);
+
+    /**
+     * @brief Creation of new user account
+     * @return
+     */
+    bool newUserApplication(const std::string &input);
 
     // Function Input Vector.
     std::vector<std::function< void()> >                    m_setup_functions;

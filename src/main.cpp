@@ -17,8 +17,9 @@
  *
  */
 
-#include "data/config.hpp"
+#include "model/config.hpp"
 #include "data/config_dao.hpp"
+#include "data/prompts_dao.hpp"  // testing
 
 #include "server.hpp"
 #include "server_ssl.hpp"
@@ -31,6 +32,9 @@
 #include <cstdlib>
 #include <iostream>
 #include <thread>
+
+// temp
+#include <fstream>
 
 //#include <cstdio>
 //#include <sqlite3.h>
@@ -191,7 +195,38 @@ auto main() -> int
     // Load BBS Configuration here into Global Singleton.
     TheCommunicator::Instance()->attachConfig(config);
 
+    // Testing!
+    TextPrompt tp;
+    PromptDao  prompt;
+    CommonIO   common_io;
 
+    //m_session_data->deliver(m_session_io.pipe2ansi("|CS|07"));
+    std::string filename = "PROMPTS.DAT";
+
+
+    // Loop each Option after Reading the Menu.
+    int u = 0;
+
+    std::string path = DATA_PATH;
+    path.append("\\");
+    path.append("prompts.xml");
+    std::ofstream ofs(path);
+
+    while(prompt.recordRead(&tp, filename, u++))
+    {
+        // Convert Pascal to C Strings.
+        common_io.PascalToCString(tp.Desc);
+        common_io.PascalToCString(tp.Prompt);
+
+        ofs << "<prompt>" << std::endl;
+        ofs << "<id>" << u << "</id>" << std::endl;
+        ofs << "<description>" << tp.Desc << "</description>" << std::endl;
+        ofs << "<text>" << tp.Prompt << "</text>" << std::endl;
+        ofs << "</prompt>" << std::endl;
+        //if (u == 25) break;
+    }
+    ofs.close();
+/*
     // start io_service.run( ) in separate thread
     auto t = std::thread(&run, std::ref(io_service));
 
@@ -223,7 +258,7 @@ auto main() -> int
             TheCommunicator::Instance()->addMessageQueue(line);
             TheCommunicator::Instance()->sendGlobalMessage();
         }
-    }
+    }*/
 
     // Release Communicator Instance
     TheCommunicator::ReleaseInstance();
