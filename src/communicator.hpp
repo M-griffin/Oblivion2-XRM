@@ -3,7 +3,7 @@
 
 #include "model/config.hpp"
 #include "safe_queue.hpp"
-#include "broad_caster.hpp"
+#include "session_manager.hpp"
 #include "common_io.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
@@ -82,7 +82,7 @@ public:
      * from anywhere in the system.
      * @param room
      */
-    void setupServer(board_caster_ptr &room)
+    void setupServer(session_manager_ptr &room)
     {
         std::lock_guard<std::mutex> lock(m_data_mutex);
         m_room = room;
@@ -158,10 +158,10 @@ public:
         std::lock_guard<std::mutex> lock(m_config_mutex);
         return config_wptr(m_config);
     }
-    
+
     // ThreadSafe Message Queue
     SafeQueue<std::string> m_queue;
-    board_caster_ptr       m_room;
+    session_manager_ptr       m_room;
 
 private:
     mutable std::mutex    m_node_mutex;

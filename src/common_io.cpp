@@ -1245,7 +1245,7 @@ void CommonIO::parseLocalMCI(std::string &AnsiString, std::string mcicode, std::
  */
 void CommonIO::readinAnsi(std::string FileName, std::string &buff)
 {
-    std::string path = TEXTFILE_PATH;
+    std::string path = GLOBAL_TEXTFILE_PATH;
 #ifdef _WIN32
     path.append("\\");
 #else

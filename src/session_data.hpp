@@ -3,7 +3,7 @@
 
 #include "connection_base.hpp"
 #include "telnet_decoder.hpp"
-#include "broad_caster.hpp"
+#include "session_manager.hpp"
 
 #include "model/structures.hpp"
 #include "model/struct_compat.hpp"
@@ -35,7 +35,7 @@ class SessionData
 public:
 
     SessionData(connection_ptr           connection,
-                board_caster_ptr         room,
+                session_manager_ptr         room,
                 boost::asio::io_service& io_service,
                 state_manager_ptr        menu_manager)
         : m_connection(connection)
@@ -177,7 +177,7 @@ public:
             std::cout << "Session Closed()" << std::endl;
         }
 
-        board_caster_ptr room = m_room.lock();
+        session_manager_ptr room = m_room.lock();
         if(room && error && (!m_is_leaving))
         {
             m_is_leaving = true;
@@ -244,7 +244,7 @@ private:
 public:
 
     connection_ptr     m_connection;
-    board_caster_wptr  m_room;
+    session_manager_wptr  m_room;
     telnet_ptr         m_telnet_state;
     deadline_timer     m_input_deadline;
     state_manager_ptr  m_menu_manager;

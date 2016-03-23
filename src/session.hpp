@@ -5,7 +5,7 @@
 #include "system_state.hpp"
 #include "state_manager.hpp"
 #include "connection_tcp.hpp"
-#include "broad_caster.hpp"
+#include "session_manager.hpp"
 #include "telnet_decoder.hpp"
 #include "communicator.hpp"
 #include "session_data.hpp"
@@ -63,7 +63,7 @@ public:
      * @param room
      * @return
      */
-    static session_ptr create(boost::asio::io_service& io_service, connection_ptr connection, board_caster_ptr room)
+    static session_ptr create(boost::asio::io_service& io_service, connection_ptr connection, session_manager_ptr room)
     {
         session_ptr new_session(new Session(io_service, connection, room));
 
@@ -199,7 +199,7 @@ public:
             std::cout << "Session Closed()" << std::endl;
         }
 
-        board_caster_ptr room = m_session_data->m_room.lock();
+        session_manager_ptr room = m_session_data->m_room.lock();
         if(room && error && (!m_session_data->m_is_leaving))
         {
             m_session_data->m_is_leaving = true;
@@ -271,7 +271,7 @@ public:
      * @param room
      * @return
      */
-    Session(boost::asio::io_service& io_service, connection_ptr connection, board_caster_ptr room)
+    Session(boost::asio::io_service& io_service, connection_ptr connection, session_manager_ptr room)
         : m_session_state(SESSION_STATE::STATE_CMD)
         , m_connection(connection)
         , m_menu_manager(new StateManager())

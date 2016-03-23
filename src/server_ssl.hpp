@@ -1,6 +1,6 @@
 
 #include "model/config.hpp"
-#include "broad_caster.hpp"
+#include "session_manager.hpp"
 #include "communicator.hpp"
 #include "connection_base.hpp"
 #include "connection_ssl.hpp"
@@ -31,7 +31,7 @@ public:
                      , boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4()
                      , port))
         , m_context(boost::asio::ssl::context::sslv23)
-        , m_room(new BroadCaster())
+        , m_room(new SessionManager())
     {
         std::cout << "Starting SSL Server" << std::endl;
         m_context.set_options(
@@ -107,5 +107,5 @@ private:
     boost::asio::io_service&        m_io_service;
     boost::asio::ip::tcp::acceptor  m_acceptor;
     boost::asio::ssl::context       m_context;
-    board_caster_ptr                m_room;
+    session_manager_ptr                m_room;
 };

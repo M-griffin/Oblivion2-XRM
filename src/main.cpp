@@ -17,7 +17,6 @@
  *
  */
 
-#include "compat/prompts_dao.hpp"  // testing
 #include "model/config.hpp"
 #include "data/config_dao.hpp"
 
@@ -47,10 +46,10 @@
 #include <boost/smart_ptr/weak_ptr.hpp>
 
 // Temp!
-std::string BBS_PATH = "";
-std::string DATA_PATH = "";
-std::string MENU_PATH = "";
-std::string TEXTFILE_PATH = "";
+std::string GLOBAL_BBS_PATH = "";
+std::string GLOBAL_DATA_PATH = "";
+std::string GLOBAL_MENU_PATH = "";
+std::string GLOBAL_TEXTFILE_PATH = "";
 
 using boost::asio::ip::tcp;
 
@@ -161,13 +160,9 @@ auto main() -> int
     std::cout << "Oblivion/2 XRM Server (c) 2015 Michael Griffin." << std::endl;
 
     CommonIO common;
-    BBS_PATH = common.getProgramPath();
-    std::cout << "BBS HOME Directory Registered: " << BBS_PATH << std::endl;
-
-    // Have to match with Config record, or ignore in config!
-    DATA_PATH = BBS_PATH + "DATA";
-    MENU_PATH = BBS_PATH + "MENU";
-    TEXTFILE_PATH = BBS_PATH + "TEXTFILE";
+    GLOBAL_BBS_PATH = common.getProgramPath();
+    std::cout << "BBS HOME Directory Registered: " << GLOBAL_BBS_PATH << std::endl;
+    
 
     // Start System Services and Main Loop.
     boost::asio::io_service io_service;
@@ -181,8 +176,10 @@ auto main() -> int
     }
 
 
-    // Handle to Data Access Object.
-    ConfigDao cfg(config, BBS_PATH);
+    // Handle to Data Access Object,  at the moment were not using directories
+    // Setup in the config, everything is branched from the main path.
+    // Later on we'll check config for overides only.
+    ConfigDao cfg(config, GLOBAL_BBS_PATH);
 
     // Try to read configuration file, if it doesn't exist create with defaults.
     if (!cfg.loadConfig())
@@ -195,38 +192,11 @@ auto main() -> int
     // Load BBS Configuration here into Global Singleton.
     TheCommunicator::Instance()->attachConfig(config);
 
-    // Testing!
-    TextPrompt tp;
-    PromptDao  prompt;
-    CommonIO   common_io;
+    // Setup System Folder Paths off main BBS Path.
+    GLOBAL_DATA_PATH = GLOBAL_BBS_PATH + "DATA";
+    GLOBAL_MENU_PATH = GLOBAL_BBS_PATH + "MENU";
+    GLOBAL_TEXTFILE_PATH = GLOBAL_BBS_PATH + "TEXTFILE";
 
-    //m_session_data->deliver(m_session_io.pipe2ansi("|CS|07"));
-    std::string filename = "PROMPTS.DAT";
-
-
-    // Loop each Option after Reading the Menu.
-    int u = 0;
-
-    std::string path = DATA_PATH;
-    path.append("\\");
-    path.append("prompts.xml");
-    std::ofstream ofs(path);
-
-    while(prompt.recordRead(&tp, filename, u++))
-    {
-        // Convert Pascal to C Strings.
-        common_io.PascalToCString(tp.Desc);
-        common_io.PascalToCString(tp.Prompt);
-
-        ofs << "<prompt>" << std::endl;
-        ofs << "<id>" << u << "</id>" << std::endl;
-        ofs << "<description>" << tp.Desc << "</description>" << std::endl;
-        ofs << "<text>" << tp.Prompt << "</text>" << std::endl;
-        ofs << "</prompt>" << std::endl;
-        //if (u == 25) break;
-    }
-    ofs.close();
-/*
     // start io_service.run( ) in separate thread
     auto t = std::thread(&run, std::ref(io_service));
 
@@ -258,7 +228,7 @@ auto main() -> int
             TheCommunicator::Instance()->addMessageQueue(line);
             TheCommunicator::Instance()->sendGlobalMessage();
         }
-    }*/
+    }
 
     // Release Communicator Instance
     TheCommunicator::ReleaseInstance();
