@@ -1,6 +1,11 @@
 
 Change Log Update (00.00.21)
 * 2016-03-23
++ Renamed Broad_Caster to Session_Manager to better describe what it does.
++ Various cleanup and re-organization.
+
+Change Log Update (00.00.21)
+* 2016-03-23
 + Moved OBV/2 DAO's to compat sub folder to separate data access to original OBV/2 data files vs
   the current new data access objects.
 + These functions will be used later on for writing conversions.

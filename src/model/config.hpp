@@ -50,7 +50,6 @@ protected:
         ar & BOOST_SERIALIZATION_NVP(port_ssl);
         ar & BOOST_SERIALIZATION_NVP(use_service_telnet);
         ar & BOOST_SERIALIZATION_NVP(use_service_ssl);
-        ar & BOOST_SERIALIZATION_NVP(directory_bbs);
         ar & BOOST_SERIALIZATION_NVP(directory_screens);
         ar & BOOST_SERIALIZATION_NVP(directory_boards);
         ar & BOOST_SERIALIZATION_NVP(directory_files);
@@ -139,7 +138,6 @@ protected:
         ar & BOOST_SERIALIZATION_NVP(t.port_ssl);
         ar & BOOST_SERIALIZATION_NVP(t.use_service_telnet);
         ar & BOOST_SERIALIZATION_NVP(t.use_service_ssl);
-        ar & BOOST_SERIALIZATION_NVP(t.directory_bbs);
         ar & BOOST_SERIALIZATION_NVP(t.directory_screens);
         ar & BOOST_SERIALIZATION_NVP(t.directory_boards);
         ar & BOOST_SERIALIZATION_NVP(t.directory_files);
@@ -340,11 +338,7 @@ public:
     void SetDirectoryBadFiles(const std::string& directory_bad_files)
     {
         this->directory_bad_files = directory_bad_files;
-    }
-    void SetDirectoryBbs(const std::string& directory_bbs)
-    {
-        this->directory_bbs = directory_bbs;
-    }
+    }    
     void SetDirectoryBoards(const std::string& directory_boards)
     {
         this->directory_boards = directory_boards;
@@ -661,10 +655,6 @@ public:
     {
         return directory_bad_files;
     }
-    const std::string& GetDirectoryBbs() const
-    {
-        return directory_bbs;
-    }
     const std::string& GetDirectoryBoards() const
     {
         return directory_boards;
@@ -869,7 +859,6 @@ public:
     // bool
     bool use_service_telnet;    // new
     bool use_service_ssl;       // new
-    std::string directory_bbs;         // BBSDir,
     std::string directory_screens;     // TextDir,
     std::string directory_boards;      // BoardDir,
     std::string directory_files;       // FilesDir,
@@ -990,7 +979,6 @@ public:
         , port_ssl(443)
         , use_service_telnet(true)
         , use_service_ssl(false)
-        , directory_bbs("")
         , directory_screens("")
         , directory_boards("")
         , directory_files("")

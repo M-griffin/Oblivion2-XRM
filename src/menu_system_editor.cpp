@@ -32,7 +32,7 @@ std::string MenuSystem::displayMenus()
     char mid       = (char)186; // ║
 
     namespace fs = boost::filesystem;
-    fs::path someDir(MENU_PATH);   // Add to menu path from config!
+    fs::path someDir(GLOBAL_MENU_PATH);   // Add to menu path from config!
     fs::directory_iterator end_iter;
 
     typedef std::vector<std::string> result_set_t;

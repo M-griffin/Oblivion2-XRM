@@ -2,7 +2,7 @@
 #define SERVER_HPP
 
 #include "model/config.hpp"
-#include "broad_caster.hpp"
+#include "session_manager.hpp"
 #include "session.hpp"
 #include "connection_tcp.hpp"
 #include "communicator.hpp"
@@ -26,7 +26,7 @@ public:
         : m_io_service(io_service)
         , m_acceptor_v6(io_service)
         , m_acceptor_v4(io_service)
-        , m_room(new BroadCaster())
+        , m_room(new SessionManager())
         , m_is_using_ipv6(true)
         , m_context(boost::asio::ssl::context::sslv23)
     {
@@ -152,7 +152,7 @@ private:
     boost::asio::io_service&    m_io_service;
     tcp::acceptor               m_acceptor_v6;
     tcp::acceptor               m_acceptor_v4;
-    board_caster_ptr            m_room;
+    session_manager_ptr            m_room;
     bool m_is_using_ipv6;
 
     // Place Holder Not used!

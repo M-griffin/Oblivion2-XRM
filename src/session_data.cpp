@@ -1,6 +1,6 @@
 #include "session_data.hpp"
 #include "state_manager.hpp"
-#include "broad_caster.hpp"
+#include "session_manager.hpp"
 
 #include <boost/asio.hpp>
 #include <boost/asio/deadline_timer.hpp>
@@ -23,7 +23,7 @@ void SessionData::handleRead(const boost::system::error_code& error, size_t byte
         handleTeloptCodes();
     }
 
-    board_caster_ptr room = m_room.lock();
+    session_manager_ptr room = m_room.lock();
     if(room)
     {
         if(!error)
@@ -89,7 +89,7 @@ void SessionData::handleRead(const boost::system::error_code& error, size_t byte
             if(!m_is_leaving)
             {
 
-                board_caster_ptr room = m_room.lock();
+                session_manager_ptr room = m_room.lock();
                 if(room && error)
                 {
                     m_is_leaving = true;
