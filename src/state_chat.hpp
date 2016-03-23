@@ -1,7 +1,7 @@
 #ifndef CHAT_STATE_HPP
 #define CHAT_STATE_HPP
 
-#include "the_state.hpp"
+#include "state_base.hpp"
 
 #include "model/struct_compat.hpp"
 
@@ -17,19 +17,19 @@
  */
 
 /**
- * @class ChatState
+ * @class StateChat
  * @author Michael Griffin
  * @date 9/1/2015
- * @file chat_state.hpp
+ * @file state_chat.hpp
  * @brief Chat Interface State.
  */
 class ChatState
-    : public TheState
+    : public StateBase
 {
 public:
 
     ChatState(session_data_ptr session_data)
-        : TheState(session_data)
+        : StateBase(session_data)
         , m_next_state(0)
     { }
 

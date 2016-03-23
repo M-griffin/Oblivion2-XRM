@@ -1,7 +1,7 @@
 #ifndef MENU_SYSTEM_HPP
 #define MENU_SYSTEM_HPP
 
-#include "the_state.hpp"
+#include "state_base.hpp"
 #include "session_io.hpp"
 #include "common_io.hpp"
 #include "session_data.hpp"
@@ -18,7 +18,7 @@
 
 
 class MenuSystem
-    : public TheState
+    : public StateBase
     , public MenuDao
 {
 public:
@@ -84,7 +84,7 @@ public:
 
     // Handle to modules being executed.
     std::vector<module_ptr> m_module;
-    
+
    /**
     * @brief Reads a Specific Menu, Info and Options { Called From readInMenuData() }
     */

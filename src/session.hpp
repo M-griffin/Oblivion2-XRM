@@ -1,8 +1,8 @@
 #ifndef SESSION_HPP
 #define SESSION_HPP
 
-#include "chat_state.hpp"
-#include "system_state.hpp"
+#include "state_chat.hpp"
+#include "state_system.hpp"
 #include "state_manager.hpp"
 #include "connection_tcp.hpp"
 #include "session_manager.hpp"
@@ -134,7 +134,7 @@ public:
         {
             case MACHINE_STATE::SYSTEM_STATE:
                 {
-                    state_ptr new_state(new SystemState(m_session_data));
+                    state_ptr new_state(new StateSystem(m_session_data));
                     m_menu_manager->changeState(new_state);
                     break;
                 }
