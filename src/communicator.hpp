@@ -1,7 +1,10 @@
 #ifndef COMMUNICATOR_HPP
 #define COMMUNICATOR_HPP
 
+#include "data/text_prompts_dao.hpp"
+#include "model/structures.hpp"
 #include "model/config.hpp"
+
 #include "safe_queue.hpp"
 #include "session_manager.hpp"
 #include "common_io.hpp"
@@ -25,27 +28,27 @@ public:
      * @brief Creates Singleton Instatce of Class
      * @return
      */
-    static Communicator* Instance()
+    static Communicator* instance()
     {
-        if(!m_globalInstance)
+        if(!m_global_instance)
         {
-            std::cout << "Communicator Created." << std::endl;
-            m_globalInstance = new Communicator();
-            return m_globalInstance;
+            std::cout << "Communicator" << std::endl;
+            m_global_instance = new Communicator();
+            return m_global_instance;
         }
-        return m_globalInstance;
+        return m_global_instance;
     }
 
     /**
      * @brief Releases the Instance from Memory
      */
-    static void ReleaseInstance()
+    static void releaseInstance()
     {
-        if(m_globalInstance)
+        if(m_global_instance)
         {
-            std::cout << "Communicator Released." << std::endl;
-            delete m_globalInstance;
-            m_globalInstance = nullptr;
+            std::cout << "~Communicator" << std::endl;
+            delete m_global_instance;
+            m_global_instance = nullptr;
         }
         return;
     }
@@ -159,18 +162,52 @@ public:
         return config_wptr(m_config);
     }
 
+    /**
+     * @brief Create Default Global Text Prompts
+     */
+    void createTextPrompts()
+    {
+        std::lock_guard<std::mutex> lock(m_prompt_mutex);
+
+        // Create Mapping to pass for file creation (default values)
+        M_TextPrompt value;
+        value[GLOBAL_PROMPT_PAUSE]    = std::make_pair("Displayed for Pause Prompts", "Hit any Key -- OBV/2 XRM");
+
+        m_text_prompts_dao->writeValue(value);
+    }
+
+    /**
+     * @brief Pull Global Prompts with muxtex for threads.
+     * @param lookup
+     * @return
+     */
+    M_StringPair getGlobalPrompt(const std::string &lookup)
+    {
+        std::lock_guard<std::mutex> lock(m_prompt_mutex);
+        
+        M_StringPair result = m_text_prompts_dao->getPrompt(lookup);
+        return result;
+    }
+
     // ThreadSafe Message Queue
     SafeQueue<std::string> m_queue;
-    session_manager_ptr       m_room;
+    session_manager_ptr    m_room;    
 
 private:
-    mutable std::mutex    m_node_mutex;
-    mutable std::mutex    m_data_mutex;
-    mutable std::mutex    m_config_mutex;
-    std::vector<int>      m_node_array;
-    static Communicator*  m_globalInstance;
-    CommonIO              m_common_io;
-    config_ptr            m_config;
+
+    std::string            m_filename;
+    text_prompts_dao_ptr   m_text_prompts_dao;
+    bool                   m_is_text_prompt_exist;
+
+    mutable std::mutex     m_node_mutex;
+    mutable std::mutex     m_data_mutex;
+    mutable std::mutex     m_config_mutex;
+    mutable std::mutex     m_prompt_mutex;
+
+    std::vector<int>       m_node_array;
+    static Communicator*   m_global_instance;
+    CommonIO               m_common_io;
+    config_ptr             m_config;
 
     Communicator();
     ~Communicator();

@@ -4,10 +4,15 @@
 
 #include <string>
 
-extern std::string BBS_PATH;  // BBS System
-extern std::string DATA_PATH; // OBV/2 Data Files
-extern std::string MENU_PATH; // OBV/2 Data Files
-extern std::string TEXTFILE_PATH; // OBV/2 Data Files
+extern std::string GLOBAL_BBS_PATH;      // BBS System
+extern std::string GLOBAL_DATA_PATH;
+extern std::string GLOBAL_MENU_PATH;
+extern std::string GLOBAL_TEXTFILE_PATH;
+
+/**
+ * @brief Const Key values for global text prompt lookup
+ */
+const std::string GLOBAL_PROMPT_PAUSE = "pause";
 
 /**
  * @brief List of interfaces for pipe2ansi conversion
