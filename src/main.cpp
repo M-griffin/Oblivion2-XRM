@@ -165,8 +165,12 @@ auto main() -> int
     CommonIO common;
     GLOBAL_BBS_PATH = common.getProgramPath();
     std::cout << "BBS HOME Directory Registered: " << GLOBAL_BBS_PATH << std::endl;
-    
 
+    // Setup System Folder Paths off main BBS Path.
+    GLOBAL_DATA_PATH = GLOBAL_BBS_PATH + "DATA";
+    GLOBAL_MENU_PATH = GLOBAL_BBS_PATH + "MENU";
+    GLOBAL_TEXTFILE_PATH = GLOBAL_BBS_PATH + "TEXTFILE";
+    
     // Start System Services and Main Loop.
     boost::asio::io_service io_service;
 
@@ -194,13 +198,7 @@ auto main() -> int
 
     // Load BBS Configuration here into Global Singleton.
     TheCommunicator::instance()->attachConfig(config);
-
-    // Setup System Folder Paths off main BBS Path.
-    GLOBAL_DATA_PATH = GLOBAL_BBS_PATH + "DATA";
-    GLOBAL_MENU_PATH = GLOBAL_BBS_PATH + "MENU";
-    GLOBAL_TEXTFILE_PATH = GLOBAL_BBS_PATH + "TEXTFILE";
-
-
+    
     // start io_service.run( ) in separate thread
     auto t = std::thread(&run, std::ref(io_service));
 
