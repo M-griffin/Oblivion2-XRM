@@ -1,3 +1,12 @@
+Change Log Update (00.00.27)
+* 2016-03-24
++ Update to main, moved path setup before the communicator is called so it has valid paths for
+  creating / reading global text prompts.
++ Updated session: added a deadline detection timer for Telnet negotiations.  
+  on connection the session should wait at least 1.5 seconds before starting the state
+  so that any terminal detection can be negotiated and detected before starting the login process.
++ Also updated the state, if were in the detection phase, and the state is not yet created
+  then any input received is put on hold until the state is ready.
 
 Change Log Update (00.00.26)
 * 2016-03-24

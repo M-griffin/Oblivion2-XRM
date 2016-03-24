@@ -38,68 +38,72 @@ void StateManager::update()
 
     boundary::ssegment_index::iterator current, end;
 
-    std::string incoming_data = std::move(m_the_state.back()->m_session_data->m_parsed_data);
-    if(!m_the_state.empty() && incoming_data.size() > 0)
+    // Make sure state is created before accepting input.
+    if(!m_the_state.empty())
     {
-        // Were going to loop the Parsed data, and pass each
-        // Charactesr in seperately like 1 keys at a time
-        // Handles Multi-byte UTF-8 Sequences
-        for (auto ch : incoming_data)
+        std::string incoming_data = std::move(m_the_state.back()->m_session_data->m_parsed_data);
+        if(!m_the_state.empty() && incoming_data.size() > 0)
         {
-            char_value = ch;
-            if (!utf_found)
+            // Were going to loop the Parsed data, and pass each
+            // Charactesr in seperately like 1 keys at a time
+            // Handles Multi-byte UTF-8 Sequences
+            for (auto ch : incoming_data)
             {
-                if ((char_value & 0xC0) != 0xC0)
-                    utf_found = false; // 1 Byte
-                else if ((char_value & 0xE0) == 0xC0)
-                    utf_found = true;  // 2;
-                else if ((char_value & 0xF0) == 0xE0)
-                    utf_found = true;  // 3;
-                else if ((char_value & 0xF8) == 0xF0)
-                    utf_found = true;  // 4;
+                char_value = ch;
+                if (!utf_found)
+                {
+                    if ((char_value & 0xC0) != 0xC0)
+                        utf_found = false; // 1 Byte
+                    else if ((char_value & 0xE0) == 0xC0)
+                        utf_found = true;  // 2;
+                    else if ((char_value & 0xF0) == 0xE0)
+                        utf_found = true;  // 3;
+                    else if ((char_value & 0xF8) == 0xF0)
+                        utf_found = true;  // 4;
+                    else
+                    {
+                        // Not a valid character, or in the
+                        //std::cout << "Exception: Invalid character input (NOT ASCII or UTF-8)!" << std::endl;
+                        continue;
+                    }
+                }
+
+                //charValue = 0x8A;  // Test single-byte extended ASCII
+                character += char_value;
+                boundary::ssegment_index index; //index(boundary::word,character.begin(),character.end());
+                index.map(boundary::character,character.begin(),character.end());
+
+                // Catch All MultiByte UTF-8 Character Sequences.
+                // By default, UTF-8 can be any char > 127 ASCII
+                // Depending if input encoding is CP437 etc.. we might need to intercept
+                // 128-255 here on input for the 8th bit translations.
+                if (utf_found)
+                {
+                    for(current = index.begin(), end = index.end();
+                            current != end; ++current)
+                    {
+                        // Only Gets here in complete UTF-8 Sequence.
+                        m_the_state.back()->update(character, utf_found);
+                        character.erase();
+                    }
+                }
                 else
                 {
-                    // Not a valid character, or in the
-                    //std::cout << "Exception: Invalid character input (NOT ASCII or UTF-8)!" << std::endl;
-                    continue;
-                }
-            }
-
-            //charValue = 0x8A;  // Test single-byte extended ASCII
-            character += char_value;
-            boundary::ssegment_index index; //index(boundary::word,character.begin(),character.end());
-            index.map(boundary::character,character.begin(),character.end());
-
-            // Catch All MultiByte UTF-8 Character Sequences.
-            // By default, UTF-8 can be any char > 127 ASCII
-            // Depending if input encoding is CP437 etc.. we might need to intercept
-            // 128-255 here on input for the 8th bit translations.
-            if (utf_found)
-            {
-                for(current = index.begin(), end = index.end();
-                        current != end; ++current)
-                {
-                    // Only Gets here in complete UTF-8 Sequence.
+                    // Single Byte 0 - 255
                     m_the_state.back()->update(character, utf_found);
                     character.erase();
                 }
             }
-            else
-            {
-                // Single Byte 0 - 255
-                m_the_state.back()->update(character, utf_found);
-                character.erase();
-            }
         }
-    }
 
-    // After All data parsed, if there is a lone ESC, then we want to pass it!
-    // if last character sent was ESC, then force a null \0 after to notifiy no more data!
-    if (char_value == 27)
-    {
-        character.erase();
-        character += '\0';
-        m_the_state.back()->update(character, utf_found);
+        // After All data parsed, if there is a lone ESC, then we want to pass it!
+        // if last character sent was ESC, then force a null \0 after to notifiy no more data!
+        if (char_value == 27)
+        {
+            character.erase();
+            character += '\0';
+            m_the_state.back()->update(character, utf_found);
+        }
     }
 }
 

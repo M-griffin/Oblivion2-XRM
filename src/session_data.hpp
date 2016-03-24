@@ -35,14 +35,14 @@ class SessionData
 public:
 
     SessionData(connection_ptr           connection,
-                session_manager_ptr         room,
+                session_manager_ptr      room,
                 boost::asio::io_service& io_service,
-                state_manager_ptr        menu_manager)
+                state_manager_ptr        state_manager)
         : m_connection(connection)
         , m_room(room)
         , m_telnet_state(new TelnetDecoder(connection))
         , m_input_deadline(io_service)
-        , m_menu_manager(menu_manager)
+        , m_state_manager(state_manager)
         , m_user_record()
         , m_node_number(0)
         , m_input_encoding("cp437")
@@ -243,22 +243,21 @@ private:
 
 public:
 
-    connection_ptr     m_connection;
+    connection_ptr        m_connection;
     session_manager_wptr  m_room;
-    telnet_ptr         m_telnet_state;
-    deadline_timer     m_input_deadline;
-    state_manager_ptr  m_menu_manager;
+    telnet_ptr            m_telnet_state;
+    deadline_timer        m_input_deadline;
+    state_manager_ptr     m_state_manager;
 
     // Temp while testing.
-    UserRec            m_user_record;
+    UserRec               m_user_record;
 
-    int                m_node_number;
-    std::string        m_input_encoding;
-    std::string        m_output_encoding;
-    bool               m_is_session_authorized;
-    bool               m_is_leaving;
-    bool               m_is_esc_timer;
-
+    int                   m_node_number;
+    std::string           m_input_encoding;
+    std::string           m_output_encoding;
+    bool                  m_is_session_authorized;
+    bool                  m_is_leaving;
+    bool                  m_is_esc_timer;
 
     enum { max_length = 4096 };
     char m_raw_data[max_length];  // Raw Incoming
