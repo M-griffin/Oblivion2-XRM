@@ -54,6 +54,8 @@
       <File Name="src/data/config_dao.hpp"/>
       <File Name="src/data/users_dao.hpp"/>
       <File Name="src/data/users_dao.cpp"/>
+      <File Name="src/data/text_prompts_dao.hpp"/>
+      <File Name="src/data/text_prompts_dao.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
       <File Name="src/mods/mod_base.hpp"/>
