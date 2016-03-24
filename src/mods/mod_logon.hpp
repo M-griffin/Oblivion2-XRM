@@ -3,11 +3,15 @@
 
 #include "mod_base.hpp"
 
+#include "../model/structures.hpp"
+#include "../data/text_prompts_dao.hpp"
+
 #include "../session_data.hpp"
 #include "../session_io.hpp"
 
 #include <vector>
 #include <functional>
+
 
 /**
  * @class ModLogin
@@ -23,9 +27,12 @@ public:
     ModLogon(session_data_ptr session_data)
         : ModBase(session_data)
         , m_session_io(session_data)
+        , m_filename("mod_logon.yaml")
+        , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
         , m_mod_function_index(MOD_LOGON)
         , m_failure_attempts(0)
         , m_max_failure_attempts(3)
+        , m_is_text_prompt_exist(false)
     {
         std::cout << "ModLogon" << std::endl;
 
@@ -41,6 +48,16 @@ public:
         m_mod_functions.push_back(std::bind(&ModLogon::passwordChallenge, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModLogon::passwordChange, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModLogon::newUserApplication, this, std::placeholders::_1));
+
+        // Check of the Text Prompts exist.
+        m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
+        if (!m_is_text_prompt_exist)
+        {
+            createTextPrompts();
+        }
+
+        // Loads all Text Prompts for current module
+        m_text_prompts_dao->readPrompts();
     }
 
     virtual ~ModLogon()
@@ -63,6 +80,16 @@ public:
         MOD_CHANGE_PASSWORD,
         MOD_NEW_USER
     };
+
+    // Create Prompt Constants, use the name and no typo's.
+    const std::string PROMPT_LOGON = "logon";
+    const std::string PROMPT_PASSWORD = "password";
+
+
+    /**
+     * @brief Create Default Text Prompts for module
+     */
+    void createTextPrompts();
 
     /**
      * @brief Sets an indivdual module index.
@@ -136,14 +163,16 @@ private:
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
-    SessionIO   m_session_io;
 
-    int         m_mod_function_index;
-    int         m_failure_attempts;
-    int         m_max_failure_attempts;
 
-    
+    SessionIO            m_session_io;
+    std::string          m_filename;
+    text_prompts_dao_ptr m_text_prompts_dao;
 
+    int                  m_mod_function_index;
+    int                  m_failure_attempts;
+    int                  m_max_failure_attempts;
+    bool                 m_is_text_prompt_exist;
 };
 
 #endif // SYSTEM_STATE_HPP

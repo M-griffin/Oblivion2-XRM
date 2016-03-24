@@ -3,10 +3,13 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include <boost/smart_ptr/shared_ptr.hpp>
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <map>
+
 
 // Types for Text Prompt formatting to file.
 typedef std::map<std::string, std::pair<std::string, std::string> > M_TextPrompt;
@@ -27,6 +30,12 @@ public:
     ~TextPromptsDao();
 
     /**
+     * @brief Check if the file exists and we need to create a new one.
+     * @return
+     */
+    bool fileExists();
+
+    /**
      * @brief Helper, appends forward/backward slash to path
      * @param value
      */
@@ -38,12 +47,19 @@ public:
      */
     void writeValue(M_TextPrompt &value);
 
+
+    /**
+     * @brief Read in the prompt file to the class.
+     * @return
+     */
+    bool readPrompts();
+
     /**
      * @brief Retrieves Desc, Text Pair of Text Prompt from yaml file.
      * @param lookup
      * @return
      */
-    M_StringPair getPrompt(std::string &lookup);
+    M_StringPair getPrompt(const std::string &lookup);
 
     /**
      * @brief Testing, display all nodes in a file.
@@ -53,7 +69,12 @@ public:
 
     std::string m_path;
     std::string m_filename;
+    bool        m_is_loaded;
+
+    YAML::Node  m_node;
 
 };
+
+typedef boost::shared_ptr<TextPromptsDao> text_prompts_dao_ptr;
 
 #endif // TEXT_PROMPTS_DAO_HPP

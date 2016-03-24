@@ -1,4 +1,13 @@
 
+Change Log Update (00.00.25)
+* 2016-03-24
++ mod_logon now has the initial read/write of module specific text prompts
+  basic setup will check on creation of class if file exists, if not it will create
+  with defaults.  The Module will load each prompt file on startup so to minimize disk i/o
+  when grabbing different prompts throughout the lifetime of the object.
+- Should create a global text prompt handler as well.  Things like Pause, or hit a key
+  and other misc text prompts should not be duplicated across modules.
+  
 Change Log Update (00.00.24)
 * 2016-03-24
 + Created new text_prompt_dao to handle reading and writing prompts for all modules

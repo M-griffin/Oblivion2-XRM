@@ -17,6 +17,8 @@
  *
  */
 
+#include "data/text_prompts_dao.hpp"
+
 #include "model/config.hpp"
 #include "data/config_dao.hpp"
 
@@ -31,6 +33,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <thread>
+#include <map>
 
 // temp
 #include <fstream>
@@ -196,6 +199,7 @@ auto main() -> int
     GLOBAL_DATA_PATH = GLOBAL_BBS_PATH + "DATA";
     GLOBAL_MENU_PATH = GLOBAL_BBS_PATH + "MENU";
     GLOBAL_TEXTFILE_PATH = GLOBAL_BBS_PATH + "TEXTFILE";
+
 
     // start io_service.run( ) in separate thread
     auto t = std::thread(&run, std::ref(io_service));

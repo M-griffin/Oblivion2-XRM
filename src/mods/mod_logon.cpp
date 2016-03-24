@@ -1,11 +1,7 @@
 #include "mod_logon.hpp"
 
-#include <yaml-cpp/yaml.h>
-
 #include <iostream>
 #include <string>
-
-
 
 
 /**
@@ -16,13 +12,13 @@ bool ModLogon::update(const std::string &character_buffer, const bool &)
 {
     // Make sure system is active, when system is done, success or failes
     // We change this is inactive to single the login process is completed.
-    if (!m_is_active)
+    if(!m_is_active)
     {
         return false;
     }
 
     // Return True when were keeping module active / else false;
-    if (character_buffer.size() == 0)
+    if(character_buffer.size() == 0)
     {
         return true;
     }
@@ -50,7 +46,7 @@ bool ModLogon::update(const std::string &character_buffer, const bool &)
         // Send back the single input received TESTING
         m_session_data->deliver(result);
     }
-  
+
     return true;
 }
 
@@ -63,11 +59,10 @@ bool ModLogon::onEnter()
     std::cout << "OnEnter() ModLogin\n";
     m_is_active = true;
 
+    // Grab ANSI Screen, display, if desired.. logon.ans maybe?
+
+    // Execure the initial setup index.
     m_setup_functions[m_mod_function_index]();
-
-    // Grab ANSI Screen, display,
-
-    // Read in Text Prompts, display.
 
     return true;
 }
@@ -81,6 +76,20 @@ bool ModLogon::onExit()
     std::cout << "OnExit() ModLogin\n";
     m_is_active = false;
     return true;
+}
+
+/**
+ * @brief Create Default Text Prompts for module
+ */
+void ModLogon::createTextPrompts()
+{
+
+    // Create Mapping to pass for file creation (default values)
+    M_TextPrompt value;
+    value[PROMPT_LOGON]    = std::make_pair("Displayed for Logon Prompt", "|15Logon: ");
+    value[PROMPT_PASSWORD] = std::make_pair("Displayed for Password Prompt", "|15password: ");
+
+    m_text_prompts_dao->writeValue(value);
 }
 
 
@@ -102,6 +111,17 @@ void ModLogon::changeModule(int mod_function_index)
  */
 void ModLogon::setupLogon()
 {
+
+    std::cout << "setupLogon()" << std::endl;
+
+    // Testing.
+    m_text_prompts_dao->displayAll();
+
+    // Test display
+
+    M_StringPair result = m_text_prompts_dao->getPrompt(PROMPT_PASSWORD);
+
+    std::cout << "TEST: " << result.first << ", " << result.second << std::endl;
 
 }
 
@@ -152,7 +172,7 @@ void ModLogon::setupNewUserApplication()
 bool ModLogon::logon(const std::string &input)
 {
     bool result = false;
-    if (input.size() != 0)
+    if(input.size() != 0)
     {
 
     }
@@ -168,7 +188,7 @@ bool ModLogon::logon(const std::string &input)
 bool ModLogon::password(const std::string &input)
 {
     bool result = false;
-    if (input.size() != 0)
+    if(input.size() != 0)
     {
 
     }
@@ -183,7 +203,7 @@ bool ModLogon::password(const std::string &input)
 bool ModLogon::passwordChallenge(const std::string &input)
 {
     bool result = false;
-    if (input.size() != 0)
+    if(input.size() != 0)
     {
 
     }
@@ -198,7 +218,7 @@ bool ModLogon::passwordChallenge(const std::string &input)
 bool ModLogon::passwordChange(const std::string &input)
 {
     bool result = false;
-    if (input.size() != 0)
+    if(input.size() != 0)
     {
 
     }
@@ -213,7 +233,7 @@ bool ModLogon::passwordChange(const std::string &input)
 bool ModLogon::newUserApplication(const std::string &input)
 {
     bool result = false;
-    if (input.size() != 0)
+    if(input.size() != 0)
     {
 
     }

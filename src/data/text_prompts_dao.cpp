@@ -5,15 +5,19 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <exception>
 
 TextPromptsDao::TextPromptsDao(std::string path, std::string filename)
     : m_path(path)
     , m_filename(filename)
+    , m_is_loaded(false)
 {
+    std::cout << "TextPromptsDao" << std::endl;
 }
 
 TextPromptsDao::~TextPromptsDao()
 {
+    std::cout << "~TextPromptsDao" << std::endl;
 }
 
 /**
@@ -28,6 +32,27 @@ void TextPromptsDao::pathSeperator(std::string &value)
     value.append("/");
 #endif
 }
+
+
+/**
+ * @brief Check if the file exists and we need to create a new one.
+ * @return
+ */
+bool TextPromptsDao::fileExists()
+{
+    std::string path = m_path;
+    pathSeperator(path);
+    path.append(m_filename);
+
+    std::ifstream ifs(path);
+    if (!ifs.is_open())
+    {
+        return false;
+    }
+    ifs.close();
+    return true;
+}
+
 
 /**
  * @brief Takes mapping of M_TextPrompt and writes out Key, (Value, Value).
@@ -47,7 +72,9 @@ void TextPromptsDao::writeValue(M_TextPrompt &value)
     }
 
     YAML::Emitter out;
-    YAML::Node node;
+
+    // Clear and start fresh
+    m_is_loaded = false;    
 
     out << YAML::BeginMap;
     out << YAML::Flow;
@@ -66,21 +93,52 @@ void TextPromptsDao::writeValue(M_TextPrompt &value)
 }
 
 /**
- * @brief Retrieves Desc, Text Pair of Text Prompt from yaml file.
- * @param lookup
+ * @brief Read in the prompt file to the class.
  * @return
  */
-M_StringPair TextPromptsDao::getPrompt(std::string &lookup)
+bool TextPromptsDao::readPrompts()
 {
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
 
-    YAML::Node node = YAML::LoadFile(path);
+    // Load the file into the class.
+    try
+    {
+        // Clear and Existing Nodes first beload loading.
+        if (m_node.size() > 0)
+        {
+            m_node.reset();
+        }
+
+        // Load file fresh.
+        m_node = YAML::LoadFile(path);
+        m_is_loaded = true;
+    }
+    catch (std::exception ex)
+    {
+        std::cout << "Exception YAML::LoadFile() " << ex.what() << std::endl;
+    }
+    return m_is_loaded;
+}
+
+
+/**
+ * @brief Retrieves Desc, Text Pair of Text Prompt from yaml file.
+ * @param lookup
+ * @return
+ */
+M_StringPair TextPromptsDao::getPrompt(const std::string &lookup)
+{
     M_StringPair temp;
 
+    if (!m_is_loaded)
+    {
+        return temp;
+    }
+
     std::string key = "";
-    for (YAML::const_iterator it = node.begin(); it != node.end(); ++it)
+    for (YAML::const_iterator it = m_node.begin(); it != m_node.end(); ++it)
     {
         key = it->first.as<std::string>();
 
@@ -96,20 +154,15 @@ M_StringPair TextPromptsDao::getPrompt(std::string &lookup)
 }
 
 /**
- * @brief Testing, display all nodes in a file.
+ * @brief Testing, display all nodes loaded
  */
 void TextPromptsDao::displayAll()
 {
-    std::string path = m_path;
-    pathSeperator(path);
-    path.append(m_filename);
-
-    YAML::Node node = YAML::LoadFile(path);
     M_StringPair temp;
 
-    for (YAML::const_iterator it = node.begin(); it != node.end(); ++it)
+    for (YAML::const_iterator it = m_node.begin(); it != m_node.end(); ++it)
     {
-        std::string key = it->first.as<std::string>();                // <- key
+        std::string key = it->first.as<std::string>();
         M_StringPair value = it->second.as<M_StringPair>();
 
         std::cout << key << " -> " << value.first << ", " << value.second << std::endl;
