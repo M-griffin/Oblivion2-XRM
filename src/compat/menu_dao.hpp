@@ -9,7 +9,7 @@
  * @author Michael Griffin
  * @date 10/6/2015
  * @file menu_data.hpp
- * @brief Holds Binary funcations for reading .MNU Data Files.
+ * @brief Holds Binary funcations for reading .MNU Data Files. Original OBV/2
  */
 class MenuDao
 {
@@ -52,12 +52,12 @@ public:
         // Use to read from either Menu or Data Records
         if(std::is_same<T, MenuInfo>::value)
         {
-            path.append(MENU_PATH);
+            path.append(GLOBAL_MENU_PATH);
         }
         else
         {
             // Else we want to read MENUPROMPT.DAT in DATA Folder
-            path.append(DATA_PATH);
+            path.append(GLOBAL_DATA_PATH);
         }
 
         pathSeperator(path);
@@ -84,7 +84,7 @@ public:
     template <typename T>
     int recordWriteOption(T *t, std::string filename, int idx)
     {
-        std::string path = MENU_PATH;
+        std::string path = GLOBAL_MENU_PATH;
         pathSeperator(path);
         path.append(filename);
 
@@ -120,12 +120,12 @@ public:
         // Use to read from either Menu or Data Records
         if(std::is_same<T, MenuInfo>::value)
         {
-            path.append(MENU_PATH);
+            path.append(GLOBAL_MENU_PATH);
         }
         else
         {
             // Else we want to read MENUPROMPT.DAT in DATA Folder
-            path.append(DATA_PATH);
+            path.append(GLOBAL_DATA_PATH);
         }
 
         pathSeperator(path);
@@ -156,7 +156,7 @@ public:
     template <typename T>
     int recordReadOption(T *t, std::string filename, int idx)
     {
-        std::string path = MENU_PATH;
+        std::string path = GLOBAL_MENU_PATH;
         pathSeperator(path);
         path.append(filename);
 

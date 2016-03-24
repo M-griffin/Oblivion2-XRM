@@ -10,7 +10,7 @@
  * @author Michael Griffin
  * @date 3/18/2016
  * @file prompt_dao.hpp
- * @brief Holds Binary funcations for reading PROMPTS.DAT
+ * @brief Holds Binary funcations for reading PROMPTS.DAT Original OBV/2
  */
 class PromptDao
 {
@@ -50,7 +50,7 @@ public:
     int recordWrite(T *t, std::string filename, int idx)
     {
         std::string path = "";
-        path.append(DATA_PATH);
+        path.append(GLOBAL_DATA_PATH);
         pathSeperator(path);
         path.append(filename);
 
@@ -83,7 +83,7 @@ public:
     int recordRead(T *t, std::string filename, int idx)
     {
         std::string path = "";
-        path.append(DATA_PATH);
+        path.append(GLOBAL_DATA_PATH);
         pathSeperator(path);
         path.append(filename);
 
@@ -108,6 +108,42 @@ public:
         fclose(stream);
         return x;
     }
+
+    /*
+    void exportToXML()
+    {
+        // Testing!
+        TextPrompt tp;
+        PromptDao  prompt;
+        CommonIO   common_io;
+
+        //m_session_data->deliver(m_session_io.pipe2ansi("|CS|07"));
+        std::string filename = "PROMPTS.DAT";
+
+
+        // Loop each Option after Reading the Menu.
+        int u = 0;
+
+        std::string path = GLOBAL_DATA_PATH;
+        path.append("\\");
+        path.append("prompts.xml");
+        std::ofstream ofs(path);
+
+        while(prompt.recordRead(&tp, filename, u++))
+        {
+            // Convert Pascal to C Strings.
+            common_io.PascalToCString(tp.Desc);
+            common_io.PascalToCString(tp.Prompt);
+
+            ofs << "<prompt>" << std::endl;
+            ofs << "<id>" << u << "</id>" << std::endl;
+            ofs << "<description>" << tp.Desc << "</description>" << std::endl;
+            ofs << "<text>" << tp.Prompt << "</text>" << std::endl;
+            ofs << "</prompt>" << std::endl;
+            //if (u == 25) break;
+        }
+        ofs.close();
+    }*/
 };
 
 #endif // PROMPT_DAO_HPP

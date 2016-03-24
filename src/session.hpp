@@ -48,7 +48,7 @@ public:
     ~Session()
     {
         // Free the Node Number from this session.
-        TheCommunicator::Instance()->freeNodeNumber(m_session_data->m_node_number);
+        TheCommunicator::instance()->freeNodeNumber(m_session_data->m_node_number);
         std::cout << "~Session, Node: " << m_session_data->m_node_number << std::endl;
 
         // Free the menu system state and modules when session closes.
@@ -331,7 +331,7 @@ public:
         }
 
         // Get The First available node number.
-        m_session_data->m_node_number = TheCommunicator::Instance()->getNodeNumber();
+        m_session_data->m_node_number = TheCommunicator::instance()->getNodeNumber();
         std::cout << "Node Number: " << m_session_data->m_node_number << std::endl;
 
         // Setup the Menu Manager for this session.
