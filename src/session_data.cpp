@@ -39,7 +39,7 @@ void SessionData::handleRead(const boost::system::error_code& error, size_t byte
                 }
                 else if(!m_is_esc_timer)
                 {
-                    m_menu_manager->update();
+                    m_state_manager->update();
                 }
 
                 /*
@@ -215,6 +215,6 @@ void SessionData::handleEscTimer(boost::asio::deadline_timer* timer)
         std::cout << "Deadline Checking, CAUGHT REMAINING SEQUENCE!" << std::endl;
     }
     // Move text to State Machine, Timer has passed, or remainer of Sequence caught up!
-    m_menu_manager->update();
+    m_state_manager->update();
     m_is_esc_timer = false;
 }

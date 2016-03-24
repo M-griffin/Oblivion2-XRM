@@ -52,7 +52,7 @@ public:
         std::cout << "~Session, Node: " << m_session_data->m_node_number << std::endl;
 
         // Free the menu system state and modules when session closes.
-        m_menu_manager->clean();
+        m_state_manager->clean();
         std::cout << "m_menu_manager->clean() Completd!" << std::endl;
     }
 
@@ -120,10 +120,51 @@ public:
             new_session->m_session_data->m_telnet_state->addReply(TELOPT_NEW_ENVIRON);
 
             std::cout << "send initial IAC sequences ended." << std::endl;
+
+
+            // Wait 2 Seconds for respones.
+            new_session->startDetectionTimer();            
         }
 
         return new_session;
     }
+
+    /**
+     * @brief Start ESC Key input timer
+     */
+    void startDetectionTimer()
+    {
+        // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences reponses
+        m_detection_deadline.expires_from_now(boost::posix_time::milliseconds(1500));
+        m_detection_deadline.async_wait(
+            boost::bind(&Session::handleDetectionTimer, shared_from_this(), &m_detection_deadline));
+    }
+
+
+    /**
+     * @brief Deadline Detection Timer for Negoiation
+     * @param timer
+     */
+    void handleDetectionTimer(boost::asio::deadline_timer* timer)
+    {
+        if(timer->expires_at() <= deadline_timer::traits_type::now())
+        {
+            // The deadline has passed. Stop the session. The other actors will
+            // terminate as soon as possible.
+            //stop();
+            std::cout << "Deadline Detection, EXPIRED!" << std::endl;
+        }
+        else
+        {
+            // Got more input while waiting, FOUND MORE DATA!
+            std::cout << "Deadline Detection Checking, CAUGHT REMAINING SEQUENCE!" << std::endl;
+        }
+
+        // Start State Now
+        state_ptr new_state(new MenuSystem(m_session_data));
+        m_state_manager->changeState(new_state);
+    }
+
 
     /**
      * @brief State Machine Switcher.  Select Active Modules per the Enum
@@ -135,18 +176,18 @@ public:
             case MACHINE_STATE::SYSTEM_STATE:
                 {
                     state_ptr new_state(new StateSystem(m_session_data));
-                    m_menu_manager->changeState(new_state);
+                    m_state_manager->changeState(new_state);
                     break;
                 }
 
-            /* Not working chat state at this time!
-             * Probably Change to Services or something else!
-            case MACHINE_STATE::CHAT_STATE:
-                {
-                    state_ptr new_state(new ChatState(m_session_data));
-                    m_menu_manager->changeState(new_state);
-                    break;
-                }*/
+                /* Not working chat state at this time!
+                 * Probably Change to Services or something else!
+                case MACHINE_STATE::CHAT_STATE:
+                    {
+                        state_ptr new_state(new ChatState(m_session_data));
+                        m_menu_manager->changeState(new_state);
+                        break;
+                    }*/
             default:
                 {
                     std::cout << "Error, Invalid state for switch_satates in Session." << std::endl;
@@ -274,9 +315,10 @@ public:
     Session(boost::asio::io_service& io_service, connection_ptr connection, session_manager_ptr room)
         : m_session_state(SESSION_STATE::STATE_CMD)
         , m_connection(connection)
-        , m_menu_manager(new StateManager())
-        , m_session_data(new SessionData(connection, room, io_service, m_menu_manager))
+        , m_state_manager(new StateManager())
+        , m_session_data(new SessionData(connection, room, io_service, m_state_manager))
         , m_resolv(io_service)
+        , m_detection_deadline(io_service)
 
     {
 
@@ -333,17 +375,15 @@ public:
         // Get The First available node number.
         m_session_data->m_node_number = TheCommunicator::instance()->getNodeNumber();
         std::cout << "Node Number: " << m_session_data->m_node_number << std::endl;
-
-        // Setup the Menu Manager for this session.
-        state_ptr new_state(new MenuSystem(m_session_data));
-        m_menu_manager->changeState(new_state);
     }
 
     int                 m_session_state;
     connection_ptr	    m_connection;
-    state_manager_ptr    m_menu_manager;
+    state_manager_ptr   m_state_manager;
     session_data_ptr    m_session_data;
     tcp::resolver       m_resolv;
+
+    deadline_timer      m_detection_deadline;
 
 };
 
