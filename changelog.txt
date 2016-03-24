@@ -1,8 +1,20 @@
 
-Change Log Update (00.00.21)
+Change Log Update (00.00.24)
+* 2016-03-24
++ Created new text_prompt_dao to handle reading and writing prompts for all modules
++ Each module with have it's own short and simple prompt file, this is a general
+  template to handle all modules
+
+Change Log Update (00.00.23)
+* 2016-03-23
++ Realigned the state code files to standard naming convention
+
+Change Log Update (00.00.22)
 * 2016-03-23
 + Renamed Broad_Caster to Session_Manager to better describe what it does.
 + Various cleanup and re-organization.
++ Also removed directory_bbs from config, the main root folder will always 
+  be detected from where the executable is launched.
 
 Change Log Update (00.00.21)
 * 2016-03-23
