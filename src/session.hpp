@@ -1,14 +1,13 @@
 #ifndef SESSION_HPP
 #define SESSION_HPP
 
-#include "state_chat.hpp"
-#include "state_system.hpp"
 #include "state_manager.hpp"
 #include "connection_tcp.hpp"
 #include "session_manager.hpp"
 #include "telnet_decoder.hpp"
 #include "communicator.hpp"
 #include "session_data.hpp"
+#include "menu_system.hpp"
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
@@ -145,56 +144,15 @@ public:
      * @brief Deadline Detection Timer for Negoiation
      * @param timer
      */
-    void handleDetectionTimer(boost::asio::deadline_timer* timer)
+    void handleDetectionTimer(boost::asio::deadline_timer* /*timer*/)
     {
-        if(timer->expires_at() <= deadline_timer::traits_type::now())
-        {
-            // The deadline has passed. Stop the session. The other actors will
-            // terminate as soon as possible.
-            //stop();
-            std::cout << "Deadline Detection, EXPIRED!" << std::endl;
-        }
-        else
-        {
-            // Got more input while waiting, FOUND MORE DATA!
-            std::cout << "Deadline Detection Checking, CAUGHT REMAINING SEQUENCE!" << std::endl;
-        }
+        std::cout << "Deadline Detection, EXPIRED!" << std::endl;
 
         // Start State Now
         state_ptr new_state(new MenuSystem(m_session_data));
         m_state_manager->changeState(new_state);
     }
-
-
-    /**
-     * @brief State Machine Switcher.  Select Active Modules per the Enum
-     */
-    void switchStates(int state)
-    {
-        switch(state)
-        {
-            case MACHINE_STATE::SYSTEM_STATE:
-                {
-                    state_ptr new_state(new StateSystem(m_session_data));
-                    m_state_manager->changeState(new_state);
-                    break;
-                }
-
-                /* Not working chat state at this time!
-                 * Probably Change to Services or something else!
-                case MACHINE_STATE::CHAT_STATE:
-                    {
-                        state_ptr new_state(new ChatState(m_session_data));
-                        m_menu_manager->changeState(new_state);
-                        break;
-                    }*/
-            default:
-                {
-                    std::cout << "Error, Invalid state for switch_satates in Session." << std::endl;
-                    break;
-                }
-        }
-    }
+    
 
     /**
      * @brief Callback from The Broadcaster to write data to the active sessions.
@@ -313,8 +271,7 @@ public:
      * @return
      */
     Session(boost::asio::io_service& io_service, connection_ptr connection, session_manager_ptr room)
-        : m_session_state(SESSION_STATE::STATE_CMD)
-        , m_connection(connection)
+        : m_connection(connection)
         , m_state_manager(new StateManager())
         , m_session_data(new SessionData(connection, room, io_service, m_state_manager))
         , m_resolv(io_service)
@@ -377,7 +334,6 @@ public:
         std::cout << "Node Number: " << m_session_data->m_node_number << std::endl;
     }
 
-    int                 m_session_state;
     connection_ptr	    m_connection;
     state_manager_ptr   m_state_manager;
     session_data_ptr    m_session_data;
