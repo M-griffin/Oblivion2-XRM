@@ -33,7 +33,7 @@ typedef int32_t  LongInt;   // -2147483648 .. 2147483647   4
 typedef uint32_t LongWord;  // 0 .. 4294967295             4
 
 // Undetermined length, much check String[0] for length.
-typedef int8_t  *String;
+typedef int8_t  String[256];
 
 const   Byte MaxMesLines  = 150;
 const   Byte NumPrompts   = 205;

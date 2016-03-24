@@ -102,7 +102,7 @@ void run(boost::asio::io_service& io_service)
     server_ssl_ptr    serverSSL;
 
     // Grab Lock and Create Instance of accessable configuration.
-    config_ptr cfg(TheCommunicator::Instance()->getConfig().lock());
+    config_ptr cfg(TheCommunicator::instance()->getConfig().lock());
     if (!cfg)
     {
         std::cout << "Error: getConfig.lock()" << std::endl;
@@ -193,7 +193,7 @@ auto main() -> int
     }
 
     // Load BBS Configuration here into Global Singleton.
-    TheCommunicator::Instance()->attachConfig(config);
+    TheCommunicator::instance()->attachConfig(config);
 
     // Setup System Folder Paths off main BBS Path.
     GLOBAL_DATA_PATH = GLOBAL_BBS_PATH + "DATA";
@@ -219,7 +219,7 @@ auto main() -> int
         {
             std::cout << "Shutting Down the Server" << std::endl;
             // Shutdown the Thread and merge it back.
-            TheCommunicator::Instance()->shutdown();
+            TheCommunicator::instance()->shutdown();
             io_service.stop();
             t.join();
             break;
@@ -229,12 +229,12 @@ auto main() -> int
             // Sends Global Text to All Users connected.
             // Need to update this to pick 'either'
             // All or Individual Sessions.
-            TheCommunicator::Instance()->addMessageQueue(line);
-            TheCommunicator::Instance()->sendGlobalMessage();
+            TheCommunicator::instance()->addMessageQueue(line);
+            TheCommunicator::instance()->sendGlobalMessage();
         }
     }
 
     // Release Communicator Instance
-    TheCommunicator::ReleaseInstance();
+    TheCommunicator::releaseInstance();
     return 0;
 }

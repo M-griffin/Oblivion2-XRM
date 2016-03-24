@@ -47,7 +47,7 @@ public:
 
         // Setup the communicator to allow rest of program to talk with
         // And send messages to other nodes.
-        TheCommunicator::Instance()->setupServer(m_room);
+        TheCommunicator::instance()->setupServer(m_room);
 
         std::cout << "SSL Server Ready." << std::endl;
         wait_for_connection();

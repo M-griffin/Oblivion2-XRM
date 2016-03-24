@@ -85,7 +85,7 @@ bool MenuSystem::onEnter()
     std::cout << "OnEnter() MenuSystem" << std::endl;
 
     // Grab handle to the system configuration
-    config_ptr cfg(TheCommunicator::Instance()->getConfig().lock());
+    config_ptr cfg(TheCommunicator::instance()->getConfig().lock());
     if(!cfg)
     {
         std::cout << "Error: getConfig.lock()" << std::endl;
