@@ -7,7 +7,9 @@
 #include "telnet_decoder.hpp"
 #include "communicator.hpp"
 #include "session_data.hpp"
+#include "session_io.hpp"
 #include "menu_system.hpp"
+
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
@@ -120,6 +122,16 @@ public:
 
             std::cout << "send initial IAC sequences ended." << std::endl;
 
+            // NOTE add ANSI ESC[6n detection here!
+
+            // Grab Detection Prompt
+            M_StringPair prompt = TheCommunicator::instance()->getGlobalPrompt(GLOBAL_PROMPT_DETECT_TERMOPTS);
+
+            std::cout << "GLOBAL_PROMPT_DETECT_TERMOPTS: " << prompt.first << ", " << prompt.second << std::endl;
+
+            SessionIO io(new_session->m_session_data);
+            std::string result = io.pipe2ansi(prompt.second);
+            new_session->deliver(result);
 
             // Wait 2 Seconds for respones.
             new_session->startDetectionTimer();            
@@ -147,6 +159,17 @@ public:
     void handleDetectionTimer(boost::asio::deadline_timer* /*timer*/)
     {
         std::cout << "Deadline Detection, EXPIRED!" << std::endl;
+
+        // Grab Emulation Detected
+        /*
+        M_StringPair prompt = TheCommunicator::instance()->getGlobalPrompt(GLOBAL_PROMPT_DETECT);
+
+        std::cout << "GLOBAL_PROMPT_DETECT: " << prompt.first << ", " << prompt.second << std::endl;
+
+        SessionIO io(new_session->m_session_data);
+        std::string result = io.pipe2ansi(prompt.second);
+        deliver(result);*/
+
 
         // Start State Now
         state_ptr new_state(new MenuSystem(m_session_data));

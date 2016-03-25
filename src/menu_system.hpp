@@ -67,6 +67,7 @@ public:
     {
         MENU_INPUT,
         MENU_EDITOR_INPUT,
+        MODULE_PRELOGON_INPUT,
         MODULE_INPUT
     };
 
@@ -166,7 +167,17 @@ public:
     /**
      * @brief Starts up Logon Module
      */
+    void startupModulePreLogon();
+
+    /**
+     * @brief Starts up Logon Module
+     */
     void startupModuleLogon();
+
+    /**
+     * @brief Handles parsing input for current module.
+     */
+    void modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8);
 
     /**
      * @brief Handles parsing input for current module.

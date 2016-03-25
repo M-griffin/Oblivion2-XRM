@@ -7,6 +7,7 @@
 #include "model/config.hpp"
 
 #include "mods/mod_base.hpp"
+#include "mods/mod_prelogon.hpp"
 #include "mods/mod_logon.hpp"
 
 #include <boost/locale.hpp>
@@ -46,6 +47,7 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     // Setup std::function array with available options to pass input to.
     m_menu_functions.push_back(std::bind(&MenuSystem::menuInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::menuEditorInput, this, std::placeholders::_1, std::placeholders::_2));
+    m_menu_functions.push_back(std::bind(&MenuSystem::modulePreLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
 }
 
@@ -84,47 +86,11 @@ bool MenuSystem::onEnter()
 {
     std::cout << "OnEnter() MenuSystem" << std::endl;
 
-    // Grab handle to the system configuration
-    config_ptr cfg(TheCommunicator::instance()->getConfig().lock());
-    if(!cfg)
-    {
-        std::cout << "Error: getConfig.lock()" << std::endl;
-        assert(false);
-    }
-
-    // Check if the current user has been logged in yet.
-    if (!m_session_data->m_is_session_authorized)
-    {
-        std::cout << "!m_is_session_authorized" << std::endl;
-
-        // Access any needed global configuration values
-        // For Example...
-        if(cfg->use_matrix_login)
-        {
-            // Setup Matrix Menu
-            std::cout << "cfg->use_matrix_login" << std::endl;
-
-            m_current_menu = "MATRIX.MNU";
-            startupMenu();
-        }
-        else
-        {
-            // Setup the login Module for normal login sequence.
-            std::cout << "!cfg->use_matrix_login" << std::endl;
-
-            startupModuleLogon();
-        }
-    }
-    else
-    {
-        std::cout << "m_is_session_authorized" << std::endl;
-    }
-
+    // Startup the Prelogon sequence
+    startupModulePreLogon();
+        
     m_is_active = true;
 
-    // Need to startup starting interface here!
-
-    // menu input is default
     return true;
 }
 
@@ -136,13 +102,6 @@ bool MenuSystem::onExit()
 {
     std::cout << "OnExit() MenuSystem\n";
     m_is_active = false;
-
-    // Clear any lingering modules if were shutting down.
-    // Pop off the stack to deaallocate.
-
-    // Test if this is needed here or the destructor!
-    //std::vector<module_ptr>().swap(m_module);
-
     return true;
 }
 
@@ -822,6 +781,35 @@ void MenuSystem::menuEditorInput(const std::string &character_buffer, const bool
 /**
  * @brief Start up the Normal Login Process.
  */
+void MenuSystem::startupModulePreLogon()
+{
+    // Setup the input processor
+    m_input_index = MODULE_PRELOGON_INPUT;
+
+    // Allocate the Module here and push to container
+    module_ptr module(new ModPreLogon(m_session_data));
+    if (!module)
+    {
+        std::cout << "ModPreLogon Allocation Error!" << std::endl;
+        assert(false);
+    }
+
+    // First clear any left overs if they exist.
+    if (m_module.size() > 0)
+    {
+        std::vector<module_ptr>().swap(m_module);
+    }
+
+    // Run the startup for the module
+    module->onEnter();
+
+    // Push to stack now the new module.
+    m_module.push_back(module);
+}
+
+/**
+ * @brief Start up the Normal Login Process.
+ */
 void MenuSystem::startupModuleLogon()
 {
     // Setup the input processor
@@ -852,6 +840,86 @@ void MenuSystem::startupModuleLogon()
  * @brief Handles parsing input for modules
  *
  */
+void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8)
+{
+
+    std::cout << "modulePreLogonInput" << std::endl;
+    // Make sure we have an allocated module before processing.
+    if (m_module.size() == 0)
+    {
+        std::cout << "modulePreLogonInput size 0" << std::endl;
+        return;
+    }
+
+    // Make sure we have data
+    if (character_buffer.size() == 0)
+    {
+        std::cout << "modulePreLogonInput char_buff size 0" << std::endl;
+        return;
+    }
+
+    // Execute the modules update passing through input.
+    // result = true, means were still active, false means completed, return to menu!
+    //bool result = m_module[0]->update(character_buffer, is_utf8);
+
+    // Don't need return result on this.
+    m_module[0]->update(character_buffer, is_utf8);
+
+    // Finished modules processing.
+    if (!m_module[0]->m_is_active)
+    {
+        // Do module shutdown /// NEED A MODULE FALL BACK TO register menu or a new module to load.
+        m_module[0]->onExit();
+
+        // First pop the module off the stack to deallocate
+        m_module.pop_back();
+
+        // Grab handle to the system configuration
+        config_ptr cfg(TheCommunicator::instance()->getConfig().lock());
+        if(!cfg)
+        {
+            std::cout << "Error: getConfig.lock()" << std::endl;
+            assert(false);
+        }
+
+        // Check if the current user has been logged in yet.
+        if (!m_session_data->m_is_session_authorized)
+        {
+            std::cout << "!m_is_session_authorized" << std::endl;
+
+            // Access any needed global configuration values
+            // For Example...
+            if(cfg->use_matrix_login)
+            {
+                // Setup Matrix Menu
+                std::cout << "cfg->use_matrix_login" << std::endl;
+
+                // Set the Next Menu to Load, Matrix for Login
+                m_current_menu = "MATRIX.MNU";
+                startupMenu();
+            }
+            else
+            {
+                // Setup the login Module for normal login sequence.
+                std::cout << "!cfg->use_matrix_login" << std::endl;
+
+                // Set The Default menu to jump to after logon
+                m_current_menu = "TOP.MNU";
+                startupModuleLogon();
+            }
+        }
+        else
+        {
+            std::cout << "m_is_session_authorized" << std::endl;
+            // Reset the Input back to the Menu System
+        }
+    }
+}
+
+/**
+ * @brief Handles parsing input for modules
+ *
+ */
 void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is_utf8)
 {
     // Make sure we have an allocated module before processing.
@@ -876,7 +944,7 @@ void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is
     // Finished modules processing.
     if (!m_module[0]->m_is_active)
     {
-        // Do module shutdown
+        // Do module shutdown /// NEED A MODULE FALL BACK TO register menu or a new module to load.
         m_module[0]->onExit();
 
         // First pop the module off the stack to deallocate

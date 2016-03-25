@@ -87,6 +87,13 @@ public:
     std::string seperatePipeWithCharsDigits(const std::string &pipe_code);
 
     /**
+     * @brief Parse Files %%Filename.ext
+     * @param pipe_code
+     * @return
+     */
+    std::string parseFilename(const std::string &pipe_code);
+
+    /**
      * @brief Parse Pipe Codes with no Following Digits
      * @param pipe_code
      * @return

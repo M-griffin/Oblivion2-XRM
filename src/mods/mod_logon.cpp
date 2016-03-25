@@ -61,7 +61,7 @@ bool ModLogon::onEnter()
 
     // Grab ANSI Screen, display, if desired.. logon.ans maybe?
 
-    // Execure the initial setup index.
+    // Execute the initial setup index.
     m_setup_functions[m_mod_function_index]();
 
     return true;
@@ -86,8 +86,9 @@ void ModLogon::createTextPrompts()
 
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
-    value[PROMPT_LOGON]    = std::make_pair("Displayed for Logon Prompt", "|15Logon: ");
-    value[PROMPT_PASSWORD] = std::make_pair("Displayed for Password Prompt", "|15password: ");
+
+    value[PROMPT_LOGON]          = std::make_pair("Displayed for Logon Prompt", "|15Logon: ");
+    value[PROMPT_PASSWORD]       = std::make_pair("Displayed for Password Prompt", "|15password: ");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -112,17 +113,14 @@ void ModLogon::changeModule(int mod_function_index)
 void ModLogon::setupLogon()
 {
 
-    std::cout << "setupLogon()" << std::endl;
+    std::cout << "setupPreLogon()" << std::endl;
 
-    // Testing.
-    m_text_prompts_dao->displayAll();
+    M_StringPair prompt = m_text_prompts_dao->getPrompt(PROMPT_LOGON);
 
-    // Test display
+    std::cout << "TEST: " << prompt.first << ", " << prompt.second << std::endl;
+    std::string result = m_session_io.pipe2ansi(prompt.second);
 
-    M_StringPair result = m_text_prompts_dao->getPrompt(PROMPT_PASSWORD);
-
-    std::cout << "TEST: " << result.first << ", " << result.second << std::endl;
-
+    m_session_data->deliver(result);
 }
 
 
@@ -150,17 +148,6 @@ void ModLogon::setupPasswordChallenge()
  */
 void ModLogon::setupPasswordChange()
 {
-
-}
-
-/**
- * @brief Creates New User Account
- * @return
- */
-void ModLogon::setupNewUserApplication()
-{
-
-
 
 }
 
@@ -226,17 +213,3 @@ bool ModLogon::passwordChange(const std::string &input)
     return result;
 }
 
-/**
- * @brief Creation of new user account
- * @return
- */
-bool ModLogon::newUserApplication(const std::string &input)
-{
-    bool result = false;
-    if(input.size() != 0)
-    {
-
-    }
-
-    return result;
-}

@@ -42,7 +42,10 @@ void StateManager::update()
     if(!m_the_state.empty())
     {
         std::string incoming_data = std::move(m_the_state.back()->m_session_data->m_parsed_data);
-        if(!m_the_state.empty() && incoming_data.size() > 0)
+
+        std::cout << "incoming: " << incoming_data << std::endl;
+
+        if(incoming_data.size() > 0)
         {
             // Were going to loop the Parsed data, and pass each
             // Charactesr in seperately like 1 keys at a time
@@ -63,7 +66,7 @@ void StateManager::update()
                     else
                     {
                         // Not a valid character, or in the
-                        //std::cout << "Exception: Invalid character input (NOT ASCII or UTF-8)!" << std::endl;
+                        std::cout << "Exception: Invalid character input (NOT ASCII or UTF-8)!" << std::endl;
                         continue;
                     }
                 }
@@ -83,6 +86,8 @@ void StateManager::update()
                             current != end; ++current)
                     {
                         // Only Gets here in complete UTF-8 Sequence.
+                        //std::cout << "utf8: " << character << std::endl;
+
                         m_the_state.back()->update(character, utf_found);
                         character.erase();
                     }
@@ -90,6 +95,7 @@ void StateManager::update()
                 else
                 {
                     // Single Byte 0 - 255
+                    //std::cout << "single: " << character << std::endl;
                     m_the_state.back()->update(character, utf_found);
                     character.erase();
                 }

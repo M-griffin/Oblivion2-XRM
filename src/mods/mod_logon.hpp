@@ -37,17 +37,16 @@ public:
         std::cout << "ModLogon" << std::endl;
 
         // Push function pointers to the stack.
+
         m_setup_functions.push_back(std::bind(&ModLogon::setupLogon, this));
         m_setup_functions.push_back(std::bind(&ModLogon::setupPassword, this));
         m_setup_functions.push_back(std::bind(&ModLogon::setupPasswordChallenge, this));
         m_setup_functions.push_back(std::bind(&ModLogon::setupPasswordChange, this));
-        m_setup_functions.push_back(std::bind(&ModLogon::setupNewUserApplication, this));
 
         m_mod_functions.push_back(std::bind(&ModLogon::logon, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModLogon::password, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModLogon::passwordChallenge, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModLogon::passwordChange, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModLogon::newUserApplication, this, std::placeholders::_1));
 
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
@@ -81,10 +80,9 @@ public:
         MOD_NEW_USER
     };
 
-    // Create Prompt Constants, use the name and no typo's.
+    // Create Prompt Constants, these are the keys for key/value lookup
     const std::string PROMPT_LOGON = "logon";
     const std::string PROMPT_PASSWORD = "password";
-
 
     /**
      * @brief Create Default Text Prompts for module
@@ -96,6 +94,12 @@ public:
      * @param mod_function_index
      */
     void changeModule(int mod_function_index);
+
+    /**
+     * @brief Pre Logon Sequence
+     * @return
+     */
+    void setupPreLogon();
 
     /**
      * @brief Validates user Logon
@@ -128,6 +132,12 @@ public:
     void setupNewUserApplication();
 
 private:
+
+    /**
+     * @brief Pre Logon Sequence
+     * @return
+     */
+    bool preLogon(const std::string &input);
 
     /**
      * @brief Validates user Logon
