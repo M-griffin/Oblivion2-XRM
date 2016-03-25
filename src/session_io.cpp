@@ -1,5 +1,6 @@
 #include "session_io.hpp"
 #include "session_data.hpp"
+#include "common_io.hpp"
 
 #include <boost/regex.hpp>
 #include <string>
@@ -485,6 +486,28 @@ std::string SessionIO::seperatePipeWithCharsDigits(const std::string &pipe_code)
 
 
 /**
+ * @brief Parse Files %%Filename.ext
+ * @param pipe_code
+ * @return
+ */
+std::string SessionIO::parseFilename(const std::string &pipe_code)
+{
+    // Strip %% and grab the 'Filename.ext'
+    std::string str = pipe_code.substr(2);
+
+    CommonIO common_io;
+
+    std::string buffer = "";
+    common_io.readinAnsi(str, buffer);
+    if (buffer.size() > 0)
+    {
+        return pipe2ansi(buffer);
+    }
+    return buffer;
+}
+
+
+/**
  * @brief Parse Pipe Codes with no Following Digits
  * @param pipe_code
  * @return
@@ -566,7 +589,9 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
     // 4. boost::regex expr {"(\\%[A-Z]{2})"};
     // 5. boost::regex expr {"(\\|[A-Z]{2}+[0-9]{4})"};
     // 6. boost::regex expr {"(\\%[0-9]{2})"};
-    boost::regex expr {"(\\|[0-9]{2})|(\\|[A-Z]{1,2}+[0-9]{1,2})|(\\|[A-Z]{2})|(%[A-Z]{2})|(\\|[A-Z]{2}+[0-9]{4})|(\\%[0-9]{2})"};
+    // 7. boost::regex expr {"(\\%%[A-Za-z0-9]+[.].{3})"}; // Get filename.ext from strings.
+
+    boost::regex expr {"(\\|[0-9]{2})|(\\|[A-Z]{1,2}+[0-9]{1,2})|(\\|[A-Z]{2})|(%[A-Z]{2})|(\\|[A-Z]{2}+[0-9]{4})|(\\%[0-9]{2})|(\\%%[A-Za-z0-9]+[.].{3})"};
 
     boost::smatch matches;
     std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
@@ -611,6 +636,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
             }
         }
     }
+
     // All Global MCI Codes likes standard screens and colors will
     // He handled here, then specific interfaces will break out below this.
     // Break out parsing on which pattern was matched.
@@ -668,6 +694,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
 
             case 4: // Percent w/ 2 CHARS
                 {
+                    // Remove for now, haven't gotten this far!
                     ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
                 }
                 break;
@@ -675,6 +702,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
             case 5: // Pipe w/ 2 Chars and 4 Digits
                 // Mainly used for absolute XY position |XY0101
                 {
+                    // Remove for now, haven't gotten this far!
                     ansi_string.replace(my_matches.m_offset, my_matches.m_length, "       ");
                 }
                 break;
@@ -684,7 +712,24 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
                     // Were just removing them becasue they are processed.
                     // Now that first part of sequence |01 etc.. are processed!
                     std::cout << "replacing %## codes" << std::endl;
+                    // Remove for now, haven't gotten this far!
                     ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
+                }
+                break;
+
+            case 7: // %%FILENAME.EXT  get filenames for loading from string prompts
+                {
+                    std::cout << "replacing %%FILENAME.EXT codes" << std::endl;
+                    std::string result = std::move(parseFilename(my_matches.m_code));
+                    if(result.size() != 0)
+                    {
+                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
+                    }
+                    else
+                    {
+                        std::string s(my_matches.m_length, ' ');
+                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, s);
+                    }
                 }
                 break;
 

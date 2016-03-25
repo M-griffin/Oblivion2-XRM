@@ -1,14 +1,15 @@
 #ifndef SESSION_HPP
 #define SESSION_HPP
 
-#include "state_chat.hpp"
-#include "state_system.hpp"
 #include "state_manager.hpp"
 #include "connection_tcp.hpp"
 #include "session_manager.hpp"
 #include "telnet_decoder.hpp"
 #include "communicator.hpp"
 #include "session_data.hpp"
+#include "session_io.hpp"
+#include "menu_system.hpp"
+
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
@@ -121,6 +122,16 @@ public:
 
             std::cout << "send initial IAC sequences ended." << std::endl;
 
+            // NOTE add ANSI ESC[6n detection here!
+
+            // Grab Detection Prompt
+            M_StringPair prompt = TheCommunicator::instance()->getGlobalPrompt(GLOBAL_PROMPT_DETECT_TERMOPTS);
+
+            std::cout << "GLOBAL_PROMPT_DETECT_TERMOPTS: " << prompt.first << ", " << prompt.second << std::endl;
+
+            SessionIO io(new_session->m_session_data);
+            std::string result = io.pipe2ansi(prompt.second);
+            new_session->deliver(result);
 
             // Wait 2 Seconds for respones.
             new_session->startDetectionTimer();            
@@ -145,56 +156,26 @@ public:
      * @brief Deadline Detection Timer for Negoiation
      * @param timer
      */
-    void handleDetectionTimer(boost::asio::deadline_timer* timer)
+    void handleDetectionTimer(boost::asio::deadline_timer* /*timer*/)
     {
-        if(timer->expires_at() <= deadline_timer::traits_type::now())
-        {
-            // The deadline has passed. Stop the session. The other actors will
-            // terminate as soon as possible.
-            //stop();
-            std::cout << "Deadline Detection, EXPIRED!" << std::endl;
-        }
-        else
-        {
-            // Got more input while waiting, FOUND MORE DATA!
-            std::cout << "Deadline Detection Checking, CAUGHT REMAINING SEQUENCE!" << std::endl;
-        }
+        std::cout << "Deadline Detection, EXPIRED!" << std::endl;
+
+        // Grab Emulation Detected
+        /*
+        M_StringPair prompt = TheCommunicator::instance()->getGlobalPrompt(GLOBAL_PROMPT_DETECT);
+
+        std::cout << "GLOBAL_PROMPT_DETECT: " << prompt.first << ", " << prompt.second << std::endl;
+
+        SessionIO io(new_session->m_session_data);
+        std::string result = io.pipe2ansi(prompt.second);
+        deliver(result);*/
+
 
         // Start State Now
         state_ptr new_state(new MenuSystem(m_session_data));
         m_state_manager->changeState(new_state);
     }
-
-
-    /**
-     * @brief State Machine Switcher.  Select Active Modules per the Enum
-     */
-    void switchStates(int state)
-    {
-        switch(state)
-        {
-            case MACHINE_STATE::SYSTEM_STATE:
-                {
-                    state_ptr new_state(new StateSystem(m_session_data));
-                    m_state_manager->changeState(new_state);
-                    break;
-                }
-
-                /* Not working chat state at this time!
-                 * Probably Change to Services or something else!
-                case MACHINE_STATE::CHAT_STATE:
-                    {
-                        state_ptr new_state(new ChatState(m_session_data));
-                        m_menu_manager->changeState(new_state);
-                        break;
-                    }*/
-            default:
-                {
-                    std::cout << "Error, Invalid state for switch_satates in Session." << std::endl;
-                    break;
-                }
-        }
-    }
+    
 
     /**
      * @brief Callback from The Broadcaster to write data to the active sessions.
@@ -313,8 +294,7 @@ public:
      * @return
      */
     Session(boost::asio::io_service& io_service, connection_ptr connection, session_manager_ptr room)
-        : m_session_state(SESSION_STATE::STATE_CMD)
-        , m_connection(connection)
+        : m_connection(connection)
         , m_state_manager(new StateManager())
         , m_session_data(new SessionData(connection, room, io_service, m_state_manager))
         , m_resolv(io_service)
@@ -377,7 +357,6 @@ public:
         std::cout << "Node Number: " << m_session_data->m_node_number << std::endl;
     }
 
-    int                 m_session_state;
     connection_ptr	    m_connection;
     state_manager_ptr   m_state_manager;
     session_data_ptr    m_session_data;

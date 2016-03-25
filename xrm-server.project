@@ -61,6 +61,8 @@
       <File Name="src/mods/mod_base.hpp"/>
       <File Name="src/mods/mod_logon.hpp"/>
       <File Name="src/mods/mod_logon.cpp"/>
+      <File Name="src/mods/mod_prelogon.cpp"/>
+      <File Name="src/mods/mod_prelogon.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="compat">
       <File Name="src/compat/menu_dao.hpp"/>
@@ -76,11 +78,7 @@
     </VirtualDirectory>
     <File Name="src/session_manager.cpp"/>
     <File Name="src/session_manager.hpp"/>
-    <File Name="src/state_system.hpp"/>
-    <File Name="src/state_system.cpp"/>
     <File Name="src/state_base.hpp"/>
-    <File Name="src/state_chat.cpp"/>
-    <File Name="src/state_chat.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

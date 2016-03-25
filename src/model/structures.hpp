@@ -13,6 +13,8 @@ extern std::string GLOBAL_TEXTFILE_PATH;
  * @brief Const Key values for global text prompt lookup
  */
 const std::string GLOBAL_PROMPT_PAUSE = "pause";
+const std::string GLOBAL_PROMPT_DETECT_TERMOPTS = "detect_term";
+
 
 /**
  * @brief List of interfaces for pipe2ansi conversion
@@ -34,27 +36,6 @@ typedef struct MapType
     std::string::size_type m_match;
     std::string            m_code;
 } MapType;
-
-/**
- * @brief State of the Current Session I/O
- */
-enum SESSION_STATE
-{
-    STATE_CMD,  // Command / BBS
-    STATE_CHAT, // Chat Global / Sysop
-    STATE_DONE  // Done exit!
-};
-
-/**
- * @brief State of the Current Machine Module
- */
-enum MACHINE_STATE
-{
-    SYSTEM_STATE,
-    CHAT_STATE,
-    WFC_STATE,
-    TRANSFER_STATE
-};
 
 
 /*struct Area

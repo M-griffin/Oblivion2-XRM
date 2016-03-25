@@ -1,3 +1,20 @@
+
+Change Log Update (00.00.28)
+* 2016-03-25
++ Created New Mod_PreLogon to handle pre-logon sequences like Emulation and Term Detection.
++ Reworking the Setup / Input methods per the modules right now.  
++ Moved the Initial Global Text Prompts out of Communicator to the PreLogon Modules to where
+  they will be used.
++ Added parseFilename to session_io to handle text prompts with %%FILENAME.EXT MCI code
+  This will parse and loaded the file name given in a prompt and display a file in the
+  prompt string.
++ Communicator added Telnet Option detection global prompts.  So show when the client/server
+  are communicates on options negotiation.
++ Removed new user functions from the Login Module, I'll create a new user module later next.
++ Removed SystemState, this wasn't being used as the MenuSystem is now called as the main state,
+  More status will be added lateron for other "Services" once the main system is completed
+  or further along.
+
 Change Log Update (00.00.27)
 * 2016-03-24
 + Update to main, moved path setup before the communicator is called so it has valid paths for
