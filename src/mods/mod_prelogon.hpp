@@ -9,9 +9,13 @@
 #include "../session_data.hpp"
 #include "../session_io.hpp"
 
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/asio/deadline_timer.hpp>
+
 #include <vector>
 #include <functional>
 
+using boost::asio::deadline_timer;
 
 /**
  * @class ModPreLogin
@@ -21,7 +25,8 @@
  * @brief System PreLogin Module
  */
 class ModPreLogon
-    : public ModBase
+    : public boost::enable_shared_from_this<ModPreLogon>
+    , public ModBase
 {
 public:
     ModPreLogon(session_data_ptr session_data)
@@ -29,8 +34,11 @@ public:
         , m_session_io(session_data)
         , m_filename("mod_prelogon.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
+        , m_detection_deadline(session_data->m_io_service)
         , m_mod_function_index(MOD_DETECT_EMULATION)
         , m_is_text_prompt_exist(false)
+        , m_is_esc_detected(false)
+        , m_is_emulation_detected(false)
         , m_input_buffer("")
         , m_x_position(0)
         , m_y_position(0)
@@ -38,10 +46,11 @@ public:
         std::cout << "ModPreLogon" << std::endl;
 
         // Push function pointers to the stack.
-
         m_setup_functions.push_back(std::bind(&ModPreLogon::setupEmulationDetection, this));
+        m_setup_functions.push_back(std::bind(&ModPreLogon::setupAskANSIColor, this));
 
         m_mod_functions.push_back(std::bind(&ModPreLogon::emulationDetection, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModPreLogon::askANSIColor, this, std::placeholders::_1));
 
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
@@ -65,10 +74,11 @@ public:
     virtual bool onEnter();
     virtual bool onExit();
 
-    // This matches the index for mod_functions.push_back
+    // This matches the index for and key for setup -> mod_functions.push_back
     enum
     {
-        MOD_DETECT_EMULATION
+        MOD_DETECT_EMULATION,
+        MOD_ASK_ANSI_COLOR,
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
@@ -96,35 +106,80 @@ public:
     void changeModule(int mod_function_index);
 
     /**
-     * @brief Pre Logon Sequence
+     * @brief Start ANSI ESC[6n ANSI Detection
      * @return
      */
     void setupEmulationDetection();
 
-    
+    /**
+     * @brief Detection Completed, display results.
+     * @return
+     */
+    void setupAskANSIColor();
+
+
+    /**
+     * @brief Start ANSI Detection timer
+     */
+    void startDetectionTimer()
+    {
+        // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences reponses
+        m_detection_deadline.expires_from_now(boost::posix_time::milliseconds(1500));
+        m_detection_deadline.async_wait(
+            boost::bind(&ModPreLogon::handleDetectionTimer, shared_from_this(), &m_detection_deadline));
+    }
+
+
+    /**
+     * @brief Deadline Detection Timer for ANSI Detection
+     * @param timer
+     */
+    void handleDetectionTimer(boost::asio::deadline_timer* /*timer*/)
+    {
+        std::cout << "Deadline ANSI Detection, EXPIRED!" << std::endl;
+
+        // When timer is completd, move the next state.
+        //changeModule(MOD_DETECT_COMPLETED);
+
+        // Jump to Emulation completed.
+        emulationCompleted();
+    }
+
+
+    /**
+     * @brief After Emulation Detection is completed
+     * @param input
+     */
+    void emulationCompleted();
 
 private:
 
     /**
-     * @brief Pre Logon Sequence
+     * @brief Detect ANSI Emulation
      * @return
      */
     bool emulationDetection(const std::string &input);
 
-   
+    /**
+     * @brief ASK ANSI Color
+     * @return
+     */
+    bool askANSIColor(const std::string &input);
 
     // Function Input Vector.
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
 
-
     SessionIO            m_session_io;
     std::string          m_filename;
     text_prompts_dao_ptr m_text_prompts_dao;
+    deadline_timer       m_detection_deadline;
 
     int                  m_mod_function_index;   
     bool                 m_is_text_prompt_exist;
+    bool                 m_is_esc_detected;
+    bool                 m_is_emulation_detected;
     std::string          m_input_buffer;
     int                  m_x_position;
     int                  m_y_position;

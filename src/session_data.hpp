@@ -43,6 +43,7 @@ public:
         , m_telnet_state(new TelnetDecoder(connection))
         , m_input_deadline(io_service)
         , m_state_manager(state_manager)
+        , m_io_service(io_service)
         , m_user_record()
         , m_node_number(0)
         , m_input_encoding("cp437")
@@ -248,6 +249,7 @@ public:
     telnet_ptr            m_telnet_state;
     deadline_timer        m_input_deadline;
     state_manager_ptr     m_state_manager;
+    boost::asio::io_service& m_io_service;
 
     // Temp while testing.
     UserRec               m_user_record;

@@ -289,7 +289,7 @@ public:
      * @param mcicode
      * @param replacement
      */
-    void parseLocalMCI(std::string &AnsiString, std::string mcicode, std::string replacement);
+    void parseLocalMCI(std::string &AnsiString, const std::string &mcicode, const std::string &replacement);
 
     /**
      * @brief Read In ANSI text files for parsing.

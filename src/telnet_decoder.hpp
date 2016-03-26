@@ -109,6 +109,11 @@ public:
         return m_naws_col;
     }
 
+    std::string getTermType() const
+    {
+        return m_term_type;
+    }
+
 private:
 
     connection_ptr		m_connection;

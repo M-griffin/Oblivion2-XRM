@@ -16,6 +16,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/asio/io_service.hpp>
+#include <boost/asio/deadline_timer.hpp>
 
 #include <list>
 #include <string>
@@ -122,8 +123,6 @@ public:
 
             std::cout << "send initial IAC sequences ended." << std::endl;
 
-            // NOTE add ANSI ESC[6n detection here!
-
             // Grab Detection Prompt
             M_StringPair prompt = TheCommunicator::instance()->getGlobalPrompt(GLOBAL_PROMPT_DETECT_TERMOPTS);
 
@@ -133,7 +132,7 @@ public:
             std::string result = io.pipe2ansi(prompt.second);
             new_session->deliver(result);
 
-            // Wait 2 Seconds for respones.
+            // Wait 1.5 Seconds for respones.
             new_session->startDetectionTimer();            
         }
 
@@ -160,18 +159,50 @@ public:
     {
         std::cout << "Deadline Detection, EXPIRED!" << std::endl;
 
-        // Grab Emulation Detected
-        /*
-        M_StringPair prompt = TheCommunicator::instance()->getGlobalPrompt(GLOBAL_PROMPT_DETECT);
+        // Grab Detected Terminal, ANSI, XTERM, etc..
+        M_StringPair prompt_term = TheCommunicator::instance()->getGlobalPrompt(GLOBAL_PROMPT_DETECTED_TERM);
 
-        std::cout << "GLOBAL_PROMPT_DETECT: " << prompt.first << ", " << prompt.second << std::endl;
+        // Grab Detected Terminal Size 80x24, 80x50 etc..
+        M_StringPair prompt_size = TheCommunicator::instance()->getGlobalPrompt(GLOBAL_PROMPT_DETECTED_SIZE);
 
-        SessionIO io(new_session->m_session_data);
-        std::string result = io.pipe2ansi(prompt.second);
-        deliver(result);*/
+        // Handle to Session IO
+        SessionIO io(m_session_data);
+
+        // Send out the results of the prompts after parsing MCI and Color codes.
+        // These prompts have spcial |OT place holders for variables.
+        std::string result;
+        std::string mci_code = "|OT";
+
+        // Handle Term, only display if prompt is not empty!
+        if (prompt_term.second.size() > 0)
+        {
+            result = prompt_term.second;
+
+            std::string term = m_session_data->m_telnet_state->getTermType();
+            std::cout << "Term Type: " << term << std::endl;
+            io.m_common_io.parseLocalMCI(result, mci_code, term);
+
+            result = io.pipe2ansi(result);
+            deliver(result);
+        }
 
 
-        // Start State Now
+        // Handle Screen Size only display if prompt is not empty!
+        if (prompt_size.second.size() > 0)
+        {
+            result = prompt_size.second;
+
+            std::string term_size = std::to_string(m_session_data->m_telnet_state->getTermCols());
+            term_size.append("x");
+            term_size.append(std::to_string(m_session_data->m_telnet_state->getTermRows()));
+            std::cout << "Term Size: " << term_size << std::endl;
+            io.m_common_io.parseLocalMCI(result, mci_code, term_size);
+
+            result = io.pipe2ansi(result);
+            deliver(result);
+        }
+
+        // Detection Completed, start ip the Pre-Logon Sequence State.
         state_ptr new_state(new MenuSystem(m_session_data));
         m_state_manager->changeState(new_state);
     }
