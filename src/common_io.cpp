@@ -1222,9 +1222,8 @@ std::string CommonIO::boolAlpha(bool value)
  * @param mcicode
  * @param replacement
  */
-void CommonIO::parseLocalMCI(std::string &AnsiString, std::string mcicode, std::string replacement)
+void CommonIO::parseLocalMCI(std::string &AnsiString, const std::string &mcicode, const std::string &replacement)
 {
-//    char szTmp[2]= {0};
     std::string::size_type id1 = 0;
     do
     {

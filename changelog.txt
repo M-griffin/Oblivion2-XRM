@@ -1,4 +1,17 @@
 
+Change Log Update (00.00.29)
+* 2016-03-26
++ Prompts are not working for Terminal Detection (Telnet Option Parsing)
+  When completed, now displays detected terminal 'ansi' and size '80x25' etc..
++ Prelogon Emulation Detection is working, sending ESC[6n and getting a response
+  from the client,  ESC[xx;xxR for current X/Y Position showing the client 
+  can use ESC sequence
++ Also added a new Detection Timer for 1.5 seconds to receive client response
+  for ESC[6n query.
++ Prompts are now setup to show Emulation Detected results
+- Left off on asking for ANSI Color when detection fails
+- Left off on asking Encoding CP437 or UTF-8
+
 Change Log Update (00.00.28)
 * 2016-03-25
 + Created New Mod_PreLogon to handle pre-logon sequences like Emulation and Term Detection.
