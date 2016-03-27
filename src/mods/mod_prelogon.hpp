@@ -42,6 +42,7 @@ public:
         , m_input_buffer("")
         , m_x_position(0)
         , m_y_position(0)
+        , m_term_type("undetected")
     {
         std::cout << "ModPreLogon" << std::endl;
 
@@ -94,10 +95,10 @@ public:
     const std::string PROMPT_ANSI_SELECTED = "ansi_selected";
     const std::string PROMPT_ASCII_SELECTED = "ascii_selected";
 
-    const std::string PROMPT_USE_CP437 = "use_cp437";
-    const std::string PROMPT_USE_UTF8 = "use_utf8";
-    const std::string PROMPT_CODEPAGE_CP437 = "codepage_437";
-    const std::string PROMPT_CODEPAGE_UTF8 = "codepage_utf8";
+    const std::string PROMPT_ASK_CP437 = "use_cp437";
+    const std::string PROMPT_ASK_UTF8 = "use_utf8";
+    const std::string PROMPT_CP437_SELECTED = "cp437_selected";
+    const std::string PROMPT_UTF8_SELECTED = "utf8_selected";
 
 
     /**
@@ -197,6 +198,7 @@ private:
     std::string          m_input_buffer;
     int                  m_x_position;
     int                  m_y_position;
+    std::string          m_term_type;
 };
 
 #endif // SYSTEM_STATE_HPP

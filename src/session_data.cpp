@@ -30,6 +30,22 @@ void SessionData::handleRead(const boost::system::error_code& error, size_t byte
         {
             if(m_parsed_data.size() > 0)
             {
+                // Windows Console Telnet sends [CR\LF] for ENTER!
+                // search and replace input buffer we only need one!
+                std::string::size_type id1 = 0;
+                do
+                {
+                    // Convert CR\LF to LF!
+                    id1 = m_parsed_data.find("\r\n", 0);
+                    if(id1 != std::string::npos)
+                    {
+                        m_parsed_data.erase(id1, 1);
+                        id1 = m_parsed_data.find("\r\n", 0);
+                    }
+                }
+                while(id1 != std::string::npos);
+
+
                 // Last Character Received is ESC, then Check for
                 // ESC Sequence, or Lone ESC Key.
                 if(m_parsed_data[m_parsed_data.size()-1] == '\x1b')

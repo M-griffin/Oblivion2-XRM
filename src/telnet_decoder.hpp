@@ -172,8 +172,6 @@ private:
             return;
         }
 
-        std::cout << "telnet: " << msg << std::endl;
-
         if(m_connection->is_open())
         {
             if(m_connection->m_is_secure)
