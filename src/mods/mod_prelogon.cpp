@@ -25,37 +25,8 @@ bool ModPreLogon::update(const std::string &character_buffer, const bool &)
         return true;
     }
 
-
     // Process all incoming data stright to the input functions.
     m_mod_functions[m_mod_function_index](character_buffer);
-
-
-    /** if were in emulation detection, ANSI, we need to parse here
-     *  for response, otherwise getInputField will eat this up!
-     */
-
-/*
-    std::string input = "";
-    std::string result = m_session_io.getInputField(character_buffer, input);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
-    {
-        std::cout << "aborted!" << std::endl;
-    }
-    else if(result[0] == '\n')
-    {
-        // Send back the entire string.  TESTING
-        // This should then be processed becasue ENTER was hit.
-        //m_session_data->deliver(input);
-        m_session_data->deliver(result);
-
-        // Process the completed input for the string.
-        m_mod_functions[m_mod_function_index](input);
-    }
-    else
-    {
-        // Send back the single input received TESTING
-        m_session_data->deliver(result);
-    }*/
 
     return true;
 }
@@ -93,7 +64,6 @@ bool ModPreLogon::onExit()
  */
 void ModPreLogon::createTextPrompts()
 {
-
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
@@ -101,13 +71,16 @@ void ModPreLogon::createTextPrompts()
     value[PROMPT_DETECTED_ANSI]    = std::make_pair("ANSI Emulation Detected", "|CR|04E|12m|14ulation: An|12s|04i");
     value[PROMPT_DETECTED_NONE]    = std::make_pair("Emulation Detect:None", "|CREmulation Detect: None");
 
-    value[PROMPT_USE_ANSI]         = std::make_pair("Use ANSI Colors (Y/n) ", "|CR|08Press [|15Y|08 or |15ENTER|08] to use ANSI : ");
+    value[PROMPT_USE_ANSI]         = std::make_pair("Use ANSI Colors (Y/n) ", "|CR|CRPress [Y or ENTER] to use ANSI Color : ");
+    value[PROMPT_USE_INVALID]      = std::make_pair("Invalid Response to Y/N/ENTER", "|CRInvalid Response! Try again");
+    value[PROMPT_ANSI_SELECTED]    = std::make_pair("ANSI Color Selected", "|CR|04A|12N|14SI Colors Select|12e|04d");
+    value[PROMPT_ASCII_SELECTED]   = std::make_pair("ASCII No Colors Selected", "|CRASCII No Colors Selected");
 
-    value[PROMPT_USE_CP437]        = std::make_pair("Use CP437 Output Encoding", "|D1|08[|15Y|08] Select MS-DOS CP-437 Output |CR|08[|15N|08] Select UTF-8 Terminal Output");
-    value[PROMPT_USE_UTF8]         = std::make_pair("Use UTF-8 Output Encoding", "|D1|08[|15Y|08] Select UTF-8 Terminal Output |CR|08[|15N|08] Select MS-DOS CP-437 Output");
+    value[PROMPT_USE_CP437]        = std::make_pair("Use CP437 Output Encoding", "|CR|08[|15Y|08] Select MS-DOS CP-437 Output |CR|08[|15N|08] Select UTF-8 Terminal Output");
+    value[PROMPT_USE_UTF8]         = std::make_pair("Use UTF-8 Output Encoding", "|CR|08[|15Y|08] Select UTF-8 Terminal Output |CR|08[|15N|08] Select MS-DOS CP-437 Output");
 
-    value[PROMPT_CODEPAGE_CP437]   = std::make_pair("Output Encoding, CP437 Default", "|D1|08Press [|15Y|08 or |15ENTER|08] to use ANSI : ");
-    value[PROMPT_CODEPAGE_UTF8]    = std::make_pair("Output Encoding, UTF-8 Default", "|D1|08Press [|15Y|08 or |15ENTER|08] to use UTF-8 : ");
+    value[PROMPT_CODEPAGE_CP437]   = std::make_pair("Output Encoding, CP437 Default", "|CR|08Press [|15Y|08 or |15ENTER|08] to use ANSI : ");
+    value[PROMPT_CODEPAGE_UTF8]    = std::make_pair("Output Encoding, UTF-8 Default", "|CR|08Press [|15Y|08 or |15ENTER|08] to use UTF-8 : ");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -133,7 +106,7 @@ void ModPreLogon::setupEmulationDetection()
     std::cout << "setupEmulationDetection()" << std::endl;
 
     // Deliver ANSI Location Sequence
-    m_session_data->deliver("\x1b[s\x1b[255B\x1b[6n\x1b[1;1H");
+    m_session_data->deliver("\x1b[s\x1b[255B\x1b[6n");
     m_session_data->deliver("\x1b[u");
 
     M_StringPair prompt = m_text_prompts_dao->getPrompt(PROMPT_DETECT_EMULATION);
@@ -154,6 +127,22 @@ void ModPreLogon::setupEmulationDetection()
 void ModPreLogon::setupAskANSIColor()
 {
     std::cout << "setupAskANSIColor()" << std::endl;
+
+    // Ask to use colors - mode to next method to ask question and get reponse!
+
+    M_StringPair prompt = m_text_prompts_dao->getPrompt(PROMPT_USE_ANSI);
+    std::cout << "TEST: " << prompt.first << ", " << prompt.second << std::endl;
+    std::string result = m_session_io.pipe2ansi(prompt.second);
+    m_session_data->deliver(result);
+}
+
+/**
+ * @brief Ask Setup CodePage CP437 / UTF-8
+ * @return
+ */
+void ModPreLogon::setupAskCodePage()
+{
+    std::cout << "setupAskCodePage()" << std::endl;
 
     // Ask to use colors - mode to next method to ask question and get reponse!
     /*
@@ -245,6 +234,9 @@ void ModPreLogon::emulationCompleted()
         std::cout << "TEST: " << prompt.first << ", " << prompt.second << std::endl;
         std::string result = m_session_io.pipe2ansi(prompt.second);
         m_session_data->deliver(result);
+
+        // ANSI Detect, Move to Next Ask CodePage.
+        changeModule(MOD_ASK_CODEPAGE);
     }
     else
     {
@@ -254,10 +246,9 @@ void ModPreLogon::emulationCompleted()
         std::string result = m_session_io.pipe2ansi(prompt.second);
         m_session_data->deliver(result);
 
-        // Move to the next Method to ask to use ANSI Color
+        // Emulation not detected, ask to use ANSI Color, then move to CodePage.
         changeModule(MOD_ASK_ANSI_COLOR);
     }
-
 }
 
 
@@ -268,6 +259,75 @@ void ModPreLogon::emulationCompleted()
 bool ModPreLogon::askANSIColor(const std::string &input)
 {
     std::cout << "askANSIColor: " << input << std::endl;
+
+    // handle input for using ansi color, hot key or ENTER after..  hmm
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key);
+    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    {
+        std::cout << "aborted!" << std::endl;
+    }
+    else if(result[0] == '\n')
+    {
+        // Send back the entire string.  TESTING
+        // This should then be processed becasue ENTER was hit.
+
+        std::cout << "key: " << key << std::endl;
+
+        // If ENTER Default to Yes, or Single Y is hit
+        if (key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1))
+        {
+            if (key.size() == 0)
+            {
+                m_session_data->deliver("Yes");
+            }
+
+            // Set the Session VAriable.
+            m_session_data->m_is_use_ansi = true;
+
+            M_StringPair prompt = m_text_prompts_dao->getPrompt(PROMPT_ANSI_SELECTED);
+            std::cout << "TEST: " << prompt.first << ", " << prompt.second << std::endl;
+            std::string result = m_session_io.pipe2ansi(prompt.second);
+            m_session_data->deliver(result);
+            changeModule(MOD_ASK_CODEPAGE);
+        }
+        // Else check for single N for No to default to ASCII no colors.
+        else if (toupper(key[0]) == 'N' && key.size() == 1)
+        {
+            M_StringPair prompt = m_text_prompts_dao->getPrompt(PROMPT_ASCII_SELECTED);
+            std::cout << "TEST: " << prompt.first << ", " << prompt.second << std::endl;
+            std::string result = m_session_io.pipe2ansi(prompt.second);
+            m_session_data->deliver(result);
+            changeModule(MOD_ASK_CODEPAGE);
+        }
+        else
+        {
+            M_StringPair prompt = m_text_prompts_dao->getPrompt(PROMPT_USE_INVALID);
+            std::cout << "TEST: " << prompt.first << ", " << prompt.second << std::endl;
+            std::string result = m_session_io.pipe2ansi(prompt.second);
+            m_session_data->deliver(result);
+
+            // Invalid, Ask again
+            setupAskANSIColor();
+        }
+    }
+    else
+    {
+        // Send back the single input received TESTING
+        m_session_data->deliver(input);
+
+        std::cout << "input: " << input << std::endl;
+    }
+    return true;
+}
+
+/**
+ * @brief ASK CodePage CP437 / UTF-8
+ * @return
+ */
+bool ModPreLogon::askCodePage(const std::string &input)
+{
+    std::cout << "askCodePage: " << input << std::endl;
 
     // handle input for using ansi color, hot key or ENTER after..  hmmm
 

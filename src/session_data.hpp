@@ -46,7 +46,7 @@ public:
         , m_io_service(io_service)
         , m_user_record()
         , m_node_number(0)
-        , m_input_encoding("cp437")
+        , m_is_use_ansi(false)
         , m_output_encoding("cp437")
         , m_is_session_authorized(false)
         , m_is_leaving(false)
@@ -255,7 +255,7 @@ public:
     UserRec               m_user_record;
 
     int                   m_node_number;
-    std::string           m_input_encoding;
+    bool                  m_is_use_ansi;
     std::string           m_output_encoding;
     bool                  m_is_session_authorized;
     bool                  m_is_leaving;
