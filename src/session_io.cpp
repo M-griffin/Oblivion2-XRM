@@ -221,7 +221,7 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
             }
         }
         // Check for Completed Field Entry
-        else if(string_data[0] == '\n' && string_data.size() == 1)
+        else if((string_data[0] == '\n' && string_data.size() == 1) || character_buffer[0] == '\n')
         {
             result = m_common_io.getInputBuffer();
             //std::cout << "Field: " << result << std::endl;
@@ -752,4 +752,34 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
     // Clear Codemap.
     std::vector<MapType>().swap(code_map);
     return ansi_string;
+}
+
+
+/**
+ * @brief Parses Text Prompt String Pair, if |D1 is found, pull description into prompt
+ * @param prompt
+ * @return
+ */
+std::string SessionIO::parseTextPrompt(const M_StringPair &prompt)
+{
+    // Looks like D1 is delay on not description for text prompts,
+    // Need to work on a timer displya procress for delays and
+    // long ansi screen scrolling that is async friends and will not hose
+    // up the system loop.  in these cases might need a thread?!?
+    // Delays can wait till more of the system it put togehter to test what
+    // works best with multiple users online and doing stuff.
+
+    /*
+    // handle to prompt
+    std::string text_prompt = prompt.second;
+    std::string mci_code = "|D1";
+
+    // If Description Flag is in Prompt, then replace code with Description
+    m_common_io.parseLocalMCI(text_prompt, mci_code, prompt.first);
+
+    // Return full mci code parsing on the new string.
+    return pipe2ansi(text_prompt);*/
+
+    std::string text_prompt = prompt.second;
+    return pipe2ansi(text_prompt);
 }

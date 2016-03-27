@@ -1,8 +1,17 @@
 
+Change Log Update (00.00.32)
+* 2016-03-27
++ Completed Use Codepage selections in PreLogon Module.
++ PreLogon module is now completed with initial detection phases.
+  Moving on to the Logon Module for the Matrix login, and NewUser Module
+  for new user accounts.
++ Adding CR\LF replacement to LF on incoming data.  Windows Console Telnet
+  Likes to send CR\LF for [ENTER] instead of a single key.
+
 Change Log Update (00.00.31)
 * 2016-03-27
 + Working on more of the PreLogon process, When ANSI is not detected it will
-  ask to use colors or ascii no color.  Next need to work on codepage output
+  ask to use colors or ASCII no color.  Next need to work on codepage output
   CP437 or UTF-8.  
 - Also look at the NEW_ENV Telnet options when I get some more time.
 

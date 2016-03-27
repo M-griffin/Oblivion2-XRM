@@ -18,6 +18,11 @@
 class SessionIO
 {
 public:
+
+    // Types for Text Prompt formatting to file.
+    typedef std::pair<std::string, std::string> M_StringPair;
+
+
     SessionIO(session_data_ptr session_data);
     ~SessionIO();
 
@@ -107,6 +112,14 @@ public:
      * @return
      */
     std::string pipe2ansi(const std::string &sequence, int interface = STANDARD_MCI);
+
+
+    /**
+     * @brief Parses Text Prompt String Pair, if |D1 is found, pull description into prompt
+     * @param prompt
+     * @return
+     */
+    std::string parseTextPrompt(const M_StringPair &prompt);
 
     // Internal Methods
     session_data_ptr m_session_data; // SessionData
