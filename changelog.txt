@@ -1,4 +1,9 @@
 
+Change Log Update (00.00.30)
+* 2016-03-27
++ Worked out NEW_ENV Telnet options were locking up Windows Console Telnet.
+  For now I've commented this out to look into at a later date.
+
 Change Log Update (00.00.29)
 * 2016-03-26
 + Prompts are not working for Terminal Detection (Telnet Option Parsing)

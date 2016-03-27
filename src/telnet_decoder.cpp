@@ -53,6 +53,7 @@ unsigned char TelnetDecoder::telnetOptionDeny(unsigned char cmd)
  */
 void TelnetDecoder::decodeBuffer()
 {
+    std::cout << "decodeByffer 240 - SE received" << std::endl;
 
     // Check if this was a sequence we were waiting for.
     if(checkReply(m_subnegoOption))
@@ -86,12 +87,12 @@ void TelnetDecoder::decodeBuffer()
             std::cout << "TELOPT_LINEMODE data: " << data_sequence << std::endl;
             break;
 
-
         default:
             std::cout << "Invalid option: " << (int) m_subnegoOption << m_subnegoOption << std::endl;
             break;
     }
     m_teloptStage = 0;
+    m_subnegoOption = 0;
 }
 
 /**
@@ -122,12 +123,20 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
             // Stage 1: Find Command
         case 1:
             // Check if Binary Mode is ON, if we get double double IAC, pass through
-            if(c == IAC)
+            if(c == IAC && m_is_binary)
             {
                 // If were in Binary Mode, Than IAC IAC = IAC.
-                //std::cout << "\r\n Got double IAC!!\r\n" << std::endl;
+                std::cout << "\r\n Got double IAC BINARY!!\r\n" << std::endl;
                 m_teloptStage = 0;
                 return IAC;
+            }
+            else if (c == IAC)
+            {
+                // If were NOT in binary mode, (WINDOWS TELNET CONSOLE)
+                // Then IAC is sent as double IAC for single command starter!
+                std::cout << "\r\n Got double IAC!!\r\n" << std::endl;
+                //m_teloptStage = 0;
+                break;
             }
 
             // Parse 2 Bytes Commands, No Responses Given.
@@ -154,12 +163,14 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
 
                     // Handle Data Received from Client.
                 case SE:    //     240        /* end sub negotiation */
+                    std::cout << "[IAC] [" << (int)c << "] SE" << std::endl;
                     decodeBuffer();
                     data_sequence.clear();
                     m_teloptStage = 0;
                     break;
 
                 default:
+                    std::cout << "[IAC] [" << (int)c << "] MOVE to 3 BYTE" << std::endl;
                     // Move to 3 Byte Commands
                     m_teloptCommand = c;
                     m_teloptStage++;
@@ -169,7 +180,9 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
 
             // Stage 2: Parse Commands that need a Reply (3 Byte Sequences)
         case 2:
-            m_teloptStage = 0;
+
+            std::cout << "[IAC] [" << (int)c << "] STAGE 2" << std::endl;
+
             // Catch if were getting Invalid Option!.
             if(TELCMD_OK(m_teloptCommand))
             {
@@ -187,6 +200,26 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
             {
                     // DON'T, Only Valid Response is WONT
                 case DONT:
+                    // Handle Flags, if we received them shit it down.
+                    switch(c)
+                    {
+                        case TELOPT_ECHO:
+                            m_is_echo = false;
+                            break;
+                        case TELOPT_BINARY:
+                            m_is_binary = false;
+                            break;
+                        case TELOPT_SGA:
+                            m_is_sga = false;
+                            break;
+                        case TELOPT_LINEMODE:
+                            m_is_linemode = false;
+                            break;
+
+                        default:
+                            break;
+                    }
+
                     std::cout << "[IAC] RECEIVED DONT [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                     if(!checkReply(c))
                     {
@@ -214,6 +247,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                             else
                             {
                                 std::cout << "[IAC] DO TELOPT_ECHO -> REPLY TO RESPONSE! [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+                                m_is_echo = true;
                                 deleteReply(c);
                             }
                             break;
@@ -227,6 +261,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                             else
                             {
                                 std::cout << "[IAC] DO TELOPT_BINARY -> REPLY TO RESPONSE! [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+                                m_is_binary = true;
                                 deleteReply(c);
                             }
                             break;
@@ -240,6 +275,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                             else
                             {
                                 std::cout << "[IAC] DO TELOPT_SGA -> REPLY TO RESPONSE! [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+                                m_is_sga = true;
                                 deleteReply(c);
                             }
                             break;
@@ -258,6 +294,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                             else
                             {
                                 std::cout << "[IAC] DO LINEMODE -> REPLY TO RESPONSE! [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+                                m_is_linemode = true;
                                 deleteReply(c);
                             }
                             break;
@@ -286,6 +323,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                             else
                             {
                                 std::cout << "[IAC] WILL TELOPT_ECHO -> REPLY TO RESPONSE! [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+                                m_is_echo = true;
                                 deleteReply(c);
                             }
                             break;
@@ -299,6 +337,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                             else
                             {
                                 std::cout << "[IAC] WILL TELOPT_BINARY -> REPLY TO RESPONSE! [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+                                m_is_binary = true;
                                 deleteReply(c);
                             }
                             break;
@@ -312,6 +351,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                             else
                             {
                                 std::cout << "[IAC] WILL TELOPT_SGA -> REPLY TO RESPONSE! [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+                                m_is_sga = true;
                                 deleteReply(c);
                             }
                             break;
@@ -327,8 +367,9 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                             break;
 
                         case TELOPT_NEW_ENVIRON:
-                            sendENVRequest();
-                            addReply(TELOPT_NEW_ENVIRON);
+                            // Locks up Windows Telnet!!?!?!  Work this out later on.
+                            //sendENVRequest();
+                            //addReply(TELOPT_NEW_ENVIRON);
                             break;
 
                         case TELOPT_LINEMODE:
@@ -340,6 +381,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                             else
                             {
                                 std::cout << "[IAC] WILL LINEMODE -> REPLY TO RESPONSE! [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+                                m_is_linemode = true;
                                 deleteReply(c);
                             }
                             break;
@@ -354,6 +396,25 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
 
                     // WON'T, Only Valid Response is DONT
                 case WONT:
+                    // Handle Flags, if we received them shit it down.
+                    switch(c)
+                    {
+                        case TELOPT_ECHO:
+                            m_is_echo = false;
+                            break;
+                        case TELOPT_BINARY:
+                            m_is_binary = false;
+                            break;
+                        case TELOPT_SGA:
+                            m_is_sga = false;
+                            break;
+                        case TELOPT_LINEMODE:
+                            m_is_linemode = false;
+                            break;
+
+                        default:
+                            break;
+                    }
 
                     if(!checkReply(c))
                     {
@@ -457,7 +518,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
             // Only Gets here on TTYPE Sub-Negotiation.
         case 4:
             std::cout << "--> STAGE 4 TTYPE [" << (int)c << "]" << std::endl;
-            if(c != IAC)
+            if(c != IAC && c != SE)
             {
                 if(c == '\x00' || c == '\0')
                     data_sequence += '\0';
@@ -474,14 +535,21 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
             // check for End of Sequence IAC SE.
             if(c == IAC)
             {
+                // IAC then 240 to close sequence for TTYPE
                 m_teloptStage = 1;
             }
+            /*
+            else if (c == SE)
+            {
+                //data_sequence.clear();
+                m_teloptStage = 0;
+            }*/
             break;
 
         case 5:
             std::cout << "--> STAGE 5 NAWS [" << (int)c << "]" << std::endl;
 
-            if(c != IAC)
+            if(c != IAC && c != SE)
             {
                 if(c == '\x00' || c == '\0')
                     data_sequence += '\0';
@@ -498,14 +566,21 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
             // check for End of Sequence IAC SE.
             if(c == IAC)
             {
+                // IAC then 240 to close sequence for NAWS
                 m_teloptStage = 1;
             }
+            /*
+            else if (c == SE)
+            {
+                //data_sequence.clear();
+                m_teloptStage = 0;
+            }*/
             break;
 
         case 6:
             std::cout << "--> STAGE 6 TELOPT_NEW_ENVIRON [" << (int)c << "]" << std::endl;
 
-            if(c != IAC)
+            if(c != IAC && c != SE)
             {
                 if(c == '\x00' || c == '\0')
                     data_sequence += ' ';
@@ -516,13 +591,19 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                 {
                     // Invalid Sequences,, just clear.
                     data_sequence.clear();
+                    m_teloptStage = 0;
                 }
             }
 
             // check for End of Sequence IAC SE.
             if(c == IAC)
             {
-                m_teloptStage = 1;
+                // IAC then 240 to close sequence for NAWS
+            }
+            else if (c == SE)
+            {
+                //data_sequence.clear();
+                m_teloptStage = 0;
             }
             break;
 
@@ -540,7 +621,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
              */
             std::cout << "--> STAGE 7 TELOPT_LINEMODE [" << (int)c << "]" << std::endl;
 
-            if(c != IAC)
+            if(c != IAC && c != SE)
             {
                 data_sequence += c;
                 if (data_sequence.size() >= SB_MAXLEN)
@@ -553,11 +634,9 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
             // check for End of Sequence IAC SE.
             if(c == IAC)
             {
-                // m_teloptStage = 1;
-                // Wait for SE, IAC is doubled here!
+                // IAC then 240 to close sequence for NAWS
             }
-            else
-            if (c == SE )
+            else if (c == SE)
             {
                 m_teloptStage = 0;
                 data_sequence.erase();
