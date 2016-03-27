@@ -48,9 +48,11 @@ public:
         // Push function pointers to the stack.
         m_setup_functions.push_back(std::bind(&ModPreLogon::setupEmulationDetection, this));
         m_setup_functions.push_back(std::bind(&ModPreLogon::setupAskANSIColor, this));
+        m_setup_functions.push_back(std::bind(&ModPreLogon::setupAskCodePage, this));
 
         m_mod_functions.push_back(std::bind(&ModPreLogon::emulationDetection, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModPreLogon::askANSIColor, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModPreLogon::askCodePage, this, std::placeholders::_1));
 
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
@@ -79,6 +81,7 @@ public:
     {
         MOD_DETECT_EMULATION,
         MOD_ASK_ANSI_COLOR,
+        MOD_ASK_CODEPAGE
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
@@ -87,6 +90,9 @@ public:
     const std::string PROMPT_DETECTED_NONE = "detected_none";
 
     const std::string PROMPT_USE_ANSI = "use_ansi";
+    const std::string PROMPT_USE_INVALID = "ansi_invalid";
+    const std::string PROMPT_ANSI_SELECTED = "ansi_selected";
+    const std::string PROMPT_ASCII_SELECTED = "ascii_selected";
 
     const std::string PROMPT_USE_CP437 = "use_cp437";
     const std::string PROMPT_USE_UTF8 = "use_utf8";
@@ -117,6 +123,11 @@ public:
      */
     void setupAskANSIColor();
 
+    /**
+     * @brief Ask Setup CodePage CP437 / UTF-8
+     * @return
+     */
+    void setupAskCodePage();
 
     /**
      * @brief Start ANSI Detection timer
@@ -137,9 +148,6 @@ public:
     void handleDetectionTimer(boost::asio::deadline_timer* /*timer*/)
     {
         std::cout << "Deadline ANSI Detection, EXPIRED!" << std::endl;
-
-        // When timer is completd, move the next state.
-        //changeModule(MOD_DETECT_COMPLETED);
 
         // Jump to Emulation completed.
         emulationCompleted();
@@ -165,6 +173,12 @@ private:
      * @return
      */
     bool askANSIColor(const std::string &input);
+
+    /**
+     * @brief ASK CodePage CP437 / UTF-8
+     * @return
+     */
+    bool askCodePage(const std::string &input);
 
     // Function Input Vector.
     std::vector<std::function< void()> >                    m_setup_functions;

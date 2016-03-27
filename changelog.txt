@@ -1,4 +1,16 @@
 
+Change Log Update (00.00.31)
+* 2016-03-27
++ Working on more of the PreLogon process, When ANSI is not detected it will
+  ask to use colors or ascii no color.  Next need to work on codepage output
+  CP437 or UTF-8.  
+- Also look at the NEW_ENV Telnet options when I get some more time.
+
+Change Log Update (00.00.30)
+* 2016-03-27
++ Worked out NEW_ENV Telnet options were locking up Windows Console Telnet.
+  For now I've commented this out to look into at a later date.
+
 Change Log Update (00.00.29)
 * 2016-03-26
 + Prompts are not working for Terminal Detection (Telnet Option Parsing)

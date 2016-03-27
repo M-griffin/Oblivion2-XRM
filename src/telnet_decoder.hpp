@@ -29,6 +29,10 @@ public:
         , m_naws_row(24)
         , m_naws_col(80)
         , m_term_type("undetected")
+        , m_is_binary(false)
+        , m_is_echo(false)
+        , m_is_sga(false)
+        , m_is_linemode(false)
         , m_teloptStage(0)
         , m_teloptCommand(0)
         , m_currentOption(0)
@@ -118,9 +122,14 @@ private:
 
     connection_ptr		m_connection;
 
-    int m_naws_row;
-    int m_naws_col;
+    int         m_naws_row;
+    int         m_naws_col;
     std::string m_term_type;
+
+    bool        m_is_binary;
+    bool        m_is_echo;
+    bool        m_is_sga;
+    bool        m_is_linemode;
 
     // Global Option State for Telnet Options Parsing.
     int m_teloptStage;
@@ -162,6 +171,8 @@ private:
         {
             return;
         }
+
+        std::cout << "telnet: " << msg << std::endl;
 
         if(m_connection->is_open())
         {
