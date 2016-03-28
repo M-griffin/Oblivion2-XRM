@@ -115,7 +115,7 @@ public:
 
 
     /**
-     * @brief Parses Text Prompt String Pair, if |D1 is found, pull description into prompt
+     * @brief Parses Text Prompt String Pair
      * @param prompt
      * @return
      */

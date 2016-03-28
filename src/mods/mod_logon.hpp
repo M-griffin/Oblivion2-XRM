@@ -33,6 +33,7 @@ public:
         , m_failure_attempts(0)
         , m_max_failure_attempts(3)
         , m_is_text_prompt_exist(false)
+        , m_is_authorized(false)
     {
         std::cout << "ModLogon" << std::endl;
 
@@ -40,12 +41,14 @@ public:
 
         m_setup_functions.push_back(std::bind(&ModLogon::setupLogon, this));
         m_setup_functions.push_back(std::bind(&ModLogon::setupPassword, this));
-        m_setup_functions.push_back(std::bind(&ModLogon::setupPasswordChallenge, this));
+        m_setup_functions.push_back(std::bind(&ModLogon::setupPasswordQuestion, this));
+        m_setup_functions.push_back(std::bind(&ModLogon::setupPasswordAnswer, this));
         m_setup_functions.push_back(std::bind(&ModLogon::setupPasswordChange, this));
 
         m_mod_functions.push_back(std::bind(&ModLogon::logon, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModLogon::password, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModLogon::passwordChallenge, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModLogon::passwordQuestion, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModLogon::passwordAnswer, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModLogon::passwordChange, this, std::placeholders::_1));
 
         // Check of the Text Prompts exist.
@@ -75,7 +78,8 @@ public:
     {
         MOD_LOGON,
         MOD_PASSWORD,
-        MOD_FORGOT_PASSWORD,
+        MOD_PASSWORD_QUESTION,
+        MOD_PASSWORD_ANSWER,
         MOD_CHANGE_PASSWORD,
         MOD_NEW_USER
     };
@@ -83,6 +87,9 @@ public:
     // Create Prompt Constants, these are the keys for key/value lookup
     const std::string PROMPT_LOGON = "logon";
     const std::string PROMPT_PASSWORD = "password";
+    const std::string PROMPT_PASSWORD_QUESTION = "password_question";
+    const std::string PROMPT_PASSWORD_ANSWER = "password_answer";
+    const std::string PROMPT_USE_INVALID = "invalid";
 
     /**
      * @brief Create Default Text Prompts for module
@@ -114,10 +121,16 @@ public:
     void setupPassword();
 
     /**
-     * @brief Validates user logon password challenge questions
+     * @brief Set the Password Challenge Question
      * @return
      */
-    void setupPasswordChallenge();
+    void setupPasswordQuestion();
+
+    /**
+     * @brief Set the Password Challenge Answer
+     * @return
+     */
+    void setupPasswordAnswer();
 
     /**
      * @brief Changes user logon password
@@ -151,11 +164,17 @@ private:
      */
     bool password(const std::string &input);
 
-     /**
-     * @brief Validates user logon password challenge questions
+    /**
+     * @brief Gets Password Challenge Question Response
      * @return
      */
-    bool passwordChallenge(const std::string &input);
+    bool passwordQuestion(const std::string &input);
+
+    /**
+     * @brief Gets Password Challenge Answer Response
+     * @return
+     */
+    bool passwordAnswer(const std::string &input);
 
     /**
      * @brief Changes user logon password
@@ -183,6 +202,7 @@ private:
     int                  m_failure_attempts;
     int                  m_max_failure_attempts;
     bool                 m_is_text_prompt_exist;
+    bool                 m_is_authorized;
 };
 
 #endif // SYSTEM_STATE_HPP

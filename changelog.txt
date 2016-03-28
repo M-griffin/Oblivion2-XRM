@@ -1,4 +1,15 @@
 
+Change Log Update (00.00.33)
+* 2016-03-28
++ Completed most of the stub for Logon Module for Login and Password Sequences
+  Database lookup for user and password must be completed.  However, the signup
+  and accounts needs to be created first for test.
++ Create Module Signup, initial stubbing completed for new user application.
+- Also setup Session_Data->Emulation for ANSI or ASCII no color.
+  Have to work out the stubs for removing all pipe color codes from prompts when
+  in ASCII mode instead of having separate prompts.  Same with ANSI screens .ASC instead of .ANS
+  default will be generic menus.  Test with Matrix first.
+
 Change Log Update (00.00.32)
 * 2016-03-27
 + Completed Use Codepage selections in PreLogon Module.

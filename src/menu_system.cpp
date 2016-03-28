@@ -679,6 +679,17 @@ void MenuSystem::processMenuOptions(std::string &input)
 }
 
 
+/**  NOT SETUP YET!
+ * @brief Sets an indivdual module index.
+ * @param mod_function_index
+ */
+void MenuSystem::changeModule(int mod_function_index)
+{
+    // Set, and Execute the Setup module.
+    //m_mod_function_index = mod_function_index;
+    //m_setup_functions[m_mod_function_index]();
+}
+
 /**
  * @brief Default Menu Input Processing.
  *        Handles Processing for Loaded Menus Hotkey and Lightbars
@@ -887,8 +898,12 @@ void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const 
         {
             std::cout << "!m_is_session_authorized" << std::endl;
 
+            m_current_menu = "MATRIX.MNU";
+            startupMenu();
+
             // Access any needed global configuration values
             // For Example...
+            /*
             if(cfg->use_matrix_login)
             {
                 // Setup Matrix Menu
@@ -906,7 +921,7 @@ void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const 
                 // Set The Default menu to jump to after logon
                 m_current_menu = "TOP.MNU";
                 startupModuleLogon();
-            }
+            }*/
         }
         else
         {
@@ -936,10 +951,9 @@ void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is
 
     // Execute the modules update passing through input.
     // result = true, means were still active, false means completed, return to menu!
-    //bool result = m_module[0]->update(character_buffer, is_utf8);
 
-    // Don't need return result on this.
-    m_module[0]->update(character_buffer, is_utf8);
+    // Only check result when m_is_active == false!
+    bool result = m_module[0]->update(character_buffer, is_utf8);
 
     // Finished modules processing.
     if (!m_module[0]->m_is_active)
@@ -949,6 +963,11 @@ void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is
 
         // First pop the module off the stack to deallocate
         m_module.pop_back();
+
+        if (result)
+        {
+            // Check if authorized, if not, then hangup here!
+        }
 
         // Reset the Input back to the Menu System
         m_input_index = MENU_INPUT;

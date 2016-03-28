@@ -156,6 +156,13 @@ public:
     void executeMenuOptions(MenuOption &option);
 
     void processMenuOptions(std::string &input);
+
+    /**
+     * @brief Sets an indivdual module index.
+     * @param mod_function_index
+     */
+    void changeModule(int mod_function_index);
+
     void menuInput(const std::string &character_buffer, const bool &is_utf8);
 
     void startupMenuEditor();

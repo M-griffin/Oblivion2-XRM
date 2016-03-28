@@ -756,7 +756,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
 
 
 /**
- * @brief Parses Text Prompt String Pair, if |D1 is found, pull description into prompt
+ * @brief Parses Text Prompt String Pair
  * @param prompt
  * @return
  */
@@ -779,6 +779,10 @@ std::string SessionIO::parseTextPrompt(const M_StringPair &prompt)
 
     // Return full mci code parsing on the new string.
     return pipe2ansi(text_prompt);*/
+
+    // If emulation is not active, then we need to remove pipe colors!
+    // WIP
+    //if (!m_session_data->m_is_use_ansi)
 
     std::string text_prompt = prompt.second;
     return pipe2ansi(text_prompt);
