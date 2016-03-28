@@ -48,7 +48,6 @@
     <File Name="src/connection_ssl.hpp"/>
     <File Name="src/connection_tcp.hpp"/>
     <File Name="src/connection_base.hpp"/>
-    <File Name="sqlitewrap/libSqliteWrapped.h"/>
     <VirtualDirectory Name="data">
       <File Name="src/data/config_dao.cpp"/>
       <File Name="src/data/config_dao.hpp"/>
@@ -63,6 +62,8 @@
       <File Name="src/mods/mod_logon.cpp"/>
       <File Name="src/mods/mod_prelogon.cpp"/>
       <File Name="src/mods/mod_prelogon.hpp"/>
+      <File Name="src/mods/mod_signup.hpp"/>
+      <File Name="src/mods/mod_signup.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="compat">
       <File Name="src/compat/menu_dao.hpp"/>
@@ -79,6 +80,7 @@
     <File Name="src/session_manager.cpp"/>
     <File Name="src/session_manager.hpp"/>
     <File Name="src/state_base.hpp"/>
+    <File Name="sqlitewrap/libSqliteWrapped.h"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

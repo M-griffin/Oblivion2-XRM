@@ -74,7 +74,7 @@ void ModPreLogon::createTextPrompts()
     value[PROMPT_DETECTED_NONE]    = std::make_pair("Emulation Detect:None", "|CREmulation Detect: None");
 
     value[PROMPT_USE_ANSI]         = std::make_pair("Use ANSI Colors (Y/n) ", "|CR|CRPress [Y or ENTER] to use ANSI : ");
-    value[PROMPT_USE_INVALID]      = std::make_pair("Invalid Response to Y/N/ENTER", "|CRInvalid Response! Try again");
+    value[PROMPT_USE_INVALID]      = std::make_pair("Invalid Response to Y/N/ENTER", "|CR|12Invalid Response! Try again");
     value[PROMPT_ANSI_SELECTED]    = std::make_pair("ANSI Color Selected", "|CR|04A|12N|14SI Colors Select|12e|04d");
     value[PROMPT_ASCII_SELECTED]   = std::make_pair("ASCII No Colors Selected", "|CRASCII No Colors Selected");
 
@@ -258,6 +258,9 @@ void ModPreLogon::emulationCompleted()
 
         // ANSI Detect, Move to Next Ask CodePage.
         changeModule(MOD_ASK_CODEPAGE);
+
+        // Set ANSI Color Emulation to True
+        m_session_data->m_is_use_ansi = true;
     }
     else
     {
@@ -300,7 +303,7 @@ bool ModPreLogon::askANSIColor(const std::string &input)
                 m_session_data->deliver("Yes");
             }
 
-            // Set the Session VAriable.
+            // Set ANSI Color Emulation to True
             m_session_data->m_is_use_ansi = true;
 
             // ANSI Selected Text Prompt
@@ -318,6 +321,9 @@ bool ModPreLogon::askANSIColor(const std::string &input)
             std::string result = m_session_io.parseTextPrompt(
                                      m_text_prompts_dao->getPrompt(PROMPT_ASCII_SELECTED)
                                  );
+
+            // Set ANSI Color Emulation to False
+            m_session_data->m_is_use_ansi = false;
 
             // Change to next module
             changeModule(MOD_ASK_CODEPAGE);
