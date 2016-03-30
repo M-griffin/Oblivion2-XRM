@@ -17,7 +17,7 @@
  * @author Michael Griffin
  * @date 3/28/2016
  * @file mod_signup.hpp
- * @brief
+ * @brief New User Application Module
  */
 class ModSignup
     : public ModBase
@@ -26,7 +26,7 @@ public:
     ModSignup(session_data_ptr session_data)
         : ModBase(session_data)
         , m_session_io(session_data)
-        , m_filename("mod_logon.yaml")
+        , m_filename("mod_signup.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
         , m_mod_function_index(MOD_SIGNUP)
         , m_is_text_prompt_exist(false)
