@@ -1,4 +1,10 @@
 
+Change Log Update (00.00.34)
+* 2016-03-30
++ If ANSI is not detected, and ASCII NO Color is selected, .ASC screens are then
+  loaded instead of .ANS and menu pull down lightbars are disabled for normal menu
+  keys.
+
 Change Log Update (00.00.33)
 * 2016-03-28
 + Completed most of the stub for Logon Module for Login and Password Sequences

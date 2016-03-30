@@ -221,11 +221,19 @@ std::string MenuSystem::loadMenuScreen()
     std::string screen_data = "";
 
     // NOTES: check for themes here!!!
-
-    if(pull_down_filename.size() == 0)
+    // also  if (m_session_data->m_is_use_ansi), if not ansi, then maybe no pull down, or lightbars!
+    if(pull_down_filename.size() == 0 || !m_session_data->m_is_use_ansi)
     {
+        std::string screen_file = "";
         // Load ansi by Menu Name, remove .MNU and Add .ANS, maybe .UTF for utf8 native?
-        std::string screen_file = m_current_menu.substr(0, m_current_menu.size()-4) + ".ANS";
+        if (m_session_data->m_is_use_ansi)
+        {
+            screen_file = m_current_menu.substr(0, m_current_menu.size()-4) + ".ANS";
+        }
+        else
+        {
+            screen_file = m_current_menu.substr(0, m_current_menu.size()-4) + ".ASC";
+        }
         m_common_io.readinAnsi(screen_file, screen_data);
     }
     else
@@ -334,7 +342,7 @@ void MenuSystem::startupMenu()
     //for(int i = 0; i < (signed)m_loaded_menu_options.size(); i++)
     for(auto &m : m_loaded_menu_options)
     {
-        if(m.PulldownID > 0)
+        if(m.PulldownID > 0 && m_session_data->m_is_use_ansi)
         {
             pull_down_ids.push_back(m.PulldownID);
 
@@ -357,7 +365,7 @@ void MenuSystem::startupMenu()
     std::string output = m_session_io.pipe2ansi(buffer);
 
     // If active pull_down id's found, mark as active pulldown menu.
-    if(pull_down_ids.size() > 0)
+    if(pull_down_ids.size() > 0 && m_session_data->m_is_use_ansi)
     {
         /**
           * @brief Set Default, however check menu command for override.

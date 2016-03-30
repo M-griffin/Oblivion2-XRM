@@ -260,7 +260,7 @@ void ModPreLogon::emulationCompleted()
         changeModule(MOD_ASK_CODEPAGE);
 
         // Set ANSI Color Emulation to True
-        m_session_data->m_is_use_ansi = true;
+        m_session_data->m_is_use_ansi = false;
     }
     else
     {
