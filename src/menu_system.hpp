@@ -157,14 +157,9 @@ public:
 
     void processMenuOptions(std::string &input);
 
-    /**
-     * @brief Sets an indivdual module index.
-     * @param mod_function_index
-     */
-    void changeModule(int mod_function_index);
-
     void menuInput(const std::string &character_buffer, const bool &is_utf8);
 
+    // Move this to it's own module eventually!
     void startupMenuEditor();
     void menuEditorInput(const std::string &character_buffer, const bool &);
 
@@ -180,6 +175,11 @@ public:
      * @brief Starts up Logon Module
      */
     void startupModuleLogon();
+
+    /**
+     * @brief Starts up Signup Module
+     */
+    void startupModuleSignup();
 
     /**
      * @brief Handles parsing input for current module.

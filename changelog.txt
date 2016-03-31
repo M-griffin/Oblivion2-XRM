@@ -1,4 +1,15 @@
 
+Change Log Update (00.00.35)
+* 2016-03-31
++ Added more code in SessionIO to check if ANSI emulations is not enabled, then 
+  Ignore PIPE color codes in prompts and pipe2ansi replace methods.
++ Started working on Signup Module for New User Applications
+  Finished a lot of the initial method stubs and virtual functions
+  Working on prompts on key/value descriptions
+  Added check for Disclaimer and new user password.
+- Next will also rewrite the system configuration from serialized xml to .yaml
+  to make manual configuration and testing much easier.
+
 Change Log Update (00.00.34)
 * 2016-03-30
 + If ANSI is not detected, and ASCII NO Color is selected, .ASC screens are then

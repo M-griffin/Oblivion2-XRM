@@ -80,6 +80,15 @@ void SessionIO::createInputField(std::string &field_name, int &len)
         return;
     }
 
+    // Format Input Field, if color is enabled, otherwise just add Field Name like "Login: "
+    if (!m_session_data->m_is_use_ansi)
+    {
+        sprintf(formatted, "%s", (char *)field_name.c_str()); // Field Name
+        field_name = formatted;
+        return;
+    }
+
+
     // Overide Input Length for Ansi
     position = field_name.find("%IN", 0);
     if(position != std::string::npos)
@@ -163,13 +172,13 @@ void SessionIO::createInputField(std::string &field_name, int &len)
         sprintf(INPUT_COLOR,"|00|19"); // make theme
     }
 
-    // Format Input Field
+    // Format the input field
     sprintf(formatted, "%s%s%s\x1b[%iD",
             (char *)field_name.c_str(), // Field Name
             INPUT_COLOR,          // Field Fg,Bg Color
             repeat.c_str(),       // Padding length of Field
             len+1);               // Move back to starting position of field.
-
+    
     field_name = formatted;
 }
 
@@ -654,8 +663,15 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
                     std::string result = std::move(pipeColors(my_matches.m_code));
                     if(result.size() != 0)
                     {
-                        // Replace the string
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
+                        // Replace the Color, if not ansi then remove the color!
+                        if (m_session_data->m_is_use_ansi)
+                        {
+                            ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
+                        }
+                        else
+                        {
+                            ansi_string.replace(my_matches.m_offset, my_matches.m_length, "");
+                        }
                     }
                     else
                     {
