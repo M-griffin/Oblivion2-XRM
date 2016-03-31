@@ -69,7 +69,7 @@ UsersDao::UsersDao(SQLW::Database &database)
         "iMenuSelected     INTEGER NOT NULL, "
         "iStatusSelected   INTEGER NOT NULL, "
         "bAnsi             BOOLEAN NOT NULL, "
-        "bVt100            BOOLEAN NOT NULL, "
+        "bBackSpaceVt100   BOOLEAN NOT NULL, "
         "iNuvVotesYes      INTEGER NOT NULL, "
         "iNuvVotesNo       INTEGER NOT NULL, "
         "sUsersVotingYes   TEXT NOT NULL, "
@@ -91,6 +91,7 @@ UsersDao::UsersDao(SQLW::Database &database)
         "bYesNoBars        BOOLEAN NOT NULL, "
         "iHackAttempts     INTEGER NOT NULL, "
         "bDoPause          BOOLEAN NOT NULL, "
+        "bClearOrScroll    BOOLEAN NOT NULL, "
         "bIgnoreTimeLimit  BOOLEAN NOT NULL, "
         "bAllowPurge       BOOLEAN NOT NULL "
         "); ";
@@ -254,7 +255,7 @@ void UsersDao::pullUserResult(query_ptr qry, user_ptr user)
     qry->getFieldByName("iMenuSelected", user->iMenuSelected);
     qry->getFieldByName("iStatusSelected", user->iStatusSelected);
     qry->getFieldByName("bAnsi", user->bAnsi);
-    qry->getFieldByName("bVt100", user->bVt100);
+    qry->getFieldByName("bBackSpaceVt100", user->bBackSpaceVt100);
     qry->getFieldByName("iNuvVotesYes", user->iNuvVotesYes);
     qry->getFieldByName("iNuvVotesNo", user->iNuvVotesNo);
     qry->getFieldByName("dtPassChangeDate", user->dtPassChangeDate);
@@ -273,7 +274,8 @@ void UsersDao::pullUserResult(query_ptr qry, user_ptr user)
     qry->getFieldByName("dtFirstOn", user->dtFirstOn);
     qry->getFieldByName("bYesNoBars", user->bYesNoBars);
     qry->getFieldByName("iHackAttempts", user->iHackAttempts);
-    qry->getFieldByName("bDoPause", user->bDoPause);  // do we really want to ask pause? maybe clear screen!
+    qry->getFieldByName("bDoPause", user->bDoPause);
+    qry->getFieldByName("bClearOrScroll", user->bClearOrScroll);
     qry->getFieldByName("bIgnoreTimeLimit", user->bIgnoreTimeLimit);
     qry->getFieldByName("bAllowPurge", user->bAllowPurge);
 }
@@ -313,7 +315,7 @@ void UsersDao::fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::
     values.push_back(qry->translateFieldName("iMenuSelected", user->iMenuSelected));
     values.push_back(qry->translateFieldName("iStatusSelected", user->iStatusSelected));
     values.push_back(qry->translateFieldName("bAnsi", user->bAnsi));
-    values.push_back(qry->translateFieldName("bVt100", user->bVt100));
+    values.push_back(qry->translateFieldName("bBackSpaceVt100", user->bBackSpaceVt100));
     values.push_back(qry->translateFieldName("iNuvVotesYes", user->iNuvVotesYes));
     values.push_back(qry->translateFieldName("iNuvVotesNo", user->iNuvVotesNo));
     values.push_back(qry->translateFieldName("dtPassChangeDate", user->dtPassChangeDate));
@@ -333,6 +335,7 @@ void UsersDao::fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::
     values.push_back(qry->translateFieldName("bYesNoBars", user->bYesNoBars));
     values.push_back(qry->translateFieldName("iHackAttempts", user->iHackAttempts));
     values.push_back(qry->translateFieldName("bDoPause", user->bDoPause));
+    values.push_back(qry->translateFieldName("bClearOrScroll", user->bClearOrScroll));
     values.push_back(qry->translateFieldName("bIgnoreTimeLimit", user->bIgnoreTimeLimit));
     values.push_back(qry->translateFieldName("bAllowPurge", user->bAllowPurge));
 }
@@ -406,7 +409,7 @@ std::string UsersDao::insertUserQryString(query_ptr qry, user_ptr user)
         user->iMenuSelected,
         user->iStatusSelected,
         user->bAnsi,
-        user->bVt100,
+        user->bBackSpaceVt100,
         user->iNuvVotesYes,
         user->iNuvVotesNo,
         user->dtPassChangeDate,
@@ -426,6 +429,7 @@ std::string UsersDao::insertUserQryString(query_ptr qry, user_ptr user)
         user->bYesNoBars,
         user->iHackAttempts,
         user->bDoPause,
+        user->bClearOrScroll,
         user->bIgnoreTimeLimit,
         user->bAllowPurge
     );
@@ -494,7 +498,7 @@ std::string UsersDao::updateUserQryString(query_ptr qry, user_ptr user)
         user->iMenuSelected,
         user->iStatusSelected,
         user->bAnsi,
-        user->bVt100,
+        user->bBackSpaceVt100,
         user->iNuvVotesYes,
         user->iNuvVotesNo,
         user->dtPassChangeDate,
@@ -514,6 +518,7 @@ std::string UsersDao::updateUserQryString(query_ptr qry, user_ptr user)
         user->bYesNoBars,
         user->iHackAttempts,
         user->bDoPause,
+        user->bClearOrScroll,
         user->bIgnoreTimeLimit,
         user->bAllowPurge,
         user->iId

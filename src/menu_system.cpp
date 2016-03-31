@@ -9,6 +9,7 @@
 #include "mods/mod_base.hpp"
 #include "mods/mod_prelogon.hpp"
 #include "mods/mod_logon.hpp"
+#include "mods/mod_signup.hpp"
 
 #include <boost/locale.hpp>
 #include <boost/filesystem.hpp>
@@ -508,11 +509,14 @@ void MenuSystem::executeMenuOptions(MenuOption &option)
             {
                     // Logon
                 case 'S':
+                    std::cout << "Executing startupModuleLogon()" << std::endl;
+                    startupModuleLogon();
                     break;
 
                     // Apply
                 case 'A':
-                    std::cout << "Executing New User Application" << std::endl;
+                    std::cout << "Executing startupModuleSignup();" << std::endl;
+                    startupModuleSignup();
                     break;
 
                     // Check
@@ -687,17 +691,6 @@ void MenuSystem::processMenuOptions(std::string &input)
 }
 
 
-/**  NOT SETUP YET!
- * @brief Sets an indivdual module index.
- * @param mod_function_index
- */
-void MenuSystem::changeModule(int mod_function_index)
-{
-    // Set, and Execute the Setup module.
-    //m_mod_function_index = mod_function_index;
-    //m_setup_functions[m_mod_function_index]();
-}
-
 /**
  * @brief Default Menu Input Processing.
  *        Handles Processing for Loaded Menus Hotkey and Lightbars
@@ -854,6 +847,37 @@ void MenuSystem::startupModuleLogon()
     // Push to stack now the new module.
     m_module.push_back(module);
 }
+
+/**
+ * @brief Starts up Signup Module
+ */
+void MenuSystem::startupModuleSignup()
+{
+    // Setup the input processor
+    m_input_index = MODULE_INPUT;
+
+    // Allocate the Module here and push to container
+    module_ptr module(new ModSignup(m_session_data));
+    if (!module)
+    {
+        std::cout << "ModSignup Allocation Error!" << std::endl;
+        assert(false);
+    }
+
+    // First clear any left overs if they exist.
+    if (m_module.size() > 0)
+    {
+        std::vector<module_ptr>().swap(m_module);
+    }
+
+    // Run the startup for the module
+    module->onEnter();
+
+    // Push to stack now the new module.
+    m_module.push_back(module);
+
+}
+
 
 /**
  * @brief Handles parsing input for modules
