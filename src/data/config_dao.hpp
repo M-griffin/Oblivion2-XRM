@@ -2,6 +2,7 @@
 #define DAO_CONFIG_HPP
 
 #include <boost/smart_ptr/shared_ptr.hpp>
+
 #include <string>
 #include <mutex>
 

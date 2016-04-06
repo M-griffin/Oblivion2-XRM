@@ -32,7 +32,6 @@
     <File Name="src/menu_system.hpp"/>
     <File Name="src/menu_system_editor.cpp"/>
     <File Name="src/menu_system_prompts.cpp"/>
-    <File Name="src/messageQueue.hpp"/>
     <File Name="src/safe_queue.hpp"/>
     <File Name="src/server.hpp"/>
     <File Name="src/session.hpp"/>
@@ -49,12 +48,12 @@
     <File Name="src/connection_tcp.hpp"/>
     <File Name="src/connection_base.hpp"/>
     <VirtualDirectory Name="data">
-      <File Name="src/data/config_dao.cpp"/>
-      <File Name="src/data/config_dao.hpp"/>
       <File Name="src/data/users_dao.hpp"/>
       <File Name="src/data/users_dao.cpp"/>
       <File Name="src/data/text_prompts_dao.hpp"/>
       <File Name="src/data/text_prompts_dao.cpp"/>
+      <File Name="src/data/config_dao.cpp"/>
+      <File Name="src/data/config_dao.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
       <File Name="src/mods/mod_base.hpp"/>
@@ -72,10 +71,10 @@
     <File Name="src/state_manager.cpp"/>
     <File Name="src/state_manager.hpp"/>
     <VirtualDirectory Name="model">
-      <File Name="src/model/config.hpp"/>
       <File Name="src/model/struct_compat.hpp"/>
       <File Name="src/model/structures.hpp"/>
       <File Name="src/model/users.hpp"/>
+      <File Name="src/model/config.hpp"/>
     </VirtualDirectory>
     <File Name="src/session_manager.cpp"/>
     <File Name="src/session_manager.hpp"/>

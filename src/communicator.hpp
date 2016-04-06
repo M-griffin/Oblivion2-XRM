@@ -145,22 +145,22 @@ public:
     /**
      * @brief Attach the system configuration.
      * @param config
-     */
+     *
     void attachConfig(config_ptr config)
     {
         std::lock_guard<std::mutex> lock(m_config_mutex);
         m_config = config;
-    }
+    }*/
 
     /**
      * @brief Return a Read Only Instance of the Configuration.
      * @param config
-     */
+     *
     config_wptr getConfig() const
     {
         std::lock_guard<std::mutex> lock(m_config_mutex);
         return config_wptr(m_config);
-    }
+    }*/
 
     /**
      * @brief Create Default Global Text Prompts
@@ -172,10 +172,7 @@ public:
         // Create Mapping to pass for file creation (default values)
         M_TextPrompt value;
         value[GLOBAL_PROMPT_PAUSE]            = std::make_pair("Displayed for Pause Prompts", "|03Hit any Key |08-- |03OBV/2 XRM");
-        value[GLOBAL_PROMPT_DETECT_TERMOPTS]  = std::make_pair("Detecting Terminal Options", "|CR|08|15 - |08Detecting Terminal Options |15-|08");
-        value[GLOBAL_PROMPT_DETECTED_TERM]    = std::make_pair("Detecting Terminal: |OT ", "|CR|08Detected Terminal: |04|OT |07");
-        value[GLOBAL_PROMPT_DETECTED_SIZE]    = std::make_pair("Detecting Terminal Size: |OT ", "|CR|08Detected Screen Size: |04|OT |07");
-
+        
         m_text_prompts_dao->writeValue(value);
     }
 

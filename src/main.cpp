@@ -101,31 +101,38 @@ void run(boost::asio::io_service& io_service)
     server_telnet_ptr serverTelnet;
     server_ssl_ptr    serverSSL;
 
-    // Grab Lock and Create Instance of accessable configuration.
-    config_ptr cfg(TheCommunicator::instance()->getConfig().lock());
-    if (!cfg)
+    // Default Config Instance
+    config_ptr config(new Config());
+    if (!config)
     {
-        std::cout << "Error: getConfig.lock()" << std::endl;
+        std::cout << "Unable to allocate config structure" << std::endl;
         assert(false);
     }
+
+    // Setup the Data Access Object
+    //config_dao_ptr cfg(config, GLOBAL_BBS_PATH);
+    ConfigDao cfg(config, GLOBAL_BBS_PATH);
+
+    // Loads the Config file into the Data Access Object.
+    cfg.loadConfig();
     
     // Service Startup Here.
     try
     {        
         // Startup Telnet Server
-        if (cfg->use_service_telnet)
+        if (cfg.m_config->use_service_telnet)
         {
             std::cout << "Listening for telnet connections on port "
-                      << cfg->port_telnet << std::endl;
-            serverTelnet.reset(new Server(io_service, cfg->port_telnet));
+                      << cfg.m_config->port_telnet << std::endl;
+            serverTelnet.reset(new Server(io_service, cfg.m_config->port_telnet));
         }
 
         // Initial Testing of SSL Server.
-        if (cfg->use_service_ssl)
+        if (cfg.m_config->use_service_ssl)
         {
             std::cout << "Listening for service connections on port "
-                      << cfg->port_ssl << std::endl;
-            serverSSL.reset(new ServerSSL(io_service, cfg->port_ssl));
+                      << cfg.m_config->port_ssl << std::endl;
+            serverSSL.reset(new ServerSSL(io_service, cfg.m_config->port_ssl));
         }
 
         // Setup first timer.
@@ -175,29 +182,27 @@ auto main() -> int
     boost::asio::io_service io_service;
 
     // NEW Loading and saving default Configuration file to XML
-    config_ptr config(new Config());
+
+    config_ptr config(new Config());;
     if (!config)
     {
         std::cout << "Unable to allocate config structure" << std::endl;
         assert(false);
     }
 
-
     // Handle to Data Access Object,  at the moment were not using directories
     // Setup in the config, everything is branched from the main path.
     // Later on we'll check config for overides only.
     ConfigDao cfg(config, GLOBAL_BBS_PATH);
 
-    // Try to read configuration file, if it doesn't exist create with defaults.
-    if (!cfg.loadConfig())
+    if (!cfg.fileExists())
     {
-        // If config file doesn't exist. then save a default, and reopen.
-        std::cout << "Unable to Load, or Recreate missing xrm-config.xml file." << std::endl;
-        assert(false);
+        cfg.saveConfig(config);
     }
 
+
     // Load BBS Configuration here into Global Singleton.
-    TheCommunicator::instance()->attachConfig(config);
+    //TheCommunicator::instance()->attachConfig(config);
     
     // start io_service.run( ) in separate thread
     auto t = std::thread(&run, std::ref(io_service));

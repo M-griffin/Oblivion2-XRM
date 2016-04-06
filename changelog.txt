@@ -1,4 +1,13 @@
 
+Change Log Update (00.00.37)
+* 2016-04-06
++ Updated Modules.  Main will check and create a fresh config file if it doesn't exist.
+  The config file is loaded one the menu system starts and is now passed through
+  to each module for access.
++ Reordered the Detection phases.  Terminal options are detected, however they are now displayed
+  after the Emulation is detected.
++ Work can now start on the New User Signup.
+
 Change Log Update (00.00.36)
 * 2016-04-05
 + Converted the Configuration to from Boost XML serialization to YAML

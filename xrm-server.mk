@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Blue
-Date                   :=3/28/2016
+Date                   :=4/6/2016
 CodeLitePath           :="C:\Program Files (x86)\CodeLite"
 LinkerName             :=C:/MinGW-5.1.0/mingw32/bin/g++.exe
 SharedObjectLinkerName :=C:/MinGW-5.1.0/mingw32/bin/g++.exe -shared -fPIC
@@ -64,7 +64,7 @@ AS       := C:/MinGW-5.1.0/mingw32/bin/as.exe
 CodeLiteDir:=C:\Program Files (x86)\CodeLite
 UNIT_TEST_PP_SRC_DIR:=C:\UnitTest++-1.3
 Objects0=$(IntermediateDirectory)/src_ansi_processor.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_communicator.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_system.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_system_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_system_prompts.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_data.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_telnet_decoder.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_state_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_data_config_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_data_users_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_data_text_prompts_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_mods_mod_logon.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_mods_mod_prelogon.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_mods_mod_signup.cpp$(ObjectSuffix) 
+	$(IntermediateDirectory)/src_state_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_data_users_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_data_text_prompts_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_data_config_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_mods_mod_logon.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_mods_mod_prelogon.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_mods_mod_signup.cpp$(ObjectSuffix) 
 
 
 
@@ -191,14 +191,6 @@ $(IntermediateDirectory)/src_session_manager.cpp$(DependSuffix): src/session_man
 $(IntermediateDirectory)/src_session_manager.cpp$(PreprocessSuffix): src/session_manager.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_session_manager.cpp$(PreprocessSuffix) "src/session_manager.cpp"
 
-$(IntermediateDirectory)/src_data_config_dao.cpp$(ObjectSuffix): src/data/config_dao.cpp $(IntermediateDirectory)/src_data_config_dao.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/Test2/src/data/config_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_data_config_dao.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/src_data_config_dao.cpp$(DependSuffix): src/data/config_dao.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_data_config_dao.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_data_config_dao.cpp$(DependSuffix) -MM "src/data/config_dao.cpp"
-
-$(IntermediateDirectory)/src_data_config_dao.cpp$(PreprocessSuffix): src/data/config_dao.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_data_config_dao.cpp$(PreprocessSuffix) "src/data/config_dao.cpp"
-
 $(IntermediateDirectory)/src_data_users_dao.cpp$(ObjectSuffix): src/data/users_dao.cpp $(IntermediateDirectory)/src_data_users_dao.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/Test2/src/data/users_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_data_users_dao.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_data_users_dao.cpp$(DependSuffix): src/data/users_dao.cpp
@@ -214,6 +206,14 @@ $(IntermediateDirectory)/src_data_text_prompts_dao.cpp$(DependSuffix): src/data/
 
 $(IntermediateDirectory)/src_data_text_prompts_dao.cpp$(PreprocessSuffix): src/data/text_prompts_dao.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_data_text_prompts_dao.cpp$(PreprocessSuffix) "src/data/text_prompts_dao.cpp"
+
+$(IntermediateDirectory)/src_data_config_dao.cpp$(ObjectSuffix): src/data/config_dao.cpp $(IntermediateDirectory)/src_data_config_dao.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/Test2/src/data/config_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_data_config_dao.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_data_config_dao.cpp$(DependSuffix): src/data/config_dao.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_data_config_dao.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_data_config_dao.cpp$(DependSuffix) -MM "src/data/config_dao.cpp"
+
+$(IntermediateDirectory)/src_data_config_dao.cpp$(PreprocessSuffix): src/data/config_dao.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_data_config_dao.cpp$(PreprocessSuffix) "src/data/config_dao.cpp"
 
 $(IntermediateDirectory)/src_mods_mod_logon.cpp$(ObjectSuffix): src/mods/mod_logon.cpp $(IntermediateDirectory)/src_mods_mod_logon.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/Test2/src/mods/mod_logon.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_mods_mod_logon.cpp$(ObjectSuffix) $(IncludePath)
