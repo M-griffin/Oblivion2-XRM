@@ -10,10 +10,14 @@
 #include "../session_io.hpp"
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/asio/deadline_timer.hpp>
 
 #include <vector>
 #include <functional>
+
+class Config;
+typedef boost::shared_ptr<Config> config_ptr;
 
 using boost::asio::deadline_timer;
 
@@ -29,8 +33,8 @@ class ModPreLogon
     , public ModBase
 {
 public:
-    ModPreLogon(session_data_ptr session_data)
-        : ModBase(session_data)
+    ModPreLogon(session_data_ptr session_data, config_ptr config)
+        : ModBase(session_data, config)
         , m_session_io(session_data)
         , m_filename("mod_prelogon.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
@@ -38,7 +42,6 @@ public:
         , m_mod_function_index(MOD_DETECT_EMULATION)
         , m_is_text_prompt_exist(false)
         , m_is_esc_detected(false)
-        , m_is_emulation_detected(false)
         , m_input_buffer("")
         , m_x_position(0)
         , m_y_position(0)
@@ -95,6 +98,10 @@ public:
     const std::string PROMPT_ANSI_SELECTED = "ansi_selected";
     const std::string PROMPT_ASCII_SELECTED = "ascii_selected";
 
+    const std::string PROMPT_DETECT_TERMOPTS = "detect_term";
+    const std::string PROMPT_DETECTED_TERM = "detected_term";
+    const std::string PROMPT_DETECTED_SIZE = "detected_size";
+
     const std::string PROMPT_ASK_CP437 = "use_cp437";
     const std::string PROMPT_ASK_UTF8 = "use_utf8";
     const std::string PROMPT_CP437_SELECTED = "cp437_selected";
@@ -123,6 +130,11 @@ public:
      * @return
      */
     void setupAskANSIColor();
+
+    /**
+     * @brief Displays Terminal Detection after Emulation Detection.
+     */
+    void displayTerminalDetection();
 
     /**
      * @brief Ask Setup CodePage CP437 / UTF-8
@@ -194,7 +206,6 @@ private:
     int                  m_mod_function_index;   
     bool                 m_is_text_prompt_exist;
     bool                 m_is_esc_detected;
-    bool                 m_is_emulation_detected;
     std::string          m_input_buffer;
     int                  m_x_position;
     int                  m_y_position;

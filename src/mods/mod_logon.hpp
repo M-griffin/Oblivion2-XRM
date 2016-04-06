@@ -9,9 +9,13 @@
 #include "../session_data.hpp"
 #include "../session_io.hpp"
 
+#include <boost/smart_ptr/shared_ptr.hpp>
+
 #include <vector>
 #include <functional>
 
+class Config;
+typedef boost::shared_ptr<Config> config_ptr;
 
 /**
  * @class ModLogin
@@ -24,8 +28,8 @@ class ModLogon
     : public ModBase
 {
 public:
-    ModLogon(session_data_ptr session_data)
-        : ModBase(session_data)
+    ModLogon(session_data_ptr session_data, config_ptr config)
+        : ModBase(session_data, config)
         , m_session_io(session_data)
         , m_filename("mod_logon.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))

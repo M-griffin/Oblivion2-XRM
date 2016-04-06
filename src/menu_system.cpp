@@ -6,6 +6,8 @@
 #include "model/struct_compat.hpp"
 #include "model/config.hpp"
 
+#include "data/config_dao.hpp"
+
 #include "mods/mod_base.hpp"
 #include "mods/mod_prelogon.hpp"
 #include "mods/mod_logon.hpp"
@@ -28,6 +30,8 @@ const std::string MenuSystem::m_menuID = "MENU_SYSTEM";
 MenuSystem::MenuSystem(session_data_ptr session_data)
     : StateBase(session_data)
     , m_session_io(session_data)
+    , m_config(new Config())
+    , m_config_dao(new ConfigDao(m_config, GLOBAL_BBS_PATH))
     , m_line_buffer("")
     , m_use_hotkey(false)
     , m_current_menu("")
@@ -50,6 +54,13 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     m_menu_functions.push_back(std::bind(&MenuSystem::menuEditorInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::modulePreLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
+
+    // Load the configuration file to the class
+    if (!m_config_dao->loadConfig())
+    {
+        std::cout << "Error: unable to load configuration file" << std::endl;
+        assert(false);
+    }
 }
 
 MenuSystem::~MenuSystem()
@@ -118,6 +129,7 @@ void MenuSystem::clearMenuPullDownOptions()
     }
 }
 
+
 /**
  * @brief Reads a Specific Menu, Info and Options
  */
@@ -128,6 +140,7 @@ void MenuSystem::clearMenuOptions()
         m_loaded_menu_options.pop_back();
     }
 }
+
 
 /**
  * @brief Reads a Specific Menu, Info and Options
@@ -191,6 +204,7 @@ void MenuSystem::readInMenuData()
     }
 }
 
+
 /**
  * @brief Load a menu handling.
  */
@@ -245,6 +259,7 @@ std::string MenuSystem::loadMenuScreen()
     return screen_data;
 }
 
+
 /**
  * @brief Build Light Bars Strings for Display
  *        NOTE, need to check if codes don't exist in ansi screen, we need to skip!
@@ -279,6 +294,7 @@ std::string MenuSystem::buildLightBars()
     return light_bars;
 }
 
+
 /**
  * @brief Re parses and display current menu system.
  */
@@ -308,6 +324,7 @@ void MenuSystem::redisplayMenuScreen()
     }
     m_session_data->deliver(output);
 }
+
 
 /**
  * @brief Startup And load the Menu File
@@ -428,6 +445,7 @@ void MenuSystem::startupMenu()
     }
 }
 
+
 /**
  * @brief Updates current and next lightbar positions.
  */
@@ -465,6 +483,7 @@ void MenuSystem::lightbarUpdate(int previous_pulldown_id)
     std::string output = std::move(m_session_io.pipe2ansi(light_bars));
     m_session_data->deliver(output);
 }
+
 
 /**
  * @brief Process Command Keys passed from menu selection
@@ -552,6 +571,7 @@ void MenuSystem::executeMenuOptions(MenuOption &option)
             break;
     }
 }
+
 
 /**
  * @brief Processes Menu Commands with input.
@@ -790,6 +810,7 @@ void MenuSystem::menuEditorInput(const std::string &character_buffer, const bool
     m_session_data->deliver(output_buffer);
 }
 
+
 /**
  * @brief Start up the Normal Login Process.
  */
@@ -799,7 +820,7 @@ void MenuSystem::startupModulePreLogon()
     m_input_index = MODULE_PRELOGON_INPUT;
 
     // Allocate the Module here and push to container
-    module_ptr module(new ModPreLogon(m_session_data));
+    module_ptr module(new ModPreLogon(m_session_data, m_config));
     if (!module)
     {
         std::cout << "ModPreLogon Allocation Error!" << std::endl;
@@ -819,6 +840,7 @@ void MenuSystem::startupModulePreLogon()
     m_module.push_back(module);
 }
 
+
 /**
  * @brief Start up the Normal Login Process.
  */
@@ -828,7 +850,7 @@ void MenuSystem::startupModuleLogon()
     m_input_index = MODULE_INPUT;
 
     // Allocate the Module here and push to container
-    module_ptr module(new ModLogon(m_session_data));
+    module_ptr module(new ModLogon(m_session_data, m_config));
     if (!module)
     {
         std::cout << "ModLogon Allocation Error!" << std::endl;
@@ -848,6 +870,7 @@ void MenuSystem::startupModuleLogon()
     m_module.push_back(module);
 }
 
+
 /**
  * @brief Starts up Signup Module
  */
@@ -857,7 +880,7 @@ void MenuSystem::startupModuleSignup()
     m_input_index = MODULE_INPUT;
 
     // Allocate the Module here and push to container
-    module_ptr module(new ModSignup(m_session_data));
+    module_ptr module(new ModSignup(m_session_data, m_config));
     if (!module)
     {
         std::cout << "ModSignup Allocation Error!" << std::endl;
@@ -875,7 +898,6 @@ void MenuSystem::startupModuleSignup()
 
     // Push to stack now the new module.
     m_module.push_back(module);
-
 }
 
 
@@ -916,14 +938,7 @@ void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const 
 
         // First pop the module off the stack to deallocate
         m_module.pop_back();
-
-        // Grab handle to the system configuration
-        config_ptr cfg(TheCommunicator::instance()->getConfig().lock());
-        if(!cfg)
-        {
-            std::cout << "Error: getConfig.lock()" << std::endl;
-            assert(false);
-        }
+        
 
         // Check if the current user has been logged in yet.
         if (!m_session_data->m_is_session_authorized)
@@ -936,6 +951,7 @@ void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const 
             // Access any needed global configuration values
             // For Example...
             /*
+            m_config_dao->use_matrix_login  etc..
             if(cfg->use_matrix_login)
             {
                 // Setup Matrix Menu
@@ -962,6 +978,7 @@ void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const 
         }
     }
 }
+
 
 /**
  * @brief Handles parsing input for modules

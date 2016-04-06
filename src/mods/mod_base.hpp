@@ -8,6 +8,9 @@
 #include <iostream>
 #include <string>
 
+class Config;
+typedef boost::shared_ptr<Config> config_ptr;
+
 /**
  * @class ModBase
  * @author Michael Griffin
@@ -27,14 +30,16 @@ public:
     virtual bool onEnter() = 0;
     virtual bool onExit()  = 0;
 
-    ModBase(session_data_ptr session_data)
+    ModBase(session_data_ptr session_data, config_ptr config)
         : m_session_data(session_data)
+        , m_config(config)
         , m_is_active(false)
     { }
 
     // This holds session data passed to each session.
     // In modules we'll use the weak pointer so more clarity.
     session_data_ptr  m_session_data;
+    config_ptr        m_config;
     bool              m_is_active;
 
 

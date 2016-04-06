@@ -13,9 +13,7 @@ extern std::string GLOBAL_TEXTFILE_PATH;
  * @brief Const Key values for global text prompt lookup
  */
 const std::string GLOBAL_PROMPT_PAUSE = "pause";
-const std::string GLOBAL_PROMPT_DETECT_TERMOPTS = "detect_term";
-const std::string GLOBAL_PROMPT_DETECTED_TERM = "detected_term";
-const std::string GLOBAL_PROMPT_DETECTED_SIZE = "detected_size";
+
 
 
 /**

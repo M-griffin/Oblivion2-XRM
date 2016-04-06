@@ -11,11 +11,19 @@
 #include "model/struct_compat.hpp"
 #include "mods/mod_base.hpp"
 
+#include <boost/smart_ptr/shared_ptr.hpp>
+
 #include <stdint.h>
 #include <string>
 #include <vector>
 #include <functional>
 
+
+class Config;
+typedef boost::shared_ptr<Config> config_ptr;
+
+class ConfigDao;
+typedef boost::shared_ptr<ConfigDao> config_dao_ptr;
 
 class MenuSystem
     : public StateBase
@@ -39,6 +47,8 @@ public:
     //session_data_ptr m_session_data;     // Handles to the session for i/o. {in TheState Base Class!}
     SessionIO        m_session_io;         // SessionIO for Output parsing and MCI Codes etc.
     CommonIO         m_common_io;          // CommonIO
+    config_ptr       m_config;             // Config
+    config_dao_ptr   m_config_dao;         // Config Data Access Object
     std::string      m_line_buffer;        // Buffer used for menu system and reading field data.
     bool             m_use_hotkey;         // Toggle for Single Hotkey or GetLine input. - Not used yet!
     std::string      m_current_menu;       // Name of current menu loaded.

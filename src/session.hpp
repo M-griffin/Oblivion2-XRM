@@ -60,7 +60,7 @@ public:
 
     /**
      * @brief Handle the initial Session Creation, Also start the
-     * Telnet Option Negotiation with the client.
+     *        Telnet Option Negotiation with the client.
      * @param tcp_connection
      * @param room
      * @return
@@ -123,17 +123,8 @@ public:
 
             std::cout << "send initial IAC sequences ended." << std::endl;
 
-            // Grab Detection Prompt
-            M_StringPair prompt = TheCommunicator::instance()->getGlobalPrompt(GLOBAL_PROMPT_DETECT_TERMOPTS);
-
-            std::cout << "GLOBAL_PROMPT_DETECT_TERMOPTS: " << prompt.first << ", " << prompt.second << std::endl;
-
-            SessionIO io(new_session->m_session_data);
-            std::string result = io.pipe2ansi(prompt.second);
-            new_session->deliver(result);
-
             // Wait 1.5 Seconds for respones.
-            new_session->startDetectionTimer();            
+            new_session->startDetectionTimer();
         }
 
         return new_session;
@@ -150,63 +141,18 @@ public:
             boost::bind(&Session::handleDetectionTimer, shared_from_this(), &m_detection_deadline));
     }
 
-
     /**
      * @brief Deadline Detection Timer for Negoiation
      * @param timer
      */
     void handleDetectionTimer(boost::asio::deadline_timer* /*timer*/)
     {
-        std::cout << "Deadline Detection, EXPIRED!" << std::endl;
-
-        // Grab Detected Terminal, ANSI, XTERM, etc..
-        M_StringPair prompt_term = TheCommunicator::instance()->getGlobalPrompt(GLOBAL_PROMPT_DETECTED_TERM);
-
-        // Grab Detected Terminal Size 80x24, 80x50 etc..
-        M_StringPair prompt_size = TheCommunicator::instance()->getGlobalPrompt(GLOBAL_PROMPT_DETECTED_SIZE);
-
-        // Handle to Session IO
-        SessionIO io(m_session_data);
-
-        // Send out the results of the prompts after parsing MCI and Color codes.
-        // These prompts have spcial |OT place holders for variables.
-        std::string result;
-        std::string mci_code = "|OT";
-
-        // Handle Term, only display if prompt is not empty!
-        if (prompt_term.second.size() > 0)
-        {
-            result = prompt_term.second;
-
-            std::string term = m_session_data->m_telnet_state->getTermType();
-            std::cout << "Term Type: " << term << std::endl;
-            io.m_common_io.parseLocalMCI(result, mci_code, term);
-
-            result = io.pipe2ansi(result);
-            deliver(result);
-        }
-
-
-        // Handle Screen Size only display if prompt is not empty!
-        if (prompt_size.second.size() > 0)
-        {
-            result = prompt_size.second;
-
-            std::string term_size = std::to_string(m_session_data->m_telnet_state->getTermCols());
-            term_size.append("x");
-            term_size.append(std::to_string(m_session_data->m_telnet_state->getTermRows()));
-            std::cout << "Term Size: " << term_size << std::endl;
-            io.m_common_io.parseLocalMCI(result, mci_code, term_size);
-
-            result = io.pipe2ansi(result);
-            deliver(result);
-        }
+        std::cout << "Deadline Terminal Detection, EXPIRED!" << std::endl;
 
         // Detection Completed, start ip the Pre-Logon Sequence State.
         state_ptr new_state(new MenuSystem(m_session_data));
         m_state_manager->changeState(new_state);
     }
-    
 
     /**
      * @brief Callback from The Broadcaster to write data to the active sessions.
@@ -238,10 +184,9 @@ public:
         }
     }
 
-
     /**
      * @brief Callback after Writing Data, If error/hangup notifies
-     * everything this person has left.
+     *        Everyone this person has left.
      * @param error
      */
     void handleWrite(const boost::system::error_code& error)
@@ -298,6 +243,11 @@ public:
         }
     }
 
+    /**
+     * @brief Resolves the Hostname
+     * @param ec
+     * @param it
+     */
     void resolve_handler(const boost::system::error_code &ec,
                          tcp::resolver::iterator it)
     {
@@ -392,7 +342,6 @@ public:
     state_manager_ptr   m_state_manager;
     session_data_ptr    m_session_data;
     tcp::resolver       m_resolv;
-
     deadline_timer      m_detection_deadline;
 
 };

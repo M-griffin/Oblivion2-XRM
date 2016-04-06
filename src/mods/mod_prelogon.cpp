@@ -73,10 +73,14 @@ void ModPreLogon::createTextPrompts()
     value[PROMPT_DETECTED_ANSI]    = std::make_pair("ANSI Emulation Detected", "|CR|04E|12m|14ulation: An|12s|04i|07");
     value[PROMPT_DETECTED_NONE]    = std::make_pair("Emulation Detect:None", "|CREmulation Detect: None");
 
-    value[PROMPT_USE_ANSI]         = std::make_pair("Use ANSI Colors (Y/n) ", "|CR|CRPress [Y or ENTER] to use ANSI : ");
+    value[PROMPT_USE_ANSI]         = std::make_pair("Use ANSI Colors (Y/n) ", "|CR|CRPress [Y or ENTER] to use ANSI Colors |CR|08[|15N|08] to Select ASCII No Colors |15: ");
     value[PROMPT_USE_INVALID]      = std::make_pair("Invalid Response to Y/N/ENTER", "|CR|12Invalid Response! Try again");
     value[PROMPT_ANSI_SELECTED]    = std::make_pair("ANSI Color Selected", "|CR|04A|12N|14SI Colors Select|12e|04d");
     value[PROMPT_ASCII_SELECTED]   = std::make_pair("ASCII No Colors Selected", "|CRASCII No Colors Selected");
+
+    value[PROMPT_DETECT_TERMOPTS]  = std::make_pair("Detecting Terminal Options", "|CR|CR|08|15 - |08Detecting Terminal Options |15-|08");
+    value[PROMPT_DETECTED_TERM]    = std::make_pair("Detecting Terminal: |OT ", "|CR|08Detected Terminal: |04|OT |07");
+    value[PROMPT_DETECTED_SIZE]    = std::make_pair("Detecting Terminal Size: |OT ", "|CR|08Detected Screen Size: |04|OT |07");
 
     value[PROMPT_ASK_CP437]        = std::make_pair("Use CP437 Output Encoding", "|CR|CR|08[|15Y or ENTER|08] to Select MS-DOS CP-437 Codepage |CR|08[|15N|08] to Select UTF-8 Codepage : |15");
     value[PROMPT_ASK_UTF8]         = std::make_pair("Use UTF-8 Output Encoding", "|CR|CR|08[|15Y or ENTER|08] to Select UTF-8 Terminal Codepage|CR|08[|15N|08] to Select MS-DOS CP-437 Codepage : |15");
@@ -86,7 +90,6 @@ void ModPreLogon::createTextPrompts()
 
     m_text_prompts_dao->writeValue(value);
 }
-
 
 /**
  * @brief Sets an indivdual module index.
@@ -123,7 +126,6 @@ void ModPreLogon::setupEmulationDetection()
     startDetectionTimer();
 }
 
-
 /**
  * @brief Ask to us ANSI Color {Only ask for color if emulation detection fails!}
  * @return
@@ -140,11 +142,70 @@ void ModPreLogon::setupAskANSIColor()
 }
 
 /**
+ * @brief Displays Terminal Detection after Emulation Detection.
+ */
+void ModPreLogon::displayTerminalDetection()
+{
+    // Grab Detected Terminal, ANSI, XTERM, etc..
+    std::string result = m_session_io.parseTextPrompt(
+                              m_text_prompts_dao->getPrompt(PROMPT_DETECT_TERMOPTS)
+                          );
+
+    m_session_data->deliver(result);
+
+    // Grab Detected Terminal, ANSI, XTERM, etc..
+    // Where grabbing both pairs first so we can parse the local MCI code
+    // before we parse for colors and other stuff that would remove it!
+    // NOTE, Term and Size can be made global mci codes later on. :)
+    M_StringPair prompt_term = m_text_prompts_dao->getPrompt(PROMPT_DETECTED_TERM);
+
+
+    // Grab Detected Terminal Size 80x24, 80x50 etc..
+    M_StringPair prompt_size = m_text_prompts_dao->getPrompt(PROMPT_DETECTED_SIZE);
+
+
+    // Send out the results of the prompts after parsing MCI and Color codes.
+    // These prompts have spcial |OT place holders for variables.
+    std::string mci_code = "|OT";
+
+    // Handle Term, only display if prompt is not empty!
+    if(prompt_term.second.size() > 0)
+    {
+        result = prompt_term.second;
+
+        std::string term = m_session_data->m_telnet_state->getTermType();
+        std::cout << "Term Type: " << term << std::endl;
+        m_session_io.m_common_io.parseLocalMCI(result, mci_code, term);
+
+        result = m_session_io.pipe2ansi(result);
+        m_session_data->deliver(result);
+    }
+
+    // Handle Screen Size only display if prompt is not empty!
+    if(prompt_size.second.size() > 0)
+    {
+        result = prompt_size.second;
+
+        std::string term_size = std::to_string(m_session_data->m_telnet_state->getTermCols());
+        term_size.append("x");
+        term_size.append(std::to_string(m_session_data->m_telnet_state->getTermRows()));
+        std::cout << "Term Size: " << term_size << std::endl;
+        m_session_io.m_common_io.parseLocalMCI(result, mci_code, term_size);
+
+        result = m_session_io.pipe2ansi(result);
+        m_session_data->deliver(result);
+    }
+}
+
+/**
  * @brief Ask Setup CodePage CP437 / UTF-8
  * @return
  */
 void ModPreLogon::setupAskCodePage()
 {
+    // First Display Terminal Detection
+    displayTerminalDetection();
+
     std::cout << "setupAskCodePage()" << std::endl;
 
     // Display CodePage Selections, then prompt to ask for selection
@@ -173,7 +234,6 @@ void ModPreLogon::setupAskCodePage()
 
 }
 
-
 /**
  * @brief Were Detecting Emulation here, we should get response.
  * @return
@@ -200,7 +260,14 @@ bool ModPreLogon::emulationDetection(const std::string &input)
         {
             if(toupper(ch) == 'R')
             {
-                m_is_emulation_detected = true;
+                m_session_data->m_is_use_ansi = true;
+                // Make sure anything piggy backing doesn't reset
+                // Once were detected.
+                m_is_esc_detected = false;
+            }
+            else
+            {
+                m_session_data->m_is_use_ansi = false;
             }
         }
 
@@ -246,9 +313,8 @@ void ModPreLogon::emulationCompleted()
 {
     std::cout << "emulationCompleted: " << std::endl;
     // Reset to false so we can reuse for other methods.
-    m_is_esc_detected = false;
 
-    if(m_is_emulation_detected)
+    if(m_session_data->m_is_use_ansi)
     {
         // Emulation Detected ANSI
         std::string result = m_session_io.parseTextPrompt(
@@ -259,8 +325,6 @@ void ModPreLogon::emulationCompleted()
         // ANSI Detect, Move to Next Ask CodePage.
         changeModule(MOD_ASK_CODEPAGE);
 
-        // Set ANSI Color Emulation to True
-        m_session_data->m_is_use_ansi = true;
     }
     else
     {
@@ -274,7 +338,6 @@ void ModPreLogon::emulationCompleted()
         changeModule(MOD_ASK_ANSI_COLOR);
     }
 }
-
 
 /**
  * @brief ASK ANSI Color {Only ask for color if emulation detection fails!}
@@ -379,8 +442,8 @@ bool ModPreLogon::askCodePage(const std::string &input)
                     boost::iequals(m_term_type, "ansi"))
             {
                 result = m_session_io.parseTextPrompt(
-                                         m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
-                                     );
+                             m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
+                         );
 
                 // Even though it's default, lets set it anyways/
                 m_session_data->m_output_encoding = "cp437";
@@ -388,8 +451,8 @@ bool ModPreLogon::askCodePage(const std::string &input)
             else
             {
                 result = m_session_io.parseTextPrompt(
-                                         m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
-                                     );
+                             m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
+                         );
 
                 // Even though it's default, lets set it anyways/
                 m_session_data->m_output_encoding = "utf-8";
@@ -409,8 +472,8 @@ bool ModPreLogon::askCodePage(const std::string &input)
                     boost::iequals(m_term_type, "ansi"))
             {
                 result = m_session_io.parseTextPrompt(
-                                         m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
-                                     );
+                             m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
+                         );
 
                 // Even though it's default, lets set it anyways/
                 m_session_data->m_output_encoding = "utf-8";
@@ -418,8 +481,8 @@ bool ModPreLogon::askCodePage(const std::string &input)
             else
             {
                 result = m_session_io.parseTextPrompt(
-                                         m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
-                                     );
+                             m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
+                         );
 
                 // Even though it's default, lets set it anyways/
                 m_session_data->m_output_encoding = "cp437";

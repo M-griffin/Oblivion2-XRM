@@ -46,7 +46,7 @@ public:
         , m_io_service(io_service)
         , m_user_record()
         , m_node_number(0)
-        , m_is_use_ansi(false)
+        , m_is_use_ansi(true)
         , m_output_encoding("cp437")
         , m_is_session_authorized(false)
         , m_is_leaving(false)
