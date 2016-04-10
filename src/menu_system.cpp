@@ -61,7 +61,11 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
         std::cout << "Error: unable to load configuration file" << std::endl;
         assert(false);
     }
+
+    std::cout << "m_config NUP in menusystem: " << m_config->use_newuser_password << std::endl;
+
 }
+
 
 MenuSystem::~MenuSystem()
 {
@@ -72,8 +76,8 @@ MenuSystem::~MenuSystem()
 
     // Pop off the stack to deaallocate any active modules.
     std::vector<module_ptr>().swap(m_module);
-
 }
+
 
 /**
  * @brief Handles Updates or Data Input from Client
@@ -88,6 +92,7 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
     // This simplily passed through the input to the current system fuction were at.
     m_menu_functions[m_input_index](character_buffer, is_utf8);
 }
+
 
 /**
  * @brief Startup class, setup initial screens / interface, flags etc..
@@ -105,6 +110,7 @@ bool MenuSystem::onEnter()
 
     return true;
 }
+
 
 /**
  * @brief Exit, close down, display screens to change over data.
@@ -167,18 +173,6 @@ void MenuSystem::readInMenuData()
     m_common_io.PascalToCString(m_menu_info.MenuTitle);
     m_common_io.PascalToCString(m_menu_info.PulldownFN);
 
-    /*
-    std::cout << "Name: " << t.Name << std::endl;
-    std::cout << "Password: " << t.Password << std::endl;
-    std::cout << "FallBack: " << t.FallBack << std::endl;
-    std::cout << "HelpID: " << t.HelpID << std::endl;
-    std::cout << "ACS: " << t.ACS << std::endl;
-    std::cout << "NameInPrompt: " << t.NameInPrompt << std::endl;
-    std::cout << "MenuTitle: " << t.MenuTitle << std::endl;
-    std::cout << "PulldownFN: " << t.PulldownFN << std::endl;
-
-    std::cout << std::endl; */
-
     // Loop each Option after Reading the Menu.
     int u = 0;
     while(recordReadOption(&m_menu_option, m_current_menu, u++))
@@ -191,16 +185,6 @@ void MenuSystem::readInMenuData()
 
         // Load into vector.
         m_loaded_menu_options.push_back(m_menu_option);
-
-        /*
-        std::cout << "OptName: " << o.OptName << std::endl;
-        std::cout << "Acs: " << o.Acs << std::endl;
-        std::cout << "Hidden: " << m_common_io.boolAlpha(o.Hidden) << std::endl;
-        std::cout << "CKeys: " << o.CKeys << std::endl;
-        std::cout << "Keys: " << o.Keys << std::endl;
-        std::cout << "CString: " << o.CString << std::endl;
-        std::cout << "PulldownID: " << o.PulldownID << std::endl;
-        std::cout << std::endl;*/
     }
 }
 
@@ -385,10 +369,6 @@ void MenuSystem::startupMenu()
     // If active pull_down id's found, mark as active pulldown menu.
     if(pull_down_ids.size() > 0 && m_session_data->m_is_use_ansi)
     {
-        /**
-          * @brief Set Default, however check menu command for override.
-          */
-
         // m_menu_info.PulldownFN
 
         m_is_active_pulldown_menu = true;
@@ -422,11 +402,9 @@ void MenuSystem::startupMenu()
     cout.imbue(loc);
 
     // Now loop and scan for first cmd and each time
-    //for(int i = 0; i < (signed)m_loaded_menu_options.size(); i++)
     for(auto &m : m_loaded_menu_options)
     {
         // Process all First Commands}
-        //std::string key = (char *)m_loaded_menu_options[i].Keys;
         std::string key = (char *)m.Keys;
         key = to_upper(key);
 
@@ -434,6 +412,7 @@ void MenuSystem::startupMenu()
         {
             // Process
             std::cout << "FOUND FIRSTCMD! EXECUTE: " << m.CKeys << std::endl;
+            executeMenuOptions(m);
         }
 
         // Next Process EVERY Commands}
@@ -441,6 +420,7 @@ void MenuSystem::startupMenu()
         {
             // Process
             std::cout << "FOUND EACH! EXECUTE: " << m.CKeys << std::endl;
+            executeMenuOptions(m);
         }
     }
 }
@@ -594,22 +574,15 @@ void MenuSystem::processMenuOptions(std::string &input)
 
     bool is_enter = false;
 
-    // Test jump to Menu Editor
-    /*
-    if(input[0] == 'G')
-    {
-        startupMenuEditor();
-        return;
-    }*/
+    // Uppercase all input to match on comamnd/option keys
+    input = to_upper(input);
 
+    // Check if ENTER was hit as a command!
     if(input == "ENTER")
     {
         std::cout << "EXECUTE ENTER!: " << input << std::endl;
         is_enter = true;
     }
-
-    // Uppercase all input to match on comamnd/option keys
-    input = to_upper(input);
 
     // Check for loaded menu commands.
     // Get Pulldown menu commands, Load all from menu options (disk)
@@ -621,8 +594,10 @@ void MenuSystem::processMenuOptions(std::string &input)
         // Next Process EVERY Commands}
         if(key == "EACH")
         {
-            // Process
+            // Process, although should each be execure before, or after a menu command!
+            // OR is each just on each load/reload of menu i think!!
             std::cout << "FOUND EACH! EXECUTE: " << m.CKeys << std::endl;
+            executeMenuOptions(m);
             continue;
         }
 
@@ -645,6 +620,7 @@ void MenuSystem::processMenuOptions(std::string &input)
                     m_active_pulldownID = 1;
                 }
                 lightbarUpdate(previous_id);
+                continue;
             }
             else if(input == "LT_ARROW" || input == "UP_ARROW")
             {
@@ -657,6 +633,7 @@ void MenuSystem::processMenuOptions(std::string &input)
                     m_active_pulldownID = (signed)m_ansi_process.m_pull_down_options.size();
                 }
                 lightbarUpdate(previous_id);
+                continue;
             }
             else
             {
@@ -667,11 +644,12 @@ void MenuSystem::processMenuOptions(std::string &input)
         // Check for ESC sequence, and next/prev lightbar movement.
         else if(input[0] == '\x1b')
         {
-            // Received ESC key
+            // Received ESC key,  check for ESC is menu here..
 
         }
 
-        // Then check other keys.
+        // Check Input Keys on Both Pulldown and Normal Menus
+        // If the input matches the current key, or Enter is hit, then process it.
         else if(input.compare(key) == 0 || (m_is_active_pulldown_menu && is_enter))
         {
             // We have the command, start the work
@@ -689,7 +667,8 @@ void MenuSystem::processMenuOptions(std::string &input)
 
                         if(key != "FIRSTCMD" && key != "EACH")
                         {
-                            input = key;
+                            //input = key; ??
+                            executeMenuOptions(m);
                         }
                     }
 
@@ -699,12 +678,16 @@ void MenuSystem::processMenuOptions(std::string &input)
                 {
                     // NOT ENTER and pulldown,  check hotkeys here!!
                     std::cout << "Menu Command HOTKEY Executed for: " << key << std::endl;
+                    executeMenuOptions(m);
+                    // More testing here.. executeMenuOptions( ... );
                 }
             }
             else
             {
                 // They key compared, execute it
                 std::cout << "NORMAL HOT KEY MATCH and EXECUTE! " << key << std::endl;
+                executeMenuOptions(m);
+                // More testing here.. executeMenuOptions( ... );
             }
         }
     }

@@ -42,6 +42,13 @@ public:
      * @return
      */
     bool loadConfig();
+    
+    /**
+     * @brief Moves the Loaded config to the shared pointer.
+     * @param rhs
+     * @return
+     */
+    void encode(const Config &rhs);
 
     /**
      * @brief Grab a const handle to the loaded configuration.
@@ -54,7 +61,7 @@ public:
             return m_config;
         }
     }
-
+   
     config_ptr  m_config;
     std::string m_path;
     std::string m_filename;

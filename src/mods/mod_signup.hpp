@@ -140,7 +140,8 @@ public:
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
-    const std::string PROMPT_NUP = "new_user_password";
+    const std::string PROMPT_NUP = "newuser_password";
+    const std::string PROMPT_DISCLAIMER = "disclaimer";
     const std::string PROMPT_HANDLE = "handle";
     const std::string PROMPT_REAL_NAME = "real_name";
     const std::string PROMPT_ADDRESS = "address";
@@ -149,6 +150,18 @@ public:
     const std::string PROMPT_EMAIL = "email";
     const std::string PROMPT_USER_NOTE = "user_note";
     const std::string PROMPT_BIRTH_DATE = "birth_date";
+    const std::string PROMPT_GENDER = "gender";
+    const std::string PROMPT_PASSWORD = "password";
+    const std::string PROMPT_VERIFY_PASSWORD = "verify_password";
+    const std::string PROMPT_CHALLENGE_QUESTION = "challenge_question";
+    const std::string PROMPT_CHALLENGE_ANSWER = "challenge_answer";
+    const std::string PROMPT_VERIFY_ANSWER = "verify_answer";
+    const std::string PROMPT_YESNO_BARS = "yes_no_bars";
+    const std::string PROMPT_USE_PAUSE = "use_pause";
+    const std::string PROMPT_USE_CLEAR = "use_clear";
+    const std::string PROMPT_USE_ANSI_COLOR = "use_ansi_color";
+    const std::string PROMPT_BACK_SPACE = "use_back_space";
+
     // ... cont
 
 
