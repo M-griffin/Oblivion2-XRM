@@ -80,6 +80,8 @@ public:
     bool use_screen_prelogin;     // UsePrelogon,
     bool use_screen_welcome;      // UseWelcome,
     bool use_matrix_login;        // SpecialLogin;
+    bool use_newuser_password;
+    bool use_discalimer;
 
 // char
     char hidden_input_character;  // HiddenInputChar;
@@ -191,7 +193,9 @@ public:
         , use_log_chat_sessions(true)
         , use_screen_prelogin(false)
         , use_screen_welcome(false)
-        , use_matrix_login(false)
+        , use_matrix_login(true)
+        , use_newuser_password(true)
+        , use_discalimer(true)
         , hidden_input_character('*')
         , use_auto_validate_users(false)
         , use_newuser_voting(false)
@@ -302,6 +306,8 @@ namespace YAML
             node["use_screen_prelogin"] = rhs.use_screen_prelogin;
             node["use_screen_welcome"] = rhs.use_screen_welcome;
             node["use_matrix_login"] = rhs.use_matrix_login;
+            node["use_newuser_password"] = rhs.use_newuser_password;
+            node["use_discalimer"] = rhs.use_discalimer;
             node["hidden_input_character"] = rhs.hidden_input_character;
             node["use_auto_validate_users"] = rhs.use_auto_validate_users;
             node["use_newuser_voting"] = rhs.use_newuser_voting;
@@ -392,6 +398,8 @@ namespace YAML
             rhs.use_screen_prelogin             = node["use_screen_prelogin"].as<bool>();
             rhs.use_screen_welcome              = node["use_screen_welcome"].as<bool>();
             rhs.use_matrix_login                = node["use_matrix_login"].as<bool>();
+            rhs.use_newuser_password            = node["use_newuser_password"].as<bool>();
+            rhs.use_discalimer                  = node["use_discalimer"].as<bool>();
             rhs.hidden_input_character          = node["hidden_input_character"].as<unsigned char>();
             rhs.use_auto_validate_users         = node["use_auto_validate_users"].as<bool>();
             rhs.use_newuser_voting              = node["use_newuser_voting"].as<bool>();

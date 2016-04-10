@@ -1,4 +1,16 @@
 
+Change Log Update (00.00.38)
+* 2016-04-10
++ Update the ConfigDao object to update the smart pointer when loading the config file
+  Modules now have access to the loaded values, might be able to switch this to copy/move
+  constructor lateron, but looks good for now.
++ Added use_newuser_password and use_disclaimer to the config files for signup items.
+  If they are enabled, they will be displayed and use in the signup process.
++ Update the menu system on command execution via ENTER and Hotkey to now execute the 
+  command match the command key sequence.  The matrix menu is the test bed, and is now 
+  kicking off the new user application when hitting A or ENTER on Apply for new.
++ Still working on the input handling for all of the signup fields now.
+
 Change Log Update (00.00.37)
 * 2016-04-06
 + Updated Modules.  Main will check and create a fresh config file if it doesn't exist.

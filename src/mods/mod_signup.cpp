@@ -1,5 +1,7 @@
 #include "mod_signup.hpp"
 
+#include "../model/config.hpp"
+
 #include <iostream>
 #include <string>
 
@@ -30,6 +32,7 @@ bool ModSignup::update(const std::string &character_buffer, const bool &)
     return true;
 }
 
+
 /**
  * @brief Startup class, setup and display initial screens / interface.
  * @return
@@ -48,6 +51,7 @@ bool ModSignup::onEnter()
     return true;
 }
 
+
 /**
  * @brief Exit, close down, display screens to change over data.
  * @return
@@ -59,6 +63,7 @@ bool ModSignup::onExit()
     return true;
 }
 
+
 /**
  * @brief Create Default Text Prompts for module
  */
@@ -67,7 +72,27 @@ void ModSignup::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_HANDLE]          = std::make_pair("User Handle", "|08Handle: |04");
+    value[PROMPT_NUP]                = std::make_pair("New User Password", "|08|CR|CRNew User Password: |04");
+    value[PROMPT_DISCLAIMER]         = std::make_pair("Disclaimer", "|08|CRDisclaimer Text here.. |CR|CR[y/n] Disclaimer Agree : |04");
+    value[PROMPT_HANDLE]             = std::make_pair("User Handle", "|08|CREnter Handle : |04");
+    value[PROMPT_REAL_NAME]          = std::make_pair("Real Name", "|08|CREnter Real Name : |04");
+    value[PROMPT_ADDRESS]            = std::make_pair("Address", "|08|CRAddress : |04");
+    value[PROMPT_LOCATION]           = std::make_pair("Location", "|08|CRLocation : |04");
+    value[PROMPT_COUNTRY]            = std::make_pair("Country", "|08|CRCountry : |04");
+    value[PROMPT_EMAIL]              = std::make_pair("Email Address", "|08|CREmail Address : |04");
+    value[PROMPT_USER_NOTE]          = std::make_pair("User Note", "|08|CRAffiliations / User Note : |04");
+    value[PROMPT_BIRTH_DATE]         = std::make_pair("Birth Date", "|08|CR[yyyy-mm-dd] Birth Date : |04");
+    value[PROMPT_GENDER]             = std::make_pair("Gender", "|CR|08[m/f] Gender : |04");
+    value[PROMPT_PASSWORD]           = std::make_pair("Password", "|CR|08(case sensitive) Password : |04");
+    value[PROMPT_VERIFY_PASSWORD]    = std::make_pair("Verify Password", "|CR|08(case sensitive) Verify Password : |04");
+    value[PROMPT_CHALLENGE_QUESTION] = std::make_pair("Forgot Password Challenge Question", "|CR|08Challenge Question : |04");
+    value[PROMPT_CHALLENGE_ANSWER]   = std::make_pair("Forgot Password Challenge Answer", "|CR|08Challenge Answer : |04");
+    value[PROMPT_VERIFY_ANSWER]      = std::make_pair("Forgot Password Verify Answer", "|CR|08Verify Answer : |04");
+    value[PROMPT_YESNO_BARS]         = std::make_pair("Use YES/NO Bars", "|CR|08[y/n] Use Yes/No Bars : |04");
+    value[PROMPT_USE_PAUSE]          = std::make_pair("Pause on ", "|CR|08Screen Pausing : |04");
+    value[PROMPT_USE_CLEAR]          = std::make_pair("Clear Screen or Scroll ", "|CR|08Clear Screen or Scroll : |04");
+    value[PROMPT_USE_ANSI_COLOR]     = std::make_pair("Use Ansi Color ", "|CR|08[y/n] Ansi Color : |04");
+    value[PROMPT_BACK_SPACE]         = std::make_pair("Backspace Type", "|CR|08Backspace Key |CR[(W)indows/(T)erminal/(D)etect [ENTER] = Detect] : |04");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -91,7 +116,19 @@ void ModSignup::changeModule(int mod_function_index)
  */
 void ModSignup::setupNewUserPassword()
 {
-
+    // Check if New User Password is enabled
+    if(m_config->use_newuser_password)
+    {
+        std::string result = m_session_io.parseTextPrompt(
+                                 m_text_prompts_dao->getPrompt(PROMPT_NUP)
+                             );
+        m_session_data->deliver(result);
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }
 }
 
 /**
@@ -100,7 +137,10 @@ void ModSignup::setupNewUserPassword()
  */
 void ModSignup::setupDisclaimer()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_DISCLAIMER)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -109,7 +149,10 @@ void ModSignup::setupDisclaimer()
  */
 void ModSignup::setupHandle()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_HANDLE)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -118,7 +161,10 @@ void ModSignup::setupHandle()
  */
 void ModSignup::setupRealName()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_REAL_NAME)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -127,7 +173,10 @@ void ModSignup::setupRealName()
  */
 void ModSignup::setupAddress()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_ADDRESS)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -136,7 +185,10 @@ void ModSignup::setupAddress()
  */
 void ModSignup::setupLocation()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_LOCATION)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -145,7 +197,10 @@ void ModSignup::setupLocation()
  */
 void ModSignup::setupCountry()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_COUNTRY)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -154,7 +209,10 @@ void ModSignup::setupCountry()
  */
 void ModSignup::setupEmail()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_EMAIL)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -163,7 +221,10 @@ void ModSignup::setupEmail()
  */
 void ModSignup::setupUserNote()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_USER_NOTE)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -172,7 +233,10 @@ void ModSignup::setupUserNote()
  */
 void ModSignup::setupBirthday()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_BIRTH_DATE)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -181,7 +245,10 @@ void ModSignup::setupBirthday()
  */
 void ModSignup::setupGender()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_GENDER)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -190,7 +257,10 @@ void ModSignup::setupGender()
  */
 void ModSignup::setupPassword()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_PASSWORD)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -199,7 +269,10 @@ void ModSignup::setupPassword()
  */
 void ModSignup::setupVerifyPassword()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_VERIFY_PASSWORD)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -209,6 +282,10 @@ void ModSignup::setupVerifyPassword()
 void ModSignup::setupChallengeQuestion()
 {
 
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_CHALLENGE_QUESTION)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -217,7 +294,10 @@ void ModSignup::setupChallengeQuestion()
  */
 void ModSignup::setupChallengeAnswer()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_CHALLENGE_ANSWER)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -226,7 +306,10 @@ void ModSignup::setupChallengeAnswer()
  */
 void ModSignup::setupVerifyChallengeAnswer()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_VERIFY_ANSWER)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -235,7 +318,10 @@ void ModSignup::setupVerifyChallengeAnswer()
  */
 void ModSignup::setupYesNoBars()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_YESNO_BARS)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -244,7 +330,10 @@ void ModSignup::setupYesNoBars()
  */
 void ModSignup::setupDoPause()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_USE_PAUSE)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -254,6 +343,10 @@ void ModSignup::setupDoPause()
 void ModSignup::setupClearOrScroll()
 {
 
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_USE_CLEAR)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -262,7 +355,10 @@ void ModSignup::setupClearOrScroll()
  */
 void ModSignup::setupAnsiColor()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_USE_ANSI_COLOR)
+                         );
+    m_session_data->deliver(result);
 }
 
 /**
@@ -271,7 +367,10 @@ void ModSignup::setupAnsiColor()
  */
 void ModSignup::setupBackSpace()
 {
-
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_BACK_SPACE)
+                         );
+    m_session_data->deliver(result);
 }
 
 
@@ -279,7 +378,7 @@ void ModSignup::setupBackSpace()
  * @brief Check for New User Password
  * @return
  */
-bool ModSignup::newUserPassword(const std::string &input)
+bool ModSignup::newUserPassword(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -289,7 +388,7 @@ bool ModSignup::newUserPassword(const std::string &input)
  * @brief Pre Application Disclaimer
  * @return
  */
-bool ModSignup::disclaimer(const std::string &input)
+bool ModSignup::disclaimer(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -299,7 +398,7 @@ bool ModSignup::disclaimer(const std::string &input)
  * @brief Get Handle from User
  * @return
  */
-bool ModSignup::handle(const std::string &input)
+bool ModSignup::handle(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -309,7 +408,7 @@ bool ModSignup::handle(const std::string &input)
  * @brief Get Real Name
  * @return
  */
-bool ModSignup::realName(const std::string &input)
+bool ModSignup::realName(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -319,7 +418,7 @@ bool ModSignup::realName(const std::string &input)
  * @brief Get Address
  * @return
  */
-bool ModSignup::address(const std::string &input)
+bool ModSignup::address(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -329,7 +428,7 @@ bool ModSignup::address(const std::string &input)
  * @brief Get Location
  * @return
  */
-bool ModSignup::location(const std::string &input)
+bool ModSignup::location(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -339,7 +438,7 @@ bool ModSignup::location(const std::string &input)
  * @brief Get Country
  * @return
  */
-bool ModSignup::country(const std::string &input)
+bool ModSignup::country(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -349,7 +448,7 @@ bool ModSignup::country(const std::string &input)
  * @brief Get Email
  * @return
  */
-bool ModSignup::email(const std::string &input)
+bool ModSignup::email(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -359,7 +458,7 @@ bool ModSignup::email(const std::string &input)
  * @brief Get UserNote
  * @return
  */
-bool ModSignup::userNote(const std::string &input)
+bool ModSignup::userNote(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -369,7 +468,7 @@ bool ModSignup::userNote(const std::string &input)
  * @brief Get Birthdate
  * @return
  */
-bool ModSignup::birthday(const std::string &input)
+bool ModSignup::birthday(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -379,7 +478,7 @@ bool ModSignup::birthday(const std::string &input)
  * @brief Get Gender
  * @return
  */
-bool ModSignup::gender(const std::string &input)
+bool ModSignup::gender(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -389,7 +488,7 @@ bool ModSignup::gender(const std::string &input)
  * @brief Get Password
  * @return
  */
-bool ModSignup::password(const std::string &input)
+bool ModSignup::password(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -399,7 +498,7 @@ bool ModSignup::password(const std::string &input)
  * @brief Verify Password
  * @return
  */
-bool ModSignup::verifyPassword(const std::string &input)
+bool ModSignup::verifyPassword(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -409,7 +508,7 @@ bool ModSignup::verifyPassword(const std::string &input)
  * @brief Set Password Reset Challenge Question
  * @return
  */
-bool ModSignup::challengeQuestion(const std::string &input)
+bool ModSignup::challengeQuestion(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -419,7 +518,7 @@ bool ModSignup::challengeQuestion(const std::string &input)
  * @brief Set Password Reset Challenge Answer
  * @return
  */
-bool ModSignup::challengeAnswer(const std::string &input)
+bool ModSignup::challengeAnswer(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -429,7 +528,7 @@ bool ModSignup::challengeAnswer(const std::string &input)
  * @brief Set Password Reset Challenge Answer
  * @return
  */
-bool ModSignup::verifyChallengeAnswer(const std::string &input)
+bool ModSignup::verifyChallengeAnswer(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -439,7 +538,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
  * @brief Get Yes / No Bar Preference
  * @return
  */
-bool ModSignup::yesNoBars(const std::string &input)
+bool ModSignup::yesNoBars(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -449,7 +548,7 @@ bool ModSignup::yesNoBars(const std::string &input)
  * @brief Get Pause Preference
  * @return
  */
-bool ModSignup::doPause(const std::string &input)
+bool ModSignup::doPause(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -459,7 +558,7 @@ bool ModSignup::doPause(const std::string &input)
  * @brief Get Clear or Scroll preference
  * @return
  */
-bool ModSignup::clearOrScroll(const std::string &input)
+bool ModSignup::clearOrScroll(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -469,7 +568,7 @@ bool ModSignup::clearOrScroll(const std::string &input)
  * @brief Get ANSI Color preference
  * @return
  */
-bool ModSignup::ansiColor(const std::string &input)
+bool ModSignup::ansiColor(const std::string &) //input)
 {
     bool result = false;
     return result;
@@ -479,7 +578,7 @@ bool ModSignup::ansiColor(const std::string &input)
  * @brief Get Backspace Preference WINDOWS/LINUX (Terminal)
  * @return
  */
-bool ModSignup::backSpace(const std::string &input)
+bool ModSignup::backSpace(const std::string &) //input)
 {
     bool result = false;
     return result;
