@@ -162,6 +162,9 @@ public:
     const std::string PROMPT_USE_ANSI_COLOR = "use_ansi_color";
     const std::string PROMPT_BACK_SPACE = "use_back_space";
 
+    const std::string PROMPT_TEXT_INVALID = "text_invalid";
+    const std::string PROMPT_DATE_INVALID = "date_invalid";
+    const std::string PROMPT_PASS_INVALID = "pass_invalid";
     // ... cont
 
 

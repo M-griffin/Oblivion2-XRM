@@ -101,7 +101,7 @@ bool ConfigDao::saveConfig(config_ptr cfg)
     out << YAML::Key << "use_screen_welcome" << YAML::Value << cfg->use_screen_welcome;
     out << YAML::Key << "use_matrix_login" << YAML::Value << cfg->use_matrix_login;
     out << YAML::Key << "use_newuser_password" << YAML::Value << cfg->use_newuser_password;
-    out << YAML::Key << "use_discalimer" << YAML::Value << cfg->use_discalimer;
+    out << YAML::Key << "use_disclaimer" << YAML::Value << cfg->use_disclaimer;
     out << YAML::Key << "hidden_input_character" << YAML::Value << cfg->hidden_input_character;
     out << YAML::Key << "use_auto_validate_users" << YAML::Value << cfg->use_auto_validate_users;
     out << YAML::Key << "use_newuser_voting" << YAML::Value << cfg->use_newuser_voting;
@@ -209,7 +209,7 @@ void ConfigDao::encode(const Config &rhs)
     m_config->use_screen_welcome = rhs.use_screen_welcome;
     m_config->use_matrix_login = rhs.use_matrix_login;
     m_config->use_newuser_password = rhs.use_newuser_password;
-    m_config->use_discalimer = rhs.use_discalimer;
+    m_config->use_disclaimer = rhs.use_disclaimer;
     m_config->hidden_input_character = rhs.hidden_input_character;
     m_config->use_auto_validate_users = rhs.use_auto_validate_users;
     m_config->use_newuser_voting = rhs.use_newuser_voting;
