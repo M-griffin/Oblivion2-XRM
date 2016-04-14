@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 
+
 /**
  * @brief Handles Updates or Data Input from Client
  * @return bool, not used anymore?!?
@@ -32,7 +33,6 @@ bool ModSignup::update(const std::string &character_buffer, const bool &)
     return true;
 }
 
-
 /**
  * @brief Startup class, setup and display initial screens / interface.
  * @return
@@ -50,7 +50,6 @@ bool ModSignup::onEnter()
 
     return true;
 }
-
 
 /**
  * @brief Exit, close down, display screens to change over data.
@@ -94,6 +93,11 @@ void ModSignup::createTextPrompts()
     value[PROMPT_USE_ANSI_COLOR]     = std::make_pair("Use Ansi Color ", "|CR|08[y/n] Ansi Color : |04");
     value[PROMPT_BACK_SPACE]         = std::make_pair("Backspace Type", "|CR|08Backspace Key |CR[(W)indows/(T)erminal/(D)etect [ENTER] = Detect] : |04");
 
+    // Invalid.
+    value[PROMPT_TEXT_INVALID]     = std::make_pair("Invalid Text", "|CR|08[y/n] Ansi Color : |04");
+    value[PROMPT_DATE_INVALID]     = std::make_pair("Invalid Date", "|CR|08[y/n] Ansi Color : |04");
+    value[PROMPT_PASS_INVALID]     = std::make_pair("Invalid/Non Matching Password", "|CR|08[y/n] Ansi Color : |04");
+
     m_text_prompts_dao->writeValue(value);
 }
 
@@ -108,7 +112,6 @@ void ModSignup::changeModule(int mod_function_index)
     m_mod_function_index = mod_function_index;
     m_setup_functions[m_mod_function_index]();
 }
-
 
 /**
  * @brief Check for New User Password
@@ -137,10 +140,18 @@ void ModSignup::setupNewUserPassword()
  */
 void ModSignup::setupDisclaimer()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_DISCLAIMER)
-                         );
-    m_session_data->deliver(result);
+    if(m_config->use_disclaimer)
+    {
+        std::string result = m_session_io.parseTextPrompt(
+                                 m_text_prompts_dao->getPrompt(PROMPT_DISCLAIMER)
+                             );
+        m_session_data->deliver(result);
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }
 }
 
 /**
@@ -378,10 +389,54 @@ void ModSignup::setupBackSpace()
  * @brief Check for New User Password
  * @return
  */
-bool ModSignup::newUserPassword(const std::string &) //input)
+bool ModSignup::newUserPassword(const std::string &input)
 {
-    bool result = false;
-    return result;
+    std::cout << "newUserPassword: " << input << std::endl;
+
+    // handle input for using ansi color, hot key or ENTER after..  hmm
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key);
+    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    {
+        std::cout << "aborted!" << std::endl;
+        // exit, and return
+        m_is_active = false;
+        return false;
+    }
+    else if(result[0] == '\n')
+    {
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return false;
+        }
+
+        // Pull in and test aginst new user password.
+        if(key.compare("TeSt") == 0)
+        {
+            std::cout << "Match" << key.size() << std::endl;
+        }
+        else
+        {
+            std::cout << "No Match" << key.size() << std::endl;
+
+            std::string prompt_text = m_session_io.parseTextPrompt(
+                                          m_text_prompts_dao->getPrompt(PROMPT_TEXT_INVALID)
+                                      );
+            m_session_data->deliver(prompt_text);
+
+            // Invalid, Ask again
+            setupNewUserPassword();
+        }
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        m_session_data->deliver(input);
+    }
+
+    return true;
 }
 
 /**

@@ -1,4 +1,9 @@
 
+Change Log Update (00.00.39)
+* 2016-04-14
++ Added both Initial SHA1 and PKCS5_PBKDF2 password encryption routines
++ Some more testing needed on c++ conversions of hex values.
+
 Change Log Update (00.00.38)
 * 2016-04-10
 + Update the ConfigDao object to update the smart pointer when loading the config file

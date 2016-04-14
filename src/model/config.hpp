@@ -81,7 +81,7 @@ public:
     bool use_screen_welcome;      // UseWelcome,
     bool use_matrix_login;        // SpecialLogin;
     bool use_newuser_password;
-    bool use_discalimer;
+    bool use_disclaimer;
 
 // char
     char hidden_input_character;  // HiddenInputChar;
@@ -195,7 +195,7 @@ public:
         , use_screen_welcome(false)
         , use_matrix_login(true)
         , use_newuser_password(true)
-        , use_discalimer(true)
+        , use_disclaimer(true)
         , hidden_input_character('*')
         , use_auto_validate_users(false)
         , use_newuser_voting(false)
@@ -263,7 +263,6 @@ namespace YAML
          */
         static Node encode(const Config &rhs)
         {
-
             Node node;
             node["bbs_name_sysop"] = rhs.bbs_name_sysop;
             node["bbs_name"] = rhs.bbs_name;
@@ -307,7 +306,7 @@ namespace YAML
             node["use_screen_welcome"] = rhs.use_screen_welcome;
             node["use_matrix_login"] = rhs.use_matrix_login;
             node["use_newuser_password"] = rhs.use_newuser_password;
-            node["use_discalimer"] = rhs.use_discalimer;
+            node["use_disclaimer"] = rhs.use_disclaimer;
             node["hidden_input_character"] = rhs.hidden_input_character;
             node["use_auto_validate_users"] = rhs.use_auto_validate_users;
             node["use_newuser_voting"] = rhs.use_newuser_voting;
@@ -346,6 +345,7 @@ namespace YAML
             node["filename_archive_comments"] = rhs.filename_archive_comments;
             node["directory_bad_files"] = rhs.directory_bad_files;
             node["use_greater_then_for_quotes"] = rhs.use_greater_then_for_quotes;
+
             return node;
         }
 
@@ -399,7 +399,7 @@ namespace YAML
             rhs.use_screen_welcome              = node["use_screen_welcome"].as<bool>();
             rhs.use_matrix_login                = node["use_matrix_login"].as<bool>();
             rhs.use_newuser_password            = node["use_newuser_password"].as<bool>();
-            rhs.use_discalimer                  = node["use_discalimer"].as<bool>();
+            rhs.use_disclaimer                  = node["use_disclaimer"].as<bool>();
             rhs.hidden_input_character          = node["hidden_input_character"].as<unsigned char>();
             rhs.use_auto_validate_users         = node["use_auto_validate_users"].as<bool>();
             rhs.use_newuser_voting              = node["use_newuser_voting"].as<bool>();

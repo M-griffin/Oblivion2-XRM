@@ -80,6 +80,8 @@
     <File Name="src/session_manager.hpp"/>
     <File Name="src/state_base.hpp"/>
     <File Name="sqlitewrap/libSqliteWrapped.h"/>
+    <File Name="src/encryption.hpp"/>
+    <File Name="src/encryption.cpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
