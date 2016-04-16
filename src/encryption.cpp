@@ -31,10 +31,10 @@ std::string Encrypt::unsignedToHex(unsigned char inchar)
 
 /**
  * @brief SHA1 password encryption
- * @param password
+ * @param key
  * @param salt
  */
-std::string Encrypt::SHA1(std::string password, std::string salt)
+std::string Encrypt::SHA1(std::string key, std::string salt)
 {
     bool EncryptOk = true;
 
@@ -53,32 +53,26 @@ std::string Encrypt::SHA1(std::string password, std::string salt)
         EncryptOk = false;
     }
 
-    std::string sale_result = "";
+    std::string salt_result = "";
     for(unsigned char c : salt)
     {
-        printf("%02x", c);
-        sale_result += unsignedToHex(c);
+        salt_result += unsignedToHex(c);
     }
-    std::cout << " salt: " << sale_result << std::endl;
 
     std::string result = "";
     if(EncryptOk)
     {
         EVP_MD_CTX_init(&mdctx);
         EVP_DigestInit_ex(&mdctx, md, NULL);
-        EVP_DigestUpdate(&mdctx, (char *)salt.c_str(), salt.size());
-        EVP_DigestUpdate(&mdctx, (char *)password.c_str(), password.size());
+        EVP_DigestUpdate(&mdctx, (char *)salt_result.c_str(), salt_result.size());
+        EVP_DigestUpdate(&mdctx, (char *)key.c_str(), key.size());
         EVP_DigestFinal_ex(&mdctx, md_value, &md_len);
         EVP_MD_CTX_cleanup(&mdctx);
 
-        // Testing
-        //std::cout << "digest: " << std::flush;
         for(i = 0; i < md_len; i++)
         {
-            //printf("%02x",md_value[i]);
             result += unsignedToHex(md_value[i]);
         }
-        //std::cout << std::endl;
     }
     else
     {
@@ -92,48 +86,77 @@ std::string Encrypt::SHA1(std::string password, std::string salt)
 
 /**
  * @brief PKCS5_PBKDF2 password encryption
- * @param password
+ * @param key
  * @param salt
  */
-std::string Encrypt::PKCS5_PBKDF2(std::string password, std::string salt)
+std::string Encrypt::PKCS5_PBKDF2(std::string key, std::string salt)
 {
     size_t i;
     unsigned char *out;
+    out = (unsigned char *) malloc(sizeof(unsigned char) * SHA512_OUTPUT_BYTES);
 
-    out = (unsigned char *) malloc(sizeof(unsigned char) * KEK_KEY_LEN);
-
-    std::cout << "pass: " << password << std::endl;
-    std::cout << "salt: " << salt << std::endl;
-    std::cout << "iteration: " << ITERATION << std::endl;
-
-    std::string sale_result = "";
+    std::string salt_result = "";
     for(i = 0; i < salt.size(); i++)
     {
-        printf("%02x", salt[i]);
-        sale_result += unsignedToHex(salt[i]);
+        salt_result += unsignedToHex(salt[i]);
     }
-    std::cout << " salt: " << sale_result << std::endl;
 
     std::string result = "";
-    if(PKCS5_PBKDF2_HMAC_SHA1(
-        (const char *)password.c_str(), password.size(),
-        (const unsigned char *)salt.c_str(), salt.size(),
-        ITERATION, KEK_KEY_LEN,
+    if(PKCS5_PBKDF2_HMAC(
+        (const char *)key.c_str(), key.size(),
+        (const unsigned char *)salt_result.c_str(), salt_result.size(),
+        ITERATION,
+        EVP_sha512(),
+        SHA512_OUTPUT_BYTES,
         (unsigned char *)out) != 0)
     {
-        for(i = 0; i < KEK_KEY_LEN; i++)
+        for(i = 0; i < SHA512_OUTPUT_BYTES; i++)
         {
-            printf("%02x", out[i]);
             result += unsignedToHex(out[i]);
         }
     }
     else
     {
-        std::cout << "PKCS5_PBKDF2_HMAC_SHA1 failed" << std::endl;
+        std::cout << "PKCS5_PBKDF2_HMAC failed" << std::endl;
     }
-    std::cout << " pass: " << result << std::endl;
 
     free(out);
     return result;
+}
+
+
+/**
+ * @brief generate salt hash key
+ * @param key
+ * @param salt
+ */
+std::string Encrypt::generate_salt(std::string key, std::string salt)
+{
+    std::string generated_salt = SHA1(key, salt);
+    return generated_salt;
+}
+
+
+/**
+ * @brief generate password hash key
+ * @param key
+ * @param salt
+ */
+std::string Encrypt::generate_password(std::string key, std::string salt)
+{
+    std::string generated_password = PKCS5_PBKDF2(key, salt);
+    return generated_password;
+}
+
+
+/**
+ * @brief Case Insensitive compare valid password hash
+ * @param hash1
+ * @param hash2
+ * @return
+ */
+bool Encrypt::compare(std::string hash1, std::string hash2)
+{
+    return (hash1.compare(hash2) == 0);
 }
 

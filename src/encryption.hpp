@@ -7,10 +7,9 @@ class Encrypt
 {
 
 private:
-    // PKCS5_PBKDF2_HMAC_SHA1
-    #define KEY_LEN      32
-    #define KEK_KEY_LEN  20
-    #define ITERATION     1
+
+    #define SHA512_OUTPUT_BYTES 64
+    #define ITERATION           1000
 
 public:
 
@@ -29,14 +28,36 @@ public:
      * @param password
      * @param salt
      */
-    std::string SHA1(std::string password, std::string salt);
+    std::string SHA1(std::string key, std::string salt);
 
     /**
      * @brief PKCS5_PBKDF2 password encryption
      * @param password
      * @param salt
      */
-    std::string PKCS5_PBKDF2(std::string password, std::string salt);
+    std::string PKCS5_PBKDF2(std::string key, std::string salt);
+
+    /**
+     * @brief generate salt hash key
+     * @param password
+     * @param salt
+     */
+    std::string generate_salt(std::string key, std::string salt);
+
+    /**
+     * @brief generate password hash key
+     * @param password
+     * @param salt
+     */
+    std::string generate_password(std::string key, std::string salt);
+
+    /**
+     * @brief Compare valid password hash
+     * @param hash1
+     * @param hash2
+     * @return
+     */
+    bool compare(std::string hash1, std::string hash2);
 
 };
 

@@ -1,4 +1,9 @@
 
+Change Log Update (00.00.40)
+* 2016-04-16
++ Updated from PKCS5_PBKDF2 SHA1 to SHA512 for stronger encryption.
++ Also added SHA1 for Salt hashing.
+
 Change Log Update (00.00.39)
 * 2016-04-14
 + Added both Initial SHA1 and PKCS5_PBKDF2 password encryption routines
