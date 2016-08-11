@@ -1,4 +1,10 @@
 
+Change Log Update (00.00.41)
+* 2016-08-11
++ Reworked inputField to handle pass through data properly.  
++ Reworked so Backspace, Del, and ESC Sequences are not echoed back
++ WIP New User Application
+
 Change Log Update (00.00.40)
 * 2016-04-16
 + Updated from PKCS5_PBKDF2 SHA1 to SHA512 for stronger encryption.

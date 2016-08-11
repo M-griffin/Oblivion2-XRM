@@ -66,9 +66,9 @@ void ModLogon::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_LOGON]          = std::make_pair("Logon Prompt", "|08Logon: |04");
-    value[PROMPT_PASSWORD]       = std::make_pair("Password Prompt", "|08password: |04");
-    value[PROMPT_USE_INVALID]    = std::make_pair("Invalid Entry", "|CR|12Invalid Response! Try again");
+    value[PROMPT_LOGON]          = std::make_pair("Logon Prompt", "|CR|08Lo|07gon|08: |04");
+    value[PROMPT_PASSWORD]       = std::make_pair("Password Prompt", "|CR|08pa|07ssword|08: |04");
+    value[PROMPT_USE_INVALID]    = std::make_pair("Invalid Entry", "|CR|12Invalid Response! Try again.");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -160,6 +160,7 @@ bool ModLogon::logon(const std::string &input)
     // handle input for using ansi color, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key);
+
     if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
     {
         std::cout << "aborted!" << std::endl;
@@ -169,15 +170,6 @@ bool ModLogon::logon(const std::string &input)
         // If ENTER Default to Yes, or Single Y is hit
         if(key.size() > 0)
         {
-            // Set the Session VAriable.
-            //m_session_data->m_is_use_ansi = true;
-
-            // ANSI Selected Text Prompt
-            std::string result = m_session_io.parseTextPrompt(
-                                     m_text_prompts_dao->getPrompt(PROMPT_LOGON)
-                                 );
-            m_session_data->deliver(result);
-
             // Validate User name here...
 
             // If user matches then change mod to ask for password!
@@ -199,8 +191,12 @@ bool ModLogon::logon(const std::string &input)
     else
     {
         // Send back the single input received to show client key presses.
-        m_session_data->deliver(input);
+        // Only if return data shows a processed key returned.
+        if (result != "empty") {
+            m_session_data->deliver(result);
+        }
     }
+
     return m_is_authorized;
 }
 
@@ -224,16 +220,7 @@ bool ModLogon::password(const std::string &input)
     {
         // If ENTER Default to Yes, or Single Y is hit
         if(key.size() > 0)
-        {
-            // Set the Session VAriable.
-            //m_session_data->m_is_use_ansi = true;
-
-            // ANSI Selected Text Prompt
-            std::string result = m_session_io.parseTextPrompt(
-                                     m_text_prompts_dao->getPrompt(PROMPT_PASSWORD)
-                                 );
-            m_session_data->deliver(result);
-
+        {            
             // Validate User password here...
 
             // If passowrd is valid, then marked authorized.
@@ -258,7 +245,10 @@ bool ModLogon::password(const std::string &input)
     else
     {
         // Send back the single input received to show client key presses.
-        m_session_data->deliver(input);
+        // Only if return data shows a processed key returned.
+        if (result != "empty") {
+            m_session_data->deliver(result);
+        }
     }
 
     // If successful login, we'll check the return result.
