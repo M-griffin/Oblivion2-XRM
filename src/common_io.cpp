@@ -1066,22 +1066,24 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
             {
                 if(m_line_buffer.size() > 0)
                 {
-                    //std::cout << "Received DEL ESC Sequence !!!!!" << std::endl;
+                    std::cout << "Received DEL ESC Sequence !!!!!" << std::endl;
                     std::string temp = eraseString(m_line_buffer, numberOfChars(m_line_buffer)-1, 1);
                     m_line_buffer = std::move(temp);
-                    m_column_position =  m_line_buffer.size();
+                    m_column_position = m_line_buffer.size();
                     return "\x1b[D \x1b[D";
                 }
                 else
                 {
                     // Nothing to delete at begining Skip.
-                    return "";
+                    std::cout << "del at begining: " << character_buffer << std::endl;
+                    return "empty";
                 }
             }
             else
             {
                 // Unhandled sequence! Skip and return
-                return ""; // ""
+                std::cout << "Unhandled sequence: " << character_buffer << std::endl;
+                return "empty"; // ""
             }
         }
     }
@@ -1090,6 +1092,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
     {
         if(m_line_buffer.size() > 0)
         {
+            std::cout << "ctrl y: " << character_buffer << std::endl;
             for(int i = numberOfChars(m_line_buffer); i > 0; i--)
             {
                 output_buffer += "\x1b[D \x1b[D";
@@ -1101,7 +1104,8 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         else
         {
             // At beginign of line, nothing to delete!
-            return "";
+            std::cout << "ctrl y beginning of line: " << character_buffer << std::endl;
+            return "empty";
         }
     }
     // Handle BS and DEL as both Destructive Backspace on Fields
@@ -1110,6 +1114,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
     {
         if(m_line_buffer.size() > 0)
         {
+            std::cout << "backspace: " << character_buffer << std::endl;
             std::string temp = eraseString(m_line_buffer, numberOfChars(m_line_buffer)-1, 1);
             m_line_buffer = std::move(temp);
             m_column_position =  m_line_buffer.size();
@@ -1118,7 +1123,8 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         else
         {
             // At begining of Line, nothing to delete.
-            return "";
+            std::cout << "At begining of Line, nothing to bs: " << character_buffer << std::endl;
+            return "empty";
         }
     }
     // Normal Input processing, ASCII and Unicode. Add new functions for size!
@@ -1127,21 +1133,21 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
     {
         if(hidden)
         {
-            //std::cout << "hidden field input: " << character_buffer << std::endl;
+            std::cout << "hidden field input: " << character_buffer << std::endl;
             m_line_buffer += character_buffer;
             m_column_position = numberOfChars(m_line_buffer);
             return "*";
         }
         else
         {
-            //std::cout << "normal field input: " << character_buffer << std::endl;
+            std::cout << "normal field input: " << character_buffer << std::endl;
             m_line_buffer += character_buffer;
             m_column_position = numberOfChars(m_line_buffer);
             return character_buffer;
         }
     }
-    //std::cout << "Past the max length, nothing to add!" << std::endl;
-    return ""; // ""
+    std::cout << "Past the max length, nothing to add!" << std::endl;
+    return "empty"; // ""
 }
 
 

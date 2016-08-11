@@ -1,5 +1,5 @@
 /*
- * Oblivion/2 XRM (c) 2015 Michael Griffin
+ * Oblivion/2 XRM (c) 2015-2016 Michael Griffin
  * A Telnet Server and BBS system modeled after Oblivion/2 bbs software.
  *
  * XRM = Extreme Remake!
@@ -167,7 +167,7 @@ void run(boost::asio::io_service& io_service)
 // auto main(int argc, char* argv[]) -> int
 auto main() -> int
 {
-    std::cout << "Oblivion/2 XRM Server (c) 2015 Michael Griffin." << std::endl;
+    std::cout << "Oblivion/2 XRM Server (c) 2015-2016 Michael Griffin." << std::endl;
 
     CommonIO common;
     GLOBAL_BBS_PATH = common.getProgramPath();

@@ -385,6 +385,8 @@ void ModSignup::setupBackSpace()
 }
 
 
+
+
 /**
  * @brief Check for New User Password
  * @return
@@ -403,6 +405,8 @@ bool ModSignup::newUserPassword(const std::string &input)
         m_is_active = false;
         return false;
     }
+    // else if(result[0] == '\')  NEED DEL And BACKSPACE!
+
     else if(result[0] == '\n')
     {
         // Key == 0 on [ENTER] pressed alone. then invalid!
@@ -413,7 +417,7 @@ bool ModSignup::newUserPassword(const std::string &input)
         }
 
         // Pull in and test aginst new user password.
-        if(key.compare("TeSt") == 0)
+        if(key.compare("Test") == 0)
         {
             std::cout << "Match" << key.size() << std::endl;
         }
@@ -433,7 +437,10 @@ bool ModSignup::newUserPassword(const std::string &input)
     else
     {
         // Send back the single input received to show client key presses.
-        m_session_data->deliver(input);
+        // Only if return data shows a processed key returned.
+        if (result != "empty") {
+            m_session_data->deliver(result);
+        }
     }
 
     return true;

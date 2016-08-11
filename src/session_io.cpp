@@ -241,11 +241,12 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
         // Updates on Keypresses.
         else
         {
-            //std::cout << "menu_system result: " << result << std::endl;
+            std::cout << "input_system result: " << result << std::endl;
             return string_data;
         }
     }
-    //std::cout << "result empty!" << std::endl;
+
+    std::cout << "result empty!" << std::endl;
     return "";
 }
 
@@ -401,6 +402,8 @@ std::string SessionIO::pipeColors(const std::string &color_string)
 std::string SessionIO::parsePipeWithCharsDigits(const std::string &code, int value)
 {
     std::string sequence = "";
+
+    std::cout << "parsePipeWithCharsDigits" << std::endl;
 
     // Check Single letter Sequences
     if(code.size() == 1)
@@ -585,8 +588,8 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
 
     // To make parsing a little faster, pre-fill vector with 50,
     // So it's not allocating each insert.
-    code_map.reserve(50);
-    code_map.resize(50);
+    //code_map.reserve(50);
+    //code_map.resize(50);
 
     // Make a copy that we can modify and process on.
     std::string ansi_string = sequence;
@@ -646,6 +649,8 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
         }
     }
 
+    std::cout << "code_map.size(): " << code_map.size() << std::endl;
+
     // All Global MCI Codes likes standard screens and colors will
     // He handled here, then specific interfaces will break out below this.
     // Break out parsing on which pattern was matched.
@@ -660,6 +665,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
         {
             case 1: // Pipe w/ 2 DIDIT Colors
                 {
+                    std::cout << "Pipe w/ 2 DIDIT Colors" << std::endl;
                     std::string result = std::move(pipeColors(my_matches.m_code));
                     if(result.size() != 0)
                     {
@@ -682,6 +688,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
 
             case 2: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
                 {
+                    std::cout << "Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS" << std::endl;
                     std::string result = std::move(seperatePipeWithCharsDigits(my_matches.m_code));
                     if(result.size() != 0)
                     {
@@ -695,6 +702,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
                 // This one will need replacement in the string parsing
                 // Pass the original string becasue of |DE for delay!
                 {
+                    std::cout << "Pipe w/ 2 CHARS" << std::endl;
                     std::string result = std::move(parsePipeWithChars(my_matches.m_code));
                     if(result.size() != 0)
                     {
@@ -710,6 +718,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
 
             case 4: // Percent w/ 2 CHARS
                 {
+                    std::cout << "Percent w/ 2 CHARS" << std::endl;
                     // Remove for now, haven't gotten this far!
                     ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
                 }
@@ -718,6 +727,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
             case 5: // Pipe w/ 2 Chars and 4 Digits
                 // Mainly used for absolute XY position |XY0101
                 {
+                    std::cout << "Pipe w/ 2 Chars and 4 Digits" << std::endl;
                     // Remove for now, haven't gotten this far!
                     ansi_string.replace(my_matches.m_offset, my_matches.m_length, "       ");
                 }
@@ -799,6 +809,8 @@ std::string SessionIO::parseTextPrompt(const M_StringPair &prompt)
     // If emulation is not active, then we need to remove pipe colors!
     // WIP
     //if (!m_session_data->m_is_use_ansi)
+
+    std::cout << "parseTextPrompt" << std::endl;
 
     std::string text_prompt = prompt.second;
     return pipe2ansi(text_prompt);
