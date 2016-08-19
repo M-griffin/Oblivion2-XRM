@@ -1,6 +1,7 @@
 #ifndef ANSI_PROCESSOR_HPP
 #define ANSI_PROCESSOR_HPP
 
+#include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <stdint.h>
 #include <string>
@@ -141,5 +142,7 @@ public:
     void parseAnsiScreen(char *buff);  // 1
 
 };
+
+typedef boost::shared_ptr<AnsiProcessor> ansi_process_ptr;
 
 #endif // ANSI_PROCESSOR_HPP

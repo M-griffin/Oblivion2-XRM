@@ -22,16 +22,34 @@
  */
 class Config
 {
-
+    
 public:
+
+    // Static Field Lengths to keep fields standard throughout
+    // The internal and external program.
+    static enum {
+
+        sName_length             = 35,
+        sPassword_length         = 35,
+        sDirectory_length        = 35,
+        sAccess_length           = 35,
+        sDefault_color_length    = 3,
+        sDefault_question_length = 35,
+        sControl_string_length   = 80,
+        sQwk_packet_name_length  = 10,
+        sMenu_name_length        = 10,
+        sSingle_key_length       = 1
+
+    } FIELD_LENGTH;
+
 
 // string
     std::string bbs_name_sysop;        // SysopName,
     std::string bbs_name;              // BoardName;
     std::string bbs_uuid;              // new {unique uuid for this bbs for services etc }
-    std::string password_system;         // SysPass,
-    std::string password_sysop;           // System1Pass,
-    std::string password_newuser;         // NewUserPass;
+    std::string password_system;       // SysPass,
+    std::string password_sysop;        // System1Pass,
+    std::string password_newuser;      // NewUserPass;
 
 // int
     int port_telnet;           // new { default telnet port }
@@ -80,8 +98,9 @@ public:
     bool use_screen_prelogin;     // UsePrelogon,
     bool use_screen_welcome;      // UseWelcome,
     bool use_matrix_login;        // SpecialLogin;
-    bool use_newuser_password;
-    bool use_disclaimer;
+    bool use_newuser_password;    // Use a NewUser Password
+    bool use_disclaimer;          // Show Disclaimer
+    bool use_address;             // Ask Address New User Application
 
 // char
     char hidden_input_character;  // HiddenInputChar;
@@ -156,10 +175,10 @@ public:
         : bbs_name_sysop("New OBV2 XRM Sysop")
         , bbs_name("New OBV2 XRM BBS")
         , bbs_uuid("")
-        , password_system("")
-        , password_sysop("")
-        , password_newuser("")
-        , port_telnet(6023)      // Default for Testing
+        , password_system("system")
+        , password_sysop("sysop")
+        , password_newuser("newuser")
+        , port_telnet(6023)
         , port_ssl(443)
         , use_service_telnet(true)
         , use_service_ssl(false)
@@ -196,6 +215,7 @@ public:
         , use_matrix_login(true)
         , use_newuser_password(true)
         , use_disclaimer(true)
+        , use_address(true)
         , hidden_input_character('*')
         , use_auto_validate_users(false)
         , use_newuser_voting(false)

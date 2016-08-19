@@ -158,6 +158,34 @@ bool UsersDao::isTableExists()
 
 
 /**
+ * @brief Run Setup Params for SQL Database.
+  */
+bool UsersDao::firstTimeSetupParams()
+{
+    bool result = false;
+
+    // Make Sure Database Reference is Connected
+    if (!m_users_database.isConnected())
+    {
+        std::cout << "Error, Database is not connected!" << std::endl;
+        return result;
+    }
+
+    // Create Pointer and Connect Query Object to Database.
+    query_ptr qry(new SQLW::Query(m_users_database));
+    if (!qry || !qry->isConnected())
+    {
+        std::cout << "Error, Query has no connection to the database" << std::endl;
+        return result;
+    }
+
+    // Execute Statement.
+    result = qry->execute(cmdFirstTimeSetup);
+    return result;
+}
+
+
+/**
  * @brief Create Users Table
  * If Create Table Fails, skip trying to create index.
  */
@@ -182,6 +210,7 @@ bool UsersDao::createTable()
 
     // Create List of statements to execute in a single transaction.
     std::vector<std::string> statements;
+
     statements.push_back(cmdCreateUserTable);
     statements.push_back(cmdCreateUserIndex);
 
@@ -224,7 +253,7 @@ bool UsersDao::dropTable()
 }
 
 /**
- * @brief Pulls results by FileNames into their Class Variables.
+ * @brief Pulls results by FieldNames into their Class Variables.
  */
 void UsersDao::pullUserResult(query_ptr qry, user_ptr user)
 {

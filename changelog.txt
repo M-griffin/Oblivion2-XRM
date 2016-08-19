@@ -1,4 +1,17 @@
 
+Change Log Update (00.00.42)
+* 2016-08-19
++ Added Enum to config for standard field lengths for limiting field input
+  by the same length through the program without having to hard code in each area.
++ Reworked AnsiProcessor to smart pointer and passes to all modules.  This keeps 
+  track of all screen data output so we know locally where the screen's x/y position
+  is.  This is important for advanced screen redraws and MCI code parsing of positions 
+  on the fly.
++ Completed more work and refining on the new user application
++ Added in initial user database setup on startup and setup for creating new users 
+  in the sign up process.
++ Signup process is still a WIP.
+
 Change Log Update (00.00.41)
 * 2016-08-11
 + Reworked inputField to handle pass through data properly.  

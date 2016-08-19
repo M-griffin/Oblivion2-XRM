@@ -316,6 +316,13 @@ void AnsiProcessor::screenBufferSetPixel(char c)
     if(m_x_position > m_max_x_position)
         m_max_x_position = m_x_position;
 
+
+    // catch screen screen scrolling here one shot.
+    if (m_y_position >= m_number_lines) {
+        screenBufferScrollUp();
+        m_y_position = m_number_lines-1;
+    }
+
     m_screen_pixel.c = c;
     m_screen_pixel.x_position = m_x_position;
     m_screen_pixel.y_position = m_y_position;
@@ -333,7 +340,7 @@ void AnsiProcessor::screenBufferSetPixel(char c)
             m_screen_buffer.at(m_position) = m_screen_pixel;
         else
         {
-            std::cout << "Xposition out of bounds: " << m_x_position-1 << std::endl;
+            std::cout << "position out of bounds: " << m_x_position-1 << std::endl;
         }
     }
     catch(std::exception &e)
@@ -897,11 +904,14 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
                 m_x_position = 1;
                 ++m_y_position;
 
-                //if(!line_wrapping)
-                //{
-                //screenbuffer('\r');
                 esc_sequence.erase();
-                // }
+
+                // catch screen screen scrolling here one shot.
+                if (m_y_position >= m_number_lines) {
+                    screenBufferScrollUp();
+                    m_y_position = m_number_lines-1;
+                }
+
                 continue;
             }
             else if(c == '\r' || c == '\n')
@@ -909,11 +919,14 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
                 m_x_position = 1;
                 ++m_y_position;
 
-                //if(!line_wrapping)
-                //{
-                //screenbuffer('\r');
                 esc_sequence.erase();
-                // }
+
+                // catch screen screen scrolling here one shot.
+                if (m_y_position >= m_number_lines) {
+                    screenBufferScrollUp();
+                    m_y_position = m_number_lines-1;
+                }
+
                 continue;
             }
 

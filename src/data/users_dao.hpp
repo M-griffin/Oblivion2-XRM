@@ -56,6 +56,11 @@ public:
     bool isTableExists();
 
     /**
+     * @brief Run Setup Params for SQL Database.
+     */
+    bool firstTimeSetupParams();
+
+    /**
      * @brief Create Users Database
      * @return
      */

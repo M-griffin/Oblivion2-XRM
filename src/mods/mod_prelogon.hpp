@@ -19,6 +19,9 @@
 class Config;
 typedef boost::shared_ptr<Config> config_ptr;
 
+class AnsiProcessor;
+typedef boost::shared_ptr<AnsiProcessor> ansi_process_ptr;
+
 using boost::asio::deadline_timer;
 
 /**
@@ -33,8 +36,8 @@ class ModPreLogon
     , public ModBase
 {
 public:
-    ModPreLogon(session_data_ptr session_data, config_ptr config)
-        : ModBase(session_data, config)
+    ModPreLogon(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
+        : ModBase(session_data, config, ansi_process)
         , m_session_io(session_data)
         , m_filename("mod_prelogon.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
@@ -135,6 +138,12 @@ public:
      * @brief Displays Terminal Detection after Emulation Detection.
      */
     void displayTerminalDetection();
+
+    /**
+     * @brief Displays Terminal Detection before Asking CodePage.
+     * @return
+     */
+    void setupDisplayTerminalDetection();
 
     /**
      * @brief Ask Setup CodePage CP437 / UTF-8

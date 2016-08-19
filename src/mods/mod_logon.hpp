@@ -17,6 +17,9 @@
 class Config;
 typedef boost::shared_ptr<Config> config_ptr;
 
+class AnsiProcessor;
+typedef boost::shared_ptr<AnsiProcessor> ansi_process_ptr;
+
 /**
  * @class ModLogin
  * @author Michael Griffin
@@ -28,8 +31,8 @@ class ModLogon
     : public ModBase
 {
 public:
-    ModLogon(session_data_ptr session_data, config_ptr config)
-        : ModBase(session_data, config)
+    ModLogon(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
+        : ModBase(session_data, config, ansi_process)
         , m_session_io(session_data)
         , m_filename("mod_logon.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
