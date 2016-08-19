@@ -41,8 +41,9 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     , m_menu_prompt()
     , m_menu_info()
     , m_menu_options()
-    , m_ansi_process(session_data->m_telnet_state->getTermRows(),
-                     session_data->m_telnet_state->getTermCols())
+    , m_ansi_process(new AnsiProcessor(
+                    session_data->m_telnet_state->getTermRows(),
+                    session_data->m_telnet_state->getTermCols()))
     , m_active_pulldownID(0)
     , m_fail_flag(false)
     , m_pulldown_reentrace_flag(false)
@@ -265,7 +266,7 @@ std::string MenuSystem::buildLightBars()
         if(m.PulldownID > 0)
         {
             // Parse for X/Y Position and colors
-            light_bars.append(m_ansi_process.buildPullDownBars(m.PulldownID, active_lightbar));
+            light_bars.append(m_ansi_process->buildPullDownBars(m.PulldownID, active_lightbar));
             active_lightbar = false;
 
             // Add the Option Description
@@ -291,14 +292,14 @@ void MenuSystem::redisplayMenuScreen()
     if(m_is_active_pulldown_menu)
     {
         // Parse the Screen to the Screen Buffer.
-        m_ansi_process.parseAnsiScreen((char *)buffer.c_str());
+        m_ansi_process->parseAnsiScreen((char *)buffer.c_str());
 
         // Screen to String so it can be processed.
-        m_ansi_process.screenBufferToString();
+        m_ansi_process->screenBufferToString();
 
         // Process buffer for PullDown Codes.
         // only if we want result, ignore.., result just for testing at this time!
-        std::string result = std::move(m_ansi_process.screenBufferParse());
+        std::string result = std::move(m_ansi_process->screenBufferParse());
 
         // Now Build the Light bars
         std::string light_bars = buildLightBars();
@@ -374,13 +375,13 @@ void MenuSystem::startupMenu()
         m_is_active_pulldown_menu = true;
 
         // Parse the Screen to the Screen Buffer.
-        m_ansi_process.parseAnsiScreen((char *)buffer.c_str());
+        m_ansi_process->parseAnsiScreen((char *)buffer.c_str());
 
         // Screen to String so it can be processed.
-        m_ansi_process.screenBufferToString();
+        m_ansi_process->screenBufferToString();
 
         // Process buffer for PullDown Codes. results for TESTING, are discarded.
-        std::string result = std::move(m_ansi_process.screenBufferParse());
+        std::string result = std::move(m_ansi_process->screenBufferParse());
 
         // Now Build the Light bars
         std::string light_bars = buildLightBars();
@@ -435,7 +436,7 @@ void MenuSystem::lightbarUpdate(int previous_pulldown_id)
     std::string light_bars = "";
     // Moved to Next Item
     // Turn off Previous Bar
-    light_bars.append(m_ansi_process.buildPullDownBars(previous_pulldown_id, false));
+    light_bars.append(m_ansi_process->buildPullDownBars(previous_pulldown_id, false));
 
     for(auto &m : m_loaded_pulldown_options)
     {
@@ -448,7 +449,7 @@ void MenuSystem::lightbarUpdate(int previous_pulldown_id)
     light_bars.append("\x1b[0m");
 
     // Turn on Current Bar
-    light_bars.append(m_ansi_process.buildPullDownBars(m_active_pulldownID, true));
+    light_bars.append(m_ansi_process->buildPullDownBars(m_active_pulldownID, true));
 
     for(auto &m : m_loaded_pulldown_options)
     {
@@ -611,7 +612,7 @@ void MenuSystem::processMenuOptions(std::string &input)
             int previous_id = m_active_pulldownID;
             if(input == "RT_ARROW" || input == "DN_ARROW")
             {
-                if(m_active_pulldownID < (signed)m_ansi_process.m_pull_down_options.size())
+                if(m_active_pulldownID < (signed)m_ansi_process->m_pull_down_options.size())
                 {
                     ++m_active_pulldownID;
                 }
@@ -630,7 +631,7 @@ void MenuSystem::processMenuOptions(std::string &input)
                 }
                 else
                 {
-                    m_active_pulldownID = (signed)m_ansi_process.m_pull_down_options.size();
+                    m_active_pulldownID = (signed)m_ansi_process->m_pull_down_options.size();
                 }
                 lightbarUpdate(previous_id);
                 continue;
@@ -803,7 +804,7 @@ void MenuSystem::startupModulePreLogon()
     m_input_index = MODULE_PRELOGON_INPUT;
 
     // Allocate the Module here and push to container
-    module_ptr module(new ModPreLogon(m_session_data, m_config));
+    module_ptr module(new ModPreLogon(m_session_data, m_config, m_ansi_process));
     if (!module)
     {
         std::cout << "ModPreLogon Allocation Error!" << std::endl;
@@ -833,7 +834,7 @@ void MenuSystem::startupModuleLogon()
     m_input_index = MODULE_INPUT;
 
     // Allocate the Module here and push to container
-    module_ptr module(new ModLogon(m_session_data, m_config));
+    module_ptr module(new ModLogon(m_session_data, m_config, m_ansi_process));
     if (!module)
     {
         std::cout << "ModLogon Allocation Error!" << std::endl;
@@ -863,7 +864,7 @@ void MenuSystem::startupModuleSignup()
     m_input_index = MODULE_INPUT;
 
     // Allocate the Module here and push to container
-    module_ptr module(new ModSignup(m_session_data, m_config));
+    module_ptr module(new ModSignup(m_session_data, m_config, m_ansi_process));
     if (!module)
     {
         std::cout << "ModSignup Allocation Error!" << std::endl;

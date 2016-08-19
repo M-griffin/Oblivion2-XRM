@@ -19,6 +19,9 @@
 class Config;
 typedef boost::shared_ptr<Config> config_ptr;
 
+class AnsiProcessor;
+typedef boost::shared_ptr<AnsiProcessor> ansi_process_ptr;
+
 /**
  * @class ModSignup
  * @author Michael Griffin
@@ -30,8 +33,8 @@ class ModSignup
     : public ModBase
 {
 public:
-    ModSignup(session_data_ptr session_data, config_ptr config)
-        : ModBase(session_data, config)
+    ModSignup(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
+        : ModBase(session_data, config, ansi_process)
         , m_session_io(session_data)
         , m_filename("mod_signup.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
@@ -165,6 +168,8 @@ public:
     const std::string PROMPT_TEXT_INVALID = "text_invalid";
     const std::string PROMPT_DATE_INVALID = "date_invalid";
     const std::string PROMPT_PASS_INVALID = "pass_invalid";
+    const std::string PROMPT_HANDLE_INVALID = "handle_invalid";
+    const std::string PROMPT_NAME_INVALID = "name_invalid";
     // ... cont
 
 

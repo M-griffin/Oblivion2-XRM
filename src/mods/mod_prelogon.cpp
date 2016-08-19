@@ -1,4 +1,5 @@
 #include "mod_prelogon.hpp"
+#include "../model/config.hpp"
 
 #include <boost/algorithm/string.hpp>
 
@@ -113,14 +114,14 @@ void ModPreLogon::setupEmulationDetection()
     // Deliver ANSI Location Sequence to Detect Emulation Response
     // Only detects if terminal handles ESC responses.
     // Windows Console Telnet will response it's at 259 y!
-    m_session_data->deliver("\x1b[s\x1b[255B\x1b[6n");
-    m_session_data->deliver("\x1b[u");
+    baseProcessAndDeliver("\x1b[s\x1b[255B\x1b[6n");
+    baseProcessAndDeliver("\x1b[u");
 
     // Display Detecting Emulation
     std::string result = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_DETECT_EMULATION)
                          );
-    m_session_data->deliver(result);
+    baseProcessAndDeliver(result);
 
     // Start Timeout for Detection.
     startDetectionTimer();
@@ -138,7 +139,7 @@ void ModPreLogon::setupAskANSIColor()
     std::string result = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_USE_ANSI)
                          );
-    m_session_data->deliver(result);
+    baseProcessAndDeliver(result);
 }
 
 /**
@@ -151,7 +152,7 @@ void ModPreLogon::displayTerminalDetection()
                               m_text_prompts_dao->getPrompt(PROMPT_DETECT_TERMOPTS)
                           );
 
-    m_session_data->deliver(result);
+    baseProcessAndDeliver(result);
 
     // Grab Detected Terminal, ANSI, XTERM, etc..
     // Where grabbing both pairs first so we can parse the local MCI code
@@ -178,7 +179,7 @@ void ModPreLogon::displayTerminalDetection()
         m_session_io.m_common_io.parseLocalMCI(result, mci_code, term);
 
         result = m_session_io.pipe2ansi(result);
-        m_session_data->deliver(result);
+        baseProcessAndDeliver(result);
     }
 
     // Handle Screen Size only display if prompt is not empty!
@@ -193,19 +194,20 @@ void ModPreLogon::displayTerminalDetection()
         m_session_io.m_common_io.parseLocalMCI(result, mci_code, term_size);
 
         result = m_session_io.pipe2ansi(result);
-        m_session_data->deliver(result);
+        baseProcessAndDeliver(result);
     }
+
+    // jump stright to asking code page after terminal detection
+    changeModule(MOD_ASK_CODEPAGE);
 }
+
 
 /**
  * @brief Ask Setup CodePage CP437 / UTF-8
  * @return
  */
 void ModPreLogon::setupAskCodePage()
-{
-    // First Display Terminal Detection
-    displayTerminalDetection();
-
+{   
     std::cout << "setupAskCodePage()" << std::endl;
 
     // Display CodePage Selections, then prompt to ask for selection
@@ -230,7 +232,7 @@ void ModPreLogon::setupAskCodePage()
                  );
     }
 
-    m_session_data->deliver(result);
+    baseProcessAndDeliver(result);
 
 }
 
@@ -317,22 +319,22 @@ void ModPreLogon::emulationCompleted()
     if(m_session_data->m_is_use_ansi)
     {
         // Emulation Detected ANSI
-        std::string result = m_session_io.parseTextPrompt(
+        std::string message = m_session_io.parseTextPrompt(
                                  m_text_prompts_dao->getPrompt(PROMPT_DETECTED_ANSI)
                              );
-        m_session_data->deliver(result);
+        baseProcessAndDeliver(message);
 
         // ANSI Detect, Move to Next Ask CodePage.
-        changeModule(MOD_ASK_CODEPAGE);
+        displayTerminalDetection();
 
     }
     else
     {
         // Emulation Detected NONE
-        std::string result = m_session_io.parseTextPrompt(
+        std::string message = m_session_io.parseTextPrompt(
                                  m_text_prompts_dao->getPrompt(PROMPT_DETECTED_NONE)
                              );
-        m_session_data->deliver(result);
+        baseProcessAndDeliver(message);
 
         // Emulation not detected, ask to use ANSI Color, then move to CodePage.
         changeModule(MOD_ASK_ANSI_COLOR);
@@ -349,7 +351,7 @@ bool ModPreLogon::askANSIColor(const std::string &input)
 
     // handle input for using ansi color, hot key or ENTER after..  hmm
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key);
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
     if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
     {
         std::cout << "aborted!" << std::endl;
@@ -363,40 +365,44 @@ bool ModPreLogon::askANSIColor(const std::string &input)
             if(key.size() == 0)
             {
                 // If ENTER, then display Yes as key press.
-                m_session_data->deliver("Yes");
+                baseProcessAndDeliver("Yes");
             }
 
             // Set ANSI Color Emulation to True
             m_session_data->m_is_use_ansi = true;
 
             // ANSI Selected Text Prompt
-            std::string result = m_session_io.parseTextPrompt(
+            std::string message = m_session_io.parseTextPrompt(
                                      m_text_prompts_dao->getPrompt(PROMPT_ANSI_SELECTED)
                                  );
-            m_session_data->deliver(result);
+
+            baseProcessAndDeliver(message);
 
             // Change to next Module
-            changeModule(MOD_ASK_CODEPAGE);
+            displayTerminalDetection();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
-            std::string result = m_session_io.parseTextPrompt(
+            std::string message = m_session_io.parseTextPrompt(
                                      m_text_prompts_dao->getPrompt(PROMPT_ASCII_SELECTED)
                                  );
+
+            baseProcessAndDeliver(message);
 
             // Set ANSI Color Emulation to False
             m_session_data->m_is_use_ansi = false;
 
             // Change to next module
-            changeModule(MOD_ASK_CODEPAGE);
+            displayTerminalDetection();
         }
         else
         {
-            std::string result = m_session_io.parseTextPrompt(
+            std::string message = m_session_io.parseTextPrompt(
                                      m_text_prompts_dao->getPrompt(PROMPT_USE_INVALID)
                                  );
-            m_session_data->deliver(result);
+
+            baseProcessAndDeliver(message);
 
             // Invalid, Ask again
             setupAskANSIColor();
@@ -405,7 +411,10 @@ bool ModPreLogon::askANSIColor(const std::string &input)
     else
     {
         // Send back the single input received to show client key presses.
-        m_session_data->deliver(input);
+        // Only if return data shows a processed key returned.
+        if (result != "empty") {
+            baseProcessAndDeliver(result);
+        }
     }
     return true;
 }
@@ -420,7 +429,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
 
     // handle input for using ansi color, hot key or ENTER after..  hmm
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key);
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
     if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
     {
         std::cout << "aborted!" << std::endl;
@@ -434,14 +443,14 @@ bool ModPreLogon::askCodePage(const std::string &input)
             if(key.size() == 0)
             {
                 // If ENTER, then display Yes as key press.
-                m_session_data->deliver("Yes");
+                baseProcessAndDeliver("Yes");
             }
 
-            std::string result = "";
+            std::string message = "";
             if(boost::iequals(m_term_type, "undetected") ||
                     boost::iequals(m_term_type, "ansi"))
             {
-                result = m_session_io.parseTextPrompt(
+                message = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
                          );
 
@@ -450,7 +459,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
             }
             else
             {
-                result = m_session_io.parseTextPrompt(
+                message = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
                          );
 
@@ -459,7 +468,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
             }
 
             // Deliver result.
-            m_session_data->deliver(result);
+            baseProcessAndDeliver(message);
 
             // Change to next Module ( or Exit Prelogin and move to Login module!!
             m_is_active = false;
@@ -467,11 +476,11 @@ bool ModPreLogon::askCodePage(const std::string &input)
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
-            std::string result = "";
+            std::string message = "";
             if(boost::iequals(m_term_type, "undetected") ||
                     boost::iequals(m_term_type, "ansi"))
             {
-                result = m_session_io.parseTextPrompt(
+                message = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
                          );
 
@@ -480,7 +489,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
             }
             else
             {
-                result = m_session_io.parseTextPrompt(
+                message = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
                          );
 
@@ -490,7 +499,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
             }
 
             // Deliver result.
-            m_session_data->deliver(result);
+            baseProcessAndDeliver(message);
 
             // Change to next Module ( or Exit Prelogin and move to Login module!!
             m_is_active = false;
@@ -498,10 +507,11 @@ bool ModPreLogon::askCodePage(const std::string &input)
         else
         {
             // Invalid Entry, try again!
-            std::string result = m_session_io.parseTextPrompt(
+            std::string message = m_session_io.parseTextPrompt(
                                      m_text_prompts_dao->getPrompt(PROMPT_USE_INVALID)
                                  );
-            m_session_data->deliver(result);
+
+            baseProcessAndDeliver(message);
 
             // Invalid, Ask again
             setupAskCodePage();
@@ -510,7 +520,10 @@ bool ModPreLogon::askCodePage(const std::string &input)
     else
     {
         // Send back the single input received to show client key presses.
-        m_session_data->deliver(input);
+        // Only if return data shows a processed key returned.
+        if (result != "empty") {
+            baseProcessAndDeliver(result);
+        }
     }
 
     return true;

@@ -1,4 +1,5 @@
 #include "mod_logon.hpp"
+#include "../model/config.hpp"
 
 #include <iostream>
 #include <string>
@@ -96,7 +97,7 @@ void ModLogon::setupLogon()
     std::string result = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_LOGON)
                          );
-    m_session_data->deliver(result);
+    baseProcessAndDeliver(result);
 }
 
 
@@ -110,7 +111,7 @@ void ModLogon::setupPassword()
     std::string result = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_PASSWORD)
                          );
-    m_session_data->deliver(result);
+    baseProcessAndDeliver(result);
 }
 
 /**
@@ -123,7 +124,7 @@ void ModLogon::setupPasswordQuestion()
     std::string result = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_PASSWORD_QUESTION)
                          );
-    m_session_data->deliver(result);
+    baseProcessAndDeliver(result);
 }
 
 /**
@@ -136,7 +137,7 @@ void ModLogon::setupPasswordAnswer()
     std::string result = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_PASSWORD_ANSWER)
                          );
-    m_session_data->deliver(result);
+    baseProcessAndDeliver(result);
 }
 
 /**
@@ -159,7 +160,7 @@ bool ModLogon::logon(const std::string &input)
 
     // handle input for using ansi color, hot key or ENTER after..  hmm
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key);
+    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
 
     if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
     {
@@ -182,7 +183,7 @@ bool ModLogon::logon(const std::string &input)
             std::string result = m_session_io.parseTextPrompt(
                                      m_text_prompts_dao->getPrompt(PROMPT_USE_INVALID)
                                  );
-            m_session_data->deliver(result);
+            baseProcessAndDeliver(result);
 
             // Invalid, Ask again
             setupLogon();
@@ -193,7 +194,7 @@ bool ModLogon::logon(const std::string &input)
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
         if (result != "empty") {
-            m_session_data->deliver(result);
+            baseProcessAndDeliver(result);
         }
     }
 
@@ -211,7 +212,7 @@ bool ModLogon::password(const std::string &input)
 
     // handle input for using ansi color, hot key or ENTER after..  hmm
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key);
+    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length);
     if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
     {
         std::cout << "aborted!" << std::endl;
@@ -236,7 +237,7 @@ bool ModLogon::password(const std::string &input)
             std::string result = m_session_io.parseTextPrompt(
                                      m_text_prompts_dao->getPrompt(PROMPT_USE_INVALID)
                                  );
-            m_session_data->deliver(result);
+            baseProcessAndDeliver(result);
 
             // Invalid, Ask again
             setupLogon();
@@ -247,7 +248,7 @@ bool ModLogon::password(const std::string &input)
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
         if (result != "empty") {
-            m_session_data->deliver(result);
+            baseProcessAndDeliver(result);
         }
     }
 

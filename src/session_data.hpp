@@ -4,15 +4,20 @@
 #include "connection_base.hpp"
 #include "telnet_decoder.hpp"
 #include "session_manager.hpp"
+#include "common_io.hpp"
 
 #include "model/structures.hpp"
 #include "model/struct_compat.hpp"
+#include "model/users.hpp"
+#include "data/users_dao.hpp"
 
 #include <boost/asio.hpp>
 #include <boost/asio/deadline_timer.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
+
+#include "libSqliteWrapped.h"
 
 #include <string>
 
@@ -21,6 +26,7 @@ using boost::asio::ip::tcp;
 
 class StateManager;
 typedef boost::shared_ptr<StateManager>	state_manager_ptr;
+
 
 /**
  * @class SessionData
@@ -44,7 +50,9 @@ public:
         , m_input_deadline(io_service)
         , m_state_manager(state_manager)
         , m_io_service(io_service)
-        , m_user_record()
+        , m_common_io()
+        , m_user_database(USERS_DATABASE)
+        , m_user_record(new Users())
         , m_node_number(0)
         , m_is_use_ansi(true)
         , m_output_encoding("cp437")
@@ -144,12 +152,24 @@ public:
             return;
         }
 
+        std::string outputBuffer = "";
+
+        // handle output encoding, if utf-8 translate data accordingly.
+        if (m_output_encoding != "cp437")
+        {
+            outputBuffer = m_common_io.translateUnicode(msg);
+        }
+        else
+        {
+            outputBuffer = msg;
+        }
+
         if(m_connection->is_open())
         {
             if(m_connection->m_is_secure)
             {
                 boost::asio::async_write(m_connection->m_secure_socket,
-                                         boost::asio::buffer(msg, msg.size()),
+                                         boost::asio::buffer(outputBuffer, outputBuffer.size()),
                                          boost::bind(&SessionData::handleWrite, shared_from_this(),
                                                      boost::asio::placeholders::error));
 
@@ -157,7 +177,7 @@ public:
             else
             {
                 boost::asio::async_write(m_connection->m_normal_socket,
-                                         boost::asio::buffer(msg, msg.size()),
+                                         boost::asio::buffer(outputBuffer, outputBuffer.size()),
                                          boost::bind(&SessionData::handleWrite, shared_from_this(),
                                                      boost::asio::placeholders::error));
             }
@@ -251,9 +271,12 @@ public:
     state_manager_ptr     m_state_manager;
     boost::asio::io_service& m_io_service;
 
-    // Temp while testing.
-    UserRec               m_user_record;
+    CommonIO              m_common_io;
 
+    // Temp while testing.
+    SQLW::Database        m_user_database;
+    user_ptr              m_user_record;
+    
     int                   m_node_number;
     bool                  m_is_use_ansi;
     std::string           m_output_encoding;

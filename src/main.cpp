@@ -27,7 +27,10 @@
 #include "communicator.hpp"
 #include "common_io.hpp"
 
-//#include "libSqliteWrapped.h"
+// Needed for Initializing and checking users data is setup
+// On startup.
+#include "data/users_dao.hpp"
+#include "libSqliteWrapped.h"
 //#include "menu_system.hpp"
 
 #include <cstdlib>
@@ -53,6 +56,7 @@ std::string GLOBAL_BBS_PATH = "";
 std::string GLOBAL_DATA_PATH = "";
 std::string GLOBAL_MENU_PATH = "";
 std::string GLOBAL_TEXTFILE_PATH = "";
+std::string USERS_DATABASE = "";
 
 using boost::asio::ip::tcp;
 
@@ -177,6 +181,45 @@ auto main() -> int
     GLOBAL_DATA_PATH = GLOBAL_BBS_PATH + "DATA";
     GLOBAL_MENU_PATH = GLOBAL_BBS_PATH + "MENU";
     GLOBAL_TEXTFILE_PATH = GLOBAL_BBS_PATH + "TEXTFILE";
+
+    // Setup Users Database name and path
+    USERS_DATABASE = GLOBAL_DATA_PATH;
+
+    #ifdef _WIN32
+    USERS_DATABASE.append("\\");
+    #else
+    USERS_DATABASE.append("/");
+    #endif
+
+    USERS_DATABASE.append("xrm_users.sqlite3");
+
+    // Check and Setup users database if tables are not setup
+    SQLW::Database user_database(USERS_DATABASE);
+
+    // Link to users dao for data access object
+    users_dao_ptr user_dao(new UsersDao(user_database));
+
+    // Verify if the user table exists.
+    if (!user_dao->isTableExists())
+    {
+        std::cout << "doesn't exist (user table)." << std::endl;
+
+        // Setup database Param, cache sies etc..
+        if (!user_dao->firstTimeSetupParams())
+        {
+            std::cout << "unable to execute firstTimeSetupParams (user table)." << std::endl;
+            assert(false);
+        }
+
+        // Setup create users table and indexes.
+        if (!user_dao->createTable())
+        {
+            std::cout << "unable to create (user table)." << std::endl;
+            assert(false);
+        }
+
+        std::cout << "user table created successfully." << std::endl;
+    }
     
     // Start System Services and Main Loop.
     boost::asio::io_service io_service;
