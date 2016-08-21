@@ -93,6 +93,8 @@ public:
     bool bIgnoreTimeLimit;
     bool bAllowPurge;
 
+    int iSecurityIndex;
+
     // Default User ID to -1 so we know it's not active!
     Users()
         : iId(-1)
@@ -145,6 +147,7 @@ public:
         , bClearOrScroll(true)
         , bIgnoreTimeLimit(false)
         , bAllowPurge(true)
+        , iSecurityIndex(-1)
     { }
     ~Users() { }
 

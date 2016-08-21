@@ -41,8 +41,11 @@ public:
     // Handle to Database
     SQLW::Database &m_users_database;
 
+    std::string strTableName;
+
     // Static Queries
     std::string cmdFirstTimeSetup;
+
     std::string cmdUserTableExists;
     std::string cmdCreateUserTable;
     std::string cmdCreateUserIndex;
@@ -78,7 +81,7 @@ public:
     std::string insertUserQryString(query_ptr qry, user_ptr user);
 
     /**
-     * @brief Creates QueryString to Update Existing User Record
+     * @brief Creates Query String to Update Existing User Record
      */
     std::string updateUserQryString(query_ptr qry, user_ptr user);
 
@@ -116,7 +119,7 @@ public:
     void fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::pair<std::string, std::string> > &values);
 
     /**
-     * @brief Check if the Database Exists.
+     * @brief Return User Record By Id.
      * @return
      */
     user_ptr getUserById(long userId);

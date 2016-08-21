@@ -450,7 +450,9 @@ bool ModPreLogon::askCodePage(const std::string &input)
             if(boost::iequals(m_term_type, "undetected") ||
                     boost::iequals(m_term_type, "ansi"))
             {
-                message = m_session_io.parseTextPrompt(
+                // Switch to ISO, then CP437 Character Set.
+                message = "\x1b%@\x1b(U";
+                message += m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
                          );
 
@@ -459,7 +461,9 @@ bool ModPreLogon::askCodePage(const std::string &input)
             }
             else
             {
-                message = m_session_io.parseTextPrompt(
+                // Switch to Unicode Character Set.
+                message = "\x1b%@\x1b%G";
+                message += m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
                          );
 
@@ -480,7 +484,9 @@ bool ModPreLogon::askCodePage(const std::string &input)
             if(boost::iequals(m_term_type, "undetected") ||
                     boost::iequals(m_term_type, "ansi"))
             {
-                message = m_session_io.parseTextPrompt(
+                // Switch to Unicode Character Set.
+                message = "\x1b%@\x1b%G";
+                message += m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
                          );
 
@@ -489,7 +495,9 @@ bool ModPreLogon::askCodePage(const std::string &input)
             }
             else
             {
-                message = m_session_io.parseTextPrompt(
+                // Switch to ISO, then CP437 Character Set.
+                message = "\x1b%@\x1b(U";
+                message += m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
                          );
 

@@ -9,21 +9,13 @@
 #include <iostream>
 #include <string>
 
-/*
- * void enforceForeignKeys( sqlite3* db, bool enforceForeignKeyConstraints ) {
-
-    int expectedNewValue = enforceForeignKeyConstraints ? 1 : 0;
-    int actualNewValue;
-
-    int err = sqlite3_db_config( db, SQLITE_DBCONFIG_ENABLE_FKEY, expectedNewValue, &actualNewValue);
-    if( err != SQLITE_OK ) throw err;
-    if( actualNewValue != expectedNewValue ) throw SOME_USER_DEFINED_ERROR;
-}
- */
 
 UsersDao::UsersDao(SQLW::Database &database)
     : m_users_database(database)
 {
+
+    // Setup Table name
+    strTableName = "users";
 
     /**
      * Pre Popluate Static Queries one Time
@@ -35,13 +27,13 @@ UsersDao::UsersDao(SQLW::Database &database)
         "PRAGMA foreign_keys=ON; "
         "PRAGMA default_cache_size=10000; "
         "PRAGMA cache_size=10000; ";
-
+    
     // Check if Database Exists.
-    cmdUserTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='users' COLLATE NOCASE;";
-   
+    cmdUserTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + strTableName + "' COLLATE NOCASE;";
+
     // Create Users Table Query (SQLite Only for the moment)
     cmdCreateUserTable =
-        "CREATE TABLE IF NOT EXISTS users ( "
+        "CREATE TABLE IF NOT EXISTS " + strTableName + " ( "
         "iId               INTEGER PRIMARY KEY, "
         "sHandle           TEXT NOT NULL, "
         "sRealName         TEXT NOT NULL, "
@@ -93,14 +85,17 @@ UsersDao::UsersDao(SQLW::Database &database)
         "bDoPause          BOOLEAN NOT NULL, "
         "bClearOrScroll    BOOLEAN NOT NULL, "
         "bIgnoreTimeLimit  BOOLEAN NOT NULL, "
-        "bAllowPurge       BOOLEAN NOT NULL "
+        "bAllowPurge       BOOLEAN NOT NULL, "
+        "iSecurityIndex    INT NOT NULL, "
+        "FOREIGN KEY(iSecurityIndex) REFERENCES Secutiry(iId) ON DELETE CASCADE "
         "); ";
+
 
     cmdCreateUserIndex =
         "CREATE UNIQUE INDEX IF NOT EXISTS users_idx "
-        "ON users (sHandle, sRealName, sEmail); ";
+        "ON " + strTableName + " (sHandle, sRealName, sEmail); ";
 
-    cmdDropUserTable = "DROP TABLE IF EXISTS users; ";
+    cmdDropUserTable = "DROP TABLE IF EXISTS " + strTableName + "; ";
     cmdDropUserIndex = "DROP INDEX IF EXISTS users_idx; ";
 
 }
@@ -307,6 +302,7 @@ void UsersDao::pullUserResult(query_ptr qry, user_ptr user)
     qry->getFieldByName("bClearOrScroll", user->bClearOrScroll);
     qry->getFieldByName("bIgnoreTimeLimit", user->bIgnoreTimeLimit);
     qry->getFieldByName("bAllowPurge", user->bAllowPurge);
+    qry->getFieldByName("iSecurityIndex", user->iSecurityIndex);
 }
 
 
@@ -367,6 +363,9 @@ void UsersDao::fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::
     values.push_back(qry->translateFieldName("bClearOrScroll", user->bClearOrScroll));
     values.push_back(qry->translateFieldName("bIgnoreTimeLimit", user->bIgnoreTimeLimit));
     values.push_back(qry->translateFieldName("bAllowPurge", user->bAllowPurge));
+    values.push_back(qry->translateFieldName("iSecurityIndex", user->iSecurityIndex));
+
+
 }
 
 
@@ -380,7 +379,7 @@ std::string UsersDao::insertUserQryString(query_ptr qry, user_ptr user)
     std::vector< std::pair<std::string, std::string> >::iterator it;
     std::vector< std::pair<std::string, std::string> > values;
 
-    ssColumn << "INSERT INTO users (";
+    ssColumn << "INSERT INTO " + strTableName + " (";
     ssType << ") VALUES (";
 
     // Populate the Pairs.
@@ -460,7 +459,8 @@ std::string UsersDao::insertUserQryString(query_ptr qry, user_ptr user)
         user->bDoPause,
         user->bClearOrScroll,
         user->bIgnoreTimeLimit,
-        user->bAllowPurge
+        user->bAllowPurge,
+        user->iSecurityIndex
     );
 
     return result;
@@ -477,7 +477,7 @@ std::string UsersDao::updateUserQryString(query_ptr qry, user_ptr user)
     std::vector< std::pair<std::string, std::string> > values;
 
     // Setup start of Statement
-    ssColumn << "UPDATE users SET ";
+    ssColumn << "UPDATE " + strTableName + " SET ";
 
     // Populate the Pairs. Variable = %Q formatted string.
     fillColumnValues(qry, user, values);
@@ -550,6 +550,7 @@ std::string UsersDao::updateUserQryString(query_ptr qry, user_ptr user)
         user->bClearOrScroll,
         user->bIgnoreTimeLimit,
         user->bAllowPurge,
+        user->iSecurityIndex,
         user->iId
     );
 
@@ -652,7 +653,7 @@ bool UsersDao::deleteUserRecord(long userId)
     }
 
     // Build string
-    std::string queryString = sqlite3_mprintf("DELETE FROM users WHERE iId = %ld;", userId);
+    std::string queryString = sqlite3_mprintf("DELETE FROM %Q WHERE iId = %ld;", strTableName, userId);
 
     // Execute Update in a Transaction, rollback if fails.
     std::vector<std::string> statements;
@@ -686,7 +687,7 @@ user_ptr UsersDao::getUserById(long userId)
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM users WHERE iID = %ld;", userId);
+    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iID = %ld;", strTableName, userId);
 
     // Execute Query.
     if (qry->getResult(queryString))
@@ -734,7 +735,8 @@ user_ptr UsersDao::getUserByHandle(std::string name)
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM users WHERE sHandle = %Q; COLLATE NOCASE;", name.c_str());
+    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sHandle = %Q; COLLATE NOCASE;",
+        strTableName, name.c_str());
 
     // Execute Query.
     if (qry->getResult(queryString))
@@ -782,7 +784,8 @@ user_ptr UsersDao::getUserByRealName(std::string name)
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM users WHERE sRealName = %Q COLLATE NOCASE;", name.c_str());
+    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sRealName = %Q COLLATE NOCASE;",
+        strTableName, name.c_str());
 
     // Execute Query.
     if (qry->getResult(queryString))
@@ -829,7 +832,8 @@ user_ptr UsersDao::getUserByEmail(std::string email)
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM users WHERE sEmail = %Q COLLATE NOCASE;", email.c_str());
+    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sEmail = %Q COLLATE NOCASE;",
+        strTableName, email.c_str());
 
     // create a test3 table
     if (qry->getResult(queryString))
