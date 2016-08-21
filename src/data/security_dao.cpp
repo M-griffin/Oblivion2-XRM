@@ -34,14 +34,15 @@ SecurityDao::SecurityDao(SQLW::Database &database)
     // Crate Seciroty Table Query (SQLite Only for the moment)
     cmdCreateSecurityTable =
         "CREATE TABLE IF NOT EXISTS " + strTableName + " ( "
-        "iId               INTEGER PRIMARY KEY, "
-        "sPasswordHash     TEXT NOT NULL, "
-        "sSaltHash         TEXT NOT NULL "
+        "iId                   INTEGER PRIMARY KEY, "
+        "sPasswordHash         TEXT NOT NULL, "
+        "sSaltHash             TEXT NOT NULL, "
+        "sChallengeQuestion    TEXT NOT NULL, "
+        "sChallengeAnswerHash  TEXT NOT NULL "
         "); ";
 
     // Drops and cleanup security table.
     cmdDropSecurityTable = "DROP TABLE IF EXISTS " + strTableName + "; ";
-
 }
 
 SecurityDao::~SecurityDao()
@@ -196,6 +197,8 @@ void SecurityDao::pullSecurityResult(query_ptr qry, security_ptr security)
     qry->getFieldByName("iId", security->iId);
     qry->getFieldByName("sPasswordHash", security->sPasswordHash);
     qry->getFieldByName("sSaltHash", security->sSaltHash);
+    qry->getFieldByName("sChallengeQuestion", security->sChallengeQuestion);
+    qry->getFieldByName("sChallengeAnswerHash", security->sChallengeAnswerHash);
 }
 
 
@@ -209,6 +212,8 @@ void SecurityDao::fillColumnValues(query_ptr qry, security_ptr security, std::ve
     // values.push_back(qry->translateFieldName("iId", security->iId));
     values.push_back(qry->translateFieldName("sPasswordHash", security->sPasswordHash));
     values.push_back(qry->translateFieldName("sSaltHash", security->sSaltHash));
+    values.push_back(qry->translateFieldName("sChallengeQuestion", security->sChallengeQuestion));
+    values.push_back(qry->translateFieldName("sChallengeAnswerHash", security->sChallengeAnswerHash));
 }
 
 
@@ -255,7 +260,9 @@ std::string SecurityDao::insertSecurityQryString(query_ptr qry, security_ptr sec
     // Mprint statement to avoid injections.
     std::string result = sqlite3_mprintf(newQueryString.c_str(),
         security->sPasswordHash.c_str(),
-        security->sSaltHash.c_str()
+        security->sSaltHash.c_str(),
+        security->sChallengeQuestion.c_str(),
+        security->sChallengeAnswerHash.c_str()
     );
 
     return result;
@@ -298,6 +305,8 @@ std::string SecurityDao::updateSecurityQryString(query_ptr qry, security_ptr sec
     std::string result = sqlite3_mprintf(newQueryString.c_str(),
         security->sPasswordHash.c_str(),
         security->sSaltHash.c_str(),
+        security->sChallengeQuestion.c_str(),
+        security->sChallengeAnswerHash.c_str(),
         security->iId
     );
 

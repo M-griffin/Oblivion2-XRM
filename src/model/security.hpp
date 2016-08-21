@@ -22,11 +22,15 @@ public:
     long iId;
     std::string sPasswordHash;
     std::string sSaltHash;
+    std::string sChallengeQuestion;
+    std::string sChallengeAnswerHash;
 
     Security()
         : iId(-1)
         , sPasswordHash("")
         , sSaltHash("")
+        , sChallengeQuestion("")
+        , sChallengeAnswerHash("")
     { }
     ~Security() { }
 
