@@ -1,4 +1,13 @@
 
+Change Log Update (00.00.43)
+* 2016-08-21
++ Created Security Table, Model and Dao for storing password and salt hashes
+  per user.  This will have a foreign key linked to the user record.
++ Setup the tables in main and tested the dao
++ More updates to the signup process, added date validation
++ Plugged in the encryption hashing for passwords
++ Also Added ESC Sequences for proper CP437 to UTF-8 selection for Terminal Support
+
 Change Log Update (00.00.42)
 * 2016-08-19
 + Added Enum to config for standard field lengths for limiting field input
@@ -11,6 +20,9 @@ Change Log Update (00.00.42)
 + Added in initial user database setup on startup and setup for creating new users 
   in the sign up process.
 + Signup process is still a WIP.
++ Also plugged in the ansi processor to the modules, all output should be sent through
+  the local screen buffer to we can pick up MCI codes on screens at any point in the scroll
+  This allows dynamic lightbar on any screen without hard coding specific positions!
 
 Change Log Update (00.00.41)
 * 2016-08-11

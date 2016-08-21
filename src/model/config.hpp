@@ -38,7 +38,8 @@ public:
         sControl_string_length   = 80,
         sQwk_packet_name_length  = 10,
         sMenu_name_length        = 10,
-        sSingle_key_length       = 1
+        sSingle_key_length       = 1,
+        sDate_length             = 10
 
     } FIELD_LENGTH;
 

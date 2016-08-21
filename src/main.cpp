@@ -29,6 +29,7 @@
 
 // Needed for Initializing and checking users data is setup
 // On startup.
+#include "data/security_dao.hpp"
 #include "data/users_dao.hpp"
 #include "libSqliteWrapped.h"
 //#include "menu_system.hpp"
@@ -193,60 +194,89 @@ auto main() -> int
 
     USERS_DATABASE.append("xrm_users.sqlite3");
 
-    // Check and Setup users database if tables are not setup
-    SQLW::Database user_database(USERS_DATABASE);
-
-    // Link to users dao for data access object
-    users_dao_ptr user_dao(new UsersDao(user_database));
-
-    // Verify if the user table exists.
-    if (!user_dao->isTableExists())
+    // Setup isolated scope for smart pointers and clean up.
     {
-        std::cout << "doesn't exist (user table)." << std::endl;
+        // Check and Setup users database if tables are not setup
+        SQLW::Database user_database(USERS_DATABASE);
 
-        // Setup database Param, cache sies etc..
-        if (!user_dao->firstTimeSetupParams())
+        // Link to users dao for data access object
+        users_dao_ptr user_dao(new UsersDao(user_database));
+
+        // Link to security dao for data access object
+        security_dao_ptr security_dao(new SecurityDao(user_database));
+
+        // Verify if the security table exists.
+        // Security must be present before user becasue of foreign key.
+        if (!security_dao->isTableExists())
         {
-            std::cout << "unable to execute firstTimeSetupParams (user table)." << std::endl;
+            std::cout << "doesn't exist (security table)." << std::endl;
+
+            // Setup database Param, cache sies etc..
+            if (!security_dao->firstTimeSetupParams())
+            {
+                std::cout << "unable to execute firstTimeSetupParams (security table)." << std::endl;
+                assert(false);
+            }
+
+            // Setup create users table and indexes.
+            if (!security_dao->createTable())
+            {
+                std::cout << "unable to create (security table)." << std::endl;
+                assert(false);
+            }
+
+            std::cout << "security table created successfully." << std::endl;
+        }
+
+        // Verify if the user table exists.
+        if (!user_dao->isTableExists())
+        {
+            std::cout << "doesn't exist (user table)." << std::endl;
+
+            // Setup database Param, cache sies etc..
+            if (!user_dao->firstTimeSetupParams())
+            {
+                std::cout << "unable to execute firstTimeSetupParams (user table)." << std::endl;
+                assert(false);
+            }
+
+            // Setup create users table and indexes.
+            if (!user_dao->createTable())
+            {
+                std::cout << "unable to create (user table)." << std::endl;
+                assert(false);
+            }
+
+            std::cout << "user table created successfully." << std::endl;
+        }
+       
+        // NEW Loading and saving default Configuration file to XML
+
+        config_ptr config(new Config());
+        if (!config)
+        {
+            std::cout << "Unable to allocate config structure" << std::endl;
             assert(false);
         }
 
-        // Setup create users table and indexes.
-        if (!user_dao->createTable())
+        // Handle to Data Access Object,  at the moment were not using directories
+        // Setup in the config, everything is branched from the main path.
+        // Later on we'll check config for overides only.
+        ConfigDao cfg(config, GLOBAL_BBS_PATH);
+
+        if (!cfg.fileExists())
         {
-            std::cout << "unable to create (user table)." << std::endl;
-            assert(false);
+            cfg.saveConfig(config);
         }
 
-        std::cout << "user table created successfully." << std::endl;
     }
-    
+
     // Start System Services and Main Loop.
     boost::asio::io_service io_service;
 
-    // NEW Loading and saving default Configuration file to XML
-
-    config_ptr config(new Config());;
-    if (!config)
-    {
-        std::cout << "Unable to allocate config structure" << std::endl;
-        assert(false);
-    }
-
-    // Handle to Data Access Object,  at the moment were not using directories
-    // Setup in the config, everything is branched from the main path.
-    // Later on we'll check config for overides only.
-    ConfigDao cfg(config, GLOBAL_BBS_PATH);
-
-    if (!cfg.fileExists())
-    {
-        cfg.saveConfig(config);
-    }
-
-
     // Load BBS Configuration here into Global Singleton.
     //TheCommunicator::instance()->attachConfig(config);
-    
+
     // start io_service.run( ) in separate thread
     auto t = std::thread(&run, std::ref(io_service));
 

@@ -1,6 +1,9 @@
 #ifndef ENCRYPTION_HPP
 #define ENCRYPTION_HPP
 
+
+#include <boost/smart_ptr/shared_ptr.hpp>
+
 #include <string>
 
 class Encrypt
@@ -60,5 +63,7 @@ public:
     bool compare(std::string hash1, std::string hash2);
 
 };
+
+typedef boost::shared_ptr<Encrypt> encrypt_ptr;
 
 #endif // ENCRYPTION_HPP

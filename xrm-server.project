@@ -54,6 +54,8 @@
       <File Name="src/data/text_prompts_dao.cpp"/>
       <File Name="src/data/config_dao.cpp"/>
       <File Name="src/data/config_dao.hpp"/>
+      <File Name="src/data/security_dao.cpp"/>
+      <File Name="src/data/security_dao.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
       <File Name="src/mods/mod_base.hpp"/>
@@ -75,6 +77,7 @@
       <File Name="src/model/structures.hpp"/>
       <File Name="src/model/users.hpp"/>
       <File Name="src/model/config.hpp"/>
+      <File Name="src/model/security.hpp"/>
     </VirtualDirectory>
     <File Name="src/session_manager.cpp"/>
     <File Name="src/session_manager.hpp"/>

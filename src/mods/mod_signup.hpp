@@ -4,12 +4,15 @@
 #include "mod_base.hpp"
 
 #include "../model/structures.hpp"
+#include "../model/security.hpp"
 #include "../model/users.hpp"
+
 #include "../data/text_prompts_dao.hpp"
 #include "../data/users_dao.hpp"
 
 #include "../session_data.hpp"
 #include "../session_io.hpp"
+#include "../encryption.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
@@ -39,6 +42,8 @@ public:
         , m_filename("mod_signup.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
         , m_user_record(new Users())
+        , m_encryption(new Encrypt())
+        , m_security_record(new Security())
         , m_mod_function_index(MOD_NUP)
         , m_is_text_prompt_exist(false)
     {
@@ -446,9 +451,12 @@ private:
     std::string          m_filename;
     text_prompts_dao_ptr m_text_prompts_dao;
     user_ptr             m_user_record;
+    encrypt_ptr          m_encryption;
+    security_ptr         m_security_record;
 
     int                  m_mod_function_index;
     bool                 m_is_text_prompt_exist;
+
 };
 
 #endif // MOD_SIGNUP_HPP

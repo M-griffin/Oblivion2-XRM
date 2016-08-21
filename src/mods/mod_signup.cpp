@@ -2,9 +2,16 @@
 
 #include "../model/config.hpp"
 #include "../model/users.hpp"
+#include "../encryption.hpp"
+
+#include <boost/regex.hpp>
 
 #include <iostream>
 #include <string>
+#include <sstream>
+#include <iomanip>
+#include <ctime>
+
 
 
 /**
@@ -77,7 +84,7 @@ void ModSignup::createTextPrompts()
     value[PROMPT_HANDLE]             = std::make_pair("User Handle", "|08|CREnter Handle : |04");
     value[PROMPT_REAL_NAME]          = std::make_pair("Real Name", "|08|CREnter Real Name : |04");
     value[PROMPT_ADDRESS]            = std::make_pair("Address", "|08|CRAddress : |04");
-    value[PROMPT_LOCATION]           = std::make_pair("Location", "|08|CRLocation : |04");
+    value[PROMPT_LOCATION]           = std::make_pair("Location", "|08|CRCity/State : |04");
     value[PROMPT_COUNTRY]            = std::make_pair("Country", "|08|CRCountry : |04");
     value[PROMPT_EMAIL]              = std::make_pair("Email Address", "|08|CREmail Address : |04");
     value[PROMPT_USER_NOTE]          = std::make_pair("User Note", "|08|CRAffiliations / User Note : |04");
@@ -96,7 +103,7 @@ void ModSignup::createTextPrompts()
     // Invalid.
     value[PROMPT_TEXT_INVALID]       = std::make_pair("Invalid Text", "|CR|04Invalid entry!");
     value[PROMPT_DATE_INVALID]       = std::make_pair("Invalid Date", "|CR|04Invalid date entered!");
-    value[PROMPT_PASS_INVALID]       = std::make_pair("Invalid/Non Matching Password", "|CR|04Invalid password!");
+    value[PROMPT_PASS_INVALID]       = std::make_pair("Invalid/Non Matching Password", "|CR|04Invalid, password does not match!");
     value[PROMPT_HANDLE_INVALID]     = std::make_pair("User Name Already Exists", "|CR|04Invalid UserName, Already Exists!");
     value[PROMPT_NAME_INVALID]       = std::make_pair("Real Name Already Exists", "|CR|04Name, Already Exists, Try Adding a middle initial.");
 
@@ -674,8 +681,46 @@ bool ModSignup::realName(const std::string &input)
  */
 bool ModSignup::address(const std::string &input)
 {
-    bool result = false;
-    return result;
+    std::cout << "address: " << input << std::endl;
+
+    // address input, hot key or ENTER after..  hmm
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
+    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    {
+        std::cout << "aborted!" << std::endl;
+        // exit, and return
+        m_is_active = false;
+        return false;
+    }
+    else if(result[0] == '\n')
+    {
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return false;
+        }
+
+
+        // Set the User Name
+        m_user_record->sAddress = key;
+
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty")
+        {
+            baseProcessAndDeliver(result);
+        }
+    }
+
+    return true;
 }
 
 /**
@@ -684,8 +729,46 @@ bool ModSignup::address(const std::string &input)
  */
 bool ModSignup::location(const std::string &input)
 {
-    bool result = false;
-    return result;
+    std::cout << "location: " << input << std::endl;
+
+    // location input, hot key or ENTER after..  hmm
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
+    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    {
+        std::cout << "aborted!" << std::endl;
+        // exit, and return
+        m_is_active = false;
+        return false;
+    }
+    else if(result[0] == '\n')
+    {
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return false;
+        }
+
+
+        // Set the User Name
+        m_user_record->sLocation = key;
+
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty")
+        {
+            baseProcessAndDeliver(result);
+        }
+    }
+
+    return true;
 }
 
 /**
@@ -694,8 +777,46 @@ bool ModSignup::location(const std::string &input)
  */
 bool ModSignup::country(const std::string &input)
 {
-    bool result = false;
-    return result;
+    std::cout << "country: " << input << std::endl;
+
+    // country input, hot key or ENTER after..  hmm
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
+    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    {
+        std::cout << "aborted!" << std::endl;
+        // exit, and return
+        m_is_active = false;
+        return false;
+    }
+    else if(result[0] == '\n')
+    {
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return false;
+        }
+
+
+        // Set the User Name
+        m_user_record->sCountry = key;
+
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty")
+        {
+            baseProcessAndDeliver(result);
+        }
+    }
+
+    return true;
 }
 
 /**
@@ -704,8 +825,46 @@ bool ModSignup::country(const std::string &input)
  */
 bool ModSignup::email(const std::string &input)
 {
-    bool result = false;
-    return result;
+    std::cout << "email: " << input << std::endl;
+
+    // email input, hot key or ENTER after..  hmm
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
+    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    {
+        std::cout << "aborted!" << std::endl;
+        // exit, and return
+        m_is_active = false;
+        return false;
+    }
+    else if(result[0] == '\n')
+    {
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return false;
+        }
+
+
+        // Set the User Name
+        m_user_record->sEmail = key;
+
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty")
+        {
+            baseProcessAndDeliver(result);
+        }
+    }
+
+    return true;
 }
 
 /**
@@ -714,8 +873,46 @@ bool ModSignup::email(const std::string &input)
  */
 bool ModSignup::userNote(const std::string &input)
 {
-    bool result = false;
-    return result;
+    std::cout << "userNote: " << input << std::endl;
+
+    // userNote input, hot key or ENTER after..  hmm
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
+    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    {
+        std::cout << "aborted!" << std::endl;
+        // exit, and return
+        m_is_active = false;
+        return false;
+    }
+    else if(result[0] == '\n')
+    {
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return false;
+        }
+
+
+        // Set the User Name
+        m_user_record->sUserNote = key;
+
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty")
+        {
+            baseProcessAndDeliver(result);
+        }
+    }
+
+    return true;
 }
 
 /**
@@ -724,8 +921,89 @@ bool ModSignup::userNote(const std::string &input)
  */
 bool ModSignup::birthday(const std::string &input)
 {
-    bool result = false;
-    return result;
+    std::cout << "birthday: " << input << std::endl;
+
+    // birthday input, hot key or ENTER after..  hmm
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sDate_length);
+    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    {
+        std::cout << "aborted!" << std::endl;
+        // exit, and return
+        m_is_active = false;
+        return false;
+    }
+    else if(result[0] == '\n')
+    {
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return false;
+        }
+        
+        // Validate Date Here,  ie.. 2016-01-01 format.
+        boost::regex date_regex {"(19|20)\\d\\d([- /.])(0[1-9]|1[012])\\2(0[1-9]|[12][0-9]|3[01])"};
+        boost::smatch str_matches;
+
+        if (boost::regex_match(key, str_matches, date_regex))
+        {
+            struct std::tm tm;
+            std::istringstream ss(key);
+
+            ss >> std::get_time(&tm, "%Y-%m-%d");
+
+            // Make sure date format was parsed properly.
+            if(ss.fail())
+            {
+
+                std::cout << "regex passed, ss failed!" << std::endl;
+
+                ss.clear();
+
+                // Invalid Entry, try again!
+                std::string message = m_session_io.parseTextPrompt(
+                                         m_text_prompts_dao->getPrompt(PROMPT_DATE_INVALID)
+                                     );
+
+                baseProcessAndDeliver(message);
+
+                // Move to next module.
+                changeModule(m_mod_function_index);
+            }
+
+            std::time_t time = mktime(&tm);
+
+            // Set the User Birth Date
+            m_user_record->dtBirthday = time;
+
+            // Move to next module.
+            changeModule(m_mod_function_index+1);
+        }
+        else
+        {
+            // Invalid Entry, try again!
+            std::string message = m_session_io.parseTextPrompt(
+                                     m_text_prompts_dao->getPrompt(PROMPT_DATE_INVALID)
+                                 );
+
+            baseProcessAndDeliver(message);
+
+            // Move to next module.
+            changeModule(m_mod_function_index);
+        }
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty")
+        {
+            baseProcessAndDeliver(result);
+        }
+    }
+
+    return true;
 }
 
 /**
@@ -734,8 +1012,46 @@ bool ModSignup::birthday(const std::string &input)
  */
 bool ModSignup::gender(const std::string &input)
 {
-    bool result = false;
-    return result;
+    std::cout << "gender: " << input << std::endl;
+
+    // gender input, hot key or ENTER after..  hmm
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    {
+        std::cout << "aborted!" << std::endl;
+        // exit, and return
+        m_is_active = false;
+        return false;
+    }
+    else if(result[0] == '\n')
+    {
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return false;
+        }
+
+
+        // Set the User Name
+        m_user_record->sGender = key;
+
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty")
+        {
+            baseProcessAndDeliver(result);
+        }
+    }
+
+    return true;
 }
 
 /**
@@ -744,8 +1060,45 @@ bool ModSignup::gender(const std::string &input)
  */
 bool ModSignup::password(const std::string &input)
 {
-    bool result = false;
-    return result;
+    std::cout << "password: " << input << std::endl;
+
+    // password input, hot key or ENTER after..  hmm
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length);
+    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    {
+        std::cout << "aborted!" << std::endl;
+        // exit, and return
+        m_is_active = false;
+        return false;
+    }
+    else if(result[0] == '\n')
+    {
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return false;
+        }
+
+        // Set the Password and verify it matches on next module.
+        m_security_record->sPasswordHash = key;
+
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty")
+        {
+            baseProcessAndDeliver(result);
+        }
+    }
+
+    return true;
 }
 
 /**
@@ -754,8 +1107,77 @@ bool ModSignup::password(const std::string &input)
  */
 bool ModSignup::verifyPassword(const std::string &input)
 {
-    bool result = false;
-    return result;
+    std::cout << "password: " << input << std::endl;
+
+    // password input, hot key or ENTER after..  hmm
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length);
+    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    {
+        std::cout << "aborted!" << std::endl;
+        // exit, and return
+        m_is_active = false;
+        return false;
+    }
+    else if(result[0] == '\n')
+    {
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return false;
+        }
+
+
+        // compare password to previous, then encrypt if they match
+        // otherwise fail back if they don't and ask again.
+        if (m_security_record->sPasswordHash.compare(key) == 0) {
+            std::string salt = m_encryption->generate_salt(m_user_record->sHandle, m_config->bbs_uuid);
+            std::string password = m_encryption->generate_password(m_security_record->sPasswordHash, salt);
+
+            if (salt.size() == 0 || password.size() == 0)
+            {
+                std::cout << "Error, Salt or Password were empty" << std::endl;
+                assert(false);
+            }
+
+            // setup the salt and password.
+            m_security_record->sSaltHash = salt;
+            m_security_record->sPasswordHash = password;
+
+            // Move to next module.
+            changeModule(m_mod_function_index+1);
+        }
+        else {
+
+            std::cout << "no match found" << std::endl;
+
+            // Set the password back to blank
+            m_security_record->sPasswordHash = "";
+
+            // Invalid Entry, try again!
+            std::string message = m_session_io.parseTextPrompt(
+                                     m_text_prompts_dao->getPrompt(PROMPT_PASS_INVALID)
+                                 );
+
+            baseProcessAndDeliver(message);
+
+            // Move to next module.
+            changeModule(m_mod_function_index-1);
+        }
+
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty")
+        {
+            baseProcessAndDeliver(result);
+        }
+    }
+
+    return true;
 }
 
 /**
