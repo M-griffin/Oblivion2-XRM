@@ -1,4 +1,13 @@
 
+Change Log Update (00.00.44)
+* 2016-08-21
++ Moved regexp fields expressions to the config file.
+  Plan is to allow custom expressions for fields like handles and passwords etc..
++ Completed a few more new user app questions things.
++ Added Challenge Question/Answers to the Security Table for lost password
+  If users don't like waiting on emails, etc, then can be ask a secondary question
+  to reset their password. (Should we have multiple questions)?  One good for now.
+
 Change Log Update (00.00.43)
 * 2016-08-21
 + Created Security Table, Model and Dao for storing password and salt hashes

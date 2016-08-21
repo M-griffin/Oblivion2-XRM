@@ -140,6 +140,11 @@ bool ConfigDao::saveConfig(config_ptr cfg)
     out << YAML::Key << "filename_archive_comments" << YAML::Value << cfg->filename_archive_comments;
     out << YAML::Key << "directory_bad_files" << YAML::Value << cfg->directory_bad_files;
     out << YAML::Key << "use_greater_then_for_quotes" << YAML::Value << cfg->use_greater_then_for_quotes;
+    out << YAML::Key << "regexp_generic_validation" << YAML::Value << cfg->regexp_generic_validation;
+    out << YAML::Key << "regexp_handle_validation" << YAML::Value << cfg->regexp_handle_validation;
+    out << YAML::Key << "regexp_password_validation" << YAML::Value << cfg->regexp_password_validation;
+    out << YAML::Key << "regexp_date_validation" << YAML::Value << cfg->regexp_date_validation;
+    out << YAML::Key << "regexp_email_validation" << YAML::Value << cfg->regexp_email_validation;
 
     out << YAML::EndMap;
 
@@ -248,6 +253,11 @@ void ConfigDao::encode(const Config &rhs)
     m_config->filename_archive_comments = rhs.filename_archive_comments;
     m_config->directory_bad_files = rhs.directory_bad_files;
     m_config->use_greater_then_for_quotes = rhs.use_greater_then_for_quotes;
+    m_config->regexp_generic_validation = rhs.regexp_generic_validation;
+    m_config->regexp_handle_validation = rhs.regexp_handle_validation;
+    m_config->regexp_password_validation = rhs.regexp_password_validation;
+    m_config->regexp_date_validation = rhs.regexp_date_validation;
+    m_config->regexp_email_validation = rhs.regexp_email_validation;
 }
 
 /**

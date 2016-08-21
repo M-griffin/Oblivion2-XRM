@@ -943,7 +943,7 @@ bool ModSignup::birthday(const std::string &input)
         }
         
         // Validate Date Here,  ie.. 2016-01-01 format.
-        boost::regex date_regex {"(19|20)\\d\\d([- /.])(0[1-9]|1[012])\\2(0[1-9]|[12][0-9]|3[01])"};
+        boost::regex date_regex { m_config->regexp_date_validation };
         boost::smatch str_matches;
 
         if (boost::regex_match(key, str_matches, date_regex))
@@ -1186,8 +1186,45 @@ bool ModSignup::verifyPassword(const std::string &input)
  */
 bool ModSignup::challengeQuestion(const std::string &input)
 {
-    bool result = false;
-    return result;
+    std::cout << "challengeQuestion: " << input << std::endl;
+
+    // challengeQuestion input, hot key or ENTER after..  hmm
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length);
+    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    {
+        std::cout << "aborted!" << std::endl;
+        // exit, and return
+        m_is_active = false;
+        return false;
+    }
+    else if(result[0] == '\n')
+    {
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return false;
+        }
+
+        // Set the Password and verify it matches on next module.
+        m_security_record->sPasswordHash = key;
+
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty")
+        {
+            baseProcessAndDeliver(result);
+        }
+    }
+
+    return true;
 }
 
 /**

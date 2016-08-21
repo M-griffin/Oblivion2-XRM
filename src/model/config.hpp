@@ -171,6 +171,12 @@ public:
 // bool
     bool use_greater_then_for_quotes;  // UseGreaterThanSign;
 
+// Regexp String Validations
+    std::string regexp_generic_validation;
+    std::string regexp_handle_validation;
+    std::string regexp_password_validation;
+    std::string regexp_date_validation;
+    std::string regexp_email_validation;
 
     Config()
         : bbs_name_sysop("New OBV2 XRM Sysop")
@@ -255,7 +261,11 @@ public:
         , filename_archive_comments("")
         , directory_bad_files("")
         , use_greater_then_for_quotes(false)
-
+        , regexp_generic_validation("")
+        , regexp_handle_validation("")
+        , regexp_password_validation("")
+        , regexp_date_validation("(19|20)\\d\\d([- /.])(0[1-9]|1[012])\\2(0[1-9]|[12][0-9]|3[01])")
+        , regexp_email_validation("")
     {
         // Generates an Initial Unique Board UUID when the configuration is created.
         // If someone wipes out their config, they should save this and re-enter it!
@@ -366,6 +376,11 @@ namespace YAML
             node["filename_archive_comments"] = rhs.filename_archive_comments;
             node["directory_bad_files"] = rhs.directory_bad_files;
             node["use_greater_then_for_quotes"] = rhs.use_greater_then_for_quotes;
+            node["regexp_generic_validation"] = rhs.regexp_generic_validation;
+            node["regexp_handle_validation"] = rhs.regexp_handle_validation;
+            node["regexp_password_validation"] = rhs.regexp_password_validation;
+            node["regexp_date_validation"] = rhs.regexp_date_validation;
+            node["regexp_email_validation"] = rhs.regexp_email_validation;
 
             return node;
         }
@@ -459,6 +474,11 @@ namespace YAML
             rhs.filename_archive_comments       = node["filename_archive_comments"].as<std::string>();
             rhs.directory_bad_files             = node["directory_bad_files"].as<std::string>();
             rhs.use_greater_then_for_quotes     = node["use_greater_then_for_quotes"].as<bool>();
+            rhs.regexp_generic_validation       = node["regexp_generic_validation"].as<std::string>();
+            rhs.regexp_handle_validation        = node["regexp_handle_validation"].as<std::string>();
+            rhs.regexp_password_validation      = node["regexp_password_validation"].as<std::string>();
+            rhs.regexp_date_validation          = node["regexp_date_validation"].as<std::string>();
+            rhs.regexp_email_validation         = node["regexp_email_validation"].as<std::string>();
 
             return true;
         }
