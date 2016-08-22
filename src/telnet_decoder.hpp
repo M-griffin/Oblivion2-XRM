@@ -292,7 +292,7 @@ private:
             find_if(t.begin(), t.end(), FindFirst(option));
 
         // Sequence Not Found, add new sequence.
-        if(it == t.end())
+        //if(it == t.end())
             t.push_back(option);
     }
 

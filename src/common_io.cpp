@@ -1271,7 +1271,12 @@ void CommonIO::readinAnsi(std::string FileName, std::string &buff)
     {
         c = getc(fp);
         if(c != EOF)
-            buff += c;
+        {
+            if (c == '\n')
+                buff += "\r\n";
+            else
+                buff += c;
+        }
     }
     while(c != EOF);
 

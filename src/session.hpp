@@ -89,27 +89,33 @@ public:
             // start the negotiation of client features.
             std::cout << "send initial IAC sequences started." << std::endl;
 
+            // On initial connection, clear and home cursor
+            std::string clear_screen = "\x1b[1;1H\x1b[2J";
+            new_session->deliver(clear_screen);
+
             // Need to negotiate this first, then turn off for Linux/osx to switch
             // Otherwise they both ignore the DONT and do not turn it off.
-            new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_LINEMODE);
-            new_session->m_session_data->m_telnet_state->addReply(TELOPT_LINEMODE);
+            //new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_LINEMODE);
+            //new_session->m_session_data->m_telnet_state->addReply(TELOPT_LINEMODE);
 
-            // Don't need to tell other DO when we say we WILL!
-            //session->m_telnet_state->send_iac(DO, TELOPT_BINARY);
-            //session->m_telnet_state->add_reply(TELOPT_BINARY);
+            //new_session->m_session_data->m_telnet_state->sendIACSequences(DONT, TELOPT_LINEMODE);
+
+            new_session->m_session_data->m_telnet_state->sendIACSequences(DONT, TELOPT_OLD_ENVIRON);
+                       
+            new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_SGA);
+            new_session->m_session_data->m_telnet_state->addReply(TELOPT_SGA);
+
+            new_session->m_session_data->m_telnet_state->sendIACSequences(WILL, TELOPT_ECHO);
+            new_session->m_session_data->m_telnet_state->addReply(TELOPT_ECHO);
+
+            new_session->m_session_data->m_telnet_state->sendIACSequences(WILL, TELOPT_SGA);
+            new_session->m_session_data->m_telnet_state->addReply(TELOPT_SGA);
 
             new_session->m_session_data->m_telnet_state->sendIACSequences(WILL, TELOPT_BINARY);
             new_session->m_session_data->m_telnet_state->addReply(TELOPT_BINARY);
 
-            new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_SGA);
-            new_session->m_session_data->m_telnet_state->addReply(TELOPT_SGA);
-
-            // Don't need to tell other DON'T when we say we WILL!
-            //session->m_telnet_state->send_iac(DONT, TELOPT_ECHO);
-            //session->m_telnet_state->add_reply(TELOPT_ECHO);
-
-            new_session->m_session_data->m_telnet_state->sendIACSequences(WILL, TELOPT_ECHO);
-            new_session->m_session_data->m_telnet_state->addReply(TELOPT_ECHO);
+            new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_BINARY);
+            new_session->m_session_data->m_telnet_state->addReply(TELOPT_BINARY);
 
             new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_TTYPE);
             new_session->m_session_data->m_telnet_state->addReply(TELOPT_TTYPE);
@@ -118,8 +124,8 @@ public:
             new_session->m_session_data->m_telnet_state->addReply(TELOPT_NAWS);
 
             // No replies, this can really not be used, only informational.
-            new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_NEW_ENVIRON);
-            new_session->m_session_data->m_telnet_state->addReply(TELOPT_NEW_ENVIRON);
+            //new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_NEW_ENVIRON);
+            //new_session->m_session_data->m_telnet_state->addReply(TELOPT_NEW_ENVIRON);
 
             std::cout << "send initial IAC sequences ended." << std::endl;
 
