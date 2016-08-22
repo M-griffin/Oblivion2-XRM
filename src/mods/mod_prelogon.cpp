@@ -114,14 +114,22 @@ void ModPreLogon::setupEmulationDetection()
     // Deliver ANSI Location Sequence to Detect Emulation Response
     // Only detects if terminal handles ESC responses.
     // Windows Console Telnet will response it's at 259 y!
-    baseProcessAndDeliver("\x1b[s\x1b[255B\x1b[6n");
+
+    std::string detection = m_session_io.pipe2ansi("|00\x1b[s\x1b[255B\x1b[6n");
+
+    baseProcessAndDeliver(detection);
     baseProcessAndDeliver("\x1b[u");
 
     // Display Detecting Emulation
     std::string result = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_DETECT_EMULATION)
                          );
-    baseProcessAndDeliver(result);
+
+    // If response is echoed back, make it black on black.
+    result.append("|00");
+    std::string output = m_session_io.pipe2ansi(result);
+
+    baseProcessAndDeliver(output);
 
     // Start Timeout for Detection.
     startDetectionTimer();
@@ -451,7 +459,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
                     boost::iequals(m_term_type, "ansi"))
             {
                 // Switch to ISO, then CP437 Character Set.
-                message = "\x1b%@\x1b(U";
+                message = m_session_io.pipe2ansi("|00\x1b%@\x1b(U");
                 message += m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
                          );
@@ -462,7 +470,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
             else
             {
                 // Switch to Unicode Character Set.
-                message = "\x1b%@\x1b%G";
+                message = m_session_io.pipe2ansi("|00\x1b%@\x1b%G");
                 message += m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
                          );
@@ -485,7 +493,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
                     boost::iequals(m_term_type, "ansi"))
             {
                 // Switch to Unicode Character Set.
-                message = "\x1b%@\x1b%G";
+                message = m_session_io.pipe2ansi("|00\x1b%@\x1b%G");
                 message += m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
                          );
@@ -496,7 +504,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
             else
             {
                 // Switch to ISO, then CP437 Character Set.
-                message = "\x1b%@\x1b(U";
+                message = m_session_io.pipe2ansi("|00\x1b%@\x1b(U");
                 message += m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
                          );

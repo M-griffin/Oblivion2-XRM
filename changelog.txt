@@ -1,4 +1,18 @@
 
+Change Log Update (00.00.45)
+* 2016-08-22
++ Added Several Updates and Fixes for Linux/OSX Terminals
++ Corrected Telnet Options for Echoing back and removing line mode
++ Removed check for duplicate options, so we can call more then one
+  and expect just as many replies without endless loops.  Tested Good.
++ Added Clear Screen and home cursor for initial screen positions to match
+  the local screen buffer.
++ For ansi screens in windows, replaced \n with \r\n on parsing ansi files.
+  (Should also add detection if just \r or replace with \r\n also.
++ WIP need to add screen size change detection, if the screen size changes 
+  we need to redraw the screen but also resize the local screen buffer to match
+  so lightbar are still in the correct positions!  Important, but not vital just yet.
+
 Change Log Update (00.00.44)
 * 2016-08-21
 + Moved regexp fields expressions to the config file.
