@@ -73,6 +73,7 @@ public:
         m_setup_functions.push_back(std::bind(&ModSignup::setupClearOrScroll, this));
         m_setup_functions.push_back(std::bind(&ModSignup::setupAnsiColor, this));
         m_setup_functions.push_back(std::bind(&ModSignup::setupBackSpace, this));
+        m_setup_functions.push_back(std::bind(&ModSignup::setupVerifyAndSave, this));
 
         // Input Processing Functions
         m_mod_functions.push_back(std::bind(&ModSignup::newUserPassword, this, std::placeholders::_1));
@@ -98,6 +99,7 @@ public:
         m_mod_functions.push_back(std::bind(&ModSignup::clearOrScroll, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModSignup::ansiColor, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModSignup::backSpace, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModSignup::verifyAndSave, this, std::placeholders::_1));
 
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
@@ -144,7 +146,8 @@ public:
         MOD_PAUSE,
         MOD_CLEAR_SCREEN,
         MOD_ANSI_COLOR,
-        MOD_BACKSPACE
+        MOD_BACKSPACE,
+        MOD_VERIFY_SAVE
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
@@ -169,12 +172,17 @@ public:
     const std::string PROMPT_USE_CLEAR = "use_clear";
     const std::string PROMPT_USE_ANSI_COLOR = "use_ansi_color";
     const std::string PROMPT_BACK_SPACE = "use_back_space";
+    const std::string PROMPT_VERIFY_SAVE = "verify_save";
 
     const std::string PROMPT_TEXT_INVALID = "text_invalid";
     const std::string PROMPT_DATE_INVALID = "date_invalid";
     const std::string PROMPT_PASS_INVALID = "pass_invalid";
     const std::string PROMPT_HANDLE_INVALID = "handle_invalid";
     const std::string PROMPT_NAME_INVALID = "name_invalid";
+
+    const std::string PROMPT_SAVED = "confirmed_save";
+    const std::string PROMPT_NOT_SAVED = "record_not_saved";
+
     // ... cont
 
 
@@ -315,6 +323,12 @@ public:
      */
     void setupBackSpace();
 
+    /**
+     * @brief Confirm and save user record.
+     * @return
+     */
+    void setupVerifyAndSave();
+
 private:
 
     /**
@@ -442,6 +456,13 @@ private:
      * @return
      */
     bool backSpace(const std::string &input);
+
+    /**
+     * @brief Confirm and save user record.
+     * @return
+     */
+    bool verifyAndSave(const std::string &input);
+
 
     // Function Input Vector.
     std::vector<std::function< void()> >                    m_setup_functions;

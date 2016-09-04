@@ -81,7 +81,7 @@ void ModSignup::createTextPrompts()
 
     value[PROMPT_NUP]                = std::make_pair("New User Password", "|08|CR|CRNew User Password: |04");
     value[PROMPT_DISCLAIMER]         = std::make_pair("Disclaimer", "|08|CRDisclaimer Text here.. |CR|CR[y/n] Disclaimer Agree : |04");
-    value[PROMPT_HANDLE]             = std::make_pair("User Handle", "|08|CREnter Handle : |04");
+    value[PROMPT_HANDLE]             = std::make_pair("User Handle", "|08|CR|CREnter Handle : |04");
     value[PROMPT_REAL_NAME]          = std::make_pair("Real Name", "|08|CREnter Real Name : |04");
     value[PROMPT_ADDRESS]            = std::make_pair("Address", "|08|CRAddress : |04");
     value[PROMPT_LOCATION]           = std::make_pair("Location", "|08|CRCity/State : |04");
@@ -90,22 +90,29 @@ void ModSignup::createTextPrompts()
     value[PROMPT_USER_NOTE]          = std::make_pair("User Note", "|08|CRAffiliations / User Note : |04");
     value[PROMPT_BIRTH_DATE]         = std::make_pair("Birth Date", "|08|CR[yyyy-mm-dd] Birth Date : |04");
     value[PROMPT_GENDER]             = std::make_pair("Gender", "|CR|08[m/f] Gender : |04");
-    value[PROMPT_PASSWORD]           = std::make_pair("Password", "|CR|08(case sensitive) Password : |04");
+    value[PROMPT_PASSWORD]           = std::make_pair("Password", "|CR|CR|08(case sensitive) Password : |04");
     value[PROMPT_VERIFY_PASSWORD]    = std::make_pair("Verify Password", "|CR|08(case sensitive) Verify Password : |04");
-    value[PROMPT_CHALLENGE_QUESTION] = std::make_pair("Forgot Password Challenge Question", "|CR|08Challenge Question : |04");
+    value[PROMPT_CHALLENGE_QUESTION] = std::make_pair("Forgot Password Challenge Question", "|CR|CR|08Challenge Question : |04");
     value[PROMPT_CHALLENGE_ANSWER]   = std::make_pair("Forgot Password Challenge Answer", "|CR|08(case sensitive) Challenge Answer : |04");
     value[PROMPT_VERIFY_ANSWER]      = std::make_pair("Forgot Password Verify Answer", "|CR|08(case sensitive) Verify Answer : |04");
-    value[PROMPT_YESNO_BARS]         = std::make_pair("Use YES/NO Bars", "|CR|08[y/n] Use Yes/No Bars : |04");
-    value[PROMPT_USE_PAUSE]          = std::make_pair("Pause on ", "|CR|08Screen Pausing : |04");
-    value[PROMPT_USE_CLEAR]          = std::make_pair("Clear Screen or Scroll ", "|CR|08Clear Screen or Scroll : |04");
-    value[PROMPT_USE_ANSI_COLOR]     = std::make_pair("Use Ansi Color ", "|CR|08[y/n] Ansi Color : |04");
-    value[PROMPT_BACK_SPACE]         = std::make_pair("Backspace Type", "|CR|08Backspace Key |CR[(W)indows/(T)erminal/(D)etect [ENTER] = Detect] : |04");
+    value[PROMPT_YESNO_BARS]         = std::make_pair("Use YES/NO Bars", "|CR|CR|08[y/n] Use Yes/No Bars [ENTER] = Yes: |04");
+    value[PROMPT_USE_PAUSE]          = std::make_pair("Pause on ", "|CR|CR|08Screen Pausing [ENTER] = Yes: |04");
+    value[PROMPT_USE_CLEAR]          = std::make_pair("Clear Screen or Scroll ", "|CR|CR|08Clear Screen or Scroll [ENTER] = Yes: |04");
+    value[PROMPT_USE_ANSI_COLOR]     = std::make_pair("Use Ansi Color ", "|CR|CR|08[y/n] Ansi Color [ENTER] = Yes: |04");
+    value[PROMPT_BACK_SPACE]         = std::make_pair("Backspace Sequence", "|CR|CR|08Backspace Key |CR[(W)indows/(T)erminal/(D)etect [ENTER] = Detect] : |04");
+    value[PROMPT_VERIFY_SAVE]        = std::make_pair("Verify All Data", "|CR|CR|08[y/n] Verify and Save user record: |04");
+
+
     // Invalid.
-    value[PROMPT_TEXT_INVALID]       = std::make_pair("Invalid Text", "|CR|04Invalid entry!");
-    value[PROMPT_DATE_INVALID]       = std::make_pair("Invalid Date", "|CR|04Invalid date entered!");
-    value[PROMPT_PASS_INVALID]       = std::make_pair("Invalid/Non Matching Password", "|CR|04Invalid, password does not match!");
-    value[PROMPT_HANDLE_INVALID]     = std::make_pair("User Name Already Exists", "|CR|04Invalid UserName, Already Exists!");
-    value[PROMPT_NAME_INVALID]       = std::make_pair("Real Name Already Exists", "|CR|04Name, Already Exists, Try Adding a middle initial.");
+    value[PROMPT_TEXT_INVALID]       = std::make_pair("Invalid Text", "|CR|04Invalid entry!|CR");
+    value[PROMPT_DATE_INVALID]       = std::make_pair("Invalid Date", "|CR|04Invalid date entered!|CR");
+    value[PROMPT_PASS_INVALID]       = std::make_pair("Invalid/Non Matching Password", "|CR|04Invalid, password does not match!|CR");
+    value[PROMPT_HANDLE_INVALID]     = std::make_pair("User Name Already Exists", "|CR|04Invalid UserName, Already Exists!|CR");
+    value[PROMPT_NAME_INVALID]       = std::make_pair("Real Name Already Exists", "|CR|04Name, Already Exists, Try Adding a middle initial.|CR");
+
+    // Confirmation of Save
+    value[PROMPT_SAVED]              = std::make_pair("User Record Saved", "|CR|10User Record Saved Successfully.|CR");
+    value[PROMPT_NOT_SAVED]          = std::make_pair("User Record Not Saved", "|CR|04Error, User Record Saved.|CR");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -402,6 +409,18 @@ void ModSignup::setupBackSpace()
 }
 
 
+/**
+ * @brief Confirm and save user record.
+ * @return
+ */
+void ModSignup::setupVerifyAndSave()
+{
+    std::string result = m_session_io.parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_VERIFY_SAVE)
+                         );
+
+    baseProcessAndDeliver(result);
+}
 
 /**
  * @brief Check for New User Password
@@ -1008,15 +1027,30 @@ bool ModSignup::gender(const std::string &input)
     }
     else if(result[0] == '\n')
     {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            // Return and don't do anything.
-            return false;
-        }
 
-        // Set the User Name
-        m_user_record->sGender = key;
+        // If ENTER Default to Yes, or Single Y is hit
+        if((toupper(key[0]) == 'M' && key.size() == 1))
+        {
+            m_user_record->sGender = key;
+        }
+        // Else check for single N for No to default to ASCII no colors.
+        else if(toupper(key[0]) == 'F' && key.size() == 1)
+        {
+            m_user_record->sGender = key;
+        }
+        else
+        {
+            // Invalid Entry, try again!
+            std::string message = m_session_io.parseTextPrompt(
+                                      m_text_prompts_dao->getPrompt(PROMPT_TEXT_INVALID)
+                                  );
+
+            baseProcessAndDeliver(message);
+
+            // Ask Again And Redisplay.
+            changeModule(m_mod_function_index);
+            return true;
+        }
 
         // Move to next module.
         changeModule(m_mod_function_index+1);
@@ -1382,15 +1416,36 @@ bool ModSignup::yesNoBars(const std::string &input)
     }
     else if(result[0] == '\n')
     {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
+        // If ENTER Default to Yes, or Single Y is hit
+        if(key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1))
         {
-            // Return and don't do anything.
-            return false;
-        }
+            // Key == 0 on [ENTER] pressed alone.
+            if(key.size() == 0)
+            {
+                // If ENTER, then display Yes as key press.
+                baseProcessAndDeliver("Yes");
+            }
 
-        // Set the User Name
-        //m_user_record->bYesNoBars = key;
+            m_user_record->bYesNoBars = true;
+        }
+        // Else check for single N for No to default to ASCII no colors.
+        else if(toupper(key[0]) == 'N' && key.size() == 1)
+        {
+            m_user_record->bYesNoBars = false;
+        }
+        else
+        {
+            // Invalid Entry, try again!
+            std::string message = m_session_io.parseTextPrompt(
+                                      m_text_prompts_dao->getPrompt(PROMPT_TEXT_INVALID)
+                                  );
+
+            baseProcessAndDeliver(message);
+
+            // Ask Again And Redisplay.
+            changeModule(m_mod_function_index);
+            return true;
+        }
 
         // Move to next module.
         changeModule(m_mod_function_index+1);
@@ -1428,15 +1483,36 @@ bool ModSignup::doPause(const std::string &input)
     }
     else if(result[0] == '\n')
     {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
+        // If ENTER Default to Yes, or Single Y is hit
+        if(key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1))
         {
-            // Return and don't do anything.
-            return false;
-        }
+            // Key == 0 on [ENTER] pressed alone.
+            if(key.size() == 0)
+            {
+                // If ENTER, then display Yes as key press.
+                baseProcessAndDeliver("Yes");
+            }
 
-        // Set the User Name
-        //m_user_record->bDoPause = key;
+            m_user_record->bDoPause = true;
+        }
+        // Else check for single N for No to default to ASCII no colors.
+        else if(toupper(key[0]) == 'N' && key.size() == 1)
+        {
+            m_user_record->bDoPause = false;
+        }
+        else
+        {
+            // Invalid Entry, try again!
+            std::string message = m_session_io.parseTextPrompt(
+                                      m_text_prompts_dao->getPrompt(PROMPT_TEXT_INVALID)
+                                  );
+
+            baseProcessAndDeliver(message);
+
+            // Ask Again And Redisplay.
+            changeModule(m_mod_function_index);
+            return true;
+        }
 
         // Move to next module.
         changeModule(m_mod_function_index+1);
@@ -1474,15 +1550,36 @@ bool ModSignup::clearOrScroll(const std::string &input)
     }
     else if(result[0] == '\n')
     {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
+        // If ENTER Default to Yes, or Single Y is hit
+        if(key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1))
         {
-            // Return and don't do anything.
-            return false;
-        }
+            // Key == 0 on [ENTER] pressed alone.
+            if(key.size() == 0)
+            {
+                // If ENTER, then display Yes as key press.
+                baseProcessAndDeliver("Yes");
+            }
 
-        // Set the User Name
-        //m_user_record->bClearOrScroll = key;
+            m_user_record->bClearOrScroll = true;
+        }
+        // Else check for single N for No to default to ASCII no colors.
+        else if(toupper(key[0]) == 'N' && key.size() == 1)
+        {
+            m_user_record->bClearOrScroll = false;
+        }
+        else
+        {
+            // Invalid Entry, try again!
+            std::string message = m_session_io.parseTextPrompt(
+                                      m_text_prompts_dao->getPrompt(PROMPT_TEXT_INVALID)
+                                  );
+
+            baseProcessAndDeliver(message);
+
+            // Ask Again And Redisplay.
+            changeModule(m_mod_function_index);
+            return true;
+        }
 
         // Move to next module.
         changeModule(m_mod_function_index+1);
@@ -1520,15 +1617,36 @@ bool ModSignup::ansiColor(const std::string &input)
     }
     else if(result[0] == '\n')
     {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
+        // If ENTER Default to Yes, or Single Y is hit
+        if(key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1))
         {
-            // Return and don't do anything.
-            return false;
-        }
+            // Key == 0 on [ENTER] pressed alone.
+            if(key.size() == 0)
+            {
+                // If ENTER, then display Yes as key press.
+                baseProcessAndDeliver("Yes");
+            }
 
-        // Set the User Name
-        //m_user_record->bAnsi = key;
+            m_user_record->bAnsi = true;
+        }
+        // Else check for single N for No to default to ASCII no colors.
+        else if(toupper(key[0]) == 'N' && key.size() == 1)
+        {
+            m_user_record->bAnsi = false;
+        }
+        else
+        {
+            // Invalid Entry, try again!
+            std::string message = m_session_io.parseTextPrompt(
+                                      m_text_prompts_dao->getPrompt(PROMPT_TEXT_INVALID)
+                                  );
+
+            baseProcessAndDeliver(message);
+
+            // Ask Again And Redisplay.
+            changeModule(m_mod_function_index);
+            return true;
+        }
 
         // Move to next module.
         changeModule(m_mod_function_index+1);
@@ -1566,15 +1684,43 @@ bool ModSignup::backSpace(const std::string &input)
     }
     else if(result[0] == '\n')
     {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
+       // If ENTER Default to Yes, or Single Y is hit
         if(key.size() == 0)
         {
-            // Return and don't do anything.
-            return false;
-        }
+            // Key == 0 on [ENTER] pressed alone.
+            // If ENTER, then display Yes as key press.
+            baseProcessAndDeliver("Detection WIP, Select W or T.");
 
-        // Set the User Name
-        //m_user_record->bBackSpaceVt100 = key;
+            // Not Implimented YET
+            // Start Backspace Detection here!
+            changeModule(m_mod_function_index);
+            return true;
+
+        }
+        else if(toupper(key[0]) == 'W' && key.size() == 1)
+        {
+            // Use Default Windows Termnal Backspace
+            m_user_record->bBackSpaceVt100 = false;
+        }
+        // Else check for single N for No to default to ASCII no colors.
+        else if(toupper(key[0]) == 'T' && key.size() == 1)
+        {
+            // Use Degault Linux Terminal Backspace
+            m_user_record->bBackSpaceVt100 = true;
+        }
+        else
+        {
+            // Invalid Entry, try again!
+            std::string message = m_session_io.parseTextPrompt(
+                                      m_text_prompts_dao->getPrompt(PROMPT_TEXT_INVALID)
+                                  );
+
+            baseProcessAndDeliver(message);
+
+            // Ask Again And Redisplay.
+            changeModule(m_mod_function_index);
+            return true;
+        }
 
         // Move to next module.
         changeModule(m_mod_function_index+1);
@@ -1588,6 +1734,20 @@ bool ModSignup::backSpace(const std::string &input)
             baseProcessAndDeliver(result);
         }
     }
+
+    return true;
+}
+
+
+/**
+ * @brief Confirm and save user record.
+ * @return
+ */
+bool ModSignup::verifyAndSave(const std::string &input) {
+
+    //PROMPT_SAVED
+
+    //PROMPT_NOT_SAVED
 
     return true;
 }
