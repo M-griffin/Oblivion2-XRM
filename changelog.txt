@@ -1,4 +1,11 @@
 
+Change Log Update (00.00.47)
+* 2016-09-17
++ Worked more on the sign-up process,  Now saving user record and security record
+  to the Sqlite database.  Still need a little work on the dates and best way
+  to store and retrieve UTC date and times.
++ Also cleaned up the mod_signup code some and optimized the displayPrompts
+
 Change Log Update (00.00.46)
 * 2016-09-04
 + More work on the signup process.  Most of the questions are all set.

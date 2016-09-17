@@ -198,6 +198,12 @@ public:
     void changeModule(int mod_function_index);
 
     /**
+     * @brief Pull and Display Prompts
+     * @param prompt
+     */
+    void displayPrompt(const std::string &prompt);
+
+    /**
      * @brief New User Password
      * @return
      */
@@ -462,6 +468,12 @@ private:
      * @return
      */
     bool verifyAndSave(const std::string &input);
+
+
+    /**
+     * @brief Save New User Record
+     */
+    void saveNewUserRecord();
 
 
     // Function Input Vector.
