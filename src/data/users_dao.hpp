@@ -97,7 +97,7 @@ public:
      * @param user
      * @return
      */
-    bool insertUserRecord(user_ptr user);
+    long insertUserRecord(user_ptr user);
 
     /**
      * @brief Deletes a User Record

@@ -4,6 +4,11 @@
 #include "../model/users.hpp"
 #include "../encryption.hpp"
 
+// DataBase
+#include "../data/security_dao.hpp"
+#include "../data/users_dao.hpp"
+#include "libSqliteWrapped.h"
+
 #include <boost/regex.hpp>
 
 #include <iostream>
@@ -112,7 +117,7 @@ void ModSignup::createTextPrompts()
 
     // Confirmation of Save
     value[PROMPT_SAVED]              = std::make_pair("User Record Saved", "|CR|10User Record Saved Successfully.|CR");
-    value[PROMPT_NOT_SAVED]          = std::make_pair("User Record Not Saved", "|CR|04Error, User Record Saved.|CR");
+    value[PROMPT_NOT_SAVED]          = std::make_pair("User Record Not Saved", "|CR|04Error, User Record Not Saved!|CR");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -129,6 +134,21 @@ void ModSignup::changeModule(int mod_function_index)
     m_setup_functions[m_mod_function_index]();
 }
 
+
+/**
+ * @brief Pull and Display Prompts
+ * @param prompt
+ */
+void ModSignup::displayPrompt(const std::string &prompt)
+{
+    std::string result = m_session_io.parseTextPrompt(
+                                 m_text_prompts_dao->getPrompt(prompt)
+                             );
+
+    baseProcessAndDeliver(result);
+}
+
+
 /**
  * @brief Check for New User Password
  * @return
@@ -138,10 +158,7 @@ void ModSignup::setupNewUserPassword()
     // Check if New User Password is enabled
     if(m_config->use_newuser_password)
     {
-        std::string result = m_session_io.parseTextPrompt(
-                                 m_text_prompts_dao->getPrompt(PROMPT_NUP)
-                             );
-        baseProcessAndDeliver(result);
+        displayPrompt(PROMPT_NUP);
     }
     else
     {
@@ -158,10 +175,7 @@ void ModSignup::setupDisclaimer()
 {
     if(m_config->use_disclaimer)
     {
-        std::string result = m_session_io.parseTextPrompt(
-                                 m_text_prompts_dao->getPrompt(PROMPT_DISCLAIMER)
-                             );
-        baseProcessAndDeliver(result);
+        displayPrompt(PROMPT_DISCLAIMER);
     }
     else
     {
@@ -176,10 +190,7 @@ void ModSignup::setupDisclaimer()
  */
 void ModSignup::setupHandle()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_HANDLE)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_HANDLE);
 }
 
 /**
@@ -188,10 +199,7 @@ void ModSignup::setupHandle()
  */
 void ModSignup::setupRealName()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_REAL_NAME)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_REAL_NAME);
 }
 
 /**
@@ -202,10 +210,7 @@ void ModSignup::setupAddress()
 {
     if(m_config->use_address)
     {
-        std::string result = m_session_io.parseTextPrompt(
-                                 m_text_prompts_dao->getPrompt(PROMPT_ADDRESS)
-                             );
-        baseProcessAndDeliver(result);
+        displayPrompt(PROMPT_ADDRESS);
     }
     else
     {
@@ -220,10 +225,7 @@ void ModSignup::setupAddress()
  */
 void ModSignup::setupLocation()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_LOCATION)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_LOCATION);
 }
 
 /**
@@ -232,10 +234,7 @@ void ModSignup::setupLocation()
  */
 void ModSignup::setupCountry()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_COUNTRY)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_COUNTRY);
 }
 
 /**
@@ -244,10 +243,7 @@ void ModSignup::setupCountry()
  */
 void ModSignup::setupEmail()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_EMAIL)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_EMAIL);
 }
 
 /**
@@ -256,10 +252,7 @@ void ModSignup::setupEmail()
  */
 void ModSignup::setupUserNote()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_USER_NOTE)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_USER_NOTE);
 }
 
 /**
@@ -268,10 +261,7 @@ void ModSignup::setupUserNote()
  */
 void ModSignup::setupBirthday()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_BIRTH_DATE)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_BIRTH_DATE);
 }
 
 /**
@@ -280,10 +270,7 @@ void ModSignup::setupBirthday()
  */
 void ModSignup::setupGender()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_GENDER)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_GENDER);
 }
 
 /**
@@ -292,10 +279,7 @@ void ModSignup::setupGender()
  */
 void ModSignup::setupPassword()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_PASSWORD)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_PASSWORD);
 }
 
 /**
@@ -304,10 +288,7 @@ void ModSignup::setupPassword()
  */
 void ModSignup::setupVerifyPassword()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_VERIFY_PASSWORD)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_VERIFY_PASSWORD);
 }
 
 /**
@@ -316,11 +297,7 @@ void ModSignup::setupVerifyPassword()
  */
 void ModSignup::setupChallengeQuestion()
 {
-
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_CHALLENGE_QUESTION)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_CHALLENGE_QUESTION);
 }
 
 /**
@@ -329,10 +306,7 @@ void ModSignup::setupChallengeQuestion()
  */
 void ModSignup::setupChallengeAnswer()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_CHALLENGE_ANSWER)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_CHALLENGE_ANSWER);
 }
 
 /**
@@ -341,10 +315,7 @@ void ModSignup::setupChallengeAnswer()
  */
 void ModSignup::setupVerifyChallengeAnswer()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_VERIFY_ANSWER)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_VERIFY_ANSWER);
 }
 
 /**
@@ -353,10 +324,7 @@ void ModSignup::setupVerifyChallengeAnswer()
  */
 void ModSignup::setupYesNoBars()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_YESNO_BARS)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_YESNO_BARS);
 }
 
 /**
@@ -365,10 +333,7 @@ void ModSignup::setupYesNoBars()
  */
 void ModSignup::setupDoPause()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_USE_PAUSE)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_USE_PAUSE);
 }
 
 /**
@@ -377,11 +342,7 @@ void ModSignup::setupDoPause()
  */
 void ModSignup::setupClearOrScroll()
 {
-
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_USE_CLEAR)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_USE_CLEAR);
 }
 
 /**
@@ -390,10 +351,7 @@ void ModSignup::setupClearOrScroll()
  */
 void ModSignup::setupAnsiColor()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_USE_ANSI_COLOR)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_USE_ANSI_COLOR);
 }
 
 /**
@@ -402,10 +360,7 @@ void ModSignup::setupAnsiColor()
  */
 void ModSignup::setupBackSpace()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_BACK_SPACE)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_BACK_SPACE);
 }
 
 
@@ -415,11 +370,7 @@ void ModSignup::setupBackSpace()
  */
 void ModSignup::setupVerifyAndSave()
 {
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_VERIFY_SAVE)
-                         );
-
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_VERIFY_SAVE);
 }
 
 /**
@@ -461,10 +412,7 @@ bool ModSignup::newUserPassword(const std::string &input)
         {
             std::cout << "No Match" << key.size() << std::endl;
 
-            std::string prompt_text = m_session_io.parseTextPrompt(
-                                          m_text_prompts_dao->getPrompt(PROMPT_PASS_INVALID)
-                                      );
-            baseProcessAndDeliver(prompt_text);
+            displayPrompt(PROMPT_PASS_INVALID);
 
             // Invalid, Ask again, Reload Current Module
             changeModule(m_mod_function_index);
@@ -525,11 +473,7 @@ bool ModSignup::disclaimer(const std::string &input)
         else
         {
             // Display Invalid Input.
-            std::string prompt_text = m_session_io.parseTextPrompt(
-                                          m_text_prompts_dao->getPrompt(PROMPT_TEXT_INVALID)
-                                      );
-
-            baseProcessAndDeliver(prompt_text);
+            displayPrompt(PROMPT_TEXT_INVALID);
 
             // Invalid, Ask again, Reload Current Module
             changeModule(m_mod_function_index);
@@ -595,11 +539,7 @@ bool ModSignup::handle(const std::string &input)
             std::cout << "match found" << std::endl;
 
             // Invalid Entry, try again!
-            std::string message = m_session_io.parseTextPrompt(
-                                      m_text_prompts_dao->getPrompt(PROMPT_HANDLE_INVALID)
-                                  );
-
-            baseProcessAndDeliver(message);
+            displayPrompt(PROMPT_HANDLE_INVALID);
 
             // Invalid, Ask again, Reload Current Module
             changeModule(m_mod_function_index);
@@ -665,11 +605,7 @@ bool ModSignup::realName(const std::string &input)
             std::cout << "match found" << std::endl;
 
             // Invalid Entry, try again!
-            std::string message = m_session_io.parseTextPrompt(
-                                      m_text_prompts_dao->getPrompt(PROMPT_NAME_INVALID)
-                                  );
-
-            baseProcessAndDeliver(message);
+            displayPrompt(PROMPT_NAME_INVALID);
 
             // Invalid, Ask again, Reload Current Module
             changeModule(m_mod_function_index);
@@ -963,11 +899,7 @@ bool ModSignup::birthday(const std::string &input)
                 ss.clear();
 
                 // Invalid Entry, try again!
-                std::string message = m_session_io.parseTextPrompt(
-                                          m_text_prompts_dao->getPrompt(PROMPT_DATE_INVALID)
-                                      );
-
-                baseProcessAndDeliver(message);
+                displayPrompt(PROMPT_DATE_INVALID);
 
                 // Move to next module.
                 changeModule(m_mod_function_index);
@@ -984,11 +916,7 @@ bool ModSignup::birthday(const std::string &input)
         else
         {
             // Invalid Entry, try again!
-            std::string message = m_session_io.parseTextPrompt(
-                                      m_text_prompts_dao->getPrompt(PROMPT_DATE_INVALID)
-                                  );
-
-            baseProcessAndDeliver(message);
+            displayPrompt(PROMPT_DATE_INVALID);
 
             // Move to next module.
             changeModule(m_mod_function_index);
@@ -1041,11 +969,7 @@ bool ModSignup::gender(const std::string &input)
         else
         {
             // Invalid Entry, try again!
-            std::string message = m_session_io.parseTextPrompt(
-                                      m_text_prompts_dao->getPrompt(PROMPT_TEXT_INVALID)
-                                  );
-
-            baseProcessAndDeliver(message);
+            displayPrompt(PROMPT_TEXT_INVALID);
 
             // Ask Again And Redisplay.
             changeModule(m_mod_function_index);
@@ -1186,11 +1110,7 @@ bool ModSignup::verifyPassword(const std::string &input)
             m_security_record->sPasswordHash = "";
 
             // Invalid Entry, try again!
-            std::string message = m_session_io.parseTextPrompt(
-                                      m_text_prompts_dao->getPrompt(PROMPT_PASS_INVALID)
-                                  );
-
-            baseProcessAndDeliver(message);
+            displayPrompt(PROMPT_PASS_INVALID);
 
             // Move to next module.
             changeModule(m_mod_function_index-1);
@@ -1373,12 +1293,8 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
             m_security_record->sChallengeAnswerHash = "";
 
             // Invalid Entry, try again!
-            std::string message = m_session_io.parseTextPrompt(
-                                      m_text_prompts_dao->getPrompt(PROMPT_PASS_INVALID)
-                                  );
-
-            baseProcessAndDeliver(message);
-
+            displayPrompt(PROMPT_PASS_INVALID);
+            
             // Move to next module.
             changeModule(m_mod_function_index-1);
         }
@@ -1436,11 +1352,7 @@ bool ModSignup::yesNoBars(const std::string &input)
         else
         {
             // Invalid Entry, try again!
-            std::string message = m_session_io.parseTextPrompt(
-                                      m_text_prompts_dao->getPrompt(PROMPT_TEXT_INVALID)
-                                  );
-
-            baseProcessAndDeliver(message);
+            displayPrompt(PROMPT_TEXT_INVALID);
 
             // Ask Again And Redisplay.
             changeModule(m_mod_function_index);
@@ -1503,11 +1415,7 @@ bool ModSignup::doPause(const std::string &input)
         else
         {
             // Invalid Entry, try again!
-            std::string message = m_session_io.parseTextPrompt(
-                                      m_text_prompts_dao->getPrompt(PROMPT_TEXT_INVALID)
-                                  );
-
-            baseProcessAndDeliver(message);
+            displayPrompt(PROMPT_TEXT_INVALID);
 
             // Ask Again And Redisplay.
             changeModule(m_mod_function_index);
@@ -1570,11 +1478,7 @@ bool ModSignup::clearOrScroll(const std::string &input)
         else
         {
             // Invalid Entry, try again!
-            std::string message = m_session_io.parseTextPrompt(
-                                      m_text_prompts_dao->getPrompt(PROMPT_TEXT_INVALID)
-                                  );
-
-            baseProcessAndDeliver(message);
+            displayPrompt(PROMPT_TEXT_INVALID);
 
             // Ask Again And Redisplay.
             changeModule(m_mod_function_index);
@@ -1637,11 +1541,7 @@ bool ModSignup::ansiColor(const std::string &input)
         else
         {
             // Invalid Entry, try again!
-            std::string message = m_session_io.parseTextPrompt(
-                                      m_text_prompts_dao->getPrompt(PROMPT_TEXT_INVALID)
-                                  );
-
-            baseProcessAndDeliver(message);
+            displayPrompt(PROMPT_TEXT_INVALID);
 
             // Ask Again And Redisplay.
             changeModule(m_mod_function_index);
@@ -1711,12 +1611,8 @@ bool ModSignup::backSpace(const std::string &input)
         else
         {
             // Invalid Entry, try again!
-            std::string message = m_session_io.parseTextPrompt(
-                                      m_text_prompts_dao->getPrompt(PROMPT_TEXT_INVALID)
-                                  );
-
-            baseProcessAndDeliver(message);
-
+            displayPrompt(PROMPT_TEXT_INVALID);
+            
             // Ask Again And Redisplay.
             changeModule(m_mod_function_index);
             return true;
@@ -1740,14 +1636,130 @@ bool ModSignup::backSpace(const std::string &input)
 
 
 /**
+ * @brief Save New User Record
+ */
+void ModSignup::saveNewUserRecord()
+{
+
+    // Check and Setup users database if tables are not setup
+    SQLW::Database user_database(USERS_DATABASE);
+
+    // Private Scope for Smart Pointers to deallocate prior to database.
+    {
+        // Link to users dao for data access object
+        users_dao_ptr user_dao(new UsersDao(user_database));
+
+        // Link to security dao for data access object
+        security_dao_ptr security_dao(new SecurityDao(user_database));
+
+        // Save New Security Record, index is then inserted into user record
+        long securityIndex = security_dao->insertSecurityRecord(m_security_record);
+        if (securityIndex < 0)
+        {
+            std::cout << "Error, unable to insert new user record." << std::endl;
+
+            displayPrompt(PROMPT_NOT_SAVED);
+
+            m_is_active = false;
+            return;
+        }
+
+        // Save New User Record
+        m_user_record->iSecurityIndex = securityIndex;
+
+        std::time_t result = std::time(nullptr);
+
+        m_user_record->dtFirstOn = result;
+        m_user_record->dtPassChangeDate = result;
+        m_user_record->dtLastCallDate = result;
+
+        long userIndex = user_dao->insertUserRecord(m_user_record);
+        if (userIndex < 0)
+        {
+            std::cout << "Error, unable to insert new user record." << std::endl;
+
+            // Remove Secutiry Record if unable to create user record.
+            if (!security_dao->deleteSecurityRecord(securityIndex))
+            {
+                std::cout << "Error, unable to remove secutiry record." << std::endl;
+            }
+
+            displayPrompt(PROMPT_NOT_SAVED);
+
+            m_is_active = false;
+            return;
+        }
+
+        // Completed Successfully
+        displayPrompt(PROMPT_SAVED);
+    }
+
+    m_is_active = false;
+    return;
+}
+
+
+/**
  * @brief Confirm and save user record.
  * @return
  */
 bool ModSignup::verifyAndSave(const std::string &input) {
 
-    //PROMPT_SAVED
+    std::cout << "verifyAndSave: " << input << std::endl;
 
-    //PROMPT_NOT_SAVED
+    // verifyAndSave input, hot key or ENTER after..  hmm
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    {
+        std::cout << "aborted!" << std::endl;
+        // exit, and return
+        m_is_active = false;
+        return false;
+    }
+    else if(result[0] == '\n')
+    {
+        // If ENTER Default to Yes, or Single Y is hit
+        if(key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1))
+        {
+            // Key == 0 on [ENTER] pressed alone.
+            if(key.size() == 0)
+            {
+                // If ENTER, then display Yes as key press.
+                baseProcessAndDeliver("Yes");
+            }
+
+            // Save The User Record
+            saveNewUserRecord();
+
+            return false;
+        }
+        // Else check for single N for No to default to ASCII no colors.
+        else if(toupper(key[0]) == 'N' && key.size() == 1)
+        {
+            // Abort and Return;
+            m_is_active = false;
+            return false;
+        }
+        else
+        {
+            // Invalid Entry, try again!
+            displayPrompt(PROMPT_TEXT_INVALID);
+
+            // Ask Again And Redisplay.
+            changeModule(m_mod_function_index);
+            return true;
+        }
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if(result != "empty")
+        {
+            baseProcessAndDeliver(result);
+        }
+    }
 
     return true;
 }

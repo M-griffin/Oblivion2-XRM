@@ -64,8 +64,6 @@ UsersDao::UsersDao(SQLW::Database &database)
         "bBackSpaceVt100   BOOLEAN NOT NULL, "
         "iNuvVotesYes      INTEGER NOT NULL, "
         "iNuvVotesNo       INTEGER NOT NULL, "
-        "sUsersVotingYes   TEXT NOT NULL, "
-        "sUusersVotingNo   TEXT NOT NULL, "
         "dtPassChangeDate  DATETIME DEFAULT CURRENT_TIMESTAMP, "
         "dtLastReplyDate   DATETIME DEFAULT CURRENT_TIMESTAMP, "
         "bScrollFL         BOOLEAN NOT NULL, "
@@ -598,9 +596,10 @@ bool UsersDao::updateUserRecord(user_ptr user)
  * @param user
  * @return
  */
-bool UsersDao::insertUserRecord(user_ptr user)
+long UsersDao::insertUserRecord(user_ptr user)
 {    
     bool result = false;
+    long lastInsertId = -1;
 
     // Make Sure Database Reference is Connected
     if (!m_users_database.isConnected())
@@ -625,7 +624,13 @@ bool UsersDao::insertUserRecord(user_ptr user)
     statements.push_back(queryString);
     result = qry->executeTransaction(statements);
 
-    return result;
+    // We need the insert id for user table
+    if (result)
+    {
+        lastInsertId = qry->getInsertId();
+    }
+
+    return lastInsertId;
 }
 
 /**

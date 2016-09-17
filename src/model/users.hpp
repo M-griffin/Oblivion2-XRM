@@ -93,7 +93,7 @@ public:
     bool bIgnoreTimeLimit;
     bool bAllowPurge;
 
-    int iSecurityIndex;
+    long iSecurityIndex;
 
     // Default User ID to -1 so we know it's not active!
     Users()
