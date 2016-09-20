@@ -105,7 +105,7 @@ void ModSignup::createTextPrompts()
     value[PROMPT_USE_CLEAR]          = std::make_pair("Clear Screen or Scroll ", "|CR|CR|08Clear Screen or Scroll [ENTER] = Yes: |04");
     value[PROMPT_USE_ANSI_COLOR]     = std::make_pair("Use Ansi Color ", "|CR|CR|08[y/n] Ansi Color [ENTER] = Yes: |04");
     value[PROMPT_BACK_SPACE]         = std::make_pair("Backspace Sequence", "|CR|CR|08Backspace Key |CR[(W)indows/(T)erminal/(D)etect [ENTER] = Detect] : |04");
-    value[PROMPT_VERIFY_SAVE]        = std::make_pair("Verify All Data", "|CR|CR|08[y/n] Verify and Save user record: |04");
+    value[PROMPT_VERIFY_SAVE]        = std::make_pair("Verify All Data", "|CR|CR|08[y/n] Verify and Save user record [ENTER] = Yes: |04");
 
 
     // Invalid.
@@ -114,6 +114,7 @@ void ModSignup::createTextPrompts()
     value[PROMPT_PASS_INVALID]       = std::make_pair("Invalid/Non Matching Password", "|CR|04Invalid, password does not match!|CR");
     value[PROMPT_HANDLE_INVALID]     = std::make_pair("User Name Already Exists", "|CR|04Invalid UserName, Already Exists!|CR");
     value[PROMPT_NAME_INVALID]       = std::make_pair("Real Name Already Exists", "|CR|04Name, Already Exists, Try Adding a middle initial.|CR");
+    value[PROMPT_EMAIL_INVALID]      = std::make_pair("Email Already Exists", "|CR|04Email, Already Exists, Try another adress or check if your have an account.|CR");
 
     // Confirmation of Save
     value[PROMPT_SAVED]              = std::make_pair("User Record Saved", "|CR|10User Record Saved Successfully.|CR");
@@ -789,11 +790,35 @@ bool ModSignup::email(const std::string &input)
             return false;
         }
 
-        // Set the User Name
-        m_user_record->sEmail = key;
 
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        // Test if email already exists.
+        users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+        user_ptr search = user_data->getUserByEmail(key);
+
+        if(search->iId == -1)
+        {
+            std::cout << "no match found" << std::endl;
+
+            // Set the User Name
+            m_user_record->sEmail = key;
+
+            // Move to next module.
+            changeModule(m_mod_function_index+1);
+        }
+        else
+        {
+            std::cout << "match found" << std::endl;
+
+            // Invalid Entry, try again!
+            displayPrompt(PROMPT_EMAIL_INVALID);
+
+            // Invalid, Ask again, Reload Current Module
+            changeModule(m_mod_function_index);
+        }
+
+
+
+        
     }
     else
     {
@@ -887,10 +912,12 @@ bool ModSignup::birthday(const std::string &input)
 
         if(boost::regex_match(key, str_matches, date_regex))
         {
+            // Append Time For Date.
+            key += " 00:00:00";
             struct std::tm tm;
             std::istringstream ss(key);
 
-            ss >> std::get_time(&tm, "%Y-%m-%d");
+            ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
 
             // Make sure date format was parsed properly.
             if(ss.fail())
@@ -905,7 +932,7 @@ bool ModSignup::birthday(const std::string &input)
                 changeModule(m_mod_function_index);
             }
 
-            std::time_t time = mktime(&tm);
+            std::time_t const time = mktime(&tm);
 
             // Set the User Birth Date
             m_user_record->dtBirthday = time;
@@ -1667,7 +1694,9 @@ void ModSignup::saveNewUserRecord()
         // Save New User Record
         m_user_record->iSecurityIndex = securityIndex;
 
-        std::time_t result = std::time(nullptr);
+        //time_t const t = (time_t)time(0);
+        std::time_t tt = 0;
+        std::time_t const result = std::time(&tt);
 
         m_user_record->dtFirstOn = result;
         m_user_record->dtPassChangeDate = result;

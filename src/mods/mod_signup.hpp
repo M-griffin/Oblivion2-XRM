@@ -179,6 +179,7 @@ public:
     const std::string PROMPT_PASS_INVALID = "pass_invalid";
     const std::string PROMPT_HANDLE_INVALID = "handle_invalid";
     const std::string PROMPT_NAME_INVALID = "name_invalid";
+    const std::string PROMPT_EMAIL_INVALID = "email_invalid";
 
     const std::string PROMPT_SAVED = "confirmed_save";
     const std::string PROMPT_NOT_SAVED = "record_not_saved";
