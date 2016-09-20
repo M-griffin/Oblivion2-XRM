@@ -1,4 +1,12 @@
 
+Change Log Update (00.00.48)
+* 2016-09-20
++ More work on Sign-up and saving user data.
++ Narrowed down saving Birth date and Call Dates to the database in UTC Unix epoch.
++ Need to test some on applying different times differences.  Local time works good
+  Good for system, but each user will select and have their own local time represented.
++ Also added Invalid Email prompt when the email entered already exists.
+
 Change Log Update (00.00.47)
 * 2016-09-17
 + Worked more on the sign-up process,  Now saving user record and security record
