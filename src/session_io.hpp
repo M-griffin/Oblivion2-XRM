@@ -7,6 +7,7 @@
 #include "model/structures.hpp"
 
 #include <string>
+#include <map>
 
 /**
  * @class SessionIO
@@ -21,7 +22,6 @@ public:
 
     // Types for Text Prompt formatting to file.
     typedef std::pair<std::string, std::string> M_StringPair;
-
 
     SessionIO(session_data_ptr session_data);
     ~SessionIO();
@@ -115,15 +115,32 @@ public:
 
 
     /**
-     * @brief Parses Text Prompt String Pair
-     * @param prompt
+     * @brief Stores Key (MCI Code) Value (String for Replacement) in Mapping
+     * @param key
+     * @param value
      * @return
      */
     std::string parseTextPrompt(const M_StringPair &prompt);
 
+
+    /**
+     * @brief Parses Text Prompt String Pair
+     * @param prompt
+     * @return
+     */
+    void addMCIMapping(const std::string &key, const std::string &value);
+
+
+    /**
+     * @brief Clears all mappings
+     */
+    void clearAllMCIMapping();
+
+
     // Internal Methods
-    session_data_ptr m_session_data; // SessionData
-    CommonIO         m_common_io;    // CommonIO
+    session_data_ptr                   m_session_data; // SessionData
+    CommonIO                           m_common_io;    // CommonIO
+    std::map<std::string, std::string> m_mapped_codes; // MCI Code Translation for specific screens.
 };
 
 #endif // MENU_IO_HPP
