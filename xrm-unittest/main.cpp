@@ -18,10 +18,12 @@
 #include <vector>
 #include <stdexcept>
 
-std::string BBS_PATH = "";
-std::string DATA_PATH = "";
-std::string MENU_PATH = "";
-std::string TEXTFILE_PATH = "";
+std::string GLOBAL_BBS_PATH;      // BBS System
+std::string GLOBAL_DATA_PATH;
+std::string GLOBAL_MENU_PATH;
+std::string GLOBAL_TEXTFILE_PATH;
+
+std::string USERS_DATABASE;
 
 /*
  * These Unit Tests are To test the core logic of classes and methods.

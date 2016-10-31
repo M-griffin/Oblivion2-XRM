@@ -19,27 +19,27 @@
 
 namespace SQLW
 {
-    SysLog::SysLog(const std::string& appname,int option,int facility)
-    {
-        openlog(appname.c_str(), option, facility);
-    }
+SysLog::SysLog(const std::string& appname,int option,int facility)
+{
+    openlog(appname.c_str(), option, facility);
+}
 
-    SysLog::~SysLog()
-    {
-        closelog();
-    }
+SysLog::~SysLog()
+{
+    closelog();
+}
 
-    void SysLog::databaseError(Database& db,const std::string& str)
-    {
-        syslog(LOG_ERR, "%s", str.c_str());
-    }
+void SysLog::databaseError(Database& db,const std::string& str)
+{
+    syslog(LOG_ERR, "%s", str.c_str());
+}
 
 
-    void SysLog::databaseError(Database& db,Query& q,const std::string& str)
-    {
-        syslog(LOG_ERR, "%s: %s(%d)", str.c_str(),q.GetError().c_str(),q.GetErrno());
-        syslog(LOG_ERR, "QUERY: \"%s\"", q.GetLastQuery().c_str());
-    }
+void SysLog::databaseError(Database& db,Query& q,const std::string& str)
+{
+    syslog(LOG_ERR, "%s: %s(%d)", str.c_str(),q.GetError().c_str(),q.GetErrno());
+    //syslog(LOG_ERR, "QUERY: \"%s\"", q.GetLastQuery().c_str());
+}
 
 } // namespace SQLW
 

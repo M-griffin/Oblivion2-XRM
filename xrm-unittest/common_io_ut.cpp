@@ -329,10 +329,10 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(result, false);
     }
 
-     /**
-     * @brief Parses Input char at a time.
-     * @return
-     */
+    /**
+    * @brief Parses Input char at a time.
+    * @return
+    */
 
     TEST(parseInput_Normal_Character_Should_Return_Same)
     {
@@ -398,5 +398,5 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(result, "\x1b");
     }
 
-    
+
 }
