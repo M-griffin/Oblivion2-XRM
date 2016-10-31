@@ -6,11 +6,13 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
 
+#include <vector>
+
 // Forward Declerations
 namespace SQLW
 {
-    class Database;
-    class Query;
+class Database;
+class Query;
 }
 
 
@@ -47,7 +49,7 @@ public:
     std::string cmdSecurityTableExists;
     std::string cmdCreateSecurityTable;
     std::string cmdDropSecurityTable;
-    
+
 
     /**
      * @brief Check of the Database Exists.
@@ -120,7 +122,7 @@ public:
      * @return
      */
     security_ptr getSecurityById(long securityId);
-    
+
 };
 
 // Handle to Database Queries

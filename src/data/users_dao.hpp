@@ -4,11 +4,13 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
 
+#include <vector>
+
 // Forward Declerations
 namespace SQLW
 {
-    class Database;
-    class Query;
+class Database;
+class Query;
 }
 
 class Users;
