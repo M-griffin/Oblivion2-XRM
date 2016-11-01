@@ -125,7 +125,8 @@ public:
     {
         std::lock_guard<std::mutex> lock(m_node_mutex);
         auto it = std::find(m_node_array.begin(), m_node_array.end(), int_to_remove);
-        if (it != m_node_array.end()) {
+        if (it != m_node_array.end())
+        {
             std::swap(*it, m_node_array.back());
             m_node_array.pop_back();
         }
@@ -140,6 +141,7 @@ public:
     {
         std::lock_guard<std::mutex> lock(m_data_mutex);
         m_room->shutdown();
+        m_active = false;
     }
 
     /**
@@ -172,8 +174,18 @@ public:
         // Create Mapping to pass for file creation (default values)
         M_TextPrompt value;
         value[GLOBAL_PROMPT_PAUSE]            = std::make_pair("Displayed for Pause Prompts", "|03Hit any Key |08-- |03OBV/2 XRM");
-        
+
         m_text_prompts_dao->writeValue(value);
+    }
+
+    /**
+     * @brief Check if the System is Active
+     * Used for io_service reloading
+     * @return
+     */
+    bool isActive()
+    {
+        return m_active;
     }
 
     /**
@@ -184,20 +196,21 @@ public:
     M_StringPair getGlobalPrompt(const std::string &lookup)
     {
         std::lock_guard<std::mutex> lock(m_prompt_mutex);
-        
+
         M_StringPair result = m_text_prompts_dao->getPrompt(lookup);
         return result;
     }
 
     // ThreadSafe Message Queue
     SafeQueue<std::string> m_queue;
-    session_manager_ptr    m_room;    
+    session_manager_ptr    m_room;
 
 private:
 
     std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
     bool                   m_is_text_prompt_exist;
+    bool                   m_active;
 
     mutable std::mutex     m_node_mutex;
     mutable std::mutex     m_data_mutex;

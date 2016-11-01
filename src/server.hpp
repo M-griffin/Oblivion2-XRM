@@ -36,10 +36,12 @@ public:
         boost::asio::ip::v6_only v6_only(false);
         boost::system::error_code ec;
 
+
         // Try to Setup Listen Socket with IPv6 + IPv4 Support.
         m_acceptor_v6.open(boost::asio::ip::tcp::v6(), ec);
         if (!ec)
         {
+            m_acceptor_v6.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
             m_acceptor_v6.set_option(v6_only, ec);
             m_acceptor_v6.get_option(v6_only);
 
@@ -60,6 +62,7 @@ public:
             m_acceptor_v4.open(tcp::v4(), ec);
             if (!ec)
             {
+                m_acceptor_v4.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
                 // Listen to localhost connections only
                 //m_acceptor_v4.bind(tcp::endpoint(ip::address::from_string("127.0.0.1"), "5555"));
                 m_acceptor_v4.bind(tcp::endpoint(boost::asio::ip::tcp::v4(), port));
@@ -113,17 +116,17 @@ public:
         if (m_is_using_ipv6)
         {
             m_acceptor_v6.async_accept(new_connection->m_normal_socket,
-                                boost::bind(&Server::handle_accept, this,
-                                            new_connection,
-                                            boost::asio::placeholders::error));
+                                       boost::bind(&Server::handle_accept, this,
+                                                   new_connection,
+                                                   boost::asio::placeholders::error));
 
         }
         else
         {
             m_acceptor_v4.async_accept(new_connection->m_normal_socket,
-                                boost::bind(&Server::handle_accept, this,
-                                            new_connection,
-                                            boost::asio::placeholders::error));
+                                       boost::bind(&Server::handle_accept, this,
+                                                   new_connection,
+                                                   boost::asio::placeholders::error));
         }
     }
 

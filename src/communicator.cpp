@@ -20,6 +20,7 @@ Communicator::Communicator()
     : m_filename("mod_global.yaml")
     , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
     , m_is_text_prompt_exist(false)
+    , m_active(true)
 {
     std::cout << "Communicator" << std::endl;
 
