@@ -8,6 +8,12 @@ Change Log Update (00.00.50)
 + Added flag for global shutdown on the communation to let the thread loop
   know when the io_service is ready to be shutdown for good.
 
+* 2016-10-15
++ SessionIO::pipe2ansi, added new custom screen MCI translations lookup/replacements
+  On custom screen we need to ability to compile of a list of MCI codes specific 
+  to an interface, then when the ansi is parsed it quickly process these interface 
+  specific codes.
+
 Change Log Update (00.00.49)
 * 2016-10-11
 + Updated workspace, moved project files to separate win32 folder, Linux and BSD etc..
@@ -976,7 +982,7 @@ Short Term Goals:
 5. WFC (Waiting for Caller) Interface for configuration and node chat/viewing.
 
 Long Term Goals:
-1. Telnet server options for ignoring bad ip's and too many connections from the 
+1. Telnet server options for ignoring bad IP's and too many connections from the 
    same ip address.
 2. Full OBV/2 Menu command and light-bar emulations.
    Support for Stacked commands along with fall back menu

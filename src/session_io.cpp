@@ -15,6 +15,7 @@ SessionIO::SessionIO(session_data_ptr session_data)
 
 SessionIO::~SessionIO()
 {
+    clearAllMCIMapping();
     std::cout << "~SessionIO" << std::endl;
 }
 
@@ -660,6 +661,21 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
         my_matches = code_map.back();
         code_map.pop_back();
 
+        // Check for Custom Screen Translation Mappings
+        // If these exist, they take presidence over standard codes
+        if (m_mapped_codes.size() > 0)
+        {
+            std::map<std::string, std::string>::iterator it;
+            it = m_mapped_codes.find(my_matches.m_code);
+            if (it != m_mapped_codes.end())
+            {
+                // If found, replace mci sequence with text
+                ansi_string.replace(my_matches.m_offset, my_matches.m_length, it->second);
+                continue;
+            }
+        }
+
+
         // Handle parsing on expression match.
         switch(my_matches.m_match)
         {
@@ -777,6 +793,10 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
 
     // Clear Codemap.
     std::vector<MapType>().swap(code_map);
+
+    // Clear Custom MCI Screen Translation Mappings
+    clearAllMCIMapping();
+
     return ansi_string;
 }
 
@@ -814,4 +834,27 @@ std::string SessionIO::parseTextPrompt(const M_StringPair &prompt)
 
     std::string text_prompt = prompt.second;
     return pipe2ansi(text_prompt);
+}
+
+/**
+ * @brief Stores Key (MCI Code) Value (String for Replacement) in Mapping
+ * @param key
+ * @param value
+ * @return
+ */
+void SessionIO::addMCIMapping(const std::string &key, const std::string &value)
+{
+    m_mapped_codes.insert(std::pair<std::string, std::string>(std::move(key), std::move(value)));
+}
+
+
+/**
+ * @brief Clears all mappings
+ */
+void SessionIO::clearAllMCIMapping()
+{
+    if (m_mapped_codes.size() > 0)
+    {
+        std::map<std::string, std::string>().swap(m_mapped_codes);
+    }
 }
