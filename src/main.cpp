@@ -38,6 +38,7 @@
 #include <iostream>
 #include <thread>
 #include <map>
+#include <exception>
 
 // temp
 #include <fstream>
@@ -101,7 +102,7 @@ void handler(const boost::system::error_code& /*e*/,
  * @param io_service
  */
 void run(boost::asio::io_service& io_service)
-{    
+{
     // Create Handles to Services
     server_telnet_ptr serverTelnet;
     server_ssl_ptr    serverSSL;
@@ -120,48 +121,51 @@ void run(boost::asio::io_service& io_service)
 
     // Loads the Config file into the Data Access Object.
     cfg.loadConfig();
-    
-    // Service Startup Here.
-    try
-    {        
-        // Startup Telnet Server
-        if (cfg.m_config->use_service_telnet)
-        {
-            std::cout << "Listening for telnet connections on port "
-                      << cfg.m_config->port_telnet << std::endl;
-            serverTelnet.reset(new Server(io_service, cfg.m_config->port_telnet));
-        }
 
-        // Initial Testing of SSL Server.
-        if (cfg.m_config->use_service_ssl)
-        {
-            std::cout << "Listening for service connections on port "
-                      << cfg.m_config->port_ssl << std::endl;
-            serverSSL.reset(new ServerSSL(io_service, cfg.m_config->port_ssl));
-        }
-
-        // Setup first timer.
-        //    int count = 0;
-        //    boost::asio::deadline_timer timer(io_service, boost::posix_time::seconds(1));
-        //    timer.async_wait(
-        //        boost::bind(handler, boost::asio::placeholders::error, &timer, &count));
-
-        io_service.run();
-
-        /* If we want to created extra helper threads to Enable later, don't need now in development!
-         std::thread thread1{[&io_service](){ io_service.run(); }};
-         std::thread thread2{[&io_service](){ io_service.run(); }};
-         thread1.join();
-         thread2.join();
-        */
-
-        // here we process all network (or other) operations associated with io_service
-    }
-    catch(std::exception& e)
+    // Startup Telnet Server
+    if (cfg.m_config->use_service_telnet)
     {
-        std::cerr << "Exception: " << e.what() << "\n";
+        std::cout << "Listening for telnet connections on port "
+                  << cfg.m_config->port_telnet << std::endl;
+        serverTelnet.reset(new Server(io_service, cfg.m_config->port_telnet));
     }
 
+    // Initial Testing of SSL Server.
+    if (cfg.m_config->use_service_ssl)
+    {
+        std::cout << "Listening for service connections on port "
+                  << cfg.m_config->port_ssl << std::endl;
+        serverSSL.reset(new ServerSSL(io_service, cfg.m_config->port_ssl));
+    }
+
+    // Setup first timer.
+    //    int count = 0;
+    //    boost::asio::deadline_timer timer(io_service, boost::posix_time::seconds(1));
+    //    timer.async_wait(
+    //        boost::bind(handler, boost::asio::placeholders::error, &timer, &count));
+
+    // Loop IO Service Execution Thread
+    // We need a break for shutdowns!
+    while(TheCommunicator::instance()->isActive())
+    {
+        try
+        {
+            io_service.run();
+
+            /* If we want to created extra helper threads to Enable later, don't need now in development!
+             std::thread thread1{[&io_service](){ io_service.run(); }};
+             std::thread thread2{[&io_service](){ io_service.run(); }};
+             thread1.join();
+             thread2.join();
+            */
+
+            // here we process all network (or other) operations associated with io_service
+        }
+        catch(std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
+    }
 }
 
 /**
@@ -186,11 +190,11 @@ auto main() -> int
     // Setup Users Database name and path
     USERS_DATABASE = GLOBAL_DATA_PATH;
 
-    #ifdef _WIN32
+#ifdef _WIN32
     USERS_DATABASE.append("\\");
-    #else
+#else
     USERS_DATABASE.append("/");
-    #endif
+#endif
 
     USERS_DATABASE.append("xrm_users.sqlite3");
 
@@ -249,7 +253,7 @@ auto main() -> int
 
             std::cout << "user table created successfully." << std::endl;
         }
-       
+
         // NEW Loading and saving default Configuration file to XML
 
         config_ptr config(new Config());
@@ -282,7 +286,7 @@ auto main() -> int
 
     // Main Thread, Get Server Input from System Operator
     // We'll handle Node and System setup here.  Need to write interface.
-    while(true)
+    while(TheCommunicator::instance()->isActive())
     {
         // Just testing with text input, change this to state for commands
         // Or communication with a session or all sessions!
