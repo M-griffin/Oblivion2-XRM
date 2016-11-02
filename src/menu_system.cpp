@@ -409,18 +409,10 @@ void MenuSystem::startupMenu()
         std::string key = (char *)m.Keys;
         key = to_upper(key);
 
-        if(key == "FIRSTCMD")
+        if(key == "FIRSTCMD" || key == "EACH")
         {
             // Process
             std::cout << "FOUND FIRSTCMD! EXECUTE: " << m.CKeys << std::endl;
-            executeMenuOptions(m);
-        }
-
-        // Next Process EVERY Commands}
-        else if(key == "EACH")
-        {
-            // Process
-            std::cout << "FOUND EACH! EXECUTE: " << m.CKeys << std::endl;
             executeMenuOptions(m);
         }
     }
@@ -438,6 +430,7 @@ void MenuSystem::lightbarUpdate(int previous_pulldown_id)
     // Turn off Previous Bar
     light_bars.append(m_ansi_process->buildPullDownBars(previous_pulldown_id, false));
 
+    // Grab Previous
     for(auto &m : m_loaded_pulldown_options)
     {
         if(m.PulldownID == previous_pulldown_id)
@@ -451,6 +444,7 @@ void MenuSystem::lightbarUpdate(int previous_pulldown_id)
     // Turn on Current Bar
     light_bars.append(m_ansi_process->buildPullDownBars(m_active_pulldownID, true));
 
+    // Grab Current or new selection
     for(auto &m : m_loaded_pulldown_options)
     {
         if(m.PulldownID == m_active_pulldownID)
