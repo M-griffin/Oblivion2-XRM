@@ -574,37 +574,185 @@ std::string SessionIO::parsePipeWithChars(const std::string &pipe_code)
     return esc_sequence;
 }
 
+
 /**
- * @brief Parses MCI/Pipe Codes to ANSI Sequences.
- * @param sequence
- * @param interface
+ * @brief Parses Code Map and replaces ansi_string codes with ANSI Sequences.
+ * @param ansi_string
+ * @param code_map
  * @return
  */
-std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
+std::string SessionIO::parseCodeMap(std::string ansi_string, std::vector<MapType> &code_map)
+{   
+    std::cout << "code_map.size(): " << code_map.size() << std::endl;
+    MapType my_matches;
+
+    // All Global MCI Codes likes standard screens and colors will
+    // He handled here, then specific interfaces will break out below this.
+    // Break out parsing on which pattern was matched.
+    while(code_map.size() > 0)
+    {
+        // Loop Backwards to perserve string offsets on replacement.
+        my_matches = code_map.back();
+        code_map.pop_back();
+
+        // Check for Custom Screen Translation Mappings
+        // If these exist, they take presidence over standard codes
+        if (m_mapped_codes.size() > 0)
+        {
+            std::map<std::string, std::string>::iterator it;
+            it = m_mapped_codes.find(my_matches.m_code);
+            if (it != m_mapped_codes.end())
+            {
+                // If found, replace mci sequence with text
+                ansi_string.replace(my_matches.m_offset, my_matches.m_length, it->second);
+                continue;
+            }
+        }
+
+
+        // Handle parsing on expression match.
+        switch(my_matches.m_match)
+        {
+            case 1: // Pipe w/ 2 DIDIT Colors
+                {
+                    std::cout << "Pipe w/ 2 DIDIT Colors |00" << std::endl;
+                    std::string result = std::move(pipeColors(my_matches.m_code));
+                    if(result.size() != 0)
+                    {
+                        // Replace the Color, if not ansi then remove the color!
+                        if (m_session_data->m_is_use_ansi)
+                        {
+                            ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
+                        }
+                        else
+                        {
+                            ansi_string.replace(my_matches.m_offset, my_matches.m_length, "");
+                        }
+                    }
+                    else
+                    {
+                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
+                    }
+                }
+                break;
+
+            case 2: // Pipe w/ 2 Chars and 4 Digits // |XY0101
+                {
+                    std::cout << "Pipe w/ 2 Chars and 4 Digits // |XY0101" << std::endl;
+                    // Remove for now, haven't gotten this far!
+                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, "       ");
+                }
+                break;
+
+            case 3: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
+                {
+                    std::cout << "Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33" << std::endl;
+                    std::string result = std::move(seperatePipeWithCharsDigits(my_matches.m_code));
+                    if(result.size() != 0)
+                    {
+                        // Replace the string
+                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
+                    }
+                }
+                break;
+
+            case 4: // Pipe w/ 2 CHARS
+                // This one will need replacement in the string parsing
+                // Pass the original string becasue of |DE for delay!
+                {
+                    std::cout << "Pipe w/ 2 CHARS // |AA" << std::endl;
+                    std::string result = std::move(parsePipeWithChars(my_matches.m_code));
+                    if(result.size() != 0)
+                    {
+                        // Replace the string
+                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
+                    }
+                    else
+                    {
+                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
+                    }
+                }
+                break;
+
+            case 5: // %%FILENAME.EXT  get filenames for loading from string prompts
+                {
+                    std::cout << "replacing %%FILENAME.EXT codes" << std::endl;
+                    std::string result = std::move(parseFilename(my_matches.m_code));
+                    if(result.size() != 0)
+                    {
+                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
+                    }
+                    else
+                    {
+                        std::string s(my_matches.m_length, ' ');
+                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, s);
+                    }
+                }
+                break;
+
+            case 6: // Percent w/ 2 CHARS
+                {
+                    std::cout << "Percent w/ 2 CHARS" << std::endl;
+                    // Remove for now, haven't gotten this far!
+                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
+                }
+                break;
+
+
+            case 7: // Percent with 2 digits, custom codes
+                {
+                    // Were just removing them becasue they are processed.
+                    // Now that first part of sequence |01 etc.. are processed!
+                    std::cout << "replacing %## codes" << std::endl;
+                    // Remove for now, haven't gotten this far!
+                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
+                }
+                break;
+
+
+
+            default:
+                break;
+        }
+    }
+
+    // Clear Codemap.
+    std::vector<MapType>().swap(code_map);
+
+    // Clear Custom MCI Screen Translation Mappings
+    clearAllMCIMapping();
+
+    return ansi_string;
+}
+
+
+/**
+ * @brief Parses string and returns code mapping and positions
+ * @param sequence
+ * @return
+ */
+std::vector<MapType> SessionIO::pipe2codeMap(const std::string &sequence)
 {
     // Contains all matches found so we can iterate and reaplace
     // Without Multiple loops through the string.
     MapType my_matches;
     std::vector<MapType> code_map;
 
-    // To make parsing a little faster, pre-fill vector with 50,
-    // So it's not allocating each insert.
-    //code_map.reserve(50);
-    //code_map.resize(50);
-
     // Make a copy that we can modify and process on.
     std::string ansi_string = sequence;
 
-    // Each Set of Codes for Expression Matches 1 - 5.
-    // 1. boost::regex expr {"(\\|[0-9]{2})"};
-    // 2. boost::regex expr {"(\\|[A-Z]{1,2}+[0-9]{1,2})"};
-    // 3. boost::regex expr {"(\\|[A-Z]{2})"}; //(?!\\d)"};
-    // 4. boost::regex expr {"(\\%[A-Z]{2})"};
-    // 5. boost::regex expr {"(\\|[A-Z]{2}+[0-9]{4})"};
-    // 6. boost::regex expr {"(\\%[0-9]{2})"};
-    // 7. boost::regex expr {"(\\%%[A-Za-z0-9]+[.].{3})"}; // Get filename.ext from strings.
-
-    boost::regex expr {"(\\|[0-9]{2})|(\\|[A-Z]{1,2}+[0-9]{1,2})|(\\|[A-Z]{2})|(%[A-Z]{2})|(\\|[A-Z]{2}+[0-9]{4})|(\\%[0-9]{2})|(\\%%[A-Za-z0-9]+[.].{3})"};
+    // MCI Code Groups 1 - 7
+    /*
+        ([|]{1}[0-9]{2})                // |00
+        ([|]{1}[X][Y][0-9]{4}           // |XY0101
+        ([|]{1}[A-Z]{1,2}[0-9]{1,2})    // |A1 A22  AA2  AA33
+        ([|]{1}[A-Z]{2})                // |AA
+        ([%]{2}[\w]+[.]{1}[\w]{3})      // %%filename.ans
+        ([%]{1}[A-Z]{2})                // %AA
+        ([%]{1}[0-9]{2})                // %11
+    */
+    boost::regex expr {"([|]{1}[0-9]{2})|([|]{1}[X][Y][0-9]{4})|([|]{1}[A-Z]{1,2}[0-9]{1,2})|([|]{1}[A-Z]{2})" \
+                       "|([%]{2}[\\w]+[.]{1}[\\w]{3})|([%]{1}[A-Z]{2})|([%]{1}[0-9]{2})"};
 
     boost::smatch matches;
     std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
@@ -652,152 +800,20 @@ std::string SessionIO::pipe2ansi(const std::string &sequence, int interface)
 
     std::cout << "code_map.size(): " << code_map.size() << std::endl;
 
-    // All Global MCI Codes likes standard screens and colors will
-    // He handled here, then specific interfaces will break out below this.
-    // Break out parsing on which pattern was matched.
-    while(code_map.size() > 0)
-    {
-        // Loop Backwards to perserve string offsets on replacement.
-        my_matches = code_map.back();
-        code_map.pop_back();
-
-        // Check for Custom Screen Translation Mappings
-        // If these exist, they take presidence over standard codes
-        if (m_mapped_codes.size() > 0)
-        {
-            std::map<std::string, std::string>::iterator it;
-            it = m_mapped_codes.find(my_matches.m_code);
-            if (it != m_mapped_codes.end())
-            {
-                // If found, replace mci sequence with text
-                ansi_string.replace(my_matches.m_offset, my_matches.m_length, it->second);
-                continue;
-            }
-        }
+    return code_map;
+}
 
 
-        // Handle parsing on expression match.
-        switch(my_matches.m_match)
-        {
-            case 1: // Pipe w/ 2 DIDIT Colors
-                {
-                    std::cout << "Pipe w/ 2 DIDIT Colors" << std::endl;
-                    std::string result = std::move(pipeColors(my_matches.m_code));
-                    if(result.size() != 0)
-                    {
-                        // Replace the Color, if not ansi then remove the color!
-                        if (m_session_data->m_is_use_ansi)
-                        {
-                            ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
-                        }
-                        else
-                        {
-                            ansi_string.replace(my_matches.m_offset, my_matches.m_length, "");
-                        }
-                    }
-                    else
-                    {
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
-                    }
-                }
-                break;
-
-            case 2: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
-                {
-                    std::cout << "Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS" << std::endl;
-                    std::string result = std::move(seperatePipeWithCharsDigits(my_matches.m_code));
-                    if(result.size() != 0)
-                    {
-                        // Replace the string
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
-                    }
-                }
-                break;
-
-            case 3: // Pipe w/ 2 CHARS
-                // This one will need replacement in the string parsing
-                // Pass the original string becasue of |DE for delay!
-                {
-                    std::cout << "Pipe w/ 2 CHARS" << std::endl;
-                    std::string result = std::move(parsePipeWithChars(my_matches.m_code));
-                    if(result.size() != 0)
-                    {
-                        // Replace the string
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
-                    }
-                    else
-                    {
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
-                    }
-                }
-                break;
-
-            case 4: // Percent w/ 2 CHARS
-                {
-                    std::cout << "Percent w/ 2 CHARS" << std::endl;
-                    // Remove for now, haven't gotten this far!
-                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
-                }
-                break;
-
-            case 5: // Pipe w/ 2 Chars and 4 Digits
-                // Mainly used for absolute XY position |XY0101
-                {
-                    std::cout << "Pipe w/ 2 Chars and 4 Digits" << std::endl;
-                    // Remove for now, haven't gotten this far!
-                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, "       ");
-                }
-                break;
-
-            case 6: // Percent with 2 digits, custom codes
-                {
-                    // Were just removing them becasue they are processed.
-                    // Now that first part of sequence |01 etc.. are processed!
-                    std::cout << "replacing %## codes" << std::endl;
-                    // Remove for now, haven't gotten this far!
-                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
-                }
-                break;
-
-            case 7: // %%FILENAME.EXT  get filenames for loading from string prompts
-                {
-                    std::cout << "replacing %%FILENAME.EXT codes" << std::endl;
-                    std::string result = std::move(parseFilename(my_matches.m_code));
-                    if(result.size() != 0)
-                    {
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
-                    }
-                    else
-                    {
-                        std::string s(my_matches.m_length, ' ');
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, s);
-                    }
-                }
-                break;
-
-            default:
-                break;
-        }
-
-        // This is to parse for Interface specific MCI Codes.
-        switch(interface)
-        {
-                // Standard + Unique to Menu Prompt
-            case MENU_PROMPT_MCI:
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    // Clear Codemap.
-    std::vector<MapType>().swap(code_map);
-
-    // Clear Custom MCI Screen Translation Mappings
-    clearAllMCIMapping();
-
-    return ansi_string;
+/**
+ * @brief Converts MCI Sequences to Ansi screen output.
+ * @param sequence
+ * @return
+ */
+std::string SessionIO::pipe2ansi(const std::string &sequence)
+{
+    //Broke up these functions for easier unit testing.
+    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence));
+    return parseCodeMap(sequence, code_map);
 }
 
 

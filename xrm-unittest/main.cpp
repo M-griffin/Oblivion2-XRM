@@ -9,6 +9,7 @@
 #include <unittest++/UnitTest++.h>
 #endif
 
+
 // C Standard
 #include <cstdio>
 #include <cstring>
@@ -18,12 +19,12 @@
 #include <vector>
 #include <stdexcept>
 
-std::string GLOBAL_BBS_PATH;      // BBS System
-std::string GLOBAL_DATA_PATH;
-std::string GLOBAL_MENU_PATH;
-std::string GLOBAL_TEXTFILE_PATH;
-
-std::string USERS_DATABASE;
+// Mocking Paths
+std::string GLOBAL_BBS_PATH      = "";
+std::string GLOBAL_DATA_PATH     = "";
+std::string GLOBAL_MENU_PATH     = "";
+std::string GLOBAL_TEXTFILE_PATH = "";
+std::string USERS_DATABASE       = "";
 
 /*
  * These Unit Tests are To test the core logic of classes and methods.

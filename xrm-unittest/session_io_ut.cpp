@@ -244,6 +244,8 @@ SUITE(XRMSessionIO)
         CHECK((result.compare("\x1b""up_arrow") == 0));
     }
 
+
+
     TEST(InputKey_Escape_Sequence_Hardware_Dn_Arrow_Sequence)
     {
         session_data_ptr session_data;
@@ -341,7 +343,13 @@ SUITE(XRMSessionIO)
 
     TEST(createInputField_1_Length_Retuns_Field_Name_1_Length_ANSI_Field)
     {
-        session_data_ptr session_data;
+        // Mock SessionData Class
+        connection_ptr          connection;
+        session_manager_ptr     room;
+        boost::asio::io_service io_service;
+        state_manager_ptr       state_manager;
+
+        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing ";
@@ -352,7 +360,13 @@ SUITE(XRMSessionIO)
 
     TEST(createInputField_10_Length_Retuns_Field_Name_10_Length_ANSI_Field)
     {
-        session_data_ptr session_data;
+        // Mock SessionData Class
+        connection_ptr          connection;
+        session_manager_ptr     room;
+        boost::asio::io_service io_service;
+        state_manager_ptr       state_manager;
+
+        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing ";
@@ -363,7 +377,13 @@ SUITE(XRMSessionIO)
 
     TEST(createInputField_10_Length_Retuns_Default_Becasue_IN17_Larger_Than_length20)
     {
-        session_data_ptr session_data;
+        // Mock SessionData Class
+        connection_ptr          connection;
+        session_manager_ptr     room;
+        boost::asio::io_service io_service;
+        state_manager_ptr       state_manager;
+
+        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing %IN17";
@@ -374,7 +394,13 @@ SUITE(XRMSessionIO)
 
     TEST(createInputField_10_Length_Retuns_Default_Becasue_IN10_Larger_Than_length20)
     {
-        session_data_ptr session_data;
+        // Mock SessionData Class
+        connection_ptr          connection;
+        session_manager_ptr     room;
+        boost::asio::io_service io_service;
+        state_manager_ptr       state_manager;
+
+        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing %IN10";
@@ -385,7 +411,13 @@ SUITE(XRMSessionIO)
 
     TEST(createInputField_10_Length_Retuns_Default_Becasue_IN10_Larger_Than_length20_Failure)
     {
-        session_data_ptr session_data;
+       // Mock SessionData Class
+        connection_ptr          connection;
+        session_manager_ptr     room;
+        boost::asio::io_service io_service;
+        state_manager_ptr       state_manager;
+
+        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing %IN10";
@@ -396,7 +428,13 @@ SUITE(XRMSessionIO)
 
     TEST(createInputField_20_Length_Retuns_Field_Name_Override_Input_Length)
     {
-        session_data_ptr session_data;
+        // Mock SessionData Class
+        connection_ptr          connection;
+        session_manager_ptr     room;
+        boost::asio::io_service io_service;
+        state_manager_ptr       state_manager;
+
+        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing %IN17";
@@ -407,7 +445,13 @@ SUITE(XRMSessionIO)
 
     TEST(createInputField_20_Length_Retuns_Field_Name_Override_Input_Length_And_Color)
     {
-        session_data_ptr session_data;
+        // Mock SessionData Class
+        connection_ptr          connection;
+        session_manager_ptr     room;
+        boost::asio::io_service io_service;
+        state_manager_ptr       state_manager;
+
+        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing %IN17%FB0116";
@@ -418,7 +462,13 @@ SUITE(XRMSessionIO)
 
     TEST(createInputField_10_Length_Retuns_Field_Name_Override_Color_Only)
     {
-        session_data_ptr session_data;
+        // Mock SessionData Class
+        connection_ptr          connection;
+        session_manager_ptr     room;
+        boost::asio::io_service io_service;
+        state_manager_ptr       state_manager;
+
+        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing: %FB0116";
@@ -434,7 +484,13 @@ SUITE(XRMSessionIO)
 
     TEST(getInputField_Test_Field_Return_No_LF)
     {
-        session_data_ptr session_data;
+        // Mock SessionData Class
+        connection_ptr          connection;
+        session_manager_ptr     room;
+        boost::asio::io_service io_service;
+        state_manager_ptr       state_manager;
+
+        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
         std::string character_buffer;
@@ -463,7 +519,13 @@ SUITE(XRMSessionIO)
 
     TEST(getInputField_Test_Field_Return_No_LF_Received_Return_Empty)
     {
-        session_data_ptr session_data;
+        // Mock SessionData Class
+        connection_ptr          connection;
+        session_manager_ptr     room;
+        boost::asio::io_service io_service;
+        state_manager_ptr       state_manager;
+
+        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
         std::string character_buffer;
@@ -486,7 +548,13 @@ SUITE(XRMSessionIO)
 
     TEST(getInputField_Test_Field_Return_Aborted_On_ESC)
     {
-        session_data_ptr session_data;
+        // Mock SessionData Class
+        connection_ptr          connection;
+        session_manager_ptr     room;
+        boost::asio::io_service io_service;
+        state_manager_ptr       state_manager;
+
+        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
         std::string character_buffer;
@@ -507,7 +575,13 @@ SUITE(XRMSessionIO)
 
     TEST(getInputField_Test_Field_Return_Aborted_On_ESC_Mid_Field)
     {
-        session_data_ptr session_data;
+        // Mock SessionData Class
+        connection_ptr          connection;
+        session_manager_ptr     room;
+        boost::asio::io_service io_service;
+        state_manager_ptr       state_manager;
+
+        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
         std::string character_buffer;
@@ -544,7 +618,14 @@ SUITE(XRMSessionIO)
     {
         // We want to make sure ESC sequences, arrow keys etc..
         // will not be mistaken for ESC and abort the field.
-        session_data_ptr session_data;
+
+        // Mock SessionData Class
+        connection_ptr          connection;
+        session_manager_ptr     room;
+        boost::asio::io_service io_service;
+        state_manager_ptr       state_manager;
+
+        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
         std::string character_buffer;
@@ -566,34 +647,43 @@ SUITE(XRMSessionIO)
 
         character_buffer = "\x1b";
         std::string value = sess.getInputField(character_buffer, result, length);
-        CHECK_EQUAL(value, "");  // String Aborted Return on ESC Press.
-        CHECK_EQUAL(result, "");        // Result Blank on Aborts
+        CHECK_EQUAL(value, "");       // String Aborted Return on ESC Press.
+        CHECK_EQUAL(result, "");      // Result Blank on Aborts
 
         character_buffer = "[";
         result.clear();
         value = sess.getInputField(character_buffer, result, length);
-        CHECK_EQUAL(value, "");  // String Aborted Return on ESC Press.
-        CHECK_EQUAL(result, "");        // Result Blank on Aborts
+        CHECK_EQUAL(value, "");       // String Aborted Return on ESC Press.
+        CHECK_EQUAL(result, "");      // Result Blank on Aborts
 
         character_buffer = "A";
         result.clear();
         value = sess.getInputField(character_buffer, result, length);
-        CHECK_EQUAL(value, "");  // String Aborted Return on ESC Press.
-        CHECK_EQUAL(result, "");        // Result Blank on Aborts
+
+        std::cout << value << std::endl;
+        CHECK_EQUAL(value, "empty");  // String Aborted Return on ESC Press.
+        CHECK_EQUAL(result, "");      // Result Blank on Aborts
 
         // Now return the character after the ESC Sequence.
         character_buffer = "A";
         result.clear();
         value = sess.getInputField(character_buffer, result, length);
-        CHECK_EQUAL(value, "A");  // String Aborted Return on ESC Press.
-        CHECK_EQUAL(result, "");  // Result Blank on Aborts only returns data after ENTER
+        CHECK_EQUAL(value, "A");      // String Aborted Return on ESC Press.
+        CHECK_EQUAL(result, "");      // Result Blank on Aborts only returns data after ENTER
     }
 
     TEST(getInputField_Test_Field_Returns_Result_String_On_Enter)
     {
         // We want to make sure ESC sequences, arrow keys etc..
         // will not be mistaken for ESC and abort the field.
-        session_data_ptr session_data;
+
+        // Mock SessionData Class
+        connection_ptr          connection;
+        session_manager_ptr     room;
+        boost::asio::io_service io_service;
+        state_manager_ptr       state_manager;
+
+        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
         std::string character_buffer;
@@ -623,7 +713,14 @@ SUITE(XRMSessionIO)
     {
         // We want to make sure ESC sequences, arrow keys etc..
         // will not be mistaken for ESC and abort the field.
-        session_data_ptr session_data;
+
+        // Mock SessionData Class
+        connection_ptr          connection;
+        session_manager_ptr     room;
+        boost::asio::io_service io_service;
+        state_manager_ptr       state_manager;
+
+        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
         std::string character_buffer;
@@ -643,11 +740,4 @@ SUITE(XRMSessionIO)
         CHECK_EQUAL(result, "");   // Result Blank on Aborts
     }
 
-    /*
-    std::string SessionIO::getInputField(const std::string &character_buffer,
-                                     std::string &result,
-                                     int length,
-                                     std::string leadoff,
-                                     bool hidden)
-                                      */
 }

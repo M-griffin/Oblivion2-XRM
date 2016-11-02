@@ -1,4 +1,12 @@
 
+Change Log Update (00.00.51)
+* 2016-11-02
++ Minor Updates to menu system
++ Refactored regexp for pipe2ansi, also broke out code_map and parsing
+  to more easily unit test results from regexp.
++ Updated unit tests for previous code changes.
+- WIP add new unit tests for code mapping
+
 Change Log Update (00.00.50)
 * 2016-11-01
 + Create Linux Workspace and project files

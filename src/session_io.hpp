@@ -106,13 +106,26 @@ public:
     std::string parsePipeWithChars(const std::string &pipe_code);
 
     /**
-     * @brief Parses MCI/Pipe Codes to ANSI Sequences.
-     * @param sequence
-     * @param interface
+     * @brief Parses Code Map and replaces ansi_string codes with ANSI Sequences.
+     * @param ansi_string
+     * @param code_map
      * @return
      */
-    std::string pipe2ansi(const std::string &sequence, int interface = STANDARD_MCI);
+    std::string parseCodeMap(std::string ansi_string, std::vector<MapType> &code_map);
 
+    /**
+     * @brief Parses string and returns code mapping and positions
+     * @param sequence
+     * @return
+     */
+    std::vector<MapType> pipe2codeMap(const std::string &sequence);
+
+    /**
+     * @brief Converts MCI Sequences to Ansi screen output.
+     * @param sequence
+     * @return
+     */
+    std::string pipe2ansi(const std::string &sequence);
 
     /**
      * @brief Stores Key (MCI Code) Value (String for Replacement) in Mapping
