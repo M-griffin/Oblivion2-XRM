@@ -1,4 +1,9 @@
 
+Change Log Update (00.00.52)
+* 2016-11-03
++ Create new unit tests for SessionIO testing main MCI regex sequence parsing.
+  Completed tests for all (7) groups of codes.
+
 Change Log Update (00.00.51)
 * 2016-11-02
 + Minor Updates to menu system
