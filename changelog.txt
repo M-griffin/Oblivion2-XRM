@@ -1,7 +1,15 @@
 
+Change Log Update (00.00.53)
+* 2016-11-05
++ Added some more regexp field validation expressions (unit tests needed)
++ Added regexp validation messages, for descriptions on field requirements.
+
+* 2016-11-04
++ Some cppcheck issues fixed
+  
 Change Log Update (00.00.52)
 * 2016-11-03
-+ Create new unit tests for SessionIO testing main MCI regex sequence parsing.
++ Create new unit tests for SessionIO testing main MCI Regex sequence parsing.
   Completed tests for all (7) groups of codes.
 
 Change Log Update (00.00.51)
@@ -15,10 +23,10 @@ Change Log Update (00.00.51)
 Change Log Update (00.00.50)
 * 2016-11-01
 + Create Linux Workspace and project files
-+ Fixes issues with linux terminal closing causing exceptions in io_service
++ Fixes issues with Linux terminal closing causing exceptions in io_service
   Now the io_service loops and reload any disconnects which doesn't cause
   issues to other connections and threads.
-+ Added flag for global shutdown on the communation to let the thread loop
++ Added flag for global shutdown on the commutation to let the thread loop
   know when the io_service is ready to be shutdown for good.
 
 * 2016-10-15
@@ -996,7 +1004,7 @@ Short Term Goals:
 
 Long Term Goals:
 1. Telnet server options for ignoring bad IP's and too many connections from the 
-   same ip address.
+   same IP address.
 2. Full OBV/2 Menu command and light-bar emulations.
    Support for Stacked commands along with fall back menu
    - Extra new support added for listing descriptive commands top/down in 

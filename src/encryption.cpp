@@ -43,7 +43,6 @@ std::string Encrypt::SHA1(std::string key, std::string salt)
     const EVP_MD *md;
     unsigned char md_value[EVP_MAX_MD_SIZE]= {0};
     unsigned int  md_len = 0;
-    size_t i;
 
     OpenSSL_add_all_digests();
 
@@ -69,7 +68,7 @@ std::string Encrypt::SHA1(std::string key, std::string salt)
         EVP_DigestFinal_ex(&mdctx, md_value, &md_len);
         EVP_MD_CTX_cleanup(&mdctx);
 
-        for(i = 0; i < md_len; i++)
+        for(size_t i = 0; i < md_len; i++)
         {
             result += unsignedToHex(md_value[i]);
         }
