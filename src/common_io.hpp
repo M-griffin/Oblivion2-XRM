@@ -164,6 +164,13 @@ public:
      * Get The BBS System Users HOME directory
      */
     std::string getSystemHomeDirectory();
+    
+    /**
+     * @brief Appends Path Seperator depending on environment.
+     * @param path
+     * @return 
+     */
+    void pathAppend(std::string &path);
 
     /**
      * String Lengh counting actual characters not bytes

@@ -186,7 +186,7 @@ std::string CommonIO::getSystemHomeDirectory()
         if(!homedir)
         {
             std::cout << "Error: Unable to locate bbs user's home directory: "
-                      << homedir << std::endl;
+                      << std::endl;
             home_directory = "";
         }
         else
@@ -198,6 +198,22 @@ std::string CommonIO::getSystemHomeDirectory()
     return home_directory;
 }
 #endif
+
+
+/**
+ * @brief Appends Path Seperator depending on environment.
+ * @param path
+ * @return 
+ */
+void CommonIO::pathAppend(std::string &path)
+{
+#ifdef _WIN32
+    path.append("\\");
+#else
+    path.append("/");
+#endif
+}
+
 
 /**
  * @brief String Lengh counting actual characters not bytes
@@ -1180,7 +1196,6 @@ void CommonIO::PascalToCString(int8_t *string)
 /**
  * @brief Converts Pascal Strings to C-Strings
  * @param string
- * NOTE, TEST THIS!
  */
 void CommonIO::CStringToPascal(int8_t *string)
 {
@@ -1251,20 +1266,14 @@ void CommonIO::parseLocalMCI(std::string &AnsiString, const std::string &mcicode
 void CommonIO::readinAnsi(std::string FileName, std::string &buff)
 {
     std::string path = GLOBAL_TEXTFILE_PATH;
-#ifdef _WIN32
-    path.append("\\");
-#else
-    path.append("/");
-#endif
+    pathAppend(path);
     path += FileName;
 
     FILE *fp;
-    std::string::size_type id1 = 0;
 
     int c = 0;
     if((fp = fopen(path.c_str(), "r+")) ==  NULL)
     {
-        std::cout << "<ERROR> ANSI not found: " << path << std::endl;
         return;
     }
     do
@@ -1279,18 +1288,6 @@ void CommonIO::readinAnsi(std::string FileName, std::string &buff)
         }
     }
     while(c != EOF);
-
-    // If we have clear, replace with MCI code so it will add
-    // Clear then Also goto [1,1] Home Cursor Position.
-    //do
-    //{
-    //id1 = buff.find("\x1b[2J",0);
-    //if (id1 != std::string::npos)
-    //{
-    //    buff.replace(id1,4,"|CS");
-    //}
-    //}
-    //while(id1 != std::string::npos);
 
     fclose(fp);
 }

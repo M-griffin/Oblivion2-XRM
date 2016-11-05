@@ -173,10 +173,20 @@ public:
 
 // Regexp String Validations
     std::string regexp_generic_validation;
+    std::string regexp_generic_validation_msg;
+    
     std::string regexp_handle_validation;
+    std::string regexp_handle_validation_msg;
+    
     std::string regexp_password_validation;
+    std::string regexp_password_validation_msg;
+    
     std::string regexp_date_validation;
+    std::string regexp_date_validation_msg;
+    
     std::string regexp_email_validation;
+    std::string regexp_email_validation_msg;
+    
 
     Config()
         : bbs_name_sysop("New OBV2 XRM Sysop")
@@ -211,6 +221,7 @@ public:
         , access_mail_attachment("s20")
         , access_top_ten("s20")
         , access_check_sysop_avail("s20")
+        
         , use_file_points(false)        // NEW
         , use_postcall_ratio(false)     // NEW
         , use_library_ansi(true)
@@ -223,10 +234,13 @@ public:
         , use_newuser_password(true)
         , use_disclaimer(true)
         , use_address(true)
+        
         , hidden_input_character('*')
+        
         , use_auto_validate_users(false)
         , use_newuser_voting(false)
         , use_auto_kick_unvalidated(false)
+        
         , newuser_votes_validate(3)
         , newuser_votes_delete(3)
         , newuser_days_to_upload(7)
@@ -254,18 +268,31 @@ public:
         , default_post_call_ratio(0)
         , default_time_limit(120)
         , default_user_timeout(20)
+        
         , use_auto_validate_files(false)
         , use_upload_checker(false) // default to true lateron!
+        
         , cmdline_virus_scan("")
         , filename_bbs_ad("")
         , filename_archive_comments("")
         , directory_bad_files("")
+        
         , use_greater_then_for_quotes(false)
-        , regexp_generic_validation("")
-        , regexp_handle_validation("")
-        , regexp_password_validation("")
+        
+        , regexp_generic_validation("[^\\s][\\w,.!@#$%^&*()]+")  // testing no starting spaces!
+        , regexp_generic_validation_msg("At least one AlphaNumeric Word character required.")
+        
+        , regexp_handle_validation("(?=.*[a-zA-Z])(?!.*\\d).{2,}")
+        , regexp_handle_validation_msg("At least two characters case insensitive no spaces.")
+        
+        , regexp_password_validation("(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}")
+        , regexp_password_validation_msg("At least one lower, one upper, one digit and minimum of 8.")
+        
         , regexp_date_validation("(19|20)\\d\\d([- /.])(0[1-9]|1[012])\\2(0[1-9]|[12][0-9]|3[01])")
-        , regexp_email_validation("")
+        , regexp_date_validation_msg("Must be a valid year matching the following dd\\mm\\yyyy")
+        
+        , regexp_email_validation("[\\w.]+[@]{1}[\\w]+[.]*[\\w]*")
+        , regexp_email_validation_msg("Must be a valid email at the very lest name@domain")
     {
         // Generates an Initial Unique Board UUID when the configuration is created.
         // If someone wipes out their config, they should save this and re-enter it!
@@ -380,7 +407,12 @@ namespace YAML
             node["regexp_handle_validation"] = rhs.regexp_handle_validation;
             node["regexp_password_validation"] = rhs.regexp_password_validation;
             node["regexp_date_validation"] = rhs.regexp_date_validation;
-            node["regexp_email_validation"] = rhs.regexp_email_validation;
+            node["regexp_email_validation"] = rhs.regexp_email_validation;            
+            node["regexp_generic_validation_msg"] = rhs.regexp_generic_validation_msg;
+            node["regexp_handle_validation_msg"] = rhs.regexp_handle_validation_msg;
+            node["regexp_password_validation_msg"] = rhs.regexp_password_validation_msg;
+            node["regexp_date_validation_msg"] = rhs.regexp_date_validation_msg;
+            node["regexp_email_validation_msg"] = rhs.regexp_email_validation_msg;
 
             return node;
         }
@@ -478,7 +510,12 @@ namespace YAML
             rhs.regexp_handle_validation        = node["regexp_handle_validation"].as<std::string>();
             rhs.regexp_password_validation      = node["regexp_password_validation"].as<std::string>();
             rhs.regexp_date_validation          = node["regexp_date_validation"].as<std::string>();
-            rhs.regexp_email_validation         = node["regexp_email_validation"].as<std::string>();
+            rhs.regexp_email_validation         = node["regexp_email_validation"].as<std::string>();            
+            rhs.regexp_generic_validation_msg   = node["regexp_generic_validation_msg"].as<std::string>();
+            rhs.regexp_handle_validation_msg    = node["regexp_handle_validation_msg"].as<std::string>();
+            rhs.regexp_password_validation_msg  = node["regexp_password_validation_msg"].as<std::string>();
+            rhs.regexp_date_validation_msg      = node["regexp_date_validation_msg"].as<std::string>();
+            rhs.regexp_email_validation_msg     = node["regexp_email_validation_msg"].as<std::string>();
 
             return true;
         }

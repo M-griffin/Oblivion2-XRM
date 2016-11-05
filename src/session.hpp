@@ -224,7 +224,7 @@ public:
                         m_connection->m_secure_socket.lowest_layer().shutdown(tcp::socket::shutdown_both);
                         m_connection->m_secure_socket.lowest_layer().close();
                     }
-                    catch(std::exception ex)
+                    catch(std::exception &ex)
                     {
                         std::cout << "Exception closing socket(): " << ex.what() << std::endl;
                     }
@@ -240,7 +240,7 @@ public:
                         m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
                         m_connection->m_normal_socket.close();
                     }
-                    catch(std::exception ex)
+                    catch(std::exception &ex)
                     {
                         std::cout << "Exception closing socket(): " << ex.what() << std::endl;
                     }
@@ -316,7 +316,7 @@ public:
                               << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
                               << std::endl;
                 }
-                catch(std::exception ex)
+                catch(std::exception &ex)
                 {
                     std::cout << "Exception remote_endpoint(): " << ex.what() << std::endl;
                 }
@@ -330,7 +330,7 @@ public:
                               << m_connection->m_normal_socket.remote_endpoint().address().to_string()
                               << std::endl;
                 }
-                catch(std::exception ex)
+                catch(std::exception &ex)
                 {
                     std::cout << "Exception remote_endpoint(): " << ex.what() << std::endl;
                 }
