@@ -99,10 +99,27 @@ public:
     bool use_screen_prelogin;     // UsePrelogon,
     bool use_screen_welcome;      // UseWelcome,
     bool use_matrix_login;        // SpecialLogin;
+    
+    // New User Prompts
     bool use_newuser_password;    // Use a NewUser Password
     bool use_disclaimer;          // Show Disclaimer
     bool use_address;             // Ask Address New User Application
-
+    bool use_handle;              // Ask for Handle
+    bool use_real_name;           // Ask for RealName
+    bool use_location;            // Ask Location
+    bool use_country;             // Ask Country
+    bool use_email;               // Ask Email
+    bool use_user_note;           // Ask User Note
+    bool use_birthdate;           // Ask Birthdate
+    bool use_gender;              // Ask Gender
+    bool use_challenge_question;  // Ask for Challenge Question
+    bool use_yesno_bars;          // Ask for yes/no bars
+    bool use_pause;               // Ask for Pause
+    bool use_clear_screen;        // Ask Clear or Scroll
+    bool use_ansi_color;          // Ask ANSI
+    bool use_backspace;           // Ask Backspace
+    
+    
 // char
     char hidden_input_character;  // HiddenInputChar;
 
@@ -234,6 +251,20 @@ public:
         , use_newuser_password(true)
         , use_disclaimer(true)
         , use_address(true)
+        , use_handle(true)
+        , use_real_name(true)
+        , use_location(true)
+        , use_country(true)
+        , use_email(true)
+        , use_user_note(true)
+        , use_birthdate(true)
+        , use_gender(true)
+        , use_challenge_question(true)
+        , use_yesno_bars(true)
+        , use_pause(true)
+        , use_clear_screen(true)
+        , use_ansi_color(true)
+        , use_backspace(true)
         
         , hidden_input_character('*')
         
@@ -289,7 +320,7 @@ public:
         , regexp_password_validation_msg("At least one lower, one upper, one digit and minimum of 8.")
         
         , regexp_date_validation("(19|20)\\d\\d([- /.])(0[1-9]|1[012])\\2(0[1-9]|[12][0-9]|3[01])")
-        , regexp_date_validation_msg("Must be a valid year matching the following dd\\mm\\yyyy")
+        , regexp_date_validation_msg("Must be a valid year matching UTC Format yyyy-mm-dd")
         
         , regexp_email_validation("[\\w.]+[@]{1}[\\w]+[.]*[\\w]*")
         , regexp_email_validation_msg("Must be a valid email at the very lest name@domain")
@@ -364,7 +395,21 @@ namespace YAML
             node["use_screen_welcome"] = rhs.use_screen_welcome;
             node["use_matrix_login"] = rhs.use_matrix_login;
             node["use_newuser_password"] = rhs.use_newuser_password;
-            node["use_disclaimer"] = rhs.use_disclaimer;
+            node["use_disclaimer"] = rhs.use_disclaimer;                        
+            node["use_handle"] = rhs.use_handle;
+            node["use_real_name"] = rhs.use_real_name;
+            node["use_location"] = rhs.use_location;
+            node["use_country"] = rhs.use_country;
+            node["use_email"] = rhs.use_email;
+            node["use_user_note"] = rhs.use_user_note;
+            node["use_birthdate"] = rhs.use_birthdate;
+            node["use_gender"] = rhs.use_gender;
+            node["use_challenge_question"] = rhs.use_challenge_question;
+            node["use_yesno_bars"] = rhs.use_yesno_bars;
+            node["use_pause"] = rhs.use_pause;
+            node["use_clear_screen"] = rhs.use_clear_screen;
+            node["use_ansi_color"] = rhs.use_ansi_color;
+            node["use_backspace"] = rhs.use_backspace;                        
             node["hidden_input_character"] = rhs.hidden_input_character;
             node["use_auto_validate_users"] = rhs.use_auto_validate_users;
             node["use_newuser_voting"] = rhs.use_newuser_voting;
@@ -467,7 +512,21 @@ namespace YAML
             rhs.use_screen_welcome              = node["use_screen_welcome"].as<bool>();
             rhs.use_matrix_login                = node["use_matrix_login"].as<bool>();
             rhs.use_newuser_password            = node["use_newuser_password"].as<bool>();
-            rhs.use_disclaimer                  = node["use_disclaimer"].as<bool>();
+            rhs.use_disclaimer                  = node["use_disclaimer"].as<bool>();            
+            rhs.use_handle                      = node["use_handle"].as<bool>();
+            rhs.use_real_name                   = node["use_real_name"].as<bool>();
+            rhs.use_location                    = node["use_location"].as<bool>();
+            rhs.use_country                     = node["use_country"].as<bool>();
+            rhs.use_email                       = node["use_email"].as<bool>();
+            rhs.use_user_note                   = node["use_user_note"].as<bool>();
+            rhs.use_birthdate                   = node["use_birthdate"].as<bool>();
+            rhs.use_gender                      = node["use_gender"].as<bool>();
+            rhs.use_challenge_question          = node["use_challenge_question"].as<bool>();
+            rhs.use_yesno_bars                  = node["use_yesno_bars"].as<bool>();
+            rhs.use_pause                       = node["use_pause"].as<bool>();
+            rhs.use_clear_screen                = node["use_clear_screen"].as<bool>();
+            rhs.use_ansi_color                  = node["use_ansi_color"].as<bool>();
+            rhs.use_backspace                   = node["use_backspace"].as<bool>();
             rhs.hidden_input_character          = node["hidden_input_character"].as<unsigned char>();
             rhs.use_auto_validate_users         = node["use_auto_validate_users"].as<bool>();
             rhs.use_newuser_voting              = node["use_newuser_voting"].as<bool>();

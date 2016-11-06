@@ -104,6 +104,19 @@ void ModPreLogon::changeModule(int mod_function_index)
 }
 
 /**
+ * @brief Pull and Display Prompts
+ * @param prompt
+ */
+void ModPreLogon::displayPrompt(const std::string &prompt)
+{
+    std::string result = m_session_io.parseTextPrompt(
+                                 m_text_prompts_dao->getPrompt(prompt)
+                             );
+
+    baseProcessAndDeliver(result);
+}
+
+/**
  * @brief Startup ANSI Emulation Detection.
  * @return
  */
@@ -120,7 +133,7 @@ void ModPreLogon::setupEmulationDetection()
     baseProcessAndDeliver(detection);
     baseProcessAndDeliver("\x1b[u");
 
-    // Display Detecting Emulation
+    // Display Detecting Emulation, not using display prompt casue we need to append.
     std::string result = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_DETECT_EMULATION)
                          );
@@ -144,10 +157,8 @@ void ModPreLogon::setupAskANSIColor()
     std::cout << "setupAskANSIColor()" << std::endl;
 
     // Ask to use colors - mode to next method to ask question and get reponse!
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_USE_ANSI)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_DETECT_EMULATION);
+
 }
 
 /**
@@ -156,11 +167,7 @@ void ModPreLogon::setupAskANSIColor()
 void ModPreLogon::displayTerminalDetection()
 {
     // Grab Detected Terminal, ANSI, XTERM, etc..
-    std::string result = m_session_io.parseTextPrompt(
-                              m_text_prompts_dao->getPrompt(PROMPT_DETECT_TERMOPTS)
-                          );
-
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_DETECT_TERMOPTS);
 
     // Grab Detected Terminal, ANSI, XTERM, etc..
     // Where grabbing both pairs first so we can parse the local MCI code
@@ -180,7 +187,7 @@ void ModPreLogon::displayTerminalDetection()
     // Handle Term, only display if prompt is not empty!
     if(prompt_term.second.size() > 0)
     {
-        result = prompt_term.second;
+        std::string result = prompt_term.second;
 
         std::string term = m_session_data->m_telnet_state->getTermType();
         std::cout << "Term Type: " << term << std::endl;
@@ -193,7 +200,7 @@ void ModPreLogon::displayTerminalDetection()
     // Handle Screen Size only display if prompt is not empty!
     if(prompt_size.second.size() > 0)
     {
-        result = prompt_size.second;
+        std::string result = prompt_size.second;
 
         std::string term_size = std::to_string(m_session_data->m_telnet_state->getTermCols());
         term_size.append("x");
@@ -219,7 +226,7 @@ void ModPreLogon::setupAskCodePage()
     std::cout << "setupAskCodePage()" << std::endl;
 
     // Display CodePage Selections, then prompt to ask for selection
-    std::string result = "";
+
 
     // Fill the local term type to work with.
     m_term_type = m_session_data->m_telnet_state->getTermType();
@@ -229,19 +236,12 @@ void ModPreLogon::setupAskCodePage()
     if(boost::iequals(m_term_type, "undetected") ||
             boost::iequals(m_term_type, "ansi"))
     {
-        result = m_session_io.parseTextPrompt(
-                     m_text_prompts_dao->getPrompt(PROMPT_ASK_CP437)
-                 );
+        displayPrompt(PROMPT_ASK_CP437);
     }
     else
     {
-        result = m_session_io.parseTextPrompt(
-                     m_text_prompts_dao->getPrompt(PROMPT_ASK_UTF8)
-                 );
+        displayPrompt(PROMPT_ASK_UTF8);
     }
-
-    baseProcessAndDeliver(result);
-
 }
 
 /**
@@ -327,10 +327,7 @@ void ModPreLogon::emulationCompleted()
     if(m_session_data->m_is_use_ansi)
     {
         // Emulation Detected ANSI
-        std::string message = m_session_io.parseTextPrompt(
-                                 m_text_prompts_dao->getPrompt(PROMPT_DETECTED_ANSI)
-                             );
-        baseProcessAndDeliver(message);
+        displayPrompt(PROMPT_DETECTED_ANSI);
 
         // ANSI Detect, Move to Next Ask CodePage.
         displayTerminalDetection();
@@ -339,10 +336,7 @@ void ModPreLogon::emulationCompleted()
     else
     {
         // Emulation Detected NONE
-        std::string message = m_session_io.parseTextPrompt(
-                                 m_text_prompts_dao->getPrompt(PROMPT_DETECTED_NONE)
-                             );
-        baseProcessAndDeliver(message);
+        displayPrompt(PROMPT_DETECTED_NONE);
 
         // Emulation not detected, ask to use ANSI Color, then move to CodePage.
         changeModule(MOD_ASK_ANSI_COLOR);
@@ -380,11 +374,7 @@ bool ModPreLogon::askANSIColor(const std::string &input)
             m_session_data->m_is_use_ansi = true;
 
             // ANSI Selected Text Prompt
-            std::string message = m_session_io.parseTextPrompt(
-                                     m_text_prompts_dao->getPrompt(PROMPT_ANSI_SELECTED)
-                                 );
-
-            baseProcessAndDeliver(message);
+            displayPrompt(PROMPT_ANSI_SELECTED);
 
             // Change to next Module
             displayTerminalDetection();
@@ -392,11 +382,7 @@ bool ModPreLogon::askANSIColor(const std::string &input)
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
-            std::string message = m_session_io.parseTextPrompt(
-                                     m_text_prompts_dao->getPrompt(PROMPT_ASCII_SELECTED)
-                                 );
-
-            baseProcessAndDeliver(message);
+            displayPrompt(PROMPT_ASCII_SELECTED);
 
             // Set ANSI Color Emulation to False
             m_session_data->m_is_use_ansi = false;
@@ -406,11 +392,7 @@ bool ModPreLogon::askANSIColor(const std::string &input)
         }
         else
         {
-            std::string message = m_session_io.parseTextPrompt(
-                                     m_text_prompts_dao->getPrompt(PROMPT_USE_INVALID)
-                                 );
-
-            baseProcessAndDeliver(message);
+            displayPrompt(PROMPT_USE_INVALID);
 
             // Invalid, Ask again
             setupAskANSIColor();
@@ -523,11 +505,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
         else
         {
             // Invalid Entry, try again!
-            std::string message = m_session_io.parseTextPrompt(
-                                     m_text_prompts_dao->getPrompt(PROMPT_USE_INVALID)
-                                 );
-
-            baseProcessAndDeliver(message);
+            displayPrompt(PROMPT_USE_INVALID);
 
             // Invalid, Ask again
             setupAskCodePage();

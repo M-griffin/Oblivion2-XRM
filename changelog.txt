@@ -1,4 +1,8 @@
 
+Change Log Update (00.00.54)
+* 2016-11-06
++ Added more use flag fields to the config file for new user prompts.
+
 Change Log Update (00.00.53)
 * 2016-11-05
 + Added some more regexp field validation expressions (unit tests needed)

@@ -87,6 +87,20 @@ void ModLogon::changeModule(int mod_function_index)
 }
 
 
+
+/**
+ * @brief Pull and Display Prompts
+ * @param prompt
+ */
+void ModLogon::displayPrompt(const std::string &prompt)
+{
+    std::string result = m_session_io.parseTextPrompt(
+                                 m_text_prompts_dao->getPrompt(prompt)
+                             );
+
+    baseProcessAndDeliver(result);
+}
+
 /**
  * @brief Validates user Logon
  * @return
@@ -94,10 +108,7 @@ void ModLogon::changeModule(int mod_function_index)
 void ModLogon::setupLogon()
 {
     std::cout << "setupLogon()" << std::endl;
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_LOGON)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_LOGON);
 }
 
 
@@ -108,10 +119,7 @@ void ModLogon::setupLogon()
 void ModLogon::setupPassword()
 {
     std::cout << "setupPassword()" << std::endl;
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_PASSWORD)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_PASSWORD);
 }
 
 /**
@@ -121,10 +129,7 @@ void ModLogon::setupPassword()
 void ModLogon::setupPasswordQuestion()
 {
     std::cout << "setupPasswordQuestion()" << std::endl;
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_PASSWORD_QUESTION)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_PASSWORD_QUESTION);
 }
 
 /**
@@ -134,14 +139,11 @@ void ModLogon::setupPasswordQuestion()
 void ModLogon::setupPasswordAnswer()
 {
     std::cout << "setupPasswordAnswer()" << std::endl;
-    std::string result = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_PASSWORD_ANSWER)
-                         );
-    baseProcessAndDeliver(result);
+    displayPrompt(PROMPT_PASSWORD_ANSWER);
 }
 
 /**
- * @brief Chanes user logon password
+ * @brief Changes user logon password
  * @return
  */
 void ModLogon::setupPasswordChange()
@@ -179,12 +181,9 @@ bool ModLogon::logon(const std::string &input)
             changeModule(MOD_PASSWORD);
         }
         else
-        {
-            std::string result = m_session_io.parseTextPrompt(
-                                     m_text_prompts_dao->getPrompt(PROMPT_USE_INVALID)
-                                 );
-            baseProcessAndDeliver(result);
-
+        {            
+            displayPrompt(PROMPT_USE_INVALID);
+            
             // Invalid, Ask again
             setupLogon();
         }
@@ -234,10 +233,7 @@ bool ModLogon::password(const std::string &input)
         }
         else
         {
-            std::string result = m_session_io.parseTextPrompt(
-                                     m_text_prompts_dao->getPrompt(PROMPT_USE_INVALID)
-                                 );
-            baseProcessAndDeliver(result);
+            displayPrompt(PROMPT_USE_INVALID);
 
             // Invalid, Ask again
             setupLogon();
