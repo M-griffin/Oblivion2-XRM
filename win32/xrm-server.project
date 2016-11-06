@@ -86,6 +86,8 @@
       <File Name="../src/mods/mod_signup.cpp"/>
       <File Name="../src/mods/mod_signup.hpp"/>
     </VirtualDirectory>
+    <File Name="../src/form_manager.cpp"/>
+    <File Name="../src/form_manager.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
