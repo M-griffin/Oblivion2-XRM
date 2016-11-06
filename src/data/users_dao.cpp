@@ -403,9 +403,8 @@ std::string UsersDao::insertUserQryString(query_ptr qry, user_ptr user)
     ssType << "); ";
 
     // Setup String to build the Query.
-    std::string newQueryString = "";
-    newQueryString = ssColumn.str();
-    newQueryString.append(ssType.str());
+    std::string newQueryString = ssColumn;
+    newQueryString.append(ssType);
 
     // Mprint statement to avoid injections.
     std::string result = sqlite3_mprintf(newQueryString.c_str(),
@@ -493,8 +492,7 @@ std::string UsersDao::updateUserQryString(query_ptr qry, user_ptr user)
     }
 
     // Closing For Query.
-    std::string newQueryString = "";
-    newQueryString = ssColumn.str();
+    std::string newQueryString = ssColumn;
     newQueryString.append(" WHERE iId = %ld; ");
 
     // Mprint statement to avoid injections.

@@ -30,10 +30,11 @@ namespace SQLW
     {
         UNUSED(db);
         time_t t = time(nullptr);
-        struct tm *tp = localtime(&t);
+        struct tm tp;
+        localtime_r(&t, &tp);
         fprintf(stderr,"%d-%02d-%02d %02d:%02d:%02d :: Database: %s\n",
-                tp -> tm_year + 1900,tp -> tm_mon + 1,tp -> tm_mday,
-                tp -> tm_hour,tp -> tm_min, tp -> tm_sec,
+                tp.tm_year + 1900,tp.tm_mon + 1,tp.tm_mday,
+                tp.tm_hour,tp.tm_min, tp.tm_sec,
                 str.c_str());
     }
 
@@ -41,10 +42,11 @@ namespace SQLW
     {
         UNUSED(db);
         time_t t = time(nullptr);
-        struct tm *tp = localtime(&t);
+        struct tm tp;
+        localtime_r(&t, &tp);
         fprintf(stderr,"%d-%02d-%02d %02d:%02d:%02d :: Query: %s: %s(%d)\n",
-                tp -> tm_year + 1900,tp -> tm_mon + 1,tp -> tm_mday,
-                tp -> tm_hour,tp -> tm_min, tp -> tm_sec,
+                tp.tm_year + 1900,tp.tm_mon + 1,tp.tm_mday,
+                tp.tm_hour,tp.tm_min, tp.tm_sec,
                 str.c_str(),q.GetError().c_str(),q.GetErrno());
         fprintf(stderr," (QUERY: \"%s\")\n",q.getLastQuery().c_str());
     }

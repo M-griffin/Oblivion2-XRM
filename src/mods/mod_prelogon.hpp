@@ -123,6 +123,12 @@ public:
     void changeModule(int mod_function_index);
 
     /**
+     * @brief Pull and Display Prompts
+     * @param prompt
+     */
+    void displayPrompt(const std::string &prompt);
+
+    /**
      * @brief Start ANSI ESC[6n ANSI Detection
      * @return
      */

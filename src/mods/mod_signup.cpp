@@ -191,7 +191,16 @@ void ModSignup::setupDisclaimer()
  */
 void ModSignup::setupHandle()
 {
-    displayPrompt(PROMPT_HANDLE);
+    if(m_config->use_handle)
+    {
+        displayPrompt(PROMPT_HANDLE);        
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }
+        
 }
 
 /**
@@ -200,7 +209,15 @@ void ModSignup::setupHandle()
  */
 void ModSignup::setupRealName()
 {
-    displayPrompt(PROMPT_REAL_NAME);
+    if(m_config->use_real_name)
+    {
+        displayPrompt(PROMPT_REAL_NAME);        
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }
 }
 
 /**
@@ -225,8 +242,16 @@ void ModSignup::setupAddress()
  * @return
  */
 void ModSignup::setupLocation()
-{
-    displayPrompt(PROMPT_LOCATION);
+{    
+    if(m_config->use_location)
+    {
+        displayPrompt(PROMPT_LOCATION);
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }
 }
 
 /**
@@ -235,7 +260,15 @@ void ModSignup::setupLocation()
  */
 void ModSignup::setupCountry()
 {
-    displayPrompt(PROMPT_COUNTRY);
+    if(m_config->use_country)
+    {
+        displayPrompt(PROMPT_COUNTRY);
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }
 }
 
 /**
@@ -244,7 +277,15 @@ void ModSignup::setupCountry()
  */
 void ModSignup::setupEmail()
 {
-    displayPrompt(PROMPT_EMAIL);
+    if(m_config->use_email)
+    {
+        displayPrompt(PROMPT_EMAIL);
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }
 }
 
 /**
@@ -253,7 +294,15 @@ void ModSignup::setupEmail()
  */
 void ModSignup::setupUserNote()
 {
-    displayPrompt(PROMPT_USER_NOTE);
+    if(m_config->use_user_note)
+    {
+        displayPrompt(PROMPT_USER_NOTE);
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }
 }
 
 /**
@@ -262,7 +311,15 @@ void ModSignup::setupUserNote()
  */
 void ModSignup::setupBirthday()
 {
-    displayPrompt(PROMPT_BIRTH_DATE);
+    if(m_config->use_birthdate)
+    {
+        displayPrompt(PROMPT_BIRTH_DATE);
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }
 }
 
 /**
@@ -271,7 +328,15 @@ void ModSignup::setupBirthday()
  */
 void ModSignup::setupGender()
 {
-    displayPrompt(PROMPT_GENDER);
+    if(m_config->use_gender)
+    {
+        displayPrompt(PROMPT_GENDER);
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }    
 }
 
 /**
@@ -298,7 +363,15 @@ void ModSignup::setupVerifyPassword()
  */
 void ModSignup::setupChallengeQuestion()
 {
-    displayPrompt(PROMPT_CHALLENGE_QUESTION);
+    if(m_config->use_challenge_question)
+    {
+        displayPrompt(PROMPT_CHALLENGE_QUESTION);        
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }   
 }
 
 /**
@@ -307,7 +380,16 @@ void ModSignup::setupChallengeQuestion()
  */
 void ModSignup::setupChallengeAnswer()
 {
-    displayPrompt(PROMPT_CHALLENGE_ANSWER);
+    if(m_config->use_challenge_question)
+    {
+        displayPrompt(PROMPT_CHALLENGE_ANSWER);        
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }   
+        
 }
 
 /**
@@ -316,7 +398,15 @@ void ModSignup::setupChallengeAnswer()
  */
 void ModSignup::setupVerifyChallengeAnswer()
 {
-    displayPrompt(PROMPT_VERIFY_ANSWER);
+    if(m_config->use_challenge_question)
+    {
+        displayPrompt(PROMPT_VERIFY_ANSWER);        
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }   
 }
 
 /**
@@ -325,7 +415,15 @@ void ModSignup::setupVerifyChallengeAnswer()
  */
 void ModSignup::setupYesNoBars()
 {
-    displayPrompt(PROMPT_YESNO_BARS);
+    if(m_config->use_yesno_bars)
+    {
+        displayPrompt(PROMPT_YESNO_BARS);        
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }  
 }
 
 /**
@@ -334,7 +432,15 @@ void ModSignup::setupYesNoBars()
  */
 void ModSignup::setupDoPause()
 {
-    displayPrompt(PROMPT_USE_PAUSE);
+    if(m_config->use_pause)
+    {
+        displayPrompt(PROMPT_USE_PAUSE);        
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }  
 }
 
 /**
@@ -343,7 +449,15 @@ void ModSignup::setupDoPause()
  */
 void ModSignup::setupClearOrScroll()
 {
-    displayPrompt(PROMPT_USE_CLEAR);
+    if(m_config->use_clear_screen)
+    {
+        displayPrompt(PROMPT_USE_CLEAR);        
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }  
 }
 
 /**
@@ -352,7 +466,15 @@ void ModSignup::setupClearOrScroll()
  */
 void ModSignup::setupAnsiColor()
 {
-    displayPrompt(PROMPT_USE_ANSI_COLOR);
+    if(m_config->use_ansi_color)
+    {
+        displayPrompt(PROMPT_USE_ANSI_COLOR);        
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }  
 }
 
 /**
@@ -361,7 +483,15 @@ void ModSignup::setupAnsiColor()
  */
 void ModSignup::setupBackSpace()
 {
-    displayPrompt(PROMPT_BACK_SPACE);
+    if(m_config->use_backspace)
+    {
+        displayPrompt(PROMPT_BACK_SPACE);        
+    }
+    else
+    {
+        // Move to next module.
+        changeModule(m_mod_function_index+1);
+    }  
 }
 
 
@@ -373,6 +503,7 @@ void ModSignup::setupVerifyAndSave()
 {
     displayPrompt(PROMPT_VERIFY_SAVE);
 }
+
 
 /**
  * @brief Check for New User Password

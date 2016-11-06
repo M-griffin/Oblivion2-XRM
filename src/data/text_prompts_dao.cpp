@@ -115,7 +115,7 @@ bool TextPromptsDao::readPrompts()
         m_node = YAML::LoadFile(path);
         m_is_loaded = true;
     }
-    catch (std::exception ex)
+    catch (std::exception &ex)
     {
         std::cout << "Exception YAML::LoadFile() " << ex.what() << std::endl;
     }
@@ -158,8 +158,6 @@ M_StringPair TextPromptsDao::getPrompt(const std::string &lookup)
  */
 void TextPromptsDao::displayAll()
 {
-    M_StringPair temp;
-
     for (YAML::const_iterator it = m_node.begin(); it != m_node.end(); ++it)
     {
         std::string key = it->first.as<std::string>();
