@@ -4,6 +4,7 @@
  */
 
 #include "session_io.hpp"
+#include "model/config.hpp"
 
 #ifdef _WIN32
 #include <UnitTest++.h>
@@ -945,4 +946,78 @@ SUITE(XRMSessionIO)
         CHECK_EQUAL(code_map[18].m_match, 7);
     }
 
+    // Test Regex Config Field Validations
+    TEST(checkRegex_config_regexp_generic_validation_pass)
+    {
+        config_ptr config(new Config());
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        // [^\\s][\\w\\s,.!@#$%^&*()]+
+        std::string sequence = "123west,.!@#$%^&*()";
+        std::string expression = config->regexp_generic_validation;
+
+        bool result = sess.checkRegex(sequence, expression);
+        CHECK_EQUAL(result, true);
+    }
+    
+    TEST(checkRegex_config_regexp_generic_validation_no_leading_spaces)
+    {
+        config_ptr config(new Config());
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        // [^\\s][\\w\\s,.!@#$%^&*()]+
+        std::string sequence = " 123west";
+        std::string expression = config->regexp_generic_validation;
+
+        bool result = sess.checkRegex(sequence, expression);
+        CHECK_EQUAL(result, false);
+    }
+    
+    TEST(checkRegex_config_regexp_generic_validation_space_seperator)
+    {
+        config_ptr config(new Config());
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        // [^\\s][\\w\\s,.!@#$%^&*()]+
+        std::string sequence = "123west ,.!@#$%^&*()";
+        std::string expression = config->regexp_generic_validation;
+
+        bool result = sess.checkRegex(sequence, expression);
+        CHECK_EQUAL(result, true);
+    }
+    
+    TEST(checkRegex_config_regexp_generic_validation_no_leading_space2)
+    {        
+        config_ptr config(new Config());
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        // [^\\s][\\w\\s,.!@#$%^&*()]+
+        std::string sequence = " 123west ,.!@#$%^&*()";
+        std::string expression = config->regexp_generic_validation;
+
+        bool result = sess.checkRegex(sequence, expression);
+        CHECK_EQUAL(result, false);
+    }
+    
+    // \X Match any Unicode combining character sequence, for example "a\x 0301" (a letter a with an acute).
+    // Boost is not setup properly for ICU and regex (WINDOWS),  fixme!
+    /*
+    TEST(checkRegex_config_regexp_generic_validation_test_unicode)
+    {        
+        config_ptr config(new Config());
+        session_data_ptr session_data;
+        SessionIO sess(session_data);
+
+        // [^\\s][\\w\\s,.!@#$%^&*()]+
+        std::string sequence = "123west ,.!@#$%^&*() Ê î Î ô Ô û Û";
+        std::string expression = config->regexp_generic_validation;
+
+        bool result = sess.checkRegex(sequence, expression);
+        CHECK_EQUAL(result, true);
+    }*/
+    
 }

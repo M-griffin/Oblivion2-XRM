@@ -237,10 +237,9 @@ public:
         , access_post_anonymous("s20")
         , access_mail_attachment("s20")
         , access_top_ten("s20")
-        , access_check_sysop_avail("s20")
-        
-        , use_file_points(false)        // NEW
-        , use_postcall_ratio(false)     // NEW
+        , access_check_sysop_avail("s20")        
+        , use_file_points(false)
+        , use_postcall_ratio(false)
         , use_library_ansi(true)
         , use_notify_on_logins(true)
         , use_notify_on_logoff(true)
@@ -264,14 +263,11 @@ public:
         , use_pause(true)
         , use_clear_screen(true)
         , use_ansi_color(true)
-        , use_backspace(true)
-        
-        , hidden_input_character('*')
-        
+        , use_backspace(true)        
+        , hidden_input_character('*')        
         , use_auto_validate_users(false)
         , use_newuser_voting(false)
-        , use_auto_kick_unvalidated(false)
-        
+        , use_auto_kick_unvalidated(false)        
         , newuser_votes_validate(3)
         , newuser_votes_delete(3)
         , newuser_days_to_upload(7)
@@ -298,30 +294,22 @@ public:
         , default_kilobyte_daily(0)
         , default_post_call_ratio(0)
         , default_time_limit(120)
-        , default_user_timeout(20)
-        
+        , default_user_timeout(20)        
         , use_auto_validate_files(false)
-        , use_upload_checker(false) // default to true lateron!
-        
+        , use_upload_checker(false) // default to true lateron!        
         , cmdline_virus_scan("")
         , filename_bbs_ad("")
         , filename_archive_comments("")
-        , directory_bad_files("")
-        
-        , use_greater_then_for_quotes(false)
-        
-        , regexp_generic_validation("[^\\s][\\w,.!@#$%^&*()]+")  // testing no starting spaces!
-        , regexp_generic_validation_msg("At least one AlphaNumeric Word character required.")
-        
+        , directory_bad_files("")        
+        , use_greater_then_for_quotes(false)        
+        , regexp_generic_validation("[^\\s][\\A\\w\\s,.!@#$%^&*()]+")  // testing no starting spaces!
+        , regexp_generic_validation_msg("At least one AlphaNumeric Word characters required space seperators.")        
         , regexp_handle_validation("(?=.*[a-zA-Z])(?!.*\\d).{2,}")
-        , regexp_handle_validation_msg("At least two characters case insensitive no spaces.")
-        
+        , regexp_handle_validation_msg("At least two characters case insensitive no spaces.")        
         , regexp_password_validation("(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}")
-        , regexp_password_validation_msg("At least one lower, one upper, one digit and minimum of 8.")
-        
+        , regexp_password_validation_msg("At least one lower, one upper, one digit and minimum of 8.")        
         , regexp_date_validation("(19|20)\\d\\d([- /.])(0[1-9]|1[012])\\2(0[1-9]|[12][0-9]|3[01])")
-        , regexp_date_validation_msg("Must be a valid year matching UTC Format yyyy-mm-dd")
-        
+        , regexp_date_validation_msg("Must be a valid year matching UTC Format yyyy-mm-dd")        
         , regexp_email_validation("[\\w.]+[@]{1}[\\w]+[.]*[\\w]*")
         , regexp_email_validation_msg("Must be a valid email at the very lest name@domain")
     {

@@ -1,6 +1,7 @@
 #ifndef SESSION_IO_HPP
 #define SESSION_IO_HPP
 
+
 #include "session_data.hpp"
 #include "common_io.hpp"
 
@@ -126,6 +127,14 @@ public:
      * @return
      */
     std::string pipe2ansi(const std::string &sequence);
+
+    /**
+     * @brief Checks a String if it matches the expression passed.
+     * @param sequence
+     * @param expression
+     * @return
+     */
+    bool checkRegex(const std::string &sequence, const std::string &expression);
 
     /**
      * @brief Stores Key (MCI Code) Value (String for Replacement) in Mapping

@@ -206,27 +206,34 @@ public:
             // Disconenct the session.
             room->leave(m_node_number);
 
-            if(m_connection->is_open())
+            if(m_connection && m_connection->is_open())
             {
-                if(m_connection->m_is_secure)
+                try
                 {
-                    std::cout << "Leaving 111 Peer IP: "
-                              << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
-                              << std::endl;
+                    if(m_connection->m_is_secure)
+                    {
+                        std::cout << "Leaving 111 Peer IP: "
+                                  << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
+                                  << std::endl;
 
-                    m_connection->m_secure_socket.lowest_layer().shutdown(tcp::socket::shutdown_both);
-                    m_connection->m_secure_socket.lowest_layer().close();
+                        m_connection->m_secure_socket.lowest_layer().shutdown(tcp::socket::shutdown_both);
+                        m_connection->m_secure_socket.lowest_layer().close();
+                    }
+                    else
+                    {
+                        std::cout << "Leaving 111 Peer IP: "
+                                  << m_connection->m_normal_socket.remote_endpoint().address().to_string()
+                                  << std::endl;
+
+                        m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
+                        m_connection->m_normal_socket.close();
+                    }
                 }
-                else
+                catch(std::exception &e)
                 {
-                    std::cout << "Leaving 111 Peer IP: "
-                              << m_connection->m_normal_socket.remote_endpoint().address().to_string()
-                              << std::endl;
-
-                    m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
-                    m_connection->m_normal_socket.close();
+                    std::cout << "Caught: " << e.what();
                 }
-            }
+            }            
         }
     }
 
@@ -254,6 +261,50 @@ public:
             boost::bind(&SessionData::handleEscTimer, shared_from_this(), &m_input_deadline));
     }
 
+
+    /**
+     * @brief User Logoff
+     */
+    void logoff()
+    {
+        
+        session_manager_ptr room = m_room.lock();
+        if(room)
+        {
+            // Room is the session.
+            room->leave(m_node_number);   
+        }
+        
+        if(m_connection && m_connection->is_open())
+        {
+            try
+            {
+                if(m_connection->m_is_secure)
+                {
+                    std::cout << "Leaving 111 Peer IP: "
+                              << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
+                              << std::endl;
+
+                    m_connection->m_secure_socket.lowest_layer().shutdown(tcp::socket::shutdown_both);
+                    m_connection->m_secure_socket.lowest_layer().close();
+                }
+                else
+                {
+                    std::cout << "Leaving 111 Peer IP: "
+                              << m_connection->m_normal_socket.remote_endpoint().address().to_string()
+                              << std::endl;
+
+                    m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
+                    m_connection->m_normal_socket.close();
+                }
+            }
+            catch(std::exception &e)
+            {
+                std::cout << "Caught: " << e.what();
+            }
+        }   
+    }
+    
 private:
 
     /**

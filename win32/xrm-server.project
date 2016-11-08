@@ -110,6 +110,7 @@
         <IncludePath Value="C:/sqlite3/include"/>
         <IncludePath Value="C:/OpenSSL-Win32/include"/>
         <IncludePath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/include"/>
+        <IncludePath Value="C:\Users\Blue\Downloads\icu_53_1_mingw_builds_4_9_1_posix_dwarf_32_devel\icu53_1\include"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>

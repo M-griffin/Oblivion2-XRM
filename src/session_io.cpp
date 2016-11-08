@@ -2,7 +2,18 @@
 #include "session_data.hpp"
 #include "common_io.hpp"
 
+#include <clocale>
+
+//#include <boost/format.hpp>
+#include <boost/locale.hpp>
+
+#include <boost/regex/config.hpp>
+#ifdef BOOST_HAS_ICU
+#include <boost/regex/icu.hpp>
+#endif
+
 #include <boost/regex.hpp>
+
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -816,6 +827,42 @@ std::string SessionIO::pipe2ansi(const std::string &sequence)
     return parseCodeMap(sequence, code_map);
 }
 
+
+/**
+ * @brief Checks a String if it matches the expression passed.
+ * @param sequence
+ * @param expression
+ * @return
+ */
+bool SessionIO::checkRegex(const std::string &sequence, const std::string &expression)
+{
+    using namespace boost::locale;
+    generator gen;
+
+    // Make system default locale global
+    std::locale loc = gen("");
+    std::locale::global(loc);
+    std::cout.imbue(loc);
+    
+    boost::smatch match;    
+    bool result = false;
+    
+#ifdef BOOST_HAS_ICU
+    boost::u32regex regExp = boost::make_u32regex(expression);
+    result = boost::u32regex_match(sequence, match, regExp);
+#else
+    boost::regex regExpression(expression);
+    result = boost::regex_match(sequence, match, regExpression);
+ #endif   
+
+    return result; 
+}
+
+
+std::string myString = "\"\"\"";
+    boost::smatch match;
+    boost::regex regExpString3("[\"']((:?[^\"']|\\\")+?)[\"']");
+    bool statusString3 = boost::regex_match(myString, match, regExpString3);
 
 /**
  * @brief Parses Text Prompt String Pair
