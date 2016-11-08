@@ -527,6 +527,8 @@ void MenuSystem::executeMenuOptions(MenuOption &option)
 
                     // Logoff
                 case 'G':
+                    std::cout << "Goodbye;" << std::endl;
+                    m_session_data->logoff();
                     break;
             }
             break;
