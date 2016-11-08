@@ -101,7 +101,22 @@ bool ConfigDao::saveConfig(config_ptr cfg)
     out << YAML::Key << "use_screen_welcome" << YAML::Value << cfg->use_screen_welcome;
     out << YAML::Key << "use_matrix_login" << YAML::Value << cfg->use_matrix_login;
     out << YAML::Key << "use_newuser_password" << YAML::Value << cfg->use_newuser_password;
-    out << YAML::Key << "use_disclaimer" << YAML::Value << cfg->use_disclaimer;
+    out << YAML::Key << "use_disclaimer" << YAML::Value << cfg->use_disclaimer;        
+    out << YAML::Key << "use_address" << YAML::Value << cfg->use_address;
+    out << YAML::Key << "use_handle" << YAML::Value << cfg->use_handle;
+    out << YAML::Key << "use_real_name" << YAML::Value << cfg->use_real_name;
+    out << YAML::Key << "use_location" << YAML::Value << cfg->use_location;
+    out << YAML::Key << "use_country" << YAML::Value << cfg->use_country;
+    out << YAML::Key << "use_email" << YAML::Value << cfg->use_email;
+    out << YAML::Key << "use_user_note" << YAML::Value << cfg->use_user_note;
+    out << YAML::Key << "use_birthdate" << YAML::Value << cfg->use_birthdate;
+    out << YAML::Key << "use_gender" << YAML::Value << cfg->use_gender;
+    out << YAML::Key << "use_challenge_question" << YAML::Value << cfg->use_challenge_question;
+    out << YAML::Key << "use_yesno_bars" << YAML::Value << cfg->use_yesno_bars;
+    out << YAML::Key << "use_pause" << YAML::Value << cfg->use_pause;
+    out << YAML::Key << "use_clear_screen" << YAML::Value << cfg->use_clear_screen;
+    out << YAML::Key << "use_ansi_color" << YAML::Value << cfg->use_ansi_color;
+    out << YAML::Key << "use_backspace" << YAML::Value << cfg->use_backspace;        
     out << YAML::Key << "hidden_input_character" << YAML::Value << cfg->hidden_input_character;
     out << YAML::Key << "use_auto_validate_users" << YAML::Value << cfg->use_auto_validate_users;
     out << YAML::Key << "use_newuser_voting" << YAML::Value << cfg->use_newuser_voting;
@@ -139,13 +154,18 @@ bool ConfigDao::saveConfig(config_ptr cfg)
     out << YAML::Key << "filename_bbs_ad" << YAML::Value << cfg->filename_bbs_ad;
     out << YAML::Key << "filename_archive_comments" << YAML::Value << cfg->filename_archive_comments;
     out << YAML::Key << "directory_bad_files" << YAML::Value << cfg->directory_bad_files;
-    out << YAML::Key << "use_greater_then_for_quotes" << YAML::Value << cfg->use_greater_then_for_quotes;
+    out << YAML::Key << "use_greater_then_for_quotes" << YAML::Value << cfg->use_greater_then_for_quotes;    
     out << YAML::Key << "regexp_generic_validation" << YAML::Value << cfg->regexp_generic_validation;
+    out << YAML::Key << "regexp_generic_validation_msg" << YAML::Value << cfg->regexp_generic_validation_msg;
     out << YAML::Key << "regexp_handle_validation" << YAML::Value << cfg->regexp_handle_validation;
+    out << YAML::Key << "regexp_handle_validation_msg" << YAML::Value << cfg->regexp_handle_validation_msg;
     out << YAML::Key << "regexp_password_validation" << YAML::Value << cfg->regexp_password_validation;
+    out << YAML::Key << "regexp_password_validation_msg" << YAML::Value << cfg->regexp_password_validation_msg;
     out << YAML::Key << "regexp_date_validation" << YAML::Value << cfg->regexp_date_validation;
-    out << YAML::Key << "regexp_email_validation" << YAML::Value << cfg->regexp_email_validation;
-
+    out << YAML::Key << "regexp_date_validation_msg" << YAML::Value << cfg->regexp_date_validation_msg;
+    out << YAML::Key << "regexp_email_validation" << YAML::Value << cfg->regexp_email_validation;    
+    out << YAML::Key << "regexp_email_validation_msg" << YAML::Value << cfg->regexp_email_validation_msg;
+    
     out << YAML::EndMap;
 
 
@@ -214,7 +234,22 @@ void ConfigDao::encode(const Config &rhs)
     m_config->use_screen_welcome = rhs.use_screen_welcome;
     m_config->use_matrix_login = rhs.use_matrix_login;
     m_config->use_newuser_password = rhs.use_newuser_password;
-    m_config->use_disclaimer = rhs.use_disclaimer;
+    m_config->use_disclaimer = rhs.use_disclaimer;    
+    m_config->use_address = rhs.use_address;
+    m_config->use_handle = rhs.use_handle;
+    m_config->use_real_name = rhs.use_real_name;
+    m_config->use_location = rhs.use_location;
+    m_config->use_country = rhs.use_country;
+    m_config->use_email = rhs.use_email;
+    m_config->use_user_note = rhs.use_user_note;
+    m_config->use_birthdate = rhs.use_birthdate;
+    m_config->use_gender = rhs.use_gender;
+    m_config->use_challenge_question = rhs.use_challenge_question;
+    m_config->use_yesno_bars = rhs.use_yesno_bars;
+    m_config->use_pause = rhs.use_pause;
+    m_config->use_clear_screen = rhs.use_clear_screen;
+    m_config->use_ansi_color = rhs.use_ansi_color;
+    m_config->use_backspace = rhs.use_backspace;    
     m_config->hidden_input_character = rhs.hidden_input_character;
     m_config->use_auto_validate_users = rhs.use_auto_validate_users;
     m_config->use_newuser_voting = rhs.use_newuser_voting;
@@ -252,12 +287,18 @@ void ConfigDao::encode(const Config &rhs)
     m_config->filename_bbs_ad = rhs.filename_bbs_ad;
     m_config->filename_archive_comments = rhs.filename_archive_comments;
     m_config->directory_bad_files = rhs.directory_bad_files;
-    m_config->use_greater_then_for_quotes = rhs.use_greater_then_for_quotes;
+    m_config->use_greater_then_for_quotes = rhs.use_greater_then_for_quotes;    
     m_config->regexp_generic_validation = rhs.regexp_generic_validation;
+    m_config->regexp_generic_validation_msg = rhs.regexp_generic_validation_msg;
     m_config->regexp_handle_validation = rhs.regexp_handle_validation;
+    m_config->regexp_handle_validation_msg = rhs.regexp_handle_validation_msg;
     m_config->regexp_password_validation = rhs.regexp_password_validation;
+    m_config->regexp_password_validation_msg = rhs.regexp_password_validation_msg;
     m_config->regexp_date_validation = rhs.regexp_date_validation;
-    m_config->regexp_email_validation = rhs.regexp_email_validation;
+    m_config->regexp_date_validation_msg = rhs.regexp_date_validation_msg;
+    m_config->regexp_email_validation = rhs.regexp_email_validation;    
+    m_config->regexp_email_validation_msg = rhs.regexp_email_validation_msg;
+    
 }
 
 /**

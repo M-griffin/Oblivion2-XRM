@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Blue
-Date                   :=11/2/2016
+Date                   :=08/11/2016
 CodeLitePath           :="C:/Program Files (x86)/CodeLite"
 LinkerName             :=C:/MinGW-5.1.0/mingw32/bin/g++.exe
 SharedObjectLinkerName :=C:/MinGW-5.1.0/mingw32/bin/g++.exe -shared -fPIC
@@ -62,7 +62,6 @@ AS       := C:/MinGW-5.1.0/mingw32/bin/as.exe
 ## User defined environment variables
 ##
 CodeLiteDir:=C:\Program Files (x86)\CodeLite
-UNIT_TEST_PP_SRC_DIR:=C:\UnitTest++-1.3
 Objects0=$(IntermediateDirectory)/Database.cpp$(ObjectSuffix) $(IntermediateDirectory)/Query.cpp$(ObjectSuffix) $(IntermediateDirectory)/StderrLog.cpp$(ObjectSuffix) $(IntermediateDirectory)/SysLog.cpp$(ObjectSuffix) 
 
 

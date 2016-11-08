@@ -1,4 +1,9 @@
 
+Change Log Update (00.00.55)
+* 2016-11-08
++ Added New config variables to Config_DAO for read/write to yaml file.
++ Added session disconnect to matrix G command to test logoff.
+
 Change Log Update (00.00.54)
 * 2016-11-06
 + Added more use flag fields to the config file for new user prompts.
