@@ -23,6 +23,8 @@ You can follow the **changelog** in the root folder for progress updates.
 
 Main development is current under Windows with releases planned for Linux, OSX, ARM.
 
+Using CodeLite http://codelite.org/ IDE for W32/64 and Linux Workspace(s).
+
 Built under C++ with Boost and compiles under g++ MingW32/64 5.1.0 using latest c++14.
 
 
