@@ -1,4 +1,11 @@
 
+Change Log Update (00.00.56)
+* 2016-11-10
++ Refactored Menu System, decoupled and split core from the state 
+  into a base class. This allows other dynamic systems to use it's 
+  features for lightbars with callback command execution specific
+  to each interface.
+
 Change Log Update (00.00.55)
 * 2016-11-08
 + Added New config variables to Config_DAO for read/write to yaml file.

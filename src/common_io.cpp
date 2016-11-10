@@ -203,7 +203,7 @@ std::string CommonIO::getSystemHomeDirectory()
 /**
  * @brief Appends Path Seperator depending on environment.
  * @param path
- * @return 
+ * @return
  */
 void CommonIO::pathAppend(std::string &path)
 {
@@ -724,7 +724,7 @@ std::string CommonIO::printWideCharacters(const std::wstring &wide_string)
     for(wchar_t wc : wide_string)
     {
         std::string mb(MB_CUR_MAX, '\0');
-        int ret = std::wcrtomb(&mb[0], wc, &state);
+        std::string::size_type ret = std::wcrtomb(&mb[0], wc, &state);
         if((ret == 0) || (ret > MB_CUR_MAX))
             break;
 
