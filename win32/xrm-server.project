@@ -88,6 +88,8 @@
     </VirtualDirectory>
     <File Name="../src/form_manager.cpp"/>
     <File Name="../src/form_manager.hpp"/>
+    <File Name="../src/menu_base.hpp"/>
+    <File Name="../src/menu_base.cpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
