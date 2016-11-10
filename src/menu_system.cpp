@@ -14,19 +14,19 @@ const std::string MenuSystem::m_menuID = "MENU_SYSTEM";
 
 MenuSystem::MenuSystem(session_data_ptr session_data)
     : StateBase(session_data)
-    , MenuBase(session_data)    
+    , MenuBase(session_data)
 {
     std::cout << "MenuSystem" << std::endl;
 
     // Setup std::function array with available options to pass input to.
-    m_menu_functions.push_back(std::bind(&MenuSystem::menuInput, this, std::placeholders::_1, std::placeholders::_2));
+    m_menu_functions.push_back(std::bind(&MenuBase::menuInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::menuEditorInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::modulePreLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
-    
+
     // Setup Menu Option Calls for executing menu commands.
     m_execute_callback.push_back(std::bind(&MenuSystem::menuOptionsCallback, this, std::placeholders::_1));
-    
+
 
     // Load the configuration file to the class
     if (!m_config_dao->loadConfig())
@@ -39,7 +39,7 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
 
 MenuSystem::~MenuSystem()
 {
-    std::cout << "~MenuSystem" << std::endl;    
+    std::cout << "~MenuSystem" << std::endl;
 }
 
 
@@ -69,7 +69,7 @@ bool MenuSystem::onEnter()
 
     // Startup the Prelogon sequence
     startupModulePreLogon();
-        
+
     m_is_active = true;
 
     return true;
@@ -174,7 +174,7 @@ void MenuSystem::menuOptionsCallback(const MenuOption &option)
                     break;
             }
             break;
-    }     
+    }
 }
 
 
@@ -198,7 +198,7 @@ void MenuSystem::startupMenuEditor()
  * @brief Menu Editor, Read and Modify Menus
  */
 void MenuSystem::menuEditorInput(const std::string &character_buffer, const bool &)
-{    
+{
     // If were not using hot keys, loop input untill we get ENTER
     // Then handle only the first key in the buffer.  Other "SYSTEMS"
     // Will parse for entire line for matching Command Keys.
@@ -368,7 +368,7 @@ void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const 
 
         // First pop the module off the stack to deallocate
         m_module.pop_back();
-        
+
 
         // Check if the current user has been logged in yet.
         if (!m_session_data->m_is_session_authorized)
