@@ -18,7 +18,7 @@
  * @brief Menu Editor, Read and Modify Menus
  * Remake of the orignal Menu Editor Screen
  */
-std::string MenuSystem::displayMenus()
+std::string MenuBase::displayMenus()
 {
     // Setup Extended ASCII Box Drawing characters.
     char top_left  = (char)214; // ╓
