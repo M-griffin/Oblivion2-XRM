@@ -2,6 +2,7 @@
 #define MOD_SIGNUP_HPP
 
 #include "mod_base.hpp"
+#include "menu_base.hpp"
 
 #include "../model/structures.hpp"
 #include "../model/security.hpp"
@@ -25,6 +26,7 @@ typedef boost::shared_ptr<Config> config_ptr;
 class AnsiProcessor;
 typedef boost::shared_ptr<AnsiProcessor> ansi_process_ptr;
 
+
 /**
  * @class ModSignup
  * @author Michael Griffin
@@ -37,8 +39,9 @@ class ModSignup
 {
 public:
     ModSignup(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
-        : ModBase(session_data, config, ansi_process)
+        : ModBase(session_data, config, ansi_process)        
         , m_session_io(session_data)
+        , m_menu_base(new MenuBase(session_data))
         , m_filename("mod_signup.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
         , m_user_record(new Users())
@@ -482,6 +485,7 @@ private:
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
     SessionIO            m_session_io;
+    menu_base_ptr        m_menu_base;    
     std::string          m_filename;
     text_prompts_dao_ptr m_text_prompts_dao;
     user_ptr             m_user_record;
