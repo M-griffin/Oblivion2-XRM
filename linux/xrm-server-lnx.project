@@ -57,8 +57,8 @@
     <File Name="../src/telnet_decoder.cpp"/>
     <File Name="../src/telnet_decoder.hpp"/>
     <VirtualDirectory Name="compat">
-      <File Name="../src/compat/menu_dao.hpp"/>
-      <File Name="../src/compat/prompts_dao.hpp"/>
+      <File Name="../src/compat/menu_compat_dao.hpp"/>
+      <File Name="../src/compat/prompts_compat_dao.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="data">
       <File Name="../src/data/config_dao.cpp"/>
@@ -69,6 +69,8 @@
       <File Name="../src/data/text_prompts_dao.hpp"/>
       <File Name="../src/data/users_dao.cpp"/>
       <File Name="../src/data/users_dao.hpp"/>
+      <File Name="../src/data/menu_dao.cpp"/>
+      <File Name="../src/data/menu_dao.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="model">
       <File Name="../src/model/config.hpp"/>
@@ -76,6 +78,7 @@
       <File Name="../src/model/struct_compat.hpp"/>
       <File Name="../src/model/structures.hpp"/>
       <File Name="../src/model/users.hpp"/>
+      <File Name="../src/model/menu.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
       <File Name="../src/mods/mod_base.hpp"/>
