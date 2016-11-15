@@ -7,7 +7,7 @@
 #include "ansi_processor.hpp"
 #include "communicator.hpp"
 
-#include "compat/menu_dao.hpp"
+#include "compat/menu_compat_dao.hpp"
 #include "model/struct_compat.hpp"
 #include "model/config.hpp"
 #include "data/config_dao.hpp"
@@ -32,7 +32,7 @@ typedef boost::shared_ptr<SessionData> session_data_ptr;
  * @brief Base Class for Menu System and Interfaces needing dynamic command execution
  */
 class MenuBase
-    : public MenuDao
+    : public MenuCompatDao
 {
 public:
     MenuBase(session_data_ptr session_data);
@@ -160,5 +160,7 @@ public:
     void menuInput(const std::string &character_buffer, const bool &is_utf8);
     
 };
+
+typedef boost::shared_ptr<MenuBase> menu_base_ptr;
 
 #endif // MENUBASE_HPP
