@@ -10,6 +10,11 @@
 
 #include <mutex>
 
+
+// Setup the file version for the config file.
+const std::string Config::FILE_VERSION = "1.0.0";
+
+
 ConfigDao::ConfigDao(config_ptr config, std::string path)
     : m_config(config)
     , m_path(path)
@@ -193,7 +198,7 @@ bool ConfigDao::saveConfig(config_ptr cfg)
  * @return
  */
 void ConfigDao::encode(const Config &rhs)
-{
+{      
     m_config->file_version = rhs.file_version;
     m_config->bbs_name_sysop = rhs.bbs_name_sysop;
     m_config->bbs_name = rhs.bbs_name;
@@ -317,17 +322,39 @@ bool ConfigDao::loadConfig()
 
     // Load the file into the class.
     try
-    {
+    {        
         // Load file fresh.
         node = YAML::LoadFile(path);
+        
+        // Testing Is on nodes always throws exceptions.
+        if (node.size() == 0) 
+        {
+            return false; //File Not Found?
+        }
+        
+        std::string file_version = node["file_version"].as<std::string>();
+        
+        // Validate File Version
+        std::cout << "Config File Version: " << file_version << std::endl;
+        if (file_version != Config::FILE_VERSION) {
+            throw std::invalid_argument("Invalid file_version, expected: " + Config::FILE_VERSION);
+        }
+        
+        // When doing node.as (all fields must be present on file)
         Config c = node.as<Config>();
 
         // Moves the Loaded config to m_config shared pointer.
         encode(c);
     }
+    catch (YAML::Exception &ex)
+    {
+        std::cout << "YAML::LoadFile(xrm-config.yaml) " << ex.what() << std::endl;
+        std::cout << "Most likely a required field in the config file is missing. " << std::endl;
+        assert(false);
+    }
     catch (std::exception &ex)
     {
-        std::cout << "Exception YAML::LoadFile(xrm-config.yaml) " << ex.what() << std::endl;
+        std::cout << "Unexpected YAML::LoadFile(xrm-config.yaml) " << ex.what() << std::endl;
         assert(false);
     }
 
