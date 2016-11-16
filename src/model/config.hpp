@@ -44,6 +44,8 @@ public:
     } FIELD_LENGTH;
 
 
+    std::string file_version;          // File Version.
+
 // string
     std::string bbs_name_sysop;        // SysopName,
     std::string bbs_name;              // BoardName;
@@ -206,7 +208,8 @@ public:
     
 
     Config()
-        : bbs_name_sysop("New OBV2 XRM Sysop")
+        : file_version("1.0.0")
+        , bbs_name_sysop("New OBV2 XRM Sysop")
         , bbs_name("New OBV2 XRM BBS")
         , bbs_uuid("")
         , password_system("system")
@@ -341,6 +344,7 @@ namespace YAML
         static Node encode(const Config &rhs)
         {
             Node node;
+            node["file_version"] = rhs.file_version;
             node["bbs_name_sysop"] = rhs.bbs_name_sysop;
             node["bbs_name"] = rhs.bbs_name;
             node["bbs_uuid"] = rhs.bbs_uuid;
@@ -458,6 +462,7 @@ namespace YAML
          */
         static bool decode(const Node& node, Config& rhs)
         {
+            rhs.file_version                    = node["file_version"].as<std::string>();
             rhs.bbs_name_sysop                  = node["bbs_name_sysop"].as<std::string>();
             rhs.bbs_name                        = node["bbs_name"].as<std::string>();
             rhs.bbs_uuid                        = node["bbs_uuid"].as<std::string>();

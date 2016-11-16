@@ -1,0 +1,1 @@
+./Debug/main.cpp.o ./Debug/struct_compat.cpp.o   

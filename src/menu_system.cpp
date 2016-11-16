@@ -92,7 +92,7 @@ bool MenuSystem::onExit()
  * @brief Process Command Keys passed from menu selection (Callback)
  * @param option
  */
-void MenuSystem::menuOptionsCallback(const MenuOption &option)
+void MenuSystem::menuOptionsCallback(const MenuCompatOption &option)
 {
     /* Run through the case and switch over the new interface.
     std::string mnuOption = option.CKeys;
