@@ -1,4 +1,11 @@
 
+Change Log Update (00.00.59)
+* 2016-11-16
++ Added File Versions to all YAML configuration files
+  Config, Menus, Text Prompts
++ Current Asserts on Version ms-matches, need to eventually work out
+  a cleaner shutdown process.
+
 Change Log Update (00.00.58)
 * 2016-11-16
 + Rename Legacy Menu objects with Compat

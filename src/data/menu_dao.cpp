@@ -10,6 +10,9 @@
 
 #include <mutex>
 
+// Setup the file version for the config file.
+const std::string Menu::FILE_VERSION = "1.0.0";
+
 MenuDao::MenuDao(menu_ptr menu, std::string menu_name, std::string path)
     : m_menu(menu)
     , m_path(path)
@@ -144,14 +147,34 @@ bool MenuDao::loadMenu()
     {
         // Load file fresh.
         node = YAML::LoadFile(path);
+        // Testing Is on nodes always throws exceptions.
+        if (node.size() == 0) 
+        {
+            return false; //File Not Found?
+        }
+        
+        std::string file_version = node["file_version"].as<std::string>();
+        
+        // Validate File Version
+        std::cout << "Menu File Version: " << file_version << std::endl;
+        if (file_version != Menu::FILE_VERSION) {
+            throw std::invalid_argument("Invalid file_version, expected: " + Menu::FILE_VERSION);
+        }
+        
         Menu m = node.as<Menu>();
 
         // Moves the Loaded config to m_config shared pointer.
         encode(m);
+    }   
+    catch (YAML::Exception &ex)
+    {
+        std::cout << "Exception YAML::LoadFile(" << m_filename << ".yaml) " << ex.what() << std::endl;
+        std::cout << "Most likely a required field in the menu file is missing. " << std::endl;
+        assert(false);
     }
     catch (std::exception &ex)
     {
-        std::cout << "Exception YAML::LoadFile(" << m_filename << ".yaml) " << ex.what() << std::endl;
+        std::cout << "Unexpected YAML::LoadFile(" << m_filename << ".yaml) " << ex.what() << std::endl;
         assert(false);
     }
 

@@ -23,7 +23,9 @@
 class Config
 {
     
-public:
+public:    
+
+    const static std::string FILE_VERSION;
 
     // Static Field Lengths to keep fields standard throughout
     // The internal and external program.
@@ -208,7 +210,7 @@ public:
     
 
     Config()
-        : file_version("1.0.0")
+        : file_version(FILE_VERSION)
         , bbs_name_sysop("New OBV2 XRM Sysop")
         , bbs_name("New OBV2 XRM BBS")
         , bbs_uuid("")

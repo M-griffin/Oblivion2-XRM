@@ -116,7 +116,12 @@ void run(boost::asio::io_service& io_service)
     ConfigDao cfg(config, GLOBAL_BBS_PATH);
 
     // Loads the Config file into the Data Access Object.
-    cfg.loadConfig();
+    if (!cfg.loadConfig()) 
+    {
+        // TODO Throws exception right now, need to work in
+        // better shutdown on from this point! just assert for now.
+        return;
+    }
 
     // Startup Telnet Server
     if (cfg.m_config->use_service_telnet)
