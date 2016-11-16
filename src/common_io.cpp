@@ -123,12 +123,16 @@ std::string CommonIO::getProgramPath()
     std::string::size_type position;
     position = program_path.rfind("/xrm-server");
     if(position != std::string::npos)
-        program_path.erase(position+1,program_path.size()-1);
+    {
+        program_path.erase(position+1,program_path.size()-1);        
+    }
 
     // remove extra './'
     position = program_path.rfind("./");
     if(position != std::string::npos)
-        program_path.erase(position,2);
+    {
+        program_path.erase(position,2);        
+    }
 
 #elif _WIN32
     // Get the Current Program path.
@@ -143,7 +147,9 @@ std::string CommonIO::getProgramPath()
     program_path = current_path;
     std::string::size_type position = program_path.rfind("\\",program_path.size()-1);
     if(position != std::string::npos)
-        program_path.erase(position+1);
+    {
+        program_path.erase(position+1);        
+    }
 #else
 
     char exe_path[PATH_MAX] = {0};
@@ -162,8 +168,10 @@ std::string CommonIO::getProgramPath()
     // Remove Executable
     std::string::size_type position;
     position = program_path.rfind("/xrm-server");
-    if(position != std::string::npos)
-        program_path.erase(position+1,program_path.size()-1);
+    if(position != std::string::npos) 
+    {
+        program_path.erase(position+1,program_path.size()-1);        
+    }
 
 #endif
     return program_path;
@@ -188,12 +196,11 @@ std::string CommonIO::getSystemHomeDirectory()
             std::cout << "Error: Unable to locate bbs user's home directory: "
                       << std::endl;
             home_directory = "";
+            return home_directory;
         }
-        else
-            home_directory = homedir;
     }
-    else
-        home_directory = homedir;
+
+    home_directory = homedir;
 
     return home_directory;
 }
@@ -307,12 +314,20 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str)
 std::string CommonIO::leftTrim(const std::string &str)
 {
     std::string new_string = str;
+    
     if(new_string.empty())
     {
         //std::cout << "Exception (Common::LeftTrim) string length == 0" << std::endl;
         return new_string;
     }
-    new_string.erase(new_string.begin(), std::find_if(new_string.begin(), new_string.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+    
+    new_string.erase(
+        new_string.begin(), 
+        std::find_if(new_string.begin(), 
+            new_string.end(), 
+            std::not1(std::ptr_fun<int, int>(std::isspace)))
+    );
+
     return new_string;
 }
 
@@ -324,12 +339,20 @@ std::string CommonIO::leftTrim(const std::string &str)
 std::string CommonIO::rightTrim(const std::string &str)
 {
     std::string new_string = str;
+    
     if(new_string.empty())
     {
         //std::cout << "Exception (Common::RightTrim) string length == 0" << std::endl;
         return new_string;
     }
-    new_string.erase(std::find_if(new_string.rbegin(), new_string.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), new_string.end());
+    
+    new_string.erase(std::find_if(
+        new_string.rbegin(), 
+        new_string.rend(), 
+        std::not1(std::ptr_fun<int, int>(std::isspace))).base(), 
+            new_string.end()
+    );
+    
     return new_string;
 }
 
@@ -367,13 +390,17 @@ std::string CommonIO::eraseString(const std::string &str,
     // 0 defaults to end of string.
     // Otherwise End Position is added for number of characters to remove.
     if(end_position == 0)
-        end_position = string_size;
+    {
+        end_position = string_size;        
+    }
     else
     {
         end_position = start_position + (end_position-1);
         // Make sure we can never go past end of string!
         if(end_position > string_size)
-            end_position = string_size;
+        {
+            end_position = string_size;            
+        }
     }
 
     std::string character;
@@ -493,7 +520,9 @@ std::string CommonIO::rightPadding(const std::string &str, std::string::size_typ
     }
 
     for(std::string::size_type i = 0; i < (space-s); i++)
-        padded_line += ' ';
+    {
+        padded_line += ' ';        
+    }
 
     new_string.append(padded_line);
     return new_string;
@@ -508,7 +537,11 @@ std::string CommonIO::rightPadding(const std::string &str, std::string::size_typ
 std::string CommonIO::leftPadding(const std::string &str, std::string::size_type space)
 {
     std::string new_string = str;
-    if(space == 0) return new_string;
+    if(space == 0) 
+    {
+        return new_string;
+    }
+    
     if(new_string.empty())
     {
         //std::cout << "Exception (Common::leftPadding) string length == 0" << std::endl;
@@ -525,7 +558,9 @@ std::string CommonIO::leftPadding(const std::string &str, std::string::size_type
     }
 
     for(std::string::size_type i = 0; i < (space-s); i++)
-        new_string.insert(0, " ");
+    {
+        new_string.insert(0, " ");        
+    }
 
     return new_string;
 }
@@ -562,7 +597,9 @@ std::string CommonIO::centerPadding(const std::string &str, int term_width)
 
     std::string padded_line;
     for(int i = 0; i < space; i++)
+    {
         padded_line += ' ';
+    }
 
     // Appending currnet data after Padding.
     new_string.insert(0,padded_line);
@@ -592,7 +629,9 @@ std::string CommonIO::maskString(const std::string &str)
 
     new_string.erase();
     for(std::string::size_type i = 0; i < string_size; i++)
-        new_string.append("*");
+    {
+        new_string.append("*");        
+    }
 
     return new_string;
 }
@@ -724,9 +763,11 @@ std::string CommonIO::printWideCharacters(const std::wstring &wide_string)
     for(wchar_t wc : wide_string)
     {
         std::string mb(MB_CUR_MAX, '\0');
-        std::string::size_type ret = std::wcrtomb(&mb[0], wc, &state);
+        int ret = std::wcrtomb(&mb[0], wc, &state);
         if((ret == 0) || (ret > MB_CUR_MAX))
-            break;
+        {
+            break;            
+        }
 
         // Skip any Trailing / Embedded null from Wide -> multibtye
         // Conversion, don't send NULL's to the screen.
@@ -757,9 +798,13 @@ std::string CommonIO::translateUnicode(const std::string &standard_string)
     {
         ascii_value = std::char_traits<char>().to_int_type(standard_string[i]);
         if(ascii_value < 256)
-            wide_string = CP437_TABLE[ascii_value];
+        {
+            wide_string = CP437_TABLE[ascii_value];            
+        }
         else
-            wide_string = standard_string[i];
+        {
+            wide_string = standard_string[i];            
+        }
 
         output += printWideCharacters(wide_string);
     }
@@ -1232,7 +1277,9 @@ void CommonIO::CStringToPascal(int8_t *string)
 std::string CommonIO::boolAlpha(bool value)
 {
     if(value)
-        return "True";
+    {
+        return "True";        
+    }
     return "False";
 }
 
@@ -1282,9 +1329,13 @@ void CommonIO::readinAnsi(std::string FileName, std::string &buff)
         if(c != EOF)
         {
             if (c == '\n')
-                buff += "\r\n";
+            {
+                buff += "\r\n";                
+            }
             else
-                buff += c;
+            {
+                buff += c;                
+            }
         }
     }
     while(c != EOF);

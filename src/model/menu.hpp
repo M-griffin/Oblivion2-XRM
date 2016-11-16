@@ -61,6 +61,8 @@ class Menu
 
 public:
 
+    static const std::string FILE_VERSION;
+
     std::string file_version;
     std::string menu_name;
     std::string menu_password;
@@ -74,7 +76,7 @@ public:
     std::vector<MenuOption> menu_options;
 
     Menu()
-        : file_version("1.0.0")
+        : file_version(FILE_VERSION)
         , menu_name("New Menu")
         , menu_password("")
         , menu_fall_back("")

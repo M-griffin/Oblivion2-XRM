@@ -26,7 +26,7 @@ class TextPromptsDao
 {
 public:
 
-    const std::string FILE_VERSION = "1.0.0";
+    static const std::string FILE_VERSION;
 
     TextPromptsDao(std::string path, std::string filename);
     ~TextPromptsDao();
