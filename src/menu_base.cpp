@@ -40,7 +40,7 @@ MenuBase::~MenuBase()
     
     // Pop Functions off the stack.
     std::vector<std::function< void(const std::string &, const bool &is_utf8)> >().swap(m_menu_functions);
-    std::vector<std::function< void(const MenuOption &)> >().swap(m_execute_callback);
+    std::vector<std::function< void(const MenuCompatOption &)> >().swap(m_execute_callback);
 
     // Pop off the stack to deaallocate any active modules.
     std::vector<module_ptr>().swap(m_module);
@@ -76,11 +76,11 @@ void MenuBase::clearMenuOptions()
  */
 void MenuBase::readInMenuData()
 {
-    MenuInfo m_menu_info;
-    MenuOption m_menu_option;
+    MenuCompatInfo m_menu_info;
+    MenuCompatOption m_menu_option;
 
-    memset(&m_menu_info, 0, sizeof(MenuInfo));
-    memset(&m_menu_option, 0, sizeof(MenuOption));
+    memset(&m_menu_info, 0, sizeof(MenuCompatInfo));
+    memset(&m_menu_option, 0, sizeof(MenuCompatOption));
     clearMenuOptions();
     clearMenuPullDownOptions();
 
@@ -260,7 +260,7 @@ void MenuBase::startupMenu()
     }
 
     // Clear!
-    std::vector<MenuOption>().swap(m_loaded_pulldown_options);
+    std::vector<MenuCompatOption>().swap(m_loaded_pulldown_options);
     std::vector<int> pull_down_ids;
 
     // Get Pulldown menu commands, Load all from menu options (disk)
@@ -386,7 +386,7 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
  * @brief Process Command Keys passed from menu selection
  * @param input
  */
-void MenuBase::executeMenuOptions(const MenuOption &option)
+void MenuBase::executeMenuOptions(const MenuCompatOption &option)
 {
     // If Invalid then return
     if(m_execute_callback.size() == 0 || strlen((const char *)option.CKeys) != 2)

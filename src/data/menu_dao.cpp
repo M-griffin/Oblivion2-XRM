@@ -32,6 +32,7 @@ bool MenuDao::fileExists()
 {
     std::string path = m_path;
     path.append(m_filename);
+    path.append(".yaml");
 
     std::ifstream ifs(path);
     if (!ifs.is_open())
@@ -52,16 +53,42 @@ bool MenuDao::saveMenu(menu_ptr menu)
 {
     std::string path = m_path;
     path.append(m_filename);
+    path.append(".yaml");
 
     YAML::Emitter out;
 
     out << YAML::BeginMap;
     out << YAML::Flow;
 
-    // Start Creating the Key/Value Output for the Menu File.
+    // Start Creating the Key/Value Output for the Menu File.    
+    out << YAML::Key << "file_version" << YAML::Value << menu->file_version;
     out << YAML::Key << "menu_name" << YAML::Value << menu->menu_name;
-    
-    
+    out << YAML::Key << "menu_password" << YAML::Value << menu->menu_password;
+    out << YAML::Key << "menu_fall_back" << YAML::Value << menu->menu_fall_back;
+    out << YAML::Key << "menu_help_file" << YAML::Value << menu->menu_help_file;
+    out << YAML::Key << "menu_groups" << YAML::Value << menu->menu_groups;
+    out << YAML::Key << "menu_prompt" << YAML::Value << menu->menu_prompt;
+    out << YAML::Key << "menu_title" << YAML::Value << menu->menu_title;
+    out << YAML::Key << "menu_pulldown_file" << YAML::Value << menu->menu_pulldown_file;
+
+    // Loop and encode each menu option
+    for (auto opt : menu->menu_options) 
+    {
+        out << YAML::Key << "menu_option";
+        out << YAML::Value << YAML::BeginMap;
+        
+        out << YAML::Key << "option_index" << YAML::Value << opt.option_index;
+        out << YAML::Key << "option_name" << YAML::Value << opt.option_name;
+        out << YAML::Key << "option_groups" << YAML::Value << opt.option_groups;  
+        out << YAML::Key << "option_hidden" << YAML::Value << opt.option_hidden;
+        out << YAML::Key << "option_input_key" << YAML::Value << opt.option_input_key;
+        out << YAML::Key << "option_cmd_key" << YAML::Value << opt.option_cmd_key;
+        out << YAML::Key << "option_cmd_string" << YAML::Value << opt.option_cmd_string;
+        out << YAML::Key << "option_pulldown_id" << YAML::Value << opt.option_pulldown_id;
+        
+        out << YAML::EndMap;
+    }
+            
     out << YAML::EndMap;
 
 
@@ -87,10 +114,17 @@ bool MenuDao::saveMenu(menu_ptr menu)
  * @return
  */
 void MenuDao::encode(const Menu &rhs)
-{
-    m_menu->menu_name = rhs.menu_name;
-    
-    
+{   
+    m_menu->file_version        = rhs.file_version;
+    m_menu->menu_name           = rhs.menu_name;
+    m_menu->menu_password       = rhs.menu_password;
+    m_menu->menu_fall_back      = rhs.menu_fall_back;
+    m_menu->menu_help_file      = rhs.menu_help_file;
+    m_menu->menu_groups         = rhs.menu_groups;
+    m_menu->menu_prompt         = rhs.menu_prompt;
+    m_menu->menu_title          = rhs.menu_title;
+    m_menu->menu_pulldown_file  = rhs.menu_pulldown_file;
+    m_menu->menu_options        = rhs.menu_options;
 }
 
 /**
@@ -101,6 +135,7 @@ bool MenuDao::loadMenu()
 {
     std::string path = m_path;
     path.append(m_filename);
+    path.append(".yaml");
 
     YAML::Node node;
 
@@ -114,9 +149,9 @@ bool MenuDao::loadMenu()
         // Moves the Loaded config to m_config shared pointer.
         encode(m);
     }
-    catch (std::exception ex)
+    catch (std::exception &ex)
     {
-        std::cout << "Exception YAML::LoadFile(" << m_filename << ") " << ex.what() << std::endl;
+        std::cout << "Exception YAML::LoadFile(" << m_filename << ".yaml) " << ex.what() << std::endl;
         assert(false);
     }
 

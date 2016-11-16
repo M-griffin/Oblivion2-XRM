@@ -79,6 +79,8 @@ void TextPromptsDao::writeValue(M_TextPrompt &value)
     out << YAML::BeginMap;
     out << YAML::Flow;
 
+    out << YAML::Key << "file_version" << YAML::Value << FILE_VERSION;
+
     for(auto it = value.begin(); it != value.end(); ++it)
     {
         out << YAML::Key << (*it).first;

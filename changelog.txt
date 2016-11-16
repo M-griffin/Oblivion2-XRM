@@ -1,4 +1,13 @@
 
+Change Log Update (00.00.58)
+* 2016-11-16
++ Rename Legacy Menu objects with Compat
++ Create New Data Access Object (DAO) and classes for 
+  reading/writing menu's in YAML files.
++ Starting on Legacy to new YAML XRM Menu format then plan 
+  to update the loading code to start using the new menu files.
++ Also added File Versions to all YAML configuration files.
+
 Change Log Update (00.00.57)
 * 2016-11-15
 + Add new MenuDao and Menu class for YAML menu files.  Rename previous to compat to 

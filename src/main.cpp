@@ -32,7 +32,6 @@
 #include "data/security_dao.hpp"
 #include "data/users_dao.hpp"
 #include "libSqliteWrapped.h"
-//#include "menu_system.hpp"
 
 #include <cstdlib>
 #include <iostream>
@@ -42,9 +41,6 @@
 
 // temp
 #include <fstream>
-
-//#include <cstdio>
-//#include <sqlite3.h>
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
@@ -106,7 +102,7 @@ void run(boost::asio::io_service& io_service)
     // Create Handles to Services
     server_telnet_ptr serverTelnet;
     server_ssl_ptr    serverSSL;
-
+           
     // Default Config Instance
     config_ptr config(new Config());
     if (!config)
@@ -186,6 +182,7 @@ auto main() -> int
     GLOBAL_DATA_PATH = GLOBAL_BBS_PATH + "DATA";
     GLOBAL_MENU_PATH = GLOBAL_BBS_PATH + "MENU";
     GLOBAL_TEXTFILE_PATH = GLOBAL_BBS_PATH + "TEXTFILE";
+    
 
     // Setup Users Database name and path
     USERS_DATABASE = GLOBAL_DATA_PATH;
