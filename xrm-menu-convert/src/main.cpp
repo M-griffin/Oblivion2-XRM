@@ -16,7 +16,6 @@
 
 #include "common_io.hpp"
 
-
 #include <cstdlib>
 #include <iostream>
 
@@ -39,8 +38,9 @@ std::string GLOBAL_TEXTFILE_PATH = "";
 auto main() -> int
 {
     std::cout << "Oblivion/2 XRM Server - Legacy to XRM Menu Converter (c) 2015-2016 Michael Griffin." << std::endl;
-    std::cout << "Import, you must run this from the root bbs directory." << std::endl;
-
+    std::cout << "Important, you must run this from the root bbs directory." << std::endl;
+    std::cout << "- Otherwise you can set the OBV2 environment variable to point to root bbs path." << std::endl;
+    
     CommonIO common;
     GLOBAL_BBS_PATH = common.getProgramPath();
     std::cout << "BBS HOME Directory Registered: " << GLOBAL_BBS_PATH << std::endl;
@@ -139,10 +139,6 @@ auto main() -> int
         }
 
     }
-
-
-
-
 
     return 0;
 }
