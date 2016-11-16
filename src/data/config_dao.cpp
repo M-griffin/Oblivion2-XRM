@@ -59,6 +59,8 @@ bool ConfigDao::saveConfig(config_ptr cfg)
     out << YAML::Flow;
 
     // Start Creating the Key/Value Output for the Config File.
+    
+    out << YAML::Key << "file_version" << YAML::Value << cfg->file_version;
     out << YAML::Key << "bbs_name_sysop" << YAML::Value << cfg->bbs_name_sysop;
     out << YAML::Key << "bbs_name" << YAML::Value << cfg->bbs_name;
     out << YAML::Key << "bbs_uuid" << YAML::Value << cfg->bbs_uuid;
@@ -192,6 +194,7 @@ bool ConfigDao::saveConfig(config_ptr cfg)
  */
 void ConfigDao::encode(const Config &rhs)
 {
+    m_config->file_version = rhs.file_version;
     m_config->bbs_name_sysop = rhs.bbs_name_sysop;
     m_config->bbs_name = rhs.bbs_name;
     m_config->bbs_uuid = rhs.bbs_uuid;
@@ -322,7 +325,7 @@ bool ConfigDao::loadConfig()
         // Moves the Loaded config to m_config shared pointer.
         encode(c);
     }
-    catch (std::exception ex)
+    catch (std::exception &ex)
     {
         std::cout << "Exception YAML::LoadFile(xrm-config.yaml) " << ex.what() << std::endl;
         assert(false);

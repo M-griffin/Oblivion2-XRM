@@ -50,7 +50,7 @@ public:
     {
         std::string path = "";
         // Use to read from either Menu or Data Records
-        if(std::is_same<T, MenuInfo>::value)
+        if(std::is_same<T, MenuCompatInfo>::value)
         {
             path.append(GLOBAL_MENU_PATH);
         }
@@ -100,7 +100,7 @@ public:
                 return x;
             }
         }
-        if(fseek(stream, sizeof(MenuInfo) + ((int)idx * sizeof(T)), SEEK_SET) == 0)
+        if(fseek(stream, sizeof(MenuCompatInfo) + ((int)idx * sizeof(T)), SEEK_SET) == 0)
             x = fwrite(t, sizeof(T), 1, stream);
         fclose(stream);
         return x;
@@ -118,7 +118,7 @@ public:
     {
         std::string path = "";
         // Use to read from either Menu or Data Records
-        if(std::is_same<T, MenuInfo>::value)
+        if(std::is_same<T, MenuCompatInfo>::value)
         {
             path.append(GLOBAL_MENU_PATH);
         }
@@ -176,7 +176,7 @@ public:
         fclose(stream);
 
         stream = fopen(path.c_str(), "rb");
-        if(fseek(stream, sizeof(MenuInfo) + ((int)idx * sizeof(T)), SEEK_SET) == 0)
+        if(fseek(stream, sizeof(MenuCompatInfo) + ((int)idx * sizeof(T)), SEEK_SET) == 0)
             x = fread(t, sizeof(T), 1, stream);
         fclose(stream);
         return x;

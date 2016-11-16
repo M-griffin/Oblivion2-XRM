@@ -56,8 +56,8 @@ public:
 
     // Temp
     MenuPrompt       m_menu_prompt;        // Hold the currently loaded menu prompt.
-    MenuInfo         m_menu_info;          // Menu Info
-    MenuOption       m_menu_options;       // Menu Commands
+    MenuCompatInfo         m_menu_info;          // Menu Info
+    MenuCompatOption       m_menu_options;       // Menu Commands
 
     ansi_process_ptr m_ansi_process;       // Instance for AnsiProcess Methods
     int              m_active_pulldownID;  // Active Lightbar Position.
@@ -69,13 +69,13 @@ public:
 
 
     // Holds all menu options/commands.
-    std::vector<MenuOption> m_loaded_menu_options;
+    std::vector<MenuCompatOption> m_loaded_menu_options;
 
     // Holds all menu prompts.
     std::vector<MenuPrompt> m_loaded_menu_prompts;
 
     // Holds all pulldown menu options.
-    std::vector<MenuOption> m_loaded_pulldown_options;
+    std::vector<MenuCompatOption> m_loaded_pulldown_options;
 
     // Dynamic Async Input Function Vector.
     std::vector<std::function< void(const std::string &, const bool &is_utf8)> > m_menu_functions;
@@ -84,7 +84,7 @@ public:
     std::vector<module_ptr> m_module;
     
     // Handles Dynamic Menu Command Option Execution
-    std::vector<std::function< void(const MenuOption &)> > m_execute_callback;
+    std::vector<std::function< void(const MenuCompatOption &)> > m_execute_callback;
 
    /**
     * @brief Reads a Specific Menu, Info and Options { Called From readInMenuData() }
@@ -153,7 +153,7 @@ public:
      * @brief Handles Menu Option Call Back
      * @param input
      */
-    void executeMenuOptions(const MenuOption &option);
+    void executeMenuOptions(const MenuCompatOption &option);
 
     void processMenuOptions(std::string &input);
 

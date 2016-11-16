@@ -479,7 +479,7 @@ typedef struct UserRec
  * @brief Menu Option Record
  */
 #pragma pack(push, 1)
-typedef struct MenuOption
+typedef struct MenuCompatOption
 {
     MStr    Acs,
             OptName;
@@ -488,7 +488,7 @@ typedef struct MenuOption
     SStr    Keys;
     MStr    CString;
     Word    PulldownID;
-} MenuOption;
+} MenuCompatOption;
 #pragma pack(pop)
 
 /**
@@ -498,7 +498,7 @@ typedef struct MenuOption
  * @brief Menu Record
  */
 #pragma pack(push, 1)
-typedef struct MenuInfo
+typedef struct MenuCompatInfo
 {
     MStr    Name,
             Password;
@@ -508,7 +508,7 @@ typedef struct MenuInfo
     MStr    NameInPrompt;
     MStr    MenuTitle;
     MStr    PulldownFN;
-} MenuInfo;
+} MenuCompatInfo;
 #pragma pack(pop)
 
 /**
