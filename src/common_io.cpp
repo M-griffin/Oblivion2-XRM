@@ -103,10 +103,29 @@ std::string CommonIO::getProgramPath()
     // First check for SYSTEM environmental variable:
     char *pPath;
     pPath = std::getenv((char *)"OBV2");
-    if(pPath!=NULL)
+    if(pPath != nullptr)
     {
+        std::cout << "Found OBV2 Enviroment set: " << pPath << std::endl;
+        
         program_path = pPath;
+        
+#ifdef _WIN32        
+        if (program_path[program_path.size()-1] != '\\')
+        {
+            program_path.append("\\");
+        }
+#else
+        if (program_path[program_path.size()-1] != '/')
+        {
+            program_path.append("/");
+        }
+#endif
+
         return program_path;
+    }
+    else
+    {
+        std::cout << "looking up program path." << std::endl;
     }
 
     // Get the Folder the Executable runs in.
@@ -1213,15 +1232,15 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
 
 
 /**
- * @brief Converts Pascal Strings to C-Strings
+ * @brief Converts Pascal Strings to C-Strings Also return std::string for conversions.
  * @param string
  */
-void CommonIO::PascalToCString(int8_t *string)
+std::string CommonIO::PascalToCString(int8_t *string)
 {
     if(string[0] == 0)
     {
-        string[0] = '\0';
-        return;
+        string = '\0';
+        return "";
     }
 
     std::string newstring = "";
@@ -1236,6 +1255,8 @@ void CommonIO::PascalToCString(int8_t *string)
         ++string;
     }
     *string = '\0';
+    
+    return newstring;
 }
 
 /**

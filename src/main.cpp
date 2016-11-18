@@ -177,11 +177,12 @@ void run(boost::asio::io_service& io_service)
 // auto main(int argc, char* argv[]) -> int
 auto main() -> int
 {
-    std::cout << "Oblivion/2 XRM Server (c) 2015-2016 Michael Griffin." << std::endl;
-
+    std::cout << "Oblivion/2 XRM Server (c) 2015-2016 Michael Griffin." << std::endl
+              << std::endl;
     CommonIO common;
     GLOBAL_BBS_PATH = common.getProgramPath();
-    std::cout << "BBS HOME Directory Registered: " << GLOBAL_BBS_PATH << std::endl;
+    std::cout << "BBS HOME Directory Registered: " << std::endl;
+    std::cout << GLOBAL_BBS_PATH << std::endl;
 
     // Setup System Folder Paths off main BBS Path.
     GLOBAL_DATA_PATH = GLOBAL_BBS_PATH + "DATA";

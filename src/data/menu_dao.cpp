@@ -28,6 +28,20 @@ MenuDao::~MenuDao()
 
 
 /**
+ * @brief Helper, appends forward/backward slash to path
+ * @param value
+ */
+void MenuDao::pathSeperator(std::string &value)
+{
+#ifdef _WIN32
+    value.append("\\");
+#else
+    value.append("/");
+#endif
+}
+
+
+/**
  * @brief Check if the file exists and we need to create a new one.
  * @return
  */
@@ -55,6 +69,7 @@ bool MenuDao::fileExists()
 bool MenuDao::saveMenu(menu_ptr menu)
 {
     std::string path = m_path;
+    pathSeperator(path);
     path.append(m_filename);
     path.append(".yaml");
 
@@ -79,15 +94,15 @@ bool MenuDao::saveMenu(menu_ptr menu)
     {
         out << YAML::Key << "menu_option";
         out << YAML::Value << YAML::BeginMap;
-        
-        out << YAML::Key << "option_index" << YAML::Value << opt.option_index;
-        out << YAML::Key << "option_name" << YAML::Value << opt.option_name;
-        out << YAML::Key << "option_groups" << YAML::Value << opt.option_groups;  
-        out << YAML::Key << "option_hidden" << YAML::Value << opt.option_hidden;
-        out << YAML::Key << "option_input_key" << YAML::Value << opt.option_input_key;
-        out << YAML::Key << "option_cmd_key" << YAML::Value << opt.option_cmd_key;
-        out << YAML::Key << "option_cmd_string" << YAML::Value << opt.option_cmd_string;
-        out << YAML::Key << "option_pulldown_id" << YAML::Value << opt.option_pulldown_id;
+                
+        out << YAML::Key << "index" << YAML::Value << opt.index;
+        out << YAML::Key << "name" << YAML::Value << opt.name;
+        out << YAML::Key << "groups" << YAML::Value << opt.groups;  
+        out << YAML::Key << "hidden" << YAML::Value << opt.hidden;
+        out << YAML::Key << "menu_key" << YAML::Value << opt.menu_key;
+        out << YAML::Key << "command_key" << YAML::Value << opt.command_key;
+        out << YAML::Key << "command_string" << YAML::Value << opt.command_string;
+        out << YAML::Key << "pulldown_id" << YAML::Value << opt.pulldown_id;
         
         out << YAML::EndMap;
     }
