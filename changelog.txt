@@ -1,4 +1,14 @@
 
+Change Log Update (00.00.60)
+* 2016-11-18
++ Finished Legacy .MNU to new .YAML menu file conversion utility
++ Also made some correction to the legacy menu loading code.
++ Next step is to replace the menu loading code to use the new yaml files.
++ Some minor changes to the menu option names in the yaml file.
++ Updated unit tests for new config file version, included needed dao file.
++ Added check if and exit if no legacy .MNU files exist to display a message and exit
++ Added Fix in Telnet_Decoder for NAWS, add a proper casting for int conversion.
+
 Change Log Update (00.00.59)
 * 2016-11-16
 + Added File Versions to all YAML configuration files

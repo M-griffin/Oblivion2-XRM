@@ -184,4 +184,8 @@
       </Completion>
     </Configuration>
   </Settings>
+  <VirtualDirectory Name="data">
+    <File Name="../src/data/config_dao.cpp"/>
+    <File Name="../src/data/config_dao.hpp"/>
+  </VirtualDirectory>
 </CodeLite_Project>
