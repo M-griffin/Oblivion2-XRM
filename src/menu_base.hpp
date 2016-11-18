@@ -56,9 +56,8 @@ public:
 
     // Temp
     MenuPrompt       m_menu_prompt;        // Hold the currently loaded menu prompt.
-    MenuCompatInfo         m_menu_info;          // Menu Info
-    MenuCompatOption       m_menu_options;       // Menu Commands
-
+    MenuCompatInfo   m_menu_info;          // Menu Info
+    
     ansi_process_ptr m_ansi_process;       // Instance for AnsiProcess Methods
     int              m_active_pulldownID;  // Active Lightbar Position.
 

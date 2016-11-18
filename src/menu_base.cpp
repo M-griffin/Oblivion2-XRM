@@ -76,11 +76,10 @@ void MenuBase::clearMenuOptions()
  */
 void MenuBase::readInMenuData()
 {
-    MenuCompatInfo m_menu_info;
-    MenuCompatOption m_menu_option;
+    MenuCompatOption   menu_option;
 
     memset(&m_menu_info, 0, sizeof(MenuCompatInfo));
-    memset(&m_menu_option, 0, sizeof(MenuCompatOption));
+    memset(&menu_option, 0, sizeof(MenuCompatOption));
     clearMenuOptions();
     clearMenuPullDownOptions();
 
@@ -108,6 +107,7 @@ void MenuBase::readInMenuData()
 
         // Load into vector.
         m_loaded_menu_options.push_back(m_menu_option);
+        memset(&menu_option, 0, sizeof(MenuCompatOption));
     }
 }
 
