@@ -103,10 +103,29 @@ std::string CommonIO::getProgramPath()
     // First check for SYSTEM environmental variable:
     char *pPath;
     pPath = std::getenv((char *)"OBV2");
-    if(pPath!=NULL)
+    if(pPath != nullptr)
     {
+        std::cout << "Found OBV2 Enviroment set: " << pPath << std::endl;
+        
         program_path = pPath;
+        
+#ifdef _WIN32        
+        if (program_path[program_path.size()-1] != '\\')
+        {
+            program_path.append("\\");
+        }
+#else
+        if (program_path[program_path.size()-1] != '/')
+        {
+            program_path.append("/");
+        }
+#endif
+
         return program_path;
+    }
+    else
+    {
+        std::cout << "looking up program path." << std::endl;
     }
 
     // Get the Folder the Executable runs in.

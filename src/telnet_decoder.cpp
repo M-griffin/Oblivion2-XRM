@@ -66,8 +66,9 @@ void TelnetDecoder::decodeBuffer()
     switch(m_subnegoOption)
     {
         case TELOPT_NAWS:
-            m_naws_col = (256 * (int)data_sequence[0]) + (int)data_sequence[1];
-            m_naws_row = (256 * (int)data_sequence[2]) + (int)data_sequence[3];
+            m_naws_col = (256 * (unsigned char)data_sequence[0]) + (unsigned char)data_sequence[1];
+            m_naws_row = (256 * (unsigned char)data_sequence[2]) + (unsigned char)data_sequence[3];
+            
             std::cout << "TELOPT_NAWS option: " << m_naws_col << " x " << m_naws_row << std::endl;
             break;
 
@@ -523,7 +524,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                 if(c == '\x00' || c == '\0')
                     data_sequence += '\0';
                 else
-                    data_sequence += c;
+                    data_sequence += static_cast<char>(c);
 
                 if (data_sequence.size() >= SB_MAXLEN)
                 {
@@ -554,7 +555,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                 if(c == '\x00' || c == '\0')
                     data_sequence += '\0';
                 else
-                    data_sequence += c;
+                    data_sequence += static_cast<char>(c);
 
                 if (data_sequence.size() >= SB_MAXLEN)
                 {
@@ -585,7 +586,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                 if(c == '\x00' || c == '\0')
                     data_sequence += ' ';
                 else
-                    data_sequence += c;
+                    data_sequence += static_cast<char>(c);
 
                 if (data_sequence.size() >= SB_MAXLEN)
                 {
