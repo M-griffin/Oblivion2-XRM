@@ -272,10 +272,10 @@ public:
                         bool  hidden);              // If input is hidden or masked     {Optional}
 
     /**
-     * @brief Converts Pascal Strings to C-Strings
+     * @brief Converts Pascal Strings to C-Strings Also return std::string for conversions.
      * @param string
      */
-    void PascalToCString(int8_t *string);
+    std::string PascalToCString(int8_t *string);
 
     /**
      * @brief Converts C-Strings to Pascal Strings

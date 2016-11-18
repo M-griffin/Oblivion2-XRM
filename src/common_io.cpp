@@ -1232,15 +1232,15 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
 
 
 /**
- * @brief Converts Pascal Strings to C-Strings
+ * @brief Converts Pascal Strings to C-Strings Also return std::string for conversions.
  * @param string
  */
-void CommonIO::PascalToCString(int8_t *string)
+std::string CommonIO::PascalToCString(int8_t *string)
 {
     if(string[0] == 0)
     {
-        string[0] = '\0';
-        return;
+        string = '\0';
+        return "";
     }
 
     std::string newstring = "";
@@ -1255,6 +1255,8 @@ void CommonIO::PascalToCString(int8_t *string)
         ++string;
     }
     *string = '\0';
+    
+    return newstring;
 }
 
 /**

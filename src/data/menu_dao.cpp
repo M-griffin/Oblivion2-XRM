@@ -28,6 +28,20 @@ MenuDao::~MenuDao()
 
 
 /**
+ * @brief Helper, appends forward/backward slash to path
+ * @param value
+ */
+void MenuDao::pathSeperator(std::string &value)
+{
+#ifdef _WIN32
+    value.append("\\");
+#else
+    value.append("/");
+#endif
+}
+
+
+/**
  * @brief Check if the file exists and we need to create a new one.
  * @return
  */
@@ -55,6 +69,7 @@ bool MenuDao::fileExists()
 bool MenuDao::saveMenu(menu_ptr menu)
 {
     std::string path = m_path;
+    pathSeperator(path);
     path.append(m_filename);
     path.append(".yaml");
 

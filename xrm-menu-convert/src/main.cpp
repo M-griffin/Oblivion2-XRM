@@ -25,7 +25,7 @@
 
 #include <cstdlib>
 #include <iostream>
-
+#include <algorithm>
 #include <exception>
 
 #include <boost/smart_ptr/shared_ptr.hpp>
@@ -37,6 +37,13 @@ std::string GLOBAL_MENU_PATH = "";
 std::string GLOBAL_TEXTFILE_PATH = "";
 
 
+/**
+ * @class MenuConvert
+ * @author Michael Griffin
+ * @date 17/11/2016
+ * @file main.cpp
+ * @brief Handle OBV/2 Legacy to XRM Menu conversion
+ */
 class MenuConvert
     : private MenuCompatDao
 { 
@@ -59,35 +66,35 @@ public:
      * @brief Helper, appends forward/backward slash to path
      * @param value
      */
-    void pathSeperator(std::string &value);
+    void path_seperator(std::string &value);
   
     /**
      * @brief Reads a Specific Menu, Info and Options
      */
-    void clearMenuOptions();
+    void clear_menu_options();
 
     /**
      * @brief Reads a Specific Menu, Info and Options
      */
-    void readInMenuData();
+    void load_menu();
 
     /**
-     * @brief Copy Legacy to Backup and Create Yaml
+     * @brief Convert Legacy to Backup and Create Yaml
      * 
      */
-    void copy_menus();
+    void convert_menu();
      
      /**
      * @brief Copy Legacy to Backup and Create Yaml
      * 
      */
-    void backup_menus();
+    bool backup_menu();
 
     /**
      * @brief Read all Legacy Menus, then save to backup folder
      * Then convert Legacy to YAML format.
      */
-    void process_menus();
+    void process_menu();
   
 };
 
@@ -96,7 +103,7 @@ public:
  * @brief Helper, appends forward/backward slash to path
  * @param value
  */
-void MenuConvert::pathSeperator(std::string &value)
+void MenuConvert::path_seperator(std::string &value)
 {
 #ifdef _WIN32
     value.append("\\");
@@ -109,7 +116,7 @@ void MenuConvert::pathSeperator(std::string &value)
 /**
  * @brief Reads a Specific Menu, Info and Options
  */
-void MenuConvert::clearMenuOptions()
+void MenuConvert::clear_menu_options()
 {
     while(m_loaded_menu_options.size() > 0)
     {
@@ -121,15 +128,13 @@ void MenuConvert::clearMenuOptions()
 /**
  * @brief Reads a Specific Menu, Info and Options
  */
-void MenuConvert::readInMenuData()
+void MenuConvert::load_menu()
 {
-    MenuCompatInfo m_menu_info;
-    MenuCompatOption m_menu_option;
+    MenuCompatOption menu_option;
 
     memset(&m_menu_info, 0, sizeof(MenuCompatInfo));
-    memset(&m_menu_option, 0, sizeof(MenuCompatOption));
-    clearMenuOptions();
-    //clearMenuPullDownOptions();
+    memset(&menu_option, 0, sizeof(MenuCompatOption));
+    clear_menu_options();
 
     recordReadInfo(&m_menu_info, m_current_menu, 0);
 
@@ -145,16 +150,89 @@ void MenuConvert::readInMenuData()
 
     // Loop each Option after Reading the Menu.
     int u = 0;
-    while(recordReadOption(&m_menu_option, m_current_menu, u++))
+    while(recordReadOption(&menu_option, m_current_menu, u++))
     {
-        m_common_io.PascalToCString(m_menu_option.Acs);
-        m_common_io.PascalToCString(m_menu_option.OptName);
-        m_common_io.PascalToCString(m_menu_option.Keys);
-        m_common_io.PascalToCString(m_menu_option.CKeys);
-        m_common_io.PascalToCString(m_menu_option.CString);
+        m_common_io.PascalToCString(menu_option.Acs);
+        m_common_io.PascalToCString(menu_option.OptName);
+        m_common_io.PascalToCString(menu_option.Keys);
+        m_common_io.PascalToCString(menu_option.CKeys);
+        m_common_io.PascalToCString(menu_option.CString);
 
         // Load into vector.
-        m_loaded_menu_options.push_back(m_menu_option);
+        m_loaded_menu_options.push_back(menu_option);
+        
+        memset(&menu_option, 0, sizeof(MenuCompatOption));
+    }
+}
+
+
+/**
+ * @brief Convert Legacy to Backup and Create Yaml
+ * 
+ */
+void MenuConvert::convert_menu() 
+{   
+    namespace fs = boost::filesystem;
+    
+    
+    // Testing Menu
+    menu_ptr menu(new Menu());
+
+    // Convert int8_t* to std::strings
+    menu->menu_name          = boost::lexical_cast<std::string>(m_menu_info.Name);
+    menu->menu_password      = boost::lexical_cast<std::string>(m_menu_info.Password);
+    menu->menu_fall_back     = boost::lexical_cast<std::string>(m_menu_info.FallBack);
+    menu->menu_help_file     = boost::lexical_cast<std::string>(m_menu_info.HelpID);
+    menu->menu_groups        = boost::lexical_cast<std::string>(m_menu_info.ACS);
+    menu->menu_prompt        = boost::lexical_cast<std::string>(m_menu_info.NameInPrompt);
+    menu->menu_title         = boost::lexical_cast<std::string>(m_menu_info.MenuTitle);
+    menu->menu_pulldown_file = boost::lexical_cast<std::string>(m_menu_info.PulldownFN);
+
+    MenuOption option;
+    
+    int index = 0;
+    for (auto &opt : m_loaded_menu_options)
+    {
+        option.option_index       = index++;
+        option.option_name        = boost::lexical_cast<std::string>(opt.OptName);
+        option.option_groups      = boost::lexical_cast<std::string>(opt.Acs);
+        option.option_hidden      = boost::lexical_cast<bool>(opt.Hidden);
+        option.option_input_key   = boost::lexical_cast<std::string>(opt.Keys);
+        option.option_cmd_key     = boost::lexical_cast<std::string>(opt.CKeys);
+        option.option_cmd_string  = boost::lexical_cast<std::string>(opt.CString);
+        option.option_pulldown_id = boost::lexical_cast<int>(opt.PulldownID);
+
+        menu->menu_options.push_back(option);
+    }
+    
+    
+    // Strip .MNU from Menu filename
+    std::string core_menu_name = m_current_menu.substr(0, m_current_menu.size() - 4);
+    std::transform(
+        core_menu_name.begin(), 
+        core_menu_name.end(), 
+        core_menu_name.begin(), 
+        ::tolower
+    );
+    
+    // Save new YAML Menu
+    MenuDao mnu(menu, core_menu_name, GLOBAL_MENU_PATH);
+    
+    try
+    {
+        // On success, remove legacy .MNU File
+        if (mnu.saveMenu(menu)) 
+        {
+            std::string legacy_menu = GLOBAL_MENU_PATH;
+            pathSeperator(legacy_menu);
+            legacy_menu.append(m_current_menu);
+            remove(legacy_menu.c_str());
+        }
+    }
+    catch (std::exception &e)
+    {
+        std::cout << "Exception, unable to write .yaml menu file" << std::endl;
+        std::cout << e.what() << std::endl;
     }
 }
 
@@ -163,9 +241,11 @@ void MenuConvert::readInMenuData()
  * @brief Backup Legacy to Backup and Create Yaml
  * 
  */
-void MenuConvert::backup_menus() 
-{   
+bool MenuConvert::backup_menu() 
+{       
     namespace fs = boost::filesystem;
+    
+    bool result = true;
     
     std::string source = GLOBAL_MENU_PATH;
     std::string dest   = GLOBAL_MENU_PATH;
@@ -188,8 +268,18 @@ void MenuConvert::backup_menus()
     std::cout << "processing menu: " << m_current_menu << std::endl;
     
     // Loop through and process, move to backup folder, then generate yaml.
-    fs::copy_file(menu_source_path, menu_dest_path, fs::copy_option::overwrite_if_exists);
+    try 
+    {
+        fs::copy_file(menu_source_path, menu_dest_path, fs::copy_option::overwrite_if_exists);
+    }
+    catch (std::exception &e)
+    {
+        std::cout << "erorr, unable to backup: " << m_current_menu << std::endl;
+        std::cout << "Excepton: " << e.what() << std::endl;
+        result = false;
+    }
     
+    return result;
 }
 
 
@@ -197,7 +287,7 @@ void MenuConvert::backup_menus()
  * @brief Read all Legacy Menus and create backup folder. 
  * 
  */
-void MenuConvert::process_menus() 
+void MenuConvert::process_menu() 
 {
     namespace fs = boost::filesystem;
     fs::path menu_directory(GLOBAL_MENU_PATH);   // Add to menu path from config!
@@ -251,7 +341,13 @@ void MenuConvert::process_menus()
     for (std::string s : result_set)
     {
         m_current_menu = s;
-        backup_menus();
+        
+        // Only convert menus that are backed up.
+        if (backup_menu())
+        {
+            load_menu();
+            convert_menu();
+        }
     }    
 }
 
@@ -294,12 +390,13 @@ auto main() -> int
         if (!cfg.fileExists())
         {
             std::cout << "Unable to locate xrm-config.yaml, you must run this from root bbs directory." << std::endl;
-            assert(false);
+            exit(1);
         }
     }
     catch (std::exception &e)
     {
         std::cout << "Unable to load configuration in bbs root." << std::endl;
+        exit(2);
     }
     
     
@@ -308,12 +405,13 @@ auto main() -> int
     
     // start Conversion process
     try {
-        convert.process_menus();        
+        convert.process_menu();        
     }
     catch (std::exception &e)
     {
         std::cout << "Exception: Unable to process menus." << std::endl;
         std::cout << e.what() << std::endl;
+        exit(3);
     }
     
     
