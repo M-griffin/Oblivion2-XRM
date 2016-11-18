@@ -7,6 +7,7 @@ Change Log Update (00.00.60)
 + Some minor changes to the menu option names in the yaml file.
 + Updated unit tests for new config file version, included needed dao file.
 + Added check if and exit if no legacy .MNU files exist to display a message and exit
++ Added Fix in Telnet_Decoder for NAWS, add a proper casting for int conversion.
 
 Change Log Update (00.00.59)
 * 2016-11-16
