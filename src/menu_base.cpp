@@ -24,7 +24,6 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_input_index(0)
     , m_menu_prompt()
     , m_menu_info()
-    , m_menu_options()
     , m_ansi_process(new AnsiProcessor(
                     session_data->m_telnet_state->getTermRows(),
                     session_data->m_telnet_state->getTermCols()))
@@ -97,16 +96,16 @@ void MenuBase::readInMenuData()
 
     // Loop each Option after Reading the Menu.
     int u = 0;
-    while(recordReadOption(&m_menu_option, m_current_menu, u++))
+    while(recordReadOption(&menu_option, m_current_menu, u++))
     {
-        m_common_io.PascalToCString(m_menu_option.Acs);
-        m_common_io.PascalToCString(m_menu_option.OptName);
-        m_common_io.PascalToCString(m_menu_option.Keys);
-        m_common_io.PascalToCString(m_menu_option.CKeys);
-        m_common_io.PascalToCString(m_menu_option.CString);
+        m_common_io.PascalToCString(menu_option.Acs);
+        m_common_io.PascalToCString(menu_option.OptName);
+        m_common_io.PascalToCString(menu_option.Keys);
+        m_common_io.PascalToCString(menu_option.CKeys);
+        m_common_io.PascalToCString(menu_option.CString);
 
         // Load into vector.
-        m_loaded_menu_options.push_back(m_menu_option);
+        m_loaded_menu_options.push_back(menu_option);
         memset(&menu_option, 0, sizeof(MenuCompatOption));
     }
 }

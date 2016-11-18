@@ -4,7 +4,7 @@
  *
  * Compiles under MingW32/64 5.1.0 g++
  *
- * LIBS:
+ * LIBS: Boost, yamlc++
  *
  */
 
@@ -35,7 +35,6 @@ std::string GLOBAL_BBS_PATH = "";
 std::string GLOBAL_DATA_PATH = "";
 std::string GLOBAL_MENU_PATH = "";
 std::string GLOBAL_TEXTFILE_PATH = "";
-
 
 /**
  * @class MenuConvert
@@ -98,7 +97,6 @@ public:
   
 };
 
-
 /**
  * @brief Helper, appends forward/backward slash to path
  * @param value
@@ -112,7 +110,6 @@ void MenuConvert::path_seperator(std::string &value)
 #endif
 }
 
-
 /**
  * @brief Reads a Specific Menu, Info and Options
  */
@@ -123,7 +120,6 @@ void MenuConvert::clear_menu_options()
         m_loaded_menu_options.pop_back();
     }
 }
-
 
 /**
  * @brief Reads a Specific Menu, Info and Options
@@ -165,7 +161,6 @@ void MenuConvert::load_menu()
     }
 }
 
-
 /**
  * @brief Convert Legacy to Backup and Create Yaml
  * 
@@ -174,8 +169,7 @@ void MenuConvert::convert_menu()
 {   
     namespace fs = boost::filesystem;
     
-    
-    // Testing Menu
+    // Instatnce for new yaml menu format.
     menu_ptr menu(new Menu());
 
     // Convert int8_t* to std::strings
@@ -193,20 +187,19 @@ void MenuConvert::convert_menu()
     int index = 0;
     for (auto &opt : m_loaded_menu_options)
     {
-        option.option_index       = index++;
-        option.option_name        = boost::lexical_cast<std::string>(opt.OptName);
-        option.option_groups      = boost::lexical_cast<std::string>(opt.Acs);
-        option.option_hidden      = boost::lexical_cast<bool>(opt.Hidden);
-        option.option_input_key   = boost::lexical_cast<std::string>(opt.Keys);
-        option.option_cmd_key     = boost::lexical_cast<std::string>(opt.CKeys);
-        option.option_cmd_string  = boost::lexical_cast<std::string>(opt.CString);
-        option.option_pulldown_id = boost::lexical_cast<int>(opt.PulldownID);
+        option.index           = index++;
+        option.name            = boost::lexical_cast<std::string>(opt.OptName);
+        option.groups          = boost::lexical_cast<std::string>(opt.Acs);
+        option.hidden          = boost::lexical_cast<bool>(opt.Hidden);
+        option.menu_key        = boost::lexical_cast<std::string>(opt.Keys);
+        option.command_key     = boost::lexical_cast<std::string>(opt.CKeys);
+        option.command_string  = boost::lexical_cast<std::string>(opt.CString);
+        option.pulldown_id     = boost::lexical_cast<int>(opt.PulldownID);
 
         menu->menu_options.push_back(option);
     }
-    
-    
-    // Strip .MNU from Menu filename
+        
+    // Strip .MNU from Menu filename and lower case it.
     std::string core_menu_name = m_current_menu.substr(0, m_current_menu.size() - 4);
     std::transform(
         core_menu_name.begin(), 
@@ -282,7 +275,6 @@ bool MenuConvert::backup_menu()
     return result;
 }
 
-
 /**
  * @brief Read all Legacy Menus and create backup folder. 
  * 
@@ -311,6 +303,14 @@ void MenuConvert::process_menu()
             }
         }
     }
+    
+    // check result set, if no menu then return gracefully.
+    if (result_set.size() == 0)
+    {
+        std::cout << "\r\n*** No Legacy .MNU files found to convert at this time." << std::endl;
+        return;
+    }
+    
     // Sort Menu's in accending order
     std::sort(result_set.begin(), result_set.end());
     
@@ -414,76 +414,5 @@ auto main() -> int
         exit(3);
     }
     
-    
-/*
-    // Start Menu Conversion Process
-    {
-        // Testing Menu
-        menu_ptr menu(new Menu());
-
-        menu->menu_name = "matrix";
-        menu->menu_password = "password";
-        menu->menu_fall_back = "fallback";
-        menu->menu_help_file = "helpfile";
-        menu->menu_groups = "groups";
-        menu->menu_prompt = "prompt";
-        menu->menu_title = "title";
-        menu->menu_pulldown_file = "pulldown";
-
-        MenuOption option;
-
-        option.option_index = 1;
-        option.option_name = "name 1";
-        option.option_groups = "group1";
-        option.option_hidden = true;
-        option.option_input_key = "ikey1";
-        option.option_cmd_key = "ckey1";
-        option.option_cmd_string = "cstr1";
-        option.option_pulldown_id = 1;
-
-        menu->menu_options.push_back(option);
-
-        option.option_index = 2;
-        option.option_name = "name 2";
-        option.option_groups = "group2";
-        option.option_hidden = false;
-        option.option_input_key = "ikey2";
-        option.option_cmd_key = "ckey2";
-        option.option_cmd_string = "cstr2";
-        option.option_pulldown_id = 2;
-
-        menu->menu_options.push_back(option);
-             
-        MenuDao mnu(menu, "matrix", GLOBAL_MENU_PATH);
-
-
-        //mnu.saveMenu(menu);
-
-        mnu.loadMenu();
-
-        std::cout << menu->menu_name << std::endl;
-        std::cout << menu->menu_password << std::endl;
-        std::cout << menu->menu_fall_back << std::endl;
-        std::cout << menu->menu_help_file << std::endl;
-        std::cout << menu->menu_groups << std::endl;
-        std::cout << menu->menu_prompt << std::endl;
-        std::cout << menu->menu_title << std::endl;
-        std::cout << menu->menu_pulldown_file << std::endl << std::endl;
-
-        std::cout << "options size: " << menu->menu_options.size() << std::endl;
-        for (auto &o : menu->menu_options)
-        {
-            std::cout << o.option_index << std::endl;
-            std::cout << o.option_name << std::endl;
-            std::cout << o.option_groups << std::endl;
-            std::cout << o.option_hidden << std::endl;
-            std::cout << o.option_input_key << std::endl;
-            std::cout << o.option_cmd_key << std::endl;
-            std::cout << o.option_cmd_string << std::endl;
-            std::cout << o.option_pulldown_id << std::endl << std::endl;
-        }
-
-    }
-*/
     return 0;
 }
