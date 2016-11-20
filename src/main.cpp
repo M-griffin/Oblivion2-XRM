@@ -180,7 +180,7 @@ auto main() -> int
     std::cout << "Oblivion/2 XRM Server (c) 2015-2016 Michael Griffin." << std::endl
               << std::endl;
     CommonIO common;
-    GLOBAL_BBS_PATH = common.getProgramPath();
+    GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
     std::cout << "BBS HOME Directory Registered: " << std::endl;
     std::cout << GLOBAL_BBS_PATH << std::endl;
 

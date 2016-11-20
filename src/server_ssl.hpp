@@ -107,5 +107,5 @@ private:
     boost::asio::io_service&        m_io_service;
     boost::asio::ip::tcp::acceptor  m_acceptor;
     boost::asio::ssl::context       m_context;
-    session_manager_ptr                m_room;
+    session_manager_ptr             m_room;
 };
