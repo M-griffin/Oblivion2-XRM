@@ -11,8 +11,8 @@
 #include "model/struct_compat.hpp"
 #include "model/structures.hpp"
 
-#include "model/config.hpp"
 #include "data/config_dao.hpp"
+#include "model/config.hpp"
 
 #include "compat/menu_compat_dao.hpp"
 #include "model/menu.hpp"
@@ -21,7 +21,11 @@
 #include "common_io.hpp"
 
 #include <boost/locale.hpp>
+
+// Fix for file_copy
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 #include <cstdlib>
 #include <iostream>
@@ -45,16 +49,16 @@ std::string GLOBAL_TEXTFILE_PATH = "";
  */
 class MenuConvert
     : private MenuCompatDao
-{ 
- 
+{
+
 public:
 
     MenuConvert()
         : m_current_menu("")
     { }
-    
+
     ~MenuConvert() { }
-    
+
     std::string                   m_current_menu;
     CommonIO                      m_common_io;
     MenuCompatInfo                m_menu_info;
@@ -66,7 +70,7 @@ public:
      * @param value
      */
     void path_seperator(std::string &value);
-  
+
     /**
      * @brief Reads a Specific Menu, Info and Options
      */
@@ -79,14 +83,14 @@ public:
 
     /**
      * @brief Convert Legacy to Backup and Create Yaml
-     * 
+     *
      */
     void convert_menu();
-     
-     /**
-     * @brief Copy Legacy to Backup and Create Yaml
-     * 
-     */
+
+    /**
+    * @brief Copy Legacy to Backup and Create Yaml
+    *
+    */
     bool backup_menu();
 
     /**
@@ -94,7 +98,7 @@ public:
      * Then convert Legacy to YAML format.
      */
     void process_menu();
-  
+
 };
 
 /**
@@ -156,19 +160,19 @@ void MenuConvert::load_menu()
 
         // Load into vector.
         m_loaded_menu_options.push_back(menu_option);
-        
+
         memset(&menu_option, 0, sizeof(MenuCompatOption));
     }
 }
 
 /**
  * @brief Convert Legacy to Backup and Create Yaml
- * 
+ *
  */
-void MenuConvert::convert_menu() 
-{   
+void MenuConvert::convert_menu()
+{
     namespace fs = boost::filesystem;
-    
+
     // Instatnce for new yaml menu format.
     menu_ptr menu(new Menu());
 
@@ -183,7 +187,7 @@ void MenuConvert::convert_menu()
     menu->menu_pulldown_file = boost::lexical_cast<std::string>(m_menu_info.PulldownFN);
 
     MenuOption option;
-    
+
     int index = 0;
     for (auto &opt : m_loaded_menu_options)
     {
@@ -198,24 +202,24 @@ void MenuConvert::convert_menu()
 
         menu->menu_options.push_back(option);
     }
-        
+
     // Strip .MNU from Menu filename and lower case it.
     // Might want to change to boost locale to_lower
     std::string core_menu_name = m_current_menu.substr(0, m_current_menu.size() - 4);
     std::transform(
-        core_menu_name.begin(), 
-        core_menu_name.end(), 
-        core_menu_name.begin(), 
+        core_menu_name.begin(),
+        core_menu_name.end(),
+        core_menu_name.begin(),
         ::tolower
     );
-    
+
     // Save new YAML Menu
     MenuDao mnu(menu, core_menu_name, GLOBAL_MENU_PATH);
-    
+
     try
     {
         // On success, remove legacy .MNU File
-        if (mnu.saveMenu(menu)) 
+        if (mnu.saveMenu(menu))
         {
             std::string legacy_menu = GLOBAL_MENU_PATH;
             pathSeperator(legacy_menu);
@@ -233,36 +237,37 @@ void MenuConvert::convert_menu()
 
 /**
  * @brief Backup Legacy to Backup and Create Yaml
- * 
+ *
  */
-bool MenuConvert::backup_menu() 
-{       
+bool MenuConvert::backup_menu()
+{
     namespace fs = boost::filesystem;
-    
+
     bool result = true;
-    
+
     std::string source = GLOBAL_MENU_PATH;
     std::string dest   = GLOBAL_MENU_PATH;
-    
+
     pathSeperator(dest);
-    dest.append("backup");    
+    dest.append("backup");
 
     std::string source_menu = source;
     pathSeperator(source_menu);
-    
+
     std::string dest_menu = dest;
     pathSeperator(dest_menu);
-    
-    source_menu.append(m_current_menu);   
-    dest_menu.append(m_current_menu);    
-      
+
+    source_menu.append(m_current_menu);
+    dest_menu.append(m_current_menu);
+
     fs::path menu_source_path(source_menu);
     fs::path menu_dest_path(dest_menu);
-  
+
     std::cout << "processing menu: " << m_current_menu << std::endl;
-    
+
     // Loop through and process, move to backup folder, then generate yaml.
-    try 
+    boost::system::error_code ec;
+    try
     {
         fs::copy_file(menu_source_path, menu_dest_path, fs::copy_option::overwrite_if_exists);
     }
@@ -272,15 +277,15 @@ bool MenuConvert::backup_menu()
         std::cout << "Excepton: " << e.what() << std::endl;
         result = false;
     }
-    
+
     return result;
 }
 
 /**
- * @brief Read all Legacy Menus and create backup folder. 
- * 
+ * @brief Read all Legacy Menus and create backup folder.
+ *
  */
-void MenuConvert::process_menu() 
+void MenuConvert::process_menu()
 {
     namespace fs = boost::filesystem;
     fs::path menu_directory(GLOBAL_MENU_PATH);   // Add to menu path from config!
@@ -304,52 +309,52 @@ void MenuConvert::process_menu()
             }
         }
     }
-    
+
     // check result set, if no menu then return gracefully.
     if (result_set.size() == 0)
     {
         std::cout << "\r\n*** No Legacy .MNU files found to convert at this time." << std::endl;
         return;
     }
-    
+
     // Sort Menu's in accending order
     std::sort(result_set.begin(), result_set.end());
-    
-    
+
+
     // Setup and Create Backup Directory
     std::string backup_directory = GLOBAL_MENU_PATH;
     pathSeperator(backup_directory);
     backup_directory.append("backup");
-    
+
     fs::path menu_backup_directory(backup_directory);
-    
+
     // Check if backup exists, if not create it.
     if(!fs::exists(menu_backup_directory) || !fs::is_directory(menu_backup_directory))
     {
         std::cout << "Backup folder: " << menu_backup_directory << std::endl;
         if (boost::filesystem::create_directory(menu_backup_directory))
         {
-            std::cout << "Backup folder created." << std::endl;    
+            std::cout << "Backup folder created." << std::endl;
         }
-        else 
+        else
         {
             std::cout << "Unable to create Backup directory. Check Permissions." << std::endl;
             return;
         }
     }
-        
+
     // Loop each menu
     for (std::string s : result_set)
     {
         m_current_menu = s;
-        
+
         // Only convert menus that are backed up.
         if (backup_menu())
         {
             load_menu();
             convert_menu();
         }
-    }    
+    }
 }
 
 /**
@@ -361,13 +366,13 @@ auto main() -> int
     std::cout << "Oblivion/2 XRM Server - Legacy to XRM Menu Converter" << std::endl;
     std::cout << "(c) 2015-2016 Michael Griffin." << std::endl << std::endl;
     std::cout << "Important, you must run this from the root directory," << std::endl;
-    std::cout << "Otherwise you can set the OBV2 environment variable." << std::endl 
-              << std::endl;
-    
+    std::cout << "Otherwise you can set the OBV2 environment variable." << std::endl
+    << std::endl;
+
     CommonIO common;
     GLOBAL_BBS_PATH = common.getProgramPath("xrm-menu-convert");
-    std::cout << "BBS HOME Directory Registered: " 
-              << std::endl << GLOBAL_BBS_PATH << std::endl;
+    std::cout << "BBS HOME Directory Registered: "
+    << std::endl << GLOBAL_BBS_PATH << std::endl;
 
     // Setup System Folder Paths off main BBS Path.
     GLOBAL_DATA_PATH = GLOBAL_BBS_PATH + "DATA";
@@ -399,14 +404,14 @@ auto main() -> int
         std::cout << "Unable to load configuration in bbs root." << std::endl;
         exit(2);
     }
-    
-    
+
+
     // Menu Convert Instance.
     MenuConvert convert;
-    
+
     // start Conversion process
     try {
-        convert.process_menu();        
+        convert.process_menu();
     }
     catch (std::exception &e)
     {
@@ -414,6 +419,6 @@ auto main() -> int
         std::cout << e.what() << std::endl;
         exit(3);
     }
-    
+
     return 0;
 }

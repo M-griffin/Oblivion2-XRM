@@ -1,1 +1,1 @@
-./Debug/Database.cpp.o ./Debug/Query.cpp.o ./Debug/StderrLog.cpp.o ./Debug/SysLog.cpp.o   
+./Debug/Database.cpp.o ./Debug/Query.cpp.o ./Debug/StderrLog.cpp.o ./Debug/SysLog.cpp.o
