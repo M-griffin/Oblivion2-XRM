@@ -158,7 +158,7 @@ public:
      * To Determine where the executable is located.
      * This has only been tested in Windows, Linux, OSX.
      */
-    std::string getProgramPath();
+    std::string getProgramPath(const std::string &program_name);
 
     /**
      * Get The BBS System Users HOME directory
