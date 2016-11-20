@@ -1,4 +1,30 @@
 
+Change Log Update (00.00.61)
+* 2016-11-20
++ MenuBase has been converted over to using the new .yaml menu files.
+  Only tested matrix.yaml at the moment, still more code need to be added 
+  for jumping to other menus, and then implimenting menu features to come.
++ Update getProgramPath to pass executable name.  So multiple utilities
+  sharing the same object will have the correct filename removed from the 
+  program's path.
+
+Change Log Update (00.00.60)
+* 2016-11-18
++ Finished Legacy .MNU to new .YAML menu file conversion utility
++ Also made some correction to the legacy menu loading code.
++ Next step is to replace the menu loading code to use the new yaml files.
++ Some minor changes to the menu option names in the yaml file.
++ Updated unit tests for new config file version, included needed dao file.
++ Added check if and exit if no legacy .MNU files exist to display a message and exit
++ Added Fix in Telnet_Decoder for NAWS, add a proper casting for int conversion.
+
+Change Log Update (00.00.59)
+* 2016-11-16
++ Added File Versions to all YAML configuration files
+  Config, Menus, Text Prompts
++ Current Asserts on Version ms-matches, need to eventually work out
+  a cleaner shutdown process.
+
 Change Log Update (00.00.58)
 * 2016-11-16
 + Rename Legacy Menu objects with Compat

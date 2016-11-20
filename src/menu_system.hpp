@@ -5,6 +5,7 @@
 #include "menu_base.hpp"
 
 #include "model/struct_compat.hpp"
+#include "model/menu.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
@@ -62,7 +63,7 @@ public:
      * @brief Process Command Keys passed from menu selection (Callback)
      * @param option
      */
-    void menuOptionsCallback(const MenuCompatOption &option);
+    void menuOptionsCallback(const MenuOption &option);
 
 
     // Move this to it's own module eventually!

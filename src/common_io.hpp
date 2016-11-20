@@ -158,7 +158,7 @@ public:
      * To Determine where the executable is located.
      * This has only been tested in Windows, Linux, OSX.
      */
-    std::string getProgramPath();
+    std::string getProgramPath(const std::string &program_name);
 
     /**
      * Get The BBS System Users HOME directory
@@ -272,10 +272,10 @@ public:
                         bool  hidden);              // If input is hidden or masked     {Optional}
 
     /**
-     * @brief Converts Pascal Strings to C-Strings
+     * @brief Converts Pascal Strings to C-Strings Also return std::string for conversions.
      * @param string
      */
-    void PascalToCString(int8_t *string);
+    std::string PascalToCString(int8_t *string);
 
     /**
      * @brief Converts C-Strings to Pascal Strings

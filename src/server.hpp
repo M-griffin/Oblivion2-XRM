@@ -155,7 +155,7 @@ private:
     boost::asio::io_service&    m_io_service;
     tcp::acceptor               m_acceptor_v6;
     tcp::acceptor               m_acceptor_v4;
-    session_manager_ptr            m_room;
+    session_manager_ptr         m_room;
     bool m_is_using_ipv6;
 
     // Place Holder Not used!

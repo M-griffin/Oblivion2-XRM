@@ -7,10 +7,14 @@
 #include "ansi_processor.hpp"
 #include "communicator.hpp"
 
+// Needed Still for prompts
 #include "compat/menu_compat_dao.hpp"
+
 #include "model/struct_compat.hpp"
 #include "model/config.hpp"
+#include "model/menu.hpp"
 #include "data/config_dao.hpp"
+#include "data/menu_dao.hpp"
 #include "mods/mod_base.hpp"
 
 #include <functional>
@@ -56,9 +60,9 @@ public:
 
     // Temp
     MenuPrompt       m_menu_prompt;        // Hold the currently loaded menu prompt.
-    MenuCompatInfo         m_menu_info;          // Menu Info
-    MenuCompatOption       m_menu_options;       // Menu Commands
-
+    menu_ptr         m_menu_info;          // Menu Info
+             
+    
     ansi_process_ptr m_ansi_process;       // Instance for AnsiProcess Methods
     int              m_active_pulldownID;  // Active Lightbar Position.
 
@@ -68,14 +72,14 @@ public:
     bool             m_is_active_pulldown_menu;     // If menu has active lightbars to display.
 
 
-    // Holds all menu options/commands.
-    std::vector<MenuCompatOption> m_loaded_menu_options;
+    // Holds all menu options/commands. {No longer needed, menu has options in struct now}.
+    //std::vector<MenuOption> m_loaded_menu_options;
 
     // Holds all menu prompts.
     std::vector<MenuPrompt> m_loaded_menu_prompts;
 
     // Holds all pulldown menu options.
-    std::vector<MenuCompatOption> m_loaded_pulldown_options;
+    std::vector<MenuOption> m_loaded_pulldown_options;
 
     // Dynamic Async Input Function Vector.
     std::vector<std::function< void(const std::string &, const bool &is_utf8)> > m_menu_functions;
@@ -84,12 +88,7 @@ public:
     std::vector<module_ptr> m_module;
     
     // Handles Dynamic Menu Command Option Execution
-    std::vector<std::function< void(const MenuCompatOption &)> > m_execute_callback;
-
-   /**
-    * @brief Reads a Specific Menu, Info and Options { Called From readInMenuData() }
-    */
-    void clearMenuOptions();
+    std::vector<std::function< void(const MenuOption &)> > m_execute_callback;
 
    /**
     * @brief Clears out Loaded Pulldown options { Called From readInMenuData() }
@@ -153,7 +152,7 @@ public:
      * @brief Handles Menu Option Call Back
      * @param input
      */
-    void executeMenuOptions(const MenuCompatOption &option);
+    void executeMenuOptions(const MenuOption &option);
 
     void processMenuOptions(std::string &input);
 

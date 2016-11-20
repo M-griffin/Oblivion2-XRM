@@ -10,6 +10,9 @@
 
 #include <mutex>
 
+// Setup the file version for the config file.
+const std::string Menu::FILE_VERSION = "1.0.0";
+
 MenuDao::MenuDao(menu_ptr menu, std::string menu_name, std::string path)
     : m_menu(menu)
     , m_path(path)
@@ -25,14 +28,31 @@ MenuDao::~MenuDao()
 
 
 /**
+ * @brief Helper, appends forward/backward slash to path
+ * @param value
+ */
+void MenuDao::pathSeperator(std::string &value)
+{
+#ifdef _WIN32
+    value.append("\\");
+#else
+    value.append("/");
+#endif
+}
+
+
+/**
  * @brief Check if the file exists and we need to create a new one.
  * @return
  */
 bool MenuDao::fileExists()
 {
     std::string path = m_path;
+    pathSeperator(path);    
     path.append(m_filename);
     path.append(".yaml");
+    
+    std::cout << "menu_path: " << path << std::endl;
 
     std::ifstream ifs(path);
     if (!ifs.is_open())
@@ -52,6 +72,7 @@ bool MenuDao::fileExists()
 bool MenuDao::saveMenu(menu_ptr menu)
 {
     std::string path = m_path;
+    pathSeperator(path);
     path.append(m_filename);
     path.append(".yaml");
 
@@ -76,15 +97,15 @@ bool MenuDao::saveMenu(menu_ptr menu)
     {
         out << YAML::Key << "menu_option";
         out << YAML::Value << YAML::BeginMap;
-        
-        out << YAML::Key << "option_index" << YAML::Value << opt.option_index;
-        out << YAML::Key << "option_name" << YAML::Value << opt.option_name;
-        out << YAML::Key << "option_groups" << YAML::Value << opt.option_groups;  
-        out << YAML::Key << "option_hidden" << YAML::Value << opt.option_hidden;
-        out << YAML::Key << "option_input_key" << YAML::Value << opt.option_input_key;
-        out << YAML::Key << "option_cmd_key" << YAML::Value << opt.option_cmd_key;
-        out << YAML::Key << "option_cmd_string" << YAML::Value << opt.option_cmd_string;
-        out << YAML::Key << "option_pulldown_id" << YAML::Value << opt.option_pulldown_id;
+                
+        out << YAML::Key << "index" << YAML::Value << opt.index;
+        out << YAML::Key << "name" << YAML::Value << opt.name;
+        out << YAML::Key << "groups" << YAML::Value << opt.groups;  
+        out << YAML::Key << "hidden" << YAML::Value << opt.hidden;
+        out << YAML::Key << "menu_key" << YAML::Value << opt.menu_key;
+        out << YAML::Key << "command_key" << YAML::Value << opt.command_key;
+        out << YAML::Key << "command_string" << YAML::Value << opt.command_string;
+        out << YAML::Key << "pulldown_id" << YAML::Value << opt.pulldown_id;
         
         out << YAML::EndMap;
     }
@@ -134,6 +155,7 @@ void MenuDao::encode(const Menu &rhs)
 bool MenuDao::loadMenu()
 {
     std::string path = m_path;
+    pathSeperator(path);
     path.append(m_filename);
     path.append(".yaml");
 
@@ -144,14 +166,34 @@ bool MenuDao::loadMenu()
     {
         // Load file fresh.
         node = YAML::LoadFile(path);
+        // Testing Is on nodes always throws exceptions.
+        if (node.size() == 0) 
+        {
+            return false; //File Not Found?
+        }
+        
+        std::string file_version = node["file_version"].as<std::string>();
+        
+        // Validate File Version
+        std::cout << "Menu File Version: " << file_version << std::endl;
+        if (file_version != Menu::FILE_VERSION) {
+            throw std::invalid_argument("Invalid file_version, expected: " + Menu::FILE_VERSION);
+        }
+        
         Menu m = node.as<Menu>();
 
         // Moves the Loaded config to m_config shared pointer.
         encode(m);
+    }   
+    catch (YAML::Exception &ex)
+    {
+        std::cout << "Exception YAML::LoadFile(" << m_filename << ".yaml) " << ex.what() << std::endl;
+        std::cout << "Most likely a required field in the menu file is missing. " << std::endl;
+        assert(false);
     }
     catch (std::exception &ex)
     {
-        std::cout << "Exception YAML::LoadFile(" << m_filename << ".yaml) " << ex.what() << std::endl;
+        std::cout << "Unexpected YAML::LoadFile(" << m_filename << ".yaml) " << ex.what() << std::endl;
         assert(false);
     }
 

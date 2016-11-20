@@ -26,6 +26,12 @@ public:
     ~MenuDao();
 
     /**
+     * @brief Helper, appends forward/backward slash to path
+     * @param value
+     */
+    void pathSeperator(std::string &value);
+
+    /**
      * @brief Check if the file exists and we need to create a new one.
      * @return
      */

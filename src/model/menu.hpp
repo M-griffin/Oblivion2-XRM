@@ -25,26 +25,26 @@ class MenuOption
 public:
 
     MenuOption()
-        : option_index(0)
-        , option_name("New Option")
-        , option_groups("")  
-        , option_hidden(false)
-        , option_input_key("")
-        , option_cmd_key("")
-        , option_cmd_string("")        
-        , option_pulldown_id(0)
+        : index(0)
+        , name("New Option")
+        , groups("")  
+        , hidden(false)
+        , menu_key("")
+        , command_key("")
+        , command_string("")        
+        , pulldown_id(0)
     { }
     
     ~MenuOption() { }
     
-    int            option_index;
-    std::string    option_name;
-    std::string    option_groups;    
-    bool           option_hidden;
-    std::string    option_input_key;
-    std::string    option_cmd_key;
-    std::string    option_cmd_string;        
-    int            option_pulldown_id;
+    int            index;
+    std::string    name;
+    std::string    groups;    
+    bool           hidden;
+    std::string    menu_key;
+    std::string    command_key;
+    std::string    command_string;        
+    int            pulldown_id;
 
 };
 
@@ -61,6 +61,8 @@ class Menu
 
 public:
 
+    static const std::string FILE_VERSION;
+
     std::string file_version;
     std::string menu_name;
     std::string menu_password;
@@ -74,7 +76,7 @@ public:
     std::vector<MenuOption> menu_options;
 
     Menu()
-        : file_version("1.0.0")
+        : file_version(FILE_VERSION)
         , menu_name("New Menu")
         , menu_password("")
         , menu_fall_back("")
@@ -115,15 +117,15 @@ namespace YAML
         {
             Node node;
             
-            node["option_index"]        = rhs.option_index;
-            node["option_name"]         = rhs.option_name;
-            node["option_groups"]       = rhs.option_groups;  
-            node["option_hidden"]       = rhs.option_hidden;
-            node["option_input_key"]    = rhs.option_input_key;
-            node["option_cmd_key"]      = rhs.option_cmd_key;
-            node["option_cmd_string"]   = rhs.option_cmd_string;
-            node["option_pulldown_id"]  = rhs.option_pulldown_id;
-                            
+            node["index"]            = rhs.index;
+            node["name"]             = rhs.name;
+            node["groups"]           = rhs.groups;  
+            node["hidden"]           = rhs.hidden;
+            node["menu_key"]         = rhs.menu_key;
+            node["command_key"]      = rhs.command_key;
+            node["command_string"]   = rhs.command_string;
+            node["pulldown_id"]      = rhs.pulldown_id;
+                           
             return node;
         }
 
@@ -135,14 +137,14 @@ namespace YAML
          */
         static bool decode(const Node& node, MenuOption& rhs)
         {            
-            rhs.option_index       = node["option_index"].as<int>();
-            rhs.option_name        = node["option_name"].as<std::string>();
-            rhs.option_groups      = node["option_groups"].as<std::string>();
-            rhs.option_hidden      = node["option_hidden"].as<bool>();
-            rhs.option_input_key   = node["option_input_key"].as<std::string>();
-            rhs.option_cmd_key     = node["option_cmd_key"].as<std::string>();
-            rhs.option_cmd_string  = node["option_cmd_string"].as<std::string>();
-            rhs.option_pulldown_id = node["option_pulldown_id"].as<int>();
+            rhs.index           = node["index"].as<int>();
+            rhs.name            = node["name"].as<std::string>();
+            rhs.groups          = node["groups"].as<std::string>();
+            rhs.hidden          = node["hidden"].as<bool>();
+            rhs.menu_key        = node["menu_key"].as<std::string>();
+            rhs.command_key     = node["command_key"].as<std::string>();
+            rhs.command_string  = node["command_string"].as<std::string>();
+            rhs.pulldown_id     = node["pulldown_id"].as<int>();
                 
             return true;
         }
@@ -169,14 +171,14 @@ namespace YAML
         static Node encode(const Menu &rhs)
         {
             Node node;
-            node["file_version"] = rhs.file_version;
-            node["menu_name"] = rhs.menu_name;            
-            node["menu_password"] = rhs.menu_password;
-            node["menu_fall_back"] = rhs.menu_fall_back;
-            node["menu_help_file"] = rhs.menu_help_file;
-            node["menu_groups"] = rhs.menu_groups;
-            node["menu_prompt"] = rhs.menu_prompt;
-            node["menu_title"] = rhs.menu_title;
+            node["file_version"]       = rhs.file_version;
+            node["menu_name"]          = rhs.menu_name;            
+            node["menu_password"]      = rhs.menu_password;
+            node["menu_fall_back"]     = rhs.menu_fall_back;
+            node["menu_help_file"]     = rhs.menu_help_file;
+            node["menu_groups"]        = rhs.menu_groups;
+            node["menu_prompt"]        = rhs.menu_prompt;
+            node["menu_title"]         = rhs.menu_title;
             node["menu_pulldown_file"] = rhs.menu_pulldown_file;          
 
             // Child Nodes for storying menu options.
@@ -185,18 +187,18 @@ namespace YAML
             // Loop and encode each menu option
             for (auto &opt : rhs.menu_options) 
             {
-                option["option_index"]        = opt.option_index;
-                option["option_name"]         = opt.option_name;
-                option["option_groups"]       = opt.option_groups;  
-                option["option_hidden"]       = opt.option_hidden;
-                option["option_input_key"]    = opt.option_input_key;
-                option["option_cmd_key"]      = opt.option_cmd_key;
-                option["option_cmd_string"]   = opt.option_cmd_string;
-                option["option_pulldown_id"]  = opt.option_pulldown_id;
+                option["index"]            = opt.index;
+                option["name"]             = opt.name;
+                option["groups"]           = opt.groups;  
+                option["hidden"]           = opt.hidden;
+                option["menu_key"]         = opt.menu_key;
+                option["command_key"]      = opt.command_key;
+                option["command_string"]   = opt.command_string;
+                option["pulldown_id"]      = opt.pulldown_id;
                                 
                 node["menu_option"].push_back(option);
             }
-
+            
             return node;
         }
 

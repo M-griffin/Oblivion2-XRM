@@ -25,7 +25,7 @@ SUITE(XRMCommonIO)
     TEST(ProgramPath)
     {
         CommonIO common;
-        std::string myPath = common.getProgramPath();
+        std::string myPath = common.getProgramPath("xrm-server");
         CHECK(!myPath.empty());
     }
 
