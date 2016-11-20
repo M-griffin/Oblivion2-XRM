@@ -48,8 +48,11 @@ void MenuDao::pathSeperator(std::string &value)
 bool MenuDao::fileExists()
 {
     std::string path = m_path;
+    pathSeperator(path);    
     path.append(m_filename);
     path.append(".yaml");
+    
+    std::cout << "menu_path: " << path << std::endl;
 
     std::ifstream ifs(path);
     if (!ifs.is_open())
@@ -152,6 +155,7 @@ void MenuDao::encode(const Menu &rhs)
 bool MenuDao::loadMenu()
 {
     std::string path = m_path;
+    pathSeperator(path);
     path.append(m_filename);
     path.append(".yaml");
 

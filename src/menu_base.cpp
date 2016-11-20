@@ -1,5 +1,7 @@
 #include "menu_base.hpp"
 
+#include "data/menu_dao.hpp"
+
 #include <boost/locale.hpp>
 #include <boost/filesystem.hpp>
 
@@ -23,7 +25,7 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_fallback_menu("")
     , m_input_index(0)
     , m_menu_prompt()
-    , m_menu_info()
+    , m_menu_info(new Menu())
     , m_ansi_process(new AnsiProcessor(
                     session_data->m_telnet_state->getTermRows(),
                     session_data->m_telnet_state->getTermCols()))
@@ -39,7 +41,7 @@ MenuBase::~MenuBase()
     
     // Pop Functions off the stack.
     std::vector<std::function< void(const std::string &, const bool &is_utf8)> >().swap(m_menu_functions);
-    std::vector<std::function< void(const MenuCompatOption &)> >().swap(m_execute_callback);
+    std::vector<std::function< void(const MenuOption &)> >().swap(m_execute_callback);
 
     // Pop off the stack to deaallocate any active modules.
     std::vector<module_ptr>().swap(m_module);
@@ -61,52 +63,50 @@ void MenuBase::clearMenuPullDownOptions()
 /**
  * @brief Reads a Specific Menu, Info and Options
  */
-void MenuBase::clearMenuOptions()
-{
-    while(m_loaded_menu_options.size() > 0)
-    {
-        m_loaded_menu_options.pop_back();
-    }
-}
-
-
-/**
- * @brief Reads a Specific Menu, Info and Options
- */
 void MenuBase::readInMenuData()
 {
-    MenuCompatOption   menu_option;
-
-    memset(&m_menu_info, 0, sizeof(MenuCompatInfo));
-    memset(&menu_option, 0, sizeof(MenuCompatOption));
-    clearMenuOptions();
     clearMenuPullDownOptions();
+    
+    // Get Fallback menu if menu is not available.
+    std::string fallback = "";
+    std::string revert = "";
+    if(m_menu_info)
+    { 
+        fallback = m_menu_info->menu_fall_back;
+        revert = m_menu_info->menu_name;
+    }
 
-    recordReadInfo(&m_menu_info, m_current_menu, 0);
+    // Reset the Smart Pointer on menu load.
+    m_menu_info.reset(new Menu());
 
-    // Convert Pascal to C Strings.
-    m_common_io.PascalToCString(m_menu_info.Name);
-    m_common_io.PascalToCString(m_menu_info.Password);
-    m_common_io.PascalToCString(m_menu_info.FallBack);
-    m_common_io.PascalToCString(m_menu_info.HelpID);
-    m_common_io.PascalToCString(m_menu_info.ACS);
-    m_common_io.PascalToCString(m_menu_info.NameInPrompt);
-    m_common_io.PascalToCString(m_menu_info.MenuTitle);
-    m_common_io.PascalToCString(m_menu_info.PulldownFN);
-
-    // Loop each Option after Reading the Menu.
-    int u = 0;
-    while(recordReadOption(&menu_option, m_current_menu, u++))
+    // Call MenuDao to ready in .yaml file
+    MenuDao mnu(m_menu_info, m_current_menu, GLOBAL_MENU_PATH);
+    if (mnu.fileExists())
     {
-        m_common_io.PascalToCString(menu_option.Acs);
-        m_common_io.PascalToCString(menu_option.OptName);
-        m_common_io.PascalToCString(menu_option.Keys);
-        m_common_io.PascalToCString(menu_option.CKeys);
-        m_common_io.PascalToCString(menu_option.CString);
-
-        // Load into vector.
-        m_loaded_menu_options.push_back(menu_option);
-        memset(&menu_option, 0, sizeof(MenuCompatOption));
+        mnu.loadMenu();
+    }
+    else
+    {
+        std::cout << "Menu doesn't exist, loading fallback if exists." << std::endl;
+        if (fallback.size() > 0) 
+        {
+            std::cout << "Loading Fallback menu " << fallback << std::endl;
+            m_current_menu = fallback;
+            return readInMenuData();
+        }
+        
+        /*
+        // Else revert back to previous menu
+        std::cout << "Reverting to Previous menu " << revert << std::endl;
+        if (revert.size() > 0) 
+        {
+            m_current_menu = revert;
+            return readInMenuData();            
+        }*/
+        
+        // No menu to fallback or revert
+        // Assert so were not in endless loop, something wrong, fix it!
+        assert(false);
     }
 }
 
@@ -126,9 +126,13 @@ void MenuBase::loadInMenu(std::string menu_name)
     // Read in the Current Menu
     readInMenuData();
 
+    std::cout << m_menu_info->menu_name << std::endl;
+    std::cout << m_menu_info->menu_pulldown_file << std::endl;
+    std::cout << m_menu_info->menu_help_file << std::endl;
+
     // Check If user has access for menu.
 
-    //if not load fallback menu.. etc..
+    // if not load fallback menu.. etc..
 }
 
 
@@ -137,30 +141,55 @@ void MenuBase::loadInMenu(std::string menu_name)
  */
 std::string MenuBase::loadMenuScreen()
 {
+    std::cout << "loadMenuScreen" << std::endl;
+    
     // Check Pulldown FileID
-    std::string pull_down_filename = (char *)m_menu_info.PulldownFN;
     std::string screen_data = "";
 
     // NOTES: check for themes here!!!
     // also  if (m_menu_session_data->m_is_use_ansi), if not ansi, then maybe no pull down, or lightbars!
-    if(pull_down_filename.size() == 0 || !m_menu_session_data->m_is_use_ansi)
+    if(m_menu_info->menu_pulldown_file.size() == 0 || !m_menu_session_data->m_is_use_ansi)
     {
-        std::string screen_file = "";
+        std::string screen_file = m_menu_info->menu_name;
         // Load ansi by Menu Name, remove .MNU and Add .ANS, maybe .UTF for utf8 native?
         if (m_menu_session_data->m_is_use_ansi)
         {
-            screen_file = m_current_menu.substr(0, m_current_menu.size()-4) + ".ANS";
+            screen_file.append(".ANS");
         }
         else
         {
-            screen_file = m_current_menu.substr(0, m_current_menu.size()-4) + ".ASC";
+            screen_file.append(".ASC");
         }
+        
+        // Screen File(s) are Uppercase.
+        std::transform(
+            screen_file.begin(), 
+            screen_file.end(), 
+            screen_file.begin(), 
+            ::toupper
+        );
+        
+        std::cout << "readinAnsi1: " << screen_file << std::endl;
+         
         m_common_io.readinAnsi(screen_file, screen_data);
     }
     else
     {
+        // Pulldown file should have .ANS extnesion.
+        std::string screen_file = m_menu_info->menu_pulldown_file;
+        
+        // Screen File(s) are Uppercase.
+        std::transform(
+            screen_file.begin(), 
+            screen_file.end(), 
+            screen_file.begin(), 
+            ::toupper
+        );
+        
+        std::cout << "readinAnsi2: " << screen_file << std::endl;
+        
         // Otherwise use the Pulldown menu name from the menu.
-        m_common_io.readinAnsi(pull_down_filename, screen_data);
+        m_common_io.readinAnsi(screen_file, screen_data);
     }
     return screen_data;
 }
@@ -177,21 +206,21 @@ std::string MenuBase::buildLightBars()
     std::string light_bars = "";
     bool active_lightbar = false;
 
-    for(auto &m : m_loaded_menu_options)
+    for(auto &m : m_menu_info->menu_options)
     {
         // Always start on Initial or first indexed lightbar.
         // Might need to verify if we need to check for lowest ID, and start on that!
-        if(m_active_pulldownID > 0 && m_active_pulldownID == m.PulldownID)
+        if(m_active_pulldownID > 0 && m_active_pulldownID == m.pulldown_id)
             active_lightbar = true;
 
-        if(m.PulldownID > 0)
+        if(m.pulldown_id > 0)
         {
             // Parse for X/Y Position and colors
-            light_bars.append(m_ansi_process->buildPullDownBars(m.PulldownID, active_lightbar));
+            light_bars.append(m_ansi_process->buildPullDownBars(m.pulldown_id, active_lightbar));
             active_lightbar = false;
 
             // Add the Option Description
-            light_bars.append((char *)m.OptName);
+            light_bars.append(m.name);
 
             // Clear and reset so we end the lightbar
             light_bars.append("\x1b[0m");
@@ -246,29 +275,22 @@ void MenuBase::startupMenu()
     m_input_index = 0; // MENU_INPUT;
 
     m_active_pulldownID = 0;
-
-    // Read in the Menu ANSI
-    std::string buffer = loadMenuScreen();
-
+    
     // Load the Menu ,, Clears All Structs.
     loadInMenu(m_current_menu);
-    if(m_loaded_menu_options.size() < 1)
+    if(m_menu_info->menu_options.size() < 1)
     {
-        std::cout << "<Error> Failed to {find} and load menu: " << m_current_menu << std::endl;
+        std::cout << "Menu has no menu_options: " << m_current_menu << std::endl;
         return;
     }
-
-    // Clear!
-    std::vector<MenuCompatOption>().swap(m_loaded_pulldown_options);
-    std::vector<int> pull_down_ids;
-
+            
     // Get Pulldown menu commands, Load all from menu options (disk)
-    //for(int i = 0; i < (signed)m_loaded_menu_options.size(); i++)
-    for(auto &m : m_loaded_menu_options)
+    std::vector<int> pull_down_ids;
+    for(auto &m : m_menu_info->menu_options)
     {
-        if(m.PulldownID > 0 && m_menu_session_data->m_is_use_ansi)
+        if(m.pulldown_id > 0 && m_menu_session_data->m_is_use_ansi)
         {
-            pull_down_ids.push_back(m.PulldownID);
+            pull_down_ids.push_back(m.pulldown_id);
 
             // Get Actual Options with Descriptions for Lightbars.
             m_loaded_pulldown_options.push_back(m);
@@ -286,6 +308,10 @@ void MenuBase::startupMenu()
     //m_menu_session_data->deliver("\x1b[2J\x1b[1;1H");
 
     // Finally parse the ansi screen and remove pipes
+    // Read in the Menu ANSI
+    std::string buffer = loadMenuScreen();
+    
+    // Output has parsed out MCI codes, translations are then appended.
     std::string output = m_session_io.pipe2ansi(buffer);
 
     // If active pull_down id's found, mark as active pulldown menu.
@@ -324,16 +350,20 @@ void MenuBase::startupMenu()
     cout.imbue(loc);
 
     // Now loop and scan for first cmd and each time
-    for(auto &m : m_loaded_menu_options)
+    for(auto &m : m_menu_info->menu_options)
     {
-        // Process all First Commands}
-        std::string key = (char *)m.Keys;
-        key = to_upper(key);
+        // Process all First Commands or commands that should run every action.
+        std::transform(
+            m.menu_key.begin(), 
+            m.menu_key.end(), 
+            m.menu_key.begin(), 
+            ::toupper
+        );
 
-        if(key == "FIRSTCMD" || key == "EACH")
+        if(m.menu_key == "FIRSTCMD" || m.menu_key == "EACH")
         {
             // Process
-            std::cout << "FOUND FIRSTCMD! EXECUTE: " << m.CKeys << std::endl;
+            std::cout << "FOUND FIRSTCMD! EXECUTE: " << m.command_key << std::endl;
             executeMenuOptions(m);
         }
     }
@@ -354,9 +384,9 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
     // Grab Previous
     for(auto &m : m_loaded_pulldown_options)
     {
-        if(m.PulldownID == previous_pulldown_id)
+        if(m.pulldown_id == previous_pulldown_id)
         {
-            light_bars.append((char *)m.OptName);
+            light_bars.append(m.name);
             break;
         }
     }
@@ -368,9 +398,9 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
     // Grab Current or new selection
     for(auto &m : m_loaded_pulldown_options)
     {
-        if(m.PulldownID == m_active_pulldownID)
+        if(m.pulldown_id == m_active_pulldownID)
         {
-            light_bars.append((char *)m.OptName);
+            light_bars.append(m.name);
             break;
         }
     }
@@ -385,10 +415,10 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
  * @brief Process Command Keys passed from menu selection
  * @param input
  */
-void MenuBase::executeMenuOptions(const MenuCompatOption &option)
+void MenuBase::executeMenuOptions(const MenuOption &option)
 {
     // If Invalid then return
-    if(m_execute_callback.size() == 0 || strlen((const char *)option.CKeys) != 2)
+    if(m_execute_callback.size() == 0 || option.command_key.size() != 2)
     {
         return;
     }
@@ -431,17 +461,22 @@ void MenuBase::processMenuOptions(std::string &input)
 
     // Check for loaded menu commands.
     // Get Pulldown menu commands, Load all from menu options (disk)
-    for(auto &m : m_loaded_menu_options)
+    for(auto &m : m_menu_info->menu_options)
     {
-        std::string key = (char *)m.Keys;
-        key = to_upper(key);
+        // Process all First Commands or commands that should run every action.
+        std::transform(
+            m.menu_key.begin(), 
+            m.menu_key.end(), 
+            m.menu_key.begin(), 
+            ::toupper
+        );
 
         // Next Process EVERY Commands}
-        if(key == "EACH")
+        if(m.menu_key == "EACH")
         {
             // Process, although should each be execure before, or after a menu command!
             // OR is each just on each load/reload of menu i think!!
-            std::cout << "FOUND EACH! EXECUTE: " << m.CKeys << std::endl;
+            std::cout << "FOUND EACH! EXECUTE: " << m.command_key << std::endl;
             executeMenuOptions(m);
             continue;
         }
@@ -493,9 +528,23 @@ void MenuBase::processMenuOptions(std::string &input)
 
         }
 
+
+/*        // TODO!
+            There is wildcarding for menu commands:
+          
+              If you set the Key to X*, then you can put * in the
+              Cstring and that will put what follows the X in the
+              Cstring. This is advisable for such cases as file
+              conference jumping such as J* with would do JM with a
+              Cstring of * so one could J1,J2, etc.
+          
+            Also a possibility for CString is & in which is set to the
+          input gotten with -I, -J, or set with -*.
+*/
+
         // Check Input Keys on Both Pulldown and Normal Menus
         // If the input matches the current key, or Enter is hit, then process it.
-        else if(input.compare(key) == 0 || (m_is_active_pulldown_menu && is_enter))
+        else if(input.compare(m.menu_key) == 0 || (m_is_active_pulldown_menu && is_enter))
         {
             // We have the command, start the work
             if(m_is_active_pulldown_menu)
@@ -505,32 +554,32 @@ void MenuBase::processMenuOptions(std::string &input)
                 {
                     // Process the current active pull down ID.
                     // Check Pull down commands
-                    if(m.PulldownID == m_active_pulldownID)
+                    if(m.pulldown_id == m_active_pulldownID)
                     {
                         // Then we have a match!  Execute the Menu Command with this ID!
-                        std::cout << "Menu Command Executed for: " << key << std::endl;
+                        std::cout << "Menu Command Executed for: " << m.menu_key << std::endl;
 
-                        if(key != "FIRSTCMD" && key != "EACH")
+                        if(m.menu_key != "FIRSTCMD" && m.menu_key != "EACH")
                         {
-                            //input = key; ??
+                            //input = m.menu_key; ??
                             executeMenuOptions(m);
                         }
                     }
 
-                    // Now assign the key to the input, so on next loop, we hit any stacked commands!
+                    // Now assign the m.menu_key to the input, so on next loop, we hit any stacked commands!
                 }
                 else
                 {
                     // NOT ENTER and pulldown,  check hotkeys here!!
-                    std::cout << "Menu Command HOTKEY Executed for: " << key << std::endl;
+                    std::cout << "Menu Command HOTKEY Executed for: " << m.menu_key << std::endl;
                     executeMenuOptions(m);
                     // More testing here.. executeMenuOptions( ... );
                 }
             }
             else
             {
-                // They key compared, execute it
-                std::cout << "NORMAL HOT KEY MATCH and EXECUTE! " << key << std::endl;
+                // They m.menu_key compared, execute it
+                std::cout << "NORMAL HOT KEY MATCH and EXECUTE! " << m.menu_key << std::endl;
                 executeMenuOptions(m);
                 // More testing here.. executeMenuOptions( ... );
             }

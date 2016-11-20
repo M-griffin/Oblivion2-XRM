@@ -92,7 +92,7 @@ bool MenuSystem::onExit()
  * @brief Process Command Keys passed from menu selection (Callback)
  * @param option
  */
-void MenuSystem::menuOptionsCallback(const MenuCompatOption &option)
+void MenuSystem::menuOptionsCallback(const MenuOption &option)
 {
     /* Run through the case and switch over the new interface.
     std::string mnuOption = option.CKeys;
@@ -100,16 +100,16 @@ void MenuSystem::menuOptionsCallback(const MenuCompatOption &option)
     std::string mnuAccess = option.Acs; */
 
     // If Invalid then return
-    if(strlen((const char *)option.CKeys) != 2)
+    if(option.command_key.size() != 2)
     {
         return;
     }
 
     // Run through Comamnd Keys for Method
-    switch(option.CKeys[0])
+    switch(option.command_key[0])
     {
         case '-':
-            switch(option.CKeys[1])
+            switch(option.command_key[1])
             {
                     // Turns on Pulldown Menu Re-entrance
                     // This option returns to the selected option
@@ -127,7 +127,7 @@ void MenuSystem::menuOptionsCallback(const MenuCompatOption &option)
 
             // Matrix Menu Commands
         case '{':
-            switch(option.CKeys[1])
+            switch(option.command_key[1])
             {
                     // Logon
                 case 'S':
@@ -163,7 +163,7 @@ void MenuSystem::menuOptionsCallback(const MenuCompatOption &option)
 
             // Sysop Commands
         case '*':
-            switch(option.CKeys[1])
+            switch(option.command_key[1])
             {
                     // Menu Editor
                 case '#':
@@ -375,7 +375,8 @@ void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const 
         {
             std::cout << "!m_is_session_authorized" << std::endl;
 
-            m_current_menu = "MATRIX.MNU";
+            // TODO, Make this configuration option, matrix is forced in obv/2.
+            m_current_menu = "matrix";
             startupMenu();
 
             // Access any needed global configuration values

@@ -200,6 +200,7 @@ void MenuConvert::convert_menu()
     }
         
     // Strip .MNU from Menu filename and lower case it.
+    // Might want to change to boost locale to_lower
     std::string core_menu_name = m_current_menu.substr(0, m_current_menu.size() - 4);
     std::transform(
         core_menu_name.begin(), 
