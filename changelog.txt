@@ -4,6 +4,9 @@ Change Log Update (00.00.61)
 + MenuBase has been converted over to using the new .yaml menu files.
   Only tested matrix.yaml at the moment, still more code need to be added 
   for jumping to other menus, and then implimenting menu features to come.
++ Update getProgramPath to pass executable name.  So multiple utilities
+  sharing the same object will have the correct filename removed from the 
+  program's path.
 
 Change Log Update (00.00.60)
 * 2016-11-18

@@ -96,9 +96,10 @@ wchar_t CP437_TABLE[] =
  * This has only been tested in Windows, Linux, OSX.
  * @return
  */
-std::string CommonIO::getProgramPath()
+std::string CommonIO::getProgramPath(const std::string &program_name)
 {
     std::string program_path;
+    std::string program = "/" + program_name;
 
     // First check for SYSTEM environmental variable:
     char *pPath;
@@ -140,7 +141,7 @@ std::string CommonIO::getProgramPath()
     // Remove Executable
     program_path = current_path;
     std::string::size_type position;
-    position = program_path.rfind("/xrm-server");
+    position = program_path.rfind(program);
     if(position != std::string::npos)
     {
         program_path.erase(position+1,program_path.size()-1);        
@@ -164,7 +165,7 @@ std::string CommonIO::getProgramPath()
     }
 
     program_path = current_path;
-    std::string::size_type position = program_path.rfind("\\",program_path.size()-1);
+    std::string::size_type position = program_path.rfind("\\", program_path.size()-1);
     if(position != std::string::npos)
     {
         program_path.erase(position+1);        
@@ -186,7 +187,7 @@ std::string CommonIO::getProgramPath()
 
     // Remove Executable
     std::string::size_type position;
-    position = program_path.rfind("/xrm-server");
+    position = program_path.rfind(program);
     if(position != std::string::npos) 
     {
         program_path.erase(position+1,program_path.size()-1);        

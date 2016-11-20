@@ -365,7 +365,7 @@ auto main() -> int
               << std::endl;
     
     CommonIO common;
-    GLOBAL_BBS_PATH = common.getProgramPath();
+    GLOBAL_BBS_PATH = common.getProgramPath("xrm-menu-convert");
     std::cout << "BBS HOME Directory Registered: " 
               << std::endl << GLOBAL_BBS_PATH << std::endl;
 
