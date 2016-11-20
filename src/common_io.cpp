@@ -1336,6 +1336,8 @@ void CommonIO::readinAnsi(std::string FileName, std::string &buff)
     std::string path = GLOBAL_TEXTFILE_PATH;
     pathAppend(path);
     path += FileName;
+    
+    std::cout << "readinAnsi: " << path << std::endl;
 
     FILE *fp;
 

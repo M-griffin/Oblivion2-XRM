@@ -1,4 +1,10 @@
 
+Change Log Update (00.00.61)
+* 2016-11-20
++ MenuBase has been converted over to using the new .yaml menu files.
+  Only tested matrix.yaml at the moment, still more code need to be added 
+  for jumping to other menus, and then implimenting menu features to come.
+
 Change Log Update (00.00.60)
 * 2016-11-18
 + Finished Legacy .MNU to new .YAML menu file conversion utility
