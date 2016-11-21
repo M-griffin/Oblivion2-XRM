@@ -44,6 +44,12 @@ public:
     bool loadConfig();
     
     /**
+     * @brief Validates settings for possiable conflicts
+     * @return
+     */
+    bool validation();
+
+    /**
      * @brief Moves the Loaded config to the shared pointer.
      * @param rhs
      * @return

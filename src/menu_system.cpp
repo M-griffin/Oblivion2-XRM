@@ -406,6 +406,12 @@ void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const 
         {
             std::cout << "m_is_session_authorized" << std::endl;
             // Reset the Input back to the Menu System
+            
+            // TODO Grab startup menu from config!
+            m_current_menu = "main";
+            startupMenu();
+            
+            
         }
     }
 }

@@ -361,3 +361,19 @@ bool ConfigDao::loadConfig()
     return true;
 }
 
+/**
+ * @brief Validates settings for possiable conflicts
+ * @return
+ */
+bool ConfigDao::validation() 
+{
+    // Check if Handle and Real Name are configured.
+    if (!m_config->use_handle && !m_config->use_real_name) {
+        std::cout << "Config Validation Error:" << std::endl;
+        std::cout << "use_handle and use_real_name can't both be false." << std::endl;
+        return false;
+    }
+    
+    // Add More checks as needed    
+    return true;
+}

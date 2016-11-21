@@ -87,6 +87,7 @@ void MenuBase::readInMenuData()
     }
     else
     {
+        // Fallck is if user doesn't have access.  update this lateron.
         std::cout << "Menu doesn't exist, loading fallback if exists." << std::endl;
         if (fallback.size() > 0) 
         {
@@ -94,16 +95,7 @@ void MenuBase::readInMenuData()
             m_current_menu = fallback;
             return readInMenuData();
         }
-        
-        /*
-        // Else revert back to previous menu
-        std::cout << "Reverting to Previous menu " << revert << std::endl;
-        if (revert.size() > 0) 
-        {
-            m_current_menu = revert;
-            return readInMenuData();            
-        }*/
-        
+                
         // No menu to fallback or revert
         // Assert so were not in endless loop, something wrong, fix it!
         assert(false);
@@ -528,20 +520,18 @@ void MenuBase::processMenuOptions(std::string &input)
 
         }
 
-
-/*        // TODO!
-            There is wildcarding for menu commands:
-          
-              If you set the Key to X*, then you can put * in the
-              Cstring and that will put what follows the X in the
-              Cstring. This is advisable for such cases as file
-              conference jumping such as J* with would do JM with a
-              Cstring of * so one could J1,J2, etc.
-          
-            Also a possibility for CString is & in which is set to the
-          input gotten with -I, -J, or set with -*.
-*/
-
+        /**
+         * There is wildcarding for menu commands:
+         * If you set the Key to X*, then you can put * in the
+         * Cstring and that will put what follows the X in the
+         * Cstring. This is advisable for such cases as file
+         * conference jumping such as J* with would do JM with a
+         * Cstring of * so one could J1,J2, etc.
+         * 
+         * Also a possibility for CString is & in which is set to the
+         * input gotten with -I, -J, or set with -*.
+         */
+ 
         // Check Input Keys on Both Pulldown and Normal Menus
         // If the input matches the current key, or Enter is hit, then process it.
         else if(input.compare(m.menu_key) == 0 || (m_is_active_pulldown_menu && is_enter))

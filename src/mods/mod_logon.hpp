@@ -97,6 +97,8 @@ public:
     const std::string PROMPT_PASSWORD_QUESTION = "password_question";
     const std::string PROMPT_PASSWORD_ANSWER = "password_answer";
     const std::string PROMPT_USE_INVALID = "invalid";
+    const std::string PROMPT_INVALID_USERNAME = "invalid_username";
+    const std::string PROMPT_INVALID_PASSWORD = "invalid_password";
 
     /**
      * @brief Create Default Text Prompts for module
@@ -166,10 +168,23 @@ private:
     bool preLogon(const std::string &input);
 
     /**
+     * @brief Lookup user records Handle, Name, or Email
+     * @return 
+     */
+    bool checkUserLogon(const std::string &input);
+
+    /**
      * @brief Validates user Logon
      * @return
      */
     bool logon(const std::string &input);
+
+    /**
+     * @brief Encodes and Validates User Password
+     * @param input
+     * @return 
+     */
+    bool validate_password(const std::string &input);
 
     /**
      * @brief Validates user logon password
@@ -216,6 +231,9 @@ private:
     int                  m_max_failure_attempts;
     bool                 m_is_text_prompt_exist;
     bool                 m_is_authorized;
+    
+    // Hold instatnce of user trying to login to the system.
+    user_ptr             m_logon_user;
 };
 
 #endif // SYSTEM_STATE_HPP
