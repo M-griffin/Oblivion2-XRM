@@ -1,4 +1,10 @@
 
+Change Log Update (00.00.62)
+* 2016-11-20
++ Added some initial config flag validation to catch any possiable 
+  conflicts on manual configuration.
+  
+
 Change Log Update (00.00.61)
 * 2016-11-20
 + MenuBase has been converted over to using the new .yaml menu files.
