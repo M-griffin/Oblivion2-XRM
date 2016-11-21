@@ -7,7 +7,6 @@
 // DataBase
 #include "../data/security_dao.hpp"
 #include "../data/users_dao.hpp"
-#include "libSqliteWrapped.h"
 
 #include <boost/regex.hpp>
 
@@ -656,7 +655,7 @@ bool ModSignup::handle(const std::string &input)
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
         user_ptr search = user_data->getUserByHandle(key);
 
-        if(search->iId == -1)
+        if(!search || search->iId == -1)
         {
             std::cout << "no match found" << std::endl;
 
@@ -722,7 +721,7 @@ bool ModSignup::realName(const std::string &input)
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
         user_ptr search = user_data->getUserByRealName(key);
 
-        if(search->iId == -1)
+        if(!search || search->iId == -1)
         {
             std::cout << "no match found" << std::endl;
 
@@ -926,7 +925,7 @@ bool ModSignup::email(const std::string &input)
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
         user_ptr search = user_data->getUserByEmail(key);
 
-        if(search->iId == -1)
+        if(!search || search->iId == -1)
         {
             std::cout << "no match found" << std::endl;
 
@@ -945,11 +944,7 @@ bool ModSignup::email(const std::string &input)
 
             // Invalid, Ask again, Reload Current Module
             changeModule(m_mod_function_index);
-        }
-
-
-
-        
+        }  
     }
     else
     {
@@ -1242,9 +1237,23 @@ bool ModSignup::verifyPassword(const std::string &input)
         // compare password to previous, then encrypt if they match
         // otherwise fail back if they don't and ask again.
         if(m_security_record->sPasswordHash.compare(key) == 0)
-        {
-            std::string salt = m_encryption->generate_salt(m_user_record->sHandle, m_config->bbs_uuid);
-            std::string password = m_encryption->generate_password(m_security_record->sPasswordHash, salt);
+        {            
+            // Load pointer to encrypt methods.
+            encrypt_ptr encryption(new Encrypt());
+            if (!encryption) 
+            {
+                std::cout << "Error, unable to allocate encryption" << std::endl;
+                
+                // Invalid Entry, display try again!
+                displayPrompt(PROMPT_PASS_INVALID);
+
+                // Move to next module.
+                changeModule(m_mod_function_index-1);
+                return false;
+            }
+        
+            std::string salt = encryption->generate_salt(m_user_record->sHandle, m_config->bbs_uuid);
+            std::string password = encryption->generate_password(m_security_record->sPasswordHash, salt);
 
             if(salt.size() == 0 || password.size() == 0)
             {
@@ -1426,13 +1435,30 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
         // otherwise fail back if they don't and ask again.
         if(m_security_record->sChallengeAnswerHash.compare(key) == 0)
         {
-            std::string password = m_encryption->generate_password(
+            encrypt_ptr encryption(new Encrypt());
+            if (!encryption) 
+            {
+                std::cout << "Error, unable to allocate encryption" << std::endl;
+                // Set the password back to blank
+                m_security_record->sChallengeAnswerHash = "";
+
+                // Invalid Entry, try again!
+                displayPrompt(PROMPT_PASS_INVALID);
+                
+                // Move to next module.
+                changeModule(m_mod_function_index-1);
+                return true;
+            }
+            
+            // Generate Password Hash
+            std::string password = encryption->generate_password(
                                        m_security_record->sChallengeAnswerHash,
                                        m_security_record->sSaltHash
                                    );
 
             if(password.size() == 0)
             {
+                // Shouldn't have any empty fields.
                 std::cout << "Error, ChallengeAnswer was empty" << std::endl;
                 assert(false);
             }
@@ -1798,61 +1824,55 @@ bool ModSignup::backSpace(const std::string &input)
  */
 void ModSignup::saveNewUserRecord()
 {
+    // Link to users dao for data access object
+    users_dao_ptr user_dao(new UsersDao(m_session_data->m_user_database));
 
-    // Check and Setup users database if tables are not setup
-    SQLW::Database user_database(USERS_DATABASE);
+    // Link to security dao for data access object
+    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
 
-    // Private Scope for Smart Pointers to deallocate prior to database.
+    // Save New Security Record, index is then inserted into user record
+    long securityIndex = security_dao->insertSecurityRecord(m_security_record);
+    if (securityIndex < 0)
     {
-        // Link to users dao for data access object
-        users_dao_ptr user_dao(new UsersDao(user_database));
+        std::cout << "Error, unable to insert new user record." << std::endl;
 
-        // Link to security dao for data access object
-        security_dao_ptr security_dao(new SecurityDao(user_database));
+        displayPrompt(PROMPT_NOT_SAVED);
 
-        // Save New Security Record, index is then inserted into user record
-        long securityIndex = security_dao->insertSecurityRecord(m_security_record);
-        if (securityIndex < 0)
-        {
-            std::cout << "Error, unable to insert new user record." << std::endl;
-
-            displayPrompt(PROMPT_NOT_SAVED);
-
-            m_is_active = false;
-            return;
-        }
-
-        // Save New User Record
-        m_user_record->iSecurityIndex = securityIndex;
-
-        //time_t const t = (time_t)time(0);
-        std::time_t tt = 0;
-        std::time_t const result = std::time(&tt);
-
-        m_user_record->dtFirstOn = result;
-        m_user_record->dtPassChangeDate = result;
-        m_user_record->dtLastCallDate = result;
-
-        long userIndex = user_dao->insertUserRecord(m_user_record);
-        if (userIndex < 0)
-        {
-            std::cout << "Error, unable to insert new user record." << std::endl;
-
-            // Remove Secutiry Record if unable to create user record.
-            if (!security_dao->deleteSecurityRecord(securityIndex))
-            {
-                std::cout << "Error, unable to remove secutiry record." << std::endl;
-            }
-
-            displayPrompt(PROMPT_NOT_SAVED);
-
-            m_is_active = false;
-            return;
-        }
-
-        // Completed Successfully
-        displayPrompt(PROMPT_SAVED);
+        m_is_active = false;
+        return;
     }
+
+    // Save New User Record
+    m_user_record->iSecurityIndex = securityIndex;
+
+    //time_t const t = (time_t)time(0);
+    std::time_t tt = 0;
+    std::time_t const result = std::time(&tt);
+
+    m_user_record->dtFirstOn = result;
+    m_user_record->dtPassChangeDate = result;
+    m_user_record->dtLastCallDate = result;
+
+    long userIndex = user_dao->insertUserRecord(m_user_record);
+    if (userIndex < 0)
+    {
+        std::cout << "Error, unable to insert new user record." << std::endl;
+
+        // Remove Secutiry Record if unable to create user record.
+        if (!security_dao->deleteSecurityRecord(securityIndex))
+        {
+            std::cout << "Error, unable to remove secutiry record." << std::endl;
+        }
+
+        displayPrompt(PROMPT_NOT_SAVED);
+
+        m_is_active = false;
+        return;
+    }
+
+    // Completed Successfully
+    displayPrompt(PROMPT_SAVED);
+
 
     m_is_active = false;
     return;

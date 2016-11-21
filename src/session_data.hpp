@@ -51,7 +51,7 @@ public:
         , m_state_manager(state_manager)
         , m_io_service(io_service)
         , m_common_io()
-        , m_user_database(USERS_DATABASE)
+        , m_user_database(USERS_DATABASE, &m_database_log)
         , m_user_record(new Users())
         , m_node_number(0)
         , m_is_use_ansi(true)
@@ -326,6 +326,8 @@ public:
 
     // Temp while testing.
     SQLW::Database        m_user_database;
+    SQLW::StderrLog       m_database_log;   
+    
     user_ptr              m_user_record;
     
     int                   m_node_number;

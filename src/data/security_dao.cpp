@@ -414,7 +414,8 @@ bool SecurityDao::deleteSecurityRecord(long securityId)
     }
 
     // Build string
-    std::string queryString = sqlite3_mprintf("DELETE FROM %Q WHERE iId = %ld;", strTableName, securityId);
+    std::string queryString = sqlite3_mprintf("DELETE FROM %Q WHERE iId = %ld;", 
+        strTableName.c_str(), securityId);
 
     // Execute Update in a Transaction, rollback if fails.
     std::vector<std::string> statements;
@@ -448,7 +449,8 @@ security_ptr SecurityDao::getSecurityById(long securityId)
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iID = %ld;", strTableName, securityId);
+    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iID = %ld;", 
+        strTableName.c_str(), securityId);
 
     // Execute Query.
     if (qry->getResult(queryString))

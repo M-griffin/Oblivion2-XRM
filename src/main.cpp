@@ -258,7 +258,6 @@ auto main() -> int
         }
 
         // NEW Loading and saving default Configuration file to XML
-
         config_ptr config(new Config());
         if (!config)
         {
@@ -275,7 +274,14 @@ auto main() -> int
         {
             cfg.saveConfig(config);
         }
-
+        
+        // Load Config and lets do some validation
+        cfg.loadConfig();
+        
+        if (!cfg.validation())
+        {
+            return 0;
+        }
     }
 
     // Start System Services and Main Loop.
