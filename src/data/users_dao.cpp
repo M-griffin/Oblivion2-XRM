@@ -89,9 +89,9 @@ UsersDao::UsersDao(SQLW::Database &database)
         "); ";
 
 
-    cmdCreateUserIndex =
-        "CREATE UNIQUE INDEX IF NOT EXISTS users_idx "
-        "ON " + strTableName + " (sHandle, sRealName, sEmail); ";
+    //cmdCreateUserIndex = "";
+        //"CREATE UNIQUE INDEX IF NOT EXISTS users_idx "
+        //"ON " + strTableName + " (sHandle, sRealName, sEmail); ";
 
     cmdDropUserTable = "DROP TABLE IF EXISTS " + strTableName + "; ";
     cmdDropUserIndex = "DROP INDEX IF EXISTS users_idx; ";
@@ -205,7 +205,7 @@ bool UsersDao::createTable()
     std::vector<std::string> statements;
 
     statements.push_back(cmdCreateUserTable);
-    statements.push_back(cmdCreateUserIndex);
+    //statements.push_back(cmdCreateUserIndex);
 
     // Execute Transaction.
     result = qry->executeTransaction(statements);
@@ -656,7 +656,7 @@ bool UsersDao::deleteUserRecord(long userId)
     }
 
     // Build string
-    std::string queryString = sqlite3_mprintf("DELETE FROM %Q WHERE iId = %ld;", strTableName, userId);
+    std::string queryString = sqlite3_mprintf("DELETE FROM %Q WHERE iId = %ld;", strTableName.c_str(), userId);
 
     // Execute Update in a Transaction, rollback if fails.
     std::vector<std::string> statements;
@@ -690,7 +690,7 @@ user_ptr UsersDao::getUserById(long userId)
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iID = %ld;", strTableName, userId);
+    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iID = %ld;", strTableName.c_str(), userId);
 
     // Execute Query.
     if (qry->getResult(queryString))
@@ -739,7 +739,7 @@ user_ptr UsersDao::getUserByHandle(std::string name)
 
     // Build Query String
     std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sHandle = %Q; COLLATE NOCASE;",
-        strTableName, name.c_str());
+        strTableName.c_str(), name.c_str());
 
     // Execute Query.
     if (qry->getResult(queryString))
@@ -757,7 +757,7 @@ user_ptr UsersDao::getUserByHandle(std::string name)
     }
     else
     {
-        std::cout << "Error, getResult()!" << std::endl;
+        std::cout << "Error, getResult()" << std::endl;
     }
 
     return user;
@@ -788,7 +788,7 @@ user_ptr UsersDao::getUserByRealName(std::string name)
 
     // Build Query String
     std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sRealName = %Q COLLATE NOCASE;",
-        strTableName, name.c_str());
+        strTableName.c_str(), name.c_str());
 
     // Execute Query.
     if (qry->getResult(queryString))
@@ -836,7 +836,7 @@ user_ptr UsersDao::getUserByEmail(std::string email)
 
     // Build Query String
     std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sEmail = %Q COLLATE NOCASE;",
-        strTableName, email.c_str());
+        strTableName.c_str(), email.c_str());
 
     // create a test3 table
     if (qry->getResult(queryString))
