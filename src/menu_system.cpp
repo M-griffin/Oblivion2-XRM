@@ -22,6 +22,7 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     m_menu_functions.push_back(std::bind(&MenuBase::menuInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::menuEditorInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::modulePreLogonInput, this, std::placeholders::_1, std::placeholders::_2));
+    m_menu_functions.push_back(std::bind(&MenuSystem::moduleLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
 
     // Setup Menu Option Calls for executing menu commands.
@@ -232,7 +233,6 @@ void MenuSystem::menuEditorInput(const std::string &character_buffer, const bool
         case 'Q': // Quit
             // Reload fall back, or gosub to last menu!
 
-
             return;
         default : // Return
             return;
@@ -278,7 +278,7 @@ void MenuSystem::startupModulePreLogon()
 void MenuSystem::startupModuleLogon()
 {
     // Setup the input processor
-    m_input_index = MODULE_INPUT;
+    m_input_index = MODULE_LOGON_INPUT;
 
     // Allocate the Module here and push to container
     module_ptr module(new ModLogon(m_session_data, m_config, m_ansi_process));
@@ -333,7 +333,7 @@ void MenuSystem::startupModuleSignup()
 
 
 /**
- * @brief Handles parsing input for modules
+ * @brief Handles parsing input for preLogon module
  *
  */
 void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8)
@@ -377,30 +377,67 @@ void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const 
 
             // TODO, Make this configuration option, matrix is forced in obv/2.
             m_current_menu = "matrix";
+            startupMenu();           
+        }
+        else
+        {
+            // If Authorized, then we want to move to main!
+            std::cout << "m_is_session_authorized" << std::endl;
+            // Reset the Input back to the Menu System
+            
+            // TODO Grab startup menu from config!
+            m_current_menu = "main";
+            startupMenu();                        
+        }
+    }
+}
+
+/**
+ * @brief Handles parsing input for Logon module
+ *
+ */
+void MenuSystem::moduleLogonInput(const std::string &character_buffer, const bool &is_utf8)
+{
+    std::cout << "modulePreLogonInput" << std::endl;
+    // Make sure we have an allocated module before processing.
+    if (m_module.size() == 0)
+    {
+        std::cout << "modulePreLogonInput size 0" << std::endl;
+        return;
+    }
+
+    // Make sure we have data
+    if (character_buffer.size() == 0)
+    {
+        std::cout << "modulePreLogonInput char_buff size 0" << std::endl;
+        return;
+    }
+
+    // Execute the modules update passing through input.
+    // result = true, means were still active, false means completed, return to menu!
+    //bool result = m_module[0]->update(character_buffer, is_utf8);
+
+    // Don't need return result on this.
+    m_module[0]->update(character_buffer, is_utf8);
+
+    // Finished modules processing.
+    if (!m_module[0]->m_is_active)
+    {
+        // Do module shutdown /// NEED A MODULE FALL BACK TO register menu or a new module to load.
+        m_module[0]->onExit();
+
+        // First pop the module off the stack to deallocate
+        m_module.pop_back();
+
+
+        // Check if the current user has been logged in yet.
+        if (!m_session_data->m_is_session_authorized)
+        {
+            std::cout << "!m_is_session_authorized" << std::endl;
+
+            // TODO, Make this configuration option, matrix is forced in obv/2.
+            m_current_menu = "matrix";
             startupMenu();
-
-            // Access any needed global configuration values
-            // For Example...
-            /*
-            m_config_dao->use_matrix_login  etc..
-            if(cfg->use_matrix_login)
-            {
-                // Setup Matrix Menu
-                std::cout << "cfg->use_matrix_login" << std::endl;
-
-                // Set the Next Menu to Load, Matrix for Login
-                m_current_menu = "MATRIX.MNU";
-                startupMenu();
-            }
-            else
-            {
-                // Setup the login Module for normal login sequence.
-                std::cout << "!cfg->use_matrix_login" << std::endl;
-
-                // Set The Default menu to jump to after logon
-                m_current_menu = "TOP.MNU";
-                startupModuleLogon();
-            }*/
         }
         else
         {
@@ -409,13 +446,10 @@ void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const 
             
             // TODO Grab startup menu from config!
             m_current_menu = "main";
-            startupMenu();
-            
-            
+            startupMenu();                        
         }
     }
 }
-
 
 /**
  * @brief Handles parsing input for modules

@@ -299,6 +299,12 @@ public:
     void parseLocalMCI(std::string &AnsiString, const std::string &mcicode, const std::string &replacement);
 
     /**
+     * @brief Check if the file exists
+     * @return
+     */
+    bool fileExists(std::string FileName);
+
+    /**
      * @brief Read In ANSI text files for parsing.
      * @param FileName
      * @param buff

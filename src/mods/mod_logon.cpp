@@ -265,7 +265,7 @@ bool ModLogon::logon(const std::string &input)
         }
     }
 
-    return m_is_authorized;
+    return false;
 }
 
 /**
@@ -340,7 +340,7 @@ bool ModLogon::password(const std::string &input)
         {
             // If success, set authorized true, and return.
             // or m_session_data->m_is_session_authorized = true;
-            m_is_authorized = true;
+            m_session_data->m_is_session_authorized = true;
             m_is_active = false;
         }
         else
@@ -356,13 +356,14 @@ bool ModLogon::password(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty") {
+        if (result != "empty") 
+        {
             baseProcessAndDeliver(result);
         }
     }
 
     // If successful login, we'll check the return result.
-    return m_is_authorized;
+    return false;
 }
 
 /**

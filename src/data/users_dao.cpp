@@ -35,12 +35,12 @@ UsersDao::UsersDao(SQLW::Database &database)
     cmdCreateUserTable =
         "CREATE TABLE IF NOT EXISTS " + strTableName + " ( "
         "iId               INTEGER PRIMARY KEY, "
-        "sHandle           TEXT NOT NULL, "
-        "sRealName         TEXT NOT NULL, "
+        "sHandle           TEXT NOT NULL COLLATE NOCASE, "
+        "sRealName         TEXT NOT NULL COLLATE NOCASE, "
         "sAddress          TEXT NOT NULL, "
         "sLocation         TEXT NOT NULL, "
         "sCountry          TEXT NOT NULL, "
-        "sEmail            TEXT NOT NULL, "
+        "sEmail            TEXT NOT NULL COLLATE NOCASE, "
         "sUserNote         TEXT NOT NULL, "
         "dtBirthday        DATETIME NOT NULL, "
         "iLevel            INTEGER NOT NULL, "
@@ -89,10 +89,11 @@ UsersDao::UsersDao(SQLW::Database &database)
         "); ";
 
 
-    //cmdCreateUserIndex = "";
-        //"CREATE UNIQUE INDEX IF NOT EXISTS users_idx "
-        //"ON " + strTableName + " (sHandle, sRealName, sEmail); ";
+    cmdCreateUserIndex = "";
+        "CREATE INDEX IF NOT EXISTS users_idx "
+        "ON " + strTableName + " (sHandle COLLATE NOCASE, sRealName COLLATE NOCASE, sEmail COLLATE NOCASE); ";
 
+    // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
     cmdDropUserTable = "DROP TABLE IF EXISTS " + strTableName + "; ";
     cmdDropUserIndex = "DROP INDEX IF EXISTS users_idx; ";
 
@@ -205,7 +206,7 @@ bool UsersDao::createTable()
     std::vector<std::string> statements;
 
     statements.push_back(cmdCreateUserTable);
-    //statements.push_back(cmdCreateUserIndex);
+    statements.push_back(cmdCreateUserIndex);
 
     // Execute Transaction.
     result = qry->executeTransaction(statements);

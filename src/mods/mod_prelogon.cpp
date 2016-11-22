@@ -57,7 +57,7 @@ bool ModPreLogon::onEnter()
  */
 bool ModPreLogon::onExit()
 {
-    std::cout << "OnExit() ModLogin\n";
+    std::cout << "OnExit() ModPreLogon\n";
     m_is_active = false;
     return true;
 }

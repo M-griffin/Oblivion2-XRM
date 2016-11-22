@@ -142,7 +142,7 @@ std::string MenuBase::loadMenuScreen()
     // also  if (m_menu_session_data->m_is_use_ansi), if not ansi, then maybe no pull down, or lightbars!
     if(m_menu_info->menu_pulldown_file.size() == 0 || !m_menu_session_data->m_is_use_ansi)
     {
-        std::string screen_file = m_menu_info->menu_name;
+        std::string screen_file = m_menu_info->menu_help_file;
         // Load ansi by Menu Name, remove .MNU and Add .ANS, maybe .UTF for utf8 native?
         if (m_menu_session_data->m_is_use_ansi)
         {
@@ -163,7 +163,18 @@ std::string MenuBase::loadMenuScreen()
         
         std::cout << "readinAnsi1: " << screen_file << std::endl;
          
-        m_common_io.readinAnsi(screen_file, screen_data);
+         
+        // if file doesn't exist, then use generic template 
+        if (m_common_io.fileExists(screen_file))
+        {
+            m_common_io.readinAnsi(screen_file, screen_data);            
+        }
+        else 
+        {
+            // Load and use generic template.
+            // These are GENTOP. GENMID, GENBOT.ANS
+        }
+        
     }
     else
     {
@@ -181,7 +192,16 @@ std::string MenuBase::loadMenuScreen()
         std::cout << "readinAnsi2: " << screen_file << std::endl;
         
         // Otherwise use the Pulldown menu name from the menu.
-        m_common_io.readinAnsi(screen_file, screen_data);
+        // if file doesn't exist, then use generic template 
+        if (m_common_io.fileExists(screen_file))
+        {
+            m_common_io.readinAnsi(screen_file, screen_data);            
+        }
+        else 
+        {
+            // Load and use generic template.
+            // These are GENTOP. GENMID, GENBOT.ANS
+        }
     }
     return screen_data;
 }
@@ -197,13 +217,16 @@ std::string MenuBase::buildLightBars()
     // Test setup and display lightbars
     std::string light_bars = "";
     bool active_lightbar = false;
+        
 
     for(auto &m : m_menu_info->menu_options)
     {
         // Always start on Initial or first indexed lightbar.
         // Might need to verify if we need to check for lowest ID, and start on that!
         if(m_active_pulldownID > 0 && m_active_pulldownID == m.pulldown_id)
-            active_lightbar = true;
+        {
+            active_lightbar = true;            
+        }
 
         if(m.pulldown_id > 0)
         {
@@ -249,6 +272,7 @@ void MenuBase::redisplayMenuScreen()
         // add and write out.
         output.append(light_bars);
     }
+    
     m_menu_session_data->deliver(output);
 }
 
@@ -275,28 +299,8 @@ void MenuBase::startupMenu()
         std::cout << "Menu has no menu_options: " << m_current_menu << std::endl;
         return;
     }
-            
-    // Get Pulldown menu commands, Load all from menu options (disk)
-    std::vector<int> pull_down_ids;
-    for(auto &m : m_menu_info->menu_options)
-    {
-        if(m.pulldown_id > 0 && m_menu_session_data->m_is_use_ansi)
-        {
-            pull_down_ids.push_back(m.pulldown_id);
-
-            // Get Actual Options with Descriptions for Lightbars.
-            m_loaded_pulldown_options.push_back(m);
-        }
-    }
-
-    // Set the lowest pulldown ID as Active
-    if(pull_down_ids.size() > 0)
-    {
-        auto id = std::min_element(pull_down_ids.begin(), pull_down_ids.end());
-        m_active_pulldownID = *id;
-    }
-
-    //if (MenuInfo clear the scrren etc.. feature to add! )
+    
+     //if (MenuInfo clear the scrren etc.. feature to add! )
     //m_menu_session_data->deliver("\x1b[2J\x1b[1;1H");
 
     // Finally parse the ansi screen and remove pipes
@@ -305,33 +309,65 @@ void MenuBase::startupMenu()
     
     // Output has parsed out MCI codes, translations are then appended.
     std::string output = m_session_io.pipe2ansi(buffer);
-
-    // If active pull_down id's found, mark as active pulldown menu.
-    if(pull_down_ids.size() > 0 && m_menu_session_data->m_is_use_ansi)
+    
+    
+    // If we have a pulldown ansi, then setup pull down 
+    if(m_menu_info->menu_pulldown_file.size() != 0) 
     {
-        // m_menu_info.PulldownFN
+    
+        // Get Pulldown menu commands, Load all from menu options (disk)
+        std::vector<int> pull_down_ids;
+        for(auto &m : m_menu_info->menu_options)
+        {
+            if(m.pulldown_id > 0 && m_menu_session_data->m_is_use_ansi)
+            {
+                pull_down_ids.push_back(m.pulldown_id);
 
-        m_is_active_pulldown_menu = true;
+                // Get Actual Options with Descriptions for Lightbars.
+                m_loaded_pulldown_options.push_back(m);
+            }
+        }
 
-        // Parse the Screen to the Screen Buffer.
-        m_ansi_process->parseAnsiScreen((char *)buffer.c_str());
+        // Set the lowest pulldown ID as Active
+        if(pull_down_ids.size() > 0)
+        {
+            auto id = std::min_element(pull_down_ids.begin(), pull_down_ids.end());
+            m_active_pulldownID = *id;
+        }
+        
+        // If active pull_down id's found, mark as active pulldown menu.
+        if(pull_down_ids.size() > 0 && m_menu_session_data->m_is_use_ansi)
+        {
+            // m_menu_info.PulldownFN
+            m_is_active_pulldown_menu = true;
 
-        // Screen to String so it can be processed.
-        m_ansi_process->screenBufferToString();
+            // Parse the Screen to the Screen Buffer.
+            m_ansi_process->parseAnsiScreen((char *)buffer.c_str());
 
-        // Process buffer for PullDown Codes. results for TESTING, are discarded.
-        std::string result = std::move(m_ansi_process->screenBufferParse());
+            // Screen to String so it can be processed.
+            m_ansi_process->screenBufferToString();
 
-        // Now Build the Light bars
-        std::string light_bars = buildLightBars();
+            // Process buffer for PullDown Codes. results for TESTING, are discarded.
+            std::string result = std::move(m_ansi_process->screenBufferParse());
 
-        // add and write out.
-        output.append(light_bars);
+            // Now Build the Light bars
+            std::string light_bars = buildLightBars();
+
+            // add and write out.
+            output.append(light_bars);
+        }
+        else 
+        {
+            m_is_active_pulldown_menu = false;
+        }
+
     }
     else
     {
         m_is_active_pulldown_menu = false;
     }
+            
+    
     m_menu_session_data->deliver(output);
 
     using namespace boost::locale;

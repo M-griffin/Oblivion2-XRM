@@ -55,6 +55,7 @@ public:
         MENU_INPUT,
         MENU_EDITOR_INPUT,
         MODULE_PRELOGON_INPUT,
+        MODULE_LOGON_INPUT,
         MODULE_INPUT
     };
 
@@ -89,10 +90,15 @@ public:
     void startupModuleSignup();
 
     /**
-     * @brief Handles parsing input for current module.
+     * @brief Handles parsing input for PreLogon current module.
      */
     void modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8);
 
+    /**
+     * @brief Handles parsing input for Logon current module.
+     */
+    void moduleLogonInput(const std::string &character_buffer, const bool &is_utf8);
+    
     /**
      * @brief Handles parsing input for current module.
      */
