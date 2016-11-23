@@ -337,8 +337,9 @@ void MenuSystem::startupModuleSignup()
  *
  */
 void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8)
-{
-    std::cout << "modulePreLogonInput" << std::endl;
+{    
+    std::cout << " *** modulePreLogonInput" << std::endl;
+    
     // Make sure we have an allocated module before processing.
     if (m_module.size() == 0)
     {
@@ -397,8 +398,9 @@ void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const 
  *
  */
 void MenuSystem::moduleLogonInput(const std::string &character_buffer, const bool &is_utf8)
-{
-    std::cout << "modulePreLogonInput" << std::endl;
+{   
+    std::cout << " *** modulePreLogonInput" << std::endl;
+    
     // Make sure we have an allocated module before processing.
     if (m_module.size() == 0)
     {
@@ -438,6 +440,9 @@ void MenuSystem::moduleLogonInput(const std::string &character_buffer, const boo
             // TODO, Make this configuration option, matrix is forced in obv/2.
             m_current_menu = "matrix";
             startupMenu();
+            
+             // Reset the Input back to the Menu System
+            m_input_index = MENU_INPUT;
         }
         else
         {
@@ -446,7 +451,10 @@ void MenuSystem::moduleLogonInput(const std::string &character_buffer, const boo
             
             // TODO Grab startup menu from config!
             m_current_menu = "main";
-            startupMenu();                        
+            startupMenu();
+            
+            // Reset the Input back to the Menu System
+            m_input_index = MENU_INPUT;
         }
     }
 }
@@ -457,6 +465,8 @@ void MenuSystem::moduleLogonInput(const std::string &character_buffer, const boo
  */
 void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is_utf8)
 {
+    std::cout << " *** moduleInput" << std::endl;
+    
     // Make sure we have an allocated module before processing.
     if (m_module.size() == 0)
     {

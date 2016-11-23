@@ -90,6 +90,18 @@ public:
     // Handles Dynamic Menu Command Option Execution
     std::vector<std::function< void(const MenuOption &)> > m_execute_callback;
 
+    /**
+     * @brief Method for Adding outgoing text data to ansi processor
+     *        Then delivering the data to the client
+     * @param data
+     */
+    void baseProcessAndDeliver(std::string data)
+    {
+        m_ansi_process->parseAnsiScreen((char *)data.c_str());
+        m_menu_session_data->deliver(data);
+    }
+    
+    
    /**
     * @brief Clears out Loaded Pulldown options { Called From readInMenuData() }
     */

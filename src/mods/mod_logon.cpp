@@ -260,7 +260,8 @@ bool ModLogon::logon(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty") {
+        if (result != "empty") 
+        {
             baseProcessAndDeliver(result);
         }
     }

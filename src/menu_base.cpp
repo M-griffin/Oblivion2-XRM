@@ -457,6 +457,14 @@ void MenuBase::executeMenuOptions(const MenuOption &option)
 
 
 /**
+ * TODO, split this into seperate pulldown menu processing
+ * need to separate out normal menu!
+ * don't wrap it all up in a single method, too many variables.
+ * 
+ * ALSO NOTE: if we change menu in loop,  then break and exit
+ * we don't want to reload EACH command from previous or new menu here!
+ */
+/**
  * @brief Processes Menu Commands with input.
  * @param input
  */
@@ -499,18 +507,8 @@ void MenuBase::processMenuOptions(std::string &input)
             ::toupper
         );
 
-        // Next Process EVERY Commands}
-        if(m.menu_key == "EACH")
-        {
-            // Process, although should each be execure before, or after a menu command!
-            // OR is each just on each load/reload of menu i think!!
-            std::cout << "FOUND EACH! EXECUTE: " << m.command_key << std::endl;
-            executeMenuOptions(m);
-            continue;
-        }
-
         // Check for ESC sequence, and next/prev lightbar movement.
-        else if(input[0] == '\x1b' && input.size() > 2)
+        if(input[0] == '\x1b' && input.size() > 2)
         {
             // Remove leading ESC for cleaner comparisons.
             input.erase(0,1);
@@ -611,6 +609,22 @@ void MenuBase::processMenuOptions(std::string &input)
             }
         }
     }
+    
+    // Check for loaded menu commands.
+    // Get Pulldown menu commands, Load all from menu options (disk)
+    for(auto &m : m_menu_info->menu_options)
+    {
+        // Process Each should onlu be done, before return to the menu, after completed 
+        // All if any stacked menu commands.
+        if(m.menu_key == "EACH")
+        {
+            // Process, although should each be execure before, or after a menu command!
+            // OR is each just on each load/reload of menu i think!!
+            std::cout << "FOUND EACH! EXECUTE: " << m.command_key << std::endl;
+            executeMenuOptions(m);
+            continue;
+        }        
+    }
 }
 
 
@@ -620,30 +634,82 @@ void MenuBase::processMenuOptions(std::string &input)
  */
 void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf8)
 {
+    std::cout << " *** menuInput" << std::endl;
+    
     // Check key input, if were in a sequence get the complete sequence
-    std::string result = m_session_io.getKeyInput(character_buffer);
-    std::string input = character_buffer;
+    std::string result; 
+    std::string input; 
 
-    if(result.size() == 0)
-    {
-        // Empty, possiable sequence, get keep checking!
-        return;
+        
+    // If were in lightbar mode, then we are using hotkeys.
+    if (m_is_active_pulldown_menu)
+    {            
+        std::cout << " *** menuInput / active pulldown menu" << std::endl;
+        
+        // Get hotmay and lightbar input.
+        result = m_session_io.getKeyInput(character_buffer);
+        input = character_buffer;
+        
+        if(result.size() == 0)
+        {
+            return;
+        }            
+        else if(result[0] == 13 || result[0] == 10)
+        {
+            // Menu Translations for ENTER
+            input = "ENTER";
+        }
+        else if(result[0] == '\x1b' && result.size() > 2 && !is_utf8)
+        {
+            // ESC SEQUENCE
+            input = result;
+        }
+        else if(result[0] == '\x1b' && result.size() == 1)
+        {
+            // Check Single ESC KEY
+            input = "ESC";
+        }
+        
+        // Process CommandOptions Matching the Key Input.
+        // Need to check for wildcard input there with menu option.
+        processMenuOptions(input);        
     }
-    else if(result[0] == 13 || result[0] == 10)
+    else
     {
-        // Menu Translations for ENTER
-        input = "ENTER";
+        std::cout << " *** menuInput / inactive pulldown menu" << std::endl;
+        
+        // Get LineInput and wait for ENTER.
+        std::string key = "";
+        result = m_session_io.getInputField(input, key, Config::sMenuPrompt_length);
+        
+        if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+        {
+            std::cout << "ESC aborted!" << std::endl;
+        }
+        else if(result[0] == '\n')
+        {
+            // Key == 0 on [ENTER] pressed alone. then invalid!
+            if(key.size() == 0)
+            {
+                // Return and don't do anything.
+                return;
+            }
+                    
+            // key is a input string.
+            // Need to check for wildcard input there with menu option.
+            processMenuOptions(key);
+            
+        }
+        else
+        {
+            // Send back the single input received to show client key presses.
+            // Only if return data shows a processed key returned.
+            if (result != "empty") 
+            {
+                baseProcessAndDeliver(result);
+            }
+        }
+        
     }
-    else if(result[0] == '\x1b' && result.size() > 2 && !is_utf8)
-    {
-        // ESC SEQUENCE
-        input = result;
-    }
-    else if(result[0] == '\x1b' && result.size() == 1)
-    {
-        // Check Single ESC KEY
-        input = "ESC";
-    }
-    // Process CommandOptions Matching the Key Input.
-    processMenuOptions(input);
+    
 }
