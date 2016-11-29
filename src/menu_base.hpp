@@ -84,12 +84,25 @@ public:
     // Dynamic Async Input Function Vector.
     std::vector<std::function< void(const std::string &, const bool &is_utf8)> > m_menu_functions;
 
+    // Handles Dynamic Menu Command Option Execution
+    std::vector<std::function< bool(const MenuOption &)> > m_execute_callback;
+    
     // Handle Dynamic modules being executed.
     std::vector<module_ptr> m_module;
-    
-    // Handles Dynamic Menu Command Option Execution
-    std::vector<std::function< void(const MenuOption &)> > m_execute_callback;
+        
 
+    /**
+     * @brief Method for Adding outgoing text data to ansi processor
+     *        Then delivering the data to the client
+     * @param data
+     */
+    void baseProcessAndDeliver(std::string data)
+    {
+        m_ansi_process->parseAnsiScreen((char *)data.c_str());
+        m_menu_session_data->deliver(data);
+    }
+    
+    
    /**
     * @brief Clears out Loaded Pulldown options { Called From readInMenuData() }
     */
@@ -152,10 +165,18 @@ public:
      * @brief Handles Menu Option Call Back
      * @param input
      */
-    void executeMenuOptions(const MenuOption &option);
+    bool executeMenuOptions(const MenuOption &option);
 
-    void processMenuOptions(std::string &input);
+    /**
+     * @brief Handle Standard Menu Input with Wildcard input
+     * @param input
+     * @param key
+     * @return 
+     */
+    bool handleStandardMenuInput(const std::string &input, const std::string &key);
 
+    bool processMenuOptions(const std::string &input);
+    
     void menuInput(const std::string &character_buffer, const bool &is_utf8);
     
 };

@@ -121,6 +121,9 @@ public:
     
     // Process Build strings from pull_down array.
     std::string buildPullDownBars(int pulldown_id, bool active); // 4
+    
+    // Clear Pull Down Bars once menu options are reset.
+    void clearPullDownBars();
 
     // Parses the Screen Buffer and Builds pulldown options
     std::string screenBufferParse();          // 3
