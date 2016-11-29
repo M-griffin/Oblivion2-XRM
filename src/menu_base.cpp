@@ -456,6 +456,19 @@ bool MenuBase::executeMenuOptions(const MenuOption &option)
  */
 bool MenuBase::handleStandardMenuInput(const std::string &input, const std::string &key)
 {
+    
+    /**
+     * There is wildcarding for menu commands:
+     * If you set the Key to X*, then you can put * in the
+     * Cstring and that will put what follows the X in the
+     * Cstring. This is advisable for such cases as file
+     * conference jumping such as J* with would do JM with a
+     * Cstring of * so one could J1,J2, etc.
+     * 
+     * Also a possibility for CString is & in which is set to the
+     * input_text gotten with -I, -J, or set with -*.
+     */
+     
     std::cout << "STANDARD INPUT: " << input << " KEY: " << key << std::endl;
     
     // Check for wildcard command input.
@@ -465,9 +478,7 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
     // If it exists, grab text up to *, then test aginst input.
     // Check for Wildcard input .. A* would be any keys starting with A
     if (idx != std::string::npos)
-    {
-        
-        
+    {                
         // Match Strings to the same size.
         std::string key_match = key.substr(0, idx);
         std::string input_match = input.substr(0, m_common_io.numberOfChars(key_match));
@@ -498,9 +509,136 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
 
 
 /**
+ * @brief Handle updating lightbar selections and redraw
+ * @param input
+ * @return 
+ */
+bool MenuBase::handleLightbarSelection(const std::string &input)
+{
+    // Handle ESC and Sequences
+    int executed = 0;
+    int previous_id = m_active_pulldownID;
+    if(input == "RT_ARROW" || input == "DN_ARROW")
+    {
+        if(m_active_pulldownID < (signed)m_ansi_process->m_pull_down_options.size())
+        {
+            ++m_active_pulldownID;
+        }
+        else
+        {
+            m_active_pulldownID = 1;
+        }
+        lightbarUpdate(previous_id);
+        ++executed;
+    }
+    else if(input == "LT_ARROW" || input == "UP_ARROW")
+    {
+        if(m_active_pulldownID > 1)
+        {
+            --m_active_pulldownID;
+        }
+        else
+        {
+            m_active_pulldownID = (signed)m_ansi_process->m_pull_down_options.size();
+        }
+        lightbarUpdate(previous_id);
+        ++executed;
+    }
+    else
+    {
+        // Add home end.  page etc..
+        std::cout << "lightbar ELSE!" << std::endl;
+    }
+    
+    if (executed > 0) 
+    {
+        return true;
+    }
+    return false;
+}
+
+
+/**
+ * @brief Handle Pulldown Specific Command Processing
+ * @param input_text
+ * @param m
+ * @param is_enter
+ * @return 
+ */
+bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter)
+{
+    int executed = 0;
+    
+    // First Check for Execute on LightBar Selection.
+    if(is_enter)
+    {
+        // Process the current active pull down ID.
+        // Check Pull down commands
+        if(m.pulldown_id == m_active_pulldownID)
+        {
+            // Then we have a match!  Execute the Menu Command with this ID!
+            std::cout << "Menu Command Executed for: " << m.menu_key << std::endl;
+
+            if(m.menu_key != "FIRSTCMD" && m.menu_key != "EACH")
+            {
+                //input = m.menu_key; ??
+                if (executeMenuOptions(m))
+                {
+                    ++executed;                        
+                }
+            }
+        }
+
+        // Now assign the m.menu_key to the input, so on next loop, we hit any stacked commands!
+    }
+    else
+    {
+        // NOT ENTER and pulldown,  check hotkeys here!!
+        std::cout << "Menu Command HOTKEY Executed for: " << m.menu_key << std::endl;
+        if (executeMenuOptions(m))
+        {
+            ++executed;                        
+        }
+        // More testing here.. executeMenuOptions( ... );
+    }
+    
+    if (executed > 0)
+    {
+        return true;        
+    }
+    return false;
+}
+
+
+/**
+ * @brief Handles Re-running EACH command re-executed after each refresh
+ */
+void MenuBase::executeEachCommands()
+{
+    // Then do not loop and execute this!
+    // Get Pulldown menu commands, Load all from menu options (disk)
+    for(auto &m : m_menu_info->menu_options)
+    {
+        // Process Each should onlu be done, before return to the menu, after completed 
+        // All if any stacked menu commands.
+        if(m.menu_key == "EACH")
+        {
+            // Process, although should each be execure before, or after a menu command!
+            // OR is each just on each load/reload of menu i think!!
+            std::cout << "FOUND EACH! EXECUTE: " << m.command_key << std::endl;
+            executeMenuOptions(m);
+            continue;
+        }        
+    }        
+}
+
+
+/**
  * @brief Processes Menu Commands with input.
  * @param input
  */
+ 
+ // This is too big, split this up!
 bool MenuBase::processMenuOptions(const std::string &input)
 {
     std::cout << "processMenuOptions: " << input << std::endl;
@@ -544,42 +682,27 @@ bool MenuBase::processMenuOptions(const std::string &input)
 
             // Handle Pull Down Options for Lightbars only.
             if (m_is_active_pulldown_menu)
-            {
-                // Handle ESC and Sequences
-                int previous_id = m_active_pulldownID;
-                if(clean_sequence == "RT_ARROW" || clean_sequence == "DN_ARROW")
+            {                
+                // First Make sure the pulldown menu, doesn't have menu keys set to specific
+                // Control Sequence,  If so, they are normal menu commands, execute first
+                // Instead of lightbar interaction.
+                if (handleStandardMenuInput(clean_sequence, m.menu_key)) 
                 {
-                    if(m_active_pulldownID < (signed)m_ansi_process->m_pull_down_options.size())
+                    std::cout << "STANDARD MATCH, EXECUTING " << m.menu_key << std::endl;
+                    if (executeMenuOptions(m))
                     {
-                        ++m_active_pulldownID;
+                        ++executed;                        
                     }
-                    else
-                    {
-                        m_active_pulldownID = 1;
-                    }
-                    lightbarUpdate(previous_id);
-                    ++executed;
-                    continue;
                 }
-                else if(clean_sequence == "LT_ARROW" || clean_sequence == "UP_ARROW")
-                {
-                    if(m_active_pulldownID > 1)
+                else 
+                {                    
+                    // handle Pull Down Lightbar Changes
+                    if (handleLightbarSelection(clean_sequence))
                     {
-                        --m_active_pulldownID;
+                        ++executed;
+                        continue;
                     }
-                    else
-                    {
-                        m_active_pulldownID = (signed)m_ansi_process->m_pull_down_options.size();
-                    }
-                    lightbarUpdate(previous_id);
-                    ++executed;
-                    continue;
                 }
-                else
-                {
-                    // Add home end.  page etc..
-                    std::cout << "lightbar ELSE!" << std::endl;
-                }                
             }
             else
             {
@@ -601,68 +724,28 @@ bool MenuBase::processMenuOptions(const std::string &input)
             // Received ESC key,  check for ESC is menu here..
             ++executed;
         }
-
-        /**
-         * There is wildcarding for menu commands:
-         * If you set the Key to X*, then you can put * in the
-         * Cstring and that will put what follows the X in the
-         * Cstring. This is advisable for such cases as file
-         * conference jumping such as J* with would do JM with a
-         * Cstring of * so one could J1,J2, etc.
-         * 
-         * Also a possibility for CString is & in which is set to the
-         * input_text gotten with -I, -J, or set with -*.
-         */
- 
+         
         // Check Input Keys on Both Pulldown and Normal Menus
         // If the input matches the current key, or Enter is hit, then process it.
         else if(input_text.compare(m.menu_key) == 0 || (m_is_active_pulldown_menu && is_enter))
         {
-            // We have the command, start the work
+            // Pulldown selection.
             if(m_is_active_pulldown_menu)
             {
-                // First Check for Execute on LightBar Selection.
-                if(is_enter)
+                // Handles ENTER Selection or Hotkeys Command Input.
+                if (handlePulldownHotKeys(m, is_enter))
                 {
-                    // Process the current active pull down ID.
-                    // Check Pull down commands
-                    if(m.pulldown_id == m_active_pulldownID)
-                    {
-                        // Then we have a match!  Execute the Menu Command with this ID!
-                        std::cout << "Menu Command Executed for: " << m.menu_key << std::endl;
-
-                        if(m.menu_key != "FIRSTCMD" && m.menu_key != "EACH")
-                        {
-                            //input = m.menu_key; ??
-                            if (executeMenuOptions(m))
-                            {
-                                ++executed;                        
-                            }
-                        }
-                    }
-
-                    // Now assign the m.menu_key to the input, so on next loop, we hit any stacked commands!
-                }
-                else
-                {
-                    // NOT ENTER and pulldown,  check hotkeys here!!
-                    std::cout << "Menu Command HOTKEY Executed for: " << m.menu_key << std::endl;
-                    if (executeMenuOptions(m))
-                    {
-                        ++executed;                        
-                    }
-                    // More testing here.. executeMenuOptions( ... );
+                    ++executed;          
                 }
             }
             else
             {
                 // They m.menu_key compared, execute it
-                std::cout << "NORMAL HOT KEY MATCH and EXECUTE! " << m.menu_key << std::endl;
+                std::cout << "ENTER OR HOT KEY MATCH and EXECUTE! " << m.menu_key << std::endl;
                 if (executeMenuOptions(m))
                 {
                     ++executed;                        
                 }
-                // More testing here.. executeMenuOptions( ... );
             }
         }
         else
@@ -681,23 +764,10 @@ bool MenuBase::processMenuOptions(const std::string &input)
     
     // Check for Change Menu before this point, if we changed the menu
     // Then do not re-execute menu commands for previous menu
+    // Each New Menu Load does handle this the first time.
     if (current_menu == m_current_menu)
     {
-        // Then do not loop and execute this!
-        // Get Pulldown menu commands, Load all from menu options (disk)
-        for(auto &m : m_menu_info->menu_options)
-        {
-            // Process Each should onlu be done, before return to the menu, after completed 
-            // All if any stacked menu commands.
-            if(m.menu_key == "EACH")
-            {
-                // Process, although should each be execure before, or after a menu command!
-                // OR is each just on each load/reload of menu i think!!
-                std::cout << "FOUND EACH! EXECUTE: " << m.command_key << std::endl;
-                executeMenuOptions(m);
-                continue;
-            }        
-        }        
+        executeEachCommands();
     }
     
     // Track Executed Commands, If we didn't execute anything

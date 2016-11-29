@@ -175,6 +175,27 @@ public:
      */
     bool handleStandardMenuInput(const std::string &input, const std::string &key);
 
+    /**
+     * @brief Handle updating lightbar selections and redraw
+     * @param input
+     * @return 
+     */
+    bool handleLightbarSelection(const std::string &input);
+    
+    /**
+     * @brief Handle Pulldown Specific Command Processing
+     * @param input_text
+     * @param m
+     * @param is_enter
+     * @return 
+     */
+    bool handlePulldownHotKeys(const MenuOption &m, const bool &is_enter);
+    
+    /**
+     * @brief Handles Re-running EACH command re-executed after each refresh
+     */
+    void executeEachCommands();
+
     bool processMenuOptions(const std::string &input);
     
     void menuInput(const std::string &character_buffer, const bool &is_utf8);
