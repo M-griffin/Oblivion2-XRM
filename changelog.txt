@@ -7,6 +7,8 @@ Change Log Update (00.00.63)
   Hotkey interpretation while normal menu are full line input
   with the ability to set T* then typing t, transfer and any test starting
   with T will execute the command.
++ Corrections to Database Layout, added COLLATE NOCASE for Handle, Name, and Email Fields
+  Tested with standard and Unicode input.
 - WIP generic menu templates top, mid, bottom.
 
 Change Log Update (00.00.62)
