@@ -183,6 +183,16 @@ std::string AnsiProcessor::buildPullDownBars(int pulldown_id, bool active)
     return output;
 }
 
+
+/**
+ * @brief // Clear Pull Down Bars once menu options are reset.
+ */
+void AnsiProcessor::clearPullDownBars()
+{
+    std::map<int, ScreenPixel>().swap(m_pull_down_options);
+}
+
+
 /**
  * @brief Parses through MCI Codes for Lightbars and Char Parameters.
  */

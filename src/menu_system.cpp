@@ -93,7 +93,7 @@ bool MenuSystem::onExit()
  * @brief Process Command Keys passed from menu selection (Callback)
  * @param option
  */
-void MenuSystem::menuOptionsCallback(const MenuOption &option)
+bool MenuSystem::menuOptionsCallback(const MenuOption &option)
 {
     /* Run through the case and switch over the new interface.
     std::string mnuOption = option.CKeys;
@@ -103,7 +103,7 @@ void MenuSystem::menuOptionsCallback(const MenuOption &option)
     // If Invalid then return
     if(option.command_key.size() != 2)
     {
-        return;
+        return false;
     }
 
     // Run through Comamnd Keys for Method
@@ -118,11 +118,14 @@ void MenuSystem::menuOptionsCallback(const MenuOption &option)
                     // This works ONLY if the command that the user
                     // executed does not go to another menu.
                 case '\'':
-                    break;
-
+                    return false;
                     // Turns off Pulldown Menu Re-Entrance
+                    
                 case '`':
-                    break;
+                    return false;
+                    
+                default :
+                    return false;
             }
             break;
 
@@ -134,31 +137,34 @@ void MenuSystem::menuOptionsCallback(const MenuOption &option)
                 case 'S':
                     std::cout << "Executing startupModuleLogon()" << std::endl;
                     startupModuleLogon();
-                    break;
+                    return true;
 
                     // Apply
                 case 'A':
                     std::cout << "Executing startupModuleSignup();" << std::endl;
                     startupModuleSignup();
-                    break;
+                    return true;
 
                     // Check
                 case 'C':
-                    break;
+                    return false;
 
                     // Feedback
                 case 'F':
-                    break;
+                    return false;
 
                     // Chat
                 case 'P':
-                    break;
+                    return false;
 
                     // Logoff
                 case 'G':
                     std::cout << "Goodbye;" << std::endl;
                     m_session_data->logoff();
-                    break;
+                    return true;
+                    
+                default:
+                    return false;
             }
             break;
 
@@ -168,14 +174,19 @@ void MenuSystem::menuOptionsCallback(const MenuOption &option)
             {
                     // Menu Editor
                 case '#':
-                    break;
+                    return false;
 
                     // Configuration Menu
                 case 'C':
-                    break;
+                    return false;
+                    
+                default:
+                    return false;
             }
             break;
     }
+    
+    return false;
 }
 
 

@@ -64,7 +64,7 @@ public:
      * @brief Process Command Keys passed from menu selection (Callback)
      * @param option
      */
-    void menuOptionsCallback(const MenuOption &option);
+    bool menuOptionsCallback(const MenuOption &option);
 
 
     // Move this to it's own module eventually!
