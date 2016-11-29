@@ -1,4 +1,16 @@
 
+Change Log Update (00.00.63)
+* 2016-11-29
++ Split Standard menu input, (InputField) with wildcards for menu commands
+  And Lightbars.  For Instance Matrix (Lightbar) vs Main (Standard)
+  Pull down menu are hot keys CTRL keys for movement and automatically
+  Hotkey interpretation while normal menu are full line input
+  with the ability to set T* then typing t, transfer and any test starting
+  with T will execute the command.
++ Corrections to Database Layout, added COLLATE NOCASE for Handle, Name, and Email Fields
+  Tested with standard and Unicode input.
+- WIP generic menu templates top, mid, bottom.
+
 Change Log Update (00.00.62)
 * 2016-11-21
 + Added some initial config flag validation to catch any possible 
@@ -13,7 +25,7 @@ Change Log Update (00.00.62)
 + Added STDIO error output for database for debugging, attached &m_database_log
   in session data.
 + Corrections on queries, added c_str() to table name variables, was missed.
-+ WIP, Successful login marks authorized, then moves to main menu.
+- WIP, Successful login marks authorized, then moves to main menu.
   Also need to add invalid attempt, kick back to matrix or logoff.
 
 Change Log Update (00.00.61)

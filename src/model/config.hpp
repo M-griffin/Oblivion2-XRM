@@ -35,6 +35,7 @@ public:
         sPassword_length         = 35,
         sDirectory_length        = 35,
         sAccess_length           = 35,
+        sMenuPrompt_length       = 35,
         sDefault_color_length    = 3,
         sDefault_question_length = 35,
         sControl_string_length   = 80,

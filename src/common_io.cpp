@@ -32,6 +32,7 @@
 #include <cctype>
 #include <locale>
 #include <sstream>
+#include <fstream>
 #include <map>
 
 
@@ -1326,6 +1327,26 @@ void CommonIO::parseLocalMCI(std::string &AnsiString, const std::string &mcicode
         }
     }
     while(id1 != std::string::npos);
+}
+
+
+/**
+ * @brief Check if the file exists
+ * @return
+ */
+bool CommonIO::fileExists(std::string FileName)
+{
+    std::string path = GLOBAL_TEXTFILE_PATH;
+    pathAppend(path);
+    path += FileName;
+
+    std::ifstream ifs(path);
+    if (!ifs.is_open())
+    {
+        return false;
+    }
+    ifs.close();
+    return true;
 }
 
 

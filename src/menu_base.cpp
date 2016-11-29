@@ -41,7 +41,7 @@ MenuBase::~MenuBase()
     
     // Pop Functions off the stack.
     std::vector<std::function< void(const std::string &, const bool &is_utf8)> >().swap(m_menu_functions);
-    std::vector<std::function< void(const MenuOption &)> >().swap(m_execute_callback);
+    std::vector<std::function< bool(const MenuOption &)> >().swap(m_execute_callback);
 
     // Pop off the stack to deaallocate any active modules.
     std::vector<module_ptr>().swap(m_module);
@@ -57,6 +57,8 @@ void MenuBase::clearMenuPullDownOptions()
     {
         m_loaded_pulldown_options.pop_back();
     }
+    
+    m_ansi_process->clearPullDownBars();
 }
 
 
@@ -142,7 +144,7 @@ std::string MenuBase::loadMenuScreen()
     // also  if (m_menu_session_data->m_is_use_ansi), if not ansi, then maybe no pull down, or lightbars!
     if(m_menu_info->menu_pulldown_file.size() == 0 || !m_menu_session_data->m_is_use_ansi)
     {
-        std::string screen_file = m_menu_info->menu_name;
+        std::string screen_file = m_menu_info->menu_help_file;
         // Load ansi by Menu Name, remove .MNU and Add .ANS, maybe .UTF for utf8 native?
         if (m_menu_session_data->m_is_use_ansi)
         {
@@ -153,17 +155,23 @@ std::string MenuBase::loadMenuScreen()
             screen_file.append(".ASC");
         }
         
-        // Screen File(s) are Uppercase.
-        std::transform(
-            screen_file.begin(), 
-            screen_file.end(), 
-            screen_file.begin(), 
-            ::toupper
-        );
+        // Make all screens uppercase, handle unicode names.
+        screen_file = boost::locale::to_upper(screen_file);
         
         std::cout << "readinAnsi1: " << screen_file << std::endl;
          
-        m_common_io.readinAnsi(screen_file, screen_data);
+         
+        // if file doesn't exist, then use generic template 
+        if (m_common_io.fileExists(screen_file))
+        {
+            m_common_io.readinAnsi(screen_file, screen_data);            
+        }
+        else 
+        {
+            // Load and use generic template.
+            // These are GENTOP. GENMID, GENBOT.ANS
+        }
+        
     }
     else
     {
@@ -171,17 +179,21 @@ std::string MenuBase::loadMenuScreen()
         std::string screen_file = m_menu_info->menu_pulldown_file;
         
         // Screen File(s) are Uppercase.
-        std::transform(
-            screen_file.begin(), 
-            screen_file.end(), 
-            screen_file.begin(), 
-            ::toupper
-        );
+        screen_file = boost::locale::to_upper(screen_file);
         
         std::cout << "readinAnsi2: " << screen_file << std::endl;
         
         // Otherwise use the Pulldown menu name from the menu.
-        m_common_io.readinAnsi(screen_file, screen_data);
+        // if file doesn't exist, then use generic template 
+        if (m_common_io.fileExists(screen_file))
+        {
+            m_common_io.readinAnsi(screen_file, screen_data);            
+        }
+        else 
+        {
+            // Load and use generic template.
+            // These are GENTOP. GENMID, GENBOT.ANS
+        }
     }
     return screen_data;
 }
@@ -197,13 +209,16 @@ std::string MenuBase::buildLightBars()
     // Test setup and display lightbars
     std::string light_bars = "";
     bool active_lightbar = false;
+        
 
     for(auto &m : m_menu_info->menu_options)
     {
         // Always start on Initial or first indexed lightbar.
         // Might need to verify if we need to check for lowest ID, and start on that!
         if(m_active_pulldownID > 0 && m_active_pulldownID == m.pulldown_id)
-            active_lightbar = true;
+        {
+            active_lightbar = true;            
+        }
 
         if(m.pulldown_id > 0)
         {
@@ -249,6 +264,7 @@ void MenuBase::redisplayMenuScreen()
         // add and write out.
         output.append(light_bars);
     }
+    
     m_menu_session_data->deliver(output);
 }
 
@@ -275,28 +291,8 @@ void MenuBase::startupMenu()
         std::cout << "Menu has no menu_options: " << m_current_menu << std::endl;
         return;
     }
-            
-    // Get Pulldown menu commands, Load all from menu options (disk)
-    std::vector<int> pull_down_ids;
-    for(auto &m : m_menu_info->menu_options)
-    {
-        if(m.pulldown_id > 0 && m_menu_session_data->m_is_use_ansi)
-        {
-            pull_down_ids.push_back(m.pulldown_id);
-
-            // Get Actual Options with Descriptions for Lightbars.
-            m_loaded_pulldown_options.push_back(m);
-        }
-    }
-
-    // Set the lowest pulldown ID as Active
-    if(pull_down_ids.size() > 0)
-    {
-        auto id = std::min_element(pull_down_ids.begin(), pull_down_ids.end());
-        m_active_pulldownID = *id;
-    }
-
-    //if (MenuInfo clear the scrren etc.. feature to add! )
+    
+     //if (MenuInfo clear the scrren etc.. feature to add! )
     //m_menu_session_data->deliver("\x1b[2J\x1b[1;1H");
 
     // Finally parse the ansi screen and remove pipes
@@ -305,33 +301,65 @@ void MenuBase::startupMenu()
     
     // Output has parsed out MCI codes, translations are then appended.
     std::string output = m_session_io.pipe2ansi(buffer);
-
-    // If active pull_down id's found, mark as active pulldown menu.
-    if(pull_down_ids.size() > 0 && m_menu_session_data->m_is_use_ansi)
+    
+    
+    // If we have a pulldown ansi, then setup pull down 
+    if(m_menu_info->menu_pulldown_file.size() != 0) 
     {
-        // m_menu_info.PulldownFN
+    
+        // Get Pulldown menu commands, Load all from menu options (disk)
+        std::vector<int> pull_down_ids;
+        for(auto &m : m_menu_info->menu_options)
+        {
+            if(m.pulldown_id > 0 && m_menu_session_data->m_is_use_ansi)
+            {
+                pull_down_ids.push_back(m.pulldown_id);
 
-        m_is_active_pulldown_menu = true;
+                // Get Actual Options with Descriptions for Lightbars.
+                m_loaded_pulldown_options.push_back(m);
+            }
+        }
 
-        // Parse the Screen to the Screen Buffer.
-        m_ansi_process->parseAnsiScreen((char *)buffer.c_str());
+        // Set the lowest pulldown ID as Active
+        if(pull_down_ids.size() > 0)
+        {
+            auto id = std::min_element(pull_down_ids.begin(), pull_down_ids.end());
+            m_active_pulldownID = *id;
+        }
+        
+        // If active pull_down id's found, mark as active pulldown menu.
+        if(pull_down_ids.size() > 0 && m_menu_session_data->m_is_use_ansi)
+        {
+            // m_menu_info.PulldownFN
+            m_is_active_pulldown_menu = true;
 
-        // Screen to String so it can be processed.
-        m_ansi_process->screenBufferToString();
+            // Parse the Screen to the Screen Buffer.
+            m_ansi_process->parseAnsiScreen((char *)buffer.c_str());
 
-        // Process buffer for PullDown Codes. results for TESTING, are discarded.
-        std::string result = std::move(m_ansi_process->screenBufferParse());
+            // Screen to String so it can be processed.
+            m_ansi_process->screenBufferToString();
 
-        // Now Build the Light bars
-        std::string light_bars = buildLightBars();
+            // Process buffer for PullDown Codes. results for TESTING, are discarded.
+            std::string result = std::move(m_ansi_process->screenBufferParse());
 
-        // add and write out.
-        output.append(light_bars);
+            // Now Build the Light bars
+            std::string light_bars = buildLightBars();
+
+            // add and write out.
+            output.append(light_bars);
+        }
+        else 
+        {
+            m_is_active_pulldown_menu = false;
+        }
+
     }
     else
     {
         m_is_active_pulldown_menu = false;
     }
+            
+    
     m_menu_session_data->deliver(output);
 
     using namespace boost::locale;
@@ -407,16 +435,65 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
  * @brief Process Command Keys passed from menu selection
  * @param input
  */
-void MenuBase::executeMenuOptions(const MenuOption &option)
+bool MenuBase::executeMenuOptions(const MenuOption &option)
 {
     // If Invalid then return
     if(m_execute_callback.size() == 0 || option.command_key.size() != 2)
     {
-        return;
+        return false;
     }
 
     // Execute Menu Option Commands per Callback
-    m_execute_callback[0](option);    
+    return m_execute_callback[0](option);    
+}
+
+
+/**
+ * @brief Handle Standard Menu Input with Wildcard input
+ * @param input
+ * @param key
+ * @return 
+ */
+bool MenuBase::handleStandardMenuInput(const std::string &input, const std::string &key)
+{
+    std::cout << "STANDARD INPUT: " << input << " KEY: " << key << std::endl;
+    
+    // Check for wildcard command input.
+    std::string::size_type idx;
+    idx = key.find("*", 0);
+    
+    // If it exists, grab text up to *, then test aginst input.
+    // Check for Wildcard input .. A* would be any keys starting with A
+    if (idx != std::string::npos)
+    {
+        
+        
+        // Match Strings to the same size.
+        std::string key_match = key.substr(0, idx);
+        std::string input_match = input.substr(0, m_common_io.numberOfChars(key_match));
+        
+        std::cout << "key_match: " << key_match << std::endl;
+        std::cout << "input_match: " << input_match << std::endl;
+        
+        // Normalize and upper case for testing key input
+        key_match = boost::locale::to_upper(key_match);
+        input_match = boost::locale::to_upper(input_match);
+        
+        // If we have a match, execute
+        if (key_match == input_match)
+        {
+            return true;
+        }        
+        return false;
+    }
+    
+    // Handle one to one matches.
+    if (input.compare(key) == 0)
+    {
+        return true;
+    }
+        
+    return false;
 }
 
 
@@ -424,9 +501,10 @@ void MenuBase::executeMenuOptions(const MenuOption &option)
  * @brief Processes Menu Commands with input.
  * @param input
  */
-void MenuBase::processMenuOptions(std::string &input)
+bool MenuBase::processMenuOptions(const std::string &input)
 {
     std::cout << "processMenuOptions: " << input << std::endl;
+    
     // Create system default locale
     using namespace boost::locale;
     using namespace std;
@@ -440,84 +518,88 @@ void MenuBase::processMenuOptions(std::string &input)
     cout.imbue(loc);
 
     bool is_enter = false;
+    int  executed = 0;
+    std::string current_menu = m_current_menu;
 
     // Uppercase all input to match on comamnd/option keys
-    input = to_upper(input);
+    // TODO, use boost local for upper case local!!
+    std::string input_text = boost::locale::to_upper(input);
 
     // Check if ENTER was hit as a command!
-    if(input == "ENTER")
+    if(input_text == "ENTER")
     {
-        std::cout << "EXECUTE ENTER!: " << input << std::endl;
+        std::cout << "EXECUTE ENTER!: " << input_text << std::endl;
         is_enter = true;
     }
 
     // Check for loaded menu commands.
     // Get Pulldown menu commands, Load all from menu options (disk)
     for(auto &m : m_menu_info->menu_options)
-    {
-        // Process all First Commands or commands that should run every action.
-        std::transform(
-            m.menu_key.begin(), 
-            m.menu_key.end(), 
-            m.menu_key.begin(), 
-            ::toupper
-        );
-
-        // Next Process EVERY Commands}
-        if(m.menu_key == "EACH")
-        {
-            // Process, although should each be execure before, or after a menu command!
-            // OR is each just on each load/reload of menu i think!!
-            std::cout << "FOUND EACH! EXECUTE: " << m.command_key << std::endl;
-            executeMenuOptions(m);
-            continue;
-        }
-
-        // Check for ESC sequence, and next/prev lightbar movement.
-        else if(input[0] == '\x1b' && input.size() > 2)
+    {    
+        if(input_text[0] == '\x1b' && input_text.size() > 2)
         {
             // Remove leading ESC for cleaner comparisons.
-            input.erase(0,1);
+            std::string clean_sequence = input_text;
+            clean_sequence.erase(0,1);
 
-            // Handle ESC and Sequences
-            int previous_id = m_active_pulldownID;
-            if(input == "RT_ARROW" || input == "DN_ARROW")
+            // Handle Pull Down Options for Lightbars only.
+            if (m_is_active_pulldown_menu)
             {
-                if(m_active_pulldownID < (signed)m_ansi_process->m_pull_down_options.size())
+                // Handle ESC and Sequences
+                int previous_id = m_active_pulldownID;
+                if(clean_sequence == "RT_ARROW" || clean_sequence == "DN_ARROW")
                 {
-                    ++m_active_pulldownID;
+                    if(m_active_pulldownID < (signed)m_ansi_process->m_pull_down_options.size())
+                    {
+                        ++m_active_pulldownID;
+                    }
+                    else
+                    {
+                        m_active_pulldownID = 1;
+                    }
+                    lightbarUpdate(previous_id);
+                    ++executed;
+                    continue;
+                }
+                else if(clean_sequence == "LT_ARROW" || clean_sequence == "UP_ARROW")
+                {
+                    if(m_active_pulldownID > 1)
+                    {
+                        --m_active_pulldownID;
+                    }
+                    else
+                    {
+                        m_active_pulldownID = (signed)m_ansi_process->m_pull_down_options.size();
+                    }
+                    lightbarUpdate(previous_id);
+                    ++executed;
+                    continue;
                 }
                 else
                 {
-                    m_active_pulldownID = 1;
-                }
-                lightbarUpdate(previous_id);
-                continue;
-            }
-            else if(input == "LT_ARROW" || input == "UP_ARROW")
-            {
-                if(m_active_pulldownID > 1)
-                {
-                    --m_active_pulldownID;
-                }
-                else
-                {
-                    m_active_pulldownID = (signed)m_ansi_process->m_pull_down_options.size();
-                }
-                lightbarUpdate(previous_id);
-                continue;
+                    // Add home end.  page etc..
+                    std::cout << "lightbar ELSE!" << std::endl;
+                }                
             }
             else
             {
-                // Add home end.  page etc..
+                // Handle Standard Input for CONTROL KEYS.         
+                if (handleStandardMenuInput(clean_sequence, m.menu_key))
+                {
+                    std::cout << "STANDARD MATCH, EXECUTING " << m.menu_key << std::endl;
+                    if (executeMenuOptions(m))
+                    {
+                        ++executed;                        
+                    }
+                }
             }
-        }
+        }            
 
         // Check for ESC sequence, and next/prev lightbar movement.
-        else if(input[0] == '\x1b')
+        else if(input_text[0] == '\x1b')
         {
             // Received ESC key,  check for ESC is menu here..
-
+            ++executed;
         }
 
         /**
@@ -529,12 +611,12 @@ void MenuBase::processMenuOptions(std::string &input)
          * Cstring of * so one could J1,J2, etc.
          * 
          * Also a possibility for CString is & in which is set to the
-         * input gotten with -I, -J, or set with -*.
+         * input_text gotten with -I, -J, or set with -*.
          */
  
         // Check Input Keys on Both Pulldown and Normal Menus
         // If the input matches the current key, or Enter is hit, then process it.
-        else if(input.compare(m.menu_key) == 0 || (m_is_active_pulldown_menu && is_enter))
+        else if(input_text.compare(m.menu_key) == 0 || (m_is_active_pulldown_menu && is_enter))
         {
             // We have the command, start the work
             if(m_is_active_pulldown_menu)
@@ -552,7 +634,10 @@ void MenuBase::processMenuOptions(std::string &input)
                         if(m.menu_key != "FIRSTCMD" && m.menu_key != "EACH")
                         {
                             //input = m.menu_key; ??
-                            executeMenuOptions(m);
+                            if (executeMenuOptions(m))
+                            {
+                                ++executed;                        
+                            }
                         }
                     }
 
@@ -562,7 +647,10 @@ void MenuBase::processMenuOptions(std::string &input)
                 {
                     // NOT ENTER and pulldown,  check hotkeys here!!
                     std::cout << "Menu Command HOTKEY Executed for: " << m.menu_key << std::endl;
-                    executeMenuOptions(m);
+                    if (executeMenuOptions(m))
+                    {
+                        ++executed;                        
+                    }
                     // More testing here.. executeMenuOptions( ... );
                 }
             }
@@ -570,11 +658,56 @@ void MenuBase::processMenuOptions(std::string &input)
             {
                 // They m.menu_key compared, execute it
                 std::cout << "NORMAL HOT KEY MATCH and EXECUTE! " << m.menu_key << std::endl;
-                executeMenuOptions(m);
+                if (executeMenuOptions(m))
+                {
+                    ++executed;                        
+                }
                 // More testing here.. executeMenuOptions( ... );
             }
         }
+        else
+        {
+            // Handle Standard Menu, Input Field processing.            
+            if (handleStandardMenuInput(input_text, m.menu_key))
+            {
+                std::cout << "STANDARD MATCH, EXECUTING " << m.menu_key << std::endl;
+                if (executeMenuOptions(m))
+                {
+                    ++executed;                        
+                }
+            }
+        }
     }
+    
+    // Check for Change Menu before this point, if we changed the menu
+    // Then do not re-execute menu commands for previous menu
+    if (current_menu == m_current_menu)
+    {
+        // Then do not loop and execute this!
+        // Get Pulldown menu commands, Load all from menu options (disk)
+        for(auto &m : m_menu_info->menu_options)
+        {
+            // Process Each should onlu be done, before return to the menu, after completed 
+            // All if any stacked menu commands.
+            if(m.menu_key == "EACH")
+            {
+                // Process, although should each be execure before, or after a menu command!
+                // OR is each just on each load/reload of menu i think!!
+                std::cout << "FOUND EACH! EXECUTE: " << m.command_key << std::endl;
+                executeMenuOptions(m);
+                continue;
+            }        
+        }        
+    }
+    
+    // Track Executed Commands, If we didn't execute anything
+    // By user input_text, then clear the menu prompt input field
+    if (executed > 0)
+    {
+        return true;
+    }
+    
+    return false;
 }
 
 
@@ -584,30 +717,90 @@ void MenuBase::processMenuOptions(std::string &input)
  */
 void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf8)
 {
+    std::cout << " *** menuInput" << std::endl;
+    
     // Check key input, if were in a sequence get the complete sequence
-    std::string result = m_session_io.getKeyInput(character_buffer);
-    std::string input = character_buffer;
-
-    if(result.size() == 0)
-    {
-        // Empty, possiable sequence, get keep checking!
-        return;
+    std::string result; 
+        
+    // If were in lightbar mode, then we are using hotkeys.
+    if (m_is_active_pulldown_menu)
+    {            
+        std::cout << " *** menuInput / active pulldown menu" << std::endl;
+        
+        // Get hotmay and lightbar input.
+        result = m_session_io.getKeyInput(character_buffer);
+        std::string input = "";
+        
+        if(result.size() == 0)
+        {
+            return;
+        }            
+        else if(result[0] == 13 || result[0] == 10)
+        {
+            // Menu Translations for ENTER
+            input = "ENTER";
+        }
+        else if(result[0] == '\x1b' && result.size() > 2 && !is_utf8)
+        {
+            // ESC SEQUENCE
+            input = result;
+        }
+        else if(result[0] == '\x1b' && result.size() == 1)
+        {
+            // Check Single ESC KEY
+            input = "ESC";
+        }
+        
+        // Process CommandOptions Matching the Key Input.
+        // Need to check for wildcard input there with menu option.
+        processMenuOptions(input);        
     }
-    else if(result[0] == 13 || result[0] == 10)
+    else
     {
-        // Menu Translations for ENTER
-        input = "ENTER";
+        std::cout << " *** menuInput / inactive pulldown menu: " << character_buffer << std::endl;
+        
+        // Get LineInput and wait for ENTER.
+        std::string key = "";
+        result = m_session_io.getInputField(character_buffer, key, Config::sMenuPrompt_length);
+        
+        std::cout << "result: " << result << std::endl;
+        
+        if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+        {
+            std::cout << "ESC aborted!" << std::endl;
+        }
+        else if(result[0] == '\n')
+        {
+            // Key == 0 on [ENTER] pressed alone. then invalid!
+            if(key.size() == 0)
+            {
+                // Return and don't do anything.
+                return;
+            }
+                   
+            // Process incoming String from Menu Input up to ENTER.
+            // If no commands were processed, erase all prompt text
+            if (!processMenuOptions(key))
+            {
+                // Clear Menu Field input Text, redraw prompt?
+                std::string clear_input = "";
+                for(int i = m_common_io.numberOfChars(key); i > 0; i--)
+                {
+                    clear_input += "\x1b[D \x1b[D";
+                }
+                baseProcessAndDeliver(clear_input);
+            }
+        }
+        else
+        {
+            // Send back the single input received to show client key presses.
+            // Only if return data shows a processed key returned.
+            if (result != "empty") 
+            {
+                std::cout << "baseProcessAndDeliver: " << result << std::endl;
+                baseProcessAndDeliver(result);
+            }
+        }        
     }
-    else if(result[0] == '\x1b' && result.size() > 2 && !is_utf8)
-    {
-        // ESC SEQUENCE
-        input = result;
-    }
-    else if(result[0] == '\x1b' && result.size() == 1)
-    {
-        // Check Single ESC KEY
-        input = "ESC";
-    }
-    // Process CommandOptions Matching the Key Input.
-    processMenuOptions(input);
 }
+
