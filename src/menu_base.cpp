@@ -131,6 +131,107 @@ void MenuBase::loadInMenu(std::string menu_name)
 
 
 /**
+ * @brief Processes a MID Template Screen for Menus
+ * @param screen
+ * @return 
+ */
+std::string MenuBase::processMidGenericTemplate(const std::string &screen)
+{
+    std::string output_screen;
+    
+    // Clear All Mappings
+    m_session_io.clearAllMCIMapping();
+    
+    // Build a single code map that can be reused.
+    std::vector<MapType> code_map = m_session_io.pipe2genericCodeMap(screen);
+
+    // Loop the code map and determine the number of unique columns for parsing.
+    int key_columns = 0;
+    int des_columns = 0;
+    std::string lookup = "";
+    
+    
+    // Look coldes and get max number of columns per code.
+    for(auto &map : code_map)
+    {
+        std::cout << "Generic Code: " << map.m_code << std::endl;
+        if (map.m_code[1] == 'K')
+        {
+            ++key_columns;
+        }
+            
+        if (map.m_code[1] == 'D')
+        {
+            ++des_columns;
+        }
+    }
+    
+    // No codes found in ansi, or invalid combination exit!
+    if (key_columns == 0 || key_columns != des_columns)
+    {
+        std::cout << "No Generic Code Maps found." << std::endl;
+        return output_screen;
+    }
+    
+    // Loop all menu options, and pass the number of columns at a time.
+    int column = 1;
+    std::string key, value;
+    std::string::size_type idx;
+    for (auto &m : m_menu_info->menu_options)
+    {        
+        // Skip Options that are Automatic Exection, or Stacked with no name and hidden
+        if(m.menu_key == "FIRSTCMD" || m.menu_key == "EACH" || 
+           m.name.size() == 0 || m.hidden)
+        {
+            continue;
+        }
+        
+        
+        // Build Key/Value for Menu Key
+        key = "|K" + std::to_string(column);
+        
+        // Clean any wildcard from menu key.
+        idx = m.menu_key.find("*");
+        if (idx != std::string::npos)
+        {
+            value = m.menu_key.substr(0, idx);
+        }
+        else
+        {
+            value = m.menu_key;
+        }                
+        m_session_io.addMCIMapping(key, value);
+        
+        
+        // Build Key/Value for Menu Description
+        key = "|D" + std::to_string(column);
+        value = m.name;        
+        m_session_io.addMCIMapping(key, value);
+        
+        if (column % key_columns == 0)
+        {
+            // Process template menu row and all columns added.
+            output_screen += m_session_io.parseCodeMapGenerics(screen, code_map);
+            column = 0;
+        }
+        
+        ++column;
+    }
+    
+    // Process any remaining not caught in offset.
+    if (m_session_io.getMCIMappingCount() > 0)
+    {
+        output_screen += m_session_io.parseCodeMapGenerics(screen, code_map);
+    }
+    
+    // Clear Codemap.
+    std::vector<MapType>().swap(code_map);
+    
+    return output_screen;
+}
+
+
+/**
  * @brief Generic SRT, MID, END screen processing
  * @return 
  */
@@ -142,8 +243,24 @@ std::string MenuBase::processGenericScreens()
     std::string screen_output = "";
     
     // Add the Top section of the template
+    // Do a simple MCI Code replace for title
     // |TI - Menu Title
-    screen_output += top_screen;
+    std::string::size_type idx = top_screen.find("|TI");
+    if (idx != std::string::npos)
+    {
+        std::cout << "parsing menu code title" << std::endl;
+        screen_output += top_screen.replace(
+                            idx, 
+                            3, 
+                            m_menu_info->menu_title
+                        );
+    }
+    else 
+    {
+        // No title Found, just append.
+        std::cout << "no menu title code found" << std::endl;
+        screen_output += top_screen;        
+    }
     
     /**
      * According to the ANSI 3.64-1979 standard esc[;xxH should go
@@ -156,8 +273,7 @@ std::string MenuBase::processGenericScreens()
     
     // |K? - key,  |D? - Description
     //|K1 |D1   |K2  |D2  |K3  |D3 ...
-    
-    screen_output += mid_screen;
+    screen_output += processMidGenericTemplate(mid_screen);
     
     screen_output += bot_screen;
     

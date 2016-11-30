@@ -739,7 +739,7 @@ SUITE(XRMSessionIO)
         // Test Group 1 ([|]{1}[0-9]{2})                // |00
         std::string sequence = "e|013e|02AA||03FE";
 
-        std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence));
+        std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence, sess.STD_EXPRESSION));
         CHECK_EQUAL(code_map.size(), 3);
 
         // Verify Codes
@@ -761,8 +761,7 @@ SUITE(XRMSessionIO)
         // Test Group 2 ([|]{1}[X][Y][0-9]{4}           // |XY0101
         std::string sequence = "ers|XY0101e3%||XY101000weXa";
 
-
-        std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence));
+        std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence, sess.STD_EXPRESSION));
         CHECK_EQUAL(code_map.size(), 2);
 
         // Verify Codes
@@ -782,8 +781,7 @@ SUITE(XRMSessionIO)
         // Test Group 3 ([|]{1}[A-Z]{1,2}[0-9]{1,2})    // |A1 A22  AA2  AA33
         std::string sequence = "..W||A1%|B22XY1010weR-|AI3XY1010342|CC223eq0";
 
-
-        std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence));
+        std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence, sess.STD_EXPRESSION));
         CHECK_EQUAL(code_map.size(), 4);
 
         // Verify Codes
@@ -807,8 +805,7 @@ SUITE(XRMSessionIO)
         // Test Group 4 ([|]{1}[A-Z]{2})                // |AA
         std::string sequence = "..W||AE%|Be22XY1010weR-|AI|3XY1010342|CCe2%%C|ERE23eq0";
 
-
-        std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence));
+        std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence, sess.STD_EXPRESSION));
         CHECK_EQUAL(code_map.size(), 4);
 
         // Verify Codes
@@ -832,8 +829,7 @@ SUITE(XRMSessionIO)
         // Test Group 5 ([%]{2}[\w]+[.]{1}[\w]{3})      // %%filename.ans
         std::string sequence = "..W||1AE%|Be22%%obv.ascecXY1010%%%obv.txt%w%%obv.tx~";
 
-
-        std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence));
+        std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence, sess.STD_EXPRESSION));
         CHECK_EQUAL(code_map.size(), 2);
 
         // Verify Codes
@@ -853,8 +849,7 @@ SUITE(XRMSessionIO)
         // Test Group 6 ([%]{1}[A-Z]{2})                // %AA
         std::string sequence = "..W||1AE%1|Be22%%o$%TAbXY1010%%RF%obw%%obv.tx~";
 
-
-        std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence));
+        std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence, sess.STD_EXPRESSION));
         CHECK_EQUAL(code_map.size(), 2);
 
         // Verify Codes
@@ -874,8 +869,7 @@ SUITE(XRMSessionIO)
         // Test Group 7 ([%]{1}[0-9]{2})                // %11
         std::string sequence = "..W||1AE%1|Be22%%o1$%18bXY1010%%991%obw%%obv.tx~";
 
-
-        std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence));
+        std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence, sess.STD_EXPRESSION));
         CHECK_EQUAL(code_map.size(), 2);
 
         // Verify Codes
@@ -899,8 +893,7 @@ SUITE(XRMSessionIO)
             ".txt%w%%obv.tx~..W||1AE%1|Be22%%o$%TAbXY1010%%RF%obw%%obv.tx~..W||" \
             "1AE%1|Be22%%o1$%18bXY1010%%991%obw%%obv.tx~";
 
-
-        std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence));
+        std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence, sess.STD_EXPRESSION));
         CHECK_EQUAL(code_map.size(), 19);
 
         // Verify Codes

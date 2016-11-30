@@ -130,6 +130,13 @@ public:
     std::string loadMenuScreen();
 
     /**
+     * @brief Processes a MID Template Screen for Menus
+     * @param screen
+     * @return 
+     */
+    std::string processMidGenericTemplate(const std::string &screen);
+
+    /**
      * @brief Generic SRT, MID, END screen processing
      * @return 
      */

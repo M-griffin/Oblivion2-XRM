@@ -88,7 +88,9 @@ void AnsiProcessor::screenBufferDisplayTest()
     std::string character = "";
 
     if(m_is_screen_cleared)
-        m_ansi_output.append("\x1b[1;1H\x1b[2J");
+    {
+        m_ansi_output.append("\x1b[1;1H\x1b[2J");        
+    }
 
     int count = 1;
     for(auto &buff : m_screen_buffer)
@@ -101,8 +103,13 @@ void AnsiProcessor::screenBufferDisplayTest()
                     fore != buff.foreground ||
                     back != buff.background)
             {
-                ss << "\x1b[" << buff.attribute << ";" << buff.foreground << ";" << buff.background << "m";
+                ss  << "\x1b[" 
+                    << buff.attribute << ";" 
+                    << buff.foreground << ";" 
+                    << buff.background << "m";
+                    
                 m_ansi_output.append(ss.str());
+                
                 attr = buff.attribute;
                 fore = buff.foreground;
                 back = buff.background;
@@ -142,7 +149,6 @@ std::string AnsiProcessor::buildPullDownBars(int pulldown_id, bool active)
 {
     std::string output = "";
     std::stringstream ss;
-    //need hi and low colors.. shoot!!
 
     std::map<int, ScreenPixel>::iterator it;
     it = m_pull_down_options.find(pulldown_id);
