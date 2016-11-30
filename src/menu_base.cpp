@@ -270,6 +270,33 @@ void MenuBase::redisplayMenuScreen()
 
 
 /**
+ * @brief Execute First and Each Commands on Startup
+ */
+void MenuBase::executeFirstAndEachCommands()
+{
+    using namespace boost::locale;
+    using namespace std;
+    generator gen;
+    locale loc=gen("");
+    locale::global(loc);
+    cout.imbue(loc);
+
+    // Now loop and scan for first cmd and each time
+    for(auto &m : m_menu_info->menu_options)
+    {
+        // Process all First Commands or commands that should run every action.       
+        m.menu_key = boost::locale::to_upper(m.menu_key);
+
+        if(m.menu_key == "FIRSTCMD" || m.menu_key == "EACH")
+        {
+            // Process
+            std::cout << "FOUND FIRSTCMD! EXECUTE: " << m.command_key << std::endl;
+            executeMenuOptions(m);
+        }
+    }
+}
+
+/**
  * @brief Startup And load the Menu File
  *        Default Menu Startup sets Input to MenuInput processing.
  */
@@ -362,31 +389,7 @@ void MenuBase::startupMenu()
     
     m_menu_session_data->deliver(output);
 
-    using namespace boost::locale;
-    using namespace std;
-    generator gen;
-    locale loc=gen("");
-    locale::global(loc);
-    cout.imbue(loc);
-
-    // Now loop and scan for first cmd and each time
-    for(auto &m : m_menu_info->menu_options)
-    {
-        // Process all First Commands or commands that should run every action.
-        std::transform(
-            m.menu_key.begin(), 
-            m.menu_key.end(), 
-            m.menu_key.begin(), 
-            ::toupper
-        );
-
-        if(m.menu_key == "FIRSTCMD" || m.menu_key == "EACH")
-        {
-            // Process
-            std::cout << "FOUND FIRSTCMD! EXECUTE: " << m.command_key << std::endl;
-            executeMenuOptions(m);
-        }
-    }
+    executeFirstAndEachCommands();
 }
 
 
@@ -782,95 +785,108 @@ bool MenuBase::processMenuOptions(const std::string &input)
 
 
 /**
+ * @brief Handle Input Specific to Pull Down Menus
+ * @param character_buffer
+ */
+void MenuBase::handlePulldownInput(const std::string &character_buffer, const bool &is_utf8)
+{   
+    // Get hotmay and lightbar input.
+    std::string result = m_session_io.getKeyInput(character_buffer);
+    std::string input = "";
+    
+    if(result.size() == 0)
+    {
+        return;
+    }            
+    else if(result[0] == 13 || result[0] == 10)
+    {
+        // Menu Translations for ENTER
+        input = "ENTER";
+    }
+    else if(result[0] == '\x1b' && result.size() > 2 && !is_utf8)
+    {
+        // ESC SEQUENCE
+        input = result;
+    }
+    else if(result[0] == '\x1b' && result.size() == 1)
+    {
+        // Check Single ESC KEY
+        input = "ESC";
+    }
+    
+    // Process CommandOptions Matching the Key Input.
+    // Need to check for wildcard input there with menu option.
+    processMenuOptions(input);    
+}
+
+
+/**
+ * @brief Handle Input Specific to Pull Down Menus
+ * @param character_buffer
+ */
+void MenuBase::handleStandardMenuInput(const std::string &character_buffer)
+{
+    // Get LineInput and wait for ENTER.
+    std::string key = "";
+    std::string result = m_session_io.getInputField(character_buffer, key, Config::sMenuPrompt_length);
+    
+    std::cout << "result: " << result << std::endl;
+    
+    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    {
+        std::cout << "ESC aborted!" << std::endl;
+    }
+    else if(result[0] == '\n')
+    {
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return;
+        }
+               
+        // Process incoming String from Menu Input up to ENTER.
+        // If no commands were processed, erase all prompt text
+        if (!processMenuOptions(key))
+        {
+            // Clear Menu Field input Text, redraw prompt?
+            std::string clear_input = "";
+            for(int i = m_common_io.numberOfChars(key); i > 0; i--)
+            {
+                clear_input += "\x1b[D \x1b[D";
+            }
+            baseProcessAndDeliver(clear_input);
+        }
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty") 
+        {
+            std::cout << "baseProcessAndDeliver: " << result << std::endl;
+            baseProcessAndDeliver(result);
+        }
+    }        
+}
+
+
+/**
  * @brief Default Menu Input Processing.
  *        Handles Processing for Loaded Menus Hotkey and Lightbars
  */
 void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf8)
 {
-    std::cout << " *** menuInput" << std::endl;
-    
-    // Check key input, if were in a sequence get the complete sequence
-    std::string result; 
+    std::cout << " *** menuInput" << std::endl;       
         
     // If were in lightbar mode, then we are using hotkeys.
     if (m_is_active_pulldown_menu)
     {            
-        std::cout << " *** menuInput / active pulldown menu" << std::endl;
-        
-        // Get hotmay and lightbar input.
-        result = m_session_io.getKeyInput(character_buffer);
-        std::string input = "";
-        
-        if(result.size() == 0)
-        {
-            return;
-        }            
-        else if(result[0] == 13 || result[0] == 10)
-        {
-            // Menu Translations for ENTER
-            input = "ENTER";
-        }
-        else if(result[0] == '\x1b' && result.size() > 2 && !is_utf8)
-        {
-            // ESC SEQUENCE
-            input = result;
-        }
-        else if(result[0] == '\x1b' && result.size() == 1)
-        {
-            // Check Single ESC KEY
-            input = "ESC";
-        }
-        
-        // Process CommandOptions Matching the Key Input.
-        // Need to check for wildcard input there with menu option.
-        processMenuOptions(input);        
+        handlePulldownInput(character_buffer, is_utf8);
     }
     else
     {
-        std::cout << " *** menuInput / inactive pulldown menu: " << character_buffer << std::endl;
-        
-        // Get LineInput and wait for ENTER.
-        std::string key = "";
-        result = m_session_io.getInputField(character_buffer, key, Config::sMenuPrompt_length);
-        
-        std::cout << "result: " << result << std::endl;
-        
-        if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
-        {
-            std::cout << "ESC aborted!" << std::endl;
-        }
-        else if(result[0] == '\n')
-        {
-            // Key == 0 on [ENTER] pressed alone. then invalid!
-            if(key.size() == 0)
-            {
-                // Return and don't do anything.
-                return;
-            }
-                   
-            // Process incoming String from Menu Input up to ENTER.
-            // If no commands were processed, erase all prompt text
-            if (!processMenuOptions(key))
-            {
-                // Clear Menu Field input Text, redraw prompt?
-                std::string clear_input = "";
-                for(int i = m_common_io.numberOfChars(key); i > 0; i--)
-                {
-                    clear_input += "\x1b[D \x1b[D";
-                }
-                baseProcessAndDeliver(clear_input);
-            }
-        }
-        else
-        {
-            // Send back the single input received to show client key presses.
-            // Only if return data shows a processed key returned.
-            if (result != "empty") 
-            {
-                std::cout << "baseProcessAndDeliver: " << result << std::endl;
-                baseProcessAndDeliver(result);
-            }
-        }        
-    }
+        handleStandardMenuInput(character_buffer);
+    }            
 }
 

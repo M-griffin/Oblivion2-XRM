@@ -144,6 +144,10 @@ public:
      */
     void redisplayMenuScreen();
 
+    /**
+     * @brief Execute First and Each Commands on Startup
+     */
+    void executeFirstAndEachCommands();
 
     // Menu System will be a (2) Function system 1st setups up and displays
     // The Second handles all I/O for the menu options, this is dynamic since
@@ -198,6 +202,22 @@ public:
 
     bool processMenuOptions(const std::string &input);
     
+    /**
+     * @brief Handle Input Specific to Pull Down Menus
+     * @param character_buffer
+     */
+    void handlePulldownInput(const std::string &character_buffer, const bool &is_utf8);
+    
+    /**
+     * @brief Handle Input Specific to Pull Down Menus
+     * @param character_buffer
+     */
+    void handleStandardMenuInput(const std::string &character_buffer);
+    
+    /**
+     * @brief Default Menu Input Processing.
+     *        Handles Processing for Loaded Menus Hotkey and Lightbars
+     */
     void menuInput(const std::string &character_buffer, const bool &is_utf8);
     
 };
