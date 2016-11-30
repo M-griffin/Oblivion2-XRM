@@ -4,6 +4,7 @@
 
 #include <boost/locale.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <cstring>
 #include <string>
@@ -33,6 +34,16 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_fail_flag(false)
     , m_pulldown_reentrace_flag(false)
 {
+    // Load all Menu Prompts
+    // Lateron we'll optimize this for the users selected!
+    try
+    {
+        readMenuAllPrompts();        
+    }
+    catch(std::exception ex)
+    {
+        std::cout << "Exception reading menu prompts" << ex.what() << std::endl;
+    }
 }
 
 MenuBase::~MenuBase()
@@ -418,7 +429,8 @@ void MenuBase::redisplayMenuScreen()
         output.append(light_bars);
     }
     
-    m_menu_session_data->deliver(output);
+    //m_menu_session_data->deliver(output);
+    baseProcessAndDeliver(output);
 }
 
 
@@ -448,6 +460,7 @@ void MenuBase::executeFirstAndEachCommands()
         }
     }
 }
+
 
 
 /**
@@ -543,7 +556,23 @@ void MenuBase::startupMenu()
     }
             
     
+    // Display Menu Prompt if it exists, right now it's default
+    // lateron add users selected.  This is just a test!
+    if (m_loaded_menu_prompts.size() > 0)
+    {
+        std::string prompt = "\x1b[22;1H";
+        prompt += boost::lexical_cast<std::string>(m_loaded_menu_prompts[0].Data[0]) + "\r\n";
+        prompt += boost::lexical_cast<std::string>(m_loaded_menu_prompts[0].Data[1]) + "\r\n";
+        prompt += boost::lexical_cast<std::string>(m_loaded_menu_prompts[0].Data[2]) + "\r\n";
+        output += m_session_io.pipe2ansi(prompt);
+    }
+    else
+    {
+        std::cout << "No Menu prompts loaded." << std::endl;
+    }
+    
     m_menu_session_data->deliver(output);
+    //baseProcessAndDeliver(output);
 
     executeFirstAndEachCommands();
 }
@@ -656,9 +685,13 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
         return false;
     }
     
+    std::string key_normalized = boost::locale::to_upper(key);
+    std::string input_normailized = boost::locale::to_upper(input);
+        
     // Handle one to one matches.
-    if (input.compare(key) == 0)
+    if (input_normailized.compare(key_normalized) == 0)
     {
+        std::cout << "Match Found " << input_normailized << std::endl;
         return true;
     }
         
@@ -849,6 +882,7 @@ bool MenuBase::processMenuOptions(const std::string &input)
                 // First Make sure the pulldown menu, doesn't have menu keys set to specific
                 // Control Sequence,  If so, they are normal menu commands, execute first
                 // Instead of lightbar interaction.
+                std::cout << "Handle 1 " << m.menu_key << std::endl;
                 if (handleStandardMenuInput(clean_sequence, m.menu_key)) 
                 {
                     std::cout << "STANDARD MATCH, EXECUTING " << m.menu_key << std::endl;
@@ -868,7 +902,8 @@ bool MenuBase::processMenuOptions(const std::string &input)
             }
             else
             {
-                // Handle Standard Input for CONTROL KEYS.         
+                // Handle Standard Input for CONTROL KEYS.
+                std::cout << "Handle 2 " << m.menu_key << std::endl; 
                 if (handleStandardMenuInput(clean_sequence, m.menu_key))
                 {
                     std::cout << "STANDARD MATCH, EXECUTING " << m.menu_key << std::endl;
@@ -920,7 +955,8 @@ bool MenuBase::processMenuOptions(const std::string &input)
         }
         else
         {
-            // Handle Standard Menu, Input Field processing.            
+            // Handle Standard Menu, Input Field processing.    
+            std::cout << "Handle 3 " << m.menu_key << std::endl;        
             if (handleStandardMenuInput(input_text, m.menu_key))
             {
                 std::cout << "STANDARD MATCH, EXECUTING " << m.menu_key << std::endl;
@@ -980,6 +1016,11 @@ void MenuBase::handlePulldownInput(const std::string &character_buffer, const bo
         // Check Single ESC KEY
         input = "ESC";
     }
+    else
+    {
+        // Hot Key Input.
+        input = result;
+    }
     
     // Process CommandOptions Matching the Key Input.
     // Need to check for wildcard input there with menu option.
@@ -991,7 +1032,7 @@ void MenuBase::handlePulldownInput(const std::string &character_buffer, const bo
  * @brief Handle Input Specific to Pull Down Menus
  * @param character_buffer
  */
-void MenuBase::handleStandardMenuInput(const std::string &character_buffer)
+void MenuBase::handleStandardInput(const std::string &character_buffer)
 {
     // Get LineInput and wait for ENTER.
     std::string key = "";
@@ -1049,11 +1090,13 @@ void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf
     // If were in lightbar mode, then we are using hotkeys.
     if (m_is_active_pulldown_menu)
     {            
+        std::cout << "handlePulldown" << std::endl;
         handlePulldownInput(character_buffer, is_utf8);
     }
     else
     {
-        handleStandardMenuInput(character_buffer);
+        std::cout << "handleStandard" << std::endl;
+        handleStandardInput(character_buffer);
     }            
 }
 

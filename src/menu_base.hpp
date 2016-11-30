@@ -225,7 +225,7 @@ public:
      * @brief Handle Input Specific to Pull Down Menus
      * @param character_buffer
      */
-    void handleStandardMenuInput(const std::string &character_buffer);
+    void handleStandardInput(const std::string &character_buffer);
     
     /**
      * @brief Default Menu Input Processing.
