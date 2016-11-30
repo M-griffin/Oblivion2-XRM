@@ -20,6 +20,7 @@
 
 #include "common_io.hpp"
 
+#include <boost/lexical_cast.hpp>
 #include <boost/locale.hpp>
 
 // Fix for file_copy

@@ -130,6 +130,19 @@ public:
     std::string loadMenuScreen();
 
     /**
+     * @brief Processes a MID Template Screen for Menus
+     * @param screen
+     * @return 
+     */
+    std::string processMidGenericTemplate(const std::string &screen);
+
+    /**
+     * @brief Generic SRT, MID, END screen processing
+     * @return 
+     */
+    std::string processGenericScreens();
+
+    /**
      * @brief Load the Menu into the system container.
      */
     void loadInMenu(std::string menu_name);
@@ -144,6 +157,10 @@ public:
      */
     void redisplayMenuScreen();
 
+    /**
+     * @brief Execute First and Each Commands on Startup
+     */
+    void executeFirstAndEachCommands();
 
     // Menu System will be a (2) Function system 1st setups up and displays
     // The Second handles all I/O for the menu options, this is dynamic since
@@ -175,8 +192,45 @@ public:
      */
     bool handleStandardMenuInput(const std::string &input, const std::string &key);
 
+    /**
+     * @brief Handle updating lightbar selections and redraw
+     * @param input
+     * @return 
+     */
+    bool handleLightbarSelection(const std::string &input);
+    
+    /**
+     * @brief Handle Pulldown Specific Command Processing
+     * @param input_text
+     * @param m
+     * @param is_enter
+     * @return 
+     */
+    bool handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, bool &stack_reassignment);
+    
+    /**
+     * @brief Handles Re-running EACH command re-executed after each refresh
+     */
+    void executeEachCommands();
+
     bool processMenuOptions(const std::string &input);
     
+    /**
+     * @brief Handle Input Specific to Pull Down Menus
+     * @param character_buffer
+     */
+    void handlePulldownInput(const std::string &character_buffer, const bool &is_utf8);
+    
+    /**
+     * @brief Handle Input Specific to Pull Down Menus
+     * @param character_buffer
+     */
+    void handleStandardInput(const std::string &character_buffer);
+    
+    /**
+     * @brief Default Menu Input Processing.
+     *        Handles Processing for Loaded Menus Hotkey and Lightbars
+     */
     void menuInput(const std::string &character_buffer, const bool &is_utf8);
     
 };
