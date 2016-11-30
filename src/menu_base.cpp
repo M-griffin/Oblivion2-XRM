@@ -142,12 +142,20 @@ std::string MenuBase::processGenericScreens()
     std::string screen_output = "";
     
     // Add the Top section of the template
+    // |TI - Menu Title
     screen_output += top_screen;
     
-    // Process the mid section with all menu options.
+    /**
+     * According to the ANSI 3.64-1979 standard esc[;xxH should go
+     * to XXth column in first row, however Oblivion/2 interprets
+     * the code differently in middle repeat ansis (and only middle
+     * in the repeat ansis).  Instead of going to XXth column in
+     * first row, it will go to XXth column in current row, thus
+     * making repeat ANSIs possible.
+     */
     
-    // |K = key,  |D = Description
-    //|K1 |D1   |K2  |D2  |K3  |D3
+    // |K? - key,  |D? - Description
+    //|K1 |D1   |K2  |D2  |K3  |D3 ...
     
     screen_output += mid_screen;
     
