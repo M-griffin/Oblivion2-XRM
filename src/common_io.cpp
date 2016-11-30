@@ -1387,3 +1387,43 @@ void CommonIO::readinAnsi(std::string FileName, std::string &buff)
 
     fclose(fp);
 }
+
+/**
+ * Reads in Ansi file into Buffer Only
+ */
+std::string CommonIO::readinAnsi(std::string FileName)
+{
+    std::string path = GLOBAL_TEXTFILE_PATH;
+    pathAppend(path);
+    path += FileName;
+    
+    std::cout << "readinAnsi: " << path << std::endl;
+    std::string buff;
+
+    FILE *fp;
+
+    int c = 0;
+    if((fp = fopen(path.c_str(), "r+")) ==  NULL)
+    {
+        return "";
+    }
+    do
+    {
+        c = getc(fp);
+        if(c != EOF)
+        {
+            if (c == '\n')
+            {
+                buff += "\r\n";                
+            }
+            else
+            {
+                buff += c;                
+            }
+        }
+    }
+    while(c != EOF);
+
+    fclose(fp);
+    return buff;
+}

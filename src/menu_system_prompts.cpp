@@ -31,7 +31,9 @@ void MenuBase::readMenuAllPrompts()
 
     // Make sure list is cleared so we can reload if needed
     if(m_loaded_menu_prompts.size() > 0)
-        clearAllMenuPrompts();
+    {
+        clearAllMenuPrompts();        
+    }
 
     // Loop each Option after Reading the Menu.
     int u = 0;

@@ -1,4 +1,28 @@
 
+Change Log Update (00.00.64)
+* 2016-11-30
++ Menu Option Cleanup and split out to separate methods.
++ Split up Menu Input into Pull down and Standard Input
+  Pull down Accepts Hotkey's, while Standard is line mode.
++ Added new code to handle stacked commands when using 
+  ENTER to make lightbar selection
++ Split Regex Expressions into constants that can be 
+  passed in to the Code Map for different screens.
+  Makes it easier to setup different screens and their
+  custom MCI code replacements per interface.
++ Completed Generic Menu Template processing.  When the
+  Menu HelpId is empty, or no ansi exist the Generic 
+  Template is used for Top, Mid, and Bottom.  All
+  valid Menu options are then populated. Drawing the 
+  Menu ANSI Screen. This is also used for the Menu 
+  Library's and Selectable Themes across the system.
++ Added some Missing Include for Boost Lexical Cast.
++ Corrected missed parsing on Pull down Menu Hotkey's.
+- Initial Menu Prompts are pulling and are displayed. 
+  Need to add MCI parsing for data and position.
+  Also need to debug the baseProcessAndDeliver for Menu screens.
+- Also need to setup user selection for available menu prompts.
+
 Change Log Update (00.00.63)
 * 2016-11-29
 + Split Standard menu input, (InputField) with wildcards for menu commands

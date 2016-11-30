@@ -24,6 +24,7 @@ public:
     // Types for Text Prompt formatting to file.
     typedef std::pair<std::string, std::string> M_StringPair;
 
+    SessionIO();
     SessionIO(session_data_ptr session_data);
     ~SessionIO();
 
@@ -107,19 +108,27 @@ public:
     std::string parsePipeWithChars(const std::string &pipe_code);
 
     /**
-     * @brief Parses Code Map and replaces ansi_string codes with ANSI Sequences.
-     * @param ansi_string
+     * @brief Parses Code Map and replaces screen codes with ANSI Sequences.
+     * @param screen
      * @param code_map
      * @return
      */
-    std::string parseCodeMap(std::string ansi_string, std::vector<MapType> &code_map);
+    std::string parseCodeMap(const std::string &screen, std::vector<MapType> &code_map);
+
+    /**
+     * @brief Parses Code Map and replaces screen codes with Generic Items.
+     * @param screen
+     * @param code_map
+     * @return
+     */
+    std::string parseCodeMapGenerics(const std::string &screen, const std::vector<MapType> &code_map);
 
     /**
      * @brief Parses string and returns code mapping and positions
      * @param sequence
      * @return
      */
-    std::vector<MapType> pipe2codeMap(const std::string &sequence);
+    std::vector<MapType> pipe2codeMap(const std::string &sequence, const std::string &expression);
 
     /**
      * @brief Converts MCI Sequences to Ansi screen output.
@@ -127,6 +136,13 @@ public:
      * @return
      */
     std::string pipe2ansi(const std::string &sequence);
+    
+    /**
+     * @brief Converts MCI Sequences to Code Maps for Multiple Parses of same string data
+     * @param sequence
+     * @return
+     */
+    std::vector<MapType> pipe2genericCodeMap(const std::string &sequence);
 
     /**
      * @brief Checks a String if it matches the expression passed.
@@ -158,11 +174,23 @@ public:
      */
     void clearAllMCIMapping();
 
+    /**
+     * @brief Get a Count of all Mapped MCI Codes
+     * @return 
+     */
+    int getMCIMappingCount();
 
     // Internal Methods
     session_data_ptr                   m_session_data; // SessionData
     CommonIO                           m_common_io;    // CommonIO
     std::map<std::string, std::string> m_mapped_codes; // MCI Code Translation for specific screens.
+    
+    const std::string STD_EXPRESSION = {"([|]{1}[0-9]{2})|([|]{1}[X][Y][0-9]{4})|"
+                              "([|]{1}[A-Z]{1,2}[0-9]{1,2})|([|]{1}[A-Z]{2})|"
+                              "([%]{2}[\\w]+[.]{1}[\\w]{3})|([%]{1}[A-Z]{2})|"
+                              "([%]{1}[0-9]{2})"};
+                              
+    const std::string MID_EXPRESSION = {"([|]{1}[A-Z]{1}[0-9]{1,2})|([|]{1}[A-Z]{2})"};
 };
 
 #endif // MENU_IO_HPP
