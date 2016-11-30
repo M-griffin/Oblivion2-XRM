@@ -310,6 +310,11 @@ public:
      * @param buff
      */
     void readinAnsi(std::string FileName, std::string &buff);
+    
+    /**
+     * Reads in Ansi file into Buffer Only
+     */
+    std::string readinAnsi(std::string FileName);
 
     /**
      * @brief Template search quick find

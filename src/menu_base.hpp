@@ -130,6 +130,12 @@ public:
     std::string loadMenuScreen();
 
     /**
+     * @brief Generic SRT, MID, END screen processing
+     * @return 
+     */
+    std::string processGenericScreens();
+
+    /**
      * @brief Load the Menu into the system container.
      */
     void loadInMenu(std::string menu_name);
@@ -193,7 +199,7 @@ public:
      * @param is_enter
      * @return 
      */
-    bool handlePulldownHotKeys(const MenuOption &m, const bool &is_enter);
+    bool handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, bool &stack_reassignment);
     
     /**
      * @brief Handles Re-running EACH command re-executed after each refresh
