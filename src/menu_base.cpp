@@ -429,8 +429,10 @@ void MenuBase::redisplayMenuScreen()
         output.append(light_bars);
     }
     
-    //m_menu_session_data->deliver(output);
-    baseProcessAndDeliver(output);
+    // Load the Menu prompt
+    output += loadMenuPrompt();
+    
+    m_menu_session_data->deliver(output);
 }
 
 
@@ -461,6 +463,54 @@ void MenuBase::executeFirstAndEachCommands()
     }
 }
 
+
+/**
+ * @brief Return Selected or Active prompt as a string.
+ * @return 
+ */
+std::string MenuBase::loadMenuPrompt()
+{
+    // Display Menu Prompt if it exists, right now it's default
+    // lateron add users selected.  This is just a test!
+    
+    std::string prompt = "";
+        
+    // Don't display prompts on Pulldown menu's.
+    if (!m_is_active_pulldown_menu && m_loaded_menu_prompts.size() > 0)
+    {
+        
+        //fmt.Print("\033[?25l")
+        // fmt.Print("\033[?25h")
+    
+        // Default Display Cursor prompt starting point, make this configurable lateron
+        prompt = "\x1b[?25h\x1b[22;1H";
+                
+        prompt += boost::lexical_cast<std::string>(m_loaded_menu_prompts[
+                    m_menu_session_data->m_user_record->iPromptSelected].Data[0]) + "\r\n";
+        prompt += boost::lexical_cast<std::string>(m_loaded_menu_prompts[
+                    m_menu_session_data->m_user_record->iPromptSelected].Data[1]) + "\r\n";
+        prompt += boost::lexical_cast<std::string>(m_loaded_menu_prompts[
+                    m_menu_session_data->m_user_record->iPromptSelected].Data[2]);
+        
+        std::string output = m_session_io.pipe2ansi(prompt);
+        std::cout << "prompt: " << output << std::endl;
+        return output;
+    }
+    else
+    {
+        std::cout << "No Menu prompts loaded." << std::endl;
+        if (m_menu_info->menu_prompt.size() > 0)
+        {
+            std::cout << "Use Default Prompt String in Menu." << std::endl;
+            prompt = "\x1b[?25h"; // Turn on Cursor.
+            prompt +=  m_session_io.pipe2ansi(m_menu_info->menu_prompt);            
+        }
+        
+        // Pull prompt from menu text if exists.
+    }
+    
+    return prompt;
+}
 
 
 /**
@@ -497,12 +547,10 @@ void MenuBase::startupMenu()
     
     // Output has parsed out MCI codes, translations are then appended.
     std::string output = m_session_io.pipe2ansi(buffer);
-    
-    
+        
     // If we have a pulldown ansi, then setup pull down 
     if(m_menu_info->menu_pulldown_file.size() != 0) 
-    {
-    
+    {    
         // Get Pulldown menu commands, Load all from menu options (disk)
         std::vector<int> pull_down_ids;
         for(auto &m : m_menu_info->menu_options)
@@ -526,6 +574,9 @@ void MenuBase::startupMenu()
         // If active pull_down id's found, mark as active pulldown menu.
         if(pull_down_ids.size() > 0 && m_menu_session_data->m_is_use_ansi)
         {
+            // Hide Cursor on lightbars
+            output += "\x1b[?25l";
+            
             // m_menu_info.PulldownFN
             m_is_active_pulldown_menu = true;
 
@@ -548,31 +599,17 @@ void MenuBase::startupMenu()
         {
             m_is_active_pulldown_menu = false;
         }
-
     }
     else
     {
         m_is_active_pulldown_menu = false;
     }
-            
+                
+    // Loads the users selected menu prompt
+    output += loadMenuPrompt();
     
-    // Display Menu Prompt if it exists, right now it's default
-    // lateron add users selected.  This is just a test!
-    if (m_loaded_menu_prompts.size() > 0)
-    {
-        std::string prompt = "\x1b[22;1H";
-        prompt += boost::lexical_cast<std::string>(m_loaded_menu_prompts[0].Data[0]) + "\r\n";
-        prompt += boost::lexical_cast<std::string>(m_loaded_menu_prompts[0].Data[1]) + "\r\n";
-        prompt += boost::lexical_cast<std::string>(m_loaded_menu_prompts[0].Data[2]) + "\r\n";
-        output += m_session_io.pipe2ansi(prompt);
-    }
-    else
-    {
-        std::cout << "No Menu prompts loaded." << std::endl;
-    }
-    
+    // Don't need process here, sinec we pipe2ansi seperately
     m_menu_session_data->deliver(output);
-    //baseProcessAndDeliver(output);
 
     executeFirstAndEachCommands();
 }
@@ -587,6 +624,7 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
     std::string light_bars = "";
     // Moved to Next Item
     // Turn off Previous Bar
+    light_bars.append("\x1b[s"); // Save Cursor Position for prompt.
     light_bars.append(m_ansi_process->buildPullDownBars(previous_pulldown_id, false));
 
     // Grab Previous
@@ -612,7 +650,9 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
             break;
         }
     }
-    light_bars.append("\x1b[0m");
+    
+    // Clear Attriutes, then move back to menu prompt position.
+    light_bars.append("\x1b[0m\x1b[u");
 
     std::string output = std::move(m_session_io.pipe2ansi(light_bars));
     m_menu_session_data->deliver(output);

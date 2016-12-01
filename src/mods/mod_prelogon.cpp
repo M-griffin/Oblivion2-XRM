@@ -44,6 +44,8 @@ bool ModPreLogon::onEnter()
     m_is_active = true;
 
     // Grab ANSI Screen, display, if desired.. logon.ans maybe?
+    std::string prompt = "\x1b[?25h"; // Turn on Cursor.
+    baseProcessAndDeliver(prompt);
 
     // Execute the initial setup index.
     m_setup_functions[m_mod_function_index]();

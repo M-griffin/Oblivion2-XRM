@@ -421,7 +421,7 @@ std::string SessionIO::parsePipeWithCharsDigits(const std::string &code, int val
 {
     std::string sequence = "";
 
-    //std::cout << "parsePipeWithCharsDigits" << std::endl;
+    std::cout << "parsePipeWithCharsDigits single digit movement." << std::endl;
 
     // Check Single letter Sequences
     if(code.size() == 1)
