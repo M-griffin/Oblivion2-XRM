@@ -161,6 +161,12 @@ public:
      * @brief Execute First and Each Commands on Startup
      */
     void executeFirstAndEachCommands();
+    
+    /**
+     * @brief Return Selected or Active prompt as a string.
+     * @return 
+     */
+    std::string loadMenuPrompt();
 
     // Menu System will be a (2) Function system 1st setups up and displays
     // The Second handles all I/O for the menu options, this is dynamic since

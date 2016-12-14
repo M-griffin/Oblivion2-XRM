@@ -55,6 +55,8 @@ bool ModSignup::onEnter()
     m_is_active = true;
 
     // Check if NUP is active,  if not, move to disclaimer!
+    std::string prompt = "\x1b[?25h"; // Turn on Cursor.
+    baseProcessAndDeliver(prompt);
 
 
     // Execute the initial setup index.
