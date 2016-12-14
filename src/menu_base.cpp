@@ -148,6 +148,12 @@ void MenuBase::loadInMenu(std::string menu_name)
  */
 std::string MenuBase::processMidGenericTemplate(const std::string &screen)
 {
+    
+    // Use a Local Ansi Parser for Pasrsing Menu Template with Mid.
+    ansi_process_ptr ansi_process(new AnsiProcessor(
+                                  m_menu_session_data->m_telnet_state->getTermRows(),
+                                  m_menu_session_data->m_telnet_state->getTermCols()));
+    
     std::string output_screen;
     
     // Clear All Mappings
@@ -238,7 +244,10 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
     // Clear Codemap.
     std::vector<MapType>().swap(code_map);
     
-    return output_screen;
+    ansi_process->parseAnsiScreen((char *)output_screen.c_str());
+    
+    // Return with no clear screen, since this is a mid ansi.
+    return ansi_process->getScreenFromBuffer(false);    
 }
 
 

@@ -1,4 +1,12 @@
 
+Change Log Update (00.00.65)
+* 2016-12-14
++ Fixes for MID Ansi Template Processing, Now uses internal
+  Ansi Processor for parsing implied ESC Sequences ESC[;20H
+  where the missing sequence is considered the current row
+  instead of default row 1.  We draw the screen internally
+  then push out the processed screen for correct drawing.
+  
 Change Log Update (00.00.64)
 * 2016-11-30
 + Menu Option Cleanup and split out to separate methods.
