@@ -526,7 +526,7 @@ std::string MenuBase::loadMenuPrompt()
  * @brief Startup And load the Menu File
  *        Default Menu Startup sets Input to MenuInput processing.
  */
-void MenuBase::startupMenu()
+void MenuBase::loadAndStartupMenu()
 {
     // Check Configuration here,  if use SpecialLogin (Matrix Menu)
     // Then load it, otherwise jump to Entering UserID / P
