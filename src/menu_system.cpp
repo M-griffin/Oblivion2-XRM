@@ -82,6 +82,149 @@ bool MenuSystem::onExit()
     return true;
 }
 
+
+/**
+ * TODO - Menu Options, lets break out each section
+ * option.command_key[1] into their own methods
+ * Making this call back smaller.
+ */
+ 
+ 
+/**
+ * @brief Control Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {
+            // Turns on Pulldown Menu Re-entrance
+            // This option returns to the selected option
+            // when the user re-enters the pulldown menu.
+            // This works ONLY if the command that the user
+            // executed does not go to another menu.
+        case '\'':
+            return false;
+            // Turns off Pulldown Menu Re-Entrance
+            
+        case '`':
+            return false;
+            
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief MultiNode Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsMultiNodeCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Matrix Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {
+            // Logon
+            // {Not Implimented yet!}
+            //: When a CString is specified, PRELOGON.X, an
+            //: USERLOG.X, and SYSPASS.X will be displayed.
+            // { Note: add 0 for random! }
+        case 'S':
+            std::cout << "Executing startupModuleLogon()" << std::endl;
+            startupModuleLogon();
+            break;
+            
+            // Command Key: {T  {Research more how this is used!}
+            // Function   : Sets FailFlag to false if user is able to get to
+            //     : main system through knowing the system password
+            //     : and having an account.
+            //     : This would be used for stacking commands at the
+            //     : matrix without actually logging onto to the
+            //     : board.
+        case 'T':
+            return false;
+
+            // Apply
+        case 'A':
+            std::cout << "Executing startupModuleSignup();" << std::endl;
+            startupModuleSignup();
+            return true;
+
+            // Check
+        case 'C':
+            return false;
+
+            // Feedback
+        case 'F':
+            return false;
+
+            // Chat
+        case 'P':
+            return false;
+
+            // Logoff
+        case 'G':
+            std::cout << "Goodbye;" << std::endl;
+            m_session_data->logoff();
+            break;
+                       
+            // Drops into the BBS
+        case 'X':
+            return false;
+            
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Global New Scan Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsGlobalNewScanCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Main Menu Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
 /**
  * @brief Process Command Keys passed from menu selection (Callback)
  * @param option
@@ -98,70 +241,45 @@ bool MenuSystem::menuOptionsCallback(const MenuOption &option)
     {
         return false;
     }
+    
+    
+    // NOTE: to make even better, 
+    // we can do a function array!
+
 
     // Run through Comamnd Keys for Method
     switch(option.command_key[0])
     {
+        // "-" = Control Commands
         case '-':
-            switch(option.command_key[1])
-            {
-                    // Turns on Pulldown Menu Re-entrance
-                    // This option returns to the selected option
-                    // when the user re-enters the pulldown menu.
-                    // This works ONLY if the command that the user
-                    // executed does not go to another menu.
-                case '\'':
-                    return false;
-                    // Turns off Pulldown Menu Re-Entrance
-                    
-                case '`':
-                    return false;
-                    
-                default :
-                    return false;
-            }
+            menuOptionsControlCommands(option);
             break;
 
-            // Matrix Menu Commands
+        // & = MultiNode Commands
+        case '&':
+            menuOptionsMultiNodeCommands(option);
+            break;
+                        
+        // { = Matrix Commands
         case '{':
-            switch(option.command_key[1])
-            {
-                    // Logon
-                case 'S':
-                    std::cout << "Executing startupModuleLogon()" << std::endl;
-                    startupModuleLogon();
-                    return true;
-
-                    // Apply
-                case 'A':
-                    std::cout << "Executing startupModuleSignup();" << std::endl;
-                    startupModuleSignup();
-                    return true;
-
-                    // Check
-                case 'C':
-                    return false;
-
-                    // Feedback
-                case 'F':
-                    return false;
-
-                    // Chat
-                case 'P':
-                    return false;
-
-                    // Logoff
-                case 'G':
-                    std::cout << "Goodbye;" << std::endl;
-                    m_session_data->logoff();
-                    return true;
-                    
-                default:
-                    return false;
-            }
+            menuOptionsMatrixCommands(option);
+            break;            
+            
+            // ! = Global Newscan Commands
+        case '!':
+            menuOptionsGlobalNewScanCommands(option);
+            break;
+            
+            // [ = Main Menu Commands
+        case '[':
+            menuOptionsMainMenuCommands(option);
             break;
 
-            // Sysop Commands
+            // . = Door Commands
+        case '.':
+            break;
+
+            // * = Sysop Commands
         case '*':
             switch(option.command_key[1])
             {
@@ -177,6 +295,59 @@ bool MenuSystem::menuOptionsCallback(const MenuOption &option)
                     return false;
             }
             break;
+            
+            // ^ = New User Voting Commands
+        case '^':
+            break;
+        
+            // C = Conference Editor    
+        case 'C':
+            break;
+            
+            // D = Data Area Menu
+        case 'D':
+            break;
+        
+            //  E = Email Commands
+        case 'E':
+            break;
+            
+            // F = File Commands
+        case 'F':
+            break;
+            
+            // J = Join Conference
+        case 'J':
+            break;
+            
+            // M = Message Commands
+        case 'M':
+            break;
+            
+            // Q = QWKMail Menu
+        case 'Q':
+            break;
+            
+            // R = Top Ten Listing
+        case 'R':
+            break;
+        
+            // S = Message Base Sponsor
+        case 'S':
+            break;
+            
+            // T = File Sponsor Commands
+        case 'T':
+            break;
+            
+            //  V = Voting Commands
+        case 'V':
+            break;
+            
+            // + = Color Setting Commands
+        case '+':
+            break;
+        
     }
     
     return false;

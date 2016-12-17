@@ -64,6 +64,36 @@ public:
 
     
     /**
+     * @brief Control Commands
+     * @param option
+     */
+    bool menuOptionsControlCommands(const MenuOption &option);
+
+    /**
+     * @brief MultiNode Commands
+     * @param option
+     */
+    bool menuOptionsMultiNodeCommands(const MenuOption &option);
+
+    /**
+     * @brief Matrix Commands
+     * @param option
+     */
+    bool menuOptionsMatrixCommands(const MenuOption &option);
+
+    /**
+     * @brief Global New Scan Commands
+     * @param option
+     */
+    bool menuOptionsGlobalNewScanCommands(const MenuOption &option);
+
+    /**
+     * @brief Main Menu Commands
+     * @param option
+     */
+    bool menuOptionsMainMenuCommands(const MenuOption &option);
+
+    /**
      * @brief Process Command Keys passed from menu selection (Callback)
      * @param option
      */
