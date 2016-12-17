@@ -172,7 +172,7 @@ public:
     // The Second handles all I/O for the menu options, this is dynamic since
     // Input is passed through to it, then the function returns for the next input
     // Since ere async, nothing stays inside it always returns.
-    void startupMenu();
+    void loadAndStartupMenu();
 
     /**
      * @brief Menu Editor, Runs through all existing menus

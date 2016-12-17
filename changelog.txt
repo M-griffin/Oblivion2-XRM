@@ -1,4 +1,16 @@
 
+Change Log Update (00.00.66)
+* 2016-12-17
++ Added MCI Code parsing for Menu Prompt. Pulling the Menu Prompt
+  Field for Menu Name, Added Time Left, and Time Now 
+  Which are not implemented since were not keeping track of time
+  limits yet.  
++ Also update previous field input length limits to match legacy
+  |FL
+* 2016-12-16
++ Some Menu System/Base Code Refactoring, Variable Name Cleanup
+  Working to keep better design and naming principals
+
 Change Log Update (00.00.65)
 * 2016-12-14
 + Fixes for MID Ansi Template Processing, Now uses internal

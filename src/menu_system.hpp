@@ -21,6 +21,9 @@ typedef boost::shared_ptr<Config> config_ptr;
 class ConfigDao;
 typedef boost::shared_ptr<ConfigDao> config_dao_ptr;
 
+class ModBase;
+typedef boost::shared_ptr<ModBase> module_ptr;
+
 /**
  * @class MenuSystem
  * @author Michael Griffin
@@ -66,6 +69,11 @@ public:
      */
     bool menuOptionsCallback(const MenuOption &option);
 
+    /**
+     * @brief Resets the Menu Input Method in the Function Array
+     * @param index
+     */
+    void resetMenuInputIndex(int index);
 
     // Move this to it's own module eventually!
     void startupMenuEditor();
@@ -73,6 +81,21 @@ public:
 
     // Each system will have it's own module that is allocated and pushed to the
     // m_module container to easily push and pop from the stack.
+
+    /**
+     * @brief Clears All Modules
+     */
+    void clearAllModules();
+    
+    /**
+     * @brief Exists and Shutsdown the current module
+     */
+    void shutdownModule();
+    
+    /**
+     * @brief Exists and Shutsdown the current module
+     */
+    void startupModule(module_ptr module);
 
     /**
      * @brief Starts up Logon Module
@@ -88,6 +111,13 @@ public:
      * @brief Starts up Signup Module
      */
     void startupModuleSignup();
+
+    /**
+     * @brief Handles Input for Login and PreLogin Sequences.
+     * @param character_buffer
+     * @param is_utf8
+     */
+    void handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8);
 
     /**
      * @brief Handles parsing input for PreLogon current module.
