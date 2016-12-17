@@ -489,7 +489,7 @@ std::string MenuBase::loadMenuPrompt()
     {
         
         //fmt.Print("\033[?25l")
-        // fmt.Print("\033[?25h")
+        //fmt.Print("\033[?25h")
     
         // Default Display Cursor prompt starting point, make this configurable lateron
         prompt = "\x1b[?25h\x1b[22;1H";
@@ -500,6 +500,23 @@ std::string MenuBase::loadMenuPrompt()
                     m_menu_session_data->m_user_record->iPromptSelected].Data[1]) + "\r\n";
         prompt += boost::lexical_cast<std::string>(m_loaded_menu_prompts[
                     m_menu_session_data->m_user_record->iPromptSelected].Data[2]);
+        
+        // Parse Prompt for Menu Title here, let pip2ansi parse standard codes.
+        
+        // Clear All Mappings
+        m_session_io.clearAllMCIMapping();
+                
+        m_session_io.addMCIMapping("|MN", m_menu_info->menu_prompt);
+        m_session_io.addMCIMapping("|TL", "1440");              // Time Left {Not Implimented Yet}
+        m_session_io.addMCIMapping("|TM", "Current Date/Time"); // Time Now  {Not Implimented Yet}
+        m_session_io.addMCIMapping("|NN", std::to_string(m_menu_session_data->m_node_number));
+        
+        // Legacy Note: 
+        // SysOps may place %%filename.ext anywhere in the menu prompt
+        // to display filename.ext from the prompts directory. Use the
+        // %MN code to display the Menu's Name in Prompt (in filename.ext).
+        // Set the Prompts directory in the CONFIG.
+        m_session_io.addMCIMapping("%MN", m_menu_info->menu_prompt);
         
         std::string output = m_session_io.pipe2ansi(prompt);
         std::cout << "prompt: " << output << std::endl;
@@ -524,9 +541,8 @@ std::string MenuBase::loadMenuPrompt()
 
 /**
  * @brief Startup And load the Menu File
- *        Default Menu Startup sets Input to MenuInput processing.
  */
-void MenuBase::startupMenu()
+void MenuBase::loadAndStartupMenu()
 {
     // Check Configuration here,  if use SpecialLogin (Matrix Menu)
     // Then load it, otherwise jump to Entering UserID / P
