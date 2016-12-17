@@ -107,8 +107,8 @@ void SessionIO::createInputField(std::string &field_name, int &len)
     }
 
 
-    // Overide Input Length for Ansi
-    position = field_name.find("%IN", 0);
+    // Overide Field Input Length for Input Field.
+    position = field_name.find("|FL", 0);
     if(position != std::string::npos)
     {
         // Make sure we don't go past the bounds
@@ -130,7 +130,7 @@ void SessionIO::createInputField(std::string &field_name, int &len)
                 }
                 else
                 {
-                    std::cout << "createInputField() Incorrect %IN field length.  Length cannot be larger than "
+                    std::cout << "createInputField() Incorrect |FL field length.  Length cannot be larger than "
                               << "max size of the field, which is: "
                               << len
                               << std::endl;
@@ -142,7 +142,8 @@ void SessionIO::createInputField(std::string &field_name, int &len)
     }
 
     // Overide Foreground/Background Input Field Colors
-    position = field_name.find("%FB",0);
+    // This is now for OBV/2 .. Not in Legacy.
+    position = field_name.find("|FB",0);
 
     std::cout << "position: " <<  position << std::endl;
     std::cout << "compare : " << position+4 << " " <<  stringSize << std::endl;

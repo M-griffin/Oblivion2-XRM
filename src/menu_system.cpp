@@ -67,9 +67,7 @@ bool MenuSystem::onEnter()
 
     // Startup the Prelogon sequence
     startupModulePreLogon();
-
     m_is_active = true;
-
     return true;
 }
 
