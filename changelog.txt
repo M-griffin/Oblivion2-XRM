@@ -1,4 +1,9 @@
 
+Change Log Update (00.00.69)
+* 2016-12-18
++ Resynced Linux Workspace
++ Corrected and Updated Unit Tests for Field Input
+
 Change Log Update (00.00.68)
 * 2016-12-18
 + Completed Function Mapping for All Menu Command Functions.
