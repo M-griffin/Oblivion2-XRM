@@ -28,11 +28,11 @@ SUITE(XRMSessionIO)
      */
 
 
-     /**
-     * @brief Input Key Tests, Receives Characters 1 at a time, stores and processes.
-     *        Only passing through or building esc sequences.
-     * @return
-     */
+    /**
+    * @brief Input Key Tests, Receives Characters 1 at a time, stores and processes.
+    *        Only passing through or building esc sequences.
+    * @return
+    */
     TEST(InputKey_Empty)
     {
         // Normal Characters and sequences should pass through
@@ -363,7 +363,7 @@ SUITE(XRMSessionIO)
         CHECK((character_buffer.compare("Testing |00|19          \x1b[11D") == 0));
     }
 
-    TEST(createInputField_10_Length_Retuns_Default_Becasue_IN17_Larger_Than_length20)
+    TEST(createInputField_10_Length_Retuns_Default_Becasue_FL17_Larger_Than_length10)
     {
         // Mock SessionData Class
         connection_ptr          connection;
@@ -374,13 +374,13 @@ SUITE(XRMSessionIO)
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
-        std::string character_buffer = "Testing %IN17";
+        std::string character_buffer = "Testing |FL17";
         int length = 10;
         sess.createInputField(character_buffer, length);
         CHECK((character_buffer.compare("Testing |00|19          \x1b[11D") == 0));
     }
 
-    TEST(createInputField_10_Length_Retuns_Default_Becasue_IN10_Larger_Than_length20)
+    TEST(createInputField_10_Length_Retuns_Default_Becasue_FL10_Smaller_Than_length20)
     {
         // Mock SessionData Class
         connection_ptr          connection;
@@ -391,15 +391,15 @@ SUITE(XRMSessionIO)
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
-        std::string character_buffer = "Testing %IN10";
-        int length = 10;
+        std::string character_buffer = "Testing |FL10";
+        int length = 20;
         sess.createInputField(character_buffer, length);
         CHECK((character_buffer.compare("Testing |00|19          \x1b[11D") == 0));
     }
 
-    TEST(createInputField_10_Length_Retuns_Default_Becasue_IN10_Larger_Than_length20_Failure)
+    TEST(createInputField_10_Length_Retuns_Default_Becasue_FL10_Larger_Than_length9_Failure)
     {
-       // Mock SessionData Class
+        // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
         boost::asio::io_service io_service;
@@ -408,10 +408,15 @@ SUITE(XRMSessionIO)
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
-        std::string character_buffer = "Testing %IN10";
-        int length = 11;
+        std::string character_buffer = "Testing |FL10";
+        int length = 9;
         sess.createInputField(character_buffer, length);
-        CHECK((!character_buffer.compare("Testing |00|19          \x1b[12D") == 0));
+
+        // Doesn't Equal 10, casue it's over the max!
+        CHECK((character_buffer.compare("Testing |00|19          \x1b[12D") != 0));
+
+        // Equals 9 the max
+        CHECK((character_buffer.compare("Testing |00|19         \x1b[10D") == 0));
     }
 
     TEST(createInputField_20_Length_Retuns_Field_Name_Override_Input_Length)
@@ -425,7 +430,7 @@ SUITE(XRMSessionIO)
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
-        std::string character_buffer = "Testing %IN17";
+        std::string character_buffer = "Testing |FL17";
         int length = 20;
         sess.createInputField(character_buffer, length);
         CHECK((character_buffer.compare("Testing |00|19                 \x1b[18D") == 0));
@@ -442,7 +447,7 @@ SUITE(XRMSessionIO)
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
-        std::string character_buffer = "Testing %IN17%FB0116";
+        std::string character_buffer = "Testing |FL17|FB0116";
         int length = 20;
         sess.createInputField(character_buffer, length);
         CHECK((character_buffer.compare("Testing |01|16                 \x1b[18D") == 0));
@@ -459,7 +464,7 @@ SUITE(XRMSessionIO)
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
         SessionIO sess(session_data);
 
-        std::string character_buffer = "Testing: %FB0116";
+        std::string character_buffer = "Testing: |FB0116";
         int length = 10;
         sess.createInputField(character_buffer, length);
         CHECK((character_buffer.compare("Testing: |01|16          \x1b[11D") == 0));
@@ -888,10 +893,10 @@ SUITE(XRMSessionIO)
 
         // Test all groups are picked up when combinded
         std::string sequence = "e|013e|02AA||03FEers|XY0101e3%||XY101000weXa..W" \
-            "||A1%|B22XY1010weR-|AI3XY1010342|CC223eq0..W||AE%|Be22XY1010weR-|A" \
-            "I|3XY1010342|CCe2%%C|ERE23eq0..W||1AE%|Be22%%obv.ascecXY1010%%%obv" \
-            ".txt%w%%obv.tx~..W||1AE%1|Be22%%o$%TAbXY1010%%RF%obw%%obv.tx~..W||" \
-            "1AE%1|Be22%%o1$%18bXY1010%%991%obw%%obv.tx~";
+                               "||A1%|B22XY1010weR-|AI3XY1010342|CC223eq0..W||AE%|Be22XY1010weR-|A" \
+                               "I|3XY1010342|CCe2%%C|ERE23eq0..W||1AE%|Be22%%obv.ascecXY1010%%%obv" \
+                               ".txt%w%%obv.tx~..W||1AE%1|Be22%%o$%TAbXY1010%%RF%obw%%obv.tx~..W||" \
+                               "1AE%1|Be22%%o1$%18bXY1010%%991%obw%%obv.tx~";
 
         std::vector<MapType> code_map = std::move(sess.pipe2codeMap(sequence, sess.STD_EXPRESSION));
         CHECK_EQUAL(code_map.size(), 19);
@@ -953,7 +958,7 @@ SUITE(XRMSessionIO)
         bool result = sess.checkRegex(sequence, expression);
         CHECK_EQUAL(result, true);
     }
-    
+
     TEST(checkRegex_config_regexp_generic_validation_no_leading_spaces)
     {
         config_ptr config(new Config());
@@ -967,7 +972,7 @@ SUITE(XRMSessionIO)
         bool result = sess.checkRegex(sequence, expression);
         CHECK_EQUAL(result, false);
     }
-    
+
     TEST(checkRegex_config_regexp_generic_validation_space_seperator)
     {
         config_ptr config(new Config());
@@ -981,9 +986,9 @@ SUITE(XRMSessionIO)
         bool result = sess.checkRegex(sequence, expression);
         CHECK_EQUAL(result, true);
     }
-    
+
     TEST(checkRegex_config_regexp_generic_validation_no_leading_space2)
-    {        
+    {
         config_ptr config(new Config());
         session_data_ptr session_data;
         SessionIO sess(session_data);
@@ -995,12 +1000,12 @@ SUITE(XRMSessionIO)
         bool result = sess.checkRegex(sequence, expression);
         CHECK_EQUAL(result, false);
     }
-    
+
     // \X Match any Unicode combining character sequence, for example "a\x 0301" (a letter a with an acute).
     // Boost is not setup properly for ICU and regex (WINDOWS),  fixme!
     /*
     TEST(checkRegex_config_regexp_generic_validation_test_unicode)
-    {        
+    {
         config_ptr config(new Config());
         session_data_ptr session_data;
         SessionIO sess(session_data);
@@ -1012,5 +1017,5 @@ SUITE(XRMSessionIO)
         bool result = sess.checkRegex(sequence, expression);
         CHECK_EQUAL(result, true);
     }*/
-    
+
 }
