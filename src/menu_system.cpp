@@ -121,6 +121,11 @@ bool MenuSystem::onExit()
  */
 bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
 {
+    
+    // Some of these options set actual flags for behavior.
+    // In this case, we will need to parse for specific Control commands
+    // and set Menu System Flags!
+    
     switch(option.command_key[1])
     {
             // Turns on Pulldown Menu Re-entrance
@@ -128,12 +133,147 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             // when the user re-enters the pulldown menu.
             // This works ONLY if the command that the user
             // executed does not go to another menu.
-        case '\'':
-            return false;
-            // Turns off Pulldown Menu Re-Entrance
             
+            // And some might be stacked .. 
+            // Reference Legacy and figure out behavior.
+            
+        case '\'':
+            return false;            
+            // Turns off Pulldown Menu Re-Entrance
         case '`':
             return false;
+            
+            // Writes CString into the Header
+        case 'A':
+            return false;
+            // Sets the Bad Prompt to CString
+            // When invalid command is executed.
+        case 'B':
+            return false;
+            // Clears Fail Flag
+        case 'C':
+            return false;
+            // Cstring to modem (not used)
+        case 'D':
+            return false;
+            // Write characters with ^ char support (display string)
+        case 'E':
+            return false;
+            // Display ANSI File
+        case 'F':
+            return false;
+            // Goto Speicific X/Y Position on screen
+        case 'G':
+            return false;
+            // Gets String with hidden input
+        case 'H':
+            return false;
+            // Gets String with normal input
+        case 'I':
+            return false;
+            // Check Input H or I matches C String, sets fail flag.
+        case 'M':
+            return false;
+            // Display Stat Screen From Library
+        case 'N':
+            return false;
+            // Sets fail flag if sysop not available, otherwise true
+        case 'J': 
+            return false;
+            // Change Starting Menu, fallback using -^ change to old starting menu
+        case 'K':
+            return false;
+            // Clears Screen
+        case 'L':
+            return false;
+            // Display files from current stat screen library
+        case 'O':
+            return false;
+            // Pauses X number of seconds
+        case 'P':
+            return false;
+            // Sets current menu prompt to # in cstring
+        case 'Q':
+            return false;
+            // Prints a CR [RETURN]
+        case 'R':
+            return false;
+            // Changes user flags ACS <+,-> <Flag Letter>
+        case 'S':
+            return false;
+            // Sets Status Library to # in cstring
+        case 'T':
+            return false;
+            // Sets Menu Libraray to # in cstring
+        case 'V':
+            return false;
+            //Function   : Sets the Starting Menu to cstring and sets the
+            //           : fallback of all the : menus called with the -^
+            //           : command to the menu name in the cstring.
+        case 'U':
+            return false;
+            // Write cstring to log
+        case 'W':
+            return false;
+            // Return fail flag if file specified doesn't exist.
+        case 'X':
+            return false;
+            // Changes users flags for second set of ASC flags.
+        case 'Y':
+            return false;
+            // Pauses other commands untill output buffer is completed
+            // Might need to research this one more.
+        case 'Z':
+            return false;
+            // Display Random Welcome.x ANSI screen
+        case '+':
+            return false;
+            // Check mandatory infoforms, if not filled out will force user to complete
+        case '|':
+            return false;
+            // Read system notices
+        case '@':
+            return false;
+            // pages system if available flag.
+        case '_':
+            return false;
+            
+            // TODO main menu switching commands first.
+            
+            // goto menu sets fallback current
+        case '/':
+            return false;
+            // goes to fallback menu, sets fallback to previous fallback
+        case '\\':
+            return false;
+            // Goes to menu, sets fallback as starting menu            
+        case '^':
+            return false;
+            
+            // END
+            
+            // Sets input variable with -I or -J to cstring
+        case '*':
+            return false;
+            // Sets user level to one specified
+        case '=':
+            return false;
+            // Door (external) Error level (input) return into input variable
+            // Like external mod doing password or 
+        case '&':
+            return false;
+            // Hit Enter Prompt
+        case '(':
+            return false;
+            // Changes to infoform set in cstring
+        case ')':
+            return false;
+            
+            
+            // left off on {
+        
+        
+            
             
         default:
             return false;
@@ -243,6 +383,63 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
     {   
+        // autosig
+        case 'A':
+            return false;
+        // page sysop
+        case 'C':
+            return false;
+        // infoform
+        case 'D':
+            return false;
+        // Fill out info form to file
+        case 'F':
+            return false;
+        // Logsoff
+        case 'G':
+            std::cout << "Goodbye;" << std::endl;
+            // Add Logoff ANSI Display here.
+            m_session_data->logoff();
+            break;
+        // logoff without ansi
+        case 'H':
+            std::cout << "Goodbye;" << std::endl;
+            m_session_data->logoff();
+            break;
+        // Fill out info form
+        case 'I':
+            return false;
+        // User Configuration
+        case 'K':
+            return false;
+        // Lists Users
+        case 'L':
+            return false;
+        // System Stats
+        case 'S':
+            return false;
+        // Time Bank
+        case 'U':
+            return false;
+        // View Daily Log
+        case 'V':
+            return false;
+        // Last Callers
+        case 'W':
+            return false;
+        // Transfer to user
+        case 'X':
+            return false;
+        // user stats
+        case 'Y':
+            return false;
+        // change password
+        case '+':
+            return false;
+        // force use to change password
+        case '-':
+            return false;
+            
         default:
             return false;
     }
