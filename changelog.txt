@@ -1,4 +1,17 @@
 
+Change Log Update (00.00.68)
+* 2016-12-18
++ Completed Function Mapping for All Menu Command Functions.
+  Used std::map to easily use a lookup by the first command key value.
+  allot cleaner then a switch statement.
+
+Change Log Update (00.00.67)
+* 2016-12-17
++ Started Menu Commands Controls for Functions we need to build out
+  Still a work in progress, might go with dynamic function array
+  instead of long switch statements.  But that's just fancy
+  and doesn't really do much.
+
 Change Log Update (00.00.66)
 * 2016-12-17
 + Added MCI Code parsing for Menu Prompt. Pulling the Menu Prompt
