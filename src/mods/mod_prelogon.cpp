@@ -44,6 +44,8 @@ bool ModPreLogon::onEnter()
     m_is_active = true;
 
     // Grab ANSI Screen, display, if desired.. logon.ans maybe?
+    std::string prompt = "\x1b[?25h"; // Turn on Cursor.
+    baseProcessAndDeliver(prompt);
 
     // Execute the initial setup index.
     m_setup_functions[m_mod_function_index]();
@@ -57,7 +59,7 @@ bool ModPreLogon::onEnter()
  */
 bool ModPreLogon::onExit()
 {
-    std::cout << "OnExit() ModLogin\n";
+    std::cout << "OnExit() ModPreLogon\n";
     m_is_active = false;
     return true;
 }
@@ -402,7 +404,8 @@ bool ModPreLogon::askANSIColor(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty") {
+        if (result != "empty") 
+        {
             baseProcessAndDeliver(result);
         }
     }
@@ -515,10 +518,10 @@ bool ModPreLogon::askCodePage(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty") {
+        if (result != "empty") 
+        {
             baseProcessAndDeliver(result);
         }
     }
-
     return true;
 }

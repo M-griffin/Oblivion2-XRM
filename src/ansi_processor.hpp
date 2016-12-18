@@ -121,6 +121,9 @@ public:
     
     // Process Build strings from pull_down array.
     std::string buildPullDownBars(int pulldown_id, bool active); // 4
+    
+    // Clear Pull Down Bars once menu options are reset.
+    void clearPullDownBars();
 
     // Parses the Screen Buffer and Builds pulldown options
     std::string screenBufferParse();          // 3
@@ -130,6 +133,11 @@ public:
 
     // For testing display the output of the buffer.
     void screenBufferDisplayTest();
+    
+    /**
+     * @brief Takes buffer and displays parsed sequences
+     */
+    std::string getScreenFromBuffer(bool clearScreen);
 
 
     // Screen Buffer Modifiers
@@ -137,6 +145,11 @@ public:
     void screenBufferScrollUp();
     void screenBufferClearRange(int start, int end);
     void screenBufferClear();
+    
+    /**
+     * @brief Clears The Screen And Buffer
+     */
+    void clearScreen();
 
     // Process ANSI screen inserts into the Screen Buffer
     void parseAnsiScreen(char *buff);  // 1

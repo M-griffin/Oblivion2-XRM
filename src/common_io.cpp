@@ -32,6 +32,7 @@
 #include <cctype>
 #include <locale>
 #include <sstream>
+#include <fstream>
 #include <map>
 
 
@@ -1330,6 +1331,26 @@ void CommonIO::parseLocalMCI(std::string &AnsiString, const std::string &mcicode
 
 
 /**
+ * @brief Check if the file exists
+ * @return
+ */
+bool CommonIO::fileExists(std::string FileName)
+{
+    std::string path = GLOBAL_TEXTFILE_PATH;
+    pathAppend(path);
+    path += FileName;
+
+    std::ifstream ifs(path);
+    if (!ifs.is_open())
+    {
+        return false;
+    }
+    ifs.close();
+    return true;
+}
+
+
+/**
  * Reads in Ansi file into Buffer Only
  */
 void CommonIO::readinAnsi(std::string FileName, std::string &buff)
@@ -1365,4 +1386,44 @@ void CommonIO::readinAnsi(std::string FileName, std::string &buff)
     while(c != EOF);
 
     fclose(fp);
+}
+
+/**
+ * Reads in Ansi file into Buffer Only
+ */
+std::string CommonIO::readinAnsi(std::string FileName)
+{
+    std::string path = GLOBAL_TEXTFILE_PATH;
+    pathAppend(path);
+    path += FileName;
+    
+    std::cout << "readinAnsi: " << path << std::endl;
+    std::string buff;
+
+    FILE *fp;
+
+    int c = 0;
+    if((fp = fopen(path.c_str(), "r+")) ==  NULL)
+    {
+        return "";
+    }
+    do
+    {
+        c = getc(fp);
+        if(c != EOF)
+        {
+            if (c == '\n')
+            {
+                buff += "\r\n";                
+            }
+            else
+            {
+                buff += c;                
+            }
+        }
+    }
+    while(c != EOF);
+
+    fclose(fp);
+    return buff;
 }

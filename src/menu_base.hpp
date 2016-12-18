@@ -84,12 +84,25 @@ public:
     // Dynamic Async Input Function Vector.
     std::vector<std::function< void(const std::string &, const bool &is_utf8)> > m_menu_functions;
 
+    // Handles Dynamic Menu Command Option Execution
+    std::vector<std::function< bool(const MenuOption &)> > m_execute_callback;
+    
     // Handle Dynamic modules being executed.
     std::vector<module_ptr> m_module;
-    
-    // Handles Dynamic Menu Command Option Execution
-    std::vector<std::function< void(const MenuOption &)> > m_execute_callback;
+        
 
+    /**
+     * @brief Method for Adding outgoing text data to ansi processor
+     *        Then delivering the data to the client
+     * @param data
+     */
+    void baseProcessAndDeliver(std::string data)
+    {
+        m_ansi_process->parseAnsiScreen((char *)data.c_str());
+        m_menu_session_data->deliver(data);
+    }
+    
+    
    /**
     * @brief Clears out Loaded Pulldown options { Called From readInMenuData() }
     */
@@ -117,6 +130,19 @@ public:
     std::string loadMenuScreen();
 
     /**
+     * @brief Processes a MID Template Screen for Menus
+     * @param screen
+     * @return 
+     */
+    std::string processMidGenericTemplate(const std::string &screen);
+
+    /**
+     * @brief Generic SRT, MID, END screen processing
+     * @return 
+     */
+    std::string processGenericScreens();
+
+    /**
      * @brief Load the Menu into the system container.
      */
     void loadInMenu(std::string menu_name);
@@ -131,12 +157,22 @@ public:
      */
     void redisplayMenuScreen();
 
+    /**
+     * @brief Execute First and Each Commands on Startup
+     */
+    void executeFirstAndEachCommands();
+    
+    /**
+     * @brief Return Selected or Active prompt as a string.
+     * @return 
+     */
+    std::string loadMenuPrompt();
 
     // Menu System will be a (2) Function system 1st setups up and displays
     // The Second handles all I/O for the menu options, this is dynamic since
     // Input is passed through to it, then the function returns for the next input
     // Since ere async, nothing stays inside it always returns.
-    void startupMenu();
+    void loadAndStartupMenu();
 
     /**
      * @brief Menu Editor, Runs through all existing menus
@@ -152,10 +188,55 @@ public:
      * @brief Handles Menu Option Call Back
      * @param input
      */
-    void executeMenuOptions(const MenuOption &option);
+    bool executeMenuOptions(const MenuOption &option);
 
-    void processMenuOptions(std::string &input);
+    /**
+     * @brief Handle Standard Menu Input with Wildcard input
+     * @param input
+     * @param key
+     * @return 
+     */
+    bool handleStandardMenuInput(const std::string &input, const std::string &key);
 
+    /**
+     * @brief Handle updating lightbar selections and redraw
+     * @param input
+     * @return 
+     */
+    bool handleLightbarSelection(const std::string &input);
+    
+    /**
+     * @brief Handle Pulldown Specific Command Processing
+     * @param input_text
+     * @param m
+     * @param is_enter
+     * @return 
+     */
+    bool handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, bool &stack_reassignment);
+    
+    /**
+     * @brief Handles Re-running EACH command re-executed after each refresh
+     */
+    void executeEachCommands();
+
+    bool processMenuOptions(const std::string &input);
+    
+    /**
+     * @brief Handle Input Specific to Pull Down Menus
+     * @param character_buffer
+     */
+    void handlePulldownInput(const std::string &character_buffer, const bool &is_utf8);
+    
+    /**
+     * @brief Handle Input Specific to Pull Down Menus
+     * @param character_buffer
+     */
+    void handleStandardInput(const std::string &character_buffer);
+    
+    /**
+     * @brief Default Menu Input Processing.
+     *        Handles Processing for Loaded Menus Hotkey and Lightbars
+     */
     void menuInput(const std::string &character_buffer, const bool &is_utf8);
     
 };

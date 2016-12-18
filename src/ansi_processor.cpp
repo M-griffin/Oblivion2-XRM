@@ -88,7 +88,9 @@ void AnsiProcessor::screenBufferDisplayTest()
     std::string character = "";
 
     if(m_is_screen_cleared)
-        m_ansi_output.append("\x1b[1;1H\x1b[2J");
+    {
+        m_ansi_output.append("\x1b[1;1H\x1b[2J");        
+    }
 
     int count = 1;
     for(auto &buff : m_screen_buffer)
@@ -101,8 +103,13 @@ void AnsiProcessor::screenBufferDisplayTest()
                     fore != buff.foreground ||
                     back != buff.background)
             {
-                ss << "\x1b[" << buff.attribute << ";" << buff.foreground << ";" << buff.background << "m";
+                ss  << "\x1b[" 
+                    << buff.attribute << ";" 
+                    << buff.foreground << ";" 
+                    << buff.background << "m";
+                    
                 m_ansi_output.append(ss.str());
+                
                 attr = buff.attribute;
                 fore = buff.foreground;
                 back = buff.background;
@@ -134,6 +141,70 @@ void AnsiProcessor::screenBufferDisplayTest()
 
 
 /**
+ * @brief Takes buffer and displays parsed sequences
+ */
+std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
+{
+    int attr = 0;
+    int fore = 0;
+    int back = 0;
+
+    std::string ansi_output = "";
+    std::string character = "";
+
+    if(clearScreen)
+    {
+        ansi_output.append("\x1b[1;1H\x1b[2J");        
+    }
+
+    int count = 1;
+    for(auto &buff : m_screen_buffer)
+    {                        
+        // If buffer parse move past current cursor positon
+        if (count >= (m_x_position + (m_y_position * m_characters_per_line)))
+        {
+            break;
+        }
+        
+        std::stringstream ss;
+
+        if(attr !=  buff.attribute ||
+                fore != buff.foreground ||
+                back != buff.background)
+        {
+            ss  << "\x1b[" 
+                << buff.attribute << ";" 
+                << buff.foreground << ";" 
+                << buff.background << "m";
+                
+            ansi_output.append(ss.str());
+            
+            attr = buff.attribute;
+            fore = buff.foreground;
+            back = buff.background;
+        }
+        ss.clear();
+        ss.ignore();
+
+        // buff.c;
+        if(buff.c == '\r')
+        { } //  character = "\x1b[40m\r\n";
+        else if(buff.c == '\0')
+            character = " ";
+        else
+            character = buff.c;
+
+        ansi_output.append(character);
+        ++count;
+    }
+    // Screen should always end with reset.
+    ansi_output.append("\x1b[0m");
+    
+    return ansi_output;
+}
+
+
+/**
  * @brief Build the string for Lightbar coors and colors.
  * @param pulldown_id
  * @return
@@ -142,7 +213,6 @@ std::string AnsiProcessor::buildPullDownBars(int pulldown_id, bool active)
 {
     std::string output = "";
     std::stringstream ss;
-    //need hi and low colors.. shoot!!
 
     std::map<int, ScreenPixel>::iterator it;
     it = m_pull_down_options.find(pulldown_id);
@@ -182,6 +252,16 @@ std::string AnsiProcessor::buildPullDownBars(int pulldown_id, bool active)
     }
     return output;
 }
+
+
+/**
+ * @brief // Clear Pull Down Bars once menu options are reset.
+ */
+void AnsiProcessor::clearPullDownBars()
+{
+    std::map<int, ScreenPixel>().swap(m_pull_down_options);
+}
+
 
 /**
  * @brief Parses through MCI Codes for Lightbars and Char Parameters.
@@ -430,11 +510,22 @@ void AnsiProcessor::screenBufferClearRange(int start, int end)
 /**
  * @brief Clears the Buffer for Fresh Parsing.
  */
- void AnsiProcessor::screenBufferClear()
+void AnsiProcessor::screenBufferClear()
 {
     // Allocate the Size
     m_screen_buffer.clear();
     m_screen_buffer.resize(m_number_lines * m_characters_per_line);
+}
+
+/**
+ * @brief Clears The Screen And Buffer
+ */
+void AnsiProcessor::clearScreen()
+{
+    m_is_screen_cleared = true;
+    screenBufferClear();
+    m_x_position = 1;
+    m_y_position = 1;
 }
 
 /**
@@ -693,10 +784,7 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
                 case ERASE_DISPLAY:
                     if(param[0] == 2)
                     {
-                        m_is_screen_cleared = true;
-                        screenBufferClear();
-                        m_x_position = 1;
-                        m_y_position = 1;
+                        clearScreen();
                     }
                     esc_sequence.clear();
                     break;

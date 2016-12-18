@@ -1,4 +1,73 @@
 
+Change Log Update (00.00.68)
+* 2016-12-18
++ Completed Function Mapping for All Menu Command Functions.
+  Used std::map to easily use a lookup by the first command key value.
+  allot cleaner then a switch statement.
+
+Change Log Update (00.00.67)
+* 2016-12-17
++ Started Menu Commands Controls for Functions we need to build out
+  Still a work in progress, might go with dynamic function array
+  instead of long switch statements.  But that's just fancy
+  and doesn't really do much.
+
+Change Log Update (00.00.66)
+* 2016-12-17
++ Added MCI Code parsing for Menu Prompt. Pulling the Menu Prompt
+  Field for Menu Name, Added Time Left, and Time Now 
+  Which are not implemented since were not keeping track of time
+  limits yet.  
++ Also update previous field input length limits to match legacy
+  |FL
+* 2016-12-16
++ Some Menu System/Base Code Refactoring, Variable Name Cleanup
+  Working to keep better design and naming principals
+
+Change Log Update (00.00.65)
+* 2016-12-14
++ Fixes for MID Ansi Template Processing, Now uses internal
+  Ansi Processor for parsing implied ESC Sequences ESC[;20H
+  where the missing sequence is considered the current row
+  instead of default row 1.  We draw the screen internally
+  then push out the processed screen for correct drawing.
+  
+Change Log Update (00.00.64)
+* 2016-11-30
++ Menu Option Cleanup and split out to separate methods.
++ Split up Menu Input into Pull down and Standard Input
+  Pull down Accepts Hotkey's, while Standard is line mode.
++ Added new code to handle stacked commands when using 
+  ENTER to make lightbar selection
++ Split Regex Expressions into constants that can be 
+  passed in to the Code Map for different screens.
+  Makes it easier to setup different screens and their
+  custom MCI code replacements per interface.
++ Completed Generic Menu Template processing.  When the
+  Menu HelpId is empty, or no ansi exist the Generic 
+  Template is used for Top, Mid, and Bottom.  All
+  valid Menu options are then populated. Drawing the 
+  Menu ANSI Screen. This is also used for the Menu 
+  Library's and Selectable Themes across the system.
++ Added some Missing Include for Boost Lexical Cast.
++ Corrected missed parsing on Pull down Menu Hotkey's.
+- Initial Menu Prompts are pulling and are displayed. 
+  Need to add MCI parsing for data and position.
+  Also need to debug the baseProcessAndDeliver for Menu screens.
+- Also need to setup user selection for available menu prompts.
+
+Change Log Update (00.00.63)
+* 2016-11-29
++ Split Standard menu input, (InputField) with wildcards for menu commands
+  And Lightbars.  For Instance Matrix (Lightbar) vs Main (Standard)
+  Pull down menu are hot keys CTRL keys for movement and automatically
+  Hotkey interpretation while normal menu are full line input
+  with the ability to set T* then typing t, transfer and any test starting
+  with T will execute the command.
++ Corrections to Database Layout, added COLLATE NOCASE for Handle, Name, and Email Fields
+  Tested with standard and Unicode input.
+- WIP generic menu templates top, mid, bottom.
+
 Change Log Update (00.00.62)
 * 2016-11-21
 + Added some initial config flag validation to catch any possible 
@@ -13,7 +82,7 @@ Change Log Update (00.00.62)
 + Added STDIO error output for database for debugging, attached &m_database_log
   in session data.
 + Corrections on queries, added c_str() to table name variables, was missed.
-+ WIP, Successful login marks authorized, then moves to main menu.
+- WIP, Successful login marks authorized, then moves to main menu.
   Also need to add invalid attempt, kick back to matrix or logoff.
 
 Change Log Update (00.00.61)

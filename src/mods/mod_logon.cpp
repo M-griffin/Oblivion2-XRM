@@ -48,10 +48,12 @@ bool ModLogon::onEnter()
     m_is_active = true;
 
     // Grab ANSI Screen, display, if desired.. logon.ans maybe?
+    std::string prompt = "\x1b[?25h"; // Turn on Cursor.
+    baseProcessAndDeliver(prompt);
 
     // Execute the initial setup index.
     m_setup_functions[m_mod_function_index]();
-
+        
     return true;
 }
 
@@ -260,12 +262,13 @@ bool ModLogon::logon(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty") {
+        if (result != "empty") 
+        {
             baseProcessAndDeliver(result);
         }
     }
 
-    return m_is_authorized;
+    return false;
 }
 
 /**
@@ -340,7 +343,7 @@ bool ModLogon::password(const std::string &input)
         {
             // If success, set authorized true, and return.
             // or m_session_data->m_is_session_authorized = true;
-            m_is_authorized = true;
+            m_session_data->m_is_session_authorized = true;
             m_is_active = false;
         }
         else
@@ -356,13 +359,14 @@ bool ModLogon::password(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty") {
+        if (result != "empty") 
+        {
             baseProcessAndDeliver(result);
         }
     }
 
     // If successful login, we'll check the return result.
-    return m_is_authorized;
+    return false;
 }
 
 /**
