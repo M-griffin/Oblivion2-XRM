@@ -18,16 +18,38 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
 {
     std::cout << "MenuSystem" << std::endl;
 
-    // Setup std::function array with available options to pass input to.
+    // [Vector] Setup std::function array with available options to pass input to.
     m_menu_functions.push_back(std::bind(&MenuBase::menuInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::menuEditorInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::modulePreLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
 
-    // Setup Menu Option Calls for executing menu commands.
+    // [Vector] Setup Menu Option Calls for executing menu commands.
     m_execute_callback.push_back(std::bind(&MenuSystem::menuOptionsCallback, this, std::placeholders::_1));
-
+            
+    // [Mapped] Setup Menu Command Functions    
+    m_menu_command_functions['-'] = std::bind(&MenuSystem::menuOptionsControlCommands, this, std::placeholders::_1);
+    m_menu_command_functions['&'] = std::bind(&MenuSystem::menuOptionsMultiNodeCommands, this, std::placeholders::_1);
+    m_menu_command_functions['{'] = std::bind(&MenuSystem::menuOptionsMatrixCommands, this, std::placeholders::_1);
+    m_menu_command_functions['!'] = std::bind(&MenuSystem::menuOptionsGlobalNewScanCommands, this, std::placeholders::_1);
+    m_menu_command_functions['['] = std::bind(&MenuSystem::menuOptionsMainMenuCommands, this, std::placeholders::_1);
+    m_menu_command_functions['.'] = std::bind(&MenuSystem::menuOptionsDoorCommands, this, std::placeholders::_1);
+    m_menu_command_functions['*'] = std::bind(&MenuSystem::menuOptionsSysopCommands, this, std::placeholders::_1);
+    m_menu_command_functions['^'] = std::bind(&MenuSystem::menuOptionsNewUserVotingCommands, this, std::placeholders::_1);
+    m_menu_command_functions['C'] = std::bind(&MenuSystem::menuOptionsConferenceEditorCommands, this, std::placeholders::_1);
+    m_menu_command_functions['D'] = std::bind(&MenuSystem::menuOptionsDataAreaCommands, this, std::placeholders::_1);
+    m_menu_command_functions['E'] = std::bind(&MenuSystem::menuOptionsEmailCommands, this, std::placeholders::_1);
+    m_menu_command_functions['F'] = std::bind(&MenuSystem::menuOptionsFileCommands, this, std::placeholders::_1);
+    m_menu_command_functions['J'] = std::bind(&MenuSystem::menuOptionsJoinConference, this, std::placeholders::_1);
+    m_menu_command_functions['M'] = std::bind(&MenuSystem::menuOptionsMessageCommands, this, std::placeholders::_1);
+    m_menu_command_functions['Q'] = std::bind(&MenuSystem::menuOptionsQWKMailCommands, this, std::placeholders::_1);
+    m_menu_command_functions['R'] = std::bind(&MenuSystem::menuOptionsTopTenListingCommands, this, std::placeholders::_1);
+    m_menu_command_functions['S'] = std::bind(&MenuSystem::menuOptionsMessageBaseSponsorCommands, this, std::placeholders::_1);
+    m_menu_command_functions['T'] = std::bind(&MenuSystem::menuOptionsFileBaseSponsorCommands, this, std::placeholders::_1);
+    m_menu_command_functions['V'] = std::bind(&MenuSystem::menuOptionsVotingCommands, this, std::placeholders::_1);
+    m_menu_command_functions['+'] = std::bind(&MenuSystem::menuOptionsColorSettingCommands, this, std::placeholders::_1);
+    
 
     // Load the configuration file to the class
     if (!m_config_dao->loadConfig())
@@ -40,6 +62,9 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
 MenuSystem::~MenuSystem()
 {
     std::cout << "~MenuSystem" << std::endl;
+    
+    // Clear All Menu Command Functions.
+    MappedCommandFunctions().swap(m_menu_command_functions);
 }
 
 /**
@@ -226,6 +251,239 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
 }
 
 /**
+ * @brief Door Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsDoorCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Sysop Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {
+            // Menu Editor
+        case '#':
+            return false;
+
+            // Configuration Menu
+        case 'C':
+            return false;
+            
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief New User Voting Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsNewUserVotingCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Conference Editor Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsConferenceEditorCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Data Area Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsDataAreaCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Email Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsEmailCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief File Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsFileCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Message Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsMessageCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Join Conference Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsJoinConference(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief QWK Mail Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsQWKMailCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Top 10 Listing Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsTopTenListingCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Message Base Sponsor Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsMessageBaseSponsorCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief File Base Sponsor Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsFileBaseSponsorCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Voting Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsVotingCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Color Setting Commands
+ * @param option
+ */
+bool MenuSystem::menuOptionsColorSettingCommands(const MenuOption &option)
+{
+    switch(option.command_key[1])
+    {   
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+/**
  * @brief Process Command Keys passed from menu selection (Callback)
  * @param option
  */
@@ -241,115 +499,17 @@ bool MenuSystem::menuOptionsCallback(const MenuOption &option)
     {
         return false;
     }
-    
-    
-    // NOTE: to make even better, 
-    // we can do a function array!
+     
+    std::string firstCommandKeyIndex = "-&{![.*^CDEFJMQRSTV+";
+    std::string::size_type idx = 0;
 
-
-    // Run through Comamnd Keys for Method
-    switch(option.command_key[0])
+    // If valid then execute the related Menu Command Function
+    idx = firstCommandKeyIndex.find(option.command_key[0], 0);
+    if (idx != std::string::npos) 
     {
-        // "-" = Control Commands
-        case '-':
-            menuOptionsControlCommands(option);
-            break;
-
-        // & = MultiNode Commands
-        case '&':
-            menuOptionsMultiNodeCommands(option);
-            break;
-                        
-        // { = Matrix Commands
-        case '{':
-            menuOptionsMatrixCommands(option);
-            break;            
-            
-            // ! = Global Newscan Commands
-        case '!':
-            menuOptionsGlobalNewScanCommands(option);
-            break;
-            
-            // [ = Main Menu Commands
-        case '[':
-            menuOptionsMainMenuCommands(option);
-            break;
-
-            // . = Door Commands
-        case '.':
-            break;
-
-            // * = Sysop Commands
-        case '*':
-            switch(option.command_key[1])
-            {
-                    // Menu Editor
-                case '#':
-                    return false;
-
-                    // Configuration Menu
-                case 'C':
-                    return false;
-                    
-                default:
-                    return false;
-            }
-            break;
-            
-            // ^ = New User Voting Commands
-        case '^':
-            break;
-        
-            // C = Conference Editor    
-        case 'C':
-            break;
-            
-            // D = Data Area Menu
-        case 'D':
-            break;
-        
-            //  E = Email Commands
-        case 'E':
-            break;
-            
-            // F = File Commands
-        case 'F':
-            break;
-            
-            // J = Join Conference
-        case 'J':
-            break;
-            
-            // M = Message Commands
-        case 'M':
-            break;
-            
-            // Q = QWKMail Menu
-        case 'Q':
-            break;
-            
-            // R = Top Ten Listing
-        case 'R':
-            break;
-        
-            // S = Message Base Sponsor
-        case 'S':
-            break;
-            
-            // T = File Sponsor Commands
-        case 'T':
-            break;
-            
-            //  V = Voting Commands
-        case 'V':
-            break;
-            
-            // + = Color Setting Commands
-        case '+':
-            break;
-        
+        return m_menu_command_functions[option.command_key[0]](option);
     }
-    
+           
     return false;
 }
 
