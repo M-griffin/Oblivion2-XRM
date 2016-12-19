@@ -160,6 +160,13 @@ void ModSignup::setupNewUserPassword()
     // Check if New User Password is enabled
     if(m_config->use_newuser_password)
     {
+        // Kick back to Matrix if we exceed the number of attempts.
+        if (m_newuser_password_attempts >= m_config->invalid_newuser_password_attempts)
+        {
+            m_is_active = false;
+            return;
+        }
+        
         displayPrompt(PROMPT_NUP);
     }
     else
@@ -544,7 +551,8 @@ bool ModSignup::newUserPassword(const std::string &input)
         else
         {
             std::cout << "No Match" << key.size() << std::endl;
-
+            ++m_newuser_password_attempts;
+            
             displayPrompt(PROMPT_PASS_INVALID);
 
             // Invalid, Ask again, Reload Current Module
