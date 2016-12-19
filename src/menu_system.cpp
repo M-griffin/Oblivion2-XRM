@@ -137,8 +137,9 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             // And some might be stacked .. 
             // Reference Legacy and figure out behavior.
             
-        case '\'':
+        case '\'':        
             return false;            
+            
             // Turns off Pulldown Menu Re-Entrance
         case '`':
             return false;
@@ -268,12 +269,54 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             // Changes to infoform set in cstring
         case ')':
             return false;
-            
-            
-            // left off on {
-        
-        
-            
+            // Goes to the menu specified in the CString, does not exe firstcmd
+        case '{':
+            return false;
+            // Drops to Previous Menu, does not exe firstcmd
+        case '}':
+            return false;
+            // Toggles locking of output to the modem.
+        case ':':
+            return false;
+            // Toggles locking of input from the modem.
+        case ';':
+            return false;
+            // Goes to a menu keeping the current fallback menu does firstcmd
+        case '$':    
+            return false;
+            // Goes to a menu keeping the current fallback menu doesn't firstcmd
+        case '%':    
+            return false;
+            // Displays and gets input in same format as prompt
+        case '-':
+            return false;
+            // Sets Time left to value found in CString.
+        case '#':
+            return false;
+            // Displays current menu prompt using CString name in prompt
+        case '!':
+            return false;
+            // Sends the file specified in the CString.
+        case '.':
+            return false;
+            //  Displays Prompt String
+        case '<':
+            return false;
+            // Sets Chat Reason in Status Bar to Value in cstring
+        case '~':
+            return false;
+            // Sets the number of lines scrolled to 0. Stop screen pausing.
+        case '"':
+            return false;        
+            // Sets Screen Pausing (variable toggled in config)
+        case '1':
+            return false;            
+            // Suspends Screen Pausing until next textfile
+        case '2':
+            return false;            
+            // Sets starting Option in a pulldown Menu PullDown ID
+        case ',':
+            return false;            
             
         default:
             return false;
