@@ -1,4 +1,21 @@
 
+Change Log Update (00.00.71)
+* 2016-12-19
++ Started Working -/ and -\ Menu Loading commands for switching menu's.
+  Initial tests are working good.  Sysop menu didn't want to load but all
+  others appear to be working properly.  Will look into the Sysop menu!
++ Corrected some overdraw issues from the screen buffer for MID ANSI's.
+  '\0' Null characters or not plotted characters in the buffer were defaulting
+  to spaces. When the MID ansi codes are drawn out these spaces would then over
+  write the left and ride borders of the ANSI templates.  Instead i not loop
+  and check for a sequence of \0 characters, then push out ESC[C to move
+  the cursor forward instead of overwriting.  ANSI menu screens with templates
+  are now displaying properly.
++ Menu Option Ordering, YAML does not guarantee that Sequences are loaded in the 
+  same order they are present in the file.  Updated the Menu DAO (Data Access Object)
+  to now sort by the index field assigned to all menu options to keep the proper 
+  ordering.
+
 Change Log Update (00.00.70)
 * 2016-12-18
 + Started Shelling Menu Option Commands

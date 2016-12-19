@@ -43,7 +43,7 @@ public:
     ~MenuBase();
     
     session_data_ptr m_menu_session_data;
-    
+
     // This hold non-hotkey text passed through.
     // If Hotkeys are turn off, we append and loop this until we hit a CRLF. or ENTER
     //session_data_ptr m_session_data;     // Handles to the session for i/o. {in TheState Base Class!}
@@ -56,6 +56,7 @@ public:
     std::string      m_current_menu;       // Name of current menu loaded.
     std::string      m_previous_menu;      // Name of Previous Menu for Gosub
     std::string      m_fallback_menu;      // Fallback, this can set as a Global Fall Back and changed via menu command
+    std::string      m_starting_menu;      // Starting Menu, also used as Fallback.
     int              m_input_index;        // Menu Input Index, for Forwarding to current function.
 
     // Temp

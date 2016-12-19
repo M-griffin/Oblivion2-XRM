@@ -5,6 +5,8 @@
 #include "mods/mod_logon.hpp"
 #include "mods/mod_signup.hpp"
 
+#include <boost/locale.hpp>
+
 #include <string>
 #include <vector>
 #include <functional>
@@ -15,6 +17,7 @@ const std::string MenuSystem::m_menuID = "MENU_SYSTEM";
 MenuSystem::MenuSystem(session_data_ptr session_data)
     : StateBase(session_data)
     , MenuBase(session_data)
+    , m_system_fallback("")
 {
     std::cout << "MenuSystem" << std::endl;
 
@@ -243,10 +246,17 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             
             // goto menu sets fallback current
         case '/':
-            return false;
+            m_system_fallback = m_current_menu;
+            m_current_menu = boost::locale::to_lower(option.command_string);
+            loadAndStartupMenu();           
+            break;
+            
             // goes to fallback menu, sets fallback to previous fallback
         case '\\':
-            return false;
+            m_current_menu = m_system_fallback;
+            loadAndStartupMenu();      
+            break;
+            
             // Goes to menu, sets fallback as starting menu            
         case '^':
             return false;

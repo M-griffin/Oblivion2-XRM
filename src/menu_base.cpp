@@ -24,6 +24,7 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_current_menu("")
     , m_previous_menu("")
     , m_fallback_menu("")
+    , m_starting_menu("")
     , m_input_index(0)
     , m_menu_prompt()
     , m_menu_info(new Menu())
@@ -79,13 +80,12 @@ void MenuBase::clearMenuPullDownOptions()
 void MenuBase::readInMenuData()
 {
     clearMenuPullDownOptions();
-    
+
     // Get Fallback menu if menu is not available.
-    std::string fallback = "";
     std::string revert = "";
     if(m_menu_info)
     { 
-        fallback = m_menu_info->menu_fall_back;
+        m_fallback_menu = m_menu_info->menu_fall_back;
         revert = m_menu_info->menu_name;
     }
 
@@ -102,10 +102,10 @@ void MenuBase::readInMenuData()
     {
         // Fallck is if user doesn't have access.  update this lateron.
         std::cout << "Menu doesn't exist, loading fallback if exists." << std::endl;
-        if (fallback.size() > 0) 
+        if (m_fallback_menu.size() > 0) 
         {
-            std::cout << "Loading Fallback menu " << fallback << std::endl;
-            m_current_menu = fallback;
+            std::cout << "Loading Fallback menu " << m_fallback_menu << std::endl;
+            m_current_menu = m_fallback_menu;
             return readInMenuData();
         }
                 
@@ -168,7 +168,7 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
     std::string lookup = "";
     
     
-    // Look coldes and get max number of columns per code.
+    // Loop codes and get max number of columns per code.
     for(auto &map : code_map)
     {
         std::cout << "Generic Code: " << map.m_code << std::endl;
@@ -636,6 +636,8 @@ void MenuBase::loadAndStartupMenu()
     // Don't need process here, sinec we pipe2ansi seperately
     m_menu_session_data->deliver(output);
 
+
+    // TODO Add Flag here, specific menu commands change without running first/each when loaded.
     executeFirstAndEachCommands();
 }
 
@@ -935,6 +937,13 @@ bool MenuBase::processMenuOptions(const std::string &input)
     // Get Pulldown menu commands, Load all from menu options (disk)
     for(auto &m : m_menu_info->menu_options)
     {    
+        // If menu changed, then exit out.
+        if (current_menu != m_current_menu)
+        {
+            break;
+        }
+        
+        
         if(input_text[0] == '\x1b' && input_text.size() > 2) // hmm 2?
         {
             // Remove leading ESC for cleaner comparisons.
@@ -1039,6 +1048,10 @@ bool MenuBase::processMenuOptions(const std::string &input)
     if (current_menu == m_current_menu)
     {
         executeEachCommands();
+    }
+    else
+    {
+        return true;
     }
     
     // Track Executed Commands, If we didn't execute anything
