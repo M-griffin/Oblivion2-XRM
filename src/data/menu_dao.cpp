@@ -7,8 +7,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-
+#include <algorithm>
 #include <mutex>
+
 
 // Setup the file version for the config file.
 const std::string Menu::FILE_VERSION = "1.0.0";
@@ -146,6 +147,16 @@ void MenuDao::encode(const Menu &rhs)
     m_menu->menu_title          = rhs.menu_title;
     m_menu->menu_pulldown_file  = rhs.menu_pulldown_file;
     m_menu->menu_options        = rhs.menu_options;
+    
+    // Now Sort All Menu Options once they have been loaded.
+    // Unforunatally YAML does not keep ordering properly.
+    sort(
+        m_menu->menu_options.begin( ), m_menu->menu_options.end( ), 
+        [ ] (const MenuOption& lhs, const MenuOption& rhs)
+    {
+        return lhs.index < rhs.index;
+    });
+
 }
 
 /**

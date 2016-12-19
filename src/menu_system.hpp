@@ -48,10 +48,10 @@ public:
     {
         return m_menuID;
     }
-
     
     //int m_next_state;
     static const std::string m_menuID;
+    std::string              m_system_fallback;
 
     // This matches the index for menu_functions.push_back
     enum
@@ -69,7 +69,7 @@ public:
     
     // Holds map of Menu Option Commands for quick lookup and execution
     MappedCommandFunctions m_menu_command_functions;
-    
+            
     /**
      * @brief Control Commands
      * @param option
