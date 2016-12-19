@@ -1,4 +1,4 @@
-
+s
 Introduction
 ============
 
@@ -32,7 +32,7 @@ Follow Project Status `Project Tracker <https://github.com/M-griffin/Oblivion2-X
 Support
 =======
 * Use the `Issue Tracker <https://github.com/M-Griffin/Oblivion2-XRM/issues>`_
-* **Discussion on a Haunting The Chapel BBS!**  - telnet://htc.zapto.org
+* **Discussions on Haunting The Chapel BBS!**  - telnet://htc.zapto.org
 * IRC: **#oblivion2** on **chat.freenode.net**
 * Email: mrmisticismo - at - hotmail.com
 * Facebook: Oblivion/2 XRM group
