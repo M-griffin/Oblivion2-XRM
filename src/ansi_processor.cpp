@@ -148,6 +148,11 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
     int attr = 0;
     int fore = 0;
     int back = 0;
+    
+    // We want to cound \0 characters in a row.
+    // These are unplotted so we use home cursor drawing
+    // and ESC[C to push the cursor forward without overwritting 
+    int padding = 0;
 
     std::string ansi_output = "";
     std::string character = "";
@@ -177,7 +182,8 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
                 << buff.foreground << ";" 
                 << buff.background << "m";
                 
-            ansi_output.append(ss.str());
+            if (padding == 0)
+                ansi_output.append(ss.str());
             
             attr = buff.attribute;
             fore = buff.foreground;
@@ -186,13 +192,30 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
         ss.clear();
         ss.ignore();
 
-        // buff.c;
+        // Options and skip null non plotted characters by
+        // moving the drawing position forward.
+        if (padding > 0 && buff.c != '\0')
+        {
+            ansi_output += "\x1b[" + std::to_string(padding) + "C";
+            // Get the Color change or first character after padding.
+            ansi_output.append(ss.str());
+            padding = 0;
+        }
+
         if(buff.c == '\r')
         { } //  character = "\x1b[40m\r\n";
         else if(buff.c == '\0')
-            character = " ";
+        {
+            std::cout << "null!" << std::endl;
+            //character = " ";
+            ++padding;
+            ++count;
+            continue;
+        }            
         else
-            character = buff.c;
+        {
+            character = buff.c;            
+        }
 
         ansi_output.append(character);
         ++count;
@@ -200,6 +223,10 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
     // Screen should always end with reset.
     ansi_output.append("\x1b[0m");
     
+    // Testing
+    //std::cout << "MID" << std::endl;
+    //std::cout << ansi_output << std::endl;
+        
     return ansi_output;
 }
 
