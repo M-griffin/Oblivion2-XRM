@@ -93,6 +93,10 @@ public:
     std::string access_mail_attachment;    // FileMailACS,
     std::string access_top_ten;            // TopTenACS,
     std::string access_check_sysop_avail;  // AskAvailabilityACS;
+    
+// int    
+    int invalid_password_attempts;         
+    int invalid_newuser_password_attempts;
 
 // bool
     bool use_file_points;
@@ -243,7 +247,9 @@ public:
         , access_post_anonymous("s20")
         , access_mail_attachment("s20")
         , access_top_ten("s20")
-        , access_check_sysop_avail("s20")        
+        , access_check_sysop_avail("s20")
+        , invalid_password_attempts(3)
+        , invalid_newuser_password_attempts(3)
         , use_file_points(false)
         , use_postcall_ratio(false)
         , use_library_ansi(true)
@@ -380,6 +386,8 @@ namespace YAML
             node["access_mail_attachment"] = rhs.access_mail_attachment;
             node["access_top_ten"] = rhs.access_top_ten;
             node["access_check_sysop_avail"] = rhs.access_check_sysop_avail;
+            node["invalid_password_attempts"] = rhs.invalid_password_attempts;
+            node["invalid_newuser_password_attempts"] = rhs.invalid_newuser_password_attempts;
             node["use_file_points"] = rhs.use_file_points;
             node["use_postcall_ratio"] = rhs.use_postcall_ratio;
             node["use_library_ansi"] = rhs.use_library_ansi;
@@ -497,7 +505,9 @@ namespace YAML
             rhs.access_post_anonymous           = node["access_post_anonymous"].as<std::string>();
             rhs.access_mail_attachment          = node["access_mail_attachment"].as<std::string>();
             rhs.access_top_ten                  = node["access_top_ten"].as<std::string>();
-            rhs.access_check_sysop_avail        = node["access_check_sysop_avail"].as<std::string>();
+            rhs.access_check_sysop_avail        = node["access_check_sysop_avail"].as<std::string>();            
+            rhs.invalid_password_attempts       = node["invalid_password_attempts"].as<int>();
+            rhs.invalid_newuser_password_attempts = node["invalid_newuser_password_attempts"].as<int>();
             rhs.use_file_points                 = node["use_file_points"].as<bool>();
             rhs.use_postcall_ratio              = node["use_postcall_ratio"].as<bool>();
             rhs.use_library_ansi                = node["use_library_ansi"].as<bool>();

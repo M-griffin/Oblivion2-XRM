@@ -47,6 +47,7 @@ public:
         , m_security_record(new Security())
         , m_mod_function_index(MOD_NUP)
         , m_is_text_prompt_exist(false)
+        , m_newuser_password_attempts(0)
     {
         std::cout << "ModSignup" << std::endl;
 
@@ -491,6 +492,7 @@ private:
 
     int                  m_mod_function_index;
     bool                 m_is_text_prompt_exist;
+    int                  m_newuser_password_attempts;
 
 };
 

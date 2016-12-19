@@ -1,7 +1,16 @@
 
+Change Log Update (00.00.70)
+* 2016-12-18
++ Started Shelling Menu Option Commands
+  Started On Control Commands which handles allot of the core menu
+  features like switching menu's, setting fallbacks, and displaying strings.
++ Incremented Config File Version to 1.0.1, added new fields
+  for invalid_password_attempts, and invalid_newuser_password_attempts
+  to avoid endless loops and when to kick out on invalid attempts.
+
 Change Log Update (00.00.69)
 * 2016-12-18
-+ Resynced Linux Workspace
++ Re-synced Linux Workspace
 + Corrected and Updated Unit Tests for Field Input
 
 Change Log Update (00.00.68)
