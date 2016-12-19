@@ -12,7 +12,7 @@
 
 
 // Setup the file version for the config file.
-const std::string Config::FILE_VERSION = "1.0.0";
+const std::string Config::FILE_VERSION = "1.0.1";
 
 
 ConfigDao::ConfigDao(config_ptr config, std::string path)
@@ -98,6 +98,8 @@ bool ConfigDao::saveConfig(config_ptr cfg)
     out << YAML::Key << "access_mail_attachment" << YAML::Value << cfg->access_mail_attachment;
     out << YAML::Key << "access_top_ten" << YAML::Value << cfg->access_top_ten;
     out << YAML::Key << "access_check_sysop_avail" << YAML::Value << cfg->access_check_sysop_avail;
+    out << YAML::Key << "invalid_password_attempts" << YAML::Value << cfg->invalid_password_attempts;
+    out << YAML::Key << "invalid_newuser_password_attempts" << YAML::Value << cfg->invalid_newuser_password_attempts;
     out << YAML::Key << "use_file_points" << YAML::Value << cfg->use_file_points;
     out << YAML::Key << "use_postcall_ratio" << YAML::Value << cfg->use_postcall_ratio;
     out << YAML::Key << "use_library_ansi" << YAML::Value << cfg->use_library_ansi;
@@ -231,7 +233,9 @@ void ConfigDao::encode(const Config &rhs)
     m_config->access_hidden_files = rhs.access_hidden_files;
     m_config->access_mail_attachment = rhs.access_mail_attachment;
     m_config->access_top_ten = rhs.access_top_ten;
-    m_config->access_check_sysop_avail = rhs.access_check_sysop_avail;
+    m_config->access_check_sysop_avail = rhs.access_check_sysop_avail;    
+    m_config->invalid_password_attempts = rhs.invalid_password_attempts;
+    m_config->invalid_newuser_password_attempts = rhs.invalid_newuser_password_attempts;
     m_config->use_file_points = rhs.use_file_points;
     m_config->use_postcall_ratio = rhs.use_postcall_ratio;
     m_config->use_library_ansi = rhs.use_library_ansi;
