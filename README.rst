@@ -12,8 +12,6 @@ A text based bulletin board system served over Telnet.
 XRM for (Extreme Remake) is my attempt to recreate and emulate one of the most popular DOS based BBS software with its one of a kind interface and configurability.
 
 
-
-
 Project details
 ===============
 
@@ -28,7 +26,17 @@ Using CodeLite http://codelite.org/ IDE for W32/64 and Linux Workspace(s).
 Built under C++ with Boost and compiles under g++ MingW32/64 5.1.0 using latest c++14.
 
 
-More items will be added on the current progress and a todo list as time permits.
+Follow Project Status `Project Tracker <https://github.com/M-griffin/Oblivion2-XRM/projects/1>`_
+
+
+Support
+=======
+* Use the `Issue Tracker <https://github.com/M-Griffin/Oblivion2-XRM/issues>`_
+* **Discussion on a Haunting The Chapel BBS!**  - telnet://htc.zapto.org
+* IRC: **#oblivion2** on **chat.freenode.net**
+* Email: mrmisticismo - at - hotmail.com
+* Facebook: Oblivion/2 XRM group
+
 
 Acknowledgments and Thanks
 ==========================
