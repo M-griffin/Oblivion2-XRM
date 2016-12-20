@@ -61,8 +61,10 @@ std::string AnsiProcessor::screenBufferToString()
     m_ansi_output.erase();
     m_ansi_output = "";
 
-    for(auto &buff : m_screen_buffer)
+    for(unsigned int i = 0; i < m_screen_buffer.size(); i++)
     {
+        auto &buff = m_screen_buffer[i];
+
         if(buff.c == '\r')
         { } //  character = "\x1b[40m\r\n";
         else if(buff.c == '\0')
@@ -93,8 +95,9 @@ void AnsiProcessor::screenBufferDisplayTest()
     }
 
     int count = 1;
-    for(auto &buff : m_screen_buffer)
+    for(unsigned int i = 0; i < m_screen_buffer.size(); i++)
     {
+        auto &buff = m_screen_buffer[i];
         std::stringstream ss;
 
         if(buff.x_position >= 1)
@@ -163,8 +166,9 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
     }
 
     int count = 1;
-    for(auto &buff : m_screen_buffer)
-    {                        
+    for(unsigned int i = 0; i < m_screen_buffer.size(); i++)
+    {
+        auto &buff = m_screen_buffer[i];            
         // If buffer parse move past current cursor positon
         if (count >= (m_x_position + (m_y_position * m_characters_per_line)))
         {
@@ -206,8 +210,6 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
         { } //  character = "\x1b[40m\r\n";
         else if(buff.c == '\0')
         {
-            std::cout << "null!" << std::endl;
-            //character = " ";
             ++padding;
             ++count;
             continue;
@@ -221,11 +223,11 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
         ++count;
     }
     // Screen should always end with reset.
-    ansi_output.append("\x1b[0m");
+    ansi_output.append("\x1b[0m\r\n");
     
     // Testing
-    //std::cout << "MID" << std::endl;
-    //std::cout << ansi_output << std::endl;
+    std::cout << "MID" << std::endl;
+    std::cout << ansi_output << std::endl;
         
     return ansi_output;
 }

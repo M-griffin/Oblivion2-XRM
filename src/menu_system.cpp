@@ -17,7 +17,6 @@ const std::string MenuSystem::m_menuID = "MENU_SYSTEM";
 MenuSystem::MenuSystem(session_data_ptr session_data)
     : StateBase(session_data)
     , MenuBase(session_data)
-    , m_system_fallback("")
 {
     std::cout << "MenuSystem" << std::endl;
 
@@ -246,20 +245,37 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             
             // goto menu sets fallback current
         case '/':
-            m_system_fallback = m_current_menu;
+            if (m_current_menu.size() > 0)
+            {
+                m_system_fallback.push_back(m_current_menu);                
+            }
             m_current_menu = boost::locale::to_lower(option.command_string);
             loadAndStartupMenu();           
             break;
             
             // goes to fallback menu, sets fallback to previous fallback
         case '\\':
-            m_current_menu = m_system_fallback;
+            if (m_system_fallback.size() > 0)
+            {
+                m_current_menu = m_system_fallback.back();
+                m_system_fallback.pop_back();
+            }
+            else
+            {
+                m_current_menu = m_menu_info->menu_fall_back;
+            }
             loadAndStartupMenu();      
             break;
             
             // Goes to menu, sets fallback as starting menu            
         case '^':
-            return false;
+            if (m_starting_menu.size() > 0)
+            {
+                m_system_fallback.push_back(m_starting_menu);
+            }            
+            m_current_menu = boost::locale::to_lower(option.command_string);
+            loadAndStartupMenu();           
+            break;
             
             // END
             
@@ -281,10 +297,20 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             return false;
             // Goes to the menu specified in the CString, does not exe firstcmd
         case '{':
-            return false;
+            if (m_starting_menu.size() > 0)
+            {
+                m_system_fallback.push_back(m_starting_menu);
+            }            
+            m_current_menu = boost::locale::to_lower(option.command_string);
+            loadAndStartupMenu();  
+            // TODO Add Flags to not run firstcmd!
+            break;
             // Drops to Previous Menu, does not exe firstcmd
         case '}':
-            return false;
+            m_current_menu = m_previous_menu;
+            loadAndStartupMenu();
+            // TODO Add Flags to not run firstcmd!
+            break;
             // Toggles locking of output to the modem.
         case ':':
             return false;

@@ -233,7 +233,7 @@ private:
         stm << static_cast<char>(TELOPT_NEW_ENVIRON);
         stm << static_cast<char>(TELQUAL_SEND);
 
-        for(auto v : vars)
+        for(auto &v : vars)
         {
             stm << static_cast<char>(NEW_ENV_VAR);
             stm << v.data();

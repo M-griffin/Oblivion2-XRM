@@ -94,8 +94,10 @@ bool MenuDao::saveMenu(menu_ptr menu)
     out << YAML::Key << "menu_pulldown_file" << YAML::Value << menu->menu_pulldown_file;
 
     // Loop and encode each menu option
-    for (auto opt : menu->menu_options) 
+    for(unsigned int i = 0; i < menu->menu_options.size(); i++)
     {
+        auto &opt = menu->menu_options[i];
+        
         out << YAML::Key << "menu_option";
         out << YAML::Value << YAML::BeginMap;
                 

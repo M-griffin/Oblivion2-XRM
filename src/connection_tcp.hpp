@@ -4,9 +4,6 @@
 #include "connection_base.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
-//#include <boost/archive/text_oarchive.hpp>
-//#include <boost/archive/text_iarchive.hpp>
-//#include <boost/tuple/tuple.hpp>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 

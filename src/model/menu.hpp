@@ -94,8 +94,7 @@ public:
 
 // YAML Overide namespace for encoding/decoding Menu Class.
 namespace YAML
-{
-    
+{    
     /**
      * @class convert
      * @author Blue
@@ -222,7 +221,8 @@ namespace YAML
 
             // Iterate through so we can get MAPS with the same key "menu_option".
             std::string key = "";
-            for (YAML::const_iterator it = node.begin(); it != node.end(); ++it) {
+            for (YAML::const_iterator it = node.begin(); it != node.end(); ++it) 
+            {
                 key.clear();                
                 key = it->first.as<std::string>();
                 
