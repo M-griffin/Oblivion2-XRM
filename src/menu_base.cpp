@@ -94,6 +94,8 @@ void MenuBase::readInMenuData()
 
     // Call MenuDao to ready in .yaml file
     MenuDao mnu(m_menu_info, m_current_menu, GLOBAL_MENU_PATH);
+    
+    // Load the Menu
     if (mnu.fileExists())
     {
         mnu.loadMenu();
@@ -165,12 +167,12 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
     // Loop the code map and determine the number of unique columns for parsing.
     int key_columns = 0;
     int des_columns = 0;
-    std::string lookup = "";
-    
+    std::string lookup = "";    
     
     // Loop codes and get max number of columns per code.
-    for(auto &map : code_map)
+    for(unsigned int i = 0; i < code_map.size(); i++)
     {
+        auto &map = code_map[i];
         std::cout << "Generic Code: " << map.m_code << std::endl;
         if (map.m_code[1] == 'K')
         {
@@ -194,16 +196,16 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
     int column = 1;
     std::string key, value;
     std::string::size_type idx;
-    for (auto &m : m_menu_info->menu_options)
-    {        
+    for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
+    {
+        auto &m = m_menu_info->menu_options[i];
         // Skip Options that are Automatic Exection, or Stacked with no name and hidden
         if(m.menu_key == "FIRSTCMD" || m.menu_key == "EACH" || 
            m.name.size() == 0 || m.hidden)
         {
             continue;
         }
-        
-        
+                
         // Build Key/Value for Menu Key
         key = "|K" + std::to_string(column);
         
@@ -217,8 +219,7 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
         {
             value = m.menu_key;
         }                
-        m_session_io.addMCIMapping(key, value);
-        
+        m_session_io.addMCIMapping(key, value);        
         
         // Build Key/Value for Menu Description
         key = "|D" + std::to_string(column);
@@ -383,9 +384,9 @@ std::string MenuBase::buildLightBars()
     std::string light_bars = "";
     bool active_lightbar = false;
         
-
-    for(auto &m : m_menu_info->menu_options)
+    for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
     {
+        auto &m = m_menu_info->menu_options[i];
         // Always start on Initial or first indexed lightbar.
         // Might need to verify if we need to check for lowest ID, and start on that!
         if(m_active_pulldownID > 0 && m_active_pulldownID == m.pulldown_id)
@@ -457,16 +458,22 @@ void MenuBase::executeFirstAndEachCommands()
     locale::global(loc);
     cout.imbue(loc);
 
+    std::cout << "m_menu_info->menu_options: " << m_menu_info->menu_options.size() << std::endl;
+
     // Now loop and scan for first cmd and each time
-    for(auto &m : m_menu_info->menu_options)
+    for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
     {
+        auto &m = m_menu_info->menu_options[i];
         // Process all First Commands or commands that should run every action.       
-        m.menu_key = boost::locale::to_upper(m.menu_key);
+        std::cout << "index: " << m.index << std::endl;
+        std::cout << "menu_key: " << m.menu_key << std::endl;
+        std::string new_key = boost::locale::to_upper(m.menu_key);
+        m.menu_key = std::move(new_key);
 
         if(m.menu_key == "FIRSTCMD" || m.menu_key == "EACH")
         {
             // Process
-            std::cout << "FOUND FIRSTCMD! EXECUTE: " << m.command_key << std::endl;
+            std::cout << "*** FOUND FIRSTCMD! EXECUTE: " << m.command_key << std::endl;
             executeMenuOptions(m);
         }
     }
@@ -486,8 +493,7 @@ std::string MenuBase::loadMenuPrompt()
         
     // Don't display prompts on Pulldown menu's.
     if (!m_is_active_pulldown_menu && m_loaded_menu_prompts.size() > 0)
-    {
-        
+    {        
         //fmt.Print("\033[?25l")
         //fmt.Print("\033[?25h")
     
@@ -578,8 +584,9 @@ void MenuBase::loadAndStartupMenu()
     {    
         // Get Pulldown menu commands, Load all from menu options (disk)
         std::vector<int> pull_down_ids;
-        for(auto &m : m_menu_info->menu_options)
+        for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
         {
+            auto &m = m_menu_info->menu_options[i];
             if(m.pulldown_id > 0 && m_menu_session_data->m_is_use_ansi)
             {
                 pull_down_ids.push_back(m.pulldown_id);
@@ -655,8 +662,9 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
     light_bars.append(m_ansi_process->buildPullDownBars(previous_pulldown_id, false));
 
     // Grab Previous
-    for(auto &m : m_loaded_pulldown_options)
+    for(unsigned int i = 0; i < m_loaded_pulldown_options.size(); i++)
     {
+        auto &m = m_loaded_pulldown_options[i];
         if(m.pulldown_id == previous_pulldown_id)
         {
             light_bars.append(m.name);
@@ -669,8 +677,9 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
     light_bars.append(m_ansi_process->buildPullDownBars(m_active_pulldownID, true));
 
     // Grab Current or new selection
-    for(auto &m : m_loaded_pulldown_options)
+    for(unsigned int i = 0; i < m_loaded_pulldown_options.size(); i++)
     {
+        auto &m = m_loaded_pulldown_options[i];
         if(m.pulldown_id == m_active_pulldownID)
         {
             light_bars.append(m.name);
@@ -877,8 +886,9 @@ void MenuBase::executeEachCommands()
 {
     // Then do not loop and execute this!
     // Get Pulldown menu commands, Load all from menu options (disk)
-    for(auto &m : m_menu_info->menu_options)
+    for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
     {
+        auto &m = m_menu_info->menu_options[i];
         // Process Each should onlu be done, before return to the menu, after completed 
         // All if any stacked menu commands.
         if(m.menu_key == "EACH")
@@ -935,14 +945,14 @@ bool MenuBase::processMenuOptions(const std::string &input)
 
     // Check for loaded menu commands.
     // Get Pulldown menu commands, Load all from menu options (disk)
-    for(auto &m : m_menu_info->menu_options)
-    {    
+    for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
+    {
+        auto &m = m_menu_info->menu_options[i];
         // If menu changed, then exit out.
         if (current_menu != m_current_menu)
         {
             break;
-        }
-        
+        }        
         
         if(input_text[0] == '\x1b' && input_text.size() > 2) // hmm 2?
         {
