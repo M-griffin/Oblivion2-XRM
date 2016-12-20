@@ -10,7 +10,6 @@
 #include "session_io.hpp"
 #include "menu_system.hpp"
 
-
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 

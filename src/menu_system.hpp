@@ -51,7 +51,7 @@ public:
     
     //int m_next_state;
     static const std::string m_menuID;
-    std::string              m_system_fallback;
+    std::vector<std::string> m_system_fallback;
 
     // This matches the index for menu_functions.push_back
     enum

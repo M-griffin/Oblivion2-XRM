@@ -1,7 +1,6 @@
 #ifndef SESSION_IO_HPP
 #define SESSION_IO_HPP
 
-
 #include "session_data.hpp"
 #include "common_io.hpp"
 
