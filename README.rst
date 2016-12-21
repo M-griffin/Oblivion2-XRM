@@ -29,6 +29,12 @@ Built under C++ with Boost and compiles under g++ MingW32/64 5.1.0 using latest 
 Follow Project Status `Project Tracker <https://github.com/M-griffin/Oblivion2-XRM/projects/1>`_
 
 
+Development Goals
+=================
+The initial goal is to implement all legacy system actions in use on the default setup/install.
+With options for extended customization added later on to keep progress going.
+
+
 Support
 =======
 * Use the `Issue Tracker <https://github.com/M-Griffin/Oblivion2-XRM/issues>`_
