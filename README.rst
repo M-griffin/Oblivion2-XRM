@@ -32,7 +32,7 @@ Follow Project Status `Project Tracker <https://github.com/M-griffin/Oblivion2-X
 Development Goals
 =================
 The initial goal is to implement all legacy system actions in use on the default setup/install.
-options for extended customization will be added later on to keep progress going.
+With options for extended customization added later on to keep progress going.
 
 
 Support
