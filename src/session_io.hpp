@@ -142,6 +142,13 @@ public:
      * @return
      */
     std::vector<MapType> pipe2genericCodeMap(const std::string &sequence);
+    
+    /**
+     * @brief Converts MCI Sequences to Code Maps for Prompt Strings
+     * @param sequence
+     * @return
+     */
+    std::vector<MapType> pipe2promptCodeMap(const std::string &sequence);
 
     /**
      * @brief Checks a String if it matches the expression passed.
@@ -190,6 +197,12 @@ public:
                               "([%]{1}[0-9]{2})"};
                               
     const std::string MID_EXPRESSION = {"([|]{1}[A-Z]{1}[0-9]{1,2})|([|]{1}[A-Z]{2})"};
+    
+    const std::string PROMPT_EXPRESSION = {"([\\^]{1}[A-Z]{1})|([\\\\/=|@*:#)(]{1}$)"};
 };
 
+
+
+
+                  
 #endif // MENU_IO_HPP

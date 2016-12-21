@@ -904,6 +904,20 @@ std::vector<MapType> SessionIO::pipe2genericCodeMap(const std::string &sequence)
 
 
 /**
+ * @brief Converts MCI Sequences to Code Maps for Prompt Strings
+ * @param sequence
+ * @return
+ */
+std::vector<MapType> SessionIO::pipe2promptCodeMap(const std::string &sequence)
+{
+    // This will handle parsing the sequence, and replacement
+    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, PROMPT_EXPRESSION));
+    
+    return code_map;
+}
+
+
+/**
  * @brief Checks a String if it matches the expression passed.
  * @param sequence
  * @param expression
