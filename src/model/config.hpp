@@ -145,14 +145,6 @@ public:
 //int
     int days_keep_logs;          // DaysToSaveLog;
     
-// string { convert char or digit to pipe codes! }
-    std::string default_color_regular;    // DefRegColor,
-    std::string default_color_stat;       // DefStatColor,
-    std::string default_color_propmpt;    // DefPromptColor,
-    std::string default_color_input;      // DefInputColor,
-    std::string default_color_inverse;    // DefInverseColor,
-    std::string default_color_box;        // DefBoxColor;
-
 // string
     std::string qwk_packet_name;         // QWKName;
 
@@ -164,6 +156,14 @@ public:
 
 // int
     int days_keep_attachments;     // DaysToKeepFM;
+    
+// string { convert char or digit to pipe codes! }
+    std::string default_color_regular;    // DefRegColor,
+    std::string default_color_stat;       // DefStatColor,
+    std::string default_color_propmpt;    // DefPromptColor,
+    std::string default_color_input;      // DefInputColor,
+    std::string default_color_inverse;    // DefInverseColor,
+    std::string default_color_box;        // DefBoxColor;
 
 // string
     std::string default_user_flags;      // DefaultFlags;
