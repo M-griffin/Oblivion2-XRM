@@ -523,7 +523,8 @@ bool ModSignup::newUserPassword(const std::string &input)
 
     // handle input for using ansi color, hot key or ENTER after..  hmm
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length);
+    bool hiddenOutput = true;
+    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length, "", hiddenOutput);
     if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
     {
         std::cout << "aborted!" << std::endl;

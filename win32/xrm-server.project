@@ -128,8 +128,6 @@
         <LibraryPath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/build"/>
         <Library Value="libboost_system-mgw51-mt-1_58"/>
         <Library Value="libboost_thread-mgw51-mt-1_58"/>
-        <Library Value="libboost_chrono-mgw51-mt-1_58"/>
-        <Library Value="libboost_serialization-mgw51-mt-1_58"/>
         <Library Value="libboost_locale-mgw51-mt-1_58"/>
         <Library Value="libboost_filesystem-mgw51-mt-1_58"/>
         <Library Value="libboost_timer-mgw51-mt-1_58"/>

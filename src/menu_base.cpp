@@ -34,6 +34,7 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_active_pulldownID(0)
     , m_fail_flag(false)
     , m_pulldown_reentrace_flag(false)
+    , m_use_first_command_execution(true)
 {
     // Load all Menu Prompts
     // Lateron we'll optimize this for the users selected!
@@ -302,6 +303,88 @@ std::string MenuBase::processGenericScreens()
 }
 
 
+
+/**
+ * @brief Builds the menu prompt as a question String
+ * @return 
+ */
+std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
+{
+    m_session_io.clearAllMCIMapping();
+       
+    // Color Sequences and NewLine
+    m_session_io.addMCIMapping("^R", m_config->default_color_regular);
+    m_session_io.addMCIMapping("^S", m_config->default_color_stat);
+    m_session_io.addMCIMapping("^P", m_config->default_color_propmpt);
+    m_session_io.addMCIMapping("^E", m_config->default_color_input);
+    m_session_io.addMCIMapping("^V", m_config->default_color_inverse);
+    m_session_io.addMCIMapping("^X", m_config->default_color_box);
+    m_session_io.addMCIMapping("^M", "\r\n");
+    
+    
+    /*
+     * Notes from the Legacy Doc's.
+     * 
+     * Side Note, looks like legacy does some extra newlines before displaying 
+     * these prompt, or clears screen,  double check and compare!! 
+     * 
+    N
+        Writes the Name (menu prompt string) in the Prompt alone
+
+          May Contain:
+
+              ^R - Regular Color      ^S - Status Color
+              ^P - Prompt Color       ^E - Input Color
+              ^V - Inverse Color      ^X - Box Color
+              ^M - Goes down a line
+
+          Using The Following To End:
+              / Yes/No Bar Prompt beginning with No
+              \ Yes/No Bar Prompt beginning with Yes
+              = Yes/No/Quit Bar Prompt Beginning with Yes
+              | Yes/No/Quit Bar Prompt Beginning with No
+              @ Yes/No/Quit Bar Prompt Beginning with Quit
+              * Inputs String
+              : Inputs String with a : in a different color
+              # Hotkey without Echo
+              ) Hotkey with Echo
+              ( Sets the string equal to the Input Question
+                varaible set with -I, -J, or -M
+
+      You can use the following characters in the keys of a menu
+      using a name in prompt ending with a # or ).
+
+      All pipe codes are also applicable in this prompt.
+
+          This command is used to make menus that ask questions,
+      create hotkeyed type menus, or get input from users.
+
+      Bx
+        Does Bar selection menu with x number of columns
+
+      R
+        Uses a one-line bar menu. When creating command stacks,
+        make sure to only put a description on the first option in
+        the stack, otherwise your whole command stack will appear
+        on this menu. Also, make sure that all options don't exceed
+        80 colums, as this is a ONE line bar menu. If your options
+        exceed the 80 column limit, use the bar menus.
+    */
+    
+    // Depending on the CodeMap return fro the (2)nd group, which are the ending characters
+    // We'll need to setup new menus on these features.
+    std::vector<MapType> code_map = m_session_io.pipe2promptCodeMap(prompt_string);    
+    
+
+    // Then feed though and return the updated string.
+    std::string output = std::move(m_session_io.parseCodeMapGenerics(prompt_string, code_map));
+    
+    // Then we feed it through again to handle colors replacements.
+        
+    return m_session_io.pipe2ansi(output);
+}
+
+
 /**
  * @brief Decides which Screen is loaded then returns as string.
  */
@@ -310,7 +393,7 @@ std::string MenuBase::loadMenuScreen()
     std::cout << "loadMenuScreen" << std::endl;
     
     // Check Pulldown FileID
-    std::string screen_data = "";
+    std::string screen_data = "";    
 
     // NOTES: check for themes here!!!
     // also  if (m_menu_session_data->m_is_use_ansi), if not ansi, then maybe no pull down, or lightbars!
@@ -450,7 +533,7 @@ void MenuBase::redisplayMenuScreen()
  * @brief Execute First and Each Commands on Startup
  */
 void MenuBase::executeFirstAndEachCommands()
-{
+{           
     using namespace boost::locale;
     using namespace std;
     generator gen;
@@ -569,6 +652,39 @@ void MenuBase::loadAndStartupMenu()
         return;
     }
     
+    
+    // Pulldown filename can have (2) customization
+    // N = single prompt string with Y/N light bar propmpts, used in goodybye, feedback, newscan menus.. 
+    // ::X
+           // Where X is a letter in the alphabet. Randomly picks a
+           // letter from A to X, and will act as if the user pressed
+           // that key.  For Random Matrixes.. or menu commands!
+           
+           
+    // First Lets imploment N with ^ color codes for local theme colors.
+    if (m_menu_info->menu_pulldown_file.size() == 1 && toupper(m_menu_info->menu_pulldown_file[0]) == 'N')
+    {
+        std::string output = std::move(parseMenuPromptString(m_menu_info->menu_prompt));
+        m_menu_session_data->deliver(output);
+        m_is_active_pulldown_menu = false;
+
+        // Not sure if this is allowed in legacy, but lets do it, then they can clear screen or add ansi!
+        if (!m_use_first_command_execution)
+        {
+            // Onlu Execute Each Command
+            executeEachCommands();
+        }
+        else
+        {
+            // Execute Both
+            executeFirstAndEachCommands();        
+        }
+        
+        return;
+    }
+    
+    
+    
      //if (MenuInfo clear the scrren etc.. feature to add! )
     //m_menu_session_data->deliver("\x1b[2J\x1b[1;1H");
 
@@ -640,12 +756,20 @@ void MenuBase::loadAndStartupMenu()
     // Loads the users selected menu prompt
     output += loadMenuPrompt();
     
-    // Don't need process here, sinec we pipe2ansi seperately
+    // Don't need process here, since we pipe2ansi seperately
     m_menu_session_data->deliver(output);
 
 
-    // TODO Add Flag here, specific menu commands change without running first/each when loaded.
-    executeFirstAndEachCommands();
+    if (!m_use_first_command_execution)
+    {
+        // Onlu Execute Each Command
+        executeEachCommands();
+    }
+    else
+    {
+        // Execute Both
+        executeFirstAndEachCommands();        
+    }
 }
 
 
@@ -730,9 +854,21 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
      * 
      * Also a possibility for CString is & in which is set to the
      * input_text gotten with -I, -J, or set with -*.
+     * 
+     * 
+     * Note 2, * can also be used as a wild card alone for stacked
+     * commands to always run after any input.. for like return to a menu
+     * on yes/ no..  yes executes then does * to return,, n just returns on *
      */
      
     std::cout << "STANDARD INPUT: " << input << " KEY: " << key << std::endl;
+    
+    using namespace boost::locale;
+    using namespace std;
+    generator gen;
+    locale loc=gen("");
+    locale::global(loc);
+    cout.imbue(loc);
     
     // Check for wildcard command input.
     std::string::size_type idx;
@@ -759,6 +895,11 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
             return true;
         }        
         return false;
+    }
+    else if (idx == 0)
+    {
+        std::cout << "Whild Card  Key * By Itself: " << key << std::endl;
+        return true;
     }
     
     std::string key_normalized = boost::locale::to_upper(key);
@@ -1061,6 +1202,7 @@ bool MenuBase::processMenuOptions(const std::string &input)
     }
     else
     {
+        // Menu Changed, exit and leave startup to next menu.
         return true;
     }
     
