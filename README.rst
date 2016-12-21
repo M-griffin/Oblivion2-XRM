@@ -35,6 +35,15 @@ The initial goal is to implement all legacy system actions in use on the default
 With options for extended customization added later on to keep progress going.
 
 
+Progress Notes
+===============
+Screen shot showing some of the latest work on the menu system.
+The default theme template and menu prompt in action while switching menus.
+The menu system is still pretty raw and a lot of logic still needs to be completed.
+
+.. image:: https://dl.dropboxusercontent.com/u/92792939/MenuSwitch.png
+   :alt: Screenshot
+
 Support
 =======
 * Use the `Issue Tracker <https://github.com/M-Griffin/Oblivion2-XRM/issues>`_
