@@ -71,6 +71,7 @@ public:
     bool             m_fail_flag;                   // If menu or Option fails, kick off the fail flag.
     bool             m_pulldown_reentrace_flag;     // If menu or Option fails, kick off the fail flag.
     bool             m_is_active_pulldown_menu;     // If menu has active lightbars to display.
+    bool             m_use_first_command_execution; // If menu executes firstcmd on entrance.
 
 
     // Holds all menu options/commands. {No longer needed, menu has options in struct now}.
@@ -124,6 +125,12 @@ public:
     void clearAllMenuPrompts();
     void readMenuAllPrompts();
     void readMenuPrompts(int menu_index);
+
+    /**
+     * @brief Builds the menu prompt as a question/input string
+     * @return 
+     */
+    std::string parseMenuPromptString(const std::string &prompt_string);
 
     /**
      * @brief Loads or reloads and parses the ansi screen

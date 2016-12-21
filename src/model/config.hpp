@@ -144,7 +144,7 @@ public:
 
 //int
     int days_keep_logs;          // DaysToSaveLog;
-
+    
 // string
     std::string qwk_packet_name;         // QWKName;
 
@@ -156,7 +156,7 @@ public:
 
 // int
     int days_keep_attachments;     // DaysToKeepFM;
-
+    
 // string { convert char or digit to pipe codes! }
     std::string default_color_regular;    // DefRegColor,
     std::string default_color_stat;       // DefStatColor,
@@ -283,7 +283,7 @@ public:
         , newuser_votes_validate(3)
         , newuser_votes_delete(3)
         , newuser_days_to_upload(7)
-        , days_keep_logs(30)
+        , days_keep_logs(30)                
         , qwk_packet_name("Obv2_XRM")
         , starting_menu_name("top")
         , use_message_attachments(false)
@@ -293,7 +293,7 @@ public:
         , default_color_propmpt("|01")
         , default_color_input("|15")
         , default_color_inverse("|17")
-        , default_color_box("|11")
+        , default_color_box("|11")  
         , default_user_flags("")
         , flag_change_daily("")
         , flag_change_session("")

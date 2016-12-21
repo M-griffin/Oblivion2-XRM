@@ -16,7 +16,7 @@ const std::string MenuSystem::m_menuID = "MENU_SYSTEM";
 
 MenuSystem::MenuSystem(session_data_ptr session_data)
     : StateBase(session_data)
-    , MenuBase(session_data)
+    , MenuBase(session_data)   
 {
     std::cout << "MenuSystem" << std::endl;
 
@@ -122,11 +122,17 @@ bool MenuSystem::onExit()
  * @param option
  */
 bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
-{
-    
+{    
     // Some of these options set actual flags for behavior.
     // In this case, we will need to parse for specific Control commands
     // and set Menu System Flags!
+    
+    using namespace boost::locale;
+    using namespace std;
+    generator gen;
+    locale loc=gen("");
+    locale::global(loc);
+    cout.imbue(loc);
     
     switch(option.command_key[1])
     {
@@ -250,7 +256,8 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
                 m_system_fallback.push_back(m_current_menu);                
             }
             m_current_menu = boost::locale::to_lower(option.command_string);
-            loadAndStartupMenu();           
+            loadAndStartupMenu();
+            m_use_first_command_execution = true;
             break;
             
             // goes to fallback menu, sets fallback to previous fallback
@@ -264,7 +271,8 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             {
                 m_current_menu = m_menu_info->menu_fall_back;
             }
-            loadAndStartupMenu();      
+            loadAndStartupMenu();
+            m_use_first_command_execution = true;
             break;
             
             // Goes to menu, sets fallback as starting menu            
@@ -275,6 +283,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             }            
             m_current_menu = boost::locale::to_lower(option.command_string);
             loadAndStartupMenu();           
+            m_use_first_command_execution = true;
             break;
             
             // END
@@ -302,12 +311,14 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
                 m_system_fallback.push_back(m_starting_menu);
             }            
             m_current_menu = boost::locale::to_lower(option.command_string);
+            m_use_first_command_execution = false;
             loadAndStartupMenu();  
             // TODO Add Flags to not run firstcmd!
             break;
             // Drops to Previous Menu, does not exe firstcmd
         case '}':
             m_current_menu = m_previous_menu;
+            m_use_first_command_execution = false;
             loadAndStartupMenu();
             // TODO Add Flags to not run firstcmd!
             break;

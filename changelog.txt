@@ -1,4 +1,24 @@
 
+Change Log Update (00.00.72)
+* 2016-12-21
++ Issues with Sysop menu corrected, it was actually a C++ issue looping vectors.
+  Correct other container looks even through they weren't showing issues
+  Better Safe then Sorry!  
++ Implemented more menu switching logic, for commands that change and skip execution
+  of FIRSTCMD keys.
++ Started on Special Menu Action Prompts, menu's that display a special string with control
+  characters and get prompt with lightbars yes/no, or other user input.  this will
+  take some time to complete, as there is a lot of logic to all of the options.
++ Add masking for output on login password and the newuser passwords
++ Also started implimenting theme color logic for prompt strings
+  parsing the following control sequences for system or user selected colors.
+  ^R - Regular Color      ^S - Status Color
+  ^P - Prompt Color       ^E - Input Color
+  ^V - Inverse Color      ^X - Box Color
+  ^M - Goes down a line
+- Main focus right now is on menu options and switching between menu and getting all 
+  custom logic going.  
+
 Change Log Update (00.00.71)
 * 2016-12-19
 + Started Working -/ and -\ Menu Loading commands for switching menu's.
