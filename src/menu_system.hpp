@@ -53,16 +53,7 @@ public:
     static const std::string m_menuID;
     std::vector<std::string> m_system_fallback;
 
-    // This matches the index for menu_functions.push_back
-    enum
-    {
-        MENU_INPUT,
-        MENU_EDITOR_INPUT,
-        MODULE_PRELOGON_INPUT,
-        MODULE_LOGON_INPUT,
-        MODULE_INPUT
-    };
-
+    
     // Dynamic Map of all Menu Option Command functions
     typedef std::function< bool(const MenuOption & option)> CommandFuncType;    
     typedef std::map<char, CommandFuncType> MappedCommandFunctions;

@@ -25,7 +25,7 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_previous_menu("")
     , m_fallback_menu("")
     , m_starting_menu("")
-    , m_input_index(0)
+    , m_input_index(MENU_INPUT)
     , m_menu_prompt()
     , m_menu_info(new Menu())
     , m_ansi_process(new AnsiProcessor(
@@ -60,7 +60,6 @@ MenuBase::~MenuBase()
     std::vector<module_ptr>().swap(m_module);
 }
 
-
 /**
  * @brief Clears out Loaded Pulldown options
  */
@@ -73,7 +72,6 @@ void MenuBase::clearMenuPullDownOptions()
     
     m_ansi_process->clearPullDownBars();
 }
-
 
 /**
  * @brief Reads a Specific Menu, Info and Options
@@ -118,7 +116,6 @@ void MenuBase::readInMenuData()
     }
 }
 
-
 /**
  * @brief Load a menu handling.
  */
@@ -143,7 +140,6 @@ void MenuBase::loadInMenu(std::string menu_name)
     // if not load fallback menu.. etc..
 }
 
-
 /**
  * @brief Processes a MID Template Screen for Menus
  * @param screen
@@ -155,8 +151,7 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
     // Use a Local Ansi Parser for Pasrsing Menu Template with Mid.
     ansi_process_ptr ansi_process(new AnsiProcessor(
                                   m_menu_session_data->m_telnet_state->getTermRows(),
-                                  m_menu_session_data->m_telnet_state->getTermCols()));
-    
+                                  m_menu_session_data->m_telnet_state->getTermCols()));    
     std::string output_screen;
     
     // Clear All Mappings
@@ -232,8 +227,7 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
             // Process template menu row and all columns added.
             output_screen += m_session_io.parseCodeMapGenerics(screen, code_map);
             column = 0;
-        }
-        
+        }        
         ++column;
     }
     
@@ -244,14 +238,12 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
     }
     
     // Clear Codemap.
-    std::vector<MapType>().swap(code_map);
-    
+    std::vector<MapType>().swap(code_map);    
     ansi_process->parseAnsiScreen((char *)output_screen.c_str());
     
     // Return with no clear screen, since this is a mid ansi.
     return ansi_process->getScreenFromBuffer(false);    
 }
-
 
 /**
  * @brief Generic SRT, MID, END screen processing
@@ -295,14 +287,29 @@ std::string MenuBase::processGenericScreens()
     
     // |K? - key,  |D? - Description
     //|K1 |D1   |K2  |D2  |K3  |D3 ...
-    screen_output += processMidGenericTemplate(mid_screen);
-    
-    screen_output += bot_screen;
-    
+    screen_output += processMidGenericTemplate(mid_screen);    
+    screen_output += bot_screen;    
     return screen_output;    
 }
 
-
+/**
+ * @brief Setup light bar string, and return default display.
+ */
+std::string MenuBase::setupYesNoMenuInput()
+{
+    m_input_index = MENU_YESNO_BAR;
+    
+    std::string output = "";
+    
+    // Generate y/n light bar commands
+    // dependon on default m_active_pulldownID for y/n
+    
+    // decide if we want to buld string on default colors
+    // or parse an extra template from config??!?
+    
+    
+    return output;
+}
 
 /**
  * @brief Builds the menu prompt as a question String
@@ -310,9 +317,8 @@ std::string MenuBase::processGenericScreens()
  */
 std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
 {
-    m_session_io.clearAllMCIMapping();
-       
     // Color Sequences and NewLine
+    m_session_io.clearAllMCIMapping();
     m_session_io.addMCIMapping("^R", m_config->default_color_regular);
     m_session_io.addMCIMapping("^S", m_config->default_color_stat);
     m_session_io.addMCIMapping("^P", m_config->default_color_propmpt);
@@ -320,8 +326,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
     m_session_io.addMCIMapping("^V", m_config->default_color_inverse);
     m_session_io.addMCIMapping("^X", m_config->default_color_box);
     m_session_io.addMCIMapping("^M", "\r\n");
-    
-    
+        
     /*
      * Notes from the Legacy Doc's.
      * 
@@ -373,17 +378,51 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
     
     // Depending on the CodeMap return fro the (2)nd group, which are the ending characters
     // We'll need to setup new menus on these features.
-    std::vector<MapType> code_map = m_session_io.pipe2promptCodeMap(prompt_string);    
+    std::vector<MapType> code_map = m_session_io.pipe2promptCodeMap(prompt_string);        
+    std::string output = "";
     
-
-    // Then feed though and return the updated string.
-    std::string output = std::move(m_session_io.parseCodeMapGenerics(prompt_string, code_map));
-    
-    // Then we feed it through again to handle colors replacements.
+    // Loop codes and picked out ending control code.
+    bool match_found = false;
+    for(unsigned int i = 0; i < code_map.size(); i++)
+    {
+        auto &map = code_map[i];
+        std::cout << "Menu Prompt Code: " << map.m_code << std::endl;
         
+        // Control Codes are in Group 2
+        if (map.m_match == 2)
+        {
+            switch(map.m_code[0])
+            {                
+                case '\\':
+                    m_active_pulldownID = 0; // NO Default
+                    output = std::move(setupYesNoMenuInput());
+                    match_found = true;
+                    break;
+                
+                case '/':                    
+                    m_active_pulldownID = 1; // YES Default
+                    output = std::move(setupYesNoMenuInput());
+                    match_found = true;
+                    break;
+                    
+                default:
+                    break;                    
+            }
+        }
+        
+        // Found code, return.
+        if (match_found)
+        {
+            break;
+        }
+    }    
+    
+    // Then feed though and return the updated string.
+    output += std::move(m_session_io.parseCodeMapGenerics(prompt_string, code_map));
+    
+    // Then we feed it through again to handle colors replacements.        
     return m_session_io.pipe2ansi(output);
 }
-
 
 /**
  * @brief Decides which Screen is loaded then returns as string.
@@ -426,8 +465,7 @@ std::string MenuBase::loadMenuScreen()
             // Load and use generic template.
             // These are GENTOP. GENMID, GENBOT.ANS
             screen_data = processGenericScreens();
-        }
-        
+        }        
     }
     else
     {
@@ -454,7 +492,6 @@ std::string MenuBase::loadMenuScreen()
     }
     return screen_data;
 }
-
 
 /**
  * @brief Build Light Bars Strings for Display
@@ -493,7 +530,6 @@ std::string MenuBase::buildLightBars()
     return light_bars;
 }
 
-
 /**
  * @brief Re parses and display current menu system.
  */
@@ -523,11 +559,9 @@ void MenuBase::redisplayMenuScreen()
     }
     
     // Load the Menu prompt
-    output += loadMenuPrompt();
-    
+    output += loadMenuPrompt();    
     m_menu_session_data->deliver(output);
 }
-
 
 /**
  * @brief Execute First and Each Commands on Startup
@@ -562,7 +596,6 @@ void MenuBase::executeFirstAndEachCommands()
     }
 }
 
-
 /**
  * @brief Return Selected or Active prompt as a string.
  * @return 
@@ -570,8 +603,7 @@ void MenuBase::executeFirstAndEachCommands()
 std::string MenuBase::loadMenuPrompt()
 {
     // Display Menu Prompt if it exists, right now it's default
-    // lateron add users selected.  This is just a test!
-    
+    // lateron add users selected.  This is just a test!    
     std::string prompt = "";
         
     // Don't display prompts on Pulldown menu's.
@@ -622,11 +654,10 @@ std::string MenuBase::loadMenuPrompt()
         }
         
         // Pull prompt from menu text if exists.
-    }
+    }    
     
     return prompt;
 }
-
 
 /**
  * @brief Startup And load the Menu File
@@ -650,8 +681,7 @@ void MenuBase::loadAndStartupMenu()
     {
         std::cout << "Menu has no menu_options: " << m_current_menu << std::endl;
         return;
-    }
-    
+    }    
     
     // Pulldown filename can have (2) customization
     // N = single prompt string with Y/N light bar propmpts, used in goodybye, feedback, newscan menus.. 
@@ -659,8 +689,7 @@ void MenuBase::loadAndStartupMenu()
            // Where X is a letter in the alphabet. Randomly picks a
            // letter from A to X, and will act as if the user pressed
            // that key.  For Random Matrixes.. or menu commands!
-           
-           
+                      
     // First Lets imploment N with ^ color codes for local theme colors.
     if (m_menu_info->menu_pulldown_file.size() == 1 && toupper(m_menu_info->menu_pulldown_file[0]) == 'N')
     {
@@ -681,11 +710,10 @@ void MenuBase::loadAndStartupMenu()
         }
         
         return;
-    }
+    }    
     
     
-    
-     //if (MenuInfo clear the scrren etc.. feature to add! )
+    //if (MenuInfo clear the scrren etc.. feature to add! )
     //m_menu_session_data->deliver("\x1b[2J\x1b[1;1H");
 
     // Finally parse the ansi screen and remove pipes
@@ -759,7 +787,6 @@ void MenuBase::loadAndStartupMenu()
     // Don't need process here, since we pipe2ansi seperately
     m_menu_session_data->deliver(output);
 
-
     if (!m_use_first_command_execution)
     {
         // Onlu Execute Each Command
@@ -771,7 +798,6 @@ void MenuBase::loadAndStartupMenu()
         executeFirstAndEachCommands();        
     }
 }
-
 
 /**
  * @brief Updates current and next lightbar positions.
@@ -818,7 +844,6 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
     m_menu_session_data->deliver(output);
 }
 
-
 /**
  * @brief Process Command Keys passed from menu selection
  * @param input
@@ -834,7 +859,6 @@ bool MenuBase::executeMenuOptions(const MenuOption &option)
     // Execute Menu Option Commands per Callback
     return m_execute_callback[0](option);    
 }
-
 
 /**
  * @brief Handle Standard Menu Input with Wildcard input
@@ -915,7 +939,6 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
     return false;
 }
 
-
 /**
  * @brief Handle updating lightbar selections and redraw
  * @param input
@@ -964,7 +987,6 @@ bool MenuBase::handleLightbarSelection(const std::string &input)
     }
     return false;
 }
-
 
 /**
  * @brief Handle Pulldown Specific Command Processing
@@ -1019,7 +1041,6 @@ bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, 
     return false;
 }
 
-
 /**
  * @brief Handles Re-running EACH command re-executed after each refresh
  */
@@ -1041,7 +1062,6 @@ void MenuBase::executeEachCommands()
         }        
     }        
 }
-
 
 /**
  * @brief Processes Menu Commands with input.
@@ -1216,7 +1236,6 @@ bool MenuBase::processMenuOptions(const std::string &input)
     return false;
 }
 
-
 /**
  * @brief Handle Input Specific to Pull Down Menus
  * @param character_buffer
@@ -1250,13 +1269,11 @@ void MenuBase::handlePulldownInput(const std::string &character_buffer, const bo
     {
         // Hot Key Input.
         input = result;
-    }
-    
+    }    
     // Process CommandOptions Matching the Key Input.
     // Need to check for wildcard input there with menu option.
     processMenuOptions(input);    
 }
-
 
 /**
  * @brief Handle Input Specific to Pull Down Menus
@@ -1308,7 +1325,6 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
     }        
 }
 
-
 /**
  * @brief Default Menu Input Processing.
  *        Handles Processing for Loaded Menus Hotkey and Lightbars
@@ -1330,3 +1346,23 @@ void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf
     }            
 }
 
+/**
+ * @brief Default Menu Input Processing.
+ *        Handles Processing for Loaded Menus Hotkey and Lightbars
+ */
+void MenuBase::menuYesNoBarInput(const std::string &character_buffer, const bool &is_utf8)
+{
+    std::cout << " *** menuInput" << std::endl;       
+        
+    // If were in lightbar mode, then we are using hotkeys.
+    if (m_is_active_pulldown_menu)
+    {            
+        std::cout << "handlePulldown" << std::endl;
+        handlePulldownInput(character_buffer, is_utf8);
+    }
+    else
+    {
+        std::cout << "handleStandard" << std::endl;
+        handleStandardInput(character_buffer);
+    }            
+}
