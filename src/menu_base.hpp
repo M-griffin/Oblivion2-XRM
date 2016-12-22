@@ -42,6 +42,17 @@ public:
     MenuBase(session_data_ptr session_data);
     ~MenuBase();
     
+    // This matches the index for menu_functions.push_back
+    enum
+    {
+        MENU_INPUT,
+        MENU_YESNO_BAR,
+        MENU_EDITOR_INPUT,
+        MODULE_PRELOGON_INPUT,
+        MODULE_LOGON_INPUT,
+        MODULE_INPUT
+    };
+    
     session_data_ptr m_menu_session_data;
 
     // This hold non-hotkey text passed through.
@@ -73,9 +84,6 @@ public:
     bool             m_is_active_pulldown_menu;     // If menu has active lightbars to display.
     bool             m_use_first_command_execution; // If menu executes firstcmd on entrance.
 
-
-    // Holds all menu options/commands. {No longer needed, menu has options in struct now}.
-    //std::vector<MenuOption> m_loaded_menu_options;
 
     // Holds all menu prompts.
     std::vector<MenuPrompt> m_loaded_menu_prompts;
@@ -125,6 +133,11 @@ public:
     void clearAllMenuPrompts();
     void readMenuAllPrompts();
     void readMenuPrompts(int menu_index);
+
+    /**
+     * @brief Setup light bar string, and return default display.
+     */
+    std::string setupYesNoMenuInput();
 
     /**
      * @brief Builds the menu prompt as a question/input string
@@ -246,7 +259,13 @@ public:
      *        Handles Processing for Loaded Menus Hotkey and Lightbars
      */
     void menuInput(const std::string &character_buffer, const bool &is_utf8);
-    
+        
+    /**
+     * @brief Yes/No Menu Bar Input Processing.
+     *        Handles Processing for Loaded Menus Hotkey and Lightbars
+     */
+    void menuYesNoBarInput(const std::string &character_buffer, const bool &is_utf8);
+
 };
 
 typedef boost::shared_ptr<MenuBase> menu_base_ptr;

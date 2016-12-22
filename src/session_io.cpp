@@ -628,7 +628,6 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
             }
         }
 
-
         // Handle parsing on expression match.
         switch(my_matches.m_match)
         {
@@ -717,7 +716,6 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
                 }
                 break;
 
-
             case 7: // Percent with 2 digits, custom codes
                 {
                     // Were just removing them becasue they are processed.
@@ -727,8 +725,6 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
                     ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
                 }
                 break;
-
-
 
             default:
                 break;
@@ -786,16 +782,13 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
             {
                 std::cout << "gen not found: " << my_matches.m_code << std::endl;
                 std::string remove_code = "";
-                remove_code.insert(remove_code.begin(), my_matches.m_code.size(), ' ');
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, remove_code);
             }
         }
     }
     
-    // Clear Custom MCI Screen Translation Mappings
+    // Clear MCI And Code Mappings
     clearAllMCIMapping();
-    
-    // Clear Temp Code Mapping
     std::vector<MapType>().swap(code_mapping);
 
     return ansi_string;
