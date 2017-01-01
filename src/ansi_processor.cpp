@@ -30,7 +30,8 @@ AnsiProcessor::AnsiProcessor(int term_height, int term_width)
     , m_number_lines(term_height)
     , m_characters_per_line(term_width)
     , m_x_position(1)
-    , m_max_x_position(0)
+    , m_max_x_position(1)
+    , m_max_y_position(1)
     , m_center_ansi_output(false)
     , m_saved_cursor_x(1)
     , m_saved_cursor_y(1)
@@ -293,6 +294,16 @@ void AnsiProcessor::clearPullDownBars()
 
 
 /**
+ * @brief Return the max rows used on the screen
+ * @return 
+ */
+int AnsiProcessor::getMaxRowsUsedOnScreen()
+{
+    return m_max_y_position;
+}
+
+
+/**
  * @brief Parses through MCI Codes for Lightbars and Char Parameters.
  */
 std::string AnsiProcessor::screenBufferParse()
@@ -423,15 +434,17 @@ void AnsiProcessor::screenBufferSetPixel(char c)
 {
     // Keep track of the lonest line in buffer for Centering screen.
     if(m_x_position > m_max_x_position)
-        m_max_x_position = m_x_position;
-
-
+    {
+        m_max_x_position = m_x_position;        
+    }
+    
     // catch screen screen scrolling here one shot.
-    if (m_y_position >= m_number_lines) {
+    if (m_y_position >= m_number_lines) 
+    {
         screenBufferScrollUp();
         m_y_position = m_number_lines-1;
     }
-
+            
     m_screen_pixel.c = c;
     m_screen_pixel.x_position = m_x_position;
     m_screen_pixel.y_position = m_y_position;
@@ -446,7 +459,9 @@ void AnsiProcessor::screenBufferSetPixel(char c)
     try
     {
         if(m_position < (signed)m_screen_buffer.size())
-            m_screen_buffer.at(m_position) = m_screen_pixel;
+        {
+            m_screen_buffer.at(m_position) = m_screen_pixel;            
+        }
         else
         {
             std::cout << "position out of bounds: " << m_x_position-1 << std::endl;
@@ -476,6 +491,12 @@ void AnsiProcessor::screenBufferSetPixel(char c)
     else
     {
         ++m_x_position;
+    }
+    
+    // Set the Current Max Row Position.
+    if (m_max_y_position < m_y_position) 
+    {
+        m_max_y_position = m_y_position;
     }
 }
 
@@ -555,6 +576,7 @@ void AnsiProcessor::clearScreen()
     screenBufferClear();
     m_x_position = 1;
     m_y_position = 1;
+    m_max_y_position = 1;
 }
 
 /**

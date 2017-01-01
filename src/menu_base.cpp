@@ -299,7 +299,7 @@ std::string MenuBase::setupYesNoMenuInput()
 {
     m_input_index = MENU_YESNO_BAR;
     
-    std::string output = "";
+    std::string output = "-Yes- -No-  (Mockup)";
     
     // Generate y/n light bar commands
     // dependon on default m_active_pulldownID for y/n
@@ -309,6 +309,30 @@ std::string MenuBase::setupYesNoMenuInput()
     
     
     return output;
+}
+
+/**
+ * @brief Gets the Default Color Sequence
+ * @return 
+ */
+std::string MenuBase::getDefaultColor() {
+    return m_session_io.pipeColors(m_config->default_color_regular);
+}
+
+/**
+ * @brief Gets the Default Input Color Sequence
+ * @return 
+ */
+std::string MenuBase::getDefaultInputColor() {
+    return m_session_io.pipeColors(m_config->default_color_input);
+}
+
+/**
+ * @brief Gets the Default Input Color Sequence
+ * @return 
+ */
+std::string MenuBase::getDefaultInverseColor() {
+    return m_session_io.pipeColors(m_config->default_color_inverse);
 }
 
 /**
@@ -418,10 +442,11 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
     }    
     
     // Then feed though and return the updated string.
-    output += std::move(m_session_io.parseCodeMapGenerics(prompt_string, code_map));
+    std::string yesNoBar = std::move(m_session_io.parseCodeMapGenerics(prompt_string, code_map));
+    yesNoBar += output;
     
     // Then we feed it through again to handle colors replacements.        
-    return m_session_io.pipe2ansi(output);
+    return m_session_io.pipe2ansi(yesNoBar);
 }
 
 /**
@@ -693,7 +718,17 @@ void MenuBase::loadAndStartupMenu()
     // First Lets imploment N with ^ color codes for local theme colors.
     if (m_menu_info->menu_pulldown_file.size() == 1 && toupper(m_menu_info->menu_pulldown_file[0]) == 'N')
     {
-        std::string output = std::move(parseMenuPromptString(m_menu_info->menu_prompt));
+        // 1. Set the Default Color
+        std::string output = getDefaultColor();
+        // 2. Get Initial Line Position to display this prompt on
+        // 3. Move to next line, scrolling down if on the last
+        int screen_row = m_ansi_process->getMaxRowsUsedOnScreen();
+        std::cout << "screen row: " << screen_row << std::endl;
+        output += "\x1b[" + std::to_string(screen_row) + ";1H";
+        output += "\r\n";                
+        output += std::move(parseMenuPromptString(m_menu_info->menu_prompt));
+                
+        
         m_menu_session_data->deliver(output);
         m_is_active_pulldown_menu = false;
 
@@ -1305,7 +1340,7 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
         if (!processMenuOptions(key))
         {
             // Clear Menu Field input Text, redraw prompt?
-            std::string clear_input = "";
+            std::string clear_input = "\x1b[0m";
             for(int i = m_common_io.numberOfChars(key); i > 0; i--)
             {
                 clear_input += "\x1b[D \x1b[D";
@@ -1320,7 +1355,9 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
         if (result != "empty") 
         {
             std::cout << "baseProcessAndDeliver: " << result << std::endl;
-            baseProcessAndDeliver(result);
+            std::string output = getDefaultInputColor();
+            output.append(result);
+            baseProcessAndDeliver(output);
         }
     }        
 }
@@ -1352,6 +1389,9 @@ void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf
  */
 void MenuBase::menuYesNoBarInput(const std::string &character_buffer, const bool &is_utf8)
 {
+    
+    // NOTE: use ansi processor getMaxRowsUsedOnScreen() to get last line used!
+    
     std::cout << " *** menuInput" << std::endl;       
         
     // If were in lightbar mode, then we are using hotkeys.

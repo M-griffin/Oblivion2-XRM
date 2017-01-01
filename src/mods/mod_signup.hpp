@@ -12,7 +12,6 @@
 #include "../data/users_dao.hpp"
 
 #include "../session_data.hpp"
-#include "../session_io.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
@@ -157,6 +156,7 @@ public:
     const std::string PROMPT_DISCLAIMER = "disclaimer";
     const std::string PROMPT_HANDLE = "handle";
     const std::string PROMPT_REAL_NAME = "real_name";
+    const std::string PROMPT_USER_NUMBER = "user_number";    
     const std::string PROMPT_ADDRESS = "address";
     const std::string PROMPT_LOCATION = "location";
     const std::string PROMPT_COUNTRY = "country";

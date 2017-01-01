@@ -954,31 +954,14 @@ bool SessionIO::checkRegex(const std::string &sequence, const std::string &expre
  */
 std::string SessionIO::parseTextPrompt(const M_StringPair &prompt)
 {
-    // Looks like D1 is delay on not description for text prompts,
-    // Need to work on a timer displya procress for delays and
-    // long ansi screen scrolling that is async friends and will not hose
-    // up the system loop.  in these cases might need a thread?!?
-    // Delays can wait till more of the system it put togehter to test what
-    // works best with multiple users online and doing stuff.
-
-    /*
-    // handle to prompt
+    // |PD is new for XRM, Prompt Description.
     std::string text_prompt = prompt.second;
-    std::string mci_code = "|D1";
+    std::string mci_code = "|PD";
 
     // If Description Flag is in Prompt, then replace code with Description
     m_common_io.parseLocalMCI(text_prompt, mci_code, prompt.first);
 
     // Return full mci code parsing on the new string.
-    return pipe2ansi(text_prompt);*/
-
-    // If emulation is not active, then we need to remove pipe colors!
-    // WIP
-    //if (!m_session_data->m_is_use_ansi)
-
-    std::cout << "parseTextPrompt" << std::endl;
-
-    std::string text_prompt = prompt.second;
     return pipe2ansi(text_prompt);
 }
 

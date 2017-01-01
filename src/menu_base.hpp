@@ -140,6 +140,24 @@ public:
     std::string setupYesNoMenuInput();
 
     /**
+     * @brief Gets the Default Color Sequence
+     * @return 
+     */
+    std::string getDefaultColor();
+
+    /**
+     * @brief Gets the Default Input Color Sequence
+     * @return 
+     */
+    std::string getDefaultInputColor();
+
+    /**
+     * @brief Gets the Default Input Color Sequence
+     * @return 
+     */
+    std::string getDefaultInverseColor();
+
+    /**
      * @brief Builds the menu prompt as a question/input string
      * @return 
      */

@@ -85,28 +85,29 @@ void ModSignup::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_NUP]                = std::make_pair("New User Password", "|08|CR|CRNew User Password: |04");
-    value[PROMPT_DISCLAIMER]         = std::make_pair("Disclaimer", "|08|CRDisclaimer Text here.. |CR|CR[y/n] Disclaimer Agree : |04");
-    value[PROMPT_HANDLE]             = std::make_pair("User Handle", "|08|CR|CREnter Handle : |04");
-    value[PROMPT_REAL_NAME]          = std::make_pair("Real Name", "|08|CREnter Real Name : |04");
-    value[PROMPT_ADDRESS]            = std::make_pair("Address", "|08|CRAddress : |04");
-    value[PROMPT_LOCATION]           = std::make_pair("Location", "|08|CRCity/State : |04");
-    value[PROMPT_COUNTRY]            = std::make_pair("Country", "|08|CRCountry : |04");
-    value[PROMPT_EMAIL]              = std::make_pair("Email Address", "|08|CREmail Address : |04");
-    value[PROMPT_USER_NOTE]          = std::make_pair("User Note", "|08|CRAffiliations / User Note : |04");
-    value[PROMPT_BIRTH_DATE]         = std::make_pair("Birth Date", "|08|CR[yyyy-mm-dd] Birth Date : |04");
-    value[PROMPT_GENDER]             = std::make_pair("Gender", "|CR|08[m/f] Gender : |04");
-    value[PROMPT_PASSWORD]           = std::make_pair("Password", "|CR|CR|08(case sensitive) Password : |04");
-    value[PROMPT_VERIFY_PASSWORD]    = std::make_pair("Verify Password", "|CR|08(case sensitive) Verify Password : |04");
-    value[PROMPT_CHALLENGE_QUESTION] = std::make_pair("Forgot Password Challenge Question", "|CR|CR|08Challenge Question : |04");
-    value[PROMPT_CHALLENGE_ANSWER]   = std::make_pair("Forgot Password Challenge Answer", "|CR|08(case sensitive) Challenge Answer : |04");
-    value[PROMPT_VERIFY_ANSWER]      = std::make_pair("Forgot Password Verify Answer", "|CR|08(case sensitive) Verify Answer : |04");
-    value[PROMPT_YESNO_BARS]         = std::make_pair("Use YES/NO Bars", "|CR|CR|08[y/n] Use Yes/No Bars [ENTER] = Yes: |04");
-    value[PROMPT_USE_PAUSE]          = std::make_pair("Pause on ", "|CR|CR|08Screen Pausing [ENTER] = Yes: |04");
-    value[PROMPT_USE_CLEAR]          = std::make_pair("Clear Screen or Scroll ", "|CR|CR|08Clear Screen or Scroll [ENTER] = Yes: |04");
-    value[PROMPT_USE_ANSI_COLOR]     = std::make_pair("Use Ansi Color ", "|CR|CR|08[y/n] Ansi Color [ENTER] = Yes: |04");
-    value[PROMPT_BACK_SPACE]         = std::make_pair("Backspace Sequence", "|CR|CR|08Backspace Key |CR[(W)indows/(T)erminal/(D)etect [ENTER] = Detect] : |04");
-    value[PROMPT_VERIFY_SAVE]        = std::make_pair("Verify All Data", "|CR|CR|08[y/n] Verify and Save user record [ENTER] = Yes: |04");
+    value[PROMPT_NUP]                = std::make_pair("New User Password", "|08|CR|CRNew User Password :");
+    value[PROMPT_DISCLAIMER]         = std::make_pair("Disclaimer", "|08|CRDisclaimer Text here.. |CR|CR[y/n] Disclaimer Agree :");
+    value[PROMPT_HANDLE]             = std::make_pair("User Handle", "|08|CR|CREnter Handle :");
+    value[PROMPT_USER_NUMBER]        = std::make_pair("Your User Numer", "|08|CRYour user number is |15|OT |08...");
+    value[PROMPT_REAL_NAME]          = std::make_pair("Real Name", "|08|CREnter Real Name :");
+    value[PROMPT_ADDRESS]            = std::make_pair("Address", "|08|CRAddress :");
+    value[PROMPT_LOCATION]           = std::make_pair("Location", "|08|CRCity/State :");
+    value[PROMPT_COUNTRY]            = std::make_pair("Country", "|08|CRCountry :");
+    value[PROMPT_EMAIL]              = std::make_pair("Email Address", "|08|CREmail Address :");
+    value[PROMPT_USER_NOTE]          = std::make_pair("User Note", "|08|CRAffiliations / User Note :");
+    value[PROMPT_BIRTH_DATE]         = std::make_pair("Birth Date", "|08|CR[yyyy-mm-dd] Birth Date :");
+    value[PROMPT_GENDER]             = std::make_pair("Gender", "|CR|08[m/f] Gender :");
+    value[PROMPT_PASSWORD]           = std::make_pair("Password", "|CR|CR|08(case sensitive) Password :");
+    value[PROMPT_VERIFY_PASSWORD]    = std::make_pair("Verify Password", "|CR|08(case sensitive) Verify Password :");
+    value[PROMPT_CHALLENGE_QUESTION] = std::make_pair("Forgot Password Challenge Question", "|CR|CR|08Challenge Question :");
+    value[PROMPT_CHALLENGE_ANSWER]   = std::make_pair("Forgot Password Challenge Answer", "|CR|08(case sensitive) Challenge Answer :");
+    value[PROMPT_VERIFY_ANSWER]      = std::make_pair("Forgot Password Verify Answer", "|CR|08(case sensitive) Verify Answer :");
+    value[PROMPT_YESNO_BARS]         = std::make_pair("Use YES/NO Bars", "|CR|CR|08[y/n] Use Yes/No Bars [ENTER] = Yes:");
+    value[PROMPT_USE_PAUSE]          = std::make_pair("Pause on ", "|CR|CR|08Screen Pausing [ENTER] = Yes:");
+    value[PROMPT_USE_CLEAR]          = std::make_pair("Clear Screen or Scroll ", "|CR|CR|08Clear Screen or Scroll [ENTER] = Yes :");
+    value[PROMPT_USE_ANSI_COLOR]     = std::make_pair("Use Ansi Color ", "|CR|CR|08[y/n] Ansi Color [ENTER] = Yes :");
+    value[PROMPT_BACK_SPACE]         = std::make_pair("Backspace Sequence", "|CR|CR|08Backspace Key |CR[(W)indows/(T)erminal/(D)etect [ENTER] = Detect] :");
+    value[PROMPT_VERIFY_SAVE]        = std::make_pair("Verify All Data", "|CR|CR|08[y/n] Verify and Save user record [ENTER] = Yes:");
 
 
     // Invalid.
@@ -136,20 +137,32 @@ void ModSignup::changeModule(int mod_function_index)
     m_setup_functions[m_mod_function_index]();
 }
 
-
 /**
  * @brief Pull and Display Prompts
  * @param prompt
  */
 void ModSignup::displayPrompt(const std::string &prompt)
 {
-    std::string result = m_session_io.parseTextPrompt(
-                                 m_text_prompts_dao->getPrompt(prompt)
-                             );
+    // Set Default String Color, Can be overridden with pipe colors in text prompt.
+    std::string result = baseGetDefaultColor();    
+    
+    // Parse Prompt for Input Color And Position Override.
+    // If found, the colors of the MCI Codes should be used as the default color.
+    M_StringPair prompt_set = std::move(m_text_prompts_dao->getPrompt(prompt));
+    std::string::size_type idx = prompt_set.second.find("%IN", 0);
+    
+    result += std::move(m_session_io.parseTextPrompt(prompt_set));
+    
+    // Not found, set default input color
+    if (idx == std::string::npos) 
+    {
+        result += baseGetDefaultInputColor();        
+    }
+
+    std::cout << "prompt: " << result << std::endl;
 
     baseProcessAndDeliver(result);
 }
-
 
 /**
  * @brief Check for New User Password
@@ -166,7 +179,7 @@ void ModSignup::setupNewUserPassword()
             m_is_active = false;
             return;
         }
-        
+
         displayPrompt(PROMPT_NUP);
     }
     else
@@ -201,14 +214,14 @@ void ModSignup::setupHandle()
 {
     if(m_config->use_handle)
     {
-        displayPrompt(PROMPT_HANDLE);        
+        displayPrompt(PROMPT_HANDLE);
     }
     else
     {
         // Move to next module.
         changeModule(m_mod_function_index+1);
     }
-        
+
 }
 
 /**
@@ -219,7 +232,7 @@ void ModSignup::setupRealName()
 {
     if(m_config->use_real_name)
     {
-        displayPrompt(PROMPT_REAL_NAME);        
+        displayPrompt(PROMPT_REAL_NAME);
     }
     else
     {
@@ -250,7 +263,7 @@ void ModSignup::setupAddress()
  * @return
  */
 void ModSignup::setupLocation()
-{    
+{
     if(m_config->use_location)
     {
         displayPrompt(PROMPT_LOCATION);
@@ -344,7 +357,7 @@ void ModSignup::setupGender()
     {
         // Move to next module.
         changeModule(m_mod_function_index+1);
-    }    
+    }
 }
 
 /**
@@ -373,13 +386,13 @@ void ModSignup::setupChallengeQuestion()
 {
     if(m_config->use_challenge_question)
     {
-        displayPrompt(PROMPT_CHALLENGE_QUESTION);        
+        displayPrompt(PROMPT_CHALLENGE_QUESTION);
     }
     else
     {
         // Move to next module.
         changeModule(m_mod_function_index+1);
-    }   
+    }
 }
 
 /**
@@ -390,14 +403,14 @@ void ModSignup::setupChallengeAnswer()
 {
     if(m_config->use_challenge_question)
     {
-        displayPrompt(PROMPT_CHALLENGE_ANSWER);        
+        displayPrompt(PROMPT_CHALLENGE_ANSWER);
     }
     else
     {
         // Move to next module.
         changeModule(m_mod_function_index+1);
-    }   
-        
+    }
+
 }
 
 /**
@@ -408,13 +421,13 @@ void ModSignup::setupVerifyChallengeAnswer()
 {
     if(m_config->use_challenge_question)
     {
-        displayPrompt(PROMPT_VERIFY_ANSWER);        
+        displayPrompt(PROMPT_VERIFY_ANSWER);
     }
     else
     {
         // Move to next module.
         changeModule(m_mod_function_index+1);
-    }   
+    }
 }
 
 /**
@@ -425,13 +438,13 @@ void ModSignup::setupYesNoBars()
 {
     if(m_config->use_yesno_bars)
     {
-        displayPrompt(PROMPT_YESNO_BARS);        
+        displayPrompt(PROMPT_YESNO_BARS);
     }
     else
     {
         // Move to next module.
         changeModule(m_mod_function_index+1);
-    }  
+    }
 }
 
 /**
@@ -442,13 +455,13 @@ void ModSignup::setupDoPause()
 {
     if(m_config->use_pause)
     {
-        displayPrompt(PROMPT_USE_PAUSE);        
+        displayPrompt(PROMPT_USE_PAUSE);
     }
     else
     {
         // Move to next module.
         changeModule(m_mod_function_index+1);
-    }  
+    }
 }
 
 /**
@@ -459,13 +472,13 @@ void ModSignup::setupClearOrScroll()
 {
     if(m_config->use_clear_screen)
     {
-        displayPrompt(PROMPT_USE_CLEAR);        
+        displayPrompt(PROMPT_USE_CLEAR);
     }
     else
     {
         // Move to next module.
         changeModule(m_mod_function_index+1);
-    }  
+    }
 }
 
 /**
@@ -476,13 +489,13 @@ void ModSignup::setupAnsiColor()
 {
     if(m_config->use_ansi_color)
     {
-        displayPrompt(PROMPT_USE_ANSI_COLOR);        
+        displayPrompt(PROMPT_USE_ANSI_COLOR);
     }
     else
     {
         // Move to next module.
         changeModule(m_mod_function_index+1);
-    }  
+    }
 }
 
 /**
@@ -493,13 +506,13 @@ void ModSignup::setupBackSpace()
 {
     if(m_config->use_backspace)
     {
-        displayPrompt(PROMPT_BACK_SPACE);        
+        displayPrompt(PROMPT_BACK_SPACE);
     }
     else
     {
         // Move to next module.
         changeModule(m_mod_function_index+1);
-    }  
+    }
 }
 
 
@@ -553,7 +566,7 @@ bool ModSignup::newUserPassword(const std::string &input)
         {
             std::cout << "No Match" << key.size() << std::endl;
             ++m_newuser_password_attempts;
-            
+
             displayPrompt(PROMPT_PASS_INVALID);
 
             // Invalid, Ask again, Reload Current Module
@@ -955,7 +968,7 @@ bool ModSignup::email(const std::string &input)
 
             // Invalid, Ask again, Reload Current Module
             changeModule(m_mod_function_index);
-        }  
+        }
     }
     else
     {
@@ -1248,13 +1261,13 @@ bool ModSignup::verifyPassword(const std::string &input)
         // compare password to previous, then encrypt if they match
         // otherwise fail back if they don't and ask again.
         if(m_security_record->sPasswordHash.compare(key) == 0)
-        {            
+        {
             // Load pointer to encrypt methods.
             encrypt_ptr encryption(new Encrypt());
-            if (!encryption) 
+            if (!encryption)
             {
                 std::cout << "Error, unable to allocate encryption" << std::endl;
-                
+
                 // Invalid Entry, display try again!
                 displayPrompt(PROMPT_PASS_INVALID);
 
@@ -1262,7 +1275,7 @@ bool ModSignup::verifyPassword(const std::string &input)
                 changeModule(m_mod_function_index-1);
                 return false;
             }
-        
+
             std::string salt = encryption->generate_salt(m_user_record->sHandle, m_config->bbs_uuid);
             std::string password = encryption->generate_password(m_security_record->sPasswordHash, salt);
 
@@ -1447,7 +1460,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
         if(m_security_record->sChallengeAnswerHash.compare(key) == 0)
         {
             encrypt_ptr encryption(new Encrypt());
-            if (!encryption) 
+            if (!encryption)
             {
                 std::cout << "Error, unable to allocate encryption" << std::endl;
                 // Set the password back to blank
@@ -1455,12 +1468,12 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
 
                 // Invalid Entry, try again!
                 displayPrompt(PROMPT_PASS_INVALID);
-                
+
                 // Move to next module.
                 changeModule(m_mod_function_index-1);
                 return true;
             }
-            
+
             // Generate Password Hash
             std::string password = encryption->generate_password(
                                        m_security_record->sChallengeAnswerHash,
@@ -1489,7 +1502,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
 
             // Invalid Entry, try again!
             displayPrompt(PROMPT_PASS_INVALID);
-            
+
             // Move to next module.
             changeModule(m_mod_function_index-1);
         }
@@ -1534,7 +1547,8 @@ bool ModSignup::yesNoBars(const std::string &input)
             if(key.size() == 0)
             {
                 // If ENTER, then display Yes as key press.
-                baseProcessAndDeliver("Yes");
+                std::string yes_prompt = "Yes";
+                baseProcessAndDeliver(yes_prompt);
             }
 
             m_user_record->bYesNoBars = true;
@@ -1597,7 +1611,8 @@ bool ModSignup::doPause(const std::string &input)
             if(key.size() == 0)
             {
                 // If ENTER, then display Yes as key press.
-                baseProcessAndDeliver("Yes");
+                std::string yes_prompt = "Yes";
+                baseProcessAndDeliver(yes_prompt);
             }
 
             m_user_record->bDoPause = true;
@@ -1660,7 +1675,8 @@ bool ModSignup::clearOrScroll(const std::string &input)
             if(key.size() == 0)
             {
                 // If ENTER, then display Yes as key press.
-                baseProcessAndDeliver("Yes");
+                std::string yes_prompt = "Yes";
+                baseProcessAndDeliver(yes_prompt);
             }
 
             m_user_record->bClearOrScroll = true;
@@ -1723,7 +1739,8 @@ bool ModSignup::ansiColor(const std::string &input)
             if(key.size() == 0)
             {
                 // If ENTER, then display Yes as key press.
-                baseProcessAndDeliver("Yes");
+                std::string yes_prompt = "Yes";
+                baseProcessAndDeliver(yes_prompt);
             }
 
             m_user_record->bAnsi = true;
@@ -1779,12 +1796,13 @@ bool ModSignup::backSpace(const std::string &input)
     }
     else if(result[0] == '\n')
     {
-       // If ENTER Default to Yes, or Single Y is hit
+        // If ENTER Default to Yes, or Single Y is hit
         if(key.size() == 0)
         {
             // Key == 0 on [ENTER] pressed alone.
             // If ENTER, then display Yes as key press.
-            baseProcessAndDeliver("Detection WIP, Select W or T.");
+            std::string detection_prompt = "Detection WIP, Select W or T.";
+            baseProcessAndDeliver(detection_prompt);
 
             // Not Implimented YET
             // Start Backspace Detection here!
@@ -1807,7 +1825,7 @@ bool ModSignup::backSpace(const std::string &input)
         {
             // Invalid Entry, try again!
             displayPrompt(PROMPT_TEXT_INVALID);
-            
+
             // Ask Again And Redisplay.
             changeModule(m_mod_function_index);
             return true;
@@ -1894,7 +1912,8 @@ void ModSignup::saveNewUserRecord()
  * @brief Confirm and save user record.
  * @return
  */
-bool ModSignup::verifyAndSave(const std::string &input) {
+bool ModSignup::verifyAndSave(const std::string &input)
+{
 
     std::cout << "verifyAndSave: " << input << std::endl;
 
@@ -1917,7 +1936,8 @@ bool ModSignup::verifyAndSave(const std::string &input) {
             if(key.size() == 0)
             {
                 // If ENTER, then display Yes as key press.
-                baseProcessAndDeliver("Yes");
+                std::string yes_prompt = "Yes";
+                baseProcessAndDeliver(yes_prompt);
             }
 
             // Save The User Record

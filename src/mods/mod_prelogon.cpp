@@ -131,9 +131,10 @@ void ModPreLogon::setupEmulationDetection()
     // Windows Console Telnet will response it's at 259 y!
 
     std::string detection = m_session_io.pipe2ansi("|00\x1b[s\x1b[255B\x1b[6n");
+    std::string restore_position = "\x1b[u";
 
     baseProcessAndDeliver(detection);
-    baseProcessAndDeliver("\x1b[u");
+    baseProcessAndDeliver(restore_position);
 
     // Display Detecting Emulation, not using display prompt casue we need to append.
     std::string result = m_session_io.parseTextPrompt(
@@ -369,7 +370,8 @@ bool ModPreLogon::askANSIColor(const std::string &input)
             if(key.size() == 0)
             {
                 // If ENTER, then display Yes as key press.
-                baseProcessAndDeliver("Yes");
+                std::string yes_prompt = "Yes";
+                baseProcessAndDeliver(yes_prompt);
             }
 
             // Set ANSI Color Emulation to True
@@ -436,7 +438,8 @@ bool ModPreLogon::askCodePage(const std::string &input)
             if(key.size() == 0)
             {
                 // If ENTER, then display Yes as key press.
-                baseProcessAndDeliver("Yes");
+                std::string yes_prompt = "Yes";
+                baseProcessAndDeliver(yes_prompt);
             }
 
             std::string message = "";

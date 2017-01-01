@@ -1,4 +1,20 @@
 
+Change Log Update (00.00.73)
+WIP 31
++ mod prompts (Signup, Login, Pre-Login) settung up default prompt theme colors
+  will also carry over to menu's to match system/user preference colors.
+
+- notes:
+  1. %IN, need to parse and get position and color, like in lightbars parse for input prompts.
+  2. screen_buffer, max used row,  when drawing screen need to track the last line used
+     prompt might move up or down etc.. we need this integer value so when we propmpt
+     we space down a line under when running custom menu prompt with y/n bars.
+
+- updates
+  3. Feedback is no proper default color, need to switch input to hotkey for N Menu functions.
+  4. only the gen template seems to have max row.. need to check resetting and that other screens
+     for templates are all parsed in the same buffer.
+
 Change Log Update (00.00.72)
 * 2016-12-21
 + Issues with Sysop menu corrected, it was actually a C++ issue looping vectors.
