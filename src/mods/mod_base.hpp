@@ -45,7 +45,8 @@ public:
      * @brief Gets the Default Color Sequence
      * @return 
      */
-    std::string baseGetDefaultColor() {
+    std::string baseGetDefaultColor() 
+    {
         return m_session_io.pipeColors(m_config->default_color_regular);
     }
     
@@ -53,7 +54,8 @@ public:
      * @brief Gets the Default Input Color Sequence
      * @return 
      */
-    std::string baseGetDefaultInputColor() {
+    std::string baseGetDefaultInputColor() 
+    {
         return m_session_io.pipeColors(m_config->default_color_input);
     }
     
@@ -61,7 +63,8 @@ public:
      * @brief Gets the Default Input Color Sequence
      * @return 
      */
-    std::string baseGetDefaultInverseColor() {
+    std::string baseGetDefaultInverseColor() 
+    {
         return m_session_io.pipeColors(m_config->default_color_inverse);
     }
 
@@ -96,4 +99,4 @@ typedef boost::shared_ptr<ModBase>	module_ptr;
 typedef boost::weak_ptr<ModBase>	module_wptr;
 
 
-#endif // THE_STATE_HPP
+#endif // MOD_BASE_HPP

@@ -174,7 +174,6 @@ public:
             boost::bind(&ModPreLogon::handleDetectionTimer, shared_from_this(), &m_detection_deadline));
     }
 
-
     /**
      * @brief Deadline Detection Timer for ANSI Detection
      * @param timer
@@ -186,7 +185,6 @@ public:
         // Jump to Emulation completed.
         emulationCompleted();
     }
-
 
     /**
      * @brief After Emulation Detection is completed
@@ -233,4 +231,4 @@ private:
     std::string          m_term_type;
 };
 
-#endif // SYSTEM_STATE_HPP
+#endif // MOD_PRELOGON_HPP

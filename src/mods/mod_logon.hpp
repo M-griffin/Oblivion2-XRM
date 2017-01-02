@@ -44,7 +44,6 @@ public:
         std::cout << "ModLogon" << std::endl;
 
         // Push function pointers to the stack.
-
         m_setup_functions.push_back(std::bind(&ModLogon::setupLogon, this));
         m_setup_functions.push_back(std::bind(&ModLogon::setupPassword, this));
         m_setup_functions.push_back(std::bind(&ModLogon::setupPasswordQuestion, this));
@@ -234,4 +233,4 @@ private:
     user_ptr             m_logon_user;
 };
 
-#endif // SYSTEM_STATE_HPP
+#endif // MOD_LOGON_HPP

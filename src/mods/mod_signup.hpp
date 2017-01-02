@@ -186,9 +186,6 @@ public:
     const std::string PROMPT_SAVED = "confirmed_save";
     const std::string PROMPT_NOT_SAVED = "record_not_saved";
 
-    // ... cont
-
-
     /**
      * @brief Create Default Text Prompts for module
      */
@@ -486,7 +483,6 @@ private:
      * @return
      */
     bool verifyAndSave(const std::string &input);
-
 
     /**
      * @brief Save New User Record
