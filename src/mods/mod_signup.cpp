@@ -84,38 +84,37 @@ void ModSignup::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_NUP]                = std::make_pair("New User Password", "|08|CR|CRNew User Password :");
-    value[PROMPT_DISCLAIMER]         = std::make_pair("Disclaimer", "|08|CRDisclaimer Text here.. |CR|CR[y/n] Disclaimer Agree :");
-    value[PROMPT_HANDLE]             = std::make_pair("User Handle", "|08|CR|CREnter Handle :");
-    value[PROMPT_USER_NUMBER]        = std::make_pair("Your User Numer", "|08|CRYour user number is |15|OT |08...");
-    value[PROMPT_REAL_NAME]          = std::make_pair("Real Name", "|08|CREnter Real Name :");
-    value[PROMPT_ADDRESS]            = std::make_pair("Address", "|08|CRAddress :");
-    value[PROMPT_LOCATION]           = std::make_pair("Location", "|08|CRCity/State :");
-    value[PROMPT_COUNTRY]            = std::make_pair("Country", "|08|CRCountry :");
-    value[PROMPT_EMAIL]              = std::make_pair("Email Address", "|08|CREmail Address :");
-    value[PROMPT_USER_NOTE]          = std::make_pair("User Note", "|08|CRAffiliations / User Note :");
-    value[PROMPT_BIRTH_DATE]         = std::make_pair("Birth Date", "|08|CR[yyyy-mm-dd] Birth Date :");
-    value[PROMPT_GENDER]             = std::make_pair("Gender", "|CR|08[m/f] Gender :");
-    value[PROMPT_PASSWORD]           = std::make_pair("Password", "|CR|CR|08(case sensitive) Password :");
-    value[PROMPT_VERIFY_PASSWORD]    = std::make_pair("Verify Password", "|CR|08(case sensitive) Verify Password :");
-    value[PROMPT_CHALLENGE_QUESTION] = std::make_pair("Forgot Password Challenge Question", "|CR|CR|08Challenge Question :");
-    value[PROMPT_CHALLENGE_ANSWER]   = std::make_pair("Forgot Password Challenge Answer", "|CR|08(case sensitive) Challenge Answer :");
-    value[PROMPT_VERIFY_ANSWER]      = std::make_pair("Forgot Password Verify Answer", "|CR|08(case sensitive) Verify Answer :");
-    value[PROMPT_YESNO_BARS]         = std::make_pair("Use YES/NO Bars", "|CR|CR|08[y/n] Use Yes/No Bars [ENTER] = Yes:");
-    value[PROMPT_USE_PAUSE]          = std::make_pair("Pause on ", "|CR|CR|08Screen Pausing [ENTER] = Yes:");
-    value[PROMPT_USE_CLEAR]          = std::make_pair("Clear Screen or Scroll ", "|CR|CR|08Clear Screen or Scroll [ENTER] = Yes :");
-    value[PROMPT_USE_ANSI_COLOR]     = std::make_pair("Use Ansi Color ", "|CR|CR|08[y/n] Ansi Color [ENTER] = Yes :");
-    value[PROMPT_BACK_SPACE]         = std::make_pair("Backspace Sequence", "|CR|CR|08Backspace Key |CR[(W)indows/(T)erminal/(D)etect [ENTER] = Detect] :");
-    value[PROMPT_VERIFY_SAVE]        = std::make_pair("Verify All Data", "|CR|CR|08[y/n] Verify and Save user record [ENTER] = Yes:");
-
+    value[PROMPT_NUP]                = std::make_pair("New User Password", "New User Password :");
+    value[PROMPT_DISCLAIMER]         = std::make_pair("Disclaimer", "%%DFDISCLAIMER |CR[y/n] Disclaimer Agree :");
+    value[PROMPT_HANDLE]             = std::make_pair("User Handle", "Enter Handle :");
+    value[PROMPT_USER_NUMBER]        = std::make_pair("Your User Numer |OT", "Your user number is |OT.");
+    value[PROMPT_REAL_NAME]          = std::make_pair("Real Name", "Enter Real Name :");
+    value[PROMPT_ADDRESS]            = std::make_pair("Address", "Address :");
+    value[PROMPT_LOCATION]           = std::make_pair("Location", "City/State :");
+    value[PROMPT_COUNTRY]            = std::make_pair("Country", "Country :");
+    value[PROMPT_EMAIL]              = std::make_pair("Email Address", "Email Address :");
+    value[PROMPT_USER_NOTE]          = std::make_pair("User Note", "Affiliations / User Note :");
+    value[PROMPT_BIRTH_DATE]         = std::make_pair("Birth Date", "[yyyy-mm-dd] Birth Date :");
+    value[PROMPT_GENDER]             = std::make_pair("Gender", "[m/f] Gender :");
+    value[PROMPT_PASSWORD]           = std::make_pair("Password", "(case sensitive) Password :");
+    value[PROMPT_VERIFY_PASSWORD]    = std::make_pair("Verify Password", "(case sensitive) Verify Password :");
+    value[PROMPT_CHALLENGE_QUESTION] = std::make_pair("Forgot Password Challenge Question", "Challenge Question :");
+    value[PROMPT_CHALLENGE_ANSWER]   = std::make_pair("Forgot Password Challenge Answer", "(case sensitive) Challenge Answer :");
+    value[PROMPT_VERIFY_ANSWER]      = std::make_pair("Forgot Password Verify Answer", "(case sensitive) Verify Answer :");
+    value[PROMPT_YESNO_BARS]         = std::make_pair("Use YES/NO Bars", "[y/n] Use Yes/No Bars [ENTER] = Yes:");
+    value[PROMPT_USE_PAUSE]          = std::make_pair("Pause on ", "Screen Pausing [ENTER] = Yes:");
+    value[PROMPT_USE_CLEAR]          = std::make_pair("Clear Screen or Scroll ", "Clear Screen or Scroll [ENTER] = Yes :");
+    value[PROMPT_USE_ANSI_COLOR]     = std::make_pair("Use Ansi Color ", "[y/n] Ansi Color [ENTER] = Yes :");
+    value[PROMPT_BACK_SPACE]         = std::make_pair("Backspace Sequence", "Backspace Key [W]indows/[T]erminal/[ENTER] Detect :");
+    value[PROMPT_VERIFY_SAVE]        = std::make_pair("Verify All Data", "[y/n] Verify and Save user record [ENTER] = Yes : ");
 
     // Invalid.
-    value[PROMPT_TEXT_INVALID]       = std::make_pair("Invalid Text", "|CR|04Invalid entry!|CR");
-    value[PROMPT_DATE_INVALID]       = std::make_pair("Invalid Date", "|CR|04Invalid date entered!|CR");
-    value[PROMPT_PASS_INVALID]       = std::make_pair("Invalid/Non Matching Password", "|CR|04Invalid, password does not match!|CR");
-    value[PROMPT_HANDLE_INVALID]     = std::make_pair("User Name Already Exists", "|CR|04Invalid UserName, Already Exists!|CR");
-    value[PROMPT_NAME_INVALID]       = std::make_pair("Real Name Already Exists", "|CR|04Name, Already Exists, Try Adding a middle initial.|CR");
-    value[PROMPT_EMAIL_INVALID]      = std::make_pair("Email Already Exists", "|CR|04Email, Already Exists, Try another adress or check if your have an account.|CR");
+    value[PROMPT_TEXT_INVALID]       = std::make_pair("Invalid Text", "|04Invalid entry!|CR");
+    value[PROMPT_DATE_INVALID]       = std::make_pair("Invalid Date", "|04Invalid date entered!|CR");
+    value[PROMPT_PASS_INVALID]       = std::make_pair("Invalid/Non Matching Password", "|04Invalid, password does not match!|CR");
+    value[PROMPT_HANDLE_INVALID]     = std::make_pair("User Name Already Exists", "|04Invalid UserName, Already Exists!|CR");
+    value[PROMPT_NAME_INVALID]       = std::make_pair("Real Name Already Exists", "|04Name, Already Exists, Try Adding a middle initial.|CR");
+    value[PROMPT_EMAIL_INVALID]      = std::make_pair("Email Already Exists", "|04Email, Already Exists, Try another adress or check if your have an account.|CR");
 
     // Confirmation of Save
     value[PROMPT_SAVED]              = std::make_pair("User Record Saved", "|CR|10User Record Saved Successfully.|CR");
@@ -171,25 +170,7 @@ void ModSignup::redisplayModulePrompt()
  */
 void ModSignup::displayPrompt(const std::string &prompt)
 {
-    // Set Default String Color, Can be overridden with pipe colors in text prompt.
-    std::string result = baseGetDefaultColor();    
-    
-    // Parse Prompt for Input Color And Position Override.
-    // If found, the colors of the MCI Codes should be used as the default color.
-    M_StringPair prompt_set = std::move(m_text_prompts_dao->getPrompt(prompt));
-    std::string::size_type idx = prompt_set.second.find("%IN", 0);
-    
-    result += std::move(m_session_io.parseTextPrompt(prompt_set));
-    
-    // Not found, set default input color
-    if (idx == std::string::npos) 
-    {
-        result += baseGetDefaultInputColor();        
-    }
-
-    std::cout << "prompt: " << result << std::endl;
-
-    baseProcessAndDeliver(result);
+    baseDisplayPrompt(prompt, m_text_prompts_dao);
 }
 
 /**

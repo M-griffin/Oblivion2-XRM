@@ -72,24 +72,24 @@ void ModPreLogon::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_DETECT_EMULATION] = std::make_pair("Detecting Emulation", "|CR|CR|15 - |08Detecting Emulation |15-");
-    value[PROMPT_DETECTED_ANSI]    = std::make_pair("ANSI Emulation Detected", "|CR|04E|12m|14ulation: An|12s|04i|07");
-    value[PROMPT_DETECTED_NONE]    = std::make_pair("Emulation Detect:None", "|CREmulation Detect: None");
+    value[PROMPT_DETECT_EMULATION] = std::make_pair("Detecting Emulation", "Detecting Emulation");
+    value[PROMPT_DETECTED_ANSI]    = std::make_pair("Emulation Detected: Ansi ESC Supported", "|CREmulation Detected :|03ANSI ESC Supported.");
+    value[PROMPT_DETECTED_NONE]    = std::make_pair("Emulation Detected: None", "|CREmulation Detect :|03none");
 
-    value[PROMPT_USE_ANSI]         = std::make_pair("Use ANSI Colors (Y/n) ", "|CR|CRPress [Y or ENTER] to use ANSI Colors |CR|08[|15N|08] to Select ASCII No Colors |15: ");
-    value[PROMPT_USE_INVALID]      = std::make_pair("Invalid Response to Y/N/ENTER", "|CR|12Invalid Response! Try again");
-    value[PROMPT_ANSI_SELECTED]    = std::make_pair("ANSI Color Selected", "|CR|04A|12N|14SI Colors Select|12e|04d");
-    value[PROMPT_ASCII_SELECTED]   = std::make_pair("ASCII No Colors Selected", "|CRASCII No Colors Selected");
+    value[PROMPT_USE_ANSI]         = std::make_pair("Use ANSI Colors (Y/n) ", "|CRPress [y/ENTER] to use ANSI Colors |CR[N] to Select ASCII No Colors :");
+    value[PROMPT_USE_INVALID]      = std::make_pair("Invalid Response to Y/N/ENTER", "|04Invalid Response! Try again.");
+    value[PROMPT_ANSI_SELECTED]    = std::make_pair("ANSI Color Selected", "Selected :|03Ansi.");
+    value[PROMPT_ASCII_SELECTED]   = std::make_pair("ASCII No Colors Selected", "Selected :None.");
 
-    value[PROMPT_DETECT_TERMOPTS]  = std::make_pair("Detecting Terminal Options", "|CR|CR|08|15 - |08Detecting Terminal Options |15-|08");
-    value[PROMPT_DETECTED_TERM]    = std::make_pair("Detecting Terminal: |OT ", "|CR|08Detected Terminal: |04|OT |07");
-    value[PROMPT_DETECTED_SIZE]    = std::make_pair("Detecting Terminal Size: |OT ", "|CR|08Detected Screen Size: |04|OT |07");
+    value[PROMPT_DETECT_TERMOPTS]  = std::make_pair("Detecting Terminal Options", "|CR|CRDetecting Terminal Options");
+    value[PROMPT_DETECTED_TERM]    = std::make_pair("Detecting Terminal: |OT ", "|CRDetected Terminal Type :|03|OT");
+    value[PROMPT_DETECTED_SIZE]    = std::make_pair("Detecting Terminal Size: |OT ", "|CRDetected Screen Size :|03|OT");
 
-    value[PROMPT_ASK_CP437]        = std::make_pair("Use CP437 Output Encoding", "|CR|CR|08[|15Y or ENTER|08] to Select MS-DOS CP-437 Codepage |CR|08[|15N|08] to Select UTF-8 Codepage : |15");
-    value[PROMPT_ASK_UTF8]         = std::make_pair("Use UTF-8 Output Encoding", "|CR|CR|08[|15Y or ENTER|08] to Select UTF-8 Terminal Codepage|CR|08[|15N|08] to Select MS-DOS CP-437 Codepage : |15");
+    value[PROMPT_ASK_CP437]        = std::make_pair("Use CP437 Output Encoding", "|CR|CR[y/n/ENTER] Select Output Encoding CP-437 :");
+    value[PROMPT_ASK_UTF8]         = std::make_pair("Use UTF-8 Output Encoding", "|CR|CR[y/n/ENTER] Select Output Encoding UTF-8 :");
 
-    value[PROMPT_CP437_SELECTED]   = std::make_pair("Selected CP437 Output Encoding", "|CR|04S|12e|14lected MS-DOS CP-437 Codepa|12g|04e|07");
-    value[PROMPT_UTF8_SELECTED]    = std::make_pair("Selected UTF-8 Output Encoding", "|CR|04S|12e|14lected UTF-8 Terminal Codepa|12g|04e|07");
+    value[PROMPT_CP437_SELECTED]   = std::make_pair("Selected CP437 Output Encoding", "Selected :|03CP-437 Codepage.");
+    value[PROMPT_UTF8_SELECTED]    = std::make_pair("Selected UTF-8 Output Encoding", "Selected :|03UTF-8 Codepage.");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -120,11 +120,7 @@ void ModPreLogon::redisplayModulePrompt()
  */
 void ModPreLogon::displayPrompt(const std::string &prompt)
 {
-    std::string result = m_session_io.parseTextPrompt(
-                                 m_text_prompts_dao->getPrompt(prompt)
-                             );
-
-    baseProcessAndDeliver(result);
+    baseDisplayPrompt(prompt, m_text_prompts_dao);
 }
 
 /**
@@ -356,7 +352,7 @@ bool ModPreLogon::askANSIColor(const std::string &input)
             if(key.size() == 0)
             {
                 std::string yes_prompt = "Yes";
-                baseProcessAndDeliver(yes_prompt);
+                baseProcessAndDeliverNewLine(yes_prompt);
             }
 
             m_session_data->m_is_use_ansi = true;
@@ -366,12 +362,14 @@ bool ModPreLogon::askANSIColor(const std::string &input)
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
+            baseProcessDeliverNewLine();
             displayPrompt(PROMPT_ASCII_SELECTED);
             m_session_data->m_is_use_ansi = false;
             displayTerminalDetection();
         }
         else
         {
+            baseProcessDeliverNewLine();
             displayPrompt(PROMPT_USE_INVALID);
             redisplayModulePrompt();
         }
@@ -413,7 +411,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
             {
                 // If ENTER, then display Yes as key press.
                 std::string yes_prompt = "Yes";
-                baseProcessAndDeliver(yes_prompt);
+                baseProcessAndDeliverNewLine(yes_prompt);
             }
 
             std::string message = "";
@@ -441,7 +439,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
                 m_session_data->m_output_encoding = "utf-8";
             }
 
-            baseProcessAndDeliver(message);
+            baseProcessAndDeliverNewLine(message);
             m_is_active = false;
         }
         // Else check for single N for No to default to ASCII no colors.
@@ -472,11 +470,12 @@ bool ModPreLogon::askCodePage(const std::string &input)
                 m_session_data->m_output_encoding = "cp437";
             }
 
-            baseProcessAndDeliver(message);
+            baseProcessAndDeliverNewLine(message);
             m_is_active = false;
         }
         else
         {
+            baseProcessDeliverNewLine();
             displayPrompt(PROMPT_USE_INVALID);
             redisplayModulePrompt();
         }
