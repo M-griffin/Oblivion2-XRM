@@ -121,6 +121,12 @@ public:
      * @param mod_function_index
      */
     void changeModule(int mod_function_index);
+    
+    /**
+     * @brief Redisplay's the current module prompt.
+     * @param mod_function_index
+     */
+    void redisplayModulePrompt();
 
     /**
      * @brief Pull and Display Prompts

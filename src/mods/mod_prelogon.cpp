@@ -106,6 +106,15 @@ void ModPreLogon::changeModule(int mod_function_index)
 }
 
 /**
+ * @brief Redisplay's the current module prompt.
+ * @param mod_function_index
+ */
+void ModPreLogon::redisplayModulePrompt()
+{
+    m_setup_functions[m_mod_function_index]();
+}
+
+/**
  * @brief Pull and Display Prompts
  * @param prompt
  */
@@ -158,10 +167,7 @@ void ModPreLogon::setupEmulationDetection()
 void ModPreLogon::setupAskANSIColor()
 {
     std::cout << "setupAskANSIColor()" << std::endl;
-
-    // Ask to use colors - mode to next method to ask question and get reponse!
     displayPrompt(PROMPT_DETECT_EMULATION);
-
 }
 
 /**
@@ -178,10 +184,8 @@ void ModPreLogon::displayTerminalDetection()
     // NOTE, Term and Size can be made global mci codes later on. :)
     M_StringPair prompt_term = m_text_prompts_dao->getPrompt(PROMPT_DETECTED_TERM);
 
-
     // Grab Detected Terminal Size 80x24, 80x50 etc..
     M_StringPair prompt_size = m_text_prompts_dao->getPrompt(PROMPT_DETECTED_SIZE);
-
 
     // Send out the results of the prompts after parsing MCI and Color codes.
     // These prompts have spcial |OT place holders for variables.
@@ -191,11 +195,10 @@ void ModPreLogon::displayTerminalDetection()
     if(prompt_term.second.size() > 0)
     {
         std::string result = prompt_term.second;
-
         std::string term = m_session_data->m_telnet_state->getTermType();
         std::cout << "Term Type: " << term << std::endl;
+        
         m_session_io.m_common_io.parseLocalMCI(result, mci_code, term);
-
         result = m_session_io.pipe2ansi(result);
         baseProcessAndDeliver(result);
     }
@@ -204,13 +207,11 @@ void ModPreLogon::displayTerminalDetection()
     if(prompt_size.second.size() > 0)
     {
         std::string result = prompt_size.second;
-
         std::string term_size = std::to_string(m_session_data->m_telnet_state->getTermCols());
         term_size.append("x");
         term_size.append(std::to_string(m_session_data->m_telnet_state->getTermRows()));
         std::cout << "Term Size: " << term_size << std::endl;
         m_session_io.m_common_io.parseLocalMCI(result, mci_code, term_size);
-
         result = m_session_io.pipe2ansi(result);
         baseProcessAndDeliver(result);
     }
@@ -227,10 +228,6 @@ void ModPreLogon::displayTerminalDetection()
 void ModPreLogon::setupAskCodePage()
 {   
     std::cout << "setupAskCodePage()" << std::endl;
-
-    // Display CodePage Selections, then prompt to ask for selection
-
-
     // Fill the local term type to work with.
     m_term_type = m_session_data->m_telnet_state->getTermType();
 
@@ -256,8 +253,6 @@ bool ModPreLogon::emulationDetection(const std::string &input)
     bool result = false;
     if(input.size() != 0)
     {
-        std::cout << "emulationDetection" << input << std::endl;
-
         unsigned int ch = 0;
         ch = input[0];
 
@@ -325,23 +320,14 @@ bool ModPreLogon::emulationDetection(const std::string &input)
 void ModPreLogon::emulationCompleted()
 {
     std::cout << "emulationCompleted: " << std::endl;
-    // Reset to false so we can reuse for other methods.
-
     if(m_session_data->m_is_use_ansi)
     {
-        // Emulation Detected ANSI
         displayPrompt(PROMPT_DETECTED_ANSI);
-
-        // ANSI Detect, Move to Next Ask CodePage.
         displayTerminalDetection();
-
     }
     else
     {
-        // Emulation Detected NONE
         displayPrompt(PROMPT_DETECTED_NONE);
-
-        // Emulation not detected, ask to use ANSI Color, then move to CodePage.
         changeModule(MOD_ASK_ANSI_COLOR);
     }
 }
@@ -353,11 +339,11 @@ void ModPreLogon::emulationCompleted()
 bool ModPreLogon::askANSIColor(const std::string &input)
 {
     std::cout << "askANSIColor: " << input << std::endl;
-
-    // handle input for using ansi color, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
     }
@@ -369,37 +355,25 @@ bool ModPreLogon::askANSIColor(const std::string &input)
             // Key == 0 on [ENTER] pressed alone.
             if(key.size() == 0)
             {
-                // If ENTER, then display Yes as key press.
                 std::string yes_prompt = "Yes";
                 baseProcessAndDeliver(yes_prompt);
             }
 
-            // Set ANSI Color Emulation to True
             m_session_data->m_is_use_ansi = true;
-
-            // ANSI Selected Text Prompt
             displayPrompt(PROMPT_ANSI_SELECTED);
-
-            // Change to next Module
             displayTerminalDetection();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
             displayPrompt(PROMPT_ASCII_SELECTED);
-
-            // Set ANSI Color Emulation to False
             m_session_data->m_is_use_ansi = false;
-
-            // Change to next module
             displayTerminalDetection();
         }
         else
         {
             displayPrompt(PROMPT_USE_INVALID);
-
-            // Invalid, Ask again
-            setupAskANSIColor();
+            redisplayModulePrompt();
         }
     }
     else
@@ -421,11 +395,11 @@ bool ModPreLogon::askANSIColor(const std::string &input)
 bool ModPreLogon::askCodePage(const std::string &input)
 {
     std::cout << "askCodePage: " << input << std::endl;
-
-    // handle input for using ansi color, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
     }
@@ -467,10 +441,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
                 m_session_data->m_output_encoding = "utf-8";
             }
 
-            // Deliver result.
             baseProcessAndDeliver(message);
-
-            // Change to next Module ( or Exit Prelogin and move to Login module!!
             m_is_active = false;
         }
         // Else check for single N for No to default to ASCII no colors.
@@ -499,22 +470,15 @@ bool ModPreLogon::askCodePage(const std::string &input)
 
                 // Even though it's default, lets set it anyways/
                 m_session_data->m_output_encoding = "cp437";
-
             }
 
-            // Deliver result.
             baseProcessAndDeliver(message);
-
-            // Change to next Module ( or Exit Prelogin and move to Login module!!
             m_is_active = false;
         }
         else
         {
-            // Invalid Entry, try again!
             displayPrompt(PROMPT_USE_INVALID);
-
-            // Invalid, Ask again
-            setupAskCodePage();
+            redisplayModulePrompt();
         }
     }
     else
