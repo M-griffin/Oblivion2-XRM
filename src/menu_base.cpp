@@ -585,7 +585,7 @@ void MenuBase::redisplayMenuScreen()
     
     // Load the Menu prompt
     output += loadMenuPrompt();    
-    m_menu_session_data->deliver(output);
+    baseProcessAndDeliver(output);
 }
 
 /**
@@ -685,6 +685,19 @@ std::string MenuBase::loadMenuPrompt()
 }
 
 /**
+ * @brief Move to End of Display then output
+ * @param output
+ */
+void MenuBase::moveToBottomAndDisplay(const std::string &prompt)
+{
+    std::string output = getDefaultColor();
+    int screen_row = m_ansi_process->getMaxRowsUsedOnScreen();
+    output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
+    output += std::move(prompt);        
+    baseProcessAndDeliver(output);           
+}
+
+/**
  * @brief Startup And load the Menu File
  */
 void MenuBase::loadAndStartupMenu()
@@ -718,18 +731,7 @@ void MenuBase::loadAndStartupMenu()
     // First Lets imploment N with ^ color codes for local theme colors.
     if (m_menu_info->menu_pulldown_file.size() == 1 && toupper(m_menu_info->menu_pulldown_file[0]) == 'N')
     {
-        // 1. Set the Default Color
-        std::string output = getDefaultColor();
-        // 2. Get Initial Line Position to display this prompt on
-        // 3. Move to next line, scrolling down if on the last
-        int screen_row = m_ansi_process->getMaxRowsUsedOnScreen();
-        std::cout << "screen row: " << screen_row << std::endl;
-        output += "\x1b[" + std::to_string(screen_row) + ";1H";
-        output += "\r\n";                
-        output += std::move(parseMenuPromptString(m_menu_info->menu_prompt));
-                
-        
-        m_menu_session_data->deliver(output);
+        moveToBottomAndDisplay(parseMenuPromptString(m_menu_info->menu_prompt));                    
         m_is_active_pulldown_menu = false;
 
         // Not sure if this is allowed in legacy, but lets do it, then they can clear screen or add ansi!
@@ -818,9 +820,7 @@ void MenuBase::loadAndStartupMenu()
                 
     // Loads the users selected menu prompt
     output += loadMenuPrompt();
-    
-    // Don't need process here, since we pipe2ansi seperately
-    m_menu_session_data->deliver(output);
+    baseProcessAndDeliver(output);
 
     if (!m_use_first_command_execution)
     {
@@ -876,7 +876,7 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
     light_bars.append("\x1b[0m\x1b[u");
 
     std::string output = std::move(m_session_io.pipe2ansi(light_bars));
-    m_menu_session_data->deliver(output);
+    baseProcessAndDeliver(output);
 }
 
 /**
@@ -1354,7 +1354,6 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
         // Only if return data shows a processed key returned.
         if (result != "empty") 
         {
-            std::cout << "baseProcessAndDeliver: " << result << std::endl;
             std::string output = getDefaultInputColor();
             output.append(result);
             baseProcessAndDeliver(output);

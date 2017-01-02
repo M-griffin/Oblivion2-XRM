@@ -207,6 +207,12 @@ public:
      */
     std::string loadMenuPrompt();
 
+    /**
+     * @brief Move to End of Display then output
+     * @param output
+     */
+    void moveToBottomAndDisplay(const std::string &prompt);
+
     // Menu System will be a (2) Function system 1st setups up and displays
     // The Second handles all I/O for the menu options, this is dynamic since
     // Input is passed through to it, then the function returns for the next input
