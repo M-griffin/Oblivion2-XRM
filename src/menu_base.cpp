@@ -1387,12 +1387,7 @@ void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf
  *        Handles Processing for Loaded Menus Hotkey and Lightbars
  */
 void MenuBase::menuYesNoBarInput(const std::string &character_buffer, const bool &is_utf8)
-{
-    
-    // NOTE: use ansi processor getMaxRowsUsedOnScreen() to get last line used!
-    
-    std::cout << " *** menuInput" << std::endl;       
-        
+{         
     // If were in lightbar mode, then we are using hotkeys.
     if (m_is_active_pulldown_menu)
     {            

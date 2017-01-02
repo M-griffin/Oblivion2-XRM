@@ -201,6 +201,21 @@ public:
     void changeModule(int mod_function_index);
 
     /**
+     * @brief Changes to Next module index.
+     */
+    void changeNextModule();
+    
+    /**
+     * @brief Changes to Previous module index.
+     */
+    void changePreviousModule();
+
+    /**
+     * @brief Redisplay's the current module prompt.
+     */
+    void redisplayModulePrompt();
+
+    /**
      * @brief Pull and Display Prompts
      * @param prompt
      */
