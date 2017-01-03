@@ -133,6 +133,12 @@ public:
      * @param prompt
      */
     void displayPrompt(const std::string &prompt);
+    
+    /**
+     * @brief Pull and Display Prompts with following newline
+     * @param prompt
+     */
+    void displayPromptAndNewLine(const std::string &prompt);
 
     /**
      * @brief Start ANSI ESC[6n ANSI Detection

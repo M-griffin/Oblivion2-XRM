@@ -84,29 +84,29 @@ void ModSignup::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_NUP]                = std::make_pair("New User Password", "New User Password :");
-    value[PROMPT_DISCLAIMER]         = std::make_pair("Disclaimer", "%%DFDISCLAIMER |CR[y/n] Disclaimer Agree :");
-    value[PROMPT_HANDLE]             = std::make_pair("User Handle", "Enter Handle :");
+    value[PROMPT_NUP]                = std::make_pair("New User Password", "New User Password: ");
+    value[PROMPT_DISCLAIMER]         = std::make_pair("Disclaimer", "%%DFDISCLAIMER.ANS |CR[y/n] Disclaimer Agree: ");
+    value[PROMPT_HANDLE]             = std::make_pair("User Handle", "Enter Handle: ");
     value[PROMPT_USER_NUMBER]        = std::make_pair("Your User Numer |OT", "Your user number is |OT.");
-    value[PROMPT_REAL_NAME]          = std::make_pair("Real Name", "Enter Real Name :");
-    value[PROMPT_ADDRESS]            = std::make_pair("Address", "Address :");
-    value[PROMPT_LOCATION]           = std::make_pair("Location", "City/State :");
-    value[PROMPT_COUNTRY]            = std::make_pair("Country", "Country :");
-    value[PROMPT_EMAIL]              = std::make_pair("Email Address", "Email Address :");
-    value[PROMPT_USER_NOTE]          = std::make_pair("User Note", "Affiliations / User Note :");
-    value[PROMPT_BIRTH_DATE]         = std::make_pair("Birth Date", "[yyyy-mm-dd] Birth Date :");
-    value[PROMPT_GENDER]             = std::make_pair("Gender", "[m/f] Gender :");
-    value[PROMPT_PASSWORD]           = std::make_pair("Password", "(case sensitive) Password :");
-    value[PROMPT_VERIFY_PASSWORD]    = std::make_pair("Verify Password", "(case sensitive) Verify Password :");
-    value[PROMPT_CHALLENGE_QUESTION] = std::make_pair("Forgot Password Challenge Question", "Challenge Question :");
-    value[PROMPT_CHALLENGE_ANSWER]   = std::make_pair("Forgot Password Challenge Answer", "(case sensitive) Challenge Answer :");
-    value[PROMPT_VERIFY_ANSWER]      = std::make_pair("Forgot Password Verify Answer", "(case sensitive) Verify Answer :");
-    value[PROMPT_YESNO_BARS]         = std::make_pair("Use YES/NO Bars", "[y/n] Use Yes/No Bars [ENTER] = Yes:");
-    value[PROMPT_USE_PAUSE]          = std::make_pair("Pause on ", "Screen Pausing [ENTER] = Yes:");
-    value[PROMPT_USE_CLEAR]          = std::make_pair("Clear Screen or Scroll ", "Clear Screen or Scroll [ENTER] = Yes :");
-    value[PROMPT_USE_ANSI_COLOR]     = std::make_pair("Use Ansi Color ", "[y/n] Ansi Color [ENTER] = Yes :");
-    value[PROMPT_BACK_SPACE]         = std::make_pair("Backspace Sequence", "Backspace Key [W]indows/[T]erminal/[ENTER] Detect :");
-    value[PROMPT_VERIFY_SAVE]        = std::make_pair("Verify All Data", "[y/n] Verify and Save user record [ENTER] = Yes : ");
+    value[PROMPT_REAL_NAME]          = std::make_pair("Real Name", "Enter Real Name: ");
+    value[PROMPT_ADDRESS]            = std::make_pair("Address", "Address: ");
+    value[PROMPT_LOCATION]           = std::make_pair("Location", "City/State: ");
+    value[PROMPT_COUNTRY]            = std::make_pair("Country", "Country: ");
+    value[PROMPT_EMAIL]              = std::make_pair("Email Address", "Email Address: ");
+    value[PROMPT_USER_NOTE]          = std::make_pair("User Note", "Affiliations / User Note: ");
+    value[PROMPT_BIRTH_DATE]         = std::make_pair("Birth Date", "[yyyy-mm-dd] Birth Date: ");
+    value[PROMPT_GENDER]             = std::make_pair("Gender", "[m/f] Gender: ");
+    value[PROMPT_PASSWORD]           = std::make_pair("Password", "(case sensitive) Password: ");
+    value[PROMPT_VERIFY_PASSWORD]    = std::make_pair("Verify Password", "(case sensitive) Verify Password: ");
+    value[PROMPT_CHALLENGE_QUESTION] = std::make_pair("Forgot Password Challenge Question", "Challenge Question: ");
+    value[PROMPT_CHALLENGE_ANSWER]   = std::make_pair("Forgot Password Challenge Answer", "(case sensitive) Challenge Answer: ");
+    value[PROMPT_VERIFY_ANSWER]      = std::make_pair("Forgot Password Verify Answer", "(case sensitive) Verify Answer: ");
+    value[PROMPT_YESNO_BARS]         = std::make_pair("Use YES/NO Bars", "[y/ENTER or n] Use Yes/No Bars: ");
+    value[PROMPT_USE_PAUSE]          = std::make_pair("Pause on ", "[y/ENTER or n] Use Screen Pausing: ");
+    value[PROMPT_USE_CLEAR]          = std::make_pair("Clear Screen or Scroll ", "[y/ENTER or n] Use Clear Screen or Scrolling: ");
+    value[PROMPT_USE_ANSI_COLOR]     = std::make_pair("Use Ansi Color ", "[y/n] Use Ansi Color: ");
+    value[PROMPT_BACK_SPACE]         = std::make_pair("Backspace Sequence", "[W]indows/[T]erminal/[ENTER] to Set Backspace Key: ");
+    value[PROMPT_VERIFY_SAVE]        = std::make_pair("Verify All Data", "[y/n] Verify and Save user record: ");
 
     // Invalid.
     value[PROMPT_TEXT_INVALID]       = std::make_pair("Invalid Text", "|04Invalid entry!|CR");
@@ -117,8 +117,8 @@ void ModSignup::createTextPrompts()
     value[PROMPT_EMAIL_INVALID]      = std::make_pair("Email Already Exists", "|04Email, Already Exists, Try another adress or check if your have an account.|CR");
 
     // Confirmation of Save
-    value[PROMPT_SAVED]              = std::make_pair("User Record Saved", "|CR|10User Record Saved Successfully.|CR");
-    value[PROMPT_NOT_SAVED]          = std::make_pair("User Record Not Saved", "|CR|04Error, User Record Not Saved!|CR");
+    value[PROMPT_SAVED]              = std::make_pair("User Record Saved", "|CR|03User Record Saved Successfully.");
+    value[PROMPT_NOT_SAVED]          = std::make_pair("User Record Not Saved", "|CR|04Error, User Record Not Saved!");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -171,6 +171,15 @@ void ModSignup::redisplayModulePrompt()
 void ModSignup::displayPrompt(const std::string &prompt)
 {
     baseDisplayPrompt(prompt, m_text_prompts_dao);
+}
+
+/**
+ * @brief Pull and Display Prompts with following newline
+ * @param prompt
+ */
+void ModSignup::displayPromptAndNewLine(const std::string &prompt)
+{
+    baseDisplayPromptAndNewLine(prompt, m_text_prompts_dao);
 }
 
 /**
@@ -538,6 +547,8 @@ bool ModSignup::newUserPassword(const std::string &input)
             return false;
         }
 
+        baseProcessDeliverNewLine();
+
         // Pull in and test aginst new user password.
         if(key.compare(m_config->password_newuser) == 0)
         {
@@ -548,7 +559,7 @@ bool ModSignup::newUserPassword(const std::string &input)
         {
             std::cout << "No Match" << key.size() << std::endl;
             ++m_newuser_password_attempts;
-            displayPrompt(PROMPT_PASS_INVALID);
+            displayPromptAndNewLine(PROMPT_PASS_INVALID);
             redisplayModulePrompt();
         }
     }
@@ -593,6 +604,8 @@ bool ModSignup::disclaimer(const std::string &input)
             return false;
         }
 
+        baseProcessDeliverNewLine();
+
         // If ENTER Default to Yes, or Single Y is hit
         if(toupper(key[0]) == 'Y' && key.size() == 1)
         {
@@ -606,7 +619,7 @@ bool ModSignup::disclaimer(const std::string &input)
         }
         else
         {
-            displayPrompt(PROMPT_TEXT_INVALID);
+            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
             redisplayModulePrompt();
         }
     }
@@ -652,6 +665,8 @@ bool ModSignup::handle(const std::string &input)
         // Check for user name and if is already exists!
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
         user_ptr search = user_data->getUserByHandle(key);
+        
+        baseProcessDeliverNewLine();
 
         if(!search || search->iId == -1)
         {
@@ -662,7 +677,7 @@ bool ModSignup::handle(const std::string &input)
         else
         {
             std::cout << "match found" << std::endl;
-            displayPrompt(PROMPT_HANDLE_INVALID);
+            displayPromptAndNewLine(PROMPT_HANDLE_INVALID);
             redisplayModulePrompt();
         }
     }
@@ -708,6 +723,8 @@ bool ModSignup::realName(const std::string &input)
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
         user_ptr search = user_data->getUserByRealName(key);
 
+        baseProcessDeliverNewLine();
+
         if(!search || search->iId == -1)
         {
             std::cout << "no match found" << std::endl;
@@ -717,7 +734,7 @@ bool ModSignup::realName(const std::string &input)
         else
         {
             std::cout << "match found" << std::endl;
-            displayPrompt(PROMPT_NAME_INVALID);
+            displayPromptAndNewLine(PROMPT_NAME_INVALID);
             redisplayModulePrompt();
         }
     }
@@ -758,7 +775,8 @@ bool ModSignup::address(const std::string &input)
         {
             return false;
         }
-
+        
+        baseProcessDeliverNewLine();
         m_user_record->sAddress = key;
         changeNextModule();
     }
@@ -800,6 +818,7 @@ bool ModSignup::location(const std::string &input)
             return false;
         }
 
+        baseProcessDeliverNewLine();
         m_user_record->sLocation = key;
         changeNextModule();
     }
@@ -841,6 +860,7 @@ bool ModSignup::country(const std::string &input)
             return false;
         }
 
+        baseProcessDeliverNewLine();
         m_user_record->sCountry = key;
         changeNextModule();
     }
@@ -882,9 +902,11 @@ bool ModSignup::email(const std::string &input)
             return false;
         }
 
+        baseProcessDeliverNewLine();
+
         // Test if email already exists.
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
-        user_ptr search = user_data->getUserByEmail(key);
+        user_ptr search = user_data->getUserByEmail(key);        
 
         if(!search || search->iId == -1)
         {
@@ -895,7 +917,7 @@ bool ModSignup::email(const std::string &input)
         else
         {
             std::cout << "match found" << std::endl;
-            displayPrompt(PROMPT_EMAIL_INVALID);
+            displayPromptAndNewLine(PROMPT_EMAIL_INVALID);
             redisplayModulePrompt();
         }
     }
@@ -937,6 +959,7 @@ bool ModSignup::userNote(const std::string &input)
             return false;
         }
 
+        baseProcessDeliverNewLine();
         m_user_record->sUserNote = key;
         changeNextModule();
     }
@@ -978,6 +1001,8 @@ bool ModSignup::birthday(const std::string &input)
             return false;
         }
 
+        baseProcessDeliverNewLine();
+
         // Validate Date Here,  ie.. 2016-01-01 format.
         boost::regex date_regex { m_config->regexp_date_validation };
         boost::smatch str_matches;
@@ -994,8 +1019,9 @@ bool ModSignup::birthday(const std::string &input)
             {
                 std::cout << "regex passed, ss failed!" << std::endl;
                 ss.clear();
-                displayPrompt(PROMPT_DATE_INVALID);
+                displayPromptAndNewLine(PROMPT_DATE_INVALID);
                 redisplayModulePrompt();
+                return true;
             }
 
             std::time_t const time = mktime(&tm);
@@ -1004,7 +1030,7 @@ bool ModSignup::birthday(const std::string &input)
         }
         else
         {
-            displayPrompt(PROMPT_DATE_INVALID);
+            displayPromptAndNewLine(PROMPT_DATE_INVALID);
             redisplayModulePrompt();
         }
     }
@@ -1040,6 +1066,14 @@ bool ModSignup::gender(const std::string &input)
     }
     else if(result[0] == '\n')
     {
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            return false;
+        }
+        
+        baseProcessDeliverNewLine();
+        
         // If ENTER Default to Yes, or Single Y is hit
         if((toupper(key[0]) == 'M' && key.size() == 1))
         {
@@ -1052,11 +1086,12 @@ bool ModSignup::gender(const std::string &input)
         }
         else
         {
-            displayPrompt(PROMPT_TEXT_INVALID);
+            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
             redisplayModulePrompt();
             return true;
         }
         
+        baseProcessDeliverNewLine();
         changeNextModule();
     }
     else
@@ -1104,6 +1139,7 @@ bool ModSignup::password(const std::string &input)
             return false;
         }
 
+        baseProcessDeliverNewLine();
         m_security_record->sPasswordHash = key;
         changeNextModule();
     }
@@ -1152,6 +1188,8 @@ bool ModSignup::verifyPassword(const std::string &input)
             return false;
         }
 
+        baseProcessDeliverNewLine();
+
         // compare password to previous, then encrypt if they match
         // otherwise fail back if they don't and ask again.
         if(m_security_record->sPasswordHash.compare(key) == 0)
@@ -1161,7 +1199,7 @@ bool ModSignup::verifyPassword(const std::string &input)
             if (!encryption)
             {
                 std::cout << "Error, unable to allocate encryption" << std::endl;
-                displayPrompt(PROMPT_PASS_INVALID);
+                displayPromptAndNewLine(PROMPT_PASS_INVALID);
                 changePreviousModule();
                 return false;
             }
@@ -1184,7 +1222,7 @@ bool ModSignup::verifyPassword(const std::string &input)
         {
             std::cout << "no match found" << std::endl;
             m_security_record->sPasswordHash = "";
-            displayPrompt(PROMPT_PASS_INVALID);
+            displayPromptAndNewLine(PROMPT_PASS_INVALID);
             changePreviousModule();
         }
     }
@@ -1225,6 +1263,8 @@ bool ModSignup::challengeQuestion(const std::string &input)
         {
             return false;
         }
+        
+        baseProcessDeliverNewLine();
 
         // Set the Password and verify it matches on next module.
         m_security_record->sChallengeQuestion = key;
@@ -1274,6 +1314,8 @@ bool ModSignup::challengeAnswer(const std::string &input)
         {
             return false;
         }
+        
+        baseProcessDeliverNewLine();
 
         m_security_record->sChallengeAnswerHash = key;
         changeNextModule();
@@ -1322,6 +1364,8 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
         {
             return false;
         }
+        
+        baseProcessDeliverNewLine();
 
         // compare password to previous, then encrypt if they match
         // otherwise fail back if they don't and ask again.
@@ -1332,7 +1376,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
             {
                 std::cout << "Error, unable to allocate encryption" << std::endl;
                 m_security_record->sChallengeAnswerHash = "";
-                displayPrompt(PROMPT_PASS_INVALID);
+                displayPromptAndNewLine(PROMPT_PASS_INVALID);
                 changePreviousModule();
                 return true;
             }
@@ -1357,7 +1401,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
         {
             std::cout << "no match found" << std::endl;
             m_security_record->sChallengeAnswerHash = "";
-            displayPrompt(PROMPT_PASS_INVALID);
+            displayPromptAndNewLine(PROMPT_PASS_INVALID);
             changePreviousModule();
         }
     }
@@ -1392,7 +1436,7 @@ bool ModSignup::yesNoBars(const std::string &input)
         return false;
     }
     else if(result[0] == '\n')
-    {
+    {                
         // If ENTER Default to Yes, or Single Y is hit
         if(key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1))
         {
@@ -1404,15 +1448,17 @@ bool ModSignup::yesNoBars(const std::string &input)
             }
 
             m_user_record->bYesNoBars = true;
+            baseProcessDeliverNewLine();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
             m_user_record->bYesNoBars = false;
+            baseProcessDeliverNewLine();
         }
         else
         {
-            displayPrompt(PROMPT_TEXT_INVALID);
+            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
             redisplayModulePrompt();
             return true;
         }
@@ -1450,7 +1496,7 @@ bool ModSignup::doPause(const std::string &input)
         return false;
     }
     else if(result[0] == '\n')
-    {
+    {        
         // If ENTER Default to Yes, or Single Y is hit
         if(key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1))
         {
@@ -1462,15 +1508,17 @@ bool ModSignup::doPause(const std::string &input)
             }
 
             m_user_record->bDoPause = true;
+            baseProcessDeliverNewLine();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
             m_user_record->bDoPause = false;
+            baseProcessDeliverNewLine();
         }
         else
         {
-            displayPrompt(PROMPT_TEXT_INVALID);
+            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
             redisplayModulePrompt();
             return true;
         }
@@ -1520,15 +1568,17 @@ bool ModSignup::clearOrScroll(const std::string &input)
             }
 
             m_user_record->bClearOrScroll = true;
+            baseProcessDeliverNewLine();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
             m_user_record->bClearOrScroll = false;
+            baseProcessDeliverNewLine();
         }
         else
         {
-            displayPrompt(PROMPT_TEXT_INVALID);
+            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
             redisplayModulePrompt();
             return true;
         }
@@ -1578,15 +1628,17 @@ bool ModSignup::ansiColor(const std::string &input)
             }
 
             m_user_record->bAnsi = true;
+            baseProcessDeliverNewLine();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
             m_user_record->bAnsi = false;
+            baseProcessDeliverNewLine();
         }
         else
         {
-            displayPrompt(PROMPT_TEXT_INVALID);
+            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
             redisplayModulePrompt();
             return true;
         }
@@ -1630,7 +1682,7 @@ bool ModSignup::backSpace(const std::string &input)
         {
             // Key == 0 on [ENTER] pressed alone.
             std::string detection_prompt = "Detection WIP, Select W or T.";
-            baseProcessAndDeliver(detection_prompt);
+            baseProcessAndDeliverNewLine(detection_prompt);
 
             // Not Implimented YET
             // Start Backspace Detection here!
@@ -1641,15 +1693,17 @@ bool ModSignup::backSpace(const std::string &input)
         else if(toupper(key[0]) == 'W' && key.size() == 1)
         {
             m_user_record->bBackSpaceVt100 = false;
+            baseProcessDeliverNewLine();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'T' && key.size() == 1)
         {
             m_user_record->bBackSpaceVt100 = true;
+            baseProcessDeliverNewLine();
         }
         else
         {
-            displayPrompt(PROMPT_TEXT_INVALID);
+            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
             redisplayModulePrompt();
             return true;
         }
@@ -1711,13 +1765,13 @@ void ModSignup::saveNewUserRecord()
             std::cout << "Error, unable to remove secutiry record." << std::endl;
         }
 
-        displayPrompt(PROMPT_NOT_SAVED);
+        displayPromptAndNewLine(PROMPT_NOT_SAVED);
         m_is_active = false;
         return;
     }
 
     // Completed Successfully
-    displayPrompt(PROMPT_SAVED);
+    displayPromptAndNewLine(PROMPT_SAVED);
 
     m_is_active = false;
     return;
@@ -1753,6 +1807,8 @@ bool ModSignup::verifyAndSave(const std::string &input)
                 baseProcessAndDeliver(yes_prompt);
             }
 
+            baseProcessDeliverNewLine();
+
             saveNewUserRecord();
             return false;
         }
@@ -1761,11 +1817,12 @@ bool ModSignup::verifyAndSave(const std::string &input)
         {
             // Abort and Return;
             m_is_active = false;
+            baseProcessDeliverNewLine();
             return false;
         }
         else
         {
-            displayPrompt(PROMPT_TEXT_INVALID);
+            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
             redisplayModulePrompt();
             return true;
         }

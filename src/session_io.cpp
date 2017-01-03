@@ -529,6 +529,8 @@ std::string SessionIO::parseFilename(const std::string &pipe_code)
     CommonIO common_io;
 
     std::string buffer = "";
+    
+    // TODO, note if .ANS is not found, load .ASC
     common_io.readinAnsi(str, buffer);
     if (buffer.size() > 0)
     {

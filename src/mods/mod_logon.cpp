@@ -77,11 +77,11 @@ void ModLogon::createTextPrompts()
     M_TextPrompt value;
 
     value[PROMPT_LOGON]               = std::make_pair("Logon Prompt", "Logon: ");
-    value[PROMPT_USERNUMBER]          = std::make_pair("Your User Number is |OT", "Use your user number for quick logins, # is |03|OT");
+    value[PROMPT_USERNUMBER]          = std::make_pair("Your User Number is |OT", "Use your user number for quick logins, # is |03|OT|CR");
     value[PROMPT_PASSWORD]            = std::make_pair("Password Prompt", "password: ");
-    value[PROMPT_USE_INVALID]         = std::make_pair("Invalid Entry", "|04Invalid Response! Try again.");
-    value[PROMPT_INVALID_USERNAME]    = std::make_pair("Invalid Username", "|04Invalid Username! Try again.");
-    value[PROMPT_INVALID_PASSWORD]    = std::make_pair("Invalid Passowrd", "|04Invalid Passowrd! Try again.");
+    value[PROMPT_USE_INVALID]         = std::make_pair("Invalid Entry", "|04Invalid Response! Try again.|CR");
+    value[PROMPT_INVALID_USERNAME]    = std::make_pair("Invalid Username", "|04Invalid Username! Try again.|CR");
+    value[PROMPT_INVALID_PASSWORD]    = std::make_pair("Invalid Passowrd", "|04Invalid Passowrd! Try again.|CR");
 
     m_text_prompts_dao->writeValue(value);
 }

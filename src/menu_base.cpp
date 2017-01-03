@@ -1345,6 +1345,7 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
     else if(result[0] == '\n')
     {
         // Key == 0 on [ENTER] pressed alone. then invalid!
+        // TODO, might have menu keys with ENTER, update this lateron!!
         if(key.size() == 0)
         {
             // Return and don't do anything.

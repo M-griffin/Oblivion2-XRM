@@ -76,7 +76,7 @@ void ModPreLogon::createTextPrompts()
     value[PROMPT_DETECTED_ANSI]    = std::make_pair("Emulation Detected: Ansi ESC Supported", "|CREmulation Detected: |03ANSI ESC Supported.");
     value[PROMPT_DETECTED_NONE]    = std::make_pair("Emulation Detected: None", "|CREmulation Detect: |03none");
 
-    value[PROMPT_USE_ANSI]         = std::make_pair("Use ANSI Colors (Y/n) ", "|CRPress [y/ENTER] to use ANSI Colors |CR[N] to Select ASCII No Colors: ");
+    value[PROMPT_USE_ANSI]         = std::make_pair("Use ANSI Colors (Y/n) ", "|CRPress [y/ENTER or n] to use ANSI Colors or to Select ASCII No Colors: ");
     value[PROMPT_USE_INVALID]      = std::make_pair("Invalid Response to Y/N/ENTER", "|04Invalid Response! Try again.");
     value[PROMPT_ANSI_SELECTED]    = std::make_pair("ANSI Color Selected", "Selected :|03Ansi.");
     value[PROMPT_ASCII_SELECTED]   = std::make_pair("ASCII No Colors Selected", "Selected :None.");
@@ -85,8 +85,8 @@ void ModPreLogon::createTextPrompts()
     value[PROMPT_DETECTED_TERM]    = std::make_pair("Detecting Terminal: |OT ", "|CRDetected Terminal Type: |03|OT");
     value[PROMPT_DETECTED_SIZE]    = std::make_pair("Detecting Terminal Size: |OT ", "|CRDetected Screen Size: |03|OT");
 
-    value[PROMPT_ASK_CP437]        = std::make_pair("Use CP437 Output Encoding", "|CR|CR[y/n/ENTER] Select Output Encoding CP-437: ");
-    value[PROMPT_ASK_UTF8]         = std::make_pair("Use UTF-8 Output Encoding", "|CR|CR[y/n/ENTER] Select Output Encoding UTF-8: ");
+    value[PROMPT_ASK_CP437]        = std::make_pair("Use CP437 Output Encoding", "|CR|CR[y/ENTER or n] Select Output Encoding CP-437: ");
+    value[PROMPT_ASK_UTF8]         = std::make_pair("Use UTF-8 Output Encoding", "|CR|CR[y/ENTER or n] Select Output Encoding UTF-8: ");
 
     value[PROMPT_CP437_SELECTED]   = std::make_pair("Selected CP437 Output Encoding", "Selected :|03CP-437 Codepage.");
     value[PROMPT_UTF8_SELECTED]    = std::make_pair("Selected UTF-8 Output Encoding", "Selected :|03UTF-8 Codepage.");
@@ -121,6 +121,15 @@ void ModPreLogon::redisplayModulePrompt()
 void ModPreLogon::displayPrompt(const std::string &prompt)
 {
     baseDisplayPrompt(prompt, m_text_prompts_dao);
+}
+
+/**
+ * @brief Pull and Display Prompts with following newline
+ * @param prompt
+ */
+void ModPreLogon::displayPromptAndNewLine(const std::string &prompt)
+{
+    baseDisplayPromptAndNewLine(prompt, m_text_prompts_dao);
 }
 
 /**
