@@ -76,8 +76,9 @@ void ModLogon::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_LOGON]               = std::make_pair("Logon Prompt", "|CRLogon :");
-    value[PROMPT_PASSWORD]            = std::make_pair("Password Prompt", "password :");
+    value[PROMPT_LOGON]               = std::make_pair("Logon Prompt", "Logon: ");
+    value[PROMPT_USERNUMBER]          = std::make_pair("Your User Number is |OT", "Use your user number for quick logins, # is |03|OT");
+    value[PROMPT_PASSWORD]            = std::make_pair("Password Prompt", "password: ");
     value[PROMPT_USE_INVALID]         = std::make_pair("Invalid Entry", "|04Invalid Response! Try again.");
     value[PROMPT_INVALID_USERNAME]    = std::make_pair("Invalid Username", "|04Invalid Username! Try again.");
     value[PROMPT_INVALID_PASSWORD]    = std::make_pair("Invalid Passowrd", "|04Invalid Passowrd! Try again.");
@@ -135,6 +136,15 @@ void ModLogon::displayPrompt(const std::string &prompt)
 }
 
 /**
+ * @brief Pull and Display Prompts with following newline
+ * @param prompt
+ */
+void ModLogon::displayPromptAndNewLine(const std::string &prompt)
+{
+    baseDisplayPromptAndNewLine(prompt, m_text_prompts_dao);
+}
+
+/**
  * @brief Validates user Logon
  * @return
  */
@@ -142,6 +152,24 @@ void ModLogon::setupLogon()
 {
     std::cout << "setupLogon()" << std::endl;
     displayPrompt(PROMPT_LOGON);
+}
+
+/**
+ * @brief Display the UserNumber on Logon.
+ */
+void ModLogon::displayUserNumber()
+{
+    M_StringPair prompt_set = std::move(m_text_prompts_dao->getPrompt(PROMPT_USERNUMBER));
+    
+    std::string mci_code = "|OT";    
+    std::string result = prompt_set.second;
+    std::string user_number = std::to_string(m_logon_user->iId);
+    
+    std::cout << "User Number: " << user_number << std::endl;        
+    m_session_io.m_common_io.parseLocalMCI(result, mci_code, user_number);
+    result = m_session_io.pipe2ansi(result);
+    result += "\r\n";
+    baseProcessAndDeliver(result);       
 }
 
 /**
@@ -215,6 +243,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
         m_logon_user = user_data->getUserByHandle(input);
         if(!m_logon_user || m_logon_user->iId != -1) 
         {
+            displayUserNumber();
             return true;
         }
     }
@@ -224,6 +253,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
         m_logon_user = user_data->getUserByEmail(input);
         if(!m_logon_user || m_logon_user->iId != -1) 
         {
+            displayUserNumber();
             return true;
         }
     }
@@ -233,6 +263,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
         m_logon_user = user_data->getUserByRealName(input);
         if(!m_logon_user || m_logon_user->iId != -1) 
         {
+            displayUserNumber();
             return true;
         }
     }
@@ -256,9 +287,7 @@ bool ModLogon::logon(const std::string &input)
         std::cout << "aborted!" << std::endl;
     }
     else if(result[0] == '\n')
-    {
-        baseProcessDeliverNewLine();
-        
+    {            
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
@@ -266,17 +295,18 @@ bool ModLogon::logon(const std::string &input)
             return false;
         }
                 
+        baseProcessDeliverNewLine();
+        
         // Check if users enter valid identifier.
         if (checkUserLogon(key))
-        {            
-            // Match Found, ask for password
-            std::cout << "match found" << std::endl;            
+        {               
+            // Testing print user name.
+            std::cout << m_logon_user->sHandle << std::endl;
             changeNextModule();
         }
         else
         {
-            // Invalid Entry, try again!            
-            displayPrompt(PROMPT_INVALID_USERNAME);                    
+            displayPromptAndNewLine(PROMPT_INVALID_USERNAME);                    
             redisplayModulePrompt();
         }            
     }
@@ -354,25 +384,23 @@ bool ModLogon::password(const std::string &input)
         std::cout << "aborted!" << std::endl;
     }
     else if(result[0] == '\n')
-    {
-        baseProcessDeliverNewLine();
-        
+    {                
         // If ENTER Default to Yes, or Single Y is hit
         if(key.size() == 0)
         {
             return false;
         }         
         
+        baseProcessDeliverNewLine();
+        
         if (validate_password(key))
         {
-            // If success, set authorized true, and return.
             m_session_data->m_is_session_authorized = true;
             m_is_active = false;
         }
         else
         {
-            std::cout << "no match found" << std::endl;
-            displayPrompt(PROMPT_INVALID_PASSWORD);        
+            displayPromptAndNewLine(PROMPT_INVALID_PASSWORD);        
             redisplayModulePrompt();
         }
     }

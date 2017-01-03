@@ -73,20 +73,20 @@ void ModPreLogon::createTextPrompts()
     M_TextPrompt value;
 
     value[PROMPT_DETECT_EMULATION] = std::make_pair("Detecting Emulation", "Detecting Emulation");
-    value[PROMPT_DETECTED_ANSI]    = std::make_pair("Emulation Detected: Ansi ESC Supported", "|CREmulation Detected :|03ANSI ESC Supported.");
-    value[PROMPT_DETECTED_NONE]    = std::make_pair("Emulation Detected: None", "|CREmulation Detect :|03none");
+    value[PROMPT_DETECTED_ANSI]    = std::make_pair("Emulation Detected: Ansi ESC Supported", "|CREmulation Detected: |03ANSI ESC Supported.");
+    value[PROMPT_DETECTED_NONE]    = std::make_pair("Emulation Detected: None", "|CREmulation Detect: |03none");
 
-    value[PROMPT_USE_ANSI]         = std::make_pair("Use ANSI Colors (Y/n) ", "|CRPress [y/ENTER] to use ANSI Colors |CR[N] to Select ASCII No Colors :");
+    value[PROMPT_USE_ANSI]         = std::make_pair("Use ANSI Colors (Y/n) ", "|CRPress [y/ENTER] to use ANSI Colors |CR[N] to Select ASCII No Colors: ");
     value[PROMPT_USE_INVALID]      = std::make_pair("Invalid Response to Y/N/ENTER", "|04Invalid Response! Try again.");
     value[PROMPT_ANSI_SELECTED]    = std::make_pair("ANSI Color Selected", "Selected :|03Ansi.");
     value[PROMPT_ASCII_SELECTED]   = std::make_pair("ASCII No Colors Selected", "Selected :None.");
 
     value[PROMPT_DETECT_TERMOPTS]  = std::make_pair("Detecting Terminal Options", "|CR|CRDetecting Terminal Options");
-    value[PROMPT_DETECTED_TERM]    = std::make_pair("Detecting Terminal: |OT ", "|CRDetected Terminal Type :|03|OT");
-    value[PROMPT_DETECTED_SIZE]    = std::make_pair("Detecting Terminal Size: |OT ", "|CRDetected Screen Size :|03|OT");
+    value[PROMPT_DETECTED_TERM]    = std::make_pair("Detecting Terminal: |OT ", "|CRDetected Terminal Type: |03|OT");
+    value[PROMPT_DETECTED_SIZE]    = std::make_pair("Detecting Terminal Size: |OT ", "|CRDetected Screen Size: |03|OT");
 
-    value[PROMPT_ASK_CP437]        = std::make_pair("Use CP437 Output Encoding", "|CR|CR[y/n/ENTER] Select Output Encoding CP-437 :");
-    value[PROMPT_ASK_UTF8]         = std::make_pair("Use UTF-8 Output Encoding", "|CR|CR[y/n/ENTER] Select Output Encoding UTF-8 :");
+    value[PROMPT_ASK_CP437]        = std::make_pair("Use CP437 Output Encoding", "|CR|CR[y/n/ENTER] Select Output Encoding CP-437: ");
+    value[PROMPT_ASK_UTF8]         = std::make_pair("Use UTF-8 Output Encoding", "|CR|CR[y/n/ENTER] Select Output Encoding UTF-8: ");
 
     value[PROMPT_CP437_SELECTED]   = std::make_pair("Selected CP437 Output Encoding", "Selected :|03CP-437 Codepage.");
     value[PROMPT_UTF8_SELECTED]    = std::make_pair("Selected UTF-8 Output Encoding", "Selected :|03UTF-8 Codepage.");
@@ -134,7 +134,6 @@ void ModPreLogon::setupEmulationDetection()
     // Deliver ANSI Location Sequence to Detect Emulation Response
     // Only detects if terminal handles ESC responses.
     // Windows Console Telnet will response it's at 259 y!
-
     std::string detection = m_session_io.pipe2ansi("|00\x1b[s\x1b[255B\x1b[6n");
     std::string restore_position = "\x1b[u";
 
@@ -192,8 +191,7 @@ void ModPreLogon::displayTerminalDetection()
     {
         std::string result = prompt_term.second;
         std::string term = m_session_data->m_telnet_state->getTermType();
-        std::cout << "Term Type: " << term << std::endl;
-        
+        std::cout << "Term Type: " << term << std::endl;        
         m_session_io.m_common_io.parseLocalMCI(result, mci_code, term);
         result = m_session_io.pipe2ansi(result);
         baseProcessAndDeliver(result);

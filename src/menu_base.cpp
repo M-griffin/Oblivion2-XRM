@@ -1146,6 +1146,8 @@ bool MenuBase::processMenuOptions(const std::string &input)
     {
         std::cout << "EXECUTE ENTER!: " << input_text << std::endl;
         is_enter = true;
+        // Push out a NewLine after ENTER Executions
+        baseProcessAndDeliver("\r\n");
     }
 
     // Check for loaded menu commands.

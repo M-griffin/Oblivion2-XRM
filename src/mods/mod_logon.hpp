@@ -91,6 +91,7 @@ public:
 
     // Create Prompt Constants, these are the keys for key/value lookup
     const std::string PROMPT_LOGON = "logon";
+    const std::string PROMPT_USERNUMBER = "user_number";
     const std::string PROMPT_PASSWORD = "password";
     const std::string PROMPT_PASSWORD_QUESTION = "password_question";
     const std::string PROMPT_PASSWORD_ANSWER = "password_answer";
@@ -131,6 +132,12 @@ public:
      * @param prompt
      */
     void displayPrompt(const std::string &prompt);
+    
+    /**
+     * @brief Pull and Display Prompts with following newline
+     * @param prompt
+     */
+    void displayPromptAndNewLine(const std::string &prompt);
 
     /**
      * @brief Pre Logon Sequence
@@ -143,6 +150,11 @@ public:
      * @return
      */
     void setupLogon();
+
+    /**
+     * @brief Display the UserNumber on Logon.
+     */
+    void displayUserNumber();
 
     /**
      * @brief Validates user logon password
@@ -184,7 +196,7 @@ private:
 
     /**
      * @brief Lookup user records Handle, Name, or Email
-     * @return 
+     * @return
      */
     bool checkUserLogon(const std::string &input);
 
@@ -197,7 +209,7 @@ private:
     /**
      * @brief Encodes and Validates User Password
      * @param input
-     * @return 
+     * @return
      */
     bool validate_password(const std::string &input);
 
@@ -245,7 +257,7 @@ private:
     int                  m_failure_attempts;
     int                  m_max_failure_attempts;
     bool                 m_is_text_prompt_exist;
-    
+
     // Hold instatnce of user trying to login to the system.
     user_ptr             m_logon_user;
 };
