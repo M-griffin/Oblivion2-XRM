@@ -380,7 +380,7 @@ bool ModPreLogon::askANSIColor(const std::string &input)
         // Only if return data shows a processed key returned.
         if (result != "empty") 
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
     return true;
@@ -486,7 +486,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
         // Only if return data shows a processed key returned.
         if (result != "empty") 
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
     return true;

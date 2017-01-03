@@ -96,12 +96,20 @@ public:
     
     /**
      * @brief Deliver NewLine for [ENTER] On Prompts.
-     * @param data
      */
     void baseProcessDeliverNewLine()
     {
         std::string data = "\r\n";
         baseProcessAndDeliver(data);
+    }
+    
+    /**
+     * @brief Deliver Input for prompts (No Coloring Extras)
+     */
+    void baseProcessDeliverInput(std::string &data)
+    {
+        m_ansi_process->parseAnsiScreen((char *)data.c_str());
+        m_session_data->deliver(data);
     }
     
     /**

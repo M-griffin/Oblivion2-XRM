@@ -93,8 +93,6 @@ void MenuBase::readInMenuData()
 
     // Call MenuDao to ready in .yaml file
     MenuDao mnu(m_menu_info, m_current_menu, GLOBAL_MENU_PATH);
-    
-    // Load the Menu
     if (mnu.fileExists())
     {
         mnu.loadMenu();
@@ -131,6 +129,7 @@ void MenuBase::loadInMenu(std::string menu_name)
     // Read in the Current Menu
     readInMenuData();
 
+    // Testing Information pulled in.
     std::cout << m_menu_info->menu_name << std::endl;
     std::cout << m_menu_info->menu_pulldown_file << std::endl;
     std::cout << m_menu_info->menu_help_file << std::endl;
@@ -306,8 +305,7 @@ std::string MenuBase::setupYesNoMenuInput()
     
     // decide if we want to buld string on default colors
     // or parse an extra template from config??!?
-    
-    
+        
     return output;
 }
 
@@ -315,7 +313,8 @@ std::string MenuBase::setupYesNoMenuInput()
  * @brief Gets the Default Color Sequence
  * @return 
  */
-std::string MenuBase::getDefaultColor() {
+std::string MenuBase::getDefaultColor() 
+{
     return m_session_io.pipeColors(m_config->default_color_regular);
 }
 
@@ -323,7 +322,8 @@ std::string MenuBase::getDefaultColor() {
  * @brief Gets the Default Input Color Sequence
  * @return 
  */
-std::string MenuBase::getDefaultInputColor() {
+std::string MenuBase::getDefaultInputColor() 
+{
     return m_session_io.pipeColors(m_config->default_color_input);
 }
 
@@ -331,7 +331,8 @@ std::string MenuBase::getDefaultInputColor() {
  * @brief Gets the Default Input Color Sequence
  * @return 
  */
-std::string MenuBase::getDefaultInverseColor() {
+std::string MenuBase::getDefaultInverseColor() 
+{
     return m_session_io.pipeColors(m_config->default_color_inverse);
 }
 
@@ -560,6 +561,7 @@ std::string MenuBase::buildLightBars()
  */
 void MenuBase::redisplayMenuScreen()
 {
+    std::cout << " *** redisplay Menu Screen *** " << std::endl;
     // Read in the Menu ANSI
     std::string buffer = loadMenuScreen();
     std::string output = m_session_io.pipe2ansi(buffer);
@@ -600,22 +602,21 @@ void MenuBase::executeFirstAndEachCommands()
     locale::global(loc);
     cout.imbue(loc);
 
-    std::cout << "m_menu_info->menu_options: " << m_menu_info->menu_options.size() << std::endl;
+    //std::cout << "m_menu_info->menu_options: " << m_menu_info->menu_options.size() << std::endl;
 
     // Now loop and scan for first cmd and each time
     for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
     {
         auto &m = m_menu_info->menu_options[i];
         // Process all First Commands or commands that should run every action.       
-        std::cout << "index: " << m.index << std::endl;
-        std::cout << "menu_key: " << m.menu_key << std::endl;
+        //std::cout << "index: " << m.index << std::endl;
+        //std::cout << "menu_key: " << m.menu_key << std::endl;
         std::string new_key = boost::locale::to_upper(m.menu_key);
         m.menu_key = std::move(new_key);
 
         if(m.menu_key == "FIRSTCMD" || m.menu_key == "EACH")
         {
-            // Process
-            std::cout << "*** FOUND FIRSTCMD! EXECUTE: " << m.command_key << std::endl;
+            //std::cout << "*** FOUND FIRSTCMD! EXECUTE: " << m.command_key << std::endl;
             executeMenuOptions(m);
         }
     }
@@ -802,6 +803,8 @@ void MenuBase::loadAndStartupMenu()
             // Process buffer for PullDown Codes. results for TESTING, are discarded.
             std::string result = std::move(m_ansi_process->screenBufferParse());
 
+
+            std::cout << " *** push out lightbars *** " << std::endl;
             // Now Build the Light bars
             std::string light_bars = buildLightBars();
 
@@ -839,6 +842,8 @@ void MenuBase::loadAndStartupMenu()
  */
 void MenuBase::lightbarUpdate(int previous_pulldown_id)
 {
+    
+    std::cout << " *** lightbar update! *** " << std::endl;
     // Draw Light bars, use next item to determine next/previous id to pull.
     std::string light_bars = "";
     // Moved to Next Item
@@ -876,6 +881,9 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
     light_bars.append("\x1b[0m\x1b[u");
 
     std::string output = std::move(m_session_io.pipe2ansi(light_bars));
+    
+    std::cout << "ligtbar text: " << output << std::endl;
+    
     baseProcessAndDeliver(output);
 }
 
@@ -1120,6 +1128,7 @@ bool MenuBase::processMenuOptions(const std::string &input)
 
     bool is_enter = false;
     int  executed = 0;
+    int  executedLightBarMovement = 0;
     
     // For checking if the menu has changed from an executed option
     std::string current_menu = m_current_menu;
@@ -1173,10 +1182,15 @@ bool MenuBase::processMenuOptions(const std::string &input)
                 }
                 else 
                 {                    
-                    // handle Pull Down Lightbar Changes
-                    if (handleLightbarSelection(clean_sequence))
+                    // handle Pull Down Lightbar Changes Movement Keys
+                    // Should only execute once for movement! in loop of all options.
+                    if (executedLightBarMovement == 0) 
                     {
-                        ++executed;
+                        if (handleLightbarSelection(clean_sequence))
+                        {
+                            ++executed;
+                            ++executedLightBarMovement;
+                        }                    
                     }
                 }
             }

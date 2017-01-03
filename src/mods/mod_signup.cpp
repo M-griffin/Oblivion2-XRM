@@ -558,7 +558,7 @@ bool ModSignup::newUserPassword(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -616,7 +616,7 @@ bool ModSignup::disclaimer(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -672,7 +672,7 @@ bool ModSignup::handle(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -727,7 +727,7 @@ bool ModSignup::realName(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -768,7 +768,7 @@ bool ModSignup::address(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -809,7 +809,7 @@ bool ModSignup::location(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -850,7 +850,7 @@ bool ModSignup::country(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -905,7 +905,7 @@ bool ModSignup::email(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -946,7 +946,7 @@ bool ModSignup::userNote(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1014,7 +1014,7 @@ bool ModSignup::birthday(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1065,7 +1065,7 @@ bool ModSignup::gender(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1113,7 +1113,7 @@ bool ModSignup::password(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1194,7 +1194,7 @@ bool ModSignup::verifyPassword(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1236,7 +1236,7 @@ bool ModSignup::challengeQuestion(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1284,7 +1284,7 @@ bool ModSignup::challengeAnswer(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1367,7 +1367,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1425,7 +1425,7 @@ bool ModSignup::yesNoBars(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1483,7 +1483,7 @@ bool ModSignup::doPause(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1541,7 +1541,7 @@ bool ModSignup::clearOrScroll(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1599,7 +1599,7 @@ bool ModSignup::ansiColor(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1662,7 +1662,7 @@ bool ModSignup::backSpace(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1776,7 +1776,7 @@ bool ModSignup::verifyAndSave(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 

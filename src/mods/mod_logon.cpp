@@ -286,7 +286,7 @@ bool ModLogon::logon(const std::string &input)
         // Only if return data shows a processed key returned.
         if (result != "empty") 
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -382,7 +382,7 @@ bool ModLogon::password(const std::string &input)
         // Only if return data shows a processed key returned.
         if (result != "empty") 
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
