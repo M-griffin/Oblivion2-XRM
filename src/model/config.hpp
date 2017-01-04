@@ -160,7 +160,7 @@ public:
 // string { convert char or digit to pipe codes! }
     std::string default_color_regular;    // DefRegColor,
     std::string default_color_stat;       // DefStatColor,
-    std::string default_color_propmpt;    // DefPromptColor,
+    std::string default_color_prompt;     // DefPromptColor,
     std::string default_color_input;      // DefInputColor,
     std::string default_color_inverse;    // DefInverseColor,
     std::string default_color_box;        // DefBoxColor;
@@ -290,7 +290,7 @@ public:
         , days_keep_attachments(30)
         , default_color_regular("|15")
         , default_color_stat("|03")
-        , default_color_propmpt("|11")
+        , default_color_prompt("|11")
         , default_color_input("|11")
         , default_color_inverse("|00|19")
         , default_color_box("|08")  
@@ -427,7 +427,7 @@ namespace YAML
             node["days_keep_attachments"] = rhs.days_keep_attachments;
             node["default_color_regular"] = rhs.default_color_regular;
             node["default_color_stat"] = rhs.default_color_stat;
-            node["default_color_propmpt"] = rhs.default_color_propmpt;
+            node["default_color_prompt"] = rhs.default_color_prompt;
             node["default_color_input"] = rhs.default_color_input;
             node["default_color_inverse"] = rhs.default_color_inverse;
             node["default_color_box"] = rhs.default_color_box;
@@ -547,7 +547,7 @@ namespace YAML
             rhs.days_keep_attachments           = node["days_keep_attachments"].as<int>();
             rhs.default_color_regular           = node["default_color_regular"].as<std::string>();
             rhs.default_color_stat              = node["default_color_stat"].as<std::string>();
-            rhs.default_color_propmpt           = node["default_color_propmpt"].as<std::string>();
+            rhs.default_color_prompt            = node["default_color_prompt"].as<std::string>();
             rhs.default_color_input             = node["default_color_input"].as<std::string>();
             rhs.default_color_inverse           = node["default_color_inverse"].as<std::string>();
             rhs.default_color_box               = node["default_color_box"].as<std::string>();

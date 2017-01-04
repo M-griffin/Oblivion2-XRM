@@ -306,7 +306,17 @@ bool ModLogon::logon(const std::string &input)
         }
         else
         {
-            displayPromptAndNewLine(PROMPT_INVALID_USERNAME);                    
+            displayPromptAndNewLine(PROMPT_INVALID_USERNAME);
+            ++m_failure_attempts;
+            
+            // If max, then exit back to matrix.  
+            // NOTE Separate login/password attempts or change to login?
+            if (m_failure_attempts >= m_config->invalid_password_attempts)
+            {
+                m_is_active = false;
+                return false;
+            }
+               
             redisplayModulePrompt();
         }            
     }
@@ -375,8 +385,8 @@ bool ModLogon::password(const std::string &input)
 {
     std::cout << "password: " << input << std::endl;
     std::string key = "";
-    bool hiddenOutput = true;
-    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length, "", hiddenOutput);
+    bool useHiddenOutput = true;
+    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length, "", useHiddenOutput);
  
     // ESC was hit
     if(result == "aborted") 
@@ -396,11 +406,20 @@ bool ModLogon::password(const std::string &input)
         if (validate_password(key))
         {
             m_session_data->m_is_session_authorized = true;
-            m_is_active = false;
+            m_is_active = false;                        
         }
         else
         {
-            displayPromptAndNewLine(PROMPT_INVALID_PASSWORD);        
+            displayPromptAndNewLine(PROMPT_INVALID_PASSWORD);                   
+            ++m_failure_attempts;
+            
+            // If max, then exit back to matrix.
+            if (m_failure_attempts >= m_config->invalid_password_attempts)
+            {
+                m_is_active = false;
+                return false;
+            }
+            
             redisplayModulePrompt();
         }
     }

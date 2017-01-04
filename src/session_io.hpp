@@ -9,6 +9,10 @@
 #include <string>
 #include <map>
 
+class Config;
+typedef boost::shared_ptr<Config> config_ptr;
+
+
 /**
  * @class SessionIO
  * @author Michael Griffin
@@ -77,6 +81,44 @@ public:
      * @return
      */
     std::string pipeColors(const std::string &color_string);
+
+
+    /**
+     * @brief Gets the Default Color Sequence
+     * @return 
+     */
+    std::string getDefaultColor(config_ptr config);
+
+    /**
+     * @brief Gets the Default Input Color Sequence
+     * @return 
+     */
+    std::string getDefaultInputColor(config_ptr config);
+
+    /**
+     * @brief Gets the Default Inverse Color Sequence
+     * @return 
+     */
+    std::string getDefaultInverseColor(config_ptr config);
+
+    /**
+     * @brief Gets the Default Prompt Color Sequence
+     * @return 
+     */
+    std::string getDefaultPromptColor(config_ptr config);
+
+    /**
+     * @brief Gets the Default stat Color Sequence
+     * @return 
+     */
+    std::string getDefaultStatColor(config_ptr config);
+
+    /**
+     * @brief Gets the Default box Color Sequence
+     * @return 
+     */
+    std::string getDefaultBoxColor(config_ptr config);
+
 
     /**
     * @brief Parsed Pipe Codes with 1 or 2 Digits
@@ -151,6 +193,34 @@ public:
     std::vector<MapType> pipe2promptCodeMap(const std::string &sequence);
 
     /**
+     * @brief Converts MCI Sequences to Code Maps for Prompt Formatting Strings
+     * @param sequence
+     * @return
+     */
+    std::vector<MapType> pipe2promptFormatCodeMap(const std::string &sequence);
+
+    /**
+     * @brief Colorizes Brackets and Text between brackets to system theme colors
+     * @param sequence
+     * @return 
+     */
+    std::string parseFormatColorsBrackets(const std::string &sequence, config_ptr config);
+
+    /**
+     * @brief Colorizes Colons to system theme colors
+     * @param sequence
+     * @return 
+     */
+    std::string parseFormatColorsColon(const std::string &sequence, config_ptr config);
+
+    /**
+     * @brief Parses unformatted prompt text and adds colors to brackets and colans.
+     * @param sequence
+     * @return 
+     */
+    std::string pipe2promptFormat(const std::string &sequence, config_ptr config);
+
+    /**
      * @brief Checks a String if it matches the expression passed.
      * @param sequence
      * @param expression
@@ -199,6 +269,8 @@ public:
     const std::string MID_EXPRESSION = {"([|]{1}[A-Z]{1}[0-9]{1,2})|([|]{1}[A-Z]{2})"};
     
     const std::string PROMPT_EXPRESSION = {"([\\^]{1}[A-Z]{1})|([\\\\/=|@*:#)(]{1}$)"};
+    
+    const std::string FORMAT_EXPRESSION = {"([[]{1}[\\w\\W]+[]]{1})|([:]{1})"};
 };
 
 

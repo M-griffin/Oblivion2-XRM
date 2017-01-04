@@ -140,7 +140,7 @@ bool ConfigDao::saveConfig(config_ptr cfg)
     out << YAML::Key << "days_keep_attachments" << YAML::Value << cfg->days_keep_attachments;
     out << YAML::Key << "default_color_regular" << YAML::Value << cfg->default_color_regular;
     out << YAML::Key << "default_color_stat" << YAML::Value << cfg->default_color_stat;
-    out << YAML::Key << "default_color_propmpt" << YAML::Value << cfg->default_color_propmpt;
+    out << YAML::Key << "default_color_prompt" << YAML::Value << cfg->default_color_prompt;
     out << YAML::Key << "default_color_input" << YAML::Value << cfg->default_color_input;
     out << YAML::Key << "default_color_inverse" << YAML::Value << cfg->default_color_inverse;
     out << YAML::Key << "default_color_box" << YAML::Value << cfg->default_color_box;
@@ -276,7 +276,7 @@ void ConfigDao::encode(const Config &rhs)
     m_config->days_keep_attachments = rhs.days_keep_attachments;
     m_config->default_color_regular = rhs.default_color_regular;
     m_config->default_color_stat = rhs.default_color_stat;
-    m_config->default_color_propmpt = rhs.default_color_propmpt;
+    m_config->default_color_prompt = rhs.default_color_prompt;
     m_config->default_color_input = rhs.default_color_input;
     m_config->default_color_inverse = rhs.default_color_inverse;
     m_config->default_color_box = rhs.default_color_box;

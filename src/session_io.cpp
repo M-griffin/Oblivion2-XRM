@@ -2,10 +2,13 @@
 #include "session_data.hpp"
 #include "common_io.hpp"
 
+#include "model/config.hpp"
+
 #include <clocale>
 
 //#include <boost/format.hpp>
 #include <boost/locale.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <boost/regex/config.hpp>
 #ifdef BOOST_HAS_ICU
@@ -413,6 +416,62 @@ std::string SessionIO::pipeColors(const std::string &color_string)
     return esc_sequence;
 }
 
+
+/**
+ * @brief Gets the Default Color Sequence
+ * @return 
+ */
+std::string SessionIO::getDefaultColor(config_ptr config) 
+{
+    return pipeColors(config->default_color_regular);
+}
+
+/**
+ * @brief Gets the Default Input Color Sequence
+ * @return 
+ */
+std::string SessionIO::getDefaultInputColor(config_ptr config) 
+{
+    return pipeColors(config->default_color_input);
+}
+
+/**
+ * @brief Gets the Default Inverse Color Sequence
+ * @return 
+ */
+std::string SessionIO::getDefaultInverseColor(config_ptr config) 
+{
+    return pipeColors(config->default_color_inverse);
+}
+
+/**
+ * @brief Gets the Default Prompt Color Sequence
+ * @return 
+ */
+std::string SessionIO::getDefaultPromptColor(config_ptr config) 
+{
+    return pipeColors(config->default_color_prompt);
+}
+
+/**
+ * @brief Gets the Default stat Color Sequence
+ * @return 
+ */
+std::string SessionIO::getDefaultStatColor(config_ptr config) 
+{
+    return pipeColors(config->default_color_stat);
+}
+
+/**
+ * @brief Gets the Default box Color Sequence
+ * @return 
+ */
+std::string SessionIO::getDefaultBoxColor(config_ptr config) 
+{
+    return pipeColors(config->default_color_box);
+}
+
+
 /**
  * @brief Parsed Pipe Codes with 1 or 2 Digits
  * @param pipe_code
@@ -776,13 +835,13 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
             it = m_mapped_codes.find(my_matches.m_code);
             if (it != m_mapped_codes.end())
             {
-                std::cout << "gen found: " << my_matches.m_code << " : " << it->second << std::endl;
+                //std::cout << "gen found: " << my_matches.m_code << " : " << it->second << std::endl;
                 // If found, replace mci sequence with text
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, it->second);
             }
             else
             {
-                std::cout << "gen not found: " << my_matches.m_code << std::endl;
+                //std::cout << "gen not found: " << my_matches.m_code << std::endl;
                 std::string remove_code = "";
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, remove_code);
             }
@@ -867,9 +926,8 @@ std::vector<MapType> SessionIO::pipe2codeMap(const std::string &sequence, const 
             }
         }
     }
-
+    
     std::cout << "code_map.size(): " << code_map.size() << std::endl;
-
     return code_map;
 }
 
@@ -906,9 +964,99 @@ std::vector<MapType> SessionIO::pipe2genericCodeMap(const std::string &sequence)
 std::vector<MapType> SessionIO::pipe2promptCodeMap(const std::string &sequence)
 {
     // This will handle parsing the sequence, and replacement
-    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, PROMPT_EXPRESSION));
-    
+    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, PROMPT_EXPRESSION));    
     return code_map;
+}
+
+
+/**
+ * @brief Converts MCI Sequences to Code Maps for Prompt Formatting Strings
+ * @param sequence
+ * @return
+ */
+std::vector<MapType> SessionIO::pipe2promptFormatCodeMap(const std::string &sequence)
+{
+    // This will handle parsing the sequence, and replacement
+    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, FORMAT_EXPRESSION));    
+    return code_map;
+}
+
+
+/**
+ * @brief Colorizes Brackets and Text between brackets to system theme colors
+ * @param sequence
+ * @return 
+ */
+std::string SessionIO::parseFormatColorsBrackets(const std::string &sequence, config_ptr config)
+{
+    // Mocked up for now
+    std::string output = sequence;
+    output += getDefaultPromptColor(config);
+    
+    
+    return output;
+}
+
+
+/**
+ * @brief Colorizes Colons to system theme colors
+ * @param sequence
+ * @return 
+ */
+std::string SessionIO::parseFormatColorsColon(const std::string &sequence, config_ptr config)
+{
+    // Mocked up for now
+    std::string output = sequence;
+    output += getDefaultPromptColor(config);
+    
+    return output;
+}
+
+
+/**
+ * @brief Parses unformatted prompt text and adds colors to brackets and colans.
+ * @param sequence
+ * @return 
+ */
+std::string SessionIO::pipe2promptFormat(const std::string &sequence, config_ptr config) 
+{
+    std::vector<MapType> code_map = pipe2promptFormatCodeMap(sequence);    
+    std::string output = "";
+    std::string key;
+    std::string value;
+    
+    // Loop codes and build MCI Parsing List
+    for(unsigned int i = 0; i < code_map.size(); i++)
+    {
+        auto &map = code_map[i];
+        std::cout << "Menu Format Code: " << map.m_code << std::endl;
+        
+        // Control Codes are in Group 2
+        switch (map.m_match)
+        {            
+            case 1: // Handle [ text ] inside brackets
+                // Build replacement here
+                key = map.m_code;
+                value = parseFormatColorsBrackets(map.m_code, config);
+                addMCIMapping(key, value);
+                break;                
+            
+            case 2: // Handle :
+                // Build replacement here
+                key = map.m_code;
+                value = parseFormatColorsColon(map.m_code, config);
+                addMCIMapping(key, value);
+                break;
+                
+            default:
+                break;
+        }        
+    }    
+    
+    
+    // Then feed though and return the updated string.
+    output = std::move(parseCodeMapGenerics(sequence, code_map));
+    return output;    
 }
 
 

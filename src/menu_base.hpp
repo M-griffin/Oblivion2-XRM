@@ -17,6 +17,7 @@
 #include "data/menu_dao.hpp"
 #include "mods/mod_base.hpp"
 
+#include <boost/smart_ptr/shared_ptr.hpp>
 #include <functional>
 
 class Config;

@@ -78,8 +78,8 @@ void ModPreLogon::createTextPrompts()
 
     value[PROMPT_USE_ANSI]         = std::make_pair("Use ANSI Colors (Y/n) ", "|CRPress [y/ENTER or n] to use ANSI Colors or to Select ASCII No Colors: ");
     value[PROMPT_USE_INVALID]      = std::make_pair("Invalid Response to Y/N/ENTER", "|04Invalid Response! Try again.");
-    value[PROMPT_ANSI_SELECTED]    = std::make_pair("ANSI Color Selected", "Selected :|03Ansi.");
-    value[PROMPT_ASCII_SELECTED]   = std::make_pair("ASCII No Colors Selected", "Selected :None.");
+    value[PROMPT_ANSI_SELECTED]    = std::make_pair("ANSI Color Selected", "Selected: |03Ansi.");
+    value[PROMPT_ASCII_SELECTED]   = std::make_pair("ASCII No Colors Selected", "Selected: None.");
 
     value[PROMPT_DETECT_TERMOPTS]  = std::make_pair("Detecting Terminal Options", "|CR|CRDetecting Terminal Options");
     value[PROMPT_DETECTED_TERM]    = std::make_pair("Detecting Terminal: |OT ", "|CRDetected Terminal Type: |03|OT");
@@ -88,8 +88,8 @@ void ModPreLogon::createTextPrompts()
     value[PROMPT_ASK_CP437]        = std::make_pair("Use CP437 Output Encoding", "|CR|CR[y/ENTER or n] Select Output Encoding CP-437: ");
     value[PROMPT_ASK_UTF8]         = std::make_pair("Use UTF-8 Output Encoding", "|CR|CR[y/ENTER or n] Select Output Encoding UTF-8: ");
 
-    value[PROMPT_CP437_SELECTED]   = std::make_pair("Selected CP437 Output Encoding", "Selected :|03CP-437 Codepage.");
-    value[PROMPT_UTF8_SELECTED]    = std::make_pair("Selected UTF-8 Output Encoding", "Selected :|03UTF-8 Codepage.");
+    value[PROMPT_CP437_SELECTED]   = std::make_pair("Selected CP437 Output Encoding", "Selected: |03CP-437 Codepage.");
+    value[PROMPT_UTF8_SELECTED]    = std::make_pair("Selected UTF-8 Output Encoding", "Selected: |03UTF-8 Codepage.");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -400,6 +400,7 @@ bool ModPreLogon::askANSIColor(const std::string &input)
 bool ModPreLogon::askCodePage(const std::string &input)
 {
     std::cout << "askCodePage: " << input << std::endl;
+    std::string blackColor = "|00";
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
     
@@ -420,14 +421,19 @@ bool ModPreLogon::askCodePage(const std::string &input)
                 std::string yes_prompt = "Yes";
                 baseProcessAndDeliverNewLine(yes_prompt);
             }
+            
+            baseProcessDeliverNewLine();
 
             std::string message = "";
             if(boost::iequals(m_term_type, "undetected") ||
                     boost::iequals(m_term_type, "ansi"))
             {
                 // Switch to ISO, then CP437 Character Set.
-                message = m_session_io.pipe2ansi("|00\x1b%@\x1b(U");
-                message += m_session_io.parseTextPrompt(
+                message = "\x1b[0m" + m_session_io.pipeColors(blackColor);
+                message += "\x1b%@\x1b(U \r\n\x1b[A";                
+                m_session_data->deliver(message);
+                
+                message = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
                          );
 
@@ -437,8 +443,11 @@ bool ModPreLogon::askCodePage(const std::string &input)
             else
             {
                 // Switch to Unicode Character Set.
-                message = m_session_io.pipe2ansi("|00\x1b%@\x1b%G");
-                message += m_session_io.parseTextPrompt(
+                message = "\x1b[0m" + m_session_io.pipeColors(blackColor);
+                message += "\x1b%@\x1b%G \r\n\x1b[A";                
+                m_session_data->deliver(message);
+                
+                message = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
                          );
 
@@ -451,14 +460,19 @@ bool ModPreLogon::askCodePage(const std::string &input)
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
-        {
+        {            
+            baseProcessDeliverNewLine();
+            
             std::string message = "";
             if(boost::iequals(m_term_type, "undetected") ||
                     boost::iequals(m_term_type, "ansi"))
             {
                 // Switch to Unicode Character Set.
-                message = m_session_io.pipe2ansi("|00\x1b%@\x1b%G");
-                message += m_session_io.parseTextPrompt(
+                message = "\x1b[0m" + m_session_io.pipeColors(blackColor);
+                message += "\x1b%@\x1b%G \r\n\x1b[A";
+                m_session_data->deliver(message);
+                
+                message = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
                          );
 
@@ -468,8 +482,11 @@ bool ModPreLogon::askCodePage(const std::string &input)
             else
             {
                 // Switch to ISO, then CP437 Character Set.
-                message = m_session_io.pipe2ansi("|00\x1b%@\x1b(U");
-                message += m_session_io.parseTextPrompt(
+                message = "\x1b[0m" + m_session_io.pipeColors(blackColor);
+                message += "\x1b%@\x1b(U \r\n\x1b[A";
+                m_session_data->deliver(message);
+                
+                message = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
                          );
 

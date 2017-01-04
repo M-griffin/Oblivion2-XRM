@@ -328,7 +328,7 @@ std::string MenuBase::getDefaultInputColor()
 }
 
 /**
- * @brief Gets the Default Input Color Sequence
+ * @brief Gets the Default Inverse Color Sequence
  * @return 
  */
 std::string MenuBase::getDefaultInverseColor() 
@@ -346,7 +346,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
     m_session_io.clearAllMCIMapping();
     m_session_io.addMCIMapping("^R", m_config->default_color_regular);
     m_session_io.addMCIMapping("^S", m_config->default_color_stat);
-    m_session_io.addMCIMapping("^P", m_config->default_color_propmpt);
+    m_session_io.addMCIMapping("^P", m_config->default_color_prompt);
     m_session_io.addMCIMapping("^E", m_config->default_color_input);
     m_session_io.addMCIMapping("^V", m_config->default_color_inverse);
     m_session_io.addMCIMapping("^X", m_config->default_color_box);
@@ -477,9 +477,6 @@ std::string MenuBase::loadMenuScreen()
         
         // Make all screens uppercase, handle unicode names.
         screen_file = boost::locale::to_upper(screen_file);
-        
-        std::cout << "readinAnsi1: " << screen_file << std::endl;
-         
          
         // if file doesn't exist, then use generic template 
         if (m_common_io.fileExists(screen_file))
@@ -500,8 +497,6 @@ std::string MenuBase::loadMenuScreen()
         
         // Screen File(s) are Uppercase.
         screen_file = boost::locale::to_upper(screen_file);
-        
-        std::cout << "readinAnsi2: " << screen_file << std::endl;
         
         // Otherwise use the Pulldown menu name from the menu.
         // if file doesn't exist, then use generic template 
@@ -666,7 +661,7 @@ std::string MenuBase::loadMenuPrompt()
         m_session_io.addMCIMapping("%MN", m_menu_info->menu_prompt);
         
         std::string output = m_session_io.pipe2ansi(prompt);
-        std::cout << "prompt: " << output << std::endl;
+        //std::cout << "prompt: " << output << std::endl;
         return output;
     }
     else
@@ -879,10 +874,8 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
     
     // Clear Attriutes, then move back to menu prompt position.
     light_bars.append("\x1b[0m\x1b[u");
-
-    std::string output = std::move(m_session_io.pipe2ansi(light_bars));
-    
-    std::cout << "ligtbar text: " << output << std::endl;
+    std::string output = std::move(m_session_io.pipe2ansi(light_bars));   
+    //std::cout << "ligtbar text: " << output << std::endl;
     
     baseProcessAndDeliver(output);
 }
@@ -1336,8 +1329,7 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
     std::string key = "";
     std::string result = m_session_io.getInputField(character_buffer, key, Config::sMenuPrompt_length);
     
-    std::cout << "result: " << result << std::endl;
-    
+    //std::cout << "result: " << result << std::endl;    
     if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
     {
         std::cout << "ESC aborted!" << std::endl;

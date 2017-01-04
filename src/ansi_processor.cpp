@@ -223,13 +223,9 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
         ansi_output.append(character);
         ++count;
     }
-    // Screen should always end with reset.
-    ansi_output.append("\x1b[0m\r\n");
     
-    // Testing
-    std::cout << "MID" << std::endl;
-    std::cout << ansi_output << std::endl;
-        
+    // Screen should always end with reset.
+    ansi_output.append("\x1b[0m\r\n");        
     return ansi_output;
 }
 

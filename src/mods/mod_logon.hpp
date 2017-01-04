@@ -38,7 +38,6 @@ public:
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
         , m_mod_function_index(MOD_LOGON)
         , m_failure_attempts(0)
-        , m_max_failure_attempts(3)
         , m_is_text_prompt_exist(false)
     {
         std::cout << "ModLogon" << std::endl;
@@ -255,7 +254,6 @@ private:
 
     int                  m_mod_function_index;
     int                  m_failure_attempts;
-    int                  m_max_failure_attempts;
     bool                 m_is_text_prompt_exist;
 
     // Hold instatnce of user trying to login to the system.

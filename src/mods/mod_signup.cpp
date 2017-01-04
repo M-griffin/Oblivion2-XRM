@@ -528,8 +528,8 @@ bool ModSignup::newUserPassword(const std::string &input)
 {
     std::cout << "newUserPassword: " << input << std::endl;
     std::string key = "";
-    bool hiddenOutput = true;
-    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length, "", hiddenOutput);
+    bool useHiddenOutput = true;
+    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length, "", useHiddenOutput);
     
     // ESC was hit
     if(result == "aborted")
@@ -1091,7 +1091,6 @@ bool ModSignup::gender(const std::string &input)
             return true;
         }
         
-        baseProcessDeliverNewLine();
         changeNextModule();
     }
     else
@@ -1115,13 +1114,13 @@ bool ModSignup::password(const std::string &input)
 {
     std::cout << "password: " << input << std::endl;
     std::string key = "";
-    bool hiddenOutput = true;
+    bool useHiddenOutput = true;
     std::string result = m_session_io.getInputField(
                              input,
                              key,
                              Config::sPassword_length,
                              "",
-                             hiddenOutput
+                             useHiddenOutput
                          );
 
     // ESC was hit
@@ -1164,13 +1163,13 @@ bool ModSignup::verifyPassword(const std::string &input)
 {
     std::cout << "password: " << input << std::endl;
     std::string key = "";
-    bool hiddenOutput = true;
+    bool useHiddenOutput = true;
     std::string result = m_session_io.getInputField(
                              input,
                              key,
                              Config::sPassword_length,
                              "",
-                             hiddenOutput
+                             useHiddenOutput
                          );
 
     // ESC was hit
@@ -1291,13 +1290,13 @@ bool ModSignup::challengeAnswer(const std::string &input)
 {
     std::cout << "challengeAnswer: " << input << std::endl;
     std::string key = "";
-    bool hiddenOutput = true;
+    bool useHiddenOutput = true;
     std::string result = m_session_io.getInputField(
                              input,
                              key,
                              Config::sPassword_length,
                              "",
-                             hiddenOutput
+                             useHiddenOutput
                          );
 
     // ESC was hit
@@ -1341,13 +1340,13 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
 {
     std::cout << "password: " << input << std::endl;
     std::string key = "";
-    bool hiddenOutput = true;
+    bool useHiddenOutput = true;
     std::string result = m_session_io.getInputField(
                              input,
                              key,
                              Config::sPassword_length,
                              "",
-                             hiddenOutput
+                             useHiddenOutput
                          );
 
     // ESC was hit
@@ -1444,7 +1443,7 @@ bool ModSignup::yesNoBars(const std::string &input)
             if(key.size() == 0)
             {
                 std::string yes_prompt = "Yes";
-                baseProcessAndDeliver(yes_prompt);
+                baseProcessDeliverInput(yes_prompt);
             }
 
             m_user_record->bYesNoBars = true;
@@ -1458,6 +1457,7 @@ bool ModSignup::yesNoBars(const std::string &input)
         }
         else
         {
+            baseProcessDeliverNewLine();
             displayPromptAndNewLine(PROMPT_TEXT_INVALID);
             redisplayModulePrompt();
             return true;
@@ -1504,7 +1504,7 @@ bool ModSignup::doPause(const std::string &input)
             if(key.size() == 0)
             {
                 std::string yes_prompt = "Yes";
-                baseProcessAndDeliver(yes_prompt);
+                baseProcessDeliverInput(yes_prompt);
             }
 
             m_user_record->bDoPause = true;
@@ -1518,6 +1518,7 @@ bool ModSignup::doPause(const std::string &input)
         }
         else
         {
+            baseProcessDeliverNewLine();
             displayPromptAndNewLine(PROMPT_TEXT_INVALID);
             redisplayModulePrompt();
             return true;
@@ -1564,7 +1565,7 @@ bool ModSignup::clearOrScroll(const std::string &input)
             if(key.size() == 0)
             {
                 std::string yes_prompt = "Yes";
-                baseProcessAndDeliver(yes_prompt);
+                baseProcessDeliverInput(yes_prompt);
             }
 
             m_user_record->bClearOrScroll = true;
@@ -1578,6 +1579,7 @@ bool ModSignup::clearOrScroll(const std::string &input)
         }
         else
         {
+            baseProcessDeliverNewLine();
             displayPromptAndNewLine(PROMPT_TEXT_INVALID);
             redisplayModulePrompt();
             return true;
@@ -1624,7 +1626,7 @@ bool ModSignup::ansiColor(const std::string &input)
             if(key.size() == 0)
             {
                 std::string yes_prompt = "Yes";
-                baseProcessAndDeliver(yes_prompt);
+                baseProcessDeliverInput(yes_prompt);
             }
 
             m_user_record->bAnsi = true;
@@ -1638,6 +1640,7 @@ bool ModSignup::ansiColor(const std::string &input)
         }
         else
         {
+            baseProcessDeliverNewLine();
             displayPromptAndNewLine(PROMPT_TEXT_INVALID);
             redisplayModulePrompt();
             return true;
@@ -1680,8 +1683,9 @@ bool ModSignup::backSpace(const std::string &input)
         // If ENTER Default to Yes, or Single Y is hit
         if(key.size() == 0)
         {
+            baseProcessDeliverNewLine();
             // Key == 0 on [ENTER] pressed alone.
-            std::string detection_prompt = "Detection WIP, Select W or T.";
+            std::string detection_prompt = "- Detection WIP, Select W or T.";
             baseProcessAndDeliverNewLine(detection_prompt);
 
             // Not Implimented YET
@@ -1703,6 +1707,7 @@ bool ModSignup::backSpace(const std::string &input)
         }
         else
         {
+            baseProcessDeliverNewLine();
             displayPromptAndNewLine(PROMPT_TEXT_INVALID);
             redisplayModulePrompt();
             return true;
@@ -1764,13 +1769,15 @@ void ModSignup::saveNewUserRecord()
         {
             std::cout << "Error, unable to remove secutiry record." << std::endl;
         }
-
+        
+        baseProcessDeliverNewLine();
         displayPromptAndNewLine(PROMPT_NOT_SAVED);
         m_is_active = false;
         return;
     }
 
     // Completed Successfully
+    baseProcessDeliverNewLine();
     displayPromptAndNewLine(PROMPT_SAVED);
 
     m_is_active = false;
@@ -1804,7 +1811,7 @@ bool ModSignup::verifyAndSave(const std::string &input)
             if(key.size() == 0)
             {
                 std::string yes_prompt = "Yes";
-                baseProcessAndDeliver(yes_prompt);
+                baseProcessDeliverInput(yes_prompt);
             }
 
             baseProcessDeliverNewLine();
@@ -1822,6 +1829,7 @@ bool ModSignup::verifyAndSave(const std::string &input)
         }
         else
         {
+            baseProcessDeliverNewLine();
             displayPromptAndNewLine(PROMPT_TEXT_INVALID);
             redisplayModulePrompt();
             return true;
