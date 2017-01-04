@@ -58,7 +58,6 @@ bool ModSignup::onEnter()
     std::string prompt = "\x1b[?25h"; // Turn on Cursor.
     baseProcessAndDeliver(prompt);
 
-
     // Execute the initial setup index.
     m_setup_functions[m_mod_function_index]();
 
@@ -85,41 +84,41 @@ void ModSignup::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_NUP]                = std::make_pair("New User Password", "|08|CR|CRNew User Password: |04");
-    value[PROMPT_DISCLAIMER]         = std::make_pair("Disclaimer", "|08|CRDisclaimer Text here.. |CR|CR[y/n] Disclaimer Agree : |04");
-    value[PROMPT_HANDLE]             = std::make_pair("User Handle", "|08|CR|CREnter Handle : |04");
-    value[PROMPT_REAL_NAME]          = std::make_pair("Real Name", "|08|CREnter Real Name : |04");
-    value[PROMPT_ADDRESS]            = std::make_pair("Address", "|08|CRAddress : |04");
-    value[PROMPT_LOCATION]           = std::make_pair("Location", "|08|CRCity/State : |04");
-    value[PROMPT_COUNTRY]            = std::make_pair("Country", "|08|CRCountry : |04");
-    value[PROMPT_EMAIL]              = std::make_pair("Email Address", "|08|CREmail Address : |04");
-    value[PROMPT_USER_NOTE]          = std::make_pair("User Note", "|08|CRAffiliations / User Note : |04");
-    value[PROMPT_BIRTH_DATE]         = std::make_pair("Birth Date", "|08|CR[yyyy-mm-dd] Birth Date : |04");
-    value[PROMPT_GENDER]             = std::make_pair("Gender", "|CR|08[m/f] Gender : |04");
-    value[PROMPT_PASSWORD]           = std::make_pair("Password", "|CR|CR|08(case sensitive) Password : |04");
-    value[PROMPT_VERIFY_PASSWORD]    = std::make_pair("Verify Password", "|CR|08(case sensitive) Verify Password : |04");
-    value[PROMPT_CHALLENGE_QUESTION] = std::make_pair("Forgot Password Challenge Question", "|CR|CR|08Challenge Question : |04");
-    value[PROMPT_CHALLENGE_ANSWER]   = std::make_pair("Forgot Password Challenge Answer", "|CR|08(case sensitive) Challenge Answer : |04");
-    value[PROMPT_VERIFY_ANSWER]      = std::make_pair("Forgot Password Verify Answer", "|CR|08(case sensitive) Verify Answer : |04");
-    value[PROMPT_YESNO_BARS]         = std::make_pair("Use YES/NO Bars", "|CR|CR|08[y/n] Use Yes/No Bars [ENTER] = Yes: |04");
-    value[PROMPT_USE_PAUSE]          = std::make_pair("Pause on ", "|CR|CR|08Screen Pausing [ENTER] = Yes: |04");
-    value[PROMPT_USE_CLEAR]          = std::make_pair("Clear Screen or Scroll ", "|CR|CR|08Clear Screen or Scroll [ENTER] = Yes: |04");
-    value[PROMPT_USE_ANSI_COLOR]     = std::make_pair("Use Ansi Color ", "|CR|CR|08[y/n] Ansi Color [ENTER] = Yes: |04");
-    value[PROMPT_BACK_SPACE]         = std::make_pair("Backspace Sequence", "|CR|CR|08Backspace Key |CR[(W)indows/(T)erminal/(D)etect [ENTER] = Detect] : |04");
-    value[PROMPT_VERIFY_SAVE]        = std::make_pair("Verify All Data", "|CR|CR|08[y/n] Verify and Save user record [ENTER] = Yes: |04");
-
+    value[PROMPT_NUP]                = std::make_pair("New User Password", "New User Password: ");
+    value[PROMPT_DISCLAIMER]         = std::make_pair("Disclaimer", "%%DFDISCLAIMER.ANS |CR[y/n] Disclaimer Agree: ");
+    value[PROMPT_HANDLE]             = std::make_pair("User Handle", "Enter Handle: ");
+    value[PROMPT_USER_NUMBER]        = std::make_pair("Your User Numer |OT", "Your user number is |OT.");
+    value[PROMPT_REAL_NAME]          = std::make_pair("Real Name", "Enter Real Name: ");
+    value[PROMPT_ADDRESS]            = std::make_pair("Address", "Address: ");
+    value[PROMPT_LOCATION]           = std::make_pair("Location", "City/State: ");
+    value[PROMPT_COUNTRY]            = std::make_pair("Country", "Country: ");
+    value[PROMPT_EMAIL]              = std::make_pair("Email Address", "Email Address: ");
+    value[PROMPT_USER_NOTE]          = std::make_pair("User Note", "Affiliations / User Note: ");
+    value[PROMPT_BIRTH_DATE]         = std::make_pair("Birth Date", "[yyyy-mm-dd] Birth Date: ");
+    value[PROMPT_GENDER]             = std::make_pair("Gender", "[m/f] Gender: ");
+    value[PROMPT_PASSWORD]           = std::make_pair("Password", "(case sensitive) Password: ");
+    value[PROMPT_VERIFY_PASSWORD]    = std::make_pair("Verify Password", "(case sensitive) Verify Password: ");
+    value[PROMPT_CHALLENGE_QUESTION] = std::make_pair("Forgot Password Challenge Question", "Challenge Question: ");
+    value[PROMPT_CHALLENGE_ANSWER]   = std::make_pair("Forgot Password Challenge Answer", "(case sensitive) Challenge Answer: ");
+    value[PROMPT_VERIFY_ANSWER]      = std::make_pair("Forgot Password Verify Answer", "(case sensitive) Verify Answer: ");
+    value[PROMPT_YESNO_BARS]         = std::make_pair("Use YES/NO Bars", "[y/ENTER or n] Use Yes/No Bars: ");
+    value[PROMPT_USE_PAUSE]          = std::make_pair("Pause on ", "[y/ENTER or n] Use Screen Pausing: ");
+    value[PROMPT_USE_CLEAR]          = std::make_pair("Clear Screen or Scroll ", "[y/ENTER or n] Use Clear Screen or Scrolling: ");
+    value[PROMPT_USE_ANSI_COLOR]     = std::make_pair("Use Ansi Color ", "[y/n] Use Ansi Color: ");
+    value[PROMPT_BACK_SPACE]         = std::make_pair("Backspace Sequence", "[W]indows/[T]erminal/[ENTER] to Set Backspace Key: ");
+    value[PROMPT_VERIFY_SAVE]        = std::make_pair("Verify All Data", "[y/n] Verify and Save user record: ");
 
     // Invalid.
-    value[PROMPT_TEXT_INVALID]       = std::make_pair("Invalid Text", "|CR|04Invalid entry!|CR");
-    value[PROMPT_DATE_INVALID]       = std::make_pair("Invalid Date", "|CR|04Invalid date entered!|CR");
-    value[PROMPT_PASS_INVALID]       = std::make_pair("Invalid/Non Matching Password", "|CR|04Invalid, password does not match!|CR");
-    value[PROMPT_HANDLE_INVALID]     = std::make_pair("User Name Already Exists", "|CR|04Invalid UserName, Already Exists!|CR");
-    value[PROMPT_NAME_INVALID]       = std::make_pair("Real Name Already Exists", "|CR|04Name, Already Exists, Try Adding a middle initial.|CR");
-    value[PROMPT_EMAIL_INVALID]      = std::make_pair("Email Already Exists", "|CR|04Email, Already Exists, Try another adress or check if your have an account.|CR");
+    value[PROMPT_TEXT_INVALID]       = std::make_pair("Invalid Text", "|04Invalid entry!|CR");
+    value[PROMPT_DATE_INVALID]       = std::make_pair("Invalid Date", "|04Invalid date entered!|CR");
+    value[PROMPT_PASS_INVALID]       = std::make_pair("Invalid/Non Matching Password", "|04Invalid, password does not match!|CR");
+    value[PROMPT_HANDLE_INVALID]     = std::make_pair("User Name Already Exists", "|04Invalid UserName, Already Exists!|CR");
+    value[PROMPT_NAME_INVALID]       = std::make_pair("Real Name Already Exists", "|04Name, Already Exists, Try Adding a middle initial.|CR");
+    value[PROMPT_EMAIL_INVALID]      = std::make_pair("Email Already Exists", "|04Email, Already Exists, Try another adress or check if your have an account.|CR");
 
     // Confirmation of Save
-    value[PROMPT_SAVED]              = std::make_pair("User Record Saved", "|CR|10User Record Saved Successfully.|CR");
-    value[PROMPT_NOT_SAVED]          = std::make_pair("User Record Not Saved", "|CR|04Error, User Record Not Saved!|CR");
+    value[PROMPT_SAVED]              = std::make_pair("User Record Saved", "|CR|03User Record Saved Successfully.");
+    value[PROMPT_NOT_SAVED]          = std::make_pair("User Record Not Saved", "|CR|04Error, User Record Not Saved!");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -136,6 +135,34 @@ void ModSignup::changeModule(int mod_function_index)
     m_setup_functions[m_mod_function_index]();
 }
 
+/**
+ * @brief Changes to Next module index.
+ */
+void ModSignup::changeNextModule()
+{
+    // Set, and Execute the Setup module.
+    ++m_mod_function_index;
+    m_setup_functions[m_mod_function_index]();
+}
+
+/**
+ * @brief Changes to Previous module index.
+ */
+void ModSignup::changePreviousModule()
+{
+    // Set, and Execute the Setup module.
+    --m_mod_function_index;
+    m_setup_functions[m_mod_function_index]();
+}
+
+/**
+ * @brief Redisplay's the current module prompt.
+ * @param mod_function_index
+ */
+void ModSignup::redisplayModulePrompt()
+{
+    m_setup_functions[m_mod_function_index]();
+}
 
 /**
  * @brief Pull and Display Prompts
@@ -143,13 +170,17 @@ void ModSignup::changeModule(int mod_function_index)
  */
 void ModSignup::displayPrompt(const std::string &prompt)
 {
-    std::string result = m_session_io.parseTextPrompt(
-                                 m_text_prompts_dao->getPrompt(prompt)
-                             );
-
-    baseProcessAndDeliver(result);
+    baseDisplayPrompt(prompt, m_text_prompts_dao);
 }
 
+/**
+ * @brief Pull and Display Prompts with following newline
+ * @param prompt
+ */
+void ModSignup::displayPromptAndNewLine(const std::string &prompt)
+{
+    baseDisplayPromptAndNewLine(prompt, m_text_prompts_dao);
+}
 
 /**
  * @brief Check for New User Password
@@ -166,13 +197,11 @@ void ModSignup::setupNewUserPassword()
             m_is_active = false;
             return;
         }
-        
         displayPrompt(PROMPT_NUP);
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
 }
 
@@ -188,8 +217,7 @@ void ModSignup::setupDisclaimer()
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
 }
 
@@ -201,14 +229,12 @@ void ModSignup::setupHandle()
 {
     if(m_config->use_handle)
     {
-        displayPrompt(PROMPT_HANDLE);        
+        displayPrompt(PROMPT_HANDLE);
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
-        
 }
 
 /**
@@ -219,12 +245,11 @@ void ModSignup::setupRealName()
 {
     if(m_config->use_real_name)
     {
-        displayPrompt(PROMPT_REAL_NAME);        
+        displayPrompt(PROMPT_REAL_NAME);
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
 }
 
@@ -240,8 +265,7 @@ void ModSignup::setupAddress()
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
 }
 
@@ -250,15 +274,14 @@ void ModSignup::setupAddress()
  * @return
  */
 void ModSignup::setupLocation()
-{    
+{
     if(m_config->use_location)
     {
         displayPrompt(PROMPT_LOCATION);
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
 }
 
@@ -274,8 +297,7 @@ void ModSignup::setupCountry()
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
 }
 
@@ -291,8 +313,7 @@ void ModSignup::setupEmail()
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
 }
 
@@ -308,8 +329,7 @@ void ModSignup::setupUserNote()
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
 }
 
@@ -325,8 +345,7 @@ void ModSignup::setupBirthday()
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
 }
 
@@ -342,9 +361,8 @@ void ModSignup::setupGender()
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
-    }    
+        changeNextModule();
+    }
 }
 
 /**
@@ -373,13 +391,12 @@ void ModSignup::setupChallengeQuestion()
 {
     if(m_config->use_challenge_question)
     {
-        displayPrompt(PROMPT_CHALLENGE_QUESTION);        
+        displayPrompt(PROMPT_CHALLENGE_QUESTION);
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
-    }   
+        changeNextModule();
+    }
 }
 
 /**
@@ -390,14 +407,12 @@ void ModSignup::setupChallengeAnswer()
 {
     if(m_config->use_challenge_question)
     {
-        displayPrompt(PROMPT_CHALLENGE_ANSWER);        
+        displayPrompt(PROMPT_CHALLENGE_ANSWER);
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
-    }   
-        
+        changeNextModule();
+    }
 }
 
 /**
@@ -408,13 +423,12 @@ void ModSignup::setupVerifyChallengeAnswer()
 {
     if(m_config->use_challenge_question)
     {
-        displayPrompt(PROMPT_VERIFY_ANSWER);        
+        displayPrompt(PROMPT_VERIFY_ANSWER);
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
-    }   
+        changeNextModule();
+    }
 }
 
 /**
@@ -425,13 +439,12 @@ void ModSignup::setupYesNoBars()
 {
     if(m_config->use_yesno_bars)
     {
-        displayPrompt(PROMPT_YESNO_BARS);        
+        displayPrompt(PROMPT_YESNO_BARS);
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
-    }  
+        changeNextModule();
+    }
 }
 
 /**
@@ -442,13 +455,12 @@ void ModSignup::setupDoPause()
 {
     if(m_config->use_pause)
     {
-        displayPrompt(PROMPT_USE_PAUSE);        
+        displayPrompt(PROMPT_USE_PAUSE);
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
-    }  
+        changeNextModule();
+    }
 }
 
 /**
@@ -459,13 +471,12 @@ void ModSignup::setupClearOrScroll()
 {
     if(m_config->use_clear_screen)
     {
-        displayPrompt(PROMPT_USE_CLEAR);        
+        displayPrompt(PROMPT_USE_CLEAR);
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
-    }  
+        changeNextModule();
+    }
 }
 
 /**
@@ -476,13 +487,12 @@ void ModSignup::setupAnsiColor()
 {
     if(m_config->use_ansi_color)
     {
-        displayPrompt(PROMPT_USE_ANSI_COLOR);        
+        displayPrompt(PROMPT_USE_ANSI_COLOR);
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
-    }  
+        changeNextModule();
+    }
 }
 
 /**
@@ -493,15 +503,13 @@ void ModSignup::setupBackSpace()
 {
     if(m_config->use_backspace)
     {
-        displayPrompt(PROMPT_BACK_SPACE);        
+        displayPrompt(PROMPT_BACK_SPACE);
     }
     else
     {
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
-    }  
+        changeNextModule();
+    }
 }
-
 
 /**
  * @brief Confirm and save user record.
@@ -512,7 +520,6 @@ void ModSignup::setupVerifyAndSave()
     displayPrompt(PROMPT_VERIFY_SAVE);
 }
 
-
 /**
  * @brief Check for New User Password
  * @return
@@ -520,12 +527,12 @@ void ModSignup::setupVerifyAndSave()
 bool ModSignup::newUserPassword(const std::string &input)
 {
     std::cout << "newUserPassword: " << input << std::endl;
-
-    // handle input for using ansi color, hot key or ENTER after..  hmm
     std::string key = "";
-    bool hiddenOutput = true;
-    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length, "", hiddenOutput);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    bool useHiddenOutput = true;
+    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length, "", useHiddenOutput);
+    
+    // ESC was hit
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         // exit, and return
@@ -537,27 +544,23 @@ bool ModSignup::newUserPassword(const std::string &input)
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
             return false;
         }
+
+        baseProcessDeliverNewLine();
 
         // Pull in and test aginst new user password.
         if(key.compare(m_config->password_newuser) == 0)
         {
             std::cout << "Match" << key.size() << std::endl;
-
-            // Move to next module.
-            changeModule(m_mod_function_index+1);
+            changeNextModule();
         }
         else
         {
             std::cout << "No Match" << key.size() << std::endl;
             ++m_newuser_password_attempts;
-            
-            displayPrompt(PROMPT_PASS_INVALID);
-
-            // Invalid, Ask again, Reload Current Module
-            changeModule(m_mod_function_index);
+            displayPromptAndNewLine(PROMPT_PASS_INVALID);
+            redisplayModulePrompt();
         }
     }
     else
@@ -566,7 +569,7 @@ bool ModSignup::newUserPassword(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -584,7 +587,9 @@ bool ModSignup::disclaimer(const std::string &input)
     // handle input for using ansi color, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
         // exit, and return
@@ -596,15 +601,15 @@ bool ModSignup::disclaimer(const std::string &input)
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
             return false;
         }
+
+        baseProcessDeliverNewLine();
 
         // If ENTER Default to Yes, or Single Y is hit
         if(toupper(key[0]) == 'Y' && key.size() == 1)
         {
-            // Move to next module.
-            changeModule(m_mod_function_index+1);
+            changeNextModule();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
@@ -614,11 +619,8 @@ bool ModSignup::disclaimer(const std::string &input)
         }
         else
         {
-            // Display Invalid Input.
-            displayPrompt(PROMPT_TEXT_INVALID);
-
-            // Invalid, Ask again, Reload Current Module
-            changeModule(m_mod_function_index);
+            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
+            redisplayModulePrompt();
         }
     }
     else
@@ -627,7 +629,7 @@ bool ModSignup::disclaimer(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -642,14 +644,13 @@ bool ModSignup::disclaimer(const std::string &input)
 bool ModSignup::handle(const std::string &input)
 {
     std::cout << "handle: " << input << std::endl;
-
-    // handle input for using ansi color, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sName_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -658,33 +659,26 @@ bool ModSignup::handle(const std::string &input)
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
             return false;
         }
 
         // Check for user name and if is already exists!
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
         user_ptr search = user_data->getUserByHandle(key);
+        
+        baseProcessDeliverNewLine();
 
         if(!search || search->iId == -1)
         {
             std::cout << "no match found" << std::endl;
-
-            // Set the User Name
             m_user_record->sHandle = key;
-
-            // Move to next module.
-            changeModule(m_mod_function_index+1);
+            changeNextModule();
         }
         else
         {
             std::cout << "match found" << std::endl;
-
-            // Invalid Entry, try again!
-            displayPrompt(PROMPT_HANDLE_INVALID);
-
-            // Invalid, Ask again, Reload Current Module
-            changeModule(m_mod_function_index);
+            displayPromptAndNewLine(PROMPT_HANDLE_INVALID);
+            redisplayModulePrompt();
         }
     }
     else
@@ -693,7 +687,7 @@ bool ModSignup::handle(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -707,11 +701,11 @@ bool ModSignup::handle(const std::string &input)
 bool ModSignup::realName(const std::string &input)
 {
     std::cout << "realName: " << input << std::endl;
-
-    // realName input for using ansi color, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sName_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
         // exit, and return
@@ -720,37 +714,28 @@ bool ModSignup::realName(const std::string &input)
     }
     else if(result[0] == '\n')
     {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
             return false;
         }
-
 
         // Check for real name and if is already exists!
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
         user_ptr search = user_data->getUserByRealName(key);
 
+        baseProcessDeliverNewLine();
+
         if(!search || search->iId == -1)
         {
             std::cout << "no match found" << std::endl;
-
-            // Set the User Name
             m_user_record->sRealName = key;
-
-            // Move to next module.
-            changeModule(m_mod_function_index+1);
+            changeNextModule();
         }
         else
         {
             std::cout << "match found" << std::endl;
-
-            // Invalid Entry, try again!
-            displayPrompt(PROMPT_NAME_INVALID);
-
-            // Invalid, Ask again, Reload Current Module
-            changeModule(m_mod_function_index);
+            displayPromptAndNewLine(PROMPT_NAME_INVALID);
+            redisplayModulePrompt();
         }
     }
     else
@@ -759,7 +744,7 @@ bool ModSignup::realName(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -773,14 +758,13 @@ bool ModSignup::realName(const std::string &input)
 bool ModSignup::address(const std::string &input)
 {
     std::cout << "address: " << input << std::endl;
-
-    // address input, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -789,15 +773,12 @@ bool ModSignup::address(const std::string &input)
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
             return false;
         }
-
-        // Set the User Name
+        
+        baseProcessDeliverNewLine();
         m_user_record->sAddress = key;
-
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
     else
     {
@@ -805,7 +786,7 @@ bool ModSignup::address(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -819,14 +800,13 @@ bool ModSignup::address(const std::string &input)
 bool ModSignup::location(const std::string &input)
 {
     std::cout << "location: " << input << std::endl;
-
-    // location input, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -835,15 +815,12 @@ bool ModSignup::location(const std::string &input)
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
             return false;
         }
 
-        // Set the User Name
+        baseProcessDeliverNewLine();
         m_user_record->sLocation = key;
-
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
     else
     {
@@ -851,7 +828,7 @@ bool ModSignup::location(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -865,14 +842,13 @@ bool ModSignup::location(const std::string &input)
 bool ModSignup::country(const std::string &input)
 {
     std::cout << "country: " << input << std::endl;
-
-    // country input, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -881,15 +857,12 @@ bool ModSignup::country(const std::string &input)
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
             return false;
         }
 
-        // Set the User Name
+        baseProcessDeliverNewLine();
         m_user_record->sCountry = key;
-
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
     else
     {
@@ -897,7 +870,7 @@ bool ModSignup::country(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -911,14 +884,13 @@ bool ModSignup::country(const std::string &input)
 bool ModSignup::email(const std::string &input)
 {
     std::cout << "email: " << input << std::endl;
-
-    // email input, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -927,35 +899,27 @@ bool ModSignup::email(const std::string &input)
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
             return false;
         }
 
+        baseProcessDeliverNewLine();
 
         // Test if email already exists.
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
-        user_ptr search = user_data->getUserByEmail(key);
+        user_ptr search = user_data->getUserByEmail(key);        
 
         if(!search || search->iId == -1)
         {
             std::cout << "no match found" << std::endl;
-
-            // Set the User Name
             m_user_record->sEmail = key;
-
-            // Move to next module.
-            changeModule(m_mod_function_index+1);
+            changeNextModule();
         }
         else
         {
             std::cout << "match found" << std::endl;
-
-            // Invalid Entry, try again!
-            displayPrompt(PROMPT_EMAIL_INVALID);
-
-            // Invalid, Ask again, Reload Current Module
-            changeModule(m_mod_function_index);
-        }  
+            displayPromptAndNewLine(PROMPT_EMAIL_INVALID);
+            redisplayModulePrompt();
+        }
     }
     else
     {
@@ -963,7 +927,7 @@ bool ModSignup::email(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -977,14 +941,13 @@ bool ModSignup::email(const std::string &input)
 bool ModSignup::userNote(const std::string &input)
 {
     std::cout << "userNote: " << input << std::endl;
-
-    // userNote input, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -993,15 +956,12 @@ bool ModSignup::userNote(const std::string &input)
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
             return false;
         }
 
-        // Set the User Name
+        baseProcessDeliverNewLine();
         m_user_record->sUserNote = key;
-
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
     else
     {
@@ -1009,7 +969,7 @@ bool ModSignup::userNote(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1023,14 +983,13 @@ bool ModSignup::userNote(const std::string &input)
 bool ModSignup::birthday(const std::string &input)
 {
     std::cout << "birthday: " << input << std::endl;
-
-    // birthday input, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDate_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -1039,9 +998,10 @@ bool ModSignup::birthday(const std::string &input)
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
             return false;
         }
+
+        baseProcessDeliverNewLine();
 
         // Validate Date Here,  ie.. 2016-01-01 format.
         boost::regex date_regex { m_config->regexp_date_validation };
@@ -1055,35 +1015,23 @@ bool ModSignup::birthday(const std::string &input)
             std::istringstream ss(key);
 
             ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
-
-            // Make sure date format was parsed properly.
             if(ss.fail())
             {
                 std::cout << "regex passed, ss failed!" << std::endl;
                 ss.clear();
-
-                // Invalid Entry, try again!
-                displayPrompt(PROMPT_DATE_INVALID);
-
-                // Move to next module.
-                changeModule(m_mod_function_index);
+                displayPromptAndNewLine(PROMPT_DATE_INVALID);
+                redisplayModulePrompt();
+                return true;
             }
 
             std::time_t const time = mktime(&tm);
-
-            // Set the User Birth Date
             m_user_record->dtBirthday = time;
-
-            // Move to next module.
-            changeModule(m_mod_function_index+1);
+            changeNextModule();
         }
         else
         {
-            // Invalid Entry, try again!
-            displayPrompt(PROMPT_DATE_INVALID);
-
-            // Move to next module.
-            changeModule(m_mod_function_index);
+            displayPromptAndNewLine(PROMPT_DATE_INVALID);
+            redisplayModulePrompt();
         }
     }
     else
@@ -1092,7 +1040,7 @@ bool ModSignup::birthday(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1106,20 +1054,26 @@ bool ModSignup::birthday(const std::string &input)
 bool ModSignup::gender(const std::string &input)
 {
     std::cout << "gender: " << input << std::endl;
-
-    // gender input, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
     else if(result[0] == '\n')
     {
-
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            return false;
+        }
+        
+        baseProcessDeliverNewLine();
+        
         // If ENTER Default to Yes, or Single Y is hit
         if((toupper(key[0]) == 'M' && key.size() == 1))
         {
@@ -1132,16 +1086,12 @@ bool ModSignup::gender(const std::string &input)
         }
         else
         {
-            // Invalid Entry, try again!
-            displayPrompt(PROMPT_TEXT_INVALID);
-
-            // Ask Again And Redisplay.
-            changeModule(m_mod_function_index);
+            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
+            redisplayModulePrompt();
             return true;
         }
-
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        
+        changeNextModule();
     }
     else
     {
@@ -1149,7 +1099,7 @@ bool ModSignup::gender(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1163,22 +1113,20 @@ bool ModSignup::gender(const std::string &input)
 bool ModSignup::password(const std::string &input)
 {
     std::cout << "password: " << input << std::endl;
-
-    // password input, hot key or ENTER after..  hmm
     std::string key = "";
-    bool hiddenOutput = true;
+    bool useHiddenOutput = true;
     std::string result = m_session_io.getInputField(
                              input,
                              key,
                              Config::sPassword_length,
                              "",
-                             hiddenOutput
+                             useHiddenOutput
                          );
 
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    // ESC was hit
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -1187,15 +1135,12 @@ bool ModSignup::password(const std::string &input)
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
             return false;
         }
 
-        // Set the Password and verify it matches on next module.
+        baseProcessDeliverNewLine();
         m_security_record->sPasswordHash = key;
-
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
     else
     {
@@ -1203,7 +1148,7 @@ bool ModSignup::password(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1217,22 +1162,20 @@ bool ModSignup::password(const std::string &input)
 bool ModSignup::verifyPassword(const std::string &input)
 {
     std::cout << "password: " << input << std::endl;
-
-    // password input, hot key or ENTER after..  hmm
     std::string key = "";
-    bool hiddenOutput = true;
+    bool useHiddenOutput = true;
     std::string result = m_session_io.getInputField(
                              input,
                              key,
                              Config::sPassword_length,
                              "",
-                             hiddenOutput
+                             useHiddenOutput
                          );
 
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    // ESC was hit
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -1241,28 +1184,25 @@ bool ModSignup::verifyPassword(const std::string &input)
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
             return false;
         }
+
+        baseProcessDeliverNewLine();
 
         // compare password to previous, then encrypt if they match
         // otherwise fail back if they don't and ask again.
         if(m_security_record->sPasswordHash.compare(key) == 0)
-        {            
+        {
             // Load pointer to encrypt methods.
             encrypt_ptr encryption(new Encrypt());
-            if (!encryption) 
+            if (!encryption)
             {
                 std::cout << "Error, unable to allocate encryption" << std::endl;
-                
-                // Invalid Entry, display try again!
-                displayPrompt(PROMPT_PASS_INVALID);
-
-                // Move to next module.
-                changeModule(m_mod_function_index-1);
+                displayPromptAndNewLine(PROMPT_PASS_INVALID);
+                changePreviousModule();
                 return false;
             }
-        
+
             std::string salt = encryption->generate_salt(m_user_record->sHandle, m_config->bbs_uuid);
             std::string password = encryption->generate_password(m_security_record->sPasswordHash, salt);
 
@@ -1275,23 +1215,14 @@ bool ModSignup::verifyPassword(const std::string &input)
             // setup the salt and password.
             m_security_record->sSaltHash = salt;
             m_security_record->sPasswordHash = password;
-
-            // Move to next module.
-            changeModule(m_mod_function_index+1);
+            changeNextModule();
         }
         else
         {
-
             std::cout << "no match found" << std::endl;
-
-            // Set the password back to blank
             m_security_record->sPasswordHash = "";
-
-            // Invalid Entry, try again!
-            displayPrompt(PROMPT_PASS_INVALID);
-
-            // Move to next module.
-            changeModule(m_mod_function_index-1);
+            displayPromptAndNewLine(PROMPT_PASS_INVALID);
+            changePreviousModule();
         }
     }
     else
@@ -1300,7 +1231,7 @@ bool ModSignup::verifyPassword(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1314,14 +1245,13 @@ bool ModSignup::verifyPassword(const std::string &input)
 bool ModSignup::challengeQuestion(const std::string &input)
 {
     std::cout << "challengeQuestion: " << input << std::endl;
-
-    // challengeQuestion input, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sPassword_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -1330,15 +1260,14 @@ bool ModSignup::challengeQuestion(const std::string &input)
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
             return false;
         }
+        
+        baseProcessDeliverNewLine();
 
         // Set the Password and verify it matches on next module.
         m_security_record->sChallengeQuestion = key;
-
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
     else
     {
@@ -1346,7 +1275,7 @@ bool ModSignup::challengeQuestion(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1360,22 +1289,20 @@ bool ModSignup::challengeQuestion(const std::string &input)
 bool ModSignup::challengeAnswer(const std::string &input)
 {
     std::cout << "challengeAnswer: " << input << std::endl;
-
-    // challengeAnswer input, hot key or ENTER after..  hmm
     std::string key = "";
-    bool hiddenOutput = true;
+    bool useHiddenOutput = true;
     std::string result = m_session_io.getInputField(
                              input,
                              key,
                              Config::sPassword_length,
                              "",
-                             hiddenOutput
+                             useHiddenOutput
                          );
 
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -1384,15 +1311,13 @@ bool ModSignup::challengeAnswer(const std::string &input)
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
             return false;
         }
+        
+        baseProcessDeliverNewLine();
 
-        // Set the ChallengeAnswer and verify it matches on next module.
         m_security_record->sChallengeAnswerHash = key;
-
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
     else
     {
@@ -1400,7 +1325,7 @@ bool ModSignup::challengeAnswer(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1414,22 +1339,20 @@ bool ModSignup::challengeAnswer(const std::string &input)
 bool ModSignup::verifyChallengeAnswer(const std::string &input)
 {
     std::cout << "password: " << input << std::endl;
-
-    // password input, hot key or ENTER after..  hmm
     std::string key = "";
-    bool hiddenOutput = true;
+    bool useHiddenOutput = true;
     std::string result = m_session_io.getInputField(
                              input,
                              key,
                              Config::sPassword_length,
                              "",
-                             hiddenOutput
+                             useHiddenOutput
                          );
 
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -1438,29 +1361,25 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
             return false;
         }
+        
+        baseProcessDeliverNewLine();
 
         // compare password to previous, then encrypt if they match
         // otherwise fail back if they don't and ask again.
         if(m_security_record->sChallengeAnswerHash.compare(key) == 0)
         {
             encrypt_ptr encryption(new Encrypt());
-            if (!encryption) 
+            if (!encryption)
             {
                 std::cout << "Error, unable to allocate encryption" << std::endl;
-                // Set the password back to blank
                 m_security_record->sChallengeAnswerHash = "";
-
-                // Invalid Entry, try again!
-                displayPrompt(PROMPT_PASS_INVALID);
-                
-                // Move to next module.
-                changeModule(m_mod_function_index-1);
+                displayPromptAndNewLine(PROMPT_PASS_INVALID);
+                changePreviousModule();
                 return true;
             }
-            
+
             // Generate Password Hash
             std::string password = encryption->generate_password(
                                        m_security_record->sChallengeAnswerHash,
@@ -1474,24 +1393,15 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
                 assert(false);
             }
 
-            // setup the salted challenge answer.
             m_security_record->sChallengeAnswerHash = password;
-
-            // Move to next module.
-            changeModule(m_mod_function_index+1);
+            changeNextModule();
         }
         else
         {
             std::cout << "no match found" << std::endl;
-
-            // Set the password back to blank
             m_security_record->sChallengeAnswerHash = "";
-
-            // Invalid Entry, try again!
-            displayPrompt(PROMPT_PASS_INVALID);
-            
-            // Move to next module.
-            changeModule(m_mod_function_index-1);
+            displayPromptAndNewLine(PROMPT_PASS_INVALID);
+            changePreviousModule();
         }
     }
     else
@@ -1500,7 +1410,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1514,48 +1424,46 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
 bool ModSignup::yesNoBars(const std::string &input)
 {
     std::cout << "yesNoBars: " << input << std::endl;
-
-    // yesNoBars input, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
     else if(result[0] == '\n')
-    {
+    {                
         // If ENTER Default to Yes, or Single Y is hit
         if(key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1))
         {
             // Key == 0 on [ENTER] pressed alone.
             if(key.size() == 0)
             {
-                // If ENTER, then display Yes as key press.
-                baseProcessAndDeliver("Yes");
+                std::string yes_prompt = "Yes";
+                baseProcessDeliverInput(yes_prompt);
             }
 
             m_user_record->bYesNoBars = true;
+            baseProcessDeliverNewLine();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
             m_user_record->bYesNoBars = false;
+            baseProcessDeliverNewLine();
         }
         else
         {
-            // Invalid Entry, try again!
-            displayPrompt(PROMPT_TEXT_INVALID);
-
-            // Ask Again And Redisplay.
-            changeModule(m_mod_function_index);
+            baseProcessDeliverNewLine();
+            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
+            redisplayModulePrompt();
             return true;
         }
 
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
     else
     {
@@ -1563,7 +1471,7 @@ bool ModSignup::yesNoBars(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1577,48 +1485,46 @@ bool ModSignup::yesNoBars(const std::string &input)
 bool ModSignup::doPause(const std::string &input)
 {
     std::cout << "doPause: " << input << std::endl;
-
-    // doPause input, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
     else if(result[0] == '\n')
-    {
+    {        
         // If ENTER Default to Yes, or Single Y is hit
         if(key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1))
         {
             // Key == 0 on [ENTER] pressed alone.
             if(key.size() == 0)
             {
-                // If ENTER, then display Yes as key press.
-                baseProcessAndDeliver("Yes");
+                std::string yes_prompt = "Yes";
+                baseProcessDeliverInput(yes_prompt);
             }
 
             m_user_record->bDoPause = true;
+            baseProcessDeliverNewLine();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
             m_user_record->bDoPause = false;
+            baseProcessDeliverNewLine();
         }
         else
         {
-            // Invalid Entry, try again!
-            displayPrompt(PROMPT_TEXT_INVALID);
-
-            // Ask Again And Redisplay.
-            changeModule(m_mod_function_index);
+            baseProcessDeliverNewLine();
+            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
+            redisplayModulePrompt();
             return true;
         }
 
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
     else
     {
@@ -1626,7 +1532,7 @@ bool ModSignup::doPause(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1640,14 +1546,13 @@ bool ModSignup::doPause(const std::string &input)
 bool ModSignup::clearOrScroll(const std::string &input)
 {
     std::cout << "clearOrScroll: " << input << std::endl;
-
-    // clearOrScroll input, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -1659,29 +1564,28 @@ bool ModSignup::clearOrScroll(const std::string &input)
             // Key == 0 on [ENTER] pressed alone.
             if(key.size() == 0)
             {
-                // If ENTER, then display Yes as key press.
-                baseProcessAndDeliver("Yes");
+                std::string yes_prompt = "Yes";
+                baseProcessDeliverInput(yes_prompt);
             }
 
             m_user_record->bClearOrScroll = true;
+            baseProcessDeliverNewLine();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
             m_user_record->bClearOrScroll = false;
+            baseProcessDeliverNewLine();
         }
         else
         {
-            // Invalid Entry, try again!
-            displayPrompt(PROMPT_TEXT_INVALID);
-
-            // Ask Again And Redisplay.
-            changeModule(m_mod_function_index);
+            baseProcessDeliverNewLine();
+            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
+            redisplayModulePrompt();
             return true;
         }
 
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
     else
     {
@@ -1689,7 +1593,7 @@ bool ModSignup::clearOrScroll(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1703,14 +1607,13 @@ bool ModSignup::clearOrScroll(const std::string &input)
 bool ModSignup::ansiColor(const std::string &input)
 {
     std::cout << "ansiColor: " << input << std::endl;
-
-    // ansiColor input, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -1722,29 +1625,28 @@ bool ModSignup::ansiColor(const std::string &input)
             // Key == 0 on [ENTER] pressed alone.
             if(key.size() == 0)
             {
-                // If ENTER, then display Yes as key press.
-                baseProcessAndDeliver("Yes");
+                std::string yes_prompt = "Yes";
+                baseProcessDeliverInput(yes_prompt);
             }
 
             m_user_record->bAnsi = true;
+            baseProcessDeliverNewLine();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
             m_user_record->bAnsi = false;
+            baseProcessDeliverNewLine();
         }
         else
         {
-            // Invalid Entry, try again!
-            displayPrompt(PROMPT_TEXT_INVALID);
-
-            // Ask Again And Redisplay.
-            changeModule(m_mod_function_index);
+            baseProcessDeliverNewLine();
+            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
+            redisplayModulePrompt();
             return true;
         }
 
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
     else
     {
@@ -1752,7 +1654,7 @@ bool ModSignup::ansiColor(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1766,55 +1668,52 @@ bool ModSignup::ansiColor(const std::string &input)
 bool ModSignup::backSpace(const std::string &input)
 {
     std::cout << "backSpace: " << input << std::endl;
-
-    // backSpace input, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
     else if(result[0] == '\n')
     {
-       // If ENTER Default to Yes, or Single Y is hit
+        // If ENTER Default to Yes, or Single Y is hit
         if(key.size() == 0)
         {
+            baseProcessDeliverNewLine();
             // Key == 0 on [ENTER] pressed alone.
-            // If ENTER, then display Yes as key press.
-            baseProcessAndDeliver("Detection WIP, Select W or T.");
+            std::string detection_prompt = "- Detection WIP, Select W or T.";
+            baseProcessAndDeliverNewLine(detection_prompt);
 
             // Not Implimented YET
             // Start Backspace Detection here!
-            changeModule(m_mod_function_index);
+            redisplayModulePrompt();
             return true;
 
         }
         else if(toupper(key[0]) == 'W' && key.size() == 1)
         {
-            // Use Default Windows Termnal Backspace
             m_user_record->bBackSpaceVt100 = false;
+            baseProcessDeliverNewLine();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'T' && key.size() == 1)
         {
-            // Use Degault Linux Terminal Backspace
             m_user_record->bBackSpaceVt100 = true;
+            baseProcessDeliverNewLine();
         }
         else
         {
-            // Invalid Entry, try again!
-            displayPrompt(PROMPT_TEXT_INVALID);
-            
-            // Ask Again And Redisplay.
-            changeModule(m_mod_function_index);
+            baseProcessDeliverNewLine();
+            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
+            redisplayModulePrompt();
             return true;
         }
 
-        // Move to next module.
-        changeModule(m_mod_function_index+1);
+        changeNextModule();
     }
     else
     {
@@ -1822,7 +1721,7 @@ bool ModSignup::backSpace(const std::string &input)
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -1835,10 +1734,8 @@ bool ModSignup::backSpace(const std::string &input)
  */
 void ModSignup::saveNewUserRecord()
 {
-    // Link to users dao for data access object
+    // StartUp Data Access Objects for SQL
     users_dao_ptr user_dao(new UsersDao(m_session_data->m_user_database));
-
-    // Link to security dao for data access object
     security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
 
     // Save New Security Record, index is then inserted into user record
@@ -1846,9 +1743,7 @@ void ModSignup::saveNewUserRecord()
     if (securityIndex < 0)
     {
         std::cout << "Error, unable to insert new user record." << std::endl;
-
         displayPrompt(PROMPT_NOT_SAVED);
-
         m_is_active = false;
         return;
     }
@@ -1874,16 +1769,16 @@ void ModSignup::saveNewUserRecord()
         {
             std::cout << "Error, unable to remove secutiry record." << std::endl;
         }
-
-        displayPrompt(PROMPT_NOT_SAVED);
-
+        
+        baseProcessDeliverNewLine();
+        displayPromptAndNewLine(PROMPT_NOT_SAVED);
         m_is_active = false;
         return;
     }
 
     // Completed Successfully
-    displayPrompt(PROMPT_SAVED);
-
+    baseProcessDeliverNewLine();
+    displayPromptAndNewLine(PROMPT_SAVED);
 
     m_is_active = false;
     return;
@@ -1894,17 +1789,16 @@ void ModSignup::saveNewUserRecord()
  * @brief Confirm and save user record.
  * @return
  */
-bool ModSignup::verifyAndSave(const std::string &input) {
-
+bool ModSignup::verifyAndSave(const std::string &input)
+{
     std::cout << "verifyAndSave: " << input << std::endl;
-
-    // verifyAndSave input, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -1916,13 +1810,13 @@ bool ModSignup::verifyAndSave(const std::string &input) {
             // Key == 0 on [ENTER] pressed alone.
             if(key.size() == 0)
             {
-                // If ENTER, then display Yes as key press.
-                baseProcessAndDeliver("Yes");
+                std::string yes_prompt = "Yes";
+                baseProcessDeliverInput(yes_prompt);
             }
 
-            // Save The User Record
-            saveNewUserRecord();
+            baseProcessDeliverNewLine();
 
+            saveNewUserRecord();
             return false;
         }
         // Else check for single N for No to default to ASCII no colors.
@@ -1930,15 +1824,14 @@ bool ModSignup::verifyAndSave(const std::string &input) {
         {
             // Abort and Return;
             m_is_active = false;
+            baseProcessDeliverNewLine();
             return false;
         }
         else
         {
-            // Invalid Entry, try again!
-            displayPrompt(PROMPT_TEXT_INVALID);
-
-            // Ask Again And Redisplay.
-            changeModule(m_mod_function_index);
+            baseProcessDeliverNewLine();
+            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
+            redisplayModulePrompt();
             return true;
         }
     }
@@ -1948,7 +1841,7 @@ bool ModSignup::verifyAndSave(const std::string &input) {
         // Only if return data shows a processed key returned.
         if(result != "empty")
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 

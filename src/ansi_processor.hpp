@@ -54,6 +54,7 @@ public:
     int m_characters_per_line;      // TERM Width
     int m_x_position;
     int m_max_x_position;
+    int m_max_y_position;
     int m_center_ansi_output;
     int m_saved_cursor_x;
     int m_saved_cursor_y;
@@ -124,6 +125,9 @@ public:
     
     // Clear Pull Down Bars once menu options are reset.
     void clearPullDownBars();
+    
+     // Return the max rows used on the screen
+    int getMaxRowsUsedOnScreen();
 
     // Parses the Screen Buffer and Builds pulldown options
     std::string screenBufferParse();          // 3

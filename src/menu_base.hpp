@@ -17,6 +17,7 @@
 #include "data/menu_dao.hpp"
 #include "mods/mod_base.hpp"
 
+#include <boost/smart_ptr/shared_ptr.hpp>
 #include <functional>
 
 class Config;
@@ -140,6 +141,24 @@ public:
     std::string setupYesNoMenuInput();
 
     /**
+     * @brief Gets the Default Color Sequence
+     * @return 
+     */
+    std::string getDefaultColor();
+
+    /**
+     * @brief Gets the Default Input Color Sequence
+     * @return 
+     */
+    std::string getDefaultInputColor();
+
+    /**
+     * @brief Gets the Default Input Color Sequence
+     * @return 
+     */
+    std::string getDefaultInverseColor();
+
+    /**
      * @brief Builds the menu prompt as a question/input string
      * @return 
      */
@@ -188,6 +207,12 @@ public:
      * @return 
      */
     std::string loadMenuPrompt();
+
+    /**
+     * @brief Move to End of Display then output
+     * @param output
+     */
+    void moveToBottomAndDisplay(const std::string &prompt);
 
     // Menu System will be a (2) Function system 1st setups up and displays
     // The Second handles all I/O for the menu options, this is dynamic since

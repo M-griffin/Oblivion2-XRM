@@ -12,7 +12,6 @@
 #include "../data/users_dao.hpp"
 
 #include "../session_data.hpp"
-#include "../session_io.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
@@ -157,6 +156,7 @@ public:
     const std::string PROMPT_DISCLAIMER = "disclaimer";
     const std::string PROMPT_HANDLE = "handle";
     const std::string PROMPT_REAL_NAME = "real_name";
+    const std::string PROMPT_USER_NUMBER = "user_number";    
     const std::string PROMPT_ADDRESS = "address";
     const std::string PROMPT_LOCATION = "location";
     const std::string PROMPT_COUNTRY = "country";
@@ -186,9 +186,6 @@ public:
     const std::string PROMPT_SAVED = "confirmed_save";
     const std::string PROMPT_NOT_SAVED = "record_not_saved";
 
-    // ... cont
-
-
     /**
      * @brief Create Default Text Prompts for module
      */
@@ -201,10 +198,31 @@ public:
     void changeModule(int mod_function_index);
 
     /**
+     * @brief Changes to Next module index.
+     */
+    void changeNextModule();
+    
+    /**
+     * @brief Changes to Previous module index.
+     */
+    void changePreviousModule();
+
+    /**
+     * @brief Redisplay's the current module prompt.
+     */
+    void redisplayModulePrompt();
+
+    /**
      * @brief Pull and Display Prompts
      * @param prompt
      */
     void displayPrompt(const std::string &prompt);
+
+    /**
+     * @brief Pull and Display Prompts with following newline
+     * @param prompt
+     */
+    void displayPromptAndNewLine(const std::string &prompt);
 
     /**
      * @brief New User Password
@@ -471,7 +489,6 @@ private:
      * @return
      */
     bool verifyAndSave(const std::string &input);
-
 
     /**
      * @brief Save New User Record

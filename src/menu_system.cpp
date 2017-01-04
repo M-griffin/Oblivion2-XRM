@@ -847,17 +847,17 @@ void MenuSystem::menuEditorInput(const std::string &character_buffer, const bool
         m_line_buffer += character_buffer[0];
     }
 
-    std::string output_buffer = "";
+    std::string output_buffer = m_config->default_color_regular;
     switch (std::toupper(m_line_buffer[0]))
     {
         case 'A': // Add
-            output_buffer = "Enter Menu Name to Add : ";
+            output_buffer += "Enter Menu Name to Add : ";
             break;
         case 'C': // Change/Edit
-            output_buffer = "Enter Menu Name to Change : ";
+            output_buffer += "Enter Menu Name to Change : ";
             break;
         case 'D': // Delete
-            output_buffer = "Enter Menu to Delete : ";
+            output_buffer += "Enter Menu to Delete : ";
             break;
         case 'Q': // Quit
             // Reload fall back, or gosub to last menu!
