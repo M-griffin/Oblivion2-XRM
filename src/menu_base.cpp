@@ -93,8 +93,6 @@ void MenuBase::readInMenuData()
 
     // Call MenuDao to ready in .yaml file
     MenuDao mnu(m_menu_info, m_current_menu, GLOBAL_MENU_PATH);
-    
-    // Load the Menu
     if (mnu.fileExists())
     {
         mnu.loadMenu();
@@ -131,6 +129,7 @@ void MenuBase::loadInMenu(std::string menu_name)
     // Read in the Current Menu
     readInMenuData();
 
+    // Testing Information pulled in.
     std::cout << m_menu_info->menu_name << std::endl;
     std::cout << m_menu_info->menu_pulldown_file << std::endl;
     std::cout << m_menu_info->menu_help_file << std::endl;
@@ -299,16 +298,42 @@ std::string MenuBase::setupYesNoMenuInput()
 {
     m_input_index = MENU_YESNO_BAR;
     
-    std::string output = "";
+    std::string output = "-Yes- -No-  (Mockup)";
     
     // Generate y/n light bar commands
     // dependon on default m_active_pulldownID for y/n
     
     // decide if we want to buld string on default colors
     // or parse an extra template from config??!?
-    
-    
+        
     return output;
+}
+
+/**
+ * @brief Gets the Default Color Sequence
+ * @return 
+ */
+std::string MenuBase::getDefaultColor() 
+{
+    return m_session_io.pipeColors(m_config->default_color_regular);
+}
+
+/**
+ * @brief Gets the Default Input Color Sequence
+ * @return 
+ */
+std::string MenuBase::getDefaultInputColor() 
+{
+    return m_session_io.pipeColors(m_config->default_color_input);
+}
+
+/**
+ * @brief Gets the Default Inverse Color Sequence
+ * @return 
+ */
+std::string MenuBase::getDefaultInverseColor() 
+{
+    return m_session_io.pipeColors(m_config->default_color_inverse);
 }
 
 /**
@@ -321,7 +346,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
     m_session_io.clearAllMCIMapping();
     m_session_io.addMCIMapping("^R", m_config->default_color_regular);
     m_session_io.addMCIMapping("^S", m_config->default_color_stat);
-    m_session_io.addMCIMapping("^P", m_config->default_color_propmpt);
+    m_session_io.addMCIMapping("^P", m_config->default_color_prompt);
     m_session_io.addMCIMapping("^E", m_config->default_color_input);
     m_session_io.addMCIMapping("^V", m_config->default_color_inverse);
     m_session_io.addMCIMapping("^X", m_config->default_color_box);
@@ -418,10 +443,11 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
     }    
     
     // Then feed though and return the updated string.
-    output += std::move(m_session_io.parseCodeMapGenerics(prompt_string, code_map));
+    std::string yesNoBar = std::move(m_session_io.parseCodeMapGenerics(prompt_string, code_map));
+    yesNoBar += output;
     
     // Then we feed it through again to handle colors replacements.        
-    return m_session_io.pipe2ansi(output);
+    return m_session_io.pipe2ansi(yesNoBar);
 }
 
 /**
@@ -451,9 +477,6 @@ std::string MenuBase::loadMenuScreen()
         
         // Make all screens uppercase, handle unicode names.
         screen_file = boost::locale::to_upper(screen_file);
-        
-        std::cout << "readinAnsi1: " << screen_file << std::endl;
-         
          
         // if file doesn't exist, then use generic template 
         if (m_common_io.fileExists(screen_file))
@@ -474,8 +497,6 @@ std::string MenuBase::loadMenuScreen()
         
         // Screen File(s) are Uppercase.
         screen_file = boost::locale::to_upper(screen_file);
-        
-        std::cout << "readinAnsi2: " << screen_file << std::endl;
         
         // Otherwise use the Pulldown menu name from the menu.
         // if file doesn't exist, then use generic template 
@@ -535,6 +556,7 @@ std::string MenuBase::buildLightBars()
  */
 void MenuBase::redisplayMenuScreen()
 {
+    std::cout << " *** redisplay Menu Screen *** " << std::endl;
     // Read in the Menu ANSI
     std::string buffer = loadMenuScreen();
     std::string output = m_session_io.pipe2ansi(buffer);
@@ -560,7 +582,7 @@ void MenuBase::redisplayMenuScreen()
     
     // Load the Menu prompt
     output += loadMenuPrompt();    
-    m_menu_session_data->deliver(output);
+    baseProcessAndDeliver(output);
 }
 
 /**
@@ -575,22 +597,21 @@ void MenuBase::executeFirstAndEachCommands()
     locale::global(loc);
     cout.imbue(loc);
 
-    std::cout << "m_menu_info->menu_options: " << m_menu_info->menu_options.size() << std::endl;
+    //std::cout << "m_menu_info->menu_options: " << m_menu_info->menu_options.size() << std::endl;
 
     // Now loop and scan for first cmd and each time
     for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
     {
         auto &m = m_menu_info->menu_options[i];
         // Process all First Commands or commands that should run every action.       
-        std::cout << "index: " << m.index << std::endl;
-        std::cout << "menu_key: " << m.menu_key << std::endl;
+        //std::cout << "index: " << m.index << std::endl;
+        //std::cout << "menu_key: " << m.menu_key << std::endl;
         std::string new_key = boost::locale::to_upper(m.menu_key);
         m.menu_key = std::move(new_key);
 
         if(m.menu_key == "FIRSTCMD" || m.menu_key == "EACH")
         {
-            // Process
-            std::cout << "*** FOUND FIRSTCMD! EXECUTE: " << m.command_key << std::endl;
+            //std::cout << "*** FOUND FIRSTCMD! EXECUTE: " << m.command_key << std::endl;
             executeMenuOptions(m);
         }
     }
@@ -640,7 +661,7 @@ std::string MenuBase::loadMenuPrompt()
         m_session_io.addMCIMapping("%MN", m_menu_info->menu_prompt);
         
         std::string output = m_session_io.pipe2ansi(prompt);
-        std::cout << "prompt: " << output << std::endl;
+        //std::cout << "prompt: " << output << std::endl;
         return output;
     }
     else
@@ -657,6 +678,19 @@ std::string MenuBase::loadMenuPrompt()
     }    
     
     return prompt;
+}
+
+/**
+ * @brief Move to End of Display then output
+ * @param output
+ */
+void MenuBase::moveToBottomAndDisplay(const std::string &prompt)
+{
+    std::string output = getDefaultColor();
+    int screen_row = m_ansi_process->getMaxRowsUsedOnScreen();
+    output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
+    output += std::move(prompt);        
+    baseProcessAndDeliver(output);           
 }
 
 /**
@@ -693,8 +727,7 @@ void MenuBase::loadAndStartupMenu()
     // First Lets imploment N with ^ color codes for local theme colors.
     if (m_menu_info->menu_pulldown_file.size() == 1 && toupper(m_menu_info->menu_pulldown_file[0]) == 'N')
     {
-        std::string output = std::move(parseMenuPromptString(m_menu_info->menu_prompt));
-        m_menu_session_data->deliver(output);
+        moveToBottomAndDisplay(parseMenuPromptString(m_menu_info->menu_prompt));                    
         m_is_active_pulldown_menu = false;
 
         // Not sure if this is allowed in legacy, but lets do it, then they can clear screen or add ansi!
@@ -765,6 +798,8 @@ void MenuBase::loadAndStartupMenu()
             // Process buffer for PullDown Codes. results for TESTING, are discarded.
             std::string result = std::move(m_ansi_process->screenBufferParse());
 
+
+            std::cout << " *** push out lightbars *** " << std::endl;
             // Now Build the Light bars
             std::string light_bars = buildLightBars();
 
@@ -783,9 +818,7 @@ void MenuBase::loadAndStartupMenu()
                 
     // Loads the users selected menu prompt
     output += loadMenuPrompt();
-    
-    // Don't need process here, since we pipe2ansi seperately
-    m_menu_session_data->deliver(output);
+    baseProcessAndDeliver(output);
 
     if (!m_use_first_command_execution)
     {
@@ -804,6 +837,8 @@ void MenuBase::loadAndStartupMenu()
  */
 void MenuBase::lightbarUpdate(int previous_pulldown_id)
 {
+    
+    std::cout << " *** lightbar update! *** " << std::endl;
     // Draw Light bars, use next item to determine next/previous id to pull.
     std::string light_bars = "";
     // Moved to Next Item
@@ -839,9 +874,10 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
     
     // Clear Attriutes, then move back to menu prompt position.
     light_bars.append("\x1b[0m\x1b[u");
-
-    std::string output = std::move(m_session_io.pipe2ansi(light_bars));
-    m_menu_session_data->deliver(output);
+    std::string output = std::move(m_session_io.pipe2ansi(light_bars));   
+    //std::cout << "ligtbar text: " << output << std::endl;
+    
+    baseProcessAndDeliver(output);
 }
 
 /**
@@ -1085,6 +1121,7 @@ bool MenuBase::processMenuOptions(const std::string &input)
 
     bool is_enter = false;
     int  executed = 0;
+    int  executedLightBarMovement = 0;
     
     // For checking if the menu has changed from an executed option
     std::string current_menu = m_current_menu;
@@ -1102,6 +1139,8 @@ bool MenuBase::processMenuOptions(const std::string &input)
     {
         std::cout << "EXECUTE ENTER!: " << input_text << std::endl;
         is_enter = true;
+        // Push out a NewLine after ENTER Executions
+        baseProcessAndDeliver("\r\n");
     }
 
     // Check for loaded menu commands.
@@ -1138,10 +1177,15 @@ bool MenuBase::processMenuOptions(const std::string &input)
                 }
                 else 
                 {                    
-                    // handle Pull Down Lightbar Changes
-                    if (handleLightbarSelection(clean_sequence))
+                    // handle Pull Down Lightbar Changes Movement Keys
+                    // Should only execute once for movement! in loop of all options.
+                    if (executedLightBarMovement == 0) 
                     {
-                        ++executed;
+                        if (handleLightbarSelection(clean_sequence))
+                        {
+                            ++executed;
+                            ++executedLightBarMovement;
+                        }                    
                     }
                 }
             }
@@ -1285,8 +1329,7 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
     std::string key = "";
     std::string result = m_session_io.getInputField(character_buffer, key, Config::sMenuPrompt_length);
     
-    std::cout << "result: " << result << std::endl;
-    
+    //std::cout << "result: " << result << std::endl;    
     if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
     {
         std::cout << "ESC aborted!" << std::endl;
@@ -1294,6 +1337,7 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
     else if(result[0] == '\n')
     {
         // Key == 0 on [ENTER] pressed alone. then invalid!
+        // TODO, might have menu keys with ENTER, update this lateron!!
         if(key.size() == 0)
         {
             // Return and don't do anything.
@@ -1305,7 +1349,7 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
         if (!processMenuOptions(key))
         {
             // Clear Menu Field input Text, redraw prompt?
-            std::string clear_input = "";
+            std::string clear_input = "\x1b[0m";
             for(int i = m_common_io.numberOfChars(key); i > 0; i--)
             {
                 clear_input += "\x1b[D \x1b[D";
@@ -1319,8 +1363,9 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
         // Only if return data shows a processed key returned.
         if (result != "empty") 
         {
-            std::cout << "baseProcessAndDeliver: " << result << std::endl;
-            baseProcessAndDeliver(result);
+            std::string output = getDefaultInputColor();
+            output.append(result);
+            baseProcessAndDeliver(output);
         }
     }        
 }
@@ -1351,9 +1396,7 @@ void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf
  *        Handles Processing for Loaded Menus Hotkey and Lightbars
  */
 void MenuBase::menuYesNoBarInput(const std::string &character_buffer, const bool &is_utf8)
-{
-    std::cout << " *** menuInput" << std::endl;       
-        
+{         
     // If were in lightbar mode, then we are using hotkeys.
     if (m_is_active_pulldown_menu)
     {            

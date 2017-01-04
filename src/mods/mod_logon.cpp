@@ -76,11 +76,12 @@ void ModLogon::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_LOGON]               = std::make_pair("Logon Prompt", "|CR|08Lo|07gon|08: |04");
-    value[PROMPT_PASSWORD]            = std::make_pair("Password Prompt", "|CR|08pa|07ssword|08: |04");
-    value[PROMPT_USE_INVALID]         = std::make_pair("Invalid Entry", "|CR|12Invalid Response! Try again.");
-    value[PROMPT_INVALID_USERNAME]    = std::make_pair("Invalid Username", "|CR|12Invalid Username! Try again.");
-    value[PROMPT_INVALID_PASSWORD]    = std::make_pair("Invalid Passowrd", "|CR|12Invalid Passowrd! Try again.");
+    value[PROMPT_LOGON]               = std::make_pair("Logon Prompt", "Logon: ");
+    value[PROMPT_USERNUMBER]          = std::make_pair("Your User Number is |OT", "Use your user number for quick logins, # is |03|OT|CR");
+    value[PROMPT_PASSWORD]            = std::make_pair("Password Prompt", "password: ");
+    value[PROMPT_USE_INVALID]         = std::make_pair("Invalid Entry", "|04Invalid Response! Try again.|CR");
+    value[PROMPT_INVALID_USERNAME]    = std::make_pair("Invalid Username", "|04Invalid Username! Try again.|CR");
+    value[PROMPT_INVALID_PASSWORD]    = std::make_pair("Invalid Passowrd", "|04Invalid Passowrd! Try again.|CR");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -97,16 +98,50 @@ void ModLogon::changeModule(int mod_function_index)
 }
 
 /**
+ * @brief Changes to Next module index.
+ */
+void ModLogon::changeNextModule()
+{
+    // Set, and Execute the Setup module.
+    ++m_mod_function_index;
+    m_setup_functions[m_mod_function_index]();
+}
+
+/**
+ * @brief Changes to Previous module index.
+ */
+void ModLogon::changePreviousModule()
+{
+    // Set, and Execute the Setup module.
+    --m_mod_function_index;
+    m_setup_functions[m_mod_function_index]();
+}
+
+/**
+ * @brief Redisplay's the current module prompt.
+ * @param mod_function_index
+ */
+void ModLogon::redisplayModulePrompt()
+{
+    m_setup_functions[m_mod_function_index]();
+}
+
+/**
  * @brief Pull and Display Prompts
  * @param prompt
  */
 void ModLogon::displayPrompt(const std::string &prompt)
 {
-    std::string result = m_session_io.parseTextPrompt(
-                                 m_text_prompts_dao->getPrompt(prompt)
-                             );
+    baseDisplayPrompt(prompt, m_text_prompts_dao);
+}
 
-    baseProcessAndDeliver(result);
+/**
+ * @brief Pull and Display Prompts with following newline
+ * @param prompt
+ */
+void ModLogon::displayPromptAndNewLine(const std::string &prompt)
+{
+    baseDisplayPromptAndNewLine(prompt, m_text_prompts_dao);
 }
 
 /**
@@ -119,6 +154,23 @@ void ModLogon::setupLogon()
     displayPrompt(PROMPT_LOGON);
 }
 
+/**
+ * @brief Display the UserNumber on Logon.
+ */
+void ModLogon::displayUserNumber()
+{
+    M_StringPair prompt_set = std::move(m_text_prompts_dao->getPrompt(PROMPT_USERNUMBER));
+    
+    std::string mci_code = "|OT";    
+    std::string result = prompt_set.second;
+    std::string user_number = std::to_string(m_logon_user->iId);
+    
+    std::cout << "User Number: " << user_number << std::endl;        
+    m_session_io.m_common_io.parseLocalMCI(result, mci_code, user_number);
+    result = m_session_io.pipe2ansi(result);
+    result += "\r\n";
+    baseProcessAndDeliver(result);       
+}
 
 /**
  * @brief Validates user logon password
@@ -191,6 +243,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
         m_logon_user = user_data->getUserByHandle(input);
         if(!m_logon_user || m_logon_user->iId != -1) 
         {
+            displayUserNumber();
             return true;
         }
     }
@@ -200,6 +253,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
         m_logon_user = user_data->getUserByEmail(input);
         if(!m_logon_user || m_logon_user->iId != -1) 
         {
+            displayUserNumber();
             return true;
         }
     }
@@ -209,6 +263,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
         m_logon_user = user_data->getUserByRealName(input);
         if(!m_logon_user || m_logon_user->iId != -1) 
         {
+            displayUserNumber();
             return true;
         }
     }
@@ -223,17 +278,16 @@ bool ModLogon::checkUserLogon(const std::string &input)
 bool ModLogon::logon(const std::string &input)
 {
     std::cout << "logon: " << input << std::endl;
-
-    // handle input for using ansi color, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sName_length);
 
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
     }
     else if(result[0] == '\n')
-    {
+    {            
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
@@ -241,21 +295,29 @@ bool ModLogon::logon(const std::string &input)
             return false;
         }
                 
+        baseProcessDeliverNewLine();
+        
         // Check if users enter valid identifier.
         if (checkUserLogon(key))
-        {            
-            // Match Found, ask for password
-            std::cout << "match found" << std::endl;
-            
-            changeModule(m_mod_function_index + 1);                        
+        {               
+            // Testing print user name.
+            std::cout << m_logon_user->sHandle << std::endl;
+            changeNextModule();
         }
         else
         {
-            // Invalid Entry, try again!            
-            std::cout << "no match found" << std::endl;
-            displayPrompt(PROMPT_INVALID_USERNAME);        
+            displayPromptAndNewLine(PROMPT_INVALID_USERNAME);
+            ++m_failure_attempts;
             
-            changeModule(m_mod_function_index);            
+            // If max, then exit back to matrix.  
+            // NOTE Separate login/password attempts or change to login?
+            if (m_failure_attempts >= m_config->invalid_password_attempts)
+            {
+                m_is_active = false;
+                return false;
+            }
+               
+            redisplayModulePrompt();
         }            
     }
     else
@@ -264,7 +326,7 @@ bool ModLogon::logon(const std::string &input)
         // Only if return data shows a processed key returned.
         if (result != "empty") 
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
@@ -303,9 +365,8 @@ bool ModLogon::validate_password(const std::string &input)
         return false;
     }
     
+    // Compare case sensitive hash with generated hash string.   
     std::string password = encryption->generate_password(input, security->sSaltHash);
-    
-    // Compare case sensitive hash with generated hash string.
     if(security->sPasswordHash.compare(password) == 0)
     {
         // Success!
@@ -322,38 +383,44 @@ bool ModLogon::validate_password(const std::string &input)
  */
 bool ModLogon::password(const std::string &input)
 {
-   std::cout << "password: " << input << std::endl;
-
-    // handle input for using ansi color, hot key or ENTER after..  hmm
+    std::cout << "password: " << input << std::endl;
     std::string key = "";
-    bool hiddenOutput = true;
-    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length, "", hiddenOutput);
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    bool useHiddenOutput = true;
+    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length, "", useHiddenOutput);
+ 
+    // ESC was hit
+    if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
     }
     else if(result[0] == '\n')
-    {
+    {                
         // If ENTER Default to Yes, or Single Y is hit
         if(key.size() == 0)
         {
             return false;
         }         
         
+        baseProcessDeliverNewLine();
+        
         if (validate_password(key))
         {
-            // If success, set authorized true, and return.
-            // or m_session_data->m_is_session_authorized = true;
             m_session_data->m_is_session_authorized = true;
-            m_is_active = false;
+            m_is_active = false;                        
         }
         else
         {
-            // Invalid Entry, try again!            
-            std::cout << "no match found" << std::endl;
-            displayPrompt(PROMPT_INVALID_PASSWORD);        
+            displayPromptAndNewLine(PROMPT_INVALID_PASSWORD);                   
+            ++m_failure_attempts;
             
-            changeModule(m_mod_function_index);
+            // If max, then exit back to matrix.
+            if (m_failure_attempts >= m_config->invalid_password_attempts)
+            {
+                m_is_active = false;
+                return false;
+            }
+            
+            redisplayModulePrompt();
         }
     }
     else
@@ -362,11 +429,10 @@ bool ModLogon::password(const std::string &input)
         // Only if return data shows a processed key returned.
         if (result != "empty") 
         {
-            baseProcessAndDeliver(result);
+            baseProcessDeliverInput(result);
         }
     }
 
-    // If successful login, we'll check the return result.
     return false;
 }
 

@@ -1,4 +1,23 @@
 
+Change Log Update (00.00.73)
+* 2017-01-04
++ mod prompts (Signup, Login, Pre-Login) setting up default prompt theme colors
+  will also carry over to menu's to match system/user preference colors.
++ Added max screen rows used, so we can pull the lines drawn on the screen
+  then display the prompt by default under the last items draw no matter where the cursor is.
++ Large refactoring of all Modules (Signup, Login, Pre-Login), go rid of some code smells
+  and reorganized methods to have better naming to cut down on comments needed.
++ Reformatted all module text prompts to use default theme colors, pipe colors can stuff work
+  but now everything is customizable by default on system color settings.  More on this to come.
++ Fixed lightbar drawing issues on pull down menu's.. most noticeable was the matrix menu.
+- Mocked up the yes/no light bars, still a WIP
+- Need to switch input to hotkey for N Menu functions.
+- Started working on text prompt formatting for unformatted strings, default coloring for 
+  strings not using pipe colors to add some configurable default feel to the system
+- Added |PD in text prompts, this will display the prompt description (XRM Special)
+  Users can add extra notes or instructions in the description of the prompt and display it along 
+  with the text.
+  
 Change Log Update (00.00.72)
 * 2016-12-21
 + Issues with Sysop menu corrected, it was actually a C++ issue looping vectors.
@@ -10,7 +29,7 @@ Change Log Update (00.00.72)
   characters and get prompt with lightbars yes/no, or other user input.  this will
   take some time to complete, as there is a lot of logic to all of the options.
 + Add masking for output on login password and the newuser passwords
-+ Also started implimenting theme color logic for prompt strings
++ Also started implementing theme color logic for prompt strings
   parsing the following control sequences for system or user selected colors.
   ^R - Regular Color      ^S - Status Color
   ^P - Prompt Color       ^E - Input Color

@@ -121,12 +121,24 @@ public:
      * @param mod_function_index
      */
     void changeModule(int mod_function_index);
+    
+    /**
+     * @brief Redisplay's the current module prompt.
+     * @param mod_function_index
+     */
+    void redisplayModulePrompt();
 
     /**
      * @brief Pull and Display Prompts
      * @param prompt
      */
     void displayPrompt(const std::string &prompt);
+    
+    /**
+     * @brief Pull and Display Prompts with following newline
+     * @param prompt
+     */
+    void displayPromptAndNewLine(const std::string &prompt);
 
     /**
      * @brief Start ANSI ESC[6n ANSI Detection
@@ -168,7 +180,6 @@ public:
             boost::bind(&ModPreLogon::handleDetectionTimer, shared_from_this(), &m_detection_deadline));
     }
 
-
     /**
      * @brief Deadline Detection Timer for ANSI Detection
      * @param timer
@@ -180,7 +191,6 @@ public:
         // Jump to Emulation completed.
         emulationCompleted();
     }
-
 
     /**
      * @brief After Emulation Detection is completed
@@ -227,4 +237,4 @@ private:
     std::string          m_term_type;
 };
 
-#endif // SYSTEM_STATE_HPP
+#endif // MOD_PRELOGON_HPP

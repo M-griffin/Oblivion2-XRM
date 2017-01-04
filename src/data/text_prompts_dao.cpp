@@ -7,7 +7,7 @@
 #include <string>
 #include <exception>
 
-const std::string TextPromptsDao::FILE_VERSION = "1.0.0";
+const std::string TextPromptsDao::FILE_VERSION = "1.0.1";
 
 TextPromptsDao::TextPromptsDao(std::string path, std::string filename)
     : m_path(path)
