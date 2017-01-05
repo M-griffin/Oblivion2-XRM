@@ -582,14 +582,11 @@ std::string SessionIO::seperatePipeWithCharsDigits(const std::string &pipe_code)
  */
 std::string SessionIO::parseFilename(const std::string &pipe_code)
 {
-    // Strip %% and grab the 'Filename.ext'
-    std::string str = pipe_code.substr(2);
-
+    // Strip %%DF and grab the 'Filename.ext
     CommonIO common_io;
-
+    std::string str = pipe_code.substr(4);
     std::string buffer = "";
     
-    // TODO, note if .ANS is not found, load .ASC
     common_io.readinAnsi(str, buffer);
     if (buffer.size() > 0)
     {
@@ -797,7 +794,6 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
     // Clear Custom MCI Screen Translation Mappings
     clearAllMCIMapping();
-
     return ansi_string;
 }
 
@@ -851,7 +847,6 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
     // Clear MCI And Code Mappings
     clearAllMCIMapping();
     std::vector<MapType>().swap(code_mapping);
-
     return ansi_string;
 }
 
@@ -991,9 +986,7 @@ std::string SessionIO::parseFormatColorsBrackets(const std::string &sequence, co
 {
     // Mocked up for now
     std::string output = sequence;
-    output += getDefaultPromptColor(config);
-    
-    
+    output += getDefaultPromptColor(config);    
     return output;
 }
 
@@ -1007,8 +1000,7 @@ std::string SessionIO::parseFormatColorsColon(const std::string &sequence, confi
 {
     // Mocked up for now
     std::string output = sequence;
-    output += getDefaultPromptColor(config);
-    
+    output += getDefaultPromptColor(config);    
     return output;
 }
 
