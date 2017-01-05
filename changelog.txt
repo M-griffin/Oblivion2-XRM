@@ -1,4 +1,9 @@
 
+Change Log Update (00.00.74)
+* 2017-01-05
++ Quick Fix, on %%DF Filename display in text prompts.
++ Also added .ASC file load if .ANS is not found.
+
 Change Log Update (00.00.73)
 * 2017-01-04
 + mod prompts (Signup, Login, Pre-Login) setting up default prompt theme colors
