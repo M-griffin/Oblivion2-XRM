@@ -1361,11 +1361,30 @@ void CommonIO::readinAnsi(std::string FileName, std::string &buff)
     
     std::cout << "readinAnsi: " << path << std::endl;
 
-    FILE *fp;
+    // If files diesn't exist, change from .ANS to .ASC
+    if (!fileExists(FileName))
+    {
+        std::string newFileName = FileName.substr(0, FileName.size() - 4);
+        newFileName.append(".ASC");
+        if (fileExists(newFileName))
+        {        
+            std::cout << "Updated Filename to .ASC: " << path << std::endl;
+            path = GLOBAL_TEXTFILE_PATH;
+            pathAppend(path);        
+            path += newFileName;
+        }
+        else        
+        {
+            std::cout << "Not Found .ASC: " << newFileName << std::endl;
+            return;
+        }
+    }
 
+    FILE *fp;
     int c = 0;
     if((fp = fopen(path.c_str(), "r+")) ==  NULL)
     {
+        // File not found
         return;
     }
     do
