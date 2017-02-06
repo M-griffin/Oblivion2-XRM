@@ -102,9 +102,9 @@ void ModSignup::createTextPrompts()
     value[PROMPT_CHALLENGE_ANSWER]   = std::make_pair("Forgot Password Challenge Answer", "(case sensitive) Challenge Answer: ");
     value[PROMPT_VERIFY_ANSWER]      = std::make_pair("Forgot Password Verify Answer", "(case sensitive) Verify Answer: ");
     value[PROMPT_YESNO_BARS]         = std::make_pair("Use YES/NO Bars", "[y/ENTER or n] Use Yes/No Bars: ");
-    value[PROMPT_USE_PAUSE]          = std::make_pair("Pause on ", "[y/ENTER or n] Use Screen Pausing: ");
-    value[PROMPT_USE_CLEAR]          = std::make_pair("Clear Screen or Scroll ", "[y/ENTER or n] Use Clear Screen or Scrolling: ");
-    value[PROMPT_USE_ANSI_COLOR]     = std::make_pair("Use Ansi Color ", "[y/n] Use Ansi Color: ");
+    value[PROMPT_USE_PAUSE]          = std::make_pair("Enable Screen Pausing", "[y/ENTER or n] Use Screen Pausing: ");
+    value[PROMPT_USE_CLEAR]          = std::make_pair("Clear Screen or Scroll", "[y/ENTER or n] Use Clear Screen or Scrolling: ");
+    value[PROMPT_USE_ANSI_COLOR]     = std::make_pair("Use Ansi Colors", "[y/ENTER or n] Use Ansi Colors: ");
     value[PROMPT_BACK_SPACE]         = std::make_pair("Backspace Sequence", "[W]indows/[T]erminal/[ENTER] to Set Backspace Key: ");
     value[PROMPT_VERIFY_SAVE]        = std::make_pair("Verify All Data", "[y/n] Verify and Save user record: ");
 

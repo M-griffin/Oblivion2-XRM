@@ -1,4 +1,21 @@
 
+Change Log Update (00.00.75)
+* 2017-02-06
++ Updated Build (Data Files) Archive which is linked on the Wiki.
+  Fixed some display issues with default file menu settings, Some stacked
+  commands should have been marked hidden.
++ Corrected Issues with Starting and Fallback menus, Now able to pass through
+  From Message / Scan, and Quick Back to Main
+  From File / Scan, and Quick Back to Main without issues.
++ Updated Menu Templates, no longer forcing a New line between mid and end screens
+  The end template should add a CR is one is desired.
+- Single line Bar Menu's are will a WIP.
+
+Change Log Update (00.00.74)
+* 2017-01-05
++ Quick Fix, on %%DF Filename display in text prompts.
++ Also added .ASC file load if .ANS is not found.
+
 Change Log Update (00.00.73)
 * 2017-01-04
 + mod prompts (Signup, Login, Pre-Login) setting up default prompt theme colors
