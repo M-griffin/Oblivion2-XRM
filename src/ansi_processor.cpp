@@ -225,7 +225,7 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
     }
     
     // Screen should always end with reset.
-    ansi_output.append("\x1b[0m\r\n");        
+    ansi_output.append("\x1b[0m");        
     return ansi_output;
 }
 
