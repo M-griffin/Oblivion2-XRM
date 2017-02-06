@@ -278,10 +278,11 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             
             // Goes to menu, sets fallback as starting menu            
         case '^':
-            if (m_starting_menu.size() > 0)
+            if (m_starting_menu.size() == 0)
             {
-                m_system_fallback.push_back(m_starting_menu);
-            }            
+                m_starting_menu = m_current_menu;
+            }
+            m_system_fallback.push_back(m_starting_menu);
             m_current_menu = boost::locale::to_lower(option.command_string);
             loadAndStartupMenu();           
             m_use_first_command_execution = true;
@@ -307,10 +308,11 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             return false;
             // Goes to the menu specified in the CString, does not exe firstcmd
         case '{':
-            if (m_starting_menu.size() > 0)
+            if (m_starting_menu.size() == 0)
             {
-                m_system_fallback.push_back(m_starting_menu);
-            }            
+                m_starting_menu = m_current_menu;
+            }
+            m_system_fallback.push_back(m_starting_menu);         
             m_current_menu = boost::locale::to_lower(option.command_string);
             m_use_first_command_execution = false;
             loadAndStartupMenu();  
