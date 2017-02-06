@@ -47,6 +47,7 @@ The menu system is still pretty raw and a lot of logic still needs to be complet
 Support
 =======
 * Use the `Issue Tracker <https://github.com/M-Griffin/Oblivion2-XRM/issues>`_
+* Use the `Wiki For Build Notes <https://github.com/M-Griffin/Oblivion2-XRM/wiki>`_
 * **Discussions on Haunting The Chapel BBS!**  - telnet://htc.zapto.org
 * IRC: **#oblivion2** on **chat.freenode.net**
 * Email: **mrmisticismo - at - hotmail.com**
