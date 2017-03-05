@@ -58,17 +58,17 @@ typedef struct TextPrompt
 
 
 /**
- * @class MenuPrompt
+ * @class MenuPromptCompat
  * @author Michael Griffin
  * @date 9/22/2015
- * @brief Menu Promt Record
+ * @brief Menu Prompt Record
  */
 #pragma pack(push, 1)
-typedef struct MenuPrompt
+typedef struct MenuPromptCompat
 {
     MStr    Name;
     LStr    Data[3];
-} MenuPrompt;
+} MenuPromptCompat;
 #pragma pack(pop)
 
 

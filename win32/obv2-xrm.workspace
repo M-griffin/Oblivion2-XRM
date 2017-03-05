@@ -7,6 +7,7 @@
   <Project Name="xrm-server" Path="xrm-server.project" Active="Yes"/>
   <Project Name="xrm-unittest" Path="../xrm-unittest/xrm-unittest.project" Active="No"/>
   <Project Name="xrm-menu-convert" Path="../xrm-menu-convert/xrm-menu-convert.project" Active="No"/>
+  <Project Name="xrm-menu-convert-prompt" Path="../xrm-menu-prompt-convert/xrm-menu-convert-prompt.project" Active="No"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Environment/>
@@ -14,6 +15,7 @@
       <Project Name="xrm-server" ConfigName="Debug"/>
       <Project Name="xrm-unittest" ConfigName="Debug"/>
       <Project Name="xrm-menu-convert" ConfigName="Debug"/>
+      <Project Name="xrm-menu-prompt-convert" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
@@ -21,6 +23,7 @@
       <Project Name="xrm-server" ConfigName="Release"/>
       <Project Name="xrm-unittest" ConfigName="Release"/>
       <Project Name="xrm-menu-convert" ConfigName="Release"/>
+      <Project Name="xrm-menu-prompt-convert" ConfigName="Release"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

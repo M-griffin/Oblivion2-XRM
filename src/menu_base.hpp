@@ -72,7 +72,7 @@ public:
     int              m_input_index;        // Menu Input Index, for Forwarding to current function.
 
     // Temp
-    MenuPrompt       m_menu_prompt;        // Hold the currently loaded menu prompt.
+    MenuPromptCompat       m_menu_prompt;        // Hold the currently loaded menu prompt.
     menu_ptr         m_menu_info;          // Menu Info
              
     
@@ -87,7 +87,7 @@ public:
 
 
     // Holds all menu prompts.
-    std::vector<MenuPrompt> m_loaded_menu_prompts;
+    std::vector<MenuPromptCompat> m_loaded_menu_prompts;
 
     // Holds all pulldown menu options.
     std::vector<MenuOption> m_loaded_pulldown_options;
