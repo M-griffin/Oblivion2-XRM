@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="xrm-menu-prompt-convert" InternalType="Console">
+<CodeLite_Project Name="xrm-menu-prompt-convert" InternalType="Console" Version="10.0.0">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -30,14 +30,14 @@
     <VirtualDirectory Name="data">
       <File Name="../src/data/config_dao.cpp"/>
       <File Name="../src/data/config_dao.hpp"/>
-      <File Name="../src/data/menu_dao.cpp"/>
-      <File Name="../src/data/menu_dao.hpp"/>
+      <File Name="../src/data/menu_prompt_dao.cpp"/>
+      <File Name="../src/data/menu_prompt_dao.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="model">
       <File Name="../src/model/config.hpp"/>
-      <File Name="../src/model/menu.hpp"/>
       <File Name="../src/model/struct_compat.hpp"/>
       <File Name="../src/model/structures.hpp"/>
+      <File Name="../src/model/menu_prompt.hpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <Settings Type="Executable">

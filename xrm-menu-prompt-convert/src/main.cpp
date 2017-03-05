@@ -39,6 +39,7 @@
 std::string GLOBAL_BBS_PATH = "";
 std::string GLOBAL_DATA_PATH = "";
 std::string GLOBAL_MENU_PATH = "";
+std::string GLOBAL_MENU_PROMPT_PATH = "";
 std::string GLOBAL_TEXTFILE_PATH = "";
 
 /**

@@ -62,7 +62,7 @@ AS       := C:/MinGW-5.1.0/mingw32/bin/as.exe
 ## User defined environment variables
 ##
 CodeLiteDir:=C:\Program Files (x86)\CodeLite
-Objects0=$(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data_config_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data_menu_dao.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data_config_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data_menu_prompt_dao.cpp$(ObjectSuffix) 
 
 
 
@@ -117,13 +117,13 @@ $(IntermediateDirectory)/up_src_data_config_dao.cpp$(DependSuffix): ../src/data/
 $(IntermediateDirectory)/up_src_data_config_dao.cpp$(PreprocessSuffix): ../src/data/config_dao.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_data_config_dao.cpp$(PreprocessSuffix) ../src/data/config_dao.cpp
 
-$(IntermediateDirectory)/up_src_data_menu_dao.cpp$(ObjectSuffix): ../src/data/menu_dao.cpp $(IntermediateDirectory)/up_src_data_menu_dao.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/Oblivion2-XRM/src/data/menu_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_data_menu_dao.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_src_data_menu_dao.cpp$(DependSuffix): ../src/data/menu_dao.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_data_menu_dao.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_data_menu_dao.cpp$(DependSuffix) -MM ../src/data/menu_dao.cpp
+$(IntermediateDirectory)/up_src_data_menu_prompt_dao.cpp$(ObjectSuffix): ../src/data/menu_prompt_dao.cpp $(IntermediateDirectory)/up_src_data_menu_prompt_dao.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/Oblivion2-XRM/src/data/menu_prompt_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_data_menu_prompt_dao.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_data_menu_prompt_dao.cpp$(DependSuffix): ../src/data/menu_prompt_dao.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_data_menu_prompt_dao.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_data_menu_prompt_dao.cpp$(DependSuffix) -MM ../src/data/menu_prompt_dao.cpp
 
-$(IntermediateDirectory)/up_src_data_menu_dao.cpp$(PreprocessSuffix): ../src/data/menu_dao.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_data_menu_dao.cpp$(PreprocessSuffix) ../src/data/menu_dao.cpp
+$(IntermediateDirectory)/up_src_data_menu_prompt_dao.cpp$(PreprocessSuffix): ../src/data/menu_prompt_dao.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_data_menu_prompt_dao.cpp$(PreprocessSuffix) ../src/data/menu_prompt_dao.cpp
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
