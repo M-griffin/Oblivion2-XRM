@@ -66,31 +66,22 @@ bool MenuPromptDao::fileExists()
 
 
 /**
- * @brief Creates and Saves a newly Generated Menu File.
+ * @brief Creates and Saves a newly Generated Menu Prompt File.
  * @param cfg
  * @return
  */
 bool MenuPromptDao::saveMenuPrompt(menu_prompt_ptr menu_prompt)
 {
+    /** 
+     * Note YAML always outputs UTF-8, so for menu prompts
+     * We need to keep the CP437 char set, so we write out
+     * Yaml format manually so no conversion is done.
+     */
+     
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
     path.append(".yaml");
-
-    YAML::Emitter out;
-
-    out << YAML::BeginMap;
-    out << YAML::Flow;
-
-    // Start Creating the Key/Value Output for the Menu File.    
-    out << YAML::Key << "file_version" << YAML::Value << menu_prompt->file_version;
-    out << YAML::Key << "name" << YAML::Value << menu_prompt->name;
-    out << YAML::Key << "data_line1" << YAML::Value << menu_prompt->data_line1;
-    out << YAML::Key << "data_line2" << YAML::Value << menu_prompt->data_line2;
-    out << YAML::Key << "data_line3" << YAML::Value << menu_prompt->data_line3;
-               
-    out << YAML::EndMap;
-
 
     // Setup file to Write out File.
     std::ofstream ofs(path);
@@ -99,8 +90,13 @@ bool MenuPromptDao::saveMenuPrompt(menu_prompt_ptr menu_prompt)
         std::cout << "Error, unable to write to: " << path << std::endl;
         return false;
     }
-
-    ofs << out.c_str();
+               
+    ofs << "file_version: \"" << menu_prompt->file_version << "\"" << std::endl;   
+    ofs << "name: \"" << menu_prompt->name << "\"" << std::endl;   
+    ofs << "data_line1: \"" << menu_prompt->data_line1 << "\"" << std::endl;    
+    ofs << "data_line2: \"" << menu_prompt->data_line2 << "\"" << std::endl;    
+    ofs << "data_line3: \"" << menu_prompt->data_line3 << "\"" << std::endl;
+                              
     ofs.close();
 
     return true;
@@ -108,18 +104,23 @@ bool MenuPromptDao::saveMenuPrompt(menu_prompt_ptr menu_prompt)
 
 
 /**
- * @brief Moves the Loaded menu to the shared pointer.
+ * @brief Moves the Loaded menu prompt to the shared pointer.
  *        This can probably be redone lateron with copy constructors..
  * @param rhs
  * @return
  */
 void MenuPromptDao::encode(const MenuPrompt &rhs)
 {   
+    
+    std::cout << "-encode" << std::endl;
+    
     m_menu_prompt->file_version    = rhs.file_version;
     m_menu_prompt->name            = rhs.name;
     m_menu_prompt->data_line1      = rhs.data_line1;
     m_menu_prompt->data_line2      = rhs.data_line2;
     m_menu_prompt->data_line3      = rhs.data_line3;
+    
+    std::cout << "-a encode" << std::endl;
 }
 
 /**
@@ -137,9 +138,10 @@ bool MenuPromptDao::loadMenuPrompt()
 
     // Load the file into the class.
     try
-    {
+    {        
         // Load file fresh.
         node = YAML::LoadFile(path);
+        
         // Testing Is on nodes always throws exceptions.
         if (node.size() == 0) 
         {
@@ -147,7 +149,7 @@ bool MenuPromptDao::loadMenuPrompt()
         }
         
         std::string file_version = node["file_version"].as<std::string>();
-        
+                
         // Validate File Version
         std::cout << "MenuPrompt File Version: " << file_version << std::endl;
         if (file_version != MenuPrompt::FILE_VERSION) {

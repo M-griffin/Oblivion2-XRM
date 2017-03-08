@@ -1,5 +1,5 @@
-#ifndef MENU_HPP
-#define MENU_HPP
+#ifndef MENU_PROMPT_HPP
+#define MENU_PROMPT_HPP
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>

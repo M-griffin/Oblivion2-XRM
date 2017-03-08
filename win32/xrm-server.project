@@ -38,7 +38,6 @@
     <File Name="../src/menu_system.cpp"/>
     <File Name="../src/menu_system.hpp"/>
     <File Name="../src/menu_system_editor.cpp"/>
-    <File Name="../src/menu_system_prompts.cpp"/>
     <File Name="../src/safe_queue.hpp"/>
     <File Name="../src/safe_set.hpp"/>
     <File Name="../src/server.hpp"/>

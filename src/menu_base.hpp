@@ -13,12 +13,16 @@
 #include "model/struct_compat.hpp"
 #include "model/config.hpp"
 #include "model/menu.hpp"
+#include "model/menu_prompt.hpp"
 #include "data/config_dao.hpp"
 #include "data/menu_dao.hpp"
+#include "data/menu_prompt_dao.hpp"
 #include "mods/mod_base.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
+
 #include <functional>
+#include <vector>
 
 class Config;
 typedef boost::shared_ptr<Config> config_ptr;
@@ -72,9 +76,8 @@ public:
     int              m_input_index;        // Menu Input Index, for Forwarding to current function.
 
     // Temp
-    MenuPromptCompat       m_menu_prompt;        // Hold the currently loaded menu prompt.
     menu_ptr         m_menu_info;          // Menu Info
-             
+    menu_prompt_ptr  m_menu_prompt;        // Menu Prompt             
     
     ansi_process_ptr m_ansi_process;       // Instance for AnsiProcess Methods
     int              m_active_pulldownID;  // Active Lightbar Position.
@@ -85,9 +88,6 @@ public:
     bool             m_is_active_pulldown_menu;     // If menu has active lightbars to display.
     bool             m_use_first_command_execution; // If menu executes firstcmd on entrance.
 
-
-    // Holds all menu prompts.
-    std::vector<MenuPromptCompat> m_loaded_menu_prompts;
 
     // Holds all pulldown menu options.
     std::vector<MenuOption> m_loaded_pulldown_options;
@@ -264,6 +264,19 @@ public:
      * @brief Handles Re-running EACH command re-executed after each refresh
      */
     void executeEachCommands();
+    
+    /**
+     * @brief Parse Menu Prompt Folder and pull list of Prompt Names
+     * @return 
+     */
+    std::vector<std::string> getListOfMenuPrompts();
+    
+    /**
+     * @brief Parse Menu Prompt Folder and pull list of Prompt Names
+     * @return 
+     */
+    std::string getRandomMenuPrompt();
+    
 
     bool processMenuOptions(const std::string &input);
     

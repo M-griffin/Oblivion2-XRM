@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="xrm-menu-prompt-convert" InternalType="Console" Version="10.0.0">
+  <Reconciliation>
+    <Regexes/>
+    <Excludepaths/>
+    <Ignorefiles/>
+    <Extensions>
+      <![CDATA[cpp;c;h;hpp;xrc;wxcp;fbp]]>
+    </Extensions>
+    <Topleveldir>../xrm-menu-prompt-convert</Topleveldir>
+  </Reconciliation>
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -7,7 +16,7 @@
     <Plugin Name="CMakePlugin">
       <![CDATA[[{
   "name": "Debug",
-  "enabled": false,
+  "enabled": true,
   "buildDirectory": "build",
   "sourceDirectory": "$(ProjectPath)",
   "generator": "",

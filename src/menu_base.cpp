@@ -3,8 +3,12 @@
 #include "data/menu_dao.hpp"
 
 #include <boost/locale.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+
+// Fix for file_copy
+#define BOOST_NO_CXX11_SCOPED_ENUMS
+#include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 #include <cstring>
 #include <string>
@@ -13,6 +17,8 @@
 #include <fstream>
 #include <algorithm>
 #include <functional>
+#include <random>
+
 
 MenuBase::MenuBase(session_data_ptr session_data)
     : m_menu_session_data(session_data)
@@ -26,8 +32,8 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_fallback_menu("")
     , m_starting_menu("")
     , m_input_index(MENU_INPUT)
-    , m_menu_prompt()
     , m_menu_info(new Menu())
+    , m_menu_prompt()    
     , m_ansi_process(new AnsiProcessor(
                     session_data->m_telnet_state->getTermRows(),
                     session_data->m_telnet_state->getTermCols()))
@@ -36,16 +42,7 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_pulldown_reentrace_flag(false)
     , m_use_first_command_execution(true)
 {
-    // Load all Menu Prompts
-    // Lateron we'll optimize this for the users selected!
-    try
-    {
-        readMenuAllPrompts();        
-    }
-    catch(std::exception ex)
-    {
-        std::cout << "Exception reading menu prompts" << ex.what() << std::endl;
-    }
+    std::cout << "MenuBase" << std::endl;
 }
 
 MenuBase::~MenuBase()
@@ -618,6 +615,80 @@ void MenuBase::executeFirstAndEachCommands()
 }
 
 /**
+ * @brief Parse Menu Prompt Folder and pull Random Menu Prompt
+ * @return 
+ */
+std::vector<std::string> MenuBase::getListOfMenuPrompts() 
+{      
+    namespace fs = boost::filesystem;
+    fs::path prompt_directory(GLOBAL_MENU_PROMPT_PATH);
+    fs::directory_iterator end_iter;
+
+    typedef std::vector<std::string> result_set_t;
+    typedef std::vector<std::string>::iterator iterator;
+    result_set_t result_set;
+    std::vector<std::string> result_list;
+
+    if(fs::exists(prompt_directory) && fs::is_directory(prompt_directory))
+    {
+        for(fs::directory_iterator dir_iter(prompt_directory); dir_iter != end_iter; ++dir_iter)
+        {
+            if(dir_iter->path().extension() == ".yaml")
+            {
+                if(fs::is_regular_file(dir_iter->status()))
+                {
+                    result_set.push_back(dir_iter->path().filename().string());
+                    // result_set_t::value_type(fs::last_write_time( dir_iter->path() ) ) ); // *dir_iter));
+                }
+            }
+        }
+    }
+
+    // check result set, if no menu then return gracefully.
+    if(result_set.size() == 0)
+    {
+        std::cout << "\r\n*** No Menu Prompt .yaml files found!" << std::endl;
+        return result_list;
+    }
+    
+    // Sort Menu Prompt's in accending order
+    std::sort(result_set.begin(), result_set.end());
+        
+    for (std::string s : result_set) {        
+        result_list.push_back(s.substr(0, s.size()-5));
+    }
+    
+    return result_list;
+}
+
+
+/**
+ * @brief Parse Menu Prompt Folder and pull Random Menu Prompt
+ * @return 
+ */
+std::string MenuBase::getRandomMenuPrompt() 
+{          
+    std::vector<std::string> result_set = getListOfMenuPrompts();
+    
+    // check result set, if no menu then return gracefully.
+    if(result_set.size() == 0)
+    {        
+        return "";
+    }
+       
+    //generator initialized with seed from time.
+    std::mt19937_64 generator{static_cast<unsigned int>(std::time(0))}; 
+    
+    int set_size = result_set.size()-1;
+    
+    //the range is inclusive, so this produces numbers in range [0, 10), same as before
+    std::uniform_int_distribution<> dist{0, set_size}; 
+
+    int randomNumber = dist(generator);
+    return result_set[randomNumber];
+}
+
+/**
  * @brief Return Selected or Active prompt as a string.
  * @return 
  */
@@ -625,29 +696,40 @@ std::string MenuBase::loadMenuPrompt()
 {
     // Display Menu Prompt if it exists, right now it's default
     // lateron add users selected.  This is just a test!    
-    std::string prompt = "";
+    std::string prompt = m_menu_session_data->m_user_record->sMenuPromptName;
+    std::string prompt_display = "";        
+        
+    // If users Menu Promt is blank, then grab random menu prompt!
+    if (prompt.size() == 0 || prompt == "") 
+    {
+        prompt = getRandomMenuPrompt();        
+    }
+    
+    // Load Menu prompt.
+    m_menu_prompt.reset(new MenuPrompt());
+        
+    std::cout << "Loading Menu Prompt: " << prompt << std::endl;
+        
+    // Load YAML Menu Prompt
+    MenuPromptDao mnu_prompt(m_menu_prompt, prompt, GLOBAL_MENU_PROMPT_PATH);
+    bool is_loaded = mnu_prompt.loadMenuPrompt();
         
     // Don't display prompts on Pulldown menu's.
-    if (!m_is_active_pulldown_menu && m_loaded_menu_prompts.size() > 0)
+    if (!m_is_active_pulldown_menu && is_loaded)
     {        
         //fmt.Print("\033[?25l")
         //fmt.Print("\033[?25h")
     
         // Default Display Cursor prompt starting point, make this configurable lateron
-        prompt = "\x1b[?25h\x1b[22;1H";
-                
-        prompt += boost::lexical_cast<std::string>(m_loaded_menu_prompts[
-                    m_menu_session_data->m_user_record->iPromptSelected].Data[0]) + "\r\n";
-        prompt += boost::lexical_cast<std::string>(m_loaded_menu_prompts[
-                    m_menu_session_data->m_user_record->iPromptSelected].Data[1]) + "\r\n";
-        prompt += boost::lexical_cast<std::string>(m_loaded_menu_prompts[
-                    m_menu_session_data->m_user_record->iPromptSelected].Data[2]);
-        
-        // Parse Prompt for Menu Title here, let pip2ansi parse standard codes.
+        prompt_display = "\x1b[?25h\x1b[22;1H";                                
+        prompt_display += boost::lexical_cast<std::string>(m_menu_prompt->data_line1) + "\r\n";
+        prompt_display += boost::lexical_cast<std::string>(m_menu_prompt->data_line2) + "\r\n";
+        prompt_display += boost::lexical_cast<std::string>(m_menu_prompt->data_line3);                
         
         // Clear All Mappings
         m_session_io.clearAllMCIMapping();
-                
+        
+        // Parse Prompt for Menu Title here, let pip2ansi parse standard codes.        
         m_session_io.addMCIMapping("|MN", m_menu_info->menu_prompt);
         m_session_io.addMCIMapping("|TL", "1440");              // Time Left {Not Implimented Yet}
         m_session_io.addMCIMapping("|TM", "Current Date/Time"); // Time Now  {Not Implimented Yet}
@@ -660,20 +742,20 @@ std::string MenuBase::loadMenuPrompt()
         // Set the Prompts directory in the CONFIG.
         m_session_io.addMCIMapping("%MN", m_menu_info->menu_prompt);
         
-        std::string output = m_session_io.pipe2ansi(prompt);
+        std::string output = m_session_io.pipe2ansi(prompt_display);
         //std::cout << "prompt: " << output << std::endl;
         return output;
     }
     else
     {
+        prompt = "";
         std::cout << "No Menu prompts loaded." << std::endl;
         if (m_menu_info->menu_prompt.size() > 0)
         {
             std::cout << "Use Default Prompt String in Menu." << std::endl;
             prompt = "\x1b[?25h"; // Turn on Cursor.
             prompt +=  m_session_io.pipe2ansi(m_menu_info->menu_prompt);            
-        }
-        
+        }        
         // Pull prompt from menu text if exists.
     }    
     

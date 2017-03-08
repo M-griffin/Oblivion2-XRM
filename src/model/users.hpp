@@ -56,7 +56,7 @@ public:
 
     int iPostCallRatio;
 
-    int iPromptSelected;
+    std::string sMenuPromptName;
     int iMenuSelected;
     int iStatusSelected;
 
@@ -120,7 +120,7 @@ public:
         , sStatColor("|11")
         , sBoxColor("|03")
         , iPostCallRatio(0)
-        , iPromptSelected(0)
+        , sMenuPromptName("")
         , iMenuSelected(0)
         , iStatusSelected(0)
         , bAnsi(true)
