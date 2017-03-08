@@ -53,6 +53,7 @@
 std::string GLOBAL_BBS_PATH = "";
 std::string GLOBAL_DATA_PATH = "";
 std::string GLOBAL_MENU_PATH = "";
+std::string GLOBAL_MENU_PROMPT_PATH = "";
 std::string GLOBAL_TEXTFILE_PATH = "";
 std::string USERS_DATABASE = "";
 
@@ -187,6 +188,7 @@ auto main() -> int
     // Setup System Folder Paths off main BBS Path.
     GLOBAL_DATA_PATH = GLOBAL_BBS_PATH + "DATA";
     GLOBAL_MENU_PATH = GLOBAL_BBS_PATH + "MENU";
+    GLOBAL_MENU_PROMPT_PATH = GLOBAL_BBS_PATH + "MPROMPT";
     GLOBAL_TEXTFILE_PATH = GLOBAL_BBS_PATH + "TEXTFILE";
     
 
