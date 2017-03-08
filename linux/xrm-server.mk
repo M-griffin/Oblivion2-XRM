@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Michae Griffin
-Date                   :=18/12/16
+Date                   :=08/03/17
 CodeLitePath           :="/home/merc/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -60,8 +60,8 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/src_ansi_processor.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_communicator.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_encryption.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_system.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_system_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_system_prompts.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_data.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_io.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_state_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_telnet_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_base.cpp$(ObjectSuffix) $(IntermediateDirectory)/data_config_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data_security_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data_text_prompts_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data_users_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data_menu_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_logon.cpp$(ObjectSuffix) \
+Objects0=$(IntermediateDirectory)/src_ansi_processor.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_communicator.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_encryption.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_system.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_system_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_data.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_manager.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_state_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_telnet_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_base.cpp$(ObjectSuffix) $(IntermediateDirectory)/data_config_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data_security_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data_text_prompts_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data_users_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data_menu_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data_menu_prompt_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_logon.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/mods_mod_prelogon.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_signup.cpp$(ObjectSuffix) 
 
 
@@ -148,14 +148,6 @@ $(IntermediateDirectory)/src_menu_system_editor.cpp$(DependSuffix): ../src/menu_
 
 $(IntermediateDirectory)/src_menu_system_editor.cpp$(PreprocessSuffix): ../src/menu_system_editor.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_menu_system_editor.cpp$(PreprocessSuffix) "../src/menu_system_editor.cpp"
-
-$(IntermediateDirectory)/src_menu_system_prompts.cpp$(ObjectSuffix): ../src/menu_system_prompts.cpp $(IntermediateDirectory)/src_menu_system_prompts.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/menu_system_prompts.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_menu_system_prompts.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/src_menu_system_prompts.cpp$(DependSuffix): ../src/menu_system_prompts.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_menu_system_prompts.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_menu_system_prompts.cpp$(DependSuffix) -MM "../src/menu_system_prompts.cpp"
-
-$(IntermediateDirectory)/src_menu_system_prompts.cpp$(PreprocessSuffix): ../src/menu_system_prompts.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_menu_system_prompts.cpp$(PreprocessSuffix) "../src/menu_system_prompts.cpp"
 
 $(IntermediateDirectory)/src_session_data.cpp$(ObjectSuffix): ../src/session_data.cpp $(IntermediateDirectory)/src_session_data.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/session_data.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_session_data.cpp$(ObjectSuffix) $(IncludePath)
@@ -244,6 +236,14 @@ $(IntermediateDirectory)/data_menu_dao.cpp$(DependSuffix): ../src/data/menu_dao.
 
 $(IntermediateDirectory)/data_menu_dao.cpp$(PreprocessSuffix): ../src/data/menu_dao.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/data_menu_dao.cpp$(PreprocessSuffix) "../src/data/menu_dao.cpp"
+
+$(IntermediateDirectory)/data_menu_prompt_dao.cpp$(ObjectSuffix): ../src/data/menu_prompt_dao.cpp $(IntermediateDirectory)/data_menu_prompt_dao.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/data/menu_prompt_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/data_menu_prompt_dao.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/data_menu_prompt_dao.cpp$(DependSuffix): ../src/data/menu_prompt_dao.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/data_menu_prompt_dao.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/data_menu_prompt_dao.cpp$(DependSuffix) -MM "../src/data/menu_prompt_dao.cpp"
+
+$(IntermediateDirectory)/data_menu_prompt_dao.cpp$(PreprocessSuffix): ../src/data/menu_prompt_dao.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/data_menu_prompt_dao.cpp$(PreprocessSuffix) "../src/data/menu_prompt_dao.cpp"
 
 $(IntermediateDirectory)/mods_mod_logon.cpp$(ObjectSuffix): ../src/mods/mod_logon.cpp $(IntermediateDirectory)/mods_mod_logon.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/mods/mod_logon.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/mods_mod_logon.cpp$(ObjectSuffix) $(IncludePath)

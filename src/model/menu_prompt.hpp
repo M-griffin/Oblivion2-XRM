@@ -41,61 +41,58 @@ public:
     { }
 
     ~MenuPrompt() { }
-
 };
 
 
 // YAML Overide namespace for encoding/decoding Menu Class.
 namespace YAML
-{    
+{
+/**
+ * @class convert
+ * @author Blue
+ * @date 16/11/2016
+ * @file menu.hpp
+ * @brief MenuPrompt convert for MenuPrompt Class
+ */
+template<>
+struct convert<MenuPrompt>
+{
     /**
-     * @class convert
-     * @author Blue
-     * @date 16/11/2016
-     * @file menu.hpp
-     * @brief MenuPrompt convert for MenuPrompt Class
+     * @brief Overide for encoding the Menu Class
+     *        This is not used as it makes the map on a single line!
+     *        Instead Key/Value is done in the ConfigDao on save.
+     * @param rhs
+     * @return
      */
-    template<>
-    struct convert<MenuPrompt>
+    static Node encode(const MenuPrompt &rhs)
     {
-        /**
-         * @brief Overide for encoding the Menu Class
-         *        This is not used as it makes the map on a single line!
-         *        Instead Key/Value is done in the ConfigDao on save.
-         * @param rhs
-         * @return
-         */
-        static Node encode(const MenuPrompt &rhs)
-        {
-            Node node;
-            node["file_version"]     = rhs.file_version;
-            node["name"]             = rhs.name;
-            node["data_line1"]       = rhs.data_line1;  
-            node["data_line2"]       = rhs.data_line2;
-            node["data_line3"]       = rhs.data_line3;
-                           
-            return node;
-        }
+        Node node;
+        node["file_version"]     = rhs.file_version;
+        node["name"]             = rhs.name;
+        node["data_line1"]       = rhs.data_line1;
+        node["data_line2"]       = rhs.data_line2;
+        node["data_line3"]       = rhs.data_line3;
 
-        /**
-         * @brief Overide for the Load from File, this read and piluaes the Menu Object.
-         * @param node
-         * @param rhs
-         * @return
-         */
-        static bool decode(const Node& node, MenuPrompt& rhs)
-        {            
-            rhs.file_version    = node["file_version"] .as<std::string>();
-            rhs.name            = node["name"].as<std::string>();
-            rhs.data_line1      = node["data_line1"].as<std::string>();
-            rhs.data_line2      = node["data_line2"].as<std::string>();
-            rhs.data_line3      = node["data_line3"].as<std::string>();
-                            
-            return true;
-        }
-    };
-    
-        
+        return node;
+    }
+
+    /**
+     * @brief Overide for the Load from File, this read and piluaes the Menu Object.
+     * @param node
+     * @param rhs
+     * @return
+     */
+    static bool decode(const Node& node, MenuPrompt& rhs)
+    {
+        rhs.file_version    = node["file_version"] .as<std::string>();
+        rhs.name            = node["name"].as<std::string>();
+        rhs.data_line1      = node["data_line1"].as<std::string>();
+        rhs.data_line2      = node["data_line2"].as<std::string>();
+        rhs.data_line3      = node["data_line3"].as<std::string>();
+
+        return true;
+    }
+};
 }
 
 typedef boost::shared_ptr<MenuPrompt> menu_prompt_ptr;
