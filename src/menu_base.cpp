@@ -822,17 +822,7 @@ void MenuBase::moveToBottomAndDisplay(const std::string &prompt)
 {
     std::string output = "";
     int screen_row = m_ansi_process->getMaxRowsUsedOnScreen();
-    
-    // If screen Row is last line in terminal, send a CRLF to the push
-    // the screen up one row before displaying!
-   // if (screen_row == m_menu_session_data->m_telnet_state->getTermRows()) 
-   // {
-   //     output += "\x1b[D\r\n";
-   // }
-    
-    std::cout << "*** TERM " << m_menu_session_data->m_telnet_state->getTermRows() << std::endl;
-    std::cout << "*** screen_row " << screen_row << std::endl;
-    
+
     output += getDefaultColor();
     output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
     output += std::move(prompt);
