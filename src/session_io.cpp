@@ -140,7 +140,9 @@ void SessionIO::createInputField(std::string &field_name, int &len)
                 }
             }
             else
+            {
                 field_name.erase(position, 3);
+            }
         }
     }
 
@@ -200,7 +202,7 @@ void SessionIO::createInputField(std::string &field_name, int &len)
             INPUT_COLOR,          // Field Fg,Bg Color
             repeat.c_str(),       // Padding length of Field
             len+1);               // Move back to starting position of field.
-    
+
     field_name = formatted;
 }
 
@@ -419,58 +421,57 @@ std::string SessionIO::pipeColors(const std::string &color_string)
 
 /**
  * @brief Gets the Default Color Sequence
- * @return 
+ * @return
  */
-std::string SessionIO::getDefaultColor(config_ptr config) 
+std::string SessionIO::getDefaultColor(config_ptr config)
 {
     return pipeColors(config->default_color_regular);
 }
 
 /**
  * @brief Gets the Default Input Color Sequence
- * @return 
+ * @return
  */
-std::string SessionIO::getDefaultInputColor(config_ptr config) 
+std::string SessionIO::getDefaultInputColor(config_ptr config)
 {
     return pipeColors(config->default_color_input);
 }
 
 /**
  * @brief Gets the Default Inverse Color Sequence
- * @return 
+ * @return
  */
-std::string SessionIO::getDefaultInverseColor(config_ptr config) 
+std::string SessionIO::getDefaultInverseColor(config_ptr config)
 {
     return pipeColors(config->default_color_inverse);
 }
 
 /**
  * @brief Gets the Default Prompt Color Sequence
- * @return 
+ * @return
  */
-std::string SessionIO::getDefaultPromptColor(config_ptr config) 
+std::string SessionIO::getDefaultPromptColor(config_ptr config)
 {
     return pipeColors(config->default_color_prompt);
 }
 
 /**
  * @brief Gets the Default stat Color Sequence
- * @return 
+ * @return
  */
-std::string SessionIO::getDefaultStatColor(config_ptr config) 
+std::string SessionIO::getDefaultStatColor(config_ptr config)
 {
     return pipeColors(config->default_color_stat);
 }
 
 /**
  * @brief Gets the Default box Color Sequence
- * @return 
+ * @return
  */
-std::string SessionIO::getDefaultBoxColor(config_ptr config) 
+std::string SessionIO::getDefaultBoxColor(config_ptr config)
 {
     return pipeColors(config->default_color_box);
 }
-
 
 /**
  * @brief Parsed Pipe Codes with 1 or 2 Digits
@@ -586,7 +587,7 @@ std::string SessionIO::parseFilename(const std::string &pipe_code)
     CommonIO common_io;
     std::string str = pipe_code.substr(4);
     std::string buffer = "";
-    
+
     common_io.readinAnsi(str, buffer);
     if (buffer.size() > 0)
     {
@@ -658,7 +659,7 @@ std::string SessionIO::parsePipeWithChars(const std::string &pipe_code)
  * @return
  */
 std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapType> &code_map)
-{   
+{
     std::cout << "code_map.size(): " << code_map.size() << std::endl;
     std::string ansi_string = screen;
     MapType my_matches;
@@ -805,7 +806,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
  * @return
  */
 std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std::vector<MapType> &code_map)
-{   
+{
     std::cout << "generic code_map.size(): " << code_map.size() << std::endl;
     std::string ansi_string = screen;
     MapType my_matches;
@@ -843,7 +844,7 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
             }
         }
     }
-    
+
     // Clear MCI And Code Mappings
     clearAllMCIMapping();
     std::vector<MapType>().swap(code_mapping);
@@ -921,11 +922,10 @@ std::vector<MapType> SessionIO::pipe2codeMap(const std::string &sequence, const 
             }
         }
     }
-    
+
     std::cout << "code_map.size(): " << code_map.size() << std::endl;
     return code_map;
 }
-
 
 /**
  * @brief Converts MCI Sequences to Ansi screen output.
@@ -938,7 +938,6 @@ std::string SessionIO::pipe2ansi(const std::string &sequence)
     return parseCodeMap(sequence, code_map);
 }
 
-
 /**
  * @brief Converts MCI Sequences to Code Maps for Multiple Parses of same string data
  * @param sequence
@@ -950,7 +949,6 @@ std::vector<MapType> SessionIO::pipe2genericCodeMap(const std::string &sequence)
     return code_map;
 }
 
-
 /**
  * @brief Converts MCI Sequences to Code Maps for Prompt Strings
  * @param sequence
@@ -959,10 +957,9 @@ std::vector<MapType> SessionIO::pipe2genericCodeMap(const std::string &sequence)
 std::vector<MapType> SessionIO::pipe2promptCodeMap(const std::string &sequence)
 {
     // This will handle parsing the sequence, and replacement
-    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, PROMPT_EXPRESSION));    
+    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, PROMPT_EXPRESSION));
     return code_map;
 }
-
 
 /**
  * @brief Converts MCI Sequences to Code Maps for Prompt Formatting Strings
@@ -972,85 +969,80 @@ std::vector<MapType> SessionIO::pipe2promptCodeMap(const std::string &sequence)
 std::vector<MapType> SessionIO::pipe2promptFormatCodeMap(const std::string &sequence)
 {
     // This will handle parsing the sequence, and replacement
-    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, FORMAT_EXPRESSION));    
+    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, FORMAT_EXPRESSION));
     return code_map;
 }
-
 
 /**
  * @brief Colorizes Brackets and Text between brackets to system theme colors
  * @param sequence
- * @return 
+ * @return
  */
 std::string SessionIO::parseFormatColorsBrackets(const std::string &sequence, config_ptr config)
 {
     // Mocked up for now
     std::string output = sequence;
-    output += getDefaultPromptColor(config);    
+    output += getDefaultPromptColor(config);
     return output;
 }
-
 
 /**
  * @brief Colorizes Colons to system theme colors
  * @param sequence
- * @return 
+ * @return
  */
 std::string SessionIO::parseFormatColorsColon(const std::string &sequence, config_ptr config)
 {
     // Mocked up for now
     std::string output = sequence;
-    output += getDefaultPromptColor(config);    
+    output += getDefaultPromptColor(config);
     return output;
 }
-
 
 /**
  * @brief Parses unformatted prompt text and adds colors to brackets and colans.
  * @param sequence
- * @return 
+ * @return
  */
-std::string SessionIO::pipe2promptFormat(const std::string &sequence, config_ptr config) 
+std::string SessionIO::pipe2promptFormat(const std::string &sequence, config_ptr config)
 {
-    std::vector<MapType> code_map = pipe2promptFormatCodeMap(sequence);    
+    std::vector<MapType> code_map = pipe2promptFormatCodeMap(sequence);
     std::string output = "";
     std::string key;
     std::string value;
-    
+
     // Loop codes and build MCI Parsing List
     for(unsigned int i = 0; i < code_map.size(); i++)
     {
         auto &map = code_map[i];
         std::cout << "Menu Format Code: " << map.m_code << std::endl;
-        
+
         // Control Codes are in Group 2
         switch (map.m_match)
-        {            
+        {
             case 1: // Handle [ text ] inside brackets
                 // Build replacement here
                 key = map.m_code;
                 value = parseFormatColorsBrackets(map.m_code, config);
                 addMCIMapping(key, value);
-                break;                
-            
+                break;
+
             case 2: // Handle :
                 // Build replacement here
                 key = map.m_code;
                 value = parseFormatColorsColon(map.m_code, config);
                 addMCIMapping(key, value);
                 break;
-                
+
             default:
                 break;
-        }        
-    }    
-    
-    
+        }
+    }
+
     // Then feed though and return the updated string.
     output = std::move(parseCodeMapGenerics(sequence, code_map));
-    return output;    
+    return output;
 }
-
 
 /**
  * @brief Checks a String if it matches the expression passed.
@@ -1067,19 +1059,19 @@ bool SessionIO::checkRegex(const std::string &sequence, const std::string &expre
     std::locale loc = gen("");
     std::locale::global(loc);
     std::cout.imbue(loc);
-    
-    boost::smatch match;    
+
+    boost::smatch match;
     bool result = false;
-    
+
 #ifdef BOOST_HAS_ICU
     boost::u32regex regExp = boost::make_u32regex(expression);
     result = boost::u32regex_match(sequence, match, regExp);
 #else
     boost::regex regExpression(expression);
     result = boost::regex_match(sequence, match, regExpression);
- #endif   
+#endif
 
-    return result; 
+    return result;
 }
 
 /*
@@ -1118,7 +1110,6 @@ void SessionIO::addMCIMapping(const std::string &key, const std::string &value)
     m_mapped_codes.insert(std::pair<std::string, std::string>(std::move(key), std::move(value)));
 }
 
-
 /**
  * @brief Clears all mappings
  */
@@ -1130,12 +1121,11 @@ void SessionIO::clearAllMCIMapping()
     }
 }
 
-
 /**
  * @brief Get a Count of all Mapped MCI Codes
- * @return 
+ * @return
  */
-int SessionIO::getMCIMappingCount() 
+int SessionIO::getMCIMappingCount()
 {
     return m_mapped_codes.size();
 }

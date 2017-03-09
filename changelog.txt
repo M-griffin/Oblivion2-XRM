@@ -1,4 +1,36 @@
 
+Change Log Update (00.00.76)
+* 2017-03-06 / 2017-03-09
++ Fixed Several Linux display issues due to lapse in testing in this environment 
+  once functionally was added.
++ Fixed Issues with Generic Menu Template Display, Top and Mid.  Some old DOS 
+  system save clear screens with just ESC2J so had to add a ESC[1;1H to move 
+  to cursor to the top of the screen.
++ Also Fix MID ansi issues where some telnet clients will wrap ESC[C right 
+  cursor pushes. However, the Linux terminal will wait at the end of the line 
+  until a displayable character is found.  This is not fixed to check in between 
+  spacing sequences for ANSI optimizations.
++ Also refactored and some code cleanup.  Some generic some was added and might 
+  be moved to the common libraries lateron if it's needed by future systems.
++ Tested and corrected issues with yaml message prompts.  Instead of letting 
+  YAML write the output which force converts to UTF-8. We now write out the 
+  yaml format manually when it comes to menu prompts.. All text prompts have %DF 
+  for displaying files and don't need too much high ASCII. However if the need arises, 
+  can work out some MCI codes where the file will write out yaml and MCI codes will 
+  be replaces with CP437 sequences.  Add to the TODO list!
++ Fixes For Bottom of Used Screen Detection, Thanks to Putty and 24 Lines 
+  Was able to test and fix a detection issue and now new prompts will 
+  properly show under the menu prompt on any screen length.
++ Created New MenuPromptConvert project for converting legacy Menu Prompt Data to 
+  individual .yaml files
++ Create Model and DAO's for new Menu Prompt Layouts and the new code is plugged in
+  and working nicely
+- Update MenuPrompt out of yaml to save as raw text to keep CP437 encoding. YAML 
+  forces UTF-8 otuput which will corrupt the CP437 characters saved.
++ Also added random menu prompts when no prompt is selected as an option.
++ Updated User Record / Database table, changing menu prompt from an int index to 
+  the name of the file for easier lookup and selection.
+
 Change Log Update (00.00.75)
 * 2017-02-06
 + Updated Build (Data Files) Archive which is linked on the Wiki.

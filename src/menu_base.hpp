@@ -13,12 +13,16 @@
 #include "model/struct_compat.hpp"
 #include "model/config.hpp"
 #include "model/menu.hpp"
+#include "model/menu_prompt.hpp"
 #include "data/config_dao.hpp"
 #include "data/menu_dao.hpp"
+#include "data/menu_prompt_dao.hpp"
 #include "mods/mod_base.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
+
 #include <functional>
+#include <vector>
 
 class Config;
 typedef boost::shared_ptr<Config> config_ptr;
@@ -42,7 +46,7 @@ class MenuBase
 public:
     MenuBase(session_data_ptr session_data);
     ~MenuBase();
-    
+
     // This matches the index for menu_functions.push_back
     enum
     {
@@ -53,7 +57,7 @@ public:
         MODULE_LOGON_INPUT,
         MODULE_INPUT
     };
-    
+
     session_data_ptr m_menu_session_data;
 
     // This hold non-hotkey text passed through.
@@ -72,10 +76,9 @@ public:
     int              m_input_index;        // Menu Input Index, for Forwarding to current function.
 
     // Temp
-    MenuPrompt       m_menu_prompt;        // Hold the currently loaded menu prompt.
     menu_ptr         m_menu_info;          // Menu Info
-             
-    
+    menu_prompt_ptr  m_menu_prompt;        // Menu Prompt
+
     ansi_process_ptr m_ansi_process;       // Instance for AnsiProcess Methods
     int              m_active_pulldownID;  // Active Lightbar Position.
 
@@ -86,9 +89,6 @@ public:
     bool             m_use_first_command_execution; // If menu executes firstcmd on entrance.
 
 
-    // Holds all menu prompts.
-    std::vector<MenuPrompt> m_loaded_menu_prompts;
-
     // Holds all pulldown menu options.
     std::vector<MenuOption> m_loaded_pulldown_options;
 
@@ -97,10 +97,10 @@ public:
 
     // Handles Dynamic Menu Command Option Execution
     std::vector<std::function< bool(const MenuOption &)> > m_execute_callback;
-    
+
     // Handle Dynamic modules being executed.
     std::vector<module_ptr> m_module;
-        
+
 
     /**
      * @brief Method for Adding outgoing text data to ansi processor
@@ -112,11 +112,11 @@ public:
         m_ansi_process->parseAnsiScreen((char *)data.c_str());
         m_menu_session_data->deliver(data);
     }
-    
-    
-   /**
-    * @brief Clears out Loaded Pulldown options { Called From readInMenuData() }
-    */
+
+
+    /**
+     * @brief Clears out Loaded Pulldown options { Called From readInMenuData() }
+     */
     void clearMenuPullDownOptions();
 
 
@@ -142,25 +142,25 @@ public:
 
     /**
      * @brief Gets the Default Color Sequence
-     * @return 
+     * @return
      */
     std::string getDefaultColor();
 
     /**
      * @brief Gets the Default Input Color Sequence
-     * @return 
+     * @return
      */
     std::string getDefaultInputColor();
 
     /**
      * @brief Gets the Default Input Color Sequence
-     * @return 
+     * @return
      */
     std::string getDefaultInverseColor();
 
     /**
      * @brief Builds the menu prompt as a question/input string
-     * @return 
+     * @return
      */
     std::string parseMenuPromptString(const std::string &prompt_string);
 
@@ -170,15 +170,22 @@ public:
     std::string loadMenuScreen();
 
     /**
+     * @brief Processes a TOP Template Screen for Menus
+     * @param screen
+     * @return
+     */
+    std::string processTopGenericTemplate(const std::string &screen);
+
+    /**
      * @brief Processes a MID Template Screen for Menus
      * @param screen
-     * @return 
+     * @return
      */
     std::string processMidGenericTemplate(const std::string &screen);
 
     /**
      * @brief Generic SRT, MID, END screen processing
-     * @return 
+     * @return
      */
     std::string processGenericScreens();
 
@@ -201,10 +208,10 @@ public:
      * @brief Execute First and Each Commands on Startup
      */
     void executeFirstAndEachCommands();
-    
+
     /**
      * @brief Return Selected or Active prompt as a string.
-     * @return 
+     * @return
      */
     std::string loadMenuPrompt();
 
@@ -240,51 +247,64 @@ public:
      * @brief Handle Standard Menu Input with Wildcard input
      * @param input
      * @param key
-     * @return 
+     * @return
      */
     bool handleStandardMenuInput(const std::string &input, const std::string &key);
 
     /**
      * @brief Handle updating lightbar selections and redraw
      * @param input
-     * @return 
+     * @return
      */
     bool handleLightbarSelection(const std::string &input);
-    
+
     /**
      * @brief Handle Pulldown Specific Command Processing
      * @param input_text
      * @param m
      * @param is_enter
-     * @return 
+     * @return
      */
     bool handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, bool &stack_reassignment);
-    
+
     /**
      * @brief Handles Re-running EACH command re-executed after each refresh
      */
     void executeEachCommands();
 
+    /**
+     * @brief Parse Menu Prompt Folder and pull list of Prompt Names
+     * @return
+     */
+    std::vector<std::string> getListOfMenuPrompts();
+
+    /**
+     * @brief Parse Menu Prompt Folder and pull list of Prompt Names
+     * @return
+     */
+    std::string getRandomMenuPrompt();
+
+
     bool processMenuOptions(const std::string &input);
-    
+
     /**
      * @brief Handle Input Specific to Pull Down Menus
      * @param character_buffer
      */
     void handlePulldownInput(const std::string &character_buffer, const bool &is_utf8);
-    
+
     /**
      * @brief Handle Input Specific to Pull Down Menus
      * @param character_buffer
      */
     void handleStandardInput(const std::string &character_buffer);
-    
+
     /**
      * @brief Default Menu Input Processing.
      *        Handles Processing for Loaded Menus Hotkey and Lightbars
      */
     void menuInput(const std::string &character_buffer, const bool &is_utf8);
-        
+
     /**
      * @brief Yes/No Menu Bar Input Processing.
      *        Handles Processing for Loaded Menus Hotkey and Lightbars

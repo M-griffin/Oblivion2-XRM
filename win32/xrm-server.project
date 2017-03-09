@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="xrm-server" InternalType="Console">
+<CodeLite_Project Name="xrm-server" InternalType="Console" Version="10.0.0">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -38,7 +38,6 @@
     <File Name="../src/menu_system.cpp"/>
     <File Name="../src/menu_system.hpp"/>
     <File Name="../src/menu_system_editor.cpp"/>
-    <File Name="../src/menu_system_prompts.cpp"/>
     <File Name="../src/safe_queue.hpp"/>
     <File Name="../src/safe_set.hpp"/>
     <File Name="../src/server.hpp"/>
@@ -71,6 +70,8 @@
       <File Name="../src/data/users_dao.hpp"/>
       <File Name="../src/data/menu_dao.cpp"/>
       <File Name="../src/data/menu_dao.hpp"/>
+      <File Name="../src/data/menu_prompt_dao.cpp"/>
+      <File Name="../src/data/menu_prompt_dao.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="model">
       <File Name="../src/model/config.hpp"/>
@@ -79,6 +80,7 @@
       <File Name="../src/model/structures.hpp"/>
       <File Name="../src/model/users.hpp"/>
       <File Name="../src/model/menu.hpp"/>
+      <File Name="../src/model/menu_prompt.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
       <File Name="../src/mods/mod_base.hpp"/>

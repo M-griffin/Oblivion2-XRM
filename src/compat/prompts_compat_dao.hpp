@@ -10,7 +10,7 @@
  * @author Michael Griffin
  * @date 3/18/2016
  * @file prompt_dao.hpp
- * @brief Holds Binary funcations for reading PROMPTS.DAT Original OBV/2
+ * @brief Holds Binary funcations for reading MENUPROMPTS.DAT Original OBV/2
  */
 class PromptDao
 {
