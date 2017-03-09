@@ -92,7 +92,7 @@ void AnsiProcessor::screenBufferDisplayTest()
 
     if(m_is_screen_cleared)
     {
-        m_ansi_output.append("\x1b[1;1H\x1b[2J");        
+        m_ansi_output.append("\x1b[1;1H\x1b[2J");
     }
 
     int count = 1;
@@ -107,13 +107,13 @@ void AnsiProcessor::screenBufferDisplayTest()
                     fore != buff.foreground ||
                     back != buff.background)
             {
-                ss  << "\x1b[" 
-                    << buff.attribute << ";" 
-                    << buff.foreground << ";" 
+                ss  << "\x1b["
+                    << buff.attribute << ";"
+                    << buff.foreground << ";"
                     << buff.background << "m";
-                    
+
                 m_ansi_output.append(ss.str());
-                
+
                 attr = buff.attribute;
                 fore = buff.foreground;
                 back = buff.background;
@@ -152,10 +152,10 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
     int attr = 0;
     int fore = 0;
     int back = 0;
-    
+
     // We want to cound \0 characters in a row.
     // These are unplotted so we use home cursor drawing
-    // and ESC[C to push the cursor forward without overwritting 
+    // and ESC[C to push the cursor forward without overwritting
     int padding = 0;
 
     std::string ansi_output = "";
@@ -163,33 +163,33 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
 
     if(clearScreen)
     {
-        ansi_output.append("\x1b[1;1H\x1b[2J");        
+        ansi_output.append("\x1b[1;1H\x1b[2J");
     }
 
     int count = 1;
     for(unsigned int i = 0; i < m_screen_buffer.size(); i++)
     {
-        auto &buff = m_screen_buffer[i];            
+        auto &buff = m_screen_buffer[i];
         // If buffer parse move past current cursor positon
         if (count >= (m_x_position + (m_y_position * m_characters_per_line)))
         {
             break;
         }
-        
+
         std::stringstream ss;
 
         if(attr !=  buff.attribute ||
                 fore != buff.foreground ||
                 back != buff.background)
         {
-            ss  << "\x1b[" 
-                << buff.attribute << ";" 
-                << buff.foreground << ";" 
+            ss  << "\x1b["
+                << buff.attribute << ";"
+                << buff.foreground << ";"
                 << buff.background << "m";
-                
+
             if (padding == 0)
                 ansi_output.append(ss.str());
-            
+
             attr = buff.attribute;
             fore = buff.foreground;
             back = buff.background;
@@ -207,6 +207,20 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
             padding = 0;
         }
 
+        if (padding > 0 && (i > 0 && i % m_characters_per_line == 0))
+        {
+            std::cout << " appending padding " << std::endl;
+            ansi_output += "\x1b[" + std::to_string(padding) + "C";
+            ansi_output.append(ss.str());
+            padding = 0;
+            ansi_output.append("\x1B[1D\r\n");
+        }
+        else if ((i > 0 && i % m_characters_per_line == 0))
+        {
+            std::cout << " appending non-padding " << std::endl;
+            ansi_output.append("\x1B[1D\r\n");
+        }
+
         if(buff.c == '\r')
         { } //  character = "\x1b[40m\r\n";
         else if(buff.c == '\0')
@@ -214,18 +228,29 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
             ++padding;
             ++count;
             continue;
-        }            
+        }
         else
         {
-            character = buff.c;            
+            character = buff.c;
         }
 
         ansi_output.append(character);
         ++count;
     }
-    
+
     // Screen should always end with reset.
-    ansi_output.append("\x1b[0m");        
+    ansi_output.append("\x1b[0m");
+
+    std::string test_out = ansi_output;
+    std::string::size_type index = 0;
+    while(index != std::string::npos)
+    {
+        index = test_out.find("\x1b", index);
+        if (index != std::string::npos)
+            test_out.replace(index, 1, "ESC");
+    }
+    std::cout << test_out << std::endl;
+
     return ansi_output;
 }
 
@@ -291,7 +316,7 @@ void AnsiProcessor::clearPullDownBars()
 
 /**
  * @brief Return the max rows used on the screen
- * @return 
+ * @return
  */
 int AnsiProcessor::getMaxRowsUsedOnScreen()
 {
@@ -431,16 +456,16 @@ void AnsiProcessor::screenBufferSetPixel(char c)
     // Keep track of the lonest line in buffer for Centering screen.
     if(m_x_position > m_max_x_position)
     {
-        m_max_x_position = m_x_position;        
+        m_max_x_position = m_x_position;
     }
-    
+
     // catch screen screen scrolling here one shot.
-    if (m_y_position >= m_number_lines) 
+    if (m_y_position >= m_number_lines)
     {
         screenBufferScrollUp();
         m_y_position = m_number_lines-1;
     }
-            
+
     m_screen_pixel.c = c;
     m_screen_pixel.x_position = m_x_position;
     m_screen_pixel.y_position = m_y_position;
@@ -456,7 +481,7 @@ void AnsiProcessor::screenBufferSetPixel(char c)
     {
         if(m_position < (signed)m_screen_buffer.size())
         {
-            m_screen_buffer.at(m_position) = m_screen_pixel;            
+            m_screen_buffer.at(m_position) = m_screen_pixel;
         }
         else
         {
@@ -488,9 +513,9 @@ void AnsiProcessor::screenBufferSetPixel(char c)
     {
         ++m_x_position;
     }
-    
+
     // Set the Current Max Row Position.
-    if (m_max_y_position < m_y_position) 
+    if (m_max_y_position < m_y_position)
     {
         m_max_y_position = m_y_position;
     }
@@ -1042,7 +1067,8 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
                 esc_sequence.erase();
 
                 // catch screen screen scrolling here one shot.
-                if (m_y_position >= m_number_lines) {
+                if (m_y_position >= m_number_lines)
+                {
                     screenBufferScrollUp();
                     m_y_position = m_number_lines-1;
                 }
@@ -1057,7 +1083,8 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
                 esc_sequence.erase();
 
                 // catch screen screen scrolling here one shot.
-                if (m_y_position >= m_number_lines) {
+                if (m_y_position >= m_number_lines)
+                {
                     screenBufferScrollUp();
                     m_y_position = m_number_lines-1;
                 }

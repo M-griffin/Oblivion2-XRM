@@ -85,37 +85,37 @@ public:
 
     /**
      * @brief Gets the Default Color Sequence
-     * @return 
+     * @return
      */
     std::string getDefaultColor(config_ptr config);
 
     /**
      * @brief Gets the Default Input Color Sequence
-     * @return 
+     * @return
      */
     std::string getDefaultInputColor(config_ptr config);
 
     /**
      * @brief Gets the Default Inverse Color Sequence
-     * @return 
+     * @return
      */
     std::string getDefaultInverseColor(config_ptr config);
 
     /**
      * @brief Gets the Default Prompt Color Sequence
-     * @return 
+     * @return
      */
     std::string getDefaultPromptColor(config_ptr config);
 
     /**
      * @brief Gets the Default stat Color Sequence
-     * @return 
+     * @return
      */
     std::string getDefaultStatColor(config_ptr config);
 
     /**
      * @brief Gets the Default box Color Sequence
-     * @return 
+     * @return
      */
     std::string getDefaultBoxColor(config_ptr config);
 
@@ -177,14 +177,14 @@ public:
      * @return
      */
     std::string pipe2ansi(const std::string &sequence);
-    
+
     /**
      * @brief Converts MCI Sequences to Code Maps for Multiple Parses of same string data
      * @param sequence
      * @return
      */
     std::vector<MapType> pipe2genericCodeMap(const std::string &sequence);
-    
+
     /**
      * @brief Converts MCI Sequences to Code Maps for Prompt Strings
      * @param sequence
@@ -202,21 +202,21 @@ public:
     /**
      * @brief Colorizes Brackets and Text between brackets to system theme colors
      * @param sequence
-     * @return 
+     * @return
      */
     std::string parseFormatColorsBrackets(const std::string &sequence, config_ptr config);
 
     /**
      * @brief Colorizes Colons to system theme colors
      * @param sequence
-     * @return 
+     * @return
      */
     std::string parseFormatColorsColon(const std::string &sequence, config_ptr config);
 
     /**
      * @brief Parses unformatted prompt text and adds colors to brackets and colans.
      * @param sequence
-     * @return 
+     * @return
      */
     std::string pipe2promptFormat(const std::string &sequence, config_ptr config);
 
@@ -252,7 +252,7 @@ public:
 
     /**
      * @brief Get a Count of all Mapped MCI Codes
-     * @return 
+     * @return
      */
     int getMCIMappingCount();
 
@@ -260,21 +260,22 @@ public:
     session_data_ptr                   m_session_data; // SessionData
     CommonIO                           m_common_io;    // CommonIO
     std::map<std::string, std::string> m_mapped_codes; // MCI Code Translation for specific screens.
-    
+
     const std::string STD_EXPRESSION = {"([|]{1}[0-9]{2})|([|]{1}[X][Y][0-9]{4})|"
-                              "([|]{1}[A-Z]{1,2}[0-9]{1,2})|([|]{1}[A-Z]{2})|"
-                              "([%]{2}[\\w]+[.]{1}[\\w]{3})|([%]{1}[A-Z]{2})|"
-                              "([%]{1}[0-9]{2})"};
-                              
+                                        "([|]{1}[A-Z]{1,2}[0-9]{1,2})|([|]{1}[A-Z]{2})|"
+                                        "([%]{2}[\\w]+[.]{1}[\\w]{3})|([%]{1}[A-Z]{2})|"
+                                        "([%]{1}[0-9]{2})"
+                                       };
+
     const std::string MID_EXPRESSION = {"([|]{1}[A-Z]{1}[0-9]{1,2})|([|]{1}[A-Z]{2})"};
-    
+
     const std::string PROMPT_EXPRESSION = {"([\\^]{1}[A-Z]{1})|([\\\\/=|@*:#)(]{1}$)"};
-    
+
     const std::string FORMAT_EXPRESSION = {"([[]{1}[\\w\\W]+[]]{1})|([:]{1})"};
 };
 
 
 
 
-                  
+
 #endif // MENU_IO_HPP

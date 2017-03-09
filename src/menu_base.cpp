@@ -138,24 +138,71 @@ void MenuBase::loadInMenu(std::string menu_name)
 }
 
 /**
+ * @brief Processes a TOP Template Screen for Menus
+ * @param screen
+ * @return
+ */
+std::string MenuBase::processTopGenericTemplate(const std::string &screen)
+{
+    /**
+     * When we get 2J alone, it clears but leaves cursor.
+     * In most cases we need to add a pre-home cursor!
+     */
+    std::string new_screen = screen;
+    std::string::size_type index = 0;
+    while(index != std::string::npos)
+    {
+        index = new_screen.find("\x1b[2J", index);
+        if (index != std::string::npos)
+        {
+            new_screen.replace(index, 4, "\x1b[1;1H\x1b[2J");
+            // Incriment past previous replacement.
+            index += 9;
+        }
+    }
+
+    return new_screen;
+}
+
+/**
  * @brief Processes a MID Template Screen for Menus
  * @param screen
  * @return
  */
 std::string MenuBase::processMidGenericTemplate(const std::string &screen)
 {
-
     // Use a Local Ansi Parser for Pasrsing Menu Template with Mid.
     ansi_process_ptr ansi_process(new AnsiProcessor(
                                       m_menu_session_data->m_telnet_state->getTermRows(),
                                       m_menu_session_data->m_telnet_state->getTermCols()));
     std::string output_screen;
+    std::string new_screen = screen;
+
+    std::string::size_type index = 0;
+    while(index != std::string::npos)
+    {
+        index = new_screen.find("\r", index);
+        if (index != std::string::npos)
+        {
+            new_screen.erase(index, 1);
+        }
+    }
+
+    index = 0;
+    while(index != std::string::npos)
+    {
+        index = new_screen.find("\n", index);
+        if (index != std::string::npos)
+        {
+            new_screen.erase(index, 1);
+        }
+    }
 
     // Clear All Mappings
     m_session_io.clearAllMCIMapping();
 
     // Build a single code map that can be reused.
-    std::vector<MapType> code_map = m_session_io.pipe2genericCodeMap(screen);
+    std::vector<MapType> code_map = m_session_io.pipe2genericCodeMap(new_screen);
 
     // Loop the code map and determine the number of unique columns for parsing.
     int key_columns = 0;
@@ -222,7 +269,8 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
         if (column % key_columns == 0)
         {
             // Process template menu row and all columns added.
-            output_screen += m_session_io.parseCodeMapGenerics(screen, code_map);
+            output_screen += m_session_io.parseCodeMapGenerics(new_screen, code_map);
+            output_screen += "\x1b[D\r\n";
             column = 0;
         }
         ++column;
@@ -231,7 +279,8 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
     // Process any remaining not caught in offset.
     if (m_session_io.getMCIMappingCount() > 0)
     {
-        output_screen += m_session_io.parseCodeMapGenerics(screen, code_map);
+        output_screen += m_session_io.parseCodeMapGenerics(new_screen, code_map);
+        output_screen += "\x1b[D\r\n";
     }
 
     // Clear Codemap.
@@ -260,18 +309,14 @@ std::string MenuBase::processGenericScreens()
     if (idx != std::string::npos)
     {
         std::cout << "parsing menu code title" << std::endl;
-        screen_output += top_screen.replace(
-                             idx,
-                             3,
-                             m_menu_info->menu_title
-                         );
+        top_screen.replace(
+            idx,
+            3,
+            m_menu_info->menu_title
+        );
     }
-    else
-    {
-        // No title Found, just append.
-        std::cout << "no menu title code found" << std::endl;
-        screen_output += top_screen;
-    }
+
+    screen_output += processTopGenericTemplate(top_screen);
 
     /**
      * According to the ANSI 3.64-1979 standard esc[;xxH should go
