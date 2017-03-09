@@ -820,8 +820,10 @@ std::string MenuBase::loadMenuPrompt()
  */
 void MenuBase::moveToBottomAndDisplay(const std::string &prompt)
 {
-    std::string output = getDefaultColor();
+    std::string output = "";
     int screen_row = m_ansi_process->getMaxRowsUsedOnScreen();
+
+    output += getDefaultColor();
     output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
     output += std::move(prompt);
     baseProcessAndDeliver(output);

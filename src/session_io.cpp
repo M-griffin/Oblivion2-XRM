@@ -140,7 +140,9 @@ void SessionIO::createInputField(std::string &field_name, int &len)
                 }
             }
             else
+            {
                 field_name.erase(position, 3);
+            }
         }
     }
 
@@ -470,7 +472,6 @@ std::string SessionIO::getDefaultBoxColor(config_ptr config)
 {
     return pipeColors(config->default_color_box);
 }
-
 
 /**
  * @brief Parsed Pipe Codes with 1 or 2 Digits
@@ -926,7 +927,6 @@ std::vector<MapType> SessionIO::pipe2codeMap(const std::string &sequence, const 
     return code_map;
 }
 
-
 /**
  * @brief Converts MCI Sequences to Ansi screen output.
  * @param sequence
@@ -938,7 +938,6 @@ std::string SessionIO::pipe2ansi(const std::string &sequence)
     return parseCodeMap(sequence, code_map);
 }
 
-
 /**
  * @brief Converts MCI Sequences to Code Maps for Multiple Parses of same string data
  * @param sequence
@@ -949,7 +948,6 @@ std::vector<MapType> SessionIO::pipe2genericCodeMap(const std::string &sequence)
     std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, MID_EXPRESSION));
     return code_map;
 }
-
 
 /**
  * @brief Converts MCI Sequences to Code Maps for Prompt Strings
@@ -963,7 +961,6 @@ std::vector<MapType> SessionIO::pipe2promptCodeMap(const std::string &sequence)
     return code_map;
 }
 
-
 /**
  * @brief Converts MCI Sequences to Code Maps for Prompt Formatting Strings
  * @param sequence
@@ -975,7 +972,6 @@ std::vector<MapType> SessionIO::pipe2promptFormatCodeMap(const std::string &sequ
     std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, FORMAT_EXPRESSION));
     return code_map;
 }
-
 
 /**
  * @brief Colorizes Brackets and Text between brackets to system theme colors
@@ -990,7 +986,6 @@ std::string SessionIO::parseFormatColorsBrackets(const std::string &sequence, co
     return output;
 }
 
-
 /**
  * @brief Colorizes Colons to system theme colors
  * @param sequence
@@ -1003,7 +998,6 @@ std::string SessionIO::parseFormatColorsColon(const std::string &sequence, confi
     output += getDefaultPromptColor(config);
     return output;
 }
-
 
 /**
  * @brief Parses unformatted prompt text and adds colors to brackets and colans.
@@ -1045,12 +1039,10 @@ std::string SessionIO::pipe2promptFormat(const std::string &sequence, config_ptr
         }
     }
 
-
     // Then feed though and return the updated string.
     output = std::move(parseCodeMapGenerics(sequence, code_map));
     return output;
 }
-
 
 /**
  * @brief Checks a String if it matches the expression passed.
@@ -1118,7 +1110,6 @@ void SessionIO::addMCIMapping(const std::string &key, const std::string &value)
     m_mapped_codes.insert(std::pair<std::string, std::string>(std::move(key), std::move(value)));
 }
 
-
 /**
  * @brief Clears all mappings
  */
@@ -1129,7 +1120,6 @@ void SessionIO::clearAllMCIMapping()
         std::map<std::string, std::string>().swap(m_mapped_codes);
     }
 }
-
 
 /**
  * @brief Get a Count of all Mapped MCI Codes

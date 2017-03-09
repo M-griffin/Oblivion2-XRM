@@ -70,7 +70,8 @@ public:
     std::map<int, ScreenPixel> m_pull_down_options;
 
     // ANSI escape sequences
-    enum {
+    enum
+    {
         CURSOR_POSITION =      'H',
         CURSOR_POSITION_ALT =  'f',   // equivalent to 'H'
         CURSOR_UP =            'A',
@@ -119,14 +120,14 @@ public:
         BG_CYAN            = 46,
         BG_WHITE           = 47
     };
-    
+
     // Process Build strings from pull_down array.
     std::string buildPullDownBars(int pulldown_id, bool active); // 4
-    
+
     // Clear Pull Down Bars once menu options are reset.
     void clearPullDownBars();
-    
-     // Return the max rows used on the screen
+
+    // Return the max rows used on the screen
     int getMaxRowsUsedOnScreen();
 
     // Parses the Screen Buffer and Builds pulldown options
@@ -137,7 +138,7 @@ public:
 
     // For testing display the output of the buffer.
     void screenBufferDisplayTest();
-    
+
     /**
      * @brief Takes buffer and displays parsed sequences
      */
@@ -149,7 +150,7 @@ public:
     void screenBufferScrollUp();
     void screenBufferClearRange(int start, int end);
     void screenBufferClear();
-    
+
     /**
      * @brief Clears The Screen And Buffer
      */

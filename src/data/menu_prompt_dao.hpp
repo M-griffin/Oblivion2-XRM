@@ -10,14 +10,14 @@
 struct MenuPrompt;
 typedef boost::shared_ptr<MenuPrompt> menu_prompt_ptr;
 
- 
- /**
-  * @class MenuPromptDao
-  * @author Michael Griffin
-  * @date 05/03/2017
-  * @file menu_dao.hpp
-  * @brief Handles Reading and Writting a MenuPrompt from YAML Files
-  */
+
+/**
+ * @class MenuPromptDao
+ * @author Michael Griffin
+ * @date 05/03/2017
+ * @file menu_dao.hpp
+ * @brief Handles Reading and Writting a MenuPrompt from YAML Files
+ */
 class MenuPromptDao
 {
 public:
@@ -49,7 +49,7 @@ public:
      * @return
      */
     bool loadMenuPrompt();
-    
+
     /**
      * @brief Moves the Loaded Menu to the shared pointer.
      * @param rhs
@@ -68,7 +68,7 @@ public:
             return m_menu_prompt;
         }
     }
-   
+
     menu_prompt_ptr m_menu_prompt;
     std::string m_path;
     std::string m_filename;

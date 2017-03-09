@@ -209,7 +209,6 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
 
         if (padding > 0 && (i > 0 && i % m_characters_per_line == 0))
         {
-            std::cout << " appending padding " << std::endl;
             ansi_output += "\x1b[" + std::to_string(padding) + "C";
             ansi_output.append(ss.str());
             padding = 0;
@@ -217,7 +216,6 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
         }
         else if ((i > 0 && i % m_characters_per_line == 0))
         {
-            std::cout << " appending non-padding " << std::endl;
             ansi_output.append("\x1B[1D\r\n");
         }
 
@@ -240,17 +238,6 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
 
     // Screen should always end with reset.
     ansi_output.append("\x1b[0m");
-
-    std::string test_out = ansi_output;
-    std::string::size_type index = 0;
-    while(index != std::string::npos)
-    {
-        index = test_out.find("\x1b", index);
-        if (index != std::string::npos)
-            test_out.replace(index, 1, "ESC");
-    }
-    std::cout << test_out << std::endl;
-
     return ansi_output;
 }
 
@@ -514,11 +501,6 @@ void AnsiProcessor::screenBufferSetPixel(char c)
         ++m_x_position;
     }
 
-    // Set the Current Max Row Position.
-    if (m_max_y_position < m_y_position)
-    {
-        m_max_y_position = m_y_position;
-    }
 }
 
 /*
@@ -1056,7 +1038,6 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
         } // end of main escape sequence handler
         else   // otherwise output character using current color */
         {
-
             // Handle New Line in ANSI Files properly.
             if(c == '\r' && buff[z+1] == '\n')
             {
@@ -1066,13 +1047,18 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
 
                 esc_sequence.erase();
 
+                // Set the Current Max Row Position.
+                if (m_max_y_position < m_y_position)
+                {
+                    m_max_y_position = m_y_position;
+                }
+
                 // catch screen screen scrolling here one shot.
                 if (m_y_position >= m_number_lines)
                 {
                     screenBufferScrollUp();
                     m_y_position = m_number_lines-1;
                 }
-
                 continue;
             }
             else if(c == '\r' || c == '\n')
@@ -1082,19 +1068,30 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
 
                 esc_sequence.erase();
 
+                // Set the Current Max Row Position.
+                if (m_max_y_position < m_y_position)
+                {
+                    m_max_y_position = m_y_position;
+                }
+
                 // catch screen screen scrolling here one shot.
                 if (m_y_position >= m_number_lines)
                 {
                     screenBufferScrollUp();
                     m_y_position = m_number_lines-1;
                 }
-
                 continue;
             }
 
             // Append Character to Screen Buffer.
             if(c != '\0')
             {
+                // Set the Current Max Row Position.
+                if (m_max_y_position < m_y_position)
+                {
+                    m_max_y_position = m_y_position;
+                }
+
                 screenBufferSetPixel(c);
             }
             esc_sequence.erase();
