@@ -64,10 +64,10 @@ public:
 
     std::string m_current_menu_prompt;
     CommonIO m_common_io;
-    
+
     MenuPromptCompat m_menu_prompt;
     std::vector<MenuPromptCompat> m_loaded_menu_prompts;
-    
+
     /**
      * @brief Helper, appends forward/backward slash to path
      * @param value
@@ -118,26 +118,25 @@ void MenuPromptConvert::convert_menu_prompts()
 {
     namespace fs = boost::filesystem;
 
-    // Instatnce for new yaml menu format.
+    // Instance for new yaml menu format.
     menu_prompt_ptr menu_prompt(new MenuPrompt());
-    
     menu_prompt.reset(new MenuPrompt());
-    
-    for (unsigned int i = 0; i < m_loaded_menu_prompts.size(); i++) 
+
+    for (unsigned int i = 0; i < m_loaded_menu_prompts.size(); i++)
     {
         auto &m = m_loaded_menu_prompts[i];
-        
+
         // Convert int8_t* to std::strings
         menu_prompt->name = boost::lexical_cast<std::string>(m.Name);
         menu_prompt->data_line1 = boost::lexical_cast<std::string>(m.Data[0]);
         menu_prompt->data_line2 = boost::lexical_cast<std::string>(m.Data[1]);
         menu_prompt->data_line3 = boost::lexical_cast<std::string>(m.Data[2]);
-        
+
         // Save new YAML Menu
         MenuPromptDao mnu_prompt(menu_prompt, menu_prompt->name, GLOBAL_MENU_PROMPT_PATH);
-        
+
         try
-        {        
+        {
             if(mnu_prompt.saveMenuPrompt(menu_prompt))
             {
                 std::cout << "Menu Prompt Created: " << menu_prompt->name << std::endl;
@@ -148,10 +147,8 @@ void MenuPromptConvert::convert_menu_prompts()
             std::cout << "Exception, unable to write .yaml menu file: " << menu_prompt->name << std::endl;
             std::cout << e.what() << std::endl;
         }
-    
-    }    
+    }
 }
-
 
 /**
  * @brief Clears out the Loaded Menu Prompts.
@@ -169,14 +166,14 @@ void MenuPromptConvert::clearAllMenuPrompts()
  */
 void MenuPromptConvert::readMenuAllPrompts()
 {
-    // Clear Scren
+    // Clear Screen
     //m_session_data->deliver(m_session_io.pipe2ansi("|CS|07"));
     std::string filename = "MENUPROM.DAT";
 
     // Make sure list is cleared so we can reload if needed
     if(m_loaded_menu_prompts.size() > 0)
     {
-        clearAllMenuPrompts();        
+        clearAllMenuPrompts();
     }
 
     // Loop each Option after Reading the Menu.
@@ -190,10 +187,9 @@ void MenuPromptConvert::readMenuAllPrompts()
         m_common_io.PascalToCString(m_menu_prompt.Data[2]);
 
         // Add to Vector
-        m_loaded_menu_prompts.push_back(m_menu_prompt);        
+        m_loaded_menu_prompts.push_back(m_menu_prompt);
     }
 }
-
 
 /**
  * @brief Main Program Entrance.
@@ -245,7 +241,7 @@ auto main() -> int
     MenuPromptConvert convert;
 
     // start Conversion process
-    try 
+    try
     {
         convert.readMenuAllPrompts();
         convert.convert_menu_prompts();
@@ -260,4 +256,3 @@ auto main() -> int
 
     return 0;
 }
-
