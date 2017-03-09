@@ -452,7 +452,7 @@ std::string AnsiProcessor::screenBufferParse()
  * @param c
  */
 void AnsiProcessor::screenBufferSetPixel(char c)
-{
+{            
     // Keep track of the lonest line in buffer for Centering screen.
     if(m_x_position > m_max_x_position)
     {
@@ -513,12 +513,7 @@ void AnsiProcessor::screenBufferSetPixel(char c)
     {
         ++m_x_position;
     }
-
-    // Set the Current Max Row Position.
-    if (m_max_y_position < m_y_position)
-    {
-        m_max_y_position = m_y_position;
-    }
+    
 }
 
 /*
@@ -1065,6 +1060,12 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
                 ++m_y_position;
 
                 esc_sequence.erase();
+                
+                // Set the Current Max Row Position.
+                if (m_max_y_position < m_y_position)
+                {
+                    m_max_y_position = m_y_position;
+                }
 
                 // catch screen screen scrolling here one shot.
                 if (m_y_position >= m_number_lines)
@@ -1081,6 +1082,12 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
                 ++m_y_position;
 
                 esc_sequence.erase();
+                
+                // Set the Current Max Row Position.
+                if (m_max_y_position < m_y_position)
+                {
+                    m_max_y_position = m_y_position;
+                }
 
                 // catch screen screen scrolling here one shot.
                 if (m_y_position >= m_number_lines)
@@ -1095,6 +1102,13 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
             // Append Character to Screen Buffer.
             if(c != '\0')
             {
+                
+                // Set the Current Max Row Position.
+                if (m_max_y_position < m_y_position)
+                {
+                    m_max_y_position = m_y_position;
+                }
+                
                 screenBufferSetPixel(c);
             }
             esc_sequence.erase();
