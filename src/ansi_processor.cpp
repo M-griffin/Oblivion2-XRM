@@ -447,10 +447,12 @@ void AnsiProcessor::screenBufferSetPixel(char c)
     }
 
     // catch screen screen scrolling here one shot.
-    if (m_y_position >= m_number_lines)
+    //if (m_y_position >= m_number_lines)
+    if (m_y_position > m_number_lines)
     {
         screenBufferScrollUp();
-        m_y_position = m_number_lines-1;
+        //m_y_position = m_number_lines-1;
+        m_y_position = m_number_lines;
     }
 
     m_screen_pixel.c = c;
@@ -686,7 +688,9 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
             // We only store with input key if it's parsed
             // Otherwise we skip it.
             for(int seq = starting_seq; seq < ending_seq+1; seq++)
-                esc_sequence += buff[seq];
+            {
+                esc_sequence += buff[seq];                
+            }
 
             // Handle specific escape sequences
             switch(c)
@@ -751,7 +755,8 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
                     {
                         if(param[0] > (m_number_lines) - m_y_position)
                         {
-                            m_y_position = m_number_lines - 1;
+                            //m_y_position = m_number_lines - 1;
+                            m_y_position = m_number_lines;
                         }
                         else
                         {
@@ -1054,10 +1059,12 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
                 }
 
                 // catch screen screen scrolling here one shot.
-                if (m_y_position >= m_number_lines)
+                //if (m_y_position >= m_number_lines)
+                if (m_y_position > m_number_lines)
                 {
                     screenBufferScrollUp();
-                    m_y_position = m_number_lines-1;
+                    //m_y_position = m_number_lines-1;
+                    m_y_position = m_number_lines;
                 }
                 continue;
             }
@@ -1075,10 +1082,12 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
                 }
 
                 // catch screen screen scrolling here one shot.
-                if (m_y_position >= m_number_lines)
+                //if (m_y_position >= m_number_lines)
+                if (m_y_position > m_number_lines)
                 {
                     screenBufferScrollUp();
-                    m_y_position = m_number_lines-1;
+                    //m_y_position = m_number_lines-1;
+                    m_y_position = m_number_lines;
                 }
                 continue;
             }

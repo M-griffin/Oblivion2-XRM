@@ -337,19 +337,67 @@ std::string MenuBase::processGenericScreens()
 /**
  * @brief Setup light bar string, and return default display.
  */
-std::string MenuBase::setupYesNoMenuInput()
-{
+std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::vector<MapType> &code_map)
+{    
     m_input_index = MENU_YESNO_BAR;
+    clearMenuPullDownOptions();
+            
+    // Then feed though and return the updated string.
+    std::string prompt_string = std::move(m_session_io.parseCodeMapGenerics(menu_prompt, code_map));
+    std::string display_prompt = moveStringToBottom(prompt_string);
 
-    std::string output = "-Yes- -No-  (Mockup)";
+    //std::string output = "-Yes- -No-  (Mockup)";
+    std::string yesNoBars = "\x1b[0m|01\x1b[1m%01 \x1b[0m|02\x1b[1m%02";
+    
+    //display_prompt// += " " + yesNoBars;
+    yesNoBars.insert(0, display_prompt);
+    
+    std::cout << "setupYN :  prompt_string: " << yesNoBars << std::endl;
+   
+    // Parse the Screen to the Screen Buffer.
+    m_ansi_process->parseAnsiScreen((char *)yesNoBars.c_str());
 
-    // Generate y/n light bar commands
-    // dependon on default m_active_pulldownID for y/n
+    // Screen to String so it can be processed.
+    m_ansi_process->screenBufferToString();
 
-    // decide if we want to buld string on default colors
-    // or parse an extra template from config??!?
+    // Process buffer for PullDown Codes.
+    // only if we want result, ignore.., result just for testing at this time!
+    std::string result = std::move(m_ansi_process->screenBufferParse());
+       
+    
+    // Update Lightbars, by default they have no names for YES/NO/Continue prompts.
+    for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
+    {
+        auto &m = m_menu_info->menu_options[i];
+        
+        // Default setup for Yes No with default to Yes!
+        if (i == 0) 
+        {
+            m.pulldown_id = 1;
+            m.name = "Yes";
+        }
+        else
+        {
+            m.pulldown_id = 2;
+            m.name = "No";
+        }                
+        
+        m_loaded_pulldown_options.push_back(m);
+    }
 
-    return output;
+    // Now Build the Light bars
+    std::string light_bars = buildLightBars();
+    
+    std::cout << "setupYN :  light_bars: " << light_bars << std::endl;
+    std::cout << "setupYN :  yesNoBars: " << yesNoBars << std::endl;
+    
+    // add and write out.
+    //yesNoBars.append(light_bars);   
+    //std::cout << "setupYN :  yesNoBars: " << yesNoBars << std::endl;
+    display_prompt.append(light_bars);
+    std::cout << "setupYN :  display_prompt: " << display_prompt << std::endl;
+        
+    return display_prompt;
 }
 
 /**
@@ -462,15 +510,15 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
             switch(map.m_code[0])
             {
                 case '\\':
-                    m_active_pulldownID = 0; // NO Default
-                    output = std::move(setupYesNoMenuInput());
+                    m_active_pulldownID = 1; // NO Default
+                    output = std::move(setupYesNoMenuInput(prompt_string, code_map));
                     match_found = true;
                     break;
 
                 case '/':
-                    m_active_pulldownID = 1; // YES Default
-                    output = std::move(setupYesNoMenuInput());
-                    match_found = true;
+                    m_active_pulldownID = 2; // YES Default
+                    output = std::move(setupYesNoMenuInput(prompt_string, code_map));
+                    match_found = true;                    
                     break;
 
                 default:
@@ -484,13 +532,9 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
             break;
         }
     }
-
-    // Then feed though and return the updated string.
-    std::string yesNoBar = std::move(m_session_io.parseCodeMapGenerics(prompt_string, code_map));
-    yesNoBar += output;
-
+    
     // Then we feed it through again to handle colors replacements.
-    return m_session_io.pipe2ansi(yesNoBar);
+    return m_session_io.pipe2ansi(output);
 }
 
 /**
@@ -830,6 +874,21 @@ void MenuBase::moveToBottomAndDisplay(const std::string &prompt)
 }
 
 /**
+ * @brief Move to End of Display then Setup Display for String
+ * @param output
+ */
+std::string MenuBase::moveStringToBottom(const std::string &prompt)
+{
+    std::string output = "";
+    int screen_row = m_ansi_process->getMaxRowsUsedOnScreen();
+
+    output += getDefaultColor();
+    output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
+    output += std::move(prompt);
+    return output;
+}
+
+/**
  * @brief Startup And load the Menu File
  */
 void MenuBase::loadAndStartupMenu()
@@ -863,8 +922,8 @@ void MenuBase::loadAndStartupMenu()
     // First Lets imploment N with ^ color codes for local theme colors.
     if (m_menu_info->menu_pulldown_file.size() == 1 && toupper(m_menu_info->menu_pulldown_file[0]) == 'N')
     {
-        moveToBottomAndDisplay(parseMenuPromptString(m_menu_info->menu_prompt));
-        m_is_active_pulldown_menu = false;
+        baseProcessAndDeliver(parseMenuPromptString(m_menu_info->menu_prompt));
+        m_is_active_pulldown_menu = true;
 
         // Not sure if this is allowed in legacy, but lets do it, then they can clear screen or add ansi!
         if (!m_use_first_command_execution)
@@ -1528,20 +1587,11 @@ void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf
 }
 
 /**
- * @brief Default Menu Input Processing.
+ * @brief Default Menu Input Processing. (HotKey and Lightbar)
  *        Handles Processing for Loaded Menus Hotkey and Lightbars
  */
 void MenuBase::menuYesNoBarInput(const std::string &character_buffer, const bool &is_utf8)
-{
-    // If were in lightbar mode, then we are using hotkeys.
-    if (m_is_active_pulldown_menu)
-    {
-        std::cout << "handlePulldown" << std::endl;
-        handlePulldownInput(character_buffer, is_utf8);
-    }
-    else
-    {
-        std::cout << "handleStandard" << std::endl;
-        handleStandardInput(character_buffer);
-    }
+{   
+    std::cout << "*** yesNO Menu Bar Input" << std::endl;
+    handlePulldownInput(character_buffer, is_utf8);
 }
