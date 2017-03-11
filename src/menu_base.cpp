@@ -338,22 +338,17 @@ std::string MenuBase::processGenericScreens()
  * @brief Setup light bar string, and return default display.
  */
 std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::vector<MapType> &code_map)
-{    
+{
     m_input_index = MENU_YESNO_BAR;
     clearMenuPullDownOptions();
-            
+
     // Then feed though and return the updated string.
     std::string prompt_string = std::move(m_session_io.parseCodeMapGenerics(menu_prompt, code_map));
     std::string display_prompt = moveStringToBottom(prompt_string);
 
-    //std::string output = "-Yes- -No-  (Mockup)";
-    std::string yesNoBars = "\x1b[0m|01\x1b[1m%01 \x1b[0m|02\x1b[1m%02";
-    
-    //display_prompt// += " " + yesNoBars;
+    std::string yesNoBars = "\x1b[0m|01\x1b[1;37;41m%01\x1b[0m \x1b[0m|02\x1b[1;37;41m%02\x1b[0m";
     yesNoBars.insert(0, display_prompt);
-    
-    std::cout << "setupYN :  prompt_string: " << yesNoBars << std::endl;
-   
+
     // Parse the Screen to the Screen Buffer.
     m_ansi_process->parseAnsiScreen((char *)yesNoBars.c_str());
 
@@ -363,40 +358,34 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
     // Process buffer for PullDown Codes.
     // only if we want result, ignore.., result just for testing at this time!
     std::string result = std::move(m_ansi_process->screenBufferParse());
-       
-    
+
     // Update Lightbars, by default they have no names for YES/NO/Continue prompts.
     for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
     {
         auto &m = m_menu_info->menu_options[i];
-        
+
         // Default setup for Yes No with default to Yes!
-        if (i == 0) 
+        if (i == 0)
         {
             m.pulldown_id = 1;
-            m.name = "Yes";
+            m.name = "  Yes  ";
         }
         else
         {
             m.pulldown_id = 2;
-            m.name = "No";
-        }                
-        
+            m.name = "  No  ";
+        }
+
         m_loaded_pulldown_options.push_back(m);
     }
 
     // Now Build the Light bars
     std::string light_bars = buildLightBars();
-    
-    std::cout << "setupYN :  light_bars: " << light_bars << std::endl;
-    std::cout << "setupYN :  yesNoBars: " << yesNoBars << std::endl;
-    
-    // add and write out.
-    //yesNoBars.append(light_bars);   
-    //std::cout << "setupYN :  yesNoBars: " << yesNoBars << std::endl;
     display_prompt.append(light_bars);
-    std::cout << "setupYN :  display_prompt: " << display_prompt << std::endl;
-        
+    
+    // Hide Cursor on lightbars
+    display_prompt.append("\x1b[?25l");
+
     return display_prompt;
 }
 
@@ -510,15 +499,15 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
             switch(map.m_code[0])
             {
                 case '\\':
-                    m_active_pulldownID = 1; // NO Default
+                    m_active_pulldownID = 2; // NO Default
                     output = std::move(setupYesNoMenuInput(prompt_string, code_map));
                     match_found = true;
                     break;
 
                 case '/':
-                    m_active_pulldownID = 2; // YES Default
+                    m_active_pulldownID = 1; // YES Default
                     output = std::move(setupYesNoMenuInput(prompt_string, code_map));
-                    match_found = true;                    
+                    match_found = true;
                     break;
 
                 default:
@@ -532,7 +521,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
             break;
         }
     }
-    
+
     // Then we feed it through again to handle colors replacements.
     return m_session_io.pipe2ansi(output);
 }
@@ -1129,6 +1118,14 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
     std::string::size_type idx;
     idx = key.find("*", 0);
 
+    // Catch Lightbar Movement when checking wilecards.
+    if (idx != std::string::npos &&
+            (input == "RT_ARROW" || input == "DN_ARROW" ||
+             input == "LT_ARROW" || input == "UP_ARROW"))
+    {
+        return false;
+    }
+
     // If it exists, grab text up to *, then test aginst input.
     // Check for Wildcard input .. A* would be any keys starting with A
     if (idx != std::string::npos && idx != 0)
@@ -1591,7 +1588,7 @@ void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf
  *        Handles Processing for Loaded Menus Hotkey and Lightbars
  */
 void MenuBase::menuYesNoBarInput(const std::string &character_buffer, const bool &is_utf8)
-{   
+{
     std::cout << "*** yesNO Menu Bar Input" << std::endl;
     handlePulldownInput(character_buffer, is_utf8);
 }
