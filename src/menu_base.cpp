@@ -510,6 +510,8 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
                     match_found = true;
                     break;
 
+                // Handle yes /no /continue
+
                 default:
                     break;
             }
@@ -1119,7 +1121,8 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
     idx = key.find("*", 0);
 
     // Catch Lightbar Movement when checking wilecards.
-    if (idx != std::string::npos &&
+    // Return nothing found on Movement.
+    if (idx != std::string::npos && m_is_active_pulldown_menu &&
             (input == "RT_ARROW" || input == "DN_ARROW" ||
              input == "LT_ARROW" || input == "UP_ARROW"))
     {
@@ -1146,11 +1149,16 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
         {
             return true;
         }
+        // Else if Pulldown, and ENTER, then take wild card!
+        //else if (m_is_active_pulldown_menu && input_match == "ENTER") 
+        //{
+        //    return true;
+        //}
         return false;
     }
     else if (idx == 0)
     {
-        std::cout << "Whild Card  Key * By Itself: " << key << std::endl;
+        std::cout << "Wild Card Key * By Itself: " << key << std::endl;
         return true;
     }
 
@@ -1236,25 +1244,40 @@ bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, 
         if(m.pulldown_id == m_active_pulldownID)
         {
             // Then we have a match!  Execute the Menu Command with this ID!
-            std::cout << "Menu Command Executed for: " << m.menu_key << std::endl;
+            std::cout << "[ENTER] Menu Command HOTKEY Executed for: " << m.menu_key << std::endl;
 
             if(m.menu_key != "FIRSTCMD" && m.menu_key != "EACH")
             {
+                /** 
+                 * Note, if command doesn't excute, next command doesn't follow!
+                 */
                 if (executeMenuOptions(m))
                 {
+                    std::cout << "set stack_reassignment = true " << std::endl;
                     // Now assign the m.menu_key to the input, so on next loop, we hit any stacked commands!
                     // If were in pulldown menu, and the first lightbar has stacked commands, then we need
                     // to cycle through the remaining command's for stacked on lightbars.
                     stack_reassignment = true;
                     ++executed;
                 }
+                
+                /*
+                // Testing for Stack Reassignment on FeedBack Lightbars
+                executeMenuOptions(m);                
+                std::cout << "set stack_reassignment = true " << std::endl;
+                // Now assign the m.menu_key to the input, so on next loop, we hit any stacked commands!
+                // If were in pulldown menu, and the first lightbar has stacked commands, then we need
+                // to cycle through the remaining command's for stacked on lightbars.
+                stack_reassignment = true;
+                ++executed;
+                */
             }
         }
     }
     else
     {
         // NOT ENTER and pulldown,  check hotkeys here!!
-        std::cout << "Menu Command HOTKEY Executed for: " << m.menu_key << std::endl;
+        std::cout << "[HOTKEY] Menu Command HOTKEY Executed for: " << m.menu_key << std::endl;
         if (executeMenuOptions(m))
         {
             ++executed;
@@ -1331,8 +1354,11 @@ bool MenuBase::processMenuOptions(const std::string &input)
     {
         std::cout << "EXECUTE ENTER!: " << input_text << std::endl;
         is_enter = true;
+        
         // Push out a NewLine after ENTER Executions
-        baseProcessAndDeliver("\r\n");
+        //baseProcessAndDeliver("\r\n");
+        // we want a new line, but if execution fails, then display is 
+        // side stepped and pushed down one!
     }
 
     // Check for loaded menu commands.
@@ -1345,6 +1371,8 @@ bool MenuBase::processMenuOptions(const std::string &input)
         {
             break;
         }
+        
+        std::cout << "MENU KEY: " << m.menu_key << std::endl;
 
         if(input_text[0] == '\x1b' && input_text.size() > 2) // hmm 2?
         {
@@ -1410,6 +1438,9 @@ bool MenuBase::processMenuOptions(const std::string &input)
             // Pulldown selection.
             if(m_is_active_pulldown_menu)
             {
+                
+                std::cout << "handlePulldownHotKeys" << std::endl;
+                
                 // Handles ENTER Selection or Hotkeys Command Input.
                 if (handlePulldownHotKeys(m, is_enter, stack_reassignment))
                 {
@@ -1417,9 +1448,11 @@ bool MenuBase::processMenuOptions(const std::string &input)
                     // With Same Menu Key are executed (stacked commands) afterwords in order.
                     if (stack_reassignment)
                     {
+                        std::cout << "stack_reassignment TRUE, KEY: " << m.menu_key << std::endl;
                         input_text.clear();
                         input_text = m.menu_key;
                         stack_reassignment = false;
+                        is_enter = false;
                     }
                     ++executed;
                 }
