@@ -1,4 +1,18 @@
 
+Change Log Update (00.00.77)
+* 2017-03-12
++ Finished Initial Update for Single Lightbar Menu prompts.
++ Corrected some issues with Stacked Commands on these special case menus.
++ Removed CRLF after ENTER on lightbars menus is used, commands not executed 
+  should not push the screen and keep the same display.
++ Updated Login prompts, this mean the build folder will be updated and/or 
+  the login.yaml should be removed and regenerated with new defaults.
++ Corrected issues in AnsiProcessor with last line calculations.
+  Updates last line used detection methods so the single line prompts
+  will now display properly under the menu prompt.
+- WIP have to look at the quit menu option or fallback in the sysop menu, 
+  Quit is not returning to the menu that called it.
+
 Change Log Update (00.00.76)
 * 2017-03-06 / 2017-03-09
 + Fixed Several Linux display issues due to lapse in testing in this environment 

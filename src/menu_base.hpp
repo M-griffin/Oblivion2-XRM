@@ -138,7 +138,7 @@ public:
     /**
      * @brief Setup light bar string, and return default display.
      */
-    std::string setupYesNoMenuInput();
+    std::string setupYesNoMenuInput(const std::string &menu_prompt, std::vector<MapType> &code_map);
 
     /**
      * @brief Gets the Default Color Sequence
@@ -220,6 +220,12 @@ public:
      * @param output
      */
     void moveToBottomAndDisplay(const std::string &prompt);
+
+    /**
+     * @brief Move to End of Display then Setup Display for String
+     * @param output
+     */
+    std::string moveStringToBottom(const std::string &prompt);
 
     // Menu System will be a (2) Function system 1st setups up and displays
     // The Second handles all I/O for the menu options, this is dynamic since
