@@ -84,7 +84,7 @@ void ModSignup::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_NUP]                = std::make_pair("New User Password", "New User Password: ");
+    value[PROMPT_NUP]                = std::make_pair("New User Password", "|CR|CRNew User Password: ");
     value[PROMPT_DISCLAIMER]         = std::make_pair("Disclaimer", "%%DFDISCLAIMER.ANS |CR[y/n] Disclaimer Agree: ");
     value[PROMPT_HANDLE]             = std::make_pair("User Handle", "Enter Handle: ");
     value[PROMPT_USER_NUMBER]        = std::make_pair("Your User Numer |OT", "Your user number is |OT.");
