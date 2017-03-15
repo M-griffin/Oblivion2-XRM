@@ -345,8 +345,15 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
     // Then feed though and return the updated string.
     std::string prompt_string = std::move(m_session_io.parseCodeMapGenerics(menu_prompt, code_map));
     std::string display_prompt = moveStringToBottom(prompt_string);
-
-    std::string yesNoBars = "\x1b[0m|01\x1b[1;37;41m%01\x1b[0m \x1b[0m|02\x1b[1;37;41m%02\x1b[0m";
+    
+    // Translate Pipe Coles to ESC Sequences prior to parsing to keep
+    // String length calculations.
+    display_prompt = m_session_io.pipe2ansi(display_prompt);
+    
+    std::string yesNoBars = getDefaultColor() + "|01";
+    yesNoBars += getDefaultInputColor() + getDefaultInverseColor() + "%01\x1b[0m";
+    yesNoBars += getDefaultColor() + "|02";
+    yesNoBars += getDefaultInputColor() + getDefaultInverseColor() + "%02\x1b[0m";
     yesNoBars.insert(0, display_prompt);
 
     // Parse the Screen to the Screen Buffer.
@@ -525,7 +532,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
     }
 
     // Then we feed it through again to handle colors replacements.
-    return m_session_io.pipe2ansi(output);
+    return output;
 }
 
 /**
