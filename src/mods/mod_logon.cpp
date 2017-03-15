@@ -405,7 +405,9 @@ bool ModLogon::password(const std::string &input)
         
         if (validate_password(key))
         {
+            // Authorize and assign user to the session.
             m_session_data->m_is_session_authorized = true;
+            m_session_data->m_user_record = m_logon_user;
             m_is_active = false;                        
         }
         else
