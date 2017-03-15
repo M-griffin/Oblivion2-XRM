@@ -292,7 +292,7 @@ public:
         , default_color_stat("|03")
         , default_color_prompt("|11")
         , default_color_input("|11")
-        , default_color_inverse("|00|19")
+        , default_color_inverse("|19")
         , default_color_box("|08")  
         , default_user_flags("")
         , flag_change_daily("")

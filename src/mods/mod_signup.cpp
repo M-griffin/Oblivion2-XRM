@@ -1758,6 +1758,14 @@ void ModSignup::saveNewUserRecord()
     m_user_record->dtFirstOn = result;
     m_user_record->dtPassChangeDate = result;
     m_user_record->dtLastCallDate = result;
+    
+    // Set Default User Theme colors, pull from system defaults.
+    m_user_record->sRegColor = m_config->default_color_regular;
+    m_user_record->sPromptColor = m_config->default_color_prompt;
+    m_user_record->sInputColor = m_config->default_color_input;
+    m_user_record->sInverseColor = m_config->default_color_inverse;
+    m_user_record->sStatColor = m_config->default_color_stat;
+    m_user_record->sBoxColor = m_config->default_color_box;
 
     long userIndex = user_dao->insertUserRecord(m_user_record);
     if (userIndex < 0)

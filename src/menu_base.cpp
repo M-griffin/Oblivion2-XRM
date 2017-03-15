@@ -395,14 +395,14 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
 
     return display_prompt;
 }
-
+   
 /**
  * @brief Gets the Default Color Sequence
  * @return
  */
 std::string MenuBase::getDefaultColor()
 {
-    return m_session_io.pipeColors(m_config->default_color_regular);
+    return m_session_io.pipeColors(m_menu_session_data->m_user_record->sRegColor);
 }
 
 /**
@@ -411,7 +411,7 @@ std::string MenuBase::getDefaultColor()
  */
 std::string MenuBase::getDefaultInputColor()
 {
-    return m_session_io.pipeColors(m_config->default_color_input);
+    return m_session_io.pipeColors(m_menu_session_data->m_user_record->sInputColor);
 }
 
 /**
@@ -420,7 +420,7 @@ std::string MenuBase::getDefaultInputColor()
  */
 std::string MenuBase::getDefaultInverseColor()
 {
-    return m_session_io.pipeColors(m_config->default_color_inverse);
+    return m_session_io.pipeColors(m_menu_session_data->m_user_record->sInverseColor);
 }
 
 /**
