@@ -1380,6 +1380,11 @@ bool MenuBase::processMenuOptions(const std::string &input)
         }
         
         std::cout << "MENU KEY: " << m.menu_key << std::endl;
+        // Skip all first CMD's.. where only processing input here.
+        if (m.menu_key == "FIRSTCMD") 
+        {
+            continue;
+        }
 
         if(input_text[0] == '\x1b' && input_text.size() > 2) // hmm 2?
         {

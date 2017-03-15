@@ -12,6 +12,10 @@ Change Log Update (00.00.78)
   of the user record using default system theme colors until the user logs in and the 
   system takes over using the user's default theme colors.
 
+- BUG, found issue with stack reassignment on YES/NO BARS.
+  Need to track this down and see why the menu_key is blank and why it's getting 
+  pushed through?!?
+
 Change Log Update (00.00.77)
 * 2017-03-12
 + Finished Initial Update for Single Lightbar Menu prompts.
