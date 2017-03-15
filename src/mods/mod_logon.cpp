@@ -76,8 +76,8 @@ void ModLogon::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_LOGON]               = std::make_pair("Logon Prompt", "Logon: ");
-    value[PROMPT_USERNUMBER]          = std::make_pair("Your User Number is |OT", "Use your user number for quick logins, # is |03|OT|CR");
+    value[PROMPT_LOGON]               = std::make_pair("Logon Prompt", "|CR|CR|15[|07Enter Username, Real Name, Email or User # to Login|15] |CRlogon: ");
+    value[PROMPT_USERNUMBER]          = std::make_pair("Your User Number is |OT", "|CR|15Use your user number |03|OT |15for quick logins |CR");
     value[PROMPT_PASSWORD]            = std::make_pair("Password Prompt", "password: ");
     value[PROMPT_USE_INVALID]         = std::make_pair("Invalid Entry", "|04Invalid Response! Try again.|CR");
     value[PROMPT_INVALID_USERNAME]    = std::make_pair("Invalid Username", "|04Invalid Username! Try again.|CR");
@@ -405,7 +405,9 @@ bool ModLogon::password(const std::string &input)
         
         if (validate_password(key))
         {
+            // Authorize and assign user to the session.
             m_session_data->m_is_session_authorized = true;
+            m_session_data->m_user_record = m_logon_user;
             m_is_active = false;                        
         }
         else
