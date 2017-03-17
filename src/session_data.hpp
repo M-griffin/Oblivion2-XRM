@@ -30,7 +30,7 @@ typedef boost::shared_ptr<StateManager>	state_manager_ptr;
 
 /**
  * @class SessionData
- * @author Blue
+ * @author Michael Griffin
  * @date 9/19/2015
  * @file session_data.hpp
  * @brief Used for passing Session Data to and From States.

@@ -97,7 +97,7 @@ namespace YAML
 {    
     /**
      * @class convert
-     * @author Blue
+     * @author Michael Griffin
      * @date 16/11/2016
      * @file menu.hpp
      * @brief MenuOption convert for MenuOption Class
@@ -152,7 +152,7 @@ namespace YAML
     
     /**
      * @class convert
-     * @author Blue
+     * @author Michael Griffin
      * @date 16/11/2016
      * @file menu.hpp
      * @brief YAML Conversion for Menu Class

@@ -169,7 +169,7 @@ public:
      * @param sequence
      * @return
      */
-    std::vector<MapType> pipe2codeMap(const std::string &sequence, const std::string &expression);
+    std::vector<MapType> parseToCodeMap(const std::string &sequence, const std::string &expression);
 
     /**
      * @brief Converts MCI Sequences to Ansi screen output.

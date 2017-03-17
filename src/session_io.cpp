@@ -853,11 +853,11 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
 
 
 /**
- * @brief Parses string and returns code mapping and positions
+ * @brief Parses string and returns code mapping and positions per expression
  * @param sequence
  * @return
  */
-std::vector<MapType> SessionIO::pipe2codeMap(const std::string &sequence, const std::string &expression)
+std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, const std::string &expression)
 {
     // Contains all matches found so we can iterate and reaplace
     // Without Multiple loops through the string.
@@ -934,7 +934,7 @@ std::vector<MapType> SessionIO::pipe2codeMap(const std::string &sequence, const 
  */
 std::string SessionIO::pipe2ansi(const std::string &sequence)
 {
-    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, STD_EXPRESSION));
+    std::vector<MapType> code_map = std::move(parseToCodeMap(sequence, STD_EXPRESSION));
     return parseCodeMap(sequence, code_map);
 }
 
@@ -945,7 +945,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence)
  */
 std::vector<MapType> SessionIO::pipe2genericCodeMap(const std::string &sequence)
 {
-    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, MID_EXPRESSION));
+    std::vector<MapType> code_map = std::move(parseToCodeMap(sequence, MID_EXPRESSION));
     return code_map;
 }
 
@@ -957,7 +957,7 @@ std::vector<MapType> SessionIO::pipe2genericCodeMap(const std::string &sequence)
 std::vector<MapType> SessionIO::pipe2promptCodeMap(const std::string &sequence)
 {
     // This will handle parsing the sequence, and replacement
-    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, PROMPT_EXPRESSION));
+    std::vector<MapType> code_map = std::move(parseToCodeMap(sequence, PROMPT_EXPRESSION));
     return code_map;
 }
 
@@ -969,7 +969,7 @@ std::vector<MapType> SessionIO::pipe2promptCodeMap(const std::string &sequence)
 std::vector<MapType> SessionIO::pipe2promptFormatCodeMap(const std::string &sequence)
 {
     // This will handle parsing the sequence, and replacement
-    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, FORMAT_EXPRESSION));
+    std::vector<MapType> code_map = std::move(parseToCodeMap(sequence, FORMAT_EXPRESSION));
     return code_map;
 }
 
