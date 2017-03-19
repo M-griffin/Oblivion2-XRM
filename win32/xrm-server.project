@@ -115,7 +115,7 @@
         <IncludePath Value="C:/boost/include/boost-1_58"/>
         <IncludePath Value="C:/boost_1_58_0/boost"/>
         <IncludePath Value="C:/boost/include"/>
-        <IncludePath Value="C:/Users/Blue/Desktop/Test2/sqlitewrap"/>
+        <IncludePath Value="C:/Users/Blue/Desktop/Oblivion2-XRM/sqlitewrap"/>
         <IncludePath Value="C:/sqlite3/include"/>
         <IncludePath Value="C:/OpenSSL-Win32/include"/>
         <IncludePath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/include"/>
@@ -126,7 +126,7 @@
         <LibraryPath Value="C:/boost/lib"/>
         <LibraryPath Value="C:/msys/1.0/icu/source/lib"/>
         <LibraryPath Value="C:/sqlite3/lib"/>
-        <LibraryPath Value="C:/Users/Blue/Desktop/Test2/sqlitewrap/Debug"/>
+        <LibraryPath Value="C:/Users/Blue/Desktop/Oblivion2-XRM/sqlitewrap/Debug"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/MinGW"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>
         <LibraryPath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/build"/>

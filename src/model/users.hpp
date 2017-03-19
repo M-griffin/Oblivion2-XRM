@@ -3,6 +3,7 @@
 
 #include <string>
 #include <ctime>
+#include <cstdint> 
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
@@ -74,7 +75,10 @@ public:
     bool iCallsToday;
     bool iNewLevel;
     bool iCSPassChange;
-    std::string sControlFlags;
+    
+    //std::string sControlFlags;
+    uint32_t iControlFlags1;
+    uint32_t iControlFlags2;
 
     bool bWanted;
 
@@ -133,7 +137,8 @@ public:
         , iCallsToday(0)
         , iNewLevel(10)
         , iCSPassChange(0)
-        , sControlFlags("")
+        , iControlFlags1(0)
+        , iControlFlags2(0)
         , bWanted(false)
         , sHeaderType("")
         , iLastMesConf(0)
