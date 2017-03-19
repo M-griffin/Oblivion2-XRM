@@ -10,12 +10,88 @@
 #include <sstream>
 
 
-// Pass data strings to m_session_io.parseToCodeMap()
-// Return and check code map for access controls and flags.
+/**
+ * @brief Set Bit Flag on
+ * @param flag
+ * @param first_set
+ * @param user
+ */
+void AccessCondition::setFlagOn(unsigned char flag, bool first_set, user_ptr user)
+{
+    int bit = flag -= 65; // Handles A - Z
+    std::cout << "Bit Flag: " << bit << std::endl;
+    if (first_set)
+    {
+        user->iControlFlags1 |= bit;
+    }
+    else
+    {
+        user->iControlFlags2 |= bit;
+    }    
+}
 
-// Build methods to to parse secrity, flags, and others from obv2.
-// methods should return boolean tests to validate user access.
+/**
+ * @brief Set Bit Flag off
+ * @param flag
+ * @param first_set
+ * @param user
+ */
+void AccessCondition::setFlagOff(unsigned char flag, bool first_set, user_ptr user)
+{
+    int bit = flag -= 65; // Handles A - Z
+    std::cout << "Bit Flag: " << bit << std::endl;
+    if (first_set)
+    {
+        user->iControlFlags1 &= ~bit;
+    }
+    else
+    {
+        user->iControlFlags2 &= ~bit;
+    }    
+}
 
+/**
+ * @brief Test If Bit Flag is set
+ * @param flag
+ * @param first_set
+ * @param user
+ * @return 
+ */
+bool AccessCondition::checkAccessConditionFlag(unsigned char flag, bool first_set, user_ptr user)
+{
+    int bit = flag -= 65; // Handles A - Z
+    std::cout << "Bit Flag: " << bit << std::endl;
+    if (first_set)
+    {
+        return user->iControlFlags1 & bit;
+    }
+
+    return user->iControlFlags2 & bit;
+}
+
+/**
+ * @brief Sets a Default String of Bitflags On
+ * @param bitString
+ */
+void AccessCondition::setAccessConditionsFlagsOn(std::string bitString, bool first_set, user_ptr user)
+{
+    for (char flag : bitString)
+    {
+        setFlagOn((unsigned char)flag, first_set, user);
+    }    
+}
+
+/**
+ * @brief Sets a Default String of Bitflags Off
+ * @param bitString
+ */
+void AccessCondition::setAccessConditionsFlagsOff(std::string bitString, bool first_set, user_ptr user)
+{
+    for (char flag : bitString)
+    {
+        setFlagOff((unsigned char)flag, first_set, user);
+    }    
+}
 
 /**
  * @brief Parse Code Map and Test Secutiry and AR Flags.
@@ -67,7 +143,6 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
     
     return condition;
 }
-
 
 /**
  * @brief Parse ASC Strings then test User Flags

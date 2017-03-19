@@ -6,6 +6,7 @@
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <map>
@@ -26,6 +27,43 @@ public:
     AccessCondition()  { };
     ~AccessCondition() { };
     
+    /**
+     * @brief Set Bit Flag on
+     * @param flag
+     * @param first_set
+     * @param user
+     */
+    void setFlagOn(unsigned char flag, bool first_set, user_ptr user);
+
+    /**
+     * @brief Set Bit Flag off
+     * @param flag
+     * @param first_set
+     * @param user
+     */
+    void setFlagOff(unsigned char flag, bool first_set, user_ptr user);
+
+    /**
+     * @brief Test If Bit Flag is set
+     * @param flag
+     * @param first_set
+     * @param user
+     * @return 
+     */
+    bool checkAccessConditionFlag(unsigned char flag, bool first_set, user_ptr user);
+    
+    /**
+     * @brief Sets a Default String of Bitflags On
+     * @param bitString
+     */
+    void setAccessConditionsFlagsOn(std::string bitString, bool first_set, user_ptr user);
+
+    /**
+     * @brief Sets a Default String of Bitflags Off
+     * @param bitString
+     */
+    void setAccessConditionsFlagsOff(std::string bitString, bool first_set, user_ptr user);
+        
     /**
      * @brief Parse Code Map and Test Secutiry and AR Flags.
      * @param code_map
