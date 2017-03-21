@@ -8,7 +8,7 @@
 #include <vector>
 #include <iostream>
 #include <sstream>
-
+#include <cctype>
 
 /**
  * @brief Set Bit Flag on
@@ -18,15 +18,22 @@
  */
 void AccessCondition::setFlagOn(unsigned char flag, bool first_set, user_ptr user)
 {
-    int bit = flag -= 65; // Handles A - Z
-    std::cout << "Bit Flag: " << bit << std::endl;
+    int bit = toupper(flag);
+    bit -= 65; // Handles A - Z
+    
+    if (bit < 0 || bit > 31)
+    {
+        std::cout << "Error, Invalid bit flag: " << bit << std::endl;
+        return;        
+    }
+    
     if (first_set)
     {
-        user->iControlFlags1 |= bit;
+        user->iControlFlags1 |= 1 << bit;
     }
     else
     {
-        user->iControlFlags2 |= bit;
+        user->iControlFlags2 |= 1 << bit;
     }    
 }
 
@@ -38,15 +45,22 @@ void AccessCondition::setFlagOn(unsigned char flag, bool first_set, user_ptr use
  */
 void AccessCondition::setFlagOff(unsigned char flag, bool first_set, user_ptr user)
 {
-    int bit = flag -= 65; // Handles A - Z
-    std::cout << "Bit Flag: " << bit << std::endl;
+    int bit = toupper(flag);
+    bit -= 65; // Handles A - Z
+    
+    if (bit < 0 || bit > 31)
+    {
+        std::cout << "Error, Invalid bit flag: " << bit << std::endl;
+        return;        
+    }
+        
     if (first_set)
     {
-        user->iControlFlags1 &= ~bit;
+        user->iControlFlags1 &= ~(1 << bit);
     }
     else
     {
-        user->iControlFlags2 &= ~bit;
+        user->iControlFlags2 &= ~(1 << bit);
     }    
 }
 
@@ -59,14 +73,21 @@ void AccessCondition::setFlagOff(unsigned char flag, bool first_set, user_ptr us
  */
 bool AccessCondition::checkAccessConditionFlag(unsigned char flag, bool first_set, user_ptr user)
 {
-    int bit = flag -= 65; // Handles A - Z
-    std::cout << "Bit Flag: " << bit << std::endl;
-    if (first_set)
+    int bit = toupper(flag);
+    bit -= 65; // Handles A - Z
+    
+    if (bit < 0 || bit > 31)
     {
-        return user->iControlFlags1 & bit;
+        std::cout << "Error, Invalid bit flag: " << bit << std::endl;
+        return false;        
     }
 
-    return user->iControlFlags2 & bit;
+    if (first_set)
+    {
+        return (user->iControlFlags1 >> bit) & 1;
+    }
+
+    return (user->iControlFlags2 >> bit) & 1;
 }
 
 /**
@@ -101,8 +122,7 @@ void AccessCondition::setAccessConditionsFlagsOff(std::string bitString, bool fi
  */
 bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_ptr user)
 {
-    bool condition = false;
-      
+    bool condition = false;      
     MapType my_matches;
 
     // Make a copy so the original is not modified.
@@ -150,35 +170,31 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
  * @param user
  * @return 
  */
-bool AccessCondition::parseAcsString(std::string &acs_string, user_ptr user)
+std::vector<MapType> AccessCondition::parseAcsString(std::string &acs_string)
 {
-    bool condition = false;
     std::vector<MapType> code_map;
-    
-    // First split string 
-    if (user)
-    {
-        // First split any OR statements.
-        std::vector<std::string> tokens;
-        boost::split(tokens, acs_string, boost::is_any_of("|"));
 
-        if (tokens.size() > 1)
+    // First split any OR statements.
+    std::vector<std::string> tokens;
+    boost::split(tokens, acs_string, boost::is_any_of("|"));
+
+    if (tokens.size() > 1)
+    {
+        std::cout << "token 1" << std::endl;
+        // Then we have multiple statements.
+        for (std::string t : tokens)
         {
-            // Then we have multiple statements.
-            for (std::string t : tokens)
-            {
-                std::vector<MapType> tmp = m_session_io.parseToCodeMap(t, ACS_EXPRESSION);          
-                code_map.insert( code_map.end(), tmp.begin(), tmp.end() );
-            }
+             std::cout << "token 1 loop" << std::endl;
+            std::vector<MapType> tmp = m_session_io.parseToCodeMap(t, ACS_EXPRESSION);          
+            code_map.insert( code_map.end(), tmp.begin(), tmp.end() );
         }
-        else 
-        {
-            code_map = m_session_io.parseToCodeMap(acs_string, ACS_EXPRESSION);
-        }
-        
-        // Parse code map to test Secutiry and AR Flags.
-        condition = parseCodeMap(code_map, user);        
     }
+    else 
+    {
+        std::cout << "token 2" << std::endl;
+        code_map = m_session_io.parseToCodeMap(acs_string, ACS_EXPRESSION);
+    }   
     
-    return condition;
+    std::cout << "token done" << std::endl;
+    return code_map;
 }

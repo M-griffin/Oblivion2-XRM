@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="xrm-unittest" InternalType="UnitTest++">
+<CodeLite_Project Name="xrm-unittest" InternalType="UnitTest++" Version="10.0.0">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -43,11 +43,14 @@
     <File Name="users_dao_ut.cpp"/>
     <File Name="../src/session_manager.cpp"/>
     <File Name="../src/session_manager.hpp"/>
+    <File Name="../src/access_condition.cpp"/>
+    <File Name="../src/access_condition.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
   <VirtualDirectory Name="model">
     <File Name="../src/model/config.hpp"/>
+    <File Name="../src/model/users.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

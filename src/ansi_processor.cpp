@@ -349,6 +349,14 @@ std::string AnsiProcessor::screenBufferParse()
                   << "' preceeding ' " << matches.suffix().str()
                   << std::endl;*/
 
+        // Avoid Infinite loop and make sure the existing
+        // is not the same as the next!
+        if (start == matches[0].second)
+        {
+            std::cout << "no more matches!" << std::endl;
+            break;
+        }
+        
         // Since were replacing on the fly, we need to rescan the screen for next code
         start = matches[0].second;
 

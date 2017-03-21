@@ -78,7 +78,7 @@ public:
      * @param user
      * @return 
      */
-    bool parseAcsString(std::string &acs_string, user_ptr user);
+    std::vector<MapType> parseAcsString(std::string &acs_string);
 
     // Using Session IO for Code Mapping
     SessionIO  m_session_io;
@@ -87,11 +87,10 @@ public:
     // start with NOT s255 then test for s255
     // start with all not, but all normal will get caught and never pass through.
     // seperate expressons with | or. and ( )
-    const std::string ACS_EXPRESSION = {"([|]{1}[0-9]{2})|([|]{1}[X][Y][0-9]{4})|"
-                                        "([|]{1}[A-Z]{1,2}[0-9]{1,2})|([|]{1}[A-Z]{2})|"
-                                        "([%]{2}[\\w]+[.]{1}[\\w]{3})|([%]{1}[A-Z]{2})|"
-                                        "([%]{1}[0-9]{2})"
-                                       };
+    const std::string ACS_EXPRESSION = {
+        "([~]{1}[sS]{1}\\d{1,3})|([sS]{1}\\d{1,3})|"
+        "([~]{1}[fF]{1}[A-Z]{1})|([fF]{1}[A-Z]{1})|"};
+        
 
 };
 
