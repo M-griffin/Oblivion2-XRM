@@ -123,7 +123,7 @@ void AccessCondition::setAccessConditionsFlagsOff(std::string bitString, bool fi
 bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_ptr user)
 {
     bool condition = false;      
-    MapType my_matches;
+    MapType my_matches;    
 
     // Make a copy so the original is not modified.
     std::vector<MapType> code_mapping;
@@ -138,27 +138,91 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
         my_matches = code_mapping.back();
         code_mapping.pop_back();
 
-        // Check for Custom Screen Translation Mappings
-        // If these exist, they take presidence over standard codes
-        //if (m_mapped_codes.size() > 0)
-        //{
-            
-            /*
-            std::map<std::string, std::string>::iterator it;
-            it = m_mapped_codes.find(my_matches.m_code);
-            if (it != m_mapped_codes.end())
+        switch(my_matches.m_match)
+        {
+            case 1: // SL NOT
             {
-                //std::cout << "gen found: " << my_matches.m_code << " : " << it->second << std::endl;
-                // If found, replace mci sequence with text
-                ansi_string.replace(my_matches.m_offset, my_matches.m_length, it->second);
+                std::stringstream ss;
+                ss << my_matches.m_code.substr(2);
+                std::cout << "ss: " << ss.str() << std::endl;
+                int not_level = 0;
+                if (!(ss >> not_level))
+                {
+                    condition = false;
+                }
+                else if (not_level != user->iLevel)
+                {
+                    condition = true;
+                }
+                else
+                {
+                    condition = false;
+                }
+                break;
             }
-            else
+            case 2: // SL
             {
-                //std::cout << "gen not found: " << my_matches.m_code << std::endl;
-                std::string remove_code = "";
-                ansi_string.replace(my_matches.m_offset, my_matches.m_length, remove_code);
-            }*/
-        //}
+                std::stringstream ss;
+                ss << my_matches.m_code.substr(1);
+                std::cout << "ss: " << ss.str() << std::endl;                
+                int level = 0;
+                if (!(ss >> level))
+                {
+                    condition = false;
+                }
+                else if (level <= user->iLevel)
+                {
+                    condition = true;
+                }
+                else
+                {
+                    condition = false;
+                }
+                break;
+            }
+            case 3: // AR NOT
+            {                
+                std::string not_flag = my_matches.m_code.substr(2);
+                std::cout << "flag: " << not_flag[0] << std::endl;
+
+                if (!checkAccessConditionFlag(not_flag[0], true, user))
+                {
+                    condition = true;
+                }
+                else
+                {
+                    condition = false;
+                }
+                
+                break;
+            }            
+            case 4: // AR
+            {
+                std::string flag = my_matches.m_code.substr(1);
+                std::cout << "flag: " << flag[0] << std::endl;
+
+                if (checkAccessConditionFlag(flag[0], true, user))
+                {
+                    condition = true;
+                }
+                else
+                {
+                    condition = false;
+                }
+                
+                break;
+            }   
+            
+            default:
+                break;
+        }
+        
+        // Check if any conditions fail
+        if (!condition)
+        {
+            break;
+        }
+            
     }  
     
     return condition;
@@ -178,23 +242,23 @@ std::vector<MapType> AccessCondition::parseAcsString(std::string &acs_string)
     std::vector<std::string> tokens;
     boost::split(tokens, acs_string, boost::is_any_of("|"));
 
+    bool or_statements = false;
+
     if (tokens.size() > 1)
     {
-        std::cout << "token 1" << std::endl;
-        // Then we have multiple statements.
+        // Then we have multiple 'OR' statements.
+        // Only handles single STMT | STMT at this point.
+        // Multiple OR statement should be surrounded with ( ) 
         for (std::string t : tokens)
-        {
-             std::cout << "token 1 loop" << std::endl;
-            std::vector<MapType> tmp = m_session_io.parseToCodeMap(t, ACS_EXPRESSION);          
-            code_map.insert( code_map.end(), tmp.begin(), tmp.end() );
+        {           
+            std::vector<MapType> tmp = m_session_io.parseToCodeMap(t, ACS_EXPRESSION);
+            code_map.insert( code_map.end(), tmp.begin(), tmp.end() );                        
         }
     }
     else 
     {
-        std::cout << "token 2" << std::endl;
         code_map = m_session_io.parseToCodeMap(acs_string, ACS_EXPRESSION);
     }   
     
-    std::cout << "token done" << std::endl;
     return code_map;
 }
