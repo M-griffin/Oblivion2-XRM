@@ -21,7 +21,7 @@ void AccessCondition::setFlagOn(unsigned char flag, bool first_set, user_ptr use
     int bit = toupper(flag);
     bit -= 65; // Handles A - Z
     
-    if (bit < 0 || bit > 31)
+    if (bit < 0 || bit > 25)
     {
         std::cout << "Error, Invalid bit flag: " << bit << std::endl;
         return;        
@@ -48,7 +48,7 @@ void AccessCondition::setFlagOff(unsigned char flag, bool first_set, user_ptr us
     int bit = toupper(flag);
     bit -= 65; // Handles A - Z
     
-    if (bit < 0 || bit > 31)
+    if (bit < 0 || bit > 25)
     {
         std::cout << "Error, Invalid bit flag: " << bit << std::endl;
         return;        
@@ -76,7 +76,7 @@ bool AccessCondition::checkAccessConditionFlag(unsigned char flag, bool first_se
     int bit = toupper(flag);
     bit -= 65; // Handles A - Z
     
-    if (bit < 0 || bit > 31)
+    if (bit < 0 || bit > 25)
     {
         std::cout << "Error, Invalid bit flag: " << bit << std::endl;
         return false;        

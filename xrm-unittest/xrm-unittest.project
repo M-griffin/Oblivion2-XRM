@@ -45,6 +45,7 @@
     <File Name="../src/session_manager.hpp"/>
     <File Name="../src/access_condition.cpp"/>
     <File Name="../src/access_condition.hpp"/>
+    <File Name="access_condition_ut.cpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
