@@ -275,8 +275,6 @@ std::vector<MapType> AccessCondition::parseAcsString(std::string &acs_string)
     std::vector<std::string> tokens;
     boost::split(tokens, acs_string, boost::is_any_of("|"));
 
-    bool or_statements = false;
-
     if (tokens.size() > 1)
     {
         // Then we have multiple 'OR' statements.

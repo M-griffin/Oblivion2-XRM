@@ -888,10 +888,11 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
     while(boost::regex_search(start, end, matches, expr, flags))
     {
         // Found a match!        
+        /*
         std::cout << "Matched Sub '" << matches.str()
                   << "' following ' " << matches.prefix().str()
                   << "' preceeding ' " << matches.suffix().str()
-                  << std::endl;
+                  << std::endl;*/
         
         // Avoid Infinite loop and make sure the existing
         // is not the same as the next!
@@ -916,11 +917,11 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
                 length = matches[s].length();
 
                 // Test output s registers which pattern matched, 1, 2, or 3!
-                
+                /*
                 std::cout << s << " :  Matched Sub 2" << matches[s].str()
                           << " at offset " << offset
                           << " of length " << length
-                          << std::endl;
+                          << std::endl;*/
 
                 // Add to Vector so we store each match.
                 my_matches.m_offset = matches[s].first - ansi_string.begin();

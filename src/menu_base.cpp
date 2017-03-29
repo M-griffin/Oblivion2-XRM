@@ -31,7 +31,7 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_current_menu("")
     , m_previous_menu("")
     , m_fallback_menu("")
-    , m_starting_menu("")
+    , m_starting_menu("") // Note Update this from config!
     , m_input_index(MENU_INPUT)
     , m_menu_info(new Menu())
     , m_menu_prompt()
@@ -82,7 +82,10 @@ void MenuBase::readInMenuData()
     std::string revert = "";
     if(m_menu_info)
     {
-        m_fallback_menu = m_menu_info->menu_fall_back;
+        // Only set or override if it exists.
+        if (m_menu_info->menu_fall_back.size() > 0) {
+            m_fallback_menu = m_menu_info->menu_fall_back;            
+        }
         revert = m_menu_info->menu_name;
     }
 
@@ -128,13 +131,14 @@ void MenuBase::loadInMenu(std::string menu_name)
     readInMenuData();
 
     // Testing Information pulled in.
-    std::cout << m_menu_info->menu_name << std::endl;
-    std::cout << m_menu_info->menu_pulldown_file << std::endl;
-    std::cout << m_menu_info->menu_help_file << std::endl;
+    std::cout << "Menu Name: " << m_menu_info->menu_name << std::endl;
+    std::cout << "Menu Pulldown: " << m_menu_info->menu_pulldown_file << std::endl;
+    std::cout << "Menu Helpfile: " << m_menu_info->menu_help_file << std::endl;
 
     // Check If user has access for menu.
 
     // if not load fallback menu.. etc..
+    std::cout << "Fallback Menu: " << m_fallback_menu << std::endl;
 }
 
 /**
