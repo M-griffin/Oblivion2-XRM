@@ -89,7 +89,8 @@ public:
     // seperate expressons with | or. and ( )
     const std::string ACS_EXPRESSION = {
         "([~]{1}[sS]{1}\\d{1,3})|([sS]{1}\\d{1,3})|"
-        "([~]{1}[fF]{1}[A-Z]{1})|([fF]{1}[A-Z]{1})"};
+        "([~]{1}[fF]{1}[A-Z]{1})|([fF]{1}[A-Z]{1})|"
+        "([~]{1}[oO]{1}[A-Z]{1})|([oO]{1}[A-Z]{1})"};
         
 
 };

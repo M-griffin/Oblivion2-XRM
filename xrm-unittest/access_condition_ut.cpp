@@ -240,6 +240,34 @@ SUITE(XRMAccessCondition)
         CHECK(code_map[3].m_code == "~FR");
     }
     
+    TEST(ACSStringToCodeMapTestARFlagsSecond)
+    {
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "~oAOBoC~OR";
+        code_map = acs.parseAcsString(test_expression);
+        
+        // Just a test note, make sure size > 0!
+        if (code_map.size() < 1)
+        {
+            CHECK(false);
+            return;
+        }
+
+        // Test Results of code map.
+        // Not's are Match 5
+        // Normal Match 6
+        CHECK(code_map[0].m_match == 5);
+        CHECK(code_map[0].m_code == "~oA");
+        CHECK(code_map[1].m_match == 6);
+        CHECK(code_map[1].m_code == "OB");
+        CHECK(code_map[2].m_match == 6);
+        CHECK(code_map[2].m_code == "oC");
+        CHECK(code_map[3].m_match == 5);
+        CHECK(code_map[3].m_code == "~OR");
+    }
+    
     TEST(ACSStringToCodeMapTestSecurityAndARFlags)
     {
         std::vector<MapType> code_map;
@@ -272,6 +300,44 @@ SUITE(XRMAccessCondition)
         CHECK(code_map[4].m_code == "fC");
         CHECK(code_map[5].m_match == 3);
         CHECK(code_map[5].m_code == "~FR");
+        CHECK(code_map[6].m_match == 2);
+        CHECK(code_map[6].m_code == "s244");
+        CHECK(code_map[7].m_match == 1);
+        CHECK(code_map[7].m_code == "~S20");
+    }
+    
+    TEST(ACSStringToCodeMapTestSecurityAndARFlagsSecond)
+    {
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "~oA~s10S244OBoC~ORs244~S20";
+        code_map = acs.parseAcsString(test_expression);
+        
+        // Just a test note, make sure size > 0!
+        if (code_map.size() < 1)
+        {
+            CHECK(false);
+            return;
+        }
+
+        // Test Results of code map.
+        // Not's are Match 1  SL
+        // Normal Match 2     SL
+        // Not's are Match 5  AR2
+        // Normal Match 6     AR2
+        CHECK(code_map[0].m_match == 5);
+        CHECK(code_map[0].m_code == "~oA");
+        CHECK(code_map[1].m_match == 1);
+        CHECK(code_map[1].m_code == "~s10");
+        CHECK(code_map[2].m_match == 2);
+        CHECK(code_map[2].m_code == "S244");
+        CHECK(code_map[3].m_match == 6);
+        CHECK(code_map[3].m_code == "OB");
+        CHECK(code_map[4].m_match == 6);
+        CHECK(code_map[4].m_code == "oC");
+        CHECK(code_map[5].m_match == 5);
+        CHECK(code_map[5].m_code == "~OR");
         CHECK(code_map[6].m_match == 2);
         CHECK(code_map[6].m_code == "s244");
         CHECK(code_map[7].m_match == 1);
@@ -315,6 +381,52 @@ SUITE(XRMAccessCondition)
         CHECK(code_map[4].m_or == false);
         CHECK(code_map[5].m_match == 3);
         CHECK(code_map[5].m_code == "~FR");
+        CHECK(code_map[5].m_or == false);
+        CHECK(code_map[6].m_match == 2);
+        CHECK(code_map[6].m_code == "s244");
+        CHECK(code_map[6].m_or == false);
+        CHECK(code_map[7].m_match == 1);
+        CHECK(code_map[7].m_code == "~S20");
+        CHECK(code_map[7].m_or == false);
+    }
+    
+    TEST(ACSStringToCodeMapTestSecurityAndARFlags2Second)
+    {
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "ASDCXZ(~oA~s10S244OBoC~ORs244~S20)sfsdf";
+        code_map = acs.parseAcsString(test_expression);
+        
+        // Just a test note, make sure size > 0!
+        if (code_map.size() < 1)
+        {
+            CHECK(false);
+            return;
+        }
+
+        // Test Results of code map.
+        // Not's are Match 1  SL
+        // Normal Match 2     SL
+        // Not's are Match 5  AR2
+        // Normal Match 6     AR2
+        CHECK(code_map[0].m_match == 5);
+        CHECK(code_map[0].m_code == "~oA");
+        CHECK(code_map[0].m_or == false);
+        CHECK(code_map[1].m_match == 1);
+        CHECK(code_map[1].m_code == "~s10");
+        CHECK(code_map[1].m_or == false);
+        CHECK(code_map[2].m_match == 2);
+        CHECK(code_map[2].m_code == "S244");
+        CHECK(code_map[2].m_or == false);
+        CHECK(code_map[3].m_match == 6);
+        CHECK(code_map[3].m_code == "OB");
+        CHECK(code_map[3].m_or == false);
+        CHECK(code_map[4].m_match == 6);
+        CHECK(code_map[4].m_code == "oC");
+        CHECK(code_map[4].m_or == false);
+        CHECK(code_map[5].m_match == 5);
+        CHECK(code_map[5].m_code == "~OR");
         CHECK(code_map[5].m_or == false);
         CHECK(code_map[6].m_match == 2);
         CHECK(code_map[6].m_code == "s244");
@@ -537,6 +649,60 @@ SUITE(XRMAccessCondition)
     /////////////////////
     
     
+    TEST(ParseCodeMapTestSecurityARFlagsTrueSecond)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags2 |= 1 << 1; // B
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "oB";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(acs.parseCodeMap(code_map, user));
+    }
+    
+    TEST(ParseCodeMapTestSecurityARFlagsFalseSecond)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags2 |= 1 << 1; // B
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "oA";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(!acs.parseCodeMap(code_map, user));
+    }
+    
+    TEST(ParseCodeMapTestSecurityARFlagsTrueCapsSecond)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags2 |= 1 << 1; // B
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "OB";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(acs.parseCodeMap(code_map, user));
+    }
+    
+    TEST(ParseCodeMapTestSecurityARFlagsFalseCapsSecond)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags2 |= 1 << 1; // B
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "OA";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(!acs.parseCodeMap(code_map, user));
+    }
+    
+    //////////////////////////////////////
+    
     TEST(ParseCodeMapTestSecurityARFlagsTrue)
     {
         user_ptr user(new Users);
@@ -591,6 +757,73 @@ SUITE(XRMAccessCondition)
     
     //////////////////////////////////////
     
+    TEST(ParseCodeMapTestSecurityNOTARFlagsTrueSecond)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags2 |= 1 << 1; // B
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "~oA";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(acs.parseCodeMap(code_map, user));
+    }
+    
+    TEST(ParseCodeMapTestSecurityNOTARFlagsFalseSecond)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags2 |= 1 << 1; // B
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "~oB";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(!acs.parseCodeMap(code_map, user));
+    }
+    
+    TEST(ParseCodeMapTestSecurityNOTARFlagsTrueCapsSecond)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags2 |= 1 << 1; // B
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "~OA";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(acs.parseCodeMap(code_map, user));
+    }
+    
+    TEST(ParseCodeMapTestSecurityNOTARFlagsFalseCapsSecond)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags2 |= 1 << 1; // B
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "~OB";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(!acs.parseCodeMap(code_map, user));
+    }
+    
+    TEST(ParseCodeMapTestSecurityANDARFlagsTrueCapsSecond)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags2 |= 1 << 1; // B
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "~OA";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(acs.parseCodeMap(code_map, user));
+    }
+    
+    //////////////////////////////////////
+    
     TEST(ParseCodeMapTestSecurityNOTARFlagsTrue)
     {
         user_ptr user(new Users);
@@ -639,6 +872,196 @@ SUITE(XRMAccessCondition)
         AccessCondition acs;
         
         std::string test_expression = "~FB";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(!acs.parseCodeMap(code_map, user));
+    }
+    
+    TEST(ParseCodeMapTestSecurityANDARFlagsTrueCaps)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags1 |= 1 << 1; // B
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "~FA";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(acs.parseCodeMap(code_map, user));
+    }
+    
+    //////////////////////////////////////
+    
+    TEST(ParseCodeMapTestSecurityLevelAndNotARFlagsTrueCaps)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags1 |= 1 << 1; // B
+        user->iLevel = 15;
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "~FAs15";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(acs.parseCodeMap(code_map, user));
+    }
+    
+    TEST(ParseCodeMapTestSecurityLevelAndNotARFlagsTrueCapsSecond)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags2 |= 1 << 1; // B
+        user->iLevel = 15;
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "~OAs15";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(acs.parseCodeMap(code_map, user));
+    }
+    
+
+    TEST(ParseCodeMapTestSecurityLevelAndARFlagsTrueCaps)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags1 |= 1 << 1; // B
+        user->iLevel = 15;
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "FBs10";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(acs.parseCodeMap(code_map, user));
+    }
+    
+    TEST(ParseCodeMapTestSecurityLevelAndARFlagsTrueCapsSecond)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags2 |= 1 << 1; // B
+        user->iLevel = 15;
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "OBs10";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(acs.parseCodeMap(code_map, user));
+    }
+    
+    //////////////////////////////////////
+    
+    TEST(ParseCodeMapTestSecurityLevelAndNotARFlagsTrueCapsFailSecurity)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags1 |= 1 << 1; // B
+        user->iLevel = 15;
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "~FAs20";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(!acs.parseCodeMap(code_map, user));
+    }
+    
+    TEST(ParseCodeMapTestSecurityLevelAndNotARFlagsTrueCapsSecondFailSecurity)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags2 |= 1 << 1; // B
+        user->iLevel = 15;
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "~OAs20";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(!acs.parseCodeMap(code_map, user));
+    }
+    
+
+    TEST(ParseCodeMapTestSecurityLevelAndARFlagsTrueCapsFailSecurity)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags1 |= 1 << 1; // B
+        user->iLevel = 15;
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "FBs20";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(!acs.parseCodeMap(code_map, user));
+    }
+    
+    TEST(ParseCodeMapTestSecurityLevelAndARFlagsTrueCapsSecondFailSecurity)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags2 |= 1 << 1; // B
+        user->iLevel = 15;
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "OBs20";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(!acs.parseCodeMap(code_map, user));
+    }
+    
+    //////////////////////////////////////
+    
+    TEST(ParseCodeMapTestSecurityLevelAndNotARFlagsTrueCapsFailFlag)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags1 |= 1 << 1; // B
+        user->iLevel = 15;
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "~FBs15";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(!acs.parseCodeMap(code_map, user));
+    }
+    
+    TEST(ParseCodeMapTestSecurityLevelAndNotARFlagsTrueCapsSecondFailFlag)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags2 |= 1 << 1; // B
+        user->iLevel = 15;
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "~OBs15";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(!acs.parseCodeMap(code_map, user));
+    }
+    
+
+    TEST(ParseCodeMapTestSecurityLevelAndARFlagsTrueCapsFailFlag)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags1 |= 1 << 1; // B
+        user->iLevel = 15;
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "FAs15";
+        code_map = acs.parseAcsString(test_expression);
+        CHECK(!acs.parseCodeMap(code_map, user));
+    }
+    
+    TEST(ParseCodeMapTestSecurityLevelAndARFlagsTrueCapsSecondFailFlag)
+    {
+        user_ptr user(new Users);
+        user->iControlFlags2 |= 1 << 1; // B
+        user->iLevel = 15;
+        
+        std::vector<MapType> code_map;
+        AccessCondition acs;
+        
+        std::string test_expression = "OAs15";
         code_map = acs.parseAcsString(test_expression);
         CHECK(!acs.parseCodeMap(code_map, user));
     }

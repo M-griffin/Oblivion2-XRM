@@ -213,6 +213,39 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
                 break;
             }   
             
+            case 5: // AR2 NOT
+            {                
+                std::string not_flag = my_matches.m_code.substr(2);
+                std::cout << "flag: " << not_flag[0] << std::endl;
+
+                if (!checkAccessConditionFlag(not_flag[0], false, user))
+                {
+                    condition = true;
+                }
+                else
+                {
+                    condition = false;
+                }
+                
+                break;
+            }            
+            case 6: // AR2
+            {
+                std::string flag = my_matches.m_code.substr(1);
+                std::cout << "flag: " << flag[0] << std::endl;
+
+                if (checkAccessConditionFlag(flag[0], false, user))
+                {
+                    condition = true;
+                }
+                else
+                {
+                    condition = false;
+                }
+                
+                break;
+            }   
+            
             default:
                 break;
         }
@@ -249,6 +282,8 @@ std::vector<MapType> AccessCondition::parseAcsString(std::string &acs_string)
         // Then we have multiple 'OR' statements.
         // Only handles single STMT | STMT at this point.
         // Multiple OR statement should be surrounded with ( ) 
+        // NOTE, at this time OR is not handled, just breaking up statements.
+        // Or would need to be handled in the code mapping
         for (std::string t : tokens)
         {           
             std::vector<MapType> tmp = m_session_io.parseToCodeMap(t, ACS_EXPRESSION);
