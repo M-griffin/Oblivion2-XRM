@@ -441,6 +441,13 @@ namespace SQLW
          * @brief On FetchRow, Get Field Value by Column Name and Type
          */
 
+        // Unsigned Int 32 bit
+        void getFieldValue(uint32_t &type, int index)
+        {
+            //UNUSED(type);
+            type = static_cast<uint32_t>(sqlite3_column_int(res, index));
+        }
+        
         // Int
         void getFieldValue(int &type, int index)
         {
@@ -615,6 +622,12 @@ namespace SQLW
         }
 
         std::string getFieldType(int &)
+        {
+            std::string result("%d");
+            return result;
+        }
+        
+        std::string getFieldType(uint32_t &)
         {
             std::string result("%d");
             return result;

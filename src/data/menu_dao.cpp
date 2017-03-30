@@ -12,7 +12,7 @@
 
 
 // Setup the file version for the config file.
-const std::string Menu::FILE_VERSION = "1.0.0";
+const std::string Menu::FILE_VERSION = "1.0.1";
 
 MenuDao::MenuDao(menu_ptr menu, std::string menu_name, std::string path)
     : m_menu(menu)
@@ -88,7 +88,7 @@ bool MenuDao::saveMenu(menu_ptr menu)
     out << YAML::Key << "menu_password" << YAML::Value << menu->menu_password;
     out << YAML::Key << "menu_fall_back" << YAML::Value << menu->menu_fall_back;
     out << YAML::Key << "menu_help_file" << YAML::Value << menu->menu_help_file;
-    out << YAML::Key << "menu_groups" << YAML::Value << menu->menu_groups;
+    out << YAML::Key << "menu_acs_string" << YAML::Value << menu->menu_acs_string;
     out << YAML::Key << "menu_prompt" << YAML::Value << menu->menu_prompt;
     out << YAML::Key << "menu_title" << YAML::Value << menu->menu_title;
     out << YAML::Key << "menu_pulldown_file" << YAML::Value << menu->menu_pulldown_file;
@@ -103,7 +103,7 @@ bool MenuDao::saveMenu(menu_ptr menu)
                 
         out << YAML::Key << "index" << YAML::Value << opt.index;
         out << YAML::Key << "name" << YAML::Value << opt.name;
-        out << YAML::Key << "groups" << YAML::Value << opt.groups;  
+        out << YAML::Key << "acs_string" << YAML::Value << opt.acs_string;  
         out << YAML::Key << "hidden" << YAML::Value << opt.hidden;
         out << YAML::Key << "menu_key" << YAML::Value << opt.menu_key;
         out << YAML::Key << "command_key" << YAML::Value << opt.command_key;
@@ -144,7 +144,7 @@ void MenuDao::encode(const Menu &rhs)
     m_menu->menu_password       = rhs.menu_password;
     m_menu->menu_fall_back      = rhs.menu_fall_back;
     m_menu->menu_help_file      = rhs.menu_help_file;
-    m_menu->menu_groups         = rhs.menu_groups;
+    m_menu->menu_acs_string     = rhs.menu_acs_string;
     m_menu->menu_prompt         = rhs.menu_prompt;
     m_menu->menu_title          = rhs.menu_title;
     m_menu->menu_pulldown_file  = rhs.menu_pulldown_file;

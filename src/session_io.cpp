@@ -853,11 +853,11 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
 
 
 /**
- * @brief Parses string and returns code mapping and positions
+ * @brief Parses string and returns code mapping and positions per expression
  * @param sequence
  * @return
  */
-std::vector<MapType> SessionIO::pipe2codeMap(const std::string &sequence, const std::string &expression)
+std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, const std::string &expression)
 {
     // Contains all matches found so we can iterate and reaplace
     // Without Multiple loops through the string.
@@ -881,21 +881,31 @@ std::vector<MapType> SessionIO::pipe2codeMap(const std::string &sequence, const 
 
     boost::smatch matches;
     std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
-    //std::string::size_type offset = 0;
-    //std::string::size_type length = 0;
+    std::string::size_type offset = 0;
+    std::string::size_type length = 0;
 
     boost::match_flag_type flags = boost::match_default;
     while(boost::regex_search(start, end, matches, expr, flags))
     {
-        // Found a match!
+        // Found a match!        
         /*
         std::cout << "Matched Sub '" << matches.str()
                   << "' following ' " << matches.prefix().str()
                   << "' preceeding ' " << matches.suffix().str()
                   << std::endl;*/
-
-        // Since were replacing on the fly, we need to rescan the screen for next code
+        
+        // Avoid Infinite loop and make sure the existing
+        // is not the same as the next!
+        if (start == matches[0].second)
+        {
+            std::cout << "no more matches!" << std::endl;
+            break;
+        }
+        
+        // Since were replacing on the fly, we need to rescan the 
+        // string for next code
         start = matches[0].second;
+        
 
         // Loop each match, and grab the starting position and length to replace.
         for(size_t s = 1; s < matches.size(); ++s)
@@ -903,12 +913,12 @@ std::vector<MapType> SessionIO::pipe2codeMap(const std::string &sequence, const 
             // Make sure the Match is true! otherwise skip.
             if(matches[s].matched)
             {
-                //offset = matches[s].first - ansi_string.begin();
-                //length = matches[s].length();
+                offset = matches[s].first - ansi_string.begin();
+                length = matches[s].length();
 
                 // Test output s registers which pattern matched, 1, 2, or 3!
                 /*
-                std::cout << s << " :  Matched Sub " << matches[s].str()
+                std::cout << s << " :  Matched Sub 2" << matches[s].str()
                           << " at offset " << offset
                           << " of length " << length
                           << std::endl;*/
@@ -934,7 +944,7 @@ std::vector<MapType> SessionIO::pipe2codeMap(const std::string &sequence, const 
  */
 std::string SessionIO::pipe2ansi(const std::string &sequence)
 {
-    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, STD_EXPRESSION));
+    std::vector<MapType> code_map = std::move(parseToCodeMap(sequence, STD_EXPRESSION));
     return parseCodeMap(sequence, code_map);
 }
 
@@ -945,7 +955,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence)
  */
 std::vector<MapType> SessionIO::pipe2genericCodeMap(const std::string &sequence)
 {
-    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, MID_EXPRESSION));
+    std::vector<MapType> code_map = std::move(parseToCodeMap(sequence, MID_EXPRESSION));
     return code_map;
 }
 
@@ -957,7 +967,7 @@ std::vector<MapType> SessionIO::pipe2genericCodeMap(const std::string &sequence)
 std::vector<MapType> SessionIO::pipe2promptCodeMap(const std::string &sequence)
 {
     // This will handle parsing the sequence, and replacement
-    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, PROMPT_EXPRESSION));
+    std::vector<MapType> code_map = std::move(parseToCodeMap(sequence, PROMPT_EXPRESSION));
     return code_map;
 }
 
@@ -969,7 +979,7 @@ std::vector<MapType> SessionIO::pipe2promptCodeMap(const std::string &sequence)
 std::vector<MapType> SessionIO::pipe2promptFormatCodeMap(const std::string &sequence)
 {
     // This will handle parsing the sequence, and replacement
-    std::vector<MapType> code_map = std::move(pipe2codeMap(sequence, FORMAT_EXPRESSION));
+    std::vector<MapType> code_map = std::move(parseToCodeMap(sequence, FORMAT_EXPRESSION));
     return code_map;
 }
 

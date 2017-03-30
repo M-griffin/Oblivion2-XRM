@@ -31,7 +31,7 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_current_menu("")
     , m_previous_menu("")
     , m_fallback_menu("")
-    , m_starting_menu("")
+    , m_starting_menu("") // Note Update this from config!
     , m_input_index(MENU_INPUT)
     , m_menu_info(new Menu())
     , m_menu_prompt()
@@ -82,7 +82,10 @@ void MenuBase::readInMenuData()
     std::string revert = "";
     if(m_menu_info)
     {
-        m_fallback_menu = m_menu_info->menu_fall_back;
+        // Only set or override if it exists.
+        if (m_menu_info->menu_fall_back.size() > 0) {
+            m_fallback_menu = m_menu_info->menu_fall_back;            
+        }
         revert = m_menu_info->menu_name;
     }
 
@@ -128,13 +131,14 @@ void MenuBase::loadInMenu(std::string menu_name)
     readInMenuData();
 
     // Testing Information pulled in.
-    std::cout << m_menu_info->menu_name << std::endl;
-    std::cout << m_menu_info->menu_pulldown_file << std::endl;
-    std::cout << m_menu_info->menu_help_file << std::endl;
+    std::cout << "Menu Name: " << m_menu_info->menu_name << std::endl;
+    std::cout << "Menu Pulldown: " << m_menu_info->menu_pulldown_file << std::endl;
+    std::cout << "Menu Helpfile: " << m_menu_info->menu_help_file << std::endl;
 
     // Check If user has access for menu.
 
     // if not load fallback menu.. etc..
+    std::cout << "Fallback Menu: " << m_fallback_menu << std::endl;
 }
 
 /**
@@ -923,7 +927,7 @@ void MenuBase::loadAndStartupMenu()
     {
         baseProcessAndDeliver(parseMenuPromptString(m_menu_info->menu_prompt));
         m_is_active_pulldown_menu = true;
-
+        
         // Not sure if this is allowed in legacy, but lets do it, then they can clear screen or add ansi!
         if (!m_use_first_command_execution)
         {
@@ -1069,8 +1073,6 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
     // Clear Attriutes, then move back to menu prompt position.
     light_bars.append("\x1b[0m\x1b[u");
     std::string output = std::move(m_session_io.pipe2ansi(light_bars));
-    //std::cout << "ligtbar text: " << output << std::endl;
-
     baseProcessAndDeliver(output);
 }
 
@@ -1603,16 +1605,19 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
             return;
         }
 
+        // Extra test, if the menu changed, then don't clear input!
+        std::string tmp_menu = m_current_menu;
+
         // Process incoming String from Menu Input up to ENTER.
         // If no commands were processed, erase all prompt text
-        if (!processMenuOptions(key))
+        if (!processMenuOptions(key) && tmp_menu == m_current_menu)
         {
             // Clear Menu Field input Text, redraw prompt?
             std::string clear_input = "\x1b[0m";
             for(int i = m_common_io.numberOfChars(key); i > 0; i--)
             {
                 clear_input += "\x1b[D \x1b[D";
-            }
+            }            
             baseProcessAndDeliver(clear_input);
         }
     }

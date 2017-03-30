@@ -70,7 +70,8 @@ UsersDao::UsersDao(SQLW::Database &database)
         "iCallsToday       INTEGER NOT NULL, "
         "iNewLevel         INTEGER NOT NULL, "
         "iCSPassChange     INTEGER NOT NULL, "
-        "sControlFlags     TEXT NOT NULL, "
+        "iControlFlags1    INTEGER NOT NULL, "
+        "iControlFlags2    INTEGER NOT NULL, "
         "bWanted           BOOLEAN NOT NULL, "
         "sHeaderType       TEXT NOT NULL, "
         "iLastMesConf      INTEGER NOT NULL, "
@@ -287,7 +288,8 @@ void UsersDao::pullUserResult(query_ptr qry, user_ptr user)
     qry->getFieldByName("iCallsToday", user->iCallsToday);
     qry->getFieldByName("iNewLevel", user->iNewLevel);
     qry->getFieldByName("iCSPassChange", user->iCSPassChange);
-    qry->getFieldByName("sControlFlags", user->sControlFlags);
+    qry->getFieldByName("iControlFlags1", user->iControlFlags1);
+    qry->getFieldByName("iControlFlags2", user->iControlFlags2);
     qry->getFieldByName("bWanted", user->bWanted);
     qry->getFieldByName("sHeaderType", user->sHeaderType);
     qry->getFieldByName("iLastMesConf", user->iLastMesConf);
@@ -348,7 +350,8 @@ void UsersDao::fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::
     values.push_back(qry->translateFieldName("iCallsToday", user->iCallsToday));
     values.push_back(qry->translateFieldName("iNewLevel", user->iNewLevel));
     values.push_back(qry->translateFieldName("iCSPassChange", user->iCSPassChange));
-    values.push_back(qry->translateFieldName("sControlFlags", user->sControlFlags));
+    values.push_back(qry->translateFieldName("iControlFlags1", user->iControlFlags1));
+    values.push_back(qry->translateFieldName("iControlFlags2", user->iControlFlags2));
     values.push_back(qry->translateFieldName("bWanted", user->bWanted));
     values.push_back(qry->translateFieldName("sHeaderType", user->sHeaderType));
     values.push_back(qry->translateFieldName("iLastMesConf", user->iLastMesConf));
@@ -444,7 +447,8 @@ std::string UsersDao::insertUserQryString(query_ptr qry, user_ptr user)
         user->iCallsToday,
         user->iNewLevel,
         user->iCSPassChange,
-        user->sControlFlags.c_str(),
+        user->iControlFlags1,
+        user->iControlFlags2,
         user->bWanted,
         user->sHeaderType.c_str(),
         user->iLastMesConf,
@@ -533,7 +537,8 @@ std::string UsersDao::updateUserQryString(query_ptr qry, user_ptr user)
         user->iCallsToday,
         user->iNewLevel,
         user->iCSPassChange,
-        user->sControlFlags.c_str(),
+        user->iControlFlags1,
+        user->iControlFlags2,
         user->bWanted,
         user->sHeaderType.c_str(),
         user->iLastMesConf,

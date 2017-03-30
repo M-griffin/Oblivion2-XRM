@@ -1,4 +1,21 @@
 
+Change Log Update (00.00.79)
+* 2017-03-30
++ Updated Menu Version to 1.0.1
+  Change Menu and Option Groups to ACS_String
++ Complete Initial Access Condition System handling Security levels
+  and (2) Control sets of AR flags with unit tests
++ Updated User Records and Database Schema for Control Flags, Should have been
+  Integer for Bit values instead of a string
++ Fixed issue with Sysop menu and the pre gosysop menu that is suppose to ask
+  for sysop password.  The prompt is not yet setup for input, bit the menu
+  will no longer get stuck when trying to return to the starting menu
++ Fixed issue with menu prompts, when the menu was changing the system was 
+  executing the clean input (used for when menu command return without execution
+  the system will clear the input text on the screen.  Added a check if the menu
+  changes to no longer attempt to clear input text since everything is re-drawn
+  this will no longer overwrite the menu prompt.
+
 Change Log Update (00.00.78)
 * 2017-03-15
 + Corrected Issues with YES/NO Lightbar padding on pipe and control color codes.
@@ -11,7 +28,7 @@ Change Log Update (00.00.78)
 + Default colors are now pulled from configuration, and set to the initial instantiation 
   of the user record using default system theme colors until the user logs in and the 
   system takes over using the user's default theme colors.
-+ Corrected final isue with stacked commands and menu changes.  If the menu changes 
++ Corrected final issue with stacked commands and menu changes.  If the menu changes 
   while processing stacked commands, we need to then exist the loop gracefully and 
   no longer attempt to execute or loop commands that no longer exist.
 
