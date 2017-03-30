@@ -9,6 +9,8 @@
 #include <unittest++/UnitTest++.h>
 #endif
 
+#include <boost/smart_ptr/shared_ptr.hpp>
+
 
 // C Standard
 #include <cstdio>
@@ -26,11 +28,14 @@ std::string GLOBAL_MENU_PATH     = "";
 std::string GLOBAL_TEXTFILE_PATH = "";
 std::string USERS_DATABASE       = "";
 
+
+
 /*
 * These Unit Tests are To test the core logic of classes and methods.
 * Any method that hit IO, Database, File, Network, is considered an Integration Test
 * and will be setup in seperate Tests Suite or done manaully through the interface.
 */
+
 
 
 // run all unit tests

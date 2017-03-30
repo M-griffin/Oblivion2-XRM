@@ -349,6 +349,14 @@ std::string AnsiProcessor::screenBufferParse()
                   << "' preceeding ' " << matches.suffix().str()
                   << std::endl;*/
 
+        // Avoid Infinite loop and make sure the existing
+        // is not the same as the next!
+        if (start == matches[0].second)
+        {
+            std::cout << "no more matches!" << std::endl;
+            break;
+        }
+        
         // Since were replacing on the fly, we need to rescan the screen for next code
         start = matches[0].second;
 
@@ -569,7 +577,7 @@ void AnsiProcessor::screenBufferClear()
 {
     // Allocate the Size
     m_screen_buffer.clear();
-    m_screen_buffer.resize(m_number_lines * m_characters_per_line);
+    m_screen_buffer.resize(m_number_lines * m_characters_per_line);    
 }
 
 /**
@@ -1106,4 +1114,7 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
             esc_sequence.erase();
         }
     }   // end while !feof
+    
+    std::cout << "x_position: " << m_x_position << std::endl;
+    std::cout << "y_position: " << m_y_position << std::endl;
 }

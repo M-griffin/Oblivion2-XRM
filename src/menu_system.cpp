@@ -266,10 +266,12 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             if (m_system_fallback.size() > 0)
             {
                 m_current_menu = m_system_fallback.back();
+                std::cout << "FallBack reset to current: " << m_current_menu << std::endl;
                 m_system_fallback.pop_back();
             }
             else
             {
+                std::cout << "FallBack reset to menu_fall_back: " << m_menu_info->menu_fall_back << std::endl;
                 m_current_menu = m_menu_info->menu_fall_back;
             }
             loadAndStartupMenu();
@@ -282,6 +284,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             {
                 m_starting_menu = m_current_menu;
             }
+            std::cout << "Set Fallback Starting Menu: " << m_starting_menu << std::endl;
             m_system_fallback.push_back(m_starting_menu);
             m_current_menu = boost::locale::to_lower(option.command_string);
             loadAndStartupMenu();           
@@ -999,6 +1002,7 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
             // Specified in Config file!  TODO
             std::cout << "m_is_session_authorized" << std::endl;
             m_current_menu = "main";
+            m_starting_menu = "main"; // These should be pulled from config in future!!
                      
         }
         

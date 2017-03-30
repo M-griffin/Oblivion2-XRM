@@ -49,7 +49,7 @@ namespace YAML
 {
 /**
  * @class convert
- * @author Blue
+ * @author Michael Griffin
  * @date 16/11/2016
  * @file menu.hpp
  * @brief MenuPrompt convert for MenuPrompt Class

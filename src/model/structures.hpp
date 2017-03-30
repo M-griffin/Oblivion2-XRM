@@ -38,6 +38,7 @@ typedef struct MapType
     std::string::size_type m_length;
     std::string::size_type m_match;
     std::string            m_code;
+    bool                   m_or;
 } MapType;
 
 
