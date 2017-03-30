@@ -2,7 +2,7 @@
 Introduction
 ============
 
-.. image:: https://dl.dropboxusercontent.com/u/92792939/XRM.jpg
+.. image:: http://i.imgur.com/AWyEuN3.jpg
    :alt: Screenshot
 
 Oblivion/2 XRM
@@ -41,7 +41,7 @@ Screen shot showing some of the latest work on the menu system.
 The default theme template and menu prompt in action while switching menus.
 The menu system is still pretty raw and a lot of logic still needs to be completed.
 
-.. image:: https://dl.dropboxusercontent.com/u/92792939/MenuSwitch.png
+.. image:: http://i.imgur.com/GxcX1gl.png
    :alt: Screenshot
 
 Support
