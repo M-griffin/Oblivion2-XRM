@@ -93,6 +93,8 @@
     </VirtualDirectory>
     <File Name="../src/menu_base.cpp"/>
     <File Name="../src/menu_base.hpp"/>
+    <File Name="../src/access_condition.cpp"/>
+    <File Name="../src/access_condition.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

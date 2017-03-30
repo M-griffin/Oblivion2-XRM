@@ -31,7 +31,9 @@ void SessionManager::join(session_ptr session)
 void SessionManager::leave(int node_number)
 {
     std::cout << "nleft SessionManager" << std::endl;
-    deliver("\r\nleft the SessionManager");
+
+    // Re-Enable this with notifications when users disconnect lateron!
+    //deliver("\r\nleft the SessionManager");
 
     // Clear Session
     std::cout << "disconnecting Node Session: " << node_number << std::endl;

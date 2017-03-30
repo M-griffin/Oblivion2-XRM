@@ -83,8 +83,9 @@ void MenuBase::readInMenuData()
     if(m_menu_info)
     {
         // Only set or override if it exists.
-        if (m_menu_info->menu_fall_back.size() > 0) {
-            m_fallback_menu = m_menu_info->menu_fall_back;            
+        if (m_menu_info->menu_fall_back.size() > 0)
+        {
+            m_fallback_menu = m_menu_info->menu_fall_back;
         }
         revert = m_menu_info->menu_name;
     }
@@ -349,14 +350,14 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
     // Then feed though and return the updated string.
     std::string prompt_string = std::move(m_session_io.parseCodeMapGenerics(menu_prompt, code_map));
     std::string display_prompt = moveStringToBottom(prompt_string);
-    
+
     // Translate Pipe Coles to ESC Sequences prior to parsing to keep
     // String length calculations.
     display_prompt = m_session_io.pipe2ansi(display_prompt);
-    
+
     std::string yesNoBars = getDefaultColor() + "|01";
     yesNoBars += getDefaultInputColor() + getDefaultInverseColor() + "%01\x1b[0m";
-    yesNoBars += " "; 
+    yesNoBars += " ";
     yesNoBars += getDefaultColor() + "|02";
     yesNoBars += getDefaultInputColor() + getDefaultInverseColor() + "%02\x1b[0m";
     yesNoBars.insert(0, display_prompt);
@@ -394,13 +395,13 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
     // Now Build the Light bars
     std::string light_bars = buildLightBars();
     display_prompt.append(light_bars);
-    
+
     // Hide Cursor on lightbars
     display_prompt.append("\x1b[?25l");
 
     return display_prompt;
 }
-   
+
 /**
  * @brief Gets the Default Color Sequence
  * @return
@@ -522,7 +523,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
                     match_found = true;
                     break;
 
-                // Handle yes /no /continue
+                    // Handle yes /no /continue
 
                 default:
                     break;
@@ -927,7 +928,7 @@ void MenuBase::loadAndStartupMenu()
     {
         baseProcessAndDeliver(parseMenuPromptString(m_menu_info->menu_prompt));
         m_is_active_pulldown_menu = true;
-        
+
         // Not sure if this is allowed in legacy, but lets do it, then they can clear screen or add ansi!
         if (!m_use_first_command_execution)
         {
@@ -1160,7 +1161,7 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
             return true;
         }
         // Else if Pulldown, and ENTER, then take wild card!
-        //else if (m_is_active_pulldown_menu && input_match == "ENTER") 
+        //else if (m_is_active_pulldown_menu && input_match == "ENTER")
         //{
         //    return true;
         //}
@@ -1259,18 +1260,18 @@ bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, 
 
             if(m.menu_key != "FIRSTCMD" && m.menu_key != "EACH")
             {
-                /** 
+                /**
                  * Note, if command doesn't excute, next command doesn't follow!
                  */
                 if (executeMenuOptions(m))
                 {
                     // If the menu changed after executing the command
                     // then we are done, leave gracefully.
-                    if (current_menu != m_current_menu) 
+                    if (current_menu != m_current_menu)
                     {
                         return false;
                     }
-                    
+
                     std::cout << "set stack_reassignment = true " << std::endl;
                     // Now assign the m.menu_key to the input, so on next loop, we hit any stacked commands!
                     // If were in pulldown menu, and the first lightbar has stacked commands, then we need
@@ -1278,10 +1279,10 @@ bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, 
                     stack_reassignment = true;
                     ++executed;
                 }
-                
+
                 /*
                 // Testing for Stack Reassignment on FeedBack Lightbars
-                executeMenuOptions(m);                
+                executeMenuOptions(m);
                 std::cout << "set stack_reassignment = true " << std::endl;
                 // Now assign the m.menu_key to the input, so on next loop, we hit any stacked commands!
                 // If were in pulldown menu, and the first lightbar has stacked commands, then we need
@@ -1300,11 +1301,11 @@ bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, 
         {
             // If the menu changed after executing the command
             // then we are done, leave gracefully.
-            if (current_menu != m_current_menu) 
+            if (current_menu != m_current_menu)
             {
                 return false;
             }
-            ++executed;            
+            ++executed;
         }
         // More testing here.. executeMenuOptions( ... );
     }
@@ -1378,10 +1379,10 @@ bool MenuBase::processMenuOptions(const std::string &input)
     {
         std::cout << "EXECUTE ENTER!: " << input_text << std::endl;
         is_enter = true;
-        
+
         // Push out a NewLine after ENTER Executions
         //baseProcessAndDeliver("\r\n");
-        // we want a new line, but if execution fails, then display is 
+        // we want a new line, but if execution fails, then display is
         // side stepped and pushed down one!
     }
 
@@ -1389,14 +1390,14 @@ bool MenuBase::processMenuOptions(const std::string &input)
     // Get Pulldown menu commands, Load all from menu options (disk)
     for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
     {
-        auto &m = m_menu_info->menu_options[i];        
-        
+        auto &m = m_menu_info->menu_options[i];
+
         std::cout << "MENU KEY: " << m.menu_key << std::endl;
         std::cout << "Input: " << input_text << std::endl;
-        
+
         // Skip all first CMD's.. where only processing input here.
         // FIRSTCMD are executed when the menu loads.
-        if (m.menu_key == "FIRSTCMD") 
+        if (m.menu_key == "FIRSTCMD")
         {
             continue;
         }
@@ -1466,9 +1467,9 @@ bool MenuBase::processMenuOptions(const std::string &input)
             // Pulldown selection.
             if(m_is_active_pulldown_menu)
             {
-                
+
                 std::cout << "handlePulldownHotKeys" << std::endl;
-                
+
                 // Handles ENTER Selection or Hotkeys Command Input.
                 if (handlePulldownHotKeys(m, is_enter, stack_reassignment))
                 {
@@ -1508,15 +1509,15 @@ bool MenuBase::processMenuOptions(const std::string &input)
                 }
             }
         }
-        
+
         // If menu changed, then exit out.
         if (current_menu != m_current_menu)
         {
             return false;
         }
     }
-    
-    
+
+
 
     // Check for Change Menu before this point, if we changed the menu
     // Then do not re-execute menu commands for previous menu
@@ -1617,7 +1618,7 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
             for(int i = m_common_io.numberOfChars(key); i > 0; i--)
             {
                 clear_input += "\x1b[D \x1b[D";
-            }            
+            }
             baseProcessAndDeliver(clear_input);
         }
     }

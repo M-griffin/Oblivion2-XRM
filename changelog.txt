@@ -15,6 +15,10 @@ Change Log Update (00.00.79)
   the system will clear the input text on the screen.  Added a check if the menu
   changes to no longer attempt to clear input text since everything is re-drawn
   this will no longer overwrite the menu prompt.
++ Tested Changes in Linux, Updated Linux project and refreshed build folder.
++ Fixed and updates were done for Theme Colors and Users Colors for Yes/No Bars
+  Make sure to remove the xrm-config.yaml and users.sqlite3 database and let the 
+  system recreate and re-apply as a new user for correct colors on lightbars.
 
 Change Log Update (00.00.78)
 * 2017-03-15
