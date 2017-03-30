@@ -182,7 +182,7 @@ void MenuConvert::convert_menu()
     menu->menu_password = boost::lexical_cast<std::string>(m_menu_info.Password);
     menu->menu_fall_back = boost::lexical_cast<std::string>(m_menu_info.FallBack);
     menu->menu_help_file = boost::lexical_cast<std::string>(m_menu_info.HelpID);
-    menu->menu_groups = boost::lexical_cast<std::string>(m_menu_info.ACS);
+    menu->menu_acs_string = boost::lexical_cast<std::string>(m_menu_info.ACS);
     menu->menu_prompt = boost::lexical_cast<std::string>(m_menu_info.NameInPrompt);
     menu->menu_title = boost::lexical_cast<std::string>(m_menu_info.MenuTitle);
     menu->menu_pulldown_file = boost::lexical_cast<std::string>(m_menu_info.PulldownFN);
@@ -196,7 +196,7 @@ void MenuConvert::convert_menu()
 
         option.index = index++;
         option.name = boost::lexical_cast<std::string>(opt.OptName);
-        option.groups = boost::lexical_cast<std::string>(opt.Acs);
+        option.acs_string = boost::lexical_cast<std::string>(opt.Acs);
         option.hidden = boost::lexical_cast<bool>(opt.Hidden);
         option.menu_key = boost::lexical_cast<std::string>(opt.Keys);
         option.command_key = boost::lexical_cast<std::string>(opt.CKeys);
