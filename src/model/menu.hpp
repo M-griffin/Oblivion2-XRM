@@ -27,7 +27,7 @@ public:
     MenuOption()
         : index(0)
         , name("New Option")
-        , groups("")  
+        , acs_string("")  
         , hidden(false)
         , menu_key("")
         , command_key("")
@@ -39,7 +39,7 @@ public:
     
     int            index;
     std::string    name;
-    std::string    groups;    
+    std::string    acs_string;    
     bool           hidden;
     std::string    menu_key;
     std::string    command_key;
@@ -68,7 +68,7 @@ public:
     std::string menu_password;
     std::string menu_fall_back;
     std::string menu_help_file;
-    std::string menu_groups;
+    std::string menu_acs_string;
     std::string menu_prompt;
     std::string menu_title;
     std::string menu_pulldown_file;    
@@ -81,7 +81,7 @@ public:
         , menu_password("")
         , menu_fall_back("")
         , menu_help_file("")
-        , menu_groups("")
+        , menu_acs_string("")
         , menu_prompt("")
         , menu_title("")
         , menu_pulldown_file("")    
@@ -118,7 +118,7 @@ namespace YAML
             
             node["index"]            = rhs.index;
             node["name"]             = rhs.name;
-            node["groups"]           = rhs.groups;  
+            node["acs_string"]       = rhs.acs_string;  
             node["hidden"]           = rhs.hidden;
             node["menu_key"]         = rhs.menu_key;
             node["command_key"]      = rhs.command_key;
@@ -138,7 +138,7 @@ namespace YAML
         {            
             rhs.index           = node["index"].as<int>();
             rhs.name            = node["name"].as<std::string>();
-            rhs.groups          = node["groups"].as<std::string>();
+            rhs.acs_string      = node["acs_string"].as<std::string>();
             rhs.hidden          = node["hidden"].as<bool>();
             rhs.menu_key        = node["menu_key"].as<std::string>();
             rhs.command_key     = node["command_key"].as<std::string>();
@@ -175,7 +175,7 @@ namespace YAML
             node["menu_password"]      = rhs.menu_password;
             node["menu_fall_back"]     = rhs.menu_fall_back;
             node["menu_help_file"]     = rhs.menu_help_file;
-            node["menu_groups"]        = rhs.menu_groups;
+            node["menu_acs_string"]    = rhs.menu_acs_string;
             node["menu_prompt"]        = rhs.menu_prompt;
             node["menu_title"]         = rhs.menu_title;
             node["menu_pulldown_file"] = rhs.menu_pulldown_file;          
@@ -188,7 +188,7 @@ namespace YAML
             {
                 option["index"]            = opt.index;
                 option["name"]             = opt.name;
-                option["groups"]           = opt.groups;  
+                option["acs_string"]       = opt.acs_string;  
                 option["hidden"]           = opt.hidden;
                 option["menu_key"]         = opt.menu_key;
                 option["command_key"]      = opt.command_key;
@@ -214,7 +214,7 @@ namespace YAML
             rhs.menu_password            = node["menu_password"].as<std::string>();
             rhs.menu_fall_back           = node["menu_fall_back"].as<std::string>();
             rhs.menu_help_file           = node["menu_help_file"].as<std::string>();
-            rhs.menu_groups              = node["menu_groups"].as<std::string>();
+            rhs.menu_acs_string          = node["menu_acs_string"].as<std::string>();
             rhs.menu_prompt              = node["menu_prompt"].as<std::string>();
             rhs.menu_title               = node["menu_title"].as<std::string>();
             rhs.menu_pulldown_file       = node["menu_pulldown_file"].as<std::string>();
