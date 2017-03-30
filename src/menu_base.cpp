@@ -927,7 +927,7 @@ void MenuBase::loadAndStartupMenu()
     {
         baseProcessAndDeliver(parseMenuPromptString(m_menu_info->menu_prompt));
         m_is_active_pulldown_menu = true;
-
+        
         // Not sure if this is allowed in legacy, but lets do it, then they can clear screen or add ansi!
         if (!m_use_first_command_execution)
         {
@@ -1073,8 +1073,6 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
     // Clear Attriutes, then move back to menu prompt position.
     light_bars.append("\x1b[0m\x1b[u");
     std::string output = std::move(m_session_io.pipe2ansi(light_bars));
-    //std::cout << "ligtbar text: " << output << std::endl;
-
     baseProcessAndDeliver(output);
 }
 
@@ -1607,16 +1605,19 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
             return;
         }
 
+        // Extra test, if the menu changed, then don't clear input!
+        std::string tmp_menu = m_current_menu;
+
         // Process incoming String from Menu Input up to ENTER.
         // If no commands were processed, erase all prompt text
-        if (!processMenuOptions(key))
+        if (!processMenuOptions(key) && tmp_menu == m_current_menu)
         {
             // Clear Menu Field input Text, redraw prompt?
             std::string clear_input = "\x1b[0m";
             for(int i = m_common_io.numberOfChars(key); i > 0; i--)
             {
                 clear_input += "\x1b[D \x1b[D";
-            }
+            }            
             baseProcessAndDeliver(clear_input);
         }
     }
