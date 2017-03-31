@@ -1,4 +1,10 @@
 
+Change Log Update (00.00.80)
+* 2017-03-31
++ Start on FormManager Code, Created first FormSystemConfiguration with FormBase class
+  Further work will start on layout of building custom menu options, with input and yes/no bars
+  For Configuration interfaces.
+
 Change Log Update (00.00.79)
 * 2017-03-30
 + Updated Menu Version to 1.0.1
