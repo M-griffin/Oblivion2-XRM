@@ -97,6 +97,11 @@
     <File Name="../src/menu_base.cpp"/>
     <File Name="../src/access_condition.hpp"/>
     <File Name="../src/access_condition.cpp"/>
+    <VirtualDirectory Name="forms">
+      <File Name="../src/forms/form_system_config.hpp"/>
+      <File Name="../src/forms/form_system_config.cpp"/>
+      <File Name="../src/forms/form_base.hpp"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
