@@ -44,6 +44,12 @@ The menu system is still pretty raw and a lot of logic still needs to be complet
 .. image:: http://i.imgur.com/GxcX1gl.png
    :alt: Screenshot
 
+
+Then some screen shots in Linux Mint (Vmware) of the most recent updates.
+
+.. image:: http://i.imgur.com/MNF58pV.png
+   :alt: Screenshot
+
 Support
 =======
 * Use the `Issue Tracker <https://github.com/M-Griffin/Oblivion2-XRM/issues>`_
