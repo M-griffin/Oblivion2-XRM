@@ -2,6 +2,10 @@
 #define FORM_SYSTEM_CONFIG_HPP
 
 #include "form_base.hpp"
+#include "../model/menu.hpp"
+
+#include <boost/smart_ptr/shared_ptr.hpp>
+
 
 class Config;
 typedef boost::shared_ptr<Config> config_ptr;
@@ -17,18 +21,16 @@ class FormSystemConfig
     : public FormBase
 {
 public:
-    FormSystemConfig(config_ptr config)
-        : FormBase(config)
-    {
-    }
-
-    ~FormSystemConfig()
-    {
-    }
+    FormSystemConfig(config_ptr config);
+    ~FormSystemConfig();
 
     virtual bool onEnter();
     virtual bool onExit();
+        
     
+    // Holds all pulldown menu options.
+    std::vector<MenuOption> m_loaded_pulldown_options;
+   
 
 };
 
