@@ -2,7 +2,6 @@
 #define FORM_SYSTEM_CONFIG_HPP
 
 #include "form_base.hpp"
-#include "../model/menu.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
@@ -26,11 +25,6 @@ public:
 
     virtual bool onEnter();
     virtual bool onExit();
-        
-    
-    // Holds all pulldown menu options.
-    std::vector<MenuOption> m_loaded_pulldown_options;
-   
 
 };
 

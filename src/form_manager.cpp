@@ -28,7 +28,6 @@ void FormManager::shutdownForm()
     m_form.pop_back();
 }
 
-
 /**
  * @brief Start Up and execute current Form
  */
@@ -45,7 +44,7 @@ void FormManager::startupForm(form_ptr form)
 }
 
 /**
- * @brief Start up the Normal Login Process.
+ * @brief Start up the Configuration Form.
  */
 void FormManager::startupFormSystemConfiguration()
 {

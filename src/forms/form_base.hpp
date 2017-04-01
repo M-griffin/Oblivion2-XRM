@@ -2,6 +2,7 @@
 #define FORM_BASE_HPP
 
 #include "../model/config.hpp"
+#include "../model/menu.hpp"
 #include "../session_io.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
@@ -28,6 +29,9 @@ public:
 
     virtual bool onEnter() = 0;
     virtual bool onExit()  = 0;
+    
+    // Holds all pulldown menu options.
+    std::vector<MenuOption> m_menu_options;
 
     FormBase(config_ptr config)
         : m_config(config)
@@ -59,6 +63,15 @@ public:
     std::string baseGetDefaultInverseColor() 
     {
         return m_session_io.pipeColors(m_config->default_color_inverse);
+    }    
+    
+    /**
+     * @brief Pull Generated Menu Options
+     * @return 
+     */
+    std::vector<MenuOption> baseGetGeneratedFormOptions() 
+    {
+        return m_menu_options;
     }    
     
     config_ptr        m_config;

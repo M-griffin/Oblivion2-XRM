@@ -33,6 +33,7 @@ public:
         , command_key("")
         , command_string("")        
         , pulldown_id(0)
+        , form_value("")
     { }
     
     ~MenuOption() { }
@@ -45,6 +46,7 @@ public:
     std::string    command_key;
     std::string    command_string;        
     int            pulldown_id;
+    std::string    form_value;
 
 };
 
@@ -71,7 +73,8 @@ public:
     std::string menu_acs_string;
     std::string menu_prompt;
     std::string menu_title;
-    std::string menu_pulldown_file;    
+    std::string menu_pulldown_file;
+    bool        menu_form_menu;
     
     std::vector<MenuOption> menu_options;
 
@@ -84,7 +87,8 @@ public:
         , menu_acs_string("")
         , menu_prompt("")
         , menu_title("")
-        , menu_pulldown_file("")    
+        , menu_pulldown_file("")
+        , menu_form_menu(false)
     { }
 
     ~Menu() { }
