@@ -37,6 +37,13 @@ public:
         : m_config(config)
     { }
 
+    /**
+     * @brief Clear All Menu Options
+     */
+    void baseClearOptions() 
+    {
+        std::vector<MenuOption>().swap(m_menu_options);
+    }
 
     /**
      * @brief Gets the Default Color Sequence
@@ -69,10 +76,74 @@ public:
      * @brief Pull Generated Menu Options
      * @return 
      */
-    std::vector<MenuOption> baseGetGeneratedFormOptions() 
+    std::vector<MenuOption> baseGetFormOptions() 
     {
         return m_menu_options;
     }    
+    
+    /**
+     * @brief Insert Generated Menu Options
+     * @return 
+     */
+    void baseSetFormOption(MenuOption option) 
+    {
+        m_menu_options.push_back(option);
+    }    
+    
+    /**
+     * @brief Build Options, String
+     * @param value
+     */
+    void baseBuildOptions(MenuOption &m, std::string value)
+    {
+        m.form_value = value;
+        baseSetFormOption(m);
+    }
+
+    /**
+     * @brief Build Options, Int to String
+     * @param value
+     */
+    void baseBuildOptions(MenuOption &m, int value)
+    {
+        m.form_value = std::to_string(value);
+        baseSetFormOption(m);        
+    }
+
+    /**
+     * @brief Build Options, Bool to String
+     * @param value
+     */
+    void baseBuildOptions(MenuOption &m, bool value)
+    {
+        m.form_value = (value) ? "Yes" : "No";
+        baseSetFormOption(m);        
+    }
+
+    /**
+     * @brief Build Options, Char to String
+     * @param value
+     */
+    void baseBuildOptions(MenuOption &m, unsigned char value)
+    {
+        m.form_value = std::to_string(value);
+        baseSetFormOption(m);        
+    }
+    
+    /**
+     * @brief Template for building Options List.
+     * @param name
+     * @param value
+     */
+    template <typename T>
+    void setupBuildOptions(std::string name, T value) 
+    {
+        MenuOption opt;
+        opt.name = name;
+        baseBuildOptions(opt, value);
+    }
+    
+    
     
     config_ptr        m_config;
     SessionIO         m_session_io;
