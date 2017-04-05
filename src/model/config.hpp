@@ -168,12 +168,12 @@ public:
 // string
     std::string default_user_flags;      // DefaultFlags;
     std::string flag_change_daily;       // DailyFlagChange,
-    std::string flag_change_session; 	// CallFlagChange;
+    std::string flag_change_session; 	 // CallFlagChange;
 
 // int
     int default_level; 			 // DefLevel,
     int default_file_level;	     // DefFLevel
-    int default_message_level;    // new
+    int default_message_level;   // new
 
 // int
     int default_file_points;     // DefFilePoints,
@@ -277,7 +277,7 @@ public:
         , use_ansi_color(true)
         , use_backspace(true)        
         , hidden_input_character('*')        
-        , use_auto_validate_users(false)
+        , use_auto_validate_users(true)
         , use_newuser_voting(false)
         , use_auto_kick_unvalidated(false)        
         , newuser_votes_validate(3)
