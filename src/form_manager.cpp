@@ -24,7 +24,7 @@ void FormManager::shutdownForm()
 {
     // Do module shutdown, only single modules are loaded
     // This makes it easy to allocate and kill on demand.
-    m_form[0]->onExit();
+    m_form.back()->onExit();
     m_form.pop_back();
 }
 

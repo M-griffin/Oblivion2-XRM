@@ -19,6 +19,9 @@
 
 #include "data/text_prompts_dao.hpp"
 
+#include "model/access_levels.hpp"
+#include "data/access_level_dao.hpp"
+
 #include "model/config.hpp"
 #include "data/config_dao.hpp"
 
@@ -284,6 +287,25 @@ auto main() -> int
         {
             return 0;
         }
+        
+        // Check and Setup default Access Levels.
+        access_level_ptr levels(new AccessLevels());
+        AccessLevelDao acl(levels, GLOBAL_DATA_PATH);
+
+        if (!acl.fileExists())
+        {            
+            // Create Genric levels for First Time Startup
+            Level al1(10,  "unauthorized");
+            Level al2(20,  "validated");
+            Level al3(255, "sysop");
+            
+            levels->access_levels.push_back(al1);
+            levels->access_levels.push_back(al2);
+            levels->access_levels.push_back(al3);
+            
+            acl.saveConfig(levels);
+        }
+        
     }
 
     // Start System Services and Main Loop.

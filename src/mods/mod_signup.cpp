@@ -75,7 +75,6 @@ bool ModSignup::onExit()
     return true;
 }
 
-
 /**
  * @brief Create Default Text Prompts for module
  */
@@ -122,7 +121,6 @@ void ModSignup::createTextPrompts()
 
     m_text_prompts_dao->writeValue(value);
 }
-
 
 /**
  * @brief Sets an indivdual module index.

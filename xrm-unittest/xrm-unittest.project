@@ -192,4 +192,5 @@
     <File Name="../src/data/config_dao.cpp"/>
     <File Name="../src/data/config_dao.hpp"/>
   </VirtualDirectory>
+  <VirtualDirectory Name="forms"/>
 </CodeLite_Project>

@@ -21,6 +21,17 @@ FormSystemConfig::~FormSystemConfig()
  */
 bool FormSystemConfig::onEnter() 
 {
+    
+    YAML::Node node;    
+    node = m_config;
+    
+    std::cout << " * yaml out "<< node["bbs_name_sysop"].as<std::string>() << std::endl;
+    
+    //YAML::Node doc = YAML::LoadFile(path);
+    //auto node = std::make_shared(doc.as<EngineNode>());
+    
+    
+    /*
     setupBuildOptions("bbs_name_sysop", m_config->bbs_name_sysop);
     setupBuildOptions("bbs_name", m_config->bbs_name);
     setupBuildOptions("bbs_uuid", m_config->bbs_uuid);
@@ -134,7 +145,7 @@ bool FormSystemConfig::onEnter()
     setupBuildOptions("regexp_date_validation_msg", m_config->regexp_date_validation_msg);
     setupBuildOptions("regexp_email_validation", m_config->regexp_email_validation);
     setupBuildOptions("regexp_email_validation_msg", m_config->regexp_email_validation_msg);
-
+*/
     return true;
 }
 
