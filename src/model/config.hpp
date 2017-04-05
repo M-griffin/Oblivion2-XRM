@@ -285,7 +285,7 @@ public:
         , newuser_days_to_upload(7)
         , days_keep_logs(30)                
         , qwk_packet_name("Obv2_XRM")
-        , starting_menu_name("top")
+        , starting_menu_name("main")
         , use_message_attachments(false)
         , days_keep_attachments(30)
         , default_color_regular("|15")

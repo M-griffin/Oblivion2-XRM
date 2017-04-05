@@ -1001,9 +1001,18 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
             // If Authorized, then we want to move to main! Startup menu should be TOP or
             // Specified in Config file!  TODO
             std::cout << "m_is_session_authorized" << std::endl;
-            m_current_menu = "main";
-            m_starting_menu = "main"; // These should be pulled from config in future!!
-                     
+            
+            if (m_config->starting_menu_name.size() > 0)
+            {
+                m_current_menu = starting_menu_name;
+                m_starting_menu = starting_menu_name;
+            }
+            else 
+            {
+                // Default to main if nothing is set in config file.
+                m_current_menu = "main";
+                m_starting_menu = "main";
+            }    
         }
         
         loadAndStartupMenu();               
