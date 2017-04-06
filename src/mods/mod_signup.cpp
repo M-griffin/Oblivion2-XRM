@@ -75,7 +75,6 @@ bool ModSignup::onExit()
     return true;
 }
 
-
 /**
  * @brief Create Default Text Prompts for module
  */
@@ -115,14 +114,20 @@ void ModSignup::createTextPrompts()
     value[PROMPT_HANDLE_INVALID]     = std::make_pair("User Name Already Exists", "|04Invalid UserName, Already Exists!|CR");
     value[PROMPT_NAME_INVALID]       = std::make_pair("Real Name Already Exists", "|04Name, Already Exists, Try Adding a middle initial.|CR");
     value[PROMPT_EMAIL_INVALID]      = std::make_pair("Email Already Exists", "|04Email, Already Exists, Try another adress or check if your have an account.|CR");
-
+        
     // Confirmation of Save
     value[PROMPT_SAVED]              = std::make_pair("User Record Saved", "|CR|03User Record Saved Successfully.");
     value[PROMPT_NOT_SAVED]          = std::make_pair("User Record Not Saved", "|CR|04Error, User Record Not Saved!");
+    
+    // Auto Validate User
+    value[PROMPT_AUTO_VALIDATION]    = std::make_pair("User Access Auto Validated", "|10Auto Validation, |15Access has been granted to the system.|CR");
+    value[PROMPT_NOT_VALIDATED]      = std::make_pair("Access Restricted, Waiting for Validation", "|04Access Restricted, |15Waiting for Access Validation.|CR");
+    
+    // New User Voting
+    value[PROMPT_NEWUSER_VOTING]     = std::make_pair("New User Voting","|04New User Voting Active, |15Access will be granted once your account has been voted on.|CR");
 
     m_text_prompts_dao->writeValue(value);
 }
-
 
 /**
  * @brief Sets an indivdual module index.
@@ -1766,6 +1771,16 @@ void ModSignup::saveNewUserRecord()
     m_user_record->sInverseColor = m_config->default_color_inverse;
     m_user_record->sStatColor = m_config->default_color_stat;
     m_user_record->sBoxColor = m_config->default_color_box;
+    
+    // Check for User Auto Validation
+    if (m_config->use_auto_validate_users)
+    {
+        m_user_record->iLevel = m_config->default_level;
+        m_user_record->iFileLevel = m_config->default_file_level;
+        m_user_record->iMessageLevel = m_config->default_message_level;
+
+        // Also Add Default File points,, missing from user rec.
+    }
 
     long userIndex = user_dao->insertUserRecord(m_user_record);
     if (userIndex < 0)
@@ -1787,7 +1802,20 @@ void ModSignup::saveNewUserRecord()
     // Completed Successfully
     baseProcessDeliverNewLine();
     displayPromptAndNewLine(PROMPT_SAVED);
-
+    
+    // Display if user is validated or waiting validation.
+    baseProcessDeliverNewLine();
+    if (m_config->use_auto_validate_users)
+    {
+        displayPromptAndNewLine(PROMPT_AUTO_VALIDATION); 
+    }
+    else
+    {
+        // Check here if new user voting is active,
+        // Then depending (once it's coded) state user is waiting on voting results.
+        displayPromptAndNewLine(PROMPT_NOT_VALIDATED); 
+    }
+    
     m_is_active = false;
     return;
 }

@@ -893,7 +893,7 @@ void MenuSystem::shutdownModule()
 {
     // Do module shutdown, only single modules are loaded
     // This makes it easy to allocate and kill on demand.
-    m_module[0]->onExit();
+    m_module.back()->onExit();
     m_module.pop_back();
 }
 
@@ -983,10 +983,10 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
     }
 
     // Allocate and Create
-    m_module[0]->update(character_buffer, is_utf8);
+    m_module.back()->update(character_buffer, is_utf8);
 
     // Finished modules processing.
-    if (!m_module[0]->m_is_active)
+    if (!m_module.back()->m_is_active)
     {
         shutdownModule();
 
@@ -1001,9 +1001,18 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
             // If Authorized, then we want to move to main! Startup menu should be TOP or
             // Specified in Config file!  TODO
             std::cout << "m_is_session_authorized" << std::endl;
-            m_current_menu = "main";
-            m_starting_menu = "main"; // These should be pulled from config in future!!
-                     
+            
+            if (m_config->starting_menu_name.size() > 0)
+            {
+                m_current_menu = starting_menu_name;
+                m_starting_menu = starting_menu_name;
+            }
+            else 
+            {
+                // Default to main if nothing is set in config file.
+                m_current_menu = "main";
+                m_starting_menu = "main";
+            }    
         }
         
         loadAndStartupMenu();               
@@ -1045,10 +1054,10 @@ void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is
     }
 
     // Execute the modules update pass through input.
-    m_module[0]->update(character_buffer, is_utf8);
+    m_module.back()->update(character_buffer, is_utf8);
 
     // Finished modules processing.
-    if (!m_module[0]->m_is_active)
+    if (!m_module.back()->m_is_active)
     {
         shutdownModule();
 

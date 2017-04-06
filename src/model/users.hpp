@@ -38,6 +38,7 @@ public:
 
     int iLevel;
     int iFileLevel;
+    int iMessageLevel;
 
     int iLastFileArea;
     int iLastMessageArea;
@@ -112,6 +113,7 @@ public:
         , dtBirthday(0)
         , iLevel(10)
         , iFileLevel(10)
+        , iMessageLevel(10)
         , iLastFileArea(0)
         , iLastMessageArea(0)
         , dtLastCallDate(0)
