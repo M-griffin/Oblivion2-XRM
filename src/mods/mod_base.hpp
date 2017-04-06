@@ -191,7 +191,6 @@ public:
 };
 
 typedef boost::shared_ptr<ModBase>	module_ptr;
-typedef boost::weak_ptr<ModBase>	module_wptr;
 
 
 #endif // MOD_BASE_HPP

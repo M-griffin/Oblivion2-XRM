@@ -7,9 +7,6 @@
 #include "ansi_processor.hpp"
 #include "communicator.hpp"
 
-// Needed Still for prompts
-#include "compat/menu_compat_dao.hpp"
-
 #include "model/struct_compat.hpp"
 #include "model/config.hpp"
 #include "model/menu.hpp"
@@ -41,7 +38,6 @@ typedef boost::shared_ptr<SessionData> session_data_ptr;
  * @brief Base Class for Menu System and Interfaces needing dynamic command execution
  */
 class MenuBase
-    : public MenuCompatDao
 {
 public:
     MenuBase(session_data_ptr session_data);
@@ -75,7 +71,6 @@ public:
     std::string      m_starting_menu;      // Starting Menu, also used as Fallback.
     int              m_input_index;        // Menu Input Index, for Forwarding to current function.
 
-    // Temp
     menu_ptr         m_menu_info;          // Menu Info
     menu_prompt_ptr  m_menu_prompt;        // Menu Prompt
 
