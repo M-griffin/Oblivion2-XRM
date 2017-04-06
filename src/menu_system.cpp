@@ -16,7 +16,7 @@ const std::string MenuSystem::m_menuID = "MENU_SYSTEM";
 
 MenuSystem::MenuSystem(session_data_ptr session_data)
     : StateBase(session_data)
-    , MenuBase(session_data)   
+    , MenuBase(session_data)
 {
     std::cout << "MenuSystem" << std::endl;
 
@@ -30,8 +30,8 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
 
     // [Vector] Setup Menu Option Calls for executing menu commands.
     m_execute_callback.push_back(std::bind(&MenuSystem::menuOptionsCallback, this, std::placeholders::_1));
-            
-    // [Mapped] Setup Menu Command Functions    
+
+    // [Mapped] Setup Menu Command Functions
     m_menu_command_functions['-'] = std::bind(&MenuSystem::menuOptionsControlCommands, this, std::placeholders::_1);
     m_menu_command_functions['&'] = std::bind(&MenuSystem::menuOptionsMultiNodeCommands, this, std::placeholders::_1);
     m_menu_command_functions['{'] = std::bind(&MenuSystem::menuOptionsMatrixCommands, this, std::placeholders::_1);
@@ -52,7 +52,7 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     m_menu_command_functions['T'] = std::bind(&MenuSystem::menuOptionsFileBaseSponsorCommands, this, std::placeholders::_1);
     m_menu_command_functions['V'] = std::bind(&MenuSystem::menuOptionsVotingCommands, this, std::placeholders::_1);
     m_menu_command_functions['+'] = std::bind(&MenuSystem::menuOptionsColorSettingCommands, this, std::placeholders::_1);
-    
+
 
     // Load the configuration file to the class
     if (!m_config_dao->loadConfig())
@@ -65,7 +65,7 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
 MenuSystem::~MenuSystem()
 {
     std::cout << "~MenuSystem" << std::endl;
-    
+
     // Clear All Menu Command Functions.
     MappedCommandFunctions().swap(m_menu_command_functions);
 }
@@ -116,25 +116,25 @@ bool MenuSystem::onExit()
  * option.command_key[1] into their own methods
  * Making this call back smaller.
  */
- 
- 
+
+
 /**
  * @brief Control Commands
  * @param option
  */
 bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
-{    
+{
     // Some of these options set actual flags for behavior.
     // In this case, we will need to parse for specific Control commands
     // and set Menu System Flags!
-    
+
     using namespace boost::locale;
     using namespace std;
     generator gen;
     locale loc=gen("");
     locale::global(loc);
     cout.imbue(loc);
-    
+
     switch(option.command_key[1])
     {
             // Turns on Pulldown Menu Re-entrance
@@ -142,17 +142,17 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             // when the user re-enters the pulldown menu.
             // This works ONLY if the command that the user
             // executed does not go to another menu.
-            
-            // And some might be stacked .. 
+
+            // And some might be stacked ..
             // Reference Legacy and figure out behavior.
-            
-        case '\'':        
-            return false;            
-            
+
+        case '\'':
+            return false;
+
             // Turns off Pulldown Menu Re-Entrance
         case '`':
             return false;
-            
+
             // Writes CString into the Header
         case 'A':
             return false;
@@ -188,7 +188,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
         case 'N':
             return false;
             // Sets fail flag if sysop not available, otherwise true
-        case 'J': 
+        case 'J':
             return false;
             // Change Starting Menu, fallback using -^ change to old starting menu
         case 'K':
@@ -247,20 +247,20 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             // pages system if available flag.
         case '_':
             return false;
-            
+
             // TODO main menu switching commands first.
-            
+
             // goto menu sets fallback current
         case '/':
             if (m_current_menu.size() > 0)
             {
-                m_system_fallback.push_back(m_current_menu);                
+                m_system_fallback.push_back(m_current_menu);
             }
             m_current_menu = boost::locale::to_lower(option.command_string);
             loadAndStartupMenu();
             m_use_first_command_execution = true;
             break;
-            
+
             // goes to fallback menu, sets fallback to previous fallback
         case '\\':
             if (m_system_fallback.size() > 0)
@@ -277,8 +277,8 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             loadAndStartupMenu();
             m_use_first_command_execution = true;
             break;
-            
-            // Goes to menu, sets fallback as starting menu            
+
+            // Goes to menu, sets fallback as starting menu
         case '^':
             if (m_starting_menu.size() == 0)
             {
@@ -287,12 +287,12 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             std::cout << "Set Fallback Starting Menu: " << m_starting_menu << std::endl;
             m_system_fallback.push_back(m_starting_menu);
             m_current_menu = boost::locale::to_lower(option.command_string);
-            loadAndStartupMenu();           
+            loadAndStartupMenu();
             m_use_first_command_execution = true;
             break;
-            
+
             // END
-            
+
             // Sets input variable with -I or -J to cstring
         case '*':
             return false;
@@ -300,7 +300,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
         case '=':
             return false;
             // Door (external) Error level (input) return into input variable
-            // Like external mod doing password or 
+            // Like external mod doing password or
         case '&':
             return false;
             // Hit Enter Prompt
@@ -315,10 +315,10 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             {
                 m_starting_menu = m_current_menu;
             }
-            m_system_fallback.push_back(m_starting_menu);         
+            m_system_fallback.push_back(m_starting_menu);
             m_current_menu = boost::locale::to_lower(option.command_string);
             m_use_first_command_execution = false;
-            loadAndStartupMenu();  
+            loadAndStartupMenu();
             // TODO Add Flags to not run firstcmd!
             break;
             // Drops to Previous Menu, does not exe firstcmd
@@ -335,10 +335,10 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
         case ';':
             return false;
             // Goes to a menu keeping the current fallback menu does firstcmd
-        case '$':    
+        case '$':
             return false;
             // Goes to a menu keeping the current fallback menu doesn't firstcmd
-        case '%':    
+        case '%':
             return false;
             // Displays and gets input in same format as prompt
         case '-':
@@ -360,17 +360,17 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             return false;
             // Sets the number of lines scrolled to 0. Stop screen pausing.
         case '"':
-            return false;        
+            return false;
             // Sets Screen Pausing (variable toggled in config)
         case '1':
-            return false;            
+            return false;
             // Suspends Screen Pausing until next textfile
         case '2':
-            return false;            
+            return false;
             // Sets starting Option in a pulldown Menu PullDown ID
         case ',':
-            return false;            
-            
+            return false;
+
         default:
             return false;
     }
@@ -385,7 +385,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsMultiNodeCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
+    {
         default:
             return false;
     }
@@ -410,7 +410,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
             std::cout << "Executing startupModuleLogon()" << std::endl;
             startupModuleLogon();
             break;
-            
+
             // Command Key: {T  {Research more how this is used!}
             // Function   : Sets FailFlag to false if user is able to get to
             //     : main system through knowing the system password
@@ -444,11 +444,11 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
             std::cout << "Goodbye;" << std::endl;
             m_session_data->logoff();
             break;
-                       
+
             // Drops into the BBS
         case 'X':
             return false;
-            
+
         default:
             return false;
     }
@@ -463,7 +463,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsGlobalNewScanCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
+    {
         default:
             return false;
     }
@@ -478,64 +478,64 @@ bool MenuSystem::menuOptionsGlobalNewScanCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
-        // autosig
+    {
+            // autosig
         case 'A':
             return false;
-        // page sysop
+            // page sysop
         case 'C':
             return false;
-        // infoform
+            // infoform
         case 'D':
             return false;
-        // Fill out info form to file
+            // Fill out info form to file
         case 'F':
             return false;
-        // Logsoff
+            // Logsoff
         case 'G':
             std::cout << "Goodbye;" << std::endl;
             // Add Logoff ANSI Display here.
             m_session_data->logoff();
             break;
-        // logoff without ansi
+            // logoff without ansi
         case 'H':
             std::cout << "Goodbye;" << std::endl;
             m_session_data->logoff();
             break;
-        // Fill out info form
+            // Fill out info form
         case 'I':
             return false;
-        // User Configuration
+            // User Configuration
         case 'K':
             return false;
-        // Lists Users
+            // Lists Users
         case 'L':
             return false;
-        // System Stats
+            // System Stats
         case 'S':
             return false;
-        // Time Bank
+            // Time Bank
         case 'U':
             return false;
-        // View Daily Log
+            // View Daily Log
         case 'V':
             return false;
-        // Last Callers
+            // Last Callers
         case 'W':
             return false;
-        // Transfer to user
+            // Transfer to user
         case 'X':
             return false;
-        // user stats
+            // user stats
         case 'Y':
             return false;
-        // change password
+            // change password
         case '+':
             return false;
-        // force use to change password
+            // force use to change password
         case '-':
             return false;
-            
+
         default:
             return false;
     }
@@ -550,7 +550,7 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsDoorCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
+    {
         default:
             return false;
     }
@@ -573,7 +573,7 @@ bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option)
             // Configuration Menu
         case 'C':
             return false;
-            
+
         default:
             return false;
     }
@@ -588,7 +588,7 @@ bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsNewUserVotingCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
+    {
         default:
             return false;
     }
@@ -603,7 +603,7 @@ bool MenuSystem::menuOptionsNewUserVotingCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsConferenceEditorCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
+    {
         default:
             return false;
     }
@@ -618,7 +618,7 @@ bool MenuSystem::menuOptionsConferenceEditorCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsDataAreaCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
+    {
         default:
             return false;
     }
@@ -633,7 +633,7 @@ bool MenuSystem::menuOptionsDataAreaCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsEmailCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
+    {
         default:
             return false;
     }
@@ -648,7 +648,7 @@ bool MenuSystem::menuOptionsEmailCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsFileCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
+    {
         default:
             return false;
     }
@@ -663,7 +663,7 @@ bool MenuSystem::menuOptionsFileCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsMessageCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
+    {
         default:
             return false;
     }
@@ -678,7 +678,7 @@ bool MenuSystem::menuOptionsMessageCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsJoinConference(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
+    {
         default:
             return false;
     }
@@ -693,7 +693,7 @@ bool MenuSystem::menuOptionsJoinConference(const MenuOption &option)
 bool MenuSystem::menuOptionsQWKMailCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
+    {
         default:
             return false;
     }
@@ -708,7 +708,7 @@ bool MenuSystem::menuOptionsQWKMailCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsTopTenListingCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
+    {
         default:
             return false;
     }
@@ -723,7 +723,7 @@ bool MenuSystem::menuOptionsTopTenListingCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsMessageBaseSponsorCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
+    {
         default:
             return false;
     }
@@ -738,7 +738,7 @@ bool MenuSystem::menuOptionsMessageBaseSponsorCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsFileBaseSponsorCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
+    {
         default:
             return false;
     }
@@ -753,7 +753,7 @@ bool MenuSystem::menuOptionsFileBaseSponsorCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsVotingCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
+    {
         default:
             return false;
     }
@@ -768,7 +768,7 @@ bool MenuSystem::menuOptionsVotingCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsColorSettingCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {   
+    {
         default:
             return false;
     }
@@ -792,17 +792,17 @@ bool MenuSystem::menuOptionsCallback(const MenuOption &option)
     {
         return false;
     }
-     
+
     std::string firstCommandKeyIndex = "-&{![.*^CDEFJMQRSTV+";
     std::string::size_type idx = 0;
 
     // If valid then execute the related Menu Command Function
     idx = firstCommandKeyIndex.find(option.command_key[0], 0);
-    if (idx != std::string::npos) 
+    if (idx != std::string::npos)
     {
         return m_menu_command_functions[option.command_key[0]](option);
     }
-           
+
     return false;
 }
 
@@ -992,7 +992,7 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
 
         // Check if the current user has been logged in yet.
         if (!m_session_data->m_is_session_authorized)
-        {            
+        {
             std::cout << "!m_is_session_authorized" << std::endl;
             m_current_menu = "matrix";
         }
@@ -1001,21 +1001,21 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
             // If Authorized, then we want to move to main! Startup menu should be TOP or
             // Specified in Config file!  TODO
             std::cout << "m_is_session_authorized" << std::endl;
-            
+
             if (m_config->starting_menu_name.size() > 0)
             {
-                m_current_menu = starting_menu_name;
-                m_starting_menu = starting_menu_name;
+                m_current_menu = m_config->starting_menu_name;
+                m_starting_menu = m_config->starting_menu_name;
             }
-            else 
+            else
             {
                 // Default to main if nothing is set in config file.
                 m_current_menu = "main";
                 m_starting_menu = "main";
-            }    
+            }
         }
-        
-        loadAndStartupMenu();               
+
+        loadAndStartupMenu();
     }
 }
 
@@ -1024,8 +1024,8 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
  *
  */
 void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8)
-{    
-    std::cout << " *** modulePreLogonInput" << std::endl;    
+{
+    std::cout << " *** modulePreLogonInput" << std::endl;
     handleLoginInputSystem(character_buffer, is_utf8);
 }
 
@@ -1034,8 +1034,8 @@ void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const 
  *
  */
 void MenuSystem::moduleLogonInput(const std::string &character_buffer, const bool &is_utf8)
-{   
-    std::cout << " *** modulePreLogonInput" << std::endl;    
+{
+    std::cout << " *** modulePreLogonInput" << std::endl;
     handleLoginInputSystem(character_buffer, is_utf8);
 }
 
@@ -1046,7 +1046,7 @@ void MenuSystem::moduleLogonInput(const std::string &character_buffer, const boo
 void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is_utf8)
 {
     std::cout << " *** moduleInput" << std::endl;
-    
+
     // Make sure we have an allocated module before processing.
     if (m_module.size() == 0 || character_buffer.size() == 0)
     {
