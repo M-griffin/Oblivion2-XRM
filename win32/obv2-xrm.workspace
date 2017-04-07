@@ -4,8 +4,8 @@
     <![CDATA[]]>
   </Environment>
   <Project Name="sqlitewrapped" Path="../sqlitewrap/sqlitewrapped.project" Active="No"/>
-  <Project Name="xrm-server" Path="xrm-server.project" Active="No"/>
-  <Project Name="xrm-unittest" Path="../xrm-unittest/xrm-unittest.project" Active="Yes"/>
+  <Project Name="xrm-server" Path="xrm-server.project" Active="Yes"/>
+  <Project Name="xrm-unittest" Path="../xrm-unittest/xrm-unittest.project" Active="No"/>
   <Project Name="xrm-menu-convert" Path="../xrm-menu-convert/xrm-menu-convert.project" Active="No"/>
   <Project Name="xrm-menu-convert-prompt" Path="../xrm-menu-prompt-convert/xrm-menu-convert-prompt.project" Active="No"/>
   <BuildMatrix>

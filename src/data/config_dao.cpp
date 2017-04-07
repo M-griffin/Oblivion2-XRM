@@ -12,7 +12,7 @@
 
 
 // Setup the file version for the config file.
-const std::string Config::FILE_VERSION = "1.0.1";
+const std::string Config::FILE_VERSION = "1.0.2";
 
 
 ConfigDao::ConfigDao(config_ptr config, std::string path)
@@ -88,7 +88,7 @@ bool ConfigDao::saveConfig(config_ptr cfg)
     out << YAML::Key << "directory_log" << YAML::Value << cfg->directory_log;
     out << YAML::Key << "directory_scripts" << YAML::Value << cfg->directory_scripts;
     out << YAML::Key << "directory_prompts" << YAML::Value << cfg->directory_prompts;
-    out << YAML::Key << "points_per_kilobyte" << YAML::Value << cfg->points_per_kilobyte;
+    out << YAML::Key << "points_per_megabyte" << YAML::Value << cfg->points_per_megabyte;
     out << YAML::Key << "points_earned_postcall" << YAML::Value << cfg->points_earned_postcall;
     out << YAML::Key << "access_post_anonymous" << YAML::Value << cfg->access_post_anonymous;
     out << YAML::Key << "access_sysop" << YAML::Value << cfg->access_sysop;
@@ -152,8 +152,8 @@ bool ConfigDao::saveConfig(config_ptr cfg)
     out << YAML::Key << "default_message_level" << YAML::Value << cfg->default_message_level;
     out << YAML::Key << "default_file_points" << YAML::Value << cfg->default_file_points;
     out << YAML::Key << "default_file_ratio" << YAML::Value << cfg->default_file_ratio;
-    out << YAML::Key << "default_kilobyte_ratio" << YAML::Value << cfg->default_kilobyte_ratio;
-    out << YAML::Key << "default_kilobyte_daily" << YAML::Value << cfg->default_kilobyte_daily;
+    out << YAML::Key << "default_megabyte_ratio" << YAML::Value << cfg->default_megabyte_ratio;
+    out << YAML::Key << "default_megabyte_daily" << YAML::Value << cfg->default_megabyte_daily;
     out << YAML::Key << "default_post_call_ratio" << YAML::Value << cfg->default_post_call_ratio;
     out << YAML::Key << "default_time_limit" << YAML::Value << cfg->default_time_limit;
     out << YAML::Key << "default_user_timeout" << YAML::Value << cfg->default_user_timeout;
@@ -224,7 +224,7 @@ void ConfigDao::encode(const Config &rhs)
     m_config->directory_log = rhs.directory_log;
     m_config->directory_scripts = rhs.directory_scripts;
     m_config->directory_prompts = rhs.directory_prompts;
-    m_config->points_per_kilobyte = rhs.points_per_kilobyte;
+    m_config->points_per_megabyte = rhs.points_per_megabyte;
     m_config->points_earned_postcall = rhs.points_earned_postcall;
     m_config->access_post_anonymous = rhs.access_post_anonymous;
     m_config->access_sysop = rhs.access_sysop;
@@ -283,16 +283,21 @@ void ConfigDao::encode(const Config &rhs)
     m_config->default_user_flags = rhs.default_user_flags;
     m_config->flag_change_daily = rhs.flag_change_daily;
     m_config->flag_change_session = rhs.flag_change_session;
+    
+    // NOTE, Lets move to to access_levels, so each level has it own 
+    // configurable defaults.
+    // Also change kilobyte to megabyte
     m_config->default_level = rhs.default_level;
     m_config->default_file_level = rhs.default_file_level;
     m_config->default_message_level = rhs.default_message_level;
     m_config->default_file_points = rhs.default_file_points;
     m_config->default_file_ratio = rhs.default_file_ratio;
-    m_config->default_kilobyte_ratio = rhs.default_kilobyte_ratio;
-    m_config->default_kilobyte_daily = rhs.default_kilobyte_daily;
+    m_config->default_megabyte_ratio = rhs.default_megabyte_ratio;
+    m_config->default_megabyte_daily = rhs.default_megabyte_daily;
     m_config->default_post_call_ratio = rhs.default_post_call_ratio;
     m_config->default_time_limit = rhs.default_time_limit;
     m_config->default_user_timeout = rhs.default_user_timeout;
+    
     m_config->use_auto_validate_files = rhs.use_auto_validate_files;
     m_config->use_upload_checker = rhs.use_upload_checker;
     m_config->cmdline_virus_scan = rhs.cmdline_virus_scan;

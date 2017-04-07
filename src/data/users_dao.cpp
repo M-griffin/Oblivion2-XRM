@@ -57,6 +57,7 @@ UsersDao::UsersDao(SQLW::Database &database)
         "sInverseColor     TEXT NOT NULL, "
         "sStatColor        TEXT NOT NULL, "
         "sBoxColor         TEXT NOT NULL, "
+        "iFilePoints       INTEGER NOT NULL, "
         "iPostCallRatio    INTEGER NOT NULL, "
         "sMenuPromptName   TEXT NOT NULL, "
         "iMenuSelected     INTEGER NOT NULL, "
@@ -276,6 +277,7 @@ void UsersDao::pullUserResult(query_ptr qry, user_ptr user)
     qry->getFieldByName("sInverseColor", user->sInverseColor);
     qry->getFieldByName("sStatColor", user->sStatColor);
     qry->getFieldByName("sBoxColor", user->sBoxColor);
+    qry->getFieldByName("iFilePoints", user->iFilePoints);    
     qry->getFieldByName("iPostCallRatio", user->iPostCallRatio);
     qry->getFieldByName("sMenuPromptName", user->sMenuPromptName);
     qry->getFieldByName("iMenuSelected", user->iMenuSelected);
@@ -338,7 +340,8 @@ void UsersDao::fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::
     values.push_back(qry->translateFieldName("sInputColor", user->sInputColor));
     values.push_back(qry->translateFieldName("sInverseColor", user->sInverseColor));
     values.push_back(qry->translateFieldName("sStatColor", user->sStatColor));
-    values.push_back(qry->translateFieldName("sBoxColor", user->sBoxColor));
+    values.push_back(qry->translateFieldName("sBoxColor", user->sBoxColor));    
+    values.push_back(qry->translateFieldName("iFilePoints", user->iFilePoints));
     values.push_back(qry->translateFieldName("iPostCallRatio", user->iPostCallRatio));
     values.push_back(qry->translateFieldName("sMenuPromptName", user->sMenuPromptName));
     values.push_back(qry->translateFieldName("iMenuSelected", user->iMenuSelected));
@@ -435,6 +438,7 @@ std::string UsersDao::insertUserQryString(query_ptr qry, user_ptr user)
         user->sInverseColor.c_str(),
         user->sStatColor.c_str(),
         user->sBoxColor.c_str(),
+        user->iFilePoints,
         user->iPostCallRatio,
         user->sMenuPromptName.c_str(),
         user->iMenuSelected,
@@ -526,6 +530,7 @@ std::string UsersDao::updateUserQryString(query_ptr qry, user_ptr user)
         user->sInverseColor.c_str(),
         user->sStatColor.c_str(),
         user->sBoxColor.c_str(),
+        user->iFilePoints,
         user->iPostCallRatio,
         user->sMenuPromptName.c_str(),
         user->iMenuSelected,
