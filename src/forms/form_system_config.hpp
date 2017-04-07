@@ -69,7 +69,7 @@ namespace YAML
             node["directory_log"] = rhs->directory_log;
             node["directory_scripts"] = rhs->directory_scripts;
             node["directory_prompts"] = rhs->directory_prompts;
-            node["points_per_kilobyte"] = rhs->points_per_kilobyte;
+            node["points_per_megabyte"] = rhs->points_per_megabyte;
             node["points_earned_postcall"] = rhs->points_earned_postcall;
             node["access_post_anonymous"] = rhs->access_post_anonymous;
             node["access_sysop"] = rhs->access_sysop;
@@ -132,8 +132,8 @@ namespace YAML
             node["default_message_level"] = rhs->default_message_level;
             node["default_file_points"] = rhs->default_file_points;
             node["default_file_ratio"] = rhs->default_file_ratio;
-            node["default_kilobyte_ratio"] = rhs->default_kilobyte_ratio;
-            node["default_kilobyte_daily"] = rhs->default_kilobyte_daily;
+            node["default_megabyte_ratio"] = rhs->default_megabyte_ratio;
+            node["default_megabyte_daily"] = rhs->default_megabyte_daily;
             node["default_post_call_ratio"] = rhs->default_post_call_ratio;
             node["default_time_limit"] = rhs->default_time_limit;
             node["default_user_timeout"] = rhs->default_user_timeout;
@@ -189,7 +189,7 @@ namespace YAML
             rhs->directory_log                   = node["directory_log"].as<std::string>();
             rhs->directory_scripts               = node["directory_scripts"].as<std::string>();
             rhs->directory_prompts               = node["directory_prompts"].as<std::string>();
-            rhs->points_per_kilobyte             = node["points_per_kilobyte"].as<int>();
+            rhs->points_per_megabyte             = node["points_per_megabyte"].as<int>();
             rhs->points_earned_postcall          = node["points_earned_postcall"].as<int>();
             rhs->access_sysop                    = node["access_sysop"].as<std::string>();
             rhs->access_message_sysop            = node["access_message_sysop"].as<std::string>();
@@ -252,8 +252,8 @@ namespace YAML
             rhs->default_message_level           = node["default_message_level"].as<int>();
             rhs->default_file_points             = node["default_file_points"].as<int>();
             rhs->default_file_ratio              = node["default_file_ratio"].as<int>();
-            rhs->default_kilobyte_ratio          = node["default_kilobyte_ratio"].as<int>();
-            rhs->default_kilobyte_daily          = node["default_kilobyte_daily"].as<int>();
+            rhs->default_megabyte_ratio          = node["default_megabyte_ratio"].as<int>();
+            rhs->default_megabyte_daily          = node["default_megabyte_daily"].as<int>();
             rhs->default_post_call_ratio         = node["default_post_call_ratio"].as<int>();
             rhs->default_time_limit              = node["default_time_limit"].as<int>();
             rhs->default_user_timeout            = node["default_user_timeout"].as<int>();

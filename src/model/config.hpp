@@ -78,7 +78,7 @@ public:
     std::string directory_prompts;     // IncPromptsDir;  { This might be redone }
 
 // int
-    int points_per_kilobyte;       // KForEachPoint;
+    int points_per_megabyte;       // KForEachPoint;
     int points_earned_postcall;    // PointsBackPC;
 
 // string - Should ASC be strings or TAGS! I'm thinking tags or groups!
@@ -178,8 +178,8 @@ public:
 // int
     int default_file_points;     // DefFilePoints,
     int default_file_ratio;      // DefUDR,
-    int default_kilobyte_ratio;  // DefUDKR,
-    int default_kilobyte_daily;  // DnKPerDay,
+    int default_megabyte_ratio;  // DefUDKR,
+    int default_megabyte_daily;  // DnKPerDay,
     int default_post_call_ratio; // DefPCR,
     int default_time_limit;      // DefTimeLimit;
     int default_user_timeout;    // NumMinsBeforeTimeOut;
@@ -238,7 +238,7 @@ public:
         , directory_log("")
         , directory_scripts("")
         , directory_prompts("")
-        , points_per_kilobyte(0)
+        , points_per_megabyte(0)
         , points_earned_postcall(0)
         , access_sysop("s255")
         , access_message_sysop("s200")
@@ -302,8 +302,8 @@ public:
         , default_message_level(20)
         , default_file_points(0)
         , default_file_ratio(0)
-        , default_kilobyte_ratio(0)
-        , default_kilobyte_daily(0)
+        , default_megabyte_ratio(0)
+        , default_megabyte_daily(0)
         , default_post_call_ratio(0)
         , default_time_limit(120)
         , default_user_timeout(20)        
@@ -376,7 +376,7 @@ namespace YAML
             node["directory_log"] = rhs.directory_log;
             node["directory_scripts"] = rhs.directory_scripts;
             node["directory_prompts"] = rhs.directory_prompts;
-            node["points_per_kilobyte"] = rhs.points_per_kilobyte;
+            node["points_per_megabyte"] = rhs.points_per_megabyte;
             node["points_earned_postcall"] = rhs.points_earned_postcall;
             node["access_post_anonymous"] = rhs.access_post_anonymous;
             node["access_sysop"] = rhs.access_sysop;
@@ -439,8 +439,8 @@ namespace YAML
             node["default_message_level"] = rhs.default_message_level;
             node["default_file_points"] = rhs.default_file_points;
             node["default_file_ratio"] = rhs.default_file_ratio;
-            node["default_kilobyte_ratio"] = rhs.default_kilobyte_ratio;
-            node["default_kilobyte_daily"] = rhs.default_kilobyte_daily;
+            node["default_megabyte_ratio"] = rhs.default_megabyte_ratio;
+            node["default_megabyte_daily"] = rhs.default_megabyte_daily;
             node["default_post_call_ratio"] = rhs.default_post_call_ratio;
             node["default_time_limit"] = rhs.default_time_limit;
             node["default_user_timeout"] = rhs.default_user_timeout;
@@ -496,7 +496,7 @@ namespace YAML
             rhs.directory_log                   = node["directory_log"].as<std::string>();
             rhs.directory_scripts               = node["directory_scripts"].as<std::string>();
             rhs.directory_prompts               = node["directory_prompts"].as<std::string>();
-            rhs.points_per_kilobyte             = node["points_per_kilobyte"].as<int>();
+            rhs.points_per_megabyte             = node["points_per_megabyte"].as<int>();
             rhs.points_earned_postcall          = node["points_earned_postcall"].as<int>();
             rhs.access_sysop                    = node["access_sysop"].as<std::string>();
             rhs.access_message_sysop            = node["access_message_sysop"].as<std::string>();
@@ -559,8 +559,8 @@ namespace YAML
             rhs.default_message_level           = node["default_message_level"].as<int>();
             rhs.default_file_points             = node["default_file_points"].as<int>();
             rhs.default_file_ratio              = node["default_file_ratio"].as<int>();
-            rhs.default_kilobyte_ratio          = node["default_kilobyte_ratio"].as<int>();
-            rhs.default_kilobyte_daily          = node["default_kilobyte_daily"].as<int>();
+            rhs.default_megabyte_ratio          = node["default_megabyte_ratio"].as<int>();
+            rhs.default_megabyte_daily          = node["default_megabyte_daily"].as<int>();
             rhs.default_post_call_ratio         = node["default_post_call_ratio"].as<int>();
             rhs.default_time_limit              = node["default_time_limit"].as<int>();
             rhs.default_user_timeout            = node["default_user_timeout"].as<int>();

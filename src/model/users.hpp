@@ -56,6 +56,7 @@ public:
     std::string sStatColor;
     std::string sBoxColor;
 
+    int iFilePoints;
     int iPostCallRatio;
 
     std::string sMenuPromptName;
@@ -125,6 +126,7 @@ public:
         , sInverseColor("|17")
         , sStatColor("|11")
         , sBoxColor("|03")
+        , iFilePoints(0)
         , iPostCallRatio(0)
         , sMenuPromptName("")
         , iMenuSelected(0)
