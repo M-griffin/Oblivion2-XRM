@@ -185,6 +185,11 @@ public:
 
     const std::string PROMPT_SAVED = "confirmed_save";
     const std::string PROMPT_NOT_SAVED = "record_not_saved";
+    
+    const std::string PROMPT_AUTO_VALIDATION = "auto_validation";
+    const std::string PROMPT_NOT_VALIDATED = "not_validated";
+    const std::string PROMPT_NEWUSER_VOTING = "new_user_voting";
+    
 
     /**
      * @brief Create Default Text Prompts for module

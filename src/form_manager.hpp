@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+
 /**
  * Development Notes:
  *   Generate Menu and Commands for 
@@ -29,6 +30,12 @@
  *   This will need some deep thought on best implimentation.
  */
 
+class FormBase;
+typedef boost::shared_ptr<FormBase> form_ptr;
+
+class Config;
+typedef boost::shared_ptr<Config> config_ptr;
+
 /**
  * @class FormManager
  * @author Michael Griffin
@@ -41,8 +48,9 @@ class FormManager
 public:
 
 
-    FormManager()
-        : m_menu_info(new Menu())
+    FormManager(config_ptr config)
+        : m_config(config)
+        , m_menu_info(new Menu())
         , max_cmds_per_page(0)
         , m_current_page(1)
         , m_total_pages(1)
@@ -54,7 +62,33 @@ public:
     {
     }
 
+    
+    // Handle Dynamic modules being executed.
+    std::vector<form_ptr> m_form;
+        
+        
+        
+    /**
+     * @brief Clears All Forms
+     */
+    void clearAllForms();
 
+    /**
+     * @brief Exists and Shutsdown the current form
+     */
+    void shutdownForm();
+    
+    /**
+     * @brief Start up the Normal Login Process.
+     */
+    void startupFormSystemConfiguration();
+
+    /**
+     * @brief Start Up and execute current Form
+     */
+    void startupForm(form_ptr form);
+
+    config_ptr       m_config;
     menu_ptr         m_menu_info;    // Custom Menus on the Fly
     int              max_cmds_per_page;
     int              m_current_page;

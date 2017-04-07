@@ -1,4 +1,29 @@
 
+Change Log Update (00.00.81)
+* 2017-04-07
++ Added iFilePoints to User Table and Model
++ Added iMessageLevel to User Table and Model
++ Config, changed kilobyte to megabyte for more modern limits and tracking.
++ Incremented config version also.
++ Re sync Linux Project with Latest Updates. Tested good.
++ Added pull from config file for starting menu once the user has been authorized.
++ Added check for User AutoValidation on Signup,  If so, the system will upgrade 
+  from unauthorized level 10 (new user), to 20 default level set in config file.  
+  Otherwise it should sit at level 10 until the sysop validates the user.  
++ Added new AccessLevels Models and DAO for storing security levels with descriptions
+  NOTE: Add Defaults for each level, instead of single set from config, each level
+  can have it's own customized defaults.
+- Next will be implementing Access and Security checks in menus and options to enforce the rules.
++ Setting up initial Configuration Form
+- Testing Yaml for Class Reflection on Form Manager
+- Updated Menu And Options to Hold Pass through Form Values still WIP
+
+Change Log Update (00.00.80)
+* 2017-03-31
++ Start on FormManager Code, Created first FormSystemConfiguration with FormBase class
+  Further work will start on layout of building custom menu options, with input and yes/no bars
+  For Configuration interfaces.
+
 Change Log Update (00.00.79)
 * 2017-03-30
 + Updated Menu Version to 1.0.1

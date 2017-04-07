@@ -38,6 +38,7 @@ public:
 
     int iLevel;
     int iFileLevel;
+    int iMessageLevel;
 
     int iLastFileArea;
     int iLastMessageArea;
@@ -55,6 +56,7 @@ public:
     std::string sStatColor;
     std::string sBoxColor;
 
+    int iFilePoints;
     int iPostCallRatio;
 
     std::string sMenuPromptName;
@@ -112,6 +114,7 @@ public:
         , dtBirthday(0)
         , iLevel(10)
         , iFileLevel(10)
+        , iMessageLevel(10)
         , iLastFileArea(0)
         , iLastMessageArea(0)
         , dtLastCallDate(0)
@@ -123,6 +126,7 @@ public:
         , sInverseColor("|17")
         , sStatColor("|11")
         , sBoxColor("|03")
+        , iFilePoints(0)
         , iPostCallRatio(0)
         , sMenuPromptName("")
         , iMenuSelected(0)

@@ -1090,7 +1090,7 @@ bool MenuBase::executeMenuOptions(const MenuOption &option)
     }
 
     // Execute Menu Option Commands per Callback
-    return m_execute_callback[0](option);
+    return m_execute_callback.back()(option);
 }
 
 /**

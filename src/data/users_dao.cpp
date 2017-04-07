@@ -45,6 +45,7 @@ UsersDao::UsersDao(SQLW::Database &database)
         "dtBirthday        DATETIME NOT NULL, "
         "iLevel            INTEGER NOT NULL, "
         "iFileLevel        INTEGER NOT NULL, "
+        "iMessageLevel     INTEGER NOT NULL, "
         "iLastFileArea     INTEGER NOT NULL, "
         "iLastMessageArea  INTEGER NOT NULL, "
         "dtLastCallDate    DATETIME DEFAULT CURRENT_TIMESTAMP, "
@@ -56,6 +57,7 @@ UsersDao::UsersDao(SQLW::Database &database)
         "sInverseColor     TEXT NOT NULL, "
         "sStatColor        TEXT NOT NULL, "
         "sBoxColor         TEXT NOT NULL, "
+        "iFilePoints       INTEGER NOT NULL, "
         "iPostCallRatio    INTEGER NOT NULL, "
         "sMenuPromptName   TEXT NOT NULL, "
         "iMenuSelected     INTEGER NOT NULL, "
@@ -263,6 +265,7 @@ void UsersDao::pullUserResult(query_ptr qry, user_ptr user)
     qry->getFieldByName("dtBirthday", user->dtBirthday);
     qry->getFieldByName("iLevel", user->iLevel);
     qry->getFieldByName("iFileLevel", user->iFileLevel);
+    qry->getFieldByName("iMessageLevel", user->iMessageLevel);
     qry->getFieldByName("iLastFileArea", user->iLastFileArea);
     qry->getFieldByName("iLastMessageArea", user->iLastMessageArea);
     qry->getFieldByName("dtLastCallDate", user->dtLastCallDate);
@@ -274,6 +277,7 @@ void UsersDao::pullUserResult(query_ptr qry, user_ptr user)
     qry->getFieldByName("sInverseColor", user->sInverseColor);
     qry->getFieldByName("sStatColor", user->sStatColor);
     qry->getFieldByName("sBoxColor", user->sBoxColor);
+    qry->getFieldByName("iFilePoints", user->iFilePoints);    
     qry->getFieldByName("iPostCallRatio", user->iPostCallRatio);
     qry->getFieldByName("sMenuPromptName", user->sMenuPromptName);
     qry->getFieldByName("iMenuSelected", user->iMenuSelected);
@@ -325,6 +329,7 @@ void UsersDao::fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::
     values.push_back(qry->translateFieldName("dtBirthday", user->dtBirthday));
     values.push_back(qry->translateFieldName("iLevel", user->iLevel));
     values.push_back(qry->translateFieldName("iFileLevel", user->iFileLevel));
+    values.push_back(qry->translateFieldName("iMessageLevel", user->iMessageLevel));
     values.push_back(qry->translateFieldName("iLastFileArea", user->iLastFileArea));
     values.push_back(qry->translateFieldName("iLastMessageArea", user->iLastMessageArea));
     values.push_back(qry->translateFieldName("dtLastCallDate", user->dtLastCallDate));
@@ -335,7 +340,8 @@ void UsersDao::fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::
     values.push_back(qry->translateFieldName("sInputColor", user->sInputColor));
     values.push_back(qry->translateFieldName("sInverseColor", user->sInverseColor));
     values.push_back(qry->translateFieldName("sStatColor", user->sStatColor));
-    values.push_back(qry->translateFieldName("sBoxColor", user->sBoxColor));
+    values.push_back(qry->translateFieldName("sBoxColor", user->sBoxColor));    
+    values.push_back(qry->translateFieldName("iFilePoints", user->iFilePoints));
     values.push_back(qry->translateFieldName("iPostCallRatio", user->iPostCallRatio));
     values.push_back(qry->translateFieldName("sMenuPromptName", user->sMenuPromptName));
     values.push_back(qry->translateFieldName("iMenuSelected", user->iMenuSelected));
@@ -366,8 +372,6 @@ void UsersDao::fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::
     values.push_back(qry->translateFieldName("bIgnoreTimeLimit", user->bIgnoreTimeLimit));
     values.push_back(qry->translateFieldName("bAllowPurge", user->bAllowPurge));
     values.push_back(qry->translateFieldName("iSecurityIndex", user->iSecurityIndex));
-
-
 }
 
 
@@ -422,6 +426,7 @@ std::string UsersDao::insertUserQryString(query_ptr qry, user_ptr user)
         user->dtBirthday,
         user->iLevel,
         user->iFileLevel,
+        user->iMessageLevel,
         user->iLastFileArea,
         user->iLastMessageArea,
         user->dtLastCallDate,
@@ -433,6 +438,7 @@ std::string UsersDao::insertUserQryString(query_ptr qry, user_ptr user)
         user->sInverseColor.c_str(),
         user->sStatColor.c_str(),
         user->sBoxColor.c_str(),
+        user->iFilePoints,
         user->iPostCallRatio,
         user->sMenuPromptName.c_str(),
         user->iMenuSelected,
@@ -512,6 +518,7 @@ std::string UsersDao::updateUserQryString(query_ptr qry, user_ptr user)
         user->dtBirthday,
         user->iLevel,
         user->iFileLevel,
+        user->iMessageLevel,
         user->iLastFileArea,
         user->iLastMessageArea,
         user->dtLastCallDate,
@@ -523,6 +530,7 @@ std::string UsersDao::updateUserQryString(query_ptr qry, user_ptr user)
         user->sInverseColor.c_str(),
         user->sStatColor.c_str(),
         user->sBoxColor.c_str(),
+        user->iFilePoints,
         user->iPostCallRatio,
         user->sMenuPromptName.c_str(),
         user->iMenuSelected,
