@@ -78,7 +78,14 @@ public:
      * @param user
      * @return 
      */
-    std::vector<MapType> parseAcsString(std::string &acs_string);
+    std::vector<MapType> parseAcsString(const std::string &acs_string);
+
+    /**
+     * @brief Parses and Validates codemap
+     * @param expression
+     * @return 
+     */
+    bool validateAcsString(const std::string &acs_string, user_ptr user);
 
     // Using Session IO for Code Mapping
     SessionIO  m_session_io;

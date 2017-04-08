@@ -1,4 +1,10 @@
 
+Change Log Update (00.00.83)
+* 2017-04-08
++ Some slight refactoring to ACS String Validations, Call a single method instead of doing it manually
++ Started Unit Test for FormSystemConfiguration.  Unit Tests help test and map out the best way to 
+  write the dynamic menu form options.  Using YAML for serialization and mapping class fields.
+
 Change Log Update (00.00.82)
 * 2017-04-08
 + Added Menu Option ACS Level/Flag Checking, Any options not available are removed from display.

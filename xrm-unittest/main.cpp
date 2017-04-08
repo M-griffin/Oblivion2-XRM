@@ -12,6 +12,11 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 
+#include "model/config.hpp"
+#include "model/menu.hpp"
+#include "forms/form_system_config.hpp"
+
+
 // C Standard
 #include <cstdio>
 #include <cstring>
@@ -27,6 +32,32 @@ std::string GLOBAL_DATA_PATH     = "";
 std::string GLOBAL_MENU_PATH     = "";
 std::string GLOBAL_TEXTFILE_PATH = "";
 std::string USERS_DATABASE       = "";
+
+
+/**
+ * @brief Unit Testing for Initial Form Configuration Implimentation
+ * @return 
+ */
+SUITE(XRMFormSystemConfig)
+{
+    // Just testing output of onEnter .. 
+    TEST(SystemConfigOutputTest)
+    {        
+        config_ptr config(new Config());
+        form_ptr form(new FormSystemConfig(config));
+        
+        // run the form on enter.
+        form->onEnter();
+        std::vector<MenuOption> opts = form->baseGetFormOptions();
+        std::cout << "opts size: " << opts.size() << std::endl;
+        
+        // 106 Config Options generated.
+        CHECK(opts.size() == 106);        
+    }
+    
+
+}
+
 
 
 

@@ -12,26 +12,20 @@ FormSystemConfig::~FormSystemConfig()
 {
 }
 
-
-
-
 /**
  * @brief Setup for Form Menu Options
  * @return 
  */
 bool FormSystemConfig::onEnter() 
-{
+{    
+    //YAML::Node node;    
+    //node = m_config;
     
-    YAML::Node node;    
-    node = m_config;
-    
-    std::cout << " * yaml out "<< node["bbs_name_sysop"].as<std::string>() << std::endl;
+    //std::cout << " * yaml out "<< node["bbs_name_sysop"].as<std::string>() << std::endl;
     
     //YAML::Node doc = YAML::LoadFile(path);
     //auto node = std::make_shared(doc.as<EngineNode>());
-    
-    
-    /*
+        
     setupBuildOptions("bbs_name_sysop", m_config->bbs_name_sysop);
     setupBuildOptions("bbs_name", m_config->bbs_name);
     setupBuildOptions("bbs_uuid", m_config->bbs_uuid);
@@ -56,7 +50,7 @@ bool FormSystemConfig::onEnter()
     setupBuildOptions("directory_scripts", m_config->directory_scripts);
     setupBuildOptions("directory_prompts", m_config->directory_prompts);
     
-    setupBuildOptions("points_per_kilobyte", m_config->points_per_kilobyte);
+    setupBuildOptions("points_per_megabyte", m_config->points_per_megabyte);
     setupBuildOptions("points_earned_postcall", m_config->points_earned_postcall);
     setupBuildOptions("access_sysop", m_config->access_sysop);
     setupBuildOptions("access_message_sysop", m_config->access_message_sysop);
@@ -122,8 +116,8 @@ bool FormSystemConfig::onEnter()
     setupBuildOptions("default_message_level", m_config->default_message_level);    
     setupBuildOptions("default_file_points", m_config->default_file_points);
     setupBuildOptions("default_file_ratio", m_config->default_file_ratio);
-    setupBuildOptions("default_kilobyte_ratio", m_config->default_kilobyte_ratio);
-    setupBuildOptions("default_kilobyte_daily", m_config->default_kilobyte_daily);
+    setupBuildOptions("default_megabyte_ratio", m_config->default_megabyte_ratio);
+    setupBuildOptions("default_megabyte_daily", m_config->default_megabyte_daily);
     setupBuildOptions("default_post_call_ratio", m_config->default_post_call_ratio);
     setupBuildOptions("default_time_limit", m_config->default_time_limit);
     setupBuildOptions("default_user_timeout", m_config->default_user_timeout);
@@ -145,7 +139,6 @@ bool FormSystemConfig::onEnter()
     setupBuildOptions("regexp_date_validation_msg", m_config->regexp_date_validation_msg);
     setupBuildOptions("regexp_email_validation", m_config->regexp_email_validation);
     setupBuildOptions("regexp_email_validation_msg", m_config->regexp_email_validation_msg);
-*/
     return true;
 }
 
