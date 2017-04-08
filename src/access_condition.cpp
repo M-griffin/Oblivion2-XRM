@@ -144,7 +144,6 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
             {
                 std::stringstream ss;
                 ss << my_matches.m_code.substr(2);
-                std::cout << "ss: " << ss.str() << std::endl;
                 int not_level = 0;
                 if (!(ss >> not_level))
                 {
@@ -164,7 +163,6 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
             {
                 std::stringstream ss;
                 ss << my_matches.m_code.substr(1);
-                std::cout << "ss: " << ss.str() << std::endl;                
                 int level = 0;
                 if (!(ss >> level))
                 {
@@ -183,8 +181,6 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
             case 3: // AR NOT
             {                
                 std::string not_flag = my_matches.m_code.substr(2);
-                std::cout << "flag: " << not_flag[0] << std::endl;
-
                 if (!checkAccessConditionFlag(not_flag[0], true, user))
                 {
                     condition = true;
@@ -192,15 +188,12 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
                 else
                 {
                     condition = false;
-                }
-                
+                }                
                 break;
             }            
             case 4: // AR
             {
                 std::string flag = my_matches.m_code.substr(1);
-                std::cout << "flag: " << flag[0] << std::endl;
-
                 if (checkAccessConditionFlag(flag[0], true, user))
                 {
                     condition = true;
@@ -208,16 +201,12 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
                 else
                 {
                     condition = false;
-                }
-                
+                }                
                 break;
-            }   
-            
+            }               
             case 5: // AR2 NOT
             {                
                 std::string not_flag = my_matches.m_code.substr(2);
-                std::cout << "flag: " << not_flag[0] << std::endl;
-
                 if (!checkAccessConditionFlag(not_flag[0], false, user))
                 {
                     condition = true;
@@ -225,15 +214,12 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
                 else
                 {
                     condition = false;
-                }
-                
+                }                
                 break;
             }            
             case 6: // AR2
             {
                 std::string flag = my_matches.m_code.substr(1);
-                std::cout << "flag: " << flag[0] << std::endl;
-
                 if (checkAccessConditionFlag(flag[0], false, user))
                 {
                     condition = true;
@@ -267,7 +253,7 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
  * @param user
  * @return 
  */
-std::vector<MapType> AccessCondition::parseAcsString(std::string &acs_string)
+std::vector<MapType> AccessCondition::parseAcsString(const std::string &acs_string)
 {
     std::vector<MapType> code_map;
 
@@ -294,4 +280,22 @@ std::vector<MapType> AccessCondition::parseAcsString(std::string &acs_string)
     }   
     
     return code_map;
+}
+
+/**
+ * @brief Parses and Validates codemap
+ * @param expression
+ * @return 
+ */
+bool AccessCondition::validateAcsString(const std::string &acs_string, user_ptr user)
+{
+    std::vector<MapType> code_map;
+    code_map = parseAcsString(acs_string);
+    
+    // Allow Access on empty string, meaning no security.
+    if (code_map.size() == 0) 
+    {
+        return true;
+    }
+    return parseCodeMap(code_map, user);
 }

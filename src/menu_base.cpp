@@ -75,45 +75,40 @@ void MenuBase::clearMenuPullDownOptions()
 
 /**
  * @brief Validates if user has access to menu (preLoad)
- * @return 
+ * @return
  */
-bool MenuBase::checkMenuAcsAccess(menu_ptr menu) 
-{   
-    std::vector<MapType> code_map;
-    AccessCondition acs;        
-    
-    code_map = acs.parseAcsString(menu->menu_acs_string);
-    if (code_map.size() == 0 || acs.parseCodeMap(code_map, m_menu_session_data->m_user_record))
-    {
-        return true;
-    }        
-    return false;
+bool MenuBase::checkMenuAcsAccess(menu_ptr menu)
+{
+    AccessCondition acs;
+    return acs.validateAcsString(
+               menu->menu_acs_string,
+               m_menu_session_data->m_user_record
+           );
 }
 
 /**
  * @brief Validates if user has access to menu options
- * @return 
+ * @return
  */
-void MenuBase::checkMenuOptionsAcsAccess() 
+void MenuBase::checkMenuOptionsAcsAccess()
 {
     std::vector<MenuOption>::iterator it = m_menu_info->menu_options.begin();
     std::vector<MenuOption>::iterator end = m_menu_info->menu_options.end();
     std::vector<MenuOption> new_options;
-    
-    std::vector<MapType> code_map;
-    AccessCondition acs;        
-    
+    AccessCondition acs;
+
     for(; it != end; it++)
     {
-        code_map = acs.parseAcsString((*it).acs_string);
-        if (code_map.size() == 0 || acs.parseCodeMap(code_map, m_menu_session_data->m_user_record))
+        if (acs.validateAcsString(
+                    (*it).acs_string,
+                    m_menu_session_data->m_user_record))
         {
             new_options.push_back(*it);
-        }        
-        std::vector<MapType>().swap(code_map);
+        }
     }
-    
-    m_menu_info->menu_options.swap(new_options);    
+
+    // Swap Validated Options with Existing.
+    m_menu_info->menu_options.swap(new_options);
 }
 
 /**
@@ -145,9 +140,9 @@ void MenuBase::readInMenuData()
         MenuDao mnu(pre_load_menu, m_current_menu, GLOBAL_MENU_PATH);
         if (mnu.fileExists())
         {
-            // Reset the Smart Pointer on menu load.        
+            // Reset the Smart Pointer on menu load.
             mnu.loadMenu();
-            
+
             // Check Menu Access Acces,, if Valid, swap current with preloaded.
             if (checkMenuAcsAccess(pre_load_menu))
             {
@@ -276,7 +271,7 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
     for(unsigned int i = 0; i < code_map.size(); i++)
     {
         auto &map = code_map[i];
-        std::cout << "Generic Code: " << map.m_code << std::endl;
+        //std::cout << "Generic Code: " << map.m_code << std::endl;
         if (map.m_code[1] == 'K')
         {
             ++key_columns;
@@ -291,7 +286,7 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
     // No codes found in ansi, or invalid combination exit!
     if (key_columns == 0 || key_columns != des_columns)
     {
-        std::cout << "No Generic Code Maps found." << std::endl;
+        //std::cout << "No Generic Code Maps found." << std::endl;
         return output_screen;
     }
 
