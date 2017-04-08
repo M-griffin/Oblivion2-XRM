@@ -1,4 +1,10 @@
 
+Change Log Update (00.00.82)
+* 2017-04-08
++ Added Menu Option ACS Level/Flag Checking, Any options not available are removed from display.
++ Added Menu ACS Level/Flag with Menu Pre-Load, if menu is not accessible, the user stays at the current.
+  Some more testing on this is needed along with check if it should jump to fallback.
+
 Change Log Update (00.00.81)
 * 2017-04-07
 + Added iFilePoints to User Table and Model

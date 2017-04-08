@@ -3,6 +3,8 @@
 #include "data/menu_dao.hpp"
 #include "data/menu_prompt_dao.hpp"
 
+#include "access_condition.hpp"
+
 #include <boost/locale.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -72,6 +74,49 @@ void MenuBase::clearMenuPullDownOptions()
 }
 
 /**
+ * @brief Validates if user has access to menu (preLoad)
+ * @return 
+ */
+bool MenuBase::checkMenuAcsAccess(menu_ptr menu) 
+{   
+    std::vector<MapType> code_map;
+    AccessCondition acs;        
+    
+    code_map = acs.parseAcsString(menu->menu_acs_string);
+    if (code_map.size() == 0 || acs.parseCodeMap(code_map, m_menu_session_data->m_user_record))
+    {
+        return true;
+    }        
+    return false;
+}
+
+/**
+ * @brief Validates if user has access to menu options
+ * @return 
+ */
+void MenuBase::checkMenuOptionsAcsAccess() 
+{
+    std::vector<MenuOption>::iterator it = m_menu_info->menu_options.begin();
+    std::vector<MenuOption>::iterator end = m_menu_info->menu_options.end();
+    std::vector<MenuOption> new_options;
+    
+    std::vector<MapType> code_map;
+    AccessCondition acs;        
+    
+    for(; it != end; it++)
+    {
+        code_map = acs.parseAcsString((*it).acs_string);
+        if (code_map.size() == 0 || acs.parseCodeMap(code_map, m_menu_session_data->m_user_record))
+        {
+            new_options.push_back(*it);
+        }        
+        std::vector<MapType>().swap(code_map);
+    }
+    
+    m_menu_info->menu_options.swap(new_options);    
+}
+
+/**
  * @brief Reads a Specific Menu, Info and Options
  */
 void MenuBase::readInMenuData()
@@ -90,29 +135,42 @@ void MenuBase::readInMenuData()
         revert = m_menu_info->menu_name;
     }
 
-    // Reset the Smart Pointer on menu load.
-    m_menu_info.reset(new Menu());
+    // Isolate Smart Pointer Scope, once it's leaves it's cleared.
+    // For PreLoading and Testing Menu ACS String
+    {
+        // Pre-Load Menu, check access, if not valud, then fall back to previous.
+        menu_ptr pre_load_menu(new Menu);
 
-    // Call MenuDao to ready in .yaml file
-    MenuDao mnu(m_menu_info, m_current_menu, GLOBAL_MENU_PATH);
-    if (mnu.fileExists())
-    {
-        mnu.loadMenu();
-    }
-    else
-    {
-        // Fallck is if user doesn't have access.  update this lateron.
-        std::cout << "Menu doesn't exist, loading fallback if exists." << std::endl;
-        if (m_fallback_menu.size() > 0)
+        // Call MenuDao to ready in .yaml file
+        MenuDao mnu(pre_load_menu, m_current_menu, GLOBAL_MENU_PATH);
+        if (mnu.fileExists())
         {
-            std::cout << "Loading Fallback menu " << m_fallback_menu << std::endl;
-            m_current_menu = m_fallback_menu;
-            return readInMenuData();
+            // Reset the Smart Pointer on menu load.        
+            mnu.loadMenu();
+            
+            // Check Menu Access Acces,, if Valid, swap current with preloaded.
+            if (checkMenuAcsAccess(pre_load_menu))
+            {
+                m_menu_info.reset();
+                m_menu_info = pre_load_menu;
+                checkMenuOptionsAcsAccess();
+            }
         }
+        else
+        {
+            // Fallck is if user doesn't have access.  update this lateron.
+            std::cout << "Menu doesn't exist, loading fallback if exists." << std::endl;
+            if (m_fallback_menu.size() > 0)
+            {
+                std::cout << "Loading Fallback menu " << m_fallback_menu << std::endl;
+                m_current_menu = m_fallback_menu;
+                return readInMenuData();
+            }
 
-        // No menu to fallback or revert
-        // Assert so were not in endless loop, something wrong, fix it!
-        assert(false);
+            // No menu to fallback or revert
+            // Assert so were not in endless loop, something wrong, fix it!
+            assert(false);
+        }
     }
 }
 
