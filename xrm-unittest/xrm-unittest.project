@@ -46,12 +46,15 @@
     <File Name="../src/access_condition.cpp"/>
     <File Name="../src/access_condition.hpp"/>
     <File Name="access_condition_ut.cpp"/>
+    <File Name="../src/form_manager.cpp"/>
+    <File Name="../src/form_manager.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
   <VirtualDirectory Name="model">
     <File Name="../src/model/config.hpp"/>
     <File Name="../src/model/users.hpp"/>
+    <File Name="../src/model/menu.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -192,5 +195,9 @@
     <File Name="../src/data/config_dao.cpp"/>
     <File Name="../src/data/config_dao.hpp"/>
   </VirtualDirectory>
-  <VirtualDirectory Name="forms"/>
+  <VirtualDirectory Name="forms">
+    <File Name="../src/forms/form_base.hpp"/>
+    <File Name="../src/forms/form_system_config.cpp"/>
+    <File Name="../src/forms/form_system_config.hpp"/>
+  </VirtualDirectory>
 </CodeLite_Project>
