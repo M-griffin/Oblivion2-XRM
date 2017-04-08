@@ -114,6 +114,17 @@ public:
      */
     void clearMenuPullDownOptions();
 
+    /**
+     * @brief Validates if user has access to menu (preLoad)
+     * @return 
+     */
+    bool checkMenuAcsAccess(menu_ptr menu);
+
+    /**
+     * @brief Validates if user has access to menu options
+     * @return 
+     */
+    void checkMenuOptionsAcsAccess();
 
     /**
      * @brief Read Menu Data File for Info and all Options
