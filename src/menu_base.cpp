@@ -96,15 +96,14 @@ bool MenuBase::checkMenuAcsAccess(menu_ptr menu)
  */
 void MenuBase::checkMenuOptionsAcsAccess() 
 {
-    std::vector<MenuOption>::iterator begin = m_menu_info->menu_options.begin();
+    std::vector<MenuOption>::iterator it = m_menu_info->menu_options.begin();
     std::vector<MenuOption>::iterator end = m_menu_info->menu_options.end();
-    std::vector<MenuOption>::iterator it;    
     std::vector<MenuOption> new_options;
     
     std::vector<MapType> code_map;
     AccessCondition acs;        
     
-    for(it = begin; it != end; it++)
+    for(; it != end; it++)
     {
         code_map = acs.parseAcsString((*it).acs_string);
         if (code_map.size() == 0 || acs.parseCodeMap(code_map, m_menu_session_data->m_user_record))
@@ -115,7 +114,6 @@ void MenuBase::checkMenuOptionsAcsAccess()
     }
     
     m_menu_info->menu_options.swap(new_options);    
-    std::cout << "Done." << std::endl;
 }
 
 /**
