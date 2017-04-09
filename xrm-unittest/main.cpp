@@ -10,6 +10,7 @@
 #endif
 
 #include <boost/smart_ptr/shared_ptr.hpp>
+#include <boost/smart_ptr/make_shared.hpp>
 
 
 #include "model/config.hpp"
@@ -164,10 +165,12 @@ SUITE(XRMFormSystemConfig)
         node[opts[PORT_TELNET].name] = opts[PORT_TELNET].form_value;
         
         // Move from Node back to Config and Translations String to Int
-        Config c = node.as<Config>();
+        Config conf = node.as<Config>();
+        config_ptr c = boost::make_shared<Config>(conf);
+        
         
         // Now test new value is populated in config class.
-        CHECK(c.port_telnet == 2323);
+        CHECK(c->port_telnet == 2323);
     }
 
 }

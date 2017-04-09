@@ -5,6 +5,7 @@
 
 FormSystemConfig::FormSystemConfig(config_ptr config)
     : FormBase(config)
+    , m_node(config)
 {
 }
 
@@ -151,4 +152,28 @@ bool FormSystemConfig::onExit()
 {
     baseClearOptions();
     return true;
+}
+
+
+/**
+ * @brief Updates the YAML Mapping Value along with Menu Option.
+ * @param m
+ * @param value
+ */
+void FormSystemConfig::updateNodeMapping(MenuOption &m, const std::string &value)
+{
+    m.form_value = value;
+    m_node[m.name] = value;        
+}
+
+/**
+ * @brief Updates the YAML Mapping Value along with Menu Option.
+ * @param m
+ * @param value
+ */
+config_ptr FormSystemConfig::retrieveNodeMapping()
+{
+    // Generate Update config_ptr from Node Mapping for Config Save.
+    config_ptr c = m_node.as<config_ptr>();
+    return c;
 }

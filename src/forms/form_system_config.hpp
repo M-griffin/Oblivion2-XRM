@@ -26,6 +26,23 @@ public:
 
     virtual bool onEnter();
     virtual bool onExit();
+    
+    /**
+     * @brief Updates the YAML Mapping Value along with Menu Option.
+     * @param m
+     * @param value
+     */
+    void updateNodeMapping(MenuOption &m, const std::string &value);
+    
+    /**
+     * @brief Updates the YAML Mapping Value along with Menu Option.
+     * @param m
+     * @param value
+     */
+    config_ptr retrieveNodeMapping();
+    
+    
+    YAML::Node m_node;
 
 };
 
@@ -166,6 +183,8 @@ namespace YAML
          */
         static bool decode(const Node& node, config_ptr rhs)
         {
+            rhs.reset(new Config());
+            
             rhs->file_version                    = node["file_version"].as<std::string>();
             rhs->bbs_name_sysop                  = node["bbs_name_sysop"].as<std::string>();
             rhs->bbs_name                        = node["bbs_name"].as<std::string>();

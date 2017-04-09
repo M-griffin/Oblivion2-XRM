@@ -142,10 +142,8 @@ public:
         opt.name = name;
         baseBuildOptions(opt, value);
     }
-    
-    
-    
-    config_ptr        m_config;
+                    
+    config_ptr        m_config;        
     SessionIO         m_session_io;
 
 };
