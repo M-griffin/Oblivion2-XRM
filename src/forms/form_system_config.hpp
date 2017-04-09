@@ -25,24 +25,7 @@ public:
     ~FormSystemConfig();
 
     virtual bool onEnter();
-    virtual bool onExit();
-    
-    /**
-     * @brief Updates the YAML Mapping Value along with Menu Option.
-     * @param m
-     * @param value
-     */
-    virtual void updateNodeMapping(MenuOption &m, const std::string &value);
-    
-    /**
-     * @brief Updates the YAML Mapping Value along with Menu Option.
-     * @param m
-     * @param value
-     */
-    virtual config_ptr retrieveNodeMapping();
-    
-    
-    YAML::Node m_node;
+    virtual bool onExit();          
 
 };
 

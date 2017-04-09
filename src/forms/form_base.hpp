@@ -5,7 +5,11 @@
 #include "../model/menu.hpp"
 #include "../session_io.hpp"
 
+
 #include <boost/smart_ptr/shared_ptr.hpp>
+#include <boost/smart_ptr/make_shared.hpp>
+
+#include <yaml-cpp/yaml.h>
 
 #include <iostream>
 #include <string>
@@ -28,25 +32,43 @@ public:
     }
 
     virtual bool onEnter() = 0;
-    virtual bool onExit()  = 0;
-    
-    /**
-     * @brief Updates the YAML Mapping Value along with Menu Option.
-     * @param m
-     * @param value
-     */
-    virtual void updateNodeMapping(MenuOption &m, const std::string &value) = 0;
-    
-    /**
-     * @brief Updates the YAML Mapping Value along with Menu Option.
-     * @param m
-     * @param value
-     */
-    virtual config_ptr retrieveNodeMapping() = 0;
-    
-    // Holds all pulldown menu options.
-    std::vector<MenuOption> m_menu_options;
+    virtual bool onExit() = 0;
 
+    /**
+     * @brief Updates the YAML Mapping Value along with Menu Option.
+     * @param m
+     * @param value
+     */
+    void updateNodeMapping(MenuOption &m, const std::string &value)
+    {
+        m.form_value = value;
+        m_node[m.name] = value;        
+    }
+    
+    /**
+     * @brief Set the YAML::Node Mapping, this should be Smart Pointer.
+     * @param data
+     */
+    template<typename T>
+    void setNodeMappingType(T data)
+    {
+        m_node = data;
+    }
+    
+    /**
+     * @brief Retrieves all Mappings and return as Instance Class Pointer.
+     * @param m
+     * @param value
+     */
+    template<typename T>
+    boost::shared_ptr<T> retrieveNodeMapping()
+    {
+        // Generate Update <T>_ptr from Node Mapping for T Save.
+        T conf = m_node.as<T>();
+        boost::shared_ptr<T> c = boost::make_shared<T>(conf);
+        return c;
+    }
+        
     FormBase(config_ptr config)
         : m_config(config)
     { }
@@ -157,8 +179,12 @@ public:
         baseBuildOptions(opt, value);
     }
                     
-    config_ptr        m_config;        
-    SessionIO         m_session_io;
+    config_ptr              m_config;
+    YAML::Node              m_node;
+    SessionIO               m_session_io;
+    
+    // Holds all pulldown menu options.
+    std::vector<MenuOption> m_menu_options;
 
 };
 

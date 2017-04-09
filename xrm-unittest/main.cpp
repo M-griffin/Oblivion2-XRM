@@ -191,7 +191,7 @@ SUITE(XRMFormSystemConfig)
         form->updateNodeMapping(opts[BBS_NAME_SYSOP], newValue);
                 
         // Move from Node back to Config and Translations String to String
-        config_ptr c = form->retrieveNodeMapping();
+        config_ptr c = form->retrieveNodeMapping<Config>();
         
         // Now test new value is populated in config class.
         CHECK(newValue == c->bbs_name_sysop);
@@ -213,7 +213,7 @@ SUITE(XRMFormSystemConfig)
         form->updateNodeMapping(opts[USE_SSL_SERVICE], newValue);
                 
         // Move from Node back to Config and Translations String to String
-        config_ptr c = form->retrieveNodeMapping();
+        config_ptr c = form->retrieveNodeMapping<Config>();
                         
         // Now test new value is populated in config class.
         CHECK(c->use_service_ssl == true);
@@ -236,7 +236,7 @@ SUITE(XRMFormSystemConfig)
         form->updateNodeMapping(opts[PORT_TELNET], newValue);
                 
         // Move from Node back to Config and Translations String to String
-        config_ptr c = form->retrieveNodeMapping();
+        config_ptr c = form->retrieveNodeMapping<Config>();
                 
         // Now test new value is populated in config class.
         CHECK(c->port_telnet == 2323);
