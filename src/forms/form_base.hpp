@@ -30,6 +30,20 @@ public:
     virtual bool onEnter() = 0;
     virtual bool onExit()  = 0;
     
+    /**
+     * @brief Updates the YAML Mapping Value along with Menu Option.
+     * @param m
+     * @param value
+     */
+    virtual void updateNodeMapping(MenuOption &m, const std::string &value) = 0;
+    
+    /**
+     * @brief Updates the YAML Mapping Value along with Menu Option.
+     * @param m
+     * @param value
+     */
+    virtual config_ptr retrieveNodeMapping() = 0;
+    
     // Holds all pulldown menu options.
     std::vector<MenuOption> m_menu_options;
 
@@ -116,7 +130,7 @@ public:
      */
     void baseBuildOptions(MenuOption &m, bool value)
     {
-        m.form_value = (value) ? "Yes" : "No";
+        m.form_value = (value) ? "true" : "false";
         baseSetFormOption(m);        
     }
 

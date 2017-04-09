@@ -165,10 +165,79 @@ SUITE(XRMFormSystemConfig)
         node[opts[PORT_TELNET].name] = opts[PORT_TELNET].form_value;
         
         // Move from Node back to Config and Translations String to Int
+        // Do Extra Test of Conversion to Smart Pointer!
         Config conf = node.as<Config>();
         config_ptr c = boost::make_shared<Config>(conf);
+                
+        // Now test new value is populated in config class.
+        CHECK(c->port_telnet == 2323);
+    }
+
+
+    // User FormSystemConfig Methods
+    // Tests Node Type Casting from String to String
+    TEST(SystemConfigOutputTest_ThenStringReassignment_FormMethods)
+    {        
+        config_ptr config(new Config());
+        form_ptr form(new FormSystemConfig(config));
         
+        form->onEnter();
+        std::vector<MenuOption> opts = form->baseGetFormOptions();
         
+        // Test we can Read Each Value and the mappings match
+        std::cout << "Name[0]: " << opts[BBS_NAME_SYSOP].name << std::endl;        
+        
+        std::string newValue = "newValue";
+        form->updateNodeMapping(opts[BBS_NAME_SYSOP], newValue);
+                
+        // Move from Node back to Config and Translations String to String
+        config_ptr c = form->retrieveNodeMapping();
+        
+        // Now test new value is populated in config class.
+        CHECK(newValue == c->bbs_name_sysop);
+    }
+    
+    // Tests Node Type Casting from String to Boolean
+    TEST(SystemConfigOutputTest_ThenBoolReassignment_FormMethods)
+    {        
+        config_ptr config(new Config());
+        form_ptr form(new FormSystemConfig(config));
+                
+        form->onEnter();
+        std::vector<MenuOption> opts = form->baseGetFormOptions();
+                
+        // Test we can Read Each Value and the mappings match
+        std::cout << "Name[0]: " << opts[USE_SSL_SERVICE].name << std::endl;        
+        
+        std::string newValue = "true";        
+        form->updateNodeMapping(opts[USE_SSL_SERVICE], newValue);
+                
+        // Move from Node back to Config and Translations String to String
+        config_ptr c = form->retrieveNodeMapping();
+                        
+        // Now test new value is populated in config class.
+        CHECK(c->use_service_ssl == true);
+    }
+    
+    // Tests Node Type Casting from String to Integer
+    TEST(SystemConfigOutputTest_ThenIntegerReassignment_FormMethods)
+    {        
+        config_ptr config(new Config());
+        form_ptr form(new FormSystemConfig(config));
+        
+        // run the form on enter.
+        form->onEnter();
+        std::vector<MenuOption> opts = form->baseGetFormOptions();
+        
+        // Test we can Read Each Value and the mappings match
+        std::cout << "Name[0]: " << opts[PORT_TELNET].name << std::endl;        
+
+        std::string newValue = "2323";        
+        form->updateNodeMapping(opts[PORT_TELNET], newValue);
+                
+        // Move from Node back to Config and Translations String to String
+        config_ptr c = form->retrieveNodeMapping();
+                
         // Now test new value is populated in config class.
         CHECK(c->port_telnet == 2323);
     }

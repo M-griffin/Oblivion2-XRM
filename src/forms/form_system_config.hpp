@@ -32,14 +32,14 @@ public:
      * @param m
      * @param value
      */
-    void updateNodeMapping(MenuOption &m, const std::string &value);
+    virtual void updateNodeMapping(MenuOption &m, const std::string &value);
     
     /**
      * @brief Updates the YAML Mapping Value along with Menu Option.
      * @param m
      * @param value
      */
-    config_ptr retrieveNodeMapping();
+    virtual config_ptr retrieveNodeMapping();
     
     
     YAML::Node m_node;

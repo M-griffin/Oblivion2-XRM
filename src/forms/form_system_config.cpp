@@ -1,7 +1,10 @@
 #include "form_system_config.hpp"
 
 #include "../model/config.hpp"
+#include "../model/menu.hpp"
 
+#include <boost/smart_ptr/make_shared.hpp>
+#include <string>
 
 FormSystemConfig::FormSystemConfig(config_ptr config)
     : FormBase(config)
@@ -18,15 +21,7 @@ FormSystemConfig::~FormSystemConfig()
  * @return 
  */
 bool FormSystemConfig::onEnter() 
-{    
-    //YAML::Node node;    
-    //node = m_config;
-    
-    //std::cout << " * yaml out "<< node["bbs_name_sysop"].as<std::string>() << std::endl;
-    
-    //YAML::Node doc = YAML::LoadFile(path);
-    //auto node = std::make_shared(doc.as<EngineNode>());
-        
+{       
     setupBuildOptions("bbs_name_sysop", m_config->bbs_name_sysop);
     setupBuildOptions("bbs_name", m_config->bbs_name);
     setupBuildOptions("bbs_uuid", m_config->bbs_uuid);
@@ -143,7 +138,6 @@ bool FormSystemConfig::onEnter()
     return true;
 }
 
-
 /**
  * @brief Cleanup for Form Menu Options
  * @return 
@@ -153,7 +147,6 @@ bool FormSystemConfig::onExit()
     baseClearOptions();
     return true;
 }
-
 
 /**
  * @brief Updates the YAML Mapping Value along with Menu Option.
@@ -174,6 +167,7 @@ void FormSystemConfig::updateNodeMapping(MenuOption &m, const std::string &value
 config_ptr FormSystemConfig::retrieveNodeMapping()
 {
     // Generate Update config_ptr from Node Mapping for Config Save.
-    config_ptr c = m_node.as<config_ptr>();
+    Config conf = m_node.as<Config>();
+    config_ptr c = boost::make_shared<Config>(conf);
     return c;
 }
