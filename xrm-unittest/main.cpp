@@ -66,7 +66,6 @@ SUITE(XRMFormSystemConfig)
         // run the form on enter.
         form->onEnter();
         std::vector<MenuOption> opts = form->baseGetFormOptions();
-        std::cout << "opts size: " << opts.size() << std::endl;
         
         // 106 Config Options generated.
         CHECK(opts.size() == MAX_OPTIONS);
@@ -74,10 +73,6 @@ SUITE(XRMFormSystemConfig)
         // Setup Yaml Mapping, and assign the config to it.
         YAML::Node node;
         node = config;
-        
-        // Test we can Read Each Value and the mappings match
-        std::cout << "Name[0]: " << opts[BBS_NAME_SYSOP].name << std::endl;        
-        std::cout << "Node Value: " << node[opts[BBS_NAME_SYSOP].name] << std::endl;
         
         // Test Value.
         CHECK(opts[BBS_NAME_SYSOP].form_value == node[opts[BBS_NAME_SYSOP].name].as<std::string>());
@@ -104,7 +99,6 @@ SUITE(XRMFormSystemConfig)
         // run the form on enter.
         form->onEnter();
         std::vector<MenuOption> opts = form->baseGetFormOptions();
-        std::cout << "opts size: " << opts.size() << std::endl;
         
         // 106 Config Options generated.
         CHECK(opts.size() == MAX_OPTIONS);
@@ -112,10 +106,6 @@ SUITE(XRMFormSystemConfig)
         // Setup Yaml Mapping, and assign the config to it.
         YAML::Node node;
         node = config;
-        
-        // Test we can Read Each Value and the mappings match
-        std::cout << "Name[0]: " << opts[USE_SSL_SERVICE].name << std::endl;        
-        std::cout << "Node Value: " << node[opts[USE_SSL_SERVICE].name] << std::endl;
         
         // Test Value.
         CHECK(!node[opts[USE_SSL_SERVICE].name].as<bool>());
@@ -142,7 +132,6 @@ SUITE(XRMFormSystemConfig)
         // run the form on enter.
         form->onEnter();
         std::vector<MenuOption> opts = form->baseGetFormOptions();
-        std::cout << "opts size: " << opts.size() << std::endl;
         
         // 106 Config Options generated.
         CHECK(opts.size() == MAX_OPTIONS);
@@ -150,10 +139,6 @@ SUITE(XRMFormSystemConfig)
         // Setup Yaml Mapping, and assign the config to it.
         YAML::Node node;
         node = config;
-        
-        // Test we can Read Each Value and the mappings match
-        std::cout << "Name[0]: " << opts[PORT_TELNET].name << std::endl;        
-        std::cout << "Node Value: " << node[opts[PORT_TELNET].name] << std::endl;
         
         // Test Value.
         CHECK(node[opts[PORT_TELNET].name].as<int>() == 6023);
@@ -182,10 +167,7 @@ SUITE(XRMFormSystemConfig)
         form_ptr form(new FormSystemConfig(config));
         
         form->onEnter();
-        std::vector<MenuOption> opts = form->baseGetFormOptions();
-        
-        // Test we can Read Each Value and the mappings match
-        std::cout << "Name[0]: " << opts[BBS_NAME_SYSOP].name << std::endl;        
+        std::vector<MenuOption> opts = form->baseGetFormOptions();   
         
         std::string newValue = "newValue";
         form->updateNodeMapping(opts[BBS_NAME_SYSOP], newValue);
@@ -205,9 +187,6 @@ SUITE(XRMFormSystemConfig)
                 
         form->onEnter();
         std::vector<MenuOption> opts = form->baseGetFormOptions();
-                
-        // Test we can Read Each Value and the mappings match
-        std::cout << "Name[0]: " << opts[USE_SSL_SERVICE].name << std::endl;        
         
         std::string newValue = "true";        
         form->updateNodeMapping(opts[USE_SSL_SERVICE], newValue);
@@ -227,10 +206,7 @@ SUITE(XRMFormSystemConfig)
         
         // run the form on enter.
         form->onEnter();
-        std::vector<MenuOption> opts = form->baseGetFormOptions();
-        
-        // Test we can Read Each Value and the mappings match
-        std::cout << "Name[0]: " << opts[PORT_TELNET].name << std::endl;        
+        std::vector<MenuOption> opts = form->baseGetFormOptions();     
 
         std::string newValue = "2323";        
         form->updateNodeMapping(opts[PORT_TELNET], newValue);

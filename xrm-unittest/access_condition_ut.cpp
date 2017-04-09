@@ -1138,7 +1138,7 @@ SUITE(XRMAccessCondition)
     
     TEST(validateAcsStringTest2FailSL)
     {
-         user_ptr user(new Users);
+        user_ptr user(new Users);
         user->iControlFlags1 |= 1 << 1; // B
         user->iLevel = 15;
         
@@ -1148,6 +1148,18 @@ SUITE(XRMAccessCondition)
         bool result = acs.validateAcsString(test_expression, user);
         
         CHECK(!result);
+    }
+    
+    // No Restrictions should pass through True.
+    TEST(validateAcsStringTestEmptyStringPass)
+    {
+        user_ptr user(new Users);       
+        AccessCondition acs;        
+
+        std::string test_expression = "";
+        bool result = acs.validateAcsString(test_expression, user);
+        
+        CHECK(result);
     }
         
 }
