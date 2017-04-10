@@ -2,7 +2,7 @@
 #include "session_data.hpp"
 #include "common_io.hpp"
 
-#include "model/config.hpp"
+#include "model-sys/config.hpp"
 
 #include <clocale>
 

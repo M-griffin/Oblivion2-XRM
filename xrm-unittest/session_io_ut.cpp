@@ -4,7 +4,7 @@
  */
 
 #include "session_io.hpp"
-#include "model/config.hpp"
+#include "model-sys/config.hpp"
 
 #ifdef _WIN32
 #include <UnitTest++.h>

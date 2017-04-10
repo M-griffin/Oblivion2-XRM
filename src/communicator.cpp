@@ -1,7 +1,7 @@
 #include "communicator.hpp"
 
-#include "model/structures.hpp"
-#include "model/struct_compat.hpp"
+#include "model-sys/structures.hpp"
+#include "model-sys/struct_compat.hpp"
 
 #include <iostream>
 #include <string>

@@ -8,15 +8,15 @@
  *
  */
 
-#include "model/struct_compat.hpp"
-#include "model/structures.hpp"
+#include "model-sys/struct_compat.hpp"
+#include "model-sys/structures.hpp"
 
-#include "data/config_dao.hpp"
-#include "model/config.hpp"
+#include "data-sys/config_dao.hpp"
+#include "model-sys/config.hpp"
 
 #include "compat/prompts_compat_dao.hpp"
-#include "model/menu_prompt.hpp"
-#include "data/menu_prompt_dao.hpp"
+#include "model-sys/menu_prompt.hpp"
+#include "data-sys/menu_prompt_dao.hpp"
 
 #include "common_io.hpp"
 

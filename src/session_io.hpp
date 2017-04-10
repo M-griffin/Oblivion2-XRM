@@ -4,7 +4,7 @@
 #include "session_data.hpp"
 #include "common_io.hpp"
 
-#include "model/structures.hpp"
+#include "model-sys/structures.hpp"
 
 #include <string>
 #include <map>

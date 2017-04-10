@@ -1,8 +1,8 @@
 #ifndef MOD_BASE_HPP
 #define MOD_BASE_HPP
 
-#include "../data/text_prompts_dao.hpp"
-#include "../model/config.hpp"
+#include "../data-sys/text_prompts_dao.hpp"
+#include "../model-sys/config.hpp"
 
 #include "../session_data.hpp"
 #include "../session_io.hpp"

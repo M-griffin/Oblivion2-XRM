@@ -13,8 +13,8 @@
 #include <boost/smart_ptr/make_shared.hpp>
 
 
-#include "model/config.hpp"
-#include "model/menu.hpp"
+#include "model-sys/config.hpp"
+#include "model-sys/menu.hpp"
 #include "forms/form_system_config.hpp"
 
 

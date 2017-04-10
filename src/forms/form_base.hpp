@@ -1,8 +1,8 @@
 #ifndef FORM_BASE_HPP
 #define FORM_BASE_HPP
 
-#include "../model/config.hpp"
-#include "../model/menu.hpp"
+#include "../model-sys/config.hpp"
+#include "../model-sys/menu.hpp"
 #include "../session_io.hpp"
 
 
@@ -33,6 +33,11 @@ public:
 
     virtual bool onEnter() = 0;
     virtual bool onExit() = 0;
+    virtual void onSave() = 0;
+    
+    FormBase(config_ptr config)
+        : m_config(config)
+    { }
 
     /**
      * @brief Updates the YAML Mapping Value along with Menu Option.
@@ -68,11 +73,7 @@ public:
         boost::shared_ptr<T> c = boost::make_shared<T>(conf);
         return c;
     }
-        
-    FormBase(config_ptr config)
-        : m_config(config)
-    { }
-
+            
     /**
      * @brief Clear All Menu Options
      */

@@ -1,9 +1,9 @@
 #ifndef COMMUNICATOR_HPP
 #define COMMUNICATOR_HPP
 
-#include "data/text_prompts_dao.hpp"
-#include "model/structures.hpp"
-#include "model/config.hpp"
+#include "data-sys/text_prompts_dao.hpp"
+#include "model-sys/structures.hpp"
+#include "model-sys/config.hpp"
 
 #include "safe_queue.hpp"
 #include "session_manager.hpp"

@@ -4,12 +4,12 @@
 #include "mod_base.hpp"
 #include "menu_base.hpp"
 
-#include "../model/structures.hpp"
-#include "../model/security.hpp"
-#include "../model/users.hpp"
+#include "../model-sys/structures.hpp"
+#include "../model-sys/security.hpp"
+#include "../model-sys/users.hpp"
 
-#include "../data/text_prompts_dao.hpp"
-#include "../data/users_dao.hpp"
+#include "../data-sys/text_prompts_dao.hpp"
+#include "../data-sys/users_dao.hpp"
 
 #include "../session_data.hpp"
 

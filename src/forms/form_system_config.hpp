@@ -25,7 +25,8 @@ public:
     ~FormSystemConfig();
 
     virtual bool onEnter();
-    virtual bool onExit();          
+    virtual bool onExit();
+    virtual void onSave();
 
 };
 
