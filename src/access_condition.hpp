@@ -2,7 +2,7 @@
 #define ACCESS_CONDITION_HPP
 
 #include "session_io.hpp"
-#include "model/structures.hpp"
+#include "model-sys/structures.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 

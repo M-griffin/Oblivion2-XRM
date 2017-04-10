@@ -1,7 +1,7 @@
 #ifndef MENU_COMPAT_DAO_HPP
 #define MENU_COMPAT_DAO_HPP
 
-#include "../model/structures.hpp"
+#include "../model-sys/structures.hpp"
 #include <string>
 
 /**

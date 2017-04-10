@@ -1,8 +1,8 @@
 #ifndef PROMPT_DAO_HPP
 #define PROMPT_DAO_HPP
 
-#include "../model/structures.hpp"
-#include "../model/struct_compat.hpp"
+#include "../model-sys/structures.hpp"
+#include "../model-sys/struct_compat.hpp"
 #include <string>
 
 /**

@@ -1,7 +1,9 @@
 #include "form_system_config.hpp"
 
-#include "../model/config.hpp"
+#include "../model-sys/config.hpp"
+#include "../model-sys/menu.hpp"
 
+#include <string>
 
 FormSystemConfig::FormSystemConfig(config_ptr config)
     : FormBase(config)
@@ -17,15 +19,10 @@ FormSystemConfig::~FormSystemConfig()
  * @return 
  */
 bool FormSystemConfig::onEnter() 
-{    
-    //YAML::Node node;    
-    //node = m_config;
+{       
+    // Setup the YAML Noide with base data and type.
+    setNodeMappingType(m_config);
     
-    //std::cout << " * yaml out "<< node["bbs_name_sysop"].as<std::string>() << std::endl;
-    
-    //YAML::Node doc = YAML::LoadFile(path);
-    //auto node = std::make_shared(doc.as<EngineNode>());
-        
     setupBuildOptions("bbs_name_sysop", m_config->bbs_name_sysop);
     setupBuildOptions("bbs_name", m_config->bbs_name);
     setupBuildOptions("bbs_uuid", m_config->bbs_uuid);
@@ -142,7 +139,6 @@ bool FormSystemConfig::onEnter()
     return true;
 }
 
-
 /**
  * @brief Cleanup for Form Menu Options
  * @return 
@@ -152,3 +148,13 @@ bool FormSystemConfig::onExit()
     baseClearOptions();
     return true;
 }
+
+/**
+ * @brief Saves Configuration Record to File
+ */
+void FormSystemConfig::onSave()
+{
+    
+}
+
+

@@ -26,6 +26,7 @@ public:
 
     virtual bool onEnter();
     virtual bool onExit();
+    virtual void onSave();
 
 };
 
@@ -166,6 +167,8 @@ namespace YAML
          */
         static bool decode(const Node& node, config_ptr rhs)
         {
+            rhs.reset(new Config());
+            
             rhs->file_version                    = node["file_version"].as<std::string>();
             rhs->bbs_name_sysop                  = node["bbs_name_sysop"].as<std::string>();
             rhs->bbs_name                        = node["bbs_name"].as<std::string>();

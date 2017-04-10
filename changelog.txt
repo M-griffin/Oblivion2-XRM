@@ -1,4 +1,14 @@
 
+Change Log Update (00.00.84)
+* 2017-04-10
++ Completed more work on Unit Tests and Configuration Form
++ Remodeled some of the folder structure, split data and model into (2) sets app and sys
+  Sys for Core System Data and Models, and App for Application Data and Models ie..
+  LastCallers, OneLiners, etc.. 
++ Sync Linux workspaces and project with the new structure.  All Unit Tests are passing.
+- Moving from Form Work right now to getting some applications data doing and logon sequence.
+  Going to work on getting more Tables setup and Data Access Objects going now.
+
 Change Log Update (00.00.83)
 * 2017-04-08
 + Some slight refactoring to ACS String Validations, Call a single method instead of doing it manually

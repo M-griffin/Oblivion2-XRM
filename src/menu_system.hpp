@@ -4,8 +4,8 @@
 #include "state_base.hpp"
 #include "menu_base.hpp"
 
-#include "model/struct_compat.hpp"
-#include "model/menu.hpp"
+#include "model-sys/struct_compat.hpp"
+#include "model-sys/menu.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 

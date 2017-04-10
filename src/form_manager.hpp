@@ -1,7 +1,7 @@
 #ifndef FORM_MANAGER_H
 #define FORM_MANAGER_H
 
-#include "model/menu.hpp"
+#include "model-sys/menu.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 

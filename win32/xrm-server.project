@@ -55,35 +55,41 @@
     <File Name="../src/telnet.hpp"/>
     <File Name="../src/telnet_decoder.cpp"/>
     <File Name="../src/telnet_decoder.hpp"/>
+    <File Name="../src/form_manager.cpp"/>
+    <File Name="../src/form_manager.hpp"/>
+    <File Name="../src/menu_base.hpp"/>
+    <File Name="../src/menu_base.cpp"/>
+    <File Name="../src/access_condition.hpp"/>
+    <File Name="../src/access_condition.cpp"/>
     <VirtualDirectory Name="compat">
       <File Name="../src/compat/menu_compat_dao.hpp"/>
       <File Name="../src/compat/prompts_compat_dao.hpp"/>
     </VirtualDirectory>
-    <VirtualDirectory Name="data">
-      <File Name="../src/data/config_dao.cpp"/>
-      <File Name="../src/data/config_dao.hpp"/>
-      <File Name="../src/data/security_dao.cpp"/>
-      <File Name="../src/data/security_dao.hpp"/>
-      <File Name="../src/data/text_prompts_dao.cpp"/>
-      <File Name="../src/data/text_prompts_dao.hpp"/>
-      <File Name="../src/data/users_dao.cpp"/>
-      <File Name="../src/data/users_dao.hpp"/>
-      <File Name="../src/data/menu_dao.cpp"/>
-      <File Name="../src/data/menu_dao.hpp"/>
-      <File Name="../src/data/menu_prompt_dao.cpp"/>
-      <File Name="../src/data/menu_prompt_dao.hpp"/>
-      <File Name="../src/data/access_level_dao.hpp"/>
-      <File Name="../src/data/access_level_dao.cpp"/>
+    <VirtualDirectory Name="data-sys">
+      <File Name="../src/data-sys/config_dao.cpp"/>
+      <File Name="../src/data-sys/config_dao.hpp"/>
+      <File Name="../src/data-sys/security_dao.cpp"/>
+      <File Name="../src/data-sys/security_dao.hpp"/>
+      <File Name="../src/data-sys/text_prompts_dao.cpp"/>
+      <File Name="../src/data-sys/text_prompts_dao.hpp"/>
+      <File Name="../src/data-sys/users_dao.cpp"/>
+      <File Name="../src/data-sys/users_dao.hpp"/>
+      <File Name="../src/data-sys/menu_dao.cpp"/>
+      <File Name="../src/data-sys/menu_dao.hpp"/>
+      <File Name="../src/data-sys/menu_prompt_dao.cpp"/>
+      <File Name="../src/data-sys/menu_prompt_dao.hpp"/>
+      <File Name="../src/data-sys/access_level_dao.hpp"/>
+      <File Name="../src/data-sys/access_level_dao.cpp"/>
     </VirtualDirectory>
-    <VirtualDirectory Name="model">
-      <File Name="../src/model/config.hpp"/>
-      <File Name="../src/model/security.hpp"/>
-      <File Name="../src/model/struct_compat.hpp"/>
-      <File Name="../src/model/structures.hpp"/>
-      <File Name="../src/model/users.hpp"/>
-      <File Name="../src/model/menu.hpp"/>
-      <File Name="../src/model/menu_prompt.hpp"/>
-      <File Name="../src/model/access_levels.hpp"/>
+    <VirtualDirectory Name="model-sys">
+      <File Name="../src/model-sys/config.hpp"/>
+      <File Name="../src/model-sys/security.hpp"/>
+      <File Name="../src/model-sys/struct_compat.hpp"/>
+      <File Name="../src/model-sys/structures.hpp"/>
+      <File Name="../src/model-sys/users.hpp"/>
+      <File Name="../src/model-sys/menu.hpp"/>
+      <File Name="../src/model-sys/menu_prompt.hpp"/>
+      <File Name="../src/model-sys/access_levels.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
       <File Name="../src/mods/mod_base.hpp"/>
@@ -94,16 +100,18 @@
       <File Name="../src/mods/mod_signup.cpp"/>
       <File Name="../src/mods/mod_signup.hpp"/>
     </VirtualDirectory>
-    <File Name="../src/form_manager.cpp"/>
-    <File Name="../src/form_manager.hpp"/>
-    <File Name="../src/menu_base.hpp"/>
-    <File Name="../src/menu_base.cpp"/>
-    <File Name="../src/access_condition.hpp"/>
-    <File Name="../src/access_condition.cpp"/>
     <VirtualDirectory Name="forms">
       <File Name="../src/forms/form_system_config.hpp"/>
       <File Name="../src/forms/form_system_config.cpp"/>
       <File Name="../src/forms/form_base.hpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="model-app">
+      <File Name="../src/model-app/last_callers.hpp"/>
+      <File Name="../src/model-app/oneliners.hpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="data-app">
+      <File Name="../src/data-app/last_callers_dao.cpp"/>
+      <File Name="../src/data-app/last_callers_dao.hpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <Settings Type="Executable">

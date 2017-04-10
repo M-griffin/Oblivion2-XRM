@@ -6,10 +6,10 @@
 #include "session_manager.hpp"
 #include "common_io.hpp"
 
-#include "model/structures.hpp"
-#include "model/struct_compat.hpp"
-#include "model/users.hpp"
-#include "data/users_dao.hpp"
+#include "model-sys/structures.hpp"
+#include "model-sys/struct_compat.hpp"
+#include "model-sys/users.hpp"
+#include "data-sys/users_dao.hpp"
 
 #include <boost/asio.hpp>
 #include <boost/asio/deadline_timer.hpp>

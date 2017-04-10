@@ -1,5 +1,5 @@
 #include "mod_prelogon.hpp"
-#include "../model/config.hpp"
+#include "../model-sys/config.hpp"
 
 #include <boost/algorithm/string.hpp>
 
