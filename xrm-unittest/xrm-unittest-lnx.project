@@ -49,12 +49,12 @@
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
-  <VirtualDirectory Name="data">
-    <File Name="../src/data/config_dao.cpp"/>
-    <File Name="../src/data/config_dao.hpp"/>
+  <VirtualDirectory Name="data-sys">
+    <File Name="../src/data-sys/config_dao.cpp"/>
+    <File Name="../src/data-sys/config_dao.hpp"/>
   </VirtualDirectory>
-  <VirtualDirectory Name="model">
-    <File Name="../src/model/config.hpp"/>
+  <VirtualDirectory Name="model-sys">
+    <File Name="../src/model-sys/config.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
