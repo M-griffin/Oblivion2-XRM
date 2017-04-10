@@ -170,4 +170,9 @@
       </Completion>
     </Configuration>
   </Settings>
+  <VirtualDirectory Name="forms">
+    <File Name="../src/forms/form_base.hpp"/>
+    <File Name="../src/forms/form_system_config.cpp"/>
+    <File Name="../src/forms/form_system_config.hpp"/>
+  </VirtualDirectory>
 </CodeLite_Project>
