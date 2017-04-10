@@ -3,8 +3,8 @@
 
 #include "mod_base.hpp"
 
-#include "../model/structures.hpp"
-#include "../data/text_prompts_dao.hpp"
+#include "../model-sys/structures.hpp"
+#include "../data-sys/text_prompts_dao.hpp"
 
 #include "../session_data.hpp"
 #include "../session_io.hpp"

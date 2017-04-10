@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="SqliteWrapped" InternalType="Library">
+<CodeLite_Project Name="SqliteWrapped" InternalType="Library" Version="10.0.0">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -67,9 +67,11 @@
       <PreBuild/>
       <PostBuild>
         <Command Enabled="no"># Linux /OSX / BSD</Command>
+        <Command Enabled="no">#rm lib$(ProjectName).h</Command>
         <Command Enabled="no">#cat IError.h StderrLog.h SysLog.h Database.h Query.h &gt; lib$(ProjectName).h</Command>
         <Command Enabled="yes"/>
         <Command Enabled="no"># Windows</Command>
+        <Command Enabled="yes">del lib$(ProjectName).h</Command>
         <Command Enabled="yes">type IError.h StderrLog.h SysLog.h Database.h Query.h &gt; lib$(ProjectName).h</Command>
       </PostBuild>
       <CustomBuild Enabled="no">

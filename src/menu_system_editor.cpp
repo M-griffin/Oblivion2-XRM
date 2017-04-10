@@ -1,6 +1,6 @@
 #include "menu_system.hpp"
 
-#include "model/struct_compat.hpp"
+#include "model-sys/struct_compat.hpp"
 
 #include <boost/locale.hpp>
 #include <boost/filesystem.hpp>

@@ -7,13 +7,13 @@
 #include "ansi_processor.hpp"
 #include "communicator.hpp"
 
-#include "model/struct_compat.hpp"
-#include "model/config.hpp"
-#include "model/menu.hpp"
-#include "model/menu_prompt.hpp"
-#include "data/config_dao.hpp"
-#include "data/menu_dao.hpp"
-#include "data/menu_prompt_dao.hpp"
+#include "model-sys/struct_compat.hpp"
+#include "model-sys/config.hpp"
+#include "model-sys/menu.hpp"
+#include "model-sys/menu_prompt.hpp"
+#include "data-sys/config_dao.hpp"
+#include "data-sys/menu_dao.hpp"
+#include "data-sys/menu_prompt_dao.hpp"
 #include "mods/mod_base.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>

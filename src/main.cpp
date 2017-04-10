@@ -17,13 +17,13 @@
  *
  */
 
-#include "data/text_prompts_dao.hpp"
+#include "data-sys/text_prompts_dao.hpp"
 
-#include "model/access_levels.hpp"
-#include "data/access_level_dao.hpp"
+#include "model-sys/access_levels.hpp"
+#include "data-sys/access_level_dao.hpp"
 
-#include "model/config.hpp"
-#include "data/config_dao.hpp"
+#include "model-sys/config.hpp"
+#include "data-sys/config_dao.hpp"
 
 #include "server.hpp"
 #include "server_ssl.hpp"
@@ -32,8 +32,8 @@
 
 // Needed for Initializing and checking users data is setup
 // On startup.
-#include "data/security_dao.hpp"
-#include "data/users_dao.hpp"
+#include "data-sys/security_dao.hpp"
+#include "data-sys/users_dao.hpp"
 #include "libSqliteWrapped.h"
 
 #include <cstdlib>

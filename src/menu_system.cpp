@@ -1,6 +1,6 @@
 #include "menu_system.hpp"
 
-#include "data/config_dao.hpp"
+#include "data-sys/config_dao.hpp"
 #include "mods/mod_prelogon.hpp"
 #include "mods/mod_logon.hpp"
 #include "mods/mod_signup.hpp"

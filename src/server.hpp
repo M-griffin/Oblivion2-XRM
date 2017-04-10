@@ -1,7 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "model/config.hpp"
+#include "model-sys/config.hpp"
 #include "session_manager.hpp"
 #include "session.hpp"
 #include "connection_tcp.hpp"

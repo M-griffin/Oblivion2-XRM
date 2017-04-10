@@ -1,12 +1,12 @@
 #include "mod_signup.hpp"
 
-#include "../model/config.hpp"
-#include "../model/users.hpp"
+#include "../model-sys/config.hpp"
+#include "../model-sys/users.hpp"
 #include "../encryption.hpp"
 
 // DataBase
-#include "../data/security_dao.hpp"
-#include "../data/users_dao.hpp"
+#include "../data-sys/security_dao.hpp"
+#include "../data-sys/users_dao.hpp"
 
 #include <boost/regex.hpp>
 

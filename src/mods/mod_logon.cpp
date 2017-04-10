@@ -1,11 +1,11 @@
 #include "mod_logon.hpp"
-#include "../model/config.hpp"
+#include "../model-sys/config.hpp"
 #include "../encryption.hpp"
 
-#include "../model/security.hpp"
-#include "../model/users.hpp"
-#include "../data/security_dao.hpp"
-#include "../data/users_dao.hpp"
+#include "../model-sys/security.hpp"
+#include "../model-sys/users.hpp"
+#include "../data-sys/security_dao.hpp"
+#include "../data-sys/users_dao.hpp"
 
 #include <iostream>
 #include <string>
