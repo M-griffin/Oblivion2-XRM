@@ -61,7 +61,7 @@ AS       := /usr/bin/as
 ##
 CodeLiteDir:=/usr/share/codelite
 Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/common_io_ut.cpp$(ObjectSuffix) $(IntermediateDirectory)/session_io_ut.cpp$(ObjectSuffix) $(IntermediateDirectory)/ansi_processor_ut.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_ansi_processor.cpp$(ObjectSuffix) $(IntermediateDirectory)/users_dao_ut.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/access_condition_ut.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_access_condition.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_config_dao.cpp$(ObjectSuffix) 
+	$(IntermediateDirectory)/src_access_condition.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_config_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/forms_form_system_config.cpp$(ObjectSuffix) 
 
 
 
@@ -187,6 +187,14 @@ $(IntermediateDirectory)/data-sys_config_dao.cpp$(DependSuffix): ../src/data-sys
 
 $(IntermediateDirectory)/data-sys_config_dao.cpp$(PreprocessSuffix): ../src/data-sys/config_dao.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/data-sys_config_dao.cpp$(PreprocessSuffix) "../src/data-sys/config_dao.cpp"
+
+$(IntermediateDirectory)/forms_form_system_config.cpp$(ObjectSuffix): ../src/forms/form_system_config.cpp $(IntermediateDirectory)/forms_form_system_config.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/forms/form_system_config.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/forms_form_system_config.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/forms_form_system_config.cpp$(DependSuffix): ../src/forms/form_system_config.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/forms_form_system_config.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/forms_form_system_config.cpp$(DependSuffix) -MM "../src/forms/form_system_config.cpp"
+
+$(IntermediateDirectory)/forms_form_system_config.cpp$(PreprocessSuffix): ../src/forms/form_system_config.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/forms_form_system_config.cpp$(PreprocessSuffix) "../src/forms/form_system_config.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
