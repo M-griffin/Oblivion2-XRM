@@ -17,7 +17,7 @@
       <Project Name="xrm-menu-convert" ConfigName="Debug"/>
       <Project Name="xrm-menu-prompt-convert" ConfigName="Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release" Selected="no">
+    <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
       <Project Name="SqliteWrapped" ConfigName="Release"/>
       <Project Name="xrm-server" ConfigName="Release"/>
