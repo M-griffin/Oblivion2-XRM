@@ -49,21 +49,19 @@
     <File Name="../src/form_manager.cpp"/>
     <File Name="../src/form_manager.hpp"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
   <VirtualDirectory Name="model-sys">
     <File Name="../src/model-sys/config.hpp"/>
     <File Name="../src/model-sys/users.hpp"/>
     <File Name="../src/model-sys/menu.hpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="data-sys">
-      <File Name="../src/data-sys/config_dao.cpp"/>
-      <File Name="../src/data-sys/config_dao.hpp"/>
-    </VirtualDirectory>
-    <VirtualDirectory Name="forms">
-      <File Name="../src/forms/form_base.hpp"/>
-      <File Name="../src/forms/form_system_config.cpp"/>
-      <File Name="../src/forms/form_system_config.hpp"/>
+    <File Name="../src/data-sys/config_dao.cpp"/>
+    <File Name="../src/data-sys/config_dao.hpp"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="forms">
+    <File Name="../src/forms/form_base.hpp"/>
+    <File Name="../src/forms/form_system_config.cpp"/>
+    <File Name="../src/forms/form_system_config.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -200,4 +198,6 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>

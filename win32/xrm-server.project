@@ -20,8 +20,6 @@
   </Plugins>
   <Description/>
   <Dependencies/>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
   <VirtualDirectory Name="..\src">
     <File Name="../src/ansi_processor.cpp"/>
     <File Name="../src/ansi_processor.hpp"/>
@@ -238,4 +236,6 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>
