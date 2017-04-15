@@ -24,13 +24,12 @@ public:
     std::time_t timeOn;
     int  iNodeNumber;
     
-    // * Bit Flags
+    // * Bit Flags, used something like PCboard, or just spell out.
+    // wip on this.
     // 1 NewUser
     // 2 Sysop
     // 3 Available for Chat
-    
-    
-    Reserved : Array[1..8] Of Byte;
+    //Reserved : Array[1..8] Of Byte;
    
 
 
