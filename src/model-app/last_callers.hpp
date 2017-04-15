@@ -1,6 +1,8 @@
 #ifndef LAST_CALLERS_HPP
 #define LAST_CALLERS_HPP
 
+#include <string>
+
 /**
  * @class LastCallers
  * @author Michael Griffin
@@ -16,6 +18,21 @@ public:
     
     ~LastCallers()
     {}
+    
+    long iId;
+    long iUserId;    
+    std::time_t timeOn;
+    int  iNodeNumber;
+    
+    // * Bit Flags
+    // 1 NewUser
+    // 2 Sysop
+    // 3 Available for Chat
+    
+    
+    Reserved : Array[1..8] Of Byte;
+   
+
 
 };
 

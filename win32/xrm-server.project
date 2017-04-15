@@ -78,6 +78,8 @@
       <File Name="../src/data-sys/menu_prompt_dao.hpp"/>
       <File Name="../src/data-sys/access_level_dao.hpp"/>
       <File Name="../src/data-sys/access_level_dao.cpp"/>
+      <File Name="../src/data-sys/session_stats_dao.hpp"/>
+      <File Name="../src/data-sys/session_stats_dao.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="model-sys">
       <File Name="../src/model-sys/config.hpp"/>
@@ -88,6 +90,7 @@
       <File Name="../src/model-sys/menu.hpp"/>
       <File Name="../src/model-sys/menu_prompt.hpp"/>
       <File Name="../src/model-sys/access_levels.hpp"/>
+      <File Name="../src/model-sys/session_stats.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
       <File Name="../src/mods/mod_base.hpp"/>

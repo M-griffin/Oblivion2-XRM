@@ -48,7 +48,6 @@ UsersDao::UsersDao(SQLW::Database &database)
         "iMessageLevel     INTEGER NOT NULL, "
         "iLastFileArea     INTEGER NOT NULL, "
         "iLastMessageArea  INTEGER NOT NULL, "
-        "dtLastCallDate    DATETIME DEFAULT CURRENT_TIMESTAMP, "
         "iTimeLeft         INTEGER NOT NULL, "
         "iTimeLimit        INTEGER NOT NULL, "
         "sRegColor         TEXT NOT NULL, "
@@ -69,8 +68,6 @@ UsersDao::UsersDao(SQLW::Database &database)
         "dtPassChangeDate  DATETIME DEFAULT CURRENT_TIMESTAMP, "
         "dtLastReplyDate   DATETIME DEFAULT CURRENT_TIMESTAMP, "
         "bScrollFL         BOOLEAN NOT NULL, "
-        "iCallsToday       INTEGER NOT NULL, "
-        "iNewLevel         INTEGER NOT NULL, "
         "iCSPassChange     INTEGER NOT NULL, "
         "iControlFlags1    INTEGER NOT NULL, "
         "iControlFlags2    INTEGER NOT NULL, "
@@ -268,7 +265,6 @@ void UsersDao::pullUserResult(query_ptr qry, user_ptr user)
     qry->getFieldByName("iMessageLevel", user->iMessageLevel);
     qry->getFieldByName("iLastFileArea", user->iLastFileArea);
     qry->getFieldByName("iLastMessageArea", user->iLastMessageArea);
-    qry->getFieldByName("dtLastCallDate", user->dtLastCallDate);
     qry->getFieldByName("iTimeLeft", user->iTimeLeft);
     qry->getFieldByName("iTimeLimit", user->iTimeLimit);
     qry->getFieldByName("sRegColor", user->sRegColor);
@@ -289,8 +285,6 @@ void UsersDao::pullUserResult(query_ptr qry, user_ptr user)
     qry->getFieldByName("dtPassChangeDate", user->dtPassChangeDate);
     qry->getFieldByName("dtLastReplyDate", user->dtLastReplyDate);
     qry->getFieldByName("bScrollFL", user->bAnsi);  // this should be redone!
-    qry->getFieldByName("iCallsToday", user->iCallsToday);
-    qry->getFieldByName("iNewLevel", user->iNewLevel);
     qry->getFieldByName("iCSPassChange", user->iCSPassChange);
     qry->getFieldByName("iControlFlags1", user->iControlFlags1);
     qry->getFieldByName("iControlFlags2", user->iControlFlags2);
@@ -332,7 +326,7 @@ void UsersDao::fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::
     values.push_back(qry->translateFieldName("iMessageLevel", user->iMessageLevel));
     values.push_back(qry->translateFieldName("iLastFileArea", user->iLastFileArea));
     values.push_back(qry->translateFieldName("iLastMessageArea", user->iLastMessageArea));
-    values.push_back(qry->translateFieldName("dtLastCallDate", user->dtLastCallDate));
+
     values.push_back(qry->translateFieldName("iTimeLeft", user->iTimeLeft));
     values.push_back(qry->translateFieldName("iTimeLimit", user->iTimeLimit));
     values.push_back(qry->translateFieldName("sRegColor", user->sRegColor));
@@ -353,8 +347,6 @@ void UsersDao::fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::
     values.push_back(qry->translateFieldName("dtPassChangeDate", user->dtPassChangeDate));
     values.push_back(qry->translateFieldName("dtLastReplyDate", user->dtLastReplyDate));
     values.push_back(qry->translateFieldName("bScrollFL", user->bAnsi));
-    values.push_back(qry->translateFieldName("iCallsToday", user->iCallsToday));
-    values.push_back(qry->translateFieldName("iNewLevel", user->iNewLevel));
     values.push_back(qry->translateFieldName("iCSPassChange", user->iCSPassChange));
     values.push_back(qry->translateFieldName("iControlFlags1", user->iControlFlags1));
     values.push_back(qry->translateFieldName("iControlFlags2", user->iControlFlags2));
@@ -429,7 +421,6 @@ std::string UsersDao::insertUserQryString(query_ptr qry, user_ptr user)
         user->iMessageLevel,
         user->iLastFileArea,
         user->iLastMessageArea,
-        user->dtLastCallDate,
         user->iTimeLeft,
         user->iTimeLimit,
         user->sRegColor.c_str(),
@@ -450,8 +441,6 @@ std::string UsersDao::insertUserQryString(query_ptr qry, user_ptr user)
         user->dtPassChangeDate,
         user->dtLastReplyDate,
         user->bAnsi,
-        user->iCallsToday,
-        user->iNewLevel,
         user->iCSPassChange,
         user->iControlFlags1,
         user->iControlFlags2,
@@ -521,7 +510,6 @@ std::string UsersDao::updateUserQryString(query_ptr qry, user_ptr user)
         user->iMessageLevel,
         user->iLastFileArea,
         user->iLastMessageArea,
-        user->dtLastCallDate,
         user->iTimeLeft,
         user->iTimeLimit,
         user->sRegColor.c_str(),
@@ -542,8 +530,6 @@ std::string UsersDao::updateUserQryString(query_ptr qry, user_ptr user)
         user->dtPassChangeDate,
         user->dtLastReplyDate,
         user->bAnsi,
-        user->iCallsToday,
-        user->iNewLevel,
         user->iCSPassChange,
         user->iControlFlags1,
         user->iControlFlags2,
