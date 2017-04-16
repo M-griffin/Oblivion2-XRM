@@ -20,7 +20,6 @@ UsersDao::UsersDao(SQLW::Database &database)
     /**
      * Pre Popluate Static Queries one Time
      */
-
     cmdFirstTimeSetup =
         "PRAGMA synchronous=Normal; "
         "PRAGMA encoding=UTF-8; "
@@ -88,7 +87,6 @@ UsersDao::UsersDao(SQLW::Database &database)
         "FOREIGN KEY(iSecurityIndex) REFERENCES Secutiry(iId) ON DELETE CASCADE "
         "); ";
 
-
     cmdCreateUserIndex = "";
         "CREATE INDEX IF NOT EXISTS users_idx "
         "ON " + strTableName + " (sHandle COLLATE NOCASE, sRealName COLLATE NOCASE, sEmail COLLATE NOCASE); ";
@@ -96,7 +94,6 @@ UsersDao::UsersDao(SQLW::Database &database)
     // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
     cmdDropUserTable = "DROP TABLE IF EXISTS " + strTableName + "; ";
     cmdDropUserIndex = "DROP INDEX IF EXISTS users_idx; ";
-
 }
 
 UsersDao::~UsersDao()
@@ -149,7 +146,6 @@ bool UsersDao::isTableExists()
 
     return result;
 }
-
 
 /**
  * @brief Run Setup Params for SQL Database.
@@ -324,7 +320,6 @@ void UsersDao::fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::
     values.push_back(qry->translateFieldName("iMessageLevel", user->iMessageLevel));
     values.push_back(qry->translateFieldName("iLastFileArea", user->iLastFileArea));
     values.push_back(qry->translateFieldName("iLastMessageArea", user->iLastMessageArea));
-
     values.push_back(qry->translateFieldName("iTimeLeft", user->iTimeLeft));
     values.push_back(qry->translateFieldName("iTimeLimit", user->iTimeLimit));
     values.push_back(qry->translateFieldName("sRegColor", user->sRegColor));

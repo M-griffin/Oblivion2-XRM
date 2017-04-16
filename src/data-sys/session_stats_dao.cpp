@@ -14,12 +14,11 @@ SessionStatsDao::SessionStatsDao(SQLW::Database &database)
     : m_stats_database(database)
 {
     // Setup Table name
-    strTableName = "sessionstat";
+    strTableName = "sessionstats";
 
     /**
      * Pre Popluate Static Queries one Time
      */
-
     cmdFirstTimeSetup =
         "PRAGMA synchronous=Normal; "
         "PRAGMA encoding=UTF-8; "
@@ -55,15 +54,13 @@ SessionStatsDao::SessionStatsDao(SQLW::Database &database)
         "iDoorsExec        INTEGER NOT NULL  "
         "); ";
 
-
     cmdCreateSessionStatIndex = "";
         "CREATE INDEX IF NOT EXISTS session_stats_idx "
         "ON " + strTableName + " (iUserId); ";
 
     // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
     cmdDropSessionStatTable = "DROP TABLE IF EXISTS " + strTableName + "; ";
-    cmdDropSessionStatIndex = "DROP INDEX IF EXISTS session_stats_idx; ";
-    
+    cmdDropSessionStatIndex = "DROP INDEX IF EXISTS session_stats_idx; ";    
 }
 
 SessionStatsDao::~SessionStatsDao()
@@ -245,7 +242,7 @@ void SessionStatsDao::pullSessionStatResult(query_ptr qry, session_stats_ptr sta
  */
 void SessionStatsDao::fillColumnValues(query_ptr qry, session_stats_ptr stat, std::vector< std::pair<std::string, std::string> > &values)
 {
-    values.push_back(qry->translateFieldName("iId", stat->iId));
+    //values.push_back(qry->translateFieldName("iId", stat->iId));
     values.push_back(qry->translateFieldName("iUserId", stat->iUserId));
     values.push_back(qry->translateFieldName("sSessionType", stat->sSessionType));
     values.push_back(qry->translateFieldName("sCodePage", stat->sCodePage));
@@ -308,7 +305,6 @@ std::string SessionStatsDao::insertSessionStatQryString(query_ptr qry, session_s
 
     // Mprint statement to avoid injections.
     std::string result = sqlite3_mprintf(newQueryString.c_str(),
-        stat->iId,
         stat->iUserId,
         stat->sSessionType.c_str(),
         stat->sCodePage.c_str(),
@@ -365,8 +361,7 @@ std::string SessionStatsDao::updateSessionStatQryString(query_ptr qry, session_s
     newQueryString.append(" WHERE iId = %ld; ");
 
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(newQueryString.c_str(),
-        stat->iId,
+    std::string result = sqlite3_mprintf(newQueryString.c_str(),        
         stat->iUserId,
         stat->sSessionType.c_str(),
         stat->sCodePage.c_str(),
@@ -385,7 +380,8 @@ std::string SessionStatsDao::updateSessionStatQryString(query_ptr qry, session_s
         stat->iFilesDl,
         stat->iFilesUlMb,
         stat->iFilesDlMb,
-        stat->iDoorsExec
+        stat->iDoorsExec,
+        stat->iId
     );
 
     return result;

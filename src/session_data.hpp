@@ -8,8 +8,10 @@
 
 #include "model-sys/structures.hpp"
 #include "model-sys/struct_compat.hpp"
-#include "model-sys/users.hpp"
 #include "model-sys/session_stats.hpp"
+#include "model-sys/users.hpp"
+
+#include "data-sys/session_stats_dao.hpp"
 #include "data-sys/users_dao.hpp"
 
 #include <boost/asio.hpp>
@@ -306,6 +308,11 @@ public:
             }
         }   
     }
+    
+    /**
+     * @brief Startup Session Stats
+     */
+    void startUpSessionStats(std::string sessionType);
     
 private:
 
