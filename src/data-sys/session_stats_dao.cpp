@@ -100,13 +100,13 @@ bool SessionStatsDao::isTableExists()
         long rows = qry->getNumRows();
         if (rows > 0)
         {
-            std::cout << "Users Table Exists!" << std::endl;
+            std::cout << "SessionStats Table Exists!" << std::endl;
             result = true;
         }
         else
         {
             // No rows means the table doesn't exist!
-            std::cout << "Error, Users table Exists Returned Rows: " << rows << std::endl;
+            std::cout << "Error, SessionStats table Exists Returned Rows: " << rows << std::endl;
         }
     }
     else
@@ -245,7 +245,6 @@ void SessionStatsDao::pullSessionStatResult(query_ptr qry, session_stats_ptr sta
  */
 void SessionStatsDao::fillColumnValues(query_ptr qry, session_stats_ptr stat, std::vector< std::pair<std::string, std::string> > &values)
 {
-    // values.push_back(qry->translateFieldName("iId", stat->iId));
     values.push_back(qry->translateFieldName("iId", stat->iId));
     values.push_back(qry->translateFieldName("iUserId", stat->iUserId));
     values.push_back(qry->translateFieldName("sSessionType", stat->sSessionType));
