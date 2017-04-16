@@ -35,6 +35,7 @@ public:
     long dtEndDate;    
     int  iInvalidAttempts;
     bool bLogonSuccess;
+    bool bNewUser;
     bool bHungup;
     int  iMsgRead;
     int  iMsgPost;
@@ -57,6 +58,7 @@ public:
         , dtEndDate(0)
         , iInvalidAttempts(0)
         , bLogonSuccess(false)
+        , bNewUser(false)
         , bHungup(false)
         , iMsgRead(0)
         , iMsgPost(0)

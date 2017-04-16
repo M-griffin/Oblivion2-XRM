@@ -43,6 +43,7 @@ SessionStatsDao::SessionStatsDao(SQLW::Database &database)
         "dtStartDate       DATETIME NOT NULL, "
         "dtEndDate         DATETIME NOT NULL, "
         "iInvalidAttempts  INTEGER NOT NULL, "
+        "bNewUser          BOOLEAN NOT NULL, "
         "bLogonSuccess     BOOLEAN NOT NULL, "
         "bHungup           BOOLEAN NOT NULL, "
         "iMsgRead          INTEGER NOT NULL, "
@@ -224,7 +225,8 @@ void SessionStatsDao::pullSessionStatResult(query_ptr qry, session_stats_ptr sta
     qry->getFieldByName("dtStartDate", stat->dtStartDate);
     qry->getFieldByName("dtEndDate", stat->dtEndDate);
     qry->getFieldByName("iInvalidAttempts", stat->iInvalidAttempts);
-    qry->getFieldByName("bLogonSuccess", stat->bLogonSuccess);
+    qry->getFieldByName("bNewUser", stat->bNewUser);
+    qry->getFieldByName("bLogonSuccess", stat->bLogonSuccess);    
     qry->getFieldByName("bHungup", stat->bHungup);
     qry->getFieldByName("iMsgRead", stat->iMsgRead);
     qry->getFieldByName("iMsgPost", stat->iMsgPost);
@@ -253,7 +255,8 @@ void SessionStatsDao::fillColumnValues(query_ptr qry, session_stats_ptr stat, st
     values.push_back(qry->translateFieldName("dtStartDate", stat->dtStartDate));
     values.push_back(qry->translateFieldName("dtEndDate", stat->dtEndDate));    
     values.push_back(qry->translateFieldName("iInvalidAttempts", stat->iInvalidAttempts));
-    values.push_back(qry->translateFieldName("bLogonSuccess", stat->bLogonSuccess));
+    values.push_back(qry->translateFieldName("bNewUser", stat->bNewUser));
+    values.push_back(qry->translateFieldName("bLogonSuccess", stat->bLogonSuccess));    
     values.push_back(qry->translateFieldName("bHungup", stat->bHungup));
     values.push_back(qry->translateFieldName("iMsgRead", stat->iMsgRead));
     values.push_back(qry->translateFieldName("iMsgPost", stat->iMsgPost));
@@ -315,6 +318,7 @@ std::string SessionStatsDao::insertSessionStatQryString(query_ptr qry, session_s
         stat->dtStartDate,
         stat->dtEndDate,
         stat->iInvalidAttempts,
+        stat->bNewUser,
         stat->bLogonSuccess,
         stat->bHungup,
         stat->iMsgRead,
@@ -372,7 +376,8 @@ std::string SessionStatsDao::updateSessionStatQryString(query_ptr qry, session_s
         stat->dtStartDate,
         stat->dtEndDate,
         stat->iInvalidAttempts,
-        stat->bLogonSuccess,
+        stat->bNewUser,
+        stat->bLogonSuccess,        
         stat->bHungup,
         stat->iMsgRead,
         stat->iMsgPost,
