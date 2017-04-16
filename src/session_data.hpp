@@ -9,6 +9,7 @@
 #include "model-sys/structures.hpp"
 #include "model-sys/struct_compat.hpp"
 #include "model-sys/users.hpp"
+#include "model-sys/session_stats.hpp"
 #include "data-sys/users_dao.hpp"
 
 #include <boost/asio.hpp>
@@ -53,6 +54,7 @@ public:
         , m_common_io()
         , m_user_database(USERS_DATABASE, &m_database_log)
         , m_user_record(new Users())
+        , m_session_stats(new SessionStats())
         , m_node_number(0)
         , m_is_use_ansi(true)
         , m_output_encoding("cp437")
@@ -329,6 +331,7 @@ public:
     SQLW::StderrLog       m_database_log;   
     
     user_ptr              m_user_record;
+    session_stats_ptr     m_session_stats;
     
     int                   m_node_number;
     bool                  m_is_use_ansi;

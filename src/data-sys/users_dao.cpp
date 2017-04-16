@@ -178,7 +178,6 @@ bool UsersDao::firstTimeSetupParams()
     return result;
 }
 
-
 /**
  * @brief Create Users Table
  * If Create Table Fails, skip trying to create index.
@@ -304,7 +303,6 @@ void UsersDao::pullUserResult(query_ptr qry, user_ptr user)
     qry->getFieldByName("iSecurityIndex", user->iSecurityIndex);
 }
 
-
 /**
  * @brief Used for Insert Statement
  *        This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
@@ -365,7 +363,6 @@ void UsersDao::fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::
     values.push_back(qry->translateFieldName("bAllowPurge", user->bAllowPurge));
     values.push_back(qry->translateFieldName("iSecurityIndex", user->iSecurityIndex));
 }
-
 
 /**
  * @brief Create User Record Insert Statement, returns query string
@@ -463,7 +460,6 @@ std::string UsersDao::insertUserQryString(query_ptr qry, user_ptr user)
     return result;
 }
 
-
 /**
  * @brief Update Existing user Record.
  */
@@ -552,7 +548,6 @@ std::string UsersDao::updateUserQryString(query_ptr qry, user_ptr user)
 
     return result;
 }
-
 
 /**
  * @brief Updates a User Record in the database!

@@ -129,7 +129,7 @@ public:
      * @brief Return List of Last 10 Valid Sessions.
      * @return
      */
-    std::vector<session_stats_ptr> getLast10Callers();
+    std::vector<session_stats_ptr> getLast10CallerStats();
 
 };
 

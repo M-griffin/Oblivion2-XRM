@@ -9,8 +9,8 @@
 #include <boost/smart_ptr/weak_ptr.hpp>
 
 class SessionStats;
-typedef boost::shared_ptr<SessionStats> session_stat_ptr;
-typedef boost::weak_ptr<SessionStats> session_stat_weak_ptr;
+typedef boost::shared_ptr<SessionStats> session_stats_ptr;
+typedef boost::weak_ptr<SessionStats> session_stats_weak_ptr;
 
 /**
  * @class SessionStats
