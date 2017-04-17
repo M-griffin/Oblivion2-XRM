@@ -20,7 +20,6 @@ UsersDao::UsersDao(SQLW::Database &database)
     /**
      * Pre Popluate Static Queries one Time
      */
-
     cmdFirstTimeSetup =
         "PRAGMA synchronous=Normal; "
         "PRAGMA encoding=UTF-8; "
@@ -48,7 +47,6 @@ UsersDao::UsersDao(SQLW::Database &database)
         "iMessageLevel     INTEGER NOT NULL, "
         "iLastFileArea     INTEGER NOT NULL, "
         "iLastMessageArea  INTEGER NOT NULL, "
-        "dtLastCallDate    DATETIME DEFAULT CURRENT_TIMESTAMP, "
         "iTimeLeft         INTEGER NOT NULL, "
         "iTimeLimit        INTEGER NOT NULL, "
         "sRegColor         TEXT NOT NULL, "
@@ -69,8 +67,6 @@ UsersDao::UsersDao(SQLW::Database &database)
         "dtPassChangeDate  DATETIME DEFAULT CURRENT_TIMESTAMP, "
         "dtLastReplyDate   DATETIME DEFAULT CURRENT_TIMESTAMP, "
         "bScrollFL         BOOLEAN NOT NULL, "
-        "iCallsToday       INTEGER NOT NULL, "
-        "iNewLevel         INTEGER NOT NULL, "
         "iCSPassChange     INTEGER NOT NULL, "
         "iControlFlags1    INTEGER NOT NULL, "
         "iControlFlags2    INTEGER NOT NULL, "
@@ -91,7 +87,6 @@ UsersDao::UsersDao(SQLW::Database &database)
         "FOREIGN KEY(iSecurityIndex) REFERENCES Secutiry(iId) ON DELETE CASCADE "
         "); ";
 
-
     cmdCreateUserIndex = "";
         "CREATE INDEX IF NOT EXISTS users_idx "
         "ON " + strTableName + " (sHandle COLLATE NOCASE, sRealName COLLATE NOCASE, sEmail COLLATE NOCASE); ";
@@ -99,7 +94,6 @@ UsersDao::UsersDao(SQLW::Database &database)
     // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
     cmdDropUserTable = "DROP TABLE IF EXISTS " + strTableName + "; ";
     cmdDropUserIndex = "DROP INDEX IF EXISTS users_idx; ";
-
 }
 
 UsersDao::~UsersDao()
@@ -153,7 +147,6 @@ bool UsersDao::isTableExists()
     return result;
 }
 
-
 /**
  * @brief Run Setup Params for SQL Database.
   */
@@ -180,7 +173,6 @@ bool UsersDao::firstTimeSetupParams()
     result = qry->execute(cmdFirstTimeSetup);
     return result;
 }
-
 
 /**
  * @brief Create Users Table
@@ -268,7 +260,6 @@ void UsersDao::pullUserResult(query_ptr qry, user_ptr user)
     qry->getFieldByName("iMessageLevel", user->iMessageLevel);
     qry->getFieldByName("iLastFileArea", user->iLastFileArea);
     qry->getFieldByName("iLastMessageArea", user->iLastMessageArea);
-    qry->getFieldByName("dtLastCallDate", user->dtLastCallDate);
     qry->getFieldByName("iTimeLeft", user->iTimeLeft);
     qry->getFieldByName("iTimeLimit", user->iTimeLimit);
     qry->getFieldByName("sRegColor", user->sRegColor);
@@ -289,8 +280,6 @@ void UsersDao::pullUserResult(query_ptr qry, user_ptr user)
     qry->getFieldByName("dtPassChangeDate", user->dtPassChangeDate);
     qry->getFieldByName("dtLastReplyDate", user->dtLastReplyDate);
     qry->getFieldByName("bScrollFL", user->bAnsi);  // this should be redone!
-    qry->getFieldByName("iCallsToday", user->iCallsToday);
-    qry->getFieldByName("iNewLevel", user->iNewLevel);
     qry->getFieldByName("iCSPassChange", user->iCSPassChange);
     qry->getFieldByName("iControlFlags1", user->iControlFlags1);
     qry->getFieldByName("iControlFlags2", user->iControlFlags2);
@@ -309,7 +298,6 @@ void UsersDao::pullUserResult(query_ptr qry, user_ptr user)
     qry->getFieldByName("bAllowPurge", user->bAllowPurge);
     qry->getFieldByName("iSecurityIndex", user->iSecurityIndex);
 }
-
 
 /**
  * @brief Used for Insert Statement
@@ -332,7 +320,6 @@ void UsersDao::fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::
     values.push_back(qry->translateFieldName("iMessageLevel", user->iMessageLevel));
     values.push_back(qry->translateFieldName("iLastFileArea", user->iLastFileArea));
     values.push_back(qry->translateFieldName("iLastMessageArea", user->iLastMessageArea));
-    values.push_back(qry->translateFieldName("dtLastCallDate", user->dtLastCallDate));
     values.push_back(qry->translateFieldName("iTimeLeft", user->iTimeLeft));
     values.push_back(qry->translateFieldName("iTimeLimit", user->iTimeLimit));
     values.push_back(qry->translateFieldName("sRegColor", user->sRegColor));
@@ -353,8 +340,6 @@ void UsersDao::fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::
     values.push_back(qry->translateFieldName("dtPassChangeDate", user->dtPassChangeDate));
     values.push_back(qry->translateFieldName("dtLastReplyDate", user->dtLastReplyDate));
     values.push_back(qry->translateFieldName("bScrollFL", user->bAnsi));
-    values.push_back(qry->translateFieldName("iCallsToday", user->iCallsToday));
-    values.push_back(qry->translateFieldName("iNewLevel", user->iNewLevel));
     values.push_back(qry->translateFieldName("iCSPassChange", user->iCSPassChange));
     values.push_back(qry->translateFieldName("iControlFlags1", user->iControlFlags1));
     values.push_back(qry->translateFieldName("iControlFlags2", user->iControlFlags2));
@@ -373,7 +358,6 @@ void UsersDao::fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::
     values.push_back(qry->translateFieldName("bAllowPurge", user->bAllowPurge));
     values.push_back(qry->translateFieldName("iSecurityIndex", user->iSecurityIndex));
 }
-
 
 /**
  * @brief Create User Record Insert Statement, returns query string
@@ -429,7 +413,6 @@ std::string UsersDao::insertUserQryString(query_ptr qry, user_ptr user)
         user->iMessageLevel,
         user->iLastFileArea,
         user->iLastMessageArea,
-        user->dtLastCallDate,
         user->iTimeLeft,
         user->iTimeLimit,
         user->sRegColor.c_str(),
@@ -450,8 +433,6 @@ std::string UsersDao::insertUserQryString(query_ptr qry, user_ptr user)
         user->dtPassChangeDate,
         user->dtLastReplyDate,
         user->bAnsi,
-        user->iCallsToday,
-        user->iNewLevel,
         user->iCSPassChange,
         user->iControlFlags1,
         user->iControlFlags2,
@@ -473,7 +454,6 @@ std::string UsersDao::insertUserQryString(query_ptr qry, user_ptr user)
 
     return result;
 }
-
 
 /**
  * @brief Update Existing user Record.
@@ -521,7 +501,6 @@ std::string UsersDao::updateUserQryString(query_ptr qry, user_ptr user)
         user->iMessageLevel,
         user->iLastFileArea,
         user->iLastMessageArea,
-        user->dtLastCallDate,
         user->iTimeLeft,
         user->iTimeLimit,
         user->sRegColor.c_str(),
@@ -542,8 +521,6 @@ std::string UsersDao::updateUserQryString(query_ptr qry, user_ptr user)
         user->dtPassChangeDate,
         user->dtLastReplyDate,
         user->bAnsi,
-        user->iCallsToday,
-        user->iNewLevel,
         user->iCSPassChange,
         user->iControlFlags1,
         user->iControlFlags2,
@@ -566,7 +543,6 @@ std::string UsersDao::updateUserQryString(query_ptr qry, user_ptr user)
 
     return result;
 }
-
 
 /**
  * @brief Updates a User Record in the database!

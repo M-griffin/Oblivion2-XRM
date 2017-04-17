@@ -31,12 +31,19 @@ SysLog::~SysLog()
 
 void SysLog::databaseError(Database& db,const std::string& str)
 {
+    if (!db.isConnected())
+    {
+        std::cout << "Database Not Connected!" << std::endl;
+    }
     syslog(LOG_ERR, "%s", str.c_str());
 }
 
-
 void SysLog::databaseError(Database& db,Query& q,const std::string& str)
 {
+    if (!db.isConnected())
+    {
+        std::cout << "Database Not Connected!" << std::endl;
+    }
     syslog(LOG_ERR, "%s: %s(%d)", str.c_str(),q.GetError().c_str(),q.GetErrno());
     //syslog(LOG_ERR, "QUERY: \"%s\"", q.GetLastQuery().c_str());
 }

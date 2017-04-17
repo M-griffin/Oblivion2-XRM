@@ -234,3 +234,32 @@ void SessionData::handleEscTimer(boost::asio::deadline_timer* timer)
     m_state_manager->update();
     m_is_esc_timer = false;
 }
+
+/**
+ * @brief Startup Session Stats
+ */
+void SessionData::startUpSessionStats(std::string sessionType) 
+{
+    std::cout << "startUpSessionStats: " << sessionType << std::endl;
+     
+    // Check Table setup for Session Stats
+    session_stats_dao_ptr session_stat_dao(new SessionStatsDao(m_user_database));
+    // Verify if the user table exists.
+    if (session_stat_dao)
+    {        
+        std::time_t tt = 0;
+        std::time_t const dateTime = std::time(&tt);
+    
+        m_session_stats->sSessionType = sessionType;
+        m_session_stats->dtStartDate = dateTime;
+        
+        long id = session_stat_dao->insertSessionStatRecord(m_session_stats);
+        if (id < 0) 
+        {
+            std::cout << "SessionStats, error on insert: " << m_session_stats->iId << std::endl;
+            return;
+        }
+        
+        m_session_stats->iId = id;
+    }
+}

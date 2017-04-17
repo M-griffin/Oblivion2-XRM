@@ -71,12 +71,14 @@ public:
         if(connection->is_open())
         {
             if(connection->m_is_secure)
-            {
+            {                
                 // Secure Sessions do handshake first!!
+                new_session->m_session_data->startUpSessionStats("SSL");
                 new_session->m_session_data->handshake();
             }
             else
             {
+                new_session->m_session_data->startUpSessionStats("Telnet");                
                 new_session->m_session_data->waitingForData();
             }
         }
