@@ -32,6 +32,7 @@
 
 // Needed for Initializing and checking users data is setup
 // On startup.
+#include "data-sys/session_stats_dao.hpp"
 #include "data-sys/security_dao.hpp"
 #include "data-sys/users_dao.hpp"
 #include "libSqliteWrapped.h"
@@ -260,6 +261,30 @@ auto main() -> int
             }
 
             std::cout << "user table created successfully." << std::endl;
+        }
+        
+        // Check Table setup for Session Stats
+        session_stats_dao_ptr session_stat_dao(new SessionStatsDao(user_database));
+        // Verify if the user table exists.
+        if (!session_stat_dao->isTableExists())
+        {
+            std::cout << "doesn't exist (sessionstats table)." << std::endl;
+
+            // Setup database Param, cache sies etc..
+            if (!session_stat_dao->firstTimeSetupParams())
+            {
+                std::cout << "unable to execute firstTimeSetupParams (sessionstats table)." << std::endl;
+                assert(false);
+            }
+
+            // Setup create users table and indexes.
+            if (!session_stat_dao->createTable())
+            {
+                std::cout << "unable to create (sessionstats table)." << std::endl;
+                assert(false);
+            }
+
+            std::cout << "sessionstats table created successfully." << std::endl;
         }
 
         // NEW Loading and saving default Configuration file to XML

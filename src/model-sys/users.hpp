@@ -43,8 +43,6 @@ public:
     int iLastFileArea;
     int iLastMessageArea;
 
-    std::time_t dtLastCallDate;
-
     int iTimeLeft;
     int iTimeLimit;
 
@@ -74,8 +72,6 @@ public:
 
     bool bScrollFL;
 
-    bool iCallsToday;
-    bool iNewLevel;
     bool iCSPassChange;
     
     //std::string sControlFlags;
@@ -117,7 +113,6 @@ public:
         , iMessageLevel(10)
         , iLastFileArea(0)
         , iLastMessageArea(0)
-        , dtLastCallDate(0)
         , iTimeLeft(1440)
         , iTimeLimit(1440)
         , sRegColor("|05")
@@ -138,8 +133,6 @@ public:
         , dtPassChangeDate(0)
         , dtLastReplyDate(0)
         , bScrollFL(true)
-        , iCallsToday(0)
-        , iNewLevel(10)
         , iCSPassChange(0)
         , iControlFlags1(0)
         , iControlFlags2(0)

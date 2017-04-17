@@ -1762,7 +1762,6 @@ void ModSignup::saveNewUserRecord()
 
     m_user_record->dtFirstOn = result;
     m_user_record->dtPassChangeDate = result;
-    m_user_record->dtLastCallDate = result;
     
     // Set Default User Theme colors, pull from system defaults.
     m_user_record->sRegColor = m_config->default_color_regular;
