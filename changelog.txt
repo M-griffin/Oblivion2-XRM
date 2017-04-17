@@ -1,4 +1,14 @@
 
+Change Log Update (00.00.85)
+* 2017-04-17
++ Completed Initial work on SessionStats objects and Database DAO calls.
++ Added Startup creation of stats on connection.
++ Fixed minor compiler warnings left over on signed vs unsigned comparisons and 
+  Unused Database variables.
++ Synced Linux projects and Database checks on both platforms Windows and Linux.
++ Updated Users Records, removed fields not needed for individual users,
+  and moved some fields to SessionStats which is better for tracking statistics.
+
 Change Log Update (00.00.84)
 * 2017-04-10
 + Completed more work on Unit Tests and Configuration Form
@@ -298,6 +308,7 @@ Change Log Update (00.00.62)
 + Add check for disconnect on invalid attempts. Also add to config file.
 + Added STDIO error output for database for debugging, attached &m_database_log
   in session data.
+
 + Corrections on queries, added c_str() to table name variables, was missed.
 - WIP, Successful login marks authorized, then moves to main menu.
   Also need to add invalid attempt, kick back to matrix or logoff.
