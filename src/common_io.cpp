@@ -108,10 +108,10 @@ std::string CommonIO::getProgramPath(const std::string &program_name)
     if(pPath != nullptr)
     {
         std::cout << "Found OBV2 Enviroment set: " << pPath << std::endl;
-        
+
         program_path = pPath;
-        
-#ifdef _WIN32        
+
+#ifdef _WIN32
         if (program_path[program_path.size()-1] != '\\')
         {
             program_path.append("\\");
@@ -145,14 +145,14 @@ std::string CommonIO::getProgramPath(const std::string &program_name)
     position = program_path.rfind(program);
     if(position != std::string::npos)
     {
-        program_path.erase(position+1,program_path.size()-1);        
+        program_path.erase(position+1,program_path.size()-1);
     }
 
     // remove extra './'
     position = program_path.rfind("./");
     if(position != std::string::npos)
     {
-        program_path.erase(position,2);        
+        program_path.erase(position,2);
     }
 
 #elif _WIN32
@@ -169,7 +169,7 @@ std::string CommonIO::getProgramPath(const std::string &program_name)
     std::string::size_type position = program_path.rfind("\\", program_path.size()-1);
     if(position != std::string::npos)
     {
-        program_path.erase(position+1);        
+        program_path.erase(position+1);
     }
 #else
 
@@ -189,9 +189,9 @@ std::string CommonIO::getProgramPath(const std::string &program_name)
     // Remove Executable
     std::string::size_type position;
     position = program_path.rfind(program);
-    if(position != std::string::npos) 
+    if(position != std::string::npos)
     {
-        program_path.erase(position+1,program_path.size()-1);        
+        program_path.erase(position+1,program_path.size()-1);
     }
 
 #endif
@@ -335,18 +335,18 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str)
 std::string CommonIO::leftTrim(const std::string &str)
 {
     std::string new_string = str;
-    
+
     if(new_string.empty())
     {
         //std::cout << "Exception (Common::LeftTrim) string length == 0" << std::endl;
         return new_string;
     }
-    
+
     new_string.erase(
-        new_string.begin(), 
-        std::find_if(new_string.begin(), 
-            new_string.end(), 
-            std::not1(std::ptr_fun<int, int>(std::isspace)))
+        new_string.begin(),
+        std::find_if(new_string.begin(),
+                     new_string.end(),
+                     std::not1(std::ptr_fun<int, int>(std::isspace)))
     );
 
     return new_string;
@@ -360,20 +360,20 @@ std::string CommonIO::leftTrim(const std::string &str)
 std::string CommonIO::rightTrim(const std::string &str)
 {
     std::string new_string = str;
-    
+
     if(new_string.empty())
     {
         //std::cout << "Exception (Common::RightTrim) string length == 0" << std::endl;
         return new_string;
     }
-    
+
     new_string.erase(std::find_if(
-        new_string.rbegin(), 
-        new_string.rend(), 
-        std::not1(std::ptr_fun<int, int>(std::isspace))).base(), 
-            new_string.end()
-    );
-    
+                         new_string.rbegin(),
+                         new_string.rend(),
+                         std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
+                     new_string.end()
+                    );
+
     return new_string;
 }
 
@@ -412,7 +412,7 @@ std::string CommonIO::eraseString(const std::string &str,
     // Otherwise End Position is added for number of characters to remove.
     if(end_position == 0)
     {
-        end_position = string_size;        
+        end_position = string_size;
     }
     else
     {
@@ -420,7 +420,7 @@ std::string CommonIO::eraseString(const std::string &str,
         // Make sure we can never go past end of string!
         if(end_position > string_size)
         {
-            end_position = string_size;            
+            end_position = string_size;
         }
     }
 
@@ -542,7 +542,7 @@ std::string CommonIO::rightPadding(const std::string &str, std::string::size_typ
 
     for(std::string::size_type i = 0; i < (space-s); i++)
     {
-        padded_line += ' ';        
+        padded_line += ' ';
     }
 
     new_string.append(padded_line);
@@ -558,11 +558,11 @@ std::string CommonIO::rightPadding(const std::string &str, std::string::size_typ
 std::string CommonIO::leftPadding(const std::string &str, std::string::size_type space)
 {
     std::string new_string = str;
-    if(space == 0) 
+    if(space == 0)
     {
         return new_string;
     }
-    
+
     if(new_string.empty())
     {
         //std::cout << "Exception (Common::leftPadding) string length == 0" << std::endl;
@@ -580,7 +580,7 @@ std::string CommonIO::leftPadding(const std::string &str, std::string::size_type
 
     for(std::string::size_type i = 0; i < (space-s); i++)
     {
-        new_string.insert(0, " ");        
+        new_string.insert(0, " ");
     }
 
     return new_string;
@@ -651,7 +651,7 @@ std::string CommonIO::maskString(const std::string &str)
     new_string.erase();
     for(std::string::size_type i = 0; i < string_size; i++)
     {
-        new_string.append("*");        
+        new_string.append("*");
     }
 
     return new_string;
@@ -784,10 +784,10 @@ std::string CommonIO::printWideCharacters(const std::wstring &wide_string)
     for(wchar_t wc : wide_string)
     {
         std::string mb(MB_CUR_MAX, '\0');
-        int ret = std::wcrtomb(&mb[0], wc, &state);
+        std::string::size_type ret = std::wcrtomb(&mb[0], wc, &state);
         if((ret == 0) || (ret > MB_CUR_MAX))
         {
-            break;            
+            break;
         }
 
         // Skip any Trailing / Embedded null from Wide -> multibtye
@@ -820,11 +820,11 @@ std::string CommonIO::translateUnicode(const std::string &standard_string)
         ascii_value = std::char_traits<char>().to_int_type(standard_string[i]);
         if(ascii_value < 256)
         {
-            wide_string = CP437_TABLE[ascii_value];            
+            wide_string = CP437_TABLE[ascii_value];
         }
         else
         {
-            wide_string = standard_string[i];            
+            wide_string = standard_string[i];
         }
 
         output += printWideCharacters(wide_string);
@@ -1257,7 +1257,7 @@ std::string CommonIO::PascalToCString(int8_t *string)
         ++string;
     }
     *string = '\0';
-    
+
     return newstring;
 }
 
@@ -1301,7 +1301,7 @@ std::string CommonIO::boolAlpha(bool value)
 {
     if(value)
     {
-        return "True";        
+        return "True";
     }
     return "False";
 }
@@ -1358,7 +1358,7 @@ void CommonIO::readinAnsi(std::string FileName, std::string &buff)
     std::string path = GLOBAL_TEXTFILE_PATH;
     pathAppend(path);
     path += FileName;
-    
+
     std::cout << "readinAnsi: " << path << std::endl;
 
     // If files diesn't exist, change from .ANS to .ASC
@@ -1367,13 +1367,13 @@ void CommonIO::readinAnsi(std::string FileName, std::string &buff)
         std::string newFileName = FileName.substr(0, FileName.size() - 4);
         newFileName.append(".ASC");
         if (fileExists(newFileName))
-        {        
+        {
             std::cout << "Updated Filename to .ASC: " << path << std::endl;
             path = GLOBAL_TEXTFILE_PATH;
-            pathAppend(path);        
+            pathAppend(path);
             path += newFileName;
         }
-        else        
+        else
         {
             std::cout << "Not Found .ASC: " << newFileName << std::endl;
             return;
@@ -1394,11 +1394,11 @@ void CommonIO::readinAnsi(std::string FileName, std::string &buff)
         {
             if (c == '\n')
             {
-                buff += "\r\n";                
+                buff += "\r\n";
             }
             else
             {
-                buff += c;                
+                buff += c;
             }
         }
     }
@@ -1415,7 +1415,7 @@ std::string CommonIO::readinAnsi(std::string FileName)
     std::string path = GLOBAL_TEXTFILE_PATH;
     pathAppend(path);
     path += FileName;
-    
+
     std::cout << "readinAnsi: " << path << std::endl;
     std::string buff;
 
@@ -1433,11 +1433,11 @@ std::string CommonIO::readinAnsi(std::string FileName)
         {
             if (c == '\n')
             {
-                buff += "\r\n";                
+                buff += "\r\n";
             }
             else
             {
-                buff += c;                
+                buff += c;
             }
         }
     }
