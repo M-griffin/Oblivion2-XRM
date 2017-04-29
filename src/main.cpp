@@ -59,6 +59,7 @@ std::string GLOBAL_DATA_PATH = "";
 std::string GLOBAL_MENU_PATH = "";
 std::string GLOBAL_MENU_PROMPT_PATH = "";
 std::string GLOBAL_TEXTFILE_PATH = "";
+std::string GLOBAL_SCRIPT_PATH = "";
 std::string USERS_DATABASE = "";
 
 using boost::asio::ip::tcp;
@@ -194,6 +195,7 @@ auto main() -> int
     GLOBAL_MENU_PATH = GLOBAL_BBS_PATH + "MENU";
     GLOBAL_MENU_PROMPT_PATH = GLOBAL_BBS_PATH + "MPROMPT";
     GLOBAL_TEXTFILE_PATH = GLOBAL_BBS_PATH + "TEXTFILE";
+    GLOBAL_SCRIPT_PATH = GLOBAL_BBS_PATH + "SCRIPTS";
     
 
     // Setup Users Database name and path
