@@ -56,6 +56,11 @@
   <VirtualDirectory Name="model-sys">
     <File Name="../src/model-sys/config.hpp"/>
   </VirtualDirectory>
+  <VirtualDirectory Name="forms">
+    <File Name="../src/forms/form_base.hpp"/>
+    <File Name="../src/forms/form_system_config.cpp"/>
+    <File Name="../src/forms/form_system_config.hpp"/>
+  </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="" C_Options="" Assembler="">
@@ -170,9 +175,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="forms">
-    <File Name="../src/forms/form_base.hpp"/>
-    <File Name="../src/forms/form_system_config.cpp"/>
-    <File Name="../src/forms/form_system_config.hpp"/>
-  </VirtualDirectory>
 </CodeLite_Project>
