@@ -1,4 +1,13 @@
 
+Change Log Update (00.00.86)
+* 2017-04-29
++ Windows Project Updates
+  - Updated Boost from 55 to latest 64, compiled with ICU and Boost Python now.
+  - Cleaned up all Project Files, removed unused libs and include folders.
+  - Cleared new Boost Warning in Config.hpp model for Boost UUID generation.
++ Resynced Linux Projects
+- Researching Door/Script Server Now for externals.
+
 Change Log Update (00.00.85)
 * 2017-04-17
 + Completed Initial work on SessionStats objects and Database DAO calls.
