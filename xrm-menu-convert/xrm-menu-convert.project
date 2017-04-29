@@ -40,6 +40,8 @@
       <File Name="../src/model-sys/structures.hpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="" C_Options="" Assembler="">
@@ -54,41 +56,26 @@
       <Compiler Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++14;-Wall;-Wno-deprecated -Wno-unused-local-typedefs" C_Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++14;-Wall;-Wno-deprecated -Wno-unused-local-typedefs" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="../src"/>
-        <IncludePath Value="C:/boost/include/boost-1_58"/>
-        <IncludePath Value="C:/boost_1_58_0/boost"/>
-        <IncludePath Value="C:/boost/include"/>
-        <IncludePath Value="C:/Users/Blue/Desktop/Test2/sqlitewrap"/>
-        <IncludePath Value="C:/sqlite3/include"/>
-        <IncludePath Value="C:/OpenSSL-Win32/include"/>
+        <IncludePath Value="C:/boost64"/>
+        <IncludePath Value="C:/boost64/include"/>
         <IncludePath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/include"/>
-        <IncludePath Value="C:\Users\Blue\Downloads\icu_53_1_mingw_builds_4_9_1_posix_dwarf_32_devel\icu53_1\include"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
-        <LibraryPath Value="C:/boost/lib"/>
-        <LibraryPath Value="C:/msys/1.0/icu/source/lib"/>
-        <LibraryPath Value="C:/sqlite3/lib"/>
-        <LibraryPath Value="C:/Users/Blue/Desktop/Test2/sqlitewrap/Debug"/>
-        <LibraryPath Value="C:/OpenSSL-Win32/lib/MinGW"/>
-        <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>
+        <LibraryPath Value="C:/boost64/lib"/>
+        <LibraryPath Value="C:/msys/1.0/icu/dist/lib"/>
         <LibraryPath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/build"/>
-        <Library Value="libboost_system-mgw51-mt-1_58"/>
-        <Library Value="libboost_thread-mgw51-mt-1_58"/>
-        <Library Value="libboost_chrono-mgw51-mt-1_58"/>
-        <Library Value="libboost_serialization-mgw51-mt-1_58"/>
-        <Library Value="libboost_locale-mgw51-mt-1_58"/>
-        <Library Value="libboost_filesystem-mgw51-mt-1_58"/>
-        <Library Value="libboost_timer-mgw51-mt-1_58"/>
-        <Library Value="libboost_regex-mgw51-mt-1_58"/>
-        <Library Value="libws2_32.a"/>
-        <Library Value="libwsock32.a"/>
+        <Library Value="libboost_system-mgw51-mt-1_64.dll.a"/>
+        <Library Value="libboost_thread-mgw51-mt-1_64.dll.a"/>
+        <Library Value="libboost_chrono-mgw51-mt-1_64.dll.a"/>
+        <Library Value="libboost_serialization-mgw51-mt-1_64.dll.a"/>
+        <Library Value="libboost_locale-mgw51-mt-1_64.dll.a"/>
+        <Library Value="libboost_filesystem-mgw51-mt-1_64.dll.a"/>
+        <Library Value="libboost_timer-mgw51-mt-1_64.dll.a"/>
+        <Library Value="libboost_regex-mgw51-mt-1_64.dll.a"/>
         <Library Value="libiconv.a"/>
         <Library Value="libicuuc.dll.a"/>
         <Library Value="libicuin.dll.a"/>
-        <Library Value="libSqliteWrapped.a"/>
-        <Library Value="libsqlite3.a"/>
-        <Library Value="ssleay32.a"/>
-        <Library Value="libeay32.a"/>
         <Library Value="yaml-cpp.dll"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
@@ -166,6 +153,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
 </CodeLite_Project>

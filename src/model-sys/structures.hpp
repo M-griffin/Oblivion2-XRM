@@ -9,7 +9,7 @@ extern std::string GLOBAL_DATA_PATH;
 extern std::string GLOBAL_MENU_PATH;
 extern std::string GLOBAL_MENU_PROMPT_PATH;
 extern std::string GLOBAL_TEXTFILE_PATH;
-
+extern std::string GLOBAL_SCRIPT_PATH;
 extern std::string USERS_DATABASE;
 
 /**
