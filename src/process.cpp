@@ -7,6 +7,8 @@
 
 #include <boost/process/detail/config.hpp>
 #include <boost/process.hpp>
+
+// Windows only for Testing!
 #include <boost/process/windows.hpp>
 
 
@@ -34,7 +36,7 @@ Process::Process(session_data_ptr session, ba::io_service& io_service, std::stri
             bp::std_out > m_output_pipe, 
             bp::std_in < m_input_pipe, 
             bp::std_err > bp::null,
-            bp::windows::show,
+            bp::windows::show, // Windows Only for Testing.
             // Process Handlers
             /*
             bp::on_setup([](auto &e)
@@ -91,11 +93,19 @@ std::string Process::getBufferData()
  */
 void Process::waitingForData()
 {
-    // Reads from pipe (From Child Process) need to setup call back to method!
-    m_output_pipe.async_read_some(ba::buffer(m_read_buffer),
-                                    boost::bind(&Process::handleRead, shared_from_this(),
-                                        ba::placeholders::error,
-                                        ba::placeholders::bytes_transferred));
+    if (m_output_pipe.is_open())
+    {
+        // Reads from pipe (From Child Process) need to setup call back to method!
+        m_output_pipe.async_read_some(ba::buffer(m_read_buffer),
+                                        boost::bind(&Process::handleRead, shared_from_this(),
+                                            ba::placeholders::error,
+                                            ba::placeholders::bytes_transferred));
+    }
+    else
+    {
+        std::cout << "Process waitingForData pipe is closed." << std::endl;
+    }
+    
 }
 
 /**
@@ -116,7 +126,11 @@ void Process::handleRead(const bs::error_code& error, std::size_t bytes_transfer
 
     // Deliver Data Back to the User Session.
     std::string pipe_data = std::move(getBufferData());
-    m_session->deliver(pipe_data);
+    
+    if (m_session)
+    {
+        m_session->deliver(pipe_data);
+    }    
 
     // Restart Next Call Back
     if (isRunning())
@@ -136,11 +150,18 @@ void Process::handleRead(const bs::error_code& error, std::size_t bytes_transfer
  */
 void Process::deliver(const std::string &msg)
 {
-    ba::async_write(m_input_pipe, 
-                    ba::buffer(msg, msg.size()),
-                    boost::bind(&Process::handleWrite, 
-                        shared_from_this(),
-                        ba::placeholders::error));
+    if (m_input_pipe.is_open())
+    {
+        ba::async_write(m_input_pipe, 
+                ba::buffer(msg, msg.size()),
+                boost::bind(&Process::handleWrite, 
+                    shared_from_this(),
+                    ba::placeholders::error));
+    }    
+    else
+    {
+        std::cout << "Process deliver pipe is closed." << std::endl;
+    }
 }
 
 /**
