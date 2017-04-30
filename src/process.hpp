@@ -5,6 +5,7 @@
 #pragma GCC diagnostic ignored "-Wpedantic"
 
 #include <boost/process/detail/config.hpp>
+#include <boost/process/asnyc.hpp>
 #include <boost/process.hpp>
 
 // turn the warnings back on
@@ -31,8 +32,27 @@ class Process
 public:
     Process(session_data_ptr session, ba::io_service& io_service, std::string cmdline)
         : m_session(session)
-        , m_pipe(io_service)
-        , m_child(cmdline, bp::std_out > m_pipe)
+        , m_output_pipe(io_service)
+        , m_input_pipe(io_service)
+        , m_child(cmdline, bp::std_out > m_output_pipe, bp::std_in < m_input_pipe, bp::std_err > nullptr,
+                    bp::windows::show,
+                    // Process Handlers
+                    bp::on_setup([](auto &e)
+                    { 
+                        std::cout << "Process on_setup" << std::endl;
+                        e.startup_info.dwFlags = STARTF_RUNFULLSCREEN; 
+                    }),
+                    bp::on_error([](auto&, const std::error_code & error)
+                    { 
+                        std::cout << "Process on_error" << std::endl;
+                        std::cerr << error.message() << std::endl; 
+                    }),                    
+                    bp::on_exit([&](int exit, const std::error_code& error)
+                    {                      
+                        std::cout << "Process on_exit: " << exit << " : " << error.message << std::endl;
+                        m_input_pipe.async_close();
+                        m_output_pipe.async_close();
+                    }))
     {
         waitingForData();
     }
@@ -47,7 +67,7 @@ public:
      */
     bool isRunning()
     {
-        return m_child.running() || m_child.exit_code() == 0;
+        return m_child.running() && m_child.exit_code() == 0;
     }
 
     /**
@@ -68,7 +88,7 @@ public:
     void waitingForData()
     {
         // Reads from pipe (From Child Process) need to setup call back to method!
-        boost::asio::async_read_some(m_pipe, boost::asio::buffer(buf),
+        boost::asio::async_read_some(m_output_pipe, boost::asio::buffer(buf),
                                      [] (boost::bind(&Process::handleRead, shared_from_this(),
                                              boost::asio::placeholders::error,
                                              boost::asio::placeholders::bytes_transferred));
@@ -86,7 +106,7 @@ public:
             return;
         }
 
-        // TODO testing, we need to do pipe/ cp437/utf-8 conversions before sending!
+        // Deliver Data Back to the User Session.
         std::string pipe_data = std::move(getBuffData());
         m_session->deliver(pipe_data);
 
@@ -106,10 +126,9 @@ public:
      */
     void deliver(const std::string &msg)
     {
-        boost::asio::async_write(m_pipe,
-                                 boost::asio::buffer(msg, msg.size()),
-                                 boost::bind(&Process::handleWrite, shared_from_this(),
-                                             boost::asio::placeholders::error));
+        boost::asio::async_write(m_input_pipe, boost::asio::buffer(msg, msg.size()),
+                                [] (boost::bind(&Process::handleWrite, shared_from_this(),
+                                    boost::asio::placeholders::error));
     }
     
     /**
@@ -126,7 +145,8 @@ public:
     }
     
     session_data_ptr  m_session;
-    bp::async_pipe    m_pipe;
+    bp::async_pipe    m_output_pipe;
+    bp::async_pipe    m_input_pipe;
     bp::child         m_child;
     std::vector<char> m_read_buffer;
 
