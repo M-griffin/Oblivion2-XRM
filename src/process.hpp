@@ -20,11 +20,19 @@
 
 namespace ba = boost::asio;
 namespace bp = boost::process;
+namespace bs = boost::system;
 
 
 class SessionData;
 typedef boost::shared_ptr<SessionData> session_data_ptr;
 
+/**
+ * @class Process
+ * @author Michael Griffin
+ * @date 30/04/2017
+ * @file process.hpp
+ * @brief Asynchronous Process class for piping data between user sessions and external programs.
+ */
 class Process
     : public boost::enable_shared_from_this<Process>
 {
@@ -88,17 +96,17 @@ public:
     void waitingForData()
     {
         // Reads from pipe (From Child Process) need to setup call back to method!
-        boost::asio::async_read_some(m_output_pipe, boost::asio::buffer(buf),
+        ba::async_read_some(m_output_pipe, ba::buffer(buf),
                                      [] (boost::bind(&Process::handleRead, shared_from_this(),
-                                             boost::asio::placeholders::error,
-                                             boost::asio::placeholders::bytes_transferred));
+                                             ba::placeholders::error,
+                                             ba::placeholders::bytes_transferred));
     }
 
     /**
      * @brief Asyc Process Read Handler
      * @param error
      */
-    void handleRead(const boost::system::error_code& error, std::size_t bytes_transferred)
+    void handleRead(const bs::error_code& error, std::size_t bytes_transferred)
     {
         if(!error)
         {
@@ -126,9 +134,9 @@ public:
      */
     void deliver(const std::string &msg)
     {
-        boost::asio::async_write(m_input_pipe, boost::asio::buffer(msg, msg.size()),
+        ba::async_write(m_input_pipe, ba::buffer(msg, msg.size()),
                                 [] (boost::bind(&Process::handleWrite, shared_from_this(),
-                                    boost::asio::placeholders::error));
+                                    ba::placeholders::error));
     }
     
     /**
@@ -136,7 +144,7 @@ public:
      * everything this person has left.
      * @param error
      */
-    void handleWrite(const boost::system::error_code& error)
+    void handleWrite(const bs::error_code& error)
     {
         if(error)
         {
