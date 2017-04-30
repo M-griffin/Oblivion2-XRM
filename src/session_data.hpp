@@ -75,6 +75,12 @@ public:
     ~SessionData()
     {
         std::cout << "~SessionData" << std::endl;
+        
+        for (unsigned int i = 0; i < m_processes.size(); i++)
+        {
+            m_processes[i]->terminate();
+        }
+        std::vector<process_ptr>().swap(m_processes);
     }
 
     /**
@@ -313,9 +319,34 @@ public:
     }
     
     /**
-     * @brief Startup Session Stats
+     * @brief Startup Session Stats 
+     * @param sessionType
      */
     void startUpSessionStats(std::string sessionType);
+    
+    /**
+     * @brief Executes External Processes
+     * @param cmdline
+     */
+    void startExternalProcess(const std::string &cmdline) 
+    {
+        // Only (1) Process will run at a time per session.
+        process_ptr proc(new Process(shared_from_this(), m_io_service, cmdline));
+        m_processes.push_back(proc);
+    }
+    
+    /**
+     * @brief Clears Processes once it's shutdown and returned.
+     */
+    void clearProcess()
+    {
+        for (unsigned int i = 0; i < m_processes.size(); i++)
+        {
+            m_processes[i]->terminate();
+        }
+        
+        std::vector<process_ptr>().swap(m_processes);
+    }
     
 private:
 
@@ -341,8 +372,7 @@ public:
     SQLW::StderrLog       m_database_log;   
     
     user_ptr              m_user_record;
-    session_stats_ptr     m_session_stats;
-    process_ptr           m_process;
+    session_stats_ptr     m_session_stats;    
     
     int                   m_node_number;
     bool                  m_is_use_ansi;
@@ -355,6 +385,9 @@ public:
     enum { max_length = 4096 };
     char m_raw_data[max_length];  // Raw Incoming
     std::string m_parsed_data;    // Telnet Opts parsed out
+    
+    // Handle to Processes.
+    std::vector<process_ptr> m_processes;
 
 };
 

@@ -77,6 +77,14 @@ public:
      */
     void handleWrite(const bs::error_code& error);
     
+    /**
+     * @brief Kill Process
+     */
+    void terminate()
+    {
+        m_child.terminate();
+    }
+    
     session_data_ptr  m_session;
     bp::async_pipe    m_output_pipe;
     bp::async_pipe    m_input_pipe;
