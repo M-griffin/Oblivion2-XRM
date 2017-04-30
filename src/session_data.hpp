@@ -1,6 +1,7 @@
 #ifndef SESSION_DATA_HPP
 #define SESSION_DATA_HPP
 
+#include "process.hpp"
 #include "connection_base.hpp"
 #include "telnet_decoder.hpp"
 #include "session_manager.hpp"
@@ -15,6 +16,7 @@
 #include "data-sys/users_dao.hpp"
 
 #include <boost/asio.hpp>
+#include <boost/bind.hpp>
 #include <boost/asio/deadline_timer.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
@@ -63,6 +65,7 @@ public:
         , m_is_session_authorized(false)
         , m_is_leaving(false)
         , m_is_esc_timer(false)
+        , m_is_process_running(false)
         , m_raw_data()
         , m_parsed_data("")
     {
@@ -339,6 +342,7 @@ public:
     
     user_ptr              m_user_record;
     session_stats_ptr     m_session_stats;
+    process_ptr           m_process;
     
     int                   m_node_number;
     bool                  m_is_use_ansi;
@@ -346,6 +350,7 @@ public:
     bool                  m_is_session_authorized;
     bool                  m_is_leaving;
     bool                  m_is_esc_timer;
+    bool                  m_is_process_running;
 
     enum { max_length = 4096 };
     char m_raw_data[max_length];  // Raw Incoming

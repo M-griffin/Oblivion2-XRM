@@ -7,6 +7,7 @@
 #include "connection_tcp.hpp"
 #include "communicator.hpp"
 
+#include <boost/bind.hpp>
 #include <boost/asio.hpp>
 
 using boost::asio::ip::tcp;
