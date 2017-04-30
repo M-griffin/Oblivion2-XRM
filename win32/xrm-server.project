@@ -114,6 +114,7 @@
       <File Name="../src/data-app/last_callers_dao.cpp"/>
       <File Name="../src/data-app/last_callers_dao.hpp"/>
     </VirtualDirectory>
+    <File Name="../src/process.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

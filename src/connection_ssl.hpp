@@ -28,9 +28,8 @@ class ssl_connection
 public:
 
     ssl_connection(boost::asio::io_service& io_service,
-                   boost::asio::ssl::context& context,
-                   bool is_ssecure)
-        : connection_base(io_service, context, is_ssecure)
+                   boost::asio::ssl::context& context)
+        : connection_base(io_service, context, true)
     {
     }
 

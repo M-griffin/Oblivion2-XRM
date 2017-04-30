@@ -247,8 +247,8 @@ void SessionData::startUpSessionStats(std::string sessionType)
     // Verify if the user table exists.
     if (session_stat_dao)
     {        
-        std::time_t tt = 0;
-        std::time_t const dateTime = std::time(&tt);
+        std::time_t current_time = 0;
+        std::time_t const dateTime = std::time(&current_time);
     
         m_session_stats->sSessionType = sessionType;
         m_session_stats->dtStartDate = dateTime;
