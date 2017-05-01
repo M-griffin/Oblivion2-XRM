@@ -330,9 +330,28 @@ public:
      */
     void startExternalProcess(const std::string &cmdline) 
     {
+        std::cout << "SessionData Starting Process" << std::endl;
+        std::cout << GLOBAL_SCRIPT_PATH << std::endl;
+        
+        std::string path = GLOBAL_SCRIPT_PATH + "\\" + cmdline;
+                
         // Only (1) Process will run at a time per session.
-        process_ptr proc(new Process(shared_from_this(), m_io_service, cmdline));
-        m_processes.push_back(proc);
+        process_ptr proc(new Process(shared_from_this(), m_io_service, path));
+        if (proc)
+        {
+            std::cout << "SessionData Starting Process SUCCESS!" << std::endl;
+            m_is_process_running = true;
+            proc->waitingForData();
+            m_processes.push_back(proc);    
+        }
+        else
+        {
+            std::cout << "SessionData Starting Process FAILED!" << std::endl;
+            m_is_process_running = false;
+        }
+        
+        
+        std::cout << "SessionData Starting Done" << std::endl;
     }
     
     /**

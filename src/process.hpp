@@ -6,6 +6,7 @@
 #pragma GCC diagnostic ignored "-Wpedantic"
 
 #include <boost/process/detail/config.hpp>
+#include <boost/process/async.hpp>
 #include <boost/process.hpp>
 
 // turn the warnings back on
@@ -72,6 +73,11 @@ public:
     void deliver(const std::string &msg);
     
     /**
+     * @brief Pulls Input Data from User Session and Delivers to (Child Process)
+     */
+    void update();
+    
+    /**
      * @brief Callback after Writing Data, Checks Errors
      * @param error
      */
@@ -89,7 +95,8 @@ public:
     bp::async_pipe    m_output_pipe;
     bp::async_pipe    m_input_pipe;
     bp::child         m_child;
-    std::vector<char> m_read_buffer;
+    
+    std::vector<char> m_read_buffer; 
 
 };
 

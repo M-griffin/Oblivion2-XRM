@@ -351,11 +351,15 @@ auto main() -> int
     // We'll handle Node and System setup here.  Need to write interface.
     while(TheCommunicator::instance()->isActive())
     {
+        
+        Sleep(1);
+        
         // Just testing with text input, change this to state for commands
         // Or communication with a session or all sessions!
-        std::string line;
-        std::getline(std::cin, line);
+        //std::string line == "";
+        //std::getline(std::cin, line);
 
+        /*
         // process input, stop from Sysop/Local User will shutdown the server.
         // Just a temp for testing.
         if(line == "stop")
@@ -374,7 +378,7 @@ auto main() -> int
             // All or Individual Sessions.
             TheCommunicator::instance()->addMessageQueue(line);
             TheCommunicator::instance()->sendGlobalMessage();
-        }
+        }*/
     }
 
     // Release Communicator Instance

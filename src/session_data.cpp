@@ -55,7 +55,19 @@ void SessionData::handleRead(const boost::system::error_code& error, size_t byte
                 }
                 else if(!m_is_esc_timer)
                 {
-                    m_state_manager->update();
+                    // If processes is running, then redirect input data from Users
+                    // To the Session
+                    if (m_is_process_running)
+                    {
+                        if (m_processes.size() > 0) 
+                        {
+                            m_processes.back()->update();    
+                        }                        
+                    }
+                    else 
+                    {
+                        m_state_manager->update();    
+                    }                    
                 }
 
                 /*

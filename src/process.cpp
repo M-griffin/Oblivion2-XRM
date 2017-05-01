@@ -6,17 +6,24 @@
 #pragma GCC diagnostic ignored "-Wpedantic"
 
 #include <boost/process/detail/config.hpp>
+#include <boost/process/extend.hpp>
+#include <boost/process/async.hpp>
 #include <boost/process.hpp>
 
 // Windows only for Testing!
 #include <boost/process/windows.hpp>
+
+#include <boost/asio.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
 
 
 // turn the warnings back on
 #pragma GCC diagnostic pop
 
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <iostream>
 #include <vector>
@@ -33,32 +40,48 @@ Process::Process(session_data_ptr session, ba::io_service& io_service, std::stri
         , m_input_pipe(io_service)
         , m_child(cmdline, 
             bp::start_dir=GLOBAL_SCRIPT_PATH,
-            bp::std_out > m_output_pipe, 
-            bp::std_in < m_input_pipe, 
+            
+            bp::std_out > m_output_pipe,
+            bp::std_in < m_input_pipe,
             bp::std_err > bp::null,
-            bp::windows::show, // Windows Only for Testing.
+            // io_service
+            
+            
+            //bp::std_err > m_output_pipe,
+            
+            //io_service,
+            //bp::windows::show, // Windows Only for Testing.
             // Process Handlers
-            /*
-            bp::on_setup([](auto &e)
+            
+            bp::extend::on_setup([](auto &)
             { 
                 std::cout << "Process on_setup" << std::endl;
-                e.startup_info.dwFlags = STARTF_RUNFULLSCREEN; 
+                //e.startup_info.dwFlags = STARTF_USESHOWWINDOW;
+                //e.startup_info.dwCreationFlags = CREATE_NEW_CONSOLE; 
+                //e.startup_info.hStdOutput = m_output_pipe;
+                //e.hStdError = newstdout;
+                //e.startup_info.hStdInput = m_input_pipe;
             }),
-            bp::on_error([](auto&, const std::error_code & error)
+            bp::extend::on_success([](auto&)
+            { 
+                std::cout << "Process on_success" << std::endl;
+            }),            
+            bp::extend::on_error([](auto&, const std::error_code & error)
             { 
                 std::cout << "Process on_error" << std::endl;
                 std::cerr << error.message() << std::endl; 
-            }),*/
+            }),
             bp::on_exit([&](int exit, const std::error_code&)
             {                      
-                std::cout << "Process on_exit" << exit << std::endl;
+                std::cout << "Process on_exit: " << exit << std::endl;
                 m_input_pipe.async_close();
                 m_output_pipe.async_close();
                 m_session->m_is_process_running = false;
             }))
-{
+{   
     // Start up the CallBack connection on Pipe Data
-    waitingForData();
+    std::cout << "Process Startup Ready()" << std::endl;    
+    
 }
 
 Process::~Process()
@@ -71,9 +94,10 @@ Process::~Process()
  */
 bool Process::isRunning()
 {
-    std::cout << "m_child.exit_code(): " << m_child.exit_code() << std::endl;
+    //std::cout << "m_child.running(): " << m_child.running() << std::endl;
+    //std::cout << "Process m_child.exit_code(): " << m_child.exit_code() << std::endl;
     // Verify if running, what the exit code actually is.
-    return m_child.running() && m_child.exit_code() == 0;
+    return m_child.running(); // && m_child.exit_code() == 0;
 }
 
 /**
@@ -82,9 +106,11 @@ bool Process::isRunning()
  */
 std::string Process::getBufferData()
 {
-    std::string data(m_read_buffer.begin(), m_read_buffer.end());
-    data.append("\0");
-    std::vector<char>().swap(m_read_buffer);
+    std::string data = "";
+    if (m_read_buffer.size() > 0)
+    {
+        data.append(m_read_buffer.data());
+    }
     return data;
 }
 
@@ -92,10 +118,13 @@ std::string Process::getBufferData()
  * @brief Data Handler for incoming Data (From Child Process)
  */
 void Process::waitingForData()
-{
+{  
+    if (!m_session->m_is_process_running)
+        return;       
+
     if (m_output_pipe.is_open())
     {
-        // Reads from pipe (From Child Process) need to setup call back to method!
+        // Reads from pipe (From Child Process) need to setup call back to method!                                           
         m_output_pipe.async_read_some(ba::buffer(m_read_buffer),
                                         boost::bind(&Process::handleRead, shared_from_this(),
                                             ba::placeholders::error,
@@ -105,7 +134,6 @@ void Process::waitingForData()
     {
         std::cout << "Process waitingForData pipe is closed." << std::endl;
     }
-    
 }
 
 /**
@@ -114,34 +142,36 @@ void Process::waitingForData()
  */
 void Process::handleRead(const bs::error_code& error, std::size_t bytes_transferred)
 {
-    if(!error)
+    if(error)
     {
         std::cout << "async_read process error: " 
                   << error.message() 
+                  << error.value()
                   << " : " 
                   << bytes_transferred 
                   << std::endl;
         return;
     }
+    
 
     // Deliver Data Back to the User Session.
     std::string pipe_data = std::move(getBufferData());
-    
-    if (m_session)
+            
+    // Deliver Pipe (Process Output back to Users Socket)
+    if (m_session && pipe_data.size() > 0)
     {
+        std::cout << "data: " << pipe_data << std::endl;
         m_session->deliver(pipe_data);
     }    
 
     // Restart Next Call Back
-    if (isRunning())
+    if (isRunning() && m_session->m_is_process_running)
     {
-        waitingForData();
+        //waitingForData();
         return;
     }
 
     std::cout << "Process is no longer running. " << std::endl;
-    // Do we terminate here? hmm 
-    //m_child.terminate();
 }
 
 /**
@@ -150,6 +180,7 @@ void Process::handleRead(const bs::error_code& error, std::size_t bytes_transfer
  */
 void Process::deliver(const std::string &msg)
 {
+    std::cout << "Process deliver()" << std::endl;
     if (m_input_pipe.is_open())
     {
         ba::async_write(m_input_pipe, 
@@ -165,6 +196,27 @@ void Process::deliver(const std::string &msg)
 }
 
 /**
+ * @brief Pulls Input Data from User Session and Delivers to (Child Process)
+ */
+void Process::update()
+{
+    if (m_session)
+    {
+        //session_data_wptr
+        std::cout << "Process Update()" << std::endl;
+        std::string session_data = std::move(m_session->m_parsed_data);
+        if (session_data.size() > 0)
+        {
+            deliver(session_data);    
+        }
+    }    
+    else
+    {
+        std::cout << "Process Update: Session is no longer active." << std::endl;
+    }
+}
+
+/**
  * @brief Callback after Writing Data, Checks Errors
  * @param error
  */
@@ -174,6 +226,7 @@ void Process::handleWrite(const bs::error_code& error)
     {
         std::cout << "async_write process error: " 
                   << error.message() 
+                  << error.value()
                   << std::endl;
     }        
 }
