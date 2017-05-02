@@ -1,4 +1,12 @@
 
+Change Log Update (00.00.88)
+* 2017-05-02
++ Updates to Process, Added Separate UpdateState for Process Handling
+  If were inside a process, skip ESC sequence testing, just pass through
+  all data as is to the process.
++ Cleanup processes on next look, make sure if a process is not running to 
+  pop it off the stack for cleanup.
+
 Change Log Update (00.00.87)
 * 2017-05-02
 + External Processes (Windows / Posix)
