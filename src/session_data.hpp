@@ -3,6 +3,8 @@
 
 #ifdef _WIN32
 #include "process_win.hpp"
+#else
+#include "process_posix.hpp"
 #endif
 
 #include "connection_base.hpp"
@@ -78,7 +80,7 @@ public:
     ~SessionData()
     {
         std::cout << "~SessionData" << std::endl;
-        
+
         for (unsigned int i = 0; i < m_processes.size(); i++)
         {
             m_processes[i]->terminate();
@@ -205,9 +207,9 @@ public:
      */
     void handleWrite(const boost::system::error_code& error)
     {
-        
+
         std::cout << "async_write " << error.message() << std::endl;
-        
+
         if(error)
         {
             std::cout << "async_write error: " << error.message() << std::endl;
@@ -249,7 +251,7 @@ public:
                 {
                     std::cout << "Caught: " << e.what();
                 }
-            }            
+            }
         }
     }
 
@@ -281,14 +283,14 @@ public:
      * @brief User Logoff
      */
     void logoff()
-    {        
+    {
         session_manager_ptr room = m_room.lock();
         if(room)
         {
             // Room is the session.
-            room->leave(m_node_number);   
+            room->leave(m_node_number);
         }
-        
+
         if(m_connection && m_connection->is_open())
         {
             try
@@ -316,35 +318,35 @@ public:
             {
                 std::cout << "Caught: " << e.what();
             }
-        }   
+        }
     }
-    
+
     /**
-     * @brief Startup Session Stats 
+     * @brief Startup Session Stats
      * @param sessionType
      */
     void startUpSessionStats(std::string sessionType);
-    
+
     /**
      * @brief Executes External Processes
      * @param cmdline
      */
-    void startExternalProcess(const std::string &cmdline) 
+    void startExternalProcess(const std::string &cmdline)
     {
         std::cout << "SessionData Starting Process" << std::endl;
         std::cout << GLOBAL_SCRIPT_PATH << std::endl;
-        
+
         //std::string path = GLOBAL_SCRIPT_PATH + "\\" + cmdline;
         std::string path = cmdline;
-                
+
         // Only (1) Process will run at a time per session.
-#ifdef _WIN32        
+#ifdef _WIN32
         process_ptr proc(new ProcessWin(shared_from_this(), path));
         if (proc)
         {
             std::cout << "SessionData Starting Process SUCCESS!" << std::endl;
             m_is_process_running = true;
-            m_processes.push_back(proc);    
+            m_processes.push_back(proc);
         }
         else
         {
@@ -352,13 +354,23 @@ public:
             m_is_process_running = false;
         }
 #else
+        process_ptr proc(new ProcessPosix(shared_from_this(), path));
+        if (proc)
+        {
+            std::cout << "SessionData Starting Process SUCCESS!" << std::endl;
+            m_is_process_running = true;
+            m_processes.push_back(proc);
+        }
+        else
+        {
+            std::cout << "SessionData Starting Process FAILED!" << std::endl;
+            m_is_process_running = false;
+        }
+#endif
 
-        
-#endif        
-        
         std::cout << "SessionData Starting Done" << std::endl;
     }
-    
+
     /**
      * @brief Clears Processes once it's shutdown and returned.
      */
@@ -368,10 +380,10 @@ public:
         {
             m_processes[i]->terminate();
         }
-        
+
         std::vector<process_ptr>().swap(m_processes);
     }
-    
+
 private:
 
     /**
@@ -393,11 +405,11 @@ public:
 
     // Temp while testing.
     SQLW::Database        m_user_database;
-    SQLW::StderrLog       m_database_log;   
-    
+    SQLW::StderrLog       m_database_log;
+
     user_ptr              m_user_record;
-    session_stats_ptr     m_session_stats;    
-    
+    session_stats_ptr     m_session_stats;
+
     int                   m_node_number;
     bool                  m_is_use_ansi;
     std::string           m_output_encoding;
@@ -409,7 +421,7 @@ public:
     enum { max_length = 4096 };
     char m_raw_data[max_length];  // Raw Incoming
     std::string m_parsed_data;    // Telnet Opts parsed out
-    
+
     // Handle to Processes.
     std::vector<process_ptr> m_processes;
 

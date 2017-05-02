@@ -1,48 +1,49 @@
-#ifndef PROCESS_WIN_HPP
-#define PROCESS_WIN_HPP
+#ifndef PROCESS_POSIX_HPP
+#define PROCESS_POSIX_HPP
 
 #include "process_base.hpp"
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
+#include <termios.h>
 
 #include <vector>
 #include <string>
-
 
 class SessionData;
 typedef boost::shared_ptr<SessionData> session_data_ptr;
 
 /**
- * @class ProcessWin
+ * @class ProcessPosix
  * @author Michael Griffin
  * @date 30/04/2017
  * @file process.hpp
- * @brief Process Windows class for piping data between user sessions and external programs.
+ * @brief Process Posix class for piping data between user sessions and external programs.
  */
-class ProcessWin
+class ProcessPosix
     : public ProcessBase
 {
 
 public:
-    ProcessWin(session_data_ptr session, std::string cmdline);
-    ~ProcessWin();
+    ProcessPosix(session_data_ptr session, std::string cmdline);
+    ~ProcessPosix();
+
+    // pty control structure
+    struct termios m_termbuf_original;
+    struct termios m_termbuf;
 
     /**
-     * @brief Test if where using Windows NT
-     * @return
+     * @brief Startup the inital Terminal buffer
      */
-    bool isWinNT();
+    void initTerminalOptions();
 
     /**
-     * @brief Kill Process once threads and sockets are killed.
-     * @param dwPID
-     * @param dwTimeout
-     * @return
+     * @brief Setup the inital Terminal buffer
      */
-    DWORD WINAPI terminateApp(DWORD pid, DWORD timeout);
+    void setTerminalOptions();
+
+    /**
+     * @brief Setup the inital Terminal buffer
+     */
+    void setTerminalBuffer();
 
     /**
      * @brief Process Loop Thread
@@ -70,11 +71,8 @@ public:
      */
     void terminate();
 
-    PROCESS_INFORMATION m_process_info;
-    HANDLE              m_new_stdin;
-    HANDLE              m_new_stdout;
-    HANDLE              m_read_stdout;
-    HANDLE              m_write_stdin;
+    int m_pty_file_desc;
+    int m_proc_id;
 
 };
 

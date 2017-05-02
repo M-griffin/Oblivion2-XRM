@@ -429,14 +429,18 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
 
             // Check
         case 'C':
-        {
-            // Testing processes
-            std::string cmdline = "C:\\windows\\system32\\cmd.exe";
-            startupExternalProcess(cmdline);
-            return true;
-            //return false;            
-        }   
-            // Feedback         
+            {
+                // Testing processes
+#ifdef _WIN32
+                std::string cmdline = "C:\\windows\\system32\\cmd.exe";
+#else
+                std::string cmdline = "/bin/bash";
+#endif
+                startupExternalProcess(cmdline);
+                return true;
+                //return false;
+            }
+            // Feedback
         case 'F':
             return false;
 

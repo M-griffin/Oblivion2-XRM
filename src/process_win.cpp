@@ -4,9 +4,10 @@
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
-// Windows only for Testing!
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#endif
 
 #include <iostream>
 #include <vector>
@@ -49,10 +50,10 @@ BOOL CALLBACK terminateAppEnum(HWND hwnd, LPARAM lParam)
 
 ProcessWin::ProcessWin(session_data_ptr session, std::string cmdline)
     : ProcessBase(session, cmdline)
-{ 
+{
     // Startup External Process
     createProcess();
-}        
+}
 
 ProcessWin::~ProcessWin()
 { }
@@ -60,9 +61,9 @@ ProcessWin::~ProcessWin()
 
 /**
  * @brief Test if where using Windows NT
- * @return 
+ * @return
  */
-bool ProcessWin::isWinNT()  
+bool ProcessWin::isWinNT()
 {
     OSVERSIONINFO osv;
     osv.dwOSVersionInfoSize = sizeof(osv);
@@ -74,7 +75,7 @@ bool ProcessWin::isWinNT()
  * @brief Kill Process once threads and sockets are killed.
  * @param dwPID
  * @param dwTimeout
- * @return 
+ * @return
  */
 DWORD WINAPI ProcessWin::terminateApp(DWORD pid, DWORD timeout)
 {
@@ -97,7 +98,7 @@ DWORD WINAPI ProcessWin::terminateApp(DWORD pid, DWORD timeout)
     // then you kill it.
     if(WaitForSingleObject(proc, timeout) != WAIT_OBJECT_0)
     {
-        result = (TerminateProcess(proc, 0) ? TA_SUCCESS_KILL : TA_FAILED);    
+        result = (TerminateProcess(proc, 0) ? TA_SUCCESS_KILL : TA_FAILED);
     }
     else
     {
@@ -112,8 +113,8 @@ DWORD WINAPI ProcessWin::terminateApp(DWORD pid, DWORD timeout)
 /**
  * @brief Process Loop Thread
  */
-void ProcessWin::executeProcessLoop() 
-{    
+void ProcessWin::executeProcessLoop()
+{
     unsigned long exit   = 0;  // process exit code
     unsigned long bread  = 0;  // bytes read
     unsigned long avail  = 0;  // bytes available
@@ -142,7 +143,7 @@ void ProcessWin::executeProcessLoop()
 
 
         // Handle Naped Pipes for STDIO Output of protocols.
-        PeekNamedPipe(m_read_stdout, buf, RCVBUFSIZE, &bread, &avail, NULL);        
+        PeekNamedPipe(m_read_stdout, buf, RCVBUFSIZE, &bread, &avail, NULL);
 
         if (bread > 0)
         {
@@ -177,13 +178,13 @@ void ProcessWin::executeProcessLoop()
 
 /**
  * @brief Startup a Windows Specific External Process
- */    
-bool ProcessWin::createProcess()    
+ */
+bool ProcessWin::createProcess()
 {
     STARTUPINFO         startup_info;
     SECURITY_ATTRIBUTES security_attrib;
     SECURITY_DESCRIPTOR secutiry_descrip;
-        
+
     if (isWinNT())        //initialize security descriptor (Windows NT)
     {
         InitializeSecurityDescriptor(&secutiry_descrip, SECURITY_DESCRIPTOR_REVISION);
@@ -192,20 +193,20 @@ bool ProcessWin::createProcess()
     }
     else
     {
-        security_attrib.lpSecurityDescriptor = NULL;        
+        security_attrib.lpSecurityDescriptor = NULL;
     }
 
     // Secutiry Attributes
     security_attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
-    security_attrib.bInheritHandle = true;         
+    security_attrib.bInheritHandle = true;
 
     // Create stdin pipe
-    if (!CreatePipe(&m_new_stdin, &m_write_stdin, &security_attrib, 0))   
+    if (!CreatePipe(&m_new_stdin, &m_write_stdin, &security_attrib, 0))
     {
         std::cout << "Error Creating STDIN Pipe" << std::endl;
         return false;
     }
-       
+
     if (!CreatePipe(&m_read_stdout, &m_new_stdout, &security_attrib, 0))
     {
         std::cout << "Error Creating STDOUT Pipe" << std::endl;
@@ -215,7 +216,7 @@ bool ProcessWin::createProcess()
     }
 
     // Startupinfo for the process
-    GetStartupInfo(&startup_info);    
+    GetStartupInfo(&startup_info);
 
     //The dwFlags member tells CreateProcess how to make the process.
     //STARTF_USESTDHANDLES validates the hStd* members. STARTF_USESHOWWINDOW
@@ -228,12 +229,12 @@ bool ProcessWin::createProcess()
     startup_info.hStdInput = m_new_stdin;
 
     char app[1024] = {0};
-    strcpy((char *)app, m_command_line.c_str());    
+    strcpy((char *)app, m_command_line.c_str());
     std::cout << "cmdline: " << app << std::endl;
 
     //spawn the child process
-    if (!CreateProcess(app, NULL, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, 
-        NULL, NULL, &startup_info, &m_process_info))
+    if (!CreateProcess(app, NULL, NULL, NULL, TRUE, CREATE_NEW_CONSOLE,
+                       NULL, NULL, &startup_info, &m_process_info))
     {
         std::cout << "Error Creating Child Process" << std::endl;
         CloseHandle(m_new_stdin);
@@ -242,17 +243,17 @@ bool ProcessWin::createProcess()
         CloseHandle(m_write_stdin);
         return false;
     }
-    
+
     // Clear Screen on Process Start and show cursor.
     m_session->deliver("\x1b[?25h\x1b[1;1H\x1b[2J");
 
     // Execute Thread for File Transfer
     std::thread t([=] { executeProcessLoop(); });
     t.detach();
-    
+
     return true;
 }
-    
+
 /**
  * @brief Checks if the process is still running
  * @return
@@ -261,7 +262,7 @@ bool ProcessWin::isRunning()
 {
     unsigned long exit_code;
     GetExitCodeProcess(m_process_info.hProcess, &exit_code);
-    
+
     return (exit_code == STILL_ACTIVE);
 }
 
@@ -276,18 +277,18 @@ void ProcessWin::update()
         unsigned long bread = 0;
         std::string session_data = std::move(m_session->m_parsed_data);
         std::cout << "Process Update(): " << session_data << std::endl;
-        
+
         strcat((char *)buf, session_data.c_str());
-        
+
         if (buf[0] == 13)
             sprintf((char *)buf,"\r\n");
-        
+
         if (session_data.size() > 0)
         {
             WriteFile(m_write_stdin, buf, strlen((char *)buf),&bread,NULL);
-            m_session->deliver(session_data);    
+            m_session->deliver(session_data);
         }
-    }    
+    }
     else
     {
         std::cout << "Process Update: Session is no longer active." << std::endl;
@@ -299,5 +300,5 @@ void ProcessWin::update()
  */
 void ProcessWin::terminate()
 {
-    
+
 }

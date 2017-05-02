@@ -16,7 +16,7 @@
  * Error Exit Codes (2) Unable to use Fallback IPv4 Acceptor (Accept Connections).
  *
  */
- 
+
 
 #include "data-sys/text_prompts_dao.hpp"
 
@@ -111,7 +111,7 @@ void run(boost::asio::io_service& io_service)
     // Create Handles to Services
     server_telnet_ptr serverTelnet;
     server_ssl_ptr    serverSSL;
-           
+
     // Default Config Instance
     config_ptr config(new Config());
     if (!config)
@@ -125,7 +125,7 @@ void run(boost::asio::io_service& io_service)
     ConfigDao cfg(config, GLOBAL_BBS_PATH);
 
     // Loads the Config file into the Data Access Object.
-    if (!cfg.loadConfig()) 
+    if (!cfg.loadConfig())
     {
         // TODO Throws exception right now, need to work in
         // better shutdown on from this point! just assert for now.
@@ -187,7 +187,7 @@ void run(boost::asio::io_service& io_service)
 auto main() -> int
 {
     std::cout << "Oblivion/2 XRM Server (c) 2015-2016 Michael Griffin." << std::endl
-              << std::endl;
+    << std::endl;
     CommonIO common;
     GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
     std::cout << "BBS HOME Directory Registered: " << std::endl;
@@ -199,7 +199,7 @@ auto main() -> int
     GLOBAL_MENU_PROMPT_PATH = GLOBAL_BBS_PATH + "MPROMPT";
     GLOBAL_TEXTFILE_PATH = GLOBAL_BBS_PATH + "TEXTFILE";
     GLOBAL_SCRIPT_PATH = GLOBAL_BBS_PATH + "SCRIPTS";
-    
+
 
     // Setup Users Database name and path
     USERS_DATABASE = GLOBAL_DATA_PATH;
@@ -267,7 +267,7 @@ auto main() -> int
 
             std::cout << "user table created successfully." << std::endl;
         }
-        
+
         // Check Table setup for Session Stats
         session_stats_dao_ptr session_stat_dao(new SessionStatsDao(user_database));
         // Verify if the user table exists.
@@ -309,33 +309,33 @@ auto main() -> int
         {
             cfg.saveConfig(config);
         }
-        
+
         // Load Config and lets do some validation
         cfg.loadConfig();
-        
+
         if (!cfg.validation())
         {
             return 0;
         }
-        
+
         // Check and Setup default Access Levels.
         access_level_ptr levels(new AccessLevels());
         AccessLevelDao acl(levels, GLOBAL_DATA_PATH);
 
         if (!acl.fileExists())
-        {            
+        {
             // Create Genric levels for First Time Startup
             Level al1(10,  "unauthorized");
             Level al2(20,  "validated");
             Level al3(255, "sysop");
-            
+
             levels->access_levels.push_back(al1);
             levels->access_levels.push_back(al2);
             levels->access_levels.push_back(al3);
-            
+
             acl.saveConfig(levels);
         }
-        
+
     }
 
     // Start System Services and Main Loop.
@@ -351,9 +351,13 @@ auto main() -> int
     // We'll handle Node and System setup here.  Need to write interface.
     while(TheCommunicator::instance()->isActive())
     {
-        
+
+#ifdef _WIN32
         Sleep(1);
-        
+#else
+        sleep(1);
+#endif
+
         // Just testing with text input, change this to state for commands
         // Or communication with a session or all sessions!
         //std::string line == "";
