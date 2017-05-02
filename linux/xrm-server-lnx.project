@@ -114,6 +114,9 @@
       <File Name="../src/model-app/last_callers.hpp"/>
       <File Name="../src/model-app/oneliners.hpp"/>
     </VirtualDirectory>
+    <File Name="../src/process_posix.cpp"/>
+    <File Name="../src/process_posix.hpp"/>
+    <File Name="../src/process_base.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

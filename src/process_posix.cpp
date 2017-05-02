@@ -1,24 +1,14 @@
-#include "process_win.hpp"
+#include "process_posix.hpp"
 #include "session_data.hpp"
 #include "model-sys/structures.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
 
 #include <iostream>
 #include <vector>
 #include <string>
 #include <thread>
-
-// Processes
-#define TA_FAILED        0
-#define TA_SUCCESS_CLEAN 1
-#define TA_SUCCESS_KILL  2
-#define TA_SUCCESS_16    3
 
 #define OUTFD            1
 #define INFD             0
@@ -26,95 +16,25 @@
 #define FALSE            0
 #define TRUE             1
 
-BOOL CALLBACK terminateAppEnum(HWND hwnd, LPARAM lParam);
-
-/**
- * @brief Terminate Application
- * @param hwnd
- * @param lParam
- */
-BOOL CALLBACK terminateAppEnum(HWND hwnd, LPARAM lParam)
-{
-    DWORD dwID;
-
-    GetWindowThreadProcessId(hwnd, &dwID) ;
-
-    if(dwID == (DWORD)lParam)
-    {
-        PostMessage(hwnd, WM_CLOSE, 0, 0) ;
-    }
-
-    return TRUE;
-}
 
 
-ProcessWin::ProcessWin(session_data_ptr session, std::string cmdline)
+ProcessPosix::ProcessPosix(session_data_ptr session, std::string cmdline)
     : ProcessBase(session, cmdline)
 {
     // Startup External Process
     createProcess();
 }
 
-ProcessWin::~ProcessWin()
+ProcessPosix::~ProcessPosix()
 { }
 
 
 /**
- * @brief Test if where using Windows NT
- * @return
- */
-bool ProcessWin::isWinNT()
-{
-    OSVERSIONINFO osv;
-    osv.dwOSVersionInfoSize = sizeof(osv);
-    GetVersionEx(&osv);
-    return (osv.dwPlatformId == VER_PLATFORM_WIN32_NT);
-}
-
-/**
- * @brief Kill Process once threads and sockets are killed.
- * @param dwPID
- * @param dwTimeout
- * @return
- */
-DWORD WINAPI ProcessWin::terminateApp(DWORD pid, DWORD timeout)
-{
-    HANDLE  proc;
-    DWORD   result;
-
-    // If we can't open the process with PROCESS_TERMINATE rights,
-    // then we give up immediately.
-    proc = OpenProcess(SYNCHRONIZE | PROCESS_TERMINATE, FALSE, pid);
-    if(!proc)
-    {
-        return TA_FAILED;
-    }
-
-    // TerminateAppEnum() posts WM_CLOSE to all windows whose PID
-    // matches your process's.
-    ::EnumWindows((WNDENUMPROC)terminateAppEnum, (LPARAM)pid);
-
-    // Wait on the handle. If it signals, great. If it times out,
-    // then you kill it.
-    if(WaitForSingleObject(proc, timeout) != WAIT_OBJECT_0)
-    {
-        result = (TerminateProcess(proc, 0) ? TA_SUCCESS_KILL : TA_FAILED);
-    }
-    else
-    {
-        result = TA_SUCCESS_CLEAN;
-    }
-
-    CloseHandle(proc);
-
-    return result;
-}
-
-/**
  * @brief Process Loop Thread
  */
-void ProcessWin::executeProcessLoop()
+void ProcessPosix::executeProcessLoop()
 {
+    /*
     unsigned long exit   = 0;  // process exit code
     unsigned long bread  = 0;  // bytes read
     unsigned long avail  = 0;  // bytes available
@@ -174,13 +94,15 @@ void ProcessWin::executeProcessLoop()
     CloseHandle(m_new_stdout);
     CloseHandle(m_read_stdout);
     CloseHandle(m_write_stdin);
+     */
 }
 
 /**
  * @brief Startup a Windows Specific External Process
  */
-bool ProcessWin::createProcess()
+bool ProcessPosix::createProcess()
 {
+    /*
     STARTUPINFO         startup_info;
     SECURITY_ATTRIBUTES security_attrib;
     SECURITY_DESCRIPTOR secutiry_descrip;
@@ -250,7 +172,7 @@ bool ProcessWin::createProcess()
     // Execute Thread for File Transfer
     std::thread t([=] { executeProcessLoop(); });
     t.detach();
-
+    */
     return true;
 }
 
@@ -258,19 +180,23 @@ bool ProcessWin::createProcess()
  * @brief Checks if the process is still running
  * @return
  */
-bool ProcessWin::isRunning()
+bool ProcessPosix::isRunning()
 {
+    /*
     unsigned long exit_code;
     GetExitCodeProcess(m_process_info.hProcess, &exit_code);
 
     return (exit_code == STILL_ACTIVE);
+    */
+    return true;
 }
 
 /**
  * @brief Pulls Input Data from User Session and Delivers to (Child Process)
  */
-void ProcessWin::update()
+void ProcessPosix::update()
 {
+    /*
     if (m_session)
     {
         unsigned char buf[50] = {0};
@@ -293,12 +219,13 @@ void ProcessWin::update()
     {
         std::cout << "Process Update: Session is no longer active." << std::endl;
     }
+    */
 }
 
 /**
  * @brief Kill Process
  */
-void ProcessWin::terminate()
+void ProcessPosix::terminate()
 {
 
 }

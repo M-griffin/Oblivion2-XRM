@@ -1,10 +1,12 @@
-#ifndef PROCESS_WIN_HPP 
+#ifndef PROCESS_WIN_HPP
 #define PROCESS_WIN_HPP
 
 #include "process_base.hpp"
 
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#endif
 
 #include <vector>
 #include <string>
@@ -25,54 +27,54 @@ class ProcessWin
 {
 
 public:
-    ProcessWin(session_data_ptr session, std::string cmdline);        
+    ProcessWin(session_data_ptr session, std::string cmdline);
     ~ProcessWin();
 
     /**
      * @brief Test if where using Windows NT
-     * @return 
+     * @return
      */
     bool isWinNT();
-        
+
     /**
      * @brief Kill Process once threads and sockets are killed.
      * @param dwPID
      * @param dwTimeout
-     * @return 
+     * @return
      */
     DWORD WINAPI terminateApp(DWORD pid, DWORD timeout);
 
     /**
      * @brief Process Loop Thread
-     */     
+     */
     void executeProcessLoop();
 
     /**
      * @brief Startup a Windows Specific External Process
-     */    
+     */
     bool createProcess();
-        
+
     /**
      * @brief Checks if the process is still running
      * @return
      */
     bool isRunning();
-      
+
     /**
      * @brief Pulls Input Data from User Session and Delivers to (Child Process)
      */
     void update();
-       
+
     /**
      * @brief Kill Process
      */
-    void terminate();    
-        
+    void terminate();
+
     PROCESS_INFORMATION m_process_info;
     HANDLE              m_new_stdin;
     HANDLE              m_new_stdout;
     HANDLE              m_read_stdout;
-    HANDLE              m_write_stdin; 
+    HANDLE              m_write_stdin;
 
 };
 
