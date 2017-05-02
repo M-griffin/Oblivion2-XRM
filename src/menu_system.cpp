@@ -429,8 +429,17 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
 
             // Check
         case 'C':
-            return false;
-
+            {
+                // Testing processes
+#ifdef _WIN32
+                std::string cmdline = "C:\\windows\\system32\\cmd.exe";
+#else
+                std::string cmdline = "/bin/bash";
+#endif
+                startupExternalProcess(cmdline);
+                return true;
+                //return false;
+            }
             // Feedback
         case 'F':
             return false;
@@ -814,6 +823,18 @@ void MenuSystem::resetMenuInputIndex(int index)
 {
     m_input_index = index;
 }
+
+
+/**
+ * @brief Startup External (Door / Script Process)
+ * @param cmdline
+ */
+void MenuSystem::startupExternalProcess(const std::string &cmdline)
+{
+    std::cout << "MenuSystem Starting Process" << std::endl;
+    m_menu_session_data->startExternalProcess(cmdline);
+}
+
 
 /**
  * @brief Startup Menu Editor and Switch to MenuEditorInput

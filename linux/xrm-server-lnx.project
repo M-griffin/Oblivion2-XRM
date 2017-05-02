@@ -114,6 +114,9 @@
       <File Name="../src/model-app/last_callers.hpp"/>
       <File Name="../src/model-app/oneliners.hpp"/>
     </VirtualDirectory>
+    <File Name="../src/process_posix.cpp"/>
+    <File Name="../src/process_posix.hpp"/>
+    <File Name="../src/process_base.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -150,6 +153,7 @@
         <Library Value="ssl"/>
         <Library Value="crypto"/>
         <Library Value="yaml-cpp"/>
+        <Library Value="util"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>

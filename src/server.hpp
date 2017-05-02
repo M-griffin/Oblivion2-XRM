@@ -7,6 +7,7 @@
 #include "connection_tcp.hpp"
 #include "communicator.hpp"
 
+#include <boost/bind.hpp>
 #include <boost/asio.hpp>
 
 using boost::asio::ip::tcp;
@@ -104,7 +105,7 @@ public:
      */
     void wait_for_connection()
     {
-        connection_ptr new_connection(new tcp_connection(m_io_service, m_context, false));
+        connection_ptr new_connection(new tcp_connection(m_io_service, m_context));
 
         /*  Looks like UDP only!
         // Setup connections to allow Both ipv4 and ipv6!
