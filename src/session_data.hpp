@@ -354,8 +354,18 @@ public:
             m_is_process_running = false;
         }
 #else
-
-
+        process_ptr proc(new ProcessPosix(shared_from_this(), path));
+        if (proc)
+        {
+            std::cout << "SessionData Starting Process SUCCESS!" << std::endl;
+            m_is_process_running = true;
+            m_processes.push_back(proc);
+        }
+        else
+        {
+            std::cout << "SessionData Starting Process FAILED!" << std::endl;
+            m_is_process_running = false;
+        }
 #endif
 
         std::cout << "SessionData Starting Done" << std::endl;

@@ -4,7 +4,6 @@
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
-
 #include <iostream>
 #include <vector>
 #include <string>
@@ -15,7 +14,6 @@
 
 #define FALSE            0
 #define TRUE             1
-
 
 
 ProcessPosix::ProcessPosix(session_data_ptr session, std::string cmdline)
