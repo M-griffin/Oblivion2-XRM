@@ -9,6 +9,25 @@
 using boost::asio::deadline_timer;
 using boost::asio::ip::tcp;
 
+
+/**
+ * @brief Passed data Though the State, and Checks ESC Timer
+ */
+void SessionData::updateState()
+{
+    // Last Character Received is ESC, then Check for
+    // ESC Sequence, or Lone ESC Key.
+    if(m_parsed_data[m_parsed_data.size()-1] == '\x1b')
+    {
+        startEscapeTimer();
+        m_is_esc_timer = true;
+    }
+    else if(!m_is_esc_timer)
+    {
+        m_state_manager->update();                        
+    }    
+}
+
 /**
  * @brief Callback after data received. handles telnet options
  * Then parses out normal text data from client to server.
@@ -46,29 +65,30 @@ void SessionData::handleRead(const boost::system::error_code& error, size_t byte
                 while(id1 != std::string::npos);
 
 
-                // Last Character Received is ESC, then Check for
-                // ESC Sequence, or Lone ESC Key.
-                if(m_parsed_data[m_parsed_data.size()-1] == '\x1b')
+                // If were in a process, skip stat and ESC timer.
+                if (m_is_process_running)
                 {
-                    startEscapeTimer();
-                    m_is_esc_timer = true;
-                }
-                else if(!m_is_esc_timer)
-                {
-                    // If processes is running, then redirect input data from Users
-                    // To the Session
-                    if (m_is_process_running)
+                    if (m_processes.size() > 0) 
                     {
-                        if (m_processes.size() > 0) 
-                        {
-                            m_processes.back()->update();    
-                        }                        
-                    }
+                        m_processes.back()->update();    
+                    }                        
                     else 
                     {
-                        m_state_manager->update();    
-                    }                    
+                        // If no processes then reset.
+                        m_is_process_running = false;
+                        updateState();
+                    }
                 }
+                else 
+                {
+                    // Check for state cleanup
+                    if (m_processes.size() > 0)
+                    {
+                        clearProcess();
+                    }
+                    
+                    updateState();
+                }                
 
                 /*
                 // Telnet Options are parsed out.

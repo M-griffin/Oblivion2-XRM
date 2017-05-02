@@ -1,4 +1,23 @@
 
+Change Log Update (00.00.88)
+* 2017-05-02
++ Updates to Process, Added Separate UpdateState for Process Handling
+  If were inside a process, skip ESC sequence testing, just pass through
+  all data as is to the process.
++ Cleanup processes on next look, make sure if a process is not running to 
+  pop it off the stack for cleanup.
+
+Change Log Update (00.00.87)
+* 2017-05-02
++ External Processes (Windows / Posix)
+  Created Classes and methods for executing external processes, doors, scripts
+  Tried Boost Process but didn't work as needed and ASIO calls were not working
+  implemented initial platform specific processes execution.
+- Need to implement screen buffer save / restore on return from external process
+- Add Flags to clear the screen on external processes execution
+- Add checks if user hangs up, process will also be terminated (testing needed)
+- Look at implementing either Python or V8 Java Script engine for scripting.
+
 Change Log Update (00.00.86)
 * 2017-04-29
 + Windows Project Updates
