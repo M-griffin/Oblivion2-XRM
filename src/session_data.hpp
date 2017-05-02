@@ -189,6 +189,8 @@ public:
             }
             else
             {
+                std::cout << "async_write : " << outputBuffer << std::endl;
+                
                 boost::asio::async_write(m_connection->m_normal_socket,
                                          boost::asio::buffer(outputBuffer, outputBuffer.size()),
                                          boost::bind(&SessionData::handleWrite, shared_from_this(),
@@ -205,6 +207,9 @@ public:
      */
     void handleWrite(const boost::system::error_code& error)
     {
+        
+        std::cout << "async_write " << error.message() << std::endl;
+        
         if(error)
         {
             std::cout << "async_write error: " << error.message() << std::endl;
@@ -341,7 +346,7 @@ public:
         {
             std::cout << "SessionData Starting Process SUCCESS!" << std::endl;
             m_is_process_running = true;
-            proc->waitingForData();
+            //proc->waitingForData();
             m_processes.push_back(proc);    
         }
         else
