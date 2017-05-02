@@ -193,6 +193,12 @@ public:
      */
     void resetMenuInputIndex(int index);
 
+    /**
+     * @brief Startup External (Door / Script Process)
+     * @param cmdline
+     */
+    void startupExternalProcess(const std::string &cmdline);
+
     // Move this to it's own module eventually!
     void startupMenuEditor();
     void menuEditorInput(const std::string &character_buffer, const bool &);

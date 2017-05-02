@@ -16,6 +16,7 @@
  * Error Exit Codes (2) Unable to use Fallback IPv4 Acceptor (Accept Connections).
  *
  */
+ 
 
 #include "data-sys/text_prompts_dao.hpp"
 
@@ -37,6 +38,14 @@
 #include "data-sys/users_dao.hpp"
 #include "libSqliteWrapped.h"
 
+#include <boost/bind.hpp>
+#include <boost/asio.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
+#include <boost/smart_ptr/weak_ptr.hpp>
+
+
 #include <cstdlib>
 #include <iostream>
 #include <thread>
@@ -46,12 +55,6 @@
 // temp
 #include <fstream>
 
-#include <boost/bind.hpp>
-#include <boost/asio.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
 
 // Temp!
 std::string GLOBAL_BBS_PATH = "";
@@ -348,11 +351,15 @@ auto main() -> int
     // We'll handle Node and System setup here.  Need to write interface.
     while(TheCommunicator::instance()->isActive())
     {
+        
+        Sleep(1);
+        
         // Just testing with text input, change this to state for commands
         // Or communication with a session or all sessions!
-        std::string line;
-        std::getline(std::cin, line);
+        //std::string line == "";
+        //std::getline(std::cin, line);
 
+        /*
         // process input, stop from Sysop/Local User will shutdown the server.
         // Just a temp for testing.
         if(line == "stop")
@@ -371,7 +378,7 @@ auto main() -> int
             // All or Individual Sessions.
             TheCommunicator::instance()->addMessageQueue(line);
             TheCommunicator::instance()->sendGlobalMessage();
-        }
+        }*/
     }
 
     // Release Communicator Instance

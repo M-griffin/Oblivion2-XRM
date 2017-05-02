@@ -63,7 +63,7 @@ public:
      */
     void wait_for_connection()
     {
-        connection_ptr new_connection(new ssl_connection(m_io_service, m_context, true));
+        connection_ptr new_connection(new ssl_connection(m_io_service, m_context));
         m_acceptor.async_accept(new_connection->m_secure_socket.lowest_layer(),
                                 boost::bind(&ServerSSL::handle_accept, this,
                                             new_connection,

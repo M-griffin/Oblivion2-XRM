@@ -230,7 +230,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
         if (!ss.fail())
         {
             m_logon_user = user_data->getUserById(userId);
-            if(!m_logon_user || m_logon_user->iId != -1) 
+            if(m_logon_user && m_logon_user->iId != -1) 
             {
                 return true;
             }
@@ -241,7 +241,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
     if (m_config->use_handle)
     {
         m_logon_user = user_data->getUserByHandle(input);
-        if(!m_logon_user || m_logon_user->iId != -1) 
+        if(m_logon_user && m_logon_user->iId != -1) 
         {
             displayUserNumber();
             return true;
@@ -251,7 +251,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
     if (m_config->use_email)  
     {
         m_logon_user = user_data->getUserByEmail(input);
-        if(!m_logon_user || m_logon_user->iId != -1) 
+        if(m_logon_user && m_logon_user->iId != -1) 
         {
             displayUserNumber();
             return true;
@@ -261,7 +261,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
     if (m_config->use_real_name)  
     {
         m_logon_user = user_data->getUserByRealName(input);
-        if(!m_logon_user || m_logon_user->iId != -1) 
+        if(m_logon_user && m_logon_user->iId != -1) 
         {
             displayUserNumber();
             return true;

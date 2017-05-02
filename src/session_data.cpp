@@ -55,7 +55,19 @@ void SessionData::handleRead(const boost::system::error_code& error, size_t byte
                 }
                 else if(!m_is_esc_timer)
                 {
-                    m_state_manager->update();
+                    // If processes is running, then redirect input data from Users
+                    // To the Session
+                    if (m_is_process_running)
+                    {
+                        if (m_processes.size() > 0) 
+                        {
+                            m_processes.back()->update();    
+                        }                        
+                    }
+                    else 
+                    {
+                        m_state_manager->update();    
+                    }                    
                 }
 
                 /*
@@ -247,8 +259,8 @@ void SessionData::startUpSessionStats(std::string sessionType)
     // Verify if the user table exists.
     if (session_stat_dao)
     {        
-        std::time_t tt = 0;
-        std::time_t const dateTime = std::time(&tt);
+        std::time_t current_time = 0;
+        std::time_t const dateTime = std::time(&current_time);
     
         m_session_stats->sSessionType = sessionType;
         m_session_stats->dtStartDate = dateTime;

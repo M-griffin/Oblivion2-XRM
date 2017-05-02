@@ -114,6 +114,9 @@
       <File Name="../src/data-app/last_callers_dao.cpp"/>
       <File Name="../src/data-app/last_callers_dao.hpp"/>
     </VirtualDirectory>
+    <File Name="../src/process_base.hpp"/>
+    <File Name="../src/process_win.cpp"/>
+    <File Name="../src/process_win.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
@@ -148,16 +151,12 @@
         <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>
         <LibraryPath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/build"/>
         <Library Value="libboost_system-mgw51-mt-1_64.dll.a"/>
-        <Library Value="libboost_thread-mgw51-mt-1_64.dll.a"/>
         <Library Value="libboost_locale-mgw51-mt-1_64.dll.a"/>
         <Library Value="libboost_filesystem-mgw51-mt-1_64.dll.a"/>
         <Library Value="libboost_timer-mgw51-mt-1_64.dll.a"/>
         <Library Value="libboost_regex-mgw51-mt-1_64.dll.a"/>
         <Library Value="libws2_32.a"/>
         <Library Value="libwsock32.a"/>
-        <Library Value="libiconv.a"/>
-        <Library Value="libicuuc.dll.a"/>
-        <Library Value="libicuin.dll.a"/>
         <Library Value="libSqliteWrapped.a"/>
         <Library Value="libsqlite3.a"/>
         <Library Value="ssleay32.a"/>
