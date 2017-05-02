@@ -431,7 +431,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
         case 'C':
         {
             // Testing processes
-            std::string cmdline = "cmd.bat";
+            std::string cmdline = "C:\\windows\\system32\\cmd.exe";
             startupExternalProcess(cmdline);
             return true;
             //return false;            

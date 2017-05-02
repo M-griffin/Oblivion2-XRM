@@ -1,22 +1,17 @@
-#include "process.hpp"
+#include "process_win.hpp"
 #include "session_data.hpp"
 #include "model-sys/structures.hpp"
 
-// Windows only for Testing!
-#include <windows.h>
-
-#include <boost/asio.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 
+// Windows only for Testing!
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 
 #include <iostream>
 #include <vector>
 #include <string>
 #include <thread>
-
-namespace ba = boost::asio;
-namespace bs = boost::system;
 
 // Processes
 #define TA_FAILED        0
@@ -52,19 +47,14 @@ BOOL CALLBACK terminateAppEnum(HWND hwnd, LPARAM lParam)
 }
 
 
-Process::Process(session_data_ptr session, 
-                 ba::io_service&  io_service, 
-                 std::string      cmdline)
-        : m_session(session)
-        , m_input_handle(io_service)
-        , m_output_handle(io_service)
-        , m_command_line(cmdline)
+ProcessWin::ProcessWin(session_data_ptr session, std::string cmdline)
+    : ProcessBase(session, cmdline)
 { 
     // Startup External Process
     createProcess();
 }        
 
-Process::~Process()
+ProcessWin::~ProcessWin()
 { }
 
 
@@ -72,7 +62,7 @@ Process::~Process()
  * @brief Test if where using Windows NT
  * @return 
  */
-bool Process::isWinNT()  
+bool ProcessWin::isWinNT()  
 {
     OSVERSIONINFO osv;
     osv.dwOSVersionInfoSize = sizeof(osv);
@@ -86,7 +76,7 @@ bool Process::isWinNT()
  * @param dwTimeout
  * @return 
  */
-DWORD WINAPI Process::terminateApp(DWORD pid, DWORD timeout)
+DWORD WINAPI ProcessWin::terminateApp(DWORD pid, DWORD timeout)
 {
     HANDLE  proc;
     DWORD   result;
@@ -119,8 +109,10 @@ DWORD WINAPI Process::terminateApp(DWORD pid, DWORD timeout)
     return result;
 }
 
-
-void Process::executeProcessLoop() 
+/**
+ * @brief Process Loop Thread
+ */
+void ProcessWin::executeProcessLoop() 
 {    
     unsigned long exit   = 0;  // process exit code
     unsigned long bread  = 0;  // bytes read
@@ -130,7 +122,6 @@ void Process::executeProcessLoop()
     unsigned char buf[RCVBUFSIZE];
     unsigned char tmpbuf[RCVBUFSIZE];
 
-    // While process is active!!
     while(1)
     {
         GetExitCodeProcess(m_process_info.hProcess, &exit);      //while the process is running
@@ -182,14 +173,12 @@ void Process::executeProcessLoop()
     CloseHandle(m_new_stdout);
     CloseHandle(m_read_stdout);
     CloseHandle(m_write_stdin);
-
-    std::cout << "File Transfer Completed!" << std::endl;
 }
 
 /**
  * @brief Startup a Windows Specific External Process
  */    
-bool Process::createProcess()    
+bool ProcessWin::createProcess()    
 {
     STARTUPINFO         startup_info;
     SECURITY_ATTRIBUTES security_attrib;
@@ -210,21 +199,13 @@ bool Process::createProcess()
     security_attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
     security_attrib.bInheritHandle = true;         
 
-
     // Create stdin pipe
     if (!CreatePipe(&m_new_stdin, &m_write_stdin, &security_attrib, 0))   
     {
         std::cout << "Error Creating STDIN Pipe" << std::endl;
         return false;
     }
-    
-    /*
-    // Ensure the read handle to the pipe for stdout is not inherited.
-    if (!SetHandleInformation(m_new_stdin, HANDLE_FLAG_INHERIT, 0)) {
-        std::cout << "Error: m_new_stdin CreatePipe.\n";
-        return -1;
-    }*/
-    
+       
     if (!CreatePipe(&m_read_stdout, &m_new_stdout, &security_attrib, 0))
     {
         std::cout << "Error Creating STDOUT Pipe" << std::endl;
@@ -232,13 +213,6 @@ bool Process::createProcess()
         CloseHandle(m_write_stdin);
         return false;
     }
-    
-    /*
-    // Ensure the read handle to the pipe for stdout is not inherited.
-    if (!SetHandleInformation(m_read_stdout, HANDLE_FLAG_INHERIT, 0)) {
-        std::cout << "Error: m_new_stdin CreatePipe.\n";
-        return -1;
-    }*/
 
     // Startupinfo for the process
     GetStartupInfo(&startup_info);    
@@ -253,7 +227,9 @@ bool Process::createProcess()
     startup_info.hStdError = m_new_stdout;
     startup_info.hStdInput = m_new_stdin;
 
-    char app[] = "C:\\Windows\\System32\\cmd.exe"; // Program to execute on command line.
+    char app[1024] = {0};
+    strcpy((char *)app, m_command_line.c_str());    
+    std::cout << "cmdline: " << app << std::endl;
 
     //spawn the child process
     if (!CreateProcess(app, NULL, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, 
@@ -269,11 +245,7 @@ bool Process::createProcess()
     
     // Clear Screen on Process Start and show cursor.
     m_session->deliver("\x1b[?25h\x1b[1;1H\x1b[2J");
-    
-    // Assign Boost to Window Handles.
-    //m_output_handle.assign(m_read_stdout);
-    //m_input_handle.assign(m_write_stdin);
-    
+
     // Execute Thread for File Transfer
     std::thread t([=] { executeProcessLoop(); });
     t.detach();
@@ -285,7 +257,7 @@ bool Process::createProcess()
  * @brief Checks if the process is still running
  * @return
  */
-bool Process::isRunning()
+bool ProcessWin::isRunning()
 {
     unsigned long exit_code;
     GetExitCodeProcess(m_process_info.hProcess, &exit_code);
@@ -294,89 +266,9 @@ bool Process::isRunning()
 }
 
 /**
- * @brief Data Handler for incoming Data (From Child Process)
- */
-void Process::waitingForData()
-{  
-    if (!m_session->m_is_process_running)
-        return;       
-
-    // Reads from pipe (From Child Process) need to setup call back to method!                                        
-    m_output_handle.async_read_some(ba::buffer(m_read_buffer),
-                                    boost::bind(&Process::handleRead, shared_from_this(),
-                                        ba::placeholders::error,
-                                        ba::placeholders::bytes_transferred));
-}
-
-/**
- * @brief Asyc Process Read Handler when data is received.
- * @param error
- */
-void Process::handleRead(const bs::error_code& error, std::size_t bytes_transferred)
-{
-    if(error)
-    {
-        std::cout << "async_read process error: " 
-                  << error.message() 
-                  << error.value()
-                  << " : " 
-                  << bytes_transferred 
-                  << std::endl;
-        return;
-    }
-    
-
-    // Deliver Data Back to the User Session.
-    std::string pipe_data = std::move(m_read_buffer.data());
-            
-    // Deliver Pipe (Process Output back to Users Socket)
-    if (m_session && pipe_data.size() > 0)
-    {
-        std::cout << "data: " << pipe_data << std::endl;
-        m_session->deliver(pipe_data);
-    }    
-
-    // Restart Next Call Back
-    if (isRunning() && m_session->m_is_process_running)
-    {
-        waitingForData();
-        return;
-    }
-}
-
-/**
- * @brief Deliver Message (Child Process)
- * @param msg
- */
-void Process::deliver(const std::string &msg)
-{
-    std::cout << "Process deliver()" << std::endl;
-    ba::async_write(m_input_handle, 
-            ba::buffer(msg, msg.size()),
-            boost::bind(&Process::handleWrite, 
-                shared_from_this(),
-                ba::placeholders::error));
-}
-
-/**
- * @brief Callback after Writing Data, Checks Errors
- * @param error
- */
-void Process::handleWrite(const bs::error_code& error)
-{
-    if(error)
-    {
-        std::cout << "async_write process error: " 
-                  << error.message() 
-                  << error.value()
-                  << std::endl;
-    }        
-}
-
-/**
  * @brief Pulls Input Data from User Session and Delivers to (Child Process)
  */
-void Process::update()
+void ProcessWin::update()
 {
     if (m_session)
     {
@@ -402,3 +294,10 @@ void Process::update()
     }
 }
 
+/**
+ * @brief Kill Process
+ */
+void ProcessWin::terminate()
+{
+    
+}

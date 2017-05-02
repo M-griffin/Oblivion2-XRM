@@ -1,7 +1,10 @@
 #ifndef SESSION_DATA_HPP
 #define SESSION_DATA_HPP
 
-#include "process.hpp"
+#ifdef _WIN32
+#include "process_win.hpp"
+#endif
+
 #include "connection_base.hpp"
 #include "telnet_decoder.hpp"
 #include "session_manager.hpp"
@@ -109,7 +112,6 @@ public:
         }
     }
 
-
     /**
      * @brief Handle Telnet Options in incoming data
      * raw data is read in from socket
@@ -153,7 +155,6 @@ public:
      */
     void handleRead(const boost::system::error_code& error, size_t bytes_transferred);
 
-
     /**
      * @brief delivers text data to client
      * @param msg
@@ -189,8 +190,6 @@ public:
             }
             else
             {
-                std::cout << "async_write : " << outputBuffer << std::endl;
-                
                 boost::asio::async_write(m_connection->m_normal_socket,
                                          boost::asio::buffer(outputBuffer, outputBuffer.size()),
                                          boost::bind(&SessionData::handleWrite, shared_from_this(),
@@ -198,7 +197,6 @@ public:
             }
         }
     }
-
 
     /**
      * @brief Callback after Writing Data, If error/hangup notifies
@@ -279,13 +277,11 @@ public:
             boost::bind(&SessionData::handleEscTimer, shared_from_this(), &m_input_deadline));
     }
 
-
     /**
      * @brief User Logoff
      */
     void logoff()
-    {
-        
+    {        
         session_manager_ptr room = m_room.lock();
         if(room)
         {
@@ -338,15 +334,16 @@ public:
         std::cout << "SessionData Starting Process" << std::endl;
         std::cout << GLOBAL_SCRIPT_PATH << std::endl;
         
-        std::string path = GLOBAL_SCRIPT_PATH + "\\" + cmdline;
+        //std::string path = GLOBAL_SCRIPT_PATH + "\\" + cmdline;
+        std::string path = cmdline;
                 
         // Only (1) Process will run at a time per session.
-        process_ptr proc(new Process(shared_from_this(), m_io_service, path));
+#ifdef _WIN32        
+        process_ptr proc(new ProcessWin(shared_from_this(), path));
         if (proc)
         {
             std::cout << "SessionData Starting Process SUCCESS!" << std::endl;
             m_is_process_running = true;
-            //proc->waitingForData();
             m_processes.push_back(proc);    
         }
         else
@@ -354,7 +351,10 @@ public:
             std::cout << "SessionData Starting Process FAILED!" << std::endl;
             m_is_process_running = false;
         }
+#else
+
         
+#endif        
         
         std::cout << "SessionData Starting Done" << std::endl;
     }
