@@ -150,6 +150,11 @@ public:
     }
 
     /**
+     * @brief Passed data Though the State, and Checks ESC Timer
+     */
+    void updateState();
+
+    /**
      * @brief Callback after data received. handles telnet options
      * Then parses out normal text data from client to server.
      * @param error
