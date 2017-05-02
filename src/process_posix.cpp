@@ -4,20 +4,22 @@
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
+#include <unistd.h>
+#include <pty.h>
+#include <termios.h>
+#include <csignal>
+#include <cstring>
+
 #include <iostream>
 #include <vector>
 #include <string>
 #include <thread>
 
-#define OUTFD            1
-#define INFD             0
-
-#define FALSE            0
-#define TRUE             1
-
 
 ProcessPosix::ProcessPosix(session_data_ptr session, std::string cmdline)
     : ProcessBase(session, cmdline)
+    , m_pty_file_desc(0)
+    , m_proc_id(0)
 {
     // Startup External Process
     createProcess();
@@ -28,71 +30,101 @@ ProcessPosix::~ProcessPosix()
 
 
 /**
+  * Startup the inital Terminal buffer
+ */
+void ProcessPosix::initTerminalOptions()
+{
+#ifdef STREAMSPTY
+    if (really_stream)
+        tcgetattr(ttyfd, &m_termbuf);
+    else
+# endif
+        tcgetattr(m_pty_file_desc, &m_termbuf);
+
+    m_termbuf_original = m_termbuf;
+}
+
+/**
+ * @brief Setup the inital Terminal buffer
+ */
+void ProcessPosix::setTerminalBuffer()
+{
+    /*
+     * Only make the necessary changes.
+     */
+    if (memcmp(&m_termbuf, &m_termbuf_original, sizeof(m_termbuf)))
+# ifdef  STREAMSPTY
+        if (really_stream)
+            tcsetattr(ttyfd, TCSANOW, &m_termbuf);
+        else
+# endif
+            tcsetattr(m_pty_file_desc, TCSANOW, &m_termbuf);
+}
+
+/**
+ * @brief Setup the inital Terminal buffer
+ */
+void ProcessPosix::setTerminalOptions()
+{
+
+    if (memcmp(&m_termbuf, &m_termbuf_original, sizeof(m_termbuf)))
+# ifdef  STREAMSPTY
+        if (really_stream)
+            tcsetattr(ttyfd, TCSANOW, &m_termbuf);
+        else
+# endif
+            tcsetattr(m_pty_file_desc, TCSANOW, &m_termbuf);
+}
+
+/**
  * @brief Process Loop Thread
  */
 void ProcessPosix::executeProcessLoop()
 {
-    /*
-    unsigned long exit   = 0;  // process exit code
-    unsigned long bread  = 0;  // bytes read
-    unsigned long avail  = 0;  // bytes available
+    int selret;
+    fd_set rdfdset;
 
-    const int RCVBUFSIZE = 4096;
-    unsigned char buf[RCVBUFSIZE];
-    unsigned char tmpbuf[RCVBUFSIZE];
+    char character_buffer[2014] = {'\0'};
 
-    while(1)
+    do
     {
-        GetExitCodeProcess(m_process_info.hProcess, &exit);      //while the process is running
-        if(exit != STILL_ACTIVE)
+        FD_ZERO(&rdfdset);
+        FD_SET(m_pty_file_desc, &rdfdset);
+
+        selret = select(m_pty_file_desc + 1, &rdfdset, NULL, NULL, NULL);
+
+        // Error / Lost Connection on
+        if (selret <= 0)
         {
-            std::cout << "Exiting Process" << std::endl;
-
-            CloseHandle(m_process_info.hThread);
-            CloseHandle(m_process_info.hProcess);
-
-            if (m_session)
-            {
-                // Reset the socket and read waiting data refresh.
-                m_session->m_is_process_running = false;
-            }
+            m_session->m_is_process_running = false;
             break;
         }
 
 
-        // Handle Naped Pipes for STDIO Output of protocols.
-        PeekNamedPipe(m_read_stdout, buf, RCVBUFSIZE, &bread, &avail, NULL);
-
-        if (bread > 0)
+        if (FD_ISSET(m_pty_file_desc, &rdfdset))
         {
-            memset(&buf, 0, sizeof(buf));
-            memset(&tmpbuf, 0, sizeof(tmpbuf));
+            memset(&character_buffer, 0, 1024);
+            selret = read(m_pty_file_desc, character_buffer, 1023);
 
-            ReadFile(m_read_stdout, tmpbuf, RCVBUFSIZE, &bread, NULL);  //read the stdout pipe
-
-            if (strlen((const char *)tmpbuf) > 0)
+            if (selret <= 0)
             {
-                std::cout << "buffer [" << tmpbuf << "] " <<std::endl;
-
-                if (m_session)
-                {
-                    std::string buffer(reinterpret_cast<char*>(tmpbuf));
-                    m_session->deliver(buffer);
-                }
+                m_session->m_is_process_running = false;
+                break;
             }
 
-            memset(&buf, 0, sizeof(buf));
-            memset(&tmpbuf, 0, sizeof(tmpbuf));
+            if (m_session)
+            {
+                std::string buffer(reinterpret_cast<char*>(character_buffer));
+                m_session->deliver(buffer);
+            }
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
-    }
 
-    CloseHandle(m_new_stdin);
-    CloseHandle(m_new_stdout);
-    CloseHandle(m_read_stdout);
-    CloseHandle(m_write_stdin);
-     */
+    }
+    while (m_session->m_is_process_running);
+
+    m_session->m_is_process_running = false;
 }
 
 /**
@@ -100,69 +132,52 @@ void ProcessPosix::executeProcessLoop()
  */
 bool ProcessPosix::createProcess()
 {
-    /*
-    STARTUPINFO         startup_info;
-    SECURITY_ATTRIBUTES security_attrib;
-    SECURITY_DESCRIPTOR secutiry_descrip;
-
-    if (isWinNT())        //initialize security descriptor (Windows NT)
-    {
-        InitializeSecurityDescriptor(&secutiry_descrip, SECURITY_DESCRIPTOR_REVISION);
-        SetSecurityDescriptorDacl(&secutiry_descrip, true, NULL, false);
-        security_attrib.lpSecurityDescriptor = &secutiry_descrip;
-    }
-    else
-    {
-        security_attrib.lpSecurityDescriptor = NULL;
-    }
-
-    // Secutiry Attributes
-    security_attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
-    security_attrib.bInheritHandle = true;
-
-    // Create stdin pipe
-    if (!CreatePipe(&m_new_stdin, &m_write_stdin, &security_attrib, 0))
-    {
-        std::cout << "Error Creating STDIN Pipe" << std::endl;
-        return false;
-    }
-
-    if (!CreatePipe(&m_read_stdout, &m_new_stdout, &security_attrib, 0))
-    {
-        std::cout << "Error Creating STDOUT Pipe" << std::endl;
-        CloseHandle(m_new_stdin);
-        CloseHandle(m_write_stdin);
-        return false;
-    }
-
-    // Startupinfo for the process
-    GetStartupInfo(&startup_info);
-
-    //The dwFlags member tells CreateProcess how to make the process.
-    //STARTF_USESTDHANDLES validates the hStd* members. STARTF_USESHOWWINDOW
-    //validates the wShowWindow member.
-    //
-    startup_info.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
-    startup_info.wShowWindow = SW_SHOW;
-    startup_info.hStdOutput = m_new_stdout;
-    startup_info.hStdError = m_new_stdout;
-    startup_info.hStdInput = m_new_stdin;
-
     char app[1024] = {0};
     strcpy((char *)app, m_command_line.c_str());
     std::cout << "cmdline: " << app << std::endl;
 
-    //spawn the child process
-    if (!CreateProcess(app, NULL, NULL, NULL, TRUE, CREATE_NEW_CONSOLE,
-                       NULL, NULL, &startup_info, &m_process_info))
+    char *argv_init[] = {NULL, NULL, NULL, NULL, NULL, NULL};
+    argv_init[0] = strdup(m_command_line.c_str());
+
+    // Start Fork
+    m_proc_id = forkpty(&m_pty_file_desc, NULL, NULL, NULL);
+
+    // Pid 0 Start Child Process.
+    if (m_proc_id == 0)
     {
-        std::cout << "Error Creating Child Process" << std::endl;
-        CloseHandle(m_new_stdin);
-        CloseHandle(m_new_stdout);
-        CloseHandle(m_read_stdout);
-        CloseHandle(m_write_stdin);
-        return false;
+        std::cout << "Fork() Started Child Exit after Execution" << std::endl;
+
+        setsid();
+        tcsetpgrp(0, getpid());
+
+        // exec shell, with correct argv and env
+        execv(m_command_line.c_str(), argv_init);
+        exit(1);
     }
+    // Pid -1 is an error
+    else if(m_proc_id == -1)
+    {
+        std::cout << "Fork() Error" << std::endl;
+        m_session->m_is_process_running = false;
+    }
+    else if(m_proc_id > 0)
+    {
+        // Parent process.
+        std::cout << "Fork() Started Parent Return" << std::endl;
+    }
+
+    // Setup Detected Screen Size.
+    struct winsize ws;
+
+    // Setup Term
+    initTerminalOptions();
+
+#ifdef TIOCSWINSZ
+    memset(&ws, 0, sizeof(ws));
+    ws.ws_col = m_session->m_telnet_state->getTermCols();
+    ws.ws_row = m_session->m_telnet_state->getTermRows();
+    ioctl(m_pty_file_desc, TIOCSWINSZ, (char *)&ws);
+#endif
 
     // Clear Screen on Process Start and show cursor.
     m_session->deliver("\x1b[?25h\x1b[1;1H\x1b[2J");
@@ -170,7 +185,7 @@ bool ProcessPosix::createProcess()
     // Execute Thread for File Transfer
     std::thread t([=] { executeProcessLoop(); });
     t.detach();
-    */
+
     return true;
 }
 
@@ -194,30 +209,24 @@ bool ProcessPosix::isRunning()
  */
 void ProcessPosix::update()
 {
-    /*
     if (m_session)
     {
-        unsigned char buf[50] = {0};
-        unsigned long bread = 0;
         std::string session_data = std::move(m_session->m_parsed_data);
         std::cout << "Process Update(): " << session_data << std::endl;
 
-        strcat((char *)buf, session_data.c_str());
-
-        if (buf[0] == 13)
-            sprintf((char *)buf,"\r\n");
-
         if (session_data.size() > 0)
         {
-            WriteFile(m_write_stdin, buf, strlen((char *)buf),&bread,NULL);
-            m_session->deliver(session_data);
+            if(write(m_pty_file_desc, (char *)session_data.c_str(), session_data.size()) == -1)
+            {
+                // Error
+            }
+            //m_session->deliver(session_data);
         }
     }
     else
     {
         std::cout << "Process Update: Session is no longer active." << std::endl;
     }
-    */
 }
 
 /**

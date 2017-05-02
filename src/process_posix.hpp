@@ -3,6 +3,8 @@
 
 #include "process_base.hpp"
 
+#include <termios.h>
+
 #include <vector>
 #include <string>
 
@@ -23,6 +25,25 @@ class ProcessPosix
 public:
     ProcessPosix(session_data_ptr session, std::string cmdline);
     ~ProcessPosix();
+
+    // pty control structure
+    struct termios m_termbuf_original;
+    struct termios m_termbuf;
+
+    /**
+     * @brief Startup the inital Terminal buffer
+     */
+    void initTerminalOptions();
+
+    /**
+     * @brief Setup the inital Terminal buffer
+     */
+    void setTerminalOptions();
+
+    /**
+     * @brief Setup the inital Terminal buffer
+     */
+    void setTerminalBuffer();
 
     /**
      * @brief Process Loop Thread
@@ -50,6 +71,8 @@ public:
      */
     void terminate();
 
+    int m_pty_file_desc;
+    int m_proc_id;
 
 };
 

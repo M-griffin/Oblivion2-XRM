@@ -106,11 +106,11 @@ public:
 
     int getTermRows() const
     {
-        return m_naws_row;
+        return (m_naws_row > 0 ? m_naws_row : 24);
     }
     int getTermCols() const
     {
-        return m_naws_col;
+        return (m_naws_col > 0 ? m_naws_col : 80);
     }
 
     std::string getTermType() const
@@ -293,7 +293,7 @@ private:
 
         // Sequence Not Found, add new sequence.
         //if(it == t.end())
-            t.push_back(option);
+        t.push_back(option);
     }
 
     template <typename T>
