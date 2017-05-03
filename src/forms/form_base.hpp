@@ -35,10 +35,12 @@ public:
     virtual bool onExit() = 0;
     virtual void onSave() = 0;
     
-    FormBase(config_ptr config)
+    FormBase(config_ptr config, std::string title, std::string pulldown_file)
         : m_config(config)
+        , m_title(title)
+        , m_pulldown_file(pulldown_file)
     { }
-
+        
     /**
      * @brief Updates the YAML Mapping Value along with Menu Option.
      * @param m
@@ -181,6 +183,9 @@ public:
     }
                     
     config_ptr              m_config;
+    std::string             m_title;
+    std::string             m_pulldown_file;
+    
     YAML::Node              m_node;
     SessionIO               m_session_io;
     

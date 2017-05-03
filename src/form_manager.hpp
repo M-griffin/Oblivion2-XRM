@@ -1,8 +1,6 @@
 #ifndef FORM_MANAGER_H
 #define FORM_MANAGER_H
 
-#include "model-sys/menu.hpp"
-
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <string>
@@ -36,6 +34,11 @@ typedef boost::shared_ptr<FormBase> form_ptr;
 class Config;
 typedef boost::shared_ptr<Config> config_ptr;
 
+class Menu;
+typedef boost::shared_ptr<Menu> menu_ptr;
+
+class MenuOption;
+
 /**
  * @class FormManager
  * @author Michael Griffin
@@ -47,26 +50,13 @@ class FormManager
 {
 public:
 
-
-    FormManager(config_ptr config)
-        : m_config(config)
-        , m_menu_info(new Menu())
-        , max_cmds_per_page(0)
-        , m_current_page(1)
-        , m_total_pages(1)
-        , m_form_name("")
-    {
-    }
-
-    ~FormManager()
-    {
-    }
-
+    FormManager(config_ptr config);        
+    ~FormManager();
+        
     
     // Handle Dynamic modules being executed.
     std::vector<form_ptr> m_form;
-        
-        
+                
         
     /**
      * @brief Clears All Forms
@@ -87,6 +77,20 @@ public:
      * @brief Start Up and execute current Form
      */
     void startupForm(form_ptr form);
+    
+    /**
+     * @brief handles selected options for processing.
+     * @param option
+     */
+    void processFormOption(MenuOption &option, std::string value);
+    
+    /**
+     * @brief Pulls Generate Menu Options from Form
+     * @param option
+     */
+    menu_ptr loadFormOption();
+    
+    
 
     config_ptr       m_config;
     menu_ptr         m_menu_info;    // Custom Menus on the Fly
@@ -96,5 +100,8 @@ public:
     std::string      m_form_name;
 
 };
+
+
+typedef boost::shared_ptr<FormManager> form_manager_ptr;
 
 #endif // FORM_MANAGER_H
