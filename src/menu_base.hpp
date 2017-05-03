@@ -51,7 +51,8 @@ public:
         MENU_EDITOR_INPUT,
         MODULE_PRELOGON_INPUT,
         MODULE_LOGON_INPUT,
-        MODULE_INPUT
+        MODULE_INPUT,
+        FORM_INPUT
     };
 
     session_data_ptr m_menu_session_data;

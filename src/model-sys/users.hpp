@@ -6,11 +6,9 @@
 #include <cstdint> 
 
 #include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
 
 class Users;
 typedef boost::shared_ptr<Users> user_ptr;
-typedef boost::weak_ptr<Users> user_weak_ptr;
 
 /**
  * @class Users

@@ -5,6 +5,9 @@
 #include "mods/mod_logon.hpp"
 #include "mods/mod_signup.hpp"
 
+#include "forms/form_system_config.hpp"
+#include "form_manager.hpp"
+
 #include <boost/locale.hpp>
 
 #include <string>
@@ -27,6 +30,7 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     m_menu_functions.push_back(std::bind(&MenuSystem::modulePreLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
+    m_menu_functions.push_back(std::bind(&MenuSystem::formInput, this, std::placeholders::_1, std::placeholders::_2));
 
     // [Vector] Setup Menu Option Calls for executing menu commands.
     m_execute_callback.push_back(std::bind(&MenuSystem::menuOptionsCallback, this, std::placeholders::_1));
@@ -109,14 +113,6 @@ bool MenuSystem::onExit()
     m_is_active = false;
     return true;
 }
-
-
-/**
- * TODO - Menu Options, lets break out each section
- * option.command_key[1] into their own methods
- * Making this call back smaller.
- */
-
 
 /**
  * @brief Control Commands
@@ -824,7 +820,6 @@ void MenuSystem::resetMenuInputIndex(int index)
     m_input_index = index;
 }
 
-
 /**
  * @brief Startup External (Door / Script Process)
  * @param cmdline
@@ -835,6 +830,25 @@ void MenuSystem::startupExternalProcess(const std::string &cmdline)
     m_menu_session_data->startExternalProcess(cmdline);
 }
 
+/**
+ * @brief Starts up Form Manager Module.
+ */
+void MenuSystem::startupFormManager()
+{
+    // Setup the input processor
+    resetMenuInputIndex(FORM_INPUT);
+
+    // Startup a new Form manager instance.
+    m_form_manager.reset(new FormManager(m_config));
+    
+    if (m_form_manager)
+    {
+        m_form_manager->startupFormSystemConfiguration();
+        
+    }
+    
+   
+}
 
 /**
  * @brief Startup Menu Editor and Switch to MenuEditorInput
@@ -1088,4 +1102,17 @@ void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is
         // Redisplay,  may need to startup() again, but menu data should still be active and loaded!
         redisplayMenuScreen();
     }
+}
+
+/**
+ * @brief Handles parsing input for forms
+ *
+ */
+void MenuSystem::formInput(const std::string &character_buffer, const bool &is_utf8)
+{
+    
+    
+    handlePulldownInput(character_buffer, is_utf8);
+        
+    
 }

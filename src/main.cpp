@@ -6,10 +6,12 @@
  * Compiles under MingW32/64 5.1.0 g++
  *
  * LIBS:
- * Boost 58
- * ICU 4c-55_1
+ * Boost 55/64
+ * ICU 4c-58_1
  * Sqlite3
  * SqliteWrapped
+ * YamlC++
+ * Unittest++
  *
  * List All Exit Error Codes here.
  * Error Exit Codes (1) Unable to Load Configuration File.
@@ -186,8 +188,10 @@ void run(boost::asio::io_service& io_service)
 // auto main(int argc, char* argv[]) -> int
 auto main() -> int
 {
-    std::cout << "Oblivion/2 XRM Server (c) 2015-2016 Michael Griffin." << std::endl
-    << std::endl;
+    std::cout << "Oblivion/2 XRM Server (c) 2015-2017 Michael Griffin." 
+              << std::endl
+              << std::endl;
+              
     CommonIO common;
     GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
     std::cout << "BBS HOME Directory Registered: " << std::endl;

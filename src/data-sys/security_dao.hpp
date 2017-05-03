@@ -18,7 +18,6 @@ class Query;
 
 // Handles to Database
 typedef boost::shared_ptr<SQLW::Database> database_ptr;
-typedef boost::weak_ptr<SQLW::Database> database_weak_ptr;
 
 // Handle to Database Queries
 typedef boost::shared_ptr<SQLW::Query> query_ptr;
