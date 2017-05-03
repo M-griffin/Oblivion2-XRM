@@ -1,6 +1,7 @@
 #include "form_manager.hpp"
 
-#include "forms/form_base.hpp"
+#include "model-sys/menu.hpp"
+
 #include "forms/form_system_config.hpp"
 
 #include <string>
@@ -57,4 +58,25 @@ void FormManager::startupFormSystemConfiguration()
     }
 
     startupForm(form);
+}
+
+/**
+ * @brief handles selected option for processing.
+ * @param option
+ */
+void FormManager::processFormOption(const MenuOption &option)
+{
+    
+    
+}
+
+/**
+ * @brief Pulls Generate Menu Options from Form
+ * @param option
+ */
+void FormManager::loadFormOption()
+{
+    
+    
+    form->baseGetFormOptions()
 }
