@@ -6,7 +6,7 @@
 #include <string>
 
 FormSystemConfig::FormSystemConfig(config_ptr config)
-    : FormBase(config)
+    : FormBase(config, "System Configuration", "form_config")
 {
 }
 

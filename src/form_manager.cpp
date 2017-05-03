@@ -1,12 +1,28 @@
 #include "form_manager.hpp"
 
 #include "model-sys/menu.hpp"
-
 #include "forms/form_system_config.hpp"
 
+#include <iostream>
 #include <string>
 #include <vector>
 
+
+FormManager::FormManager(config_ptr config)
+        : m_config(config)
+        , m_menu_info(new Menu())
+        , max_cmds_per_page(0)
+        , m_current_page(1)
+        , m_total_pages(1)
+        , m_form_name("")
+{
+}
+
+FormManager::~FormManager()
+{
+    std::cout << "~FormManager()" << std::endl;
+}
+    
 /**
  * @brief Clears All Forms
  */
@@ -64,19 +80,23 @@ void FormManager::startupFormSystemConfiguration()
  * @brief handles selected option for processing.
  * @param option
  */
-void FormManager::processFormOption(const MenuOption &option)
-{
-    
-    
+void FormManager::processFormOption(MenuOption &option, std::string value)
+{   
+    m_form.back()->updateNodeMapping(option, value);    
 }
 
 /**
  * @brief Pulls Generate Menu Options from Form
  * @param option
  */
-void FormManager::loadFormOption()
+menu_ptr FormManager::loadFormOption()
 {
+    // Setup the Default Menu, and pull in Form Generated Options.
+    m_menu_info->menu_title = m_form.back()->m_title;
+    m_menu_info->menu_pulldown_file = m_form.back()->m_pulldown_file;    
     
+    // Need to figure out paging options?
+    m_menu_info->menu_options = m_form.back()->baseGetFormOptions();
     
-    form->baseGetFormOptions()
+    return m_menu_info;
 }

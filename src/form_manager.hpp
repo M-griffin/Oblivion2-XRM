@@ -1,8 +1,6 @@
 #ifndef FORM_MANAGER_H
 #define FORM_MANAGER_H
 
-#include "model-sys/menu.hpp"
-
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <string>
@@ -36,8 +34,10 @@ typedef boost::shared_ptr<FormBase> form_ptr;
 class Config;
 typedef boost::shared_ptr<Config> config_ptr;
 
+class Menu;
+typedef boost::shared_ptr<Menu> menu_ptr;
+
 class MenuOption;
-//typedef boost::shared_ptr<MenuOption> menu_ptr;
 
 /**
  * @class FormManager
@@ -50,20 +50,9 @@ class FormManager
 {
 public:
 
-    FormManager(config_ptr config)
-        : m_config(config)
-        , m_menu_info(new Menu())
-        , max_cmds_per_page(0)
-        , m_current_page(1)
-        , m_total_pages(1)
-        , m_form_name("")
-    {
-    }
-
-    ~FormManager()
-    {
-    }
-
+    FormManager(config_ptr config);        
+    ~FormManager();
+        
     
     // Handle Dynamic modules being executed.
     std::vector<form_ptr> m_form;
@@ -93,13 +82,13 @@ public:
      * @brief handles selected options for processing.
      * @param option
      */
-    void processFormOption(const MenuOption &option);
+    void processFormOption(MenuOption &option, std::string value);
     
     /**
      * @brief Pulls Generate Menu Options from Form
      * @param option
      */
-    void loadFormOption();
+    menu_ptr loadFormOption();
     
     
 

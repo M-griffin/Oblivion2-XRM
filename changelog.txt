@@ -1,4 +1,12 @@
 
+Change Log Update (00.00.89)
+* 2017-05-03
++ More work on the FormManager and System Configuration Form along with 
+  Implementation.  Still working on the best way to implement so playing
+  with different ideas right now.
++ Create Conference Model, and DAO for database read/writes.
+- Will be adding Message and File Area models and DAO's next.
+
 Change Log Update (00.00.88)
 * 2017-05-02
 + Updates to Process, Added Separate UpdateState for Process Handling

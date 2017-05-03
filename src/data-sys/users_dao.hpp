@@ -2,7 +2,6 @@
 #define USERS_DAO_HPP
 
 #include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
 
 #include <vector>
 
@@ -16,12 +15,9 @@ class Query;
 class Users;
 // Handles to Users
 typedef boost::shared_ptr<Users> user_ptr;
-typedef boost::weak_ptr<Users> user_weak_ptr;
-
 
 // Handles to Database
 typedef boost::shared_ptr<SQLW::Database> database_ptr;
-typedef boost::weak_ptr<SQLW::Database> database_weak_ptr;
 
 // Handle to Database Queries
 typedef boost::shared_ptr<SQLW::Query> query_ptr;
