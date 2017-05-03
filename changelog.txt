@@ -1,4 +1,10 @@
 
+Change Log Update (00.00.90)
+* 2017-05-03
++ Added new model files for File Areas, Message Areas, Network Addresses
+  and BBS Listing.
+- Create Dao objects for reading/writing the database for the new models.
+
 Change Log Update (00.00.89)
 * 2017-05-03
 + More work on the FormManager and System Configuration Form along with 

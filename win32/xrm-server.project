@@ -94,6 +94,9 @@
       <File Name="../src/model-sys/access_levels.hpp"/>
       <File Name="../src/model-sys/session_stats.hpp"/>
       <File Name="../src/model-sys/conference.hpp"/>
+      <File Name="../src/model-sys/file_area.hpp"/>
+      <File Name="../src/model-sys/message_area.hpp"/>
+      <File Name="../src/model-sys/network.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
       <File Name="../src/mods/mod_base.hpp"/>
@@ -112,6 +115,7 @@
     <VirtualDirectory Name="model-app">
       <File Name="../src/model-app/last_callers.hpp"/>
       <File Name="../src/model-app/oneliners.hpp"/>
+      <File Name="../src/model-app/bbs_list.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="data-app">
       <File Name="../src/data-app/last_callers_dao.cpp"/>
