@@ -94,6 +94,8 @@
       <File Name="../src/model-sys/access_levels.hpp"/>
       <File Name="../src/model-sys/session_stats.hpp"/>
       <File Name="../src/model-sys/conference.hpp"/>
+      <File Name="../src/model-sys/file_area.hpp"/>
+      <File Name="../src/model-sys/message_area.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
       <File Name="../src/mods/mod_base.hpp"/>
