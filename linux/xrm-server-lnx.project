@@ -76,6 +76,8 @@
       <File Name="../src/data-sys/access_level_dao.hpp"/>
       <File Name="../src/data-sys/session_stats_dao.cpp"/>
       <File Name="../src/data-sys/session_stats_dao.hpp"/>
+      <File Name="../src/data-sys/conference_dao.cpp"/>
+      <File Name="../src/data-sys/conference_dao.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="model-sys">
       <File Name="../src/model-sys/config.hpp"/>
@@ -87,6 +89,10 @@
       <File Name="../src/model-sys/menu_prompt.hpp"/>
       <File Name="../src/model-sys/access_levels.hpp"/>
       <File Name="../src/model-sys/session_stats.hpp"/>
+      <File Name="../src/model-sys/conference.hpp"/>
+      <File Name="../src/model-sys/file_area.hpp"/>
+      <File Name="../src/model-sys/message_area.hpp"/>
+      <File Name="../src/model-sys/network.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
       <File Name="../src/mods/mod_base.hpp"/>
@@ -113,10 +119,13 @@
     <VirtualDirectory Name="model-app">
       <File Name="../src/model-app/last_callers.hpp"/>
       <File Name="../src/model-app/oneliners.hpp"/>
+      <File Name="../src/model-app/bbs_list.hpp"/>
     </VirtualDirectory>
     <File Name="../src/process_posix.cpp"/>
     <File Name="../src/process_posix.hpp"/>
     <File Name="../src/process_base.hpp"/>
+    <File Name="../src/form_manager.cpp"/>
+    <File Name="../src/form_manager.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
