@@ -61,50 +61,50 @@ public:
     bool firstTimeSetupParams();
 
     /**
-     * @brief Create Users Database
+     * @brief Create Conference Database
      * @return
      */
     bool createTable();
 
     /**
-     * @brief Drop Users Database
+     * @brief Drop Conference Database
      * @return
      */
     bool dropTable();
 
     /**
-     * @brief Create Query String to Insert New User Record
+     * @brief Create Query String to Insert New Conference Record
      */
     std::string insertConferenceQryString(query_ptr qry, conference_ptr conf);
 
     /**
-     * @brief Creates Query String to Update Existing User Record
+     * @brief Creates Query String to Update Existing Conference Record
      */
     std::string updateConferenceQryString(query_ptr qry, conference_ptr conf);
 
     /**
-     * @brief Updates a User Record in the database!
+     * @brief Updates a Conference Record in the database!
      * @param conf
      * @return
      */
     bool updateConferenceRecord(conference_ptr conf);
 
     /**
-     * @brief Inserts a New User Record in the database!
+     * @brief Inserts a New Conference Record in the database!
      * @param conf
      * @return
      */
     long insertConferenceRecord(conference_ptr conf);
 
     /**
-     * @brief Deletes a User Record
+     * @brief Deletes a Conference Record
      * @param userId
      * @return
      */
     bool deleteConferenceRecord(long confId);
 
     /**
-     * @brief Helper To populate User Record with Query Results.
+     * @brief Helper To populate Conference Record with Query Results.
      */
     void pullConferenceResult(query_ptr qry, conference_ptr conf);
 
@@ -116,13 +116,13 @@ public:
         std::vector< std::pair<std::string, std::string> > &values);
 
     /**
-     * @brief Return User Record By Id.
+     * @brief Return Conference Record By Id.
      * @return
      */
     conference_ptr getConferenceById(long confId);
     
     /**
-     * @brief Return List of All Users
+     * @brief Return List of All Conferences
      * @return
      */
     std::vector<conference_ptr> getAllConferences();

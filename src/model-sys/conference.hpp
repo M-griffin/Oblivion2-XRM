@@ -3,6 +3,8 @@
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
+#include <string>
+
 class Conference;
 typedef boost::shared_ptr<Conference> conference_ptr;
 
@@ -17,14 +19,15 @@ class Conference
 {
 public:
         
-    long iId;
+    long        iId;
     std::string sName;
     std::string sType;
     std::string sACS;
-    long iSortOrder;
+    long        iSortOrder;
     
     Conference()
         : iId(-1)
+        , sName("")
         , sType("")
         , sACS("")
         , iSortOrder(-1)

@@ -17,16 +17,19 @@ class BBSList
 {
 public:
   
-    long iId;
-    std::string sName
+    long        iId;
+    std::string sName;
     std::string sType;
-    std::string sAddress
+    std::string sAddress;
+    std::string sSysop;
+    
     
     BBSList()
         : iId(-1)
         , sName("")
         , sType("")
         , sAddress("")
+        , sSysop("")
     { }
     
     ~BBSList()
