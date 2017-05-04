@@ -29,7 +29,7 @@ ConferenceDao::ConferenceDao(SQLW::Database &database)
     // Check if Database Exists.
     cmdConferenceTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + strTableName + "' COLLATE NOCASE;";
 
-    // Create Users Table Query (SQLite Only for the moment)
+    // Create Table Query (SQLite Only for the moment)
     cmdCreateConferenceTable =
         "CREATE TABLE IF NOT EXISTS " + strTableName + " ( "
         "iId               INTEGER PRIMARY KEY, "

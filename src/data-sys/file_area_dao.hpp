@@ -4,7 +4,6 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <vector>
-#include <cstdint>
 
 // Forward Declerations
 namespace SQLW
@@ -127,13 +126,11 @@ public:
     std::vector<file_area_ptr> getAllFileAreas();
     
     /**
-     * @brief Return List of All FileAreas by Type
-     * @param type
+     * @brief Return List of All FileArea by ConferenceId
+     * @param areas
      * @return
      */ 
-    std::vector<file_area_ptr> getAllFileAreasByConference(uint32_t areas);
-    
-
+    std::vector<file_area_ptr> getAllFileAreasByConference(long confId);   
     
 };
 

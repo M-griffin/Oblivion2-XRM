@@ -79,15 +79,17 @@ public:
     std::string sAcsAccess;
     std::string sAcsPost;
     bool        bAnonymous;
-    std::string sSponsor;
+    std::string sSponsor;    
     std::string sOriginLine;
     std::string sFidoPath;
+    long        iNetworkId;
     std::string sQwkName;
     long        iMaxMessages;
     bool        bRealName;
     std::string sLinkname;
     bool        bRequired;
-    bool        bPrivate;    
+    bool        bPrivate;
+    bool        bNetmail;
     long        iSortOrder;
     
     MessageArea()
@@ -99,12 +101,14 @@ public:
         , sSponsor("")
         , sOriginLine("")
         , sFidoPath("")
+        , iNetworkId(-1)
         , sQwkName("")
         , iMaxMessages(0)
         , bRealName(false)
         , sLinkname("")
         , bRequired(false)
         , bPrivate(false)
+        , bNetmail(false)
         , iSortOrder(-1)
     { }
     
