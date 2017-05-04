@@ -14,7 +14,7 @@ FileAreaDao::FileAreaDao(SQLW::Database &database)
     : m_file_area_database(database)
 {
     // Setup Table name
-    strTableName = "conference";
+    strTableName = "filearea";
 
     /**
      * Pre Popluate Static Queries one Time
@@ -29,7 +29,7 @@ FileAreaDao::FileAreaDao(SQLW::Database &database)
     // Check if Database Exists.
     cmdFileAreaTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + strTableName + "' COLLATE NOCASE;";
 
-    // Create Users Table Query (SQLite Only for the moment)
+    // Create Table Query (SQLite Only for the moment)
     cmdCreateFileAreaTable =
         "CREATE TABLE IF NOT EXISTS " + strTableName + " ( "
         "iId               INTEGER PRIMARY KEY, "
