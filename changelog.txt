@@ -1,4 +1,10 @@
 
+Change Log Update (00.00.91)
+* 2017-05-04
++ Completed FileArea DAO 
++ Added new model files for Conference Grouping
+- Create more Dao objects for reading/writing the Models to database.
+
 Change Log Update (00.00.90)
 * 2017-05-03
 + Added new model files for File Areas, Message Areas, Network Addresses
