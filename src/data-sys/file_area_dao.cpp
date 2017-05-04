@@ -155,7 +155,6 @@ bool FileAreaDao::createTable()
 
     // Create List of statements to execute in a single transaction.
     std::vector<std::string> statements;
-
     statements.push_back(cmdCreateFileAreaTable);
 
     // Execute Transaction.
@@ -164,7 +163,7 @@ bool FileAreaDao::createTable()
 }
 
 /**
- * @brief Drop Users Table
+ * @brief Drop Table
  * If Drop Index Fails, still try to Drop Tables as it will try both!
  */
 bool FileAreaDao::dropTable()
@@ -358,7 +357,7 @@ std::string FileAreaDao::updateFileAreaQryString(query_ptr qry, file_area_ptr ar
 }
 
 /**
- * @brief Updates a Conference Record in the database!
+ * @brief Updates a FileArea Record in the database!
  * @param area
  * @return
  */
@@ -559,7 +558,7 @@ std::vector<file_area_ptr> FileAreaDao::getAllFileAreas()
         }
         else
         {
-            std::cout << "Error, getAllConference Returned Rows: " << rows << std::endl;
+            std::cout << "Error, getAllFileAreas Returned Rows: " << rows << std::endl;
         }
     }
     else
@@ -596,7 +595,7 @@ std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(long confId)
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT a.* FROM %Q a, Grouping g WHERE g.iConferenceId = %ld AND a.iID = g.iFileId;", strTableName.c_str(), confId);
+    std::string queryString = sqlite3_mprintf("SELECT a.* FROM %Q a, Grouping g WHERE g.iConferenceId = %ld AND a.iID = g.iFileAreaId;", strTableName.c_str(), confId);
 
     // Execute Query.
     if (qry->getResult(queryString))
