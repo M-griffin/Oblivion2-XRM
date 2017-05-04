@@ -74,16 +74,37 @@ public:
                                 the network you're in supports private
                                 echomailing.
 */        
-    long iId;
+    long        iId;
     std::string sName;
-    std::string sType;
-    std::string sACS;
-    long iSortOrder;
+    std::string sAcsAccess;
+    std::string sAcsPost;
+    bool        bAnonymous;
+    std::string sSponsor;
+    std::string sOriginLine;
+    std::string sFidoPath;
+    std::string sQwkName;
+    long        iMaxMessages;
+    bool        bRealName;
+    std::string sLinkname;
+    bool        bRequired;
+    bool        bPrivate;    
+    long        iSortOrder;
     
     MessageArea()
         : iId(-1)
-        , sType("")
-        , sACS("")
+        , sName("")
+        , sAcsAccess("")
+        , sAcsPost("")
+        , bAnonymous(false)
+        , sSponsor("")
+        , sOriginLine("")
+        , sFidoPath("")
+        , sQwkName("")
+        , iMaxMessages(0)
+        , bRealName(false)
+        , sLinkname("")
+        , bRequired(false)
+        , bPrivate(false)
         , iSortOrder(-1)
     { }
     

@@ -4,23 +4,9 @@
   <wxString Value="/home/merc/code/Oblivion2-XRM/linux/obv2-xrm.workspace" Name="m_workspaceName"/>
   <TabInfoArray Name="TabInfoArray">
     <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/process_posix.cpp" Name="FileName"/>
-      <int Value="190" Name="FirstVisibleLine"/>
-      <int Value="202" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/process_posix.hpp" Name="FileName"/>
-      <int Value="60" Name="FirstVisibleLine"/>
-      <int Value="75" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
       <wxString Value="/home/merc/code/Oblivion2-XRM/src/menu_system.cpp" Name="FileName"/>
-      <int Value="423" Name="FirstVisibleLine"/>
-      <int Value="436" Name="CurrentLine"/>
+      <int Value="829" Name="FirstVisibleLine"/>
+      <int Value="841" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>

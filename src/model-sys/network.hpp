@@ -17,7 +17,7 @@ class Network
 {
 public:
   
-    long iId;
+    long        iId;
     std::string sName
     std::string sType;
     std::string sAddress

@@ -21,10 +21,7 @@ class Users
 {
 public:
 
-    /**
-     * Variables
-     */
-    long iId;
+    long        iId;
     std::string sHandle;
     std::string sRealName;
     std::string sAddress;
@@ -33,67 +30,48 @@ public:
     std::string sEmail;
     std::string sUserNote;
     std::time_t dtBirthday;
-
-    int iLevel;
-    int iFileLevel;
-    int iMessageLevel;
-
-    int iLastFileArea;
-    int iLastMessageArea;
-
-    int iTimeLeft;
-    int iTimeLimit;
-
-    // Might remove these!
+    int         iLevel;
+    int         iFileLevel;
+    int         iMessageLevel;
+    int         iLastFileArea;
+    int         iLastMessageArea;
+    int         iTimeLeft;
+    int         iTimeLimit;
     std::string sRegColor;
     std::string sPromptColor;
     std::string sInputColor;
     std::string sInverseColor;
     std::string sStatColor;
     std::string sBoxColor;
-
-    int iFilePoints;
-    int iPostCallRatio;
-
+    int         iFilePoints;
+    int         iPostCallRatio;
     std::string sMenuPromptName;
-    int iMenuSelected;
-    int iStatusSelected;
-
-    bool bAnsi;
-    bool bBackSpaceVt100;
-
-    int iNuvVotesYes;
-    int iNuvVotesNo;
-
+    int         iMenuSelected;
+    int         iStatusSelected;
+    bool        bAnsi;
+    bool        bBackSpaceVt100;
+    int         iNuvVotesYes;
+    int         iNuvVotesNo;
     std::time_t dtPassChangeDate;
     std::time_t dtLastReplyDate;
-
-    bool bScrollFL;
-
-    bool iCSPassChange;
-    
-    //std::string sControlFlags;
-    uint32_t iControlFlags1;
-    uint32_t iControlFlags2;
-
-    bool bWanted;
-
+    bool        bScrollFL;
+    bool        iCSPassChange;
+    uint32_t    iControlFlags1;
+    uint32_t    iControlFlags2;
+    bool        bWanted;
     std::string sHeaderType;
-    int iLastMesConf;
-    int iLastFileConf;
-
+    int         iLastMesConf;
+    int         iLastFileConf;
     std::time_t dtExpirationDate;
     std::string sGender;
-
     std::time_t dtFirstOn;
-    bool bYesNoBars;
-    int iHackAttempts;
-    bool bDoPause;
-    bool bClearOrScroll;
-    bool bIgnoreTimeLimit;
-    bool bAllowPurge;
-
-    long iSecurityIndex;
+    bool        bYesNoBars;
+    int         iHackAttempts;
+    bool        bDoPause;
+    bool        bClearOrScroll;
+    bool        bIgnoreTimeLimit;
+    bool        bAllowPurge;
+    long        iSecurityIndex;
 
     // Default User ID to -1 so we know it's not active!
     Users()
@@ -152,7 +130,6 @@ public:
     ~Users() { }
 
 };
-
 
 
 #endif // USERS_HPP
