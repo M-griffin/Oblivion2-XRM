@@ -45,16 +45,33 @@ public:
                                 is deducted for their download.
 */
         
-    long iId;
+    long        iId;
     std::string sName;
-    std::string sType;
-    std::string sACS;
-    long iSortOrder;
+    std::string sAcsAccess;
+    std::string sAcsUpload;
+    std::string sAcsDownload;
+    std::string sAcsList;
+    std::string sSponsor;
+    long        iSecurityIndex;
+    std::string sLinkname;
+    std::string sSort;
+    int         iMultiplier;
+    bool        bFreeArea;
+    long        iSortOrder;
     
     FileArea()
         : iId(-1)
-        , sType("")
-        , sACS("")
+        , sName("")
+        , sAcsAccess("")
+        , sAcsUpload("")
+        , sAcsDownload("")
+        , sAcsList("")
+        , sSponsor("")
+        , iSecurityIndex(-1)
+        , sLinkname("")
+        , sSort("F")
+        , iMultiplier(0)
+        , bFreeArea(true)
         , iSortOrder(-1)
     { }
     

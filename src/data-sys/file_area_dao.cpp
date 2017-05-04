@@ -1,5 +1,6 @@
-#include "conference_dao.hpp"
-#include "../model-sys/conference.hpp"
+#include "file_area_dao.hpp"
+
+#include "../model-sys/file_area.hpp"
 
 #include "libSqliteWrapped.h"
 #include <sqlite3.h>
@@ -9,9 +10,8 @@
 #include <iostream>
 #include <string>
 
-
-ConferenceDao::ConferenceDao(SQLW::Database &database)
-    : m_conference_database(database)
+FileAreaDao::FileAreaDao(SQLW::Database &database)
+    : m_file_area_database(database)
 {
     // Setup Table name
     strTableName = "conference";
@@ -27,28 +27,33 @@ ConferenceDao::ConferenceDao(SQLW::Database &database)
         "PRAGMA cache_size=10000; ";
     
     // Check if Database Exists.
-    cmdConferenceTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + strTableName + "' COLLATE NOCASE;";
+    cmdFileAreaTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + strTableName + "' COLLATE NOCASE;";
 
     // Create Users Table Query (SQLite Only for the moment)
-    cmdCreateConferenceTable =
+    cmdCreateFileAreaTable =
         "CREATE TABLE IF NOT EXISTS " + strTableName + " ( "
         "iId               INTEGER PRIMARY KEY, "
         "sName             TEXT NOT NULL COLLATE NOCASE, "
-        "sType             TEXT NOT NULL COLLATE NOCASE, "
-        "sACS              TEXT NOT NULL COLLATE NOCASE, "
-        "iSortOrder        INTEGER NOT NULL "
+        "sAcsAccess        TEXT NOT NULL COLLATE NOCASE, "
+        "sAcsUpload        TEXT NOT NULL COLLATE NOCASE, "
+        "sAcsDownload      TEXT NOT NULL COLLATE NOCASE, "
+        "sAcsList          TEXT NOT NULL COLLATE NOCASE, "
+        "sSponsor          TEXT NOT NULL COLLATE NOCASE, "
+        "iSecurityIndex    INT NOT NULL, "
+        "sLinkname         TEXT NOT NULL COLLATE NOCASE, "
+        "sSort             TEXT NOT NULL COLLATE NOCASE, "
+        "iMultiplier       INTEGER NOT NULL, "
+        "bFreeArea         BOOLEAN NOT NULL, "
+        "iSortOrder        INTEGER NOT NULL, "
+        "FOREIGN KEY(iSecurityIndex) REFERENCES Secutiry(iId) ON DELETE CASCADE "
         "); ";
 
-    cmdCreateConferenceIndex = "";
-        "CREATE INDEX IF NOT EXISTS conference_idx "
-        "ON " + strTableName + " (sType COLLATE NOCASE); ";
-
     // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
-    cmdDropConferenceTable = "DROP TABLE IF EXISTS " + strTableName + "; ";
-    cmdDropConferenceIndex = "DROP INDEX IF EXISTS conference_idx; ";
+    cmdDropFileAreaTable = "DROP TABLE IF EXISTS " + strTableName + "; ";
+
 }
 
-ConferenceDao::~ConferenceDao()
+FileAreaDao::~FileAreaDao()
 {
 }
 
@@ -56,19 +61,19 @@ ConferenceDao::~ConferenceDao()
  * @brief Check if the Table Exists in Database
  * @return
  */
-bool ConferenceDao::isTableExists()
+bool FileAreaDao::isTableExists()
 {
     bool result = false;
 
     // Make Sure Database Reference is Connected
-    if (!m_conference_database.isConnected())
+    if (!m_file_area_database.isConnected())
     {
         std::cout << "Error, Database is not connected!" << std::endl;
         return result;
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_conference_database));
+    query_ptr qry(new SQLW::Query(m_file_area_database));
     if (!qry || !qry->isConnected())
     {
         std::cout << "Error, Query has no connection to the database" << std::endl;
@@ -76,18 +81,18 @@ bool ConferenceDao::isTableExists()
     }
 
     // Execute and get result.
-    if (qry->getResult(cmdConferenceTableExists))
+    if (qry->getResult(cmdFileAreaTableExists))
     {
         long rows = qry->getNumRows();
         if (rows > 0)
         {
-            std::cout << "Conference Table Exists!" << std::endl;
+            std::cout << "FileArea Table Exists!" << std::endl;
             result = true;
         }
         else
         {
             // No rows means the table doesn't exist!
-            std::cout << "Error, Conference table Exists Returned Rows: " << rows << std::endl;
+            std::cout << "Error, FileArea table Exists Returned Rows: " << rows << std::endl;
         }
     }
     else
@@ -101,19 +106,19 @@ bool ConferenceDao::isTableExists()
 /**
  * @brief Run Setup Params for SQL Database.
   */
-bool ConferenceDao::firstTimeSetupParams()
+bool FileAreaDao::firstTimeSetupParams()
 {
     bool result = false;
 
     // Make Sure Database Reference is Connected
-    if (!m_conference_database.isConnected())
+    if (!m_file_area_database.isConnected())
     {
         std::cout << "Error, Database is not connected!" << std::endl;
         return result;
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_conference_database));
+    query_ptr qry(new SQLW::Query(m_file_area_database));
     if (!qry || !qry->isConnected())
     {
         std::cout << "Error, Query has no connection to the database" << std::endl;
@@ -129,19 +134,19 @@ bool ConferenceDao::firstTimeSetupParams()
  * @brief Create Users Table
  * If Create Table Fails, skip trying to create index.
  */
-bool ConferenceDao::createTable()
+bool FileAreaDao::createTable()
 {
     bool result = false;
 
     // Make Sure Database Reference is Connected
-    if (!m_conference_database.isConnected())
+    if (!m_file_area_database.isConnected())
     {
         std::cout << "Error, Database is not connected!" << std::endl;
         return result;
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_conference_database));
+    query_ptr qry(new SQLW::Query(m_file_area_database));
     if (!qry || !qry->isConnected())
     {
         std::cout << "Error, Query has no connection to the database" << std::endl;
@@ -151,8 +156,7 @@ bool ConferenceDao::createTable()
     // Create List of statements to execute in a single transaction.
     std::vector<std::string> statements;
 
-    statements.push_back(cmdCreateConferenceTable);
-    statements.push_back(cmdCreateConferenceIndex);
+    statements.push_back(cmdCreateFileAreaTable);
 
     // Execute Transaction.
     result = qry->executeTransaction(statements);
@@ -163,19 +167,19 @@ bool ConferenceDao::createTable()
  * @brief Drop Users Table
  * If Drop Index Fails, still try to Drop Tables as it will try both!
  */
-bool ConferenceDao::dropTable()
+bool FileAreaDao::dropTable()
 {
     bool result = false;
 
     // Make Sure Database Reference is Connected
-    if (!m_conference_database.isConnected())
+    if (!m_file_area_database.isConnected())
     {
         std::cout << "Error, Database is not connected!" << std::endl;
         return result;
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_conference_database));
+    query_ptr qry(new SQLW::Query(m_file_area_database));
     if (!qry || !qry->isConnected())
     {
         std::cout << "Error, Query has no connection to the database" << std::endl;
@@ -184,8 +188,7 @@ bool ConferenceDao::dropTable()
 
     // Create List of statements to execute in a single transaction.
     std::vector<std::string> statements;
-    statements.push_back(cmdDropConferenceIndex);
-    statements.push_back(cmdDropConferenceTable);
+    statements.push_back(cmdDropFileAreaTable);
 
     // Execute Transaction.
     result = qry->executeTransaction(statements);
@@ -195,41 +198,57 @@ bool ConferenceDao::dropTable()
 /**
  * @brief Pulls results by FieldNames into their Class Variables. 
  * @param qry
- * @param conf
+ * @param area
  */
-void ConferenceDao::pullConferenceResult(query_ptr qry, conference_ptr conf)
+void FileAreaDao::pullFileAreaResult(query_ptr qry, file_area_ptr area)
 {
-    qry->getFieldByName("iId", conf->iId);
-    qry->getFieldByName("sName", conf->sName);
-    qry->getFieldByName("sType", conf->sType);
-    qry->getFieldByName("sACS", conf->sACS); 
-    qry->getFieldByName("iSortOrder", conf->iSortOrder);    
+    qry->getFieldByName("iId", area->iId);
+    qry->getFieldByName("sName", area->sName);    
+    qry->getFieldByName("sAcsAccess", area->sAcsAccess);
+    qry->getFieldByName("sAcsUpload", area->sAcsUpload);
+    qry->getFieldByName("sAcsDownload", area->sAcsDownload);
+    qry->getFieldByName("sAcsList", area->sAcsList);
+    qry->getFieldByName("sSponsor", area->sSponsor);
+    qry->getFieldByName("iSecurityIndex", area->iSecurityIndex);
+    qry->getFieldByName("sLinkname", area->sLinkname);
+    qry->getFieldByName("sSort", area->sSort);
+    qry->getFieldByName("iMultiplier", area->iMultiplier);
+    qry->getFieldByName("bFreeArea", area->bFreeArea);
+    qry->getFieldByName("iSortOrder", area->iSortOrder);    
 }
 
 /**
  * @brief Used for Insert Statement
  *        This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
  * @param qry
- * @param conf
+ * @param area
  * @param values
  */ 
-void ConferenceDao::fillColumnValues(query_ptr qry, conference_ptr conf, 
+void FileAreaDao::fillColumnValues(query_ptr qry, file_area_ptr area, 
     std::vector< std::pair<std::string, std::string> > &values)
 {
     // values.push_back(qry->translateFieldName("iId", conf->iId));
-    values.push_back(qry->translateFieldName("sName", conf->sName));
-    values.push_back(qry->translateFieldName("sType", conf->sType));
-    values.push_back(qry->translateFieldName("sACS", conf->sACS));   
-    values.push_back(qry->translateFieldName("iSortOrder", conf->iSortOrder));    
+    values.push_back(qry->translateFieldName("sName", area->sName));
+    values.push_back(qry->translateFieldName("sAcsAccess", area->sAcsAccess));
+    values.push_back(qry->translateFieldName("sAcsUpload", area->sAcsUpload));
+    values.push_back(qry->translateFieldName("sAcsDownload", area->sAcsDownload));
+    values.push_back(qry->translateFieldName("sAcsList", area->sAcsList));
+    values.push_back(qry->translateFieldName("sSponsor", area->sSponsor));
+    values.push_back(qry->translateFieldName("iSecurityIndex", area->iSecurityIndex));
+    values.push_back(qry->translateFieldName("sLinkname", area->sLinkname));
+    values.push_back(qry->translateFieldName("sSort", area->sSort));
+    values.push_back(qry->translateFieldName("iMultiplier", area->iMultiplier));
+    values.push_back(qry->translateFieldName("bFreeArea", area->bFreeArea));
+    values.push_back(qry->translateFieldName("iSortOrder", area->iSortOrder));
 }
 
 /**
- * @brief Create Conference Record Insert Statement, returns query string 
+ * @brief Create FileArea Record Insert Statement, returns query string 
  * @param qry
- * @param conf
+ * @param area
  * @return 
  */
-std::string ConferenceDao::insertConferenceQryString(query_ptr qry, conference_ptr conf)
+std::string FileAreaDao::insertFileAreaQryString(query_ptr qry, file_area_ptr area)
 {
     std::stringstream ssColumn;
     std::stringstream ssType;
@@ -240,7 +259,7 @@ std::string ConferenceDao::insertConferenceQryString(query_ptr qry, conference_p
     ssType << ") VALUES (";
 
     // Populate the Pairs.
-    fillColumnValues(qry, conf, values);
+    fillColumnValues(qry, area, values);
 
     // Build Query (Columns) VALUES (Types) ..  ie %d, %Q into a full string.
     it = values.begin();
@@ -267,22 +286,30 @@ std::string ConferenceDao::insertConferenceQryString(query_ptr qry, conference_p
 
     // Mprint statement to avoid injections.
     std::string result = sqlite3_mprintf(newQueryString.c_str(),
-        conf->sName.c_str(),
-        conf->sType.c_str(),
-        conf->sACS.c_str(),
-        conf->iSortOrder
+        area->sName.c_str(),
+        area->sAcsAccess.c_str(),
+        area->sAcsUpload.c_str(),
+        area->sAcsDownload.c_str(),
+        area->sAcsList.c_str(),
+        area->sSponsor.c_str(),
+        area->iSecurityIndex,
+        area->sLinkname.c_str(),
+        area->sSort.c_str(),
+        area->iMultiplier,
+        area->bFreeArea,
+        area->iSortOrder
     );
 
     return result;
 }
 
 /**
- * @brief Update Existing Conference Record. 
+ * @brief Update Existing FileArea Record. 
  * @param qry
- * @param conf
+ * @param area
  * @return 
  */
-std::string ConferenceDao::updateConferenceQryString(query_ptr qry, conference_ptr conf)
+std::string FileAreaDao::updateFileAreaQryString(query_ptr qry, file_area_ptr area)
 {
     std::stringstream ssColumn;
     std::vector< std::pair<std::string, std::string> >::iterator it;
@@ -292,7 +319,7 @@ std::string ConferenceDao::updateConferenceQryString(query_ptr qry, conference_p
     ssColumn << "UPDATE " + strTableName + " SET ";
 
     // Populate the Pairs. Variable = %Q formatted string.
-    fillColumnValues(qry, conf, values);
+    fillColumnValues(qry, area, values);
 
     // Build Query (Columns) = (Values) ..  ie %d, %Q into a full string.
     it = values.begin();
@@ -311,12 +338,20 @@ std::string ConferenceDao::updateConferenceQryString(query_ptr qry, conference_p
     newQueryString.append(" WHERE iId = %ld; ");
 
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(newQueryString.c_str(),
-        conf->sName.c_str(),
-        conf->sType.c_str(),
-        conf->sACS.c_str(),
-        conf->iSortOrder,
-        conf->iId
+    std::string result = sqlite3_mprintf(newQueryString.c_str(),        
+        area->sName.c_str(),
+        area->sAcsAccess.c_str(),
+        area->sAcsUpload.c_str(),
+        area->sAcsDownload.c_str(),
+        area->sAcsList.c_str(),
+        area->sSponsor.c_str(),
+        area->iSecurityIndex,
+        area->sLinkname.c_str(),
+        area->sSort.c_str(),
+        area->iMultiplier,
+        area->bFreeArea,
+        area->iSortOrder,
+        area->iId
     );
 
     return result;
@@ -324,22 +359,22 @@ std::string ConferenceDao::updateConferenceQryString(query_ptr qry, conference_p
 
 /**
  * @brief Updates a Conference Record in the database!
- * @param conf
+ * @param area
  * @return
  */
-bool ConferenceDao::updateConferenceRecord(conference_ptr conf)
+bool FileAreaDao::updateFileAreaRecord(file_area_ptr area)
 {
     bool result = false;
 
     // Make Sure Database Reference is Connected
-    if (!m_conference_database.isConnected())
+    if (!m_file_area_database.isConnected())
     {
         std::cout << "Error, Database is not connected!" << std::endl;
         return result;
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_conference_database));
+    query_ptr qry(new SQLW::Query(m_file_area_database));
     if (!qry || !qry->isConnected())
     {
         std::cout << "Error, Query has no connection to the database" << std::endl;
@@ -347,7 +382,7 @@ bool ConferenceDao::updateConferenceRecord(conference_ptr conf)
     }
 
     // Build update string
-    std::string queryString = updateConferenceQryString(qry, conf);
+    std::string queryString = updateFileAreaQryString(qry, area);
 
     // Execute Update in a Transaction, rollback if fails.
     std::vector<std::string> statements;
@@ -358,24 +393,24 @@ bool ConferenceDao::updateConferenceRecord(conference_ptr conf)
 }
 
 /**
- * @brief Inserts a New Conference Record in the database!
- * @param conf
+ * @brief Inserts a New FileArea Record in the database!
+ * @param area
  * @return
  */
-long ConferenceDao::insertConferenceRecord(conference_ptr conf)
+long FileAreaDao::insertFileAreaRecord(file_area_ptr area)
 {    
     bool result = false;
     long lastInsertId = -1;
 
     // Make Sure Database Reference is Connected
-    if (!m_conference_database.isConnected())
+    if (!m_file_area_database.isConnected())
     {
         std::cout << "Error, Database is not connected!" << std::endl;
         return result;
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_conference_database));
+    query_ptr qry(new SQLW::Query(m_file_area_database));
     if (!qry || !qry->isConnected())
     {
         std::cout << "Error, Query has no connection to the database" << std::endl;
@@ -383,7 +418,7 @@ long ConferenceDao::insertConferenceRecord(conference_ptr conf)
     }
 
     // Build update string
-    std::string queryString = insertConferenceQryString(qry, conf);
+    std::string queryString = insertFileAreaQryString(qry, area);
 
     // Execute Update in a Transaction, rollback if fails.
     std::vector<std::string> statements;
@@ -400,23 +435,23 @@ long ConferenceDao::insertConferenceRecord(conference_ptr conf)
 }
 
 /**
- * @brief Deletes a Conference Record
- * @param confId
+ * @brief Deletes a FileArea Record
+ * @param areaId
  * @return
  */
-bool ConferenceDao::deleteConferenceRecord(long confId)
+bool FileAreaDao::deleteFileAreaRecord(long areaId)
 {
     bool result = false;
 
     // Make Sure Database Reference is Connected
-    if (!m_conference_database.isConnected())
+    if (!m_file_area_database.isConnected())
     {
         std::cout << "Error, Database is not connected!" << std::endl;
         return result;
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_conference_database));
+    query_ptr qry(new SQLW::Query(m_file_area_database));
     if (!qry || !qry->isConnected())
     {
         std::cout << "Error, Query has no connection to the database" << std::endl;
@@ -424,7 +459,7 @@ bool ConferenceDao::deleteConferenceRecord(long confId)
     }
 
     // Build string
-    std::string queryString = sqlite3_mprintf("DELETE FROM %Q WHERE iId = %ld;", strTableName.c_str(), confId);
+    std::string queryString = sqlite3_mprintf("DELETE FROM %Q WHERE iId = %ld;", strTableName.c_str(), areaId);
 
     // Execute Update in a Transaction, rollback if fails.
     std::vector<std::string> statements;
@@ -435,30 +470,30 @@ bool ConferenceDao::deleteConferenceRecord(long confId)
 }
 
 /**
- * @brief Return User Record By Index ID.
+ * @brief Return FileArea Record By Index ID.
  * @return
  */
-conference_ptr ConferenceDao::getConferenceById(long confId)
+file_area_ptr FileAreaDao::getFileAreaById(long areaId)
 {
-    conference_ptr conf(new Conference);
+    file_area_ptr area(new FileArea);
 
     // Make Sure Database Reference is Connected
-    if (!m_conference_database.isConnected())
+    if (!m_file_area_database.isConnected())
     {
         std::cout << "Error, Database is not connected!" << std::endl;
-        return conf;
+        return area;
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_conference_database));
+    query_ptr qry(new SQLW::Query(m_file_area_database));
     if (!qry->isConnected())
     {
         std::cout << "Error, Query has no connection to the database" << std::endl;
-        return conf;
+        return area;
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iID = %ld;", strTableName.c_str(), confId);
+    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iID = %ld;", strTableName.c_str(), areaId);
 
     // Execute Query.
     if (qry->getResult(queryString))
@@ -467,7 +502,7 @@ conference_ptr ConferenceDao::getConferenceById(long confId)
         if (rows > 0)
         {
             qry->fetchRow();
-            pullConferenceResult(qry, conf);
+            pullFileAreaResult(qry, area);
         }
         else
         {
@@ -479,31 +514,31 @@ conference_ptr ConferenceDao::getConferenceById(long confId)
         std::cout << "Error, getResult()" << std::endl;
     }
 
-    return conf;
+    return area;
 }
 
 /**
- * @brief Return List of All Conference
+ * @brief Return List of All FileAreas
  * @return
  */
-std::vector<conference_ptr> ConferenceDao::getAllConferences()
+std::vector<file_area_ptr> FileAreaDao::getAllFileAreas()
 {
-    conference_ptr conf(new Conference);
-    std::vector<conference_ptr> conf_list;
+    file_area_ptr area(new FileArea);
+    std::vector<file_area_ptr> area_list;
 
     // Make Sure Database Reference is Connected
-    if (!m_conference_database.isConnected())
+    if (!m_file_area_database.isConnected())
     {
         std::cout << "Error, Database is not connected!" << std::endl;
-        return conf_list;
+        return area_list;
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_conference_database));
+    query_ptr qry(new SQLW::Query(m_file_area_database));
     if (!qry->isConnected())
     {
         std::cout << "Error, Query has no connection to the database" << std::endl;
-        return conf_list;
+        return area_list;
     }
 
     // Build Query String
@@ -517,9 +552,9 @@ std::vector<conference_ptr> ConferenceDao::getAllConferences()
         {
             while(qry->fetchRow())
             {
-                conf.reset(new Conference);
-                pullConferenceResult(qry, conf);
-                conf_list.push_back(conf);
+                area.reset(new FileArea);
+                pullFileAreaResult(qry, area);
+                area_list.push_back(area);
             }
         }
         else
@@ -532,36 +567,40 @@ std::vector<conference_ptr> ConferenceDao::getAllConferences()
         std::cout << "Error, getResult()" << std::endl;
     }
 
-    return conf_list;
+    return area_list;
 }
 
 /**
- * @brief Return List of All Conference by Type
- * @param type
+ * @brief Return List of All FileArea by Type
+ * @param areas
  * @return
  */ 
-std::vector<conference_ptr> ConferenceDao::getAllConferencesByType(std::string type)
+std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(uint32_t areas)
 {
-    conference_ptr conf(new Conference);
-    std::vector<conference_ptr> conf_list;
+    file_area_ptr area(new FileArea);
+    std::vector<file_area_ptr> area_list;
 
     // Make Sure Database Reference is Connected
-    if (!m_conference_database.isConnected())
+    if (!m_file_area_database.isConnected())
     {
         std::cout << "Error, Database is not connected!" << std::endl;
-        return conf_list;
+        return area_list;
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_conference_database));
+    query_ptr qry(new SQLW::Query(m_file_area_database));
     if (!qry->isConnected())
     {
         std::cout << "Error, Query has no connection to the database" << std::endl;
-        return conf_list;
+        return area_list;
     }
 
+
+    // TODO, Build list of bitflags in areas, 32 bit bit flags.
+    
+
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sType like %Q;", strTableName.c_str(), type.c_str());
+    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sType like %Q;", strTableName.c_str(), areas);
 
     // Execute Query.
     if (qry->getResult(queryString))
@@ -571,14 +610,14 @@ std::vector<conference_ptr> ConferenceDao::getAllConferencesByType(std::string t
         {
             while(qry->fetchRow())
             {
-                conf.reset(new Conference);
-                pullConferenceResult(qry, conf);
-                conf_list.push_back(conf);
+                area.reset(new FileArea);
+                pullFileAreaResult(qry, area);
+                area_list.push_back(area);
             }
         }
         else
         {
-            std::cout << "Error, getAllConferencesByType Returned Rows: " << rows << std::endl;
+            std::cout << "Error, getAllFileAreasByConference Returned Rows: " << rows << std::endl;
         }
     }
     else
@@ -586,59 +625,5 @@ std::vector<conference_ptr> ConferenceDao::getAllConferencesByType(std::string t
         std::cout << "Error, getResult()" << std::endl;
     }
 
-    return conf_list;
-}
-
-/**
- * @brief Return Count or Number of Existing Conferences by Type
- * @param type
- * @return
- */ 
-long ConferenceDao::getConferencesCountByType(std::string type)
-{
-    conference_ptr conf(new Conference);
-    std::vector<conference_ptr> conf_list;
-
-    // Make Sure Database Reference is Connected
-    if (!m_conference_database.isConnected())
-    {
-        std::cout << "Error, Database is not connected!" << std::endl;
-        return conf_list.size();
-    }
-
-    // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_conference_database));
-    if (!qry->isConnected())
-    {
-        std::cout << "Error, Query has no connection to the database" << std::endl;
-        return conf_list.size();
-    }
-
-    // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sType like %Q;", strTableName.c_str(), type.c_str());
-
-    // Execute Query.
-    if (qry->getResult(queryString))
-    {
-        long rows = qry->getNumRows();
-        if (rows > 0)
-        {
-            while(qry->fetchRow())
-            {
-                conf.reset(new Conference);
-                pullConferenceResult(qry, conf);
-                conf_list.push_back(conf);
-            }
-        }
-        else
-        {
-            std::cout << "Error, getConferenceCount By Type Returned Rows: " << rows << std::endl;
-        }
-    }
-    else
-    {
-        std::cout << "Error, getResult()" << std::endl;
-    }
-
-    return conf_list.size();
+    return area_list;
 }

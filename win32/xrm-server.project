@@ -82,6 +82,14 @@
       <File Name="../src/data-sys/session_stats_dao.cpp"/>
       <File Name="../src/data-sys/conference_dao.cpp"/>
       <File Name="../src/data-sys/conference_dao.hpp"/>
+      <File Name="../src/data-sys/file_area_dao.hpp"/>
+      <File Name="../src/data-sys/file_area_dao.cpp"/>
+      <File Name="../src/data-sys/message_area_dao.hpp"/>
+      <File Name="../src/data-sys/message_area_dao.cpp"/>
+      <File Name="../src/data-sys/network_dao.hpp"/>
+      <File Name="../src/data-sys/network_dao.cpp"/>
+      <File Name="../src/data-sys/grouping_dao.hpp"/>
+      <File Name="../src/data-sys/grouping_dao.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="model-sys">
       <File Name="../src/model-sys/config.hpp"/>
@@ -97,6 +105,7 @@
       <File Name="../src/model-sys/file_area.hpp"/>
       <File Name="../src/model-sys/message_area.hpp"/>
       <File Name="../src/model-sys/network.hpp"/>
+      <File Name="../src/model-sys/grouping.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
       <File Name="../src/mods/mod_base.hpp"/>
@@ -120,6 +129,8 @@
     <VirtualDirectory Name="data-app">
       <File Name="../src/data-app/last_callers_dao.cpp"/>
       <File Name="../src/data-app/last_callers_dao.hpp"/>
+      <File Name="../src/data-app/bbs_list_dao.hpp"/>
+      <File Name="../src/data-app/bbs_list_dao.cpp"/>
     </VirtualDirectory>
     <File Name="../src/process_base.hpp"/>
     <File Name="../src/process_win.cpp"/>
