@@ -131,7 +131,7 @@ bool FileAreaDao::firstTimeSetupParams()
 }
 
 /**
- * @brief Create Users Table
+ * @brief Create Table
  * If Create Table Fails, skip trying to create index.
  */
 bool FileAreaDao::createTable()
@@ -571,11 +571,11 @@ std::vector<file_area_ptr> FileAreaDao::getAllFileAreas()
 }
 
 /**
- * @brief Return List of All FileArea by Type
+ * @brief Return List of All FileArea by ConferenceId
  * @param areas
  * @return
  */ 
-std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(uint32_t areas)
+std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(long confId)
 {
     file_area_ptr area(new FileArea);
     std::vector<file_area_ptr> area_list;
@@ -595,12 +595,8 @@ std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(uint32_t are
         return area_list;
     }
 
-
-    // TODO, Build list of bitflags in areas, 32 bit bit flags.
-    
-
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sType like %Q;", strTableName.c_str(), areas);
+    std::string queryString = sqlite3_mprintf("SELECT a.* FROM %Q a, Grouping g WHERE g.iConferenceId = %ld AND a.iID = g.iFileId;", strTableName.c_str(), confId);
 
     // Execute Query.
     if (qry->getResult(queryString))
