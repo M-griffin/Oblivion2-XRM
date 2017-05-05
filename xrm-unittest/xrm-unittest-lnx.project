@@ -87,7 +87,6 @@
         <Library Value="boost_system"/>
         <Library Value="boost_thread"/>
         <Library Value="boost_chrono"/>
-        <Library Value="boost_serialization"/>
         <Library Value="boost_locale"/>
         <Library Value="boost_filesystem"/>
         <Library Value="boost_timer"/>
