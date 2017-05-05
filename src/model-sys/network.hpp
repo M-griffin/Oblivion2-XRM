@@ -18,9 +18,9 @@ class Network
 public:
   
     long        iId;
-    std::string sName
+    std::string sName;
     std::string sType;
-    std::string sAddress
+    std::string sAddress;
     
     Network()
         : iId(-1)
