@@ -1,5 +1,5 @@
-#include "access_level_dao.hpp"
-#include "../model-sys/access_levels.hpp"
+#include "protocol_dao.hpp"
+#include "../model-sys/protocol.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/make_shared.hpp>
@@ -12,27 +12,27 @@
 
 
 // Setup the file version for the file.
-const std::string AccessLevels::FILE_VERSION = "1.0.0";
+const std::string Protocols::FILE_VERSION = "1.0.0";
 
 
-AccessLevelDao::AccessLevelDao(access_level_ptr acl, std::string path)
-    : m_access_level(acl)
+ProtocolDao::ProtocolDao(protocols_ptr prot, std::string path)
+    : m_protocols(prot)
     , m_path(path)
-    , m_filename("access_levels")
+    , m_filename("protocols")
 {
-    std::cout << "AccessLevelDao" << std::endl;
+    std::cout << "ProtocolDao" << std::endl;
 }
 
-AccessLevelDao::~AccessLevelDao()
+ProtocolDao::~ProtocolDao()
 {
-    std::cout << "~AccessLevelDao" << std::endl;
+    std::cout << "~ProtocolDao" << std::endl;
 }
 
 /**
  * @brief Helper, appends forward/backward slash to path
  * @param value
  */
-void AccessLevelDao::pathSeperator(std::string &value)
+void ProtocolDao::pathSeperator(std::string &value)
 {
 #ifdef _WIN32
     value.append("\\");
@@ -45,7 +45,7 @@ void AccessLevelDao::pathSeperator(std::string &value)
  * @brief Check if the file exists and we need to create a new one.
  * @return
  */
-bool AccessLevelDao::fileExists()
+bool ProtocolDao::fileExists()
 {
     std::string path = m_path;
     pathSeperator(path);    
@@ -64,10 +64,10 @@ bool AccessLevelDao::fileExists()
 
 /**
  * @brief Creates and Saves a newly Generated Configuration File.
- * @param acl
+ * @param prot
  * @return
  */
-bool AccessLevelDao::saveConfig(access_level_ptr acl)
+bool ProtocolDao::saveConfig(protocols_ptr prot)
 {
     std::string path = m_path;
     pathSeperator(path);    
@@ -81,19 +81,22 @@ bool AccessLevelDao::saveConfig(access_level_ptr acl)
 
     // Start Creating the Key/Value Output for the Config File.
     
-    out << YAML::Key << "file_version" << YAML::Value << acl->file_version;
+    out << YAML::Key << "file_version" << YAML::Value << prot->file_version;
     
     // Loop and encode each menu option
-    for(unsigned int i = 0; i < acl->access_levels.size(); i++)
+    for(unsigned int i = 0; i < prot->protocols.size(); i++)
     {
-        auto &opt = acl->access_levels[i];
+        auto &opt = prot->protocols[i];
         
-        out << YAML::Key << "access_levels";
-        out << YAML::Value << YAML::BeginMap;
-                
-        out << YAML::Key << "access_level" << YAML::Value << opt.access_level;
-        out << YAML::Key << "access_name" << YAML::Value << opt.access_name;
-        
+        out << YAML::Key << "protocols";
+        out << YAML::Value << YAML::BeginMap;                        
+        out << YAML::Key << "protocol_name" << YAML::Value << opt.protocol_name;
+        out << YAML::Key << "protocol_type" << YAML::Value << opt.protocol_type;
+        out << YAML::Key << "protocol_key" << YAML::Value << opt.protocol_key;
+        out << YAML::Key << "protocol_path" << YAML::Value << opt.protocol_path;
+        out << YAML::Key << "protocol_argument" << YAML::Value << opt.protocol_argument;
+        out << YAML::Key << "protocol_isBatch" << YAML::Value << opt.protocol_isBatch;
+        out << YAML::Key << "protocol_hasDSZLog" << YAML::Value << opt.protocol_hasDSZLog;        
         out << YAML::EndMap;
     }
     
@@ -121,26 +124,26 @@ bool AccessLevelDao::saveConfig(access_level_ptr acl)
  * @param rhs
  * @return
  */
-void AccessLevelDao::encode(const AccessLevels &rhs)
+void ProtocolDao::encode(const Protocols &rhs)
 {      
-    m_access_level->file_version        = rhs.file_version;    
-    m_access_level->access_levels       = rhs.access_levels;
+    m_protocols->file_version    = rhs.file_version;    
+    m_protocols->protocols       = rhs.protocols;
     
-    // Now Sort All AccessLevels once they have been loaded.
+    // Now Sort All Protocols once they have been loaded.
     // Unforunatally YAML does not keep ordering in arrays properly.
     sort(
-        m_access_level->access_levels.begin( ), m_access_level->access_levels.end( ), 
-        [ ] (const Level& lhs, const Level& rhs)
+        m_protocols->protocols.begin( ), m_protocols->protocols.end( ), 
+        [ ] (const Protocol& lhs, const Protocol& rhs)
     {
-        return lhs.access_level < rhs.access_level;
+        return lhs.protocol_name < rhs.protocol_name;
     });
 }
 
 /**
- * @brief Loads a Configuation file into the m_config stub for access.
+ * @brief Loads a Configuation file into the m_protocol stub for access.
  * @return
  */
-bool AccessLevelDao::loadConfig()
+bool ProtocolDao::loadConfig()
 {
     std::string path = m_path;
     pathSeperator(path);    
@@ -164,26 +167,26 @@ bool AccessLevelDao::loadConfig()
         std::string file_version = node["file_version"].as<std::string>();
         
         // Validate File Version
-        std::cout << "AccessLevels File Version: " << file_version << std::endl;
-        if (file_version != AccessLevels::FILE_VERSION) {
-            throw std::invalid_argument("Invalid file_version, expected: " + AccessLevels::FILE_VERSION);
+        std::cout << "Protocols File Version: " << file_version << std::endl;
+        if (file_version != Protocols::FILE_VERSION) {
+            throw std::invalid_argument("Invalid file_version, expected: " + Protocols::FILE_VERSION);
         }
         
         // When doing node.as (all fields must be present on file)
-        AccessLevels acl = node.as<AccessLevels>();
+        Protocols prot = node.as<Protocols>();
 
         // Moves the Loaded config to m_config shared pointer.
-        encode(acl);
+        encode(prot);
     }
     catch (YAML::Exception &ex)
     {
-        std::cout << "YAML::LoadFile(access_level.yaml) " << ex.what() << std::endl;
+        std::cout << "YAML::LoadFile(protocols.yaml) " << ex.what() << std::endl;
         std::cout << "Most likely a required field in the config file is missing. " << std::endl;
         assert(false);
     }
     catch (std::exception &ex)
     {
-        std::cout << "Unexpected YAML::LoadFile(access_level.yaml) " << ex.what() << std::endl;
+        std::cout << "Unexpected YAML::LoadFile(protocols.yaml) " << ex.what() << std::endl;
         assert(false);
     }
 

@@ -1,28 +1,27 @@
-#ifndef ACCESS_LEVEL_DAO_HPP
-#define ACCESS_LEVEL_DAO_HPP
+#ifndef PROTOCOL_DAO_HPP
+#define PROTOCOL_DAO_HPP
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <string>
 #include <mutex>
 
-
-class AccessLevels;
-typedef boost::shared_ptr<AccessLevels> access_level_ptr;
+class Protocols;
+typedef boost::shared_ptr<Protocols> protocols_ptr;
 
 /**
- * @class ConfigDao
+ * @class ProtocolDao
  * @author Michael Griffin
- * @date 2/21/2016
- * @file config_dao.hpp
- * @brief Handles Reading and Writting Config Class from XML
+ * @date 05/05/2017
+ * @file protocol_dao.hpp
+ * @brief Handles Reading and Writting Protocols Class from XML
  */
-class AccessLevelDao
+class ProtocolDao
 {
 public:
 
-    AccessLevelDao(access_level_ptr acl, std::string path);
-    ~AccessLevelDao();
+    ProtocolDao(protocols_ptr prots, std::string path);
+    ~ProtocolDao();
 
     /**
      * @brief Helper, appends forward/backward slash to path
@@ -41,7 +40,7 @@ public:
      * @param aco
      * @return
      */
-    bool saveConfig(access_level_ptr acl);
+    bool saveConfig(protocols_ptr prots);
 
     /**
      * @brief Loads a Configuation file into the m_config stub for access.
@@ -54,27 +53,27 @@ public:
      * @param rhs
      * @return
      */
-    void encode(const AccessLevels &rhs);
+    void encode(const Protocols &rhs);
 
     /**
      * @brief Grab a const handle to the loaded configuration.
      * @return
      */
-    access_level_ptr getConfig() const
+    protocols_ptr getConfig() const
     {
-        if(m_access_level)
+        if(m_protocols)
         {
-            return m_access_level;
+            return m_protocols;
         }
     }
    
-    access_level_ptr  m_access_level;
+    protocols_ptr     m_protocols;
     std::string       m_path;
     std::string       m_filename;
     std::mutex        m;
 
 };
 
-typedef boost::shared_ptr<AccessLevelDao> access_level_dao_ptr;
+typedef boost::shared_ptr<ProtocolDao> protocol_dao_ptr;
 
-#endif // ACCESS_LEVEL_DAO_HPP
+#endif // PROTOCOL_DAO_HPP

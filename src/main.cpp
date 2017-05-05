@@ -22,8 +22,8 @@
 
 #include "data-sys/text_prompts_dao.hpp"
 
-#include "model-sys/access_levels.hpp"
-#include "data-sys/access_level_dao.hpp"
+#include "model-sys/protocol.hpp"
+#include "data-sys/protocol_dao.hpp"
 
 #include "model-sys/config.hpp"
 #include "data-sys/config_dao.hpp"
@@ -322,6 +322,20 @@ auto main() -> int
             return 0;
         }
 
+        protocols_ptr prots(new Protocols());
+        ProtocolDao protdb(prots, GLOBAL_DATA_PATH);
+
+        if (!protdb.fileExists())
+        {
+            // Create Genric Protocol Entry to Test File Creation
+            Protocol p1("Sexyz", "D", "Z", "C:\\TESTPATH\\", "--Test", false, false);
+
+            prots->protocols.push_back(p1);
+
+            protdb.saveConfig(prots);
+        }
+        
+/*
         // Check and Setup default Access Levels.
         access_level_ptr levels(new AccessLevels());
         AccessLevelDao acl(levels, GLOBAL_DATA_PATH);
@@ -339,7 +353,7 @@ auto main() -> int
 
             acl.saveConfig(levels);
         }
-
+        */
     }
 
     // Start System Services and Main Loop.
