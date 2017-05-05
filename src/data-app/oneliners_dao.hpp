@@ -120,6 +120,12 @@ public:
     oneliner_ptr getOnelinerById(long confId);
     
     /**
+     * @brief Return All Oneliners Records By User ID.
+     * @return
+     */
+    std::vector<oneliner_ptr> getAllOnelinersByUserId(long userId);
+
+    /**
      * @brief Return List of All MessageAreas
      * @return
      */

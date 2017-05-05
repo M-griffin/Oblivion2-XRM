@@ -482,6 +482,59 @@ oneliner_ptr OnelinerDao::getOnelinerById(long oneId)
 }
 
 /**
+ * @brief Return All Oneliners Records By User ID.
+ * @return
+ */
+std::vector<oneliner_ptr> OnelinerDao::getAllOnelinersByUserId(long userId)
+{
+    oneliner_ptr one(new Oneliners);
+    std::vector<oneliner_ptr> one_list;
+
+    // Make Sure Database Reference is Connected
+    if (!m_oneliner_database.isConnected())
+    {
+        std::cout << "Error, Database is not connected!" << std::endl;
+        return one_list;
+    }
+
+    // Create Pointer and Connect Query Object to Database.
+    query_ptr qry(new SQLW::Query(m_oneliner_database));
+    if (!qry->isConnected())
+    {
+        std::cout << "Error, Query has no connection to the database" << std::endl;
+        return one_list;
+    }
+
+    // Build Query String
+    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iUserId = %ld;", strTableName.c_str(), userId);
+
+    // Execute Query.
+    if (qry->getResult(queryString))
+    {
+        long rows = qry->getNumRows();
+        if (rows > 0)
+        {
+            while(qry->fetchRow())
+            {
+                one.reset(new Oneliners);
+                pullOnelinerResult(qry, one);
+                one_list.push_back(one);
+            }
+        }
+        else
+        {
+            std::cout << "Error, getAllOnelinerss Returned Rows: " << rows << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << "Error, getResult()" << std::endl;
+    }
+
+    return one_list;
+}
+
+/**
  * @brief Return List of All Oneliners
  * @return
  */
