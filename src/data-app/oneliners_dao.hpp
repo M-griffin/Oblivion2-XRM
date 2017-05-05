@@ -1,5 +1,5 @@
-#ifndef NETWORK_DAO_HPP
-#define NETWORK_DAO_HPP
+#ifndef ONELINERS_DAO_HPP
+#define ONELINERS_DAO_HPP
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
@@ -12,9 +12,9 @@ class Database;
 class Query;
 }
 
-class Network;
+class Oneliners;
 // Handles to MessageArea
-typedef boost::shared_ptr<Network> network_ptr;
+typedef boost::shared_ptr<Oneliners> oneliner_ptr;
 
 // Handles to Database
 typedef boost::shared_ptr<SQLW::Database> database_ptr;
@@ -23,29 +23,29 @@ typedef boost::shared_ptr<SQLW::Database> database_ptr;
 typedef boost::shared_ptr<SQLW::Query> query_ptr;
 
 /**
- * @class NetworkDao
+ * @class OnelinerDao
  * @author Michael Griffin
  * @date 05/05/2017
- * @file network_dao.hpp
- * @brief Handles Message Fido and Internet Network Address
+ * @file oneliners_dao.hpp
+ * @brief One Liners Data Access Object
  */
-class NetworkDao
+class OnelinerDao
 {
 public:
-    NetworkDao(SQLW::Database &database);
-    ~NetworkDao();
+    OnelinerDao(SQLW::Database &database);
+    ~OnelinerDao();
     
     // Handle to Database
-    SQLW::Database &m_network_database;
+    SQLW::Database &m_oneliner_database;
 
     std::string strTableName;
 
-    // Static Queries
     std::string cmdFirstTimeSetup;
 
-    std::string cmdNetworkTableExists;
-    std::string cmdCreateNetworkTable;
-    std::string cmdDropNetworkTable;
+    std::string cmdOnelinerTableExists;
+    // Static Queries
+    std::string cmdCreateOnelinerTable;
+    std::string cmdDropOnelinerTable;
 
     /**
      * @brief Check of the Database Exists.
@@ -73,61 +73,67 @@ public:
     /**
      * @brief Create Query String to Insert New MessageArea Record
      */
-    std::string insertNetworkQryString(query_ptr qry, network_ptr net);
+    std::string insertOnelinerQryString(query_ptr qry, oneliner_ptr area);
 
     /**
      * @brief Creates Query String to Update Existing MessageArea Record
      */
-    std::string updateNetworkQryString(query_ptr qry, network_ptr net);
+    std::string updateOnelinerQryString(query_ptr qry, oneliner_ptr area);
 
     /**
      * @brief Updates a MessageArea Record in the database!
-     * @param net
+     * @param area
      * @return
      */
-    bool updateNetworkRecord(network_ptr net);
+    bool updateOnelinerRecord(oneliner_ptr area);
 
     /**
      * @brief Inserts a New MessageArea Record in the database!
-     * @param net
+     * @param area
      * @return
      */
-    long insertNetworkRecord(network_ptr net);
+    long insertOnelinerRecord(oneliner_ptr area);
 
     /**
      * @brief Deletes a MessageArea Record
      * @param areaId
      * @return
      */
-    bool deleteNetworkRecord(long areaId);
+    bool deleteOnelinerRecord(long areaId);
 
     /**
      * @brief Helper To populate MessageArea Record with Query Results.
      */
-    void pullNetworkResult(query_ptr qry, network_ptr net);
+    void pullOnelinerResult(query_ptr qry, oneliner_ptr area);
 
     /**
      * @brief This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
      * @param values
      */
-    void fillColumnValues(query_ptr qry, network_ptr net, 
+    void fillColumnValues(query_ptr qry, oneliner_ptr area, 
         std::vector< std::pair<std::string, std::string> > &values);
 
     /**
      * @brief Return MessageArea Record By Id.
      * @return
      */
-    network_ptr getNetworkById(long netId);
+    oneliner_ptr getOnelinerById(long confId);
     
+    /**
+     * @brief Return All Oneliners Records By User ID.
+     * @return
+     */
+    std::vector<oneliner_ptr> getAllOnelinersByUserId(long userId);
+
     /**
      * @brief Return List of All MessageAreas
      * @return
      */
-    std::vector<network_ptr> getAllNetworks();
+    std::vector<oneliner_ptr> getAllOneliners();
         
 };
 
 // Handle to Database Queries
-typedef boost::shared_ptr<NetworkDao> network_dao_ptr;
+typedef boost::shared_ptr<OnelinerDao> oneliner_dao_ptr;
 
-#endif // NETWORK_DAO_HPP
+#endif // ONELINERS_DAO_HPP

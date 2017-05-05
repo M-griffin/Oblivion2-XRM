@@ -131,6 +131,8 @@
       <File Name="../src/data-app/last_callers_dao.hpp"/>
       <File Name="../src/data-app/bbs_list_dao.hpp"/>
       <File Name="../src/data-app/bbs_list_dao.cpp"/>
+      <File Name="../src/data-app/oneliners_dao.hpp"/>
+      <File Name="../src/data-app/oneliners_dao.cpp"/>
     </VirtualDirectory>
     <File Name="../src/process_base.hpp"/>
     <File Name="../src/process_win.cpp"/>

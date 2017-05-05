@@ -1,4 +1,12 @@
 
+Change Log Update (00.00.93)
+* 2017-05-05
++ Completed Network DAO (FidoNet and IP Network Address Mappings)
++ Completed Oneliners DAO
+- Next:
+- Look at last callers, pull from sessions stats, or make standalone table.
+- Convert AccessLevel yaml to database table.
+
 Change Log Update (00.00.92)
 * 2017-05-04
 + Completed Grouping DAO (Groups Conferences and Message/File Areas)
