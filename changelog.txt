@@ -1,4 +1,10 @@
 
+Change Log Update (00.00.92)
+* 2017-05-04
++ Completed Grouping DAO (Groups Conferences and Message/File Areas)
++ Completed Message Area DAO 
+- Network DAO for Fido / IP Address for Message Areas and Networks
+
 Change Log Update (00.00.91)
 * 2017-05-04
 + Completed FileArea DAO 

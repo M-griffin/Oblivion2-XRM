@@ -21,12 +21,14 @@ public:
         
     long        iId;
     long        iConferenceId;
-    long        iAreaId
+    long        iFileAreaId;
+    long        iMsgAreaId;
     
     Grouping()
         : iId(-1)
         , iConferenceId(-1)
-        , iAreaId(-1)
+        , iFileAreaId(-1)
+        , iMsgAreaId(-1)
     { }
     
     ~Grouping()
