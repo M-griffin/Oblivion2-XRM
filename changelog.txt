@@ -1,4 +1,9 @@
 
+Change Log Update (00.00.94)
+* 2017-05-05
++ Removed AccessLevel yaml file, this will be redone in Database with DAO
++ Added new Protocol yaml file for File Transfer Protocol Configuration
+
 Change Log Update (00.00.93)
 * 2017-05-05
 + Completed Network DAO (FidoNet and IP Network Address Mappings)
