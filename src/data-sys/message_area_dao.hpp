@@ -130,7 +130,7 @@ public:
      * @param areas
      * @return
      */ 
-    std::vector<msg_area_ptr> getAllMessageAreasByConference(long confId);   
+    std::vector<msg_area_ptr> getAllMessageAreasByConference(long confId);
     
 };
 
