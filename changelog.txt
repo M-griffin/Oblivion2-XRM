@@ -1,4 +1,14 @@
 
+Change Log Update (00.00.95)
+* 2017-05-07
++ Create new BaseDao Object for Standard SQL Database base calls.
++ Updated ConferenceDao to inherit BaseDao
++ Updated OnelinerDao to inherit BaseDao
++ Created Integration UnitTests for Calling ConferenceDao testing all BaseDao 
+  Methods to make sure everthing is solid.
++ Added new getAllRecordsCount() to baseDao
+- Working on refactoring the remaining DAO objects to inherit from BaseDao
+
 Change Log Update (00.00.94)
 * 2017-05-05
 + Removed AccessLevel yaml file, this will be redone in Database with DAO

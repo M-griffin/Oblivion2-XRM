@@ -48,15 +48,22 @@
     <File Name="access_condition_ut.cpp"/>
     <File Name="../src/form_manager.cpp"/>
     <File Name="../src/form_manager.hpp"/>
+    <File Name="form_system_config_ut.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="model-sys">
     <File Name="../src/model-sys/config.hpp"/>
     <File Name="../src/model-sys/users.hpp"/>
     <File Name="../src/model-sys/menu.hpp"/>
+    <File Name="../src/model-sys/conference.hpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="data-sys">
     <File Name="../src/data-sys/config_dao.cpp"/>
     <File Name="../src/data-sys/config_dao.hpp"/>
+    <File Name="../src/data-sys/base_dao.hpp"/>
+    <File Name="../src/data-sys/conference_dao.cpp"/>
+    <File Name="../src/data-sys/conference_dao.hpp"/>
+    <File Name="../src/data-sys/menu_dao.cpp"/>
+    <File Name="../src/data-sys/menu_dao.hpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="forms">
     <File Name="../src/forms/form_base.hpp"/>
