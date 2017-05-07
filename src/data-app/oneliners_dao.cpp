@@ -1,5 +1,4 @@
 #include "oneliners_dao.hpp"
-
 #include "../model-app/oneliners.hpp"
 
 #include "libSqliteWrapped.h"
@@ -10,6 +9,11 @@
 #include <iostream>
 #include <string>
 
+/**
+ * Base Dao Calls for generic Object Data Calls
+ * (Below This Point)
+ */
+ 
 /**
  * @brief Check If Database Table Exists.
  * @return
@@ -46,7 +50,7 @@ bool OnelinerDao::dropTable()
 }
 
 /**
- * @brief Updates a MessageArea Record in the database!
+ * @brief Updates a Record in the database!
  * @param area
  * @return
  */
@@ -56,7 +60,7 @@ bool OnelinerDao::updateRecord(oneliner_ptr obj)
 }
 
 /**
- * @brief Inserts a New MessageArea Record in the database!
+ * @brief Inserts a New Record in the database!
  * @param area
  * @return
  */
@@ -66,7 +70,7 @@ long OnelinerDao::insertRecord(oneliner_ptr obj)
 }
 
 /**
- * @brief Deletes a MessageArea Record
+ * @brief Deletes a Record
  * @param areaId
  * @return
  */
@@ -75,6 +79,32 @@ bool OnelinerDao::deleteRecord(long id)
     return baseDeleteRecord(id);
 }
 
+/**
+ * @brief Retrieve Record By Id.
+ * @param id
+ * @return 
+ */ 
+oneliner_ptr OnelinerDao::getRecordById(long id)
+{
+    return baseGetRecordById(id);
+}
+
+/**
+ * @brief Retrieve All Records in a Table
+ * @return
+ */
+std::vector<oneliner_ptr> OnelinerDao::getAllRecords()
+{
+    return baseGetAllRecords();
+}
+
+
+/**
+ * Base Dao Call Back for Object Specific Data Mappings
+ * (Below This Point)
+ */
+
+     
 /**
  * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
  * @param qry
@@ -108,7 +138,7 @@ void OnelinerDao::fillOnelinerColumnValues(query_ptr qry, oneliner_ptr obj,
 }
 
 /**
- * @brief (Callback) Create Oneliners Record Insert Statement, returns query string 
+ * @brief (Callback) Create Record Insert Statement, returns query string 
  * @param qry
  * @param obj
  * @return 
@@ -128,7 +158,7 @@ std::string OnelinerDao::insertOnelinerQryString(std::string qry, oneliner_ptr o
 }
 
 /**
- * @brief (CallBack) Update Existing Oneliners Record. 
+ * @brief (CallBack) Update Existing Record. 
  * @param qry
  * @param obj
  * @return 
@@ -154,8 +184,9 @@ std::string OnelinerDao::updateOnelinerQryString(std::string qry, oneliner_ptr o
  * (Below This Point)
  */
 
+
 /**
- * @brief Return All Oneliners Records By User ID.
+ * @brief Return All Records By User ID.
  * @return
  */
 std::vector<oneliner_ptr> OnelinerDao::getAllOnelinersByUserId(long userId)

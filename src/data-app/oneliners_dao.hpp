@@ -14,9 +14,6 @@ class Database;
 class Query;
 }
 
-// Handles to Database
-typedef boost::shared_ptr<SQLW::Database> database_ptr;
-
 // Handle to Database Queries
 typedef boost::shared_ptr<SQLW::Query> query_ptr;
 
@@ -87,10 +84,17 @@ public:
     {        
     }
    
+   
    /**
-     * @brief Check If Database Table Exists.
-     * @return
-     */
+    * Base Dao Calls for generic Object Data Calls
+    * (Below This Point)
+    */
+ 
+ 
+   /**
+    * @brief Check If Database Table Exists.
+    * @return
+    */
     bool doesTableExists();
     
     /**
@@ -111,36 +115,55 @@ public:
     bool dropTable();
     
     /**
-     * @brief Updates a MessageArea Record in the database!
-     * @param area
+     * @brief Updates a Record in the database!
+     * @param obj
      * @return
      */
     bool updateRecord(oneliner_ptr obj);
 
     /**
-     * @brief Inserts a New MessageArea Record in the database!
-     * @param area
+     * @brief Inserts a New Record in the database!
+     * @param obj
      * @return
      */
     long insertRecord(oneliner_ptr obj);
-
+        
     /**
      * @brief Deletes a MessageArea Record
      * @param areaId
      * @return
      */
-    bool deleteRecord(long id);      
+    bool deleteRecord(long id);
+    
+    /**
+     * @brief Retrieve Record By Id.
+     * @param id
+     * @return 
+     */ 
+    oneliner_ptr getRecordById(long id);
+    
+    /**
+     * @brief Retrieve All Records in a Table
+     * @return
+     */
+    std::vector<oneliner_ptr> getAllRecords();
     
     
     /**
-     * @brief CallBack, Pulls results by FieldNames into their Class Variables. 
+     * Base Dao Call Back for Object Specific Data Mappings
+     * (Below This Point)
+     */
+    
+    
+    /**
+     * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
      * @param qry
      * @param obj
      */
     void pullOnelinerResult(query_ptr qry, oneliner_ptr obj);
     
     /**
-     * @brief Used for Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
+     * @brief (CallBack) Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
      * @param qry
      * @param obj
      * @param values
@@ -149,7 +172,7 @@ public:
         std::vector< std::pair<std::string, std::string> > &values);
 
     /**
-     * @brief Create Oneliners Record Insert Statement, returns query string 
+     * @brief (Callback) Create Record Insert Statement, returns query string 
      * @param qry
      * @param obj
      * @return 
@@ -157,15 +180,22 @@ public:
     std::string insertOnelinerQryString(std::string qry, oneliner_ptr obj);
 
     /**
-     * @brief Update Existing Oneliners Record. 
+     * @brief (CallBack) Update Existing Record. 
      * @param qry
      * @param obj
      * @return 
      */
     std::string updateOnelinerQryString(std::string qry, oneliner_ptr obj);
 
+
     /**
-     * @brief Return All Oneliners Records By User ID.
+     * One Off Methods SQL Queries not included in the BaseDao
+     * (Below This Point)
+     */
+
+     
+    /**
+     * @brief Return All Records By User ID.
      * @return
      */
     std::vector<oneliner_ptr> getAllOnelinersByUserId(long userId);

@@ -34,7 +34,9 @@ public:
         , m_cmdFirstTimeSetup("")
         , m_cmdTableExists("")
         , m_cmdCreateTable("")
+        , m_cmdCreateIndex("")
         , m_cmdDropTable("")
+        , m_cmdDropIndex("")
     {
     }
         
@@ -55,7 +57,9 @@ public:
     std::string m_cmdFirstTimeSetup;
     std::string m_cmdTableExists;
     std::string m_cmdCreateTable;
+    std::string m_cmdCreateIndex;
     std::string m_cmdDropTable;
+    std::string m_cmdDropIndex;
     
     // Dynamic Callbacks to Calling Class for Specific Object Mappings
     std::vector<std::function< void(query_ptr qry, boost::shared_ptr<T> obj)> > m_result_function;
@@ -164,6 +168,10 @@ public:
         // Create List of statements to execute in a single transaction.
         std::vector<std::string> statements;
         statements.push_back(m_cmdCreateTable);
+        if (m_cmdCreateIndex.size() > 0)
+        {
+            statements.push_back(m_cmdCreateIndex);
+        }
 
         // Execute Transaction.
         result = qry->executeTransaction(statements);
@@ -194,6 +202,10 @@ public:
 
         // Create List of statements to execute in a single transaction.
         std::vector<std::string> statements;
+        if (m_cmdDropIndex.size() > 0)
+        {
+            statements.push_back(m_cmdDropIndex);
+        }
         statements.push_back(m_cmdDropTable);
 
         // Execute Transaction.
@@ -426,8 +438,9 @@ public:
 
     /**
      * @brief Retrieve Record By Id.
-     * @return
-     */
+     * @param id
+     * @return 
+     */ 
     boost::shared_ptr<T> baseGetRecordById(long id)
     {
         boost::shared_ptr<T> obj(new T);
@@ -457,7 +470,7 @@ public:
             if (rows > 0)
             {
                 qry->fetchRow();
-                pullOnelinerResult(qry, obj);
+                basePullResult(qry, obj);
             }
             else
             {
@@ -508,7 +521,7 @@ public:
                 while(qry->fetchRow())
                 {
                     obj.reset(new T);
-                    pullOnelinerResult(qry, obj);
+                    basePullResult(qry, obj);
                     list.push_back(obj);
                 }
             }
