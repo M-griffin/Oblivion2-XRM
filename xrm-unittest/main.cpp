@@ -10,12 +10,11 @@
 #endif
 
 #include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/make_shared.hpp>
 
+#include "data-sys/conference_dao.hpp"
+#include "model-sys/conference.hpp"
 
-#include "model-sys/config.hpp"
-#include "model-sys/menu.hpp"
-#include "forms/form_system_config.hpp"
+#include "libSqliteWrapped.h"
 
 
 // C Standard
@@ -35,192 +34,123 @@ std::string GLOBAL_TEXTFILE_PATH = "";
 std::string USERS_DATABASE       = "";
 
 
+/**
+ * Handle Setup and Tear Down of Integration Test for SQLite
+ */
+class MyFixture
+{
+    
+public:
 
-// Definitions for XRMFormSystemConfig Unit Tests.
-#define MAX_OPTIONS 106
-#define BBS_NAME_SYSOP 0
-#define USE_SSL_SERVICE 9
-#define PORT_TELNET 6
+    MyFixture()
+        : m_database("xrm_itTest_users.sqlite3")
+    { 
+        // Can't remove database on closure, becasue the 
+        // Object is not cleared till Destructor is finished.
+        // Before Each Test, we need to remove existing database.
+        std::cout << "Remove xrm_itTest_users" << std::endl;
+        remove("xrm_itTest_users.sqlite3");
+    }
+    
+    ~MyFixture() 
+    { }
+   
+    SQLW::Database m_database;
+};
 
 
 /**
- * @brief Unit Testing for Initial Form Configuration Implimentation
+ * @brief Unit Testing for Initial Sqlite Database DAO and BaseDao.
  * @return 
  */
-SUITE(XRMFormSystemConfig)
+SUITE(XRMConferenceDao)
 {
-    /**
-     * Just testing output of onEnter .. And generate mapping translation mock up.
-     * In generate config value are places in menu options form_value as strings
-     * They are then edited and updated.  YAML::Node then translates and maps
-     * Back to their original types changing Strings back to String, Bool, Int etc..
-     * These tests confirm the mapping and updates are working correctly for the form interface.
-     */
     
-    // Tests Node Type Casting from String to String
-    TEST(SystemConfigOutputTest_ThenStringReassignment)
+    // Test DAO with All Base Dao Calls.
+    TEST_FIXTURE(MyFixture, ConferenceDaoTest)
     {        
-        config_ptr config(new Config());
-        form_ptr form(new FormSystemConfig(config));
-        
-        // run the form on enter.
-        form->onEnter();
-        std::vector<MenuOption> opts = form->baseGetFormOptions();
-        
-        // 106 Config Options generated.
-        CHECK(opts.size() == MAX_OPTIONS);
-        
-        // Setup Yaml Mapping, and assign the config to it.
-        YAML::Node node;
-        node = config;
-        
-        // Test Value.
-        CHECK(opts[BBS_NAME_SYSOP].form_value == node[opts[BBS_NAME_SYSOP].name].as<std::string>());
-        
-        // Update Value on Option.. 
-        opts[BBS_NAME_SYSOP].form_value = "new value";
-        
-        // Assign new value by lookup
-        node[opts[BBS_NAME_SYSOP].name] = opts[BBS_NAME_SYSOP].form_value;
-        
-        // Move from Node back to Config and Translations String to String
-        Config c = node.as<Config>();
-        
-        // Now test new value is populated in config class.
-        CHECK(opts[BBS_NAME_SYSOP].form_value == c.bbs_name_sysop);
-    }
-    
-    // Tests Node Type Casting from String to Boolean
-    TEST(SystemConfigOutputTest_ThenBoolReassignment)
-    {        
-        config_ptr config(new Config());
-        form_ptr form(new FormSystemConfig(config));
-        
-        // run the form on enter.
-        form->onEnter();
-        std::vector<MenuOption> opts = form->baseGetFormOptions();
-        
-        // 106 Config Options generated.
-        CHECK(opts.size() == MAX_OPTIONS);
-        
-        // Setup Yaml Mapping, and assign the config to it.
-        YAML::Node node;
-        node = config;
-        
-        // Test Value.
-        CHECK(!node[opts[USE_SSL_SERVICE].name].as<bool>());
-        
-        // Update Value on Option.. 
-        opts[USE_SSL_SERVICE].form_value = "true";
-        
-        // Assign new value by lookup
-        node[opts[USE_SSL_SERVICE].name] = opts[USE_SSL_SERVICE].form_value;
-        
-        // Move from Node back to Config and Translations String to Bool
-        Config c = node.as<Config>();
-        
-        // Now test new value is populated in config class.
-        CHECK(c.use_service_ssl == true);
-    }
-    
-    // Tests Node Type Casting from String to Integer
-    TEST(SystemConfigOutputTest_ThenIntegerReassignment)
-    {        
-        config_ptr config(new Config());
-        form_ptr form(new FormSystemConfig(config));
-        
-        // run the form on enter.
-        form->onEnter();
-        std::vector<MenuOption> opts = form->baseGetFormOptions();
-        
-        // 106 Config Options generated.
-        CHECK(opts.size() == MAX_OPTIONS);
-        
-        // Setup Yaml Mapping, and assign the config to it.
-        YAML::Node node;
-        node = config;
-        
-        // Test Value.
-        CHECK(node[opts[PORT_TELNET].name].as<int>() == 6023);
-        
-        // Update Value on Option.. 
-        opts[PORT_TELNET].form_value = "2323";
-        
-        // Assign new value by lookup
-        node[opts[PORT_TELNET].name] = opts[PORT_TELNET].form_value;
-        
-        // Move from Node back to Config and Translations String to Int
-        // Do Extra Test of Conversion to Smart Pointer!
-        Config conf = node.as<Config>();
-        config_ptr c = boost::make_shared<Config>(conf);
-                
-        // Now test new value is populated in config class.
-        CHECK(c->port_telnet == 2323);
-    }
+        // Link to users dao for data access object
+        conference_dao_ptr confdb(new ConferenceDao(m_database));
 
+        // DataBase Table Should not exist.
+        CHECK(!confdb->doesTableExist());
+        
+        // Setup database Param, cache sies etc..
+        CHECK(confdb->firstTimeSetupParams());
 
-    // User FormSystemConfig Methods
-    // Tests Node Type Casting from String to String
-    TEST(SystemConfigOutputTest_ThenStringReassignment_FormMethods)
-    {        
-        config_ptr config(new Config());
-        form_ptr form(new FormSystemConfig(config));
+        // Check Create Table and Index
+        CHECK(confdb->createTable());
         
-        form->onEnter();
-        std::vector<MenuOption> opts = form->baseGetFormOptions();   
+        // DataBase Table exists.
+        CHECK(confdb->doesTableExist());
         
-        std::string newValue = "newValue";
-        form->updateNodeMapping(opts[BBS_NAME_SYSOP], newValue);
-                
-        // Move from Node back to Config and Translations String to String
-        config_ptr c = form->retrieveNodeMapping<Config>();
+        // Check Insert
+        conference_ptr confIn(new Conference());
+        confIn->sName = "Test Message Conference";
+        confIn->sType = "M";
+        confIn->sACS = "s20";
+        confIn->iSortOrder = 1;
         
-        // Now test new value is populated in config class.
-        CHECK(newValue == c->bbs_name_sysop);
-    }
-    
-    // Tests Node Type Casting from String to Boolean
-    TEST(SystemConfigOutputTest_ThenBoolReassignment_FormMethods)
-    {        
-        config_ptr config(new Config());
-        form_ptr form(new FormSystemConfig(config));
-                
-        form->onEnter();
-        std::vector<MenuOption> opts = form->baseGetFormOptions();
+        long lastInsertId = confdb->insertRecord(confIn);
         
-        std::string newValue = "true";        
-        form->updateNodeMapping(opts[USE_SSL_SERVICE], newValue);
-                
-        // Move from Node back to Config and Translations String to String
-        config_ptr c = form->retrieveNodeMapping<Config>();
-                        
-        // Now test new value is populated in config class.
-        CHECK(c->use_service_ssl == true);
-    }
-    
-    // Tests Node Type Casting from String to Integer
-    TEST(SystemConfigOutputTest_ThenIntegerReassignment_FormMethods)
-    {        
-        config_ptr config(new Config());
-        form_ptr form(new FormSystemConfig(config));
+        // Returns Lat Insert Id, Should not be -1.
+        CHECK(lastInsertId == 1);
         
-        // run the form on enter.
-        form->onEnter();
-        std::vector<MenuOption> opts = form->baseGetFormOptions();     
+        // Check Retrieve
+        conference_ptr confOut(new Conference());
+        confOut = confdb->getRecordById(lastInsertId);
 
-        std::string newValue = "2323";        
-        form->updateNodeMapping(opts[PORT_TELNET], newValue);
-                
-        // Move from Node back to Config and Translations String to String
-        config_ptr c = form->retrieveNodeMapping<Config>();
-                
-        // Now test new value is populated in config class.
-        CHECK(c->port_telnet == 2323);
-    }
+        CHECK(confOut->iId == 1);
+        CHECK(confOut->sName == "Test Message Conference");
+        CHECK(confOut->sType == "M");
+        CHECK(confOut->sACS == "s20");
+        CHECK(confOut->iSortOrder == 1);
+        
+        // Test Update, Id should be 1 already.
+        confOut->sName = "Test File Conference";
+        confOut->sType = "F";
+        confOut->sACS = "s30";
+        confOut->iSortOrder = 2;
+        
+        // Updates returns bool.
+        CHECK(confdb->updateRecord(confOut));
+        
+        //Retrieve Update
+        conference_ptr confUpdate(new Conference());
+        confUpdate = confdb->getRecordById(lastInsertId);
+        
+        // Test Output After Update
+        CHECK(confOut->iId == 1);
+        CHECK(confOut->sName == "Test File Conference");
+        CHECK(confOut->sType == "F");
+        CHECK(confOut->sACS == "s30");
+        CHECK(confOut->iSortOrder == 2);
+        
+        // Test Get All Records in Vector.
+        std::vector<conference_ptr> getAllResults;
+        getAllResults = confdb->getAllRecords();
+        
+        CHECK(getAllResults.size() == 1);
+        
+        // Test Delete Record
+        CHECK(confdb->deleteRecord(lastInsertId));
+        
+        
+        // Test Getting Deleted Record
+        conference_ptr confDel(new Conference());
+        confDel = confdb->getRecordById(lastInsertId);
+        
+        // Invalid Records return with -1
+        CHECK(confDel->iId == -1);
+        
+        // Test Drop Table and Index returns true;
+        CHECK(confdb->dropTable());
+        
+        // DataBase Table Should not exist.
+        CHECK(!confdb->doesTableExist());        
+    }    
 
 }
-
-
 
 
 /*
@@ -228,7 +158,6 @@ SUITE(XRMFormSystemConfig)
 * Any method that hit IO, Database, File, Network, is considered an Integration Test
 * and will be setup in seperate Tests Suite or done manaully through the interface.
 */
-
 
 
 // run all unit tests

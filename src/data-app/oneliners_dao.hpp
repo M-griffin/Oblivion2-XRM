@@ -1,6 +1,8 @@
 #ifndef ONELINERS_DAO_HPP
 #define ONELINERS_DAO_HPP
 
+#include "../model-app/oneliners.hpp"
+#include "../data-sys/base_dao.hpp"
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <vector>
@@ -12,15 +14,11 @@ class Database;
 class Query;
 }
 
-class Oneliners;
-// Handles to MessageArea
-typedef boost::shared_ptr<Oneliners> oneliner_ptr;
-
-// Handles to Database
-typedef boost::shared_ptr<SQLW::Database> database_ptr;
-
 // Handle to Database Queries
 typedef boost::shared_ptr<SQLW::Query> query_ptr;
+
+// Base Dao Definition
+typedef BaseDao<Oneliners> baseOnelinerClass;
 
 /**
  * @class OnelinerDao
@@ -30,106 +28,183 @@ typedef boost::shared_ptr<SQLW::Query> query_ptr;
  * @brief One Liners Data Access Object
  */
 class OnelinerDao
+    : public baseOnelinerClass
 {
 public:
-    OnelinerDao(SQLW::Database &database);
-    ~OnelinerDao();
     
-    // Handle to Database
-    SQLW::Database &m_oneliner_database;
+    OnelinerDao(SQLW::Database &database)
+        : baseOnelinerClass(database) 
+    {
+        // Setup Table name
+        m_strTableName = "oneliner";
 
-    std::string strTableName;
+        /**
+         * Pre Popluate Static Queries one Time
+         */
+        m_cmdFirstTimeSetup =
+            "PRAGMA synchronous=Normal; "
+            "PRAGMA encoding=UTF-8; "
+            "PRAGMA foreign_keys=ON; "
+            "PRAGMA default_cache_size=10000; "
+            "PRAGMA cache_size=10000; ";
+        
+        // Check if Database Exists.
+        m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
 
-    std::string cmdFirstTimeSetup;
+        // Create Table Query (SQLite Only for the moment)
+        m_cmdCreateTable =
+            "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
+            "iId               INTEGER PRIMARY KEY, "
+            "iUserId           INTEGER NOT NULL, "
+            "sText             TEXT NOT NULL COLLATE NOCASE, "
+            "sUserName         TEXT NOT NULL COLLATE NOCASE, "
+            "sUserInitials     TEXT NOT NULL COLLATE NOCASE, "
+            "dtDatePosted      DATETIME DEFAULT CURRENT_TIMESTAMP, "
+            "FOREIGN KEY(iUserId) REFERENCES User(iId) ON DELETE CASCADE "
+            "); ";
 
-    std::string cmdOnelinerTableExists;
-    // Static Queries
-    std::string cmdCreateOnelinerTable;
-    std::string cmdDropOnelinerTable;
+        // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
+        m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
+        
+        // Setup the CallBack for Result Field Mapping
+        m_result_function.push_back(std::bind(&OnelinerDao::pullOnelinerResult, this, 
+            std::placeholders::_1, std::placeholders::_2));
+            
+        m_columns_function.push_back(std::bind(&OnelinerDao::fillOnelinerColumnValues, this, 
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+            
+        m_insert_function.push_back(std::bind(&OnelinerDao::insertOnelinerQryString, this, 
+            std::placeholders::_1, std::placeholders::_2));
+        
+        m_update_function.push_back(std::bind(&OnelinerDao::updateOnelinerQryString, this, 
+            std::placeholders::_1, std::placeholders::_2));
+    }
 
+    ~OnelinerDao()
+    {        
+    }
+   
+   
+   /**
+    * Base Dao Calls for generic Object Data Calls
+    * (Below This Point)
+    */
+ 
+ 
+   /**
+    * @brief Check If Database Table Exists.
+    * @return
+    */
+    bool doesTableExist();
+    
     /**
-     * @brief Check of the Database Exists.
-     * @return
-     */
-    bool isTableExists();
-
-    /**
-     * @brief Run Setup Params for SQL Database.
+     * @brief Run Setup Params for SQL Database Table.
      */
     bool firstTimeSetupParams();
 
     /**
-     * @brief Create MessageArea Database
+     * @brief Create Database Table
      * @return
      */
     bool createTable();
 
     /**
-     * @brief Drop MessageArea Database
+     * @brief Drop Database
      * @return
      */
     bool dropTable();
-
+    
     /**
-     * @brief Create Query String to Insert New MessageArea Record
-     */
-    std::string insertOnelinerQryString(query_ptr qry, oneliner_ptr area);
-
-    /**
-     * @brief Creates Query String to Update Existing MessageArea Record
-     */
-    std::string updateOnelinerQryString(query_ptr qry, oneliner_ptr area);
-
-    /**
-     * @brief Updates a MessageArea Record in the database!
-     * @param area
+     * @brief Updates a Record in the database!
+     * @param obj
      * @return
      */
-    bool updateOnelinerRecord(oneliner_ptr area);
+    bool updateRecord(oneliner_ptr obj);
 
     /**
-     * @brief Inserts a New MessageArea Record in the database!
-     * @param area
+     * @brief Inserts a New Record in the database!
+     * @param obj
      * @return
      */
-    long insertOnelinerRecord(oneliner_ptr area);
-
+    long insertRecord(oneliner_ptr obj);
+        
     /**
      * @brief Deletes a MessageArea Record
      * @param areaId
      * @return
      */
-    bool deleteOnelinerRecord(long areaId);
-
+    bool deleteRecord(long id);
+    
     /**
-     * @brief Helper To populate MessageArea Record with Query Results.
+     * @brief Retrieve Record By Id.
+     * @param id
+     * @return 
+     */ 
+    oneliner_ptr getRecordById(long id);
+    
+    /**
+     * @brief Retrieve All Records in a Table
+     * @return
      */
-    void pullOnelinerResult(query_ptr qry, oneliner_ptr area);
-
+    std::vector<oneliner_ptr> getAllRecords();
+    
     /**
-     * @brief This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
+     * @brief Retrieve Count of All Records in a Table
+     * @return
+     */
+    long getRecordsCount();
+    
+    
+    /**
+     * Base Dao Call Back for Object Specific Data Mappings
+     * (Below This Point)
+     */
+    
+    
+    /**
+     * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+     * @param qry
+     * @param obj
+     */
+    void pullOnelinerResult(query_ptr qry, oneliner_ptr obj);
+    
+    /**
+     * @brief (CallBack) Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
+     * @param qry
+     * @param obj
      * @param values
-     */
-    void fillColumnValues(query_ptr qry, oneliner_ptr area, 
+     */ 
+    void fillOnelinerColumnValues(query_ptr qry, oneliner_ptr obj, 
         std::vector< std::pair<std::string, std::string> > &values);
 
     /**
-     * @brief Return MessageArea Record By Id.
-     * @return
+     * @brief (Callback) Create Record Insert Statement, returns query string 
+     * @param qry
+     * @param obj
+     * @return 
      */
-    oneliner_ptr getOnelinerById(long confId);
-    
+    std::string insertOnelinerQryString(std::string qry, oneliner_ptr obj);
+
     /**
-     * @brief Return All Oneliners Records By User ID.
+     * @brief (CallBack) Update Existing Record. 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string updateOnelinerQryString(std::string qry, oneliner_ptr obj);
+
+
+    /**
+     * One Off Methods SQL Queries not included in the BaseDao
+     * (Below This Point)
+     */
+
+     
+    /**
+     * @brief Return All Records By User ID.
      * @return
      */
     std::vector<oneliner_ptr> getAllOnelinersByUserId(long userId);
-
-    /**
-     * @brief Return List of All MessageAreas
-     * @return
-     */
-    std::vector<oneliner_ptr> getAllOneliners();
         
 };
 

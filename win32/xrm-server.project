@@ -90,6 +90,7 @@
       <File Name="../src/data-sys/grouping_dao.cpp"/>
       <File Name="../src/data-sys/protocol_dao.hpp"/>
       <File Name="../src/data-sys/protocol_dao.cpp"/>
+      <File Name="../src/data-sys/base_dao.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="model-sys">
       <File Name="../src/model-sys/config.hpp"/>

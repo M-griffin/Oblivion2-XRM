@@ -28,6 +28,10 @@
 #include "model-sys/config.hpp"
 #include "data-sys/config_dao.hpp"
 
+#include "model-app/oneliners.hpp"
+#include "data-app/oneliners_dao.hpp"
+#include "data-sys/base_dao.hpp"
+
 #include "server.hpp"
 #include "server_ssl.hpp"
 #include "communicator.hpp"
@@ -331,9 +335,41 @@ auto main() -> int
             Protocol p1("Sexyz", "D", "Z", "C:\\TESTPATH\\", "--Test", false, false);
 
             prots->protocols.push_back(p1);
-
             protdb.saveConfig(prots);
         }
+        
+        
+        oneliner_dao_ptr onedb(new OnelinerDao(user_database));
+        
+        if (!onedb->doesTableExist())
+        {
+            std::cout << "doesn't exist (oneliner table)." << std::endl;
+
+            // Setup database Param, cache sies etc..
+            if (!onedb->firstTimeSetupParams())
+            {
+                std::cout << "unable to execute firstTimeSetupParams (oneliner table)." << std::endl;
+                assert(false);
+            }
+
+            // Setup create users table and indexes.
+            if (!onedb->createTable())
+            {
+                std::cout << "unable to create (oneliner table)." << std::endl;
+                assert(false);
+            }
+
+            std::cout << "oneliner table created successfully." << std::endl;
+        }
+
+        oneliner_ptr one(new Oneliners());
+        one->iUserId = 1;
+        one->sText = "Testing";
+        one->sUserInitials = "MF";
+        one->sUserName = "Mercyful Fate";
+        //one->dtDatePosted
+        onedb->insertRecord(one);
+        
         
 /*
         // Check and Setup default Access Levels.
