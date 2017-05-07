@@ -70,17 +70,17 @@ public:
         m_cmdDropIndex = "DROP INDEX IF EXISTS conference_idx; ";
         
         // Setup the CallBack for Result Field Mapping
-        m_result_function.push_back(std::bind(&ConferenceDao::pullConferenceResult, this, 
-            std::placeholders::_1, std::placeholders::_2));
+        m_result_callback = std::bind(&ConferenceDao::pullConferenceResult, this, 
+            std::placeholders::_1, std::placeholders::_2);
             
-        m_columns_function.push_back(std::bind(&ConferenceDao::fillConferenceColumnValues, this, 
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        m_columns_callback = std::bind(&ConferenceDao::fillConferenceColumnValues, this, 
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
             
-        m_insert_function.push_back(std::bind(&ConferenceDao::insertConferenceQryString, this, 
-            std::placeholders::_1, std::placeholders::_2));
+        m_insert_callback = std::bind(&ConferenceDao::insertConferenceQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
         
-        m_update_function.push_back(std::bind(&ConferenceDao::updateConferenceQryString, this, 
-            std::placeholders::_1, std::placeholders::_2));
+        m_update_callback = std::bind(&ConferenceDao::updateConferenceQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
     }
 
     ~ConferenceDao()
