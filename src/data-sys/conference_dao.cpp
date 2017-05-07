@@ -20,9 +20,9 @@
  * @brief Check If Database Table Exists.
  * @return
  */
-bool ConferenceDao::doesTableExists()
+bool ConferenceDao::doesTableExist()
 {
-    return baseDoesTableExists();
+    return baseDoesTableExist();
 }
 
 /**
@@ -118,7 +118,7 @@ void ConferenceDao::pullConferenceResult(query_ptr qry, conference_ptr obj)
     qry->getFieldByName("sName", obj->sName);
     qry->getFieldByName("sType", obj->sType);
     qry->getFieldByName("sACS", obj->sACS); 
-    qry->getFieldByName("iSortOrder", obj->iSortOrder);    
+    qry->getFieldByName("iSortOrder", obj->iSortOrder);
 }
 
 /**

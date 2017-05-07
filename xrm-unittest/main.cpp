@@ -35,18 +35,29 @@ std::string USERS_DATABASE       = "";
 
 
 /**
- * Mock the ConferenceDao and test everything with BaseDao
- * to Make sure everything is solid.
+ * Handle Setup and Tear Down of Integration Test for SQLite
  */
 class MyFixture
 {
+    
 public:
-   MyFixture() { /* setup goes here */ }
-   ~MyFixture() { /* teardown goes here */ }
+
+    MyFixture()
+        : m_database("xrm_itTest_users.sqlite3")
+    { 
+        // Can't remove database on closure, becasue the 
+        // Object is not cleared till Destructor is finished.
+        // Before Each Test, we need to remove existing database.
+        std::cout << "Remove xrm_itTest_users" << std::endl;
+        remove("xrm_itTest_users.sqlite3");
+    }
+    
+    ~MyFixture() 
+    { }
+   
+    SQLW::Database m_database;
 };
 
-
-// USERS_DATABASE = "xrm_itTest_users.sqlite3";
 
 /**
  * @brief Unit Testing for Initial Sqlite Database DAO and BaseDao.
@@ -55,48 +66,89 @@ public:
 SUITE(XRMConferenceDao)
 {
     
-    TEST_FIXTURE(MyFixture, MyFixtureTest)
-    {
-        // checks go here
-        CHECK(1);
-    }
-    
-    
-/*    
-    // Tests Node Type Casting from String to String
-    TEST(SystemConfigOutputTest_ThenStringReassignment)
+    // Test DAO with All Base Dao Calls.
+    TEST_FIXTURE(MyFixture, ConferenceDaoTest)
     {        
-        config_ptr config(new Config());
-        form_ptr form(new FormSystemConfig(config));
-        
-        // run the form on enter.
-        form->onEnter();
-        std::vector<MenuOption> opts = form->baseGetFormOptions();
-        
-        // 106 Config Options generated.
-        CHECK(opts.size() == MAX_OPTIONS);
-        
-        // Setup Yaml Mapping, and assign the config to it.
-        YAML::Node node;
-        node = config;
-        
-        // Test Value.
-        CHECK(opts[BBS_NAME_SYSOP].form_value == node[opts[BBS_NAME_SYSOP].name].as<std::string>());
-        
-        // Update Value on Option.. 
-        opts[BBS_NAME_SYSOP].form_value = "new value";
-        
-        // Assign new value by lookup
-        node[opts[BBS_NAME_SYSOP].name] = opts[BBS_NAME_SYSOP].form_value;
-        
-        // Move from Node back to Config and Translations String to String
-        Config c = node.as<Config>();
-        
-        // Now test new value is populated in config class.
-        CHECK(opts[BBS_NAME_SYSOP].form_value == c.bbs_name_sysop);
-    }
-*/
+        // Link to users dao for data access object
+        conference_dao_ptr confdb(new ConferenceDao(m_database));
 
+        // DataBase Table Should not exist.
+        CHECK(!confdb->doesTableExist());
+        
+        // Setup database Param, cache sies etc..
+        CHECK(confdb->firstTimeSetupParams());
+
+        // Check Create Table and Index
+        CHECK(confdb->createTable());
+        
+        // DataBase Table exists.
+        CHECK(confdb->doesTableExist());
+        
+        // Check Insert
+        conference_ptr confIn(new Conference());
+        confIn->sName = "Test Message Conference";
+        confIn->sType = "M";
+        confIn->sACS = "s20";
+        confIn->iSortOrder = 1;
+        
+        long lastInsertId = confdb->insertRecord(confIn);
+        
+        // Returns Lat Insert Id, Should not be -1.
+        CHECK(lastInsertId == 1);
+        
+        // Check Retrieve
+        conference_ptr confOut(new Conference());
+        confOut = confdb->getRecordById(lastInsertId);
+
+        CHECK(confOut->iId == 1);
+        CHECK(confOut->sName == "Test Message Conference");
+        CHECK(confOut->sType == "M");
+        CHECK(confOut->sACS == "s20");
+        CHECK(confOut->iSortOrder == 1);
+        
+        // Test Update, Id should be 1 already.
+        confOut->sName = "Test File Conference";
+        confOut->sType = "F";
+        confOut->sACS = "s30";
+        confOut->iSortOrder = 2;
+        
+        // Updates returns bool.
+        CHECK(confdb->updateRecord(confOut));
+        
+        //Retrieve Update
+        conference_ptr confUpdate(new Conference());
+        confUpdate = confdb->getRecordById(lastInsertId);
+        
+        // Test Output After Update
+        CHECK(confOut->iId == 1);
+        CHECK(confOut->sName == "Test File Conference");
+        CHECK(confOut->sType == "F");
+        CHECK(confOut->sACS == "s30");
+        CHECK(confOut->iSortOrder == 2);
+        
+        // Test Get All Records in Vector.
+        std::vector<conference_ptr> getAllResults;
+        getAllResults = confdb->getAllRecords();
+        
+        CHECK(getAllResults.size() == 1);
+        
+        // Test Delete Record
+        CHECK(confdb->deleteRecord(lastInsertId));
+        
+        
+        // Test Getting Deleted Record
+        conference_ptr confDel(new Conference());
+        confDel = confdb->getRecordById(lastInsertId);
+        
+        // Invalid Records return with -1
+        CHECK(confDel->iId == -1);
+        
+        // Test Drop Table and Index returns true;
+        CHECK(confdb->dropTable());
+        
+        // DataBase Table Should not exist.
+        CHECK(!confdb->doesTableExist());        
+    }    
 
 }
 

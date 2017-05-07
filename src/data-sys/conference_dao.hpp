@@ -96,7 +96,7 @@ public:
     * @brief Check If Database Table Exists.
     * @return
     */
-    bool doesTableExists();
+    bool doesTableExist();
     
     /**
      * @brief Run Setup Params for SQL Database Table.

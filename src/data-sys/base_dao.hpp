@@ -74,7 +74,7 @@ public:
      * @brief Check if the Table Exists in Database
      * @return
      */
-    bool baseDoesTableExists()
+    bool baseDoesTableExist()
     {
         bool result = false;
 
@@ -99,13 +99,13 @@ public:
             long rows = qry->getNumRows();
             if (rows > 0)
             {
-                std::cout << "FileArea Table Exists!" << std::endl;
+                std::cout << "Table Exists!" << std::endl;
                 result = true;
             }
             else
             {
                 // No rows means the table doesn't exist!
-                std::cout << "Error, FileArea table Exists Returned Rows: " << rows << std::endl;
+                std::cout << "Error, table Exists Returned Rows: " << rows << std::endl;
             }
         }
         else

@@ -18,9 +18,9 @@
  * @brief Check If Database Table Exists.
  * @return
  */
-bool OnelinerDao::doesTableExists()
+bool OnelinerDao::doesTableExist()
 {
-    return baseDoesTableExists();
+    return baseDoesTableExist();
 }
 
 /**

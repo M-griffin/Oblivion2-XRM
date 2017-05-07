@@ -341,7 +341,7 @@ auto main() -> int
         
         oneliner_dao_ptr onedb(new OnelinerDao(user_database));
         
-        if (!onedb->doesTableExists())
+        if (!onedb->doesTableExist())
         {
             std::cout << "doesn't exist (oneliner table)." << std::endl;
 
