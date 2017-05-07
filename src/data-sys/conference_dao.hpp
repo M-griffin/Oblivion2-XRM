@@ -150,6 +150,12 @@ public:
     std::vector<conference_ptr> getAllRecords();
     
     /**
+     * @brief Retrieve Count of All Records in a Table
+     * @return
+     */
+    long getRecordsCount();
+    
+    /**
      * Base Dao Call Back for Object Specific Data Mappings
      * (Below This Point)
      */

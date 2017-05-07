@@ -536,7 +536,60 @@ public:
         }
 
         return list;
-    }   
+    }
+    
+    /**
+     * @brief Retrieve Count of All Records in a Table
+     * @return
+     */
+    long baseGetRecordsCount()
+    {
+        boost::shared_ptr<T> obj(new T);
+        std::vector<boost::shared_ptr<T>> list;
+
+        // Make Sure Database Reference is Connected
+        if (!m_database.isConnected())
+        {
+            std::cout << "Error, Database is not connected!" << std::endl;
+            return list.size();
+        }
+
+        // Create Pointer and Connect Query Object to Database.
+        query_ptr qry(new SQLW::Query(m_database));
+        if (!qry->isConnected())
+        {
+            std::cout << "Error, Query has no connection to the database" << std::endl;
+            return list.size();
+        }
+
+        // Build Query String
+        std::string queryString = sqlite3_mprintf("SELECT * FROM %Q;", m_strTableName.c_str());
+
+        // Execute Query.
+        if (qry->getResult(queryString))
+        {
+            long rows = qry->getNumRows();
+            if (rows > 0)
+            {
+                while(qry->fetchRow())
+                {
+                    obj.reset(new T);
+                    basePullResult(qry, obj);
+                    list.push_back(obj);
+                }
+            }
+            else
+            {
+                std::cout << "Error, getAllOnelinerss Returned Rows: " << rows << std::endl;
+            }
+        }
+        else
+        {
+            std::cout << "Error, getResult()" << std::endl;
+        }
+
+        return list.size();
+    }
 
 };
 

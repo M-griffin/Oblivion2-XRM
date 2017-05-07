@@ -100,6 +100,14 @@ std::vector<conference_ptr> ConferenceDao::getAllRecords()
     return baseGetAllRecords();
 }
 
+/**
+ * @brief Retrieve Count of All Records in a Table
+ * @return
+ */
+long ConferenceDao::getRecordsCount()
+{
+    return baseGetRecordsCount();
+}
 
 /**
  * Base Dao Call Back for Object Specific Data Mappings

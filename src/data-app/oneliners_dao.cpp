@@ -98,6 +98,14 @@ std::vector<oneliner_ptr> OnelinerDao::getAllRecords()
     return baseGetAllRecords();
 }
 
+/**
+ * @brief Retrieve Count of All Records in a Table
+ * @return
+ */
+long OnelinerDao::getRecordsCount()
+{
+    return baseGetRecordsCount();
+}
 
 /**
  * Base Dao Call Back for Object Specific Data Mappings
