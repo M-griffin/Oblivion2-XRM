@@ -48,7 +48,7 @@
     <File Name="access_condition_ut.cpp"/>
     <File Name="../src/form_manager.cpp"/>
     <File Name="../src/form_manager.hpp"/>
-    <File Name="form_system_config_ut.hpp"/>
+    <File Name="form_system_config_ut.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="model-sys">
     <File Name="../src/model-sys/config.hpp"/>

@@ -38,7 +38,15 @@ std::string USERS_DATABASE       = "";
  * Mock the ConferenceDao and test everything with BaseDao
  * to Make sure everything is solid.
  */
+class MyFixture
+{
+public:
+   MyFixture() { /* setup goes here */ }
+   ~MyFixture() { /* teardown goes here */ }
+};
 
+
+// USERS_DATABASE = "xrm_itTest_users.sqlite3";
 
 /**
  * @brief Unit Testing for Initial Sqlite Database DAO and BaseDao.
@@ -46,6 +54,14 @@ std::string USERS_DATABASE       = "";
  */
 SUITE(XRMConferenceDao)
 {
+    
+    TEST_FIXTURE(MyFixture, MyFixtureTest)
+    {
+        // checks go here
+        CHECK(1);
+    }
+    
+    
 /*    
     // Tests Node Type Casting from String to String
     TEST(SystemConfigOutputTest_ThenStringReassignment)
