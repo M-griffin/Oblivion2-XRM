@@ -91,10 +91,20 @@ SUITE(XRMConferenceDao)
         confIn->sACS = "s20";
         confIn->iSortOrder = 1;
         
+        // Check Insert
+        conference_ptr confIn2(new Conference());
+        confIn2->sName = "Test FM Conference";
+        confIn2->sType = "G";
+        confIn2->sACS = "s45";
+        confIn2->iSortOrder = 3;
+        
         long lastInsertId = confdb->insertRecord(confIn);
+        
+        long InsertId2nd = confdb->insertRecord(confIn2);
         
         // Returns Lat Insert Id, Should not be -1.
         CHECK(lastInsertId == 1);
+        CHECK(InsertId2nd == 2);
         
         // Check Retrieve
         conference_ptr confOut(new Conference());
@@ -130,7 +140,21 @@ SUITE(XRMConferenceDao)
         std::vector<conference_ptr> getAllResults;
         getAllResults = confdb->getAllRecords();
         
-        CHECK(getAllResults.size() == 1);
+        CHECK(getAllResults.size() == 2);
+        
+        // Test Output After Update
+        CHECK(getAllResults[0]->iId == 1);
+        CHECK(getAllResults[0]->sName == "Test File Conference");
+        CHECK(getAllResults[0]->sType == "F");
+        CHECK(getAllResults[0]->sACS == "s30");
+        CHECK(getAllResults[0]->iSortOrder == 2);
+        
+        // Test 2nd Row next record.
+        CHECK(getAllResults[1]->iId == 2);
+        CHECK(getAllResults[1]->sName == "Test FM Conference");
+        CHECK(getAllResults[1]->sType == "G");
+        CHECK(getAllResults[1]->sACS == "s45");
+        CHECK(getAllResults[1]->iSortOrder == 3);        
         
         // Test Delete Record
         CHECK(confdb->deleteRecord(lastInsertId));
