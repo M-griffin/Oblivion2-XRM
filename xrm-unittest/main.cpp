@@ -156,16 +156,27 @@ SUITE(XRMConferenceDao)
         CHECK(getAllResults[1]->sACS == "s45");
         CHECK(getAllResults[1]->iSortOrder == 3);        
         
+        // Test Record Counts
+        long checkCounts = confdb->getRecordsCount();
+        
+        // Check Record Counts
+        CHECK(checkCounts == 2);
+        
         // Test Delete Record
         CHECK(confdb->deleteRecord(lastInsertId));
-        
-        
+                        
         // Test Getting Deleted Record
         conference_ptr confDel(new Conference());
         confDel = confdb->getRecordById(lastInsertId);
         
         // Invalid Records return with -1
         CHECK(confDel->iId == -1);
+        
+        // Test Record Counts After Purge
+        long checkCounts2 = confdb->getRecordsCount();
+        
+        // Check Record Counts
+        CHECK(checkCounts2 == 1);
         
         // Test Drop Table and Index returns true;
         CHECK(confdb->dropTable());
