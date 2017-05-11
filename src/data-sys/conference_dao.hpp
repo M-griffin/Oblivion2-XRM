@@ -88,15 +88,17 @@ public:
     {        
     }
 
-   /**
-    * Base Dao Calls for generic Object Data Calls
-    * (Below This Point)
-    */
+
+    /**
+     * Base Dao Calls for generic Object Data Calls
+     * (Below This Point)
+     */
  
-   /**
-    * @brief Check If Database Table Exists.
-    * @return
-    */
+ 
+    /**
+     * @brief Check If Database Table Exists.
+     * @return
+     */
     bool doesTableExist();
     
     /**
@@ -156,10 +158,12 @@ public:
      */
     long getRecordsCount();
     
+    
     /**
      * Base Dao Call Back for Object Specific Data Mappings
      * (Below This Point)
      */
+     
     
     /**
      * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
@@ -193,10 +197,12 @@ public:
      */
     std::string updateConferenceQryString(std::string qry, conference_ptr obj);
 
+
     /**
      * One Off Methods SQL Queries not included in the BaseDao
      * (Below This Point)
      */
+    
     
     /**
      * @brief Return List of All Conference by Type
