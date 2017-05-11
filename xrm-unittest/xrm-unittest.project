@@ -49,6 +49,8 @@
     <File Name="../src/form_manager.cpp"/>
     <File Name="../src/form_manager.hpp"/>
     <File Name="form_system_config_ut.cpp"/>
+    <File Name="conference_dao_it.cpp"/>
+    <File Name="oneliners_dao_it.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="model-sys">
     <File Name="../src/model-sys/config.hpp"/>
@@ -204,4 +206,11 @@
       </Completion>
     </Configuration>
   </Settings>
+  <VirtualDirectory Name="data-app">
+    <File Name="../src/data-app/oneliners_dao.cpp"/>
+    <File Name="../src/data-app/oneliners_dao.hpp"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="model-app">
+    <File Name="../src/model-app/oneliners.hpp"/>
+  </VirtualDirectory>
 </CodeLite_Project>
