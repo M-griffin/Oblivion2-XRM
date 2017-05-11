@@ -15,12 +15,12 @@
 /**
  * Handle Setup and Tear Down of Integration Test for SQLite
  */
-class MyFixture
+class MyFixtureFileArea
 {
     
 public:
 
-    MyFixture()
+    MyFixtureFileArea()
         : m_database("xrm_itFileAreaTest.sqlite3")
     { 
         // Can't remove database on closure, becasue the 
@@ -30,7 +30,7 @@ public:
         remove("xrm_itFileAreaTest.sqlite3");
     }
     
-    ~MyFixture() 
+    ~MyFixtureFileArea() 
     { }
    
     SQLW::Database m_database;
@@ -45,7 +45,7 @@ SUITE(XRMFileAreaDao)
 {
     
     // Test DAO with All Base Dao Calls.
-    TEST_FIXTURE(MyFixture, FileAreaDaoTest)
+    TEST_FIXTURE(MyFixtureFileArea, FileAreaDaoTest)
     {        
         // Link to users dao for data access object
         file_area_dao_ptr objdb(new FileAreaDao(m_database));

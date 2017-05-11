@@ -15,12 +15,12 @@
 /**
  * Handle Setup and Tear Down of Integration Test for SQLite
  */
-class MyFixture
+class MyFixtureOneLiners
 {
     
 public:
 
-    MyFixture()
+    MyFixtureOneLiners()
         : m_database("xrm_itOnelinersTest.sqlite3")
     { 
         // Can't remove database on closure, becasue the 
@@ -30,7 +30,7 @@ public:
         remove("xrm_itOnelinersTest.sqlite3");
     }
     
-    ~MyFixture() 
+    ~MyFixtureOneLiners() 
     { }
    
     SQLW::Database m_database;
@@ -45,7 +45,7 @@ SUITE(XRMOnelinersDao)
 {
     
     // Test DAO with All Base Dao Calls.
-    TEST_FIXTURE(MyFixture, OnelinersDaoTest)
+    TEST_FIXTURE(MyFixtureOneLiners, OnelinersDaoTest)
     {        
         // Link to users dao for data access object
         oneliner_dao_ptr objdb(new OnelinerDao(m_database));

@@ -41,5 +41,13 @@ std::string USERS_DATABASE       = "";
 // run all unit tests
 int main(int argc, char **argv)
 {
-    return UnitTest::RunAllTests();
+    
+    int result = UnitTest::RunAllTests();
+    
+    // Cleanup Integration Test Databases.
+    remove("xrm_itConferenceTest.sqlite3");
+    remove("xrm_itOnelinersTest.sqlite3");
+    remove("xrm_itFileAreaTest.sqlite3");
+        
+    return result;
 }
