@@ -6,6 +6,7 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <vector>
+#include <functional>
 
 // Forward Declerations
 namespace SQLW

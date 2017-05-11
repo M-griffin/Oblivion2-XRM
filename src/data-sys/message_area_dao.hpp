@@ -1,11 +1,13 @@
 #ifndef MESSAGE_AREA_DAO_HPP
 #define MESSAGE_AREA_DAO_HPP
 
-#include "../model-sys/file_area.hpp"
+#include "../model-sys/message_area.hpp"
 #include "../data-sys/base_dao.hpp"
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <vector>
+#include <functional>
+
 
 // Forward Declerations
 namespace SQLW
@@ -48,10 +50,10 @@ public:
             "PRAGMA cache_size=10000; ";
         
         // Check if Database Exists.
-        m_cmdMessageAreaTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
+        m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
 
         // Create Table Query (SQLite Only for the moment)
-        m_cmdCreateMessageAreaTable =
+        m_cmdCreateTable =
             "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
             "iId               INTEGER PRIMARY KEY, "
             "sName             TEXT NOT NULL COLLATE NOCASE, "
@@ -73,7 +75,7 @@ public:
             "); ";
 
         // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
-        m_cmdDropMessageAreaTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
+        m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
         
         // Setup the CallBack for Result Field Mapping
         m_result_callback = std::bind(&MessageAreaDao::pullMessageAreaResult, this, 
@@ -99,11 +101,12 @@ public:
      * (Below This Point)
      */
 
+
     /**
      * @brief Check of the Database Exists.
      * @return
      */
-    bool isTableExists();
+    bool doesTableExist();
 
     /**
      * @brief Run Setup Params for SQL Database.
@@ -111,78 +114,99 @@ public:
     bool firstTimeSetupParams();
 
     /**
-     * @brief Create MessageArea Database
+     * @brief Create Database Table
      * @return
      */
     bool createTable();
 
     /**
-     * @brief Drop MessageArea Database
+     * @brief Drop Database
      * @return
      */
     bool dropTable();
 
     /**
+     * @brief Updates a Record in the database!
+     * @param obj
+     * @return
+     */
+    bool updateRecord(message_area_ptr obj);
+
+    /**
+     * @brief Inserts a New Record in the database!
+     * @param obj
+     * @return
+     */
+    long insertRecord(message_area_ptr obj);
+
+    /**
+     * @brief Deletes a Record
+     * @param id
+     * @return
+     */
+    bool deleteRecord(long id);
+
+    /**
+     * Base Dao Call Back for Object Specific Data Mappings
+     * (Below This Point)
+     */
+
+    /**
      * @brief Create Query String to Insert New MessageArea Record
      */
-    std::string insertMessageAreaQryString(query_ptr qry, msg_area_ptr area);
+    std::string insertMessageAreaQryString(std::string qry, message_area_ptr obj);
 
     /**
      * @brief Creates Query String to Update Existing MessageArea Record
      */
-    std::string updateMessageAreaQryString(query_ptr qry, msg_area_ptr area);
-
-    /**
-     * @brief Updates a MessageArea Record in the database!
-     * @param area
-     * @return
-     */
-    bool updateMessageAreaRecord(msg_area_ptr area);
-
-    /**
-     * @brief Inserts a New MessageArea Record in the database!
-     * @param area
-     * @return
-     */
-    long insertMessageAreaRecord(msg_area_ptr area);
-
-    /**
-     * @brief Deletes a MessageArea Record
-     * @param areaId
-     * @return
-     */
-    bool deleteMessageAreaRecord(long areaId);
-
+    std::string updateMessageAreaQryString(std::string qry, message_area_ptr obj);
+    
     /**
      * @brief Helper To populate MessageArea Record with Query Results.
      */
-    void pullMessageAreaResult(query_ptr qry, msg_area_ptr area);
+    void pullMessageAreaResult(query_ptr qry, message_area_ptr obj);
 
     /**
      * @brief This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
      * @param values
      */
-    void fillColumnValues(query_ptr qry, msg_area_ptr area, 
+    void fillMessageAreaColumnValues(query_ptr qry, message_area_ptr obj, 
         std::vector< std::pair<std::string, std::string> > &values);
 
     /**
-     * @brief Return MessageArea Record By Id.
+     * @brief Return FileArea Record By Id.
      * @return
      */
-    msg_area_ptr getMessageAreaById(long confId);
+    message_area_ptr getRecordById(long id);
+    
+    /**
+     * @brief Return List of All FileAreas
+     * @return
+     */
+    std::vector<message_area_ptr> getAllRecords();
+    
+    /**
+     * @brief Retrieve Count of All Records in a Table
+     * @return
+     */
+    long getRecordsCount();
     
     /**
      * @brief Return List of All MessageAreas
      * @return
      */
-    std::vector<msg_area_ptr> getAllMessageAreas();
+    std::vector<message_area_ptr> getAllMessageAreas();
+    
+    
+    
+    
     
     /**
      * @brief Return List of All MessageArea by ConferenceId
      * @param areas
      * @return
      */ 
-    std::vector<msg_area_ptr> getAllMessageAreasByConference(long confId);
+    std::vector<message_area_ptr> getAllMessageAreasByConference(long confId);
     
 };
 

@@ -55,7 +55,7 @@ bool MessageAreaDao::dropTable()
  * @param area
  * @return
  */
-bool MessageAreaDao::updateRecord(file_area_ptr obj)
+bool MessageAreaDao::updateRecord(message_area_ptr obj)
 {
     return baseUpdateRecord(obj);
 }
@@ -65,7 +65,7 @@ bool MessageAreaDao::updateRecord(file_area_ptr obj)
  * @param area
  * @return
  */
-long MessageAreaDao::insertRecord(file_area_ptr obj)
+long MessageAreaDao::insertRecord(message_area_ptr obj)
 {
     return baseInsertRecord(obj);
 }
@@ -85,7 +85,7 @@ bool MessageAreaDao::deleteRecord(long id)
  * @param id
  * @return 
  */ 
-msg_area_ptr MessageAreaDao::getRecordById(long id)
+message_area_ptr MessageAreaDao::getRecordById(long id)
 {
     return baseGetRecordById(id);
 }
@@ -94,7 +94,7 @@ msg_area_ptr MessageAreaDao::getRecordById(long id)
  * @brief Retrieve All Records in a Table
  * @return
  */
-std::vector<msg_area_ptr> MessageAreaDao::getAllRecords()
+std::vector<message_area_ptr> MessageAreaDao::getAllRecords()
 {
     return baseGetAllRecords();
 }
@@ -118,7 +118,7 @@ long MessageAreaDao::getRecordsCount()
  * @param qry
  * @param obj
  */
-void MessageAreaDao::pullMessageAreaResult(query_ptr qry, msg_area_ptr obj)
+void MessageAreaDao::pullMessageAreaResult(query_ptr qry, message_area_ptr obj)
 {
     qry->getFieldByName("iId", obj->iId);
     qry->getFieldByName("sName", obj->sName);    
@@ -146,7 +146,7 @@ void MessageAreaDao::pullMessageAreaResult(query_ptr qry, msg_area_ptr obj)
  * @param obj
  * @param values
  */ 
-void MessageAreaDao::fillColumnValues(query_ptr qry, msg_area_ptr obj, 
+void MessageAreaDao::fillMessageAreaColumnValues(query_ptr qry, message_area_ptr obj, 
     std::vector< std::pair<std::string, std::string> > &values)
 {
     // values.push_back(qry->translateFieldName("iId", conf->iId));
@@ -174,7 +174,7 @@ void MessageAreaDao::fillColumnValues(query_ptr qry, msg_area_ptr obj,
  * @param obj
  * @return 
  */
-std::string MessageAreaDao::insertMessageAreaQryString(std::string qry, msg_area_ptr obj)
+std::string MessageAreaDao::insertMessageAreaQryString(std::string qry, message_area_ptr obj)
 {    
     // Mprint statement to avoid injections.
     std::string result = sqlite3_mprintf(qry.c_str(),
@@ -205,7 +205,7 @@ std::string MessageAreaDao::insertMessageAreaQryString(std::string qry, msg_area
  * @param obj
  * @return 
  */
-std::string MessageAreaDao::updateMessageAreaQryString(std::string qry, msg_area_ptr obj)
+std::string MessageAreaDao::updateMessageAreaQryString(std::string qry, message_area_ptr obj)
 {    
     // Mprint statement to avoid injections.
     std::string result = sqlite3_mprintf(qry.c_str(),        
@@ -243,10 +243,10 @@ std::string MessageAreaDao::updateMessageAreaQryString(std::string qry, msg_area
  * @param areas
  * @return
  */ 
-std::vector<msg_area_ptr> MessageAreaDao::getAllMessageAreasByConference(long id)
+std::vector<message_area_ptr> MessageAreaDao::getAllMessageAreasByConference(long id)
 {
-    msg_area_ptr area(new MessageArea);
-    std::vector<msg_area_ptr> list;
+    message_area_ptr area(new MessageArea);
+    std::vector<message_area_ptr> list;
 
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected())

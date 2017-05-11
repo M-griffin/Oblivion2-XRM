@@ -178,6 +178,7 @@ SUITE(XRMFileAreaDao)
                
         
         // Test 2nd Row next record.
+        CHECK(getAllResults[1]->iId == 2);
         CHECK(getAllResults[1]->sName == "Sysop Area");
         CHECK(getAllResults[1]->sAcsAccess == "s220");
         CHECK(getAllResults[1]->sAcsUpload == "s221");

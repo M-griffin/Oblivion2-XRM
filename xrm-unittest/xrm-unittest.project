@@ -52,6 +52,7 @@
     <File Name="conference_dao_it.cpp"/>
     <File Name="oneliners_dao_it.cpp"/>
     <File Name="file_area_dao_it.cpp"/>
+    <File Name="message_area_dao_it.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="model-sys">
     <File Name="../src/model-sys/config.hpp"/>
@@ -59,6 +60,7 @@
     <File Name="../src/model-sys/menu.hpp"/>
     <File Name="../src/model-sys/conference.hpp"/>
     <File Name="../src/model-sys/file_area.hpp"/>
+    <File Name="../src/model-sys/message_area.hpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="data-sys">
     <File Name="../src/data-sys/config_dao.cpp"/>
@@ -70,6 +72,8 @@
     <File Name="../src/data-sys/menu_dao.hpp"/>
     <File Name="../src/data-sys/file_area_dao.cpp"/>
     <File Name="../src/data-sys/file_area_dao.hpp"/>
+    <File Name="../src/data-sys/message_area_dao.cpp"/>
+    <File Name="../src/data-sys/message_area_dao.hpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="forms">
     <File Name="../src/forms/form_base.hpp"/>

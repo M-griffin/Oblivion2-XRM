@@ -47,6 +47,7 @@ int main(int argc, char **argv)
     remove("xrm_itConferenceTest.sqlite3");
     remove("xrm_itOnelinersTest.sqlite3");
     remove("xrm_itFileAreaTest.sqlite3");
+    remove("xrm_itMessageAreaTest.sqlite3");
         
     return result;
 }
