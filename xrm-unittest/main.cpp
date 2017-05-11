@@ -1,6 +1,6 @@
 /**
- *   Oblivion/2 XRM - UNIT TESTS
- *   Copyright (C) 2015 by Michael Griffin
+ *   Oblivion/2 XRM - UNIT / INTEGRATION TESTS
+ *   Copyright (C) 2015 - 2017 by Michael Griffin
  */
 
 #ifdef _WIN32
@@ -40,8 +40,7 @@ std::string USERS_DATABASE       = "";
 
 // run all unit tests
 int main(int argc, char **argv)
-{
-    
+{    
     int result = UnitTest::RunAllTests();
     
     // Cleanup Integration Test Databases.

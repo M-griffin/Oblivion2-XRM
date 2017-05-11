@@ -1,6 +1,8 @@
 #ifndef MESSAGE_AREA_DAO_HPP
 #define MESSAGE_AREA_DAO_HPP
 
+#include "../model-sys/file_area.hpp"
+#include "../data-sys/base_dao.hpp"
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <vector>
@@ -12,15 +14,11 @@ class Database;
 class Query;
 }
 
-class MessageArea;
-// Handles to MessageArea
-typedef boost::shared_ptr<MessageArea> msg_area_ptr;
-
-// Handles to Database
-typedef boost::shared_ptr<SQLW::Database> database_ptr;
-
 // Handle to Database Queries
 typedef boost::shared_ptr<SQLW::Query> query_ptr;
+
+// Base Dao Definition
+typedef BaseDao<MessageArea> baseMessageAreaClass;
 
 /**
  * @class MessageAreaDao
@@ -30,22 +28,76 @@ typedef boost::shared_ptr<SQLW::Query> query_ptr;
  * @brief Message Area Data Access Object
  */
 class MessageAreaDao
+    : public baseMessageAreaClass
 {
 public:
-    MessageAreaDao(SQLW::Database &database);
-    ~MessageAreaDao();
+    MessageAreaDao(SQLW::Database &database)
+        : baseMessageAreaClass(database)
+    {
+        // Setup Table name
+        m_strTableName = "messagearea";
 
-    // Handle to Database
-    SQLW::Database &m_msg_area_database;
+        /**
+         * Pre Popluate Static Queries one Time
+         */
+        m_cmdFirstTimeSetup =
+            "PRAGMA synchronous=Normal; "
+            "PRAGMA encoding=UTF-8; "
+            "PRAGMA foreign_keys=ON; "
+            "PRAGMA default_cache_size=10000; "
+            "PRAGMA cache_size=10000; ";
+        
+        // Check if Database Exists.
+        m_cmdMessageAreaTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
 
-    std::string strTableName;
+        // Create Table Query (SQLite Only for the moment)
+        m_cmdCreateMessageAreaTable =
+            "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
+            "iId               INTEGER PRIMARY KEY, "
+            "sName             TEXT NOT NULL COLLATE NOCASE, "
+            "sAcsAccess        TEXT NOT NULL COLLATE NOCASE, "
+            "sAcsPost          TEXT NOT NULL COLLATE NOCASE, "
+            "bAnonymous        BOOLEAN NOT NULL, "
+            "sSponsor          TEXT NOT NULL COLLATE NOCASE, "
+            "sOriginLine       TEXT NOT NULL COLLATE NOCASE, "
+            "sFidoPath         TEXT NOT NULL COLLATE NOCASE, "
+            "iNetworkId        INTEGER NOT NULL, "
+            "sQwkName          TEXT NOT NULL COLLATE NOCASE, "
+            "iMaxMessages      INTEGER NOT NULL, "
+            "bRealName         BOOLEAN NOT NULL, "
+            "sLinkname         TEXT NOT NULL COLLATE NOCASE, "
+            "bRequired         BOOLEAN NOT NULL, "
+            "bPrivate          BOOLEAN NOT NULL, "
+            "bNetmail          BOOLEAN NOT NULL, "
+            "iSortOrder        INTEGER NOT NULL "
+            "); ";
 
-    // Static Queries
-    std::string cmdFirstTimeSetup;
+        // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
+        m_cmdDropMessageAreaTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
+        
+        // Setup the CallBack for Result Field Mapping
+        m_result_callback = std::bind(&MessageAreaDao::pullMessageAreaResult, this, 
+            std::placeholders::_1, std::placeholders::_2);
+            
+        m_columns_callback = std::bind(&MessageAreaDao::fillMessageAreaColumnValues, this, 
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+            
+        m_insert_callback = std::bind(&MessageAreaDao::insertMessageAreaQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
+        
+        m_update_callback = std::bind(&MessageAreaDao::updateMessageAreaQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
+    }
 
-    std::string cmdMessageAreaTableExists;
-    std::string cmdCreateMessageAreaTable;
-    std::string cmdDropMessageAreaTable;
+    ~MessageAreaDao()
+    {
+    }
+
+
+    /**
+     * Base Dao Calls for generic Object Data Calls
+     * (Below This Point)
+     */
 
     /**
      * @brief Check of the Database Exists.
