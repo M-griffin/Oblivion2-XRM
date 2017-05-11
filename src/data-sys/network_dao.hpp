@@ -1,9 +1,12 @@
 #ifndef NETWORK_DAO_HPP
 #define NETWORK_DAO_HPP
 
+#include "../model-sys/network.hpp"
+#include "../data-sys/base_dao.hpp"
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <vector>
+#include <functional>
 
 // Forward Declerations
 namespace SQLW
@@ -12,15 +15,11 @@ class Database;
 class Query;
 }
 
-class Network;
-// Handles to MessageArea
-typedef boost::shared_ptr<Network> network_ptr;
-
-// Handles to Database
-typedef boost::shared_ptr<SQLW::Database> database_ptr;
-
 // Handle to Database Queries
 typedef boost::shared_ptr<SQLW::Query> query_ptr;
+
+// Base Dao Definition
+typedef BaseDao<Network> baseNetworkClass;
 
 /**
  * @class NetworkDao
@@ -30,100 +29,158 @@ typedef boost::shared_ptr<SQLW::Query> query_ptr;
  * @brief Handles Message Fido and Internet Network Address
  */
 class NetworkDao
+    : public baseNetworkClass
 {
 public:
-    NetworkDao(SQLW::Database &database);
-    ~NetworkDao();
     
-    // Handle to Database
-    SQLW::Database &m_network_database;
+    NetworkDao(SQLW::Database &database)
+        : baseNetworkClass(database)
+    {
+        // Setup Table name
+        m_strTableName = "network";
 
-    std::string strTableName;
+        /**
+         * Pre Popluate Static Queries one Time
+         */
+        m_cmdFirstTimeSetup =
+            "PRAGMA synchronous=Normal; "
+            "PRAGMA encoding=UTF-8; "
+            "PRAGMA foreign_keys=ON; "
+            "PRAGMA default_cache_size=10000; "
+            "PRAGMA cache_size=10000; ";
+        
+        // Check if Database Exists.
+        m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
 
-    // Static Queries
-    std::string cmdFirstTimeSetup;
+        // Create Table Query (SQLite Only for the moment)
+        m_cmdCreateTable =
+            "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
+            "iId               INTEGER PRIMARY KEY, "
+            "sName             TEXT NOT NULL COLLATE NOCASE, "
+            "sType             TEXT NOT NULL COLLATE NOCASE, "
+            "sAddress          TEXT NOT NULL COLLATE NOCASE "
+            "); ";
 
-    std::string cmdNetworkTableExists;
-    std::string cmdCreateNetworkTable;
-    std::string cmdDropNetworkTable;
+        // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
+        m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
+        
+        // Setup the CallBack for Result Field Mapping
+        m_result_callback = std::bind(&NetworkDao::pullNetworkResult, this, 
+            std::placeholders::_1, std::placeholders::_2);
+            
+        m_columns_callback = std::bind(&NetworkDao::fillNetworkColumnValues, this, 
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+            
+        m_insert_callback = std::bind(&NetworkDao::insertNetworkQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
+        
+        m_update_callback = std::bind(&NetworkDao::updateNetworkQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
+            
+    }
 
+    ~NetworkDao()
+    {
+    }
+
+    
     /**
-     * @brief Check of the Database Exists.
+     * Base Dao Calls for generic Object Data Calls
+     * (Below This Point)
+     */
+ 
+ 
+    /**
+     * @brief Check If Database Table Exists.
      * @return
      */
-    bool isTableExists();
-
+    bool doesTableExist();
+    
     /**
-     * @brief Run Setup Params for SQL Database.
+     * @brief Run Setup Params for SQL Database Table.
      */
     bool firstTimeSetupParams();
 
     /**
-     * @brief Create MessageArea Database
+     * @brief Create Database Table
      * @return
      */
     bool createTable();
 
     /**
-     * @brief Drop MessageArea Database
+     * @brief Drop Database
      * @return
      */
     bool dropTable();
-
+    
     /**
-     * @brief Create Query String to Insert New MessageArea Record
-     */
-    std::string insertNetworkQryString(query_ptr qry, network_ptr net);
-
-    /**
-     * @brief Creates Query String to Update Existing MessageArea Record
-     */
-    std::string updateNetworkQryString(query_ptr qry, network_ptr net);
-
-    /**
-     * @brief Updates a MessageArea Record in the database!
-     * @param net
+     * @brief Updates a Record in the database!
+     * @param obj
      * @return
      */
-    bool updateNetworkRecord(network_ptr net);
+    bool updateRecord(network_ptr obj);
 
     /**
-     * @brief Inserts a New MessageArea Record in the database!
-     * @param net
+     * @brief Inserts a New Record in the database!
+     * @param obj
      * @return
      */
-    long insertNetworkRecord(network_ptr net);
-
+    long insertRecord(network_ptr obj);
+        
     /**
      * @brief Deletes a MessageArea Record
      * @param areaId
      * @return
      */
-    bool deleteNetworkRecord(long areaId);
+    bool deleteRecord(long id);
+    
+    /**
+     * @brief Retrieve Record By Id.
+     * @param id
+     * @return 
+     */ 
+    network_ptr getRecordById(long id);
+    
+    /**
+     * @brief Retrieve All Records in a Table
+     * @return
+     */
+    std::vector<network_ptr> getAllRecords();
+    
+    /**
+     * @brief Retrieve Count of All Records in a Table
+     * @return
+     */
+    long getRecordsCount();
 
+    
+    /**
+     * Base Dao Call Back for Object Specific Data Mappings
+     * (Below This Point)
+     */
+     
+    
+    /**
+     * @brief Create Query String to Insert New MessageArea Record
+     */
+    std::string insertNetworkQryString(std::string qry, network_ptr obj);
+
+    /**
+     * @brief Creates Query String to Update Existing MessageArea Record
+     */
+    std::string updateNetworkQryString(std::string qry, network_ptr obj);
+    
     /**
      * @brief Helper To populate MessageArea Record with Query Results.
      */
-    void pullNetworkResult(query_ptr qry, network_ptr net);
+    void pullNetworkResult(query_ptr qry, network_ptr obj);
 
     /**
      * @brief This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
      * @param values
      */
-    void fillColumnValues(query_ptr qry, network_ptr net, 
-        std::vector< std::pair<std::string, std::string> > &values);
-
-    /**
-     * @brief Return MessageArea Record By Id.
-     * @return
-     */
-    network_ptr getNetworkById(long netId);
-    
-    /**
-     * @brief Return List of All MessageAreas
-     * @return
-     */
-    std::vector<network_ptr> getAllNetworks();
+    void fillNetworkColumnValues(query_ptr qry, network_ptr obj, 
+        std::vector< std::pair<std::string, std::string> > &values);   
         
 };
 
