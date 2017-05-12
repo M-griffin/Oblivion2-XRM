@@ -1,4 +1,12 @@
 
+Change Log Update (00.00.96)
+* 2017-05-12
++ Completed Refactoring of All Dao object to now use the BaseDao for concurrency.
++ Created Dao Integration Tests for Initial DAO Refactors with mock databases 
+  and clean up.
++ Synced all Linux Project Files
+- Eventually complete all Integration Tests.
+
 Change Log Update (00.00.95)
 * 2017-05-07
 + Create new BaseDao Object for Standard SQL Database base calls.
