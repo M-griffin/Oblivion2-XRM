@@ -2,11 +2,11 @@
 #define SECURITY_DAO_HPP
 
 #include "../model-sys/security.hpp"
-
+#include "../data-sys/base_dao.hpp"
 #include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
 
 #include <vector>
+#include <functional>
 
 // Forward Declerations
 namespace SQLW
@@ -15,12 +15,11 @@ class Database;
 class Query;
 }
 
-
-// Handles to Database
-typedef boost::shared_ptr<SQLW::Database> database_ptr;
-
 // Handle to Database Queries
 typedef boost::shared_ptr<SQLW::Query> query_ptr;
+
+// Base Dao Definition
+typedef BaseDao<Security> baseSecurityClass;
 
 /**
  * @class SecurityDao
@@ -31,96 +30,169 @@ typedef boost::shared_ptr<SQLW::Query> query_ptr;
  *        Database Objects are Instaniated in the Session then passed to the DAO for work.
  */
 class SecurityDao
+    : baseSecurityClass
 {
 public:
-    SecurityDao(SQLW::Database &database);
-    ~SecurityDao();
+        
+    SecurityDao(SQLW::Database &database)
+        : baseSecurityClass(database)
+    {
+        // Setup Table name
+        m_strTableName = "security";
 
-    // Handle to Database
-    SQLW::Database &m_security_database;
+        /**
+         * Pre Popluate Static Queries one Time
+         */
+        m_cmdFirstTimeSetup =
+            "PRAGMA synchronous=Normal; "
+            "PRAGMA encoding=UTF-8; "
+            "PRAGMA foreign_keys=ON; "
+            "PRAGMA default_cache_size=10000; "
+            "PRAGMA cache_size=10000; ";
 
-    // Table Name
-    std::string strTableName;
+        // Check if Database Exists.
+        m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' "
+            "AND name='" + m_strTableName + "' COLLATE NOCASE;";
 
-    // Static Queries
-    std::string cmdFirstTimeSetup;
+        // Crate Seciroty Table Query (SQLite Only for the moment)
+        m_cmdCreateTable =
+            "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
+            "iId                   INTEGER PRIMARY KEY, "
+            "sPasswordHash         TEXT NOT NULL, "
+            "sSaltHash             TEXT NOT NULL, "
+            "sChallengeQuestion    TEXT NOT NULL, "
+            "sChallengeAnswerHash  TEXT NOT NULL "
+            "); ";
 
-    std::string cmdSecurityTableExists;
-    std::string cmdCreateSecurityTable;
-    std::string cmdDropSecurityTable;
+        // Drops and cleanup security table.
+        m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
+        
+        // Setup the CallBack for Result Field Mapping
+        m_result_callback = std::bind(&SecurityDao::pullSecurityResult, this, 
+            std::placeholders::_1, std::placeholders::_2);
+            
+        m_columns_callback = std::bind(&SecurityDao::fillSecurityColumnValues, this, 
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+            
+        m_insert_callback = std::bind(&SecurityDao::insertSecurityQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
+        
+        m_update_callback = std::bind(&SecurityDao::updateSecurityQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
+    }
 
+    ~SecurityDao()
+    {
+        std::cout << "~SecurityDao" << std::endl;
+    }
 
+    
     /**
-     * @brief Check of the Database Exists.
+     * Base Dao Calls for generic Object Data Calls
+     * (Below This Point)
+     */
+ 
+ 
+    /**
+     * @brief Check If Database Table Exists.
      * @return
      */
-    bool isTableExists();
-
+    bool doesTableExist();
+    
     /**
-     * @brief Run Setup Params for SQL Database.
+     * @brief Run Setup Params for SQL Database Table.
      */
     bool firstTimeSetupParams();
 
     /**
-     * @brief Create Security Database
+     * @brief Create Database Table
      * @return
      */
     bool createTable();
 
     /**
-     * @brief Drop Security Database
+     * @brief Drop Database
      * @return
      */
     bool dropTable();
-
+    
     /**
-     * @brief Create Query String to Insert New Security Record
-     */
-    std::string insertSecurityQryString(query_ptr qry, security_ptr security);
-
-    /**
-     * @brief Creates QueryString to Update Security Record
-     */
-    std::string updateSecurityQryString(query_ptr qry, security_ptr security);
-
-    /**
-     * @brief Updates a Security Record in the database!
-     * @param security
+     * @brief Updates a Record in the database!
+     * @param obj
      * @return
      */
-    bool updateSecurityRecord(security_ptr security);
+    bool updateRecord(security_ptr obj);
 
     /**
-     * @brief Inserts a New Security Record in the database!
-     * @param security
+     * @brief Inserts a New Record in the database!
+     * @param obj
      * @return
      */
-    long insertSecurityRecord(security_ptr security);
-
+    long insertRecord(security_ptr obj);
+        
     /**
-     * @brief Deletes a Security Record
-     * @param securityId
+     * @brief Deletes a MessageArea Record
+     * @param areaId
      * @return
      */
-    bool deleteSecurityRecord(long securityId);
-
+    bool deleteRecord(long id);
+    
     /**
-     * @brief Helper To populate Security Record with Query Results.
+     * @brief Retrieve Record By Id.
+     * @param id
+     * @return 
+     */ 
+    security_ptr getRecordById(long id);
+    
+    /**
+     * @brief Retrieve All Records in a Table
+     * @return
      */
-    void pullSecurityResult(query_ptr qry, security_ptr security);
-
+    std::vector<security_ptr> getAllRecords();
+    
+    /**
+     * @brief Retrieve Count of All Records in a Table
+     * @return
+     */
+    long getRecordsCount();
+    
+    
+    /**
+     * Base Dao Call Back for Object Specific Data Mappings
+     * (Below This Point)
+     */
+     
 
     /**
-     * @brief This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
+     * @brief (Callback) Create Record Insert Statement, returns query string 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string insertSecurityQryString(std::string qry, security_ptr obj);
+
+    /**
+     * @brief (CallBack) Update Existing Record. 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string updateSecurityQryString(std::string qry, security_ptr obj);
+   
+    /**
+     * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+     * @param qry
+     * @param obj
+     */
+    void pullSecurityResult(query_ptr qry, security_ptr obj);
+
+    /**
+     * @brief (Callback) for Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
+     * @param qry
+     * @param obj
      * @param values
-     */
-    void fillColumnValues(query_ptr qry, security_ptr security, std::vector< std::pair<std::string, std::string> > &values);
-
-    /**
-     * @brief Returns Security Record By Id
-     * @return
-     */
-    security_ptr getSecurityById(long securityId);
+     */ 
+    void fillSecurityColumnValues(query_ptr qry, security_ptr obj, std::vector< std::pair<std::string, std::string> > &values);
 
 };
 

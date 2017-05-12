@@ -6,6 +6,7 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <vector>
+#include <functional>
 
 // Forward Declerations
 namespace SQLW
@@ -70,32 +71,34 @@ public:
         m_cmdDropIndex = "DROP INDEX IF EXISTS conference_idx; ";
         
         // Setup the CallBack for Result Field Mapping
-        m_result_function.push_back(std::bind(&ConferenceDao::pullConferenceResult, this, 
-            std::placeholders::_1, std::placeholders::_2));
+        m_result_callback = std::bind(&ConferenceDao::pullConferenceResult, this, 
+            std::placeholders::_1, std::placeholders::_2);
             
-        m_columns_function.push_back(std::bind(&ConferenceDao::fillConferenceColumnValues, this, 
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        m_columns_callback = std::bind(&ConferenceDao::fillConferenceColumnValues, this, 
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
             
-        m_insert_function.push_back(std::bind(&ConferenceDao::insertConferenceQryString, this, 
-            std::placeholders::_1, std::placeholders::_2));
+        m_insert_callback = std::bind(&ConferenceDao::insertConferenceQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
         
-        m_update_function.push_back(std::bind(&ConferenceDao::updateConferenceQryString, this, 
-            std::placeholders::_1, std::placeholders::_2));
+        m_update_callback = std::bind(&ConferenceDao::updateConferenceQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
     }
 
     ~ConferenceDao()
     {        
     }
 
-   /**
-    * Base Dao Calls for generic Object Data Calls
-    * (Below This Point)
-    */
+
+    /**
+     * Base Dao Calls for generic Object Data Calls
+     * (Below This Point)
+     */
  
-   /**
-    * @brief Check If Database Table Exists.
-    * @return
-    */
+ 
+    /**
+     * @brief Check If Database Table Exists.
+     * @return
+     */
     bool doesTableExist();
     
     /**
@@ -155,10 +158,12 @@ public:
      */
     long getRecordsCount();
     
+    
     /**
      * Base Dao Call Back for Object Specific Data Mappings
      * (Below This Point)
      */
+     
     
     /**
      * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
@@ -192,10 +197,12 @@ public:
      */
     std::string updateConferenceQryString(std::string qry, conference_ptr obj);
 
+
     /**
      * One Off Methods SQL Queries not included in the BaseDao
      * (Below This Point)
      */
+    
     
     /**
      * @brief Return List of All Conference by Type

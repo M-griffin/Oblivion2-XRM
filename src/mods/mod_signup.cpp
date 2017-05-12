@@ -1744,7 +1744,7 @@ void ModSignup::saveNewUserRecord()
     security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
 
     // Save New Security Record, index is then inserted into user record
-    long securityIndex = security_dao->insertSecurityRecord(m_security_record);
+    long securityIndex = security_dao->insertRecord(m_security_record);
     if (securityIndex < 0)
     {
         std::cout << "Error, unable to insert new user record." << std::endl;
@@ -1781,13 +1781,13 @@ void ModSignup::saveNewUserRecord()
         // Also Add Default File points,, missing from user rec.
     }
 
-    long userIndex = user_dao->insertUserRecord(m_user_record);
+    long userIndex = user_dao->insertRecord(m_user_record);
     if (userIndex < 0)
     {
         std::cout << "Error, unable to insert new user record." << std::endl;
 
         // Remove Secutiry Record if unable to create user record.
-        if (!security_dao->deleteSecurityRecord(securityIndex))
+        if (!security_dao->deleteRecord(securityIndex))
         {
             std::cout << "Error, unable to remove secutiry record." << std::endl;
         }
