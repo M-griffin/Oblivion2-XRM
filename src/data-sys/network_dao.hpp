@@ -161,24 +161,34 @@ public:
      
     
     /**
-     * @brief Create Query String to Insert New MessageArea Record
+     * @brief (Callback) Create Record Insert Statement, returns query string 
+     * @param qry
+     * @param obj
+     * @return 
      */
     std::string insertNetworkQryString(std::string qry, network_ptr obj);
 
     /**
-     * @brief Creates Query String to Update Existing MessageArea Record
+     * @brief (CallBack) Update Existing Record. 
+     * @param qry
+     * @param obj
+     * @return 
      */
     std::string updateNetworkQryString(std::string qry, network_ptr obj);
     
     /**
-     * @brief Helper To populate MessageArea Record with Query Results.
+     * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+     * @param qry
+     * @param obj
      */
     void pullNetworkResult(query_ptr qry, network_ptr obj);
 
     /**
-     * @brief This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
+     * @brief (Callback) for Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
+     * @param qry
+     * @param obj
      * @param values
-     */
+     */ 
     void fillNetworkColumnValues(query_ptr qry, network_ptr obj, 
         std::vector< std::pair<std::string, std::string> > &values);   
         

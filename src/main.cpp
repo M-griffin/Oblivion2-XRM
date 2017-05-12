@@ -233,7 +233,7 @@ auto main() -> int
 
         // Verify if the security table exists.
         // Security must be present before user becasue of foreign key.
-        if (!security_dao->isTableExists())
+        if (!security_dao->doesTableExist())
         {
             std::cout << "doesn't exist (security table)." << std::endl;
 

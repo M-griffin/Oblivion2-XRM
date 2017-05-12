@@ -351,7 +351,7 @@ bool ModLogon::validate_password(const std::string &input)
     security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
     
     // Lookup the secutiry table for existing hash.
-    security_ptr security = security_dao->getSecurityById(m_logon_user->iSecurityIndex);
+    security_ptr security = security_dao->getRecordById(m_logon_user->iSecurityIndex);
     if (!security || security->iId == -1)
     {
         return false;
