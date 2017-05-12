@@ -14,7 +14,6 @@
 // Setup the file version for the file.
 const std::string Protocols::FILE_VERSION = "1.0.0";
 
-
 ProtocolDao::ProtocolDao(protocols_ptr prot, std::string path)
     : m_protocols(prot)
     , m_path(path)

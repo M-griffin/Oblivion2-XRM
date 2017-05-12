@@ -67,17 +67,17 @@ public:
         m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
         
         // Setup the CallBack for Result Field Mapping
-        m_result_function.push_back(std::bind(&OnelinerDao::pullOnelinerResult, this, 
-            std::placeholders::_1, std::placeholders::_2));
+        m_result_callback = std::bind(&OnelinerDao::pullOnelinerResult, this, 
+            std::placeholders::_1, std::placeholders::_2);
             
-        m_columns_function.push_back(std::bind(&OnelinerDao::fillOnelinerColumnValues, this, 
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+        m_columns_callback = std::bind(&OnelinerDao::fillOnelinerColumnValues, this, 
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
             
-        m_insert_function.push_back(std::bind(&OnelinerDao::insertOnelinerQryString, this, 
-            std::placeholders::_1, std::placeholders::_2));
+        m_insert_callback = std::bind(&OnelinerDao::insertOnelinerQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
         
-        m_update_function.push_back(std::bind(&OnelinerDao::updateOnelinerQryString, this, 
-            std::placeholders::_1, std::placeholders::_2));
+        m_update_callback = std::bind(&OnelinerDao::updateOnelinerQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
     }
 
     ~OnelinerDao()

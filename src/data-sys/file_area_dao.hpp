@@ -1,9 +1,12 @@
 #ifndef FILE_AREA_DAO_HPP
 #define FILE_AREA_DAO_HPP
 
+#include "../model-sys/file_area.hpp"
+#include "../data-sys/base_dao.hpp"
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <vector>
+#include <functional>
 
 // Forward Declerations
 namespace SQLW
@@ -12,15 +15,11 @@ class Database;
 class Query;
 }
 
-class FileArea;
-// Handles to FileArea
-typedef boost::shared_ptr<FileArea> file_area_ptr;
-
-// Handles to Database
-typedef boost::shared_ptr<SQLW::Database> database_ptr;
-
 // Handle to Database Queries
 typedef boost::shared_ptr<SQLW::Query> query_ptr;
+
+// Base Dao Definition
+typedef BaseDao<FileArea> baseFileAreaClass;
 
 /**
  * @class FileAreaDao
@@ -30,108 +29,190 @@ typedef boost::shared_ptr<SQLW::Query> query_ptr;
  * @brief File Area Data Access Object
  */
 class FileAreaDao
+    : public baseFileAreaClass
 {
 public:
-    FileAreaDao(SQLW::Database &database);
-    ~FileAreaDao();
+    FileAreaDao(SQLW::Database &database)
+        : baseFileAreaClass(database)
+    {
+        // Setup Table name
+        m_strTableName = "filearea";
 
-    // Handle to Database
-    SQLW::Database &m_file_area_database;
+        /**
+         * Pre Popluate Static Queries one Time
+         */
+        m_cmdFirstTimeSetup =
+            "PRAGMA synchronous=Normal; "
+            "PRAGMA encoding=UTF-8; "
+            "PRAGMA foreign_keys=ON; "
+            "PRAGMA default_cache_size=10000; "
+            "PRAGMA cache_size=10000; ";
+        
+        // Check if Database Exists.
+        m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
 
-    std::string strTableName;
+        // Create Table Query (SQLite Only for the moment)
+        m_cmdCreateTable =
+            "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
+            "iId               INTEGER PRIMARY KEY, "
+            "sName             TEXT NOT NULL COLLATE NOCASE, "
+            "sAcsAccess        TEXT NOT NULL COLLATE NOCASE, "
+            "sAcsUpload        TEXT NOT NULL COLLATE NOCASE, "
+            "sAcsDownload      TEXT NOT NULL COLLATE NOCASE, "
+            "sAcsList          TEXT NOT NULL COLLATE NOCASE, "
+            "sSponsor          TEXT NOT NULL COLLATE NOCASE, "
+            "iSecurityIndex    INT NOT NULL, "
+            "sLinkname         TEXT NOT NULL COLLATE NOCASE, "
+            "sSort             TEXT NOT NULL COLLATE NOCASE, "
+            "iMultiplier       INTEGER NOT NULL, "
+            "bFreeArea         BOOLEAN NOT NULL, "
+            "iSortOrder        INTEGER NOT NULL, "
+            "FOREIGN KEY(iSecurityIndex) REFERENCES Secutiry(iId) ON DELETE CASCADE "
+            "); ";
 
-    // Static Queries
-    std::string cmdFirstTimeSetup;
+        // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
+        m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
+        
+        // Setup the CallBack for Result Field Mapping
+        m_result_callback = std::bind(&FileAreaDao::pullFileAreaResult, this, 
+            std::placeholders::_1, std::placeholders::_2);
+            
+        m_columns_callback = std::bind(&FileAreaDao::fillFileAreaColumnValues, this, 
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+            
+        m_insert_callback = std::bind(&FileAreaDao::insertFileAreaQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
+        
+        m_update_callback = std::bind(&FileAreaDao::updateFileAreaQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
+    }
 
-    std::string cmdFileAreaTableExists;
-    std::string cmdCreateFileAreaTable;
-    std::string cmdDropFileAreaTable;
+    ~FileAreaDao()
+    {
+    }
+
 
     /**
-     * @brief Check of the Database Exists.
+     * Base Dao Calls for generic Object Data Calls
+     * (Below This Point)
+     */
+ 
+ 
+    /**
+     * @brief Check If Database Table Exists.
      * @return
      */
-    bool isTableExists();
-
+    bool doesTableExist();
+    
     /**
-     * @brief Run Setup Params for SQL Database.
+     * @brief Run Setup Params for SQL Database Table.
      */
     bool firstTimeSetupParams();
 
     /**
-     * @brief Create FileArea Database
+     * @brief Create Database Table
      * @return
      */
     bool createTable();
 
     /**
-     * @brief Drop FileArea Database
+     * @brief Drop Database
      * @return
      */
     bool dropTable();
-
+    
     /**
-     * @brief Create Query String to Insert New FileArea Record
-     */
-    std::string insertFileAreaQryString(query_ptr qry, file_area_ptr area);
-
-    /**
-     * @brief Creates Query String to Update Existing FileArea Record
-     */
-    std::string updateFileAreaQryString(query_ptr qry, file_area_ptr area);
-
-    /**
-     * @brief Updates a FileArea Record in the database!
-     * @param area
+     * @brief Updates a Record in the database!
+     * @param obj
      * @return
      */
-    bool updateFileAreaRecord(file_area_ptr area);
+    bool updateRecord(file_area_ptr obj);
 
     /**
-     * @brief Inserts a New FileArea Record in the database!
-     * @param area
+     * @brief Inserts a New Record in the database!
+     * @param obj
      * @return
      */
-    long insertFileAreaRecord(file_area_ptr area);
-
+    long insertRecord(file_area_ptr obj);
+        
     /**
-     * @brief Deletes a FileArea Record
+     * @brief Deletes a MessageArea Record
      * @param areaId
      * @return
      */
-    bool deleteFileAreaRecord(long areaId);
-
+    bool deleteRecord(long id);
+    
     /**
-     * @brief Helper To populate FileArea Record with Query Results.
+     * @brief Retrieve Record By Id.
+     * @param id
+     * @return 
+     */ 
+    file_area_ptr getRecordById(long id);
+    
+    /**
+     * @brief Retrieve All Records in a Table
+     * @return
      */
-    void pullFileAreaResult(query_ptr qry, file_area_ptr area);
+    std::vector<file_area_ptr> getAllRecords();
+    
+    /**
+     * @brief Retrieve Count of All Records in a Table
+     * @return
+     */
+    long getRecordsCount();
+
 
     /**
-     * @brief This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
+     * Base Dao Call Back for Object Specific Data Mappings
+     * (Below This Point)
+     */
+     
+     
+    /**
+     * @brief (Callback) Create Record Insert Statement, returns query string 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string insertFileAreaQryString(std::string qry, file_area_ptr obj);
+
+    /**
+     * @brief (CallBack) Update Existing Record. 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string updateFileAreaQryString(std::string qry, file_area_ptr obj);
+    
+    /**
+     * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+     * @param qry
+     * @param obj
+     */
+    void pullFileAreaResult(query_ptr qry, file_area_ptr obj);
+
+    /**
+     * @brief (Callback) for Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
+     * @param qry
+     * @param obj
      * @param values
-     */
-    void fillColumnValues(query_ptr qry, file_area_ptr area, 
+     */ 
+    void fillFileAreaColumnValues(query_ptr qry, file_area_ptr obj, 
         std::vector< std::pair<std::string, std::string> > &values);
-
-    /**
-     * @brief Return FileArea Record By Id.
-     * @return
-     */
-    file_area_ptr getFileAreaById(long confId);
+    
     
     /**
-     * @brief Return List of All FileAreas
-     * @return
+     * One Off Methods SQL Queries not included in the BaseDao
+     * (Below This Point)
      */
-    std::vector<file_area_ptr> getAllFileAreas();
-    
+ 
+ 
     /**
      * @brief Return List of All FileArea by ConferenceId
      * @param areas
      * @return
      */ 
-    std::vector<file_area_ptr> getAllFileAreasByConference(long confId);   
-    
+    std::vector<file_area_ptr> getAllFileAreasByConference(long id);       
 };
 
 // Handle to Database Queries

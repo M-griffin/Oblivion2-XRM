@@ -233,7 +233,7 @@ auto main() -> int
 
         // Verify if the security table exists.
         // Security must be present before user becasue of foreign key.
-        if (!security_dao->isTableExists())
+        if (!security_dao->doesTableExist())
         {
             std::cout << "doesn't exist (security table)." << std::endl;
 
@@ -255,7 +255,7 @@ auto main() -> int
         }
 
         // Verify if the user table exists.
-        if (!user_dao->isTableExists())
+        if (!user_dao->doesTableExist())
         {
             std::cout << "doesn't exist (user table)." << std::endl;
 
@@ -279,7 +279,7 @@ auto main() -> int
         // Check Table setup for Session Stats
         session_stats_dao_ptr session_stat_dao(new SessionStatsDao(user_database));
         // Verify if the user table exists.
-        if (!session_stat_dao->isTableExists())
+        if (!session_stat_dao->doesTableExist())
         {
             std::cout << "doesn't exist (sessionstats table)." << std::endl;
 

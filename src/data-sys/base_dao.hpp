@@ -37,16 +37,10 @@ public:
         , m_cmdCreateIndex("")
         , m_cmdDropTable("")
         , m_cmdDropIndex("")
-    {
-    }
+    { }
         
     ~BaseDao()
-    {    
-        m_result_function.pop_back();
-        m_columns_function.pop_back();
-        m_insert_function.pop_back();
-        m_update_function.pop_back();
-    }
+    { }
 
     
     // Handle to Database
@@ -62,12 +56,12 @@ public:
     std::string m_cmdDropIndex;
     
     // Dynamic Callbacks to Calling Class for Specific Object Mappings
-    std::vector<std::function< void(query_ptr qry, boost::shared_ptr<T> obj)> > m_result_function;
-    std::vector<std::function< void(query_ptr qry, boost::shared_ptr<T> obj, 
-        std::vector< std::pair<std::string, std::string> > &values)> >          m_columns_function;
+    std::function<void(query_ptr qry, boost::shared_ptr<T> obj)>          m_result_callback;
+    std::function<void(query_ptr qry, boost::shared_ptr<T> obj, 
+        std::vector< std::pair<std::string, std::string> > &values)>      m_columns_callback;
         
-    std::vector<std::function< std::string(std::string qry, boost::shared_ptr<T> obj)> > m_insert_function;
-    std::vector<std::function< std::string(std::string qry, boost::shared_ptr<T> obj)> > m_update_function;
+    std::function<std::string(std::string qry, boost::shared_ptr<T> obj)> m_insert_callback;
+    std::function<std::string(std::string qry, boost::shared_ptr<T> obj)> m_update_callback;
 
     
     /**
@@ -220,7 +214,7 @@ public:
      */
     void basePullResult(query_ptr qry, boost::shared_ptr<T> obj)
     {    
-        m_result_function[0](qry, obj);
+        m_result_callback(qry, obj);
     }
 
     /**
@@ -233,7 +227,7 @@ public:
     void baseFillColumnValues(query_ptr qry, boost::shared_ptr<T> obj, 
         std::vector< std::pair<std::string, std::string> > &values)
     {    
-        m_columns_function[0](qry, obj, values);
+        m_columns_callback(qry, obj, values);
     }
 
     /**
@@ -279,7 +273,7 @@ public:
         newQueryString.append(ssType.str());
 
         // Mprint statement to avoid injections.
-        std::string result = m_insert_function[0](newQueryString, obj);
+        std::string result = m_insert_callback(newQueryString, obj);
         
         return result;
     }
@@ -319,7 +313,7 @@ public:
         newQueryString.append(" WHERE iId = %ld; ");
 
         // Mprint statement to avoid injections.
-        std::string result = m_update_function[0](newQueryString, obj);
+        std::string result = m_update_callback(newQueryString, obj);
 
         return result;
     }

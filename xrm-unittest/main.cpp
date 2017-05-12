@@ -1,6 +1,6 @@
 /**
- *   Oblivion/2 XRM - UNIT TESTS
- *   Copyright (C) 2015 by Michael Griffin
+ *   Oblivion/2 XRM - UNIT / INTEGRATION TESTS
+ *   Copyright (C) 2015 - 2017 by Michael Griffin
  */
 
 #ifdef _WIN32
@@ -10,11 +10,6 @@
 #endif
 
 #include <boost/smart_ptr/shared_ptr.hpp>
-
-#include "data-sys/conference_dao.hpp"
-#include "model-sys/conference.hpp"
-
-#include "libSqliteWrapped.h"
 
 
 // C Standard
@@ -34,123 +29,6 @@ std::string GLOBAL_TEXTFILE_PATH = "";
 std::string USERS_DATABASE       = "";
 
 
-/**
- * Handle Setup and Tear Down of Integration Test for SQLite
- */
-class MyFixture
-{
-    
-public:
-
-    MyFixture()
-        : m_database("xrm_itTest_users.sqlite3")
-    { 
-        // Can't remove database on closure, becasue the 
-        // Object is not cleared till Destructor is finished.
-        // Before Each Test, we need to remove existing database.
-        std::cout << "Remove xrm_itTest_users" << std::endl;
-        remove("xrm_itTest_users.sqlite3");
-    }
-    
-    ~MyFixture() 
-    { }
-   
-    SQLW::Database m_database;
-};
-
-
-/**
- * @brief Unit Testing for Initial Sqlite Database DAO and BaseDao.
- * @return 
- */
-SUITE(XRMConferenceDao)
-{
-    
-    // Test DAO with All Base Dao Calls.
-    TEST_FIXTURE(MyFixture, ConferenceDaoTest)
-    {        
-        // Link to users dao for data access object
-        conference_dao_ptr confdb(new ConferenceDao(m_database));
-
-        // DataBase Table Should not exist.
-        CHECK(!confdb->doesTableExist());
-        
-        // Setup database Param, cache sies etc..
-        CHECK(confdb->firstTimeSetupParams());
-
-        // Check Create Table and Index
-        CHECK(confdb->createTable());
-        
-        // DataBase Table exists.
-        CHECK(confdb->doesTableExist());
-        
-        // Check Insert
-        conference_ptr confIn(new Conference());
-        confIn->sName = "Test Message Conference";
-        confIn->sType = "M";
-        confIn->sACS = "s20";
-        confIn->iSortOrder = 1;
-        
-        long lastInsertId = confdb->insertRecord(confIn);
-        
-        // Returns Lat Insert Id, Should not be -1.
-        CHECK(lastInsertId == 1);
-        
-        // Check Retrieve
-        conference_ptr confOut(new Conference());
-        confOut = confdb->getRecordById(lastInsertId);
-
-        CHECK(confOut->iId == 1);
-        CHECK(confOut->sName == "Test Message Conference");
-        CHECK(confOut->sType == "M");
-        CHECK(confOut->sACS == "s20");
-        CHECK(confOut->iSortOrder == 1);
-        
-        // Test Update, Id should be 1 already.
-        confOut->sName = "Test File Conference";
-        confOut->sType = "F";
-        confOut->sACS = "s30";
-        confOut->iSortOrder = 2;
-        
-        // Updates returns bool.
-        CHECK(confdb->updateRecord(confOut));
-        
-        //Retrieve Update
-        conference_ptr confUpdate(new Conference());
-        confUpdate = confdb->getRecordById(lastInsertId);
-        
-        // Test Output After Update
-        CHECK(confOut->iId == 1);
-        CHECK(confOut->sName == "Test File Conference");
-        CHECK(confOut->sType == "F");
-        CHECK(confOut->sACS == "s30");
-        CHECK(confOut->iSortOrder == 2);
-        
-        // Test Get All Records in Vector.
-        std::vector<conference_ptr> getAllResults;
-        getAllResults = confdb->getAllRecords();
-        
-        CHECK(getAllResults.size() == 1);
-        
-        // Test Delete Record
-        CHECK(confdb->deleteRecord(lastInsertId));
-        
-        
-        // Test Getting Deleted Record
-        conference_ptr confDel(new Conference());
-        confDel = confdb->getRecordById(lastInsertId);
-        
-        // Invalid Records return with -1
-        CHECK(confDel->iId == -1);
-        
-        // Test Drop Table and Index returns true;
-        CHECK(confdb->dropTable());
-        
-        // DataBase Table Should not exist.
-        CHECK(!confdb->doesTableExist());        
-    }    
-
-}
 
 
 /*
@@ -162,6 +40,14 @@ SUITE(XRMConferenceDao)
 
 // run all unit tests
 int main(int argc, char **argv)
-{
-    return UnitTest::RunAllTests();
+{    
+    int result = UnitTest::RunAllTests();
+    
+    // Cleanup Integration Test Databases.
+    remove("xrm_itConferenceTest.sqlite3");
+    remove("xrm_itOnelinersTest.sqlite3");
+    remove("xrm_itFileAreaTest.sqlite3");
+    remove("xrm_itMessageAreaTest.sqlite3");
+        
+    return result;
 }

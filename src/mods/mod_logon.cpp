@@ -229,7 +229,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
         
         if (!ss.fail())
         {
-            m_logon_user = user_data->getUserById(userId);
+            m_logon_user = user_data->getRecordById(userId);
             if(m_logon_user && m_logon_user->iId != -1) 
             {
                 return true;
@@ -351,7 +351,7 @@ bool ModLogon::validate_password(const std::string &input)
     security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
     
     // Lookup the secutiry table for existing hash.
-    security_ptr security = security_dao->getSecurityById(m_logon_user->iSecurityIndex);
+    security_ptr security = security_dao->getRecordById(m_logon_user->iSecurityIndex);
     if (!security || security->iId == -1)
     {
         return false;

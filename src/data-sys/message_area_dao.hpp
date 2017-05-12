@@ -1,9 +1,13 @@
 #ifndef MESSAGE_AREA_DAO_HPP
 #define MESSAGE_AREA_DAO_HPP
 
+#include "../model-sys/message_area.hpp"
+#include "../data-sys/base_dao.hpp"
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <vector>
+#include <functional>
+
 
 // Forward Declerations
 namespace SQLW
@@ -12,15 +16,11 @@ class Database;
 class Query;
 }
 
-class MessageArea;
-// Handles to MessageArea
-typedef boost::shared_ptr<MessageArea> msg_area_ptr;
-
-// Handles to Database
-typedef boost::shared_ptr<SQLW::Database> database_ptr;
-
 // Handle to Database Queries
 typedef boost::shared_ptr<SQLW::Query> query_ptr;
+
+// Base Dao Definition
+typedef BaseDao<MessageArea> baseMessageAreaClass;
 
 /**
  * @class MessageAreaDao
@@ -30,107 +30,193 @@ typedef boost::shared_ptr<SQLW::Query> query_ptr;
  * @brief Message Area Data Access Object
  */
 class MessageAreaDao
+    : public baseMessageAreaClass
 {
 public:
-    MessageAreaDao(SQLW::Database &database);
-    ~MessageAreaDao();
+    MessageAreaDao(SQLW::Database &database)
+        : baseMessageAreaClass(database)
+    {
+        // Setup Table name
+        m_strTableName = "messagearea";
 
-    // Handle to Database
-    SQLW::Database &m_msg_area_database;
+        /**
+         * Pre Popluate Static Queries one Time
+         */
+        m_cmdFirstTimeSetup =
+            "PRAGMA synchronous=Normal; "
+            "PRAGMA encoding=UTF-8; "
+            "PRAGMA foreign_keys=ON; "
+            "PRAGMA default_cache_size=10000; "
+            "PRAGMA cache_size=10000; ";
+        
+        // Check if Database Exists.
+        m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
 
-    std::string strTableName;
+        // Create Table Query (SQLite Only for the moment)
+        m_cmdCreateTable =
+            "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
+            "iId               INTEGER PRIMARY KEY, "
+            "sName             TEXT NOT NULL COLLATE NOCASE, "
+            "sAcsAccess        TEXT NOT NULL COLLATE NOCASE, "
+            "sAcsPost          TEXT NOT NULL COLLATE NOCASE, "
+            "bAnonymous        BOOLEAN NOT NULL, "
+            "sSponsor          TEXT NOT NULL COLLATE NOCASE, "
+            "sOriginLine       TEXT NOT NULL COLLATE NOCASE, "
+            "sFidoPath         TEXT NOT NULL COLLATE NOCASE, "
+            "iNetworkId        INTEGER NOT NULL, "
+            "sQwkName          TEXT NOT NULL COLLATE NOCASE, "
+            "iMaxMessages      INTEGER NOT NULL, "
+            "bRealName         BOOLEAN NOT NULL, "
+            "sLinkname         TEXT NOT NULL COLLATE NOCASE, "
+            "bRequired         BOOLEAN NOT NULL, "
+            "bPrivate          BOOLEAN NOT NULL, "
+            "bNetmail          BOOLEAN NOT NULL, "
+            "iSortOrder        INTEGER NOT NULL "
+            "); ";
 
-    // Static Queries
-    std::string cmdFirstTimeSetup;
+        // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
+        m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
+        
+        // Setup the CallBack for Result Field Mapping
+        m_result_callback = std::bind(&MessageAreaDao::pullMessageAreaResult, this, 
+            std::placeholders::_1, std::placeholders::_2);
+            
+        m_columns_callback = std::bind(&MessageAreaDao::fillMessageAreaColumnValues, this, 
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+            
+        m_insert_callback = std::bind(&MessageAreaDao::insertMessageAreaQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
+        
+        m_update_callback = std::bind(&MessageAreaDao::updateMessageAreaQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
+    }
 
-    std::string cmdMessageAreaTableExists;
-    std::string cmdCreateMessageAreaTable;
-    std::string cmdDropMessageAreaTable;
+    ~MessageAreaDao()
+    {
+    }
+
 
     /**
-     * @brief Check of the Database Exists.
+     * Base Dao Calls for generic Object Data Calls
+     * (Below This Point)
+     */
+ 
+ 
+    /**
+     * @brief Check If Database Table Exists.
      * @return
      */
-    bool isTableExists();
-
+    bool doesTableExist();
+    
     /**
-     * @brief Run Setup Params for SQL Database.
+     * @brief Run Setup Params for SQL Database Table.
      */
     bool firstTimeSetupParams();
 
     /**
-     * @brief Create MessageArea Database
+     * @brief Create Database Table
      * @return
      */
     bool createTable();
 
     /**
-     * @brief Drop MessageArea Database
+     * @brief Drop Database
      * @return
      */
     bool dropTable();
-
+    
     /**
-     * @brief Create Query String to Insert New MessageArea Record
-     */
-    std::string insertMessageAreaQryString(query_ptr qry, msg_area_ptr area);
-
-    /**
-     * @brief Creates Query String to Update Existing MessageArea Record
-     */
-    std::string updateMessageAreaQryString(query_ptr qry, msg_area_ptr area);
-
-    /**
-     * @brief Updates a MessageArea Record in the database!
-     * @param area
+     * @brief Updates a Record in the database!
+     * @param obj
      * @return
      */
-    bool updateMessageAreaRecord(msg_area_ptr area);
+    bool updateRecord(message_area_ptr obj);
 
     /**
-     * @brief Inserts a New MessageArea Record in the database!
-     * @param area
+     * @brief Inserts a New Record in the database!
+     * @param obj
      * @return
      */
-    long insertMessageAreaRecord(msg_area_ptr area);
-
+    long insertRecord(message_area_ptr obj);
+        
     /**
      * @brief Deletes a MessageArea Record
      * @param areaId
      * @return
      */
-    bool deleteMessageAreaRecord(long areaId);
-
-    /**
-     * @brief Helper To populate MessageArea Record with Query Results.
-     */
-    void pullMessageAreaResult(query_ptr qry, msg_area_ptr area);
-
-    /**
-     * @brief This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
-     * @param values
-     */
-    void fillColumnValues(query_ptr qry, msg_area_ptr area, 
-        std::vector< std::pair<std::string, std::string> > &values);
-
-    /**
-     * @brief Return MessageArea Record By Id.
-     * @return
-     */
-    msg_area_ptr getMessageAreaById(long confId);
+    bool deleteRecord(long id);
     
     /**
-     * @brief Return List of All MessageAreas
+     * @brief Retrieve Record By Id.
+     * @param id
+     * @return 
+     */ 
+    message_area_ptr getRecordById(long id);
+    
+    /**
+     * @brief Retrieve All Records in a Table
      * @return
      */
-    std::vector<msg_area_ptr> getAllMessageAreas();
+    std::vector<message_area_ptr> getAllRecords();
+    
+    /**
+     * @brief Retrieve Count of All Records in a Table
+     * @return
+     */
+    long getRecordsCount();
+
+
+    /**
+     * Base Dao Call Back for Object Specific Data Mappings
+     * (Below This Point)
+     */
+
+
+    /**
+     * @brief (Callback) Create Record Insert Statement, returns query string 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string insertMessageAreaQryString(std::string qry, message_area_ptr obj);
+
+    /**
+     * @brief (CallBack) Update Existing Record. 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string updateMessageAreaQryString(std::string qry, message_area_ptr obj);
+    
+    /**
+     * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+     * @param qry
+     * @param obj
+     */
+    void pullMessageAreaResult(query_ptr qry, message_area_ptr obj);
+
+    /**
+     * @brief (Callback) for Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
+     * @param qry
+     * @param obj
+     * @param values
+     */ 
+    void fillMessageAreaColumnValues(query_ptr qry, message_area_ptr obj, 
+        std::vector< std::pair<std::string, std::string> > &values);
+
+    
+    /**
+     * One Off Methods SQL Queries not included in the BaseDao
+     * (Below This Point)
+     */
+        
     
     /**
      * @brief Return List of All MessageArea by ConferenceId
      * @param areas
      * @return
      */ 
-    std::vector<msg_area_ptr> getAllMessageAreasByConference(long confId);
+    std::vector<message_area_ptr> getAllMessageAreasByConference(long confId);
     
 };
 

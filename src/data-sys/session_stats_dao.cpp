@@ -10,548 +10,252 @@
 #include <iostream>
 #include <string>
 
-SessionStatsDao::SessionStatsDao(SQLW::Database &database)
-    : m_stats_database(database)
-{
-    // Setup Table name
-    strTableName = "sessionstats";
-
-    /**
-     * Pre Popluate Static Queries one Time
-     */
-    cmdFirstTimeSetup =
-        "PRAGMA synchronous=Normal; "
-        "PRAGMA encoding=UTF-8; "
-        "PRAGMA foreign_keys=ON; "
-        "PRAGMA default_cache_size=10000; "
-        "PRAGMA cache_size=10000; ";
-        
-    // Check if Database Exists.
-    cmdSessionStatTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + strTableName + "' COLLATE NOCASE;";
-
-    // Create Users Table Query (SQLite Only for the moment)
-    cmdCreateSessionStatTable =
-        "CREATE TABLE IF NOT EXISTS " + strTableName + " ( "
-        "iId               INTEGER PRIMARY KEY, "        
-        "iUserId           INTEGER NOT NULL, "
-        "sSessionType      TEXT NOT NULL COLLATE NOCASE, "
-        "sCodePage         TEXT NOT NULL COLLATE NOCASE, "
-        "sTerminal         TEXT NOT NULL COLLATE NOCASE, "
-        "sIPAddress        TEXT NOT NULL COLLATE NOCASE, "
-        "iTermWidth        INTEGER NOT NULL, "
-        "iTermHeight       INTEGER NOT NULL, "
-        "dtStartDate       DATETIME NOT NULL, "
-        "dtEndDate         DATETIME NOT NULL, "
-        "iInvalidAttempts  INTEGER NOT NULL, "
-        "bNewUser          BOOLEAN NOT NULL, "
-        "bLogonSuccess     BOOLEAN NOT NULL, "
-        "bHungup           BOOLEAN NOT NULL, "
-        "iMsgRead          INTEGER NOT NULL, "
-        "iMsgPost          INTEGER NOT NULL, "
-        "iFilesUl          INTEGER NOT NULL, "
-        "iFilesDl          INTEGER NOT NULL, "
-        "iFilesUlMb        INTEGER NOT NULL, "
-        "iFilesDlMb        INTEGER NOT NULL, "
-        "iDoorsExec        INTEGER NOT NULL  "
-        "); ";
-
-    cmdCreateSessionStatIndex = "";
-        "CREATE INDEX IF NOT EXISTS session_stats_idx "
-        "ON " + strTableName + " (iUserId); ";
-
-    // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
-    cmdDropSessionStatTable = "DROP TABLE IF EXISTS " + strTableName + "; ";
-    cmdDropSessionStatIndex = "DROP INDEX IF EXISTS session_stats_idx; ";    
-}
-
-SessionStatsDao::~SessionStatsDao()
-{
-    std::cout << "~SessionStatsDao" << std::endl;
-}
 
 /**
- * @brief Check if the Table Exists in Database
+ * Base Dao Calls for generic Object Data Calls
+ * (Below This Point)
+ */
+ 
+ 
+/**
+ * @brief Check If Database Table Exists.
  * @return
  */
-bool SessionStatsDao::isTableExists()
+bool SessionStatsDao::doesTableExist()
 {
-    bool result = false;
-
-    // Make Sure Database Reference is Connected
-    if (!m_stats_database.isConnected())
-    {
-        std::cout << "Error, Database is not connected!" << std::endl;
-        return result;
-    }
-
-    // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_stats_database));
-    if (!qry || !qry->isConnected())
-    {
-        std::cout << "Error, Query has no connection to the database" << std::endl;
-        return result;
-    }
-
-    // Execute and get result.
-    if (qry->getResult(cmdSessionStatTableExists))
-    {
-        long rows = qry->getNumRows();
-        if (rows > 0)
-        {
-            std::cout << "SessionStats Table Exists!" << std::endl;
-            result = true;
-        }
-        else
-        {
-            // No rows means the table doesn't exist!
-            std::cout << "Error, SessionStats table Exists Returned Rows: " << rows << std::endl;
-        }
-    }
-    else
-    {
-        std::cout << "Error, getResult()" << std::endl;
-    }
-
-    return result;
+    return baseDoesTableExist();
 }
 
 /**
- * @brief Run Setup Params for SQL Database.
-  */
+ * @brief Run Setup Params for SQL Database Table.
+ */
 bool SessionStatsDao::firstTimeSetupParams()
 {
-    bool result = false;
-
-    // Make Sure Database Reference is Connected
-    if (!m_stats_database.isConnected())
-    {
-        std::cout << "Error, Database is not connected!" << std::endl;
-        return result;
-    }
-
-    // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_stats_database));
-    if (!qry || !qry->isConnected())
-    {
-        std::cout << "Error, Query has no connection to the database" << std::endl;
-        return result;
-    }
-
-    // Execute Statement.
-    result = qry->execute(cmdFirstTimeSetup);
-    return result;
+    return baseFirstTimeSetupParams();
 }
 
 /**
- * @brief Create Users Table
- * If Create Table Fails, skip trying to create index.
+ * @brief Create Database Table
+ * @return
  */
 bool SessionStatsDao::createTable()
 {
-    bool result = false;
-
-    // Make Sure Database Reference is Connected
-    if (!m_stats_database.isConnected())
-    {
-        std::cout << "Error, Database is not connected!" << std::endl;
-        return result;
-    }
-
-    // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_stats_database));
-    if (!qry || !qry->isConnected())
-    {
-        std::cout << "Error, Query has no connection to the database" << std::endl;
-        return result;
-    }
-
-    // Create List of statements to execute in a single transaction.
-    std::vector<std::string> statements;
-
-    statements.push_back(cmdCreateSessionStatTable);
-    statements.push_back(cmdCreateSessionStatIndex);
-
-    // Execute Transaction.
-    result = qry->executeTransaction(statements);
-    return result;
+    return baseCreateTable();
 }
 
 /**
- * @brief Drop Users Table
- * If Drop Index Fails, still try to Drop Tables as it will try both!
+ * @brief Drop Database
+ * @return
  */
 bool SessionStatsDao::dropTable()
 {
-    bool result = false;
-
-    // Make Sure Database Reference is Connected
-    if (!m_stats_database.isConnected())
-    {
-        std::cout << "Error, Database is not connected!" << std::endl;
-        return result;
-    }
-
-    // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_stats_database));
-    if (!qry || !qry->isConnected())
-    {
-        std::cout << "Error, Query has no connection to the database" << std::endl;
-        return result;
-    }
-
-    // Create List of statements to execute in a single transaction.
-    std::vector<std::string> statements;
-    statements.push_back(cmdDropSessionStatIndex);
-    statements.push_back(cmdDropSessionStatTable);
-
-    // Execute Transaction.
-    result = qry->executeTransaction(statements);
-    return result;
+    return baseDropTable();
 }
 
 /**
- * @brief Pulls results by FieldNames into their Class Variables.
+ * @brief Updates a Record in the database!
+ * @param area
+ * @return
  */
-void SessionStatsDao::pullSessionStatResult(query_ptr qry, session_stats_ptr stat)
+bool SessionStatsDao::updateRecord(session_stats_ptr obj)
 {
-    qry->getFieldByName("iId", stat->iId);
-    qry->getFieldByName("iUserId", stat->iUserId);
-    qry->getFieldByName("sSessionType", stat->sSessionType);
-    qry->getFieldByName("sCodePage", stat->sCodePage);
-    qry->getFieldByName("sTerminal", stat->sTerminal);
-    qry->getFieldByName("sIPAddress", stat->sIPAddress);
-    qry->getFieldByName("iTermWidth", stat->iTermWidth);
-    qry->getFieldByName("iTermHeight", stat->iTermHeight);
-    qry->getFieldByName("dtStartDate", stat->dtStartDate);
-    qry->getFieldByName("dtEndDate", stat->dtEndDate);
-    qry->getFieldByName("iInvalidAttempts", stat->iInvalidAttempts);
-    qry->getFieldByName("bNewUser", stat->bNewUser);
-    qry->getFieldByName("bLogonSuccess", stat->bLogonSuccess);    
-    qry->getFieldByName("bHungup", stat->bHungup);
-    qry->getFieldByName("iMsgRead", stat->iMsgRead);
-    qry->getFieldByName("iMsgPost", stat->iMsgPost);
-    qry->getFieldByName("iFilesUl", stat->iFilesUl);
-    qry->getFieldByName("iFilesDl", stat->iFilesDl);
-    qry->getFieldByName("iFilesUlMb", stat->iFilesUlMb);
-    qry->getFieldByName("iFilesDlMb", stat->iFilesDlMb);
-    qry->getFieldByName("iDoorsExec", stat->iDoorsExec);
+    return baseUpdateRecord(obj);
 }
 
 /**
- * @brief Used for Insert Statement
- *        This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
+ * @brief Inserts a New Record in the database!
+ * @param area
+ * @return
+ */
+long SessionStatsDao::insertRecord(session_stats_ptr obj)
+{
+    return baseInsertRecord(obj);
+}
+
+/**
+ * @brief Deletes a Record
+ * @param areaId
+ * @return
+ */
+bool SessionStatsDao::deleteRecord(long id)
+{
+    return baseDeleteRecord(id);
+}
+
+/**
+ * @brief Retrieve Record By Id.
+ * @param id
+ * @return 
+ */ 
+session_stats_ptr SessionStatsDao::getRecordById(long id)
+{
+    return baseGetRecordById(id);
+}
+
+/**
+ * @brief Retrieve All Records in a Table
+ * @return
+ */
+std::vector<session_stats_ptr> SessionStatsDao::getAllRecords()
+{
+    return baseGetAllRecords();
+}
+
+/**
+ * @brief Retrieve Count of All Records in a Table
+ * @return
+ */
+long SessionStatsDao::getRecordsCount()
+{
+    return baseGetRecordsCount();
+}
+
+
+/**
+ * Base Dao Call Back for Object Specific Data Mappings
+ * (Below This Point)
+ */
+
+
+/**
+ * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+ * @param qry
+ * @param obj
+ */
+void SessionStatsDao::pullSessionStatsResult(query_ptr qry, session_stats_ptr obj)
+{
+    qry->getFieldByName("iId", obj->iId);
+    qry->getFieldByName("iUserId", obj->iUserId);
+    qry->getFieldByName("sSessionType", obj->sSessionType);
+    qry->getFieldByName("sCodePage", obj->sCodePage);
+    qry->getFieldByName("sTerminal", obj->sTerminal);
+    qry->getFieldByName("sIPAddress", obj->sIPAddress);
+    qry->getFieldByName("iTermWidth", obj->iTermWidth);
+    qry->getFieldByName("iTermHeight", obj->iTermHeight);
+    qry->getFieldByName("dtStartDate", obj->dtStartDate);
+    qry->getFieldByName("dtEndDate", obj->dtEndDate);
+    qry->getFieldByName("iInvalidAttempts", obj->iInvalidAttempts);
+    qry->getFieldByName("bNewUser", obj->bNewUser);
+    qry->getFieldByName("bLogonSuccess", obj->bLogonSuccess);    
+    qry->getFieldByName("bHungup", obj->bHungup);
+    qry->getFieldByName("iMsgRead", obj->iMsgRead);
+    qry->getFieldByName("iMsgPost", obj->iMsgPost);
+    qry->getFieldByName("iFilesUl", obj->iFilesUl);
+    qry->getFieldByName("iFilesDl", obj->iFilesDl);
+    qry->getFieldByName("iFilesUlMb", obj->iFilesUlMb);
+    qry->getFieldByName("iFilesDlMb", obj->iFilesDlMb);
+    qry->getFieldByName("iDoorsExec", obj->iDoorsExec);
+}
+
+/**
+ * @brief (Callback) for Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
+ * @param qry
+ * @param obj
  * @param values
- */
-void SessionStatsDao::fillColumnValues(query_ptr qry, session_stats_ptr stat, std::vector< std::pair<std::string, std::string> > &values)
+ */ 
+void SessionStatsDao::fillSessionStatsColumnValues(query_ptr qry, session_stats_ptr obj, std::vector< std::pair<std::string, std::string> > &values)
 {
-    //values.push_back(qry->translateFieldName("iId", stat->iId));
-    values.push_back(qry->translateFieldName("iUserId", stat->iUserId));
-    values.push_back(qry->translateFieldName("sSessionType", stat->sSessionType));
-    values.push_back(qry->translateFieldName("sCodePage", stat->sCodePage));
-    values.push_back(qry->translateFieldName("sTerminal", stat->sTerminal));
-    values.push_back(qry->translateFieldName("sIPAddress", stat->sIPAddress));
-    values.push_back(qry->translateFieldName("iTermWidth", stat->iTermWidth));
-    values.push_back(qry->translateFieldName("iTermHeight", stat->iTermHeight));
-    values.push_back(qry->translateFieldName("dtStartDate", stat->dtStartDate));
-    values.push_back(qry->translateFieldName("dtEndDate", stat->dtEndDate));    
-    values.push_back(qry->translateFieldName("iInvalidAttempts", stat->iInvalidAttempts));
-    values.push_back(qry->translateFieldName("bNewUser", stat->bNewUser));
-    values.push_back(qry->translateFieldName("bLogonSuccess", stat->bLogonSuccess));    
-    values.push_back(qry->translateFieldName("bHungup", stat->bHungup));
-    values.push_back(qry->translateFieldName("iMsgRead", stat->iMsgRead));
-    values.push_back(qry->translateFieldName("iMsgPost", stat->iMsgPost));
-    values.push_back(qry->translateFieldName("iFilesUl", stat->iFilesUl));
-    values.push_back(qry->translateFieldName("iFilesDl", stat->iFilesDl));
-    values.push_back(qry->translateFieldName("iFilesUlMb", stat->iFilesUlMb));
-    values.push_back(qry->translateFieldName("iFilesDlMb", stat->iFilesDlMb));
-    values.push_back(qry->translateFieldName("iDoorsExec", stat->iDoorsExec));
+    //values.push_back(qry->translateFieldName("iId", obj->iId));
+    values.push_back(qry->translateFieldName("iUserId", obj->iUserId));
+    values.push_back(qry->translateFieldName("sSessionType", obj->sSessionType));
+    values.push_back(qry->translateFieldName("sCodePage", obj->sCodePage));
+    values.push_back(qry->translateFieldName("sTerminal", obj->sTerminal));
+    values.push_back(qry->translateFieldName("sIPAddress", obj->sIPAddress));
+    values.push_back(qry->translateFieldName("iTermWidth", obj->iTermWidth));
+    values.push_back(qry->translateFieldName("iTermHeight", obj->iTermHeight));
+    values.push_back(qry->translateFieldName("dtStartDate", obj->dtStartDate));
+    values.push_back(qry->translateFieldName("dtEndDate", obj->dtEndDate));    
+    values.push_back(qry->translateFieldName("iInvalidAttempts", obj->iInvalidAttempts));
+    values.push_back(qry->translateFieldName("bNewUser", obj->bNewUser));
+    values.push_back(qry->translateFieldName("bLogonSuccess", obj->bLogonSuccess));    
+    values.push_back(qry->translateFieldName("bHungup", obj->bHungup));
+    values.push_back(qry->translateFieldName("iMsgRead", obj->iMsgRead));
+    values.push_back(qry->translateFieldName("iMsgPost", obj->iMsgPost));
+    values.push_back(qry->translateFieldName("iFilesUl", obj->iFilesUl));
+    values.push_back(qry->translateFieldName("iFilesDl", obj->iFilesDl));
+    values.push_back(qry->translateFieldName("iFilesUlMb", obj->iFilesUlMb));
+    values.push_back(qry->translateFieldName("iFilesDlMb", obj->iFilesDlMb));
+    values.push_back(qry->translateFieldName("iDoorsExec", obj->iDoorsExec));
 }
 
 /**
- * @brief Create User Record Insert Statement, returns query string
+ * @brief (Callback) Create Record Insert Statement, returns query string 
+ * @param qry
+ * @param obj
+ * @return 
  */
-std::string SessionStatsDao::insertSessionStatQryString(query_ptr qry, session_stats_ptr stat)
+std::string SessionStatsDao::insertSessionStatsQryString(std::string qry, session_stats_ptr obj)
 {
-    std::stringstream ssColumn;
-    std::stringstream ssType;
-    std::vector< std::pair<std::string, std::string> >::iterator it;
-    std::vector< std::pair<std::string, std::string> > values;
-
-    ssColumn << "INSERT INTO " + strTableName + " (";
-    ssType << ") VALUES (";
-
-    // Populate the Pairs.
-    fillColumnValues(qry, stat, values);
-
-    // Build Query (Columns) VALUES (Types) ..  ie %d, %Q into a full string.
-    it = values.begin();
-    for (int i = 0; it != values.end(); i++)
-    {
-        // First Build Column Names
-        ssColumn << (*it).first;
-        ssType << (*it).second;
-
-        ++it;
-        if (it != values.end())
-        {
-            ssColumn << ", ";
-            ssType << ", ";
-        }
-    }
-
-    // Closing For Query.
-    ssType << "); ";
-
-    // Setup String to build the Query.
-    std::string newQueryString = ssColumn.str();
-    newQueryString.append(ssType.str());
-
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(newQueryString.c_str(),
-        stat->iUserId,
-        stat->sSessionType.c_str(),
-        stat->sCodePage.c_str(),
-        stat->sTerminal.c_str(),
-        stat->sIPAddress.c_str(),
-        stat->iTermWidth,
-        stat->iTermHeight,
-        stat->dtStartDate,
-        stat->dtEndDate,
-        stat->iInvalidAttempts,
-        stat->bNewUser,
-        stat->bLogonSuccess,
-        stat->bHungup,
-        stat->iMsgRead,
-        stat->iMsgPost,
-        stat->iFilesUl,
-        stat->iFilesDl,
-        stat->iFilesUlMb,
-        stat->iFilesDlMb,
-        stat->iDoorsExec    
+    std::string result = sqlite3_mprintf(qry.c_str(),
+        obj->iUserId,
+        obj->sSessionType.c_str(),
+        obj->sCodePage.c_str(),
+        obj->sTerminal.c_str(),
+        obj->sIPAddress.c_str(),
+        obj->iTermWidth,
+        obj->iTermHeight,
+        obj->dtStartDate,
+        obj->dtEndDate,
+        obj->iInvalidAttempts,
+        obj->bNewUser,
+        obj->bLogonSuccess,
+        obj->bHungup,
+        obj->iMsgRead,
+        obj->iMsgPost,
+        obj->iFilesUl,
+        obj->iFilesDl,
+        obj->iFilesUlMb,
+        obj->iFilesDlMb,
+        obj->iDoorsExec    
     );
 
     return result;
 }
 
 /**
- * @brief Update Existing stat Record.
+ * @brief (CallBack) Update Existing Record. 
+ * @param qry
+ * @param obj
+ * @return 
  */
-std::string SessionStatsDao::updateSessionStatQryString(query_ptr qry, session_stats_ptr stat)
-{
-    std::stringstream ssColumn;
-    std::vector< std::pair<std::string, std::string> >::iterator it;
-    std::vector< std::pair<std::string, std::string> > values;
-
-    // Setup start of Statement
-    ssColumn << "UPDATE " + strTableName + " SET ";
-
-    // Populate the Pairs. Variable = %Q formatted string.
-    fillColumnValues(qry, stat, values);
-
-    // Build Query (Columns) = (Values) ..  ie %d, %Q into a full string.
-    it = values.begin();
-    for (int i = 0; it != values.end(); i++)
-    {
-        ssColumn << (*it).first << "=" << (*it).second;
-        ++it;
-        if (it != values.end())
-        {
-            ssColumn << ", ";
-        }
-    }
-
-    // Closing For Query.
-    std::string newQueryString = ssColumn.str();
-    newQueryString.append(" WHERE iId = %ld; ");
-
-    // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(newQueryString.c_str(),        
-        stat->iUserId,
-        stat->sSessionType.c_str(),
-        stat->sCodePage.c_str(),
-        stat->sTerminal.c_str(),
-        stat->sIPAddress.c_str(),
-        stat->iTermWidth,
-        stat->iTermHeight,
-        stat->dtStartDate,
-        stat->dtEndDate,
-        stat->iInvalidAttempts,
-        stat->bNewUser,
-        stat->bLogonSuccess,        
-        stat->bHungup,
-        stat->iMsgRead,
-        stat->iMsgPost,
-        stat->iFilesUl,
-        stat->iFilesDl,
-        stat->iFilesUlMb,
-        stat->iFilesDlMb,
-        stat->iDoorsExec,
-        stat->iId
-    );
-
-    return result;
-}
-
-/**
- * @brief Updates a User Record in the database!
- * @param stat
- * @return
- */
-bool SessionStatsDao::updateSessionStatRecord(session_stats_ptr stat)
-{
-    bool result = false;
-
-    // Make Sure Database Reference is Connected
-    if (!m_stats_database.isConnected())
-    {
-        std::cout << "Error, Database is not connected!" << std::endl;
-        return result;
-    }
-
-    // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_stats_database));
-    if (!qry || !qry->isConnected())
-    {
-        std::cout << "Error, Query has no connection to the database" << std::endl;
-        return result;
-    }
-
-    // Build update string
-    std::string queryString = updateSessionStatQryString(qry, stat);
-
-    // Execute Update in a Transaction, rollback if fails.
-    std::vector<std::string> statements;
-    statements.push_back(queryString);
-    result = qry->executeTransaction(statements);
-
-    return result;
-}
-
-/**
- * @brief Inserts a New User Record in the database!
- * @param stat
- * @return
- */
-long SessionStatsDao::insertSessionStatRecord(session_stats_ptr stat)
+std::string SessionStatsDao::updateSessionStatsQryString(std::string qry, session_stats_ptr obj)
 {    
-    bool result = false;
-    long lastInsertId = -1;
-
-    // Make Sure Database Reference is Connected
-    if (!m_stats_database.isConnected())
-    {
-        std::cout << "Error, Database is not connected!" << std::endl;
-        return result;
-    }
-
-    // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_stats_database));
-    if (!qry || !qry->isConnected())
-    {
-        std::cout << "Error, Query has no connection to the database" << std::endl;
-        return result;
-    }
-
-    // Build update string
-    std::string queryString = insertSessionStatQryString(qry, stat);
-
-    // Execute Update in a Transaction, rollback if fails.
-    std::vector<std::string> statements;
-    statements.push_back(queryString);
-    result = qry->executeTransaction(statements);
-
-    // We need the insert id for stat table
-    if (result)
-    {
-        lastInsertId = qry->getInsertId();
-    }
-
-    return lastInsertId;
-}
-
-/**
- * @brief Deletes a User Record
- * @param statId
- * @return
- */
-bool SessionStatsDao::deleteSessionStatRecord(long statId)
-{
-    bool result = false;
-
-    // Make Sure Database Reference is Connected
-    if (!m_stats_database.isConnected())
-    {
-        std::cout << "Error, Database is not connected!" << std::endl;
-        return result;
-    }
-
-    // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_stats_database));
-    if (!qry || !qry->isConnected())
-    {
-        std::cout << "Error, Query has no connection to the database" << std::endl;
-        return result;
-    }
-
-    // Build string
-    std::string queryString = sqlite3_mprintf("DELETE FROM %Q WHERE iId = %ld;", strTableName.c_str(), statId);
-
-    // Execute Update in a Transaction, rollback if fails.
-    std::vector<std::string> statements;
-    statements.push_back(queryString);
-    result = qry->executeTransaction(statements);
+    // Mprint statement to avoid injections.
+    std::string result = sqlite3_mprintf(qry.c_str(),        
+        obj->iUserId,
+        obj->sSessionType.c_str(),
+        obj->sCodePage.c_str(),
+        obj->sTerminal.c_str(),
+        obj->sIPAddress.c_str(),
+        obj->iTermWidth,
+        obj->iTermHeight,
+        obj->dtStartDate,
+        obj->dtEndDate,
+        obj->iInvalidAttempts,
+        obj->bNewUser,
+        obj->bLogonSuccess,        
+        obj->bHungup,
+        obj->iMsgRead,
+        obj->iMsgPost,
+        obj->iFilesUl,
+        obj->iFilesDl,
+        obj->iFilesUlMb,
+        obj->iFilesDlMb,
+        obj->iDoorsExec,
+        obj->iId
+    );
 
     return result;
 }
 
+
 /**
- * @brief Return User Record By Index ID.
- * @return
+ * One Off Methods SQL Queries not included in the BaseDao
+ * (Below This Point)
  */
-session_stats_ptr SessionStatsDao::getSessionStatById(long id)
-{
-    session_stats_ptr stat(new SessionStats);
-
-    // Make Sure Database Reference is Connected
-    if (!m_stats_database.isConnected())
-    {
-        std::cout << "Error, Database is not connected!" << std::endl;
-        return stat;
-    }
-
-    // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_stats_database));
-    if (!qry->isConnected())
-    {
-        std::cout << "Error, Query has no connection to the database" << std::endl;
-        return stat;
-    }
-
-    // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iID = %ld;", strTableName.c_str(), id);
-
-    // Execute Query.
-    if (qry->getResult(queryString))
-    {
-        long rows = qry->getNumRows();
-        if (rows > 0)
-        {
-            qry->fetchRow();
-            pullSessionStatResult(qry, stat);
-        }
-        else
-        {
-            std::cout << "Error, getSessionStatById Returned Rows: " << rows << std::endl;
-        }
-    }
-    else
-    {
-        std::cout << "Error, getResult()" << std::endl;
-    }
-
-    return stat;
-}
-
+ 
+ 
 /**
  * @brief Return List of All Users
  * @return
@@ -559,25 +263,25 @@ session_stats_ptr SessionStatsDao::getSessionStatById(long id)
 std::vector<session_stats_ptr> SessionStatsDao::getAllStatsPerUser(long userId)
 {
     session_stats_ptr stat(new SessionStats);
-    std::vector<session_stats_ptr> stat_list;
+    std::vector<session_stats_ptr> list;
 
     // Make Sure Database Reference is Connected
-    if (!m_stats_database.isConnected())
+    if (!m_database.isConnected())
     {
         std::cout << "Error, Database is not connected!" << std::endl;
-        return stat_list;
+        return list;
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_stats_database));
+    query_ptr qry(new SQLW::Query(m_database));
     if (!qry->isConnected())
     {
         std::cout << "Error, Query has no connection to the database" << std::endl;
-        return stat_list;
+        return list;
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iUserId = %ld;", strTableName.c_str(), userId);
+    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iUserId = %ld;", m_strTableName.c_str(), userId);
 
     // Execute Query.
     if (qry->getResult(queryString))
@@ -588,8 +292,8 @@ std::vector<session_stats_ptr> SessionStatsDao::getAllStatsPerUser(long userId)
             while(qry->fetchRow())
             {
                 stat.reset(new SessionStats);
-                pullSessionStatResult(qry, stat);
-                stat_list.push_back(stat);
+                pullSessionStatsResult(qry, stat);
+                list.push_back(stat);
             }
         }
         else
@@ -602,7 +306,7 @@ std::vector<session_stats_ptr> SessionStatsDao::getAllStatsPerUser(long userId)
         std::cout << "Error, getResult()" << std::endl;
     }
 
-    return stat_list;
+    return list;
 }
 
 /**
@@ -612,26 +316,26 @@ std::vector<session_stats_ptr> SessionStatsDao::getAllStatsPerUser(long userId)
 std::vector<session_stats_ptr> SessionStatsDao::getLast10CallerStats()
 {
     session_stats_ptr stat(new SessionStats);
-    std::vector<session_stats_ptr> stat_list;
+    std::vector<session_stats_ptr> list;
 
     // Make Sure Database Reference is Connected
-    if (!m_stats_database.isConnected())
+    if (!m_database.isConnected())
     {
         std::cout << "Error, Database is not connected!" << std::endl;
-        return stat_list;
+        return list;
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_stats_database));
+    query_ptr qry(new SQLW::Query(m_database));
     if (!qry->isConnected())
     {
         std::cout << "Error, Query has no connection to the database" << std::endl;
-        return stat_list;
+        return list;
     }
 
     // Build Query String
     std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE bLogonSuccess = '1' "
-        "ORDER BY iID DESC;", strTableName.c_str());
+        "ORDER BY iID DESC;", m_strTableName.c_str());
 
     // Execute Query.
     if (qry->getResult(queryString))
@@ -642,8 +346,8 @@ std::vector<session_stats_ptr> SessionStatsDao::getLast10CallerStats()
             while(qry->fetchRow())
             {
                 stat.reset(new SessionStats);
-                pullSessionStatResult(qry, stat);
-                stat_list.push_back(stat);
+                pullSessionStatsResult(qry, stat);
+                list.push_back(stat);
             }
         }
         else
@@ -656,5 +360,5 @@ std::vector<session_stats_ptr> SessionStatsDao::getLast10CallerStats()
         std::cout << "Error, getResult()" << std::endl;
     }
 
-    return stat_list;
+    return list;
 }

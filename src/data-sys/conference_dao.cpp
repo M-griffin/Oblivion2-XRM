@@ -109,6 +109,7 @@ long ConferenceDao::getRecordsCount()
     return baseGetRecordsCount();
 }
 
+
 /**
  * Base Dao Call Back for Object Specific Data Mappings
  * (Below This Point)
