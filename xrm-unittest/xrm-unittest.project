@@ -31,7 +31,6 @@
   <VirtualDirectory Name="src">
     <File Name="main.cpp"/>
     <File Name="../src/common_io.hpp"/>
-    <File Name="../src/struct.hpp"/>
     <File Name="../src/common_io.cpp"/>
     <File Name="common_io_ut.cpp"/>
     <File Name="session_io_ut.cpp"/>

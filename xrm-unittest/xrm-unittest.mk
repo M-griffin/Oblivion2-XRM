@@ -12,11 +12,19 @@ OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
+<<<<<<< Updated upstream
 User                   :=Michae Griffin
 Date                   :=12/05/17
 CodeLitePath           :="/home/merc/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
+=======
+User                   :=Blue
+Date                   :=12/05/2017
+CodeLitePath           :="C:/Program Files (x86)/CodeLite"
+LinkerName             :=C:/MinGW-5.1.0/mingw32/bin/g++.exe
+SharedObjectLinkerName :=C:/MinGW-5.1.0/mingw32/bin/g++.exe -shared -fPIC
+>>>>>>> Stashed changes
 ObjectSuffix           :=.o
 DependSuffix           :=.o.d
 PreprocessSuffix       :=.i
