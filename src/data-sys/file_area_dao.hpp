@@ -96,87 +96,61 @@ public:
      * Base Dao Calls for generic Object Data Calls
      * (Below This Point)
      */
-
-
+ 
+ 
     /**
-     * @brief Check of the Database Exists.
+     * @brief Check If Database Table Exists.
      * @return
      */
     bool doesTableExist();
-
+    
     /**
-     * @brief Run Setup Params for SQL Database.
+     * @brief Run Setup Params for SQL Database Table.
      */
     bool firstTimeSetupParams();
 
     /**
-     * @brief Create FileArea Database
+     * @brief Create Database Table
      * @return
      */
     bool createTable();
 
     /**
-     * @brief Drop FileArea Database
+     * @brief Drop Database
      * @return
      */
     bool dropTable();
-
+    
     /**
-     * @brief Updates a FileArea Record in the database!
+     * @brief Updates a Record in the database!
      * @param obj
      * @return
      */
     bool updateRecord(file_area_ptr obj);
 
     /**
-     * @brief Inserts a New FileArea Record in the database!
+     * @brief Inserts a New Record in the database!
      * @param obj
      * @return
      */
     long insertRecord(file_area_ptr obj);
-
+        
     /**
-     * @brief Deletes a FileArea Record
-     * @param id
+     * @brief Deletes a MessageArea Record
+     * @param areaId
      * @return
      */
     bool deleteRecord(long id);
-
-    /**
-     * Base Dao Call Back for Object Specific Data Mappings
-     * (Below This Point)
-     */
-     
-    /**
-     * @brief Create Query String to Insert New FileArea Record
-     */
-    std::string insertFileAreaQryString(std::string qry, file_area_ptr obj);
-
-    /**
-     * @brief Creates Query String to Update Existing FileArea Record
-     */
-    std::string updateFileAreaQryString(std::string qry, file_area_ptr obj);
     
     /**
-     * @brief Helper To populate FileArea Record with Query Results.
-     */
-    void pullFileAreaResult(query_ptr qry, file_area_ptr obj);
-
-    /**
-     * @brief This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
-     * @param values
-     */
-    void fillFileAreaColumnValues(query_ptr qry, file_area_ptr obj, 
-        std::vector< std::pair<std::string, std::string> > &values);
-
-    /**
-     * @brief Return FileArea Record By Id.
-     * @return
-     */
+     * @brief Retrieve Record By Id.
+     * @param id
+     * @return 
+     */ 
     file_area_ptr getRecordById(long id);
     
     /**
-     * @brief Return List of All FileAreas
+     * @brief Retrieve All Records in a Table
      * @return
      */
     std::vector<file_area_ptr> getAllRecords();
@@ -187,6 +161,45 @@ public:
      */
     long getRecordsCount();
 
+
+    /**
+     * Base Dao Call Back for Object Specific Data Mappings
+     * (Below This Point)
+     */
+     
+     
+    /**
+     * @brief (Callback) Create Record Insert Statement, returns query string 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string insertFileAreaQryString(std::string qry, file_area_ptr obj);
+
+    /**
+     * @brief (CallBack) Update Existing Record. 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string updateFileAreaQryString(std::string qry, file_area_ptr obj);
+    
+    /**
+     * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+     * @param qry
+     * @param obj
+     */
+    void pullFileAreaResult(query_ptr qry, file_area_ptr obj);
+
+    /**
+     * @brief (Callback) for Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
+     * @param qry
+     * @param obj
+     * @param values
+     */ 
+    void fillFileAreaColumnValues(query_ptr qry, file_area_ptr obj, 
+        std::vector< std::pair<std::string, std::string> > &values);
+    
     
     /**
      * One Off Methods SQL Queries not included in the BaseDao

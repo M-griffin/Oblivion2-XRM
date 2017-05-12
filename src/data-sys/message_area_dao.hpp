@@ -100,16 +100,16 @@ public:
      * Base Dao Calls for generic Object Data Calls
      * (Below This Point)
      */
-
-
+ 
+ 
     /**
-     * @brief Check of the Database Exists.
+     * @brief Check If Database Table Exists.
      * @return
      */
     bool doesTableExist();
-
+    
     /**
-     * @brief Run Setup Params for SQL Database.
+     * @brief Run Setup Params for SQL Database Table.
      */
     bool firstTimeSetupParams();
 
@@ -124,7 +124,7 @@ public:
      * @return
      */
     bool dropTable();
-
+    
     /**
      * @brief Updates a Record in the database!
      * @param obj
@@ -138,49 +138,23 @@ public:
      * @return
      */
     long insertRecord(message_area_ptr obj);
-
+        
     /**
-     * @brief Deletes a Record
-     * @param id
+     * @brief Deletes a MessageArea Record
+     * @param areaId
      * @return
      */
     bool deleteRecord(long id);
-
-    /**
-     * Base Dao Call Back for Object Specific Data Mappings
-     * (Below This Point)
-     */
-
-    /**
-     * @brief Create Query String to Insert New MessageArea Record
-     */
-    std::string insertMessageAreaQryString(std::string qry, message_area_ptr obj);
-
-    /**
-     * @brief Creates Query String to Update Existing MessageArea Record
-     */
-    std::string updateMessageAreaQryString(std::string qry, message_area_ptr obj);
     
     /**
-     * @brief Helper To populate MessageArea Record with Query Results.
-     */
-    void pullMessageAreaResult(query_ptr qry, message_area_ptr obj);
-
-    /**
-     * @brief This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
-     * @param values
-     */
-    void fillMessageAreaColumnValues(query_ptr qry, message_area_ptr obj, 
-        std::vector< std::pair<std::string, std::string> > &values);
-
-    /**
-     * @brief Return FileArea Record By Id.
-     * @return
-     */
+     * @brief Retrieve Record By Id.
+     * @param id
+     * @return 
+     */ 
     message_area_ptr getRecordById(long id);
     
     /**
-     * @brief Return List of All FileAreas
+     * @brief Retrieve All Records in a Table
      * @return
      */
     std::vector<message_area_ptr> getAllRecords();
@@ -190,13 +164,46 @@ public:
      * @return
      */
     long getRecordsCount();
+
+
+    /**
+     * Base Dao Call Back for Object Specific Data Mappings
+     * (Below This Point)
+     */
+
+
+    /**
+     * @brief (Callback) Create Record Insert Statement, returns query string 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string insertMessageAreaQryString(std::string qry, message_area_ptr obj);
+
+    /**
+     * @brief (CallBack) Update Existing Record. 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string updateMessageAreaQryString(std::string qry, message_area_ptr obj);
     
     /**
-     * @brief Return List of All MessageAreas
-     * @return
+     * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+     * @param qry
+     * @param obj
      */
-    std::vector<message_area_ptr> getAllMessageAreas();
-    
+    void pullMessageAreaResult(query_ptr qry, message_area_ptr obj);
+
+    /**
+     * @brief (Callback) for Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
+     * @param qry
+     * @param obj
+     * @param values
+     */ 
+    void fillMessageAreaColumnValues(query_ptr qry, message_area_ptr obj, 
+        std::vector< std::pair<std::string, std::string> > &values);
+
     
     /**
      * One Off Methods SQL Queries not included in the BaseDao
