@@ -1,9 +1,12 @@
 #ifndef USERS_DAO_HPP
 #define USERS_DAO_HPP
 
+#include "../model-sys/users.hpp"
+#include "../data-sys/base_dao.hpp"
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <vector>
+#include <functional>
 
 // Forward Declerations
 namespace SQLW
@@ -12,15 +15,11 @@ class Database;
 class Query;
 }
 
-class Users;
-// Handles to Users
-typedef boost::shared_ptr<Users> user_ptr;
-
-// Handles to Database
-typedef boost::shared_ptr<SQLW::Database> database_ptr;
-
 // Handle to Database Queries
 typedef boost::shared_ptr<SQLW::Query> query_ptr;
+
+// Base Dao Definition
+typedef BaseDao<Users> baseUsersClass;
 
 /**
  * @class UsersDao
@@ -31,97 +30,230 @@ typedef boost::shared_ptr<SQLW::Query> query_ptr;
  *        Database Objects are Instaniated in the Session then passed to the DAO for work.
  */
 class UsersDao
+    : public baseUsersClass
 {
 public:
-    UsersDao(SQLW::Database &database);
-    ~UsersDao();
+    UsersDao(SQLW::Database &database)
+        : baseUsersClass(database)
+    {
+        // Setup Table name
+        m_strTableName = "users";
 
-    // Handle to Database
-    SQLW::Database &m_users_database;
+        /**
+         * Pre Popluate Static Queries one Time
+         */
+        m_cmdFirstTimeSetup =
+            "PRAGMA synchronous=Normal; "
+            "PRAGMA encoding=UTF-8; "
+            "PRAGMA foreign_keys=ON; "
+            "PRAGMA default_cache_size=10000; "
+            "PRAGMA cache_size=10000; ";
+        
+        // Check if Database Exists.
+        m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
 
-    std::string strTableName;
+        // Create Users Table Query (SQLite Only for the moment)
+        m_cmdCreateTable =
+            "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
+            "iId               INTEGER PRIMARY KEY, "
+            "sHandle           TEXT NOT NULL COLLATE NOCASE, "
+            "sRealName         TEXT NOT NULL COLLATE NOCASE, "
+            "sAddress          TEXT NOT NULL, "
+            "sLocation         TEXT NOT NULL, "
+            "sCountry          TEXT NOT NULL, "
+            "sEmail            TEXT NOT NULL COLLATE NOCASE, "
+            "sUserNote         TEXT NOT NULL, "
+            "dtBirthday        DATETIME NOT NULL, "
+            "iLevel            INTEGER NOT NULL, "
+            "iFileLevel        INTEGER NOT NULL, "
+            "iMessageLevel     INTEGER NOT NULL, "
+            "iLastFileArea     INTEGER NOT NULL, "
+            "iLastMessageArea  INTEGER NOT NULL, "
+            "iTimeLeft         INTEGER NOT NULL, "
+            "iTimeLimit        INTEGER NOT NULL, "
+            "sRegColor         TEXT NOT NULL, "
+            "sPromptColor      TEXT NOT NULL, "
+            "sInputColor       TEXT NOT NULL, "
+            "sInverseColor     TEXT NOT NULL, "
+            "sStatColor        TEXT NOT NULL, "
+            "sBoxColor         TEXT NOT NULL, "
+            "iFilePoints       INTEGER NOT NULL, "
+            "iPostCallRatio    INTEGER NOT NULL, "
+            "sMenuPromptName   TEXT NOT NULL, "
+            "iMenuSelected     INTEGER NOT NULL, "
+            "iStatusSelected   INTEGER NOT NULL, "
+            "bAnsi             BOOLEAN NOT NULL, "
+            "bBackSpaceVt100   BOOLEAN NOT NULL, "
+            "iNuvVotesYes      INTEGER NOT NULL, "
+            "iNuvVotesNo       INTEGER NOT NULL, "
+            "dtPassChangeDate  DATETIME DEFAULT CURRENT_TIMESTAMP, "
+            "dtLastReplyDate   DATETIME DEFAULT CURRENT_TIMESTAMP, "
+            "bScrollFL         BOOLEAN NOT NULL, "
+            "iCSPassChange     INTEGER NOT NULL, "
+            "iControlFlags1    INTEGER NOT NULL, "
+            "iControlFlags2    INTEGER NOT NULL, "
+            "bWanted           BOOLEAN NOT NULL, "
+            "sHeaderType       TEXT NOT NULL, "
+            "iLastMesConf      INTEGER NOT NULL, "
+            "iLastFileConf     INTEGER NOT NULL, "
+            "dtExpirationDate  DATETIME DEFAULT('01/01/2050'), "
+            "sGender           TEXT NOT NULL, "
+            "dtFirstOn         DATETIME DEFAULT CURRENT_TIMESTAMP, "
+            "bYesNoBars        BOOLEAN NOT NULL, "
+            "iHackAttempts     INTEGER NOT NULL, "
+            "bDoPause          BOOLEAN NOT NULL, "
+            "bClearOrScroll    BOOLEAN NOT NULL, "
+            "bIgnoreTimeLimit  BOOLEAN NOT NULL, "
+            "bAllowPurge       BOOLEAN NOT NULL, "
+            "iSecurityIndex    INT NOT NULL, "
+            "FOREIGN KEY(iSecurityIndex) REFERENCES Secutiry(iId) ON DELETE CASCADE "
+            "); ";
 
-    // Static Queries
-    std::string cmdFirstTimeSetup;
+        m_cmdCreateIndex = "";
+            "CREATE INDEX IF NOT EXISTS users_idx "
+            "ON " + m_strTableName + " (sHandle COLLATE NOCASE, sRealName COLLATE NOCASE, sEmail COLLATE NOCASE); ";
 
-    std::string cmdUserTableExists;
-    std::string cmdCreateUserTable;
-    std::string cmdCreateUserIndex;
-    std::string cmdDropUserTable;
-    std::string cmdDropUserIndex;
+        // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
+        m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
+        m_cmdDropIndex = "DROP INDEX IF EXISTS users_idx; ";
+        
+        // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
+        m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
+        
+        // Setup the CallBack for Result Field Mapping
+        m_result_callback = std::bind(&UsersDao::pullUsersResult, this, 
+            std::placeholders::_1, std::placeholders::_2);
+            
+        m_columns_callback = std::bind(&UsersDao::fillUsersColumnValues, this, 
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+            
+        m_insert_callback = std::bind(&UsersDao::insertUsersQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
+        
+        m_update_callback = std::bind(&UsersDao::updateUsersQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
+    }
 
+    ~UsersDao()
+    {
+        std::cout << "~UsersDao" << std::endl;
+    }
+
+    
     /**
-     * @brief Check of the Database Exists.
+     * Base Dao Calls for generic Object Data Calls
+     * (Below This Point)
+     */
+ 
+ 
+    /**
+     * @brief Check If Database Table Exists.
      * @return
      */
-    bool isTableExists();
-
+    bool doesTableExist();
+    
     /**
-     * @brief Run Setup Params for SQL Database.
+     * @brief Run Setup Params for SQL Database Table.
      */
     bool firstTimeSetupParams();
 
     /**
-     * @brief Create Users Database
+     * @brief Create Database Table
      * @return
      */
     bool createTable();
 
     /**
-     * @brief Drop Users Database
+     * @brief Drop Database
      * @return
      */
     bool dropTable();
-
+    
     /**
-     * @brief Create Query String to Insert New User Record
-     */
-    std::string insertUserQryString(query_ptr qry, user_ptr user);
-
-    /**
-     * @brief Creates Query String to Update Existing User Record
-     */
-    std::string updateUserQryString(query_ptr qry, user_ptr user);
-
-    /**
-     * @brief Updates a User Record in the database!
-     * @param user
+     * @brief Updates a Record in the database!
+     * @param obj
      * @return
      */
-    bool updateUserRecord(user_ptr user);
+    bool updateRecord(user_ptr obj);
 
     /**
-     * @brief Inserts a New User Record in the database!
-     * @param user
+     * @brief Inserts a New Record in the database!
+     * @param obj
      * @return
      */
-    long insertUserRecord(user_ptr user);
-
+    long insertRecord(user_ptr obj);
+        
     /**
-     * @brief Deletes a User Record
-     * @param userId
+     * @brief Deletes a MessageArea Record
+     * @param areaId
      * @return
      */
-    bool deleteUserRecord(long userId);
-
+    bool deleteRecord(long id);
+    
     /**
-     * @brief Helper To populate User Record with Query Results.
+     * @brief Retrieve Record By Id.
+     * @param id
+     * @return 
+     */ 
+    user_ptr getRecordById(long id);
+    
+    /**
+     * @brief Retrieve All Records in a Table
+     * @return
      */
-    void pullUserResult(query_ptr qry, user_ptr user);
+    std::vector<user_ptr> getAllRecords();
+    
+    /**
+     * @brief Retrieve Count of All Records in a Table
+     * @return
+     */
+    long getRecordsCount();
 
+    
+    /**
+     * Base Dao Call Back for Object Specific Data Mappings
+     * (Below This Point)
+     */
+     
+     
+    /**
+     * @brief (Callback) Create Record Insert Statement, returns query string 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string insertUsersQryString(std::string qry, user_ptr obj);
 
     /**
-     * @brief This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
+     * @brief (CallBack) Update Existing Record. 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string updateUsersQryString(std::string qry, user_ptr obj);
+    
+    /**
+     * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+     * @param qry
+     * @param obj
+     */
+    void pullUsersResult(query_ptr qry, user_ptr obj);
+
+    /**
+     * @brief (Callback) for Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
+     * @param qry
+     * @param obj
      * @param values
-     */
-    void fillColumnValues(query_ptr qry, user_ptr user, std::vector< std::pair<std::string, std::string> > &values);
+     */ 
+    void fillUsersColumnValues(query_ptr qry, user_ptr obj, std::vector< std::pair<std::string, std::string> > &values);
+
 
     /**
-     * @brief Return User Record By Id.
-     * @return
+     * One Off Methods SQL Queries not included in the BaseDao
+     * (Below This Point)
      */
-    user_ptr getUserById(long userId);
-
+     
+     
     /**
      * @brief Return User Record By Handle.
      * @return
@@ -139,12 +271,6 @@ public:
      * @return
      */
     user_ptr getUserByEmail(std::string email);
-    
-    /**
-     * @brief Return List of All Users
-     * @return
-     */
-    std::vector<user_ptr> getAllUsers();
 
 };
 

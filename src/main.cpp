@@ -255,7 +255,7 @@ auto main() -> int
         }
 
         // Verify if the user table exists.
-        if (!user_dao->isTableExists())
+        if (!user_dao->doesTableExist())
         {
             std::cout << "doesn't exist (user table)." << std::endl;
 

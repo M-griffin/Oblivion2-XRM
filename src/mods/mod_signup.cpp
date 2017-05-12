@@ -1781,7 +1781,7 @@ void ModSignup::saveNewUserRecord()
         // Also Add Default File points,, missing from user rec.
     }
 
-    long userIndex = user_dao->insertUserRecord(m_user_record);
+    long userIndex = user_dao->insertRecord(m_user_record);
     if (userIndex < 0)
     {
         std::cout << "Error, unable to insert new user record." << std::endl;
