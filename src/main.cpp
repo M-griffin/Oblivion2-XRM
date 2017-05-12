@@ -279,7 +279,7 @@ auto main() -> int
         // Check Table setup for Session Stats
         session_stats_dao_ptr session_stat_dao(new SessionStatsDao(user_database));
         // Verify if the user table exists.
-        if (!session_stat_dao->isTableExists())
+        if (!session_stat_dao->doesTableExist())
         {
             std::cout << "doesn't exist (sessionstats table)." << std::endl;
 

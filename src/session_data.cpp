@@ -285,7 +285,7 @@ void SessionData::startUpSessionStats(std::string sessionType)
         m_session_stats->sSessionType = sessionType;
         m_session_stats->dtStartDate = dateTime;
         
-        long id = session_stat_dao->insertSessionStatRecord(m_session_stats);
+        long id = session_stat_dao->insertRecord(m_session_stats);
         if (id < 0) 
         {
             std::cout << "SessionStats, error on insert: " << m_session_stats->iId << std::endl;

@@ -1,10 +1,12 @@
 #ifndef SESSION_STATS_DAO_HPP
 #define SESSION_STATS_DAO_HPP
 
+#include "../model-sys/session_stats.hpp"
+#include "../data-sys/base_dao.hpp"
 #include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
 
 #include <vector>
+#include <functional>
 
 // Forward Declerations
 namespace SQLW
@@ -13,112 +15,203 @@ class Database;
 class Query;
 }
 
-class SessionStats;
-// Handles to Users
-typedef boost::shared_ptr<SessionStats> session_stats_ptr;
-typedef boost::weak_ptr<SessionStats> session_stats_weak_ptr;
-
-
-// Handles to Database
-typedef boost::shared_ptr<SQLW::Database> database_ptr;
-typedef boost::weak_ptr<SQLW::Database> database_weak_ptr;
-
 // Handle to Database Queries
 typedef boost::shared_ptr<SQLW::Query> query_ptr;
 
+// Base Dao Definition
+typedef BaseDao<SessionStats> baseSessionStatsClass;
+
 
 class SessionStatsDao
+    : public baseSessionStatsClass
 {
 public:
-    SessionStatsDao(SQLW::Database &database);
-    ~SessionStatsDao();
+    SessionStatsDao(SQLW::Database &database)
+        : baseSessionStatsClass(database)
+    {
+        // Setup Table name
+        m_strTableName = "sessionstats";
 
-    // Handle to Database
-    SQLW::Database &m_stats_database;
+        /**
+         * Pre Popluate Static Queries one Time
+         */
+        m_cmdFirstTimeSetup =
+            "PRAGMA synchronous=Normal; "
+            "PRAGMA encoding=UTF-8; "
+            "PRAGMA foreign_keys=ON; "
+            "PRAGMA default_cache_size=10000; "
+            "PRAGMA cache_size=10000; ";
+            
+        // Check if Database Exists.
+        m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
 
-    std::string strTableName;
+        // Create Users Table Query (SQLite Only for the moment)
+        m_cmdCreateTable =
+            "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
+            "iId               INTEGER PRIMARY KEY, "        
+            "iUserId           INTEGER NOT NULL, "
+            "sSessionType      TEXT NOT NULL COLLATE NOCASE, "
+            "sCodePage         TEXT NOT NULL COLLATE NOCASE, "
+            "sTerminal         TEXT NOT NULL COLLATE NOCASE, "
+            "sIPAddress        TEXT NOT NULL COLLATE NOCASE, "
+            "iTermWidth        INTEGER NOT NULL, "
+            "iTermHeight       INTEGER NOT NULL, "
+            "dtStartDate       DATETIME NOT NULL, "
+            "dtEndDate         DATETIME NOT NULL, "
+            "iInvalidAttempts  INTEGER NOT NULL, "
+            "bNewUser          BOOLEAN NOT NULL, "
+            "bLogonSuccess     BOOLEAN NOT NULL, "
+            "bHungup           BOOLEAN NOT NULL, "
+            "iMsgRead          INTEGER NOT NULL, "
+            "iMsgPost          INTEGER NOT NULL, "
+            "iFilesUl          INTEGER NOT NULL, "
+            "iFilesDl          INTEGER NOT NULL, "
+            "iFilesUlMb        INTEGER NOT NULL, "
+            "iFilesDlMb        INTEGER NOT NULL, "
+            "iDoorsExec        INTEGER NOT NULL  "
+            "); ";
 
-    // Static Queries
-    std::string cmdFirstTimeSetup;
+        m_cmdCreateIndex = "";
+            "CREATE INDEX IF NOT EXISTS session_stats_idx "
+            "ON " + m_strTableName + " (iUserId); ";
 
-    std::string cmdSessionStatTableExists;
-    std::string cmdCreateSessionStatTable;
-    std::string cmdCreateSessionStatIndex;
-    std::string cmdDropSessionStatTable;
-    std::string cmdDropSessionStatIndex;
+        // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
+        m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
+        m_cmdDropIndex = "DROP INDEX IF EXISTS session_stats_idx; ";    
+        
+        // Setup the CallBack for Result Field Mapping
+        m_result_callback = std::bind(&SessionStatsDao::pullSessionStatsResult, this, 
+            std::placeholders::_1, std::placeholders::_2);
+            
+        m_columns_callback = std::bind(&SessionStatsDao::fillSessionStatsColumnValues, this, 
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+            
+        m_insert_callback = std::bind(&SessionStatsDao::insertSessionStatsQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
+        
+        m_update_callback = std::bind(&SessionStatsDao::updateSessionStatsQryString, this, 
+            std::placeholders::_1, std::placeholders::_2);
+    }
+
+    ~SessionStatsDao()
+    {
+    }
+
 
     /**
-     * @brief Check of the Database Exists.
+     * Base Dao Calls for generic Object Data Calls
+     * (Below This Point)
+     */
+ 
+ 
+    /**
+     * @brief Check If Database Table Exists.
      * @return
      */
-    bool isTableExists();
-
+    bool doesTableExist();
+    
     /**
-     * @brief Run Setup Params for SQL Database.
+     * @brief Run Setup Params for SQL Database Table.
      */
     bool firstTimeSetupParams();
 
     /**
-     * @brief Create Users Database
+     * @brief Create Database Table
      * @return
      */
     bool createTable();
 
     /**
-     * @brief Drop Users Database
+     * @brief Drop Database
      * @return
      */
     bool dropTable();
-
-    /**
-     * @brief Create Query String to Insert New Record
-     */
-    std::string insertSessionStatQryString(query_ptr qry, session_stats_ptr stats);
-
-    /**
-     * @brief Creates Query String to Update Existing User Record
-     */
-    std::string updateSessionStatQryString(query_ptr qry, session_stats_ptr stats);
-
+    
     /**
      * @brief Updates a Record in the database!
-     * @param user
+     * @param obj
      * @return
      */
-    bool updateSessionStatRecord(session_stats_ptr stats);
+    bool updateRecord(session_stats_ptr obj);
 
     /**
      * @brief Inserts a New Record in the database!
-     * @param user
+     * @param obj
      * @return
      */
-    long insertSessionStatRecord(session_stats_ptr stats);
-
+    long insertRecord(session_stats_ptr obj);
+        
     /**
-     * @brief Deletes an Existing Record
+     * @brief Deletes a MessageArea Record
+     * @param areaId
+     * @return
+     */
+    bool deleteRecord(long id);
+    
+    /**
+     * @brief Retrieve Record By Id.
      * @param id
+     * @return 
+     */ 
+    session_stats_ptr getRecordById(long id);
+    
+    /**
+     * @brief Retrieve All Records in a Table
      * @return
      */
-    bool deleteSessionStatRecord(long id);
-
+    std::vector<session_stats_ptr> getAllRecords();
+    
     /**
-     * @brief Helper To populate User Record with Query Results.
+     * @brief Retrieve Count of All Records in a Table
+     * @return
      */
-    void pullSessionStatResult(query_ptr qry, session_stats_ptr stats);
+    long getRecordsCount();
 
+    
+    /**
+     * Base Dao Call Back for Object Specific Data Mappings
+     * (Below This Point)
+     */
+     
 
     /**
-     * @brief This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
+     * @brief (Callback) Create Record Insert Statement, returns query string 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string insertSessionStatsQryString(std::string qry, session_stats_ptr obj);
+
+    /**
+     * @brief (CallBack) Update Existing Record. 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string updateSessionStatsQryString(std::string qry, session_stats_ptr obj);
+   
+    /**
+     * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+     * @param qry
+     * @param obj
+     */
+    void pullSessionStatsResult(query_ptr qry, session_stats_ptr obj);
+
+    /**
+     * @brief (Callback) for Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
+     * @param qry
+     * @param obj
      * @param values
-     */
-    void fillColumnValues(query_ptr qry, session_stats_ptr stats, std::vector< std::pair<std::string, std::string> > &values);
+     */ 
+    void fillSessionStatsColumnValues(query_ptr qry, session_stats_ptr obj, std::vector< std::pair<std::string, std::string> > &values);
+
 
     /**
-     * @brief Return Record By Id.
-     * @return
+     * One Off Methods SQL Queries not included in the BaseDao
+     * (Below This Point)
      */
-    session_stats_ptr getSessionStatById(long id);
-
+    
+    
     /**
      * @brief Return List of Stats per user
      * @return
