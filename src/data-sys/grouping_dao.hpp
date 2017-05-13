@@ -58,8 +58,7 @@ public:
             "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
             "iId               INTEGER PRIMARY KEY, "
             "iConferenceId     INTEGER NOT NULL, "
-            "iFileAreaId       INTEGER NOT NULL, "
-            "iMsgAreaId        INTEGER NOT NULL, "        
+            "iAreaId           INTEGER NOT NULL, "
             "FOREIGN KEY(iConferenceId) REFERENCES Conference(iId) ON DELETE CASCADE "
             "); ";
 
