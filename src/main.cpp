@@ -226,26 +226,26 @@ auto main() -> int
         SQLW::Database user_database(USERS_DATABASE);
 
         // Link to users dao for data access object
-        users_dao_ptr user_dao(new UsersDao(user_database));
+        UsersDao user_dao(user_database);
 
         // Link to security dao for data access object
-        security_dao_ptr security_dao(new SecurityDao(user_database));
+        SecurityDao security_dao(user_database);
 
         // Verify if the security table exists.
         // Security must be present before user becasue of foreign key.
-        if (!security_dao->doesTableExist())
+        if (!security_dao.doesTableExist())
         {
             std::cout << "doesn't exist (security table)." << std::endl;
 
             // Setup database Param, cache sies etc..
-            if (!security_dao->firstTimeSetupParams())
+            if (!security_dao.firstTimeSetupParams())
             {
                 std::cout << "unable to execute firstTimeSetupParams (security table)." << std::endl;
                 assert(false);
             }
 
             // Setup create users table and indexes.
-            if (!security_dao->createTable())
+            if (!security_dao.createTable())
             {
                 std::cout << "unable to create (security table)." << std::endl;
                 assert(false);
@@ -255,19 +255,19 @@ auto main() -> int
         }
 
         // Verify if the user table exists.
-        if (!user_dao->doesTableExist())
+        if (!user_dao.doesTableExist())
         {
             std::cout << "doesn't exist (user table)." << std::endl;
 
             // Setup database Param, cache sies etc..
-            if (!user_dao->firstTimeSetupParams())
+            if (!user_dao.firstTimeSetupParams())
             {
                 std::cout << "unable to execute firstTimeSetupParams (user table)." << std::endl;
                 assert(false);
             }
 
             // Setup create users table and indexes.
-            if (!user_dao->createTable())
+            if (!user_dao.createTable())
             {
                 std::cout << "unable to create (user table)." << std::endl;
                 assert(false);
@@ -277,21 +277,21 @@ auto main() -> int
         }
 
         // Check Table setup for Session Stats
-        session_stats_dao_ptr session_stat_dao(new SessionStatsDao(user_database));
+        SessionStatsDao session_stat_dao(user_database);
         // Verify if the user table exists.
-        if (!session_stat_dao->doesTableExist())
+        if (!session_stat_dao.doesTableExist())
         {
             std::cout << "doesn't exist (sessionstats table)." << std::endl;
 
             // Setup database Param, cache sies etc..
-            if (!session_stat_dao->firstTimeSetupParams())
+            if (!session_stat_dao.firstTimeSetupParams())
             {
                 std::cout << "unable to execute firstTimeSetupParams (sessionstats table)." << std::endl;
                 assert(false);
             }
 
             // Setup create users table and indexes.
-            if (!session_stat_dao->createTable())
+            if (!session_stat_dao.createTable())
             {
                 std::cout << "unable to create (sessionstats table)." << std::endl;
                 assert(false);
@@ -339,21 +339,21 @@ auto main() -> int
         }
         
         
-        oneliner_dao_ptr onedb(new OnelinerDao(user_database));
+        OnelinerDao onedb(user_database);
         
-        if (!onedb->doesTableExist())
+        if (!onedb.doesTableExist())
         {
             std::cout << "doesn't exist (oneliner table)." << std::endl;
 
             // Setup database Param, cache sies etc..
-            if (!onedb->firstTimeSetupParams())
+            if (!onedb.firstTimeSetupParams())
             {
                 std::cout << "unable to execute firstTimeSetupParams (oneliner table)." << std::endl;
                 assert(false);
             }
 
             // Setup create users table and indexes.
-            if (!onedb->createTable())
+            if (!onedb.createTable())
             {
                 std::cout << "unable to create (oneliner table)." << std::endl;
                 assert(false);
@@ -368,7 +368,7 @@ auto main() -> int
         one->sUserInitials = "MF";
         one->sUserName = "Mercyful Fate";
         //one->dtDatePosted
-        onedb->insertRecord(one);
+        onedb.insertRecord(one);
         
         
 /*

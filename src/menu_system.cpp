@@ -57,9 +57,9 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     m_menu_command_functions['V'] = std::bind(&MenuSystem::menuOptionsVotingCommands, this, std::placeholders::_1);
     m_menu_command_functions['+'] = std::bind(&MenuSystem::menuOptionsColorSettingCommands, this, std::placeholders::_1);
 
-
-    // Load the configuration file to the class
-    if (!m_config_dao->loadConfig())
+    // Load the configuration file into m_config
+    config_dao_ptr config_dao(new ConfigDao(m_config, GLOBAL_BBS_PATH));    
+    if (!config_dao->loadConfig())
     {
         std::cout << "Error: unable to load configuration file" << std::endl;
         assert(false);

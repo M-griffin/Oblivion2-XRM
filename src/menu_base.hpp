@@ -11,7 +11,7 @@
 #include "model-sys/config.hpp"
 #include "model-sys/menu.hpp"
 #include "model-sys/menu_prompt.hpp"
-#include "data-sys/config_dao.hpp"
+
 #include "data-sys/menu_dao.hpp"
 #include "data-sys/menu_prompt_dao.hpp"
 #include "mods/mod_base.hpp"
@@ -24,8 +24,8 @@
 class Config;
 typedef boost::shared_ptr<Config> config_ptr;
 
-class ConfigDao;
-typedef boost::shared_ptr<ConfigDao> config_dao_ptr;
+//class ConfigDao;
+//typedef boost::shared_ptr<ConfigDao> config_dao_ptr;
 
 class SessionData;
 typedef boost::shared_ptr<SessionData> session_data_ptr;
@@ -63,7 +63,7 @@ public:
     SessionIO        m_session_io;         // SessionIO for Output parsing and MCI Codes etc.
     CommonIO         m_common_io;          // CommonIO
     config_ptr       m_config;             // Config
-    config_dao_ptr   m_config_dao;         // Config Data Access Object
+    //config_dao_ptr   m_config_dao;         // Config Data Access Object
     std::string      m_line_buffer;        // Buffer used for menu system and reading field data.
     bool             m_use_hotkey;         // Toggle for Single Hotkey or GetLine input. - Not used yet!
     std::string      m_current_menu;       // Name of current menu loaded.

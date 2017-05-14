@@ -26,8 +26,7 @@
 MenuBase::MenuBase(session_data_ptr session_data)
     : m_menu_session_data(session_data)
     , m_session_io(session_data)
-    , m_config(new Config())
-    , m_config_dao(new ConfigDao(m_config, GLOBAL_BBS_PATH))
+    , m_config(new Config())    
     , m_line_buffer("")
     , m_use_hotkey(false)
     , m_current_menu("")
@@ -45,7 +44,7 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_pulldown_reentrace_flag(false)
     , m_use_first_command_execution(true)
 {
-    std::cout << "MenuBase" << std::endl;
+    std::cout << "MenuBase" << std::endl;       
 }
 
 MenuBase::~MenuBase()

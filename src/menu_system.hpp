@@ -19,9 +19,6 @@
 class Config;
 typedef boost::shared_ptr<Config> config_ptr;
 
-class ConfigDao;
-typedef boost::shared_ptr<ConfigDao> config_dao_ptr;
-
 class ModBase;
 typedef boost::shared_ptr<ModBase> module_ptr;
 
