@@ -111,7 +111,6 @@ bool ProtocolDao::saveConfig(protocols_ptr prot)
 
     ofs << out.c_str();
     ofs.close();
-
     return true;
 }
 
