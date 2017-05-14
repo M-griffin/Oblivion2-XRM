@@ -505,16 +505,16 @@ private:
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
-    SessionIO            m_session_io;
-    menu_base_ptr        m_menu_base;    
-    std::string          m_filename;
-    text_prompts_dao_ptr m_text_prompts_dao;
-    user_ptr             m_user_record;
-    security_ptr         m_security_record;
+    SessionIO              m_session_io;
+    menu_base_ptr          m_menu_base;    
+    std::string            m_filename;
+    text_prompts_dao_ptr   m_text_prompts_dao;
+    user_ptr               m_user_record;
+    security_ptr           m_security_record;
 
-    int                  m_mod_function_index;
-    bool                 m_is_text_prompt_exist;
-    int                  m_newuser_password_attempts;
+    int                    m_mod_function_index;
+    bool                   m_is_text_prompt_exist;
+    int                    m_newuser_password_attempts;
 
 };
 

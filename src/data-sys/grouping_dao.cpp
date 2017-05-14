@@ -151,7 +151,7 @@ std::string GroupingDao::insertGroupingQryString(std::string qry, group_ptr obj)
     // Mprint statement to avoid injections.
     std::string result = sqlite3_mprintf(qry.c_str(),
         obj->iConferenceId,
-        obj->iAreaId,
+        obj->iAreaId
     );
 
     return result;
@@ -174,7 +174,6 @@ std::string GroupingDao::updateGroupingQryString(std::string qry, group_ptr obj)
 
     return result;
 }
-
 
 /**
  * One Off Methods SQL Queries not included in the BaseDao

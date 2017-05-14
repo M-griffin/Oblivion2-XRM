@@ -3,6 +3,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include <boost/smart_ptr/shared_ptr.hpp>
+
 #include <string>
 #include <vector>
 
