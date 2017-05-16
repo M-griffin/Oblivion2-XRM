@@ -3,10 +3,8 @@
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
-#include <yaml-cpp/yaml.h>
-
 #include <string>
-#include <vector>
+#include <cstdint>
 
 
 /**
