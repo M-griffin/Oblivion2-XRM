@@ -139,7 +139,6 @@ bool TextPromptsDao::readPrompts()
     return m_is_loaded;
 }
 
-
 /**
  * @brief Retrieves Desc, Text Pair of Text Prompt from yaml file.
  * @param lookup

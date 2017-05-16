@@ -91,6 +91,10 @@
       <File Name="../src/data-sys/protocol_dao.hpp"/>
       <File Name="../src/data-sys/protocol_dao.cpp"/>
       <File Name="../src/data-sys/base_dao.hpp"/>
+      <File Name="../src/data-sys/access_level_dao.hpp"/>
+      <File Name="../src/data-sys/access_level_dao.cpp"/>
+      <File Name="../src/data-sys/menu_stats_dao.hpp"/>
+      <File Name="../src/data-sys/menu_stats_dao.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="model-sys">
       <File Name="../src/model-sys/config.hpp"/>
@@ -107,6 +111,8 @@
       <File Name="../src/model-sys/network.hpp"/>
       <File Name="../src/model-sys/grouping.hpp"/>
       <File Name="../src/model-sys/protocol.hpp"/>
+      <File Name="../src/model-sys/access_level.hpp"/>
+      <File Name="../src/model-sys/menu_stats.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
       <File Name="../src/mods/mod_base.hpp"/>
