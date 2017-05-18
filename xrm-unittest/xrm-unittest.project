@@ -73,6 +73,8 @@
     <File Name="../src/data-sys/file_area_dao.hpp"/>
     <File Name="../src/data-sys/message_area_dao.cpp"/>
     <File Name="../src/data-sys/message_area_dao.hpp"/>
+    <File Name="../src/data-sys/db_startup.hpp"/>
+    <File Name="../src/data-sys/db_startup.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="forms">
     <File Name="../src/forms/form_base.hpp"/>

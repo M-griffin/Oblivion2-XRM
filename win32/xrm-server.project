@@ -95,6 +95,8 @@
       <File Name="../src/data-sys/access_level_dao.cpp"/>
       <File Name="../src/data-sys/menu_stats_dao.hpp"/>
       <File Name="../src/data-sys/menu_stats_dao.cpp"/>
+      <File Name="../src/data-sys/db_startup.cpp"/>
+      <File Name="../src/data-sys/db_startup.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="model-sys">
       <File Name="../src/model-sys/config.hpp"/>

@@ -22,15 +22,17 @@
 
 #include "data-sys/text_prompts_dao.hpp"
 
-#include "model-sys/protocol.hpp"
-#include "data-sys/protocol_dao.hpp"
-
 #include "model-sys/config.hpp"
 #include "data-sys/config_dao.hpp"
 
 #include "model-app/oneliners.hpp"
 #include "data-app/oneliners_dao.hpp"
 #include "data-sys/base_dao.hpp"
+#include "model-sys/protocol.hpp"
+#include "data-sys/protocol_dao.hpp"
+
+// This will handle database init and replace all other dao's.
+#include "data-sys/db_startup.hpp"
 
 #include "server.hpp"
 #include "server_ssl.hpp"
