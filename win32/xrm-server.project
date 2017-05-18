@@ -122,6 +122,8 @@
       <File Name="../src/mods/mod_prelogon.hpp"/>
       <File Name="../src/mods/mod_signup.cpp"/>
       <File Name="../src/mods/mod_signup.hpp"/>
+      <File Name="../src/mods/mod_sys_config.hpp"/>
+      <File Name="../src/mods/mod_sys_config.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="forms">
       <File Name="../src/forms/form_system_config.hpp"/>

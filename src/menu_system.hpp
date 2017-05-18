@@ -198,11 +198,6 @@ public:
     void resetMenuInputIndex(int index);
 
     /**
-     * @brief Starts up Form Manager Module.
-     */
-    void startupFormManager();
-
-    /**
      * @brief Startup External (Door / Script Process)
      * @param cmdline
      */
@@ -267,12 +262,6 @@ public:
      */
     void moduleInput(const std::string &character_buffer, const bool &is_utf8);
     
-    /**
-     * @brief Handles parsing input for forms
-     *
-     */
-    void formInput(const std::string &character_buffer, const bool &is_utf8);
-
 };
 
 #endif // MENU_SYSTEM_HPP
