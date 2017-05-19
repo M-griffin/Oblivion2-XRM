@@ -1,6 +1,7 @@
 #ifndef DB_STARTUP_HPP
 #define DB_STARTUP_HPP
 
+
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 /**
@@ -15,6 +16,11 @@ class DbStartup
 public:
     DbStartup();
     ~DbStartup();
+
+    /**
+     * @brief Setup for Database and Tables
+     */
+    void initDatabaseTables();
 
 };
 
