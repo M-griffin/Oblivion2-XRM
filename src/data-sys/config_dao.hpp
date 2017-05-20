@@ -1,6 +1,7 @@
 #ifndef DAO_CONFIG_HPP
 #define DAO_CONFIG_HPP
 
+#include <boost/smart_ptr/scoped_ptr.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <string>
@@ -75,6 +76,6 @@ public:
 
 };
 
-typedef boost::shared_ptr<ConfigDao> config_dao_ptr;
+typedef boost::scoped_ptr<ConfigDao> config_dao_sptr;
 
 #endif // DAO_CONFIG_HPP

@@ -88,7 +88,7 @@ public:
      * @brief Pulls Generate Menu Options from Form
      * @param option
      */
-    menu_ptr loadFormOption();
+    menu_ptr retrieveFormOptions(int page);
     
     
 

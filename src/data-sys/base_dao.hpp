@@ -11,7 +11,6 @@
 #include <vector>
 
 
-
 // Handle to Database Queries
 typedef boost::shared_ptr<SQLW::Query> query_ptr;
 

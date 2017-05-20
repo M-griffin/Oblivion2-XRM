@@ -5,8 +5,6 @@
 #include "libSqliteWrapped.h"
 #include <sqlite3.h>
 
-#include <boost/make_shared.hpp>
-
 #include <iostream>
 #include <string>
 
@@ -144,7 +142,6 @@ void SessionStatsDao::pullSessionStatsResult(query_ptr qry, session_stats_ptr ob
     qry->getFieldByName("iFilesDl", obj->iFilesDl);
     qry->getFieldByName("iFilesUlMb", obj->iFilesUlMb);
     qry->getFieldByName("iFilesDlMb", obj->iFilesDlMb);
-    qry->getFieldByName("iDoorsExec", obj->iDoorsExec);
 }
 
 /**
@@ -175,7 +172,6 @@ void SessionStatsDao::fillSessionStatsColumnValues(query_ptr qry, session_stats_
     values.push_back(qry->translateFieldName("iFilesDl", obj->iFilesDl));
     values.push_back(qry->translateFieldName("iFilesUlMb", obj->iFilesUlMb));
     values.push_back(qry->translateFieldName("iFilesDlMb", obj->iFilesDlMb));
-    values.push_back(qry->translateFieldName("iDoorsExec", obj->iDoorsExec));
 }
 
 /**
@@ -206,8 +202,7 @@ std::string SessionStatsDao::insertSessionStatsQryString(std::string qry, sessio
         obj->iFilesUl,
         obj->iFilesDl,
         obj->iFilesUlMb,
-        obj->iFilesDlMb,
-        obj->iDoorsExec    
+        obj->iFilesDlMb
     );
 
     return result;
@@ -242,7 +237,6 @@ std::string SessionStatsDao::updateSessionStatsQryString(std::string qry, sessio
         obj->iFilesDl,
         obj->iFilesUlMb,
         obj->iFilesDlMb,
-        obj->iDoorsExec,
         obj->iId
     );
 
@@ -353,6 +347,62 @@ std::vector<session_stats_ptr> SessionStatsDao::getLast10CallerStats()
         else
         {
             std::cout << "Error, getLast10CallerStats Returned Rows: " << rows << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << "Error, getResult()" << std::endl;
+    }
+
+    return list;
+}
+
+/**
+ * @brief Return List of All Connections Today
+ * @return
+ */
+std::vector<session_stats_ptr> SessionStatsDao::getTodaysCallerStats()
+{
+    session_stats_ptr stat(new SessionStats);
+    std::vector<session_stats_ptr> list;
+
+    // Make Sure Database Reference is Connected
+    if (!m_database.isConnected())
+    {
+        std::cout << "Error, Database is not connected!" << std::endl;
+        return list;
+    }
+
+    // Create Pointer and Connect Query Object to Database.
+    query_ptr qry(new SQLW::Query(m_database));
+    if (!qry->isConnected())
+    {
+        std::cout << "Error, Query has no connection to the database" << std::endl;
+        return list;
+    }
+
+    // Build Query String
+    std::string queryString = sqlite3_mprintf(
+        "SELECT * FROM %Q "
+        "WHERE datetime(dtStartDate, 'unixepoch', 'localtime') >= datetime('now','start of day') "
+        "ORDER BY iID DESC;", m_strTableName.c_str());
+
+    // Execute Query.
+    if (qry->getResult(queryString))
+    {
+        long rows = qry->getNumRows();
+        if (rows > 0)
+        {
+            while(qry->fetchRow())
+            {
+                stat.reset(new SessionStats);
+                pullSessionStatsResult(qry, stat);
+                list.push_back(stat);
+            }
+        }
+        else
+        {
+            std::cout << "Error, getTodaysCallerStats Returned Rows: " << rows << std::endl;
         }
     }
     else
