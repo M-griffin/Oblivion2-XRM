@@ -11,6 +11,8 @@
 #include <vector>
 #include <functional>
 
+
+class MenuOption;
 class MenuBase;
 typedef boost::shared_ptr<MenuBase> menu_base_ptr;
 
@@ -46,24 +48,21 @@ public:
     virtual bool onExit();
     
     /**
+     * @brief Process Command Keys passed from menu selection (Callback)
+     * @param option
+     */
+    bool menuOptionsCallback(const MenuOption &option);
+
+    /**
      * @brief Starts up Form Manager Module.
      */
     void startupFormManager();
     
-    
-    /**
-     * @brief Handles parsing input for forms
-     */
-    void formInput(const std::string &character_buffer, const bool &is_utf8);
-        
+    int                m_current_page;
     menu_base_ptr      m_menu;
-    form_manager_ptr   m_form_manager;
+    form_manager_ptr   m_form_manager;    
     SessionIO          m_session_io;
-    
-    // Function Input Vector.
-    std::vector<std::function< void()> >                    m_setup_functions;
-    std::vector<std::function< void(const std::string &)> > m_mod_functions;    
-    
+        
 };
 
 #endif // MOD_SYS_CONFIG_HPP

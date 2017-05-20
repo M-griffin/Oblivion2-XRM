@@ -196,6 +196,11 @@ public:
      * @brief Load the Menu into the system container.
      */
     void loadInMenu(std::string menu_name);
+    
+    /**
+     * @brief Import the Menu from Modules into the system container.
+     */
+    void importMenu(menu_ptr menu_info);
 
     /**
      * @brief Build string of lightbar matrices

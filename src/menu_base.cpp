@@ -195,6 +195,20 @@ void MenuBase::loadInMenu(std::string menu_name)
 }
 
 /**
+ * @brief Import the Menu from Modules into the system container.
+ */
+void MenuBase::importMenu(menu_ptr menu_info)
+{    
+    clearMenuPullDownOptions();    
+    m_menu_info = menu_info;
+    m_current_menu = m_menu_info->menu_name;
+
+    // Remove Options the users might not have access to
+    // ie Sysop Commands inside of forms.
+    checkMenuOptionsAcsAccess();
+}
+
+/**
  * @brief Processes a TOP Template Screen for Menus
  * @param screen
  * @return
