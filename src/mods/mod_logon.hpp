@@ -248,16 +248,16 @@ private:
 
 
 
-    SessionIO            m_session_io;
-    std::string          m_filename;
-    text_prompts_dao_ptr m_text_prompts_dao;
+    SessionIO              m_session_io;
+    std::string            m_filename;
+    text_prompts_dao_ptr   m_text_prompts_dao;
 
-    int                  m_mod_function_index;
-    int                  m_failure_attempts;
-    bool                 m_is_text_prompt_exist;
+    int                    m_mod_function_index;
+    int                    m_failure_attempts;
+    bool                   m_is_text_prompt_exist;
 
     // Hold instatnce of user trying to login to the system.
-    user_ptr             m_logon_user;
+    user_ptr               m_logon_user;
 };
 
 #endif // MOD_LOGON_HPP

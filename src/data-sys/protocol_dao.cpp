@@ -2,7 +2,6 @@
 #include "../model-sys/protocol.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/make_shared.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -112,7 +111,6 @@ bool ProtocolDao::saveConfig(protocols_ptr prot)
 
     ofs << out.c_str();
     ofs.close();
-
     return true;
 }
 

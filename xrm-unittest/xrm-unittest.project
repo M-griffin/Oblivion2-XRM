@@ -31,7 +31,6 @@
   <VirtualDirectory Name="src">
     <File Name="main.cpp"/>
     <File Name="../src/common_io.hpp"/>
-    <File Name="../src/struct.hpp"/>
     <File Name="../src/common_io.cpp"/>
     <File Name="common_io_ut.cpp"/>
     <File Name="session_io_ut.cpp"/>
@@ -74,6 +73,8 @@
     <File Name="../src/data-sys/file_area_dao.hpp"/>
     <File Name="../src/data-sys/message_area_dao.cpp"/>
     <File Name="../src/data-sys/message_area_dao.hpp"/>
+    <File Name="../src/data-sys/db_startup.hpp"/>
+    <File Name="../src/data-sys/db_startup.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="forms">
     <File Name="../src/forms/form_base.hpp"/>

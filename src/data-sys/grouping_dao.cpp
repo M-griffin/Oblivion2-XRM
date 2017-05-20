@@ -4,8 +4,6 @@
 #include "libSqliteWrapped.h"
 #include <sqlite3.h>
 
-#include <boost/make_shared.hpp>
-
 #include <iostream>
 #include <string>
 
@@ -125,8 +123,7 @@ void GroupingDao::pullGroupingResult(query_ptr qry, group_ptr obj)
 {
     qry->getFieldByName("iId", obj->iId);
     qry->getFieldByName("iConferenceId", obj->iConferenceId);
-    qry->getFieldByName("iFileAreaId", obj->iFileAreaId);
-    qry->getFieldByName("iMsgAreaId", obj->iMsgAreaId); 
+    qry->getFieldByName("iAreaId", obj->iAreaId);
 }
 
 /**
@@ -140,8 +137,7 @@ void GroupingDao::fillGroupingColumnValues(query_ptr qry, group_ptr obj,
 {
     // values.push_back(qry->translateFieldName("iId", obj->iId));
     values.push_back(qry->translateFieldName("iConferenceId", obj->iConferenceId));
-    values.push_back(qry->translateFieldName("iFileAreaId", obj->iFileAreaId));
-    values.push_back(qry->translateFieldName("iMsgAreaId", obj->iMsgAreaId));   
+    values.push_back(qry->translateFieldName("iAreaId", obj->iAreaId));
 }
 
 /**
@@ -155,8 +151,7 @@ std::string GroupingDao::insertGroupingQryString(std::string qry, group_ptr obj)
     // Mprint statement to avoid injections.
     std::string result = sqlite3_mprintf(qry.c_str(),
         obj->iConferenceId,
-        obj->iFileAreaId,
-        obj->iMsgAreaId
+        obj->iAreaId
     );
 
     return result;
@@ -173,14 +168,12 @@ std::string GroupingDao::updateGroupingQryString(std::string qry, group_ptr obj)
     // Mprint statement to avoid injections.
     std::string result = sqlite3_mprintf(qry.c_str(),
         obj->iConferenceId,
-        obj->iFileAreaId,
-        obj->iMsgAreaId,
+        obj->iAreaId,
         obj->iId
     );
 
     return result;
 }
-
 
 /**
  * One Off Methods SQL Queries not included in the BaseDao

@@ -43,7 +43,6 @@ public:
     long iFilesDl;
     long iFilesUlMb;
     long iFilesDlMb;
-    long iDoorsExec;
 
     SessionStats()
         : iId(-1)
@@ -66,7 +65,6 @@ public:
         , iFilesDl(0)
         , iFilesUlMb(0)
         , iFilesDlMb(0)
-        , iDoorsExec(0)
     { }
         
     ~SessionStats()

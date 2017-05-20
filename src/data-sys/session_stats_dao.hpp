@@ -67,8 +67,7 @@ public:
             "iFilesUl          INTEGER NOT NULL, "
             "iFilesDl          INTEGER NOT NULL, "
             "iFilesUlMb        INTEGER NOT NULL, "
-            "iFilesDlMb        INTEGER NOT NULL, "
-            "iDoorsExec        INTEGER NOT NULL  "
+            "iFilesDlMb        INTEGER NOT NULL "
             "); ";
 
         m_cmdCreateIndex = "";
@@ -223,6 +222,12 @@ public:
      * @return
      */
     std::vector<session_stats_ptr> getLast10CallerStats();
+    
+    /**
+     * @brief Return List of All Connections Today
+     * @return
+     */
+    std::vector<session_stats_ptr> getTodaysCallerStats();
 
 };
 

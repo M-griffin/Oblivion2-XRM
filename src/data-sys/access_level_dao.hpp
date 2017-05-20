@@ -1,7 +1,7 @@
-#ifndef GROUPING_DAO_HPP
-#define GROUPING_DAO_HPP
+#ifndef ACCESS_LEVEL_DAO_HPP
+#define ACCESS_LEVEL_DAO_HPP
 
-#include "../model-sys/grouping.hpp"
+#include "../model-sys/access_level.hpp"
 #include "../data-sys/base_dao.hpp"
 #include <boost/smart_ptr/shared_ptr.hpp>
 
@@ -19,26 +19,24 @@ class Query;
 typedef boost::shared_ptr<SQLW::Query> query_ptr;
 
 // Base Dao Definition
-typedef BaseDao<Grouping> baseGroupingClass;
-
+typedef BaseDao<AccessLevel> baseAccessLevelClass;
 
 /**
- * @class GroupingDao
+ * @class AccessLevelDao
  * @author Michael Griffin
- * @date 04/05/2017
- * @file grouping_dao.hpp
- * @brief Data Access Objects for Conference Grouping
+ * @date 14/05/2017
+ * @file access_level_dao.hpp
+ * @brief Data Access Objects for Access Levels
  */
-class GroupingDao
-    : public baseGroupingClass
+class AccessLevelDao
+    : public baseAccessLevelClass
 {
 public:
-
-    GroupingDao(SQLW::Database &database)
-        : baseGroupingClass(database)
+    AccessLevelDao(SQLW::Database &database)
+        : baseAccessLevelClass(database)
     {
         // Setup Table name
-        m_strTableName = "grouping";
+        m_strTableName = "accesslevel";
 
         /**
          * Pre Popluate Static Queries one Time
@@ -53,48 +51,55 @@ public:
         // Check if Database Exists.
         m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
 
-        // Create Table Query (SQLite Only for the moment)
+        // Create Users Table Query (SQLite Only for the moment)
         m_cmdCreateTable =
             "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
             "iId               INTEGER PRIMARY KEY, "
-            "iConferenceId     INTEGER NOT NULL, "
-            "iAreaId           INTEGER NOT NULL, "
-            "FOREIGN KEY(iConferenceId) REFERENCES Conference(iId) ON DELETE CASCADE "
+            "sName             TEXT NOT NULL COLLATE NOCASE, "
+            "sStartMenu        TEXT NOT NULL COLLATE NOCASE, "
+            "ilevel            INTEGER NOT NULL, "
+            "iFileLevel        INTEGER NOT NULL, "
+            "iMessageLevel     INTEGER NOT NULL, "
+            "iPostCallRatio    INTEGER NOT NULL, "
+            "iFileRatio        INTEGER NOT NULL, "
+            "iTimeLimit        INTEGER NOT NULL, "
+            "iCallLimit        INTEGER NOT NULL, "
+            "iDownloads        INTEGER NOT NULL, "
+            "iDownloadMB       INTEGER NOT NULL, "
+            "iARFlags1         INTEGER NOT NULL, "
+            "iARFlags2         INTEGER NOT NULL "            
             "); ";
-
-        m_cmdCreateIndex = "";
-            "CREATE INDEX IF NOT EXISTS grouping_idx "
-            "ON " + m_strTableName + " (iConferenceId); ";
+        
 
         // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
         m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
-        m_cmdDropIndex = "DROP INDEX IF EXISTS grouping_idx; ";
+        
         
         // Setup the CallBack for Result Field Mapping
-        m_result_callback = std::bind(&GroupingDao::pullGroupingResult, this, 
+        m_result_callback = std::bind(&AccessLevelDao::pullAccessLevelResult, this, 
             std::placeholders::_1, std::placeholders::_2);
             
-        m_columns_callback = std::bind(&GroupingDao::fillGroupingColumnValues, this, 
+        m_columns_callback = std::bind(&AccessLevelDao::fillAccessLevelColumnValues, this, 
             std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
             
-        m_insert_callback = std::bind(&GroupingDao::insertGroupingQryString, this, 
+        m_insert_callback = std::bind(&AccessLevelDao::insertAccessLevelQryString, this, 
             std::placeholders::_1, std::placeholders::_2);
         
-        m_update_callback = std::bind(&GroupingDao::updateGroupingQryString, this, 
+        m_update_callback = std::bind(&AccessLevelDao::updateAccessLevelQryString, this, 
             std::placeholders::_1, std::placeholders::_2);
     }
 
-    ~GroupingDao()
-    { 
+    ~AccessLevelDao()
+    {
     }
-    
+
     
     /**
      * Base Dao Calls for generic Object Data Calls
      * (Below This Point)
      */
-    
-
+ 
+ 
     /**
      * @brief Check If Database Table Exists.
      * @return
@@ -123,14 +128,14 @@ public:
      * @param obj
      * @return
      */
-    bool updateRecord(group_ptr obj);
+    bool updateRecord(access_level_ptr obj);
 
     /**
      * @brief Inserts a New Record in the database!
      * @param obj
      * @return
      */
-    long insertRecord(group_ptr obj);
+    long insertRecord(access_level_ptr obj);
         
     /**
      * @brief Deletes a MessageArea Record
@@ -144,13 +149,13 @@ public:
      * @param id
      * @return 
      */ 
-    group_ptr getRecordById(long id);
+    access_level_ptr getRecordById(long id);
     
     /**
      * @brief Retrieve All Records in a Table
      * @return
      */
-    std::vector<group_ptr> getAllRecords();
+    std::vector<access_level_ptr> getAllRecords();
     
     /**
      * @brief Retrieve Count of All Records in a Table
@@ -163,47 +168,49 @@ public:
      * Base Dao Call Back for Object Specific Data Mappings
      * (Below This Point)
      */
+     
+     
+    /**
+     * @brief (Callback) Create Record Insert Statement, returns query string 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string insertAccessLevelQryString(std::string qry, access_level_ptr obj);
+
+    /**
+     * @brief (CallBack) Update Existing Record. 
+     * @param qry
+     * @param obj
+     * @return 
+     */
+    std::string updateAccessLevelQryString(std::string qry, access_level_ptr obj);
     
- 
     /**
-     * @brief Create Query String to Insert New Conference Record
+     * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+     * @param qry
+     * @param obj
      */
-    std::string insertGroupingQryString(std::string qry, group_ptr obj);
+    void pullAccessLevelResult(query_ptr qry, access_level_ptr obj);
 
     /**
-     * @brief Creates Query String to Update Existing Conference Record
-     */
-    std::string updateGroupingQryString(std::string qry, group_ptr obj);
-   
-    /**
-     * @brief Helper To populate Conference Record with Query Results.
-     */
-    void pullGroupingResult(query_ptr qry, group_ptr obj);
-
-    /**
-     * @brief This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
+     * @brief (Callback) for Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
+     * @param qry
+     * @param obj
      * @param values
-     */
-    void fillGroupingColumnValues(query_ptr qry, group_ptr obj, 
-        std::vector< std::pair<std::string, std::string> > &values);
+     */ 
+    void fillAccessLevelColumnValues(query_ptr qry, access_level_ptr obj, std::vector< std::pair<std::string, std::string> > &values);
 
 
     /**
      * One Off Methods SQL Queries not included in the BaseDao
      * (Below This Point)
      */
-    
-   
-    /**
-     * @brief Return List of All Groupings by ConferenceId
-     * @param confId
-     * @return
-     */ 
-    std::vector<group_ptr> getAllGroupingsByConferenceId(long confId);
-    
+     
+
 };
 
 // Handle to Database Queries
-typedef boost::shared_ptr<GroupingDao> group_dao_ptr;
+typedef boost::shared_ptr<AccessLevelDao> access_level_dao_ptr;
 
-#endif // GROUPING_DAO_HPP
+#endif // ACCESS_LEVEL_DAO_HPP

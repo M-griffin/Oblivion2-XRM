@@ -6,7 +6,12 @@
 #include <string>
 
 FormSystemConfig::FormSystemConfig(config_ptr config)
-    : FormBase(config, "System Configuration", "form_config")
+    : FormBase(
+        config, 
+        "sysconfig",              // name
+        "System Configuration",   // title
+        "form_config"             // pulldown
+    )
 {
 }
 

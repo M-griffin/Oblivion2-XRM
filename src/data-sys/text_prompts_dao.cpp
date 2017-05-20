@@ -35,7 +35,6 @@ void TextPromptsDao::pathSeperator(std::string &value)
 #endif
 }
 
-
 /**
  * @brief Check if the file exists and we need to create a new one.
  * @return
@@ -54,7 +53,6 @@ bool TextPromptsDao::fileExists()
     ifs.close();
     return true;
 }
-
 
 /**
  * @brief Takes mapping of M_TextPrompt and writes out Key, (Value, Value).
@@ -140,7 +138,6 @@ bool TextPromptsDao::readPrompts()
     }
     return m_is_loaded;
 }
-
 
 /**
  * @brief Retrieves Desc, Text Pair of Text Prompt from yaml file.

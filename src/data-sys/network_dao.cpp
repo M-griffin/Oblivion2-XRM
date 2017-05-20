@@ -5,10 +5,9 @@
 #include "libSqliteWrapped.h"
 #include <sqlite3.h>
 
-#include <boost/make_shared.hpp>
-
 #include <iostream>
 #include <string>
+
 
 /**
  * Base Dao Calls for generic Object Data Calls

@@ -22,27 +22,17 @@
 
 #include "data-sys/text_prompts_dao.hpp"
 
-#include "model-sys/protocol.hpp"
-#include "data-sys/protocol_dao.hpp"
-
 #include "model-sys/config.hpp"
 #include "data-sys/config_dao.hpp"
 
-#include "model-app/oneliners.hpp"
-#include "data-app/oneliners_dao.hpp"
-#include "data-sys/base_dao.hpp"
+
+// This will handle database init and replace all other dao's.
+#include "data-sys/db_startup.hpp"
 
 #include "server.hpp"
 #include "server_ssl.hpp"
 #include "communicator.hpp"
 #include "common_io.hpp"
-
-// Needed for Initializing and checking users data is setup
-// On startup.
-#include "data-sys/session_stats_dao.hpp"
-#include "data-sys/security_dao.hpp"
-#include "data-sys/users_dao.hpp"
-#include "libSqliteWrapped.h"
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
@@ -208,99 +198,8 @@ auto main() -> int
     GLOBAL_TEXTFILE_PATH = GLOBAL_BBS_PATH + "TEXTFILE";
     GLOBAL_SCRIPT_PATH = GLOBAL_BBS_PATH + "SCRIPTS";
 
-
-    // Setup Users Database name and path
-    USERS_DATABASE = GLOBAL_DATA_PATH;
-
-#ifdef _WIN32
-    USERS_DATABASE.append("\\");
-#else
-    USERS_DATABASE.append("/");
-#endif
-
-    USERS_DATABASE.append("xrm_users.sqlite3");
-
-    // Setup isolated scope for smart pointers and clean up.
+    // Loading and saving default Configuration file to XML
     {
-        // Check and Setup users database if tables are not setup
-        SQLW::Database user_database(USERS_DATABASE);
-
-        // Link to users dao for data access object
-        users_dao_ptr user_dao(new UsersDao(user_database));
-
-        // Link to security dao for data access object
-        security_dao_ptr security_dao(new SecurityDao(user_database));
-
-        // Verify if the security table exists.
-        // Security must be present before user becasue of foreign key.
-        if (!security_dao->doesTableExist())
-        {
-            std::cout << "doesn't exist (security table)." << std::endl;
-
-            // Setup database Param, cache sies etc..
-            if (!security_dao->firstTimeSetupParams())
-            {
-                std::cout << "unable to execute firstTimeSetupParams (security table)." << std::endl;
-                assert(false);
-            }
-
-            // Setup create users table and indexes.
-            if (!security_dao->createTable())
-            {
-                std::cout << "unable to create (security table)." << std::endl;
-                assert(false);
-            }
-
-            std::cout << "security table created successfully." << std::endl;
-        }
-
-        // Verify if the user table exists.
-        if (!user_dao->doesTableExist())
-        {
-            std::cout << "doesn't exist (user table)." << std::endl;
-
-            // Setup database Param, cache sies etc..
-            if (!user_dao->firstTimeSetupParams())
-            {
-                std::cout << "unable to execute firstTimeSetupParams (user table)." << std::endl;
-                assert(false);
-            }
-
-            // Setup create users table and indexes.
-            if (!user_dao->createTable())
-            {
-                std::cout << "unable to create (user table)." << std::endl;
-                assert(false);
-            }
-
-            std::cout << "user table created successfully." << std::endl;
-        }
-
-        // Check Table setup for Session Stats
-        session_stats_dao_ptr session_stat_dao(new SessionStatsDao(user_database));
-        // Verify if the user table exists.
-        if (!session_stat_dao->doesTableExist())
-        {
-            std::cout << "doesn't exist (sessionstats table)." << std::endl;
-
-            // Setup database Param, cache sies etc..
-            if (!session_stat_dao->firstTimeSetupParams())
-            {
-                std::cout << "unable to execute firstTimeSetupParams (sessionstats table)." << std::endl;
-                assert(false);
-            }
-
-            // Setup create users table and indexes.
-            if (!session_stat_dao->createTable())
-            {
-                std::cout << "unable to create (sessionstats table)." << std::endl;
-                assert(false);
-            }
-
-            std::cout << "sessionstats table created successfully." << std::endl;
-        }
-
-        // NEW Loading and saving default Configuration file to XML
         config_ptr config(new Config());
         if (!config)
         {
@@ -325,72 +224,14 @@ auto main() -> int
         {
             return 0;
         }
-
-        protocols_ptr prots(new Protocols());
-        ProtocolDao protdb(prots, GLOBAL_DATA_PATH);
-
-        if (!protdb.fileExists())
-        {
-            // Create Genric Protocol Entry to Test File Creation
-            Protocol p1("Sexyz", "D", "Z", "C:\\TESTPATH\\", "--Test", false, false);
-
-            prots->protocols.push_back(p1);
-            protdb.saveConfig(prots);
-        }
-        
-        
-        oneliner_dao_ptr onedb(new OnelinerDao(user_database));
-        
-        if (!onedb->doesTableExist())
-        {
-            std::cout << "doesn't exist (oneliner table)." << std::endl;
-
-            // Setup database Param, cache sies etc..
-            if (!onedb->firstTimeSetupParams())
-            {
-                std::cout << "unable to execute firstTimeSetupParams (oneliner table)." << std::endl;
-                assert(false);
-            }
-
-            // Setup create users table and indexes.
-            if (!onedb->createTable())
-            {
-                std::cout << "unable to create (oneliner table)." << std::endl;
-                assert(false);
-            }
-
-            std::cout << "oneliner table created successfully." << std::endl;
-        }
-
-        oneliner_ptr one(new Oneliners());
-        one->iUserId = 1;
-        one->sText = "Testing";
-        one->sUserInitials = "MF";
-        one->sUserName = "Mercyful Fate";
-        //one->dtDatePosted
-        onedb->insertRecord(one);
-        
-        
-/*
-        // Check and Setup default Access Levels.
-        access_level_ptr levels(new AccessLevels());
-        AccessLevelDao acl(levels, GLOBAL_DATA_PATH);
-
-        if (!acl.fileExists())
-        {
-            // Create Genric levels for First Time Startup
-            Level al1(10,  "unauthorized");
-            Level al2(20,  "validated");
-            Level al3(255, "sysop");
-
-            levels->access_levels.push_back(al1);
-            levels->access_levels.push_back(al2);
-            levels->access_levels.push_back(al3);
-
-            acl.saveConfig(levels);
-        }
-        */
     }
+
+    // Database Startup in it's own context.
+    {
+        db_startup_ptr db(new DbStartup());
+        db->initDatabaseTables();
+    }
+    
 
     // Start System Services and Main Loop.
     boost::asio::io_service io_service;

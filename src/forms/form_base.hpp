@@ -35,8 +35,9 @@ public:
     virtual bool onExit() = 0;
     virtual void onSave() = 0;
     
-    FormBase(config_ptr config, std::string title, std::string pulldown_file)
+    FormBase(config_ptr config, std::string name, std::string title, std::string pulldown_file)
         : m_config(config)
+        , m_name(name)
         , m_title(title)
         , m_pulldown_file(pulldown_file)
     { }
@@ -183,6 +184,7 @@ public:
     }
                     
     config_ptr              m_config;
+    std::string             m_name;
     std::string             m_title;
     std::string             m_pulldown_file;
     

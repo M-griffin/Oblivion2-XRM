@@ -233,18 +233,18 @@ private:
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
 
-    SessionIO            m_session_io;
-    std::string          m_filename;
-    text_prompts_dao_ptr m_text_prompts_dao;
-    deadline_timer       m_detection_deadline;
+    SessionIO              m_session_io;
+    std::string            m_filename;
+    text_prompts_dao_ptr   m_text_prompts_dao;
+    deadline_timer         m_detection_deadline;
 
-    int                  m_mod_function_index;   
-    bool                 m_is_text_prompt_exist;
-    bool                 m_is_esc_detected;
-    std::string          m_input_buffer;
-    int                  m_x_position;
-    int                  m_y_position;
-    std::string          m_term_type;
+    int                    m_mod_function_index;   
+    bool                   m_is_text_prompt_exist;
+    bool                   m_is_esc_detected;
+    std::string            m_input_buffer;
+    int                    m_x_position;
+    int                    m_y_position;
+    std::string            m_term_type;
 };
 
 #endif // MOD_PRELOGON_HPP
