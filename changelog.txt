@@ -1,4 +1,17 @@
 
+Change Log Update (00.00.97)
+* 2017-05-20
++ Create ModSysConfig to use new FormManager. Still work in progress to use
+  multi-page forms
++ Created DBStartup class that will handle creating and check all tables
+  moved out of main to keep it cleaner.
++ Added AccessLevelDao, with each level having it's own limits for users
+  Still need to implement user login pulling limits from the access level assigned
++ LastCallers will use SessionStats for pulling last x successful logins
++ Cleanup DAO, removed unused includes.
++ Cleaned Up Grouping Model, don't mix file and message conferences.
++ Synced All Updates with Linux Platform.
+
 Change Log Update (00.00.96)
 * 2017-05-12
 + Completed Refactoring of All Dao object to now use the BaseDao for concurrency.
@@ -13,7 +26,7 @@ Change Log Update (00.00.95)
 + Updated ConferenceDao to inherit BaseDao
 + Updated OnelinerDao to inherit BaseDao
 + Created Integration UnitTests for Calling ConferenceDao testing all BaseDao 
-  Methods to make sure everthing is solid.
+  Methods to make sure everything is solid.
 + Added new getAllRecordsCount() to baseDao
 - Working on refactoring the remaining DAO objects to inherit from BaseDao
 
