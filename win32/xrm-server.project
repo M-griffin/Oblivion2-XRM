@@ -183,6 +183,7 @@
         <Library Value="libboost_filesystem-mgw51-mt-1_64.dll.a"/>
         <Library Value="libboost_timer-mgw51-mt-1_64.dll.a"/>
         <Library Value="libboost_regex-mgw51-mt-1_64.dll.a"/>
+        <Library Value="libboost_date_time-mgw51-mt-1_64.dll.a"/>
         <Library Value="libws2_32.a"/>
         <Library Value="libwsock32.a"/>
         <Library Value="libSqliteWrapped.a"/>

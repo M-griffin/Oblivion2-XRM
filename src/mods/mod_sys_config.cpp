@@ -13,15 +13,18 @@ ModSysConfig::ModSysConfig(session_data_ptr session_data, config_ptr config, ans
     , m_current_page(0)
     , m_menu(new MenuBase(session_data))
     , m_form_manager(new FormManager(config))
-        
 {
-
     // Setup the Callback to Menu Option Exection to this base class.
     m_menu->m_execute_callback.push_back(std::bind(&ModSysConfig::menuOptionsCallback, this, std::placeholders::_1));
-    
 }
 
 
+/**
+ * @brief Update Mehtod, Receives Input Passed Through
+ * @param character_buffer
+ * @param is_utf8
+ * @return 
+ */
 bool ModSysConfig::update(const std::string &character_buffer, const bool &is_utf8)
 {
     // Were calling single input method, we don't need dynamic input call backs here.
@@ -29,12 +32,20 @@ bool ModSysConfig::update(const std::string &character_buffer, const bool &is_ut
     return true;
 }
 
+/**
+ * @brief Executes on Module Load
+ * @return 
+ */
 bool ModSysConfig::onEnter() 
 {
     startupFormManager();
     return true;
 }
 
+/**
+ * @brief Executes on Module Exit
+ * @return 
+ */
 bool ModSysConfig::onExit()
 {
     return true;

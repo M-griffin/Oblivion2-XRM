@@ -88,9 +88,14 @@ public:
      * @brief Pulls Generate Menu Options from Form
      * @param option
      */
-    menu_ptr retrieveFormOptions(int page);
+    menu_ptr retrieveFormOptions(int current_page);
     
-    
+    /**
+     * @brief Calculates Pages in Vector of Menu Options.
+     * @param page
+     * @param list
+     */
+    std::vector<MenuOption> box_start(unsigned long page, unsigned long list);
 
     config_ptr       m_config;
     menu_ptr         m_menu_info;    // Custom Menus on the Fly

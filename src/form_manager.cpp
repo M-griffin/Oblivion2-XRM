@@ -94,16 +94,104 @@ void FormManager::processFormOption(MenuOption &option, std::string value)
  * @brief Pulls Generated Menu Options from Form
  * @param option
  */
-menu_ptr FormManager::retrieveFormOptions(int page)
+menu_ptr FormManager::retrieveFormOptions(int current_page)
 {
     // Setup the Default Menu, and pull in Form Generated Options.
     m_menu_info->menu_name = m_form.back()->m_name;
     m_menu_info->menu_title = m_form.back()->m_title;
     m_menu_info->menu_pulldown_file = m_form.back()->m_pulldown_file;
-    
-    
+        
     // Need to figure out paging options?
-    m_menu_info->menu_options = m_form.back()->baseGetFormOptions();
+    std::vector<MenuOption> opts = m_form.back()->baseGetFormOptions();
+    
+    
+    
+    
+    //m_menu_info->menu_options = 
     
     return m_menu_info;
+}
+
+
+/**
+ * TODO NOTE: Move to base lateron for all forms!
+ * @brief Calculates Pages in Vector of Menu Options.
+ * List = current area.
+ * @param page
+ * @param list
+ */
+std::vector<MenuOption> FormManager::box_start(unsigned long page, unsigned long list)
+{
+    std::vector<MenuOption> page_options;
+    
+    // Calcuate Box Size and Total Pages
+    // Use this lateron with screen height / size to 
+    // get dynamic page lengths.
+    //int boxsize = Bot - Top; // Fist Get Box Size
+    
+    
+    /*Tot = listing.size();
+    TotPages = Tot / boxsize;
+    if (Tot % boxsize > 0)
+    {
+        ++TotPages;
+    }
+    if (Tot <= boxsize)
+        TotPages = 1;
+
+
+	// This doesn't work in full screen message read?!?!?!
+	// Testing, only clear the box, if total pages > 1,
+	// Otherwise no need to clear since it's fresh draw.
+	if (TotPages > 1)
+	{
+		//Now clear the box First
+		for (int t = 0; t < boxsize; t++)
+		{
+		    sprintf(capture, "\x1b[%i;%iH\x1b[K", (Top)+t, 1);
+		    _editbox += capture;
+		}
+	}
+
+    // Now Grab as many lines as will fit in the box
+    for (int i = 1; i < boxsize+1; i++)
+    {
+        if (((boxsize*Page)+i)-1 >= (signed)listing.size()) break;
+
+        // If Area has new message rotate output to new lightbars.
+        if (listing[((boxsize*Page)+i)-1].isnew)
+        {
+            if ((signed)list+1 == (boxsize*Page)+i)
+            {
+                // Current Area
+                current_selection = Top+i-1; // Get current place in box to display.
+                sprintf(capture, "\x1b[%i;%iH%s", Top+i-1, 1, (char *)listing[((boxsize*Page)+i)-1].ansi_4.c_str());
+            }
+            else
+            {
+                sprintf(capture, "\x1b[%i;%iH%s", Top+i-1, 1, (char *)listing[((boxsize*Page)+i)-1].ansi_3.c_str());
+            }
+        }
+        else
+        {
+            if ((signed)list+1 == (boxsize*Page)+i)
+            {
+                // Current Area
+                current_selection = Top+i-1; // Get current place in box to display.
+                sprintf(capture, "\x1b[%i;%iH%s", Top+i-1, 1, (char *)listing[((boxsize*Page)+i)-1].ansi_2.c_str());
+            }
+            else
+            {
+                sprintf(capture, "\x1b[%i;%iH%s", Top+i-1, 1, (char *)listing[((boxsize*Page)+i)-1].ansi_1.c_str());
+            }
+        }
+
+        _editbox += capture;
+    }
+
+    // Write out Box.
+    sprintf(capture, "\x1b[%i;%iH", Row+Top-1, 1);
+    _editbox += capture;
+    pipe2ansi((char *)_editbox.c_str());*/
+
 }
