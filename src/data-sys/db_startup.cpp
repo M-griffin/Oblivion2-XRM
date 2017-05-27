@@ -31,7 +31,7 @@ void DbStartup::initDatabaseTables()
 {
 
     // Setup Users Database name and path
-    std::string USERS_DATABASE = GLOBAL_DATA_PATH;
+    USERS_DATABASE = GLOBAL_DATA_PATH;
 
 #ifdef _WIN32
     USERS_DATABASE.append("\\");

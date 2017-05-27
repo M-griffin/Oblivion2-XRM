@@ -1,4 +1,8 @@
 
+Change Log Update (00.00.98)
+* 2017-05-27
++ Bugfix on Database Global Variable.
+
 Change Log Update (00.00.97)
 * 2017-05-20
 + Create ModSysConfig to use new FormManager. Still work in progress to use
