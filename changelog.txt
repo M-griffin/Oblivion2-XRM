@@ -1,12 +1,8 @@
 
 Change Log Update (00.00.98)
 * 2017-05-27
-<<<<<<< HEAD
-+ Bugfix on Database Global Variable.
-=======
 + Bugfix Database Global Variable, new DBStartUp Class needs to set this
   and not use local variable.
->>>>>>> refs/remotes/origin/master
 
 Change Log Update (00.00.97)
 * 2017-05-20
