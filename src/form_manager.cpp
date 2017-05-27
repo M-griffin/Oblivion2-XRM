@@ -94,7 +94,11 @@ void FormManager::processFormOption(MenuOption &option, std::string value)
  * @brief Pulls Generated Menu Options from Form
  * @param option
  */
+<<<<<<< HEAD
 menu_ptr FormManager::retrieveFormOptions(int current_page)
+=======
+menu_ptr FormManager::retrieveFormOptions(int ) //page)
+>>>>>>> refs/remotes/origin/master
 {
     // Setup the Default Menu, and pull in Form Generated Options.
     m_menu_info->menu_name = m_form.back()->m_name;
