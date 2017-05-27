@@ -3,6 +3,9 @@
 #include "model-sys/struct_compat.hpp"
 
 #include <boost/locale.hpp>
+
+// Needed for RPI GCC 4.9
+#define BOOST_FILESYSTEM_VERSION 3
 #include <boost/filesystem.hpp>
 
 #include <stdint.h>

@@ -8,6 +8,7 @@
 #include "../data-sys/security_dao.hpp"
 #include "../data-sys/users_dao.hpp"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/regex.hpp>
 
 #include <iostream>
@@ -114,15 +115,15 @@ void ModSignup::createTextPrompts()
     value[PROMPT_HANDLE_INVALID]     = std::make_pair("User Name Already Exists", "|04Invalid UserName, Already Exists!|CR");
     value[PROMPT_NAME_INVALID]       = std::make_pair("Real Name Already Exists", "|04Name, Already Exists, Try Adding a middle initial.|CR");
     value[PROMPT_EMAIL_INVALID]      = std::make_pair("Email Already Exists", "|04Email, Already Exists, Try another adress or check if your have an account.|CR");
-        
+
     // Confirmation of Save
     value[PROMPT_SAVED]              = std::make_pair("User Record Saved", "|CR|03User Record Saved Successfully.");
     value[PROMPT_NOT_SAVED]          = std::make_pair("User Record Not Saved", "|CR|04Error, User Record Not Saved!");
-    
+
     // Auto Validate User
     value[PROMPT_AUTO_VALIDATION]    = std::make_pair("User Access Auto Validated", "|10Auto Validation, |15Access has been granted to the system.|CR");
     value[PROMPT_NOT_VALIDATED]      = std::make_pair("Access Restricted, Waiting for Validation", "|04Access Restricted, |15Waiting for Access Validation.|CR");
-    
+
     // New User Voting
     value[PROMPT_NEWUSER_VOTING]     = std::make_pair("New User Voting","|04New User Voting Active, |15Access will be granted once your account has been voted on.|CR");
 
@@ -535,7 +536,7 @@ bool ModSignup::newUserPassword(const std::string &input)
     std::string key = "";
     bool useHiddenOutput = true;
     std::string result = m_session_io.getInputField(input, key, Config::sPassword_length, "", useHiddenOutput);
-    
+
     // ESC was hit
     if(result == "aborted")
     {
@@ -592,9 +593,9 @@ bool ModSignup::disclaimer(const std::string &input)
     // handle input for using ansi color, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    
+
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         // exit, and return
@@ -651,7 +652,7 @@ bool ModSignup::handle(const std::string &input)
     std::cout << "handle: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sName_length);
-    
+
     // ESC was hit
     if(result == "aborted")
     {
@@ -670,7 +671,7 @@ bool ModSignup::handle(const std::string &input)
         // Check for user name and if is already exists!
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
         user_ptr search = user_data->getUserByHandle(key);
-        
+
         baseProcessDeliverNewLine();
 
         if(!search || search->iId == -1)
@@ -708,9 +709,9 @@ bool ModSignup::realName(const std::string &input)
     std::cout << "realName: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sName_length);
-    
+
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         // exit, and return
@@ -765,9 +766,9 @@ bool ModSignup::address(const std::string &input)
     std::cout << "address: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
-    
+
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         m_is_active = false;
@@ -780,7 +781,7 @@ bool ModSignup::address(const std::string &input)
         {
             return false;
         }
-        
+
         baseProcessDeliverNewLine();
         m_user_record->sAddress = key;
         changeNextModule();
@@ -807,9 +808,9 @@ bool ModSignup::location(const std::string &input)
     std::cout << "location: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
-    
+
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         m_is_active = false;
@@ -849,9 +850,9 @@ bool ModSignup::country(const std::string &input)
     std::cout << "country: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
-    
+
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         m_is_active = false;
@@ -891,9 +892,9 @@ bool ModSignup::email(const std::string &input)
     std::cout << "email: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
-    
+
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         m_is_active = false;
@@ -911,7 +912,7 @@ bool ModSignup::email(const std::string &input)
 
         // Test if email already exists.
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
-        user_ptr search = user_data->getUserByEmail(key);        
+        user_ptr search = user_data->getUserByEmail(key);
 
         if(!search || search->iId == -1)
         {
@@ -948,7 +949,7 @@ bool ModSignup::userNote(const std::string &input)
     std::cout << "userNote: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
-    
+
     // ESC was hit
     if(result == "aborted")
     {
@@ -990,9 +991,9 @@ bool ModSignup::birthday(const std::string &input)
     std::cout << "birthday: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDate_length);
-    
+
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         m_is_active = false;
@@ -1017,6 +1018,10 @@ bool ModSignup::birthday(const std::string &input)
             // Append Time For Date.
             key += " 00:00:00";
             struct std::tm tm;
+
+            tm = boost::posix_time::to_tm(boost::posix_time::time_from_string(key));
+
+            /* Only GCC 5.1 + Compatible
             std::istringstream ss(key);
 
             ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
@@ -1027,7 +1032,7 @@ bool ModSignup::birthday(const std::string &input)
                 displayPromptAndNewLine(PROMPT_DATE_INVALID);
                 redisplayModulePrompt();
                 return true;
-            }
+            }*/
 
             std::time_t const time = mktime(&tm);
             m_user_record->dtBirthday = time;
@@ -1061,9 +1066,9 @@ bool ModSignup::gender(const std::string &input)
     std::cout << "gender: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    
+
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         m_is_active = false;
@@ -1076,9 +1081,9 @@ bool ModSignup::gender(const std::string &input)
         {
             return false;
         }
-        
+
         baseProcessDeliverNewLine();
-        
+
         // If ENTER Default to Yes, or Single Y is hit
         if((toupper(key[0]) == 'M' && key.size() == 1))
         {
@@ -1095,7 +1100,7 @@ bool ModSignup::gender(const std::string &input)
             redisplayModulePrompt();
             return true;
         }
-        
+
         changeNextModule();
     }
     else
@@ -1252,9 +1257,9 @@ bool ModSignup::challengeQuestion(const std::string &input)
     std::cout << "challengeQuestion: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sPassword_length);
-    
+
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         m_is_active = false;
@@ -1267,7 +1272,7 @@ bool ModSignup::challengeQuestion(const std::string &input)
         {
             return false;
         }
-        
+
         baseProcessDeliverNewLine();
 
         // Set the Password and verify it matches on next module.
@@ -1305,7 +1310,7 @@ bool ModSignup::challengeAnswer(const std::string &input)
                          );
 
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         m_is_active = false;
@@ -1318,7 +1323,7 @@ bool ModSignup::challengeAnswer(const std::string &input)
         {
             return false;
         }
-        
+
         baseProcessDeliverNewLine();
 
         m_security_record->sChallengeAnswerHash = key;
@@ -1355,7 +1360,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
                          );
 
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         m_is_active = false;
@@ -1368,7 +1373,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
         {
             return false;
         }
-        
+
         baseProcessDeliverNewLine();
 
         // compare password to previous, then encrypt if they match
@@ -1431,16 +1436,16 @@ bool ModSignup::yesNoBars(const std::string &input)
     std::cout << "yesNoBars: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    
+
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
     else if(result[0] == '\n')
-    {                
+    {
         // If ENTER Default to Yes, or Single Y is hit
         if(key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1))
         {
@@ -1492,16 +1497,16 @@ bool ModSignup::doPause(const std::string &input)
     std::cout << "doPause: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    
+
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
     else if(result[0] == '\n')
-    {        
+    {
         // If ENTER Default to Yes, or Single Y is hit
         if(key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1))
         {
@@ -1553,9 +1558,9 @@ bool ModSignup::clearOrScroll(const std::string &input)
     std::cout << "clearOrScroll: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    
+
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         m_is_active = false;
@@ -1614,9 +1619,9 @@ bool ModSignup::ansiColor(const std::string &input)
     std::cout << "ansiColor: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    
+
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         m_is_active = false;
@@ -1677,7 +1682,7 @@ bool ModSignup::backSpace(const std::string &input)
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         m_is_active = false;
@@ -1762,7 +1767,7 @@ void ModSignup::saveNewUserRecord()
 
     m_user_record->dtFirstOn = result;
     m_user_record->dtPassChangeDate = result;
-    
+
     // Set Default User Theme colors, pull from system defaults.
     m_user_record->sRegColor = m_config->default_color_regular;
     m_user_record->sPromptColor = m_config->default_color_prompt;
@@ -1770,7 +1775,7 @@ void ModSignup::saveNewUserRecord()
     m_user_record->sInverseColor = m_config->default_color_inverse;
     m_user_record->sStatColor = m_config->default_color_stat;
     m_user_record->sBoxColor = m_config->default_color_box;
-    
+
     // Check for User Auto Validation
     if (m_config->use_auto_validate_users)
     {
@@ -1791,7 +1796,7 @@ void ModSignup::saveNewUserRecord()
         {
             std::cout << "Error, unable to remove secutiry record." << std::endl;
         }
-        
+
         baseProcessDeliverNewLine();
         displayPromptAndNewLine(PROMPT_NOT_SAVED);
         m_is_active = false;
@@ -1801,20 +1806,20 @@ void ModSignup::saveNewUserRecord()
     // Completed Successfully
     baseProcessDeliverNewLine();
     displayPromptAndNewLine(PROMPT_SAVED);
-    
+
     // Display if user is validated or waiting validation.
     baseProcessDeliverNewLine();
     if (m_config->use_auto_validate_users)
     {
-        displayPromptAndNewLine(PROMPT_AUTO_VALIDATION); 
+        displayPromptAndNewLine(PROMPT_AUTO_VALIDATION);
     }
     else
     {
         // Check here if new user voting is active,
         // Then depending (once it's coded) state user is waiting on voting results.
-        displayPromptAndNewLine(PROMPT_NOT_VALIDATED); 
+        displayPromptAndNewLine(PROMPT_NOT_VALIDATED);
     }
-    
+
     m_is_active = false;
     return;
 }
@@ -1829,9 +1834,9 @@ bool ModSignup::verifyAndSave(const std::string &input)
     std::cout << "verifyAndSave: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    
+
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         m_is_active = false;

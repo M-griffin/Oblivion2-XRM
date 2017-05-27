@@ -41,10 +41,11 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
 
+#include <pthread.h>
 
 #include <cstdlib>
 #include <iostream>
-#include <thread>
+//#include <thread>
 #include <map>
 #include <exception>
 
@@ -64,7 +65,7 @@ std::string USERS_DATABASE = "";
 using boost::asio::ip::tcp;
 
 // Setup Handles to Services.
-typedef boost::shared_ptr<Server>	 server_telnet_ptr;
+typedef boost::shared_ptr<Server>    server_telnet_ptr;
 typedef boost::shared_ptr<ServerSSL> server_ssl_ptr;
 
 /* NOTES
@@ -102,8 +103,14 @@ void handler(const boost::system::error_code& /*e*/,
  * @brief Main Program io_service loop
  * @param io_service
  */
-void run(boost::asio::io_service& io_service)
+//void run(boost::asio::io_service& io_service)
+extern "C" void *run(void *)
 {
+
+    //static_cast<boost::asio::io_service*>(io)->run();
+
+    boost::asio::io_service io_service;  //= static_cast<boost::asio::io_service*>(io);
+
     // Create Handles to Services
     server_telnet_ptr serverTelnet;
     server_ssl_ptr    serverSSL;
@@ -125,7 +132,7 @@ void run(boost::asio::io_service& io_service)
     {
         // TODO Throws exception right now, need to work in
         // better shutdown on from this point! just assert for now.
-        return;
+        return nullptr;
     }
 
     // Startup Telnet Server
@@ -172,6 +179,11 @@ void run(boost::asio::io_service& io_service)
             std::cerr << e.what() << std::endl;
         }
     }
+
+    io_service.stop();
+    pthread_exit(nullptr);
+
+    return nullptr;
 }
 
 /**
@@ -182,10 +194,10 @@ void run(boost::asio::io_service& io_service)
 // auto main(int argc, char* argv[]) -> int
 auto main() -> int
 {
-    std::cout << "Oblivion/2 XRM Server (c) 2015-2017 Michael Griffin." 
+    std::cout << "Oblivion/2 XRM Server (c) 2015-2017 Michael Griffin."
               << std::endl
               << std::endl;
-              
+
     CommonIO common;
     GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
     std::cout << "BBS HOME Directory Registered: " << std::endl;
@@ -231,16 +243,23 @@ auto main() -> int
         db_startup_ptr db(new DbStartup());
         db->initDatabaseTables();
     }
-    
+
 
     // Start System Services and Main Loop.
-    boost::asio::io_service io_service;
+    //boost::asio::io_service io_service;
 
     // Load BBS Configuration here into Global Singleton.
     //TheCommunicator::instance()->attachConfig(config);
 
     // start io_service.run( ) in separate thread
-    auto t = std::thread(&run, std::ref(io_service));
+    //auto t = std::thread(&run, std::ref(io_service));
+
+
+
+    // TODO Replace std::thread in pi2 casue of gcc 4.9.1 issues!
+    pthread_t t;
+    pthread_create(&t, nullptr, &run, nullptr);
+
 
     // Main Thread, Get Server Input from System Operator
     // We'll handle Node and System setup here.  Need to write interface.
@@ -279,6 +298,8 @@ auto main() -> int
             TheCommunicator::instance()->sendGlobalMessage();
         }*/
     }
+
+    pthread_exit(nullptr);
 
     // Release Communicator Instance
     TheCommunicator::releaseInstance();
