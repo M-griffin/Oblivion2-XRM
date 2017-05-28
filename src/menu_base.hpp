@@ -79,6 +79,7 @@ public:
     bool             m_pulldown_reentrace_flag;     // If menu or Option fails, kick off the fail flag.
     bool             m_is_active_pulldown_menu;     // If menu has active lightbars to display.
     bool             m_use_first_command_execution; // If menu executes firstcmd on entrance.
+    bool             m_logoff;                      // If logoff, stop loop execution on commands and exit.
 
 
     // Holds all pulldown menu options.
@@ -113,13 +114,13 @@ public:
 
     /**
      * @brief Validates if user has access to menu (preLoad)
-     * @return 
+     * @return
      */
     bool checkMenuAcsAccess(menu_ptr menu);
 
     /**
      * @brief Validates if user has access to menu options
-     * @return 
+     * @return
      */
     void checkMenuOptionsAcsAccess();
 
@@ -196,7 +197,7 @@ public:
      * @brief Load the Menu into the system container.
      */
     void loadInMenu(std::string menu_name);
-    
+
     /**
      * @brief Import the Menu from Modules into the system container.
      */

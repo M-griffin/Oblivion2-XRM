@@ -41,11 +41,12 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
 
-#include <pthread.h>
-
 #include <cstdlib>
 #include <iostream>
+
 //#include <thread>
+#include <pthread.h>
+
 #include <map>
 #include <exception>
 
@@ -298,6 +299,10 @@ auto main() -> int
             TheCommunicator::instance()->sendGlobalMessage();
         }*/
     }
+
+    // Proper Thread Shutdown
+    void *status;
+    pthread_join(t, &status);
 
     pthread_exit(nullptr);
 

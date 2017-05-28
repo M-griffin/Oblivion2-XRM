@@ -13,20 +13,26 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <thread>
+
+//#include <thread>
+#include <pthread.h>
+#include <unistd.h>
 
 
 ProcessPosix::ProcessPosix(session_data_ptr session, std::string cmdline)
     : ProcessBase(session, cmdline)
     , m_pty_file_desc(0)
     , m_proc_id(0)
+    , m_args(new ThreadArguments())
 {
     // Startup External Process
     createProcess();
 }
 
 ProcessPosix::~ProcessPosix()
-{ }
+{
+    std::cout << "ProcessPosix" << std::endl;
+}
 
 
 /**
@@ -77,54 +83,62 @@ void ProcessPosix::setTerminalOptions()
 }
 
 /**
- * @brief Process Loop Thread
+ * @brief Process Loop Thread (Pthread)
  */
-void ProcessPosix::executeProcessLoop()
+extern "C" void *executeProcessLoop(void *args)
 {
     int selret;
     fd_set rdfdset;
+
+    // Setup Thread Arguments Passed.
+    args_ptr threadArgs = * reinterpret_cast<boost::shared_ptr<ThreadArguments>*>(args);
 
     char character_buffer[2014] = {'\0'};
 
     do
     {
         FD_ZERO(&rdfdset);
-        FD_SET(m_pty_file_desc, &rdfdset);
+        FD_SET(threadArgs->m_pty_file_desc, &rdfdset);
 
-        selret = select(m_pty_file_desc + 1, &rdfdset, NULL, NULL, NULL);
+        selret = select(threadArgs->m_pty_file_desc + 1, &rdfdset, NULL, NULL, NULL);
 
         // Error / Lost Connection on
         if (selret <= 0)
         {
-            m_session->m_is_process_running = false;
+            threadArgs->m_session->m_is_process_running = false;
             break;
         }
 
 
-        if (FD_ISSET(m_pty_file_desc, &rdfdset))
+        if (FD_ISSET(threadArgs->m_pty_file_desc, &rdfdset))
         {
             memset(&character_buffer, 0, 1024);
-            selret = read(m_pty_file_desc, character_buffer, 1023);
+            selret = read(threadArgs->m_pty_file_desc, character_buffer, 1023);
 
             if (selret <= 0)
             {
-                m_session->m_is_process_running = false;
+                threadArgs->m_session->m_is_process_running = false;
                 break;
             }
 
-            if (m_session)
+            if (threadArgs->m_session)
             {
                 std::string buffer(reinterpret_cast<char*>(character_buffer));
-                m_session->deliver(buffer);
+                threadArgs->m_session->deliver(buffer);
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        // Free CPU Usage from thread io/loop.
+        //std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        usleep(20);
 
     }
-    while (m_session->m_is_process_running);
+    while (threadArgs->m_session->m_is_process_running);
 
-    m_session->m_is_process_running = false;
+    threadArgs->m_session->m_is_process_running = false;
+    pthread_exit(nullptr);
+
+    return nullptr;
 }
 
 /**
@@ -183,8 +197,16 @@ bool ProcessPosix::createProcess()
     m_session->deliver("\x1b[?25h\x1b[1;1H\x1b[2J");
 
     // Execute Thread for File Transfer
-    std::thread t([=] { executeProcessLoop(); });
-    t.detach();
+    //std::thread t([=] { executeProcessLoop(); });
+    //t.detach();
+
+    // Setup Arguments for Passing to Thread
+
+    m_args->m_session = m_session;
+    m_args->m_pty_file_desc = m_pty_file_desc;
+
+    pthread_t t;
+    pthread_create(&t, nullptr, &executeProcessLoop, reinterpret_cast<void *>(&m_args));
 
     return true;
 }

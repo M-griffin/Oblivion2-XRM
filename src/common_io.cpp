@@ -371,7 +371,7 @@ std::string CommonIO::rightTrim(const std::string &str)
                          new_string.rbegin(),
                          new_string.rend(),
                          std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
-                     new_string.end()
+                         new_string.end()
                     );
 
     return new_string;
