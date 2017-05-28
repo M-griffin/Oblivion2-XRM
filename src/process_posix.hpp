@@ -11,6 +11,23 @@
 class SessionData;
 typedef boost::shared_ptr<SessionData> session_data_ptr;
 
+
+/**
+ * @struct ThreadArguments
+ * @date 28/05/2017
+ * @brief pthread (Posix) Arguments passer
+ */
+typedef struct ThreadArguments {
+
+    session_data_ptr m_session;
+    int              m_pty_file_desc;
+
+} ThreadArguments;
+
+typedef boost::shared_ptr<ThreadArguments> args_ptr;
+
+
+
 /**
  * @class ProcessPosix
  * @author Michael Griffin
@@ -46,9 +63,9 @@ public:
     void setTerminalBuffer();
 
     /**
-     * @brief Process Loop Thread
+     * @brief Process Loop Thread (std::thread)
      */
-    void executeProcessLoop();
+    //void executeProcessLoop();
 
     /**
      * @brief Startup a Windows Specific External Process
@@ -71,8 +88,10 @@ public:
      */
     void terminate();
 
-    int m_pty_file_desc;
-    int m_proc_id;
+    int      m_pty_file_desc;
+    int      m_proc_id;
+
+    args_ptr m_args;
 
 };
 

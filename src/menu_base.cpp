@@ -26,7 +26,7 @@
 MenuBase::MenuBase(session_data_ptr session_data)
     : m_menu_session_data(session_data)
     , m_session_io(session_data)
-    , m_config(new Config())    
+    , m_config(new Config())
     , m_line_buffer("")
     , m_use_hotkey(false)
     , m_current_menu("")
@@ -43,8 +43,9 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_fail_flag(false)
     , m_pulldown_reentrace_flag(false)
     , m_use_first_command_execution(true)
+    , m_logoff(false)
 {
-    std::cout << "MenuBase" << std::endl;       
+    std::cout << "MenuBase" << std::endl;
 }
 
 MenuBase::~MenuBase()
@@ -198,8 +199,8 @@ void MenuBase::loadInMenu(std::string menu_name)
  * @brief Import the Menu from Modules into the system container.
  */
 void MenuBase::importMenu(menu_ptr menu_info)
-{    
-    clearMenuPullDownOptions();    
+{
+    clearMenuPullDownOptions();
     m_menu_info = menu_info;
     m_current_menu = m_menu_info->menu_name;
 
@@ -1333,7 +1334,7 @@ bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, 
                 {
                     // If the menu changed after executing the command
                     // then we are done, leave gracefully.
-                    if (current_menu != m_current_menu)
+                    if (current_menu != m_current_menu || m_logoff)
                     {
                         return false;
                     }
@@ -1367,7 +1368,7 @@ bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, 
         {
             // If the menu changed after executing the command
             // then we are done, leave gracefully.
-            if (current_menu != m_current_menu)
+            if (current_menu != m_current_menu || m_logoff)
             {
                 return false;
             }
@@ -1539,6 +1540,12 @@ bool MenuBase::processMenuOptions(const std::string &input)
                 // Handles ENTER Selection or Hotkeys Command Input.
                 if (handlePulldownHotKeys(m, is_enter, stack_reassignment))
                 {
+
+                    if (m_logoff)
+                    {
+                        return false;
+                    }
+
                     // If Pulldown option was selected on Enter, make sure following commands
                     // With Same Menu Key are executed (stacked commands) afterwords in order.
                     if (stack_reassignment && is_enter)
@@ -1577,7 +1584,7 @@ bool MenuBase::processMenuOptions(const std::string &input)
         }
 
         // If menu changed, then exit out.
-        if (current_menu != m_current_menu)
+        if (current_menu != m_current_menu || m_logoff)
         {
             return false;
         }
