@@ -759,9 +759,6 @@ bool CommonIO::isDigit(const std::string &str)
     return is_digit;
 }
 
-// Extended
-
-
 /**
  * @brief Used for printing output multibyte (Unicode Translations)
  * @param wide_string
@@ -801,6 +798,7 @@ std::string CommonIO::printWideCharacters(const std::wstring &wide_string)
             }
         }
     }
+
     return output;
 }
 
@@ -811,7 +809,7 @@ std::string CommonIO::printWideCharacters(const std::wstring &wide_string)
 std::string CommonIO::translateUnicode(const std::string &standard_string)
 {
     std::string output = "";
-    std::wstring wide_string;
+    std::wstring wide_string = L"";
     int ascii_value = 0;
 
     // Loop and write out after translation to Unicode
@@ -820,15 +818,15 @@ std::string CommonIO::translateUnicode(const std::string &standard_string)
         ascii_value = std::char_traits<char>().to_int_type(standard_string[i]);
         if(ascii_value < 256)
         {
-            wide_string = CP437_TABLE[ascii_value];
+            wide_string += CP437_TABLE[ascii_value];
         }
         else
         {
-            wide_string = standard_string[i];
+            wide_string += standard_string[i];
         }
-
-        output += printWideCharacters(wide_string);
     }
+
+    output += printWideCharacters(wide_string);
     return output;
 }
 
