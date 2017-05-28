@@ -81,6 +81,13 @@
     <File Name="../src/forms/form_system_config.cpp"/>
     <File Name="../src/forms/form_system_config.hpp"/>
   </VirtualDirectory>
+  <VirtualDirectory Name="data-app">
+    <File Name="../src/data-app/oneliners_dao.cpp"/>
+    <File Name="../src/data-app/oneliners_dao.hpp"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="model-app">
+    <File Name="../src/model-app/oneliners.hpp"/>
+  </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="" C_Options="" Assembler="">
@@ -111,6 +118,7 @@
         <Library Value="boost_filesystem"/>
         <Library Value="boost_timer"/>
         <Library Value="boost_regex"/>
+        <Library Value="boost_date_time"/>
         <Library Value="libSqliteWrapped.a"/>
         <Library Value="sqlite3"/>
         <Library Value="pthread"/>
@@ -194,11 +202,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="data-app">
-    <File Name="../src/data-app/oneliners_dao.cpp"/>
-    <File Name="../src/data-app/oneliners_dao.hpp"/>
-  </VirtualDirectory>
-  <VirtualDirectory Name="model-app">
-    <File Name="../src/model-app/oneliners.hpp"/>
-  </VirtualDirectory>
 </CodeLite_Project>
