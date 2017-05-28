@@ -135,6 +135,7 @@ bool MenuPromptDao::loadMenuPrompt()
         // Testing Is on nodes always throws exceptions.
         if (node.size() == 0)
         {
+            std::cout << "Not Found: " << path << std::endl;
             return false; //File Not Found?
         }
 

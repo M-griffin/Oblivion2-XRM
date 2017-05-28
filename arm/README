@@ -1,0 +1,74 @@
+Oblivion/2 XRM Build Notes for ARM (Specific to Pi 2)
+
+
+1. Must upgrade the distribution from Wheezy to Jessie
+2. Update GCC / G++ to at least 4.9.1
+3. Sqlite3 should be at least 3.8
+4. Boost should be at least 1.55 (ICU is optional at this time with custom compile!)
+5. YamlCpp
+
+
+Libs to install:
+
+
+sudo apt-get install libboost1.55-all
+sudo apt-get install libyaml-cpp-dev
+
+
+possibly also need: libssl-dev and libcrypt
+Other stuff sometimes installs these.. can't remember i had them installed already.
+
+
+Instructions...
+
+1. Clone Oblivion2-XRM to a local folder.
+2. Switch to Oblivion2-XRM/sqlitewrap
+3. Run: make -f SqliteWrapped.mk
+4. Switch to Oblivion2-XRM/arm
+5. run make
+
+The initial program should be built.  If you want to run unit tests:
+
+sudo apt-get install libunittest++-dev
+
+1. Switch to Oblivion2-XRM/unittest
+2. run make -f xrm-unittest-arm.mk
+3. cd Debug
+4. run ./xrm-unittest
+
+
+At this time you should see:
+
+    Success: 168 tests passed.
+    Test time: 4.99 seconds.  aprox..
+
+
+
+
+
+To run the BBS you must create a folder, and download the build.zip from the WIKI makes on Github.
+This folder will have all program files like menu's, prompts, and sub folders for data files and ANSI text files.
+
+- What i do is create a build folder in the root Oblivion2-XRM
+
+1. copy xrm-server from Oblivion2-XRM/arm/Debug to root Oblivion2-XRM/build folder.
+3. then from Oblivion2-XRM/build
+2. run ./xrm-server
+
+The first time you run the program it will generate xrm-config.yaml in the root folder, and all other yaml text prompt files in the DATA folder.
+
+On your first login, you should apply as a new user.
+
+1. Default new user password:  newuser (Configurable in the xrm-config.yaml file)  along with new user prompts to show.
+2. All prompts are editable and are located in the data folder
+3. Menus are in the menu
+4. Menu Prompts are in the menup folder.
+5. Ansi's are in TEXTFILE
+
+
+Done.
+
+Remember, this is alpha software and still very much a work in progress, there is a lot of debug output to console
+which can make things seems a little slower, along with make files being setup for debug compiles.. the system will run faster once a release is ready.
+
+This is a real quick and rough overview to build and get things up and running to play with.

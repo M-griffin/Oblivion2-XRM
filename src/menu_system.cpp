@@ -27,7 +27,7 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     m_menu_functions.push_back(std::bind(&MenuSystem::modulePreLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
-    
+
 
     // [Vector] Setup Menu Option Calls for executing menu commands.
     m_execute_callback.push_back(std::bind(&MenuSystem::menuOptionsCallback, this, std::placeholders::_1));
@@ -55,7 +55,7 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     m_menu_command_functions['+'] = std::bind(&MenuSystem::menuOptionsColorSettingCommands, this, std::placeholders::_1);
 
     // Load the configuration file into m_config
-    ConfigDao config_dao(m_config, GLOBAL_BBS_PATH);    
+    ConfigDao config_dao(m_config, GLOBAL_BBS_PATH);
     if (!config_dao.loadConfig())
     {
         std::cout << "Error: unable to load configuration file" << std::endl;
@@ -444,6 +444,8 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
             // Logoff
         case 'G':
             std::cout << "Goodbye;" << std::endl;
+            // Base Class
+            m_logoff = true;
             m_session_data->logoff();
             break;
 
@@ -497,11 +499,15 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
         case 'G':
             std::cout << "Goodbye;" << std::endl;
             // Add Logoff ANSI Display here.
+            // Base Class
+            m_logoff = true;
             m_session_data->logoff();
             break;
             // logoff without ansi
         case 'H':
             std::cout << "Goodbye;" << std::endl;
+            // Base Class
+            m_logoff = true;
             m_session_data->logoff();
             break;
             // Fill out info form
