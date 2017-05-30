@@ -89,7 +89,6 @@ public:
      * @param option
      */
     menu_ptr retrieveFormOptions(int current_page);
-<<<<<<< HEAD
     
     /**
      * @brief Calculates Pages in Vector of Menu Options.
@@ -97,10 +96,7 @@ public:
      * @param list
      */
     std::vector<MenuOption> box_start(unsigned long page, unsigned long list);
-=======
 
-
->>>>>>> refs/remotes/origin/master
 
     config_ptr       m_config;
     menu_ptr         m_menu_info;    // Custom Menus on the Fly

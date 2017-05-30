@@ -15,7 +15,6 @@ Change Log Update (00.00.99)
 + Created Makefile xrm-unittest-arm in Unit Test Folder for building and running
   all unit tests.
 
-
 Change Log Update (00.00.98)
 * 2017-05-27
 + Bugfix Database Global Variable, new DBStartUp Class needs to set this

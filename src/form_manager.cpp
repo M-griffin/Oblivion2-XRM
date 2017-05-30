@@ -100,20 +100,15 @@ menu_ptr FormManager::retrieveFormOptions(int ) //page)
     m_menu_info->menu_name = m_form.back()->m_name;
     m_menu_info->menu_title = m_form.back()->m_title;
     m_menu_info->menu_pulldown_file = m_form.back()->m_pulldown_file;
-<<<<<<< HEAD
         
     // Need to figure out paging options?
     std::vector<MenuOption> opts = m_form.back()->baseGetFormOptions();
     
     //m_menu_info->menu_options = 
     
-=======
-
-
     // Need to figure out paging options?
-    m_menu_info->menu_options = m_form.back()->baseGetFormOptions();
+    //m_menu_info->menu_options = m_form.back()->baseGetFormOptions();
 
->>>>>>> refs/remotes/origin/master
     return m_menu_info;
 }
 
