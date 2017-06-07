@@ -1,6 +1,10 @@
 #include "encryption.hpp"
 
-#include <openssl/evp.h>
+// For Debugging SSL Version
+#include <boost/preprocessor/stringize.hpp>
+
+#include <openssl/engine.h>
+#include "openssl/evp.h"
 
 #include <iostream>
 #include <string>
@@ -15,6 +19,30 @@ Encrypt::~Encrypt()
 {
 }
 
+
+/**
+ * @brief Handle New OpenSSL v1.01, and Conversions for Older. (Debugging OpenSSL Version)
+ * @return 
+ */
+#pragma message("OPENSSL_VERSION_NUMBER=" BOOST_PP_STRINGIZE(OPENSSL_VERSION_NUMBER))
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+
+EVP_MD_CTX *EVP_MD_CTX_new()
+{
+    //return (EVP_MD_CTX*)OPENSSL_zalloc(sizeof(EVP_MD_CTX));
+    
+    // OPENSSL_VERSION_NUMBER = 0x100010cfL Need malloc
+    // Use this for now, not sure what version have zalloc.
+    return (EVP_MD_CTX*)OPENSSL_malloc(sizeof(EVP_MD_CTX));
+}
+
+void EVP_MD_CTX_free(EVP_MD_CTX *ctx)
+{
+    EVP_MD_CTX_cleanup(ctx);
+    OPENSSL_free(ctx);
+}
+
+#endif
 
 /**
  * @brief Unsigned Char to Hex
@@ -39,8 +67,10 @@ std::string Encrypt::SHA1(std::string key, std::string salt)
     bool EncryptOk = true;
 
     // Setup Encryption for User Password.
-    EVP_MD_CTX mdctx;
+    EVP_MD_CTX *mdctx = EVP_MD_CTX_new();       
+    
     const EVP_MD *md;
+    
     unsigned char md_value[EVP_MAX_MD_SIZE]= {0};
     unsigned int  md_len = 0;
 
@@ -60,13 +90,14 @@ std::string Encrypt::SHA1(std::string key, std::string salt)
 
     std::string result = "";
     if(EncryptOk)
-    {
-        EVP_MD_CTX_init(&mdctx);
-        EVP_DigestInit_ex(&mdctx, md, NULL);
-        EVP_DigestUpdate(&mdctx, (char *)salt_result.c_str(), salt_result.size());
-        EVP_DigestUpdate(&mdctx, (char *)key.c_str(), key.size());
-        EVP_DigestFinal_ex(&mdctx, md_value, &md_len);
-        EVP_MD_CTX_cleanup(&mdctx);
+    {        
+        EVP_MD_CTX_init(mdctx);
+        EVP_DigestInit_ex(mdctx, md, NULL);
+        EVP_DigestUpdate(mdctx, (char *)salt_result.c_str(), salt_result.size());
+        EVP_DigestUpdate(mdctx, (char *)key.c_str(), key.size());
+        EVP_DigestFinal_ex(mdctx, md_value, &md_len);     
+        
+        EVP_MD_CTX_free(mdctx);
 
         for(size_t i = 0; i < md_len; i++)
         {
