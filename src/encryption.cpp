@@ -1,6 +1,8 @@
 #include "encryption.hpp"
 
+// For Debugging SSL Version
 #include <boost/preprocessor/stringize.hpp>
+
 #include <openssl/engine.h>
 #include "openssl/evp.h"
 
@@ -19,15 +21,19 @@ Encrypt::~Encrypt()
 
 
 /**
- * @brief Handle New OpenSSL v1.01, and Conversions for Older.
+ * @brief Handle New OpenSSL v1.01, and Conversions for Older. (Debugging OpenSSL Version)
  * @return 
  */
 #pragma message("OPENSSL_VERSION_NUMBER=" BOOST_PP_STRINGIZE(OPENSSL_VERSION_NUMBER))
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 
-EVP_MD_CTX *EVP_MD_CTX_new(void)
+EVP_MD_CTX *EVP_MD_CTX_new()
 {
-    return OPENSSL_zalloc(sizeof(EVP_MD_CTX));
+    //return (EVP_MD_CTX*)OPENSSL_zalloc(sizeof(EVP_MD_CTX));
+    
+    // OPENSSL_VERSION_NUMBER = 0x100010cfL Need malloc
+    // Use this for now, not sure what version have zalloc.
+    return (EVP_MD_CTX*)OPENSSL_malloc(sizeof(EVP_MD_CTX));
 }
 
 void EVP_MD_CTX_free(EVP_MD_CTX *ctx)

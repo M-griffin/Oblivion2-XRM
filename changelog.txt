@@ -1,15 +1,32 @@
 
+Change Log Update (00.00.100)
+* 2017-06-07
++ Testing Arch Linux Port of ARM.  Found some issues with OpenSSL
+  Version 1.01 has changed it's API.  Corrections are now added
+  to detect and handle newer and older API Calls for SHA1
+  Which can probably be removed later on also.. Was testing a fix
+  for Enthral as well.
+- Other issues with Arch for ARM is GCC version 7, lots of new 
+  and crazy warnings, needs to look into this.
+- Note, the previous ARM setup was more for any Linux using GCC (Debian) Jessie
+  with version 4.9 and lower.  the ARM folder will be renamed lateron for
+  Compatibility of older distro's for now at least.
+- Note, Codelite will build and compile on Arch ARM which has the latest
+  libs and features.. One plus, other is that doc's suck and you have to 
+  keep recompiling and adding missing libs as you go for just about everything
+  in Arch.. haha.
+
 Change Log Update (00.00.99)
 * 2017-05-28
 + Several Updates to compile and run on ARM platform - testing (Raspberry Pi2).
 + Updated Threads, downgraded std::thread to use pthread for Posix for gcc 4.9.1 
-  compatability ARM.  GCC < 5.1 doesn't appear to work correctly, known issue.  
+  compatibility ARM.  GCC < 5.1 doesn't appear to work correctly, known issue.  
 + Also changed from std::time methods for std::get_date and std::put_date, also 
-  not compitable with GCC < 5.1 for ARM compatability.  Switched to Boost::Date_Time
+  not compatible with GCC < 5.1 for ARM compatibility.  Switched to Boost::Date_Time
 + Corrected Shutdown issues with menu logoff command trying to execute or cycle 
   stacked commands once the sessions has closed. The system will not exit the menu
   command look when a logoff command is executed.
-+ Fix for UTF-8 output encoding, optimized byte parsing, only noticable on ARM.
++ Fix for UTF-8 output encoding, optimized byte parsing, only noticeable on ARM.
 + Created a new ARM folder for standalone make file.
 + Added README in ARM folder with build instructions and notes.
 + Created Makefile xrm-unittest-arm in Unit Test Folder for building and running

@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Blue
-Date                   :=27/05/2017
+Date                   :=07/06/2017
 CodeLitePath           :="C:/Program Files (x86)/CodeLite"
 LinkerName             :=C:/MinGW-5.1.0/mingw32/bin/g++.exe
 SharedObjectLinkerName :=C:/MinGW-5.1.0/mingw32/bin/g++.exe -shared -fPIC
@@ -41,8 +41,8 @@ LinkOptions            :=
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)../src $(IncludeSwitch)../sqlitewrap $(IncludeSwitch)C:/boost64/include $(IncludeSwitch)C:/sqlite3/include $(IncludeSwitch)C:/OpenSSL-Win32/include $(IncludeSwitch)C:/Users/Blue/Documents/GitHub/yaml-cpp/include $(IncludeSwitch)C:/msys/1.0/icu/include 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)boost_system-mgw51-mt-1_64.dll $(LibrarySwitch)boost_locale-mgw51-mt-1_64.dll $(LibrarySwitch)boost_filesystem-mgw51-mt-1_64.dll $(LibrarySwitch)boost_timer-mgw51-mt-1_64.dll $(LibrarySwitch)boost_regex-mgw51-mt-1_64.dll $(LibrarySwitch)ws2_32 $(LibrarySwitch)wsock32 $(LibrarySwitch)SqliteWrapped $(LibrarySwitch)sqlite3 $(LibrarySwitch)ssleay32 $(LibrarySwitch)eay32 $(LibrarySwitch)yaml-cpp 
-ArLibs                 :=  "libboost_system-mgw51-mt-1_64.dll.a" "libboost_locale-mgw51-mt-1_64.dll.a" "libboost_filesystem-mgw51-mt-1_64.dll.a" "libboost_timer-mgw51-mt-1_64.dll.a" "libboost_regex-mgw51-mt-1_64.dll.a" "libws2_32.a" "libwsock32.a" "libSqliteWrapped.a" "libsqlite3.a" "ssleay32.a" "libeay32.a" "yaml-cpp.dll" 
+Libs                   := $(LibrarySwitch)boost_system-mgw51-mt-1_64.dll $(LibrarySwitch)boost_locale-mgw51-mt-1_64.dll $(LibrarySwitch)boost_filesystem-mgw51-mt-1_64.dll $(LibrarySwitch)boost_timer-mgw51-mt-1_64.dll $(LibrarySwitch)boost_regex-mgw51-mt-1_64.dll $(LibrarySwitch)boost_date_time-mgw51-mt-1_64.dll $(LibrarySwitch)ws2_32 $(LibrarySwitch)wsock32 $(LibrarySwitch)SqliteWrapped $(LibrarySwitch)sqlite3 $(LibrarySwitch)ssleay32 $(LibrarySwitch)eay32 $(LibrarySwitch)yaml-cpp 
+ArLibs                 :=  "libboost_system-mgw51-mt-1_64.dll.a" "libboost_locale-mgw51-mt-1_64.dll.a" "libboost_filesystem-mgw51-mt-1_64.dll.a" "libboost_timer-mgw51-mt-1_64.dll.a" "libboost_regex-mgw51-mt-1_64.dll.a" "libboost_date_time-mgw51-mt-1_64.dll.a" "libws2_32.a" "libwsock32.a" "libSqliteWrapped.a" "libsqlite3.a" "ssleay32.a" "libeay32.a" "yaml-cpp.dll" 
 LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryPathSwitch)../sqlitewrap/Debug $(LibraryPathSwitch)C:/boost64/lib $(LibraryPathSwitch)C:/msys/1.0/icu/dist/lib $(LibraryPathSwitch)C:/sqlite3/lib $(LibraryPathSwitch)C:/OpenSSL-Win32/lib/MinGW $(LibraryPathSwitch)C:/OpenSSL-Win32/lib/ $(LibraryPathSwitch)C:/Users/Blue/Documents/GitHub/yaml-cpp/build 
 
 ##
