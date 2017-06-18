@@ -247,7 +247,6 @@ private:
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
 
-
     SessionIO              m_session_io;
     std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;

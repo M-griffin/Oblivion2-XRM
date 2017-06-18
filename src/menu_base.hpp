@@ -106,7 +106,6 @@ public:
         m_menu_session_data->deliver(data);
     }
 
-
     /**
      * @brief Clears out Loaded Pulldown options { Called From readInMenuData() }
      */
