@@ -2,19 +2,27 @@
 
 #include "model-sys/menu.hpp"
 #include "forms/form_system_config.hpp"
+#include "ansi_processor.hpp"
+#include "session_data.hpp"
 
 #include <iostream>
 #include <string>
 #include <vector>
 
 
-FormManager::FormManager(config_ptr config)
+FormManager::FormManager(config_ptr config, session_data_ptr session)
     : m_config(config)
+    , m_session_data(session)
     , m_menu_info(new Menu())
     , max_cmds_per_page(15)
     , m_current_page(1)
     , m_total_pages(1)
     , m_form_name("")
+    , m_ansi_top("")
+    , m_ansi_mid("")
+    , m_ansi_bot("")
+    , m_box_top(1)
+    , m_box_bottom(24)
 {
 }
 
@@ -31,6 +39,7 @@ void FormManager::clearAllForms()
     if (m_form.size() > 0)
     {
         std::vector<form_ptr>().swap(m_form);
+        std::vector<MenuOption>().swap(m_loaded_options);
     }
 }
 
@@ -59,10 +68,37 @@ void FormManager::startupForm(form_ptr form)
     // Push to stack now the new form.
     m_form.push_back(form);
 
-
     m_total_pages = form->m_menu_options.size() / max_cmds_per_page;
     if (form->m_menu_options.size() % max_cmds_per_page > 1)
         ++m_total_pages;
+        
+    // Ansi Processor used for Parsing templates and get line size(s).
+    // This determines the screen template size and data we can fit between
+    // Top and Bottom Templates.
+    ansi_process_ptr ansi(new AnsiProcessor(
+                        m_session_data->m_telnet_state->getTermRows(),
+                        m_session_data->m_telnet_state->getTermCols())
+                     );
+    
+    // Read in ANSI Templates related to the Form.
+    m_ansi_top = m_common_io.readinAnsi(m_form.back()->m_ansi_top);
+    m_ansi_mid = m_common_io.readinAnsi(m_form.back()->m_ansi_mid);
+    m_ansi_bot = m_common_io.readinAnsi(m_form.back()->m_ansi_bot);
+    
+    // Calc Top Rows
+    ansi->parseAnsiScreen((char *)m_ansi_top.c_str());
+    int top_rows = ansi->getMaxRowsUsedOnScreen();
+    
+    // Clear to recalc the screen fresh.
+    ansi->clearScreen();
+    
+    // Calc Bottom Rows
+    ansi->parseAnsiScreen((char *)m_ansi_bot.c_str());
+    int bot_rows = ansi->getMaxRowsUsedOnScreen();
+    
+    // Calculate the Box Range
+    m_box_top = top_rows + 1;
+    m_box_bottom = m_session_data->m_telnet_state->getTermRows() - (bot_rows + 1);
 }
 
 /**
@@ -102,96 +138,53 @@ menu_ptr FormManager::retrieveFormOptions(int ) //page)
     m_menu_info->menu_pulldown_file = m_form.back()->m_pulldown_file;
         
     // Need to figure out paging options?
-    std::vector<MenuOption> opts = m_form.back()->baseGetFormOptions();
-    
-    //m_menu_info->menu_options = 
-    
-    // Need to figure out paging options?
-    //m_menu_info->menu_options = m_form.back()->baseGetFormOptions();
+    m_loaded_options = m_form.back()->baseGetFormOptions();
 
     return m_menu_info;
 }
 
-
 /**
- * TODO NOTE: Move to base lateron for all forms!
- * @brief Calculates Pages in Vector of Menu Options.
- * List = current area.
+ * @brief Calculates Pages in Vector of Menu Options, pulls out options for a single page.
  * @param page
  * @param list
  */
-std::vector<MenuOption> FormManager::box_start(unsigned long page, unsigned long list)
-{
-    std::vector<MenuOption> page_options;
+std::vector<MenuOption> FormManager::box_start(long current_page)
+{    
+    // Clear Existing Page Options to refresh new.
+    std::vector<MenuOption>().swap(m_page_options);    
     
     // Calcuate Box Size and Total Pages
     // Use this lateron with screen height / size to 
     // get dynamic page lengths.
-    //int boxsize = Bot - Top; // Fist Get Box Size
-    
-    
-    /*Tot = listing.size();
-    TotPages = Tot / boxsize;
-    if (Tot % boxsize > 0)
+    int boxsize = m_box_bottom - m_box_top;        
+    int total_rows = m_loaded_options.size();
+            
+    m_total_pages = total_rows / boxsize;
+    if (total_rows % boxsize > 0)
     {
-        ++TotPages;
+        ++m_total_pages;
     }
-    if (Tot <= boxsize)
-        TotPages = 1;
+    
+    if (total_rows <= boxsize)
+    {
+        m_total_pages = 1;        
+    }
+    
+    if (current_page < 1) 
+    {
+        current_page = 1;
+    }
+    
+    // Paging is Zero Based for Array.
+    int page = current_page - 1;
 
-
-	// This doesn't work in full screen message read?!?!?!
-	// Testing, only clear the box, if total pages > 1,
-	// Otherwise no need to clear since it's fresh draw.
-	if (TotPages > 1)
-	{
-		//Now clear the box First
-		for (int t = 0; t < boxsize; t++)
-		{
-		    sprintf(capture, "\x1b[%i;%iH\x1b[K", (Top)+t, 1);
-		    _editbox += capture;
-		}
-	}
-
-    // Now Grab as many lines as will fit in the box
+    // Now Grab as Records that will fit in the box
     for (int i = 1; i < boxsize+1; i++)
     {
-        if (((boxsize*Page)+i)-1 >= (signed)listing.size()) break;
-
-        // If Area has new message rotate output to new lightbars.
-        if (listing[((boxsize*Page)+i)-1].isnew)
-        {
-            if ((signed)list+1 == (boxsize*Page)+i)
-            {
-                // Current Area
-                current_selection = Top+i-1; // Get current place in box to display.
-                sprintf(capture, "\x1b[%i;%iH%s", Top+i-1, 1, (char *)listing[((boxsize*Page)+i)-1].ansi_4.c_str());
-            }
-            else
-            {
-                sprintf(capture, "\x1b[%i;%iH%s", Top+i-1, 1, (char *)listing[((boxsize*Page)+i)-1].ansi_3.c_str());
-            }
-        }
-        else
-        {
-            if ((signed)list+1 == (boxsize*Page)+i)
-            {
-                // Current Area
-                current_selection = Top+i-1; // Get current place in box to display.
-                sprintf(capture, "\x1b[%i;%iH%s", Top+i-1, 1, (char *)listing[((boxsize*Page)+i)-1].ansi_2.c_str());
-            }
-            else
-            {
-                sprintf(capture, "\x1b[%i;%iH%s", Top+i-1, 1, (char *)listing[((boxsize*Page)+i)-1].ansi_1.c_str());
-            }
-        }
-
-        _editbox += capture;
+        if (((boxsize*page)+i)-1 >= (signed)m_loaded_options.size()) 
+            break;       
+        m_page_options.push_back(m_loaded_options[((boxsize*page)+i)-1]);        
     }
 
-    // Write out Box.
-    sprintf(capture, "\x1b[%i;%iH", Row+Top-1, 1);
-    _editbox += capture;
-    pipe2ansi((char *)_editbox.c_str());*/
-
+    return m_page_options;
 }

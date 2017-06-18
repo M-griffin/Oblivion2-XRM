@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "common_io.hpp"
 
 /**
  * Development Notes:
@@ -37,6 +38,9 @@ typedef boost::shared_ptr<Config> config_ptr;
 class Menu;
 typedef boost::shared_ptr<Menu> menu_ptr;
 
+class SessionData;
+typedef boost::shared_ptr<SessionData> session_data_ptr;
+
 class MenuOption;
 
 /**
@@ -50,7 +54,7 @@ class FormManager
 {
 public:
 
-    FormManager(config_ptr config);
+    FormManager(config_ptr config, session_data_ptr session_data);
     ~FormManager();
 
 
@@ -92,19 +96,28 @@ public:
     
     /**
      * @brief Calculates Pages in Vector of Menu Options.
-     * @param page
+     * @param current_page
      * @param list
      */
-    std::vector<MenuOption> box_start(unsigned long page, unsigned long list);
+    std::vector<MenuOption> box_start(long current_page);
 
 
     config_ptr       m_config;
-    menu_ptr         m_menu_info;    // Custom Menus on the Fly
+    session_data_ptr m_session_data;
+    menu_ptr         m_menu_info;
     int              max_cmds_per_page;
     int              m_current_page;
     int              m_total_pages;
     std::string      m_form_name;
-
+    std::string      m_ansi_top;
+    std::string      m_ansi_mid;
+    std::string      m_ansi_bot;
+    int              m_box_top;
+    int              m_box_bottom;
+        
+    std::vector<MenuOption> m_loaded_options;
+    std::vector<MenuOption> m_page_options;
+    CommonIO         m_common_io;
 };
 
 

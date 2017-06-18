@@ -12,7 +12,7 @@ ModSysConfig::ModSysConfig(session_data_ptr session_data, config_ptr config, ans
     : ModBase(session_data, config, ansi_process)
     , m_current_page(0)
     , m_menu(new MenuBase(session_data))
-    , m_form_manager(new FormManager(config))
+    , m_form_manager(new FormManager(config, session_data))
 {
     // Setup the Callback to Menu Option Exection to this base class.
     m_menu->m_execute_callback.push_back(std::bind(&ModSysConfig::menuOptionsCallback, this, std::placeholders::_1));
@@ -78,7 +78,7 @@ bool ModSysConfig::menuOptionsCallback(const MenuOption &option)
 void ModSysConfig::startupFormManager()
 {
     // Startup a new Form manager instance.
-    m_form_manager.reset(new FormManager(m_config));    
+    m_form_manager.reset(new FormManager(m_config, m_session_data));    
     if (m_form_manager)
     {
         m_form_manager->startupFormSystemConfiguration();

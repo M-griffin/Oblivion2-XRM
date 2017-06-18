@@ -35,11 +35,15 @@ public:
     virtual bool onExit() = 0;
     virtual void onSave() = 0;
     
-    FormBase(config_ptr config, std::string name, std::string title, std::string pulldown_file)
+    FormBase(config_ptr config, std::string name, std::string title, std::string pulldown_file,
+            std::string ansi_top, std::string ansi_mid, std::string ansi_bot)
         : m_config(config)
         , m_name(name)
         , m_title(title)
         , m_pulldown_file(pulldown_file)
+        , m_ansi_top(ansi_top)
+        , m_ansi_mid(ansi_mid)
+        , m_ansi_bot(ansi_bot)
     { }
         
     /**
@@ -187,6 +191,9 @@ public:
     std::string             m_name;
     std::string             m_title;
     std::string             m_pulldown_file;
+    std::string             m_ansi_top;
+    std::string             m_ansi_mid;
+    std::string             m_ansi_bot;
     
     YAML::Node              m_node;
     SessionIO               m_session_io;
