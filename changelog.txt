@@ -1,4 +1,11 @@
 
+Change Log Update (00.00.101)
+* 2017-06-018
++ Working on FormManager and ModSysConfig code. Initial code to parse
+  ANSI template sizes and determined how many options will fit per page
+  is done.  Now working on code to parse and display the Templates
+  With the menu command / Form Options in lightbar format.
+
 Change Log Update (00.00.100)
 * 2017-06-07
 + Testing Arch Linux Port of ARM.  Found some issues with OpenSSL
