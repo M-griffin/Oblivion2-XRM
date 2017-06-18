@@ -89,17 +89,19 @@ public:
     void processFormOption(MenuOption &option, std::string value);
 
     /**
+     * @brief Calculates Pages in Vector of Menu Options.
+     * @param current_page
+     * @param list
+     */
+    void buildPageOptions(std::vector<MenuOption> &page_options, int current_page);
+    
+    /**
      * @brief Pulls Generate Menu Options from Form
      * @param option
      */
     menu_ptr retrieveFormOptions(int current_page);
     
-    /**
-     * @brief Calculates Pages in Vector of Menu Options.
-     * @param current_page
-     * @param list
-     */
-    std::vector<MenuOption> box_start(long current_page);
+    
 
 
     config_ptr       m_config;
@@ -116,7 +118,6 @@ public:
     int              m_box_bottom;
         
     std::vector<MenuOption> m_loaded_options;
-    std::vector<MenuOption> m_page_options;
     CommonIO         m_common_io;
 };
 

@@ -68,9 +68,10 @@ void FormManager::startupForm(form_ptr form)
     // Push to stack now the new form.
     m_form.push_back(form);
 
-    m_total_pages = form->m_menu_options.size() / max_cmds_per_page;
-    if (form->m_menu_options.size() % max_cmds_per_page > 1)
-        ++m_total_pages;
+    // This is calculated in Start_Box now.
+    //m_total_pages = form->m_menu_options.size() / max_cmds_per_page;
+    //if (form->m_menu_options.size() % max_cmds_per_page > 1)
+    //    ++m_total_pages;
         
     // Ansi Processor used for Parsing templates and get line size(s).
     // This determines the screen template size and data we can fit between
@@ -85,20 +86,23 @@ void FormManager::startupForm(form_ptr form)
     m_ansi_mid = m_common_io.readinAnsi(m_form.back()->m_ansi_mid);
     m_ansi_bot = m_common_io.readinAnsi(m_form.back()->m_ansi_bot);
     
-    // Calc Top Rows
+    // Calc Top Rows, get Ending Y Position
     ansi->parseAnsiScreen((char *)m_ansi_top.c_str());
-    int top_rows = ansi->getMaxRowsUsedOnScreen();
+    int top_rows = ansi->getYPosition();
     
-    // Clear to recalc the screen fresh.
     ansi->clearScreen();
     
     // Calc Bottom Rows
     ansi->parseAnsiScreen((char *)m_ansi_bot.c_str());
     int bot_rows = ansi->getMaxRowsUsedOnScreen();
     
+    ansi->clearScreen();
+    
     // Calculate the Box Range
     m_box_top = top_rows + 1;
     m_box_bottom = m_session_data->m_telnet_state->getTermRows() - (bot_rows + 1);
+    
+    // Parse and Process Mid ansi Template for menu display where.
 }
 
 /**
@@ -127,31 +131,14 @@ void FormManager::processFormOption(MenuOption &option, std::string value)
 }
 
 /**
- * @brief Pulls Generated Menu Options from Form
- * @param option
- */
-menu_ptr FormManager::retrieveFormOptions(int ) //page)
-{
-    // Setup the Default Menu, and pull in Form Generated Options.
-    m_menu_info->menu_name = m_form.back()->m_name;
-    m_menu_info->menu_title = m_form.back()->m_title;
-    m_menu_info->menu_pulldown_file = m_form.back()->m_pulldown_file;
-        
-    // Need to figure out paging options?
-    m_loaded_options = m_form.back()->baseGetFormOptions();
-
-    return m_menu_info;
-}
-
-/**
  * @brief Calculates Pages in Vector of Menu Options, pulls out options for a single page.
  * @param page
  * @param list
  */
-std::vector<MenuOption> FormManager::box_start(long current_page)
+void FormManager::buildPageOptions(std::vector<MenuOption> &page_options, int current_page)
 {    
-    // Clear Existing Page Options to refresh new.
-    std::vector<MenuOption>().swap(m_page_options);    
+    // First Clear All Page Options
+    std::vector<MenuOption>().swap(page_options);
     
     // Calcuate Box Size and Total Pages
     // Use this lateron with screen height / size to 
@@ -183,8 +170,26 @@ std::vector<MenuOption> FormManager::box_start(long current_page)
     {
         if (((boxsize*page)+i)-1 >= (signed)m_loaded_options.size()) 
             break;       
-        m_page_options.push_back(m_loaded_options[((boxsize*page)+i)-1]);        
+        page_options.push_back(m_loaded_options[((boxsize*page)+i)-1]);        
     }
-
-    return m_page_options;
 }
+
+/**
+ * @brief Pulls Generated Menu Options from Form
+ * @param option
+ */
+menu_ptr FormManager::retrieveFormOptions(int page)
+{
+    // Setup the Default Menu, and pull in Form Generated Options.
+    m_menu_info->menu_name = m_form.back()->m_name;
+    m_menu_info->menu_title = m_form.back()->m_title;
+    m_menu_info->menu_pulldown_file = m_form.back()->m_pulldown_file;
+           
+    // Populate Menu with the Loaded Page Options.
+    std::vector<MenuOption> page_options;
+    buildPageOptions(page_options, page);
+    m_menu_info->menu_options.swap(page_options);
+
+    return m_menu_info;
+}
+
