@@ -18,7 +18,7 @@ typedef boost::shared_ptr<Oneliners> oneliner_ptr;
 class Oneliners
 {
 public:
-    Oneliners() 
+    explicit Oneliners() 
         : iId(-1)
         , iUserId(-1)
         , sText("")

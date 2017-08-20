@@ -82,16 +82,16 @@ public:
         session_data->m_user_record->sBoxColor = m_config->default_color_box;
     }
 
-    virtual ~ModPreLogon()
+    virtual ~ModPreLogon() override
     {
         std::cout << "~ModPreLogon" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
     }
 
-    virtual bool update(const std::string &character_buffer, const bool &);
-    virtual bool onEnter();
-    virtual bool onExit();
+    virtual bool update(const std::string &character_buffer, const bool &) override;
+    virtual bool onEnter() override;
+    virtual bool onExit() override;
 
     // This matches the index for and key for setup -> mod_functions.push_back
     enum

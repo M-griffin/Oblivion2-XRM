@@ -38,14 +38,14 @@ class MenuSystem
     , public MenuBase
 {
 public:
-    MenuSystem(session_data_ptr session_data);
+    explicit MenuSystem(session_data_ptr session_data);
     ~MenuSystem();
 
-    virtual void update(const std::string &character_buffer, const bool &is_utf8);
-    virtual bool onEnter();
-    virtual bool onExit();
+    virtual void update(const std::string &character_buffer, const bool &is_utf8) override;
+    virtual bool onEnter() override;
+    virtual bool onExit() override;
 
-    virtual std::string getStateID() const
+    virtual std::string getStateID() const override
     {
         return m_menuID;
     }

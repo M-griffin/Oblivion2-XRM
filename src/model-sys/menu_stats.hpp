@@ -18,7 +18,7 @@ class MenuStats
 {
 public:
 
-    MenuStats()    
+    explicit MenuStats()    
         : iId(-1)
         , sMenuName("")
         , sCmdKey("")

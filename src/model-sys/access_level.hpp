@@ -18,7 +18,7 @@ class AccessLevel
 {
 public:
 
-    AccessLevel()    
+    explicit AccessLevel()    
         : iId(-1)
         , sName("")
         , sStartMenu("")

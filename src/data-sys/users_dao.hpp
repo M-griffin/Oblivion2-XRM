@@ -33,7 +33,8 @@ class UsersDao
     : public baseUsersClass
 {
 public:
-    UsersDao(SQLW::Database &database)
+    
+    explicit UsersDao(SQLW::Database &database)
         : baseUsersClass(database)
     {
         // Setup Table name

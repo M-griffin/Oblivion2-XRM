@@ -221,7 +221,7 @@ public:
     std::string regexp_email_validation_msg;
     
 
-    Config()
+    explicit Config()
         : file_version(FILE_VERSION)
         , bbs_name_sysop("New OBV2 XRM Sysop")
         , bbs_name("New OBV2 XRM BBS")

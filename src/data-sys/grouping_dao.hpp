@@ -34,7 +34,7 @@ class GroupingDao
 {
 public:
 
-    GroupingDao(SQLW::Database &database)
+    explicit GroupingDao(SQLW::Database &database)
         : baseGroupingClass(database)
     {
         // Setup Table name

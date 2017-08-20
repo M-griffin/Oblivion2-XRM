@@ -222,7 +222,7 @@ private:
     CommonIO               m_common_io;
     config_ptr             m_config;
 
-    Communicator();
+    explicit Communicator();
     ~Communicator();
     Communicator(const Communicator&);
     Communicator& operator=(const Communicator&);

@@ -27,7 +27,7 @@ class BaseDao
     
 public:
 
-    BaseDao(SQLW::Database &database)
+    explicit BaseDao(SQLW::Database &database)
         : m_database(database)
         , m_strTableName("")
         , m_cmdFirstTimeSetup("")

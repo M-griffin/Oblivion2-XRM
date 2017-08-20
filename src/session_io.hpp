@@ -27,8 +27,8 @@ public:
     // Types for Text Prompt formatting to file.
     typedef std::pair<std::string, std::string> M_StringPair;
 
-    SessionIO();
-    SessionIO(session_data_ptr session_data);
+    explicit SessionIO();
+    explicit SessionIO(session_data_ptr session_data);
     ~SessionIO();
 
     /**

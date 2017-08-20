@@ -16,7 +16,7 @@ private:
 
 public:
 
-    Encrypt();
+    explicit Encrypt();
     ~Encrypt();
 
     /**

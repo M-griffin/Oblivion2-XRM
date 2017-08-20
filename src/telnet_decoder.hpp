@@ -24,7 +24,7 @@ class TelnetDecoder
 {
 public:
 
-    TelnetDecoder(connection_ptr connection)
+    explicit TelnetDecoder(connection_ptr connection)
         : m_connection(connection)
         , m_naws_row(24)
         , m_naws_col(80)

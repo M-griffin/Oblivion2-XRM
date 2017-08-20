@@ -32,7 +32,7 @@ class OnelinerDao
 {
 public:
     
-    OnelinerDao(SQLW::Database &database)
+    explicit OnelinerDao(SQLW::Database &database)
         : baseOnelinerClass(database) 
     {
         // Setup Table name

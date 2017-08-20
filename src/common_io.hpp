@@ -18,7 +18,7 @@ class CommonIO
 
 public:
 
-    CommonIO()
+    explicit CommonIO()
         : m_escape_sequence("")
         , m_string_buffer("")
         , m_incoming_data("")

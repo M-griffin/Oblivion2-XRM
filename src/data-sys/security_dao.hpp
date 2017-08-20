@@ -34,7 +34,7 @@ class SecurityDao
 {
 public:
         
-    SecurityDao(SQLW::Database &database)
+    explicit SecurityDao(SQLW::Database &database)
         : baseSecurityClass(database)
     {
         // Setup Table name

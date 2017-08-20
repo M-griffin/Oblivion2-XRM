@@ -9,7 +9,7 @@ FormSystemConfig::FormSystemConfig(config_ptr config)
     : FormBase(
         config, 
         "sysconfig",              // name
-        "System Configuration",   // title
+        "System Config",          // title
         "form_config",            // pulldown
         "SYSCNFSRT.ANS",          // ANSI Templates.
         "SYSCNFMID.ANS",

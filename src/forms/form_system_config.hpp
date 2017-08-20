@@ -21,12 +21,12 @@ class FormSystemConfig
     : public FormBase
 {
 public:
-    FormSystemConfig(config_ptr config);
+    explicit FormSystemConfig(config_ptr config);
     ~FormSystemConfig();
 
-    virtual bool onEnter();
-    virtual bool onExit();
-    virtual void onSave();    
+    virtual bool onEnter() override;
+    virtual bool onExit() override;
+    virtual void onSave() override;    
 };
 
 

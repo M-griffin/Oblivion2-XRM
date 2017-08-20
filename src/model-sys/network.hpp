@@ -22,7 +22,7 @@ public:
     std::string sType;
     std::string sAddress;
     
-    Network()
+    explicit Network()
         : iId(-1)
         , sName("")
         , sType("")

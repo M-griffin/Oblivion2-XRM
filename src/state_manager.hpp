@@ -19,7 +19,7 @@
 class StateManager
 {
 public:
-    StateManager()
+    explicit StateManager()
         : m_is_state_changed(false)
     {
         std::cout << "StateManager Created" << std::endl;
