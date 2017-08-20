@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "common_io.hpp"
+#include "session_io.hpp"
 
 /**
  * Development Notes:
@@ -100,8 +101,26 @@ public:
      * @param option
      */
     menu_ptr retrieveFormOptions(int current_page);
-    
-    
+        
+    /**
+     * @brief Processes a TOP Template Screen
+     * @param screen
+     * @return
+     */
+    std::string processTopFormTemplate(const std::string &screen);
+
+    /**
+     * @brief Processes a MID Template Screen
+     * @param screen
+     * @return
+     */
+    std::string processMidFormTemplate(const std::string &screen);
+
+    /**
+     * @brief SRT, MID, END screen processing
+     * @return
+     */
+    std::string processFormScreens();
 
 
     config_ptr       m_config;
@@ -119,6 +138,7 @@ public:
         
     std::vector<MenuOption> m_loaded_options;
     CommonIO         m_common_io;
+    SessionIO        m_session_io;
 };
 
 

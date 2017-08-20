@@ -29,7 +29,7 @@ public:
     virtual void resume() {}
     virtual std::string getStateID() const = 0;
 
-    StateBase(session_data_ptr session_data)
+    explicit StateBase(session_data_ptr session_data)
         : m_session_data(session_data)
         , m_is_active(false)
     { }

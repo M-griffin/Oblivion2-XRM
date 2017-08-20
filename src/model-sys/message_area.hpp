@@ -92,7 +92,7 @@ public:
     bool        bNetmail;
     long        iSortOrder;
     
-    MessageArea()
+    explicit MessageArea()
         : iId(-1)
         , sName("")
         , sAcsAccess("")

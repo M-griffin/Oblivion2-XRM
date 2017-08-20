@@ -33,7 +33,7 @@ class NetworkDao
 {
 public:
     
-    NetworkDao(SQLW::Database &database)
+    explicit NetworkDao(SQLW::Database &database)
         : baseNetworkClass(database)
     {
         // Setup Table name

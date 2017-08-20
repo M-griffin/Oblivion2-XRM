@@ -52,23 +52,23 @@ public:
     /**
      * @brief Startup a Windows Specific External Process
      */
-    bool createProcess();
+    virtual bool createProcess() override; 
 
     /**
      * @brief Checks if the process is still running
      * @return
      */
-    bool isRunning();
+    virtual bool isRunning() override;
 
     /**
      * @brief Pulls Input Data from User Session and Delivers to (Child Process)
      */
-    void update();
+    virtual void update() override;
 
     /**
      * @brief Kill Process
      */
-    void terminate();
+    virtual void terminate() override;
 
     PROCESS_INFORMATION m_process_info;
     HANDLE              m_new_stdin;

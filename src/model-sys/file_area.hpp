@@ -59,7 +59,7 @@ public:
     bool        bFreeArea;
     long        iSortOrder;
     
-    FileArea()
+    explicit FileArea()
         : iId(-1)
         , sName("")
         , sAcsAccess("")

@@ -28,7 +28,7 @@ typedef boost::shared_ptr<SessionSSL> session_ssl_ptr;
 class SessionManager
 {
 public:
-    SessionManager()
+    explicit SessionManager()
     {
         std::cout << "SessionManager" << std::endl;
     }

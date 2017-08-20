@@ -32,7 +32,7 @@ public:
     std::string data_line2;
     std::string data_line3;
 
-    MenuPrompt()
+    explicit MenuPrompt()
         : file_version(FILE_VERSION)
         , name("Menu Prompt Name")
         , data_line1("")

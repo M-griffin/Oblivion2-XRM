@@ -32,7 +32,8 @@ class FileAreaDao
     : public baseFileAreaClass
 {
 public:
-    FileAreaDao(SQLW::Database &database)
+
+    explicit FileAreaDao(SQLW::Database &database)
         : baseFileAreaClass(database)
     {
         // Setup Table name

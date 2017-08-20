@@ -33,7 +33,8 @@ class MessageAreaDao
     : public baseMessageAreaClass
 {
 public:
-    MessageAreaDao(SQLW::Database &database)
+    
+    explicit MessageAreaDao(SQLW::Database &database)
         : baseMessageAreaClass(database)
     {
         // Setup Table name

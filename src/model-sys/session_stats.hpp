@@ -44,7 +44,7 @@ public:
     long iFilesUlMb;
     long iFilesDlMb;
 
-    SessionStats()
+    explicit SessionStats()
         : iId(-1)
         , iUserId(-1)
         , sSessionType("Telnet")

@@ -40,12 +40,12 @@ public:
 
     ModSysConfig(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process);
         
-    virtual ~ModSysConfig()
+    virtual ~ModSysConfig() override
     { }
 
-    virtual bool update(const std::string &character_buffer, const bool &);
-    virtual bool onEnter();
-    virtual bool onExit();
+    virtual bool update(const std::string &character_buffer, const bool &) override;
+    virtual bool onEnter() override;
+    virtual bool onExit() override;
     
     /**
      * @brief Process Command Keys passed from menu selection (Callback)
