@@ -14,7 +14,8 @@
 class DbStartup
 {
 public:
-    DbStartup();
+
+    explicit DbStartup();
     ~DbStartup();
 
     /**

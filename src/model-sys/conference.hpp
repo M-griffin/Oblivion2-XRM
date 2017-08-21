@@ -25,7 +25,7 @@ public:
     std::string sACS;
     long        iSortOrder;
     
-    Conference()
+    explicit Conference()
         : iId(-1)
         , sName("")
         , sType("")

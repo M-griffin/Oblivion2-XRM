@@ -23,7 +23,7 @@ public:
     long        iConferenceId;
     long        iAreaId;
     
-    Grouping()
+    explicit Grouping()
         : iId(-1)
         , iConferenceId(-1)
         , iAreaId(-1)

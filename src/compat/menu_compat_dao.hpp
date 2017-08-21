@@ -14,7 +14,8 @@
 class MenuCompatDao
 {
 public:
-    MenuCompatDao()
+    
+    explicit MenuCompatDao()
     { }
 
     ~MenuCompatDao()

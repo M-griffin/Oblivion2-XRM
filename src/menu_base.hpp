@@ -37,7 +37,7 @@ typedef boost::shared_ptr<SessionData> session_data_ptr;
 class MenuBase
 {
 public:
-    MenuBase(session_data_ptr session_data);
+    explicit MenuBase(session_data_ptr session_data);
     ~MenuBase();
 
     // This matches the index for menu_functions.push_back
@@ -105,7 +105,6 @@ public:
         m_ansi_process->parseAnsiScreen((char *)data.c_str());
         m_menu_session_data->deliver(data);
     }
-
 
     /**
      * @brief Clears out Loaded Pulldown options { Called From readInMenuData() }

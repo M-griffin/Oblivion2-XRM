@@ -32,7 +32,8 @@ class ConferenceDao
     : public baseConferenceClass
 {
 public:
-    ConferenceDao(SQLW::Database &database)
+
+    explicit ConferenceDao(SQLW::Database &database)
         : baseConferenceClass(database) 
     {
         // Setup Table name

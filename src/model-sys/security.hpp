@@ -25,7 +25,7 @@ public:
     std::string sChallengeQuestion;
     std::string sChallengeAnswerHash;
 
-    Security()
+    explicit Security()
         : iId(-1)
         , sPasswordHash("")
         , sSaltHash("")

@@ -15,7 +15,8 @@
 class PromptDao
 {
 public:
-    PromptDao()
+    
+    explicit PromptDao()
     { }
 
     ~PromptDao()

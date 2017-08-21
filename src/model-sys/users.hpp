@@ -74,7 +74,7 @@ public:
     long        iSecurityIndex;
 
     // Default User ID to -1 so we know it's not active!
-    Users()
+    explicit Users()
         : iId(-1)
         , sHandle("")
         , sRealName("")

@@ -11,7 +11,8 @@
 class menu_stats_dao
 {
 public:
-    menu_stats_dao();
+    
+    explicit menu_stats_dao();
     ~menu_stats_dao();
 
 };

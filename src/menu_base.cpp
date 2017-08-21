@@ -196,7 +196,7 @@ void MenuBase::loadInMenu(std::string menu_name)
 }
 
 /**
- * @brief Import the Menu from Modules into the system container.
+ * @brief Imports Menu from Modules into the system container.
  */
 void MenuBase::importMenu(menu_ptr menu_info)
 {
@@ -207,6 +207,11 @@ void MenuBase::importMenu(menu_ptr menu_info)
     // Remove Options the users might not have access to
     // ie Sysop Commands inside of forms.
     checkMenuOptionsAcsAccess();
+    
+    // Now we need to process custom screens from module menu
+    
+    
+    
 }
 
 /**

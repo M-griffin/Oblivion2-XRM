@@ -26,7 +26,8 @@ class SessionStatsDao
     : public baseSessionStatsClass
 {
 public:
-    SessionStatsDao(SQLW::Database &database)
+    
+    explicit SessionStatsDao(SQLW::Database &database)
         : baseSessionStatsClass(database)
     {
         // Setup Table name

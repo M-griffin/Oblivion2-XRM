@@ -24,7 +24,7 @@ public:
     std::string sSysop;
     
     
-    BBSList()
+    explicit BBSList()
         : iId(-1)
         , sName("")
         , sType("")

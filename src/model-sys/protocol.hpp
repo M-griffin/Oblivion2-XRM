@@ -19,7 +19,7 @@ class Protocol
 {
 public:
 
-    Protocol()    
+    explicit Protocol()    
         : protocol_name("")
         , protocol_type("") // up/down.
         , protocol_key("")

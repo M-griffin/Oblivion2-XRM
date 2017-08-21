@@ -4,7 +4,8 @@
 class bbs_list_dao
 {
 public:
-    bbs_list_dao();
+    
+    explicit bbs_list_dao();
     ~bbs_list_dao();
 
 };

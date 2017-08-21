@@ -24,7 +24,7 @@ typedef boost::shared_ptr<Users> user_ptr;
 class AccessCondition
 {
 public:
-    AccessCondition()  { };
+    explicit AccessCondition()  { };
     ~AccessCondition() { };
     
     /**

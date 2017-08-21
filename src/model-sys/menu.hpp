@@ -24,7 +24,7 @@ class MenuOption
 
 public:
 
-    MenuOption()
+    explicit MenuOption()
         : index(0)
         , name("New Option")
         , acs_string("")  

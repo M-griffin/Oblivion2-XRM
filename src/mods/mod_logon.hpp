@@ -66,16 +66,16 @@ public:
         m_text_prompts_dao->readPrompts();
     }
 
-    virtual ~ModLogon()
+    virtual ~ModLogon() override
     {
         std::cout << "~ModLogon" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
     }
 
-    virtual bool update(const std::string &character_buffer, const bool &);
-    virtual bool onEnter();
-    virtual bool onExit();
+    virtual bool update(const std::string &character_buffer, const bool &) override;
+    virtual bool onEnter() override;
+    virtual bool onExit() override;
 
     // This matches the index for mod_functions.push_back
     enum
@@ -245,7 +245,6 @@ private:
     // Function Input Vector.
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
-
 
 
     SessionIO              m_session_io;
