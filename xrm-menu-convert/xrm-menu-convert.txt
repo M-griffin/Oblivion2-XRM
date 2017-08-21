@@ -1,1 +1,1 @@
-./Debug/src_main.cpp.o ./Debug/up_src_common_io.cpp.o ./Debug/up_src_data-sys_config_dao.cpp.o ./Debug/up_src_data-sys_menu_dao.cpp.o   
+./Debug/src_main.cpp.o ./Debug/src_common_io.cpp.o ./Debug/data-sys_config_dao.cpp.o ./Debug/data-sys_menu_dao.cpp.o

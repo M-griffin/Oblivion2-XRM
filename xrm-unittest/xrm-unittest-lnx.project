@@ -67,6 +67,15 @@
     <File Name="../src/data-sys/file_area_dao.hpp"/>
     <File Name="../src/data-sys/message_area_dao.cpp"/>
     <File Name="../src/data-sys/message_area_dao.hpp"/>
+    <File Name="../src/data-sys/access_level_dao.cpp"/>
+    <File Name="../src/data-sys/protocol_dao.cpp"/>
+    <File Name="../src/data-sys/protocol_dao.hpp"/>
+    <File Name="../src/data-sys/security_dao.cpp"/>
+    <File Name="../src/data-sys/security_dao.hpp"/>
+    <File Name="../src/data-sys/session_stats_dao.cpp"/>
+    <File Name="../src/data-sys/session_stats_dao.hpp"/>
+    <File Name="../src/data-sys/users_dao.cpp"/>
+    <File Name="../src/data-sys/users_dao.hpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="model-sys">
     <File Name="../src/model-sys/config.hpp"/>
