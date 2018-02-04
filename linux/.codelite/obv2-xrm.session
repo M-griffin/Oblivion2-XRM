@@ -2,15 +2,7 @@
 <Session Name="/home/merc/code/Oblivion2-XRM/linux/obv2-xrm.workspace">
   <int Value="0" Name="m_selectedTab"/>
   <wxString Value="/home/merc/code/Oblivion2-XRM/linux/obv2-xrm.workspace" Name="m_workspaceName"/>
-  <TabInfoArray Name="TabInfoArray">
-    <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/form_manager.cpp" Name="FileName"/>
-      <int Value="90" Name="FirstVisibleLine"/>
-      <int Value="96" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-  </TabInfoArray>
+  <TabInfoArray Name="TabInfoArray"/>
   <SerializedObject Name="m_breakpoints">
     <long Value="0" Name="Count"/>
   </SerializedObject>
