@@ -1,4 +1,8 @@
 
+.. image:: http://htc.zapto.org:1024/jenkins/job/Oblivion2-XRM/badge/icon?png
+    :target: https://htc.zapto.org/jenkins/job/Oblivion2-XRM/
+
+
 .. contents:: Table of Contents
    :depth: 3
 

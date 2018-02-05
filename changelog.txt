@@ -1,4 +1,10 @@
 
+Change Log Update (00.00.103)
+* 2018-02-05
++ Corrected issues with Linux (ARM) Builder and G++7 Compiler in Arch Linux.
++ Hooked in Jenkins build processing, on-demand builds are setup now, next will 
+  hooking up commits and pull-requests.
+
 Change Log Update (00.00.102)
 * 2017-08-20
 + Updated Classes with explicit for empty and single variable constructors
