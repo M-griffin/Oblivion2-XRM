@@ -35,7 +35,7 @@ install:	all
 		$(INSTALL) $(LIBNAME).h $(INSTALL_INCLUDE)
 
 clean:
-		rm -f *~ *.o $(PROGS) *.d slask *.a $(LIBHEADER)
+		rm -f *~ *.o $(PROGS) *.d slask *.a $(LIBNAME).h
 
 sqlite3test:	sqlite3test.o
 		g++ -o $@ $^ $(LIBS)
