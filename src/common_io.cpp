@@ -1239,7 +1239,6 @@ std::string CommonIO::PascalToCString(int8_t *string)
 {
     if(string[0] == 0)
     {
-        string = '\0';
         return "";
     }
 

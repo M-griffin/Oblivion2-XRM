@@ -1018,6 +1018,7 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
                             } // End Switch
                         } // End For
                     } // End Else
+                    break;
 
                 case RESET_MODE: // ?7h
                     esc_sequence.clear();
