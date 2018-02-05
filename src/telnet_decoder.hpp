@@ -288,8 +288,8 @@ private:
     template <typename T>
     void addSequence(T &t, unsigned char option)
     {
-        typename T::iterator it =
-            find_if(t.begin(), t.end(), FindFirst(option));
+        //typename T::iterator it =
+            //find_if(t.begin(), t.end(), FindFirst(option));
 
         // Sequence Not Found, add new sequence.
         //if(it == t.end())

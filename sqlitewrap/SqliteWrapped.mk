@@ -5,16 +5,16 @@
 ## Debug
 ProjectName            :=SqliteWrapped
 ConfigurationName      :=Debug
-WorkspacePath          := "/home/merc/code/Oblivion2-XRM/linux"
-ProjectPath            := "/home/merc/code/Oblivion2-XRM/sqlitewrap"
+WorkspacePath          :=/home/blue/code/Oblivion2-XRM/linux
+ProjectPath            :=/home/blue/code/Oblivion2-XRM/sqlitewrap
 IntermediateDirectory  :=./Debug
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
-User                   :=Michae Griffin
-Date                   :=20/08/17
-CodeLitePath           :="/home/merc/.codelite"
+User                   :=
+Date                   :=02/04/18
+CodeLitePath           :=/home/blue/.codelite
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
 ObjectSuffix           :=.o
@@ -77,8 +77,8 @@ $(OutputFile): $(Objects)
 	@echo "" > $(IntermediateDirectory)/.d
 	@echo $(Objects0)  > $(ObjectsFileList)
 	$(AR) $(ArchiveOutputSwitch)$(OutputFile) @$(ObjectsFileList) $(ArLibs)
-	@$(MakeDirCommand) "/home/merc/code/Oblivion2-XRM/linux/.build-debug"
-	@echo rebuilt > "/home/merc/code/Oblivion2-XRM/linux/.build-debug/SqliteWrapped"
+	@$(MakeDirCommand) "/home/blue/code/Oblivion2-XRM/linux/.build-debug"
+	@echo rebuilt > "/home/blue/code/Oblivion2-XRM/linux/.build-debug/SqliteWrapped"
 
 PostBuild:
 	@echo Executing Post Build commands ...
@@ -100,36 +100,36 @@ PreBuild:
 ## Objects
 ##
 $(IntermediateDirectory)/Database.cpp$(ObjectSuffix): Database.cpp $(IntermediateDirectory)/Database.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/sqlitewrap/Database.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/Database.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/blue/code/Oblivion2-XRM/sqlitewrap/Database.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/Database.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/Database.cpp$(DependSuffix): Database.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/Database.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/Database.cpp$(DependSuffix) -MM "Database.cpp"
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/Database.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/Database.cpp$(DependSuffix) -MM Database.cpp
 
 $(IntermediateDirectory)/Database.cpp$(PreprocessSuffix): Database.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Database.cpp$(PreprocessSuffix) "Database.cpp"
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Database.cpp$(PreprocessSuffix) Database.cpp
 
 $(IntermediateDirectory)/Query.cpp$(ObjectSuffix): Query.cpp $(IntermediateDirectory)/Query.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/sqlitewrap/Query.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/Query.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/blue/code/Oblivion2-XRM/sqlitewrap/Query.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/Query.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/Query.cpp$(DependSuffix): Query.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/Query.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/Query.cpp$(DependSuffix) -MM "Query.cpp"
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/Query.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/Query.cpp$(DependSuffix) -MM Query.cpp
 
 $(IntermediateDirectory)/Query.cpp$(PreprocessSuffix): Query.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Query.cpp$(PreprocessSuffix) "Query.cpp"
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Query.cpp$(PreprocessSuffix) Query.cpp
 
 $(IntermediateDirectory)/StderrLog.cpp$(ObjectSuffix): StderrLog.cpp $(IntermediateDirectory)/StderrLog.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/sqlitewrap/StderrLog.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/StderrLog.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/blue/code/Oblivion2-XRM/sqlitewrap/StderrLog.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/StderrLog.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/StderrLog.cpp$(DependSuffix): StderrLog.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/StderrLog.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/StderrLog.cpp$(DependSuffix) -MM "StderrLog.cpp"
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/StderrLog.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/StderrLog.cpp$(DependSuffix) -MM StderrLog.cpp
 
 $(IntermediateDirectory)/StderrLog.cpp$(PreprocessSuffix): StderrLog.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/StderrLog.cpp$(PreprocessSuffix) "StderrLog.cpp"
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/StderrLog.cpp$(PreprocessSuffix) StderrLog.cpp
 
 $(IntermediateDirectory)/SysLog.cpp$(ObjectSuffix): SysLog.cpp $(IntermediateDirectory)/SysLog.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/sqlitewrap/SysLog.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/SysLog.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/blue/code/Oblivion2-XRM/sqlitewrap/SysLog.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/SysLog.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/SysLog.cpp$(DependSuffix): SysLog.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/SysLog.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/SysLog.cpp$(DependSuffix) -MM "SysLog.cpp"
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/SysLog.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/SysLog.cpp$(DependSuffix) -MM SysLog.cpp
 
 $(IntermediateDirectory)/SysLog.cpp$(PreprocessSuffix): SysLog.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/SysLog.cpp$(PreprocessSuffix) "SysLog.cpp"
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/SysLog.cpp$(PreprocessSuffix) SysLog.cpp
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
