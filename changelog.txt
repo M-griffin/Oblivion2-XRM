@@ -1,4 +1,10 @@
 
+Change Log Update (00.00.104)
+* 2018-02-05
++ SqliteWrapped, update making file lib namming so if users run this manually
+  from the command line it matches the cases the project and xrm-server expect.
+  Also fixed for Jenkins build processing so it deson't have to rename it.
+
 Change Log Update (00.00.103)
 * 2018-02-05
 + Corrected issues with Linux (ARM) Builder and G++7 Compiler in Arch Linux.
