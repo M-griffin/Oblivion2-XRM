@@ -29,7 +29,7 @@ pipeline {
 		
 		stage('\u2776 Build xrm-menu-prompt-convert') {
 			steps {								
-				dir ('xrm-menu-convert') {        
+				dir ('xrm-menu-prompt-convert') {        
 					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/xrm-menu-prompt-convert/src/+src/+' xrm-menu-prompt-convert.mk'''
 					sh '''sed -i 's+/home/merc/code/Oblivion2-XRM/xrm-menu-prompt-convert/src/+src/+' xrm-menu-prompt-convert.mk'''
 					
