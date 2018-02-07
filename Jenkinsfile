@@ -3,7 +3,6 @@
 pipeline {
 	agent any
 	stages {
-
 		stage('\u2776 Build SqliteWrapped') {
 			steps {								
 				dir ('sqlitewrap') {        
