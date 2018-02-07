@@ -113,7 +113,7 @@
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
         <IncludePath Value="/usr/include/unittest++"/>
-        <IncludePath Value="/usr/include/Unittest++"/>
+        <IncludePath Value="/usr/include/UnitTest++"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
