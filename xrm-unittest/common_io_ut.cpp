@@ -5,11 +5,7 @@
 
 #include "common_io.hpp"
 
-#ifdef _WIN32
 #include <UnitTest++.h>
-#else
-#include <unittest++/UnitTest++.h>
-#endif
 
 // C++ Standard
 #include <iostream>
