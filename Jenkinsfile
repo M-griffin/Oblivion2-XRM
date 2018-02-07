@@ -8,7 +8,7 @@ pipeline {
 			steps {								
 				dir ('sqlitewrap') {        
 					sh 'make -f Makefile clean'
-					sh 'make -f Makefile -j3'
+					sh 'make -f Makefile -j2'
 				}
 			}
 		}
@@ -22,7 +22,7 @@ pipeline {
 					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/src/+../src/+' xrm-menu-convert.mk'''
 					sh '''sed -i 's+/home/merc/code/Oblivion2-XRM/src/+../src/+' xrm-menu-convert.mk'''
 					sh 'make -f xrm-menu-convert.mk clean'
-					sh 'make -f xrm-menu-convert.mk -j3'
+					sh 'make -f xrm-menu-convert.mk -j2'
 				}
 			}
 		}	
@@ -36,7 +36,7 @@ pipeline {
 					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/src/+../src/+' xrm-menu-prompt-convert.mk'''
 					sh '''sed -i 's+/home/merc/code/Oblivion2-XRM/src/+../src/+' xrm-menu-prompt-convert.mk'''
 					sh 'make -f xrm-menu-prompt-convert.mk clean'
-					sh 'make -f xrm-menu-prompt-convert.mk -j3'
+					sh 'make -f xrm-menu-prompt-convert.mk -j2'
 				}
 			}
 		}
@@ -50,7 +50,7 @@ pipeline {
 					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/src/+../src/+' xrm-unittest.mk'''
 					sh '''sed -i 's+/home/merc/code/Oblivion2-XRM/src/+../src/+' xrm-unittest.mk'''
 					sh 'make -f xrm-unittest.mk clean'
-					sh 'make -f xrm-unittest.mk -j3'
+					sh 'make -f xrm-unittest.mk -j2'
 					
 					// Run tests
 					echo 'Running Unit Tests...'
