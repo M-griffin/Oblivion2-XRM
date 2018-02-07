@@ -65,8 +65,8 @@ pipeline {
 				dir ('linux') {
 					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/src/+../src/+' xrm-server.mk'''
 					sh '''sed -i 's+/home/merc/code/Oblivion2-XRM/src/+../src/+' xrm-server.mk'''
-					sh 'make -f Makefile clean'
-					sh 'make -f Makefile -j2'
+					sh 'make -f xrm-server.mk clean'
+					sh 'make -f xrm-server.mk -j2'
 				}
 			 }
 		}
