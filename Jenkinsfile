@@ -43,10 +43,7 @@ pipeline {
 		
 		stage('\u2776 Build xrm-unittest') {
 			steps {								
-				dir ('xrm-unittest') {        
-					
-					/home/merc/code/Oblivion2-XRM/xrm-unittest/main.cpp
-					
+				dir ('xrm-unittest') {        									
 					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/xrm-unittest/++' xrm-unittest.mk'''
 					sh '''sed -i 's+/home/merc/code/Oblivion2-XRM/xrm-unittest/++' xrm-unittest.mk'''
 					
@@ -58,7 +55,7 @@ pipeline {
 					// Run tests
 					echo 'Running Unit Tests...'
 					dir ('Debug') {        
-						sh 'xrm-unittest'
+						sh './xrm-unittest'
 					}
 				}
 			}
