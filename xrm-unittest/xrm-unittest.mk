@@ -50,8 +50,8 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryP
 AR       := /usr/bin/ar rcu
 CXX      := /usr/bin/g++
 CC       := /usr/bin/gcc
-CXXFLAGS :=  -g -std=c++11 -Wno-deprecated -Wno-unused-local-typedefs $(Preprocessors)
-CFLAGS   :=  -g -std=c++11 -Wno-deprecated -Wno-unused-local-typedefs $(Preprocessors)
+CXXFLAGS :=  -g -std=c++11 -Wno-deprecated -Wno-unused-local-typedefs -Wno-psabi $(Preprocessors)
+CFLAGS   :=  -g -std=c++11 -Wno-deprecated -Wno-unused-local-typedefs -Wno-psabi $(Preprocessors)
 ASFLAGS  := 
 AS       := /usr/bin/as
 
