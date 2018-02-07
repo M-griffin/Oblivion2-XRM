@@ -44,13 +44,22 @@ pipeline {
 		stage('\u2776 Build xrm-unittest') {
 			steps {								
 				dir ('xrm-unittest') {        
-					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/xrm-unittest/src/+src/+' xrm-unittest.mk'''
-					sh '''sed -i 's+/home/merc/code/Oblivion2-XRM/xrm-unittest/src/+src/+' xrm-unittest.mk'''
+					
+					/home/merc/code/Oblivion2-XRM/xrm-unittest/main.cpp
+					
+					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/xrm-unittest/++' xrm-unittest.mk'''
+					sh '''sed -i 's+/home/merc/code/Oblivion2-XRM/xrm-unittest/++' xrm-unittest.mk'''
 					
 					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/src/+../src/+' xrm-unittest.mk'''
 					sh '''sed -i 's+/home/merc/code/Oblivion2-XRM/src/+../src/+' xrm-unittest.mk'''
 					sh 'make -f xrm-unittest.mk clean'
 					sh 'make -f xrm-unittest.mk -j3'
+					
+					// Run tests
+					echo 'Running Unit Tests...'
+					dir ('Debug') {        
+						sh 'xrm-unittest'
+					}
 				}
 			}
 		}
