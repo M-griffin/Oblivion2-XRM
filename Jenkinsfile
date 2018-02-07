@@ -13,7 +13,7 @@ pipeline {
 			}
 		}
 		
-		stage('\u2776 Build xrm-menu-convert') {
+		stage('\u2776 Build Xrm-Menu-Convert') {
 			steps {								
 				dir ('xrm-menu-convert') {        
 					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/xrm-menu-convert/src/+src/+' xrm-menu-convert.mk'''
@@ -27,7 +27,7 @@ pipeline {
 			}
 		}	
 		
-		stage('\u2776 Build xrm-menu-prompt-convert') {
+		stage('\u2776 Build Xrm-Menu-Prompt-Convert') {
 			steps {								
 				dir ('xrm-menu-prompt-convert') {        
 					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/xrm-menu-prompt-convert/src/+src/+' xrm-menu-prompt-convert.mk'''
@@ -41,7 +41,7 @@ pipeline {
 			}
 		}
 		
-		stage('\u2776 Build xrm-unittest') {
+		stage('\u2776 Build Xrm-UnitTests') {
 			steps {								
 				dir ('xrm-unittest') {        									
 					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/xrm-unittest/++' xrm-unittest.mk'''
