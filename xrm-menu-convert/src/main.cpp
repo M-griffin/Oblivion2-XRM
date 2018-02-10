@@ -289,7 +289,7 @@ void MenuConvert::process_menu()
     fs::directory_iterator end_iter;
 
     typedef std::vector<std::string> result_set_t;
-    typedef std::vector<std::string>::iterator iterator;
+    //typedef std::vector<std::string>::iterator iterator;
     result_set_t result_set;
 
     if(fs::exists(menu_directory) && fs::is_directory(menu_directory))

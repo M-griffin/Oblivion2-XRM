@@ -791,7 +791,7 @@ std::vector<std::string> MenuBase::getListOfMenuPrompts()
     fs::directory_iterator end_iter;
 
     typedef std::vector<std::string> result_set_t;
-    typedef std::vector<std::string>::iterator iterator;
+    //typedef std::vector<std::string>::iterator iterator;
     result_set_t result_set;
     std::vector<std::string> result_list;
 
