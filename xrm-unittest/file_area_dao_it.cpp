@@ -2,12 +2,7 @@
 #include "data-sys/file_area_dao.hpp"
 #include "model-sys/file_area.hpp"
 
-#ifdef _WIN32
 #include <UnitTest++.h>
-#else
-#include <unittest++/UnitTest++.h>
-#endif
-
 #include "libSqliteWrapped.h"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
@@ -17,53 +12,53 @@
  */
 class MyFixtureFileArea
 {
-    
+
 public:
 
     MyFixtureFileArea()
         : m_database("xrm_itFileAreaTest.sqlite3")
-    { 
-        // Can't remove database on closure, becasue the 
+    {
+        // Can't remove database on closure, becasue the
         // Object is not cleared till Destructor is finished.
         // Before Each Test, we need to remove existing database.
         std::cout << "xrm_itFileAreaTest.sqlite3" << std::endl;
         remove("xrm_itFileAreaTest.sqlite3");
     }
-    
-    ~MyFixtureFileArea() 
+
+    ~MyFixtureFileArea()
     { }
-   
+
     SQLW::Database m_database;
 };
 
 
 /**
  * @brief Unit Testing for Initial Sqlite Database DAO and BaseDao.
- * @return 
+ * @return
  */
 SUITE(XRMFileAreaDao)
 {
-    
+
     // Test DAO with All Base Dao Calls.
     TEST_FIXTURE(MyFixtureFileArea, FileAreaDaoTest)
-    {        
+    {
         // Link to users dao for data access object
         file_area_dao_ptr objdb(new FileAreaDao(m_database));
 
         // DataBase Table Should not exist.
         CHECK(!objdb->doesTableExist());
-        
+
         // Setup database Param, cache sies etc..
         CHECK(objdb->firstTimeSetupParams());
 
         // Check Create Table and Index
         CHECK(objdb->createTable());
-        
+
         // DataBase Table exists.
         CHECK(objdb->doesTableExist());
-        
+
         // Check Insert
-        file_area_ptr objIn(new FileArea());        
+        file_area_ptr objIn(new FileArea());
         objIn->sName = "General Area";
         objIn->sAcsAccess = "s20";
         objIn->sAcsUpload = "s21";
@@ -76,7 +71,7 @@ SUITE(XRMFileAreaDao)
         objIn->iMultiplier = 1;
         objIn->bFreeArea = true;
         objIn->iSortOrder = 1;
-        
+
         // Check Insert
         file_area_ptr objIn2(new FileArea());
         objIn2->sName = "Sysop Area";
@@ -91,19 +86,19 @@ SUITE(XRMFileAreaDao)
         objIn2->iMultiplier = 2;
         objIn2->bFreeArea = false;
         objIn2->iSortOrder = 2;
-        
+
         long lastInsertId = objdb->insertRecord(objIn);
-        
+
         long InsertId2nd = objdb->insertRecord(objIn2);
-        
+
         // Returns Lat Insert Id, Should not be -1.
         CHECK(lastInsertId == 1);
         CHECK(InsertId2nd == 2);
-        
+
         // Check Retrieve
         file_area_ptr objOut(new FileArea());
         objOut = objdb->getRecordById(lastInsertId);
-        
+
         CHECK(objOut->sName == "General Area");
         CHECK(objOut->sAcsAccess == "s20");
         CHECK(objOut->sAcsUpload == "s21");
@@ -116,9 +111,9 @@ SUITE(XRMFileAreaDao)
         CHECK(objOut->iMultiplier == 1);
         CHECK(objOut->bFreeArea == true);
         CHECK(objOut->iSortOrder == 1);
-        
-        
-        // Test Update, Id should be 1 already.                
+
+
+        // Test Update, Id should be 1 already.
         objOut->sName = "General Areas2";
         objOut->sAcsAccess = "s30";
         objOut->sAcsUpload = "s31";
@@ -131,15 +126,15 @@ SUITE(XRMFileAreaDao)
         objOut->iMultiplier = 3;
         objOut->bFreeArea = false;
         objOut->iSortOrder = 3;
-        
-        
+
+
         // Updates returns bool.
         CHECK(objdb->updateRecord(objOut));
-        
+
         //Retrieve Update
         file_area_ptr objUpdate(new FileArea());
         objUpdate = objdb->getRecordById(lastInsertId);
-        
+
         // Test Output After Update
         CHECK(objUpdate->sName == "General Areas2");
         CHECK(objUpdate->sAcsAccess == "s30");
@@ -152,14 +147,14 @@ SUITE(XRMFileAreaDao)
         CHECK(objUpdate->sSort == "M");
         CHECK(objUpdate->iMultiplier == 3);
         CHECK(objUpdate->bFreeArea == false);
-        CHECK(objUpdate->iSortOrder == 3);        
-        
+        CHECK(objUpdate->iSortOrder == 3);
+
         // Test Get All Records in Vector.
         std::vector<file_area_ptr> getAllResults;
         getAllResults = objdb->getAllRecords();
-        
+
         CHECK(getAllResults.size() == 2);
-        
+
         // Test Output After Update
         // Test Output After Update
         CHECK(getAllResults[0]->iId == 1);
@@ -174,9 +169,9 @@ SUITE(XRMFileAreaDao)
         CHECK(getAllResults[0]->sSort == "M");
         CHECK(getAllResults[0]->iMultiplier == 3);
         CHECK(getAllResults[0]->bFreeArea == false);
-        CHECK(getAllResults[0]->iSortOrder == 3);        
-               
-        
+        CHECK(getAllResults[0]->iSortOrder == 3);
+
+
         // Test 2nd Row next record.
         CHECK(getAllResults[1]->iId == 2);
         CHECK(getAllResults[1]->sName == "Sysop Area");
@@ -191,34 +186,34 @@ SUITE(XRMFileAreaDao)
         CHECK(getAllResults[1]->iMultiplier == 2);
         CHECK(getAllResults[1]->bFreeArea == false);
         CHECK(getAllResults[1]->iSortOrder == 2);
-        
+
         // Test Record Counts
         long checkCounts = objdb->getRecordsCount();
-        
+
         // Check Record Counts
         CHECK(checkCounts == 2);
-        
+
         // Test Delete Record
         CHECK(objdb->deleteRecord(lastInsertId));
-                        
+
         // Test Getting Deleted Record
         file_area_ptr objDel(new FileArea());
         objDel = objdb->getRecordById(lastInsertId);
-        
+
         // Invalid Records return with -1
         CHECK(objDel->iId == -1);
-        
+
         // Test Record Counts After Purge
         long checkCounts2 = objdb->getRecordsCount();
-        
+
         // Check Record Counts
         CHECK(checkCounts2 == 1);
-        
+
         // Test Drop Table and Index returns true;
         CHECK(objdb->dropTable());
-        
+
         // DataBase Table Should not exist.
-        CHECK(!objdb->doesTableExist());        
-    }    
+        CHECK(!objdb->doesTableExist());
+    }
 
 }

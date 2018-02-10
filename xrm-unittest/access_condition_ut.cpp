@@ -5,12 +5,7 @@
 
 #include "access_condition.hpp"
 
-#ifdef _WIN32
 #include <UnitTest++.h>
-#else
-#include <unittest++/UnitTest++.h>
-#endif
-
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include "model-sys/users.hpp"
@@ -1065,101 +1060,101 @@ SUITE(XRMAccessCondition)
         code_map = acs.parseAcsString(test_expression);
         CHECK(!acs.parseCodeMap(code_map, user));
     }
-    
+
     TEST(validateAcsStringTestFail)
     {
         user_ptr user(new Users);
         user->iControlFlags2 |= 1 << 1; // B
         user->iLevel = 15;
-        
-        AccessCondition acs;        
+
+        AccessCondition acs;
 
         std::string test_expression = "OAs15";
         bool result = acs.validateAcsString(test_expression, user);
-        
+
         CHECK(!result);
     }
-    
+
     TEST(validateAcsStringTest2Fail)
     {
-         user_ptr user(new Users);
+        user_ptr user(new Users);
         user->iControlFlags1 |= 1 << 1; // B
         user->iLevel = 15;
-        
-        AccessCondition acs;        
+
+        AccessCondition acs;
 
         std::string test_expression = "FAs15";
         bool result = acs.validateAcsString(test_expression, user);
-        
+
         CHECK(!result);
     }
-    
+
     TEST(validateAcsStringTestSuccess)
     {
         user_ptr user(new Users);
         user->iControlFlags2 |= 1 << 1; // B
         user->iLevel = 15;
-        
-        AccessCondition acs;        
+
+        AccessCondition acs;
 
         std::string test_expression = "OBs15";
         bool result = acs.validateAcsString(test_expression, user);
-        
+
         CHECK(result);
     }
-    
+
     TEST(validateAcsStringTest2Success)
     {
-         user_ptr user(new Users);
+        user_ptr user(new Users);
         user->iControlFlags1 |= 1 << 1; // B
         user->iLevel = 15;
-        
-        AccessCondition acs;        
+
+        AccessCondition acs;
 
         std::string test_expression = "FBs15";
         bool result = acs.validateAcsString(test_expression, user);
-        
+
         CHECK(result);
     }
-    
+
     TEST(validateAcsStringTestFailSL)
     {
         user_ptr user(new Users);
         user->iControlFlags2 |= 1 << 1; // B
         user->iLevel = 15;
-        
-        AccessCondition acs;        
+
+        AccessCondition acs;
 
         std::string test_expression = "OBs25";
         bool result = acs.validateAcsString(test_expression, user);
-        
+
         CHECK(!result);
     }
-    
+
     TEST(validateAcsStringTest2FailSL)
     {
         user_ptr user(new Users);
         user->iControlFlags1 |= 1 << 1; // B
         user->iLevel = 15;
-        
-        AccessCondition acs;        
+
+        AccessCondition acs;
 
         std::string test_expression = "FBs25";
         bool result = acs.validateAcsString(test_expression, user);
-        
+
         CHECK(!result);
     }
-    
+
     // No Restrictions should pass through True.
     TEST(validateAcsStringTestEmptyStringPass)
     {
-        user_ptr user(new Users);       
-        AccessCondition acs;        
+        user_ptr user(new Users);
+        AccessCondition acs;
 
         std::string test_expression = "";
         bool result = acs.validateAcsString(test_expression, user);
-        
+
         CHECK(result);
     }
-        
+
 }

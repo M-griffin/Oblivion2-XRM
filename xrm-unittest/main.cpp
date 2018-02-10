@@ -3,12 +3,7 @@
  *   Copyright (C) 2015 - 2017 by Michael Griffin
  */
 
-#ifdef _WIN32
 #include <UnitTest++.h>
-#else
-#include <unittest++/UnitTest++.h>
-#endif
-
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 
@@ -40,14 +35,14 @@ std::string USERS_DATABASE       = "";
 
 // run all unit tests
 int main(int argc, char **argv)
-{    
+{
     int result = UnitTest::RunAllTests();
-    
+
     // Cleanup Integration Test Databases.
     remove("xrm_itConferenceTest.sqlite3");
     remove("xrm_itOnelinersTest.sqlite3");
     remove("xrm_itFileAreaTest.sqlite3");
     remove("xrm_itMessageAreaTest.sqlite3");
-        
+
     return result;
 }

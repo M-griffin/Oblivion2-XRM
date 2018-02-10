@@ -108,10 +108,12 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;-std=c++11;-Wno-deprecated -Wno-unused-local-typedefs" C_Options="-g;-std=c++11;-Wno-deprecated -Wno-unused-local-typedefs" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-g;-std=c++11;-Wno-deprecated -Wno-unused-local-typedefs;-Wno-psabi" C_Options="-g;-std=c++11;-Wno-deprecated -Wno-unused-local-typedefs;-Wno-psabi" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
+        <IncludePath Value="/usr/include/unittest++"/>
+        <IncludePath Value="/usr/include/UnitTest++"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
