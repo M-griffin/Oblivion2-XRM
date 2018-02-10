@@ -420,7 +420,7 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
     clearMenuPullDownOptions();
 
     // Then feed though and return the updated string.
-    std::string prompt_string = std::move(m_session_io.parseCodeMapGenerics(menu_prompt, code_map));
+    std::string prompt_string = m_session_io.parseCodeMapGenerics(menu_prompt, code_map);
     std::string display_prompt = moveStringToBottom(prompt_string);
 
     // Translate Pipe Coles to ESC Sequences prior to parsing to keep
@@ -442,7 +442,7 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
 
     // Process buffer for PullDown Codes.
     // only if we want result, ignore.., result just for testing at this time!
-    std::string result = std::move(m_ansi_process->screenBufferParse());
+    std::string result = m_ansi_process->screenBufferParse();
 
     // Update Lightbars, by default they have no names for YES/NO/Continue prompts.
     for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
@@ -585,13 +585,13 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
             {
                 case '\\':
                     m_active_pulldownID = 2; // NO Default
-                    output = std::move(setupYesNoMenuInput(prompt_string, code_map));
+                    output = setupYesNoMenuInput(prompt_string, code_map);
                     match_found = true;
                     break;
 
                 case '/':
                     m_active_pulldownID = 1; // YES Default
-                    output = std::move(setupYesNoMenuInput(prompt_string, code_map));
+                    output = setupYesNoMenuInput(prompt_string, code_map);
                     match_found = true;
                     break;
 
@@ -734,7 +734,7 @@ void MenuBase::redisplayMenuScreen()
 
         // Process buffer for PullDown Codes.
         // only if we want result, ignore.., result just for testing at this time!
-        std::string result = std::move(m_ansi_process->screenBufferParse());
+        std::string result = m_ansi_process->screenBufferParse();
 
         // Now Build the Light bars
         std::string light_bars = buildLightBars();
@@ -1067,7 +1067,7 @@ void MenuBase::loadAndStartupMenu()
             m_ansi_process->screenBufferToString();
 
             // Process buffer for PullDown Codes. results for TESTING, are discarded.
-            std::string result = std::move(m_ansi_process->screenBufferParse());
+            std::string result = m_ansi_process->screenBufferParse();
 
 
             std::cout << " *** push out lightbars *** " << std::endl;
@@ -1145,7 +1145,7 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
 
     // Clear Attriutes, then move back to menu prompt position.
     light_bars.append("\x1b[0m\x1b[u");
-    std::string output = std::move(m_session_io.pipe2ansi(light_bars));
+    std::string output = m_session_io.pipe2ansi(light_bars);
     baseProcessAndDeliver(output);
 }
 

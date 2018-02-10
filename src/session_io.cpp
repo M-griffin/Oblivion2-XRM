@@ -406,13 +406,13 @@ std::string SessionIO::pipeColors(const std::string &color_string)
     // Foreground Colors
     if(color_index >= 0 && color_index < 16)
     {
-        esc_sequence = std::move(pipeReplaceForground(color_index));
+        esc_sequence = pipeReplaceForground(color_index);
         return esc_sequence;
     }
     // Background Colors
     else if(color_index >= 16 && color_index < 24)
     {
-        esc_sequence = std::move(pipeReplaceBackground(color_index));
+        esc_sequence = pipeReplaceBackground(color_index);
         return esc_sequence;
     }
     return esc_sequence;
@@ -693,7 +693,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
             case 1: // Pipe w/ 2 DIDIT Colors
                 {
 //                    std::cout << "Pipe w/ 2 DIDIT Colors |00" << std::endl;
-                    std::string result = std::move(pipeColors(my_matches.m_code));
+                    std::string result = pipeColors(my_matches.m_code);
                     if(result.size() != 0)
                     {
                         // Replace the Color, if not ansi then remove the color!
@@ -724,7 +724,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
             case 3: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
                 {
 //                    std::cout << "Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33" << std::endl;
-                    std::string result = std::move(seperatePipeWithCharsDigits(my_matches.m_code));
+                    std::string result = seperatePipeWithCharsDigits(my_matches.m_code);
                     if(result.size() != 0)
                     {
                         // Replace the string
@@ -738,7 +738,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
                 // Pass the original string becasue of |DE for delay!
                 {
 //                    std::cout << "Pipe w/ 2 CHARS // |AA" << std::endl;
-                    std::string result = std::move(parsePipeWithChars(my_matches.m_code));
+                    std::string result = parsePipeWithChars(my_matches.m_code);
                     if(result.size() != 0)
                     {
                         // Replace the string
@@ -754,7 +754,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
             case 5: // %%FILENAME.EXT  get filenames for loading from string prompts
                 {
 //                    std::cout << "replacing %%FILENAME.EXT codes" << std::endl;
-                    std::string result = std::move(parseFilename(my_matches.m_code));
+                    std::string result = parseFilename(my_matches.m_code);
                     if(result.size() != 0)
                     {
                         ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
@@ -944,7 +944,7 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
  */
 std::string SessionIO::pipe2ansi(const std::string &sequence)
 {
-    std::vector<MapType> code_map = std::move(parseToCodeMap(sequence, STD_EXPRESSION));
+    std::vector<MapType> code_map = parseToCodeMap(sequence, STD_EXPRESSION);
     return parseCodeMap(sequence, code_map);
 }
 
@@ -955,7 +955,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence)
  */
 std::vector<MapType> SessionIO::pipe2genericCodeMap(const std::string &sequence)
 {
-    std::vector<MapType> code_map = std::move(parseToCodeMap(sequence, MID_EXPRESSION));
+    std::vector<MapType> code_map = parseToCodeMap(sequence, MID_EXPRESSION);
     return code_map;
 }
 
@@ -967,7 +967,7 @@ std::vector<MapType> SessionIO::pipe2genericCodeMap(const std::string &sequence)
 std::vector<MapType> SessionIO::pipe2promptCodeMap(const std::string &sequence)
 {
     // This will handle parsing the sequence, and replacement
-    std::vector<MapType> code_map = std::move(parseToCodeMap(sequence, PROMPT_EXPRESSION));
+    std::vector<MapType> code_map = parseToCodeMap(sequence, PROMPT_EXPRESSION);
     return code_map;
 }
 
@@ -979,7 +979,7 @@ std::vector<MapType> SessionIO::pipe2promptCodeMap(const std::string &sequence)
 std::vector<MapType> SessionIO::pipe2promptFormatCodeMap(const std::string &sequence)
 {
     // This will handle parsing the sequence, and replacement
-    std::vector<MapType> code_map = std::move(parseToCodeMap(sequence, FORMAT_EXPRESSION));
+    std::vector<MapType> code_map = parseToCodeMap(sequence, FORMAT_EXPRESSION);
     return code_map;
 }
 
@@ -1050,7 +1050,7 @@ std::string SessionIO::pipe2promptFormat(const std::string &sequence, config_ptr
     }
 
     // Then feed though and return the updated string.
-    output = std::move(parseCodeMapGenerics(sequence, code_map));
+    output = parseCodeMapGenerics(sequence, code_map);
     return output;
 }
 

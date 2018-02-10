@@ -8,7 +8,7 @@
 #include <mutex>
 
 
-struct Config;
+class Config;
 typedef boost::shared_ptr<Config> config_ptr;
 
 /**
@@ -67,6 +67,8 @@ public:
         {
             return m_config;
         }
+		
+		return nullptr;
     }
    
     config_ptr  m_config;

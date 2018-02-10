@@ -5,7 +5,13 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <unistd.h>
+
+#ifdef TARGET_OS_MAC
+#include <util.h>
+#else
 #include <pty.h>
+#endif
+
 #include <termios.h>
 #include <csignal>
 #include <cstring>

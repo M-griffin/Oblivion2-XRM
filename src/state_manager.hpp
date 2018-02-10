@@ -20,7 +20,7 @@ class StateManager
 {
 public:
     explicit StateManager()
-        : m_is_state_changed(false)
+        //: m_is_state_changed(false)
     {
         std::cout << "StateManager Created" << std::endl;
     }
@@ -53,7 +53,7 @@ public:
 
 private:
 
-    bool                   m_is_state_changed;
+    //bool                   m_is_state_changed;
     std::vector<state_ptr> m_the_state;
 
 };

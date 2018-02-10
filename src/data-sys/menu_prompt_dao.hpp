@@ -7,7 +7,7 @@
 #include <mutex>
 
 
-struct MenuPrompt;
+class MenuPrompt;
 typedef boost::shared_ptr<MenuPrompt> menu_prompt_ptr;
 
 
@@ -67,6 +67,8 @@ public:
         {
             return m_menu_prompt;
         }
+		
+		return nullptr;
     }
 
     menu_prompt_ptr m_menu_prompt;

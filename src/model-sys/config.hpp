@@ -5,14 +5,18 @@
 #include <boost/smart_ptr/weak_ptr.hpp>
 
 // turn off the specific warning. Boost 1_64_0 for uuid
+#ifndef TARGET_OS_MAC
 #pragma GCC diagnostic ignored "-Wconversion-null"
+#endif
 
 #include <boost/uuid/uuid.hpp>            // uuid class
 #include <boost/uuid/uuid_generators.hpp> // generators
 #include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
 
 // turn the warnings back on
+#ifndef TARGET_OS_MAC
 #pragma GCC diagnostic pop
+#endif
 
 #include <boost/lexical_cast.hpp>
 

@@ -123,7 +123,7 @@ public:
         
         // Parse Prompt for Input Color And Position Override.
         // If found, the colors of the MCI Codes should be used as the default color.
-        M_StringPair prompt_set = std::move(m_text_dao->getPrompt(prompt));
+        M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
         std::string::size_type idx = prompt_set.second.find("%IN", 0);
         
         result += std::move(m_session_io.parseTextPrompt(prompt_set));
@@ -154,10 +154,10 @@ public:
         
         // Parse Prompt for Input Color And Position Override.
         // If found, the colors of the MCI Codes should be used as the default color.
-        M_StringPair prompt_set = std::move(m_text_dao->getPrompt(prompt));
+        M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
         std::string::size_type idx = prompt_set.second.find("%IN", 0);
         
-        result += std::move(m_session_io.parseTextPrompt(prompt_set));
+        result += m_session_io.parseTextPrompt(prompt_set);
         
         // Not found, set default input color
         if (idx == std::string::npos) 

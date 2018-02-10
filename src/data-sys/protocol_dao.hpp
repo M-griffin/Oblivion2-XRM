@@ -65,6 +65,8 @@ public:
         {
             return m_protocols;
         }
+		
+		return nullptr;
     }
    
     protocols_ptr     m_protocols;
