@@ -557,7 +557,7 @@ bool CommonIO::isDigit(const std::string &str)
     // Better wide characters.
     // https://www.cs.helsinki.fi/group/boi2016/doc/cppreference/reference
     //     /en.cppreference.com/w/cpp/locale/isdigit.html
-    std::string::size_type num_digits = num_digits = std::count_if(str.begin(), str.end(), 
+    std::string::size_type num_digits = std::count_if(str.begin(), str.end(), 
                             [](unsigned char c){ return std::isdigit(c); }
                         );
                         
