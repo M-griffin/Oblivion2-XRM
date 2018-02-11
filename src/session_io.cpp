@@ -7,15 +7,10 @@
 #include <clocale>
 
 //#include <boost/format.hpp>
-#include <boost/locale.hpp>
+//#include <boost/locale.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 
-#include <boost/regex/config.hpp>
-#ifdef BOOST_HAS_ICU
-#include <boost/regex/icu.hpp>
-#endif
-
-#include <boost/regex.hpp>
+#include <regex>
 
 #include <string>
 #include <iostream>
@@ -877,15 +872,15 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
         ([%]{1}[A-Z]{2})                // %AA
         ([%]{1}[0-9]{2})                // %11
     */
-    boost::regex expr(expression);
+    std::regex expr(expression);
 
-    boost::smatch matches;
+    std::smatch matches;
     std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
 //    std::string::size_type offset = 0;
 //    std::string::size_type length = 0;
 
-    boost::match_flag_type flags = boost::match_default;
-    while(boost::regex_search(start, end, matches, expr, flags))
+    std::regex_constants::match_flag_type flags = std::regex_constants::match_default;
+    while(std::regex_search(start, end, matches, expr, flags))
     {
         // Found a match!
         /*
@@ -1062,23 +1057,19 @@ std::string SessionIO::pipe2promptFormat(const std::string &sequence, config_ptr
  */
 bool SessionIO::checkRegex(const std::string &sequence, const std::string &expression)
 {
-    using namespace boost::locale;
-    generator gen;
+    // Create system default locale
+    std::locale::global(std::locale(""));
+    std::cout.imbue(std::locale());
 
-    // Make system default locale global
-    std::locale loc = gen("");
-    std::locale::global(loc);
-    std::cout.imbue(loc);
-
-    boost::smatch match;
+    std::smatch match;
     bool result = false;
 
 //#ifdef BOOST_HAS_ICU
 //    boost::u32regex regExp = boost::make_u32regex(expression);
 //    result = boost::u32regex_match(sequence, match, regExp);
 //#else
-    boost::regex regExpression(expression);
-    result = boost::regex_match(sequence, match, regExpression);
+    std::regex regExpression(expression);
+    result = std::regex_match(sequence, match, regExpression);
 //#endif
 
     return result;

@@ -8,14 +8,14 @@
 #include "../data-sys/security_dao.hpp"
 #include "../data-sys/users_dao.hpp"
 
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/regex.hpp>
+//#include <boost/date_time/posix_time/posix_time.hpp>
+#include <regex>
 
 #include <iostream>
 #include <string>
 #include <sstream>
 #include <iomanip>
-#include <ctime>
+#include <time.h>
 
 
 
@@ -1010,18 +1010,22 @@ bool ModSignup::birthday(const std::string &input)
         baseProcessDeliverNewLine();
 
         // Validate Date Here,  ie.. 2016-01-01 format.
-        boost::regex date_regex { m_config->regexp_date_validation };
-        boost::smatch str_matches;
+        std::regex date_regex { m_config->regexp_date_validation };
+        std::smatch str_matches;
 
-        if(boost::regex_match(key, str_matches, date_regex))
+        if(std::regex_match(key, str_matches, date_regex))
         {
             // Append Time For Date.
             key += " 00:00:00";
             struct std::tm tm;
 
-            tm = boost::posix_time::to_tm(boost::posix_time::time_from_string(key));
+            //strptime(key, "%Y-%m-%d %H:%M:%S", &tm);
+            //tm = boost::posix_time::to_tm(boost::posix_time::time_from_string(key));
 
-            /* Only GCC 5.1 + Compatible
+            /**
+             * Only GCC 5.1 + Compatible
+             * Were no longer using boost, so bye bye 4.9 compat for now.
+             */
             std::istringstream ss(key);
 
             ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
@@ -1032,7 +1036,7 @@ bool ModSignup::birthday(const std::string &input)
                 displayPromptAndNewLine(PROMPT_DATE_INVALID);
                 redisplayModulePrompt();
                 return true;
-            }*/
+            }
 
             std::time_t const time = mktime(&tm);
             m_user_record->dtBirthday = time;

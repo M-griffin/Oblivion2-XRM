@@ -96,6 +96,16 @@ public:
 
 
     /**
+     * @brief Convert Strings to Uppercase with Locale
+     */
+    std::string upper_case(const std::string &string_sequence);
+
+    /**
+     * @brief Convert Strings to Uppercase with Locale
+     */
+    std::string lower_case(const std::string &string_sequence);
+
+    /**
      * @brief Method for Adding outgoing text data to ansi processor
      *        Then delivering the data to the client
      * @param data

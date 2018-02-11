@@ -35,14 +35,17 @@
 #include <fstream>
 #include <map>
 
-
 #include <clocale>  // locale
 #include <cwchar>   // wchar_t wide characters
 
+#include <utf-cpp/utf8.h>
+
+/*
 #include <boost/format.hpp>
 #include <boost/locale.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
+*/
 
 /**
  * CP437 -> UTF-8 Character Translation Table
@@ -252,88 +255,16 @@ void CommonIO::pathAppend(std::string &path)
  */
 std::string::size_type CommonIO::numberOfChars(const std::string &str)
 {
-    using namespace boost::locale;
-    generator gen;
-
-    // Make system default locale global
-#ifdef TARGET_OS_MAC
-	std::locale global_loc = std::locale();  // Mac OS doesn't support locale("")
-    static std::locale lc(global_loc,
-        new boost::filesystem::detail::utf8_codecvt_facet);  
-	std::cout.imbue(lc);
-#else		
-    std::locale loc = gen("");
-    std::locale::global(loc);
-    std::cout.imbue(loc);
-#endif
-
-    std::string::size_type count = 0;
-    std::string::size_type string_size = str.size();
-
-    if(str.empty())
+    std::string line = str;
+    std::string::iterator end_it = utf8::find_invalid(line.begin(), line.end());
+    if (end_it != line.end()) 
     {
-        //std::cout << "Exception (Common::NumberOfChars) string length == 0" << std::endl;
-        return 0;
+        std::cout << "This part is fine: " << std::string(line.begin(), end_it) << std::endl;
     }
-
-    std::string character;
-    bool utf_found = false;
-    int  char_value = 0;
-    std::string::size_type i = 0;
-
-    using namespace boost::locale;
-    boundary::ssegment_index::iterator p,e;
-    while(1)
-    {
-        if(i == string_size) break;
-        char_value = static_cast<int>(str[i++]);
-
-        // Catch if we've receive multi-byte
-        if(!utf_found)
-        {
-            if((char_value & 0xC0) != 0xC0)
-                utf_found = false; // 1 Byte
-
-            if((char_value & 0xE0) == 0xC0)
-                utf_found = true;  // 2;
-
-            if((char_value & 0xF0) == 0xE0)
-                utf_found = true;  // 3;
-
-            if((char_value & 0xF8) == 0xF0)
-                utf_found = true;  // 4;
-        }
-
-        //charValue = 0x8A;  // Test singleByte extended ascii
-        character += char_value;
-        boundary::ssegment_index index(boundary::word,character.begin(),character.end());
-
-        // Catch All MultiByte UTF-8 Character Sequences.
-        if(!utf_found)
-        {
-            character.erase();
-            ++count;
-        }
-        else
-        {
-            // Parse Character for complete UTF-8 Sequence
-            for(p = index.begin(), e = index.end(); p != e; ++p)
-            {
-                if(p->rule() & boundary::word_none)
-                {
-                    character.erase();
-                    continue;
-                }
-                if(p->rule() & boundary::word_any)
-                {
-                    character.erase();
-                    ++count;
-                    utf_found = false;
-                }
-            }
-        }
-    }
-    return count;
+    
+    // Get the line length (at least for the valid part)
+    int length = utf8::distance(line.begin(), end_it);
+    return length;
 }
 
 /**
@@ -414,7 +345,7 @@ std::string CommonIO::eraseString(const std::string &str,
 {
     // std::cout << "StringERASE: " << str << " : " << str.size() << std::endl;
     std::string new_string = str;
-    std::string::size_type count = 0;
+    //std::string::size_type count = 0;
     std::string::size_type string_size = new_string.size();
 
     // 0 defaults to end of string.
@@ -432,95 +363,43 @@ std::string CommonIO::eraseString(const std::string &str,
             end_position = string_size;
         }
     }
-
-    std::string character;
-    std::string new_string_builder;
-    bool utf8Found = false;
-
-    int char_value = 0;
-    std::string::size_type i = 0;
-
+   
+    std::string new_string_builder = "";
     if(new_string.empty())
     {
-        //std::cout << "Exception (Common::EraseString) string length == 0" << std::endl;
+        std::cout << "Exception (Common::EraseString) string length == 0" << std::endl;
         return new_string;
     }
-
-    using namespace boost::locale;
-    boundary::ssegment_index::iterator p,e;
-    while(1)
-    {
-        if(i == string_size) break;
-        char_value = new_string[i++];
-
-        // Make sure if we hit an ESC sequence we loop through it.
-        if(!utf8Found)
+    
+    unsigned char_count = 0;
+    std::string::iterator it = new_string.begin();
+    std::string::iterator line_end = new_string.end();    
+    
+    while (it != line_end) {                
+        //std::cout << "ut: " << *it << std::endl;
+        uint32_t code_point = utf8::next(it, line_end);
+        
+        if(char_count < start_position || char_count > end_position)
         {
-            if((char_value & 0xC0) != 0xC0)
-                utf8Found = false; // 1 Byte
-
-            if((char_value & 0xE0) == 0xC0)
-                utf8Found = true;  // 2;
-
-            if((char_value & 0xF0) == 0xE0)
-                utf8Found = true;  // 3;
-
-            if((char_value & 0xF8) == 0xF0)
-                utf8Found = true;  // 4;
+            //std::cout << "append" << std::endl;
+            // This convert the uint32_t code point to char array
+            // So each sequence can be writen as seperate byte.
+            unsigned char character[5] = {0};
+            utf8::append(code_point, character);
+            new_string_builder += (char *)character;
         }
-
-        //charValue = 0x8A;  // Test singleByte extended ascii
-        character += char_value;
-        boundary::ssegment_index index(boundary::word,character.begin(),character.end());
-
-        // Catch All MultiByte UTF-8 Character Sequences.
-        if(!utf8Found)
-        {
-            // Add Character to new string.
-            if(count < start_position || count > end_position)
-            {
-                new_string_builder.append(character);
-            }
-            character.erase();
-            ++count;
-        }
-        else
-        {
-            // Parse Character for complete UTF-8 Sequence
-            for(p = index.begin(), e = index.end(); p != e; ++p)
-            {
-                // This is the 0x0000F ending UTF8 sequence.
-                if(p->rule() & boundary::word_none)
-                {
-                    if(count < start_position || count > end_position)
-                    {
-                        //std::cout << "append none" << std::endl;
-                        //std::cout << "count " << count << std::endl;
-                        new_string_builder.append(character);
-                    }
-                    character.erase();
-                    continue;
-                }
-                // Valid UTF-8 Character
-                if(p->rule() & boundary::word_any)
-                {
-                    if(count < start_position || count > end_position)
-                    {
-                        new_string_builder.append(character);
-                    }
-                    character.erase();
-                    ++count;
-                    utf8Found = false;
-                }
-            }
-        }
+        
+        //std::cout << "char_count: " << char_count << " " << code_point << std::endl;        
+        ++char_count;
     }
-
-    new_string.erase();
-    new_string = new_string_builder;
-
-    //std::cout << "StringERASE NEW: " << new_string << " : " << new_string.size() << std::endl;
-    return new_string;
+    
+    /*
+    std::cout << "\r\nStringERASE start_position: " << start_position << std::endl;
+    std::cout << "StringERASE end_position: " << end_position << std::endl;
+    std::cout << "StringERASE OLD: " << str << " : " << str.size() << std::endl;
+    std::cout << "StringERASE NEW: " << new_string << " : " << new_string.size() << std::endl;
+    */
+    return new_string_builder;
 }
 
 /**
@@ -674,98 +553,15 @@ std::string CommonIO::maskString(const std::string &str)
  */
 bool CommonIO::isDigit(const std::string &str)
 {
-    using namespace boost::locale;
-    generator gen;
-
-    // Make system default locale global
-    std::locale loc = gen("");
-    std::locale::global(loc);
-    std::cout.imbue(loc);
-
-    std::string::size_type count = 0;
-    std::string::size_type string_size = str.size();
-
-    std::string character;
-    bool utf_found = false;
-    bool is_digit = false;
-
-    int  char_value =  0;
-    std::string::size_type i = 0;
-
-    if(str.empty())
-    {
-        //std::cout << "Exception (Common::NumberOfChars) string length == 0" << std::endl;
-        return is_digit;
-    }
-
-    using namespace boost::locale;
-    boundary::ssegment_index::iterator p,e;
-    while(1)
-    {
-        if(i == string_size) break;
-        char_value = str[i++];
-
-        // Catch if we've receive multi-byte
-        if(!utf_found)
-        {
-            if((char_value & 0xC0) != 0xC0)
-                utf_found = false; // 1 Byte
-
-            if((char_value & 0xE0) == 0xC0)
-                utf_found = true;  // 2;
-
-            if((char_value & 0xF0) == 0xE0)
-                utf_found = true;  // 3;
-
-            if((char_value & 0xF8) == 0xF0)
-                utf_found = true;  // 4;
-        }
-
-        //charValue = 0x8A;  // Test singleByte extended ascii
-        character += char_value;
-        boundary::ssegment_index index(boundary::word,character.begin(),character.end());
-
-        // Catch All MultiByte UTF-8 Character Sequences.
-        if(!utf_found)
-        {
-            // Test for Ascii Digit
-            if(std::isdigit(str[count]))
-                is_digit = true;
-            else
-            {
-                is_digit = false; // Check for more then one!
-                return is_digit;  // Exit on any failures!
-            }
-            character.erase();
-            ++count;
-        }
-        else
-        {
-            // Parse Character for complete UTF-8 Sequence
-            for(p = index.begin(), e = index.end(); p != e; ++p)
-            {
-                if(p->rule() & boundary::word_none)
-                {
-                    character.erase();
-                    continue;
-                }
-                if(p->rule() & boundary::word_number)
-                {
-                    character.erase();
-                    ++count;
-                    utf_found = false;
-                    is_digit = true;
-                    continue;
-                }
-                else
-                {
-                    is_digit = false;
-                    return is_digit;  // Exit on any failures!
-                }
-            }
-        }
-    }
-    return is_digit;
+    // Later reference for 
+    // Better wide characters.
+    // https://www.cs.helsinki.fi/group/boi2016/doc/cppreference/reference
+    //     /en.cppreference.com/w/cpp/locale/isdigit.html
+    std::string::size_type num_digits = num_digits = std::count_if(str.begin(), str.end(), 
+                            [](unsigned char c){ return std::isdigit(c); }
+                        );
+                        
+    return num_digits == str.size();
 }
 
 /**
@@ -774,15 +570,9 @@ bool CommonIO::isDigit(const std::string &str)
  */
 std::string CommonIO::printWideCharacters(const std::wstring &wide_string)
 {
-    using namespace boost::locale;
-    using namespace std;
 
-    generator gen;
-
-    // Make system default locale global
-    std::locale loc = gen("");
-    locale::global(loc);
-    cout.imbue(loc);
+    std::locale::global(std::locale(""));
+    std::cout.imbue(std::locale());
 
     std::string output = "";
 

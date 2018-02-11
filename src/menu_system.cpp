@@ -5,7 +5,7 @@
 #include "mods/mod_logon.hpp"
 #include "mods/mod_signup.hpp"
 
-#include <boost/locale.hpp>
+#include <locale>
 
 #include <string>
 #include <vector>
@@ -121,12 +121,9 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
     // In this case, we will need to parse for specific Control commands
     // and set Menu System Flags!
 
-    using namespace boost::locale;
-    using namespace std;
-    generator gen;
-    locale loc=gen("");
-    locale::global(loc);
-    cout.imbue(loc);
+    // Create system default locale
+    std::locale::global(std::locale(""));
+    std::cout.imbue(std::locale());
 
     switch(option.command_key[1])
     {
@@ -249,7 +246,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             {
                 m_system_fallback.push_back(m_current_menu);
             }
-            m_current_menu = boost::locale::to_lower(option.command_string);
+            m_current_menu = lower_case(option.command_string);
             loadAndStartupMenu();
             m_use_first_command_execution = true;
             break;
@@ -279,7 +276,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             }
             std::cout << "Set Fallback Starting Menu: " << m_starting_menu << std::endl;
             m_system_fallback.push_back(m_starting_menu);
-            m_current_menu = boost::locale::to_lower(option.command_string);
+            m_current_menu = lower_case(option.command_string);
             loadAndStartupMenu();
             m_use_first_command_execution = true;
             break;
@@ -309,7 +306,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
                 m_starting_menu = m_current_menu;
             }
             m_system_fallback.push_back(m_starting_menu);
-            m_current_menu = boost::locale::to_lower(option.command_string);
+            m_current_menu = lower_case(option.command_string);
             m_use_first_command_execution = false;
             loadAndStartupMenu();
             // TODO Add Flags to not run firstcmd!

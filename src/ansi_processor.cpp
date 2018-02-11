@@ -9,7 +9,7 @@
 #include <cstring>
 #include <stdint.h>
 
-#include <boost/regex.hpp>
+#include <regex>
 
 // Unicode Output Encoding.
 #include <iostream> // cout
@@ -331,15 +331,15 @@ std::string AnsiProcessor::screenBufferParse()
     std::string ansi_string = m_ansi_output;
 
     // Each Set of Codes for Expression Matches 1 set. will need more for char screens.
-    boost::regex expr {"(\\|[0-9]{2}+%[0-9]{2})"};
+    std::regex expr {"(\\|[0-9]{2}+%[0-9]{2})"};
 
-    boost::smatch matches;
+    std::smatch matches;
     std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
     //std::string::size_type offset = 0;
     //std::string::size_type length = 0;
 
-    boost::match_flag_type flags = boost::match_default;
-    while(boost::regex_search(start, end, matches, expr, flags))
+    std::regex_constants::match_flag_type flags = std::regex_constants::match_default;
+    while(std::regex_search(start, end, matches, expr, flags))
     {
         // Found a match!
         /*
