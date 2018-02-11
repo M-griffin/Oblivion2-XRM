@@ -41,6 +41,8 @@
 
 #include <boost/format.hpp>
 #include <boost/locale.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
 
 /**
  * CP437 -> UTF-8 Character Translation Table
@@ -254,9 +256,16 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str)
     generator gen;
 
     // Make system default locale global
+#ifdef TARGET_OS_MAC
+	std::locale global_loc = std::locale();  // Mac OS doesn't support locale("")
+    static std::locale lc(global_loc,
+        new boost::filesystem::detail::utf8_codecvt_facet);  
+	std::cout.imbue(lc);
+#else		
     std::locale loc = gen("");
     std::locale::global(loc);
     std::cout.imbue(loc);
+#endif
 
     std::string::size_type count = 0;
     std::string::size_type string_size = str.size();
@@ -277,7 +286,7 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str)
     while(1)
     {
         if(i == string_size) break;
-        char_value = str[i++];
+        char_value = static_cast<int>(str[i++]);
 
         // Catch if we've receive multi-byte
         if(!utf_found)

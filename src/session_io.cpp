@@ -1073,13 +1073,13 @@ bool SessionIO::checkRegex(const std::string &sequence, const std::string &expre
     boost::smatch match;
     bool result = false;
 
-#ifdef BOOST_HAS_ICU
-    boost::u32regex regExp = boost::make_u32regex(expression);
-    result = boost::u32regex_match(sequence, match, regExp);
-#else
+//#ifdef BOOST_HAS_ICU
+//    boost::u32regex regExp = boost::make_u32regex(expression);
+//    result = boost::u32regex_match(sequence, match, regExp);
+//#else
     boost::regex regExpression(expression);
     result = boost::regex_match(sequence, match, regExpression);
-#endif
+//#endif
 
     return result;
 }
