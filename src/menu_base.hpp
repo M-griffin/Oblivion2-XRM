@@ -16,16 +16,15 @@
 #include "data-sys/menu_prompt_dao.hpp"
 #include "mods/mod_base.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <functional>
 #include <vector>
 
 class Config;
-typedef boost::shared_ptr<Config> config_ptr;
+typedef std::shared_ptr<Config> config_ptr;
 
 class SessionData;
-typedef boost::shared_ptr<SessionData> session_data_ptr;
+typedef std::shared_ptr<SessionData> session_data_ptr;
 
 /**
  * @class MenuBase
@@ -337,6 +336,6 @@ public:
 
 };
 
-typedef boost::shared_ptr<MenuBase> menu_base_ptr;
+typedef std::shared_ptr<MenuBase> menu_base_ptr;
 
 #endif // MENUBASE_HPP

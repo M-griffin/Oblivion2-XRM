@@ -3,11 +3,11 @@
 
 #include "connection_base.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/bind.hpp>
 
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>

@@ -6,8 +6,6 @@
 #include "../menu_base.hpp"
 
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
 ModSysConfig::ModSysConfig(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
     : ModBase(session_data, config, ansi_process)
     , m_current_page(0)

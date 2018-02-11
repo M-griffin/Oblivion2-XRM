@@ -1,8 +1,7 @@
 #include "access_condition.hpp"
 #include "model-sys/users.hpp"
 
-#include <boost/algorithm/string.hpp>
-#include <boost/make_shared.hpp>
+#include <algorithm>
 
 #include <string>
 #include <vector>
@@ -259,7 +258,9 @@ std::vector<MapType> AccessCondition::parseAcsString(const std::string &acs_stri
 
     // First split any OR statements.
     std::vector<std::string> tokens;
-    boost::split(tokens, acs_string, boost::is_any_of("|"));
+    
+    // TODO, update from boost... 
+    std::split(tokens, acs_string, std::is_any_of("|"));
 
     if (tokens.size() > 1)
     {

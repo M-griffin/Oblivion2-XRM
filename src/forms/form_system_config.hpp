@@ -3,12 +3,10 @@
 
 #include "form_base.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
 #include <yaml-cpp/yaml.h>
 
 class Config;
-typedef boost::shared_ptr<Config> config_ptr;
+typedef std::shared_ptr<Config> config_ptr;
 
 /**
  * @class FormSystemConfig

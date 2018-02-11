@@ -16,6 +16,8 @@
 
 #include "libSqliteWrapped.h"
 
+#include <cassert>
+
 DbStartup::DbStartup()
 {
 }

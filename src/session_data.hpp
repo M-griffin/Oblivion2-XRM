@@ -23,19 +23,17 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/asio/deadline_timer.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
 
 #include "libSqliteWrapped.h"
 
+#include <memory>
 #include <string>
 
 using boost::asio::deadline_timer;
 using boost::asio::ip::tcp;
 
 class StateManager;
-typedef boost::shared_ptr<StateManager>	state_manager_ptr;
+typedef std::shared_ptr<StateManager> state_manager_ptr;
 
 
 /**
@@ -46,7 +44,7 @@ typedef boost::shared_ptr<StateManager>	state_manager_ptr;
  * @brief Used for passing Session Data to and From States.
  */
 class SessionData
-    : public boost::enable_shared_from_this<SessionData>
+    : public std::enable_shared_from_this<SessionData>
 {
 public:
 
@@ -432,7 +430,7 @@ public:
 
 };
 
-typedef boost::shared_ptr<SessionData> session_data_ptr;
-typedef boost::weak_ptr<SessionData> session_data_wptr;
+typedef std::shared_ptr<SessionData> session_data_ptr;
+typedef std::weak_ptr<SessionData> session_data_wptr;
 
 #endif // SESSION_DATA_HPP

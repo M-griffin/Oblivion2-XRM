@@ -4,11 +4,10 @@
 #include <string>
 #include <ctime>
 #include <cstdint> 
-
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 class Users;
-typedef boost::shared_ptr<Users> user_ptr;
+typedef std::shared_ptr<Users> user_ptr;
 
 /**
  * @class Users

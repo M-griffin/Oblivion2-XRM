@@ -1,10 +1,10 @@
 #ifndef NETWORK_HPP
 #define NETWORK_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 class Network;
-typedef boost::shared_ptr<Network> network_ptr;
+typedef std::shared_ptr<Network> network_ptr;
 
 /**
  * @class Network

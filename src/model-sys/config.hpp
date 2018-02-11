@@ -1,24 +1,24 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
+#include <memory>
 
 // turn off the specific warning. Boost 1_64_0 for uuid
 #ifndef TARGET_OS_MAC
 #pragma GCC diagnostic ignored "-Wconversion-null"
 #endif
 
-#include <boost/uuid/uuid.hpp>            // uuid class
-#include <boost/uuid/uuid_generators.hpp> // generators
-#include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
+//#include <boost/uuid/uuid.hpp>            // uuid class
+//#include <boost/uuid/uuid_generators.hpp> // generators
+//#include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
 
 // turn the warnings back on
 #ifndef TARGET_OS_MAC
 #pragma GCC diagnostic pop
 #endif
 
-#include <boost/lexical_cast.hpp>
+// Need good replacement for this?!?
+//#include <boost/lexical_cast.hpp>
 
 #include <fstream>
 
@@ -338,9 +338,9 @@ public:
     {
         // Generates an Initial Unique Board UUID when the configuration is created.
         // If someone wipes out their config, they should save this and re-enter it!
-        boost::uuids::random_generator generator;
-        boost::uuids::uuid uuid = generator();
-        bbs_uuid = boost::lexical_cast<std::string>(uuid);
+        //boost::uuids::random_generator generator;
+        //boost::uuids::uuid uuid = generator();
+        bbs_uuid = "test"; //boost::lexical_cast<std::string>(uuid);
     }
 
     ~Config() { }
@@ -598,7 +598,7 @@ namespace YAML
     };
 }
 
-typedef boost::shared_ptr<Config> config_ptr;
-typedef boost::weak_ptr<Config> config_wptr;
+typedef std::shared_ptr<Config> config_ptr;
+typedef std::weak_ptr<Config> config_wptr;
 
 #endif // CONFIG_HPP

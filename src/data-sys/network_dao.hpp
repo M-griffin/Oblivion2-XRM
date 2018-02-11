@@ -3,8 +3,8 @@
 
 #include "../model-sys/network.hpp"
 #include "../data-sys/base_dao.hpp"
-#include <boost/smart_ptr/shared_ptr.hpp>
 
+#include <memory>
 #include <vector>
 #include <functional>
 
@@ -16,7 +16,7 @@ class Query;
 }
 
 // Handle to Database Queries
-typedef boost::shared_ptr<SQLW::Query> query_ptr;
+typedef std::shared_ptr<SQLW::Query> query_ptr;
 
 // Base Dao Definition
 typedef BaseDao<Network> baseNetworkClass;
@@ -195,6 +195,6 @@ public:
 };
 
 // Handle to Database Queries
-typedef boost::shared_ptr<NetworkDao> network_dao_ptr;
+typedef std::shared_ptr<NetworkDao> network_dao_ptr;
 
 #endif // NETWORK_DAO_HPP

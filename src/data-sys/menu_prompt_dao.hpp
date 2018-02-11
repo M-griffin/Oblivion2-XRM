@@ -1,14 +1,13 @@
 #ifndef MENU_PROMPT_DAO_HPP
 #define MENU_PROMPT_DAO_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <string>
 #include <mutex>
 
 
 class MenuPrompt;
-typedef boost::shared_ptr<MenuPrompt> menu_prompt_ptr;
+typedef std::shared_ptr<MenuPrompt> menu_prompt_ptr;
 
 
 /**
@@ -78,6 +77,6 @@ public:
 
 };
 
-typedef boost::shared_ptr<MenuPromptDao> menu_prompt_dao_ptr;
+typedef std::shared_ptr<MenuPromptDao> menu_prompt_dao_ptr;
 
 #endif // MENU_PROMPT_DAO_HPP

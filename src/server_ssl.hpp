@@ -12,9 +12,6 @@
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
-
 /**
  * @class ServerSSL
  * @author Michael Griffin

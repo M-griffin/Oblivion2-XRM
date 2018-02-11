@@ -6,24 +6,23 @@
 #include "../session_data.hpp"
 #include "../session_io.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <vector>
 #include <functional>
 
 
 class MenuOption;
 class MenuBase;
-typedef boost::shared_ptr<MenuBase> menu_base_ptr;
+typedef std::shared_ptr<MenuBase> menu_base_ptr;
 
 class FormManager;
-typedef boost::shared_ptr<FormManager> form_manager_ptr;
+typedef std::shared_ptr<FormManager> form_manager_ptr;
 
 class Config;
-typedef boost::shared_ptr<Config> config_ptr;
+typedef std::shared_ptr<Config> config_ptr;
 
 class AnsiProcessor;
-typedef boost::shared_ptr<AnsiProcessor> ansi_process_ptr;
+typedef std::shared_ptr<AnsiProcessor> ansi_process_ptr;
 
 
 /**

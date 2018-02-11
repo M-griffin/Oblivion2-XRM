@@ -1,12 +1,11 @@
 #ifndef CONNECTION_BASE_HPP
 #define CONNECTION_BASE_HPP
 
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/bind.hpp>
 
+#include <memory>
 #include <iostream>
 #include <string>
 
@@ -21,7 +20,7 @@ typedef boost::asio::ip::tcp::socket normal_socket;
  * @brief Virtual Class for Socket Sesssions.
  */
 class connection_base
-    : public boost::enable_shared_from_this<connection_base>
+    : public std::enable_shared_from_this<connection_base>
 {
 public:
 
@@ -46,6 +45,6 @@ public:
 
 };
 
-typedef boost::shared_ptr<connection_base> connection_ptr;
+typedef std::shared_ptr<connection_base> connection_ptr;
 
 #endif // CONNECTION_BASE_HPP

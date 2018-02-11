@@ -1,10 +1,10 @@
 #ifndef MESSAGE_AREA_HPP
 #define MESSAGE_AREA_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 class MessageArea;
-typedef boost::shared_ptr<MessageArea> message_area_ptr;
+typedef std::shared_ptr<MessageArea> message_area_ptr;
 
 /**
  * @class MessageArea

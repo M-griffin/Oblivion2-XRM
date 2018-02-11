@@ -2,7 +2,7 @@
 #define DB_STARTUP_HPP
 
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 /**
  * @class DbStartup
@@ -25,6 +25,6 @@ public:
 
 };
 
-typedef boost::shared_ptr<DbStartup> db_startup_ptr;
+typedef std::shared_ptr<DbStartup> db_startup_ptr;
 
 #endif // DB_STARTUP_HPP

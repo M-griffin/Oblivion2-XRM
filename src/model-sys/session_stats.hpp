@@ -4,13 +4,11 @@
 #include <string>
 #include <ctime>
 #include <cstdint> 
-
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
+#include <memory>
 
 class SessionStats;
-typedef boost::shared_ptr<SessionStats> session_stats_ptr;
-typedef boost::weak_ptr<SessionStats> session_stats_weak_ptr;
+typedef std::shared_ptr<SessionStats> session_stats_ptr;
+typedef std::weak_ptr<SessionStats> session_stats_weak_ptr;
 
 /**
  * @class SessionStats

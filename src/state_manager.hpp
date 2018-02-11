@@ -3,8 +3,7 @@
 
 #include "state_base.hpp"
 
-#include <boost/enable_shared_from_this.hpp>
-
+#include <memory>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -58,6 +57,6 @@ private:
 
 };
 
-typedef boost::shared_ptr<StateManager>	state_manager_ptr;
+typedef std::shared_ptr<StateManager>	state_manager_ptr;
 
 #endif

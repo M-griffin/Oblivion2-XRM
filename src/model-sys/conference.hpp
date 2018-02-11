@@ -1,12 +1,11 @@
 #ifndef CONFERENCE_HPP
 #define CONFERENCE_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <string>
 
 class Conference;
-typedef boost::shared_ptr<Conference> conference_ptr;
+typedef std::shared_ptr<Conference> conference_ptr;
 
 /**
  * @class Conference

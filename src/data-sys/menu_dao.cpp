@@ -1,14 +1,11 @@
 #include "menu_dao.hpp"
 #include "../model-sys/menu.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <algorithm>
 #include <mutex>
-
 
 // Setup the file version for the config file.
 const std::string Menu::FILE_VERSION = "1.0.1";

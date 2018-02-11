@@ -1,12 +1,11 @@
 #ifndef GROUPING_HPP
 #define GROUPING_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <string>
 
 class Grouping;
-typedef boost::shared_ptr<Grouping> group_ptr;
+typedef std::shared_ptr<Grouping> group_ptr;
 
 /**
  * @class Grouping

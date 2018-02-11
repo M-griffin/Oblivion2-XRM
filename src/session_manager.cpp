@@ -5,7 +5,7 @@
 #include "server.hpp"
 
 #include <algorithm>
-#include <boost/bind.hpp>
+//#include <boost/bind.hpp>
 
 SessionManager::~SessionManager()
 {
@@ -59,7 +59,7 @@ void SessionManager::deliver(std::string msg)
 
     std::cout << "deliver SessionManager notices: " << msg << std::endl;
     std::for_each(m_sessions.begin(), m_sessions.end(),
-                  boost::bind(&Session::deliver, _1, boost::ref(msg)));
+                  std::bind(&Session::deliver, _1, std::ref(msg)));
 }
 
 /**

@@ -1,8 +1,6 @@
 #include "menu_prompt_dao.hpp"
 #include "../model-sys/menu_prompt.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
 #include <iostream>
 #include <fstream>
 #include <string>

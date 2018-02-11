@@ -8,15 +8,13 @@
 #include "../data-sys/security_dao.hpp"
 #include "../data-sys/users_dao.hpp"
 
-//#include <boost/date_time/posix_time/posix_time.hpp>
 #include <regex>
 
 #include <iostream>
 #include <string>
 #include <sstream>
 #include <iomanip>
-#include <time.h>
-
+#include <ctime>
 
 
 /**
@@ -1019,7 +1017,10 @@ bool ModSignup::birthday(const std::string &input)
             key += " 00:00:00";
             struct std::tm tm;
 
+            // Test lateron, this should work on < 5.1 gcc
             //strptime(key, "%Y-%m-%d %H:%M:%S", &tm);
+            
+            
             //tm = boost::posix_time::to_tm(boost::posix_time::time_from_string(key));
 
             /**

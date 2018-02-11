@@ -8,8 +8,7 @@
 #include "../session_io.hpp"
 #include "../ansi_processor.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <iostream>
 #include <string>
 
@@ -190,7 +189,7 @@ public:
     // Checked after each stage, onEnter, Update, onExit
 };
 
-typedef boost::shared_ptr<ModBase>	module_ptr;
+typedef std::shared_ptr<ModBase>	module_ptr;
 
 
 #endif // MOD_BASE_HPP

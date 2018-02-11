@@ -5,13 +5,7 @@
 #include "model-sys/config.hpp"
 
 #include <clocale>
-
-//#include <boost/format.hpp>
-//#include <boost/locale.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
-
 #include <regex>
-
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -1074,13 +1068,6 @@ bool SessionIO::checkRegex(const std::string &sequence, const std::string &expre
 
     return result;
 }
-
-/*
-    std::string myString = "\"\"\"";
-    boost::smatch match;
-    boost::regex regExpString3("[\"']((:?[^\"']|\\\")+?)[\"']");
-    bool statusString3 = boost::regex_match(myString, match, regExpString3);
-*/
 
 /**
  * @brief Parses Text Prompt String Pair

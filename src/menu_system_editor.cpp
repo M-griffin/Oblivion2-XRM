@@ -1,8 +1,6 @@
 #include "menu_system.hpp"
-
 #include "model-sys/struct_compat.hpp"
 
-#include <boost/locale.hpp>
 
 // Needed for RPI GCC 4.9
 #define BOOST_FILESYSTEM_VERSION 3

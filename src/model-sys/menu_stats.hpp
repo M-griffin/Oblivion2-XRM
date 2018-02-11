@@ -1,8 +1,7 @@
 #ifndef MENU_STATS_HPP
 #define MENU_STATS_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <string>
 #include <ctime>
 
@@ -34,6 +33,6 @@ public:
 };
 
 
-typedef boost::shared_ptr<MenuStats> menu_stats_ptr;
+typedef std::shared_ptr<MenuStats> menu_stats_ptr;
 
 #endif // MENU_STATS_HPP

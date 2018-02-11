@@ -186,13 +186,10 @@
         <LibraryPath Value="C:/OpenSSL-Win32/lib/MinGW"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>
         <LibraryPath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/build"/>
-        <Library Value="libboost_system-mgw51-mt-1_64.dll.a"/>
         <Library Value="libboost_thread-mgw51-mt-1_64.dll.a"/>
         <Library Value="libboost_chrono-mgw51-mt-1_64.dll.a"/>
-        <Library Value="libboost_serialization-mgw51-mt-1_64.dll.a"/>
         <Library Value="libboost_filesystem-mgw51-mt-1_64.dll.a"/>
         <Library Value="libboost_timer-mgw51-mt-1_64.dll.a"/>
-        <Library Value="libboost_regex-mgw51-mt-1_64.dll.a"/>
         <Library Value="libws2_32.a"/>
         <Library Value="libwsock32.a"/>
         <Library Value="libSqliteWrapped.a"/>
@@ -200,10 +197,6 @@
         <Library Value="ssleay32.a"/>
         <Library Value="libeay32.a"/>
         <Library Value="yaml-cpp.dll"/>
-        <Library Value="libiconv.a"/>
-        <Library Value="libicuuc.dll.a"/>
-        <Library Value="libicuin.dll.a"/>
-        <Library Value="icudt"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>

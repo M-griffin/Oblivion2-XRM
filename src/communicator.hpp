@@ -9,7 +9,6 @@
 #include "session_manager.hpp"
 #include "common_io.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
 #include <iostream>
 #include <string>
 #include <mutex>

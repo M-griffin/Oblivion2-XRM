@@ -4,7 +4,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/asio/deadline_timer.hpp>
-#include <boost/enable_shared_from_this.hpp>
+
 
 using boost::asio::deadline_timer;
 using boost::asio::ip::tcp;

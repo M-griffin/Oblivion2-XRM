@@ -4,15 +4,14 @@
 #include "session_io.hpp"
 #include "model-sys/structures.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <map>
 
 class Users;
-typedef boost::shared_ptr<Users> user_ptr;
+typedef std::shared_ptr<Users> user_ptr;
 
 /**
  * @class AccessCondition

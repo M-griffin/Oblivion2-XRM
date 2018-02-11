@@ -3,8 +3,7 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -77,6 +76,6 @@ public:
 
 };
 
-typedef boost::shared_ptr<TextPromptsDao> text_prompts_dao_ptr;
+typedef std::shared_ptr<TextPromptsDao> text_prompts_dao_ptr;
 
 #endif // TEXT_PROMPTS_DAO_HPP

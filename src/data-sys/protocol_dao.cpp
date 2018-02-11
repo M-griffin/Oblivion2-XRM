@@ -1,8 +1,6 @@
 #include "protocol_dao.hpp"
 #include "../model-sys/protocol.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
 #include <iostream>
 #include <fstream>
 #include <string>

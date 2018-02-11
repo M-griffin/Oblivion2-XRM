@@ -10,13 +10,11 @@
 #include "session_io.hpp"
 #include "menu_system.hpp"
 
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
-
 #include <boost/asio.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/deadline_timer.hpp>
 
+#include <memory>
 #include <list>
 #include <string>
 
@@ -32,7 +30,7 @@ using boost::asio::ip::tcp;
 class Server;
 class Session;
 
-typedef boost::shared_ptr<Session> session_ptr;
+typedef std::shared_ptr<Session> session_ptr;
 
 /**
  * @class Session
@@ -42,7 +40,7 @@ typedef boost::shared_ptr<Session> session_ptr;
  * @brief handles TCP and SSL individual connection Sessions.
  */
 class Session
-    : public boost::enable_shared_from_this<Session>
+    : public std::enable_shared_from_this<Session>
 {
 public:
 

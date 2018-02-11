@@ -2,11 +2,10 @@
 #define SECURITY_HPP
 
 #include <string>
-
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 class Security;
-typedef boost::shared_ptr<Security> security_ptr;
+typedef std::shared_ptr<Security> security_ptr;
 
 /**
  * @class Security

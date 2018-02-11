@@ -3,8 +3,7 @@
 
 #include "session_data.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <iostream>
 #include <string>
 
@@ -43,8 +42,8 @@ public:
     // Checked after each stage, onEnter, Update, onExit    
 };
 
-typedef boost::shared_ptr<StateBase> state_ptr;
-typedef boost::weak_ptr<StateBase>	 state_wptr;
+typedef std::shared_ptr<StateBase> state_ptr;
+typedef std::weak_ptr<StateBase>	 state_wptr;
 
 
 #endif // THE_STATE_HPP

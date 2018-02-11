@@ -9,20 +9,17 @@
 #include "../session_data.hpp"
 #include "../session_io.hpp"
 
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/asio/deadline_timer.hpp>
-
+#include <memory>
 #include <vector>
 #include <functional>
 
 class Config;
-typedef boost::shared_ptr<Config> config_ptr;
+typedef std::shared_ptr<Config> config_ptr;
 
 class AnsiProcessor;
-typedef boost::shared_ptr<AnsiProcessor> ansi_process_ptr;
+typedef std::shared_ptr<AnsiProcessor> ansi_process_ptr;
 
-using boost::asio::deadline_timer;
+//using std::asio::deadline_timer;
 
 /**
  * @class ModPreLogin
@@ -32,7 +29,7 @@ using boost::asio::deadline_timer;
  * @brief System PreLogin Module
  */
 class ModPreLogon
-    : public boost::enable_shared_from_this<ModPreLogon>
+    : public std::enable_shared_from_this<ModPreLogon>
     , public ModBase
 {
 public:
@@ -184,23 +181,26 @@ public:
      */
     void startDetectionTimer()
     {
+        /* TODO Add Deadline Time to async service
+         * 
         // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences reponses
         m_detection_deadline.expires_from_now(boost::posix_time::milliseconds(1500));
         m_detection_deadline.async_wait(
             boost::bind(&ModPreLogon::handleDetectionTimer, shared_from_this(), &m_detection_deadline));
+        */
     }
 
     /**
      * @brief Deadline Detection Timer for ANSI Detection
      * @param timer
-     */
-    void handleDetectionTimer(boost::asio::deadline_timer* /*timer*/)
+     *
+    void handleDetectionTimer(boost::asio::deadline_timer* timer)
     {
         std::cout << "Deadline ANSI Detection, EXPIRED!" << std::endl;
 
         // Jump to Emulation completed.
         emulationCompleted();
-    }
+    }*/
 
     /**
      * @brief After Emulation Detection is completed

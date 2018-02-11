@@ -3,8 +3,8 @@
 
 #include "../model-sys/access_level.hpp"
 #include "../data-sys/base_dao.hpp"
-#include <boost/smart_ptr/shared_ptr.hpp>
 
+#include <memory>
 #include <vector>
 #include <functional>
 
@@ -16,7 +16,7 @@ class Query;
 }
 
 // Handle to Database Queries
-typedef boost::shared_ptr<SQLW::Query> query_ptr;
+typedef std::shared_ptr<SQLW::Query> query_ptr;
 
 // Base Dao Definition
 typedef BaseDao<AccessLevel> baseAccessLevelClass;
@@ -211,6 +211,6 @@ public:
 };
 
 // Handle to Database Queries
-typedef boost::shared_ptr<AccessLevelDao> access_level_dao_ptr;
+typedef std::shared_ptr<AccessLevelDao> access_level_dao_ptr;
 
 #endif // ACCESS_LEVEL_DAO_HPP

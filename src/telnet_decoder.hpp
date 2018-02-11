@@ -4,10 +4,9 @@
 #include "connection_base.hpp"
 #include "telnet.hpp"
 
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/asio.hpp>
 
+#include <memory>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -20,7 +19,7 @@
  * @brief Handles Telnet Options and Feature Negotiation
  */
 class TelnetDecoder
-    : public boost::enable_shared_from_this<TelnetDecoder>
+    : public std::enable_shared_from_this<TelnetDecoder>
 {
 public:
 
@@ -325,6 +324,6 @@ private:
     }
 };
 
-typedef boost::shared_ptr<TelnetDecoder> telnet_ptr;
+typedef std::shared_ptr<TelnetDecoder> telnet_ptr;
 
 #endif
