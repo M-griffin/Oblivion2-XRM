@@ -186,6 +186,7 @@
         <LibraryPath Value="C:/OpenSSL-Win32/lib/MinGW"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>
         <LibraryPath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/build"/>
+        <Library Value="libboost_system-mgw51-mt-1_64.dll.a"/>
         <Library Value="libboost_thread-mgw51-mt-1_64.dll.a"/>
         <Library Value="libboost_chrono-mgw51-mt-1_64.dll.a"/>
         <Library Value="libboost_filesystem-mgw51-mt-1_64.dll.a"/>

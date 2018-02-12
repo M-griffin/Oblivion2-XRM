@@ -1,7 +1,7 @@
 #ifndef ACCESS_LEVELS_HPP
 #define ACCESS_LEVELS_HPP
 
-#include <memory
+#include <memory>
 #include <string>
 #include <cstdint>
 

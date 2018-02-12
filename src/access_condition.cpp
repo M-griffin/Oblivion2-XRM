@@ -247,6 +247,23 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
 }
 
 /**
+ * @brief String Token Parser.
+ * @param token
+ * @param seperator
+ */
+std::vector<std::string> split(const std::string& s, char delimiter)
+{
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream tokenStream(s);
+    while (std::getline(tokenStream, token, delimiter))
+    {
+        tokens.push_back(token);
+    }
+    return tokens;
+}
+
+/**
  * @brief Parse ASC Strings then test User Flags
  * @param acs_string
  * @param user
@@ -260,7 +277,8 @@ std::vector<MapType> AccessCondition::parseAcsString(const std::string &acs_stri
     std::vector<std::string> tokens;
     
     // TODO, update from boost... 
-    std::split(tokens, acs_string, std::is_any_of("|"));
+    //std::split(tokens, acs_string, std::any_of("|"));
+    tokens = split(acs_string, '|');
 
     if (tokens.size() > 1)
     {

@@ -9,6 +9,7 @@
 #include "session_manager.hpp"
 #include "common_io.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <mutex>

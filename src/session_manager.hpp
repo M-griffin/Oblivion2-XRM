@@ -6,9 +6,6 @@
 #include <string>
 #include <set>
 
-class SessionData;
-typedef std::shared_ptr<SessionData> session_data_ptr;
-
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
 

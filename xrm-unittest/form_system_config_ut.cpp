@@ -4,9 +4,6 @@
  */
 
 #include <UnitTest++.h>
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/make_shared.hpp>
-
 
 #include "model-sys/config.hpp"
 #include "model-sys/menu.hpp"
@@ -17,6 +14,7 @@
 #include <cstdio>
 #include <cstring>
 // C++ Standard
+#include <memory>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -139,7 +137,7 @@ SUITE(XRMFormSystemConfig)
         // Move from Node back to Config and Translations String to Int
         // Do Extra Test of Conversion to Smart Pointer!
         Config conf = node.as<Config>();
-        config_ptr c = boost::make_shared<Config>(conf);
+        config_ptr c = std::make_shared<Config>(conf);
 
         // Now test new value is populated in config class.
         CHECK(c->port_telnet == 2323);

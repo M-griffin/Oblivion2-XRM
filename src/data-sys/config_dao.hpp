@@ -75,6 +75,6 @@ public:
 
 };
 
-typedef std::scoped_ptr<ConfigDao> config_dao_sptr;
+typedef std::unique_ptr<ConfigDao> config_dao_sptr;
 
 #endif // DAO_CONFIG_HPP

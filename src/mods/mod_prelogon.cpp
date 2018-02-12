@@ -461,8 +461,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
             baseProcessDeliverNewLine();
             
             std::string message = "";
-            if(boost::iequals(m_term_type, "undetected") ||
-                    boost::iequals(m_term_type, "ansi"))
+            if(m_term_type == "undetected" || m_term_type == "ansi")
             {
                 // Switch to Unicode Character Set.
                 message = "\x1b[0m" + m_session_io.pipeColors(blackColor);

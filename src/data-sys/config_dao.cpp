@@ -5,7 +5,7 @@
 #include <fstream>
 #include <string>
 #include <mutex>
-
+#include <cassert>
 
 // Setup the file version for the config file.
 const std::string Config::FILE_VERSION = "1.0.2";
