@@ -21,6 +21,18 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="..\src">
+    <File Name="../src/safe_vector.hpp"/>
+    <File Name="../src/io_service.hpp"/>
+    <File Name="../src/io_service.cpp"/>
+    <File Name="../src/async_connection.hpp"/>
+    <VirtualDirectory Name="sdl2_net">
+      <File Name="../src/sdl2_net/SDLnetUDP.cpp"/>
+      <File Name="../src/sdl2_net/SDLnetTCP.cpp"/>
+      <File Name="../src/sdl2_net/SDLnetsys.hpp"/>
+      <File Name="../src/sdl2_net/SDLnetselect.cpp"/>
+      <File Name="../src/sdl2_net/SDLnet.cpp"/>
+      <File Name="../src/sdl2_net/SDL_net.hpp"/>
+    </VirtualDirectory>
     <VirtualDirectory Name="utf-cpp">
       <File Name="../src/utf-cpp/utf8.h"/>
       <VirtualDirectory Name="utf8">
@@ -47,7 +59,6 @@
     <File Name="../src/safe_queue.hpp"/>
     <File Name="../src/safe_set.hpp"/>
     <File Name="../src/server.hpp"/>
-    <File Name="../src/server_ssl.hpp"/>
     <File Name="../src/session.hpp"/>
     <File Name="../src/session_data.cpp"/>
     <File Name="../src/session_data.hpp"/>

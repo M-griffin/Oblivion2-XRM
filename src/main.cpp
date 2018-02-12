@@ -1,13 +1,11 @@
 /*
- * Oblivion/2 XRM (c) 2015-2016 Michael Griffin
+ * Oblivion/2 XRM (c) 2015-2018 Michael Griffin
  * A Telnet Server and BBS system modeled after Oblivion/2 bbs software.
  *
  * XRM = Extreme Remake!
  * Compiles under MingW32/64 5.1.0 g++
  *
  * LIBS:
- * Boost 55/64
- * ICU 4c-58_1
  * Sqlite3
  * SqliteWrapped
  * YamlC++
@@ -21,23 +19,13 @@
 
 
 #include "data-sys/text_prompts_dao.hpp"
-
 #include "model-sys/config.hpp"
 #include "data-sys/config_dao.hpp"
-
-
-// This will handle database init and replace all other dao's.
 #include "data-sys/db_startup.hpp"
 
 #include "server.hpp"
-#include "server_ssl.hpp"
 #include "communicator.hpp"
 #include "common_io.hpp"
-
-#include <boost/bind.hpp>
-#include <boost/asio.hpp>
-//#include <boost/date_time/posix_time/posix_time.hpp>
-
 
 #include <memory>
 #include <cstdlib>
@@ -62,42 +50,8 @@ std::string GLOBAL_TEXTFILE_PATH = "";
 std::string GLOBAL_SCRIPT_PATH = "";
 std::string USERS_DATABASE = "";
 
-using boost::asio::ip::tcp;
-
 // Setup Handles to Services.
-typedef boost::shared_ptr<Server>    server_telnet_ptr;
-typedef boost::shared_ptr<ServerSSL> server_ssl_ptr;
-
-/* NOTES
-
-    #Cap sockets to 512 on Windows because winsock can only process 512 at time
-    if sys.platform == 'win32':
-        MAX_CONNECTIONS = 500
-    ## Cap sockets to 1000 on Linux because you can only have 1024 file descriptors
-    else:
-        MAX_CONNECTIONS = 1000
- */
-
-/** NOT USED AT THIS TIME!
- * @brief Generic Timer, used for testing right now.
- * @param timer
- * @param count
- */
-
-void handler(const boost::system::error_code& /*e*/,
-             boost::asio::deadline_timer* timer, int* count)
-{
-    if(*count < 5)
-    {
-        std::cout << *count << "\n";
-        ++(*count);
-
-        // Reset next Timer.
-        timer->expires_at(timer->expires_at() + boost::posix_time::milliseconds(250));
-        timer->async_wait(
-            boost::bind(handler, boost::asio::placeholders::error, timer, count));
-    }
-}
+typedef std::shared_ptr<Server> server_ptr;
 
 /**
  * @brief Main Program io_service loop
@@ -106,14 +60,11 @@ void handler(const boost::system::error_code& /*e*/,
 //void run(boost::asio::io_service& io_service)
 extern "C" void *run(void *)
 {
-
     //static_cast<boost::asio::io_service*>(io)->run();
-
-    boost::asio::io_service io_service;  //= static_cast<boost::asio::io_service*>(io);
+    //boost::asio::io_service io_service;  //= static_cast<boost::asio::io_service*>(io);
 
     // Create Handles to Services
-    server_telnet_ptr serverTelnet;
-    server_ssl_ptr    serverSSL;
+    server_ptr serverTelnet;
 
     // Default Config Instance
     config_ptr config(new Config());
@@ -144,19 +95,15 @@ extern "C" void *run(void *)
     }
 
     // Initial Testing of SSL Server.
+    /*
     if (cfg.m_config->use_service_ssl)
     {
         std::cout << "Listening for service connections on port "
                   << cfg.m_config->port_ssl << std::endl;
         serverSSL.reset(new ServerSSL(io_service, cfg.m_config->port_ssl));
-    }
+    }*/
 
-    // Setup first timer.
-    //    int count = 0;
-    //    boost::asio::deadline_timer timer(io_service, boost::posix_time::seconds(1));
-    //    timer.async_wait(
-    //        boost::bind(handler, boost::asio::placeholders::error, &timer, &count));
-
+    
     // Loop IO Service Execution Thread
     // We need a break for shutdowns!
     while(TheCommunicator::instance()->isActive())
@@ -194,7 +141,7 @@ extern "C" void *run(void *)
 // auto main(int argc, char* argv[]) -> int
 auto main() -> int
 {
-    std::cout << "Oblivion/2 XRM Server (c) 2015-2017 Michael Griffin."
+    std::cout << "Oblivion/2 XRM Server (c) 2015-2018 Michael Griffin."
               << std::endl
               << std::endl;
 
@@ -244,7 +191,6 @@ auto main() -> int
         db->initDatabaseTables();
     }
 
-
     // Start System Services and Main Loop.
     //boost::asio::io_service io_service;
 
@@ -253,8 +199,6 @@ auto main() -> int
 
     // start io_service.run( ) in separate thread
     //auto t = std::thread(&run, std::ref(io_service));
-
-
 
     // TODO Replace std::thread in pi2 casue of gcc 4.9.1 issues!
     pthread_t t;

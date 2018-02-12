@@ -4,19 +4,17 @@
 #include "model-sys/config.hpp"
 #include "session_manager.hpp"
 #include "session.hpp"
-#include "connection_tcp.hpp"
+//#include "connection_tcp.hpp"
 #include "communicator.hpp"
 
-#include <boost/bind.hpp>
-#include <boost/asio.hpp>
-
-using boost::asio::ip::tcp;
+// New Rework for SDL2_net and Asyc io.
+#include "async_connection.hpp"
 
 /**
  * @class Server
  * @author Michael Griffin
  * @date 15/08/2015
- * @file chat_server.hpp
+ * @file server.hpp
  * @brief Handling the Incoming Connections and starts session creation.
  */
 class Server
@@ -25,14 +23,12 @@ class Server
 public:
     Server(boost::asio::io_service& io_service, int port) //, const tcp::endpoint& endpoint)
         : m_io_service(io_service)
-        , m_acceptor_v6(io_service)
-        , m_acceptor_v4(io_service)
         , m_room(new SessionManager())
         , m_is_using_ipv6(true)
-        , m_context(boost::asio::ssl::context::sslv23)
     {
         std::cout << "Starting Telnet Server" << std::endl;
 
+        /*
         // Defaults v6_Only to false to accept both v4 and v6 connections.
         boost::asio::ip::v6_only v6_only(false);
         boost::system::error_code ec;
@@ -86,7 +82,8 @@ public:
         {
             std::cout << "Server Accepts only ipv4 connections." << std::endl;
         }
-
+        */
+        
         // Setup the communicator to allow rest of program to talk with
         // And send messages to other nodes.
         TheCommunicator::instance()->setupServer(m_room);
@@ -105,14 +102,9 @@ public:
      */
     void wait_for_connection()
     {
-        connection_ptr new_connection(new tcp_connection(m_io_service, m_context));
+       // connection_ptr new_connection(new tcp_connection(m_io_service, m_context));
 
-        /*  Looks like UDP only!
-        // Setup connections to allow Both ipv4 and ipv6!
-        boost::asio::ip::v6_only option(false);
-        boost::asio::ip::tcp::socket the_socket = new_connection->socket();
-        the_socket.set_option(option);*/
-
+        /*
         // Accept The Connection
         if (m_is_using_ipv6)
         {
@@ -128,7 +120,7 @@ public:
                                        boost::bind(&Server::handle_accept, this,
                                                    new_connection,
                                                    boost::asio::placeholders::error));
-        }
+        }*/
     }
 
 private:
@@ -154,13 +146,11 @@ private:
     }
 
     boost::asio::io_service&    m_io_service;
-    tcp::acceptor               m_acceptor_v6;
-    tcp::acceptor               m_acceptor_v4;
     session_manager_ptr         m_room;
+    
+    // not yet setup for SDL2_net.
     bool m_is_using_ipv6;
 
-    // Place Holder Not used!
-    boost::asio::ssl::context   m_context;
 };
 
 
