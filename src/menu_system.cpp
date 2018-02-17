@@ -6,11 +6,10 @@
 #include "mods/mod_signup.hpp"
 
 #include <locale>
-
 #include <string>
 #include <vector>
 #include <functional>
-
+#include <cassert>
 
 const std::string MenuSystem::m_menuID = "MENU_SYSTEM";
 

@@ -38,7 +38,7 @@ public:
         , m_session_io(session_data)
         , m_filename("mod_prelogon.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
-        , m_detection_deadline(session_data->m_io_service)
+//        , m_detection_deadline(session_data->m_io_service)
         , m_mod_function_index(MOD_DETECT_EMULATION)
         , m_is_text_prompt_exist(false)
         , m_is_esc_detected(false)
@@ -236,7 +236,7 @@ private:
     SessionIO              m_session_io;
     std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
-    deadline_timer         m_detection_deadline;
+//    deadline_timer         m_detection_deadline;
 
     int                    m_mod_function_index;   
     bool                   m_is_text_prompt_exist;

@@ -2,19 +2,10 @@
 
 #include "data-sys/menu_dao.hpp"
 #include "data-sys/menu_prompt_dao.hpp"
-
 #include "access_condition.hpp"
 
-//#include <boost/locale.hpp>
-#include <boost/lexical_cast.hpp>
-
-// Fix for file_copy
-#define BOOST_NO_CXX11_SCOPED_ENUMS
-#include <boost/filesystem.hpp>
-#undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 #include <locale>
-
 #include <cstring>
 #include <string>
 #include <stdint.h>
@@ -23,7 +14,7 @@
 #include <algorithm>
 #include <functional>
 #include <random>
-
+#include <cassert>
 
 MenuBase::MenuBase(session_data_ptr session_data)
     : m_menu_session_data(session_data)
@@ -810,6 +801,8 @@ void MenuBase::executeFirstAndEachCommands()
  */
 std::vector<std::string> MenuBase::getListOfMenuPrompts()
 {
+    std::vector<std::string> result_list;
+    /*
     namespace fs = boost::filesystem;
     fs::path prompt_directory(GLOBAL_MENU_PROMPT_PATH);
     fs::directory_iterator end_iter;
@@ -817,7 +810,7 @@ std::vector<std::string> MenuBase::getListOfMenuPrompts()
     typedef std::vector<std::string> result_set_t;
     //typedef std::vector<std::string>::iterator iterator;
     result_set_t result_set;
-    std::vector<std::string> result_list;
+    
 
     if(fs::exists(prompt_directory) && fs::is_directory(prompt_directory))
     {
@@ -848,7 +841,7 @@ std::vector<std::string> MenuBase::getListOfMenuPrompts()
     {
         result_list.push_back(s.substr(0, s.size()-5));
     }
-
+*/
     return result_list;
 }
 
@@ -918,9 +911,17 @@ std::string MenuBase::loadMenuPrompt()
 
         // Default Display Cursor prompt starting point, make this configurable lateron
         prompt_display = "\x1b[?25h\x1b[22;1H";
+        
+        // TODO, Testing, need replacement for lexical cast
+        // Should only be needed when converting pascal to c.
+        /*
         prompt_display += boost::lexical_cast<std::string>(m_menu_prompt->data_line1) + "\r\n";
         prompt_display += boost::lexical_cast<std::string>(m_menu_prompt->data_line2) + "\r\n";
         prompt_display += boost::lexical_cast<std::string>(m_menu_prompt->data_line3);
+        */
+        prompt_display += m_menu_prompt->data_line1 + "\r\n";
+        prompt_display += m_menu_prompt->data_line2 + "\r\n";
+        prompt_display += m_menu_prompt->data_line3;
 
         // Clear All Mappings
         m_session_io.clearAllMCIMapping();

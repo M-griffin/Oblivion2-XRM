@@ -79,6 +79,7 @@ void SDLCALL SDLNet_SetError(const char *fmt, ...)
 #ifndef WITHOUT_SDL
     SDL_SetError("%s", errorbuf);
 #endif
+
 }
 
 const char * SDLCALL SDLNet_GetError(void)

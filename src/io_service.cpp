@@ -190,6 +190,7 @@ void IOService::run()
             }
             
             // SERVICE_TYPE_CONNECT_IRC
+            /*
             else if (job_work->getServiceType() == SERVICE_TYPE_CONNECT_IRC)
             {
                 // Get host and port from string.
@@ -242,7 +243,7 @@ void IOService::run()
                     run_callback(not_connected_error_code);
                     m_service_list.remove(i);
                 }
-            }
+            }*/
             
         }
 

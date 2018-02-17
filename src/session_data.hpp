@@ -7,7 +7,8 @@
 #include "process_posix.hpp"
 #endif
 
-#include "connection_base.hpp"
+#include "io_service.hpp"
+#include "async_connection.hpp"
 #include "telnet_decoder.hpp"
 #include "session_manager.hpp"
 #include "common_io.hpp"
@@ -20,21 +21,17 @@
 #include "data-sys/session_stats_dao.hpp"
 #include "data-sys/users_dao.hpp"
 
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/asio/deadline_timer.hpp>
-
 #include "libSqliteWrapped.h"
 
 #include <memory>
 #include <string>
 
-using boost::asio::deadline_timer;
-using boost::asio::ip::tcp;
-
 class StateManager;
 typedef std::shared_ptr<StateManager> state_manager_ptr;
 
+class SessionData;
+typedef std::shared_ptr<SessionData> session_data_ptr;
+typedef std::weak_ptr<SessionData> session_data_wptr;
 
 /**
  * @class SessionData
@@ -50,12 +47,12 @@ public:
 
     SessionData(connection_ptr           connection,
                 session_manager_ptr      room,
-                boost::asio::io_service& io_service,
+                IOService&               io_service,
                 state_manager_ptr        state_manager)
         : m_connection(connection)
-        , m_room(room)
+        , m_session_manager(room)
         , m_telnet_state(new TelnetDecoder(connection))
-        , m_input_deadline(io_service)
+//      , m_input_deadline(io_service)
         , m_state_manager(state_manager)
         , m_io_service(io_service)
         , m_common_io()
@@ -69,7 +66,7 @@ public:
         , m_is_leaving(false)
         , m_is_esc_timer(false)
         , m_is_process_running(false)
-        , m_raw_data()
+//        , m_raw_data()
         , m_parsed_data("")
     {
         std::cout << "SessionData" << std::endl;
@@ -92,23 +89,15 @@ public:
     void waitingForData()
     {
         // Important, clear out buffer before each read.
-        memset(&m_raw_data, 0, max_length);
-        if(m_connection->is_open())
+        //memset(&m_raw_data, 0, max_length);
+        std::vector<unsigned char>().swap(m_in_data_vector);
+        if(m_connection->is_open() && TheCommunicator::instance()->isActive())
         {
-            if(m_connection->m_is_secure)
-            {
-                m_connection->m_secure_socket.async_read_some(boost::asio::buffer(m_raw_data, max_length),
-                        boost::bind(&SessionData::handleRead, shared_from_this(),
-                                    boost::asio::placeholders::error,
-                                    boost::asio::placeholders::bytes_transferred));
-            }
-            else
-            {
-                m_connection->m_normal_socket.async_read_some(boost::asio::buffer(m_raw_data, max_length),
-                        boost::bind(&SessionData::handleRead, shared_from_this(),
-                                    boost::asio::placeholders::error,
-                                    boost::asio::placeholders::bytes_transferred));
-            }
+            m_connection->async_read(m_in_data_vector,
+                                     std::bind(
+                                         &SessionData::handleRead,
+                                         shared_from_this(),
+                                         std::placeholders::_1));
         }
     }
 
@@ -120,8 +109,7 @@ public:
     void handleTeloptCodes()
     {
         unsigned char ch = 0;
-
-        for(unsigned char c : m_raw_data)
+        for(auto c : m_in_data_vector)
         {
             try
             {
@@ -143,8 +131,9 @@ public:
             // Incoming Buffer is filled and Telnet options are parsed out.
             m_parsed_data += ch;
         }
+
         // Clear the Session's Socket Buffer for next set of data.
-        memset(&m_raw_data, 0, max_length);
+        //memset(&m_raw_data, 0, max_length);
     }
 
     /**
@@ -158,7 +147,7 @@ public:
      * @param error
      * @param bytes_transferred
      */
-    void handleRead(const boost::system::error_code& error, size_t bytes_transferred);
+    void handleRead(const std::error_code& error);
 
     /**
      * @brief delivers text data to client
@@ -171,9 +160,8 @@ public:
             return;
         }
 
-        std::string outputBuffer = "";
-
         // handle output encoding, if utf-8 translate data accordingly.
+        std::string outputBuffer = "";
         if (m_output_encoding != "cp437")
         {
             outputBuffer = m_common_io.translateUnicode(msg);
@@ -183,23 +171,13 @@ public:
             outputBuffer = msg;
         }
 
-        if(m_connection->is_open())
+        if(m_connection->is_open() && TheCommunicator::instance()->isActive())
         {
-            if(m_connection->m_is_secure)
-            {
-                boost::asio::async_write(m_connection->m_secure_socket,
-                                         boost::asio::buffer(outputBuffer, outputBuffer.size()),
-                                         boost::bind(&SessionData::handleWrite, shared_from_this(),
-                                                     boost::asio::placeholders::error));
-
-            }
-            else
-            {
-                boost::asio::async_write(m_connection->m_normal_socket,
-                                         boost::asio::buffer(outputBuffer, outputBuffer.size()),
-                                         boost::bind(&SessionData::handleWrite, shared_from_this(),
-                                                     boost::asio::placeholders::error));
-            }
+            m_connection->async_write(outputBuffer,
+                                      std::bind(
+                                          &SessionData::handleWrite,
+                                          shared_from_this(),
+                                          std::placeholders::_1));
         }
     }
 
@@ -208,47 +186,28 @@ public:
      * everything this person has left.
      * @param error
      */
-    void handleWrite(const boost::system::error_code& error)
+    void handleWrite(const std::error_code& error)
     {
-
         std::cout << "async_write " << error.message() << std::endl;
-
         if(error)
         {
             std::cout << "async_write error: " << error.message() << std::endl;
             std::cout << "Session Closed()" << std::endl;
         }
 
-        session_manager_ptr room = m_room.lock();
-        if(room && error && (!m_is_leaving))
+        session_manager_ptr session_manager = m_session_manager.lock();
+        if(session_manager && error && (!m_is_leaving))
         {
             m_is_leaving = true;
 
             // Disconenct the session.
-            room->leave(m_node_number);
+            session_manager->leave(m_node_number);
 
             if(m_connection && m_connection->is_open())
             {
                 try
                 {
-                    if(m_connection->m_is_secure)
-                    {
-                        std::cout << "Leaving 111 Peer IP: "
-                                  << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
-                                  << std::endl;
-
-                        m_connection->m_secure_socket.lowest_layer().shutdown(tcp::socket::shutdown_both);
-                        m_connection->m_secure_socket.lowest_layer().close();
-                    }
-                    else
-                    {
-                        std::cout << "Leaving 111 Peer IP: "
-                                  << m_connection->m_normal_socket.remote_endpoint().address().to_string()
-                                  << std::endl;
-
-                        m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
-                        m_connection->m_normal_socket.close();
-                    }
+                    m_connection->shutdown();
                 }
                 catch(std::exception &e)
                 {
@@ -267,7 +226,7 @@ public:
      * @brief Handles setting up the first read() after successful handshake.
      * @param error
      */
-    void handleHandshake(const boost::system::error_code& error);
+    void handleHandshake(const std::error_code& error);
 
     /**
      * @brief Start ESC Key input timer
@@ -277,9 +236,12 @@ public:
         // Add Deadline Timer for .400 milliseconds for complete ESC Sequences.
         // Is no other input or part of ESC Sequecnes ie.. [A following the ESC
         // Then it's an ESC key, otherwise capture the rest of the sequence.
-        m_input_deadline.expires_from_now(boost::posix_time::milliseconds(400));
+
+        /* TODO ADD ASYN Timer Job.
+         m_input_deadline.expires_from_now(boost::posix_time::milliseconds(400));
         m_input_deadline.async_wait(
             boost::bind(&SessionData::handleEscTimer, shared_from_this(), &m_input_deadline));
+        */
     }
 
     /**
@@ -287,35 +249,18 @@ public:
      */
     void logoff()
     {
-        session_manager_ptr room = m_room.lock();
-        if(room)
+        session_manager_ptr session_manager = m_session_manager.lock();
+        if(session_manager)
         {
             // Room is the session.
-            room->leave(m_node_number);
+            session_manager->leave(m_node_number);
         }
 
         if(m_connection && m_connection->is_open())
         {
             try
             {
-                if(m_connection->m_is_secure)
-                {
-                    std::cout << "Leaving 111 Peer IP: "
-                              << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
-                              << std::endl;
-
-                    m_connection->m_secure_socket.lowest_layer().shutdown(tcp::socket::shutdown_both);
-                    m_connection->m_secure_socket.lowest_layer().close();
-                }
-                else
-                {
-                    std::cout << "Leaving 111 Peer IP: "
-                              << m_connection->m_normal_socket.remote_endpoint().address().to_string()
-                              << std::endl;
-
-                    m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
-                    m_connection->m_normal_socket.close();
-                }
+                m_connection->shutdown();
             }
             catch(std::exception &e)
             {
@@ -393,16 +338,16 @@ private:
      * @brief Deadline Input Timer for ESC vs ESC Sequence.
      * @param timer
      */
-    void handleEscTimer(boost::asio::deadline_timer* timer);
+    //  void handleEscTimer(boost::asio::deadline_timer* timer);
 
 public:
 
     connection_ptr        m_connection;
-    session_manager_wptr  m_room;
+    session_manager_wptr  m_session_manager;
     telnet_ptr            m_telnet_state;
-    deadline_timer        m_input_deadline;
+    //deadline_timer        m_input_deadline;
     state_manager_ptr     m_state_manager;
-    boost::asio::io_service& m_io_service;
+    IOService            &m_io_service;
 
     CommonIO              m_common_io;
 
@@ -421,16 +366,14 @@ public:
     bool                  m_is_esc_timer;
     bool                  m_is_process_running;
 
-    enum { max_length = 4096 };
-    char m_raw_data[max_length];  // Raw Incoming
-    std::string m_parsed_data;    // Telnet Opts parsed out
+    enum { max_length = 8192 };
+    //char m_raw_data[max_length];  // Raw Incoming
+    std::vector<unsigned char> m_in_data_vector;
+    std::string m_parsed_data;      // Telnet Opts parsed out
 
     // Handle to Processes.
     std::vector<process_ptr> m_processes;
 
 };
-
-typedef std::shared_ptr<SessionData> session_data_ptr;
-typedef std::weak_ptr<SessionData> session_data_wptr;
 
 #endif // SESSION_DATA_HPP

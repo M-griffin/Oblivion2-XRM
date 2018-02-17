@@ -1,10 +1,9 @@
 #ifndef __TELNET_DECODER_H_
 #define __TELNET_DECODER_H_
 
-#include "connection_base.hpp"
+#include "async_connection.hpp"
+#include "communicator.hpp"
 #include "telnet.hpp"
-
-#include <boost/asio.hpp>
 
 #include <memory>
 #include <iostream>
@@ -119,7 +118,7 @@ public:
 
 private:
 
-    connection_ptr		m_connection;
+    connection_ptr m_connection;
 
     int         m_naws_row;
     int         m_naws_col;
@@ -151,7 +150,7 @@ private:
      * @brief handles callback after write() for errors checking.
      * @param error
      */
-    void handleWrite(const boost::system::error_code& error)
+    void handleWrite(const std::error_code& error)
     {
         // Just log errors for now.
         if(error)
@@ -164,31 +163,22 @@ private:
      * @brief delivers text data to client
      * @param msg
      */
-    void deliver(const std::string &msg)
+    void deliver(const std::string &string_msg)
     {
-        if(msg.size() == 0)
+        if(string_msg.size() == 0)
         {
             return;
         }
-
-        if(m_connection->is_open())
+        
+        if(m_connection->socket()->isActive() && TheCommunicator::instance()->isActive())
         {
-            if(m_connection->m_is_secure)
-            {
-                boost::asio::async_write(m_connection->m_secure_socket,
-                                         boost::asio::buffer(msg, msg.size()),
-                                         boost::bind(&TelnetDecoder::handleWrite, shared_from_this(),
-                                                     boost::asio::placeholders::error));
-
-            }
-            else
-            {
-                boost::asio::async_write(m_connection->m_normal_socket,
-                                         boost::asio::buffer(msg, msg.size()),
-                                         boost::bind(&TelnetDecoder::handleWrite, shared_from_this(),
-                                                     boost::asio::placeholders::error));
-            }
+            m_connection->async_write(string_msg,
+                                      std::bind(
+                                          &TelnetDecoder::handleWrite,
+                                          shared_from_this(),
+                                          std::placeholders::_1));
         }
+        
     }
 
     /**

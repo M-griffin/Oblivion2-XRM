@@ -83,17 +83,7 @@ void SessionManager::shutdown()
 {
     for(auto it = begin(m_sessions); it != end(m_sessions); ++it)
     {
-        if ((*it)->m_connection->m_is_secure)
-        {
-            (*it)->m_connection->m_secure_socket.lowest_layer().shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-            (*it)->m_connection->m_secure_socket.lowest_layer().close();
-        }
-        else
-        {
-            (*it)->m_connection->m_normal_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-            (*it)->m_connection->m_normal_socket.close();
-        }
-
+        (*it)->m_connection->shutdown();
         m_sessions.erase(it);
     }
 }

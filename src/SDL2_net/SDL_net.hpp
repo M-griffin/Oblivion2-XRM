@@ -38,6 +38,17 @@ typedef struct SDLNet_version
     Uint8 patch;
 } SDLNet_version;
 
+
+// Michael Griffin 2018-002-17
+// Add method alias (this was missed in original implementation)
+#define SDL_vsnprintf vsnprintf
+#define SDL_malloc    malloc
+#define SDL_realloc   realloc
+#define SDL_free      free
+#define SDL_memcpy    memcpy
+#define SDL_memset    memset
+
+
 #else /* WITHOUT_SDL */
 
 #include <SDL2/SDL.h>
@@ -48,7 +59,7 @@ typedef SDL_version SDLNet_version;
 
 #endif /* WITHOUT_SDL */
 
-//#include "begin_code.h"
+#include "begin_code.h"
 
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
@@ -453,6 +464,6 @@ SDL_FORCE_INLINE Uint32 _SDLNet_Read32(const void *areap)
 #ifdef __cplusplus
 }
 #endif
-//#include "close_code.h"
+#include "close_code.h"
 
 #endif /* SDL_NET_H_ */

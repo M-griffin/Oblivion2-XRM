@@ -4,29 +4,51 @@
 #include "model-sys/config.hpp"
 #include "session_manager.hpp"
 #include "session.hpp"
-//#include "connection_tcp.hpp"
 #include "communicator.hpp"
 
 // New Rework for SDL2_net and Asyc io.
+#include "io_service.hpp"
 #include "async_connection.hpp"
 
+#include <thread>
+
+class Interface;
+typedef std::unique_ptr<Interface> interface_ptr;
+
 /**
- * @class Server
+ * @class Interface
  * @author Michael Griffin
- * @date 15/08/2015
- * @file server.hpp
- * @brief Handling the Incoming Connections and starts session creation.
+ * @date 13/03/2018
+ * @file interface.hpp
+ * @brief Handling Async IO Startup and connections
  */
-class Server
+class Interface
 {
 
 public:
-    Server(boost::asio::io_service& io_service, int port) //, const tcp::endpoint& endpoint)
+
+    /**
+     * @brief Create IO_Service Working thread for socket communications.
+     * @return
+     */
+    std::thread create_thread()
+    {
+        return std::thread([&] { m_io_service.run(); });
+    }
+    
+    
+    Interface(IOService& io_service, int port) //, const tcp::endpoint& endpoint)
         : m_io_service(io_service)
-        , m_room(new SessionManager())
+        , m_session_manager(new SessionManager())
         , m_is_using_ipv6(true)
     {
-        std::cout << "Starting Telnet Server" << std::endl;
+        
+        std::cout << "Interface Created" << std::endl;
+        // Start up worker thread of ASIO. We want socket communications in a separate thread.
+        // We only spawn a single thread for IO_Service on start up
+        m_thread = create_thread();
+        
+        std::cout << "Starting Telnet Listener on port: " << port << std::endl;
 
         /*
         // Defaults v6_Only to false to accept both v4 and v6 connections.
@@ -86,15 +108,17 @@ public:
         
         // Setup the communicator to allow rest of program to talk with
         // And send messages to other nodes.
-        TheCommunicator::instance()->setupServer(m_room);
+        TheCommunicator::instance()->setupServer(m_session_manager);
 
         std::cout << "Telnet Server Ready." << std::endl;
         wait_for_connection();
     }
 
-    ~Server()
+    ~Interface()
     {
-        std::cout << "~Server" << std::endl;
+        std::cout << "~Interface" << std::endl;
+        m_io_service.stop();
+        m_thread.join();
     }
 
     /**
@@ -130,13 +154,13 @@ private:
      * @param new_connection
      * @param error
      */
-    void handle_accept(connection_ptr new_connection, const boost::system::error_code& error)
+    void handle_accept(connection_ptr new_connection, const std::error_code& error)
     {
         if(!error)
         {
             std::cout << "TCP Connection accepted" << std::endl;
-            session_ptr new_session = Session::create(m_io_service, new_connection, m_room);
-            m_room->join(new_session);
+            session_ptr new_session = Session::create(m_io_service, new_connection, m_session_manager);
+            m_session_manager->join(new_session);
             wait_for_connection();
         }
         else
@@ -145,11 +169,12 @@ private:
         }
     }
 
-    boost::asio::io_service&    m_io_service;
-    session_manager_ptr         m_room;
+    IOService&          m_io_service;
+    session_manager_ptr m_session_manager;
+    std::thread         m_thread;
     
     // not yet setup for SDL2_net.
-    bool m_is_using_ipv6;
+    bool                m_is_using_ipv6;
 
 };
 

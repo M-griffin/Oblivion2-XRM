@@ -75,7 +75,7 @@ public:
         {
             message.erase();
             message = m_queue.dequeue();
-            m_room->deliver(message);
+            m_session_manager->deliver(message);
         }
     }
 
@@ -85,10 +85,10 @@ public:
      * from anywhere in the system.
      * @param room
      */
-    void setupServer(session_manager_ptr &room)
+    void setupServer(session_manager_ptr &session_channel)
     {
         std::lock_guard<std::mutex> lock(m_data_mutex);
-        m_room = room;
+        m_session_manager = session_channel;
     }
 
     /**
@@ -140,7 +140,7 @@ public:
     void shutdown()
     {
         std::lock_guard<std::mutex> lock(m_data_mutex);
-        m_room->shutdown();
+        m_session_manager->shutdown();
         m_active = false;
     }
 
@@ -203,7 +203,7 @@ public:
 
     // ThreadSafe Message Queue
     SafeQueue<std::string> m_queue;
-    session_manager_ptr    m_room;
+    session_manager_ptr    m_session_manager;
 
 private:
 
