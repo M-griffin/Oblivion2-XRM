@@ -2,7 +2,7 @@
 #include "session_data.hpp"
 #include "model-sys/structures.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 #include <unistd.h>
 
@@ -97,7 +97,7 @@ extern "C" void *executeProcessLoop(void *args)
     fd_set rdfdset;
 
     // Setup Thread Arguments Passed.
-    args_ptr threadArgs = * reinterpret_cast<boost::shared_ptr<ThreadArguments>*>(args);
+    args_ptr threadArgs = * reinterpret_cast<std::shared_ptr<ThreadArguments>*>(args);
 
     char character_buffer[2014] = {'\0'};
 
