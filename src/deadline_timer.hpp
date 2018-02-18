@@ -50,9 +50,11 @@ public:
     
     // Non-Blocking Will push job to io_service which will check if expires time has passed.
     // Then run the handler, or ignore and exit if asyncCancel
-    void asyncWait()
+    template <typename StringSequence, typename Callback>
+    void asyncWait(StringSequence string_seq, const Callback &callback)
     {
-       // Rewrite the async_read below for this!
+       std::vector<unsigned char> place_holder;
+       m_io_service.addAsyncJob(place_holder, string_seq, m_socket_handler, callback, SERVICE_TYPE_ASYNC_TIMER);
     }
     
     // Will mark the existing job as expired so cancle further waiting
@@ -61,18 +63,6 @@ public:
         
     }
     
-
-    // TODO REWRITE for adding timer jobs.
-    /**
-     * @brief 
-     * @param BufferSequence - populates will data retrieved
-     * @param Callback - returns error code
-     */
-    template <typename BufferSequence, typename Callback>
-    void async_read(BufferSequence &buffer, const Callback &callback)
-    {
-        m_io_service.addAsyncJob(buffer, nullptr, m_socket_handler, callback, SERVICE_TYPE_TIMER);
-    }
     
 };
 

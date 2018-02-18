@@ -18,6 +18,21 @@ IOService::~IOService()
 
 
 /**
+ * @Brief Always check all timers (Priority each iteration)
+ */            
+void IOService::checkPriorityTimers()
+{
+    // Timers are not removed each iteration
+    // Async stay active until exprired or canceled
+    // And wait, will block socket polling for (x) amount of time
+    for(unsigned int i = 0; i < m_timer_list.size(); i++)
+    {
+        service_base_ptr timers_work = m_timer_list.get(i);
+           
+    }    
+}
+
+/**
  * @brief Main looping method
  */
 void IOService::run()
@@ -27,12 +42,18 @@ void IOService::run()
 
     m_is_active = true;
     while(m_is_active)
-    {
+    {        
+        // Priority Deadline Timer Checks
+        checkPriorityTimers();
+        
         // This will wait for another job to be inserted on next call
         // Do we want to insert the job back, if poll is empty or
         // move to vector then look polls..  i think #2.
         for(unsigned int i = 0; i < m_service_list.size(); i++)
-        {
+        {            
+            // Priority Deadline Timer Checks, Inbetween each asyc job, if one exists.
+            checkPriorityTimers();
+            
             service_base_ptr job_work = m_service_list.get(i);
 
             /**
@@ -254,7 +275,7 @@ void IOService::run()
 }
 
 /**
- * @brief Main looping method
+ * @brief Shutdown Async Polling Service
  */
 void IOService::stop()
 {

@@ -23,7 +23,11 @@ const int SERVICE_TYPE_CONNECT_IRC       = 5;
 const int SERVICE_TYPE_HANDSHAKE_TELNET  = 6;
 const int SERVICE_TYPE_HANDSHAKE_SSH     = 7;
 const int SERVICE_TYPE_HANDSHAKE_IRC     = 8;
-const int SERVICE_TYPE_TIMER             = 9;
+const int SERVICE_TYPE_ASYNC_TIMER       = 9;
+const int SERVICE_TYPE_BLOCK_TIMER       = 10;
+
+#define SERVICE_TIMER(x) ((int)(x) <= SERVICE_TYPE_BLOCK_TIMER \
+                && (int)(x) >= SERVICE_TYPE_ASYNC_TIMER)
 
 /**
  * @class IOService
@@ -135,10 +139,32 @@ public:
             = new ServiceJob <MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
         (buffer, write_sequence, socket_handle, callback, service_type);
 
-        m_service_list.push_back(std::shared_ptr<ServiceBase>(job));
+        if (SERVICE_TIMER(service_type))
+        {
+            // Timer (Priority List Job)
+            m_timer_list.push_back(std::shared_ptr<ServiceBase>(job));
+        }
+        else 
+        {
+            // Standard Async Job
+            m_service_list.push_back(std::shared_ptr<ServiceBase>(job));
+        }
+        
     }
 
+    /**
+     * @Brief Always check all timers (Priority each iteration)
+     */            
+    void checkPriorityTimers();
+
+    /**
+     * @brief Main looping method
+     */
     void run();
+    
+    /**
+     * @brief Shutdown Async Polling Service
+     */
     void stop();
 
     /**
@@ -160,6 +186,7 @@ public:
     }
 
     SafeVector<service_base_ptr>  m_service_list;
+    SafeVector<service_base_ptr>  m_timer_list;
     bool                          m_is_active;
 
 };

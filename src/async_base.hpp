@@ -11,7 +11,7 @@
  * @author Michael Griffin
  * @date 17/02/2018
  * @file async_base.hpp
- * @brief Async IO Base Class for IOService Interfacing
+ * @brief Async Base Class Socket Class for Interfacing with IOService
  */
 class AsyncBase
 {
@@ -55,28 +55,10 @@ public:
         }
         catch (std::exception &ex)
         {
-            std::cout << "tcp_connection shutdown() - Caught exception: " << ex.what();
+            std::cout << "AsyncBase shutdown() - Caught exception: " << ex.what();
         }
     }
-
-    /**
-     * @brief Closes an Open (Maybe Not Connected Socket)
-     */
-    void close()
-    {
-        try
-        {
-            if (m_socket_handler->isActive())
-            {
-                m_socket_handler->close();
-            }
-        }
-        catch (std::exception &ex)
-        {
-            std::cout << "async_connection close() - Caught exception: " << ex.what();
-        }
-    }
-    
+   
     IOService          &m_io_service;
     socket_handler_ptr  m_socket_handler;
 };
