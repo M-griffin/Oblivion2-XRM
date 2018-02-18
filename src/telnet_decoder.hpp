@@ -172,7 +172,7 @@ private:
         
         if(m_connection->socket()->isActive() && TheCommunicator::instance()->isActive())
         {
-            m_connection->async_write(string_msg,
+            m_connection->asyncWrite(string_msg,
                                       std::bind(
                                           &TelnetDecoder::handleWrite,
                                           shared_from_this(),

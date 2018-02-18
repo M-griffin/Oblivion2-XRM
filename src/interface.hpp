@@ -9,6 +9,7 @@
 // New Rework for SDL2_net and Asyc io.
 #include "io_service.hpp"
 #include "async_connection.hpp"
+#include "socket_handler.hpp"
 
 #include <thread>
 
@@ -35,19 +36,18 @@ public:
     {
         return std::thread([&] { m_io_service.run(); });
     }
-    
-    
+
+
     Interface(IOService& io_service, int port) //, const tcp::endpoint& endpoint)
         : m_io_service(io_service)
         , m_session_manager(new SessionManager())
-        , m_is_using_ipv6(true)
     {
-        
+
         std::cout << "Interface Created" << std::endl;
         // Start up worker thread of ASIO. We want socket communications in a separate thread.
         // We only spawn a single thread for IO_Service on start up
         m_thread = create_thread();
-        
+
         std::cout << "Starting Telnet Listener on port: " << port << std::endl;
 
         /*
@@ -105,7 +105,7 @@ public:
             std::cout << "Server Accepts only ipv4 connections." << std::endl;
         }
         */
-        
+
         // Setup the communicator to allow rest of program to talk with
         // And send messages to other nodes.
         TheCommunicator::instance()->setupServer(m_session_manager);
@@ -126,7 +126,8 @@ public:
      */
     void wait_for_connection()
     {
-       // connection_ptr new_connection(new tcp_connection(m_io_service, m_context));
+        socket_handler_ptr socket_handler(new SocketHandler());
+        connection_ptr new_connection(new AsyncConnection(m_io_service, socket_handler));
 
         /*
         // Accept The Connection
@@ -159,7 +160,20 @@ private:
         if(!error)
         {
             std::cout << "TCP Connection accepted" << std::endl;
-            session_ptr new_session = Session::create(m_io_service, new_connection, m_session_manager);
+            
+            // Create DeadlineTimer and attach to new session
+            deadline_timer_ptr deadline_timer(new DeadlineTimer(
+                                          m_io_service,
+                                          new_connection->m_socket_handler
+                                      ));
+                                      
+            // Create the new Session
+            session_ptr new_session = Session::create(m_io_service, 
+                                      new_connection,
+                                      deadline_timer,
+                                      m_session_manager);
+
+            // Attach Session to Session Manager.
             m_session_manager->join(new_session);
             wait_for_connection();
         }
@@ -172,9 +186,6 @@ private:
     IOService&          m_io_service;
     session_manager_ptr m_session_manager;
     std::thread         m_thread;
-    
-    // not yet setup for SDL2_net.
-    bool                m_is_using_ipv6;
 
 };
 

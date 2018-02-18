@@ -3,6 +3,8 @@
 
 #include "state_manager.hpp"
 #include "async_connection.hpp"
+#include "deadline_timer.hpp"
+#include "socket_handler.hpp"
 #include "session_manager.hpp"
 #include "telnet_decoder.hpp"
 #include "communicator.hpp"
@@ -10,22 +12,18 @@
 #include "session_io.hpp"
 #include "menu_system.hpp"
 
-//#include <boost/asio.hpp>
-//#include <boost/asio/io_service.hpp>
-//#include <boost/asio/deadline_timer.hpp>
-
 #include <memory>
 #include <list>
 #include <string>
 #include <cassert>
 
 /*
- * NOTES: Sessions should also have incoming notification buffer
+ * NOTES TODO: Sessions should also have incoming notification buffer
  * or OLM Buffer for message from other nodes and sysops
  * when not in chat.
  */
 
-class Interface;
+//class Interface;
 class Session;
 
 typedef std::shared_ptr<Session> session_ptr;
@@ -60,18 +58,19 @@ public:
      * @param session_manager
      * @return
      */
-    static session_ptr create(IOService& io_service, connection_ptr connection, session_manager_ptr session_manager)
+    static session_ptr create(IOService& io_service, connection_ptr connection, deadline_timer_ptr deadline_timer, 
+            session_manager_ptr session_manager)
     {
-        session_ptr new_session(new Session(io_service, connection, session_manager));
+        session_ptr new_session(new Session(io_service, connection, deadline_timer, session_manager));
 
-        if(connection->is_open())
+        if(connection->isActive())
         {
             new_session->m_session_data->startUpSessionStats("Telnet");                
             new_session->m_session_data->waitingForData();
         }
 
         // Send out Telnet Negoiation Options
-        if(connection->is_open())
+        if(connection->isActive())
         {
             // On initial Session Connection,  setup and send TELNET Options to
             // start the negotiation of client features.
@@ -125,10 +124,17 @@ public:
     }
 
     /**
-     * @brief Start ESC Key input timer
+     * @brief Telopt Sequences timer
      */
     void startDetectionTimer()
     {
+        // Note, this is a non-block timer wait, then done it executes the callback.
+        // IoService loops 20 mili-second iterations, we can add a check if the time
+        // has passed, then execute and close the timer.
+        
+        // We also need a cancel/abort, on events, like for input sequence checking.
+        // And restarts of timers.
+        
         /*
         // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences reponses
         m_detection_deadline.expires_from_now(boost::posix_time::milliseconds(1500));
@@ -161,15 +167,13 @@ public:
             return;
         }
 
-        if(m_connection->is_open() && TheCommunicator::instance()->isActive())
-        {
-       
-            m_connection->async_write(msg,
+        if(m_connection->isActive() && TheCommunicator::instance()->isActive())
+        {       
+            m_connection->asyncWrite(msg,
                                       std::bind(
                                           &Session::handleWrite,
                                           shared_from_this(),
-                                          std::placeholders::_1));
-        
+                                          std::placeholders::_1));        
         }
     }
 
@@ -194,7 +198,7 @@ public:
             // Disconenct the session.
             session_manager->leave(m_session_data->m_node_number);
 
-            if(m_connection->is_open())
+            if(m_connection->isActive())
             {            
                 try
                 {
@@ -242,36 +246,19 @@ public:
      * @param session_manager
      * @return
      */
-    Session(IOService& io_service, connection_ptr connection, session_manager_ptr session_manager)
+    Session(IOService& io_service, connection_ptr connection, deadline_timer_ptr deadline_timer,
+            session_manager_ptr session_manager)
         : m_connection(connection)
-        , m_state_manager(new StateManager())
+        , m_state_manager(new StateManager())       
         , m_session_data(new SessionData(connection, session_manager, io_service, m_state_manager))
-        //, m_resolv(io_service)
-        //, m_detection_deadline(io_service)
-
+        , m_deadline_timer(deadline_timer)       
     {
 
-        /* TESTING
-        std::string server =  m_tcp_connection->m_socket.remote_endpoint().address().to_string();
-        std::string::size_type idx = server.rfind(":", server.size());
-        if (idx != std::string::npos)
-            server.erase(0, idx+1);
-
-        std::cout << "ipv6: " << server << std::endl;
-        tcp::resolver::query query(server, "");
-
-        //resolv.async_resolve(endpoint, resolve_handler);
-        m_resolv.async_resolve(query,
-                               boost::bind(&Session::resolve_handler, this,
-                                           boost::asio::placeholders::error,
-                                           boost::asio::placeholders::iterator));
-        */
-
-        if(m_connection->is_open())
+        if(m_connection->isActive())
         {        
             try
             {
-                std::cout << "New Secure Session ! " << std::endl;
+                std::cout << "New Connection Session ! " << std::endl;
                 std::cout << "Client IP Address: "
                           //<< m_connection->m_normal_socket.remote_endpoint().address().to_string()
                           << std::endl;
@@ -290,8 +277,8 @@ public:
     connection_ptr	    m_connection;
     state_manager_ptr   m_state_manager;
     session_data_ptr    m_session_data;
-    //tcp::resolver       m_resolv;
-   // deadline_timer      m_detection_deadline;
+    socket_handler_ptr  m_socket_handler;
+    deadline_timer_ptr  m_deadline_timer;
 
 };
 

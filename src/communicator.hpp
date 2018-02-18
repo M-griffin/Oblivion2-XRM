@@ -15,11 +15,11 @@
 #include <mutex>
 
 /**
- * @class communicator
+ * @class Communicator
  * @author Michael Griffin
  * @date 15/08/2015
  * @file communicator.hpp
- * @brief Singleton to share between sessions & Global Config.
+ * @brief Singleton to share between Sessions & Global Config.
   */
 class Communicator
 {
@@ -83,12 +83,12 @@ public:
      * @brief Links the Communicator with all active seesions
      * in the System so we can send notifications or chat
      * from anywhere in the system.
-     * @param room
+     * @param session_manager
      */
-    void setupServer(session_manager_ptr &session_channel)
+    void setupServer(session_manager_ptr &session_manager)
     {
         std::lock_guard<std::mutex> lock(m_data_mutex);
-        m_session_manager = session_channel;
+        m_session_manager = session_manager;
     }
 
     /**

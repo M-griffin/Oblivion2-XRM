@@ -21,6 +21,8 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="..\src">
+    <File Name="../src/async_base.hpp"/>
+    <File Name="../src/deadline_timer.hpp"/>
     <File Name="../src/socket_state.hpp"/>
     <File Name="../src/socket_telnet.cpp"/>
     <File Name="../src/socket_ssh.cpp"/>

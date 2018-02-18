@@ -91,9 +91,9 @@ public:
         // Important, clear out buffer before each read.
         //memset(&m_raw_data, 0, max_length);
         std::vector<unsigned char>().swap(m_in_data_vector);
-        if(m_connection->is_open() && TheCommunicator::instance()->isActive())
+        if(m_connection->isActive() && TheCommunicator::instance()->isActive())
         {
-            m_connection->async_read(m_in_data_vector,
+            m_connection->asyncRead(m_in_data_vector,
                                      std::bind(
                                          &SessionData::handleRead,
                                          shared_from_this(),
@@ -171,9 +171,9 @@ public:
             outputBuffer = msg;
         }
 
-        if(m_connection->is_open() && TheCommunicator::instance()->isActive())
+        if(m_connection->isActive() && TheCommunicator::instance()->isActive())
         {
-            m_connection->async_write(outputBuffer,
+            m_connection->asyncWrite(outputBuffer,
                                       std::bind(
                                           &SessionData::handleWrite,
                                           shared_from_this(),
@@ -203,7 +203,7 @@ public:
             // Disconenct the session.
             session_manager->leave(m_node_number);
 
-            if(m_connection && m_connection->is_open())
+            if(m_connection && m_connection->isActive())
             {
                 try
                 {
@@ -256,7 +256,7 @@ public:
             session_manager->leave(m_node_number);
         }
 
-        if(m_connection && m_connection->is_open())
+        if(m_connection && m_connection->isActive())
         {
             try
             {

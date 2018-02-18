@@ -14,12 +14,16 @@ typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
 
-const int SERVICE_TYPE_NONE           = 0;
-const int SERVICE_TYPE_READ           = 1;
-const int SERVICE_TYPE_WRITE          = 2;
-const int SERVICE_TYPE_CONNECT_TELNET = 3;
-const int SERVICE_TYPE_CONNECT_SSH    = 4;
-const int SERVICE_TYPE_CONNECT_IRC    = 5;
+const int SERVICE_TYPE_NONE              = 0;
+const int SERVICE_TYPE_READ              = 1;
+const int SERVICE_TYPE_WRITE             = 2;
+const int SERVICE_TYPE_CONNECT_TELNET    = 3;
+const int SERVICE_TYPE_CONNECT_SSH       = 4;
+const int SERVICE_TYPE_CONNECT_IRC       = 5;
+const int SERVICE_TYPE_HANDSHAKE_TELNET  = 6;
+const int SERVICE_TYPE_HANDSHAKE_SSH     = 7;
+const int SERVICE_TYPE_HANDSHAKE_IRC     = 8;
+const int SERVICE_TYPE_TIMER             = 9;
 
 /**
  * @class IOService
