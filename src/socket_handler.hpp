@@ -40,11 +40,17 @@ public:
     int sendSocket(unsigned char *buf, Uint32 len);
     int recvSocket(char *message);
     int poll();
-
-    bool connectIrcSocket(std::string host, int port);
+    
+    // Telnet
     bool connectTelnetSocket(std::string host, int port);
+    bool handshakeTelnetSocket(std::string host, int port);
+    
+    // SSH
     bool connectSshSocket(std::string host, int port, std::string username, std::string password);
-
+    
+    // IRC
+    bool connectIrcSocket(std::string host, int port);
+    
     std::string getSocketType() const;
     bool isActive() const;
     void setInactive();

@@ -73,7 +73,7 @@ int SSH_Socket::pollSocket()
     return num_ready;
 }
 
-bool SSH_Socket::onEnter()
+bool SSH_Socket::onConnect()
 {
     // For testing and getting debugging output
     int verb = SSH_LOG_PROTOCOL;
@@ -203,6 +203,11 @@ bool SSH_Socket::onEnter()
     return true;
 }
 
+bool SSH_Socket::onListen()
+{
+    // Temp Stub
+    return false;
+}
 
 bool SSH_Socket::onExit()
 {

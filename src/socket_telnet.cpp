@@ -75,7 +75,7 @@ int SDL_Socket::pollSocket()
     return num_ready;
 }
 
-bool SDL_Socket::onEnter()
+bool SDL_Socket::onConnect()
 {
     IPaddress ip;
 
@@ -118,6 +118,13 @@ bool SDL_Socket::onEnter()
 
     return true;
 }
+
+bool SDL_Socket::onListen()
+{
+    // Temp Stub
+    return false;
+}
+
 
 bool SDL_Socket::onExit()
 {

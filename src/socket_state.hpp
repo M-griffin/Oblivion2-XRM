@@ -38,7 +38,8 @@ public:
     virtual int sendSocket(unsigned char *message, Uint32 len) = 0;
     virtual int recvSocket(char *message)= 0;
     virtual int pollSocket() = 0;
-    virtual bool onEnter() = 0;
+    virtual bool onConnect() = 0;
+    virtual bool onListen() = 0;
     virtual bool onExit() = 0;
 
     std::string m_host;
@@ -74,7 +75,8 @@ public:
     virtual int sendSocket(unsigned char *message, Uint32 len);
     virtual int recvSocket(char *message);
     virtual int pollSocket();
-    virtual bool onEnter();
+    virtual bool onConnect();
+    virtual bool onListen();
     virtual bool onExit();
 
 private:
@@ -110,7 +112,8 @@ public:
     virtual int sendSocket(unsigned char *message, Uint32 len);
     virtual int recvSocket(char *message);
     virtual int pollSocket();
-    virtual bool onEnter();
+    virtual bool onConnect();
+    virtual bool onListen();
     virtual bool onExit();
 
 private:
@@ -151,7 +154,8 @@ public:
     virtual int sendSocket(unsigned char *message, Uint32 len);
     virtual int recvSocket(char *message);
     virtual int pollSocket();
-    virtual bool onEnter();
+    virtual bool onConnect();
+    virtual bool onListen();
     virtual bool onExit();
 
 private:
@@ -194,7 +198,8 @@ public:
     virtual int sendSocket(unsigned char *message, Uint32 len);
     virtual int recvSocket(char *message);
     virtual int pollSocket();
-    virtual bool onEnter();
+    virtual bool onConnect();
+    virtual bool onListen();
     virtual bool onExit();
 
     // Specific Functions for SSH

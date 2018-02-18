@@ -67,7 +67,7 @@ bool SocketHandler::connectTelnetSocket(std::string host, int port)
             m_socket_type = SOCKET_TYPE_TELNET;
             socket_state_ptr sdl_socket(new SDL_Socket(host, port));
             m_socket.push_back(sdl_socket);
-            if(m_socket.back()->onEnter())
+            if(m_socket.back()->onConnect())
             {
                 m_is_active = true;
             }
@@ -112,7 +112,7 @@ bool SocketHandler::connectSshSocket(std::string host, int port,
             m_socket_type = SOCKET_TYPE_SSH;
             socket_state_ptr ssh_socket(new SSH_Socket(host, port, username, password));
             m_socket.push_back(ssh_socket);
-            if(m_socket.back()->onEnter())
+            if(m_socket.back()->onConnect())
             {
                 m_is_active = true;
             }
@@ -185,6 +185,50 @@ bool SocketHandler::connectIrcSocket(std::string host, int port)
     return true;
 }
 */
+
+/**
+ * @brief Connect Telnet Socket
+ * @param host
+ * @param port
+ * @return
+ */
+bool SocketHandler::handshakeTelnetSocket(std::string host, int port)
+{
+    std::cout << "SocketHandler::initTelnet Server" << std::endl;
+    if(!m_is_active)
+    {
+        try
+        {
+            m_socket_type = SOCKET_TYPE_TELNET;
+            socket_state_ptr sdl_socket(new SDL_Socket(host, port));
+            m_socket.push_back(sdl_socket);
+            if(m_socket.back()->onListen())
+            {
+                m_is_active = true;
+            }
+            else
+            {
+                std::cout << "Unable to initialize Telnet Socket." << std::endl;
+                close();
+                return false;
+            }
+        }
+        catch(std::exception& e)
+        {
+            close();
+            std::cerr << "exception creating new SDL_Socket: "
+                      << e.what() << std::endl;
+            return false;
+        }
+    }
+    else
+    {
+        std::cout << "Telnet Socket already Active!" << std::endl;
+        return false;
+    }
+    return true;
+}
+
 
 /**
  * @brief Type of Socket
