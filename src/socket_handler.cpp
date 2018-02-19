@@ -192,7 +192,7 @@ bool SocketHandler::connectIrcSocket(std::string host, int port)
  * @param port
  * @return
  */
-bool SocketHandler::handshakeTelnetSocket(std::string host, int port)
+bool SocketHandler::createTelnetAcceptor(std::string host, int port)
 {
     std::cout << "SocketHandler::initTelnet Server" << std::endl;
     if(!m_is_active)

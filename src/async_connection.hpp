@@ -103,15 +103,15 @@ public:
 
         if(protocol == "TELNET")
         {
-            service_type = SERVICE_TYPE_HANDSHAKE_TELNET;
+            service_type = SERVICE_TYPE_LISTENER_TELNET;
         }
         else if (protocol == "SSH")
         {
-            service_type = SERVICE_TYPE_HANDSHAKE_SSH;
+            service_type = SERVICE_TYPE_LISTENER_SSH;
         }
         else if (protocol == "IRC")
         {
-            service_type = SERVICE_TYPE_HANDSHAKE_IRC;
+            service_type = SERVICE_TYPE_LISTENER_IRC;
         }
 
         m_io_service.addAsyncJob(place_holder, string_seq, m_socket_handler, callback, service_type);

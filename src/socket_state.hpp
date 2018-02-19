@@ -36,7 +36,9 @@ public:
     }
 
     virtual int sendSocket(unsigned char *message, Uint32 len) = 0;
-    virtual int recvSocket(char *message)= 0;
+    virtual int recvSocket(char *message) = 0;
+    virtual TCPsocket pollTCPSocketAccepts() = 0;
+    virtual void spawnSocket(TCPsocket socket) = 0;
     virtual int pollSocket() = 0;
     virtual bool onConnect() = 0;
     virtual bool onListen() = 0;
@@ -74,6 +76,8 @@ public:
 
     virtual int sendSocket(unsigned char *message, Uint32 len);
     virtual int recvSocket(char *message);
+    virtual TCPsocket pollTCPSocketAccepts();
+    virtual void spawnSocket(TCPsocket socket);
     virtual int pollSocket();
     virtual bool onConnect();
     virtual bool onListen();
@@ -197,6 +201,8 @@ public:
 
     virtual int sendSocket(unsigned char *message, Uint32 len);
     virtual int recvSocket(char *message);
+    virtual TCPsocket pollTCPSocketAccepts();
+    virtual void spawnSocket(TCPsocket socket);
     virtual int pollSocket();
     virtual bool onConnect();
     virtual bool onListen();

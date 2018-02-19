@@ -141,18 +141,21 @@ auto main() -> int
                       
         }
         
-        // Create Handles to Services, and starts up connection listener and ASIO Thread Worker
-        IOService io_service;
-        interface_ptr setupAndRunAsioServer(new Interface(io_service, cfg.m_config->port_telnet));
-        
-        
-        while(TheCommunicator::instance()->isActive()) 
+        // Isolate to code block for smart pointer deallocation.
         {
-            // Main Thread - While system is active loop,  This will be external event processor
-            // Or notifications, etc.. lets see what else we want to do here.
+            // Create Handles to Services, and starts up connection listener and ASIO Thread Worker
+            IOService io_service;
+            interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", cfg.m_config->port_telnet));
             
-            // Timer, for cpu useage
-            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+            
+            while(TheCommunicator::instance()->isActive()) 
+            {
+                // Main Thread - While system is active loop,  This will be external event processor
+                // Or notifications, etc.. lets see what else we want to do here.
+                
+                // Timer, for cpu useage
+                std::this_thread::sleep_for(std::chrono::milliseconds(20));
+            }        
         }
     }
 

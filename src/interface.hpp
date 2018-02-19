@@ -6,10 +6,14 @@
 #include "session.hpp"
 #include "communicator.hpp"
 
+// For Startup.
+#include <sdl2_net/SDL_net.hpp>
+
 // New Rework for SDL2_net and Asyc io.
 #include "io_service.hpp"
-#include "async_connection.hpp"
 #include "socket_handler.hpp"
+#include "async_acceptor.hpp"
+
 
 #include <thread>
 
@@ -38,11 +42,21 @@ public:
     }
 
 
-    Interface(IOService& io_service, int port) //, const tcp::endpoint& endpoint)
+    Interface(IOService& io_service, std::string protocol, int port) //, const tcp::endpoint& endpoint)
         : m_io_service(io_service)
         , m_session_manager(new SessionManager())
+        , m_socket_acceptor(new SocketHandler())
+        , m_async_listener(new AsyncAcceptor(io_service, m_socket_acceptor))
+        , m_protocol(protocol)
     {
 
+        // Startup SDL NET.
+        if(SDLNet_Init() == -1) 
+        {
+            fprintf(stderr, "ER: SDLNet_Init: %s\n", SDLNet_GetError());
+            exit(-1);
+        }
+        
         std::cout << "Interface Created" << std::endl;
         // Start up worker thread of ASIO. We want socket communications in a separate thread.
         // We only spawn a single thread for IO_Service on start up
@@ -50,62 +64,14 @@ public:
 
         std::cout << "Starting Telnet Listener on port: " << port << std::endl;
 
-        /*
-        // Defaults v6_Only to false to accept both v4 and v6 connections.
-        boost::asio::ip::v6_only v6_only(false);
-        boost::system::error_code ec;
-
-
-        // Try to Setup Listen Socket with IPv6 + IPv4 Support.
-        m_acceptor_v6.open(boost::asio::ip::tcp::v6(), ec);
-        if (!ec)
+        // Setup Telnet Server Connection Listener.
+        if (!m_socket_acceptor->createTelnetAcceptor("127.0.0.1", port))
         {
-            m_acceptor_v6.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
-            m_acceptor_v6.set_option(v6_only, ec);
-            m_acceptor_v6.get_option(v6_only);
-
-            // Listen to localhost connections only
-            //m_acceptor_v6.bind(tcp::endpoint(ip::address::from_string("127.0.0.1"), "5555"));
-            m_acceptor_v6.bind(tcp::endpoint(boost::asio::ip::tcp::v6(), port));
-            m_acceptor_v6.listen();
+             std::cout << "Unable to start Telnet Acceptor" << std::endl;
+             TheCommunicator::instance()->shutdown();
+             return;
         }
-        else
-        {
-            std::cout << "Unable to use IPv6 acceptor" << std::endl;
-        }
-
-        // Fallback to ipv4 acceptor.
-        if (!m_acceptor_v6.is_open() || v6_only)
-        {
-            m_is_using_ipv6 = false;
-            m_acceptor_v4.open(tcp::v4(), ec);
-            if (!ec)
-            {
-                m_acceptor_v4.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
-                // Listen to localhost connections only
-                //m_acceptor_v4.bind(tcp::endpoint(ip::address::from_string("127.0.0.1"), "5555"));
-                m_acceptor_v4.bind(tcp::endpoint(boost::asio::ip::tcp::v4(), port));
-                m_acceptor_v4.listen();
-            }
-            else
-            {
-                // This is the fallback, if it deoesn't work, then good luck!
-                std::cout << "Error: Unable to use IPv4 acceptor, No connections will be accepted." << std::endl;
-                exit(2);
-            }
-        }
-
-        // Give a notice on connection protocols.
-        if (m_is_using_ipv6)
-        {
-            std::cout << "Server Accepts both ipv6 and ipv4 connections." << std::endl;
-        }
-        else
-        {
-            std::cout << "Server Accepts only ipv4 connections." << std::endl;
-        }
-        */
-
+                
         // Setup the communicator to allow rest of program to talk with
         // And send messages to other nodes.
         TheCommunicator::instance()->setupServer(m_session_manager);
@@ -119,6 +85,7 @@ public:
         std::cout << "~Interface" << std::endl;
         m_io_service.stop();
         m_thread.join();
+        SDLNet_Quit();
     }
 
     /**
@@ -126,8 +93,22 @@ public:
      */
     void wait_for_connection()
     {
-        socket_handler_ptr socket_handler(new SocketHandler());
-        connection_ptr new_connection(new AsyncConnection(m_io_service, socket_handler));
+        
+        // Setup call back jobs for new connections.   
+        m_async_listener->asyncListen(
+            m_protocol, 
+            std::bind(&Interface::handle_accept, 
+                        this,
+                        std::placeholders::_1,
+                        std::placeholders::_2)
+            );                      
+
+        // Setup a seperate Socket Handler specific for connections.
+        
+        
+
+        // Check for incomming connations, if so, spawn new socket connection.
+  //      connection_listener->asyncHandshake()
 
         /*
         // Accept The Connection
@@ -137,15 +118,7 @@ public:
                                        boost::bind(&Server::handle_accept, this,
                                                    new_connection,
                                                    boost::asio::placeholders::error));
-
-        }
-        else
-        {
-            m_acceptor_v4.async_accept(new_connection->m_normal_socket,
-                                       boost::bind(&Server::handle_accept, this,
-                                                   new_connection,
-                                                   boost::asio::placeholders::error));
-        }*/
+        */
     }
 
 private:
@@ -185,6 +158,9 @@ private:
 
     IOService&          m_io_service;
     session_manager_ptr m_session_manager;
+    socket_handler_ptr  m_socket_acceptor;
+    acceptor_ptr        m_async_listener;
+    std::string         m_protocol;
     std::thread         m_thread;
 
 };

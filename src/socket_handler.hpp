@@ -43,7 +43,7 @@ public:
     
     // Telnet
     bool connectTelnetSocket(std::string host, int port);
-    bool handshakeTelnetSocket(std::string host, int port);
+    bool createTelnetAcceptor(std::string host, int port);
     
     // SSH
     bool connectSshSocket(std::string host, int port, std::string username, std::string password);

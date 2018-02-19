@@ -9,11 +9,13 @@
 #include <cerrno>
 #include <time.h>
 
-/*
- * Start of SDL_Socket Derived Class (TELNET)
+
+/**
+ * @brief Send Data Over the Socket
+ * @param buffer
+ * @param length
+ * @return 
  */
-/* send a string buffer over a TCP socket with error checking */
-/* returns 0 on any errors, length sent on success */
 int SDL_Socket::sendSocket(unsigned char *buffer, Uint32 length)
 {
     int result = 0;
@@ -33,7 +35,11 @@ int SDL_Socket::sendSocket(unsigned char *buffer, Uint32 length)
 }
 
 
-/* handle Telnet better */
+/**
+ * @brief Receive Data from Socket
+ * @param message
+ * @return 
+ */
 int SDL_Socket::recvSocket(char *message)
 {
     int result = -1;
@@ -51,6 +57,10 @@ int SDL_Socket::recvSocket(char *message)
     return result;
 }
 
+/**
+ * @brief Polls For Data To Read from the socket.
+ * @return 
+ */
 int SDL_Socket::pollSocket()
 {
     int num_ready = -1;
@@ -75,6 +85,56 @@ int SDL_Socket::pollSocket()
     return num_ready;
 }
 
+/**
+ * @brief Polls For Data To Read from the socket.
+ * @return 
+ */
+TCPsocket SDL_Socket::pollTCPSocketAccepts()
+{
+    TCPsocket socket = nullptr;
+    if (m_is_socket_active)
+    {        
+        if(SDLNet_SocketReady(m_tcp_socket)) 
+        {
+            socket = SDLNet_TCP_Accept(m_tcp_socket);       
+        }
+    }
+
+    return socket;
+}
+
+/**
+ * @brief (Server) On Socket Accepts, new Session Socket Setup.
+ * @param socket
+ */
+void SDL_Socket::spawnSocket(TCPsocket socket)
+{
+    
+    m_socket_set = SDLNet_AllocSocketSet(1);
+    if(!m_socket_set)
+    {
+        std::cout << "SDLNet_AllocSocketSet: " << SDLNet_GetError() << std::endl;
+        onExit();
+        return;
+    }
+    
+    // Attached New Socket from Accept to it's own session instance.
+    if(SDLNet_TCP_AddSocket(m_socket_set, socket) == -1)
+    {
+        std::cout << "SDLNet_TCP_AddSocket: " << SDLNet_GetError() << std::endl;
+        onExit();
+        return;
+    }
+
+    // Successful Startup
+    m_is_socket_active = true;
+    std::cout << "Connection Spawn Successful" << std::endl;
+}
+
+/**
+ * @brief (Client) Connects out to Servers
+ * @return 
+ */
 bool SDL_Socket::onConnect()
 {
     IPaddress ip;
@@ -119,13 +179,58 @@ bool SDL_Socket::onConnect()
     return true;
 }
 
+/**
+ * @brief (Server) Sets up the Listening Socket for New Conenction Polling.
+ * @return 
+ */
 bool SDL_Socket::onListen()
 {
-    // Temp Stub
-    return false;
+    IPaddress ip;
+
+    m_socket_set = SDLNet_AllocSocketSet(1);
+    if(!m_socket_set)
+    {
+        std::cout << "SDLNet_AllocSocketSet: " << SDLNet_GetError() << std::endl;
+        onExit();
+        return false;
+    }
+
+    /* Resolve the argument into an IP address type */
+    std::cout << "Listening for Telnet on port " << m_port << std::endl;
+    if(SDLNet_ResolveHost(&ip, nullptr, m_port) == -1)
+    {
+        std::cout << "SDLNet_ResolveHost: " << SDLNet_GetError() << std::endl;
+        m_tcp_socket = nullptr;
+        onExit();
+        return false;
+    }
+
+    m_tcp_socket = SDLNet_TCP_Open(&ip);
+    if(!m_tcp_socket)
+    {
+        std::cout << "SDLNet_TCP_Open: " << SDLNet_GetError() << std::endl;
+        onExit();
+        return false;
+    }
+
+    if(SDLNet_TCP_AddSocket(m_socket_set, m_tcp_socket) == -1)
+    {
+        std::cout << "SDLNet_TCP_AddSocket: " << SDLNet_GetError() << std::endl;
+        onExit();
+        return false;
+    }
+
+    // Successful Startup
+    m_is_socket_active = true;
+    std::cout << "Handshake Setup Successful" << std::endl;    
+    return true;
 }
 
 
+/**
+ * @brief Shutdown Socket.
+ * @return 
+ */
 bool SDL_Socket::onExit()
 {
     std::cout << "SDL_Socket::onExit()" << std::endl;

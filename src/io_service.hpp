@@ -20,14 +20,17 @@ const int SERVICE_TYPE_WRITE             = 2;
 const int SERVICE_TYPE_CONNECT_TELNET    = 3;
 const int SERVICE_TYPE_CONNECT_SSH       = 4;
 const int SERVICE_TYPE_CONNECT_IRC       = 5;
-const int SERVICE_TYPE_HANDSHAKE_TELNET  = 6;
-const int SERVICE_TYPE_HANDSHAKE_SSH     = 7;
-const int SERVICE_TYPE_HANDSHAKE_IRC     = 8;
+const int SERVICE_TYPE_LISTENER_TELNET   = 6;
+const int SERVICE_TYPE_LISTENER_SSH      = 7;
+const int SERVICE_TYPE_LISTENER_IRC      = 8;
 const int SERVICE_TYPE_ASYNC_TIMER       = 9;
 const int SERVICE_TYPE_BLOCK_TIMER       = 10;
 
 #define SERVICE_TIMER(x) ((int)(x) <= SERVICE_TYPE_BLOCK_TIMER \
                 && (int)(x) >= SERVICE_TYPE_ASYNC_TIMER)
+
+#define SERVICE_LISTENER(x) ((int)(x) <= SERVICE_TYPE_LISTENER_IRC \
+                && (int)(x) >= SERVICE_TYPE_LISTENER_TELNET)
 
 /**
  * @class IOService
@@ -47,6 +50,7 @@ public:
      * Handles Call Back Functions, execute at the end of Asyn Job.
      */
     typedef std::function<void(const std::error_code& error)> callback_function_handler;
+
     static const int MAX_BUFFER_SIZE = 8193;
 
     /**
@@ -144,6 +148,11 @@ public:
             // Timer (Priority List Job)
             m_timer_list.push_back(std::shared_ptr<ServiceBase>(job));
         }
+        else if (SERVICE_LISTENER(service_type))
+        {
+            // Server Connection Listener Job (1) for each Service.
+            m_listener_list.push_back(std::shared_ptr<ServiceBase>(job));
+        }
         else 
         {
             // Standard Async Job
@@ -156,6 +165,11 @@ public:
      * @Brief Always check all timers (Priority each iteration)
      */            
     void checkPriorityTimers();
+
+    /**
+     * @brief Async Listener, check for incomming connections
+     */
+    void checkAsyncListenersForConnections();
 
     /**
      * @brief Main looping method
@@ -187,6 +201,7 @@ public:
 
     SafeVector<service_base_ptr>  m_service_list;
     SafeVector<service_base_ptr>  m_timer_list;
+    SafeVector<service_base_ptr>  m_listener_list;
     bool                          m_is_active;
 
 };

@@ -51,6 +51,25 @@ int SSH_Socket::recvSocket(char *message)
     return result;
 }
 
+/**
+ * @brief (Not Used for SSH) Needed becasue of Virtual Interface Requirement.
+ * @return 
+ */
+TCPsocket SSH_Socket::pollTCPSocketAccepts()
+{
+    // Placeholder
+    return nullptr;
+}
+
+/**
+ * @brief (Server) On Socket Accepts, new Session Socket Setup.
+ * @param socket
+ */
+void SSH_Socket::spawnSocket(TCPsocket)//socket)
+{
+    // placeholder    
+}
+
 int SSH_Socket::pollSocket()
 {
     int num_ready = 0;

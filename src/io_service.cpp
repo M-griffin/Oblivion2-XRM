@@ -32,6 +32,26 @@ void IOService::checkPriorityTimers()
     }    
 }
 
+
+/**
+ * @brief Async Listener, check for incomming connections
+ */
+void IOService::checkAsyncListenersForConnections()
+{    
+    // Timers are not removed each iteration
+    // Async stay active until exprired or canceled
+    // And wait, will block socket polling for (x) amount of time
+    for(unsigned int i = 0; i < m_listener_list.size(); i++)
+    {
+        service_base_ptr listener_work = m_listener_list.get(i);
+           
+        // Check listen Socket.
+       // int result = listener_work->getSocket()->checkConnectionHandshake();
+        
+    }        
+}
+
+
 /**
  * @brief Main looping method
  */
@@ -45,6 +65,9 @@ void IOService::run()
     {        
         // Priority Deadline Timer Checks
         checkPriorityTimers();
+        
+        // Check for incomming connections
+        checkAsyncListenersForConnections();
         
         // This will wait for another job to be inserted on next call
         // Do we want to insert the job back, if poll is empty or
@@ -265,7 +288,7 @@ void IOService::run()
                     m_service_list.remove(i);
                 }
             }*/
-            
+                                    
         }
 
         // Temp timer, change to 10/20 miliseconds for cpu useage
@@ -280,5 +303,8 @@ void IOService::run()
 void IOService::stop()
 {
     m_is_active = false;
+    // Clear All Lists and attached handles.
     m_service_list.clear();
+    m_timer_list.clear();
+    m_listener_list.clear();    
 }
