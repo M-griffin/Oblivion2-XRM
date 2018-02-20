@@ -1,9 +1,9 @@
-/*
+/**
  * Oblivion/2 XRM (c) 2015-2018 Michael Griffin
  * A Telnet Server and BBS system modeled after Oblivion/2 bbs software.
  *
  * XRM = Extreme Remake!
- * Compiles under MingW32/64 5.1.0 g++
+ * Compiles under MingW32/64 g++ >= 5.1.0
  *
  * LIBS:
  * Sqlite3
@@ -14,7 +14,6 @@
  * List All Exit Error Codes here.
  * Error Exit Codes (1) Unable to Load Configuration File.
  * Error Exit Codes (2) Unable to use Fallback IPv4 Acceptor (Accept Connections).
- *
  */
 
 
@@ -31,14 +30,8 @@
 #include <cstdlib>
 #include <iostream>
 #include <chrono>
-//#include <map>
 #include <exception>
 
-// temp
-//#include <fstream>
-
-
-// Temp!
 std::string GLOBAL_BBS_PATH = "";
 std::string GLOBAL_DATA_PATH = "";
 std::string GLOBAL_MENU_PATH = "";
@@ -46,7 +39,6 @@ std::string GLOBAL_MENU_PROMPT_PATH = "";
 std::string GLOBAL_TEXTFILE_PATH = "";
 std::string GLOBAL_SCRIPT_PATH = "";
 std::string USERS_DATABASE = "";
-
 
 
 /**
@@ -86,7 +78,6 @@ auto main() -> int
         // Setup in the config, everything is branched from the main path.
         // Later on we'll check config for overides only.
         ConfigDao cfg(config, GLOBAL_BBS_PATH);
-
         if (!cfg.fileExists())
         {
             cfg.saveConfig(config);
@@ -94,20 +85,17 @@ auto main() -> int
 
         // Load Config and lets do some validation
         cfg.loadConfig();
-
         if (!cfg.validation())
         {
             return 0;
         }
     }
 
-
     // Database Startup in it's own context.
     {
         db_startup_ptr db(new DbStartup());
         db->initDatabaseTables();
     }
-
 
     // Initial Config File Read, and Start ASIO Server.
     {
@@ -122,8 +110,6 @@ auto main() -> int
         // Setup the Data Access Object
         //config_dao_ptr cfg(config, GLOBAL_BBS_PATH);
         ConfigDao cfg(config, GLOBAL_BBS_PATH);
-
-        // Loads the Config file into the Data Access Object.
         if (!cfg.loadConfig())
         {
             // TODO Throws exception right now, need to work in
@@ -131,14 +117,12 @@ auto main() -> int
             exit(1);
         }
 
-
         // TODO, from rework, right now single asio server is setup,
         // One we have SSH server setup we can split this up again.
         if (cfg.m_config->use_service_telnet)
         {
             std::cout << "Listening for telnet connections on port "
-                      << cfg.m_config->port_telnet << std::endl;
-                      
+                      << cfg.m_config->port_telnet << std::endl;                      
         }
         
         // Isolate to code block for smart pointer deallocation.
@@ -146,8 +130,7 @@ auto main() -> int
             // Create Handles to Services, and starts up connection listener and ASIO Thread Worker
             IOService io_service;
             interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", cfg.m_config->port_telnet));
-            
-            
+                        
             while(TheCommunicator::instance()->isActive()) 
             {
                 // Main Thread - While system is active loop,  This will be external event processor

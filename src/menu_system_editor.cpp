@@ -1,11 +1,6 @@
 #include "menu_system.hpp"
 #include "model-sys/struct_compat.hpp"
 
-
-// Needed for RPI GCC 4.9
-//#define BOOST_FILESYSTEM_VERSION 3
-//#include <boost/filesystem.hpp>
-
 #include <stdint.h>
 #include <string>
 #include <vector>

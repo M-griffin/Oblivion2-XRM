@@ -75,7 +75,6 @@ public:
     ~SessionData()
     {
         std::cout << "~SessionData" << std::endl;
-
         for (unsigned int i = 0; i < m_processes.size(); i++)
         {
             m_processes[i]->terminate();
@@ -201,8 +200,6 @@ public:
         if(session_manager && error && (!m_is_leaving))
         {
             m_is_leaving = true;
-
-            // Disconenct the session.
             session_manager->leave(m_node_number);
 
             if(m_connection && m_connection->isActive())
@@ -317,7 +314,6 @@ public:
             m_is_process_running = false;
         }
 #endif
-
         std::cout << "SessionData Starting Done" << std::endl;
     }
 

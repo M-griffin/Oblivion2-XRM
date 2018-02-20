@@ -6,15 +6,13 @@
 #include "session.hpp"
 #include "communicator.hpp"
 
-// For Startup.
-#include <sdl2_net/SDL_net.hpp>
-
 // New Rework for SDL2_net and Asyc io.
 #include "io_service.hpp"
 #include "socket_handler.hpp"
 #include "async_acceptor.hpp"
 
-
+// For Startup.
+#include <sdl2_net/SDL_net.hpp>
 #include <thread>
 
 class Interface;
@@ -41,8 +39,14 @@ public:
         return std::thread([&] { m_io_service.run(); });
     }
 
-
-    Interface(IOService& io_service, std::string protocol, int port) //, const tcp::endpoint& endpoint)
+    /**
+     * @brief Main interface constructor.
+     * @param io_service
+     * @param protocol
+     * @param port
+     * @return 
+     */
+    Interface(IOService& io_service, std::string protocol, int port)
         : m_io_service(io_service)
         , m_session_manager(new SessionManager())
         , m_socket_acceptor(new SocketHandler())
@@ -77,7 +81,7 @@ public:
         TheCommunicator::instance()->setupServer(m_session_manager);
 
         std::cout << "Telnet Server Ready." << std::endl;
-        wait_for_connection();
+        waitingForConnection();
     }
 
     ~Interface()
@@ -91,31 +95,14 @@ public:
     /**
      * @brief Handles incoming connections.
      */
-    void wait_for_connection()
-    {
-        
-        // Setup call back jobs for new connections.   
-        m_async_listener->asyncListen(
+    void waitingForConnection()
+    {        
+        m_async_listener->asyncAccept(
             m_protocol, 
             std::bind(&Interface::handle_accept, 
                         this,
                         std::placeholders::_1,
                         std::placeholders::_2));
-
-        // Setup a seperate Socket Handler specific for connections.                
-
-        // Check for incomming connations, if so, spawn new socket connection.
-  //      connection_listener->asyncHandshake()
-
-        /*
-        // Accept The Connection
-        if (m_is_using_ipv6)
-        {
-            m_acceptor_v6.async_accept(new_connection->m_normal_socket,
-                                       boost::bind(&Server::handle_accept, this,
-                                                   new_connection,
-                                                   boost::asio::placeholders::error));
-        */
     }
 
 private:
@@ -125,7 +112,7 @@ private:
      * @param new_connection
      * @param error
      */
-    void handle_accept(const std::error_code& error, connection_ptr new_connection)
+    void handle_accept(const std::error_code& error, connection_ptr connection)
     {
         if(!error)
         {
@@ -134,18 +121,18 @@ private:
             // Create DeadlineTimer and attach to new session
             deadline_timer_ptr deadline_timer(new DeadlineTimer(
                                           m_io_service,
-                                          new_connection->m_socket_handler
+                                          connection->m_socket_handler
                                       ));
                                       
             // Create the new Session
             session_ptr new_session = Session::create(m_io_service, 
-                                      new_connection,
+                                      connection,
                                       deadline_timer,
                                       m_session_manager);
 
             // Attach Session to Session Manager.
             m_session_manager->join(new_session);
-            wait_for_connection();
+            waitingForConnection();
         }
         else
         {

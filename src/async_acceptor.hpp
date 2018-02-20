@@ -38,7 +38,7 @@ public:
      * @param Callback - return error code and handles to new session
      */
     template <typename Protocol, typename Callback>
-    void asyncListen(Protocol protocol, const Callback &callback)
+    void asyncAccept(Protocol protocol, const Callback &callback)
     {
         // Place Holder is used for template parmeters, string_seq is used in writes
         // Where the Buffer Place Holder in the above method is used for reads.
