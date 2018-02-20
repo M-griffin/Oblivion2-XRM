@@ -100,12 +100,9 @@ public:
             std::bind(&Interface::handle_accept, 
                         this,
                         std::placeholders::_1,
-                        std::placeholders::_2)
-            );                      
+                        std::placeholders::_2));
 
-        // Setup a seperate Socket Handler specific for connections.
-        
-        
+        // Setup a seperate Socket Handler specific for connections.                
 
         // Check for incomming connations, if so, spawn new socket connection.
   //      connection_listener->asyncHandshake()
@@ -128,12 +125,12 @@ private:
      * @param new_connection
      * @param error
      */
-    void handle_accept(connection_ptr new_connection, const std::error_code& error)
+    void handle_accept(const std::error_code& error, connection_ptr new_connection)
     {
         if(!error)
         {
             std::cout << "TCP Connection accepted" << std::endl;
-            
+                        
             // Create DeadlineTimer and attach to new session
             deadline_timer_ptr deadline_timer(new DeadlineTimer(
                                           m_io_service,

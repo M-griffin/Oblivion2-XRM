@@ -3,17 +3,16 @@
 #include "session_manager.hpp"
 
 
-
 /**
  * @brief Passed data Though the State, and Checks ESC Timer
- *
+ */
 void SessionData::updateState()
 {
     // Last Character Received is ESC, then Check for
     // ESC Sequence, or Lone ESC Key.
     if(m_parsed_data[m_parsed_data.size()-1] == '\x1b')
     {
-        startEscapeTimer();
+       // startEscapeTimer();
         m_is_esc_timer = true;
     }
     else if(!m_is_esc_timer)
@@ -27,8 +26,8 @@ void SessionData::updateState()
  * Then parses out normal text data from client to server.
  * @param error
  * @param bytes_transferred
- *
-void SessionData::handleRead(const std::error_code& error)
+ */
+void SessionData::handleRead(const std::error_code& error, connection_ptr)
 {
     if(!error)
     {
@@ -114,13 +113,13 @@ void SessionData::handleRead(const std::error_code& error)
 
                     default:
                         break;
-                }
+                }*/
             }
 
             // Restart Callback to wait for more data.
             // If this step is skipped, then the node will exit
             // since io_service will have no more work!
-            if(m_connection->is_open())
+            if(m_connection->isActive())
             {
                 waitingForData();
             }
@@ -140,7 +139,7 @@ void SessionData::handleRead(const std::error_code& error)
                     session_manager->leave(m_node_number);
                     // m_session_state = SESSION_STATE::STATE_DONE;
 
-                    if(m_connection->is_open())
+                    if(m_connection->isActive())
                     {
                    
                         std::cout << "Leaving (SESSION_DATA) Client IP: " << std::endl;
@@ -151,7 +150,7 @@ void SessionData::handleRead(const std::error_code& error)
                                   << std::endl
                                   << "Bytes: "
                                   << bytes_transferred
-                                  << std::endl;
+                                  << std::endl;*/
 
                         m_connection->shutdown();
                     }
@@ -165,17 +164,15 @@ void SessionData::handleRead(const std::error_code& error)
     }
 }
 
-
-/*
- * @brief Start Secutiry handshake.
+/**
+ * @brief Start Secutiry handshake. (SSL Referene).
  *
 void SessionData::handshake()
 {
     // rewrite for incoming or 
     std::cout << "SSL handshake!" << std::endl;
     if(m_connection->is_open())
-    {
-        /*
+    {        
         m_connection->async_handshake(boost::asio::ssl::stream_base::server,
                 boost::bind(&SessionData::handleHandshake,
                             shared_from_this(),
@@ -186,7 +183,7 @@ void SessionData::handshake()
          std::cout << "ERROR: SSL handshake!" << std::endl;
     }
 
-}
+}*/
 
 /**
  * @brief Handles setting up the first read() after successful handshake.
@@ -219,7 +216,7 @@ void SessionData::handleHandshake(const std::error_code& error)
     {
         std::cout << "handle_handshake()! ERROR" << std::endl;
     }
-}
+}*/
 
 /**
  * @brief Deadline Input Timer for ESC vs ESC Sequence.
@@ -242,11 +239,11 @@ void SessionData::handleEscTimer(boost::asio::deadline_timer* timer)
     // Move text to State Machine, Timer has passed, or remainer of Sequence caught up!
     m_state_manager->update();
     m_is_esc_timer = false;
-}
+}*/
 
 /**
  * @brief Startup Session Stats
- *
+ */
 void SessionData::startUpSessionStats(std::string sessionType) 
 {
     std::cout << "startUpSessionStats: " << sessionType << std::endl;
@@ -272,5 +269,3 @@ void SessionData::startUpSessionStats(std::string sessionType)
         m_session_stats->iId = id;
     }
 }
-
-*/

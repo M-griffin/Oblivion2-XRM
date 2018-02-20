@@ -29,6 +29,7 @@ void IOService::checkPriorityTimers()
     {
         service_base_ptr timers_work = m_timer_list.get(i);
            
+        //timers_work->executeCallback(not_connected_error_code, nullptr);
     }    
 }
 
@@ -48,6 +49,7 @@ void IOService::checkAsyncListenersForConnections()
         // Check listen Socket.
        // int result = listener_work->getSocket()->checkConnectionHandshake();
         
+        //listener_work->executeCallback(not_connected_error_code, nullptr);
     }        
 }
 
@@ -96,26 +98,23 @@ void IOService::run()
                         // Error - Lost Connection
                         std::cout << "async_read - lost connection!: " << length << std::endl;
                         job_work->getSocket()->setInactive();
-                        callback_function_handler run_callback(job_work->getCallback());
                         std::error_code lost_connect_error_code (1, std::system_category());
-                        run_callback(lost_connect_error_code);
+                        job_work->executeCallback(lost_connect_error_code, nullptr);
                         m_service_list.remove(i);
                     }
                     else
                     {
                         job_work->setBuffer((unsigned char *)msg_buffer);
-                        callback_function_handler run_callback(job_work->getCallback());
                         std::error_code success_code (0, std::generic_category());
-                        run_callback(success_code);
+                        job_work->executeCallback(success_code, nullptr);
                         m_service_list.remove(i);
                     }
                 }
                 else if (result == -1)
                 {
                     std::cout << "async_poll - lost connection" << std::endl;
-                    callback_function_handler run_callback(job_work->getCallback());
                     std::error_code lost_connect_error_code (1, std::system_category());
-                    run_callback(lost_connect_error_code);
+                    job_work->executeCallback(lost_connect_error_code, nullptr);
                     m_service_list.remove(i);
                 }
             }
@@ -135,16 +134,14 @@ void IOService::run()
                     // Error - Lost Connection
                     std::cout << "async_write - lost connection!" << std::endl;
                     job_work->getSocket()->setInactive();
-                    callback_function_handler run_callback(job_work->getCallback());
                     std::error_code lost_connect_error_code (1, std::system_category());
-                    run_callback(lost_connect_error_code);
+                    job_work->executeCallback(lost_connect_error_code, nullptr);
                     m_service_list.remove(i);
                 }
                 else
                 {
-                    callback_function_handler run_callback(job_work->getCallback());
                     std::error_code success_code (0, std::generic_category());
-                    run_callback(success_code);
+                    job_work->executeCallback(success_code, nullptr);
                     m_service_list.remove(i);
                 }
             }
@@ -172,10 +169,9 @@ void IOService::run()
                 }
 
                 if (is_success)
-                {
-                    callback_function_handler run_callback(job_work->getCallback());
+                {                    
                     std::error_code success_code (0, std::generic_category());
-                    run_callback(success_code);
+                    job_work->executeCallback(success_code, nullptr);
                     m_service_list.remove(i);
                 }
                 else
@@ -183,9 +179,8 @@ void IOService::run()
                     // Error - Unable to connect
                     std::cout << "async_connection - unable to connect" << std::endl;
                     job_work->getSocket()->setInactive();
-                    callback_function_handler run_callback(job_work->getCallback());
                     std::error_code not_connected_error_code (1, std::system_category());
-                    run_callback(not_connected_error_code);
+                    job_work->executeCallback(not_connected_error_code, nullptr);
                     m_service_list.remove(i);
                 }
             }
@@ -215,10 +210,9 @@ void IOService::run()
                 }
 
                 if (is_success)
-                {
-                    callback_function_handler run_callback(job_work->getCallback());
+                {                   
                     std::error_code success_code (0, std::generic_category());
-                    run_callback(success_code);
+                    job_work->executeCallback(success_code, nullptr);
                     m_service_list.remove(i);
                 }
                 else
@@ -226,9 +220,8 @@ void IOService::run()
                     // Error - Unable to connect
                     std::cout << "async_connection - unable to connect" << std::endl;
                     job_work->getSocket()->setInactive();
-                    callback_function_handler run_callback(job_work->getCallback());
                     std::error_code not_connected_error_code (1, std::system_category());
-                    run_callback(not_connected_error_code);
+                    job_work->executeCallback(not_connected_error_code, nullptr);
                     m_service_list.remove(i);
                 }
             }

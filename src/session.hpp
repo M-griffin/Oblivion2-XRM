@@ -173,7 +173,8 @@ public:
                                       std::bind(
                                           &Session::handleWrite,
                                           shared_from_this(),
-                                          std::placeholders::_1));        
+                                          std::placeholders::_1,
+                                          std::placeholders::_2));        
         }
     }
 
@@ -182,7 +183,7 @@ public:
      *        Everyone this person has left.
      * @param error
      */
-    void handleWrite(const std::error_code& error)
+    void handleWrite(const std::error_code& error, connection_ptr)
     {
         if(error)
         {

@@ -97,7 +97,8 @@ public:
                                      std::bind(
                                          &SessionData::handleRead,
                                          shared_from_this(),
-                                         std::placeholders::_1));
+                                         std::placeholders::_1,
+                                         std::placeholders::_2));
         }
     }
 
@@ -147,7 +148,7 @@ public:
      * @param error
      * @param bytes_transferred
      */
-    void handleRead(const std::error_code& error);
+    void handleRead(const std::error_code& error, connection_ptr);
 
     /**
      * @brief delivers text data to client
@@ -177,7 +178,8 @@ public:
                                       std::bind(
                                           &SessionData::handleWrite,
                                           shared_from_this(),
-                                          std::placeholders::_1));
+                                          std::placeholders::_1,
+                                          std::placeholders::_2));
         }
     }
 
@@ -186,7 +188,7 @@ public:
      * everything this person has left.
      * @param error
      */
-    void handleWrite(const std::error_code& error)
+    void handleWrite(const std::error_code& error, connection_ptr)
     {
         std::cout << "async_write " << error.message() << std::endl;
         if(error)
