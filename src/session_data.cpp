@@ -27,7 +27,7 @@ void SessionData::updateState()
  * @param error
  * @param bytes_transferred
  */
-void SessionData::handleRead(const std::error_code& error, connection_ptr)
+void SessionData::handleRead(const std::error_code& error, socket_handler_ptr)
 {
     if(!error)
     {

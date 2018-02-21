@@ -13,6 +13,9 @@
 #include <memory>
 #include <string>
 
+class SocketHandler;
+typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
+
 /**
  * @class SocketState
  * @author Michael Griffin
@@ -37,7 +40,7 @@ public:
 
     virtual int sendSocket(unsigned char *message, Uint32 len) = 0;
     virtual int recvSocket(char *message) = 0;
-    virtual TCPsocket pollTCPSocketAccepts() = 0;
+    virtual socket_handler_ptr pollSocketAccepts() = 0;
     virtual void spawnSocket(TCPsocket socket) = 0;
     virtual int pollSocket() = 0;
     virtual bool onConnect() = 0;
@@ -76,7 +79,7 @@ public:
 
     virtual int sendSocket(unsigned char *message, Uint32 len);
     virtual int recvSocket(char *message);
-    virtual TCPsocket pollTCPSocketAccepts();
+    virtual socket_handler_ptr pollSocketAccepts();
     virtual void spawnSocket(TCPsocket socket);
     virtual int pollSocket();
     virtual bool onConnect();
@@ -201,7 +204,7 @@ public:
 
     virtual int sendSocket(unsigned char *message, Uint32 len);
     virtual int recvSocket(char *message);
-    virtual TCPsocket pollTCPSocketAccepts();
+    virtual socket_handler_ptr pollSocketAccepts();
     virtual void spawnSocket(TCPsocket socket);
     virtual int pollSocket();
     virtual bool onConnect();

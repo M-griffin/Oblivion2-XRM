@@ -89,18 +89,43 @@ int SDL_Socket::pollSocket()
  * @brief Polls For Data To Read from the socket.
  * @return 
  */
-TCPsocket SDL_Socket::pollTCPSocketAccepts()
+socket_handler_ptr SDL_Socket::pollSocketAccepts()
 {
+    std::cout << "pollSocketAccepts : m_is_socket_active = " << m_is_socket_active << std::endl;
     TCPsocket socket = nullptr;
-    if (m_is_socket_active)
+    
+    int numActiveSockets = SDLNet_CheckSockets(m_socket_set, 0);
+    if (numActiveSockets != 0)
+    {
+        std::cout << "There are currently " 
+                  << numActiveSockets 
+                  << " socket(s) with data to be processed." 
+                  << std::endl;
+    }   
+    
+    if (numActiveSockets > 0 && m_is_socket_active)
     {        
-        if(SDLNet_SocketReady(m_tcp_socket)) 
+        if(SDLNet_SocketReady(m_tcp_socket) != 0) 
         {
-            socket = SDLNet_TCP_Accept(m_tcp_socket);       
+            std::cout << "SDLNet_SocketReady : Accept Socket Ready" << std::endl;            
+            socket = SDLNet_TCP_Accept(m_tcp_socket);
+            
+            // Setup the State, SDL_Socket
+            socket_state_ptr state(new SDL_Socket("", 0));
+            state->m_is_socket_active = true;
+            state->spawnSocket(socket);
+            // Setup a Handle, which will link back to Async_Connection
+            // For individual sessions and polling read/write from clients.
+            socket_handler_ptr handler(new SocketHandler());            
+            handler->setSocketType("TELNET");
+            handler->setSocketState(state);
+            
+            std::cout << "return new SocketHandler" << std::endl;
+            return handler;
         }
     }
 
-    return socket;
+    return nullptr;
 }
 
 /**
@@ -109,7 +134,7 @@ TCPsocket SDL_Socket::pollTCPSocketAccepts()
  */
 void SDL_Socket::spawnSocket(TCPsocket socket)
 {
-    
+    std::cout << "spawnSocket" << std::endl;
     m_socket_set = SDLNet_AllocSocketSet(1);
     if(!m_socket_set)
     {
@@ -197,7 +222,7 @@ bool SDL_Socket::onListen()
 
     /* Resolve the argument into an IP address type */
     std::cout << "Listening for Telnet on port " << m_port << std::endl;
-    if(SDLNet_ResolveHost(&ip, nullptr, m_port) == -1)
+    if(SDLNet_ResolveHost(&ip, NULL, m_port) == -1)
     {
         std::cout << "SDLNet_ResolveHost: " << SDLNet_GetError() << std::endl;
         m_tcp_socket = nullptr;

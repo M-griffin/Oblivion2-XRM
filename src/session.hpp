@@ -183,7 +183,7 @@ public:
      *        Everyone this person has left.
      * @param error
      */
-    void handleWrite(const std::error_code& error, connection_ptr)
+    void handleWrite(const std::error_code& error, socket_handler_ptr)
     {
         if(error)
         {
@@ -216,30 +216,6 @@ public:
             }
         }
     }
-
-    /**
-     * @brief Resolves the Hostname
-     * @param ec
-     * @param it
-     *
-    void resolve_handler(const std::error_code &ec, tcp::resolver::iterator it)
-    {
-        if(!ec)
-        {
-            tcp::resolver::iterator end;
-            for(; it != end; ++it)
-            {
-                std::cout << "hostname: " << it->host_name() << std::endl;
-            }
-        }
-        else
-        {
-            std::cout << "Error resolving hostname: " << ec.message() << std::endl;
-        }
-    }*/
-
-
-public:
 
     /**
      * @brief Session Constructor Initiate the Connection, State, Room.

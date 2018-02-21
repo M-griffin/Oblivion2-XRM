@@ -55,7 +55,7 @@ int SSH_Socket::recvSocket(char *message)
  * @brief (Not Used for SSH) Needed becasue of Virtual Interface Requirement.
  * @return 
  */
-TCPsocket SSH_Socket::pollTCPSocketAccepts()
+socket_handler_ptr SSH_Socket::pollSocketAccepts()
 {
     // Placeholder
     return nullptr;

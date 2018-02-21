@@ -33,8 +33,8 @@ const int SERVICE_TYPE_BLOCK_TIMER       = 10;
 #define SERVICE_LISTENER(x) ((int)(x) <= SERVICE_TYPE_LISTENER_IRC \
                 && (int)(x) >= SERVICE_TYPE_LISTENER_TELNET)
 
-class AsyncConnection;
-typedef std::shared_ptr<AsyncConnection> connection_ptr;
+//class AsyncConnection;
+//typedef std::shared_ptr<AsyncConnection> connection_ptr;
 
 /**
  * @class IOService
@@ -53,7 +53,7 @@ public:
     /**
      * Handles Call Back Functions, execute at the end of Asyn Job.
      */
-    typedef std::function<void(const std::error_code &, connection_ptr)> callback_function_handler;
+    typedef std::function<void(const std::error_code&, socket_handler_ptr)> callback_function_handler;
 
     static const int MAX_BUFFER_SIZE = 8193;
 
@@ -71,7 +71,7 @@ public:
         virtual std::vector<unsigned char> &getBuffer() = 0;
         virtual std::string getStringSequence() = 0;
         virtual socket_handler_ptr getSocket() = 0;
-        virtual void executeCallback(const std::error_code &er, connection_ptr conn) = 0;
+        virtual void executeCallback(const std::error_code &er, socket_handler_ptr conn) = 0;
         virtual int getServiceType() = 0;
     };
     typedef std::shared_ptr<ServiceBase> service_base_ptr;
@@ -106,10 +106,10 @@ public:
         {
             return m_socket_handle;
         }        
-        virtual void executeCallback(const std::error_code &er, connection_ptr conn)
+        virtual void executeCallback(const std::error_code &err, socket_handler_ptr handle)
         {            
             callback_function_handler callback(m_callback);
-            callback(er, conn);
+            callback(err, handle);
         }
         
         virtual int getServiceType()

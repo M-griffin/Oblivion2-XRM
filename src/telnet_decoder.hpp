@@ -10,6 +10,10 @@
 #include <string>
 #include <vector>
 
+
+class SocketHandler;
+typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
+
 /**
  * @class TelnetDecoder
  * @author Michael Griffin
@@ -150,7 +154,7 @@ private:
      * @brief handles callback after write() for errors checking.
      * @param error
      */
-    void handleWrite(const std::error_code& error)
+    void handleWrite(const std::error_code& error, socket_handler_ptr)
     {
         // Just log errors for now.
         if(error)
@@ -176,7 +180,8 @@ private:
                                       std::bind(
                                           &TelnetDecoder::handleWrite,
                                           shared_from_this(),
-                                          std::placeholders::_1));
+                                          std::placeholders::_1,
+                                          std::placeholders::_2));
         }
         
     }

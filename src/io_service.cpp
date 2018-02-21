@@ -44,12 +44,17 @@ void IOService::checkAsyncListenersForConnections()
     // And wait, will block socket polling for (x) amount of time
     for(unsigned int i = 0; i < m_listener_list.size(); i++)
     {
+       // std::cout << "checking async connection" << std::endl;
         service_base_ptr listener_work = m_listener_list.get(i);
            
         // Check listen Socket.
-       // int result = listener_work->getSocket()->checkConnectionHandshake();
-        
-        //listener_work->executeCallback(not_connected_error_code, nullptr);
+        socket_handler_ptr handler = listener_work->getSocket()->acceptTelnetConnection();
+        if (handler != nullptr)
+        {
+            std::cout << "async accept - connection created." << std::endl;
+            std::error_code success_code (0, std::generic_category());
+            listener_work->executeCallback(success_code, handler);
+        }
     }        
 }
 
@@ -285,7 +290,7 @@ void IOService::run()
         }
 
         // Temp timer, change to 10/20 miliseconds for cpu useage
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 
 }

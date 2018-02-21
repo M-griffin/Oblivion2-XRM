@@ -97,6 +97,7 @@ public:
      */
     void waitingForConnection()
     {        
+        std::cout << "Waiting For Connection, Add Job to Listener" << std::endl;
         m_async_listener->asyncAccept(
             m_protocol, 
             std::bind(&Interface::handle_accept, 
@@ -112,27 +113,28 @@ private:
      * @param new_connection
      * @param error
      */
-    void handle_accept(const std::error_code& error, connection_ptr connection)
+    void handle_accept(const std::error_code& error, socket_handler_ptr socket_handler)
     {
         if(!error)
         {
             std::cout << "TCP Connection accepted" << std::endl;
+            connection_ptr async_conn(new AsyncConnection(m_io_service, socket_handler));
                         
             // Create DeadlineTimer and attach to new session
             deadline_timer_ptr deadline_timer(new DeadlineTimer(
                                           m_io_service,
-                                          connection->m_socket_handler
+                                          socket_handler
                                       ));
                                       
             // Create the new Session
             session_ptr new_session = Session::create(m_io_service, 
-                                      connection,
+                                      async_conn,
                                       deadline_timer,
                                       m_session_manager);
 
             // Attach Session to Session Manager.
             m_session_manager->join(new_session);
-            waitingForConnection();
+          //  waitingForConnection();
         }
         else
         {

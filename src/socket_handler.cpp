@@ -229,6 +229,14 @@ bool SocketHandler::createTelnetAcceptor(std::string host, int port)
     return true;
 }
 
+/**
+ * @brief Check and return handler on Connections
+ * @return 
+ */
+socket_handler_ptr SocketHandler::acceptTelnetConnection()
+{
+    return m_socket.back()->pollSocketAccepts();
+}
 
 /**
  * @brief Type of Socket
@@ -278,4 +286,24 @@ void SocketHandler::close()
     {
         std::cerr << "exception caught: " << e.what() << '\n';
     }
+}
+
+/**
+ * @brief Set Socket Type, eg. Telnet on Connection Accepts
+ * @param state
+ */
+void SocketHandler::setSocketType(std::string type)
+{
+    m_socket_type = type;
+}
+
+
+/**
+ * @brief Set Socket State, For creating unique standalone socket sessions
+ * @param state
+ */
+void SocketHandler::setSocketState(socket_state_ptr state)
+{
+    m_socket.push_back(state);
+    m_is_active = true;
 }

@@ -147,7 +147,7 @@ public:
      * @param error
      * @param bytes_transferred
      */
-    void handleRead(const std::error_code& error, connection_ptr);
+    void handleRead(const std::error_code& error, socket_handler_ptr);
 
     /**
      * @brief delivers text data to client
@@ -187,7 +187,7 @@ public:
      * everything this person has left.
      * @param error
      */
-    void handleWrite(const std::error_code& error, connection_ptr)
+    void handleWrite(const std::error_code& error, socket_handler_ptr)
     {
         std::cout << "async_write " << error.message() << std::endl;
         if(error)
