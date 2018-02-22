@@ -15,8 +15,10 @@ IOService::IOService()
 IOService::~IOService()
 {
     std::cout << "~IOService" << std::endl;
+    m_service_list.clear();
+    m_timer_list.clear();
+    m_listener_list.clear();
 }
-
 
 /**
  * @Brief Always check all timers (Priority each iteration)
@@ -29,6 +31,11 @@ void IOService::checkPriorityTimers()
     for(unsigned int i = 0; i < m_timer_list.size(); i++)
     {
         service_base_ptr timers_work = m_timer_list.get(i);
+        if (!timers_work || !timers_work->getSocketHandle()->isActive())
+        {
+            m_timer_list.remove(i);
+            continue;
+        }
         
         // Two Types of Timers,  blocking, which will block the existing sessions poll
         // By setting a flag on socket_handle untill the amount of time exprire.
@@ -50,8 +57,13 @@ void IOService::checkAsyncListenersForConnections()
     // And wait, will block socket polling for (x) amount of time
     for(unsigned int i = 0; i < m_listener_list.size(); i++)
     {
-       // std::cout << "checking async connection" << std::endl;
         service_base_ptr listener_work = m_listener_list.get(i);
+        if (!listener_work || !listener_work->getSocketHandle()->isActive())
+        {
+            m_listener_list.remove(i);
+            continue;
+        }
+        
         socket_handler_ptr handler = listener_work->getSocketHandle()->acceptTelnetConnection();
         if (handler != nullptr)
         {
@@ -78,8 +90,8 @@ void IOService::checkAsyncListenersForConnections()
 void IOService::run()
 {
     char msg_buffer[MAX_BUFFER_SIZE];
-
     m_is_active = true;
+    
     while(m_is_active)
     {        
         // Priority Deadline Timer Checks
@@ -97,6 +109,11 @@ void IOService::run()
             checkPriorityTimers();
             
             service_base_ptr job_work = m_service_list.get(i);
+            if (!job_work || !job_work->getSocketHandle()->isActive())
+            {
+                m_service_list.remove(i);
+                continue;
+            }
 
             /**
              * Handle Read Service if Data is Available.
@@ -211,8 +228,7 @@ void IOService::run()
                 std::cout << "ip_address: " << ip_address.size();
                 bool is_success = false;
                 if (ip_address.size() >= 4)
-                {
-                    
+                {                    
                     std::cout << "1. " << ip_address.at(0) << std::endl;
                     std::cout << "2. " << ip_address.at(1) << std::endl;
                     std::cout << "3. " << ip_address.at(2) << std::endl;

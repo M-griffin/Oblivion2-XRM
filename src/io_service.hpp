@@ -137,18 +137,18 @@ public:
     /**
      * @brief Add Async Jobs to the Vector Queue
      * @param buffer
-     * @param write_sequence
+     * @param string_sequence
      * @param socket_handle
      * @param callback
      * @param service_type
      */
     template <typename MutableBufferSequence, typename StringSequence, typename SocketHandle, typename Callback, typename ServiceType>
-    void addAsyncJob(MutableBufferSequence &buffer, StringSequence write_sequence, SocketHandle socket_handle,
+    void addAsyncJob(MutableBufferSequence &buffer, StringSequence string_sequence, SocketHandle socket_handle,
                      Callback &callback, ServiceType service_type)
     {
         ServiceJob<MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType> *job
             = new ServiceJob <MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
-        (buffer, write_sequence, socket_handle, callback, service_type);
+        (buffer, string_sequence, socket_handle, callback, service_type);
 
         if (SERVICE_TIMER(service_type))
         {
@@ -164,6 +164,39 @@ public:
         {
             // Standard Async Job
             m_service_list.push_back(std::shared_ptr<ServiceBase>(job));
+        }        
+    }
+    
+    /**
+     * @brief Delete an active Async Job in the Vector Queue
+     * @param buffer
+     * @param string_sequence
+     * @param socket_handle
+     * @param callback
+     * @param service_type
+     */
+    template <typename MutableBufferSequence, typename StringSequence, typename SocketHandle, typename Callback, typename ServiceType>
+    void delAsyncJob(MutableBufferSequence &buffer, StringSequence string_sequence, SocketHandle socket_handle,
+                     Callback &callback, ServiceType service_type)
+    {
+        ServiceJob<MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType> *job
+            = new ServiceJob <MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
+        (buffer, string_sequence, socket_handle, callback, service_type);
+
+        if (SERVICE_TIMER(service_type))
+        {
+            // Timer (Priority List Job)
+            //m_timer_list.push_back(std::shared_ptr<ServiceBase>(job));
+        }
+        else if (SERVICE_LISTENER(service_type))
+        {
+            // Server Connection Listener Job (1) for each Service.
+            //m_listener_list.push_back(std::shared_ptr<ServiceBase>(job));
+        }
+        else 
+        {
+            // Standard Async Job
+            //m_service_list.push_back(std::shared_ptr<ServiceBase>(job));
         }        
     }
 
