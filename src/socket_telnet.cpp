@@ -18,10 +18,15 @@
  */
 int SDL_Socket::sendSocket(unsigned char *buffer, Uint32 length)
 {
+    std::cout << "sendSocket: " << m_is_socket_active << std::endl;
     int result = 0;
     if (m_is_socket_active)
     {
+        
+        std::cout << "TCP Send: " << m_is_socket_active << std::endl;
         result = SDLNet_TCP_Send(m_tcp_socket, buffer, length);
+        
+        std::cout << "sendSocket - result: " << result << std::endl;
         if(result < (signed)strlen((char *)buffer))
         {
             if(SDLNet_GetError() && strlen(SDLNet_GetError()))
@@ -31,6 +36,8 @@ int SDL_Socket::sendSocket(unsigned char *buffer, Uint32 length)
             }
         }
     }
+    
+    std::cout << "return - result: " << result << std::endl;
     return(result);
 }
 
@@ -91,7 +98,7 @@ int SDL_Socket::pollSocket()
  */
 socket_handler_ptr SDL_Socket::pollSocketAccepts()
 {
-    std::cout << "pollSocketAccepts : m_is_socket_active = " << m_is_socket_active << std::endl;
+   // std::cout << "pollSocketAccepts : m_is_socket_active = " << m_is_socket_active << std::endl;
     TCPsocket socket = nullptr;
     
     int numActiveSockets = SDLNet_CheckSockets(m_socket_set, 0);
@@ -111,9 +118,9 @@ socket_handler_ptr SDL_Socket::pollSocketAccepts()
             socket = SDLNet_TCP_Accept(m_tcp_socket);
             
             // Setup the State, SDL_Socket
-            socket_state_ptr state(new SDL_Socket("", 0));
-            state->m_is_socket_active = true;
+            socket_state_ptr state(new SDL_Socket("127.0.0.1", 6023));
             state->spawnSocket(socket);
+            
             // Setup a Handle, which will link back to Async_Connection
             // For individual sessions and polling read/write from clients.
             socket_handler_ptr handler(new SocketHandler());            
@@ -135,6 +142,8 @@ socket_handler_ptr SDL_Socket::pollSocketAccepts()
 void SDL_Socket::spawnSocket(TCPsocket socket)
 {
     std::cout << "spawnSocket" << std::endl;
+    
+    m_tcp_socket = socket;
     m_socket_set = SDLNet_AllocSocketSet(1);
     if(!m_socket_set)
     {
@@ -144,7 +153,7 @@ void SDL_Socket::spawnSocket(TCPsocket socket)
     }
     
     // Attached New Socket from Accept to it's own session instance.
-    if(SDLNet_TCP_AddSocket(m_socket_set, socket) == -1)
+    if(SDLNet_TCP_AddSocket(m_socket_set, m_tcp_socket) == -1)
     {
         std::cout << "SDLNet_TCP_AddSocket: " << SDLNet_GetError() << std::endl;
         onExit();

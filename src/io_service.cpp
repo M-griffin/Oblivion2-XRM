@@ -53,7 +53,14 @@ void IOService::checkAsyncListenersForConnections()
         {
             std::cout << "async accept - connection created." << std::endl;
             std::error_code success_code (0, std::generic_category());
-            listener_work->executeCallback(success_code, handler);
+            try
+            {
+                listener_work->executeCallback(success_code, handler);            
+            }
+            catch (std::exception &ex)
+            {
+                std::cout << "Exception Async-Accept: " << ex.what() << std::endl;
+            }
         }
     }        
 }
@@ -290,7 +297,7 @@ void IOService::run()
         }
 
         // Temp timer, change to 10/20 miliseconds for cpu useage
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
 
 }

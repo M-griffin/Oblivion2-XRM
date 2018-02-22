@@ -117,7 +117,8 @@ private:
     {
         if(!error)
         {
-            std::cout << "TCP Connection accepted" << std::endl;
+            std::cout << "TCP Connection accepted" << std::endl;            
+            socket_handler->sendSocket((unsigned char *)"The Truth is out there!", 23);
             connection_ptr async_conn(new AsyncConnection(m_io_service, socket_handler));
                         
             // Create DeadlineTimer and attach to new session
@@ -132,9 +133,11 @@ private:
                                       deadline_timer,
                                       m_session_manager);
 
+            async_conn->socket()->sendSocket((unsigned char *)"testing 1.. 2.. 3..", 19);
+
             // Attach Session to Session Manager.
             m_session_manager->join(new_session);
-          //  waitingForConnection();
+            //waitingForConnection();
         }
         else
         {

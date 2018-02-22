@@ -128,7 +128,7 @@ auto main() -> int
         // Isolate to code block for smart pointer deallocation.
         {
             // Create Handles to Services, and starts up connection listener and ASIO Thread Worker
-            IOService io_service;
+            IOService io_service;            
             interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", cfg.m_config->port_telnet));
                         
             while(TheCommunicator::instance()->isActive()) 

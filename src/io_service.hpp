@@ -33,9 +33,6 @@ const int SERVICE_TYPE_BLOCK_TIMER       = 10;
 #define SERVICE_LISTENER(x) ((int)(x) <= SERVICE_TYPE_LISTENER_IRC \
                 && (int)(x) >= SERVICE_TYPE_LISTENER_TELNET)
 
-//class AsyncConnection;
-//typedef std::shared_ptr<AsyncConnection> connection_ptr;
-
 /**
  * @class IOService
  * @author Michael Griffin
@@ -94,18 +91,22 @@ public:
                 m_buffer.push_back(buffer[i]);
             }
         }
+        
         virtual std::vector<unsigned char> &getBuffer()
         {
             return m_buffer;
         }
+        
         virtual std::string getStringSequence()
         {
             return m_string_sequence;
         }
+        
         virtual socket_handler_ptr getSocket()
         {
             return m_socket_handle;
-        }        
+        }
+        
         virtual void executeCallback(const std::error_code &err, socket_handler_ptr handle)
         {            
             callback_function_handler callback(m_callback);
@@ -163,8 +164,7 @@ public:
         {
             // Standard Async Job
             m_service_list.push_back(std::shared_ptr<ServiceBase>(job));
-        }
-        
+        }        
     }
 
     /**

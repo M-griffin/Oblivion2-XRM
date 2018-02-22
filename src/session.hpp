@@ -22,10 +22,7 @@
  * or OLM Buffer for message from other nodes and sysops
  * when not in chat.
  */
-
-//class Interface;
 class Session;
-
 typedef std::shared_ptr<Session> session_ptr;
 
 /**
@@ -117,7 +114,12 @@ public:
             std::cout << "send initial IAC sequences ended." << std::endl;
 
             // Wait 1.5 Seconds for respones.
-            new_session->startDetectionTimer();
+           // new_session->startDetectionTimer();
+           
+           // TEMP
+           std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+           
+           
         }
 
         return new_session;
@@ -230,7 +232,6 @@ public:
         , m_session_data(new SessionData(connection, session_manager, io_service, m_state_manager))
         , m_deadline_timer(deadline_timer)       
     {
-
         if(m_connection->isActive())
         {        
             try
