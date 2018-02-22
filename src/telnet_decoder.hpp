@@ -174,7 +174,7 @@ private:
             return;
         }
         
-        if(m_connection->socket()->isActive() && TheCommunicator::instance()->isActive())
+        if(m_connection->getSocketHandle()->isActive() && TheCommunicator::instance()->isActive())
         {
             m_connection->asyncWrite(string_msg,
                                       std::bind(

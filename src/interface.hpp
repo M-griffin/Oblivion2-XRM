@@ -133,7 +133,7 @@ private:
                                       deadline_timer,
                                       m_session_manager);
 
-            async_conn->socket()->sendSocket((unsigned char *)"testing 1.. 2.. 3..", 19);
+            async_conn->getSocketHandle()->sendSocket((unsigned char *)"testing 1.. 2.. 3..", 19);
 
             // Attach Session to Session Manager.
             m_session_manager->join(new_session);

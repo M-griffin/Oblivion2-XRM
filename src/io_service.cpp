@@ -9,6 +9,7 @@
 IOService::IOService()
     : m_is_active(false)
 {
+    std::cout << "IOService Started" << std::endl;
 }
 
 IOService::~IOService()
@@ -28,7 +29,12 @@ void IOService::checkPriorityTimers()
     for(unsigned int i = 0; i < m_timer_list.size(); i++)
     {
         service_base_ptr timers_work = m_timer_list.get(i);
-           
+        
+        // Two Types of Timers,  blocking, which will block the existing sessions poll
+        // By setting a flag on socket_handle untill the amount of time exprire.
+        // The other is a non-block async wait, which will check and loop back 
+        // Seeing if a condition is met to abort or wait for time to run.. mimic boost deadline timer.
+        
         //timers_work->executeCallback(not_connected_error_code, nullptr);
     }    
 }
@@ -46,15 +52,15 @@ void IOService::checkAsyncListenersForConnections()
     {
        // std::cout << "checking async connection" << std::endl;
         service_base_ptr listener_work = m_listener_list.get(i);
-           
-        // Check listen Socket.
-        socket_handler_ptr handler = listener_work->getSocket()->acceptTelnetConnection();
+        socket_handler_ptr handler = listener_work->getSocketHandle()->acceptTelnetConnection();
         if (handler != nullptr)
         {
             std::cout << "async accept - connection created." << std::endl;
             std::error_code success_code (0, std::generic_category());
             try
             {
+                // Check for max nodes here, if we like can limit, send a message and drop
+                // connection on hander by not passing it through the callback.
                 listener_work->executeCallback(success_code, handler);            
             }
             catch (std::exception &ex)
@@ -71,7 +77,6 @@ void IOService::checkAsyncListenersForConnections()
  */
 void IOService::run()
 {
-
     char msg_buffer[MAX_BUFFER_SIZE];
 
     m_is_active = true;
@@ -100,16 +105,16 @@ void IOService::run()
             {
                 // If Data Available, read, then populate buffer
                 // Otherwise keep polling till data is available.
-                int result = job_work->getSocket()->poll();
+                int result = job_work->getSocketHandle()->poll();
                 if (result > 0)
                 {
                     memset(&msg_buffer, 0, MAX_BUFFER_SIZE);
-                    int length = job_work->getSocket()->recvSocket(msg_buffer);
+                    int length = job_work->getSocketHandle()->recvSocket(msg_buffer);
                     if(length < 0)
                     {
                         // Error - Lost Connection
                         std::cout << "async_read - lost connection!: " << length << std::endl;
-                        job_work->getSocket()->setInactive();
+                        job_work->getSocketHandle()->setInactive();
                         std::error_code lost_connect_error_code (1, std::system_category());
                         job_work->executeCallback(lost_connect_error_code, nullptr);
                         m_service_list.remove(i);
@@ -137,7 +142,7 @@ void IOService::run()
             else if (job_work->getServiceType() == SERVICE_TYPE_WRITE)
             {
                 // std::cout << "* SERVICE_TYPE_WRITE" << std::endl;
-                int result = job_work->getSocket()->sendSocket(
+                int result = job_work->getSocketHandle()->sendSocket(
                                  (unsigned char*)job_work->getStringSequence().c_str(),
                                  job_work->getStringSequence().size());
 
@@ -145,7 +150,7 @@ void IOService::run()
                 {
                     // Error - Lost Connection
                     std::cout << "async_write - lost connection!" << std::endl;
-                    job_work->getSocket()->setInactive();
+                    job_work->getSocketHandle()->setInactive();
                     std::error_code lost_connect_error_code (1, std::system_category());
                     job_work->executeCallback(lost_connect_error_code, nullptr);
                     m_service_list.remove(i);
@@ -167,14 +172,14 @@ void IOService::run()
                 bool is_success = false;
                 if (ip_address.size() > 1)
                 {
-                    is_success = job_work->getSocket()->connectTelnetSocket(
+                    is_success = job_work->getSocketHandle()->connectTelnetSocket(
                                      ip_address.at(0),
                                      std::atoi(ip_address.at(1).c_str())
                                  );
                 }
                 else
                 {
-                    is_success = job_work->getSocket()->connectTelnetSocket(
+                    is_success = job_work->getSocketHandle()->connectTelnetSocket(
                                      ip_address.at(0),
                                      23
                                  );
@@ -190,7 +195,7 @@ void IOService::run()
                 {
                     // Error - Unable to connect
                     std::cout << "async_connection - unable to connect" << std::endl;
-                    job_work->getSocket()->setInactive();
+                    job_work->getSocketHandle()->setInactive();
                     std::error_code not_connected_error_code (1, std::system_category());
                     job_work->executeCallback(not_connected_error_code, nullptr);
                     m_service_list.remove(i);
@@ -213,7 +218,7 @@ void IOService::run()
                     std::cout << "3. " << ip_address.at(2) << std::endl;
                     std::cout << "4. " << ip_address.at(3) << std::endl;
                     
-                    is_success = job_work->getSocket()->connectSshSocket(
+                    is_success = job_work->getSocketHandle()->connectSshSocket(
                                      ip_address.at(0),
                                      std::atoi(ip_address.at(1).c_str()),
                                      ip_address.at(2),
@@ -231,7 +236,7 @@ void IOService::run()
                 {
                     // Error - Unable to connect
                     std::cout << "async_connection - unable to connect" << std::endl;
-                    job_work->getSocket()->setInactive();
+                    job_work->getSocketHandle()->setInactive();
                     std::error_code not_connected_error_code (1, std::system_category());
                     job_work->executeCallback(not_connected_error_code, nullptr);
                     m_service_list.remove(i);
@@ -249,14 +254,14 @@ void IOService::run()
                 bool is_success = false;
                 if (ip_address.size() > 1)
                 {
-                    is_success = job_work->getSocket()->connectIrcSocket(
+                    is_success = job_work->getSocketHandle()->connectIrcSocket(
                                      ip_address.at(0),
                                      std::atoi(ip_address.at(1).c_str())
                                  );
                 }
                 else
                 {
-                    is_success = job_work->getSocket()->connectIrcSocket(
+                    is_success = job_work->getSocketHandle()->connectIrcSocket(
                                      ip_address.at(0),
                                      6667
                                  );
@@ -275,7 +280,7 @@ void IOService::run()
                         << "USER " << ident << " " << host << " bla : " << read_name << "\r\n";
                     
                     std::string output = ss.str();
-                    job_work->getSocket()->sendSocket((unsigned char *)output.c_str(), output.size());
+                    job_work->getSocketHandle()->sendSocket((unsigned char *)output.c_str(), output.size());
                                         
                     callback_function_handler run_callback(job_work->getCallback());
                     std::error_code success_code (0, std::generic_category());
@@ -286,7 +291,7 @@ void IOService::run()
                 {
                     // Error - Unable to connect
                     std::cout << "async_connection - unable to connect" << std::endl;
-                    job_work->getSocket()->setInactive();
+                    job_work->getSocketHandle()->setInactive();
                     callback_function_handler run_callback(job_work->getCallback());
                     std::error_code not_connected_error_code (1, std::system_category());
                     run_callback(not_connected_error_code);

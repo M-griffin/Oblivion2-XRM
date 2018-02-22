@@ -67,7 +67,7 @@ public:
         virtual void setBuffer(unsigned char *buffer) = 0;
         virtual std::vector<unsigned char> &getBuffer() = 0;
         virtual std::string getStringSequence() = 0;
-        virtual socket_handler_ptr getSocket() = 0;
+        virtual socket_handler_ptr getSocketHandle() = 0;
         virtual void executeCallback(const std::error_code &er, socket_handler_ptr conn) = 0;
         virtual int getServiceType() = 0;
     };
@@ -102,7 +102,7 @@ public:
             return m_string_sequence;
         }
         
-        virtual socket_handler_ptr getSocket()
+        virtual socket_handler_ptr getSocketHandle()
         {
             return m_socket_handle;
         }

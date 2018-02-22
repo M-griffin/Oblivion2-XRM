@@ -36,7 +36,7 @@ public:
      * @brief Handle to Socket
      * @return
      */
-    socket_handler_ptr socket()
+    socket_handler_ptr getSocketHandle()
     {
         return m_socket_handler;
     }
