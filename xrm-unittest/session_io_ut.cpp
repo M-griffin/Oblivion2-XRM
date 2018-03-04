@@ -3,6 +3,7 @@
  * @return
  */
 
+#include "io_service.hpp"
 #include "session_io.hpp"
 #include "model-sys/config.hpp"
 
@@ -330,7 +331,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -347,7 +348,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -364,7 +365,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -381,7 +382,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -398,7 +399,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -420,7 +421,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -437,7 +438,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -454,7 +455,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -476,7 +477,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -511,7 +512,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -540,7 +541,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -567,7 +568,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -611,7 +612,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -669,7 +670,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -706,7 +707,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));

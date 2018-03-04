@@ -34,6 +34,7 @@ void IOService::checkPriorityTimers()
         if (!timers_work || !timers_work->getSocketHandle()->isActive())
         {
             m_timer_list.remove(i);
+            --i; // Compensate for item removed.
             continue;
         }
         
@@ -61,6 +62,7 @@ void IOService::checkAsyncListenersForConnections()
         if (!listener_work || !listener_work->getSocketHandle()->isActive())
         {
             m_listener_list.remove(i);
+            --i; // Compensate for item removed.
             continue;
         }
         
@@ -112,6 +114,7 @@ void IOService::run()
             if (!job_work || !job_work->getSocketHandle()->isActive())
             {
                 m_service_list.remove(i);
+                --i; // Compensate for item removed.
                 continue;
             }
 
@@ -135,6 +138,7 @@ void IOService::run()
                         std::error_code lost_connect_error_code (1, std::system_category());
                         job_work->executeCallback(lost_connect_error_code, nullptr);
                         m_service_list.remove(i);
+                        --i; // Compensate for item removed.
                     }
                     else
                     {
@@ -142,6 +146,7 @@ void IOService::run()
                         std::error_code success_code (0, std::generic_category());
                         job_work->executeCallback(success_code, nullptr);
                         m_service_list.remove(i);
+                        --i; // Compensate for item removed.
                     }
                 }
                 else if (result == -1)
@@ -150,6 +155,7 @@ void IOService::run()
                     std::error_code lost_connect_error_code (1, std::system_category());
                     job_work->executeCallback(lost_connect_error_code, nullptr);
                     m_service_list.remove(i);
+                    --i; // Compensate for item removed.
                 }
             }
 
@@ -171,15 +177,18 @@ void IOService::run()
                     std::error_code lost_connect_error_code (1, std::system_category());
                     job_work->executeCallback(lost_connect_error_code, nullptr);
                     m_service_list.remove(i);
+                    --i; // Compensate for item removed.
                 }
                 else
                 {
                     std::error_code success_code (0, std::generic_category());
                     job_work->executeCallback(success_code, nullptr);
                     m_service_list.remove(i);
+                    --i; // Compensate for item removed.
                 }
             }
 
+            /*
             else if (job_work->getServiceType() == SERVICE_TYPE_CONNECT_TELNET)
             {
                 // Get host and port from string.
@@ -257,7 +266,7 @@ void IOService::run()
                     job_work->executeCallback(not_connected_error_code, nullptr);
                     m_service_list.remove(i);
                 }
-            }
+            }*/
             
             // SERVICE_TYPE_CONNECT_IRC
             /*

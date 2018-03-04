@@ -1,8 +1,5 @@
 #include "encryption.hpp"
 
-// For Debugging SSL Version
-//#include <boost/preprocessor/stringize.hpp>
-
 #include <openssl/engine.h>
 #include "openssl/evp.h"
 

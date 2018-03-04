@@ -6,7 +6,6 @@
 #include "access_condition.hpp"
 
 #include <UnitTest++.h>
-#include <boost/smart_ptr/shared_ptr.hpp>
 
 #include "model-sys/users.hpp"
 
@@ -18,7 +17,7 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
-
+#include <memory>
 
 SUITE(XRMAccessCondition)
 {

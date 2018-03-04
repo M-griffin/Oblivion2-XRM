@@ -21,6 +21,7 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="..\src">
+    <File Name="../src/directory.hpp"/>
     <File Name="../src/async_acceptor.hpp"/>
     <File Name="../src/async_base.hpp"/>
     <File Name="../src/deadline_timer.hpp"/>

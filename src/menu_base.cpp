@@ -3,6 +3,7 @@
 #include "data-sys/menu_dao.hpp"
 #include "data-sys/menu_prompt_dao.hpp"
 #include "access_condition.hpp"
+#include "directory.hpp"
 
 
 #include <locale>
@@ -20,6 +21,7 @@ MenuBase::MenuBase(session_data_ptr session_data)
     : m_menu_session_data(session_data)
     , m_session_io(session_data)
     , m_config(new Config())
+    , m_directory(new Directory())
     , m_line_buffer("")
     , m_use_hotkey(false)
     , m_current_menu("")
@@ -155,7 +157,7 @@ void MenuBase::readInMenuData()
     // For PreLoading and Testing Menu ACS String
     {
         // Pre-Load Menu, check access, if not valud, then fall back to previous.
-        menu_ptr pre_load_menu(new Menu);
+        menu_ptr pre_load_menu(new Menu());
 
         // Call MenuDao to ready in .yaml file
         MenuDao mnu(pre_load_menu, m_current_menu, GLOBAL_MENU_PATH);
@@ -801,32 +803,9 @@ void MenuBase::executeFirstAndEachCommands()
  */
 std::vector<std::string> MenuBase::getListOfMenuPrompts()
 {
-    std::vector<std::string> result_list;
-    /*
-    namespace fs = boost::filesystem;
-    fs::path prompt_directory(GLOBAL_MENU_PROMPT_PATH);
-    fs::directory_iterator end_iter;
-
-    typedef std::vector<std::string> result_set_t;
-    //typedef std::vector<std::string>::iterator iterator;
-    result_set_t result_set;
-    
-
-    if(fs::exists(prompt_directory) && fs::is_directory(prompt_directory))
-    {
-        for(fs::directory_iterator dir_iter(prompt_directory); dir_iter != end_iter; ++dir_iter)
-        {
-            if(dir_iter->path().extension() == ".yaml")
-            {
-                if(fs::is_regular_file(dir_iter->status()))
-                {
-                    result_set.push_back(dir_iter->path().filename().string());
-                    // result_set_t::value_type(fs::last_write_time( dir_iter->path() ) ) ); // *dir_iter));
-                }
-            }
-        }
-    }
-
+    std::vector<std::string> result_list;    
+    std::vector<std::string> result_set = m_directory->getFileListPerDirectory(GLOBAL_MENU_PROMPT_PATH, "yaml");
+      
     // check result set, if no menu then return gracefully.
     if(result_set.size() == 0)
     {
@@ -841,7 +820,7 @@ std::vector<std::string> MenuBase::getListOfMenuPrompts()
     {
         result_list.push_back(s.substr(0, s.size()-5));
     }
-*/
+
     return result_list;
 }
 

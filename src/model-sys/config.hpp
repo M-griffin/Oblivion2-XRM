@@ -2,26 +2,7 @@
 #define CONFIG_HPP
 
 #include <memory>
-
-// turn off the specific warning. Boost 1_64_0 for uuid
-#ifndef TARGET_OS_MAC
-#pragma GCC diagnostic ignored "-Wconversion-null"
-#endif
-
-//#include <boost/uuid/uuid.hpp>            // uuid class
-//#include <boost/uuid/uuid_generators.hpp> // generators
-//#include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
-
-// turn the warnings back on
-#ifndef TARGET_OS_MAC
-#pragma GCC diagnostic pop
-#endif
-
-// Need good replacement for this?!?
-//#include <boost/lexical_cast.hpp>
-
 #include <fstream>
-
 #include <yaml-cpp/yaml.h>
 
 /**

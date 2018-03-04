@@ -4,7 +4,7 @@
  */
 
 #include <UnitTest++.h>
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 
 // C Standard
@@ -34,7 +34,7 @@ std::string USERS_DATABASE       = "";
 
 
 // run all unit tests
-int main(int argc, char **argv)
+int main()
 {
     int result = UnitTest::RunAllTests();
 

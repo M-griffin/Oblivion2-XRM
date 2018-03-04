@@ -5,7 +5,7 @@
 #include <UnitTest++.h>
 #include "libSqliteWrapped.h"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 /**
  * Handle Setup and Tear Down of Integration Test for SQLite

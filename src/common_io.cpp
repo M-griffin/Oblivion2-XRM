@@ -40,13 +40,6 @@
 
 #include <utf-cpp/utf8.h>
 
-/*
-#include <boost/format.hpp>
-#include <boost/locale.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
-*/
-
 /**
  * CP437 -> UTF-8 Character Translation Table
  */
