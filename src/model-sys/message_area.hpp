@@ -1,6 +1,7 @@
 #ifndef MESSAGE_AREA_HPP
 #define MESSAGE_AREA_HPP
 
+#include <string>
 #include <memory>
 
 class MessageArea;

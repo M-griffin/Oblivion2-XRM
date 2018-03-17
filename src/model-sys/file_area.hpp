@@ -1,6 +1,7 @@
 #ifndef FILE_AREA_HPP
 #define FILE_AREA_HPP
 
+#include <string>
 #include <memory>
 
 class FileArea;

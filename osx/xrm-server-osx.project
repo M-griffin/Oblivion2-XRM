@@ -145,6 +145,37 @@
     <File Name="../src/process_base.hpp"/>
     <File Name="../src/form_manager.cpp"/>
     <File Name="../src/form_manager.hpp"/>
+    <VirtualDirectory Name="sdl2_net">
+      <File Name="../src/sdl2_net/begin_code.h"/>
+      <File Name="../src/sdl2_net/close_code.h"/>
+      <File Name="../src/sdl2_net/SDL_net.hpp"/>
+      <File Name="../src/sdl2_net/SDLnet.cpp"/>
+      <File Name="../src/sdl2_net/SDLnetselect.cpp"/>
+      <File Name="../src/sdl2_net/SDLnetsys.hpp"/>
+      <File Name="../src/sdl2_net/SDLnetTCP.cpp"/>
+      <File Name="../src/sdl2_net/SDLnetUDP.cpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="utf-cpp">
+      <File Name="../src/utf-cpp/utf8.h"/>
+      <VirtualDirectory Name="utf8">
+        <File Name="../src/utf-cpp/utf8/checked.h"/>
+        <File Name="../src/utf-cpp/utf8/core.h"/>
+        <File Name="../src/utf-cpp/utf8/unchecked.h"/>
+      </VirtualDirectory>
+    </VirtualDirectory>
+    <File Name="../src/async_acceptor.hpp"/>
+    <File Name="../src/async_base.hpp"/>
+    <File Name="../src/async_connection.hpp"/>
+    <File Name="../src/deadline_timer.hpp"/>
+    <File Name="../src/directory.hpp"/>
+    <File Name="../src/interface.hpp"/>
+    <File Name="../src/io_service.cpp"/>
+    <File Name="../src/io_service.hpp"/>
+    <File Name="../src/socket_handler.cpp"/>
+    <File Name="../src/socket_handler.hpp"/>
+    <File Name="../src/socket_ssh.cpp"/>
+    <File Name="../src/socket_state.hpp"/>
+    <File Name="../src/socket_telnet.cpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -166,23 +197,19 @@
         <IncludePath Value="/usr/local/Cellar/boost/1.66.0/include"/>
         <IncludePath Value="/usr/local/Cellar/yaml-cpp/0.6.1/include"/>
         <IncludePath Value="/usr/local/Cellar/openssl/1.0.2n/include"/>
+        <IncludePath Value="/usr/local/Cellar/libssh/0.7.5/include"/>
+        <IncludePath Value="../src/sdl2_net"/>
+        <IncludePath Value="../src/utf-cpp"/>
         <Preprocessor Value="TARGET_OS_MAC"/>
+        <Preprocessor Value="WITHOUT_SDL"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
         <LibraryPath Value="../sqlitewrap"/>
         <LibraryPath Value="/usr/local/opt/sqlite/lib"/>
-        <LibraryPath Value="/usr/local/Cellar/boost/1.66.0/lib"/>
         <LibraryPath Value="/usr/local/Cellar/yaml-cpp/0.6.1/lib"/>
         <LibraryPath Value="/usr/local/Cellar/openssl/1.0.2n/lib"/>
-        <Library Value="boost_system-mt"/>
-        <Library Value="boost_thread-mt"/>
-        <Library Value="boost_chrono-mt"/>
-        <Library Value="boost_locale-mt"/>
-        <Library Value="boost_filesystem-mt"/>
-        <Library Value="boost_timer-mt"/>
-        <Library Value="boost_regex-mt"/>
-        <Library Value="boost_date_time-mt"/>
+        <LibraryPath Value="/usr/local/Cellar/libssh/0.7.5/lib"/>
         <Library Value="libSqliteWrapped.a"/>
         <Library Value="sqlite3"/>
         <Library Value="pthread"/>
@@ -190,6 +217,7 @@
         <Library Value="crypto"/>
         <Library Value="yaml-cpp"/>
         <Library Value="util"/>
+        <Library Value="libssh"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>

@@ -3,4 +3,7 @@
   <Project Name="SqliteWrapped">
     <Options/>
   </Project>
+  <FindInFilesMask>
+    <![CDATA[*.c;*.cpp;*.cxx;*.cc;*.h;*.hpp;*.inc;*.mm;*.m;*.xrc]]>
+  </FindInFilesMask>
 </Workspace>

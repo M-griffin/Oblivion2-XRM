@@ -890,14 +890,6 @@ std::string MenuBase::loadMenuPrompt()
 
         // Default Display Cursor prompt starting point, make this configurable lateron
         prompt_display = "\x1b[?25h\x1b[22;1H";
-        
-        // TODO, Testing, need replacement for lexical cast
-        // Should only be needed when converting pascal to c.
-        /*
-        prompt_display += boost::lexical_cast<std::string>(m_menu_prompt->data_line1) + "\r\n";
-        prompt_display += boost::lexical_cast<std::string>(m_menu_prompt->data_line2) + "\r\n";
-        prompt_display += boost::lexical_cast<std::string>(m_menu_prompt->data_line3);
-        */
         prompt_display += m_menu_prompt->data_line1 + "\r\n";
         prompt_display += m_menu_prompt->data_line2 + "\r\n";
         prompt_display += m_menu_prompt->data_line3;
@@ -1435,7 +1427,6 @@ bool MenuBase::processMenuOptions(const std::string &input)
     bool stack_reassignment = false;
 
     // Uppercase all input to match on comamnd/option keys
-    // TODO, use boost local for upper case local!!
     std::string input_text = upper_case(input);
 
     // Check if ENTER was hit as a command!

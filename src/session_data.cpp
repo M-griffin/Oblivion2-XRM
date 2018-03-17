@@ -142,16 +142,7 @@ void SessionData::handleRead(const std::error_code& error, socket_handler_ptr)
                     if(m_connection->isActive())
                     {
                    
-                        std::cout << "Leaving (SESSION_DATA) Client IP: " << std::endl;
-                                  /*<< m_connection->m_normal_socket.remote_endpoint().address().to_string()
-                                  << std::endl << "Host-name: "
-                                  //<< boost::asio::ip::host_name() // Local host_name
-                                  << m_connection->m_normal_socket.remote_endpoint()
-                                  << std::endl
-                                  << "Bytes: "
-                                  << bytes_transferred
-                                  << std::endl;*/
-
+                        std::cout << "Leaving (SESSION_DATA)" << std::endl;
                         m_connection->shutdown();
                     }
                 }

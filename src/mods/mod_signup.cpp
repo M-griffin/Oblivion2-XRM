@@ -1008,46 +1008,55 @@ bool ModSignup::birthday(const std::string &input)
         baseProcessDeliverNewLine();
 
         // Validate Date Here,  ie.. 2016-01-01 format.
-        std::regex date_regex { m_config->regexp_date_validation };
-        std::smatch str_matches;
+		std::cout << "exp: " << m_config->regexp_date_validation << std::endl;
+		try
+		{
+			std::regex date_regex { m_config->regexp_date_validation };
+			std::smatch str_matches;
 
-        if(std::regex_match(key, str_matches, date_regex))
-        {
-            // Append Time For Date.
-            key += " 00:00:00";
-            struct std::tm tm;
+			if(std::regex_match(key, str_matches, date_regex))
+			{
+				// Append Time For Date.
+				key += " 00:00:00";
+				struct std::tm tm;
 
-            // Test lateron, this should work on < 5.1 gcc
-            //strptime(key, "%Y-%m-%d %H:%M:%S", &tm);
-            
-            
-            //tm = boost::posix_time::to_tm(boost::posix_time::time_from_string(key));
+				// Test lateron, this should work on < 5.1 gcc
+				//strptime(key, "%Y-%m-%d %H:%M:%S", &tm);
+				
+				
+				//tm = boost::posix_time::to_tm(boost::posix_time::time_from_string(key));
 
-            /**
-             * Only GCC 5.1 + Compatible
-             * Were no longer using boost, so bye bye 4.9 compat for now.
-             */
-            std::istringstream ss(key);
+				/**
+				 * Only GCC 5.1 + Compatible
+				 * Were no longer using boost, so bye bye 4.9 compat for now.
+				 */
+				std::istringstream ss(key);
 
-            ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
-            if(ss.fail())
-            {
-                std::cout << "regex passed, ss failed!" << std::endl;
-                ss.clear();
-                displayPromptAndNewLine(PROMPT_DATE_INVALID);
-                redisplayModulePrompt();
-                return true;
-            }
+				ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+				if(ss.fail())
+				{
+					std::cout << "regex passed, ss failed!" << std::endl;
+					ss.clear();
+					displayPromptAndNewLine(PROMPT_DATE_INVALID);
+					redisplayModulePrompt();
+					return true;
+				}
 
-            std::time_t const time = mktime(&tm);
-            m_user_record->dtBirthday = time;
-            changeNextModule();
-        }
-        else
-        {
-            displayPromptAndNewLine(PROMPT_DATE_INVALID);
-            redisplayModulePrompt();
-        }
+				std::time_t const time = mktime(&tm);
+				m_user_record->dtBirthday = time;
+				changeNextModule();
+			}
+			else
+			{
+				displayPromptAndNewLine(PROMPT_DATE_INVALID);
+				redisplayModulePrompt();
+			}			
+		}
+		catch(std::regex_error &ex)
+		{
+			std::cout << ex.what() << std::endl;
+			std::cout << "CODE IS: " << ex.code() << " " << __FILE__ << __LINE__ << std::endl;
+		}
     }
     else
     {

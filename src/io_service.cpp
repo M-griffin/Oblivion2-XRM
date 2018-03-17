@@ -18,35 +18,7 @@ IOService::~IOService()
 {
     std::cout << "~IOService" << std::endl;
     m_service_list.clear();
-    m_timer_list.clear();
     m_listener_list.clear();
-}
-
-/**
- * @Brief Always check all timers (Priority each iteration)
- */
-void IOService::checkPriorityTimers()
-{
-    // Timers are not removed each iteration
-    // Async stay active until exprired or canceled
-    // And wait, will block socket polling for (x) amount of time
-    for(unsigned int i = 0; i < m_timer_list.size(); i++)
-    {
-        service_base_ptr timers_work = m_timer_list.get(i);
-        if (!timers_work || !timers_work->getSocketHandle()->isActive())
-        {
-            m_timer_list.remove(i);
-            --i; // Compensate for item removed.
-            continue;
-        }
-
-        // Two Types of Timers,  blocking, which will block the existing sessions poll
-        // By setting a flag on socket_handle untill the amount of time exprire.
-        // The other is a non-block async wait, which will check and loop back
-        // Seeing if a condition is met to abort or wait for time to run.. mimic boost deadline timer.
-
-        //timers_work->executeCallback(not_connected_error_code, nullptr);
-    }
 }
 
 
@@ -98,9 +70,6 @@ void IOService::run()
 
     while(m_is_active)
     {
-        // Priority Deadline Timer Checks
-        checkPriorityTimers();
-
         // Check for incomming connections
         checkAsyncListenersForConnections();
 
@@ -109,9 +78,6 @@ void IOService::run()
         // move to vector then look polls..  i think #2.
         for(unsigned int i = 0; i < m_service_list.size(); i++)
         {
-            // Priority Deadline Timer Checks, Inbetween each asyc job, if one exists.
-            checkPriorityTimers();
-
             service_base_ptr job_work = m_service_list.get(i);
             if (!job_work || !job_work->getSocketHandle()->isActive())
             {

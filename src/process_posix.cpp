@@ -196,7 +196,9 @@ bool ProcessPosix::createProcess()
     memset(&ws, 0, sizeof(ws));
     ws.ws_col = m_session->m_telnet_state->getTermCols();
     ws.ws_row = m_session->m_telnet_state->getTermRows();
-    ioctl(m_pty_file_desc, TIOCSWINSZ, (char *)&ws);
+#ifndef TARGET_OS_MAC
+    ioctl(m_pty_file_desc, TIOCSWINSZ, (char *)&ws);     // NOTE MAC not seeing this for PTY
+#endif	
 #endif
 
     // Clear Screen on Process Start and show cursor.

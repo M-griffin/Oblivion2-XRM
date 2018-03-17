@@ -1,6 +1,7 @@
 #ifndef ONELINERS_HPP
 #define ONELINERS_HPP
 
+#include <string>
 #include <memory>
 #include <ctime>
 
