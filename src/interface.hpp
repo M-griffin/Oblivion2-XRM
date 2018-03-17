@@ -123,8 +123,8 @@ private:
                         
             // Create DeadlineTimer and attach to new session
             deadline_timer_ptr deadline_timer(new DeadlineTimer(
-                                          m_io_service,
-                                          socket_handler
+                                          //m_io_service,
+                                          //socket_handler
                                       ));
                                       
             // Create the new Session
@@ -137,7 +137,6 @@ private:
 
             // Attach Session to Session Manager.
             m_session_manager->join(new_session);
-            //waitingForConnection();
         }
         else
         {

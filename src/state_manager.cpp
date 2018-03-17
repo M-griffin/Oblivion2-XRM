@@ -106,6 +106,8 @@ void StateManager::changeState(state_ptr &the_state)
 {
     if(!m_the_state.empty())
     {
+        std::cout << "changeState: " << the_state->getStateID() << std::endl;
+        
         if(m_the_state.back()->getStateID() == the_state->getStateID())
         {
             return; // do nothing

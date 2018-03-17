@@ -14,6 +14,9 @@
 #include <string>
 #include <stdexcept>
 
+// Helper Macro For comparsion errors.
+#define UINT unsigned int
+
 
 SUITE(XRMSessionIO)
 {
@@ -742,7 +745,7 @@ SUITE(XRMSessionIO)
         std::string sequence = "e|013e|02AA||03FE";
 
         std::vector<MapType> code_map = sess.parseToCodeMap(sequence, sess.STD_EXPRESSION);
-        CHECK_EQUAL(code_map.size(), 3);
+        CHECK_EQUAL(code_map.size(), (UINT)3);
 
         // Verify Codes
         CHECK_EQUAL(code_map[0].m_code, "|01");
@@ -750,9 +753,9 @@ SUITE(XRMSessionIO)
         CHECK_EQUAL(code_map[2].m_code, "|03");
 
         // Verify Groups
-        CHECK_EQUAL(code_map[0].m_match, 1);
-        CHECK_EQUAL(code_map[1].m_match, 1);
-        CHECK_EQUAL(code_map[2].m_match, 1);
+        CHECK_EQUAL(code_map[0].m_match, (UINT)1);
+        CHECK_EQUAL(code_map[1].m_match, (UINT)1);
+        CHECK_EQUAL(code_map[2].m_match, (UINT)1);
     }
 
     TEST(pipe2codeMap_Test_MapCode_Group2)
@@ -764,15 +767,15 @@ SUITE(XRMSessionIO)
         std::string sequence = "ers|XY0101e3%||XY101000weXa";
 
         std::vector<MapType> code_map = sess.parseToCodeMap(sequence, sess.STD_EXPRESSION);
-        CHECK_EQUAL(code_map.size(), 2);
+        CHECK_EQUAL(code_map.size(), (UINT)2);
 
         // Verify Codes
         CHECK_EQUAL(code_map[0].m_code, "|XY0101");
         CHECK_EQUAL(code_map[1].m_code, "|XY1010");
 
         // Verify Groups
-        CHECK_EQUAL(code_map[0].m_match, 2);
-        CHECK_EQUAL(code_map[1].m_match, 2);
+        CHECK_EQUAL(code_map[0].m_match, (UINT)2);
+        CHECK_EQUAL(code_map[1].m_match, (UINT)2);
     }
 
     TEST(pipe2codeMap_Test_MapCode_Group3)
@@ -784,7 +787,7 @@ SUITE(XRMSessionIO)
         std::string sequence = "..W||A1%|B22XY1010weR-|AI3XY1010342|CC223eq0";
 
         std::vector<MapType> code_map = sess.parseToCodeMap(sequence, sess.STD_EXPRESSION);
-        CHECK_EQUAL(code_map.size(), 4);
+        CHECK_EQUAL(code_map.size(), (UINT)4);
 
         // Verify Codes
         CHECK_EQUAL(code_map[0].m_code, "|A1");
@@ -793,10 +796,10 @@ SUITE(XRMSessionIO)
         CHECK_EQUAL(code_map[3].m_code, "|CC22");
 
         // Verify Groups
-        CHECK_EQUAL(code_map[0].m_match, 3);
-        CHECK_EQUAL(code_map[1].m_match, 3);
-        CHECK_EQUAL(code_map[2].m_match, 3);
-        CHECK_EQUAL(code_map[3].m_match, 3);
+        CHECK_EQUAL(code_map[0].m_match, (UINT)3);
+        CHECK_EQUAL(code_map[1].m_match, (UINT)3);
+        CHECK_EQUAL(code_map[2].m_match, (UINT)3);
+        CHECK_EQUAL(code_map[3].m_match, (UINT)3);
     }
 
     TEST(pipe2codeMap_Test_MapCode_Group4)
@@ -808,7 +811,7 @@ SUITE(XRMSessionIO)
         std::string sequence = "..W||AE%|Be22XY1010weR-|AI|3XY1010342|CCe2%%C|ERE23eq0";
 
         std::vector<MapType> code_map = sess.parseToCodeMap(sequence, sess.STD_EXPRESSION);
-        CHECK_EQUAL(code_map.size(), 4);
+        CHECK_EQUAL(code_map.size(), (UINT)4);
 
         // Verify Codes
         CHECK_EQUAL(code_map[0].m_code, "|AE");
@@ -817,10 +820,10 @@ SUITE(XRMSessionIO)
         CHECK_EQUAL(code_map[3].m_code, "|ER");
 
         // Verify Groups
-        CHECK_EQUAL(code_map[0].m_match, 4);
-        CHECK_EQUAL(code_map[1].m_match, 4);
-        CHECK_EQUAL(code_map[2].m_match, 4);
-        CHECK_EQUAL(code_map[3].m_match, 4);
+        CHECK_EQUAL(code_map[0].m_match, (UINT)4);
+        CHECK_EQUAL(code_map[1].m_match, (UINT)4);
+        CHECK_EQUAL(code_map[2].m_match, (UINT)4);
+        CHECK_EQUAL(code_map[3].m_match, (UINT)4);
     }
 
     TEST(pipe2codeMap_Test_MapCode_Group5)
@@ -832,15 +835,15 @@ SUITE(XRMSessionIO)
         std::string sequence = "..W||1AE%|Be22%%obv.ascecXY1010%%%obv.txt%w%%obv.tx~";
 
         std::vector<MapType> code_map = sess.parseToCodeMap(sequence, sess.STD_EXPRESSION);
-        CHECK_EQUAL(code_map.size(), 2);
+        CHECK_EQUAL(code_map.size(), (UINT)2);
 
         // Verify Codes
         CHECK_EQUAL(code_map[0].m_code, "%%obv.asc");
         CHECK_EQUAL(code_map[1].m_code, "%%obv.txt");
 
         // Verify Groups
-        CHECK_EQUAL(code_map[0].m_match, 5);
-        CHECK_EQUAL(code_map[1].m_match, 5);
+        CHECK_EQUAL(code_map[0].m_match, (UINT)5);
+        CHECK_EQUAL(code_map[1].m_match, (UINT)5);
     }
 
     TEST(pipe2codeMap_Test_MapCode_Group6)
@@ -852,15 +855,15 @@ SUITE(XRMSessionIO)
         std::string sequence = "..W||1AE%1|Be22%%o$%TAbXY1010%%RF%obw%%obv.tx~";
 
         std::vector<MapType> code_map = sess.parseToCodeMap(sequence, sess.STD_EXPRESSION);
-        CHECK_EQUAL(code_map.size(), 2);
+        CHECK_EQUAL(code_map.size(), (UINT)2);
 
         // Verify Codes
         CHECK_EQUAL(code_map[0].m_code, "%TA");
         CHECK_EQUAL(code_map[1].m_code, "%RF");
 
         // Verify Groups
-        CHECK_EQUAL(code_map[0].m_match, 6);
-        CHECK_EQUAL(code_map[1].m_match, 6);
+        CHECK_EQUAL(code_map[0].m_match, (UINT)6);
+        CHECK_EQUAL(code_map[1].m_match, (UINT)6);
     }
 
     TEST(pipe2codeMap_Test_MapCode_Group7)
@@ -872,15 +875,15 @@ SUITE(XRMSessionIO)
         std::string sequence = "..W||1AE%1|Be22%%o1$%18bXY1010%%991%obw%%obv.tx~";
 
         std::vector<MapType> code_map = sess.parseToCodeMap(sequence, sess.STD_EXPRESSION);
-        CHECK_EQUAL(code_map.size(), 2);
+        CHECK_EQUAL(code_map.size(), (UINT)2);
 
         // Verify Codes
         CHECK_EQUAL(code_map[0].m_code, "%18");
         CHECK_EQUAL(code_map[1].m_code, "%99");
 
         // Verify Groups
-        CHECK_EQUAL(code_map[0].m_match, 7);
-        CHECK_EQUAL(code_map[1].m_match, 7);
+        CHECK_EQUAL(code_map[0].m_match, (UINT)7);
+        CHECK_EQUAL(code_map[1].m_match, (UINT)7);
     }
 
     TEST(pipe2codeMap_Test_MapCode_AllGroups)
@@ -896,7 +899,7 @@ SUITE(XRMSessionIO)
                                "1AE%1|Be22%%o1$%18bXY1010%%991%obw%%obv.tx~";
 
         std::vector<MapType> code_map = sess.parseToCodeMap(sequence, sess.STD_EXPRESSION);
-        CHECK_EQUAL(code_map.size(), 19);
+        CHECK_EQUAL(code_map.size(), (UINT)19);
 
         // Verify Codes
         CHECK_EQUAL(code_map[0].m_code, "|01");
@@ -920,25 +923,25 @@ SUITE(XRMSessionIO)
         CHECK_EQUAL(code_map[18].m_code, "%99");
 
         // Verify Groups
-        CHECK_EQUAL(code_map[0].m_match, 1);
-        CHECK_EQUAL(code_map[1].m_match, 1);
-        CHECK_EQUAL(code_map[2].m_match, 1);
-        CHECK_EQUAL(code_map[3].m_match, 2);
-        CHECK_EQUAL(code_map[4].m_match, 2);
-        CHECK_EQUAL(code_map[5].m_match, 3);
-        CHECK_EQUAL(code_map[6].m_match, 3);
-        CHECK_EQUAL(code_map[7].m_match, 3);
-        CHECK_EQUAL(code_map[8].m_match, 3);
-        CHECK_EQUAL(code_map[9].m_match, 4);
-        CHECK_EQUAL(code_map[10].m_match, 4);
-        CHECK_EQUAL(code_map[11].m_match, 4);
-        CHECK_EQUAL(code_map[12].m_match, 4);
-        CHECK_EQUAL(code_map[13].m_match, 5);
-        CHECK_EQUAL(code_map[14].m_match, 5);
-        CHECK_EQUAL(code_map[15].m_match, 6);
-        CHECK_EQUAL(code_map[16].m_match, 6);
-        CHECK_EQUAL(code_map[17].m_match, 7);
-        CHECK_EQUAL(code_map[18].m_match, 7);
+        CHECK_EQUAL(code_map[0].m_match, (UINT)1);
+        CHECK_EQUAL(code_map[1].m_match, (UINT)1);
+        CHECK_EQUAL(code_map[2].m_match, (UINT)1);
+        CHECK_EQUAL(code_map[3].m_match, (UINT)2);
+        CHECK_EQUAL(code_map[4].m_match, (UINT)2);
+        CHECK_EQUAL(code_map[5].m_match, (UINT)3);
+        CHECK_EQUAL(code_map[6].m_match, (UINT)3);
+        CHECK_EQUAL(code_map[7].m_match, (UINT)3);
+        CHECK_EQUAL(code_map[8].m_match, (UINT)3);
+        CHECK_EQUAL(code_map[9].m_match, (UINT)4);
+        CHECK_EQUAL(code_map[10].m_match, (UINT)4);
+        CHECK_EQUAL(code_map[11].m_match, (UINT)4);
+        CHECK_EQUAL(code_map[12].m_match, (UINT)4);
+        CHECK_EQUAL(code_map[13].m_match, (UINT)5);
+        CHECK_EQUAL(code_map[14].m_match, (UINT)5);
+        CHECK_EQUAL(code_map[15].m_match, (UINT)6);
+        CHECK_EQUAL(code_map[16].m_match, (UINT)6);
+        CHECK_EQUAL(code_map[17].m_match, (UINT)7);
+        CHECK_EQUAL(code_map[18].m_match, (UINT)7);
     }
 
     // Test Regex Config Field Validations

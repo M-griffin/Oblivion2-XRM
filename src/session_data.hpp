@@ -12,6 +12,7 @@
 #include "telnet_decoder.hpp"
 #include "session_manager.hpp"
 #include "common_io.hpp"
+#include "deadline_timer.hpp"
 
 #include "model-sys/structures.hpp"
 #include "model-sys/struct_compat.hpp"
@@ -52,7 +53,7 @@ public:
         : m_connection(connection)
         , m_session_manager(room)
         , m_telnet_state(new TelnetDecoder(connection))
-//      , m_input_deadline(io_service)
+        , m_esc_input_timer(new DeadlineTimer())
         , m_state_manager(state_manager)
         , m_io_service(io_service)
         , m_common_io()
@@ -235,12 +236,11 @@ public:
         // Add Deadline Timer for .400 milliseconds for complete ESC Sequences.
         // Is no other input or part of ESC Sequecnes ie.. [A following the ESC
         // Then it's an ESC key, otherwise capture the rest of the sequence.
-
-        /* TODO ADD ASYN Timer Job.
-         m_input_deadline.expires_from_now(boost::posix_time::milliseconds(400));
-        m_input_deadline.async_wait(
-            boost::bind(&SessionData::handleEscTimer, shared_from_this(), &m_input_deadline));
-        */
+        std::cout << "Start ESC Timer" << std::endl;
+        m_esc_input_timer->setWaitInMilliseconds(400);
+        m_esc_input_timer->asyncWait(
+            std::bind(&SessionData::handleEscTimer, shared_from_this())
+        );                    
     }
 
     /**
@@ -336,14 +336,14 @@ private:
      * @brief Deadline Input Timer for ESC vs ESC Sequence.
      * @param timer
      */
-    //  void handleEscTimer(boost::asio::deadline_timer* timer);
+    void handleEscTimer();
 
 public:
 
     connection_ptr        m_connection;
     session_manager_wptr  m_session_manager;
     telnet_ptr            m_telnet_state;
-    //deadline_timer        m_input_deadline;
+    deadline_timer_ptr    m_esc_input_timer;
     state_manager_ptr     m_state_manager;
     IOService            &m_io_service;
 

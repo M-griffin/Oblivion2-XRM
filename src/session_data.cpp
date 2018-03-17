@@ -12,7 +12,7 @@ void SessionData::updateState()
     // ESC Sequence, or Lone ESC Key.
     if(m_parsed_data[m_parsed_data.size()-1] == '\x1b')
     {
-       // startEscapeTimer();
+        startEscapeTimer();
         m_is_esc_timer = true;
     }
     else if(!m_is_esc_timer)
@@ -221,9 +221,10 @@ void SessionData::handleHandshake(const std::error_code& error)
 /**
  * @brief Deadline Input Timer for ESC vs ESC Sequence.
  * @param timer
- *
-void SessionData::handleEscTimer(boost::asio::deadline_timer* timer)
+ */
+void SessionData::handleEscTimer()
 {
+    /*
     if(timer->expires_at() <= deadline_timer::traits_type::now())
     {
         // The deadline has passed. Stop the session. The other actors will
@@ -235,11 +236,13 @@ void SessionData::handleEscTimer(boost::asio::deadline_timer* timer)
     {
         // Got more input while waiting, FOUND MORE DATA!
         std::cout << "Deadline Checking, CAUGHT REMAINING SEQUENCE!" << std::endl;
-    }
+    }*/
+    std::cout << "End ESC Timer" << std::endl;
+    
     // Move text to State Machine, Timer has passed, or remainer of Sequence caught up!
     m_state_manager->update();
     m_is_esc_timer = false;
-}*/
+}
 
 /**
  * @brief Startup Session Stats
