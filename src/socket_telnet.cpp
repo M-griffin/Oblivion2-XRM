@@ -1,7 +1,7 @@
 #include "socket_state.hpp"
 #include "socket_handler.hpp"
 
-#include <SDL2_net/SDL_net.hpp>
+#include <sdl2_net/SDL_net.hpp>
 
 #include <iostream>
 #include <cstdio>
@@ -14,7 +14,7 @@
  * @brief Send Data Over the Socket
  * @param buffer
  * @param length
- * @return 
+ * @return
  */
 int SDL_Socket::sendSocket(unsigned char *buffer, Uint32 length)
 {
@@ -22,10 +22,10 @@ int SDL_Socket::sendSocket(unsigned char *buffer, Uint32 length)
     int result = 0;
     if (m_is_socket_active)
     {
-        
+
         std::cout << "TCP Send: " << m_is_socket_active << std::endl;
         result = SDLNet_TCP_Send(m_tcp_socket, buffer, length);
-        
+
         std::cout << "sendSocket - result: " << result << std::endl;
         if(result < (signed)strlen((char *)buffer))
         {
@@ -36,7 +36,7 @@ int SDL_Socket::sendSocket(unsigned char *buffer, Uint32 length)
             }
         }
     }
-    
+
     std::cout << "return - result: " << result << std::endl;
     return(result);
 }
@@ -45,7 +45,7 @@ int SDL_Socket::sendSocket(unsigned char *buffer, Uint32 length)
 /**
  * @brief Receive Data from Socket
  * @param message
- * @return 
+ * @return
  */
 int SDL_Socket::recvSocket(char *message)
 {
@@ -60,13 +60,13 @@ int SDL_Socket::recvSocket(char *message)
         }
         message[result] = 0;
     }
-    
+
     return result;
 }
 
 /**
  * @brief Polls For Data To Read from the socket.
- * @return 
+ * @return
  */
 int SDL_Socket::pollSocket()
 {
@@ -94,39 +94,39 @@ int SDL_Socket::pollSocket()
 
 /**
  * @brief Polls For Data To Read from the socket.
- * @return 
+ * @return
  */
 socket_handler_ptr SDL_Socket::pollSocketAccepts()
 {
-   // std::cout << "pollSocketAccepts : m_is_socket_active = " << m_is_socket_active << std::endl;
+    // std::cout << "pollSocketAccepts : m_is_socket_active = " << m_is_socket_active << std::endl;
     TCPsocket socket = nullptr;
-    
+
     int numActiveSockets = SDLNet_CheckSockets(m_socket_set, 0);
     if (numActiveSockets != 0)
     {
-        std::cout << "There are currently " 
-                  << numActiveSockets 
-                  << " socket(s) with data to be processed." 
+        std::cout << "There are currently "
+                  << numActiveSockets
+                  << " socket(s) with data to be processed."
                   << std::endl;
-    }   
-    
+    }
+
     if (numActiveSockets > 0 && m_is_socket_active)
-    {        
-        if(SDLNet_SocketReady(m_tcp_socket) != 0) 
+    {
+        if(SDLNet_SocketReady(m_tcp_socket) != 0)
         {
-            std::cout << "SDLNet_SocketReady : Accept Socket Ready" << std::endl;            
+            std::cout << "SDLNet_SocketReady : Accept Socket Ready" << std::endl;
             socket = SDLNet_TCP_Accept(m_tcp_socket);
-            
+
             // Setup the State, SDL_Socket
             socket_state_ptr state(new SDL_Socket("127.0.0.1", 6023));
             state->spawnSocket(socket);
-            
+
             // Setup a Handle, which will link back to Async_Connection
             // For individual sessions and polling read/write from clients.
-            socket_handler_ptr handler(new SocketHandler());            
+            socket_handler_ptr handler(new SocketHandler());
             handler->setSocketType("TELNET");
             handler->setSocketState(state);
-            
+
             std::cout << "return new SocketHandler" << std::endl;
             return handler;
         }
@@ -142,7 +142,7 @@ socket_handler_ptr SDL_Socket::pollSocketAccepts()
 void SDL_Socket::spawnSocket(TCPsocket socket)
 {
     std::cout << "spawnSocket" << std::endl;
-    
+
     m_tcp_socket = socket;
     m_socket_set = SDLNet_AllocSocketSet(1);
     if(!m_socket_set)
@@ -151,7 +151,7 @@ void SDL_Socket::spawnSocket(TCPsocket socket)
         onExit();
         return;
     }
-    
+
     // Attached New Socket from Accept to it's own session instance.
     if(SDLNet_TCP_AddSocket(m_socket_set, m_tcp_socket) == -1)
     {
@@ -167,7 +167,7 @@ void SDL_Socket::spawnSocket(TCPsocket socket)
 
 /**
  * @brief (Client) Connects out to Servers
- * @return 
+ * @return
  */
 bool SDL_Socket::onConnect()
 {
@@ -215,7 +215,7 @@ bool SDL_Socket::onConnect()
 
 /**
  * @brief (Server) Sets up the Listening Socket for New Conenction Polling.
- * @return 
+ * @return
  */
 bool SDL_Socket::onListen()
 {
@@ -256,14 +256,14 @@ bool SDL_Socket::onListen()
 
     // Successful Startup
     m_is_socket_active = true;
-    std::cout << "Handshake Setup Successful" << std::endl;    
+    std::cout << "Handshake Setup Successful" << std::endl;
     return true;
 }
 
 
 /**
  * @brief Shutdown Socket.
- * @return 
+ * @return
  */
 bool SDL_Socket::onExit()
 {

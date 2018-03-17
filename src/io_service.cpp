@@ -2,6 +2,8 @@
 #include "socket_handler.hpp"
 
 #include <iostream>
+#include <cstring>
+#include <string>
 #include <thread>
 #include <chrono>
 #include <system_error>
@@ -22,7 +24,7 @@ IOService::~IOService()
 
 /**
  * @Brief Always check all timers (Priority each iteration)
- */            
+ */
 void IOService::checkPriorityTimers()
 {
     // Timers are not removed each iteration
@@ -37,14 +39,14 @@ void IOService::checkPriorityTimers()
             --i; // Compensate for item removed.
             continue;
         }
-        
+
         // Two Types of Timers,  blocking, which will block the existing sessions poll
         // By setting a flag on socket_handle untill the amount of time exprire.
-        // The other is a non-block async wait, which will check and loop back 
+        // The other is a non-block async wait, which will check and loop back
         // Seeing if a condition is met to abort or wait for time to run.. mimic boost deadline timer.
-        
+
         //timers_work->executeCallback(not_connected_error_code, nullptr);
-    }    
+    }
 }
 
 
@@ -52,7 +54,7 @@ void IOService::checkPriorityTimers()
  * @brief Async Listener, check for incomming connections
  */
 void IOService::checkAsyncListenersForConnections()
-{    
+{
     // Timers are not removed each iteration
     // Async stay active until exprired or canceled
     // And wait, will block socket polling for (x) amount of time
@@ -65,7 +67,7 @@ void IOService::checkAsyncListenersForConnections()
             --i; // Compensate for item removed.
             continue;
         }
-        
+
         socket_handler_ptr handler = listener_work->getSocketHandle()->acceptTelnetConnection();
         if (handler != nullptr)
         {
@@ -75,14 +77,14 @@ void IOService::checkAsyncListenersForConnections()
             {
                 // Check for max nodes here, if we like can limit, send a message and drop
                 // connection on hander by not passing it through the callback.
-                listener_work->executeCallback(success_code, handler);            
+                listener_work->executeCallback(success_code, handler);
             }
             catch (std::exception &ex)
             {
                 std::cout << "Exception Async-Accept: " << ex.what() << std::endl;
             }
         }
-    }        
+    }
 }
 
 
@@ -93,23 +95,23 @@ void IOService::run()
 {
     char msg_buffer[MAX_BUFFER_SIZE];
     m_is_active = true;
-    
+
     while(m_is_active)
-    {        
+    {
         // Priority Deadline Timer Checks
         checkPriorityTimers();
-        
+
         // Check for incomming connections
         checkAsyncListenersForConnections();
-        
+
         // This will wait for another job to be inserted on next call
         // Do we want to insert the job back, if poll is empty or
         // move to vector then look polls..  i think #2.
         for(unsigned int i = 0; i < m_service_list.size(); i++)
-        {            
+        {
             // Priority Deadline Timer Checks, Inbetween each asyc job, if one exists.
             checkPriorityTimers();
-            
+
             service_base_ptr job_work = m_service_list.get(i);
             if (!job_work || !job_work->getSocketHandle()->isActive())
             {
@@ -212,7 +214,7 @@ void IOService::run()
                 }
 
                 if (is_success)
-                {                    
+                {
                     std::error_code success_code (0, std::generic_category());
                     job_work->executeCallback(success_code, nullptr);
                     m_service_list.remove(i);
@@ -237,12 +239,12 @@ void IOService::run()
                 std::cout << "ip_address: " << ip_address.size();
                 bool is_success = false;
                 if (ip_address.size() >= 4)
-                {                    
+                {
                     std::cout << "1. " << ip_address.at(0) << std::endl;
                     std::cout << "2. " << ip_address.at(1) << std::endl;
                     std::cout << "3. " << ip_address.at(2) << std::endl;
                     std::cout << "4. " << ip_address.at(3) << std::endl;
-                    
+
                     is_success = job_work->getSocketHandle()->connectSshSocket(
                                      ip_address.at(0),
                                      std::atoi(ip_address.at(1).c_str()),
@@ -252,7 +254,7 @@ void IOService::run()
                 }
 
                 if (is_success)
-                {                   
+                {
                     std::error_code success_code (0, std::generic_category());
                     job_work->executeCallback(success_code, nullptr);
                     m_service_list.remove(i);
@@ -267,7 +269,7 @@ void IOService::run()
                     m_service_list.remove(i);
                 }
             }*/
-            
+
             // SERVICE_TYPE_CONNECT_IRC
             /*
             else if (job_work->getServiceType() == SERVICE_TYPE_CONNECT_IRC)
@@ -293,20 +295,20 @@ void IOService::run()
                 }
 
                 if (is_success)
-                {                    
+                {
                     // Send Initial Connection Information
                     std::string nick = "mercyful1";
                     std::string ident = "mercyful1";
                     std::string read_name = "michael";
                     std::string host = "localhost";
-                    
+
                     std::stringstream ss;
-                    ss  << "NICK " << nick << "\r\n" 
+                    ss  << "NICK " << nick << "\r\n"
                         << "USER " << ident << " " << host << " bla : " << read_name << "\r\n";
-                    
+
                     std::string output = ss.str();
                     job_work->getSocketHandle()->sendSocket((unsigned char *)output.c_str(), output.size());
-                                        
+
                     callback_function_handler run_callback(job_work->getCallback());
                     std::error_code success_code (0, std::generic_category());
                     run_callback(success_code);
@@ -323,7 +325,7 @@ void IOService::run()
                     m_service_list.remove(i);
                 }
             }*/
-                                    
+
         }
 
         // Temp timer, change to 10/20 miliseconds for cpu useage
@@ -341,5 +343,5 @@ void IOService::stop()
     // Clear All Lists and attached handles.
     m_service_list.clear();
     m_timer_list.clear();
-    m_listener_list.clear();    
+    m_listener_list.clear();
 }

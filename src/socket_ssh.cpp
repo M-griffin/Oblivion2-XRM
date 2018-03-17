@@ -45,15 +45,15 @@ int SSH_Socket::recvSocket(char *message)
             return SSH_ERROR;
         }
     }
-    
+
     std::cout << "recvSocket" << " message: " << message <<  std::endl;
-    
+
     return result;
 }
 
 /**
  * @brief (Not Used for SSH) Needed becasue of Virtual Interface Requirement.
- * @return 
+ * @return
  */
 socket_handler_ptr SSH_Socket::pollSocketAccepts()
 {
@@ -67,7 +67,7 @@ socket_handler_ptr SSH_Socket::pollSocketAccepts()
  */
 void SSH_Socket::spawnSocket(TCPsocket)//socket)
 {
-    // placeholder    
+    // placeholder
 }
 
 int SSH_Socket::pollSocket()
@@ -300,11 +300,11 @@ int SSH_Socket::verify_knownhost()
             std::cout << "Could not find known host file." << std::endl;
             std::cout << "If you accept the host key here, the file will be"
                       << "automatically created." << std::endl;
-#if __GNUC__ >= 6                    
+#if __GNUC__ >= 6
             [[gnu::fallthrough]]; // c++11 and c++14
 #endif
 
-        /* fallback to SSH_SERVER_NOT_KNOWN behavior */
+            /* fallback to SSH_SERVER_NOT_KNOWN behavior */
         case SSH_SERVER_NOT_KNOWN:
             hexa = ssh_get_hexa(hash, hlen);
             //Do you trust the host key?\n");
