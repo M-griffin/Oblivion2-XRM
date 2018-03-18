@@ -306,7 +306,7 @@ public:
         , filename_archive_comments("")
         , directory_bad_files("")        
         , use_greater_then_for_quotes(false)        
-        , regexp_generic_validation("[^\\s][\\A\\w\\s,.!@#$%^&*()]+")  // testing no starting spaces!
+        , regexp_generic_validation("^[^\\s]+[\\w\\s,.!@#$%^&*\\(\\)]+")  // testing no starting spaces!
         , regexp_generic_validation_msg("At least one AlphaNumeric Word characters required space seperators.")        
         , regexp_handle_validation("(?=.*[a-zA-Z])(?!.*\\d).{2,}")
         , regexp_handle_validation_msg("At least two characters case insensitive no spaces.")        

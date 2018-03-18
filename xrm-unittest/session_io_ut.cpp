@@ -953,7 +953,7 @@ SUITE(XRMSessionIO)
 
         // [^\\s][\\w\\s,.!@#$%^&*()]+
         std::string sequence = "123west,.!@#$%^&*()";
-        std::string expression = config->regexp_generic_validation;
+        std::string expression = "^[^\\s]+[\\w\\s,.!@#$%^&*\\(\\)]+"; //config->regexp_generic_validation;
 
         bool result = sess.checkRegex(sequence, expression);
         CHECK_EQUAL(result, true);
@@ -981,7 +981,7 @@ SUITE(XRMSessionIO)
 
         // [^\\s][\\w\\s,.!@#$%^&*()]+
         std::string sequence = "123west ,.!@#$%^&*()";
-        std::string expression = config->regexp_generic_validation;
+        std::string expression = "^[^\\s]+[\\w\\s,.!@#$%^&*\\(\\)]+"; //config->regexp_generic_validation;
 
         bool result = sess.checkRegex(sequence, expression);
         CHECK_EQUAL(result, true);
