@@ -50,8 +50,8 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryP
 AR       := /usr/bin/ar rcu
 CXX      := /usr/bin/g++
 CC       := /usr/bin/gcc
-CXXFLAGS :=  -Wfatal-errors -g -O0 -W -std=c++14 -Wall -static $(Preprocessors)
-CFLAGS   :=  -Wfatal-errors -g -O0 -W -std=c++14 -Wall -static $(Preprocessors)
+CXXFLAGS :=  -Wfatal-errors -g -O0 -W -std=c++11 -Wall -static $(Preprocessors)
+CFLAGS   :=  -Wfatal-errors -g -O0 -W -std=c++11 -Wall -static $(Preprocessors)
 ASFLAGS  := 
 AS       := /usr/bin/as
 
