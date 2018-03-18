@@ -40,8 +40,6 @@
     <File Name="../src/menu_system_editor.cpp"/>
     <File Name="../src/safe_queue.hpp"/>
     <File Name="../src/safe_set.hpp"/>
-    <File Name="../src/server.hpp"/>
-    <File Name="../src/server_ssl.hpp"/>
     <File Name="../src/session.hpp"/>
     <File Name="../src/session_data.cpp"/>
     <File Name="../src/session_data.hpp"/>
@@ -145,6 +143,37 @@
     <File Name="../src/process_base.hpp"/>
     <File Name="../src/form_manager.cpp"/>
     <File Name="../src/form_manager.hpp"/>
+    <File Name="../src/async_acceptor.hpp"/>
+    <File Name="../src/async_base.hpp"/>
+    <File Name="../src/async_connection.hpp"/>
+    <File Name="../src/deadline_timer.hpp"/>
+    <File Name="../src/directory.hpp"/>
+    <File Name="../src/interface.hpp"/>
+    <File Name="../src/io_service.cpp"/>
+    <File Name="../src/io_service.hpp"/>
+    <File Name="../src/socket_handler.cpp"/>
+    <File Name="../src/socket_handler.hpp"/>
+    <File Name="../src/socket_ssh.cpp"/>
+    <File Name="../src/socket_state.hpp"/>
+    <File Name="../src/socket_telnet.cpp"/>
+    <VirtualDirectory Name="sdl2_net">
+      <File Name="../src/sdl2_net/begin_code.h"/>
+      <File Name="../src/sdl2_net/close_code.h"/>
+      <File Name="../src/sdl2_net/SDLnet.cpp"/>
+      <File Name="../src/sdl2_net/SDL_net.hpp"/>
+      <File Name="../src/sdl2_net/SDLnetselect.cpp"/>
+      <File Name="../src/sdl2_net/SDLnetsys.hpp"/>
+      <File Name="../src/sdl2_net/SDLnetTCP.cpp"/>
+      <File Name="../src/sdl2_net/SDLnetUDP.cpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="utf-cpp">
+      <VirtualDirectory Name="utf8">
+        <File Name="../src/utf-cpp/utf8/checked.h"/>
+        <File Name="../src/utf-cpp/utf8/core.h"/>
+        <File Name="../src/utf-cpp/utf8/unchecked.h"/>
+      </VirtualDirectory>
+      <File Name="../src/utf-cpp/utf8.h"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -157,24 +186,17 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++14;-Wall;-Wno-deprecated -Wno-unused-local-typedefs;-Wno-psabi" C_Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++14;-Wall;-Wno-deprecated -Wno-unused-local-typedefs;-Wno-psabi" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-Wall;-Wno-psabi" C_Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-Wall;-Wno-psabi" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
         <IncludePath Value="../sqlitewrap/Debug"/>
+        <Preprocessor Value="WITHOUT_SDL"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
         <LibraryPath Value="../sqlitewrap"/>
         <LibraryPath Value="../sqlitewrap/Debug"/>
-        <Library Value="boost_system"/>
-        <Library Value="boost_thread"/>
-        <Library Value="boost_chrono"/>
-        <Library Value="boost_locale"/>
-        <Library Value="boost_filesystem"/>
-        <Library Value="boost_timer"/>
-        <Library Value="boost_regex"/>
-        <Library Value="boost_date_time"/>
         <Library Value="libSqliteWrapped.a"/>
         <Library Value="sqlite3"/>
         <Library Value="pthread"/>
@@ -182,10 +204,10 @@
         <Library Value="crypto"/>
         <Library Value="yaml-cpp"/>
         <Library Value="util"/>
+        <Library Value="libssh"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
-      <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="Default" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -225,7 +247,6 @@
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
-      <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>

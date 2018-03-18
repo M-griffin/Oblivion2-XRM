@@ -21,15 +21,44 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="..\src">
+    <File Name="../src/directory.hpp"/>
+    <File Name="../src/async_acceptor.hpp"/>
+    <File Name="../src/async_base.hpp"/>
+    <File Name="../src/deadline_timer.hpp"/>
+    <File Name="../src/socket_state.hpp"/>
+    <File Name="../src/socket_telnet.cpp"/>
+    <File Name="../src/socket_ssh.cpp"/>
+    <File Name="../src/socket_handler.hpp"/>
+    <File Name="../src/socket_handler.cpp"/>
+    <File Name="../src/interface.hpp"/>
+    <File Name="../src/safe_vector.hpp"/>
+    <File Name="../src/io_service.hpp"/>
+    <File Name="../src/io_service.cpp"/>
+    <File Name="../src/async_connection.hpp"/>
+    <VirtualDirectory Name="sdl2_net">
+      <File Name="../src/sdl2_net/close_code.h"/>
+      <File Name="../src/sdl2_net/begin_code.h"/>
+      <File Name="../src/sdl2_net/SDLnetUDP.cpp"/>
+      <File Name="../src/sdl2_net/SDLnetTCP.cpp"/>
+      <File Name="../src/sdl2_net/SDLnetsys.hpp"/>
+      <File Name="../src/sdl2_net/SDLnetselect.cpp"/>
+      <File Name="../src/sdl2_net/SDLnet.cpp"/>
+      <File Name="../src/sdl2_net/SDL_net.hpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="utf-cpp">
+      <File Name="../src/utf-cpp/utf8.h"/>
+      <VirtualDirectory Name="utf8">
+        <File Name="../src/utf-cpp/utf8/unchecked.h"/>
+        <File Name="../src/utf-cpp/utf8/core.h"/>
+        <File Name="../src/utf-cpp/utf8/checked.h"/>
+      </VirtualDirectory>
+    </VirtualDirectory>
     <File Name="../src/ansi_processor.cpp"/>
     <File Name="../src/ansi_processor.hpp"/>
     <File Name="../src/common_io.cpp"/>
     <File Name="../src/common_io.hpp"/>
     <File Name="../src/communicator.cpp"/>
     <File Name="../src/communicator.hpp"/>
-    <File Name="../src/connection_base.hpp"/>
-    <File Name="../src/connection_ssl.hpp"/>
-    <File Name="../src/connection_tcp.hpp"/>
     <File Name="../src/encryption.cpp"/>
     <File Name="../src/encryption.hpp"/>
     <File Name="../src/main.cpp"/>
@@ -38,8 +67,6 @@
     <File Name="../src/menu_system_editor.cpp"/>
     <File Name="../src/safe_queue.hpp"/>
     <File Name="../src/safe_set.hpp"/>
-    <File Name="../src/server.hpp"/>
-    <File Name="../src/server_ssl.hpp"/>
     <File Name="../src/session.hpp"/>
     <File Name="../src/session_data.cpp"/>
     <File Name="../src/session_data.hpp"/>
@@ -159,37 +186,36 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++14;-Wall;-Wno-deprecated -Wno-unused-local-typedefs" C_Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++14;-Wall;-Wno-deprecated -Wno-unused-local-typedefs" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-Wall" C_Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
-        <IncludePath Value="C:/boost64/include"/>
+        <IncludePath Value="../src/sql2_net"/>
         <IncludePath Value="C:/sqlite3/include"/>
-        <IncludePath Value="C:/OpenSSL-Win32/include"/>
         <IncludePath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/include"/>
-        <IncludePath Value="C:/msys/1.0/icu/include"/>
+        <IncludePath Value="C:/OpenSSL-Win32/include"/>
+        <IncludePath Value="C:/Users/Blue/Downloads/libssh-0.7.2/include"/>
+        <Preprocessor Value="WITHOUT_SDL"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
         <LibraryPath Value="../sqlitewrap/Debug"/>
-        <LibraryPath Value="C:/boost64/lib"/>
-        <LibraryPath Value="C:/msys/1.0/icu/dist/lib"/>
         <LibraryPath Value="C:/sqlite3/lib"/>
+        <LibraryPath Value="mingw32/lib"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/MinGW"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>
         <LibraryPath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/build"/>
-        <Library Value="libboost_system-mgw51-mt-1_64.dll.a"/>
-        <Library Value="libboost_locale-mgw51-mt-1_64.dll.a"/>
-        <Library Value="libboost_filesystem-mgw51-mt-1_64.dll.a"/>
-        <Library Value="libboost_timer-mgw51-mt-1_64.dll.a"/>
-        <Library Value="libboost_regex-mgw51-mt-1_64.dll.a"/>
-        <Library Value="libboost_date_time-mgw51-mt-1_64.dll.a"/>
+        <LibraryPath Value="C:/libz-1.2.7-1-mingw32-dev/lib"/>
+        <LibraryPath Value="C:/Users/Blue/Downloads/libssh-0.7.2\lib"/>
+        <Library Value="mingw32"/>
         <Library Value="libws2_32.a"/>
         <Library Value="libwsock32.a"/>
-        <Library Value="libSqliteWrapped.a"/>
-        <Library Value="libsqlite3.a"/>
         <Library Value="ssleay32.a"/>
         <Library Value="libeay32.a"/>
+        <Library Value="libssh"/>
+        <Library Value="libiphlpapi.a"/>
+        <Library Value="libSqliteWrapped.a"/>
+        <Library Value="libsqlite3.a"/>
         <Library Value="yaml-cpp.dll"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>

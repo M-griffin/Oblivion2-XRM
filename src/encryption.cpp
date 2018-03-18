@@ -1,8 +1,5 @@
 #include "encryption.hpp"
 
-// For Debugging SSL Version
-#include <boost/preprocessor/stringize.hpp>
-
 #include <openssl/engine.h>
 #include "openssl/evp.h"
 
@@ -20,13 +17,14 @@ Encrypt::~Encrypt()
 }
 
 
+// Removal of Boost,  not going to print out the current version, leave for debugging if needed.
+// #pragma message("OPENSSL_VERSION_NUMBER=" BOOST_PP_STRINGIZE(OPENSSL_VERSION_NUMBER))
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+
 /**
  * @brief Handle New OpenSSL v1.01, and Conversions for Older. (Debugging OpenSSL Version)
  * @return 
  */
-#pragma message("OPENSSL_VERSION_NUMBER=" BOOST_PP_STRINGIZE(OPENSSL_VERSION_NUMBER))
-#if OPENSSL_VERSION_NUMBER < 0x10100000L
-
 EVP_MD_CTX *EVP_MD_CTX_new()
 {
     //return (EVP_MD_CTX*)OPENSSL_zalloc(sizeof(EVP_MD_CTX));

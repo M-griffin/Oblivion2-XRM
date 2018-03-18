@@ -3,26 +3,25 @@
 
 #include "mod_base.hpp"
 
+
 #include "../model-sys/structures.hpp"
 #include "../data-sys/text_prompts_dao.hpp"
 
 #include "../session_data.hpp"
 #include "../session_io.hpp"
+#include "../deadline_timer.hpp"
 
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/asio/deadline_timer.hpp>
-
+#include <memory>
 #include <vector>
 #include <functional>
 
 class Config;
-typedef boost::shared_ptr<Config> config_ptr;
+typedef std::shared_ptr<Config> config_ptr;
 
 class AnsiProcessor;
-typedef boost::shared_ptr<AnsiProcessor> ansi_process_ptr;
+typedef std::shared_ptr<AnsiProcessor> ansi_process_ptr;
 
-using boost::asio::deadline_timer;
+//using std::asio::deadline_timer;
 
 /**
  * @class ModPreLogin
@@ -32,7 +31,7 @@ using boost::asio::deadline_timer;
  * @brief System PreLogin Module
  */
 class ModPreLogon
-    : public boost::enable_shared_from_this<ModPreLogon>
+    : public std::enable_shared_from_this<ModPreLogon>
     , public ModBase
 {
 public:
@@ -41,7 +40,7 @@ public:
         , m_session_io(session_data)
         , m_filename("mod_prelogon.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
-        , m_detection_deadline(session_data->m_io_service)
+        , m_deadline_timer(new DeadlineTimer())
         , m_mod_function_index(MOD_DETECT_EMULATION)
         , m_is_text_prompt_exist(false)
         , m_is_esc_detected(false)
@@ -180,21 +179,26 @@ public:
     void setupAskCodePage();
 
     /**
+     * @brief Quick Timer Methods left in the Header.
+     */
+
+    /**
      * @brief Start ANSI Detection timer
      */
     void startDetectionTimer()
     {
         // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences reponses
-        m_detection_deadline.expires_from_now(boost::posix_time::milliseconds(1500));
-        m_detection_deadline.async_wait(
-            boost::bind(&ModPreLogon::handleDetectionTimer, shared_from_this(), &m_detection_deadline));
+        m_deadline_timer->setWaitInMilliseconds(1500);
+        m_deadline_timer->asyncWait(
+            std::bind(&ModPreLogon::handleDetectionTimer, shared_from_this())
+        );
     }
 
     /**
      * @brief Deadline Detection Timer for ANSI Detection
      * @param timer
      */
-    void handleDetectionTimer(boost::asio::deadline_timer* /*timer*/)
+    void handleDetectionTimer()
     {
         std::cout << "Deadline ANSI Detection, EXPIRED!" << std::endl;
 
@@ -236,7 +240,7 @@ private:
     SessionIO              m_session_io;
     std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
-    deadline_timer         m_detection_deadline;
+    deadline_timer_ptr     m_deadline_timer;
 
     int                    m_mod_function_index;   
     bool                   m_is_text_prompt_exist;

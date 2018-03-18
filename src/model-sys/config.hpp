@@ -1,23 +1,8 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
-
-// turn off the specific warning. Boost 1_64_0 for uuid
-#pragma GCC diagnostic ignored "-Wconversion-null"
-
-#include <boost/uuid/uuid.hpp>            // uuid class
-#include <boost/uuid/uuid_generators.hpp> // generators
-#include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
-
-// turn the warnings back on
-#pragma GCC diagnostic pop
-
-#include <boost/lexical_cast.hpp>
-
+#include <memory>
 #include <fstream>
-
 #include <yaml-cpp/yaml.h>
 
 /**
@@ -321,7 +306,7 @@ public:
         , filename_archive_comments("")
         , directory_bad_files("")        
         , use_greater_then_for_quotes(false)        
-        , regexp_generic_validation("[^\\s][\\A\\w\\s,.!@#$%^&*()]+")  // testing no starting spaces!
+        , regexp_generic_validation("^[^\\s]+[\\w\\s,.!@#$%^&*\\(\\)]+")  // testing no starting spaces!
         , regexp_generic_validation_msg("At least one AlphaNumeric Word characters required space seperators.")        
         , regexp_handle_validation("(?=.*[a-zA-Z])(?!.*\\d).{2,}")
         , regexp_handle_validation_msg("At least two characters case insensitive no spaces.")        
@@ -334,9 +319,9 @@ public:
     {
         // Generates an Initial Unique Board UUID when the configuration is created.
         // If someone wipes out their config, they should save this and re-enter it!
-        boost::uuids::random_generator generator;
-        boost::uuids::uuid uuid = generator();
-        bbs_uuid = boost::lexical_cast<std::string>(uuid);
+        //boost::uuids::random_generator generator;
+        //boost::uuids::uuid uuid = generator();
+        bbs_uuid = "test"; //boost::lexical_cast<std::string>(uuid);
     }
 
     ~Config() { }
@@ -594,7 +579,7 @@ namespace YAML
     };
 }
 
-typedef boost::shared_ptr<Config> config_ptr;
-typedef boost::weak_ptr<Config> config_wptr;
+typedef std::shared_ptr<Config> config_ptr;
+typedef std::weak_ptr<Config> config_wptr;
 
 #endif // CONFIG_HPP

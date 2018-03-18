@@ -2,7 +2,9 @@
 #define SESSION_HPP
 
 #include "state_manager.hpp"
-#include "connection_tcp.hpp"
+#include "async_connection.hpp"
+#include "deadline_timer.hpp"
+#include "socket_handler.hpp"
 #include "session_manager.hpp"
 #include "telnet_decoder.hpp"
 #include "communicator.hpp"
@@ -10,29 +12,18 @@
 #include "session_io.hpp"
 #include "menu_system.hpp"
 
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
-
-#include <boost/asio.hpp>
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/deadline_timer.hpp>
-
+#include <memory>
 #include <list>
 #include <string>
+#include <cassert>
 
 /*
- * NOTES: Sessions should also have incoming notification buffer
+ * NOTES TODO: Sessions should also have incoming notification buffer
  * or OLM Buffer for message from other nodes and sysops
  * when not in chat.
  */
-
-using boost::asio::deadline_timer;
-using boost::asio::ip::tcp;
-
-class Server;
 class Session;
-
-typedef boost::shared_ptr<Session> session_ptr;
+typedef std::shared_ptr<Session> session_ptr;
 
 /**
  * @class Session
@@ -42,7 +33,7 @@ typedef boost::shared_ptr<Session> session_ptr;
  * @brief handles TCP and SSL individual connection Sessions.
  */
 class Session
-    : public boost::enable_shared_from_this<Session>
+    : public std::enable_shared_from_this<Session>
 {
 public:
 
@@ -61,30 +52,21 @@ public:
      * @brief Handle the initial Session Creation, Also start the
      *        Telnet Option Negotiation with the client.
      * @param tcp_connection
-     * @param room
+     * @param session_manager
      * @return
      */
-    static session_ptr create(boost::asio::io_service& io_service, connection_ptr connection, session_manager_ptr room)
+    static session_ptr create(IOService& io_service, connection_ptr connection, deadline_timer_ptr deadline_timer,
+                              session_manager_ptr session_manager)
     {
-        session_ptr new_session(new Session(io_service, connection, room));
-
-        if(connection->is_open())
+        session_ptr new_session(new Session(io_service, connection, deadline_timer, session_manager));
+        if(connection->isActive())
         {
-            if(connection->m_is_secure)
-            {                
-                // Secure Sessions do handshake first!!
-                new_session->m_session_data->startUpSessionStats("SSL");
-                new_session->m_session_data->handshake();
-            }
-            else
-            {
-                new_session->m_session_data->startUpSessionStats("Telnet");                
-                new_session->m_session_data->waitingForData();
-            }
+            new_session->m_session_data->startUpSessionStats("Telnet");
+            new_session->m_session_data->waitingForData();
         }
 
         // Send out Telnet Negoiation Options
-        if(connection->is_open() && !connection->m_is_secure)
+        if(connection->isActive())
         {
             // On initial Session Connection,  setup and send TELNET Options to
             // start the negotiation of client features.
@@ -102,7 +84,7 @@ public:
             //new_session->m_session_data->m_telnet_state->sendIACSequences(DONT, TELOPT_LINEMODE);
 
             new_session->m_session_data->m_telnet_state->sendIACSequences(DONT, TELOPT_OLD_ENVIRON);
-                       
+
             new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_SGA);
             new_session->m_session_data->m_telnet_state->addReply(TELOPT_SGA);
 
@@ -132,29 +114,32 @@ public:
 
             // Wait 1.5 Seconds for respones.
             new_session->startDetectionTimer();
+
+            std::cout << "sleep ended." << std::endl;
         }
 
         return new_session;
     }
 
     /**
-     * @brief Start ESC Key input timer
+     * @brief Telopt Sequences timer
      */
     void startDetectionTimer()
-    {
+    {       
         // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences reponses
-        m_detection_deadline.expires_from_now(boost::posix_time::milliseconds(1500));
-        m_detection_deadline.async_wait(
-            boost::bind(&Session::handleDetectionTimer, shared_from_this(), &m_detection_deadline));
+        m_deadline_timer->setWaitInMilliseconds(1500);
+        m_deadline_timer->asyncWait(
+            std::bind(&Session::handleDetectionTimer, shared_from_this())
+        );
     }
 
     /**
      * @brief Deadline Detection Timer for Negoiation
      * @param timer
      */
-    void handleDetectionTimer(boost::asio::deadline_timer* /*timer*/)
+    void handleDetectionTimer()
     {
-        std::cout << "Deadline Terminal Detection, EXPIRED!" << std::endl;
+        std::cout << "handleDetectionTimer Completed!" << std::endl;
 
         // Detection Completed, start ip the Pre-Logon Sequence State.
         state_ptr new_state(new MenuSystem(m_session_data));
@@ -172,22 +157,14 @@ public:
             return;
         }
 
-        if(m_connection->is_open())
+        if(m_connection->isActive() && TheCommunicator::instance()->isActive())
         {
-            if(m_connection->m_is_secure)
-            {
-                boost::asio::async_write(m_connection->m_secure_socket,
-                                         boost::asio::buffer(msg, msg.size()),
-                                         boost::bind(&Session::handleWrite, shared_from_this(),
-                                                     boost::asio::placeholders::error));
-            }
-            else
-            {
-                boost::asio::async_write(m_connection->m_normal_socket,
-                                         boost::asio::buffer(msg, msg.size()),
-                                         boost::bind(&Session::handleWrite, shared_from_this(),
-                                                     boost::asio::placeholders::error));
-            }
+            m_connection->asyncWrite(msg,
+                                     std::bind(
+                                         &Session::handleWrite,
+                                         shared_from_this(),
+                                         std::placeholders::_1,
+                                         std::placeholders::_2));
         }
     }
 
@@ -196,7 +173,7 @@ public:
      *        Everyone this person has left.
      * @param error
      */
-    void handleWrite(const boost::system::error_code& error)
+    void handleWrite(const std::error_code& error, socket_handler_ptr)
     {
         if(error)
         {
@@ -204,152 +181,70 @@ public:
             std::cout << "Session Closed()" << std::endl;
         }
 
-        session_manager_ptr room = m_session_data->m_room.lock();
-        if(room && error && (!m_session_data->m_is_leaving))
+        session_manager_ptr session_manager = m_session_data->m_session_manager.lock();
+        if(session_manager && error && (!m_session_data->m_is_leaving))
         {
             m_session_data->m_is_leaving = true;
 
             // Disconenct the session.
-            room->leave(m_session_data->m_node_number);
+            session_manager->leave(m_session_data->m_node_number);
 
-            if(m_connection->is_open())
+            if(m_connection->isActive())
             {
-                if(m_connection->m_is_secure)
+                try
                 {
-                    try
-                    {
-                        std::cout << "Leaving (SECURE SESSION) Client IP: "
-                                  << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
-                                  << std::endl;
+                    std::cout << "Leaving (NORMAL SESSION) Client IP: "
+                              //<< m_connection->m_normal_socket.remote_endpoint().address().to_string()
+                              << std::endl;
 
-                        m_connection->m_secure_socket.lowest_layer().shutdown(tcp::socket::shutdown_both);
-                        m_connection->m_secure_socket.lowest_layer().close();
-                    }
-                    catch(std::exception &ex)
-                    {
-                        std::cout << "Exception closing socket(): " << ex.what() << std::endl;
-                    }
+                    m_connection->shutdown();
                 }
-                else
+                catch(std::exception &ex)
                 {
-                    try
-                    {
-                        std::cout << "Leaving (NORMAL SESSION) Client IP: "
-                                  << m_connection->m_normal_socket.remote_endpoint().address().to_string()
-                                  << std::endl;
-
-                        m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
-                        m_connection->m_normal_socket.close();
-                    }
-                    catch(std::exception &ex)
-                    {
-                        std::cout << "Exception closing socket(): " << ex.what() << std::endl;
-                    }
+                    std::cout << "Exception closing socket(): " << ex.what() << std::endl;
                 }
             }
         }
     }
-
-    /**
-     * @brief Resolves the Hostname
-     * @param ec
-     * @param it
-     */
-    void resolve_handler(const boost::system::error_code &ec,
-                         tcp::resolver::iterator it)
-    {
-        if(!ec)
-        {
-            tcp::resolver::iterator end;
-            for(; it != end; ++it)
-            {
-                std::cout << "hostname: " << it->host_name() << std::endl;
-            }
-        }
-        else
-        {
-            std::cout << "Error resolving hostname: " << ec.message() << std::endl;
-        }
-    }
-
-
-public:
 
     /**
      * @brief Session Constructor Initiate the Connection, State, Room.
      * @param tcp_connection
-     * @param room
+     * @param session_manager
      * @return
      */
-    Session(boost::asio::io_service& io_service, connection_ptr connection, session_manager_ptr room)
+    Session(IOService& io_service, connection_ptr connection, deadline_timer_ptr deadline_timer,
+            session_manager_ptr session_manager)
         : m_connection(connection)
         , m_state_manager(new StateManager())
-        , m_session_data(new SessionData(connection, room, io_service, m_state_manager))
-        , m_resolv(io_service)
-        , m_detection_deadline(io_service)
-
+        , m_session_data(new SessionData(connection, session_manager, io_service, m_state_manager))
+        , m_deadline_timer(deadline_timer)
     {
-
-        /* TESTING
-        std::string server =  m_tcp_connection->m_socket.remote_endpoint().address().to_string();
-        std::string::size_type idx = server.rfind(":", server.size());
-        if (idx != std::string::npos)
-            server.erase(0, idx+1);
-
-        std::cout << "ipv6: " << server << std::endl;
-        tcp::resolver::query query(server, "");
-
-        //resolv.async_resolve(endpoint, resolve_handler);
-        m_resolv.async_resolve(query,
-                               boost::bind(&Session::resolve_handler, this,
-                                           boost::asio::placeholders::error,
-                                           boost::asio::placeholders::iterator));
-        */
-
-        if(m_connection->is_open())
+        if(m_connection->isActive())
         {
-            if(!m_connection->m_is_secure)
+            try
             {
-                try
-                {
-                    std::cout << "New TCP Session ! " << std::endl;
-                    std::cout << "Client IP Address: "
-                              << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
-                              << std::endl;
-                }
-                catch(std::exception &ex)
-                {
-                    std::cout << "Exception remote_endpoint(): " << ex.what() << std::endl;
-                }
+                std::cout << "New Connection Session ! " << std::endl;
+                std::cout << "Client IP Address: "
+                          //<< m_connection->m_normal_socket.remote_endpoint().address().to_string()
+                          << std::endl;
             }
-            else
+            catch(std::exception &ex)
             {
-                try
-                {
-                    std::cout << "New Secure Session ! " << std::endl;
-                    std::cout << "Client IP Address: "
-                              << m_connection->m_normal_socket.remote_endpoint().address().to_string()
-                              << std::endl;
-                }
-                catch(std::exception &ex)
-                {
-                    std::cout << "Exception remote_endpoint(): " << ex.what() << std::endl;
-                }
-
-
+                std::cout << "Exception remote_endpoint(): " << ex.what() << std::endl;
             }
         }
 
         // Get The First available node number.
         m_session_data->m_node_number = TheCommunicator::instance()->getNodeNumber();
-        std::cout << "Node Number: " << m_session_data->m_node_number << std::endl;
+        std::cout << " **** Node Number: " << m_session_data->m_node_number << std::endl;
     }
 
     connection_ptr	    m_connection;
     state_manager_ptr   m_state_manager;
     session_data_ptr    m_session_data;
-    tcp::resolver       m_resolv;
-    deadline_timer      m_detection_deadline;
+    socket_handler_ptr  m_socket_handler;
+    deadline_timer_ptr  m_deadline_timer;
 
 };
 

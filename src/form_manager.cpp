@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cassert>
 
 
 FormManager::FormManager(config_ptr config, session_data_ptr session)

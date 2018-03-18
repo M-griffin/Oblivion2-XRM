@@ -3,8 +3,8 @@
 
 #include "../model-sys/session_stats.hpp"
 #include "../data-sys/base_dao.hpp"
-#include <boost/smart_ptr/shared_ptr.hpp>
 
+#include <memory>
 #include <vector>
 #include <functional>
 
@@ -16,7 +16,7 @@ class Query;
 }
 
 // Handle to Database Queries
-typedef boost::shared_ptr<SQLW::Query> query_ptr;
+typedef std::shared_ptr<SQLW::Query> query_ptr;
 
 // Base Dao Definition
 typedef BaseDao<SessionStats> baseSessionStatsClass;
@@ -233,6 +233,6 @@ public:
 };
 
 // Handle to Database Queries
-typedef boost::shared_ptr<SessionStatsDao> session_stats_dao_ptr;
+typedef std::shared_ptr<SessionStatsDao> session_stats_dao_ptr;
 
 #endif // SESSION_STATS_DAO_HPP

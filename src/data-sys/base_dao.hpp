@@ -5,14 +5,13 @@
 #include "libSqliteWrapped.h"
 #include <sqlite3.h>
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <functional>
 #include <vector>
 
 
 // Handle to Database Queries
-typedef boost::shared_ptr<SQLW::Query> query_ptr;
+typedef std::shared_ptr<SQLW::Query> query_ptr;
 
 /**
  * @class BaseDao
@@ -55,12 +54,12 @@ public:
     std::string m_cmdDropIndex;
     
     // Dynamic Callbacks to Calling Class for Specific Object Mappings
-    std::function<void(query_ptr qry, boost::shared_ptr<T> obj)>          m_result_callback;
-    std::function<void(query_ptr qry, boost::shared_ptr<T> obj, 
+    std::function<void(query_ptr qry, std::shared_ptr<T> obj)>          m_result_callback;
+    std::function<void(query_ptr qry, std::shared_ptr<T> obj, 
         std::vector< std::pair<std::string, std::string> > &values)>      m_columns_callback;
         
-    std::function<std::string(std::string qry, boost::shared_ptr<T> obj)> m_insert_callback;
-    std::function<std::string(std::string qry, boost::shared_ptr<T> obj)> m_update_callback;
+    std::function<std::string(std::string qry, std::shared_ptr<T> obj)> m_insert_callback;
+    std::function<std::string(std::string qry, std::shared_ptr<T> obj)> m_update_callback;
 
     
     /**
@@ -211,7 +210,7 @@ public:
      * @param qry
      * @param one
      */
-    void basePullResult(query_ptr qry, boost::shared_ptr<T> obj)
+    void basePullResult(query_ptr qry, std::shared_ptr<T> obj)
     {    
         m_result_callback(qry, obj);
     }
@@ -223,7 +222,7 @@ public:
      * @param one
      * @param values
      */ 
-    void baseFillColumnValues(query_ptr qry, boost::shared_ptr<T> obj, 
+    void baseFillColumnValues(query_ptr qry, std::shared_ptr<T> obj, 
         std::vector< std::pair<std::string, std::string> > &values)
     {    
         m_columns_callback(qry, obj, values);
@@ -235,7 +234,7 @@ public:
      * @param obj
      * @return 
      */
-    std::string baseInsertQryString(query_ptr qry, boost::shared_ptr<T> obj)
+    std::string baseInsertQryString(query_ptr qry, std::shared_ptr<T> obj)
     {
         std::stringstream ssColumn;
         std::stringstream ssType;
@@ -283,7 +282,7 @@ public:
      * @param obj
      * @return 
      */
-    std::string baseUpdateQryString(query_ptr qry, boost::shared_ptr<T> obj)
+    std::string baseUpdateQryString(query_ptr qry, std::shared_ptr<T> obj)
     {
         std::stringstream ssColumn;
         std::vector< std::pair<std::string, std::string> >::iterator it;
@@ -322,7 +321,7 @@ public:
      * @param obj
      * @return
      */
-    bool baseUpdateRecord(boost::shared_ptr<T> obj)
+    bool baseUpdateRecord(std::shared_ptr<T> obj)
     {
         bool result = false;
 
@@ -357,7 +356,7 @@ public:
      * @param obj
      * @return
      */
-    long baseInsertRecord(boost::shared_ptr<T> obj)
+    long baseInsertRecord(std::shared_ptr<T> obj)
     {    
         bool result = false;
         long lastInsertId = -1;
@@ -434,9 +433,9 @@ public:
      * @param id
      * @return 
      */ 
-    boost::shared_ptr<T> baseGetRecordById(long id)
+    std::shared_ptr<T> baseGetRecordById(long id)
     {
-        boost::shared_ptr<T> obj(new T);
+        std::shared_ptr<T> obj(new T);
 
         // Make Sure Database Reference is Connected
         if (!m_database.isConnected())
@@ -482,10 +481,10 @@ public:
      * @brief Retrieve All Records in a Table
      * @return
      */
-    std::vector< boost::shared_ptr<T> > baseGetAllRecords()
+    std::vector< std::shared_ptr<T> > baseGetAllRecords()
     {
-        boost::shared_ptr<T> obj(new T);
-        std::vector<boost::shared_ptr<T>> list;
+        std::shared_ptr<T> obj(new T);
+        std::vector<std::shared_ptr<T>> list;
 
         // Make Sure Database Reference is Connected
         if (!m_database.isConnected())
@@ -537,8 +536,8 @@ public:
      */
     long baseGetRecordsCount()
     {
-        boost::shared_ptr<T> obj(new T);
-        std::vector<boost::shared_ptr<T>> list;
+        std::shared_ptr<T> obj(new T);
+        std::vector<std::shared_ptr<T>> list;
 
         // Make Sure Database Reference is Connected
         if (!m_database.isConnected())

@@ -3,8 +3,7 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -191,6 +190,6 @@ namespace YAML
     };
 }
 
-typedef boost::shared_ptr<Protocols> protocols_ptr;
+typedef std::shared_ptr<Protocols> protocols_ptr;
 
 #endif // PROTOCOLS_HPP

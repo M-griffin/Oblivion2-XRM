@@ -9,17 +9,17 @@
 #include "session_manager.hpp"
 #include "common_io.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <mutex>
 
 /**
- * @class communicator
+ * @class Communicator
  * @author Michael Griffin
  * @date 15/08/2015
  * @file communicator.hpp
- * @brief Singleton to share between sessions & Global Config.
+ * @brief Singleton to share between Sessions & Global Config.
   */
 class Communicator
 {
@@ -75,7 +75,7 @@ public:
         {
             message.erase();
             message = m_queue.dequeue();
-            m_room->deliver(message);
+            m_session_manager->deliver(message);
         }
     }
 
@@ -83,12 +83,12 @@ public:
      * @brief Links the Communicator with all active seesions
      * in the System so we can send notifications or chat
      * from anywhere in the system.
-     * @param room
+     * @param session_manager
      */
-    void setupServer(session_manager_ptr &room)
+    void setupServer(session_manager_ptr &session_manager)
     {
         std::lock_guard<std::mutex> lock(m_data_mutex);
-        m_room = room;
+        m_session_manager = session_manager;
     }
 
     /**
@@ -140,7 +140,7 @@ public:
     void shutdown()
     {
         std::lock_guard<std::mutex> lock(m_data_mutex);
-        m_room->shutdown();
+        m_session_manager->shutdown();
         m_active = false;
     }
 
@@ -203,7 +203,7 @@ public:
 
     // ThreadSafe Message Queue
     SafeQueue<std::string> m_queue;
-    session_manager_ptr    m_room;
+    session_manager_ptr    m_session_manager;
 
 private:
 

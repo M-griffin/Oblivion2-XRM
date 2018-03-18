@@ -1,9 +1,33 @@
 
+Change Log Update (00.00.105)
+* 2018-03-18
++ Large re-write removing Boost Libraries for core and unit tests
+  Minor Boost items like system/file system are used in the menu and prompt
+  converter programs for ease of use.
++ Ripped out Boost ASIO for Async Socket Communication, Timers, File System
+  and Locale support.  This was a large rewrite to get things working on OSX better.
++ Replace ASIO with SDL2_Net library used in EtherTerm, This removes SSL socket support
+  which wasn't used at the time, but also adding libssh in the process for SSH 
+  server connections to be hooked up at a later date.  
++ Created an IO_Service to mimic ASIO to use SDL2_Net Sockets and connections in
+  an asynchronous way to use the existing code base.
++ Created Deadline Timers for asynchronous waits with callbacks to mimic Boost's 
+  deadline timers to keep existing functionality.
++ Wrote some new directory methods that are cross-platform to replace the use
+  of Boost File system.
++ Added UTF-CPP project to replace Boost Local for parsing and supporting utf-8
+  character data and strings.  It's not as robust with translations but for now
+  should handle input and parsing strings correctly.
++ Create an OSX Codelite program for building the system, tested on High Sierra.
++ Switched from Boost Regex to std Regex in c++11.
++ Fixed some issues with Regex expressions used when tested in clang vs gcc
+  also added Regex Expression Exception catching.
+  
 Change Log Update (00.00.104)
 * 2018-02-05
-+ SqliteWrapped, update making file lib namming so if users run this manually
++ SqliteWrapped, update making file lib naming so if users run this manually
   from the command line it matches the cases the project and xrm-server expect.
-  Also fixed for Jenkins build processing so it deson't have to rename it.
+  Also fixed for Jenkins build processing so it doesn't have to rename it.
 
 Change Log Update (00.00.103)
 * 2018-02-05

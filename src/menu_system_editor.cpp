@@ -1,12 +1,5 @@
 #include "menu_system.hpp"
-
 #include "model-sys/struct_compat.hpp"
-
-#include <boost/locale.hpp>
-
-// Needed for RPI GCC 4.9
-#define BOOST_FILESYSTEM_VERSION 3
-#include <boost/filesystem.hpp>
 
 #include <stdint.h>
 #include <string>
@@ -14,6 +7,7 @@
 
 /**
  * @Brief This Is an Extension of the Menu System to include but branch off the editor
+ * Note, not yet setup for .YAML Files, needs some rework.
  */
 
 
@@ -23,6 +17,7 @@
  */
 std::string MenuBase::displayMenus()
 {
+    /*
     // Setup Extended ASCII Box Drawing characters.
     char top_left  = (char)214; // ╓
     char bot_left  = (char)211; // ╙
@@ -156,7 +151,11 @@ std::string MenuBase::displayMenus()
 
     // Display the prompt, then for wait for next command.
     //std::cout << "A/dd Menu C/hange Menu D/elete Menu Q/uit : " << std::flush;
-    buffer += "A/dd Menu C/hange Menu D/elete Menu Q/uit : ";
+    */
+    
+    //buffer += "A/dd Menu C/hange Menu D/elete Menu Q/uit : ";
+    std::string buffer = "A/dd Menu C/hange Menu D/elete Menu Q/uit : ";
     return (buffer);
+    
 }
 

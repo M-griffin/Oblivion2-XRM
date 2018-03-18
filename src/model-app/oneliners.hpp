@@ -1,12 +1,13 @@
 #ifndef ONELINERS_HPP
 #define ONELINERS_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <string>
+#include <memory>
 #include <ctime>
 
 
 class Oneliners;
-typedef boost::shared_ptr<Oneliners> oneliner_ptr;
+typedef std::shared_ptr<Oneliners> oneliner_ptr;
 
 /**
  * @class Oneliners

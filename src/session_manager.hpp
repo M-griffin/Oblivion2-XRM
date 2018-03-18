@@ -1,21 +1,16 @@
 #ifndef SESSION_MANAGER_HPP
 #define SESSION_MANAGER_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
-
+#include <memory>
 #include <iostream>
 #include <string>
 #include <set>
 
-class SessionData;
-typedef boost::shared_ptr<SessionData> session_data_ptr;
-
 class Session;
-typedef boost::shared_ptr<Session> session_ptr;
+typedef std::shared_ptr<Session> session_ptr;
 
 class SessionSSL;
-typedef boost::shared_ptr<SessionSSL> session_ssl_ptr;
+typedef std::shared_ptr<SessionSSL> session_ssl_ptr;
 
 /**
  * @class SessionManager
@@ -52,7 +47,7 @@ private:
     std::set<session_ssl_ptr> m_sessions_ssl;
 };
 
-typedef boost::shared_ptr<SessionManager> session_manager_ptr;
-typedef boost::weak_ptr<SessionManager>	  session_manager_wptr;
+typedef std::shared_ptr<SessionManager> session_manager_ptr;
+typedef std::weak_ptr<SessionManager>	session_manager_wptr;
 
 #endif // CHAT_ROOM_HPP

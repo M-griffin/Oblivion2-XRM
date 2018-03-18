@@ -1,10 +1,10 @@
 #ifndef BBS_LIST_HPP
 #define BBS_LIST_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 class BBSList;
-typedef boost::shared_ptr<BBSList> bbs_list_ptr;
+typedef std::shared_ptr<BBSList> bbs_list_ptr;
 
 /**
  * @class BBSList

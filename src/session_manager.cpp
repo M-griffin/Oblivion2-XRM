@@ -1,11 +1,9 @@
 #include "session_manager.hpp"
 #include "session.hpp"
-#include "server_ssl.hpp"
-#include "session_data.hpp"
-#include "server.hpp"
 
+#include <functional>
 #include <algorithm>
-#include <boost/bind.hpp>
+
 
 SessionManager::~SessionManager()
 {
@@ -59,7 +57,7 @@ void SessionManager::deliver(std::string msg)
 
     std::cout << "deliver SessionManager notices: " << msg << std::endl;
     std::for_each(m_sessions.begin(), m_sessions.end(),
-                  boost::bind(&Session::deliver, _1, boost::ref(msg)));
+                  std::bind(&Session::deliver, std::placeholders::_1, std::ref(msg)));
 }
 
 /**
@@ -85,17 +83,7 @@ void SessionManager::shutdown()
 {
     for(auto it = begin(m_sessions); it != end(m_sessions); ++it)
     {
-        if ((*it)->m_connection->m_is_secure)
-        {
-            (*it)->m_connection->m_secure_socket.lowest_layer().shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-            (*it)->m_connection->m_secure_socket.lowest_layer().close();
-        }
-        else
-        {
-            (*it)->m_connection->m_normal_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-            (*it)->m_connection->m_normal_socket.close();
-        }
-
+        (*it)->m_connection->shutdown();
         m_sessions.erase(it);
     }
 }

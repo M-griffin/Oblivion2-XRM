@@ -2,13 +2,6 @@
 #include "state_manager.hpp"
 #include "session_manager.hpp"
 
-#include <boost/asio.hpp>
-#include <boost/asio/deadline_timer.hpp>
-#include <boost/enable_shared_from_this.hpp>
-
-using boost::asio::deadline_timer;
-using boost::asio::ip::tcp;
-
 
 /**
  * @brief Passed data Though the State, and Checks ESC Timer
@@ -34,7 +27,7 @@ void SessionData::updateState()
  * @param error
  * @param bytes_transferred
  */
-void SessionData::handleRead(const boost::system::error_code& error, size_t bytes_transferred)
+void SessionData::handleRead(const std::error_code& error, socket_handler_ptr)
 {
     if(!error)
     {
@@ -42,8 +35,8 @@ void SessionData::handleRead(const boost::system::error_code& error, size_t byte
         handleTeloptCodes();
     }
 
-    session_manager_ptr room = m_room.lock();
-    if(room)
+    session_manager_ptr session_manager = m_session_manager.lock();
+    if(session_manager)
     {
         if(!error)
         {
@@ -126,7 +119,7 @@ void SessionData::handleRead(const boost::system::error_code& error, size_t byte
             // Restart Callback to wait for more data.
             // If this step is skipped, then the node will exit
             // since io_service will have no more work!
-            if(m_connection->is_open())
+            if(m_connection->isActive())
             {
                 waitingForData();
             }
@@ -136,49 +129,21 @@ void SessionData::handleRead(const boost::system::error_code& error, size_t byte
             // First error, we mark leaving, if we loop again, ignore
             if(!m_is_leaving)
             {
-
-                session_manager_ptr room = m_room.lock();
-                if(room && error)
+                session_manager_ptr session_manager = m_session_manager.lock();
+                if(session_manager && error)
                 {
                     m_is_leaving = true;
 
                     // Disconenct the session.
-                    std::cout << "Leaving chat room! " << std::endl;
-                    room->leave(m_node_number);
+                    std::cout << "Leaving session_manager! " << std::endl;
+                    session_manager->leave(m_node_number);
                     // m_session_state = SESSION_STATE::STATE_DONE;
 
-                    if(m_connection->is_open())
+                    if(m_connection->isActive())
                     {
-                        if(m_connection->m_is_secure)
-                        {
-                            std::cout << "Leaving (SECURE SESSION_DATA) Client IP: "
-                                      << m_connection->m_secure_socket.lowest_layer().remote_endpoint().address().to_string()
-                                      << std::endl << "Host-name: "
-                                      //<< boost::asio::ip::host_name() // Local host_name
-                                      << m_connection->m_secure_socket.lowest_layer().remote_endpoint()
-                                      << std::endl
-                                      << "Bytes: "
-                                      << bytes_transferred
-                                      << std::endl;
-
-                            m_connection->m_secure_socket.lowest_layer().shutdown(tcp::socket::shutdown_both);
-                            m_connection->m_secure_socket.lowest_layer().close();
-                        }
-                        else
-                        {
-                            std::cout << "Leaving (SESSION_DATA) Client IP: "
-                                      << m_connection->m_normal_socket.remote_endpoint().address().to_string()
-                                      << std::endl << "Host-name: "
-                                      //<< boost::asio::ip::host_name() // Local host_name
-                                      << m_connection->m_normal_socket.remote_endpoint()
-                                      << std::endl
-                                      << "Bytes: "
-                                      << bytes_transferred
-                                      << std::endl;
-
-                            m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
-                            m_connection->m_normal_socket.close();
-                        }
+                   
+                        std::cout << "Leaving (SESSION_DATA)" << std::endl;
+                        m_connection->shutdown();
                     }
                 }
             }
@@ -190,16 +155,16 @@ void SessionData::handleRead(const boost::system::error_code& error, size_t byte
     }
 }
 
-
-/*
- * @brief Start Secutiry handshake.
- */
+/**
+ * @brief Start Secutiry handshake. (SSL Referene).
+ *
 void SessionData::handshake()
 {
+    // rewrite for incoming or 
     std::cout << "SSL handshake!" << std::endl;
-    if(m_connection->is_open() && m_connection->m_is_secure)
-    {
-        m_connection->m_secure_socket.async_handshake(boost::asio::ssl::stream_base::server,
+    if(m_connection->is_open())
+    {        
+        m_connection->async_handshake(boost::asio::ssl::stream_base::server,
                 boost::bind(&SessionData::handleHandshake,
                             shared_from_this(),
                             boost::asio::placeholders::error));
@@ -209,13 +174,13 @@ void SessionData::handshake()
          std::cout << "ERROR: SSL handshake!" << std::endl;
     }
 
-}
+}*/
 
 /**
  * @brief Handles setting up the first read() after successful handshake.
  * @param error
- */
-void SessionData::handleHandshake(const boost::system::error_code& error)
+ *
+void SessionData::handleHandshake(const std::error_code& error)
 {
     std::cout << "handle_handshake()!" << std::endl;
     memset(&m_raw_data, 0, max_length);
@@ -242,14 +207,15 @@ void SessionData::handleHandshake(const boost::system::error_code& error)
     {
         std::cout << "handle_handshake()! ERROR" << std::endl;
     }
-}
+}*/
 
 /**
  * @brief Deadline Input Timer for ESC vs ESC Sequence.
  * @param timer
  */
-void SessionData::handleEscTimer(boost::asio::deadline_timer* timer)
+void SessionData::handleEscTimer()
 {
+    /*
     if(timer->expires_at() <= deadline_timer::traits_type::now())
     {
         // The deadline has passed. Stop the session. The other actors will
@@ -261,7 +227,9 @@ void SessionData::handleEscTimer(boost::asio::deadline_timer* timer)
     {
         // Got more input while waiting, FOUND MORE DATA!
         std::cout << "Deadline Checking, CAUGHT REMAINING SEQUENCE!" << std::endl;
-    }
+    }*/
+    std::cout << "End ESC Timer" << std::endl;
+    
     // Move text to State Machine, Timer has passed, or remainer of Sequence caught up!
     m_state_manager->update();
     m_is_esc_timer = false;

@@ -15,7 +15,7 @@
 #include "Database.h"
 #include "Query.h"
 #include "IError.h"
-#include "SysLog.h"
+#include "SysLogs.h"
 
 namespace SQLW
 {

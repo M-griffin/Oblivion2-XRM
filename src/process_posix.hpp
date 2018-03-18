@@ -4,12 +4,12 @@
 #include "process_base.hpp"
 
 #include <termios.h>
-
+#include <memory>
 #include <vector>
 #include <string>
 
 class SessionData;
-typedef boost::shared_ptr<SessionData> session_data_ptr;
+typedef std::shared_ptr<SessionData> session_data_ptr;
 
 
 /**
@@ -17,14 +17,15 @@ typedef boost::shared_ptr<SessionData> session_data_ptr;
  * @date 28/05/2017
  * @brief pthread (Posix) Arguments passer
  */
-typedef struct ThreadArguments {
+typedef struct ThreadArguments
+{
 
     session_data_ptr m_session;
     int              m_pty_file_desc;
 
 } ThreadArguments;
 
-typedef boost::shared_ptr<ThreadArguments> args_ptr;
+typedef std::shared_ptr<ThreadArguments> args_ptr;
 
 
 

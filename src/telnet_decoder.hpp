@@ -1,16 +1,18 @@
 #ifndef __TELNET_DECODER_H_
 #define __TELNET_DECODER_H_
 
-#include "connection_base.hpp"
+#include "async_connection.hpp"
+#include "communicator.hpp"
 #include "telnet.hpp"
 
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/asio.hpp>
-
+#include <memory>
 #include <iostream>
 #include <string>
 #include <vector>
+
+
+class SocketHandler;
+typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
 
 /**
  * @class TelnetDecoder
@@ -20,7 +22,7 @@
  * @brief Handles Telnet Options and Feature Negotiation
  */
 class TelnetDecoder
-    : public boost::enable_shared_from_this<TelnetDecoder>
+    : public std::enable_shared_from_this<TelnetDecoder>
 {
 public:
 
@@ -120,7 +122,7 @@ public:
 
 private:
 
-    connection_ptr		m_connection;
+    connection_ptr m_connection;
 
     int         m_naws_row;
     int         m_naws_col;
@@ -152,7 +154,7 @@ private:
      * @brief handles callback after write() for errors checking.
      * @param error
      */
-    void handleWrite(const boost::system::error_code& error)
+    void handleWrite(const std::error_code& error, socket_handler_ptr)
     {
         // Just log errors for now.
         if(error)
@@ -165,31 +167,23 @@ private:
      * @brief delivers text data to client
      * @param msg
      */
-    void deliver(const std::string &msg)
+    void deliver(const std::string &string_msg)
     {
-        if(msg.size() == 0)
+        if(string_msg.size() == 0)
         {
             return;
         }
-
-        if(m_connection->is_open())
+        
+        if(m_connection->getSocketHandle()->isActive() && TheCommunicator::instance()->isActive())
         {
-            if(m_connection->m_is_secure)
-            {
-                boost::asio::async_write(m_connection->m_secure_socket,
-                                         boost::asio::buffer(msg, msg.size()),
-                                         boost::bind(&TelnetDecoder::handleWrite, shared_from_this(),
-                                                     boost::asio::placeholders::error));
-
-            }
-            else
-            {
-                boost::asio::async_write(m_connection->m_normal_socket,
-                                         boost::asio::buffer(msg, msg.size()),
-                                         boost::bind(&TelnetDecoder::handleWrite, shared_from_this(),
-                                                     boost::asio::placeholders::error));
-            }
+            m_connection->asyncWrite(string_msg,
+                                      std::bind(
+                                          &TelnetDecoder::handleWrite,
+                                          shared_from_this(),
+                                          std::placeholders::_1,
+                                          std::placeholders::_2));
         }
+        
     }
 
     /**
@@ -325,6 +319,6 @@ private:
     }
 };
 
-typedef boost::shared_ptr<TelnetDecoder> telnet_ptr;
+typedef std::shared_ptr<TelnetDecoder> telnet_ptr;
 
 #endif

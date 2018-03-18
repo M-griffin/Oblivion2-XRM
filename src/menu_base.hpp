@@ -16,16 +16,18 @@
 #include "data-sys/menu_prompt_dao.hpp"
 #include "mods/mod_base.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <functional>
 #include <vector>
 
 class Config;
-typedef boost::shared_ptr<Config> config_ptr;
+typedef std::shared_ptr<Config> config_ptr;
 
 class SessionData;
-typedef boost::shared_ptr<SessionData> session_data_ptr;
+typedef std::shared_ptr<SessionData> session_data_ptr;
+
+class Directory;
+typedef std::shared_ptr<Directory> directory_ptr;
 
 /**
  * @class MenuBase
@@ -60,6 +62,7 @@ public:
     SessionIO        m_session_io;         // SessionIO for Output parsing and MCI Codes etc.
     CommonIO         m_common_io;          // CommonIO
     config_ptr       m_config;             // Config
+    directory_ptr    m_directory;          // Directory File Lists.
     std::string      m_line_buffer;        // Buffer used for menu system and reading field data.
     bool             m_use_hotkey;         // Toggle for Single Hotkey or GetLine input. - Not used yet!
     std::string      m_current_menu;       // Name of current menu loaded.
@@ -94,6 +97,16 @@ public:
     // Handle Dynamic modules being executed.
     std::vector<module_ptr> m_module;
 
+
+    /**
+     * @brief Convert Strings to Uppercase with Locale
+     */
+    std::string upper_case(const std::string &string_sequence);
+
+    /**
+     * @brief Convert Strings to Uppercase with Locale
+     */
+    std::string lower_case(const std::string &string_sequence);
 
     /**
      * @brief Method for Adding outgoing text data to ansi processor
@@ -327,6 +340,6 @@ public:
 
 };
 
-typedef boost::shared_ptr<MenuBase> menu_base_ptr;
+typedef std::shared_ptr<MenuBase> menu_base_ptr;
 
 #endif // MENUBASE_HPP

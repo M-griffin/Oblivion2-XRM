@@ -2,17 +2,11 @@
 
 #include "data-sys/menu_dao.hpp"
 #include "data-sys/menu_prompt_dao.hpp"
-
 #include "access_condition.hpp"
+#include "directory.hpp"
 
-#include <boost/locale.hpp>
-#include <boost/lexical_cast.hpp>
 
-// Fix for file_copy
-#define BOOST_NO_CXX11_SCOPED_ENUMS
-#include <boost/filesystem.hpp>
-#undef BOOST_NO_CXX11_SCOPED_ENUMS
-
+#include <locale>
 #include <cstring>
 #include <string>
 #include <stdint.h>
@@ -21,12 +15,13 @@
 #include <algorithm>
 #include <functional>
 #include <random>
-
+#include <cassert>
 
 MenuBase::MenuBase(session_data_ptr session_data)
     : m_menu_session_data(session_data)
     , m_session_io(session_data)
     , m_config(new Config())
+    , m_directory(new Directory())
     , m_line_buffer("")
     , m_use_hotkey(false)
     , m_current_menu("")
@@ -60,6 +55,34 @@ MenuBase::~MenuBase()
     std::vector<module_ptr>().swap(m_module);
 }
 
+/**
+ * @brief Convert Strings to Uppercase with Locale
+ */
+std::string MenuBase::upper_case(const std::string &string_sequence)
+{
+    std::string new_string = "";
+    for (auto c : string_sequence)
+    {
+        new_string += std::toupper(c, std::locale());
+    }
+    
+    return new_string;        
+}
+
+/**
+ * @brief Convert Strings to Uppercase with Locale
+ */
+std::string MenuBase::lower_case(const std::string &string_sequence)
+{
+    std::string new_string = "";
+    for (auto c : string_sequence)
+    {
+        new_string += std::tolower(c, std::locale());
+    }
+    
+    return new_string;        
+}
+ 
 /**
  * @brief Clears out Loaded Pulldown options
  */
@@ -134,7 +157,7 @@ void MenuBase::readInMenuData()
     // For PreLoading and Testing Menu ACS String
     {
         // Pre-Load Menu, check access, if not valud, then fall back to previous.
-        menu_ptr pre_load_menu(new Menu);
+        menu_ptr pre_load_menu(new Menu());
 
         // Call MenuDao to ready in .yaml file
         MenuDao mnu(pre_load_menu, m_current_menu, GLOBAL_MENU_PATH);
@@ -420,7 +443,7 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
     clearMenuPullDownOptions();
 
     // Then feed though and return the updated string.
-    std::string prompt_string = std::move(m_session_io.parseCodeMapGenerics(menu_prompt, code_map));
+    std::string prompt_string = m_session_io.parseCodeMapGenerics(menu_prompt, code_map);
     std::string display_prompt = moveStringToBottom(prompt_string);
 
     // Translate Pipe Coles to ESC Sequences prior to parsing to keep
@@ -442,7 +465,7 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
 
     // Process buffer for PullDown Codes.
     // only if we want result, ignore.., result just for testing at this time!
-    std::string result = std::move(m_ansi_process->screenBufferParse());
+    std::string result = m_ansi_process->screenBufferParse();
 
     // Update Lightbars, by default they have no names for YES/NO/Continue prompts.
     for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
@@ -585,13 +608,13 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
             {
                 case '\\':
                     m_active_pulldownID = 2; // NO Default
-                    output = std::move(setupYesNoMenuInput(prompt_string, code_map));
+                    output = setupYesNoMenuInput(prompt_string, code_map);
                     match_found = true;
                     break;
 
                 case '/':
                     m_active_pulldownID = 1; // YES Default
-                    output = std::move(setupYesNoMenuInput(prompt_string, code_map));
+                    output = setupYesNoMenuInput(prompt_string, code_map);
                     match_found = true;
                     break;
 
@@ -639,7 +662,7 @@ std::string MenuBase::loadMenuScreen()
         }
 
         // Make all screens uppercase, handle unicode names.
-        screen_file = boost::locale::to_upper(screen_file);
+        screen_file = upper_case(screen_file);
 
         // if file doesn't exist, then use generic template
         if (m_common_io.fileExists(screen_file))
@@ -659,7 +682,7 @@ std::string MenuBase::loadMenuScreen()
         std::string screen_file = m_menu_info->menu_pulldown_file;
 
         // Screen File(s) are Uppercase.
-        screen_file = boost::locale::to_upper(screen_file);
+        screen_file = upper_case(screen_file);
 
         // Otherwise use the Pulldown menu name from the menu.
         // if file doesn't exist, then use generic template
@@ -734,7 +757,7 @@ void MenuBase::redisplayMenuScreen()
 
         // Process buffer for PullDown Codes.
         // only if we want result, ignore.., result just for testing at this time!
-        std::string result = std::move(m_ansi_process->screenBufferParse());
+        std::string result = m_ansi_process->screenBufferParse();
 
         // Now Build the Light bars
         std::string light_bars = buildLightBars();
@@ -753,14 +776,8 @@ void MenuBase::redisplayMenuScreen()
  */
 void MenuBase::executeFirstAndEachCommands()
 {
-    using namespace boost::locale;
-    using namespace std;
-    generator gen;
-    locale loc=gen("");
-    locale::global(loc);
-    cout.imbue(loc);
-
-    //std::cout << "m_menu_info->menu_options: " << m_menu_info->menu_options.size() << std::endl;
+    std::locale::global(std::locale(""));
+    std::cout.imbue(std::locale());
 
     // Now loop and scan for first cmd and each time
     for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
@@ -769,7 +786,7 @@ void MenuBase::executeFirstAndEachCommands()
         // Process all First Commands or commands that should run every action.
         //std::cout << "index: " << m.index << std::endl;
         //std::cout << "menu_key: " << m.menu_key << std::endl;
-        std::string new_key = boost::locale::to_upper(m.menu_key);
+        std::string new_key = upper_case(m.menu_key);
         m.menu_key = std::move(new_key);
 
         if(m.menu_key == "FIRSTCMD" || m.menu_key == "EACH")
@@ -786,30 +803,9 @@ void MenuBase::executeFirstAndEachCommands()
  */
 std::vector<std::string> MenuBase::getListOfMenuPrompts()
 {
-    namespace fs = boost::filesystem;
-    fs::path prompt_directory(GLOBAL_MENU_PROMPT_PATH);
-    fs::directory_iterator end_iter;
-
-    typedef std::vector<std::string> result_set_t;
-    typedef std::vector<std::string>::iterator iterator;
-    result_set_t result_set;
-    std::vector<std::string> result_list;
-
-    if(fs::exists(prompt_directory) && fs::is_directory(prompt_directory))
-    {
-        for(fs::directory_iterator dir_iter(prompt_directory); dir_iter != end_iter; ++dir_iter)
-        {
-            if(dir_iter->path().extension() == ".yaml")
-            {
-                if(fs::is_regular_file(dir_iter->status()))
-                {
-                    result_set.push_back(dir_iter->path().filename().string());
-                    // result_set_t::value_type(fs::last_write_time( dir_iter->path() ) ) ); // *dir_iter));
-                }
-            }
-        }
-    }
-
+    std::vector<std::string> result_list;    
+    std::vector<std::string> result_set = m_directory->getFileListPerDirectory(GLOBAL_MENU_PROMPT_PATH, "yaml");
+      
     // check result set, if no menu then return gracefully.
     if(result_set.size() == 0)
     {
@@ -894,9 +890,9 @@ std::string MenuBase::loadMenuPrompt()
 
         // Default Display Cursor prompt starting point, make this configurable lateron
         prompt_display = "\x1b[?25h\x1b[22;1H";
-        prompt_display += boost::lexical_cast<std::string>(m_menu_prompt->data_line1) + "\r\n";
-        prompt_display += boost::lexical_cast<std::string>(m_menu_prompt->data_line2) + "\r\n";
-        prompt_display += boost::lexical_cast<std::string>(m_menu_prompt->data_line3);
+        prompt_display += m_menu_prompt->data_line1 + "\r\n";
+        prompt_display += m_menu_prompt->data_line2 + "\r\n";
+        prompt_display += m_menu_prompt->data_line3;
 
         // Clear All Mappings
         m_session_io.clearAllMCIMapping();
@@ -1067,7 +1063,7 @@ void MenuBase::loadAndStartupMenu()
             m_ansi_process->screenBufferToString();
 
             // Process buffer for PullDown Codes. results for TESTING, are discarded.
-            std::string result = std::move(m_ansi_process->screenBufferParse());
+            std::string result = m_ansi_process->screenBufferParse();
 
 
             std::cout << " *** push out lightbars *** " << std::endl;
@@ -1145,7 +1141,7 @@ void MenuBase::lightbarUpdate(int previous_pulldown_id)
 
     // Clear Attriutes, then move back to menu prompt position.
     light_bars.append("\x1b[0m\x1b[u");
-    std::string output = std::move(m_session_io.pipe2ansi(light_bars));
+    std::string output = m_session_io.pipe2ansi(light_bars);
     baseProcessAndDeliver(output);
 }
 
@@ -1192,12 +1188,8 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
 
     std::cout << "STANDARD INPUT: " << input << " KEY: " << key << std::endl;
 
-    using namespace boost::locale;
-    using namespace std;
-    generator gen;
-    locale loc=gen("");
-    locale::global(loc);
-    cout.imbue(loc);
+    std::locale::global(std::locale(""));
+    std::cout.imbue(std::locale());
 
     // Check for wildcard command input.
     std::string::size_type idx;
@@ -1224,8 +1216,8 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
         std::cout << "input_match: " << input_match << std::endl;
 
         // Normalize and upper case for testing key input
-        key_match = boost::locale::to_upper(key_match);
-        input_match = boost::locale::to_upper(input_match);
+        key_match = upper_case(key_match);
+        input_match = upper_case(input_match);
 
         // If we have a match, execute
         if (key_match == input_match)
@@ -1245,8 +1237,8 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
         return true;
     }
 
-    std::string key_normalized = boost::locale::to_upper(key);
-    std::string input_normailized = boost::locale::to_upper(input);
+    std::string key_normalized = upper_case(key);
+    std::string input_normailized = upper_case(input);
 
     // Handle one to one matches.
     if (input_normailized.compare(key_normalized) == 0)
@@ -1420,16 +1412,8 @@ bool MenuBase::processMenuOptions(const std::string &input)
     std::cout << "processMenuOptions: " << input << std::endl;
 
     // Create system default locale
-    using namespace boost::locale;
-    using namespace std;
-    generator gen;
-    locale loc=gen("");
-
-    // Make it system global
-    locale::global(loc);
-
-    // Set as default locale for output
-    cout.imbue(loc);
+    std::locale::global(std::locale(""));
+    std::cout.imbue(std::locale());
 
     bool is_enter = false;
     int  executed = 0;
@@ -1443,8 +1427,7 @@ bool MenuBase::processMenuOptions(const std::string &input)
     bool stack_reassignment = false;
 
     // Uppercase all input to match on comamnd/option keys
-    // TODO, use boost local for upper case local!!
-    std::string input_text = boost::locale::to_upper(input);
+    std::string input_text = upper_case(input);
 
     // Check if ENTER was hit as a command!
     if(input_text == "ENTER")

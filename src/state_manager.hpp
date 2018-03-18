@@ -3,8 +3,7 @@
 
 #include "state_base.hpp"
 
-#include <boost/enable_shared_from_this.hpp>
-
+#include <memory>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -20,7 +19,7 @@ class StateManager
 {
 public:
     explicit StateManager()
-        : m_is_state_changed(false)
+        //: m_is_state_changed(false)
     {
         std::cout << "StateManager Created" << std::endl;
     }
@@ -53,11 +52,11 @@ public:
 
 private:
 
-    bool                   m_is_state_changed;
+    //bool                   m_is_state_changed;
     std::vector<state_ptr> m_the_state;
 
 };
 
-typedef boost::shared_ptr<StateManager>	state_manager_ptr;
+typedef std::shared_ptr<StateManager>	state_manager_ptr;
 
 #endif

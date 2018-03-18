@@ -20,6 +20,8 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="SysLogs.h"/>
+    <File Name="SysLogs.cpp"/>
     <File Name="Database.cpp"/>
     <File Name="Database.h"/>
     <File Name="IError.h"/>
@@ -27,8 +29,6 @@
     <File Name="Query.h"/>
     <File Name="StderrLog.cpp"/>
     <File Name="StderrLog.h"/>
-    <File Name="SysLog.cpp"/>
-    <File Name="SysLog.h"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
@@ -68,11 +68,11 @@
       <PostBuild>
         <Command Enabled="no"># Linux /OSX / BSD</Command>
         <Command Enabled="no">#rm lib$(ProjectName).h</Command>
-        <Command Enabled="no">#cat IError.h StderrLog.h SysLog.h Database.h Query.h &gt; lib$(ProjectName).h</Command>
+        <Command Enabled="no">#cat IError.h StderrLog.h SysLogs.h Database.h Query.h &gt; lib$(ProjectName).h</Command>
         <Command Enabled="yes"/>
         <Command Enabled="no"># Windows</Command>
         <Command Enabled="yes">del lib$(ProjectName).h</Command>
-        <Command Enabled="yes">type IError.h StderrLog.h SysLog.h Database.h Query.h &gt; lib$(ProjectName).h</Command>
+        <Command Enabled="yes">type IError.h StderrLog.h SysLogs.h Database.h Query.h &gt; lib$(ProjectName).h</Command>
       </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>

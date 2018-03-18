@@ -1,14 +1,13 @@
 #ifndef MENU_DAO_HPP
 #define MENU_DAO_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <string>
 #include <mutex>
 
 
-struct Menu;
-typedef boost::shared_ptr<Menu> menu_ptr;
+class Menu;
+typedef std::shared_ptr<Menu> menu_ptr;
 
  
  /**
@@ -67,6 +66,8 @@ public:
         {
             return m_menu;
         }
+		
+		return nullptr;
     }
    
     menu_ptr    m_menu;
@@ -76,6 +77,6 @@ public:
 
 };
 
-typedef boost::shared_ptr<MenuDao> menu_dao_ptr;
+typedef std::shared_ptr<MenuDao> menu_dao_ptr;
 
 #endif // MENU_DAO_HPP

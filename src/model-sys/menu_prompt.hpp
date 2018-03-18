@@ -1,9 +1,7 @@
 #ifndef MENU_PROMPT_HPP
 #define MENU_PROMPT_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
-
+#include <memory>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -95,7 +93,7 @@ struct convert<MenuPrompt>
 };
 }
 
-typedef boost::shared_ptr<MenuPrompt> menu_prompt_ptr;
-typedef boost::weak_ptr<MenuPrompt> menu_prompt_wptr;
+typedef std::shared_ptr<MenuPrompt> menu_prompt_ptr;
+typedef std::weak_ptr<MenuPrompt> menu_prompt_wptr;
 
 #endif // MENU_HPP

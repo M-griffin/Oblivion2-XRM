@@ -159,7 +159,7 @@ void ModLogon::setupLogon()
  */
 void ModLogon::displayUserNumber()
 {
-    M_StringPair prompt_set = std::move(m_text_prompts_dao->getPrompt(PROMPT_USERNUMBER));
+    M_StringPair prompt_set = m_text_prompts_dao->getPrompt(PROMPT_USERNUMBER);
     
     std::string mci_code = "|OT";    
     std::string result = prompt_set.second;

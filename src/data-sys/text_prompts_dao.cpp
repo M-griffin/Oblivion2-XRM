@@ -6,6 +6,7 @@
 #include <fstream>
 #include <string>
 #include <exception>
+#include <cassert>
 
 const std::string TextPromptsDao::FILE_VERSION = "1.0.1";
 

@@ -1,12 +1,11 @@
 #ifndef PROCESS_BASE_HPP
 #define PROCESS_BASE_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <iostream>
 
 class SessionData;
-typedef boost::shared_ptr<SessionData> session_data_ptr;
+typedef std::shared_ptr<SessionData> session_data_ptr;
 
 class ProcessBase
 {
@@ -35,7 +34,7 @@ public:
 
 };
 
-typedef boost::shared_ptr<ProcessBase> process_ptr;
+typedef std::shared_ptr<ProcessBase> process_ptr;
 
 #endif // PROCESS_BASE_HPP
 

@@ -3,8 +3,8 @@
 
 #include "../model-sys/file_area.hpp"
 #include "../data-sys/base_dao.hpp"
-#include <boost/smart_ptr/shared_ptr.hpp>
 
+#include <memory>
 #include <vector>
 #include <functional>
 
@@ -16,7 +16,7 @@ class Query;
 }
 
 // Handle to Database Queries
-typedef boost::shared_ptr<SQLW::Query> query_ptr;
+typedef std::shared_ptr<SQLW::Query> query_ptr;
 
 // Base Dao Definition
 typedef BaseDao<FileArea> baseFileAreaClass;
@@ -217,6 +217,6 @@ public:
 };
 
 // Handle to Database Queries
-typedef boost::shared_ptr<FileAreaDao> file_area_dao_ptr;
+typedef std::shared_ptr<FileAreaDao> file_area_dao_ptr;
 
 #endif // FILE_AREA_DAO_HPP

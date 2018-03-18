@@ -3,8 +3,8 @@
 
 #include "../model-sys/grouping.hpp"
 #include "../data-sys/base_dao.hpp"
-#include <boost/smart_ptr/shared_ptr.hpp>
 
+#include <memory>
 #include <vector>
 #include <functional>
 
@@ -16,7 +16,7 @@ class Query;
 }
 
 // Handle to Database Queries
-typedef boost::shared_ptr<SQLW::Query> query_ptr;
+typedef std::shared_ptr<SQLW::Query> query_ptr;
 
 // Base Dao Definition
 typedef BaseDao<Grouping> baseGroupingClass;
@@ -204,6 +204,6 @@ public:
 };
 
 // Handle to Database Queries
-typedef boost::shared_ptr<GroupingDao> group_dao_ptr;
+typedef std::shared_ptr<GroupingDao> group_dao_ptr;
 
 #endif // GROUPING_DAO_HPP

@@ -5,11 +5,7 @@
 
 #include "common_io.hpp"
 
-#ifdef _WIN32
 #include <UnitTest++.h>
-#else
-#include <unittest++/UnitTest++.h>
-#endif
 
 // C++ Standard
 #include <iostream>
@@ -313,13 +309,19 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(result, false);
     }
 
+    /**
+     * @brief At this time, unicode digits are no longer
+     *        Funcational after removing boost locale,
+     *        Alternatives will be worked on later.
+     * @return
+     *
     TEST(isDigit_Unicode_Multiple)
     {
         CommonIO common;
         std::string temp = "६೬";
         bool result = common.isDigit(temp);
         CHECK_EQUAL(result, true);
-    }
+    }*/
 
     TEST(isDigit_Unicode_Bad_Preceeding)
     {

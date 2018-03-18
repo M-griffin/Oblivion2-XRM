@@ -5,12 +5,9 @@
 #include "../model-sys/menu.hpp"
 #include "../session_io.hpp"
 
-
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/make_shared.hpp>
-
 #include <yaml-cpp/yaml.h>
 
+#include <memory>
 #include <iostream>
 #include <string>
 
@@ -73,11 +70,11 @@ public:
      * @param value
      */
     template<typename T>
-    boost::shared_ptr<T> retrieveNodeMapping()
+    std::shared_ptr<T> retrieveNodeMapping()
     {
         // Generate Update <T>_ptr from Node Mapping for T Save.
         T conf = m_node.as<T>();
-        boost::shared_ptr<T> c = boost::make_shared<T>(conf);
+        std::shared_ptr<T> c = std::make_shared<T>(conf);
         return c;
     }
             
@@ -203,7 +200,7 @@ public:
 
 };
 
-typedef boost::shared_ptr<FormBase> form_ptr;
+typedef std::shared_ptr<FormBase> form_ptr;
 
 
 #endif // FORM_BASE_HPP

@@ -8,12 +8,13 @@
 #include <windows.h>
 #endif
 
+#include <memory>
 #include <vector>
 #include <string>
 
 
 class SessionData;
-typedef boost::shared_ptr<SessionData> session_data_ptr;
+typedef std::shared_ptr<SessionData> session_data_ptr;
 
 /**
  * @class ProcessWin

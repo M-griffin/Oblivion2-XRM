@@ -7,8 +7,7 @@
 #include "model-sys/struct_compat.hpp"
 #include "model-sys/menu.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -17,13 +16,13 @@
 
 
 class Config;
-typedef boost::shared_ptr<Config> config_ptr;
+typedef std::shared_ptr<Config> config_ptr;
 
 class ModBase;
-typedef boost::shared_ptr<ModBase> module_ptr;
+typedef std::shared_ptr<ModBase> module_ptr;
 
 class FormManager;
-typedef boost::shared_ptr<FormManager> form_manager_ptr;
+typedef std::shared_ptr<FormManager> form_manager_ptr;
 
 
 /**

@@ -2,13 +2,12 @@
 #include "session_data.hpp"
 #include "model-sys/structures.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
 
+#include <memory>
 #include <iostream>
 #include <vector>
 #include <string>

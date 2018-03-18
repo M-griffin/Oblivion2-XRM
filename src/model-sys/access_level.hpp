@@ -1,8 +1,7 @@
 #ifndef ACCESS_LEVELS_HPP
 #define ACCESS_LEVELS_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <string>
 #include <cstdint>
 
@@ -54,6 +53,6 @@ public:
 };
 
 
-typedef boost::shared_ptr<AccessLevel> access_level_ptr;
+typedef std::shared_ptr<AccessLevel> access_level_ptr;
 
 #endif // ACCESS_LEVELS_HPP

@@ -1,8 +1,7 @@
 #ifndef FORM_MANAGER_H
 #define FORM_MANAGER_H
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -31,16 +30,16 @@
  */
 
 class FormBase;
-typedef boost::shared_ptr<FormBase> form_ptr;
+typedef std::shared_ptr<FormBase> form_ptr;
 
 class Config;
-typedef boost::shared_ptr<Config> config_ptr;
+typedef std::shared_ptr<Config> config_ptr;
 
 class Menu;
-typedef boost::shared_ptr<Menu> menu_ptr;
+typedef std::shared_ptr<Menu> menu_ptr;
 
 class SessionData;
-typedef boost::shared_ptr<SessionData> session_data_ptr;
+typedef std::shared_ptr<SessionData> session_data_ptr;
 
 class MenuOption;
 
@@ -142,6 +141,6 @@ public:
 };
 
 
-typedef boost::shared_ptr<FormManager> form_manager_ptr;
+typedef std::shared_ptr<FormManager> form_manager_ptr;
 
 #endif // FORM_MANAGER_H

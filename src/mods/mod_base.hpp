@@ -8,8 +8,7 @@
 #include "../session_io.hpp"
 #include "../ansi_processor.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <iostream>
 #include <string>
 
@@ -123,7 +122,7 @@ public:
         
         // Parse Prompt for Input Color And Position Override.
         // If found, the colors of the MCI Codes should be used as the default color.
-        M_StringPair prompt_set = std::move(m_text_dao->getPrompt(prompt));
+        M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
         std::string::size_type idx = prompt_set.second.find("%IN", 0);
         
         result += std::move(m_session_io.parseTextPrompt(prompt_set));
@@ -154,10 +153,10 @@ public:
         
         // Parse Prompt for Input Color And Position Override.
         // If found, the colors of the MCI Codes should be used as the default color.
-        M_StringPair prompt_set = std::move(m_text_dao->getPrompt(prompt));
+        M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
         std::string::size_type idx = prompt_set.second.find("%IN", 0);
         
-        result += std::move(m_session_io.parseTextPrompt(prompt_set));
+        result += m_session_io.parseTextPrompt(prompt_set);
         
         // Not found, set default input color
         if (idx == std::string::npos) 
@@ -190,7 +189,7 @@ public:
     // Checked after each stage, onEnter, Update, onExit
 };
 
-typedef boost::shared_ptr<ModBase>	module_ptr;
+typedef std::shared_ptr<ModBase>	module_ptr;
 
 
 #endif // MOD_BASE_HPP

@@ -20,13 +20,13 @@ PROGS =
 
 all:		$(PROGS) $(LIBNAME).a $(LIBNAME).h
 
-LIBM =		Database.o Query.o StderrLog.o SysLog.o
+LIBM =		Database.o Query.o StderrLog.o SysLogs.o
 $(LIBNAME).a: 	$(LIBM)
 		ar cr $(LIBNAME).a $(LIBM)
 		ranlib $(LIBNAME).a
 
-$(LIBNAME).h:	IError.h StderrLog.h SysLog.h Database.h Query.h
-		cat IError.h StderrLog.h SysLog.h Database.h Query.h > $(LIBNAME).h
+$(LIBNAME).h:	IError.h StderrLog.h SysLogs.h Database.h Query.h
+		cat IError.h StderrLog.h SysLogs.h Database.h Query.h > $(LIBNAME).h
 
 install:	all
 		@mkdir -p $(INSTALL_LIB)

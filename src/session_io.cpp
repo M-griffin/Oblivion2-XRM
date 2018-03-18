@@ -5,18 +5,7 @@
 #include "model-sys/config.hpp"
 
 #include <clocale>
-
-//#include <boost/format.hpp>
-#include <boost/locale.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
-
-#include <boost/regex/config.hpp>
-#ifdef BOOST_HAS_ICU
-#include <boost/regex/icu.hpp>
-#endif
-
-#include <boost/regex.hpp>
-
+#include <regex>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -406,13 +395,13 @@ std::string SessionIO::pipeColors(const std::string &color_string)
     // Foreground Colors
     if(color_index >= 0 && color_index < 16)
     {
-        esc_sequence = std::move(pipeReplaceForground(color_index));
+        esc_sequence = pipeReplaceForground(color_index);
         return esc_sequence;
     }
     // Background Colors
     else if(color_index >= 16 && color_index < 24)
     {
-        esc_sequence = std::move(pipeReplaceBackground(color_index));
+        esc_sequence = pipeReplaceBackground(color_index);
         return esc_sequence;
     }
     return esc_sequence;
@@ -693,7 +682,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
             case 1: // Pipe w/ 2 DIDIT Colors
                 {
 //                    std::cout << "Pipe w/ 2 DIDIT Colors |00" << std::endl;
-                    std::string result = std::move(pipeColors(my_matches.m_code));
+                    std::string result = pipeColors(my_matches.m_code);
                     if(result.size() != 0)
                     {
                         // Replace the Color, if not ansi then remove the color!
@@ -724,7 +713,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
             case 3: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
                 {
 //                    std::cout << "Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33" << std::endl;
-                    std::string result = std::move(seperatePipeWithCharsDigits(my_matches.m_code));
+                    std::string result = seperatePipeWithCharsDigits(my_matches.m_code);
                     if(result.size() != 0)
                     {
                         // Replace the string
@@ -738,7 +727,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
                 // Pass the original string becasue of |DE for delay!
                 {
 //                    std::cout << "Pipe w/ 2 CHARS // |AA" << std::endl;
-                    std::string result = std::move(parsePipeWithChars(my_matches.m_code));
+                    std::string result = parsePipeWithChars(my_matches.m_code);
                     if(result.size() != 0)
                     {
                         // Replace the string
@@ -754,7 +743,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
             case 5: // %%FILENAME.EXT  get filenames for loading from string prompts
                 {
 //                    std::cout << "replacing %%FILENAME.EXT codes" << std::endl;
-                    std::string result = std::move(parseFilename(my_matches.m_code));
+                    std::string result = parseFilename(my_matches.m_code);
                     if(result.size() != 0)
                     {
                         ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
@@ -877,61 +866,72 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
         ([%]{1}[A-Z]{2})                // %AA
         ([%]{1}[0-9]{2})                // %11
     */
-    boost::regex expr(expression);
+	
+	std::cout << "exp: " << expression << std::endl;
+	
+	try
+	{
+		std::regex expr(expression);
 
-    boost::smatch matches;
-    std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
-//    std::string::size_type offset = 0;
-//    std::string::size_type length = 0;
+		std::smatch matches;
+		std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
+	//    std::string::size_type offset = 0;
+	//    std::string::size_type length = 0;
 
-    boost::match_flag_type flags = boost::match_default;
-    while(boost::regex_search(start, end, matches, expr, flags))
-    {
-        // Found a match!
-        /*
-        std::cout << "Matched Sub '" << matches.str()
-                  << "' following ' " << matches.prefix().str()
-                  << "' preceeding ' " << matches.suffix().str()
-                  << std::endl;*/
+		std::regex_constants::match_flag_type flags = std::regex_constants::match_default;
+		while(std::regex_search(start, end, matches, expr, flags))
+		{
+			// Found a match!
+			/*
+			std::cout << "Matched Sub '" << matches.str()
+					  << "' following ' " << matches.prefix().str()
+					  << "' preceeding ' " << matches.suffix().str()
+					  << std::endl;*/
 
-        // Avoid Infinite loop and make sure the existing
-        // is not the same as the next!
-        if (start == matches[0].second)
-        {
-            std::cout << "no more matches!" << std::endl;
-            break;
-        }
+			// Avoid Infinite loop and make sure the existing
+			// is not the same as the next!
+			if (start == matches[0].second)
+			{
+				std::cout << "no more matches!" << std::endl;
+				break;
+			}
 
-        // Since were replacing on the fly, we need to rescan the
-        // string for next code
-        start = matches[0].second;
+			// Since were replacing on the fly, we need to rescan the
+			// string for next code
+			start = matches[0].second;
 
 
-        // Loop each match, and grab the starting position and length to replace.
-        for(size_t s = 1; s < matches.size(); ++s)
-        {
-            // Make sure the Match is true! otherwise skip.
-            if(matches[s].matched)
-            {
-                //offset = matches[s].first - ansi_string.begin();
-                //length = matches[s].length();
+			// Loop each match, and grab the starting position and length to replace.
+			for(size_t s = 1; s < matches.size(); ++s)
+			{
+				// Make sure the Match is true! otherwise skip.
+				if(matches[s].matched)
+				{
+					//offset = matches[s].first - ansi_string.begin();
+					//length = matches[s].length();
 
-                // Test output s registers which pattern matched, 1, 2, or 3!
-                /*
-                std::cout << s << " :  Matched Sub 2" << matches[s].str()
-                          << " at offset " << offset
-                          << " of length " << length
-                          << std::endl;*/
+					// Test output s registers which pattern matched, 1, 2, or 3!
+					/*
+					std::cout << s << " :  Matched Sub 2" << matches[s].str()
+							  << " at offset " << offset
+							  << " of length " << length
+							  << std::endl;*/
 
-                // Add to Vector so we store each match.
-                my_matches.m_offset = matches[s].first - ansi_string.begin();
-                my_matches.m_length = matches[s].length();
-                my_matches.m_match  = s;
-                my_matches.m_code   = matches[s].str();
-                code_map.push_back(std::move(my_matches));
-            }
-        }
-    }
+					// Add to Vector so we store each match.
+					my_matches.m_offset = matches[s].first - ansi_string.begin();
+					my_matches.m_length = matches[s].length();
+					my_matches.m_match  = s;
+					my_matches.m_code   = matches[s].str();
+					code_map.push_back(std::move(my_matches));
+				}
+			}
+		}
+	}
+	catch(std::regex_error &ex)
+	{
+		std::cout << ex.what() << std::endl;
+		std::cout << "CODE IS: " << ex.code() << " " << __FILE__ << __LINE__ << std::endl;
+	}
 
     std::cout << "code_map.size(): " << code_map.size() << std::endl;
     return code_map;
@@ -944,7 +944,7 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
  */
 std::string SessionIO::pipe2ansi(const std::string &sequence)
 {
-    std::vector<MapType> code_map = std::move(parseToCodeMap(sequence, STD_EXPRESSION));
+    std::vector<MapType> code_map = parseToCodeMap(sequence, STD_EXPRESSION);
     return parseCodeMap(sequence, code_map);
 }
 
@@ -955,7 +955,7 @@ std::string SessionIO::pipe2ansi(const std::string &sequence)
  */
 std::vector<MapType> SessionIO::pipe2genericCodeMap(const std::string &sequence)
 {
-    std::vector<MapType> code_map = std::move(parseToCodeMap(sequence, MID_EXPRESSION));
+    std::vector<MapType> code_map = parseToCodeMap(sequence, MID_EXPRESSION);
     return code_map;
 }
 
@@ -967,7 +967,7 @@ std::vector<MapType> SessionIO::pipe2genericCodeMap(const std::string &sequence)
 std::vector<MapType> SessionIO::pipe2promptCodeMap(const std::string &sequence)
 {
     // This will handle parsing the sequence, and replacement
-    std::vector<MapType> code_map = std::move(parseToCodeMap(sequence, PROMPT_EXPRESSION));
+    std::vector<MapType> code_map = parseToCodeMap(sequence, PROMPT_EXPRESSION);
     return code_map;
 }
 
@@ -979,7 +979,7 @@ std::vector<MapType> SessionIO::pipe2promptCodeMap(const std::string &sequence)
 std::vector<MapType> SessionIO::pipe2promptFormatCodeMap(const std::string &sequence)
 {
     // This will handle parsing the sequence, and replacement
-    std::vector<MapType> code_map = std::move(parseToCodeMap(sequence, FORMAT_EXPRESSION));
+    std::vector<MapType> code_map = parseToCodeMap(sequence, FORMAT_EXPRESSION);
     return code_map;
 }
 
@@ -1050,7 +1050,7 @@ std::string SessionIO::pipe2promptFormat(const std::string &sequence, config_ptr
     }
 
     // Then feed though and return the updated string.
-    output = std::move(parseCodeMapGenerics(sequence, code_map));
+    output = parseCodeMapGenerics(sequence, code_map);
     return output;
 }
 
@@ -1062,34 +1062,27 @@ std::string SessionIO::pipe2promptFormat(const std::string &sequence, config_ptr
  */
 bool SessionIO::checkRegex(const std::string &sequence, const std::string &expression)
 {
-    using namespace boost::locale;
-    generator gen;
+    // Create system default locale
+    std::locale::global(std::locale(""));
+    std::cout.imbue(std::locale());
 
-    // Make system default locale global
-    std::locale loc = gen("");
-    std::locale::global(loc);
-    std::cout.imbue(loc);
-
-    boost::smatch match;
+    std::smatch match;
     bool result = false;
 
-#ifdef BOOST_HAS_ICU
-    boost::u32regex regExp = boost::make_u32regex(expression);
-    result = boost::u32regex_match(sequence, match, regExp);
-#else
-    boost::regex regExpression(expression);
-    result = boost::regex_match(sequence, match, regExpression);
-#endif
+	std::cout << "exp: " << expression << std::endl;
+	try
+	{		
+		std::regex regExpression(expression);
+		result = std::regex_match(sequence, match, regExpression);
+	}
+	catch(std::regex_error &ex)
+	{
+		std::cout << ex.what() << std::endl;
+		std::cout << "CODE IS: " << ex.code() << " " << __FILE__ << __LINE__ << std::endl;
+	}
 
     return result;
 }
-
-/*
-    std::string myString = "\"\"\"";
-    boost::smatch match;
-    boost::regex regExpString3("[\"']((:?[^\"']|\\\")+?)[\"']");
-    bool statusString3 = boost::regex_match(myString, match, regExpString3);
-*/
 
 /**
  * @brief Parses Text Prompt String Pair

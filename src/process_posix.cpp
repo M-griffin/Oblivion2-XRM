@@ -2,10 +2,16 @@
 #include "session_data.hpp"
 #include "model-sys/structures.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 #include <unistd.h>
+
+#ifdef TARGET_OS_MAC
+#include <util.h>
+#else
 #include <pty.h>
+#endif
+
 #include <termios.h>
 #include <csignal>
 #include <cstring>
@@ -91,7 +97,7 @@ extern "C" void *executeProcessLoop(void *args)
     fd_set rdfdset;
 
     // Setup Thread Arguments Passed.
-    args_ptr threadArgs = * reinterpret_cast<boost::shared_ptr<ThreadArguments>*>(args);
+    args_ptr threadArgs = * reinterpret_cast<std::shared_ptr<ThreadArguments>*>(args);
 
     char character_buffer[2014] = {'\0'};
 
@@ -190,7 +196,9 @@ bool ProcessPosix::createProcess()
     memset(&ws, 0, sizeof(ws));
     ws.ws_col = m_session->m_telnet_state->getTermCols();
     ws.ws_row = m_session->m_telnet_state->getTermRows();
-    ioctl(m_pty_file_desc, TIOCSWINSZ, (char *)&ws);
+#ifndef TARGET_OS_MAC
+    ioctl(m_pty_file_desc, TIOCSWINSZ, (char *)&ws);     // NOTE MAC not seeing this for PTY
+#endif	
 #endif
 
     // Clear Screen on Process Start and show cursor.

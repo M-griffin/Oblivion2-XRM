@@ -1,5 +1,5 @@
 /*
- * Oblivion/2 XRM - Legacy to XRM Menu Converter (c) 2015-2016 Michael Griffin
+ * Oblivion/2 XRM - Legacy to XRM Menu Converter (c) 2015-2018 Michael Griffin
  * This converts all legacy .mnu files to new .yaml configuration files
  *
  * Compiles under MingW32/64 5.1.0 g++
@@ -289,7 +289,7 @@ void MenuConvert::process_menu()
     fs::directory_iterator end_iter;
 
     typedef std::vector<std::string> result_set_t;
-    typedef std::vector<std::string>::iterator iterator;
+    //typedef std::vector<std::string>::iterator iterator;
     result_set_t result_set;
 
     if(fs::exists(menu_directory) && fs::is_directory(menu_directory))
@@ -360,7 +360,7 @@ void MenuConvert::process_menu()
 auto main() -> int
 {
     std::cout << "Oblivion/2 XRM Server - Legacy to XRM Menu Converter" << std::endl;
-    std::cout << "(c) 2015-2016 Michael Griffin." << std::endl << std::endl;
+    std::cout << "(c) 2015-2018 Michael Griffin." << std::endl << std::endl;
     std::cout << "Important, you must run this from the root directory," << std::endl;
     std::cout << "Otherwise you can set the OBV2 environment variable." << std::endl << std::endl;
 

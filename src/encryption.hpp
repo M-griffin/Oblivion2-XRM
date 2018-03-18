@@ -1,9 +1,7 @@
 #ifndef ENCRYPTION_HPP
 #define ENCRYPTION_HPP
 
-
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <string>
 
 class Encrypt
@@ -64,6 +62,6 @@ public:
 
 };
 
-typedef boost::shared_ptr<Encrypt> encrypt_ptr;
+typedef std::shared_ptr<Encrypt> encrypt_ptr;
 
 #endif // ENCRYPTION_HPP

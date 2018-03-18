@@ -1,15 +1,12 @@
 #ifndef DAO_CONFIG_HPP
 #define DAO_CONFIG_HPP
 
-#include <boost/smart_ptr/scoped_ptr.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <string>
 #include <mutex>
 
-
-struct Config;
-typedef boost::shared_ptr<Config> config_ptr;
+class Config;
+typedef std::shared_ptr<Config> config_ptr;
 
 /**
  * @class ConfigDao
@@ -67,6 +64,8 @@ public:
         {
             return m_config;
         }
+		
+		return nullptr;
     }
    
     config_ptr  m_config;
@@ -76,6 +75,6 @@ public:
 
 };
 
-typedef boost::scoped_ptr<ConfigDao> config_dao_sptr;
+typedef std::unique_ptr<ConfigDao> config_dao_sptr;
 
 #endif // DAO_CONFIG_HPP

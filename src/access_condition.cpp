@@ -1,8 +1,7 @@
 #include "access_condition.hpp"
 #include "model-sys/users.hpp"
 
-#include <boost/algorithm/string.hpp>
-#include <boost/make_shared.hpp>
+#include <algorithm>
 
 #include <string>
 #include <vector>
@@ -248,6 +247,23 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
 }
 
 /**
+ * @brief String Token Parser.
+ * @param token
+ * @param seperator
+ */
+std::vector<std::string> split(const std::string& s, char delimiter)
+{
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream tokenStream(s);
+    while (std::getline(tokenStream, token, delimiter))
+    {
+        tokens.push_back(token);
+    }
+    return tokens;
+}
+
+/**
  * @brief Parse ASC Strings then test User Flags
  * @param acs_string
  * @param user
@@ -259,8 +275,8 @@ std::vector<MapType> AccessCondition::parseAcsString(const std::string &acs_stri
 
     // First split any OR statements.
     std::vector<std::string> tokens;
-    boost::split(tokens, acs_string, boost::is_any_of("|"));
-
+    
+    tokens = split(acs_string, '|');
     if (tokens.size() > 1)
     {
         // Then we have multiple 'OR' statements.

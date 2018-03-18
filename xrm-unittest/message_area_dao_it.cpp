@@ -2,68 +2,63 @@
 #include "data-sys/message_area_dao.hpp"
 #include "model-sys/message_area.hpp"
 
-#ifdef _WIN32
 #include <UnitTest++.h>
-#else
-#include <unittest++/UnitTest++.h>
-#endif
-
 #include "libSqliteWrapped.h"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 /**
  * Handle Setup and Tear Down of Integration Test for SQLite
  */
 class MyFixtureMessageArea
 {
-    
+
 public:
 
     MyFixtureMessageArea()
         : m_database("xrm_itMessageAreaTest.sqlite3")
-    { 
-        // Can't remove database on closure, becasue the 
+    {
+        // Can't remove database on closure, becasue the
         // Object is not cleared till Destructor is finished.
         // Before Each Test, we need to remove existing database.
         std::cout << "xrm_itMessageAreaTest.sqlite3" << std::endl;
         remove("xrm_itMessageAreaTest.sqlite3");
     }
-    
-    ~MyFixtureMessageArea() 
+
+    ~MyFixtureMessageArea()
     { }
-   
+
     SQLW::Database m_database;
 };
 
 
 /**
  * @brief Unit Testing for Initial Sqlite Database DAO and BaseDao.
- * @return 
+ * @return
  */
 SUITE(XRMMessageAreaDao)
 {
-    
+
     // Test DAO with All Base Dao Calls.
     TEST_FIXTURE(MyFixtureMessageArea, MessageAreaDaoTest)
-    {        
+    {
         // Link to users dao for data access object
         msg_area_dao_ptr objdb(new MessageAreaDao(m_database));
 
         // DataBase Table Should not exist.
         CHECK(!objdb->doesTableExist());
-        
+
         // Setup database Param, cache sies etc..
         CHECK(objdb->firstTimeSetupParams());
 
         // Check Create Table and Index
         CHECK(objdb->createTable());
-        
+
         // DataBase Table exists.
         CHECK(objdb->doesTableExist());
-        
+
         // Check Insert
-        message_area_ptr objIn(new MessageArea());        
+        message_area_ptr objIn(new MessageArea());
         objIn->sName = "General Area";
         objIn->sAcsAccess = "s20";
         objIn->sAcsPost = "s21";
@@ -80,7 +75,7 @@ SUITE(XRMMessageAreaDao)
         objIn->bPrivate = false;
         objIn->bNetmail = false;
         objIn->iSortOrder = 1;
-        
+
         // Check Insert
         message_area_ptr objIn2(new MessageArea());
         objIn2->sName = "Sysop Area";
@@ -99,19 +94,19 @@ SUITE(XRMMessageAreaDao)
         objIn2->bPrivate = true;
         objIn2->bNetmail = true;
         objIn2->iSortOrder = 2;
-        
+
         long lastInsertId = objdb->insertRecord(objIn);
-        
+
         long InsertId2nd = objdb->insertRecord(objIn2);
-        
+
         // Returns Lat Insert Id, Should not be -1.
         CHECK(lastInsertId == 1);
         CHECK(InsertId2nd == 2);
-        
+
         // Check Retrieve
         message_area_ptr objOut(new MessageArea());
         objOut = objdb->getRecordById(lastInsertId);
-        
+
         CHECK(objOut->sName == "General Area");
         CHECK(objOut->sAcsAccess == "s20");
         CHECK(objOut->sAcsPost == "s21");
@@ -128,9 +123,9 @@ SUITE(XRMMessageAreaDao)
         CHECK(objOut->bPrivate == false);
         CHECK(objOut->bNetmail == false);
         CHECK(objOut->iSortOrder == 1);
-                
-        
-        // Test Update, Id should be 1 already.   
+
+
+        // Test Update, Id should be 1 already.
         objOut->sName = "General Area 3";
         objOut->sAcsAccess = "s30";
         objOut->sAcsPost = "s31";
@@ -147,14 +142,14 @@ SUITE(XRMMessageAreaDao)
         objOut->bPrivate = true;
         objOut->bNetmail = true;
         objOut->iSortOrder = 3;
-        
+
         // Updates returns bool.
         CHECK(objdb->updateRecord(objOut));
-        
+
         //Retrieve Update
         message_area_ptr objUpdate(new MessageArea());
         objUpdate = objdb->getRecordById(lastInsertId);
-        
+
         // Test Output After Update
         CHECK(objUpdate->sName == "General Area 3");
         CHECK(objUpdate->sAcsAccess == "s30");
@@ -172,14 +167,14 @@ SUITE(XRMMessageAreaDao)
         CHECK(objUpdate->bPrivate == true);
         CHECK(objUpdate->bNetmail == true);
         CHECK(objUpdate->iSortOrder == 3);
-               
+
         // Test Get All Records in Vector.
         std::vector<message_area_ptr> getAllResults;
         getAllResults = objdb->getAllRecords();
-        
+
         CHECK(getAllResults.size() == 2);
-        
-        // Test Output After Update        
+
+        // Test Output After Update
         CHECK(getAllResults[0]->iId == 1);
         CHECK(getAllResults[0]->sName == "General Area 3");
         CHECK(getAllResults[0]->sAcsAccess == "s30");
@@ -197,8 +192,8 @@ SUITE(XRMMessageAreaDao)
         CHECK(getAllResults[0]->bPrivate == true);
         CHECK(getAllResults[0]->bNetmail == true);
         CHECK(getAllResults[0]->iSortOrder == 3);
-               
-        
+
+
         // Test 2nd Row next record.
         CHECK(getAllResults[1]->iId == 2);
         CHECK(getAllResults[1]->sName == "Sysop Area");
@@ -217,34 +212,34 @@ SUITE(XRMMessageAreaDao)
         CHECK(getAllResults[1]->bPrivate == true);
         CHECK(getAllResults[1]->bNetmail == true);
         CHECK(getAllResults[1]->iSortOrder == 2);
-                
+
         // Test Record Counts
         long checkCounts = objdb->getRecordsCount();
-        
+
         // Check Record Counts
         CHECK(checkCounts == 2);
-        
+
         // Test Delete Record
         CHECK(objdb->deleteRecord(lastInsertId));
-                        
+
         // Test Getting Deleted Record
         message_area_ptr objDel(new MessageArea());
         objDel = objdb->getRecordById(lastInsertId);
-        
+
         // Invalid Records return with -1
         CHECK(objDel->iId == -1);
-        
+
         // Test Record Counts After Purge
         long checkCounts2 = objdb->getRecordsCount();
-        
+
         // Check Record Counts
         CHECK(checkCounts2 == 1);
-        
+
         // Test Drop Table and Index returns true;
         CHECK(objdb->dropTable());
-        
+
         // DataBase Table Should not exist.
-        CHECK(!objdb->doesTableExist());        
-    }    
+        CHECK(!objdb->doesTableExist());
+    }
 
 }

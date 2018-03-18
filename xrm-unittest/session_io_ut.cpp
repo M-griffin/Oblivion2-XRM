@@ -3,19 +3,19 @@
  * @return
  */
 
+#include "io_service.hpp"
 #include "session_io.hpp"
 #include "model-sys/config.hpp"
 
-#ifdef _WIN32
 #include <UnitTest++.h>
-#else
-#include <unittest++/UnitTest++.h>
-#endif
 
 // C++ Standard
 #include <iostream>
 #include <string>
 #include <stdexcept>
+
+// Helper Macro For comparsion errors.
+#define UINT unsigned int
 
 
 SUITE(XRMSessionIO)
@@ -334,7 +334,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -351,7 +351,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -368,7 +368,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -385,7 +385,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -402,7 +402,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -424,7 +424,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -441,7 +441,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -458,7 +458,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -480,7 +480,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -515,7 +515,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -544,7 +544,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -571,7 +571,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -615,7 +615,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -673,7 +673,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -710,7 +710,7 @@ SUITE(XRMSessionIO)
         // Mock SessionData Class
         connection_ptr          connection;
         session_manager_ptr     room;
-        boost::asio::io_service io_service;
+        IOService               io_service;
         state_manager_ptr       state_manager;
 
         session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
@@ -744,8 +744,8 @@ SUITE(XRMSessionIO)
         // Test Group 1 ([|]{1}[0-9]{2})                // |00
         std::string sequence = "e|013e|02AA||03FE";
 
-        std::vector<MapType> code_map = std::move(sess.parseToCodeMap(sequence, sess.STD_EXPRESSION));
-        CHECK_EQUAL(code_map.size(), 3);
+        std::vector<MapType> code_map = sess.parseToCodeMap(sequence, sess.STD_EXPRESSION);
+        CHECK_EQUAL(code_map.size(), (UINT)3);
 
         // Verify Codes
         CHECK_EQUAL(code_map[0].m_code, "|01");
@@ -753,9 +753,9 @@ SUITE(XRMSessionIO)
         CHECK_EQUAL(code_map[2].m_code, "|03");
 
         // Verify Groups
-        CHECK_EQUAL(code_map[0].m_match, 1);
-        CHECK_EQUAL(code_map[1].m_match, 1);
-        CHECK_EQUAL(code_map[2].m_match, 1);
+        CHECK_EQUAL(code_map[0].m_match, (UINT)1);
+        CHECK_EQUAL(code_map[1].m_match, (UINT)1);
+        CHECK_EQUAL(code_map[2].m_match, (UINT)1);
     }
 
     TEST(pipe2codeMap_Test_MapCode_Group2)
@@ -766,16 +766,16 @@ SUITE(XRMSessionIO)
         // Test Group 2 ([|]{1}[X][Y][0-9]{4}           // |XY0101
         std::string sequence = "ers|XY0101e3%||XY101000weXa";
 
-        std::vector<MapType> code_map = std::move(sess.parseToCodeMap(sequence, sess.STD_EXPRESSION));
-        CHECK_EQUAL(code_map.size(), 2);
+        std::vector<MapType> code_map = sess.parseToCodeMap(sequence, sess.STD_EXPRESSION);
+        CHECK_EQUAL(code_map.size(), (UINT)2);
 
         // Verify Codes
         CHECK_EQUAL(code_map[0].m_code, "|XY0101");
         CHECK_EQUAL(code_map[1].m_code, "|XY1010");
 
         // Verify Groups
-        CHECK_EQUAL(code_map[0].m_match, 2);
-        CHECK_EQUAL(code_map[1].m_match, 2);
+        CHECK_EQUAL(code_map[0].m_match, (UINT)2);
+        CHECK_EQUAL(code_map[1].m_match, (UINT)2);
     }
 
     TEST(pipe2codeMap_Test_MapCode_Group3)
@@ -786,8 +786,8 @@ SUITE(XRMSessionIO)
         // Test Group 3 ([|]{1}[A-Z]{1,2}[0-9]{1,2})    // |A1 A22  AA2  AA33
         std::string sequence = "..W||A1%|B22XY1010weR-|AI3XY1010342|CC223eq0";
 
-        std::vector<MapType> code_map = std::move(sess.parseToCodeMap(sequence, sess.STD_EXPRESSION));
-        CHECK_EQUAL(code_map.size(), 4);
+        std::vector<MapType> code_map = sess.parseToCodeMap(sequence, sess.STD_EXPRESSION);
+        CHECK_EQUAL(code_map.size(), (UINT)4);
 
         // Verify Codes
         CHECK_EQUAL(code_map[0].m_code, "|A1");
@@ -796,10 +796,10 @@ SUITE(XRMSessionIO)
         CHECK_EQUAL(code_map[3].m_code, "|CC22");
 
         // Verify Groups
-        CHECK_EQUAL(code_map[0].m_match, 3);
-        CHECK_EQUAL(code_map[1].m_match, 3);
-        CHECK_EQUAL(code_map[2].m_match, 3);
-        CHECK_EQUAL(code_map[3].m_match, 3);
+        CHECK_EQUAL(code_map[0].m_match, (UINT)3);
+        CHECK_EQUAL(code_map[1].m_match, (UINT)3);
+        CHECK_EQUAL(code_map[2].m_match, (UINT)3);
+        CHECK_EQUAL(code_map[3].m_match, (UINT)3);
     }
 
     TEST(pipe2codeMap_Test_MapCode_Group4)
@@ -810,8 +810,8 @@ SUITE(XRMSessionIO)
         // Test Group 4 ([|]{1}[A-Z]{2})                // |AA
         std::string sequence = "..W||AE%|Be22XY1010weR-|AI|3XY1010342|CCe2%%C|ERE23eq0";
 
-        std::vector<MapType> code_map = std::move(sess.parseToCodeMap(sequence, sess.STD_EXPRESSION));
-        CHECK_EQUAL(code_map.size(), 4);
+        std::vector<MapType> code_map = sess.parseToCodeMap(sequence, sess.STD_EXPRESSION);
+        CHECK_EQUAL(code_map.size(), (UINT)4);
 
         // Verify Codes
         CHECK_EQUAL(code_map[0].m_code, "|AE");
@@ -820,10 +820,10 @@ SUITE(XRMSessionIO)
         CHECK_EQUAL(code_map[3].m_code, "|ER");
 
         // Verify Groups
-        CHECK_EQUAL(code_map[0].m_match, 4);
-        CHECK_EQUAL(code_map[1].m_match, 4);
-        CHECK_EQUAL(code_map[2].m_match, 4);
-        CHECK_EQUAL(code_map[3].m_match, 4);
+        CHECK_EQUAL(code_map[0].m_match, (UINT)4);
+        CHECK_EQUAL(code_map[1].m_match, (UINT)4);
+        CHECK_EQUAL(code_map[2].m_match, (UINT)4);
+        CHECK_EQUAL(code_map[3].m_match, (UINT)4);
     }
 
     TEST(pipe2codeMap_Test_MapCode_Group5)
@@ -834,16 +834,16 @@ SUITE(XRMSessionIO)
         // Test Group 5 ([%]{2}[\w]+[.]{1}[\w]{3})      // %%filename.ans
         std::string sequence = "..W||1AE%|Be22%%obv.ascecXY1010%%%obv.txt%w%%obv.tx~";
 
-        std::vector<MapType> code_map = std::move(sess.parseToCodeMap(sequence, sess.STD_EXPRESSION));
-        CHECK_EQUAL(code_map.size(), 2);
+        std::vector<MapType> code_map = sess.parseToCodeMap(sequence, sess.STD_EXPRESSION);
+        CHECK_EQUAL(code_map.size(), (UINT)2);
 
         // Verify Codes
         CHECK_EQUAL(code_map[0].m_code, "%%obv.asc");
         CHECK_EQUAL(code_map[1].m_code, "%%obv.txt");
 
         // Verify Groups
-        CHECK_EQUAL(code_map[0].m_match, 5);
-        CHECK_EQUAL(code_map[1].m_match, 5);
+        CHECK_EQUAL(code_map[0].m_match, (UINT)5);
+        CHECK_EQUAL(code_map[1].m_match, (UINT)5);
     }
 
     TEST(pipe2codeMap_Test_MapCode_Group6)
@@ -854,16 +854,16 @@ SUITE(XRMSessionIO)
         // Test Group 6 ([%]{1}[A-Z]{2})                // %AA
         std::string sequence = "..W||1AE%1|Be22%%o$%TAbXY1010%%RF%obw%%obv.tx~";
 
-        std::vector<MapType> code_map = std::move(sess.parseToCodeMap(sequence, sess.STD_EXPRESSION));
-        CHECK_EQUAL(code_map.size(), 2);
+        std::vector<MapType> code_map = sess.parseToCodeMap(sequence, sess.STD_EXPRESSION);
+        CHECK_EQUAL(code_map.size(), (UINT)2);
 
         // Verify Codes
         CHECK_EQUAL(code_map[0].m_code, "%TA");
         CHECK_EQUAL(code_map[1].m_code, "%RF");
 
         // Verify Groups
-        CHECK_EQUAL(code_map[0].m_match, 6);
-        CHECK_EQUAL(code_map[1].m_match, 6);
+        CHECK_EQUAL(code_map[0].m_match, (UINT)6);
+        CHECK_EQUAL(code_map[1].m_match, (UINT)6);
     }
 
     TEST(pipe2codeMap_Test_MapCode_Group7)
@@ -874,16 +874,16 @@ SUITE(XRMSessionIO)
         // Test Group 7 ([%]{1}[0-9]{2})                // %11
         std::string sequence = "..W||1AE%1|Be22%%o1$%18bXY1010%%991%obw%%obv.tx~";
 
-        std::vector<MapType> code_map = std::move(sess.parseToCodeMap(sequence, sess.STD_EXPRESSION));
-        CHECK_EQUAL(code_map.size(), 2);
+        std::vector<MapType> code_map = sess.parseToCodeMap(sequence, sess.STD_EXPRESSION);
+        CHECK_EQUAL(code_map.size(), (UINT)2);
 
         // Verify Codes
         CHECK_EQUAL(code_map[0].m_code, "%18");
         CHECK_EQUAL(code_map[1].m_code, "%99");
 
         // Verify Groups
-        CHECK_EQUAL(code_map[0].m_match, 7);
-        CHECK_EQUAL(code_map[1].m_match, 7);
+        CHECK_EQUAL(code_map[0].m_match, (UINT)7);
+        CHECK_EQUAL(code_map[1].m_match, (UINT)7);
     }
 
     TEST(pipe2codeMap_Test_MapCode_AllGroups)
@@ -898,8 +898,8 @@ SUITE(XRMSessionIO)
                                ".txt%w%%obv.tx~..W||1AE%1|Be22%%o$%TAbXY1010%%RF%obw%%obv.tx~..W||" \
                                "1AE%1|Be22%%o1$%18bXY1010%%991%obw%%obv.tx~";
 
-        std::vector<MapType> code_map = std::move(sess.parseToCodeMap(sequence, sess.STD_EXPRESSION));
-        CHECK_EQUAL(code_map.size(), 19);
+        std::vector<MapType> code_map = sess.parseToCodeMap(sequence, sess.STD_EXPRESSION);
+        CHECK_EQUAL(code_map.size(), (UINT)19);
 
         // Verify Codes
         CHECK_EQUAL(code_map[0].m_code, "|01");
@@ -923,25 +923,25 @@ SUITE(XRMSessionIO)
         CHECK_EQUAL(code_map[18].m_code, "%99");
 
         // Verify Groups
-        CHECK_EQUAL(code_map[0].m_match, 1);
-        CHECK_EQUAL(code_map[1].m_match, 1);
-        CHECK_EQUAL(code_map[2].m_match, 1);
-        CHECK_EQUAL(code_map[3].m_match, 2);
-        CHECK_EQUAL(code_map[4].m_match, 2);
-        CHECK_EQUAL(code_map[5].m_match, 3);
-        CHECK_EQUAL(code_map[6].m_match, 3);
-        CHECK_EQUAL(code_map[7].m_match, 3);
-        CHECK_EQUAL(code_map[8].m_match, 3);
-        CHECK_EQUAL(code_map[9].m_match, 4);
-        CHECK_EQUAL(code_map[10].m_match, 4);
-        CHECK_EQUAL(code_map[11].m_match, 4);
-        CHECK_EQUAL(code_map[12].m_match, 4);
-        CHECK_EQUAL(code_map[13].m_match, 5);
-        CHECK_EQUAL(code_map[14].m_match, 5);
-        CHECK_EQUAL(code_map[15].m_match, 6);
-        CHECK_EQUAL(code_map[16].m_match, 6);
-        CHECK_EQUAL(code_map[17].m_match, 7);
-        CHECK_EQUAL(code_map[18].m_match, 7);
+        CHECK_EQUAL(code_map[0].m_match, (UINT)1);
+        CHECK_EQUAL(code_map[1].m_match, (UINT)1);
+        CHECK_EQUAL(code_map[2].m_match, (UINT)1);
+        CHECK_EQUAL(code_map[3].m_match, (UINT)2);
+        CHECK_EQUAL(code_map[4].m_match, (UINT)2);
+        CHECK_EQUAL(code_map[5].m_match, (UINT)3);
+        CHECK_EQUAL(code_map[6].m_match, (UINT)3);
+        CHECK_EQUAL(code_map[7].m_match, (UINT)3);
+        CHECK_EQUAL(code_map[8].m_match, (UINT)3);
+        CHECK_EQUAL(code_map[9].m_match, (UINT)4);
+        CHECK_EQUAL(code_map[10].m_match, (UINT)4);
+        CHECK_EQUAL(code_map[11].m_match, (UINT)4);
+        CHECK_EQUAL(code_map[12].m_match, (UINT)4);
+        CHECK_EQUAL(code_map[13].m_match, (UINT)5);
+        CHECK_EQUAL(code_map[14].m_match, (UINT)5);
+        CHECK_EQUAL(code_map[15].m_match, (UINT)6);
+        CHECK_EQUAL(code_map[16].m_match, (UINT)6);
+        CHECK_EQUAL(code_map[17].m_match, (UINT)7);
+        CHECK_EQUAL(code_map[18].m_match, (UINT)7);
     }
 
     // Test Regex Config Field Validations
@@ -953,7 +953,7 @@ SUITE(XRMSessionIO)
 
         // [^\\s][\\w\\s,.!@#$%^&*()]+
         std::string sequence = "123west,.!@#$%^&*()";
-        std::string expression = config->regexp_generic_validation;
+        std::string expression = "^[^\\s]+[\\w\\s,.!@#$%^&*\\(\\)]+"; //config->regexp_generic_validation;
 
         bool result = sess.checkRegex(sequence, expression);
         CHECK_EQUAL(result, true);
@@ -981,7 +981,7 @@ SUITE(XRMSessionIO)
 
         // [^\\s][\\w\\s,.!@#$%^&*()]+
         std::string sequence = "123west ,.!@#$%^&*()";
-        std::string expression = config->regexp_generic_validation;
+        std::string expression = "^[^\\s]+[\\w\\s,.!@#$%^&*\\(\\)]+"; //config->regexp_generic_validation;
 
         bool result = sess.checkRegex(sequence, expression);
         CHECK_EQUAL(result, true);

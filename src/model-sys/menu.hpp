@@ -1,9 +1,7 @@
 #ifndef MENU_HPP
 #define MENU_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
-
+#include <memory>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -241,7 +239,7 @@ namespace YAML
     };
 }
 
-typedef boost::shared_ptr<Menu> menu_ptr;
-typedef boost::weak_ptr<Menu> menu_wptr;
+typedef std::shared_ptr<Menu> menu_ptr;
+typedef std::weak_ptr<Menu> menu_wptr;
 
 #endif // MENU_HPP

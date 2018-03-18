@@ -1,13 +1,12 @@
 #ifndef PROTOCOL_DAO_HPP
 #define PROTOCOL_DAO_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <string>
 #include <mutex>
 
 class Protocols;
-typedef boost::shared_ptr<Protocols> protocols_ptr;
+typedef std::shared_ptr<Protocols> protocols_ptr;
 
 /**
  * @class ProtocolDao
@@ -65,6 +64,8 @@ public:
         {
             return m_protocols;
         }
+		
+		return nullptr;
     }
    
     protocols_ptr     m_protocols;
@@ -74,6 +75,6 @@ public:
 
 };
 
-typedef boost::shared_ptr<ProtocolDao> protocol_dao_ptr;
+typedef std::shared_ptr<ProtocolDao> protocol_dao_ptr;
 
 #endif // PROTOCOL_DAO_HPP

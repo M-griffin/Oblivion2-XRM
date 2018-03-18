@@ -1,10 +1,11 @@
 #ifndef FILE_AREA_HPP
 #define FILE_AREA_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <string>
+#include <memory>
 
 class FileArea;
-typedef boost::shared_ptr<FileArea> file_area_ptr;
+typedef std::shared_ptr<FileArea> file_area_ptr;
 
 /**
  * @class FileArea

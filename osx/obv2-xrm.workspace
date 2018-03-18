@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Workspace Name="OBV2-XRM" Database="" Version="10.0.0">
+  <Environment>
+    <![CDATA[]]>
+  </Environment>
+  <Project Name="sqlitewrapped" Path="../sqlitewrap/sqlitewrapped-osx.project" Active="No"/>
+  <Project Name="xrm-server" Path="xrm-server-osx.project" Active="No"/>
+  <Project Name="xrm-unittest" Path="../xrm-unittest/xrm-unittest-osx.project" Active="Yes"/>
+  <Project Name="xrm-menu-convert" Path="../xrm-menu-convert/xrm-menu-convert-osx.project" Active="No"/>
+  <Project Name="xrm-menu-convert-prompt" Path="../xrm-menu-prompt-convert/xrm-menu-convert-prompt-osx.project" Active="No"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
+      <Environment/>
+      <Project Name="SqliteWrapped" ConfigName="Debug"/>
+      <Project Name="xrm-menu-convert" ConfigName="Debug"/>
+      <Project Name="xrm-menu-prompt-convert" ConfigName="Debug"/>
+      <Project Name="xrm-server" ConfigName="Debug"/>
+      <Project Name="xrm-unittest" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Environment/>
+      <Project Name="SqliteWrapped" ConfigName="Release"/>
+      <Project Name="xrm-server" ConfigName="Release"/>
+      <Project Name="xrm-unittest" ConfigName="Release"/>
+      <Project Name="xrm-menu-convert" ConfigName="Release"/>
+      <Project Name="xrm-menu-prompt-convert" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>

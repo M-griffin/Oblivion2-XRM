@@ -9,7 +9,7 @@
 #include <cstring>
 #include <stdint.h>
 
-#include <boost/regex.hpp>
+#include <regex>
 
 // Unicode Output Encoding.
 #include <iostream> // cout
@@ -330,60 +330,70 @@ std::string AnsiProcessor::screenBufferParse()
     // Make a copy that we can modify and process on.
     std::string ansi_string = m_ansi_output;
 
+	std::cout << "exp: (\\|[0-9]{2}[%][0-9]{2})" << std::endl;
     // Each Set of Codes for Expression Matches 1 set. will need more for char screens.
-    boost::regex expr {"(\\|[0-9]{2}+%[0-9]{2})"};
+	try
+	{
+		std::regex expr {"(\\|[0-9]{2}[%][0-9]{2})"};
 
-    boost::smatch matches;
-    std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
-    //std::string::size_type offset = 0;
-    //std::string::size_type length = 0;
+		std::smatch matches;
+		std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
+		//std::string::size_type offset = 0;
+		//std::string::size_type length = 0;
+		
+		std::regex_constants::match_flag_type flags = std::regex_constants::match_default;
+		while(std::regex_search(start, end, matches, expr, flags))
+		{
+			// Found a match!
+			/*
+			std::cout << "Matched Sub '" << matches.str()
+					  << "' following ' " << matches.prefix().str()
+					  << "' preceeding ' " << matches.suffix().str()
+					  << std::endl;*/
 
-    boost::match_flag_type flags = boost::match_default;
-    while(boost::regex_search(start, end, matches, expr, flags))
-    {
-        // Found a match!
-        /*
-        std::cout << "Matched Sub '" << matches.str()
-                  << "' following ' " << matches.prefix().str()
-                  << "' preceeding ' " << matches.suffix().str()
-                  << std::endl;*/
+			// Avoid Infinite loop and make sure the existing
+			// is not the same as the next!
+			if (start == matches[0].second)
+			{
+				std::cout << "no more matches!" << std::endl;
+				break;
+			}
+			
+			// Since were replacing on the fly, we need to rescan the screen for next code
+			start = matches[0].second;
 
-        // Avoid Infinite loop and make sure the existing
-        // is not the same as the next!
-        if (start == matches[0].second)
-        {
-            std::cout << "no more matches!" << std::endl;
-            break;
-        }
-        
-        // Since were replacing on the fly, we need to rescan the screen for next code
-        start = matches[0].second;
+			// Loop each match, and grab the starting position and length to replace.
+			for(size_t s = 1; s < matches.size(); ++s)
+			{
+				// Make sure the Match is true! otherwise skip.
+				if(matches[s].matched)
+				{
+					//offset = matches[s].first - ansi_string.begin();
+					//length = matches[s].length();
 
-        // Loop each match, and grab the starting position and length to replace.
-        for(size_t s = 1; s < matches.size(); ++s)
-        {
-            // Make sure the Match is true! otherwise skip.
-            if(matches[s].matched)
-            {
-                //offset = matches[s].first - ansi_string.begin();
-                //length = matches[s].length();
+					// Test output s registers which pattern matched, 1, 2, or 3!
+					/*
+					std::cout << s << " :  Matched Sub " << matches[s].str()
+							  << " at offset " << offset
+							  << " of length " << length
+							  << std::endl;*/
 
-                // Test output s registers which pattern matched, 1, 2, or 3!
-                /*
-                std::cout << s << " :  Matched Sub " << matches[s].str()
-                          << " at offset " << offset
-                          << " of length " << length
-                          << std::endl;*/
-
-                // Add to Vector so we store each match.
-                my_matches.m_offset = matches[s].first - ansi_string.begin();
-                my_matches.m_length = matches[s].length();
-                my_matches.m_match  = s;
-                my_matches.m_code   = matches[s].str();
-                code_map.push_back(std::move(my_matches));
-            }
-        }
-    }
+					// Add to Vector so we store each match.
+					my_matches.m_offset = matches[s].first - ansi_string.begin();
+					my_matches.m_length = matches[s].length();
+					my_matches.m_match  = s;
+					my_matches.m_code   = matches[s].str();
+					code_map.push_back(std::move(my_matches));
+				}
+			}
+		}
+	}
+	catch(std::regex_error &ex)
+	{
+		std::cout << ex.what() << std::endl;
+		std::cout << "CODE IS: " << ex.code() << " " << __FILE__ << __LINE__ << std::endl;
+	}
+	
     // All Global MCI Codes likes standard screens and colors will
     // He handled here, then specific interfaces will break out below this.
     // Break out parsing on which pattern was matched.

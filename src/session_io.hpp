@@ -6,11 +6,12 @@
 
 #include "model-sys/structures.hpp"
 
+#include <memory>
 #include <string>
 #include <map>
 
 class Config;
-typedef boost::shared_ptr<Config> config_ptr;
+typedef std::shared_ptr<Config> config_ptr;
 
 
 /**

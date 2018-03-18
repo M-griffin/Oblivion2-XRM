@@ -1,8 +1,7 @@
 #ifndef ANSI_PROCESSOR_HPP
 #define ANSI_PROCESSOR_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
+#include <memory>
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -166,6 +165,6 @@ public:
 
 };
 
-typedef boost::shared_ptr<AnsiProcessor> ansi_process_ptr;
+typedef std::shared_ptr<AnsiProcessor> ansi_process_ptr;
 
 #endif // ANSI_PROCESSOR_HPP
