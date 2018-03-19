@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="xrm-unittest" InternalType="UnitTest++" Version="10.0.0">
-  <VirtualDirectory Name="sdl2_net">
-    <File Name="../src/sdl2_net/SDLnetUDP.cpp"/>
-    <File Name="../src/sdl2_net/SDLnetTCP.cpp"/>
-    <File Name="../src/sdl2_net/SDLnetsys.hpp"/>
-    <File Name="../src/sdl2_net/SDLnetselect.cpp"/>
-    <File Name="../src/sdl2_net/SDLnet.cpp"/>
-    <File Name="../src/sdl2_net/SDL_net.hpp"/>
-    <File Name="../src/sdl2_net/close_code.h"/>
-    <File Name="../src/sdl2_net/begin_code.h"/>
-  </VirtualDirectory>
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -36,6 +26,16 @@
  }]]]>
     </Plugin>
   </Plugins>
+  <VirtualDirectory Name="sdl2_net">
+    <File Name="../src/sdl2_net/SDLnetUDP.cpp"/>
+    <File Name="../src/sdl2_net/SDLnetTCP.cpp"/>
+    <File Name="../src/sdl2_net/SDLnetsys.hpp"/>
+    <File Name="../src/sdl2_net/SDLnetselect.cpp"/>
+    <File Name="../src/sdl2_net/SDLnet.cpp"/>
+    <File Name="../src/sdl2_net/SDL_net.hpp"/>
+    <File Name="../src/sdl2_net/close_code.h"/>
+    <File Name="../src/sdl2_net/begin_code.h"/>
+  </VirtualDirectory>
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
