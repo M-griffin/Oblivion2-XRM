@@ -232,9 +232,7 @@ void MenuBase::importMenu(menu_ptr menu_info)
     checkMenuOptionsAcsAccess();
     
     // Now we need to process custom screens from module menu
-    
-    
-    
+
 }
 
 /**
@@ -493,7 +491,6 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
 
     // Hide Cursor on lightbars
     display_prompt.append("\x1b[?25l");
-
     return display_prompt;
 }
 
@@ -1011,7 +1008,6 @@ void MenuBase::loadAndStartupMenu()
 
         return;
     }
-
 
     //if (MenuInfo clear the scrren etc.. feature to add! )
     //m_menu_session_data->deliver("\x1b[2J\x1b[1;1H");

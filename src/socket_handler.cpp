@@ -5,13 +5,19 @@
 #include <iostream>
 #include <exception>
 
+/**
+ * @brief Send Socket Data
+ * @param buffer
+ * @param length
+ * @return 
+ */
 int SocketHandler::sendSocket(unsigned char *buffer, Uint32 length)
 {
     return m_socket.back()->sendSocket(buffer, length);
 }
 
 /**
- * @brief Receive Waiting Data
+ * @brief Receive Waiting Socket Data
  * @param message
  * @return
  */
@@ -20,9 +26,13 @@ int SocketHandler::recvSocket(char *message)
     return m_socket.back()->recvSocket(message);
 }
 
+/**
+ * @brief Poll if Socket has any data to retrieve
+ * @return 
+ */
 int SocketHandler::poll()
 {
-    int ret;
+    int ret = 0;
     if(m_is_active)
     {
         ret = m_socket.back()->pollSocket();
@@ -264,7 +274,6 @@ void SocketHandler::setInactive()
     m_is_active = false;
 }
 
-
 /**
  * @brief Socket Reset
  */
@@ -296,7 +305,6 @@ void SocketHandler::setSocketType(std::string type)
 {
     m_socket_type = type;
 }
-
 
 /**
  * @brief Set Socket State, For creating unique standalone socket sessions

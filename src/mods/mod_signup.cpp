@@ -539,7 +539,6 @@ bool ModSignup::newUserPassword(const std::string &input)
     if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -596,7 +595,6 @@ bool ModSignup::disclaimer(const std::string &input)
     if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }
@@ -712,7 +710,6 @@ bool ModSignup::realName(const std::string &input)
     if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
-        // exit, and return
         m_is_active = false;
         return false;
     }

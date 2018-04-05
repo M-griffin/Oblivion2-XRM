@@ -35,7 +35,6 @@ BOOL CALLBACK terminateAppEnum(HWND hwnd, LPARAM lParam);
 BOOL CALLBACK terminateAppEnum(HWND hwnd, LPARAM lParam)
 {
     DWORD dwID;
-
     GetWindowThreadProcessId(hwnd, &dwID) ;
 
     if(dwID == (DWORD)lParam)
@@ -148,7 +147,6 @@ void ProcessWin::executeProcessLoop()
         {
             memset(&buf, 0, sizeof(buf));
             memset(&tmpbuf, 0, sizeof(tmpbuf));
-
             ReadFile(m_read_stdout, tmpbuf, RCVBUFSIZE, &bread, NULL);  //read the stdout pipe
 
             if (strlen((const char *)tmpbuf) > 0)

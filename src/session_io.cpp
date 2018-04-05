@@ -98,7 +98,6 @@ void SessionIO::createInputField(std::string &field_name, int &len)
         return;
     }
 
-
     // Overide Field Input Length for Input Field.
     position = field_name.find("|FL", 0);
     if(position != std::string::npos)
@@ -787,7 +786,6 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
     return ansi_string;
 }
 
-
 /**
  * @brief Parses Code Map and replaces screen codes with Generic Items.
  * @param screen
@@ -840,7 +838,6 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
     return ansi_string;
 }
 
-
 /**
  * @brief Parses string and returns code mapping and positions per expression
  * @param sequence
@@ -867,12 +864,10 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
         ([%]{1}[0-9]{2})                // %11
     */
 	
-	std::cout << "exp: " << expression << std::endl;
-	
+	std::cout << "exp: " << expression << std::endl;	
 	try
 	{
 		std::regex expr(expression);
-
 		std::smatch matches;
 		std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
 	//    std::string::size_type offset = 0;
@@ -899,7 +894,6 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
 			// Since were replacing on the fly, we need to rescan the
 			// string for next code
 			start = matches[0].second;
-
 
 			// Loop each match, and grab the starting position and length to replace.
 			for(size_t s = 1; s < matches.size(); ++s)

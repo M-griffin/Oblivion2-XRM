@@ -27,7 +27,6 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
 
-
     // [Vector] Setup Menu Option Calls for executing menu commands.
     m_execute_callback.push_back(std::bind(&MenuSystem::menuOptionsCallback, this, std::placeholders::_1));
 

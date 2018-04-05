@@ -285,6 +285,7 @@ bool ModLogon::logon(const std::string &input)
     if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
+        return false;
     }
     else if(result[0] == '\n')
     {            
@@ -392,6 +393,7 @@ bool ModLogon::password(const std::string &input)
     if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
+        return false;
     }
     else if(result[0] == '\n')
     {                

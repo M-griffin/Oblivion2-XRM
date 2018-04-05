@@ -225,7 +225,6 @@ std::string CommonIO::getSystemHomeDirectory()
 }
 #endif
 
-
 /**
  * @brief Appends Path Seperator depending on environment.
  * @param path
@@ -239,7 +238,6 @@ void CommonIO::pathAppend(std::string &path)
     path.append("/");
 #endif
 }
-
 
 /**
  * @brief String Lengh counting actual characters not bytes
@@ -336,9 +334,7 @@ std::string CommonIO::eraseString(const std::string &str,
                                   std::string::size_type start_position,
                                   std::string::size_type end_position)
 {
-    // std::cout << "StringERASE: " << str << " : " << str.size() << std::endl;
     std::string new_string = str;
-    //std::string::size_type count = 0;
     std::string::size_type string_size = new_string.size();
 
     // 0 defaults to end of string.
@@ -369,7 +365,6 @@ std::string CommonIO::eraseString(const std::string &str,
     std::string::iterator line_end = new_string.end();    
     
     while (it != line_end) {                
-        //std::cout << "ut: " << *it << std::endl;
         uint32_t code_point = utf8::next(it, line_end);
         
         if(char_count < start_position || char_count > end_position)
@@ -381,17 +376,10 @@ std::string CommonIO::eraseString(const std::string &str,
             utf8::append(code_point, character);
             new_string_builder += (char *)character;
         }
-        
-        //std::cout << "char_count: " << char_count << " " << code_point << std::endl;        
+              
         ++char_count;
     }
     
-    /*
-    std::cout << "\r\nStringERASE start_position: " << start_position << std::endl;
-    std::cout << "StringERASE end_position: " << end_position << std::endl;
-    std::cout << "StringERASE OLD: " << str << " : " << str.size() << std::endl;
-    std::cout << "StringERASE NEW: " << new_string << " : " << new_string.size() << std::endl;
-    */
     return new_string_builder;
 }
 
@@ -538,7 +526,6 @@ std::string CommonIO::maskString(const std::string &str)
     return new_string;
 }
 
-
 /**
  * @brief Check if Digit or Numerics in a String
  * @param str
@@ -563,7 +550,6 @@ bool CommonIO::isDigit(const std::string &str)
  */
 std::string CommonIO::printWideCharacters(const std::wstring &wide_string)
 {
-
     std::locale::global(std::locale(""));
     std::cout.imbue(std::locale());
 
@@ -629,7 +615,6 @@ std::string CommonIO::translateUnicode(const std::string &standard_string)
 std::string CommonIO::getEscapeSequence()
 {
     //std::cout << "REAL Esc sequence: " << m_escape_sequence << std::endl;
-
     // Check if Sequences Exists, otherwise return blank.
     if(m_sequence_map.find(m_escape_sequence) != m_sequence_map.end())
     {
@@ -885,6 +870,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         m_line_buffer.erase();
         m_column_position = 0;
     }
+    
     // If were starting Off Input with a String already in buffer!  display it!
     if(m_is_new_leadoff && leadoff.size() > 0)
     {
@@ -918,6 +904,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         m_is_new_leadoff = true;
         return "\n";
     }
+    
     // Escape in this case, ignore, later add movement in string
     std::string sequence = "";
     if(character_buffer[0] == 27)
@@ -925,10 +912,14 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         sequence = getEscapeSequence();
         if(sequence.size() == 0)
         {
+            
+            // WIP, update to clear field line CTRL + Y
+            
+            
             // Received ESC, Abort!
             //std::cout << "Received ESC!!!!!" << std::endl;
-            m_is_new_getline = true;
-            m_is_new_leadoff = true;
+            //m_is_new_getline = true;
+            //m_is_new_leadoff = true;
             return "\x1b";
         }
         else

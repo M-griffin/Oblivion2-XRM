@@ -18,9 +18,7 @@ void SessionManager::join(session_ptr session)
 {
     std::cout << "joined SessionManager" << std::endl;
     m_sessions.insert(session);
-    //deliver("\r\nConnected to the BroadCaster");
 }
-
 
 /**
  * @brief Notifies that a user has left the room
@@ -28,12 +26,6 @@ void SessionManager::join(session_ptr session)
  */
 void SessionManager::leave(int node_number)
 {
-    std::cout << "nleft SessionManager" << std::endl;
-
-    // Re-Enable this with notifications when users disconnect lateron!
-    //deliver("\r\nleft the SessionManager");
-
-    // Clear Session
     std::cout << "disconnecting Node Session: " << node_number << std::endl;
     for(auto it = m_sessions.begin(); it != m_sessions.end(); it++)
     {

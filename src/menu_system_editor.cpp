@@ -155,7 +155,6 @@ std::string MenuBase::displayMenus()
     
     //buffer += "A/dd Menu C/hange Menu D/elete Menu Q/uit : ";
     std::string buffer = "A/dd Menu C/hange Menu D/elete Menu Q/uit : ";
-    return (buffer);
-    
+    return (buffer);    
 }
 
