@@ -83,6 +83,7 @@
     </VirtualDirectory>
     <File Name="../src/communicator.cpp"/>
     <File Name="../src/communicator.hpp"/>
+    <File Name="../src/uuid.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
@@ -150,6 +151,7 @@
         <IncludePath Value="/usr/local/Cellar/openssl/1.0.2n/include"/>
         <IncludePath Value="/usr/local/Cellar/unittest-cpp/2.0.0/include/UnitTest++"/>
         <IncludePath Value="/usr/local/Cellar/libssh/0.7.5/include"/>
+        <IncludePath Value="/usr/local/Cellar/ossp-uuid/1.6.2_2/include"/>
         <IncludePath Value="../src/sdl2_net"/>
         <IncludePath Value="../src/utf-cpp"/>
         <Preprocessor Value="TARGET_OS_MAC"/>
@@ -165,6 +167,7 @@
         <LibraryPath Value="/usr/local/Cellar/openssl/1.0.2n/lib"/>
         <LibraryPath Value="/usr/local/Cellar/unittest-cpp/2.0.0/lib"/>
         <LibraryPath Value="/usr/local/Cellar/libssh/0.7.5/lib"/>
+        <LibraryPath Value="/usr/local/Cellar/ossp-uuid/1.6.2_2/lib"/>
         <Library Value="c++"/>
         <Library Value="c++abi"/>
         <Library Value="m"/>
@@ -177,6 +180,7 @@
         <Library Value="crypto"/>
         <Library Value="yaml-cpp"/>
         <Library Value="libssh"/>
+        <Library Value="uuid"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>

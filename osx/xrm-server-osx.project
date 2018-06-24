@@ -176,6 +176,7 @@
     <File Name="../src/socket_ssh.cpp"/>
     <File Name="../src/socket_state.hpp"/>
     <File Name="../src/socket_telnet.cpp"/>
+    <File Name="../src/uuid.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -198,6 +199,7 @@
         <IncludePath Value="/usr/local/Cellar/yaml-cpp/0.6.1/include"/>
         <IncludePath Value="/usr/local/Cellar/openssl/1.0.2n/include"/>
         <IncludePath Value="/usr/local/Cellar/libssh/0.7.5/include"/>
+        <IncludePath Value="/usr/local/Cellar/ossp-uuid/1.6.2_2/include"/>
         <IncludePath Value="../src/sdl2_net"/>
         <IncludePath Value="../src/utf-cpp"/>
         <Preprocessor Value="TARGET_OS_MAC"/>
@@ -210,6 +212,7 @@
         <LibraryPath Value="/usr/local/Cellar/yaml-cpp/0.6.1/lib"/>
         <LibraryPath Value="/usr/local/Cellar/openssl/1.0.2n/lib"/>
         <LibraryPath Value="/usr/local/Cellar/libssh/0.7.5/lib"/>
+        <LibraryPath Value="/usr/local/Cellar/ossp-uuid/1.6.2_2/lib"/>
         <Library Value="libSqliteWrapped.a"/>
         <Library Value="sqlite3"/>
         <Library Value="pthread"/>
@@ -218,6 +221,7 @@
         <Library Value="yaml-cpp"/>
         <Library Value="util"/>
         <Library Value="libssh"/>
+        <Library Value="uuid"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
