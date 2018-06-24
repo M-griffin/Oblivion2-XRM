@@ -195,7 +195,7 @@
         <IncludePath Value="C:/sqlite3/include"/>
         <IncludePath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/include"/>
         <IncludePath Value="C:/OpenSSL-Win32/include"/>
-        <IncludePath Value="C:/Users/Blue/Downloads/libssh-0.7.2/include"/>
+        <IncludePath Value="C:/libssh-0.7.2/include"/>
         <Preprocessor Value="WITHOUT_SDL"/>
       </Compiler>
       <Linker Options="" Required="yes">
@@ -207,7 +207,7 @@
         <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>
         <LibraryPath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/build"/>
         <LibraryPath Value="C:/libz-1.2.7-1-mingw32-dev/lib"/>
-        <LibraryPath Value="C:/Users/Blue/Downloads/libssh-0.7.2\lib"/>
+        <LibraryPath Value="C:/libssh-0.7.2\lib"/>
         <Library Value="mingw32"/>
         <Library Value="libws2_32.a"/>
         <Library Value="libwsock32.a"/>
