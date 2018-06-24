@@ -43,3 +43,4 @@ Temporary Items
 .apdisk
 changelog.txt
 src/form_manager.cpp
+sqlitewrap/libSqliteWrapped.h

@@ -1,9 +1,13 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
+#include "../uuid.hpp"
+
 #include <memory>
 #include <fstream>
 #include <yaml-cpp/yaml.h>
+
+
 
 /**
  * @class Config Object
@@ -321,7 +325,8 @@ public:
         // If someone wipes out their config, they should save this and re-enter it!
         //boost::uuids::random_generator generator;
         //boost::uuids::uuid uuid = generator();
-        bbs_uuid = "test"; //boost::lexical_cast<std::string>(uuid);
+        Uuid uuid;
+        bbs_uuid = uuid.createUuidString();
     }
 
     ~Config() { }

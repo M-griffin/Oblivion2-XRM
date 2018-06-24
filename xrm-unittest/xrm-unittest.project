@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="xrm-unittest" InternalType="UnitTest++" Version="10.0.0">
-  <VirtualDirectory Name="sdl2_net">
-    <File Name="../src/sdl2_net/SDLnetUDP.cpp"/>
-    <File Name="../src/sdl2_net/SDLnetTCP.cpp"/>
-    <File Name="../src/sdl2_net/SDLnetsys.hpp"/>
-    <File Name="../src/sdl2_net/SDLnetselect.cpp"/>
-    <File Name="../src/sdl2_net/SDLnet.cpp"/>
-    <File Name="../src/sdl2_net/SDL_net.hpp"/>
-    <File Name="../src/sdl2_net/close_code.h"/>
-    <File Name="../src/sdl2_net/begin_code.h"/>
-  </VirtualDirectory>
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -36,9 +26,20 @@
  }]]]>
     </Plugin>
   </Plugins>
+  <VirtualDirectory Name="sdl2_net">
+    <File Name="../src/sdl2_net/SDLnetUDP.cpp"/>
+    <File Name="../src/sdl2_net/SDLnetTCP.cpp"/>
+    <File Name="../src/sdl2_net/SDLnetsys.hpp"/>
+    <File Name="../src/sdl2_net/SDLnetselect.cpp"/>
+    <File Name="../src/sdl2_net/SDLnet.cpp"/>
+    <File Name="../src/sdl2_net/SDL_net.hpp"/>
+    <File Name="../src/sdl2_net/close_code.h"/>
+    <File Name="../src/sdl2_net/begin_code.h"/>
+  </VirtualDirectory>
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="../src/uuid.hpp"/>
     <File Name="../src/communicator.hpp"/>
     <File Name="../src/communicator.cpp"/>
     <File Name="../src/socket_telnet.cpp"/>
@@ -139,7 +140,7 @@
         <IncludePath Value="C:/Users/Blue/Desktop/Test2/sqlitewrap"/>
         <IncludePath Value="C:/OpenSSL-Win32/include"/>
         <IncludePath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/include"/>
-        <IncludePath Value="C:/Users/Blue/Downloads/libssh-0.7.2/include"/>
+        <IncludePath Value="C:/libssh-0.7.2/include"/>
         <Preprocessor Value="WITHOUT_SDL"/>
       </Compiler>
       <Linker Options="" Required="yes">
@@ -147,11 +148,12 @@
         <LibraryPath Value="../src"/>
         <LibraryPath Value="../sqlitewrap/Debug"/>
         <LibraryPath Value="C:/sqlite3/lib"/>
+        <LibraryPath Value="mingw32/lib"/>
         <LibraryPath Value="C:/UnitTest++-1.3/Debug"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/MinGW"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>
         <LibraryPath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/build"/>
-        <LibraryPath Value="C:/Users/Blue/Downloads/libssh-0.7.2\lib"/>
+        <LibraryPath Value="C:/libssh-0.7.2\lib"/>
         <Library Value="mingw32"/>
         <Library Value="libws2_32.a"/>
         <Library Value="libwsock32.a"/>
@@ -163,6 +165,7 @@
         <Library Value="libsqlite3.a"/>
         <Library Value="yaml-cpp.dll"/>
         <Library Value="UnitTest++"/>
+        <Library Value="Rpcrt4"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>

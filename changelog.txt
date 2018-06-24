@@ -1,4 +1,12 @@
 
+Change Log Update (00.00.106)
+* 2018-06-24
++ Some cleanup after rewrite, updated all project files to the latest
++ Reworked UUID generation support when boost was removed to use new libraries.
++ Removed ARM folder. ARM was for older Pi's running raspberry on an outdated setups,
+  the current linux project builds and handles both x86 and ARM builds.
+- Next work on sysop interfaces
+
 Change Log Update (00.00.105)
 * 2018-03-18
 + Large re-write removing Boost Libraries for core and unit tests
@@ -976,6 +984,7 @@ Change Log Update (00.00.09)
   or Object Relational Mapping.  After hours of compiling and
   some initial testing I'm decide to use the current SqliteWrapped
   wrapper which gives full query control. SOCI I checked out more and
+
   seemed to have several issues when working with classes and exceptions
   which killed the program every time.
 
@@ -1151,6 +1160,7 @@ Change Log Update
   Then adding in Erase from Cursor to End of Line, From Cursor to begging.
 - Add in pre-search in Pipe2Ansi for MCI codes so we know when to pull 
   color and position attributes from the screen buffer.
+
 
 Change Log Update
 * 2015-09-28 StateSystem & Internal ANSI Parser

@@ -84,6 +84,7 @@
         <Library Value="libicuuc.dll.a"/>
         <Library Value="libicuin.dll.a"/>
         <Library Value="yaml-cpp.dll"/>
+        <Library Value="Rpcrt4"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>

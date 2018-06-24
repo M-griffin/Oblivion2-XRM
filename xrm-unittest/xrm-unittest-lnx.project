@@ -79,6 +79,7 @@
       </VirtualDirectory>
       <File Name="../src/utf-cpp/utf8.h"/>
     </VirtualDirectory>
+    <File Name="../src/uuid.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
@@ -162,6 +163,7 @@
         <Library Value="crypto"/>
         <Library Value="yaml-cpp"/>
         <Library Value="libssh"/>
+        <Library Value="uuid"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
