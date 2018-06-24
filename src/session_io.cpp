@@ -863,69 +863,69 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
         ([%]{1}[A-Z]{2})                // %AA
         ([%]{1}[0-9]{2})                // %11
     */
-	
-	std::cout << "exp: " << expression << std::endl;	
-	try
-	{
-		std::regex expr(expression);
-		std::smatch matches;
-		std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
-	//    std::string::size_type offset = 0;
-	//    std::string::size_type length = 0;
 
-		std::regex_constants::match_flag_type flags = std::regex_constants::match_default;
-		while(std::regex_search(start, end, matches, expr, flags))
-		{
-			// Found a match!
-			/*
-			std::cout << "Matched Sub '" << matches.str()
-					  << "' following ' " << matches.prefix().str()
-					  << "' preceeding ' " << matches.suffix().str()
-					  << std::endl;*/
+    //std::cout << "exp: " << expression << std::endl;
+    try
+    {
+        std::regex expr(expression);
+        std::smatch matches;
+        std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
+        //    std::string::size_type offset = 0;
+        //    std::string::size_type length = 0;
 
-			// Avoid Infinite loop and make sure the existing
-			// is not the same as the next!
-			if (start == matches[0].second)
-			{
-				std::cout << "no more matches!" << std::endl;
-				break;
-			}
+        std::regex_constants::match_flag_type flags = std::regex_constants::match_default;
+        while(std::regex_search(start, end, matches, expr, flags))
+        {
+            // Found a match!
+            /*
+            std::cout << "Matched Sub '" << matches.str()
+            		  << "' following ' " << matches.prefix().str()
+            		  << "' preceeding ' " << matches.suffix().str()
+            		  << std::endl;*/
 
-			// Since were replacing on the fly, we need to rescan the
-			// string for next code
-			start = matches[0].second;
+            // Avoid Infinite loop and make sure the existing
+            // is not the same as the next!
+            if (start == matches[0].second)
+            {
+                std::cout << "no more matches!" << std::endl;
+                break;
+            }
 
-			// Loop each match, and grab the starting position and length to replace.
-			for(size_t s = 1; s < matches.size(); ++s)
-			{
-				// Make sure the Match is true! otherwise skip.
-				if(matches[s].matched)
-				{
-					//offset = matches[s].first - ansi_string.begin();
-					//length = matches[s].length();
+            // Since were replacing on the fly, we need to rescan the
+            // string for next code
+            start = matches[0].second;
 
-					// Test output s registers which pattern matched, 1, 2, or 3!
-					/*
-					std::cout << s << " :  Matched Sub 2" << matches[s].str()
-							  << " at offset " << offset
-							  << " of length " << length
-							  << std::endl;*/
+            // Loop each match, and grab the starting position and length to replace.
+            for(size_t s = 1; s < matches.size(); ++s)
+            {
+                // Make sure the Match is true! otherwise skip.
+                if(matches[s].matched)
+                {
+                    //offset = matches[s].first - ansi_string.begin();
+                    //length = matches[s].length();
 
-					// Add to Vector so we store each match.
-					my_matches.m_offset = matches[s].first - ansi_string.begin();
-					my_matches.m_length = matches[s].length();
-					my_matches.m_match  = s;
-					my_matches.m_code   = matches[s].str();
-					code_map.push_back(std::move(my_matches));
-				}
-			}
-		}
-	}
-	catch(std::regex_error &ex)
-	{
-		std::cout << ex.what() << std::endl;
-		std::cout << "CODE IS: " << ex.code() << " " << __FILE__ << __LINE__ << std::endl;
-	}
+                    // Test output s registers which pattern matched, 1, 2, or 3!
+                    /*
+                    std::cout << s << " :  Matched Sub 2" << matches[s].str()
+                    		  << " at offset " << offset
+                    		  << " of length " << length
+                    		  << std::endl;*/
+
+                    // Add to Vector so we store each match.
+                    my_matches.m_offset = matches[s].first - ansi_string.begin();
+                    my_matches.m_length = matches[s].length();
+                    my_matches.m_match  = s;
+                    my_matches.m_code   = matches[s].str();
+                    code_map.push_back(std::move(my_matches));
+                }
+            }
+        }
+    }
+    catch(std::regex_error &ex)
+    {
+        std::cout << ex.what() << std::endl;
+        std::cout << "CODE IS: " << ex.code() << " " << __FILE__ << __LINE__ << std::endl;
+    }
 
     std::cout << "code_map.size(): " << code_map.size() << std::endl;
     return code_map;
@@ -1063,17 +1063,17 @@ bool SessionIO::checkRegex(const std::string &sequence, const std::string &expre
     std::smatch match;
     bool result = false;
 
-	std::cout << "exp: " << expression << std::endl;
-	try
-	{		
-		std::regex regExpression(expression);
-		result = std::regex_match(sequence, match, regExpression);
-	}
-	catch(std::regex_error &ex)
-	{
-		std::cout << ex.what() << std::endl;
-		std::cout << "CODE IS: " << ex.code() << " " << __FILE__ << __LINE__ << std::endl;
-	}
+    //std::cout << "exp: " << expression << std::endl;
+    try
+    {
+        std::regex regExpression(expression);
+        result = std::regex_match(sequence, match, regExpression);
+    }
+    catch(std::regex_error &ex)
+    {
+        std::cout << ex.what() << std::endl;
+        std::cout << "CODE IS: " << ex.code() << " " << __FILE__ << __LINE__ << std::endl;
+    }
 
     return result;
 }
