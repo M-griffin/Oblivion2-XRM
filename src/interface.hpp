@@ -44,7 +44,7 @@ public:
      * @param io_service
      * @param protocol
      * @param port
-     * @return 
+     * @return
      */
     Interface(IOService& io_service, std::string protocol, int port)
         : m_io_service(io_service)
@@ -55,12 +55,12 @@ public:
     {
 
         // Startup SDL NET.
-        if(SDLNet_Init() == -1) 
+        if(SDLNet_Init() == -1)
         {
             fprintf(stderr, "ER: SDLNet_Init: %s\n", SDLNet_GetError());
             exit(-1);
         }
-        
+
         std::cout << "Interface Created" << std::endl;
         // Start up worker thread of ASIO. We want socket communications in a separate thread.
         // We only spawn a single thread for IO_Service on start up
@@ -69,11 +69,11 @@ public:
         // Setup Telnet Server Connection Listener.
         if (!m_socket_acceptor->createTelnetAcceptor("127.0.0.1", port))
         {
-             std::cout << "Unable to start Telnet Acceptor" << std::endl;
-             TheCommunicator::instance()->shutdown();
-             return;
+            std::cout << "Unable to start Telnet Acceptor" << std::endl;
+            TheCommunicator::instance()->shutdown();
+            return;
         }
-                
+
         // Setup the communicator to allow rest of program to talk with
         // And send messages to other nodes.
         TheCommunicator::instance()->setupServer(m_session_manager);
@@ -94,14 +94,14 @@ public:
      * @brief Handles incoming connections.
      */
     void waitingForConnection()
-    {        
+    {
         std::cout << "Waiting For Connection, Adding Async Job to Listener" << std::endl;
         m_async_listener->asyncAccept(
-            m_protocol, 
-            std::bind(&Interface::handle_accept, 
-                        this,
-                        std::placeholders::_1,
-                        std::placeholders::_2));
+            m_protocol,
+            std::bind(&Interface::handle_accept,
+                      this,
+                      std::placeholders::_1,
+                      std::placeholders::_2));
     }
 
 private:
@@ -115,23 +115,20 @@ private:
     {
         if(!error)
         {
-            std::cout << "TCP Connection accepted" << std::endl;            
-            socket_handler->sendSocket((unsigned char *)"The Truth is out there!", 23);
+            std::cout << "TCP Connection accepted" << std::endl;
             connection_ptr async_conn(new AsyncConnection(m_io_service, socket_handler));
-                        
+
             // Create DeadlineTimer and attach to new session
             deadline_timer_ptr deadline_timer(new DeadlineTimer(
-                                          //m_io_service,
-                                          //socket_handler
-                                      ));
-                                      
+                                                  //m_io_service,
+                                                  //socket_handler
+                                              ));
+
             // Create the new Session
-            session_ptr new_session = Session::create(m_io_service, 
+            session_ptr new_session = Session::create(m_io_service,
                                       async_conn,
                                       deadline_timer,
                                       m_session_manager);
-
-            async_conn->getSocketHandle()->sendSocket((unsigned char *)"testing 1.. 2.. 3..", 19);
 
             // Attach Session to Session Manager.
             m_session_manager->join(new_session);

@@ -7,9 +7,13 @@
  *
  * LIBS:
  * Sqlite3
- * SqliteWrapped
  * YamlC++
  * Unittest++
+ * OpenSSL
+ * lunux
+ *   uuid
+ * windows
+ *   Rpcrt4
  *
  * List All Exit Error Codes here.
  * Error Exit Codes (1) Unable to Load Configuration File.
@@ -50,8 +54,8 @@ std::string USERS_DATABASE = "";
 auto main() -> int
 {
     std::cout << "Oblivion/2 XRM Server (c) 2015-2018 Michael Griffin."
-              << std::endl
-              << std::endl;
+    << std::endl
+    << std::endl;
 
     CommonIO common;
     GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
@@ -122,23 +126,23 @@ auto main() -> int
         if (cfg.m_config->use_service_telnet)
         {
             std::cout << "Setting up telnet connections on port "
-                      << cfg.m_config->port_telnet << std::endl;                      
+            << cfg.m_config->port_telnet << std::endl;
         }
-        
+
         // Isolate to code block for smart pointer deallocation.
         {
             // Create Handles to Services, and starts up connection listener and ASIO Thread Worker
-            IOService io_service;            
+            IOService io_service;
             interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", cfg.m_config->port_telnet));
-                        
-            while(TheCommunicator::instance()->isActive()) 
+
+            while(TheCommunicator::instance()->isActive())
             {
                 // Main Thread - While system is active loop,  This will be external event processor
                 // Or notifications, etc.. lets see what else we want to do here.
-                
+
                 // Timer, for cpu useage
                 std::this_thread::sleep_for(std::chrono::milliseconds(20));
-            }        
+            }
         }
     }
 
