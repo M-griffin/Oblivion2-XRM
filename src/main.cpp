@@ -121,7 +121,7 @@ auto main() -> int
         // One we have SSH server setup we can split this up again.
         if (cfg.m_config->use_service_telnet)
         {
-            std::cout << "Listening for telnet connections on port "
+            std::cout << "Setting up telnet connections on port "
                       << cfg.m_config->port_telnet << std::endl;                      
         }
         

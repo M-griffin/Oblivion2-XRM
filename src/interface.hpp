@@ -66,8 +66,6 @@ public:
         // We only spawn a single thread for IO_Service on start up
         m_thread = create_thread();
 
-        std::cout << "Starting Telnet Listener on port: " << port << std::endl;
-
         // Setup Telnet Server Connection Listener.
         if (!m_socket_acceptor->createTelnetAcceptor("127.0.0.1", port))
         {
@@ -97,7 +95,7 @@ public:
      */
     void waitingForConnection()
     {        
-        std::cout << "Waiting For Connection, Add Job to Listener" << std::endl;
+        std::cout << "Waiting For Connection, Adding Async Job to Listener" << std::endl;
         m_async_listener->asyncAccept(
             m_protocol, 
             std::bind(&Interface::handle_accept, 
