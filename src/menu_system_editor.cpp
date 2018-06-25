@@ -1,5 +1,6 @@
 #include "menu_system.hpp"
 #include "model-sys/struct_compat.hpp"
+#include "directory.hpp"
 
 #include <stdint.h>
 #include <string>
@@ -15,9 +16,8 @@
  * @brief Menu Editor, Read and Modify Menus
  * Remake of the orignal Menu Editor Screen
  */
-std::string MenuBase::displayMenus()
+std::string MenuBase::displayOfMenus()
 {
-    /*
     // Setup Extended ASCII Box Drawing characters.
     char top_left  = (char)214; // ╓
     char bot_left  = (char)211; // ╙
@@ -28,29 +28,16 @@ std::string MenuBase::displayMenus()
     char mid_top   = (char)210; // ╥
     char mid_bot   = (char)208; // ╨
     char mid       = (char)186; // ║
+   
+    std::vector<std::string> result_set = m_directory->getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
 
-    namespace fs = boost::filesystem;
-    fs::path someDir(GLOBAL_MENU_PATH);   // Add to menu path from config!
-    fs::directory_iterator end_iter;
-
-    typedef std::vector<std::string> result_set_t;
-    typedef std::vector<std::string>::iterator iterator;
-    result_set_t result_set;
-
-    if(fs::exists(someDir) && fs::is_directory(someDir))
+    // check result set, if no menu then return gracefully.
+    if(result_set.size() == 0)
     {
-        for(fs::directory_iterator dir_iter(someDir); dir_iter != end_iter; ++dir_iter)
-        {
-            if(dir_iter->path().extension() == ".MNU")
-            {
-                if(fs::is_regular_file(dir_iter->status()))
-                {
-                    result_set.push_back(dir_iter->path().filename().string());
-                    //result_set_t::value_type(fs::last_write_time( dir_iter->path() ) ) ); // *dir_iter));
-                }
-            }
-        }
+        std::cout << "\r\n*** No Menus .yaml files found!" << std::endl;
+        return "No Menu Files found!";
     }
+    
     // Sort Menu's in accending order
     std::sort(result_set.begin(), result_set.end());
 
@@ -67,11 +54,12 @@ std::string MenuBase::displayMenus()
     int max_cols  = 73; // out of 80
 
     // Vector or Menus, Loop through
-    iterator i = result_set.begin();
+    std::vector<std::string>::iterator i = result_set.begin();
     std::string menu_name;
     std::string buffer = "\r\n";
     for(int rows = 0; rows < total_rows; rows++)
     {
+        buffer += "   "; // 3 Leading spaces per row.
         for(int cols = 0; cols < max_cols; cols++)
         {
             // Top Row
@@ -130,7 +118,7 @@ std::string MenuBase::displayMenus()
                     if(i != result_set.end())
                     {
                         // Strip Extension, then pad 8 characters.
-                        menu_name = i->substr(0, i->size()-4);
+                        menu_name = i->substr(0, i->size()-5);
                         menu_name = m_common_io.rightPadding(menu_name, 8);
                         //std::cout << menu_name << std::flush;
                         buffer += menu_name;
@@ -150,11 +138,9 @@ std::string MenuBase::displayMenus()
     }
 
     // Display the prompt, then for wait for next command.
-    //std::cout << "A/dd Menu C/hange Menu D/elete Menu Q/uit : " << std::flush;
-    */
     
-    //buffer += "A/dd Menu C/hange Menu D/elete Menu Q/uit : ";
-    std::string buffer = "A/dd Menu C/hange Menu D/elete Menu Q/uit : ";
+    buffer += "A/dd Menu C/hange Menu D/elete Menu Q/uit : ";
+    //std::string prompt_buffer = "A/dd Menu C/hange Menu D/elete Menu Q/uit : ";
     return (buffer);    
 }
 

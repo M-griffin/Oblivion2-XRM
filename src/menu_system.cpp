@@ -571,7 +571,9 @@ bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option)
     {
             // Menu Editor
         case '#':
-            return false;
+            std::cout << "Executing startUpMenuEditor();" << std::endl;
+            startupMenuEditor();
+            return true;
 
             // Configuration Menu
         case 'C':
@@ -836,6 +838,9 @@ void MenuSystem::startupMenuEditor()
 {
     std::cout << "Entering MenuEditor Input " << std::endl;
 
+    std::string listOfMenus = displayOfMenus();
+    baseProcessAndDeliver(listOfMenus);
+    
     // Setup the input processor
     resetMenuInputIndex(MENU_EDITOR_INPUT);
 

@@ -257,7 +257,9 @@ public:
     /**
      * @brief Menu Editor, Runs through all existing menus
      */
-    std::string displayMenus();
+    std::string displayOfMenus();
+    
+    // Handle menu editor methods here... 
 
     /**
      * @brief Updates current and next lightbar positions.
