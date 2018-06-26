@@ -1518,13 +1518,11 @@ bool MenuBase::processMenuOptions(const std::string &input)
             // Pulldown selection.
             if(m_is_active_pulldown_menu)
             {
-
                 std::cout << "handlePulldownHotKeys" << std::endl;
 
                 // Handles ENTER Selection or Hotkeys Command Input.
                 if (handlePulldownHotKeys(m, is_enter, stack_reassignment))
                 {
-
                     if (m_logoff)
                     {
                         return false;

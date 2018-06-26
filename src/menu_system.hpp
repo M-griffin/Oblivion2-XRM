@@ -202,10 +202,6 @@ public:
      */
     void startupExternalProcess(const std::string &cmdline);
 
-    // Move this to it's own module eventually!
-    void startupMenuEditor();
-    void menuEditorInput(const std::string &character_buffer, const bool &);
-
     // Each system will have it's own module that is allocated and pushed to the
     // m_module container to easily push and pop from the stack.
 
@@ -238,6 +234,11 @@ public:
      * @brief Starts up Signup Module
      */
     void startupModuleSignup();
+    
+    /**
+     * @brief Starts up Menu Editor
+     */
+    void startupModuleMenuEditor();
 
     /**
      * @brief Handles Input for Login and PreLogin Sequences.

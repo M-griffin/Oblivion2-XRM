@@ -253,14 +253,7 @@ public:
     // Input is passed through to it, then the function returns for the next input
     // Since ere async, nothing stays inside it always returns.
     void loadAndStartupMenu();
-
-    /**
-     * @brief Menu Editor, Runs through all existing menus
-     */
-    std::string displayOfMenus();
-    
-    // Handle menu editor methods here... 
-
+   
     /**
      * @brief Updates current and next lightbar positions.
      */

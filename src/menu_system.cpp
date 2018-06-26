@@ -4,6 +4,7 @@
 #include "mods/mod_prelogon.hpp"
 #include "mods/mod_logon.hpp"
 #include "mods/mod_signup.hpp"
+#include "mods/mod_menu_editor.hpp"
 
 #include <locale>
 #include <string>
@@ -22,7 +23,6 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     // [Vector] Setup std::function array with available options to pass input to.
     m_menu_functions.push_back(std::bind(&MenuBase::menuInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuBase::menuYesNoBarInput, this, std::placeholders::_1, std::placeholders::_2));
-    m_menu_functions.push_back(std::bind(&MenuSystem::menuEditorInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::modulePreLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
@@ -571,8 +571,8 @@ bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option)
     {
             // Menu Editor
         case '#':
-            std::cout << "Executing startUpMenuEditor();" << std::endl;
-            startupMenuEditor();
+            std::cout << "Executing startupModuleMenuEditor();" << std::endl;
+            startupModuleMenuEditor();
             return true;
 
             // Configuration Menu
@@ -830,70 +830,6 @@ void MenuSystem::startupExternalProcess(const std::string &cmdline)
     m_menu_session_data->startExternalProcess(cmdline);
 }
 
-
-/**
- * @brief Startup Menu Editor and Switch to MenuEditorInput
- */
-void MenuSystem::startupMenuEditor()
-{
-    std::cout << "Entering MenuEditor Input " << std::endl;
-
-    std::string listOfMenus = displayOfMenus();
-    baseProcessAndDeliver(listOfMenus);
-    
-    // Setup the input processor
-    resetMenuInputIndex(MENU_EDITOR_INPUT);
-
-    // 2. Handle any init and startup Screen Displays
-
-    // WIP, nothing completed just yet for the startup.
-}
-
-/**
- * @brief Menu Editor, Read and Modify Menus
- */
-void MenuSystem::menuEditorInput(const std::string &character_buffer, const bool &)
-{
-    // If were not using hot keys, loop input until we get ENTER
-    // Then handle only the first key in the buffer.  Other "SYSTEMS"
-    // Will parse for entire line for matching Command Keys.
-    if (!m_use_hotkey)
-    {
-        // Received ENTER, grab the previous input.
-        if (!(character_buffer[0] == 13))
-        {
-            m_line_buffer += character_buffer[0];
-            m_session_data->deliver(m_line_buffer);
-        }
-    }
-    else
-    {
-        m_line_buffer += character_buffer[0];
-    }
-
-    std::string output_buffer = m_config->default_color_regular;
-    switch (std::toupper(m_line_buffer[0]))
-    {
-        case 'A': // Add
-            output_buffer += "Enter Menu Name to Add : ";
-            break;
-        case 'C': // Change/Edit
-            output_buffer += "Enter Menu Name to Change : ";
-            break;
-        case 'D': // Delete
-            output_buffer += "Enter Menu to Delete : ";
-            break;
-        case 'Q': // Quit
-            // Reload fall back, or gosub to last menu!
-
-            return;
-        default : // Return
-            return;
-    }
-
-    m_session_data->deliver(output_buffer);
-}
-
 /**
  * @brief Clears All Modules
  */
@@ -987,6 +923,23 @@ void MenuSystem::startupModuleSignup()
 
     startupModule(module);
 }
+
+void MenuSystem::startupModuleMenuEditor() 
+{
+    // Setup the input processor
+    resetMenuInputIndex(MODULE_INPUT);
+
+    // Allocate and Create
+    module_ptr module(new ModMenuEditor(m_session_data, m_config, m_ansi_process));
+    if (!module)
+    {
+        std::cout << "ModMenuEditor Allocation Error!" << std::endl;
+        assert(false);
+    }
+
+    startupModule(module);    
+}
+
 
 /**
  * @brief Handles Input for Login and PreLogin Sequences.

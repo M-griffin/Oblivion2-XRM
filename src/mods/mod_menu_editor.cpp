@@ -1,4 +1,4 @@
-#include "menu_system.hpp"
+#include "mod_menu_editor.hpp"
 #include "model-sys/struct_compat.hpp"
 #include "directory.hpp"
 
@@ -7,16 +7,94 @@
 #include <vector>
 
 /**
- * @Brief This Is an Extension of the Menu System to include but branch off the editor
- * Note, not yet setup for .YAML Files, needs some rework.
+ * @brief Handles Updates or Data Input from Client
+ * @return bool, not used anymore?!?
  */
+bool ModMenuEditor::update(const std::string &character_buffer, const bool &)
+{
+    // Make sure system is active, when system is done, success or failes
+    // We change this is inactive to single the login process is completed.
+    if(!m_is_active)
+    {
+        std::cout << "logon() !m_is_active" << std::endl;
+        return false;
+    }
+
+    // Return True when were keeping module active / else false;
+    if(character_buffer.size() == 0)
+    {
+        std::cout << "logon() !character_buffer size 0" << std::endl;
+        return true;
+    }
+
+    // Process all incoming data stright to the input functions.
+    m_mod_functions[m_mod_function_index](character_buffer);
+
+    return true;
+}
+
+/**
+ * @brief Startup class, setup and display initial screens / interface.
+ * @return
+ */
+bool ModMenuEditor::onEnter()
+{
+    std::cout << "OnEnter() ModLogin\n";
+    m_is_active = true;
+
+    // Grab ANSI Screen, display, if desired.. logon.ans maybe?
+    std::string prompt = "\x1b[?25h"; // Turn on Cursor.
+    baseProcessAndDeliver(prompt);
+
+    // Execute the initial setup index.
+    m_setup_functions[m_mod_function_index]();
+        
+    return true;
+}
+
+/**
+ * @brief Exit, close down, display screens to change over data.
+ * @return
+ */
+bool ModMenuEditor::onExit()
+{
+    std::cout << "OnExit() ModLogin\n";
+    m_is_active = false;
+    return true;
+}
+
+/**
+ * @brief Create Default Text Prompts for module
+ */
+void ModMenuEditor::createTextPrompts()
+{
+    // Create Mapping to pass for file creation (default values)
+    M_TextPrompt value;
+
+    value[PROMPT_HEADER]     = std::make_pair("Editor Header", "|CR|CR|15[|07Enter Username, Real Name, Email or User # to Login|15] |CRlogon: ");
+    value[PROMPT_INPUT_TEXT] = std::make_pair("User Prompt", "|CR|15Use your user number |03|OT |15for quick logins |CR");
+    value[PROMPT_INVALID]    = std::make_pair("Invalid input", "|04Invalid Input! Try again.|CR");
+
+    m_text_prompts_dao->writeValue(value);
+}
+
+/**
+ * @brief Sets an indivdual module index.
+ * @param mod_function_index
+ */
+void ModMenuEditor::changeModule(int mod_function_index)
+{
+    // Set, and Execute the Setup module.
+    m_mod_function_index = mod_function_index;
+    m_setup_functions[m_mod_function_index]();
+}
 
 
 /**
  * @brief Menu Editor, Read and Modify Menus
  * Remake of the orignal Menu Editor Screen
  */
-std::string MenuBase::displayOfMenus()
+std::string ModMenuEditor::displayOfMenus()
 {
     // Setup Extended ASCII Box Drawing characters.
     char top_left  = (char)214; // ╓
@@ -29,7 +107,8 @@ std::string MenuBase::displayOfMenus()
     char mid_bot   = (char)208; // ╨
     char mid       = (char)186; // ║
    
-    std::vector<std::string> result_set = m_directory->getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
+    directory_ptr directory(new Directory());
+    std::vector<std::string> result_set = directory->getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
 
     // check result set, if no menu then return gracefully.
     if(result_set.size() == 0)
@@ -144,3 +223,49 @@ std::string MenuBase::displayOfMenus()
     return (buffer);    
 }
 
+
+
+/**
+ * @brief Menu Editor, Read and Modify Menus
+ * TODO reference moved from Menu System, for rewrite.
+void MenuSystem::menuEditorInput(const std::string &character_buffer, const bool &)
+{
+    // If were not using hot keys, loop input until we get ENTER
+    // Then handle only the first key in the buffer.  Other "SYSTEMS"
+    // Will parse for entire line for matching Command Keys.
+    if (!m_use_hotkey)
+    {
+        // Received ENTER, grab the previous input.
+        if (!(character_buffer[0] == 13))
+        {
+            m_line_buffer += character_buffer[0];
+            m_session_data->deliver(m_line_buffer);
+        }
+    }
+    else
+    {
+        m_line_buffer += character_buffer[0];
+    }
+
+    std::string output_buffer = m_config->default_color_regular;
+    switch (std::toupper(m_line_buffer[0]))
+    {
+        case 'A': // Add
+            output_buffer += "Enter Menu Name to Add : ";
+            break;
+        case 'C': // Change/Edit
+            output_buffer += "Enter Menu Name to Change : ";
+            break;
+        case 'D': // Delete
+            output_buffer += "Enter Menu to Delete : ";
+            break;
+        case 'Q': // Quit
+            // Reload fall back, or gosub to last menu!
+
+            return;
+        default : // Return
+            return;
+    }
+
+    m_session_data->deliver(output_buffer);
+}*/
