@@ -162,6 +162,8 @@ public:
     // Helpers
     int getYPosition() const { return m_y_position; }
     int getXPosition() const { return m_x_position; }
+    
+    int getMaxLines() const { return m_number_lines; }
 
 };
 

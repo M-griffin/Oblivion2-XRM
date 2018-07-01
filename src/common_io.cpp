@@ -27,6 +27,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <algorithm>
 #include <functional>
 #include <cctype>
@@ -1225,4 +1226,22 @@ std::string CommonIO::readinAnsi(std::string FileName)
 
     fclose(fp);
     return buff;
+}
+
+/**
+ * @brief Split Strings by delimiter into Vector of Strings.
+ * @param s
+ * @param delimiter
+ * @return
+ */
+std::vector<std::string> CommonIO::splitString(const std::string& s, char delimiter)
+{
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream tokenStream(s);
+    while (std::getline(tokenStream, token, delimiter))
+    {
+        tokens.push_back(token);
+    }
+    return tokens;
 }

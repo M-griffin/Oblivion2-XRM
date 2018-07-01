@@ -23,7 +23,6 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     // [Vector] Setup std::function array with available options to pass input to.
     m_menu_functions.push_back(std::bind(&MenuBase::menuInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuBase::menuYesNoBarInput, this, std::placeholders::_1, std::placeholders::_2));
-    m_menu_functions.push_back(std::bind(&MenuSystem::modulePreLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
 
@@ -873,7 +872,7 @@ void MenuSystem::startupModule(module_ptr module)
 void MenuSystem::startupModulePreLogon()
 {
     // Setup the input processor
-    resetMenuInputIndex(MODULE_PRELOGON_INPUT);
+    resetMenuInputIndex(MODULE_LOGON_INPUT);
 
     // Allocate and Create
     module_ptr module(new ModPreLogon(m_session_data, m_config, m_ansi_process));
@@ -940,15 +939,13 @@ void MenuSystem::startupModuleMenuEditor()
     startupModule(module);    
 }
 
-
 /**
- * @brief Handles Input for Login and PreLogin Sequences.
- * @param character_buffer
- * @param is_utf8
+ * @brief Handles parsing input for Logon module
+ *
  */
-void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8)
+void MenuSystem::moduleLogonInput(const std::string &character_buffer, const bool &is_utf8)
 {
-    // Make sure we have an allocated module before processing.
+   // Make sure we have an allocated module before processing.
     if (m_module.size() == 0 || character_buffer.size() == 0)
     {
         return;
@@ -989,26 +986,6 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
 
         loadAndStartupMenu();
     }
-}
-
-/**
- * @brief Handles parsing input for preLogon module
- *
- */
-void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8)
-{
-    std::cout << " *** modulePreLogonInput" << std::endl;
-    handleLoginInputSystem(character_buffer, is_utf8);
-}
-
-/**
- * @brief Handles parsing input for Logon module
- *
- */
-void MenuSystem::moduleLogonInput(const std::string &character_buffer, const bool &is_utf8)
-{
-    std::cout << " *** modulePreLogonInput" << std::endl;
-    handleLoginInputSystem(character_buffer, is_utf8);
 }
 
 /**

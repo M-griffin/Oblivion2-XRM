@@ -241,18 +241,6 @@ public:
     void startupModuleMenuEditor();
 
     /**
-     * @brief Handles Input for Login and PreLogin Sequences.
-     * @param character_buffer
-     * @param is_utf8
-     */
-    void handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8);
-
-    /**
-     * @brief Handles parsing input for PreLogon current module.
-     */
-    void modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8);
-
-    /**
      * @brief Handles parsing input for Logon current module.
      */
     void moduleLogonInput(const std::string &character_buffer, const bool &is_utf8);

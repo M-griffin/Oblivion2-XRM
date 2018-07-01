@@ -176,6 +176,36 @@ public:
         baseProcessAndDeliver(result);    
     }
     
+    /**
+     * @brief Move to End of Display then output
+     * @param output
+     */
+    void moveToBottomAndDisplay(const std::string &prompt)
+    {
+        std::string output = "";
+        int screen_row = m_ansi_process->getMaxRowsUsedOnScreen();
+
+        output += baseGetDefaultColor();
+        output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
+        output += std::move(prompt);
+        baseProcessAndDeliver(output);
+    }
+
+    /**
+     * @brief Move to End of Display then Setup Display for String
+     * @param output
+     */
+    std::string moveStringToBottom(const std::string &prompt)
+    {
+        std::string output = "";
+        int screen_row = m_ansi_process->getMaxRowsUsedOnScreen();
+
+        output += baseGetDefaultColor();
+        output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
+        output += std::move(prompt);
+        return output;
+    }
+    
     // This holds session data passed to each session.
     // In modules we'll use the weak pointer so more clarity.
     session_data_ptr  m_session_data;

@@ -33,14 +33,16 @@ public:
         , m_mod_function_index(MOD_PROMPT)
         , m_failure_attempts(0)
         , m_is_text_prompt_exist(false)
+        , m_page(0)
+        , m_rows_per_page(0)
     {
         std::cout << "ModMenuEditor" << std::endl;
 
         // Push function pointers to the stack.
         
-        //m_setup_functions.push_back(std::bind(&ModMenuEditor::setupLogon, this));
-
-        //m_mod_functions.push_back(std::bind(&ModMenuEditor::logon, this, std::placeholders::_1));
+        m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuEditor, this));
+        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorPausedInput, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorInput, this, std::placeholders::_1));
         
         
         // Check of the Text Prompts exist.
@@ -69,13 +71,12 @@ public:
     enum
     {
         MOD_PROMPT,
-        MOD_ADD,
-        MOD_CHANGE,
-        MOD_DELETE
+        MOD_PAUSE,
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
     const std::string PROMPT_HEADER = "header";
+    const std::string PROMPT_PAUSE = "pause_prompt";
     const std::string PROMPT_INPUT_TEXT = "input_text";
     const std::string PROMPT_INVALID = "invalid_input";
 
@@ -91,31 +92,73 @@ public:
     void changeModule(int mod_function_index);
     
     /**
+     * @brief Redisplay's the current module prompt.
+     * @param mod_function_index
+     */
+    void redisplayModulePrompt();
+
+    /**
+     * @brief Pull and Display Prompts
+     * @param prompt
+     */
+    void displayPrompt(const std::string &prompt);
+
+    /**
+     * @brief Validates user Logon
+     * @return
+     */
+    void setupMenuEditor();
+    
+    /**
+     * @brief Displays the current page of menu items
+     */
+    void displayCurrentPage();
+
+    /**
      * @brief Menu Editor Display, Runs through all existing menus
      */
-    std::string displayOfMenus();
+    std::string displayMenuList();
 
+
+    /**
+     * Input Methods below here.
+     */
+
+    /**
+     * @brief Handles Input (Waiting for Any Key Press)
+     * @param character_buffer
+     */
+    void menuEditorPausedInput(const std::string &input);
+
+    /**
+     * @brief Handles Menu Editor Command Selection
+     * @param character_buffer
+     */
+    void menuEditorInput(const std::string &input);
 
 private:
 
     // Function Input Vector.
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
+    std::vector<std::string>                                m_menu_display_list;
 
 
     SessionIO              m_session_io;
     std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
 
-    int                    m_mod_function_index;
+    unsigned int           m_mod_function_index;
     int                    m_failure_attempts;
     bool                   m_is_text_prompt_exist;
+    unsigned int           m_page;
+    unsigned int           m_rows_per_page;
 
     CommonIO               m_common_io;
     directory_ptr          m_directory;
 
     // Hold instatnce of user trying to login to the system.
-    //user_ptr               m_logon_user;
+    //user_ptr             m_logon_user;
     
 };
 

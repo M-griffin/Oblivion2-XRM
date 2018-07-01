@@ -39,7 +39,7 @@ bool ModMenuEditor::update(const std::string &character_buffer, const bool &)
  */
 bool ModMenuEditor::onEnter()
 {
-    std::cout << "OnEnter() ModLogin\n";
+    std::cout << "OnEnter() ModMenuEditor\n";
     m_is_active = true;
 
     // Grab ANSI Screen, display, if desired.. logon.ans maybe?
@@ -58,7 +58,7 @@ bool ModMenuEditor::onEnter()
  */
 bool ModMenuEditor::onExit()
 {
-    std::cout << "OnExit() ModLogin\n";
+    std::cout << "OnExit() ModMenuEditor\n";
     m_is_active = false;
     return true;
 }
@@ -71,8 +71,9 @@ void ModMenuEditor::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_HEADER]     = std::make_pair("Editor Header", "|CR|CR|15[|07Enter Username, Real Name, Email or User # to Login|15] |CRlogon: ");
-    value[PROMPT_INPUT_TEXT] = std::make_pair("User Prompt", "|CR|15Use your user number |03|OT |15for quick logins |CR");
+    value[PROMPT_HEADER]     = std::make_pair("Editor Header", "|CS|CR --- Menu Editor --- |CR");
+    value[PROMPT_PAUSE]      = std::make_pair("Pause Prompt", "|CR - Hit any key to continue or (a)bort listing - ");
+    value[PROMPT_INPUT_TEXT] = std::make_pair("User Prompt", "|CRA/dd Menu C/hange Menu D/elete Menu Q/uit : ");
     value[PROMPT_INVALID]    = std::make_pair("Invalid input", "|04Invalid Input! Try again.|CR");
 
     m_text_prompts_dao->writeValue(value);
@@ -89,12 +90,129 @@ void ModMenuEditor::changeModule(int mod_function_index)
     m_setup_functions[m_mod_function_index]();
 }
 
+/**
+ * @brief Redisplay's the current module prompt.
+ * @param mod_function_index
+ */
+void ModMenuEditor::redisplayModulePrompt()
+{
+    m_setup_functions[m_mod_function_index]();
+}
+
+/**
+ * @brief Pull and Display Prompts
+ * @param prompt
+ */
+void ModMenuEditor::displayPrompt(const std::string &prompt)
+{
+    baseDisplayPrompt(prompt, m_text_prompts_dao);
+}
+
+/**
+ * @brief Setup for the Menu Header 
+ * @return
+ */
+void ModMenuEditor::setupMenuEditor() 
+{
+    std::cout << "setupLogon()" << std::endl;
+    displayPrompt(PROMPT_HEADER);
+    
+    // Build a list of screen lines for the menu display
+    // So we know when to pause in large listing, or use pagenation.
+    std::string menu_display_output = displayMenuList();    
+    m_menu_display_list = m_common_io.splitString(menu_display_output, '\n');
+        
+    // std::string display_prompt = moveStringToBottom(prompt_string);
+
+    // Translate Pipe Coles to ESC Sequences prior to parsing to keep
+    // String length calculations.
+    // display_prompt = m_session_io.pipe2ansi(display_prompt);
+    
+    // calculate the rows_per_page.
+    unsigned int rows_used = m_ansi_process->getMaxRowsUsedOnScreen();
+    unsigned int max_rows = m_ansi_process->getMaxLines();
+    
+    // Set the available rows to display.
+    // Add (2) rows from space and input prompt.
+    m_page = 0;
+    m_rows_per_page = max_rows - rows_used + 2;
+        
+    displayCurrentPage();
+}
+
+/**
+ * @brief Displays the current page of menu items
+ */
+void ModMenuEditor::displayCurrentPage() 
+{
+    bool displayed_all_rows = true;
+    for (unsigned int i = (m_page*m_rows_per_page); i < m_menu_display_list.size(); i++) 
+    {
+        std::string display_line = m_session_io.pipe2ansi(m_menu_display_list[i]);
+        baseProcessAndDeliver(display_line);
+        
+        if (i >= (m_page*m_rows_per_page) + m_rows_per_page)
+        {
+            // We've displayed the max amount of rows per the currnet
+            // screen break out and wait for prompt or next page.
+            displayed_all_rows = false;
+            break;
+        }
+    }
+    
+    // If we displayed all rows, then display propmpt, otherwise
+    // Ask to hit anykey for next page.
+    if (displayed_all_rows)
+    {
+        // Reset Page back to Zero for next display.
+        m_page = 0;
+        displayPrompt(PROMPT_INPUT_TEXT);
+        changeModule(MOD_PROMPT);
+    }
+    else 
+    {
+        displayPrompt(PROMPT_PAUSE);
+        changeModule(MOD_PAUSE);
+    }
+}
+ 
+/**
+ * @brief Handles Input (Waiting for Any Key Press)
+ * @param input
+ */
+void ModMenuEditor::menuEditorPausedInput(const std::string &input)
+{
+    
+    // Check for abort on pause for next.
+    if (input.size() == 1 && std::toupper(input[0]) == 'A')
+    {
+        displayPrompt(PROMPT_INPUT_TEXT);
+        changeModule(MOD_PROMPT);
+        return;
+    }
+    
+    // Any input coming in here is valid
+    // Increment to next page, then display remaining results.
+    ++m_page;
+    displayCurrentPage();
+}
+
+
+/**
+ * @brief Handles Menu Editor Command Selection
+ * @param input
+ */
+void ModMenuEditor::menuEditorInput(const std::string &input)
+{
+    
+}
+   
 
 /**
  * @brief Menu Editor, Read and Modify Menus
  * Remake of the orignal Menu Editor Screen
  */
-std::string ModMenuEditor::displayOfMenus()
+std::string ModMenuEditor::displayMenuList()
 {
     // Setup Extended ASCII Box Drawing characters.
     char top_left  = (char)214; // ╓
@@ -135,7 +253,7 @@ std::string ModMenuEditor::displayOfMenus()
     // Vector or Menus, Loop through
     std::vector<std::string>::iterator i = result_set.begin();
     std::string menu_name;
-    std::string buffer = "\r\n";
+    std::string buffer = "";
     for(int rows = 0; rows < total_rows; rows++)
     {
         buffer += "   "; // 3 Leading spaces per row.
@@ -144,49 +262,40 @@ std::string ModMenuEditor::displayOfMenus()
             // Top Row
             if(rows == 0 && cols == 0)
             {
-                // std::cout << top_left << std::flush;
                 buffer += top_left;
             }
             else if(rows == 0 && cols == max_cols-1)
             {
-                //std::cout << top_right << std::flush;
                 buffer += top_right;
             }
             else if(rows == 0 && cols % 9 == 0)
             {
-                //std::cout << mid_top << std::flush;
                 buffer += mid_top;
             }
             else if(rows == 0)
             {
-                //std::cout << row << std::flush;
                 buffer += row;
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
-                //std::cout << bot_left << std::flush;
                 buffer += bot_left;
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
-                //std::cout << bot_right << std::flush;
                 buffer += bot_right;
             }
             else if(rows == total_rows-1 && cols % 9 == 0)
             {
-                //std::cout << mid_bot << std::flush;
                 buffer += mid_bot;
             }
             else if(rows == total_rows-1)
             {
-                //std::cout << row << std::flush;
                 buffer += row;
             }
             else if(cols % 9 == 0)
             {
-                //std::cout << mid << std::flush;
                 buffer += mid;
             }
             else
@@ -199,30 +308,25 @@ std::string ModMenuEditor::displayOfMenus()
                         // Strip Extension, then pad 8 characters.
                         menu_name = i->substr(0, i->size()-5);
                         menu_name = m_common_io.rightPadding(menu_name, 8);
-                        //std::cout << menu_name << std::flush;
                         buffer += menu_name;
                         ++i;
                     }
                     else
                     {
-                        // Empty, 8 Spaces.
-                        //std::cout << "        " << std::flush;
+                        // Empty, 8 Spaces default menu name size.
                         buffer += "        ";
                     }
                 }
             }
         }
-        //std::cout << std::endl;
-        buffer += "\r\n";
+        
+        // Were going to split on \n, which will get replaced lateron
+        // with \r\n for full carriage returns.        
+        buffer += "\n";
     }
 
-    // Display the prompt, then for wait for next command.
-    
-    buffer += "A/dd Menu C/hange Menu D/elete Menu Q/uit : ";
-    //std::string prompt_buffer = "A/dd Menu C/hange Menu D/elete Menu Q/uit : ";
     return (buffer);    
 }
-
 
 
 /**

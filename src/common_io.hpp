@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <map>
 #include <stdint.h>
 
@@ -312,9 +313,19 @@ public:
     void readinAnsi(std::string FileName, std::string &buff);
     
     /**
-     * Reads in Ansi file into Buffer Only
+     * @brief Reads in Ansi file into Buffer Only
+     * @param FileName
+     * @return 
      */
     std::string readinAnsi(std::string FileName);
+
+    /**
+     * @brief Split Strings by delimiter into Vector of Strings.
+     * @param s
+     * @param delimiter
+     * @return
+     */
+    std::vector<std::string> splitString(const std::string& s, char delimiter);
 
     /**
      * @brief Template search quick find

@@ -48,7 +48,6 @@ public:
         MENU_INPUT,
         MENU_YESNO_BAR,
         MENU_EDITOR_INPUT,
-        MODULE_PRELOGON_INPUT,
         MODULE_LOGON_INPUT,
         MODULE_INPUT,
         FORM_INPUT
