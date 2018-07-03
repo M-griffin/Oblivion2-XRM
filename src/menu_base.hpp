@@ -95,7 +95,7 @@ public:
     std::vector<std::function< bool(const MenuOption &)> > m_execute_callback;
 
     // Handle Dynamic modules being executed.
-    std::vector<module_ptr> m_module;
+    std::vector<module_ptr> m_module_stack;
 
 
     /**

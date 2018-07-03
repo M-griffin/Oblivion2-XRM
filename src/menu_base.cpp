@@ -52,7 +52,7 @@ MenuBase::~MenuBase()
     std::vector<std::function< bool(const MenuOption &)> >().swap(m_execute_callback);
 
     // Pop off the stack to deaallocate any active modules.
-    std::vector<module_ptr>().swap(m_module);
+    std::vector<module_ptr>().swap(m_module_stack);
 }
 
 /**

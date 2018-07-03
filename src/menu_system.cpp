@@ -835,9 +835,9 @@ void MenuSystem::startupExternalProcess(const std::string &cmdline)
  */
 void MenuSystem::clearAllModules()
 {
-    if (m_module.size() > 0)
+    if (m_module_stack.size() > 0)
     {
-        std::vector<module_ptr>().swap(m_module);
+        std::vector<module_ptr>().swap(m_module_stack);
     }
 }
 
@@ -848,8 +848,8 @@ void MenuSystem::shutdownModule()
 {
     // Do module shutdown, only single modules are loaded
     // This makes it easy to allocate and kill on demand.
-    m_module.back()->onExit();
-    m_module.pop_back();
+    m_module_stack.back()->onExit();
+    m_module_stack.pop_back();
 }
 
 /**
@@ -864,7 +864,7 @@ void MenuSystem::startupModule(module_ptr module)
     module->onEnter();
 
     // Push to stack now the new module.
-    m_module.push_back(module);
+    m_module_stack.push_back(module);
 }
 
 /**
@@ -940,43 +940,38 @@ void MenuSystem::startupModuleMenuEditor()
     startupModule(module);    
 }
 
-void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8)
-{
-    std::cout << " *** modulePreLogonInput" << std::endl;
-    moduleLogonInput(character_buffer, is_utf8);
-}
-
 /**
- * @brief Handles parsing input for Logon module
- *
+ * @brief Handles Input for Login and PreLogin Sequences.
+ * @param character_buffer
+ * @param is_utf8
  */
-void MenuSystem::moduleLogonInput(const std::string &character_buffer, const bool &is_utf8)
+void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8)
 {
-   // Make sure we have an allocated module before processing.
-    if (m_module.size() == 0 || character_buffer.size() == 0)
+    // Make sure we have an allocated module before processing.
+    if (m_module_stack.size() == 0 || character_buffer.size() == 0)
     {
         return;
     }
 
     // Allocate and Create
-    m_module.back()->update(character_buffer, is_utf8);
+    m_module_stack.back()->update(character_buffer, is_utf8);
 
     // Finished modules processing.
-    if (!m_module.back()->m_is_active)
+    if (!m_module_stack.back()->m_is_active)
     {
         shutdownModule();
 
         // Check if the current user has been logged in yet.
         if (!m_session_data->m_is_session_authorized)
         {
-            std::cout << "!m_is_session_authorized" << std::endl;
+            std::cout << " *** !m_is_session_authorized" << std::endl;
             m_current_menu = "matrix";
         }
         else
         {
             // If Authorized, then we want to move to main! Startup menu should be TOP or
             // Specified in Config file!  TODO
-            std::cout << "m_is_session_authorized" << std::endl;
+            std::cout << " *** m_is_session_authorized: " << m_config->starting_menu_name << std::endl;
 
             if (m_config->starting_menu_name.size() > 0)
             {
@@ -996,6 +991,26 @@ void MenuSystem::moduleLogonInput(const std::string &character_buffer, const boo
 }
 
 /**
+ * @brief Handles parsing input for preLogon module
+ *
+ */
+void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8)
+{
+    std::cout << " *** modulePreLogonInput" << std::endl;
+    handleLoginInputSystem(character_buffer, is_utf8);
+}
+
+/**
+ * @brief Handles parsing input for Logon module
+ *
+ */
+void MenuSystem::moduleLogonInput(const std::string &character_buffer, const bool &is_utf8)
+{
+    std::cout << " *** modulePreLogonInput" << std::endl;
+    handleLoginInputSystem(character_buffer, is_utf8);
+}
+
+/**
  * @brief Handles parsing input for modules
  *
  */
@@ -1004,16 +1019,16 @@ void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is
     std::cout << " *** moduleInput" << std::endl;
 
     // Make sure we have an allocated module before processing.
-    if (m_module.size() == 0 || character_buffer.size() == 0)
+    if (m_module_stack.size() == 0 || character_buffer.size() == 0)
     {
         return;
     }
 
     // Execute the modules update pass through input.
-    m_module.back()->update(character_buffer, is_utf8);
+    m_module_stack.back()->update(character_buffer, is_utf8);
 
     // Finished modules processing.
-    if (!m_module.back()->m_is_active)
+    if (!m_module_stack.back()->m_is_active)
     {
         shutdownModule();
 
@@ -1024,4 +1039,3 @@ void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is
         redisplayMenuScreen();
     }
 }
-
