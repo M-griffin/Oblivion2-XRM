@@ -241,6 +241,12 @@ public:
     void startupModuleMenuEditor();
 
     /**
+     * @brief Handles parsing input for preLogon module
+     *
+     */
+    void modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8);
+
+    /**
      * @brief Handles parsing input for Logon current module.
      */
     void moduleLogonInput(const std::string &character_buffer, const bool &is_utf8);

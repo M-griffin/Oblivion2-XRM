@@ -153,6 +153,7 @@ private:
     bool                   m_is_text_prompt_exist;
     unsigned int           m_page;
     unsigned int           m_rows_per_page;
+    bool                   m_active;
 
     CommonIO               m_common_io;
     directory_ptr          m_directory;

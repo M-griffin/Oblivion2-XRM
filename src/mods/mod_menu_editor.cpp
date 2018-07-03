@@ -181,8 +181,7 @@ void ModMenuEditor::displayCurrentPage()
  * @param input
  */
 void ModMenuEditor::menuEditorPausedInput(const std::string &input)
-{
-    
+{    
     // Check for abort on pause for next.
     if (input.size() == 1 && std::toupper(input[0]) == 'A')
     {
@@ -204,7 +203,37 @@ void ModMenuEditor::menuEditorPausedInput(const std::string &input)
  */
 void ModMenuEditor::menuEditorInput(const std::string &input)
 {
+    std::string line_buffer = "";
     
+    // Received ENTER, grab the previous input.
+    if (!(input[0] == 13))
+    {
+        line_buffer += input[0];
+        m_session_data->deliver(line_buffer);
+    }
+
+    std::string output_buffer = m_config->default_color_regular;
+    switch (std::toupper(line_buffer[0]))
+    {
+        case 'A': // Add
+            output_buffer += "Enter Menu Name to Add : ";
+            break;
+        case 'C': // Change/Edit
+            output_buffer += "Enter Menu Name to Change : ";
+            break;
+        case 'D': // Delete
+            output_buffer += "Enter Menu to Delete : ";
+            break;
+        case 'Q': // Quit
+            // Reload fall back, or gosub to last menu!
+            m_is_active = false;
+            return;
+            
+        default : // Return
+            return;
+    }
+
+    m_session_data->deliver(output_buffer);
 }
    
 
@@ -328,48 +357,3 @@ std::string ModMenuEditor::displayMenuList()
     return (buffer);    
 }
 
-
-/**
- * @brief Menu Editor, Read and Modify Menus
- * TODO reference moved from Menu System, for rewrite.
-void MenuSystem::menuEditorInput(const std::string &character_buffer, const bool &)
-{
-    // If were not using hot keys, loop input until we get ENTER
-    // Then handle only the first key in the buffer.  Other "SYSTEMS"
-    // Will parse for entire line for matching Command Keys.
-    if (!m_use_hotkey)
-    {
-        // Received ENTER, grab the previous input.
-        if (!(character_buffer[0] == 13))
-        {
-            m_line_buffer += character_buffer[0];
-            m_session_data->deliver(m_line_buffer);
-        }
-    }
-    else
-    {
-        m_line_buffer += character_buffer[0];
-    }
-
-    std::string output_buffer = m_config->default_color_regular;
-    switch (std::toupper(m_line_buffer[0]))
-    {
-        case 'A': // Add
-            output_buffer += "Enter Menu Name to Add : ";
-            break;
-        case 'C': // Change/Edit
-            output_buffer += "Enter Menu Name to Change : ";
-            break;
-        case 'D': // Delete
-            output_buffer += "Enter Menu to Delete : ";
-            break;
-        case 'Q': // Quit
-            // Reload fall back, or gosub to last menu!
-
-            return;
-        default : // Return
-            return;
-    }
-
-    m_session_data->deliver(output_buffer);
-}*/

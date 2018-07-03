@@ -190,7 +190,6 @@ public:
      */
     void handleWrite(const std::error_code& error, socket_handler_ptr)
     {
-        std::cout << "async_write " << error.message() << std::endl;
         if(error)
         {
             std::cout << "async_write error: " << error.message() << std::endl;
