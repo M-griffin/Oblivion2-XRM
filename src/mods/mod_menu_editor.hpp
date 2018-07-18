@@ -30,6 +30,7 @@ public:
         , m_session_io(session_data)
         , m_filename("mod_menu_editor.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
+        , m_mod_setup_index(MOD_DISPLAY_MENU)
         , m_mod_function_index(MOD_PROMPT)
         , m_failure_attempts(0)
         , m_is_text_prompt_exist(false)
@@ -38,12 +39,13 @@ public:
     {
         std::cout << "ModMenuEditor" << std::endl;
 
-        // Push function pointers to the stack.
-        
+        // Setup Modules
         m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuEditor, this));
-        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorPausedInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorInput, this, std::placeholders::_1));
         
+        // Input or Method Modules that handle incoming input per state.
+        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorInput, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorPausedInput, this, std::placeholders::_1));
+                
         
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
@@ -67,11 +69,17 @@ public:
     virtual bool onEnter() override;
     virtual bool onExit() override;
 
-    // This matches the index for mod_functions.push_back
+    // Setup Module Index
     enum
     {
-        MOD_PROMPT,
-        MOD_PAUSE,
+        MOD_DISPLAY_MENU = 0
+    };
+    
+    // Input Module Index
+    enum
+    {
+        MOD_PROMPT = 0,
+        MOD_PAUSE  = 1
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
@@ -86,10 +94,16 @@ public:
     void createTextPrompts();
     
     /**
-     * @brief Sets an indivdual module index.
+     * @brief Sets an indivdual input module index.
      * @param mod_function_index
      */
-    void changeModule(int mod_function_index);
+    void changeInputModule(int mod_function_index);
+
+    /**
+     * @brief Sets an indivdual setup method module index.
+     * @param mod_function_index
+     */
+    void changeSetupModule(int mod_function_index);
     
     /**
      * @brief Redisplay's the current module prompt.
@@ -148,7 +162,9 @@ private:
     std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
 
+    unsigned int           m_mod_setup_index;
     unsigned int           m_mod_function_index;
+    
     int                    m_failure_attempts;
     bool                   m_is_text_prompt_exist;
     unsigned int           m_page;
@@ -157,10 +173,7 @@ private:
 
     CommonIO               m_common_io;
     directory_ptr          m_directory;
-
-    // Hold instatnce of user trying to login to the system.
-    //user_ptr             m_logon_user;
-    
+   
 };
 
 #endif // MOD_MENU_EDITOR_HPP

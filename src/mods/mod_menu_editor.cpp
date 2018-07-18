@@ -16,14 +16,14 @@ bool ModMenuEditor::update(const std::string &character_buffer, const bool &)
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
-        std::cout << "logon() !m_is_active" << std::endl;
+        std::cout << "ModMenuEditor() !m_is_active" << std::endl;
         return false;
     }
 
     // Return True when were keeping module active / else false;
     if(character_buffer.size() == 0)
     {
-        std::cout << "logon() !character_buffer size 0" << std::endl;
+        std::cout << "ModMenuEditor() !character_buffer size 0" << std::endl;
         return true;
     }
 
@@ -47,7 +47,7 @@ bool ModMenuEditor::onEnter()
     baseProcessAndDeliver(prompt);
 
     // Execute the initial setup index.
-    m_setup_functions[m_mod_function_index]();
+    m_setup_functions[m_mod_setup_index]();
         
     return true;
 }
@@ -80,14 +80,24 @@ void ModMenuEditor::createTextPrompts()
 }
 
 /**
- * @brief Sets an indivdual module index.
+ * @brief Sets an indivdual input module index.
  * @param mod_function_index
  */
-void ModMenuEditor::changeModule(int mod_function_index)
+void ModMenuEditor::changeInputModule(int mod_function_index)
+{
+    // Setup input module
+    m_mod_function_index = mod_function_index;
+}
+
+/**
+ * @brief Sets an indivdual setup method module index.
+ * @param mod_function_index
+ */
+void ModMenuEditor::changeSetupModule(int mod_function_index)
 {
     // Set, and Execute the Setup module.
-    m_mod_function_index = mod_function_index;
-    m_setup_functions[m_mod_function_index]();
+    m_mod_setup_index = mod_function_index;
+    m_setup_functions[m_mod_setup_index]();
 }
 
 /**
@@ -96,7 +106,7 @@ void ModMenuEditor::changeModule(int mod_function_index)
  */
 void ModMenuEditor::redisplayModulePrompt()
 {
-    m_setup_functions[m_mod_function_index]();
+    m_setup_functions[m_mod_setup_index]();
 }
 
 /**
@@ -114,12 +124,19 @@ void ModMenuEditor::displayPrompt(const std::string &prompt)
  */
 void ModMenuEditor::setupMenuEditor() 
 {
-    std::cout << "setupLogon()" << std::endl;
+    std::cout << "setupMenuEditor()" << std::endl;
     displayPrompt(PROMPT_HEADER);
     
     // Build a list of screen lines for the menu display
     // So we know when to pause in large listing, or use pagenation.
     std::string menu_display_output = displayMenuList();    
+    
+    if (m_menu_display_list.size() == 0) 
+    {
+        // Clear Out list if anything already exists.
+        std::vector<std::string>().swap(m_menu_display_list);
+    }
+    
     m_menu_display_list = m_common_io.splitString(menu_display_output, '\n');
         
     // std::string display_prompt = moveStringToBottom(prompt_string);
@@ -127,15 +144,11 @@ void ModMenuEditor::setupMenuEditor()
     // Translate Pipe Coles to ESC Sequences prior to parsing to keep
     // String length calculations.
     // display_prompt = m_session_io.pipe2ansi(display_prompt);
-    
-    // calculate the rows_per_page.
-    unsigned int rows_used = m_ansi_process->getMaxRowsUsedOnScreen();
-    unsigned int max_rows = m_ansi_process->getMaxLines();
+        
     
     // Set the available rows to display.
     // Add (2) rows from space and input prompt.
     m_page = 0;
-    m_rows_per_page = max_rows - rows_used + 2;
         
     displayCurrentPage();
 }
@@ -145,10 +158,22 @@ void ModMenuEditor::setupMenuEditor()
  */
 void ModMenuEditor::displayCurrentPage() 
 {
+    
+    // calculate the rows_per_page.
+    unsigned int rows_used = m_ansi_process->getMaxRowsUsedOnScreen();
+    unsigned int max_rows = m_ansi_process->getMaxLines();
+    
+    std::cout << "*** rows_used " << rows_used << std::endl;
+    std::cout << "*** max_rows " << max_rows << std::endl;
+    m_rows_per_page = max_rows - rows_used + 2;
+    
+    std::cout << "*** m_rows_per_page " << m_rows_per_page << std::endl;
+    
     bool displayed_all_rows = true;
     for (unsigned int i = (m_page*m_rows_per_page); i < m_menu_display_list.size(); i++) 
     {
         std::string display_line = m_session_io.pipe2ansi(m_menu_display_list[i]);
+        display_line.append("\r\n");
         baseProcessAndDeliver(display_line);
         
         if (i >= (m_page*m_rows_per_page) + m_rows_per_page)
@@ -167,12 +192,12 @@ void ModMenuEditor::displayCurrentPage()
         // Reset Page back to Zero for next display.
         m_page = 0;
         displayPrompt(PROMPT_INPUT_TEXT);
-        changeModule(MOD_PROMPT);
+        changeInputModule(MOD_PROMPT);
     }
     else 
     {
         displayPrompt(PROMPT_PAUSE);
-        changeModule(MOD_PAUSE);
+        changeInputModule(MOD_PAUSE);
     }
 }
  
@@ -182,11 +207,15 @@ void ModMenuEditor::displayCurrentPage()
  */
 void ModMenuEditor::menuEditorPausedInput(const std::string &input)
 {    
+    
+    std::cout << " *** menuEditorPausedInput !!!" << std::endl;
+    std::cout << "**************************" << std::endl;
+    
     // Check for abort on pause for next.
     if (input.size() == 1 && std::toupper(input[0]) == 'A')
     {
         displayPrompt(PROMPT_INPUT_TEXT);
-        changeModule(MOD_PROMPT);
+        changeInputModule(MOD_PROMPT);
         return;
     }
     
@@ -203,37 +232,87 @@ void ModMenuEditor::menuEditorPausedInput(const std::string &input)
  */
 void ModMenuEditor::menuEditorInput(const std::string &input)
 {
-    std::string line_buffer = "";
+    std::cout << " *** menuEditorInput !!!" << std::endl;
+    std::cout << "**************************" << std::endl;
     
-    // Received ENTER, grab the previous input.
-    if (!(input[0] == 13))
-    {
-        line_buffer += input[0];
-        m_session_data->deliver(line_buffer);
-    }
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
-    std::string output_buffer = m_config->default_color_regular;
-    switch (std::toupper(line_buffer[0]))
+    // ESC was hit
+    if(result == "aborted") 
     {
-        case 'A': // Add
-            output_buffer += "Enter Menu Name to Add : ";
-            break;
-        case 'C': // Change/Edit
-            output_buffer += "Enter Menu Name to Change : ";
-            break;
-        case 'D': // Delete
-            output_buffer += "Enter Menu to Delete : ";
-            break;
-        case 'Q': // Quit
-            // Reload fall back, or gosub to last menu!
-            m_is_active = false;
+        std::cout << "aborted!" << std::endl;
+        return;
+    }
+    else if(result[0] == '\n')
+    {            
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
             return;
+        }
+                
+        baseProcessDeliverNewLine();
+        
+        std::string output_buffer = m_config->default_color_regular;
+        switch (toupper(key[0]))
+        {
+            case 'A': // Add
+                std::cout << "add" << std::endl;
+                output_buffer += "Enter Menu Name to Add : ";
+                m_session_data->deliver(output_buffer);
+                break;
+            case 'C': // Change/Edit
+                std::cout << "change" << std::endl;
+                output_buffer += "Enter Menu Name to Change : ";
+                m_session_data->deliver(output_buffer);
+                break;
+            case 'D': // Delete
+                std::cout << "delete" << std::endl;
+                output_buffer += "Enter Menu to Delete : ";
+                m_session_data->deliver(output_buffer);
+                break;
+            case 'Q': // Quit
+                std::cout << "quit" << std::endl;
+                // Reload fall back, or gosub to last menu!
+                m_is_active = false;
+                return;
+        }
+        
+        /*
+        // Check if users enter valid identifier.
+        if (checkUserLogon(key))
+        {               
+            // Testing print user name.
+            std::cout << m_logon_user->sHandle << std::endl;
+            changeNextModule();
+        }
+        else
+        {
+            displayPromptAndNewLine(PROMPT_INVALID_USERNAME);
+            ++m_failure_attempts;
             
-        default : // Return
-            return;
+            // If max, then exit back to matrix.  
+            // NOTE Separate login/password attempts or change to login?
+            if (m_failure_attempts >= m_config->invalid_password_attempts)
+            {
+                m_is_active = false;
+                return false;
+            }
+               
+            redisplayModulePrompt();
+        }*/     
     }
-
-    m_session_data->deliver(output_buffer);
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty") 
+        {
+            baseProcessDeliverInput(result);
+        }
+    }
 }
    
 
