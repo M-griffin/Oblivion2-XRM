@@ -260,6 +260,9 @@ void ModMenuEditor::menuEditorInput(const std::string &input)
         {
             case 'A': // Add
                 std::cout << "add" << std::endl;
+                
+                // Change these to prompts, then create setup to display, and single input to parse.
+                // Depending on STATE of which prompt 
                 output_buffer += "Enter Menu Name to Add : ";
                 m_session_data->deliver(output_buffer);
                 break;
@@ -370,40 +373,49 @@ std::string ModMenuEditor::displayMenuList()
             // Top Row
             if(rows == 0 && cols == 0)
             {
+                buffer += baseGetDefaultColor();
                 buffer += top_left;
             }
             else if(rows == 0 && cols == max_cols-1)
             {
+                buffer += baseGetDefaultColor();
                 buffer += top_right;
             }
             else if(rows == 0 && cols % 9 == 0)
             {
+                buffer += baseGetDefaultColor();
                 buffer += mid_top;
             }
             else if(rows == 0)
             {
+                buffer += baseGetDefaultColor();
                 buffer += row;
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
+                buffer += baseGetDefaultColor();
                 buffer += bot_left;
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
+                buffer += baseGetDefaultColor();
                 buffer += bot_right;
             }
             else if(rows == total_rows-1 && cols % 9 == 0)
             {
+                buffer += baseGetDefaultColor();
                 buffer += mid_bot;
             }
             else if(rows == total_rows-1)
             {
+                buffer += baseGetDefaultColor();
                 buffer += row;
             }
             else if(cols % 9 == 0)
             {
+                buffer += baseGetDefaultColor();
                 buffer += mid;
             }
             else
@@ -416,6 +428,8 @@ std::string ModMenuEditor::displayMenuList()
                         // Strip Extension, then pad 8 characters.
                         menu_name = i->substr(0, i->size()-5);
                         menu_name = m_common_io.rightPadding(menu_name, 8);
+                        
+                        buffer += baseGetDefaultInputColor();
                         buffer += menu_name;
                         ++i;
                     }
