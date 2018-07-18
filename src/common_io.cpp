@@ -392,15 +392,21 @@ std::string CommonIO::eraseString(const std::string &str,
  */
 std::string CommonIO::rightPadding(const std::string &str, std::string::size_type space)   // Pad Right
 {
+    std::string padded_line = "";
     std::string new_string = str;
-    if(space == 0) return new_string;
+    if(space == 0) 
+        return new_string;
+    
+    // If empty, return padded with spaces!
     if(new_string.empty())
     {
-        //std::cout << "Exception (Common::RightPadding) string length == 0" << std::endl;
-        return new_string;
+        for(std::string::size_type i = 0; i < space; i++)
+        {
+            padded_line += ' ';
+        }
+        return padded_line;
     }
-
-    std::string padded_line = "";
+    
     std::string::size_type s = numberOfChars(new_string);
 
     // if Line > Sapce, Erase to match length
@@ -433,10 +439,15 @@ std::string CommonIO::leftPadding(const std::string &str, std::string::size_type
         return new_string;
     }
 
+    // If empty, return padded with spaces!
     if(new_string.empty())
     {
-        //std::cout << "Exception (Common::leftPadding) string length == 0" << std::endl;
-        return new_string;
+        std::string padded_line = "";
+        for(std::string::size_type i = 0; i < space; i++)
+        {
+            padded_line += ' ';
+        }
+        return padded_line;
     }
 
     std::string::size_type s = numberOfChars(new_string);

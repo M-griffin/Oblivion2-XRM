@@ -73,7 +73,7 @@ void ModMenuEditor::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_HEADER]                  = std::make_pair("Menu Editor Header", "|CS|CR |03--- |15[|11Menu Editor|15] |03--- |CR");
+    value[PROMPT_HEADER]                  = std::make_pair("Menu Editor Header", "|CS|CR|03--- |15[|11Menu Editor|15] |03--- |CR");
     value[PROMPT_OPTION_HEADER]           = std::make_pair("Menu Options Editor Header", "|CS|CR |03--- |15[|11Menu Option Editor|15] |03--- |CR");
     value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 ");
     value[PROMPT_INPUT_TEXT]              = std::make_pair("User Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
@@ -623,6 +623,11 @@ std::string ModMenuEditor::displayMenuList()
     char mid_bot   = (char)208; // ╨
     char mid       = (char)186; // ║
    
+    auto stringToUpper = std::bind1st(
+                            std::mem_fun(
+                                &std::ctype<char>::toupper),
+                                &std::use_facet<std::ctype<char> >(std::locale()));
+                
     directory_ptr directory(new Directory());
     std::vector<std::string> result_set = directory->getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
 
@@ -716,6 +721,8 @@ std::string ModMenuEditor::displayMenuList()
                         menu_name = i->substr(0, i->size()-5);
                         menu_name = m_common_io.rightPadding(menu_name, 8);
                         
+                        transform(menu_name.begin(), menu_name.end(), menu_name.begin(), stringToUpper);
+                        
                         buffer += baseGetDefaultInputColor();
                         buffer += menu_name;
                         ++i;
@@ -774,13 +781,23 @@ std::string ModMenuEditor::displayMenuOptionList()
 
     // TODO WIP!
     // Build a string list of individual menu options, then loop to fit as many per screen!
-    
+    for(unsigned int i = 0; i < current_menu->menu_options.size(); i++)
+    {
+        auto &m = current_menu->menu_options[i];
+        
+        std::string option_string = m_common_io.rightPadding(std::to_string(m.index), 3);        
+        option_string.append(m_common_io.rightPadding(m.menu_key, 9));
+        option_string.append(m_common_io.rightPadding(m.command_key, 4));
+        option_string.append(m_common_io.rightPadding(m.acs_string, 8));
+
+        result_set.push_back(option_string);
+    }
     
     
 
     // iterate through and print out
-    int total_rows = result_set.size() / 8;
-    int remainder = result_set.size() % 8;
+    int total_rows = result_set.size() / 4;
+    int remainder = result_set.size() % 4;
 
     // Add for Header and Footer Row!
     total_rows += 2;
@@ -788,12 +805,14 @@ std::string ModMenuEditor::displayMenuOptionList()
         ++total_rows;
 
     // Could re-calc this on screen width lateron.
-    int max_cols  = 73; // out of 80
+    int max_cols  = 75; // out of 80
 
     // Vector or Menus, Loop through
-    std::vector<std::string>::iterator i = result_set.begin();
+    std::vector<std::string>::iterator i; // = result_set.begin();
     std::string menu_name;
     std::string buffer = "";
+    
+    /*
     for(int rows = 0; rows < total_rows; rows++)
     {
         buffer += "   "; // 3 Leading spaces per row.
@@ -810,11 +829,11 @@ std::string ModMenuEditor::displayMenuOptionList()
                 buffer += baseGetDefaultColor();
                 buffer += top_right;
             }
-            else if(rows == 0 && cols % 9 == 0)
+            else if(rows == 0 && cols % 24 == 0)
             {
                 buffer += baseGetDefaultColor();
                 buffer += mid_top;
-            }
+            } 
             else if(rows == 0)
             {
                 buffer += baseGetDefaultColor();
@@ -832,17 +851,17 @@ std::string ModMenuEditor::displayMenuOptionList()
                 buffer += baseGetDefaultColor();
                 buffer += bot_right;
             }
-            else if(rows == total_rows-1 && cols % 9 == 0)
+            else if(rows == total_rows-1 && cols % 24 == 0)
             {
                 buffer += baseGetDefaultColor();
                 buffer += mid_bot;
-            }
+            } 
             else if(rows == total_rows-1)
             {
                 buffer += baseGetDefaultColor();
                 buffer += row;
             }
-            else if(cols % 9 == 0)
+            else if(cols % 24 == 0)
             {
                 buffer += baseGetDefaultColor();
                 buffer += mid;
@@ -850,22 +869,22 @@ std::string ModMenuEditor::displayMenuOptionList()
             else
             {
                 // Here we insert the Menu name and pad through to 8 characters.
-                if(cols % 10 == 0 || cols == 1)
+                if(cols % 25 == 0 || cols == 1)
                 {
                     if(i != result_set.end())
                     {
                         // Strip Extension, then pad 8 characters.
-                        menu_name = i->substr(0, i->size()-5);
-                        menu_name = m_common_io.rightPadding(menu_name, 8);
+                        //menu_name = i->substr(0, i->size()-5);
+                        //menu_name = m_common_io.rightPadding(menu_name, 8);
                         
                         buffer += baseGetDefaultInputColor();
-                        buffer += menu_name;
+                        buffer += *i;
                         ++i;
                     }
                     else
                     {
-                        // Empty, 8 Spaces default menu name size.
-                        buffer += "        ";
+                        // Empty, 23 Spaces default menu name size.
+                        buffer += "                       ";
                     }
                 }
             }
@@ -874,7 +893,14 @@ std::string ModMenuEditor::displayMenuOptionList()
         // Were going to split on \n, which will get replaced lateron
         // with \r\n for full carriage returns.        
         buffer += "\n";
+    }*/
+    
+    for (i = result_set.begin(); i != result_set.end(); i++)
+    {
+        buffer += baseGetDefaultInputColor();
+        buffer += *i;
+        buffer += "\n";
     }
-
+    
     return (buffer);    
 }
