@@ -73,7 +73,8 @@ void ModMenuEditor::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_HEADER]                  = std::make_pair("Editor Header", "|CS|CR |03--- |15[|11Menu Editor|15] |03--- |CR");
+    value[PROMPT_HEADER]                  = std::make_pair("Menu Editor Header", "|CS|CR |03--- |15[|11Menu Editor|15] |03--- |CR");
+    value[PROMPT_OPTION_HEADER]           = std::make_pair("Menu Options Editor Header", "|CS|CR |03--- |15[|11Menu Option Editor|15] |03--- |CR");
     value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 ");
     value[PROMPT_INPUT_TEXT]              = std::make_pair("User Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
     value[PROMPT_INVALID]                 = std::make_pair("Invalid input", "|04Invalid Input! Try again.|CR");
@@ -146,7 +147,7 @@ void ModMenuEditor::displayPromptAndNewLine(const std::string &prompt)
 }
 
 /**
- * @brief Setup for the Menu Header 
+ * @brief Setup for the Menu Editor 
  * @return
  */
 void ModMenuEditor::setupMenuEditor() 
@@ -164,17 +165,31 @@ void ModMenuEditor::setupMenuEditor()
         std::vector<std::string>().swap(m_menu_display_list);
     }
     
-    m_menu_display_list = m_common_io.splitString(menu_display_output, '\n');
-        
-    // std::string display_prompt = moveStringToBottom(prompt_string);
+    m_menu_display_list = m_common_io.splitString(menu_display_output, '\n');           
+    m_page = 0;        
+    displayCurrentPage();
+}
 
-    // Translate Pipe Coles to ESC Sequences prior to parsing to keep
-    // String length calculations.
-    // display_prompt = m_session_io.pipe2ansi(display_prompt);
-        
+/**
+ * @brief Setup for the Menu Options
+ * @return
+ */
+void ModMenuEditor::setupMenuOptionEditor() 
+{
+    std::cout << "setupMenuOptionEditor()" << std::endl;
+    displayPrompt(PROMPT_OPTION_HEADER);
     
-    // Set the available rows to display.
-    // Add (2) rows from space and input prompt.
+    // Build a list of screen lines for the menu display
+    // So we know when to pause in large listing, or use pagenation.
+    std::string menu_display_output = displayMenuOptionList();    
+    
+    if (m_menu_display_list.size() == 0) 
+    {
+        // Clear Out list if anything already exists.
+        std::vector<std::string>().swap(m_menu_display_list);
+    }
+    
+    m_menu_display_list = m_common_io.splitString(menu_display_output, '\n');
     m_page = 0;
         
     displayCurrentPage();
@@ -372,22 +387,11 @@ void ModMenuEditor::menuEditorMenuNameInput(const std::string &input)
         {            
             std::cout << " * Menu name matches!" << std::endl;            
             handleMenuInputState(true, key);
-            
-            // Redisplay after adding new menu.
-            /*
-            changeInputModule(MOD_PROMPT);
-            redisplayModulePrompt();
-            */
         }
         else 
         {            
             std::cout << " * Menu name doesn't match!" << std::endl;            
             handleMenuInputState(false, key);
-            /*
-            displayPromptAndNewLine(PROMPT_INPUT_TEXT);
-            redisplayModulePrompt();
-            changeInputModule(MOD_PROMPT);
-            */
         }
     }
     else
@@ -400,7 +404,6 @@ void ModMenuEditor::menuEditorMenuNameInput(const std::string &input)
         }
     }
 }
-
 
 /**
  * @brief Here we handle each seperate state and what to do next on input.
@@ -426,7 +429,21 @@ void ModMenuEditor::handleMenuInputState(bool does_menu_exist, const std::string
             break;
             
         case MENU_CHANGE:
-        
+            if (does_menu_exist)
+            {
+                // Move to new Default setup for Options vs Menus.
+                // Also set the curent menu for the system to load
+                // to pull the commands from.
+                m_current_menu = menu_name;
+                changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);                
+            }
+            else
+            {
+                // Error, can't remove a menu that doesn't exist!
+                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_PROMPT);
+            }            
             break;
             
         case MENU_DELETE:
@@ -720,3 +737,144 @@ std::string ModMenuEditor::displayMenuList()
     return (buffer);    
 }
 
+/**
+ * @brief Menu Editor, Read and Modify Menus Options
+ */
+std::string ModMenuEditor::displayMenuOptionList()
+{
+    // Setup Extended ASCII Box Drawing characters.
+    char top_left  = (char)214; // ╓
+    char bot_left  = (char)211; // ╙
+    char row       = (char)196; // ─
+    char top_right = (char)183; // ╖
+    char bot_right = (char)189; // ╜
+
+    char mid_top   = (char)210; // ╥
+    char mid_bot   = (char)208; // ╨
+    char mid       = (char)186; // ║
+   
+
+    // Create Menu Pointer then load the menu into it.
+    menu_ptr current_menu(new Menu());
+    
+    // First load the Source Menu [m_current_menu] file name
+    MenuDao mnu_source(current_menu, m_current_menu, GLOBAL_MENU_PATH);
+    if (mnu_source.fileExists())
+    {
+        mnu_source.loadMenu();
+    }
+    else 
+    {
+        // Error, drop back to Menu Editor.
+        changeSetupModule(MOD_DISPLAY_MENU);
+        return "";
+    }
+
+    std::vector<std::string> result_set;
+
+    // TODO WIP!
+    // Build a string list of individual menu options, then loop to fit as many per screen!
+    
+    
+    
+
+    // iterate through and print out
+    int total_rows = result_set.size() / 8;
+    int remainder = result_set.size() % 8;
+
+    // Add for Header and Footer Row!
+    total_rows += 2;
+    if(remainder > 0)
+        ++total_rows;
+
+    // Could re-calc this on screen width lateron.
+    int max_cols  = 73; // out of 80
+
+    // Vector or Menus, Loop through
+    std::vector<std::string>::iterator i = result_set.begin();
+    std::string menu_name;
+    std::string buffer = "";
+    for(int rows = 0; rows < total_rows; rows++)
+    {
+        buffer += "   "; // 3 Leading spaces per row.
+        for(int cols = 0; cols < max_cols; cols++)
+        {
+            // Top Row
+            if(rows == 0 && cols == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += top_left;
+            }
+            else if(rows == 0 && cols == max_cols-1)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += top_right;
+            }
+            else if(rows == 0 && cols % 9 == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += mid_top;
+            }
+            else if(rows == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += row;
+            }
+
+            // Bottom Row
+            else if(rows == total_rows-1 && cols == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += bot_left;
+            }
+            else if(rows == total_rows-1 && cols == max_cols-1)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += bot_right;
+            }
+            else if(rows == total_rows-1 && cols % 9 == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += mid_bot;
+            }
+            else if(rows == total_rows-1)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += row;
+            }
+            else if(cols % 9 == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += mid;
+            }
+            else
+            {
+                // Here we insert the Menu name and pad through to 8 characters.
+                if(cols % 10 == 0 || cols == 1)
+                {
+                    if(i != result_set.end())
+                    {
+                        // Strip Extension, then pad 8 characters.
+                        menu_name = i->substr(0, i->size()-5);
+                        menu_name = m_common_io.rightPadding(menu_name, 8);
+                        
+                        buffer += baseGetDefaultInputColor();
+                        buffer += menu_name;
+                        ++i;
+                    }
+                    else
+                    {
+                        // Empty, 8 Spaces default menu name size.
+                        buffer += "        ";
+                    }
+                }
+            }
+        }
+        
+        // Were going to split on \n, which will get replaced lateron
+        // with \r\n for full carriage returns.        
+        buffer += "\n";
+    }
+
+    return (buffer);    
+}

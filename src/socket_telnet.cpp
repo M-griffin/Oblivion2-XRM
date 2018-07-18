@@ -18,15 +18,10 @@
  */
 int SDL_Socket::sendSocket(unsigned char *buffer, Uint32 length)
 {
-    std::cout << "sendSocket: " << m_is_socket_active << std::endl;
     int result = 0;
     if (m_is_socket_active)
     {
-
-        std::cout << "TCP Send: " << m_is_socket_active << std::endl;
         result = SDLNet_TCP_Send(m_tcp_socket, buffer, length);
-
-        std::cout << "sendSocket - result: " << result << std::endl;
         if(result < (signed)strlen((char *)buffer))
         {
             if(SDLNet_GetError() && strlen(SDLNet_GetError()))
@@ -37,7 +32,6 @@ int SDL_Socket::sendSocket(unsigned char *buffer, Uint32 length)
         }
     }
 
-    std::cout << "return - result: " << result << std::endl;
     return(result);
 }
 

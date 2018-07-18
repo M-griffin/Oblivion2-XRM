@@ -43,6 +43,7 @@ public:
 
         // Setup Modules
         m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuEditor, this));
+        m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuOptionEditor, this));
         
         // Input or Method Modules that handle incoming input per state.
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorInput, this, std::placeholders::_1));
@@ -75,7 +76,8 @@ public:
     // Setup Module Index
     enum
     {
-        MOD_DISPLAY_MENU = 0
+        MOD_DISPLAY_MENU = 0,
+        MOD_DISPLAY_MENU_OPTIONS = 1
     };
     
     // Input Module Index
@@ -97,7 +99,8 @@ public:
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
-    const std::string PROMPT_HEADER = "header";
+    const std::string PROMPT_HEADER = "menu_header";
+    const std::string PROMPT_OPTION_HEADER = "menu_option_header";
     const std::string PROMPT_PAUSE = "pause_prompt";
     const std::string PROMPT_INPUT_TEXT = "input_text";
     const std::string PROMPT_INVALID = "invalid_input";    
@@ -108,6 +111,9 @@ public:
     const std::string PROMPT_MENU_COPY_TO = "menu_copy_to";    
     const std::string PROMPT_INVALID_MENU_EXISTS = "invalid_menu_exists";
     const std::string PROMPT_INVALID_MENU_NOT_EXISTS = "invalid_menu_doesnt_exist";
+    
+    // Menu Option Editing
+    const std::string PROMPT_INPUT_OPTION_TEXT = "input_option_text";
 
 
     /**
@@ -158,6 +164,12 @@ public:
     void setupMenuEditor();
     
     /**
+     * @brief Setup for the Menu Options
+     * @return
+     */
+    void setupMenuOptionEditor();
+
+    /**
      * @brief Displays the current page of menu items
      */
     void displayCurrentPage();
@@ -173,6 +185,11 @@ public:
      * @brief Menu Editor Display, Runs through all existing menus
      */
     std::string displayMenuList();
+
+    /**
+     * @brief Menu Editor, Read and Modify Menus Options
+     */
+    std::string displayMenuOptionList();
 
 
     /**
