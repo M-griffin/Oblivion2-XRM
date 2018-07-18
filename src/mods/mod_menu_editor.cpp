@@ -796,8 +796,8 @@ std::string ModMenuEditor::displayMenuOptionList()
     
 
     // iterate through and print out
-    int total_rows = result_set.size() / 4;
-    int remainder = result_set.size() % 4;
+    int total_rows = result_set.size() / 3;
+    int remainder = result_set.size() % 3;
 
     // Add for Header and Footer Row!
     total_rows += 2;
@@ -805,17 +805,16 @@ std::string ModMenuEditor::displayMenuOptionList()
         ++total_rows;
 
     // Could re-calc this on screen width lateron.
-    int max_cols  = 75; // out of 80
+    int max_cols  = 76; // out of 80
 
     // Vector or Menus, Loop through
-    std::vector<std::string>::iterator i; // = result_set.begin();
-    std::string menu_name;
+    std::vector<std::string>::iterator i = result_set.begin();
+    //std::string menu_name;
     std::string buffer = "";
     
-    /*
     for(int rows = 0; rows < total_rows; rows++)
     {
-        buffer += "   "; // 3 Leading spaces per row.
+        buffer += "  "; // 3 Leading spaces per row.
         for(int cols = 0; cols < max_cols; cols++)
         {
             // Top Row
@@ -829,7 +828,7 @@ std::string ModMenuEditor::displayMenuOptionList()
                 buffer += baseGetDefaultColor();
                 buffer += top_right;
             }
-            else if(rows == 0 && cols % 24 == 0)
+            else if(rows == 0 && cols % 25 == 0)
             {
                 buffer += baseGetDefaultColor();
                 buffer += mid_top;
@@ -851,7 +850,7 @@ std::string ModMenuEditor::displayMenuOptionList()
                 buffer += baseGetDefaultColor();
                 buffer += bot_right;
             }
-            else if(rows == total_rows-1 && cols % 24 == 0)
+            else if(rows == total_rows-1 && cols % 25 == 0)
             {
                 buffer += baseGetDefaultColor();
                 buffer += mid_bot;
@@ -861,7 +860,7 @@ std::string ModMenuEditor::displayMenuOptionList()
                 buffer += baseGetDefaultColor();
                 buffer += row;
             }
-            else if(cols % 24 == 0)
+            else if(cols % 25 == 0)
             {
                 buffer += baseGetDefaultColor();
                 buffer += mid;
@@ -869,7 +868,7 @@ std::string ModMenuEditor::displayMenuOptionList()
             else
             {
                 // Here we insert the Menu name and pad through to 8 characters.
-                if(cols % 25 == 0 || cols == 1)
+                if(cols % 26 == 0 || cols == 1)
                 {
                     if(i != result_set.end())
                     {
@@ -883,8 +882,8 @@ std::string ModMenuEditor::displayMenuOptionList()
                     }
                     else
                     {
-                        // Empty, 23 Spaces default menu name size.
-                        buffer += "                       ";
+                        // Empty, 24 Spaces default menu name size.
+                        buffer += "                        ";
                     }
                 }
             }
@@ -892,13 +891,6 @@ std::string ModMenuEditor::displayMenuOptionList()
         
         // Were going to split on \n, which will get replaced lateron
         // with \r\n for full carriage returns.        
-        buffer += "\n";
-    }*/
-    
-    for (i = result_set.begin(); i != result_set.end(); i++)
-    {
-        buffer += baseGetDefaultInputColor();
-        buffer += *i;
         buffer += "\n";
     }
     
