@@ -214,6 +214,12 @@ public:
      */
     void deleteExistingMenu(const std::string &menu_name);
     
+    /**
+     * @brief Create a new empty Menu
+     * @param menu_name
+     */
+    void copyExistingMenu(const std::string &menu_name);
+    
 private:
 
     // Function Input Vector.

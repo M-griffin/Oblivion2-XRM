@@ -76,6 +76,22 @@ public:
 		
 		return nullptr;
     }
+    
+    /**
+     * @brief Overide the Filename
+     * @param menu_name
+     */
+    void setFileName(std::string menu_name) 
+    {
+        m_filename = menu_name; 
+    }
+    
+    /**
+     * @brief Retrieve the existing Filename
+     * @return 
+     */
+    std::string getFileName() const { return m_filename; }
+    
    
     menu_ptr    m_menu;
     std::string m_path;

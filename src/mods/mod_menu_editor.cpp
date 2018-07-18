@@ -73,15 +73,15 @@ void ModMenuEditor::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_HEADER]                  = std::make_pair("Editor Header", "|CS|CR |03--- |15Menu Editor |03--- |CR");
+    value[PROMPT_HEADER]                  = std::make_pair("Editor Header", "|CS|CR |03--- |15[|11Menu Editor|15] |03--- |CR");
     value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 ");
     value[PROMPT_INPUT_TEXT]              = std::make_pair("User Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
     value[PROMPT_INVALID]                 = std::make_pair("Invalid input", "|04Invalid Input! Try again.|CR");
-    value[PROMPT_MENU_ADD]                = std::make_pair("Menu Name To Add", "|15Enter menu name to create : ");
-    value[PROMPT_MENU_DELETE]             = std::make_pair("Menu Name To Delete", "|15Enter menu name to delete : ");
-    value[PROMPT_MENU_CHANGE]             = std::make_pair("Menu Name To Change", "|15Enter menu name to edit : ");
-    value[PROMPT_MENU_COPY_FROM]          = std::make_pair("Menu Name To Copy From", "|15Enter menu name to copy : ");
-    value[PROMPT_MENU_COPY_TO]            = std::make_pair("Menu Name To Copy To", "|15Enter menu name save as : ");    
+    value[PROMPT_MENU_ADD]                = std::make_pair("Menu Name To Add", "|15Enter menu name to |11CREATE|15 : ");
+    value[PROMPT_MENU_DELETE]             = std::make_pair("Menu Name To Delete", "|15Enter menu name to |11DELETE|15 : ");
+    value[PROMPT_MENU_CHANGE]             = std::make_pair("Menu Name To Change", "|15Enter menu name to |11EDIT|15 : ");
+    value[PROMPT_MENU_COPY_FROM]          = std::make_pair("Menu Name To Copy From", "|15Enter menu name to |11COPY|15 : ");
+    value[PROMPT_MENU_COPY_TO]            = std::make_pair("Menu Name To Copy To", "|15Enter menu name |11SAVE|15 as : ");    
     value[PROMPT_INVALID_MENU_EXISTS]     = std::make_pair("Invalid Menu Exists", "|04Invalid, Menu already exist.|CR");
     value[PROMPT_INVALID_MENU_NOT_EXISTS] = std::make_pair("Invalid Menu Doesn't Exist", "|04Invalid, Menu doesn't exist.|CR");
 
@@ -446,11 +446,39 @@ void ModMenuEditor::handleMenuInputState(bool does_menu_exist, const std::string
             break;
             
         case MENU_COPY_FROM:
-        
+            // [Source]
+            // Notes, this will take the source, then move to the 
+            // MENU_COPY_TO for destination.  Source is saved as m_current Menu
+            if (does_menu_exist) 
+            {
+                m_current_menu = menu_name;
+                changeMenuInputState(MENU_COPY_TO);
+                displayPrompt(PROMPT_MENU_COPY_TO);
+            }
+            else 
+            {
+                // Error, can't copy a menu that doesn't exist!
+                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_PROMPT);
+            }
             break;
             
         case MENU_COPY_TO:
-            
+            // [Destination]
+            if (does_menu_exist) 
+            {
+                // Error, can't copy or overwrite a destination menu that exists!
+                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_PROMPT);
+            }
+            else 
+            {
+                copyExistingMenu(menu_name);
+                changeInputModule(MOD_PROMPT);
+                redisplayModulePrompt();
+            }
             break;
     }        
 }
@@ -495,7 +523,40 @@ void ModMenuEditor::deleteExistingMenu(const std::string &menu_name)
         mnu.deleteMenu();
     }
 }
-   
+
+/**
+ * @brief Create a new empty Menu
+ * @param menu_name
+ */
+void ModMenuEditor::copyExistingMenu(const std::string &menu_name)
+{
+    // Pre-Load Menu, check access, if not valud, then fall back to previous.
+    menu_ptr new_menu(new Menu());
+    
+    // First load the Source Menu [m_current_menu] file name
+    MenuDao mnu_source(new_menu, m_current_menu, GLOBAL_MENU_PATH);
+    if (mnu_source.fileExists())
+    {
+        mnu_source.loadMenu();
+    }
+    else
+    {
+        std::cout << "Source menu file doesn't exist!" << std::endl;
+        return;
+    }
+    
+    // Next Save a new Destination Menu [menu_name] file name
+    MenuDao mnu_destination(new_menu, menu_name, GLOBAL_MENU_PATH);
+    if (!mnu_destination.fileExists())
+    {
+        mnu_destination.saveMenu(new_menu);
+    }
+    else
+    {
+        std::cout << "Destination menu file already exists!" << std::endl;
+    }
+}
+
 /**
  * @brief Check if the menu exists in the current listing
  * @param menu_name

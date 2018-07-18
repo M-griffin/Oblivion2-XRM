@@ -143,7 +143,10 @@ bool MenuDao::deleteMenu()
     if (std::remove(path.c_str()) != 0)
     {
         std::cout << "Error removing menu file: " << path << std::endl;
+        return false;
     }
+    
+    return true;
 }
 
 /**
