@@ -37,6 +37,7 @@ public:
         , m_is_text_prompt_exist(false)
         , m_page(0)
         , m_rows_per_page(0)
+        , m_current_menu("")
     {
         std::cout << "ModMenuEditor" << std::endl;
 
@@ -104,8 +105,10 @@ public:
     const std::string PROMPT_MENU_DELETE = "menu_delete";
     const std::string PROMPT_MENU_CHANGE = "menu_edit";    
     const std::string PROMPT_MENU_COPY_FROM = "menu_copy_from";
-    const std::string PROMPT_MENU_COPY_TO = "menu_copy_to";
-    
+    const std::string PROMPT_MENU_COPY_TO = "menu_copy_to";    
+    const std::string PROMPT_INVALID_MENU_EXISTS = "invalid_menu_exists";
+    const std::string PROMPT_INVALID_MENU_NOT_EXISTS = "invalid_menu_doesnt_exist";
+
 
     /**
      * @brief Create Default Text Prompts for module
@@ -194,13 +197,23 @@ public:
      */
     void menuEditorMenuNameInput(const std::string &input);
 
+    /**
+     * @brief Here we handle each seperate state and what to do next on input.
+     */
+    void handleMenuInputState(bool does_menu_exist, const std::string &menu_name);
+    
+    /**
+     * @brief Create a new empty Menu
+     * @param menu_name
+     */
+    void createNewMenu(const std::string &menu_name);
+    
 private:
 
     // Function Input Vector.
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
     std::vector<std::string>                                m_menu_display_list;
-
 
     SessionIO              m_session_io;
     std::string            m_filename;
@@ -214,7 +227,7 @@ private:
     bool                   m_is_text_prompt_exist;
     unsigned int           m_page;
     unsigned int           m_rows_per_page;
-    bool                   m_active;
+    std::string            m_current_menu;
 
     CommonIO               m_common_io;
     directory_ptr          m_directory;

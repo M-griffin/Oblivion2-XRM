@@ -1,5 +1,6 @@
 #include "mod_menu_editor.hpp"
-#include "model-sys/struct_compat.hpp"
+#include "model-sys/menu.hpp"
+#include "data-sys/menu_dao.hpp"
 #include "directory.hpp"
 
 #include <stdint.h>
@@ -72,15 +73,17 @@ void ModMenuEditor::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_HEADER]         = std::make_pair("Editor Header", "|CS|CR |03--- |15Menu Editor |03--- |CR");
-    value[PROMPT_PAUSE]          = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 ");
-    value[PROMPT_INPUT_TEXT]     = std::make_pair("User Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
-    value[PROMPT_INVALID]        = std::make_pair("Invalid input", "|04Invalid Input! Try again.|CR");
-    value[PROMPT_MENU_ADD]       = std::make_pair("Menu Name To Add", "|15Enter menu name to create : ");
-    value[PROMPT_MENU_DELETE]    = std::make_pair("Menu Name To Delete", "|15Enter menu name to delete : ");
-    value[PROMPT_MENU_CHANGE]    = std::make_pair("Menu Name To Change", "|15Enter menu name to edit : ");
-    value[PROMPT_MENU_COPY_FROM] = std::make_pair("Menu Name To Copy From", "|15Enter menu name to copy : ");
-    value[PROMPT_MENU_COPY_TO]   = std::make_pair("Menu Name To Copy To", "|15Enter menu name save as : ");
+    value[PROMPT_HEADER]                  = std::make_pair("Editor Header", "|CS|CR |03--- |15Menu Editor |03--- |CR");
+    value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 ");
+    value[PROMPT_INPUT_TEXT]              = std::make_pair("User Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
+    value[PROMPT_INVALID]                 = std::make_pair("Invalid input", "|04Invalid Input! Try again.|CR");
+    value[PROMPT_MENU_ADD]                = std::make_pair("Menu Name To Add", "|15Enter menu name to create : ");
+    value[PROMPT_MENU_DELETE]             = std::make_pair("Menu Name To Delete", "|15Enter menu name to delete : ");
+    value[PROMPT_MENU_CHANGE]             = std::make_pair("Menu Name To Change", "|15Enter menu name to edit : ");
+    value[PROMPT_MENU_COPY_FROM]          = std::make_pair("Menu Name To Copy From", "|15Enter menu name to copy : ");
+    value[PROMPT_MENU_COPY_TO]            = std::make_pair("Menu Name To Copy To", "|15Enter menu name save as : ");    
+    value[PROMPT_INVALID_MENU_EXISTS]     = std::make_pair("Invalid Menu Exists", "|04Invalid, Menu already exist.|CR");
+    value[PROMPT_INVALID_MENU_NOT_EXISTS] = std::make_pair("Invalid Menu Doesn't Exist", "|04Invalid, Menu doesn't exist.|CR");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -289,7 +292,7 @@ void ModMenuEditor::menuEditorInput(const std::string &input)
                 changeInputModule(MOD_MENU_NAME);
                 break;
                 
-            case 'C': // Change/Edit
+            case 'E': // Change/Edit
                 std::cout << "change" << std::endl;
                 changeMenuInputState(MENU_CHANGE);
                 displayPrompt(PROMPT_MENU_CHANGE);
@@ -303,6 +306,13 @@ void ModMenuEditor::menuEditorInput(const std::string &input)
                 changeInputModule(MOD_MENU_NAME);
                 break;
                 
+            case 'C': // Copy
+                std::cout << "copy" << std::endl;
+                changeMenuInputState(MENU_COPY_FROM);
+                displayPrompt(PROMPT_MENU_COPY_FROM);
+                changeInputModule(MOD_MENU_NAME);
+                break;
+                
             case 'Q': // Quit
                 std::cout << "quit" << std::endl;
                 // Reload fall back, or gosub to last menu!
@@ -310,6 +320,7 @@ void ModMenuEditor::menuEditorInput(const std::string &input)
                 return;
                 
             default:
+                // Roll back to main Editor screen and input method.
                 displayPromptAndNewLine(PROMPT_INPUT_TEXT);
                 redisplayModulePrompt();
                 changeInputModule(MOD_PROMPT);
@@ -359,21 +370,24 @@ void ModMenuEditor::menuEditorMenuNameInput(const std::string &input)
         
         if (checkMenuExists(key))
         {            
-            //TODO NOTE check input state, add is invalid if exists, and change, delete invalid if doesn't exist!
-            
             std::cout << " * Menu name matches!" << std::endl;            
-            // Add new menu method here!
+            handleMenuInputState(true, key);
             
             // Redisplay after adding new menu.
+            /*
             changeInputModule(MOD_PROMPT);
             redisplayModulePrompt();
+            */
         }
         else 
-        {
-            std::cout << " * Menu name doesn't match!" << std::endl;    
+        {            
+            std::cout << " * Menu name doesn't match!" << std::endl;            
+            handleMenuInputState(false, key);
+            /*
             displayPromptAndNewLine(PROMPT_INPUT_TEXT);
             redisplayModulePrompt();
             changeInputModule(MOD_PROMPT);
+            */
         }
     }
     else
@@ -384,6 +398,72 @@ void ModMenuEditor::menuEditorMenuNameInput(const std::string &input)
         {
             baseProcessDeliverInput(result);
         }
+    }
+}
+
+
+/**
+ * @brief Here we handle each seperate state and what to do next on input.
+ */
+void ModMenuEditor::handleMenuInputState(bool does_menu_exist, const std::string &menu_name) 
+{    
+    switch (m_mod_menu_state_index)
+    {
+        case MENU_ADD:
+            if (does_menu_exist)
+            {
+                // Error, can't create a menu that already exists!
+                displayPrompt(PROMPT_INVALID_MENU_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_PROMPT);
+            }
+            else 
+            {
+                createNewMenu(menu_name);
+                changeInputModule(MOD_PROMPT);
+                redisplayModulePrompt();                
+            }
+            break;
+            
+        case MENU_CHANGE:
+        
+            break;
+            
+        case MENU_DELETE:
+        
+            break;
+            
+        case MENU_COPY_FROM:
+        
+            break;
+            
+        case MENU_COPY_TO:
+            
+            break;
+    }        
+}
+
+/**
+ * @brief Create a new empty Menu
+ * @param menu_name
+ */
+void ModMenuEditor::createNewMenu(const std::string &menu_name)
+{
+    // Pre-Load Menu, check access, if not valud, then fall back to previous.
+    menu_ptr new_menu(new Menu());
+    
+    // Add a default menu option command to the menu
+    std::vector<MenuOption> new_menu_options;
+    
+    MenuOption new_option;
+    new_menu_options.push_back(new_option);
+    new_menu->menu_options = new_menu_options;
+
+    // Call MenuDao to ready in .yaml file
+    MenuDao mnu(new_menu, menu_name, GLOBAL_MENU_PATH);
+    if (!mnu.fileExists())
+    {
+        mnu.saveMenu(new_menu);
     }
 }
    
