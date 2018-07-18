@@ -90,7 +90,9 @@ public:
     {
         MENU_ADD    = 0,
         MENU_CHANGE = 1,
-        MENU_DELETE = 2
+        MENU_DELETE = 2,
+        MENU_COPY_FROM = 3,
+        MENU_COPY_TO = 4
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
@@ -100,7 +102,10 @@ public:
     const std::string PROMPT_INVALID = "invalid_input";    
     const std::string PROMPT_MENU_ADD = "menu_add";
     const std::string PROMPT_MENU_DELETE = "menu_delete";
-    const std::string PROMPT_MENU_CHANGE = "menu_change";
+    const std::string PROMPT_MENU_CHANGE = "menu_edit";    
+    const std::string PROMPT_MENU_COPY_FROM = "menu_copy_from";
+    const std::string PROMPT_MENU_COPY_TO = "menu_copy_to";
+    
 
     /**
      * @brief Create Default Text Prompts for module

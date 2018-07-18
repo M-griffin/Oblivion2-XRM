@@ -72,13 +72,15 @@ void ModMenuEditor::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_HEADER]      = std::make_pair("Editor Header", "|CS|CR |03--- |15Menu Editor |03--- |CR");
-    value[PROMPT_PAUSE]       = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 ");
-    value[PROMPT_INPUT_TEXT]  = std::make_pair("User Prompt", "|CR|03A|15/dd Menu |03C|15/hange Menu |03D|15/elete Menu |03Q|15/uit : ");
-    value[PROMPT_INVALID]     = std::make_pair("Invalid input", "|04Invalid Input! Try again.|CR");
-    value[PROMPT_MENU_ADD]    = std::make_pair("Menu Name To Add", "|15Enter menu name to add : ");
-    value[PROMPT_MENU_DELETE] = std::make_pair("Menu Name To Delete", "|15Enter menu name to delete : ");
-    value[PROMPT_MENU_CHANGE] = std::make_pair("Menu Name To Change", "|15Enter menu name to change : ");
+    value[PROMPT_HEADER]         = std::make_pair("Editor Header", "|CS|CR |03--- |15Menu Editor |03--- |CR");
+    value[PROMPT_PAUSE]          = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 ");
+    value[PROMPT_INPUT_TEXT]     = std::make_pair("User Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
+    value[PROMPT_INVALID]        = std::make_pair("Invalid input", "|04Invalid Input! Try again.|CR");
+    value[PROMPT_MENU_ADD]       = std::make_pair("Menu Name To Add", "|15Enter menu name to create : ");
+    value[PROMPT_MENU_DELETE]    = std::make_pair("Menu Name To Delete", "|15Enter menu name to delete : ");
+    value[PROMPT_MENU_CHANGE]    = std::make_pair("Menu Name To Change", "|15Enter menu name to edit : ");
+    value[PROMPT_MENU_COPY_FROM] = std::make_pair("Menu Name To Copy From", "|15Enter menu name to copy : ");
+    value[PROMPT_MENU_COPY_TO]   = std::make_pair("Menu Name To Copy To", "|15Enter menu name save as : ");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -356,8 +358,7 @@ void ModMenuEditor::menuEditorMenuNameInput(const std::string &input)
         baseProcessDeliverNewLine();                
         
         if (checkMenuExists(key))
-        {
-            
+        {            
             //TODO NOTE check input state, add is invalid if exists, and change, delete invalid if doesn't exist!
             
             std::cout << " * Menu name matches!" << std::endl;            
