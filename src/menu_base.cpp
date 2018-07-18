@@ -159,7 +159,7 @@ void MenuBase::readInMenuData()
         // Pre-Load Menu, check access, if not valud, then fall back to previous.
         menu_ptr pre_load_menu(new Menu());
 
-        // Call MenuDao to ready in .yaml file
+        // Call MenuDao to readin .yaml file
         MenuDao mnu(pre_load_menu, m_current_menu, GLOBAL_MENU_PATH);
         if (mnu.fileExists())
         {

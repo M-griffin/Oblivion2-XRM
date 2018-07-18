@@ -208,6 +208,12 @@ public:
      */
     void createNewMenu(const std::string &menu_name);
     
+    /**
+     * @brief Delete an existing Menu
+     * @param menu_name
+     */
+    void deleteExistingMenu(const std::string &menu_name);
+    
 private:
 
     // Function Input Vector.

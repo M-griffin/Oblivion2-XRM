@@ -1,6 +1,7 @@
 #include "menu_dao.hpp"
 #include "../model-sys/menu.hpp"
 
+#include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -127,6 +128,23 @@ bool MenuDao::saveMenu(menu_ptr menu)
     return true;
 }
 
+/**
+ * @brief Removes and Existing Menu from the directory.
+ * @param menu
+ * @return
+ */
+bool MenuDao::deleteMenu()
+{
+    std::string path = m_path;
+    pathSeperator(path);
+    path.append(m_filename);
+    path.append(".yaml");
+    
+    if (std::remove(path.c_str()) != 0)
+    {
+        std::cout << "Error removing menu file: " << path << std::endl;
+    }
+}
 
 /**
  * @brief Moves the Loaded menu to the shared pointer.

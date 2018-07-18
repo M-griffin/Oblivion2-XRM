@@ -42,6 +42,13 @@ public:
      * @return
      */
     bool saveMenu(menu_ptr menu);
+    
+    /**
+     * @brief Removes and Existing Menu from the directory.
+     * @param menu
+     * @return
+     */
+    bool deleteMenu();
 
     /**
      * @brief Loads a Menu file into the m_menu stub for access.

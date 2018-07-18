@@ -421,7 +421,7 @@ void ModMenuEditor::handleMenuInputState(bool does_menu_exist, const std::string
             {
                 createNewMenu(menu_name);
                 changeInputModule(MOD_PROMPT);
-                redisplayModulePrompt();                
+                redisplayModulePrompt();
             }
             break;
             
@@ -430,7 +430,19 @@ void ModMenuEditor::handleMenuInputState(bool does_menu_exist, const std::string
             break;
             
         case MENU_DELETE:
-        
+            if (does_menu_exist)
+            {
+                deleteExistingMenu(menu_name);
+                changeInputModule(MOD_PROMPT);
+                redisplayModulePrompt();
+            }
+            else
+            {
+                // Error, can't remove a menu that doesn't exist!
+                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_PROMPT);
+            }
             break;
             
         case MENU_COPY_FROM:
@@ -459,11 +471,28 @@ void ModMenuEditor::createNewMenu(const std::string &menu_name)
     new_menu_options.push_back(new_option);
     new_menu->menu_options = new_menu_options;
 
-    // Call MenuDao to ready in .yaml file
+    // Call MenuDao to save .yaml menu file
     MenuDao mnu(new_menu, menu_name, GLOBAL_MENU_PATH);
     if (!mnu.fileExists())
     {
         mnu.saveMenu(new_menu);
+    }
+}
+
+/**
+ * @brief Delete an existing Menu
+ * @param menu_name
+ */
+void ModMenuEditor::deleteExistingMenu(const std::string &menu_name)
+{
+    // Pre-Load Menu, check access, if not valud, then fall back to previous.
+    menu_ptr new_menu(new Menu());
+    
+    // Call MenuDao to save .yaml menu file
+    MenuDao mnu(new_menu, menu_name, GLOBAL_MENU_PATH);
+    if (mnu.fileExists())
+    {
+        mnu.deleteMenu();
     }
 }
    
@@ -490,10 +519,8 @@ bool ModMenuEditor::checkMenuExists(std::string menu_name)
     for (std::string::size_type i = 0; i < result_set.size(); i++) 
     {
         std::string name = result_set[i];
-        transform(name.begin(), name.end(), name.begin(), stringToLower);
-        
-        
-        std::cout << "COMPARE *** " << name << " : " << menu_name << std::endl;
+        transform(name.begin(), name.end(), name.begin(), stringToLower);        
+
         if (name == menu_name)
             return true;
     }
