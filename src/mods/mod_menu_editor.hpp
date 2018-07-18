@@ -32,6 +32,7 @@ public:
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
         , m_mod_setup_index(MOD_DISPLAY_MENU)
         , m_mod_function_index(MOD_PROMPT)
+        , m_mod_menu_state_index(MENU_ADD)
         , m_failure_attempts(0)
         , m_is_text_prompt_exist(false)
         , m_page(0)
@@ -45,6 +46,7 @@ public:
         // Input or Method Modules that handle incoming input per state.
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorPausedInput, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuNameInput, this, std::placeholders::_1));
                 
         
         // Check of the Text Prompts exist.
@@ -78,15 +80,27 @@ public:
     // Input Module Index
     enum
     {
-        MOD_PROMPT = 0,
-        MOD_PAUSE  = 1
+        MOD_PROMPT    = 0,
+        MOD_PAUSE     = 1,
+        MOD_MENU_NAME = 2
+    };
+    
+    // Input Menu State Index
+    enum
+    {
+        MENU_ADD    = 0,
+        MENU_CHANGE = 1,
+        MENU_DELETE = 2
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
     const std::string PROMPT_HEADER = "header";
     const std::string PROMPT_PAUSE = "pause_prompt";
     const std::string PROMPT_INPUT_TEXT = "input_text";
-    const std::string PROMPT_INVALID = "invalid_input";
+    const std::string PROMPT_INVALID = "invalid_input";    
+    const std::string PROMPT_MENU_ADD = "menu_add";
+    const std::string PROMPT_MENU_DELETE = "menu_delete";
+    const std::string PROMPT_MENU_CHANGE = "menu_change";
 
     /**
      * @brief Create Default Text Prompts for module
@@ -106,6 +120,12 @@ public:
     void changeSetupModule(int mod_function_index);
     
     /**
+     * @brief Sets an indivdual Menu Input State Add/Change/Delete
+     * @param mod_menu_state_index
+     */
+    void changeMenuInputState(int mod_menu_state_index);
+    
+    /**
      * @brief Redisplay's the current module prompt.
      * @param mod_function_index
      */
@@ -116,6 +136,12 @@ public:
      * @param prompt
      */
     void displayPrompt(const std::string &prompt);
+    
+    /**
+     * @brief Pull and Display Prompts with following newline
+     * @param prompt
+     */
+    void displayPromptAndNewLine(const std::string &prompt);
 
     /**
      * @brief Validates user Logon
@@ -127,6 +153,13 @@ public:
      * @brief Displays the current page of menu items
      */
     void displayCurrentPage();
+
+    /**
+     * @brief Check if the menu exists in the current listing
+     * @param menu_name
+     * @return 
+     */
+    bool checkMenuExists(std::string menu_name);
 
     /**
      * @brief Menu Editor Display, Runs through all existing menus
@@ -149,6 +182,12 @@ public:
      * @param character_buffer
      */
     void menuEditorInput(const std::string &input);
+    
+    /**
+     * @brief Handles Menu Name Input for Add/Change/Delete Methods calls.
+     * @param input
+     */
+    void menuEditorMenuNameInput(const std::string &input);
 
 private:
 
@@ -164,6 +203,7 @@ private:
 
     unsigned int           m_mod_setup_index;
     unsigned int           m_mod_function_index;
+    unsigned int           m_mod_menu_state_index;
     
     int                    m_failure_attempts;
     bool                   m_is_text_prompt_exist;

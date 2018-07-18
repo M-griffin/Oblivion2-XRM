@@ -3,6 +3,7 @@
 #include "directory.hpp"
 
 #include <stdint.h>
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -71,10 +72,13 @@ void ModMenuEditor::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_HEADER]     = std::make_pair("Editor Header", "|CS|CR --- Menu Editor --- |CR");
-    value[PROMPT_PAUSE]      = std::make_pair("Pause Prompt", "|CR - Hit any key to continue or (a)bort listing - ");
-    value[PROMPT_INPUT_TEXT] = std::make_pair("User Prompt", "|CRA/dd Menu C/hange Menu D/elete Menu Q/uit : ");
-    value[PROMPT_INVALID]    = std::make_pair("Invalid input", "|04Invalid Input! Try again.|CR");
+    value[PROMPT_HEADER]      = std::make_pair("Editor Header", "|CS|CR |03--- |15Menu Editor |03--- |CR");
+    value[PROMPT_PAUSE]       = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 ");
+    value[PROMPT_INPUT_TEXT]  = std::make_pair("User Prompt", "|CR|03A|15/dd Menu |03C|15/hange Menu |03D|15/elete Menu |03Q|15/uit : ");
+    value[PROMPT_INVALID]     = std::make_pair("Invalid input", "|04Invalid Input! Try again.|CR");
+    value[PROMPT_MENU_ADD]    = std::make_pair("Menu Name To Add", "|15Enter menu name to add : ");
+    value[PROMPT_MENU_DELETE] = std::make_pair("Menu Name To Delete", "|15Enter menu name to delete : ");
+    value[PROMPT_MENU_CHANGE] = std::make_pair("Menu Name To Change", "|15Enter menu name to change : ");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -101,6 +105,15 @@ void ModMenuEditor::changeSetupModule(int mod_function_index)
 }
 
 /**
+ * @brief Sets an indivdual Menu Input State Add/Change/Delete
+ * @param mod_menu_state_index
+ */
+void ModMenuEditor::changeMenuInputState(int mod_menu_state_index)
+{
+    m_mod_menu_state_index = mod_menu_state_index;
+}
+
+/**
  * @brief Redisplay's the current module prompt.
  * @param mod_function_index
  */
@@ -116,6 +129,15 @@ void ModMenuEditor::redisplayModulePrompt()
 void ModMenuEditor::displayPrompt(const std::string &prompt)
 {
     baseDisplayPrompt(prompt, m_text_prompts_dao);
+}
+
+/**
+ * @brief Pull and Display Prompts with following newline
+ * @param prompt
+ */
+void ModMenuEditor::displayPromptAndNewLine(const std::string &prompt)
+{
+    baseDisplayPromptAndNewLine(prompt, m_text_prompts_dao);
 }
 
 /**
@@ -260,52 +282,37 @@ void ModMenuEditor::menuEditorInput(const std::string &input)
         {
             case 'A': // Add
                 std::cout << "add" << std::endl;
-                
-                // Change these to prompts, then create setup to display, and single input to parse.
-                // Depending on STATE of which prompt 
-                output_buffer += "Enter Menu Name to Add : ";
-                m_session_data->deliver(output_buffer);
+                changeMenuInputState(MENU_ADD);
+                displayPrompt(PROMPT_MENU_ADD);
+                changeInputModule(MOD_MENU_NAME);
                 break;
+                
             case 'C': // Change/Edit
                 std::cout << "change" << std::endl;
-                output_buffer += "Enter Menu Name to Change : ";
-                m_session_data->deliver(output_buffer);
+                changeMenuInputState(MENU_CHANGE);
+                displayPrompt(PROMPT_MENU_CHANGE);
+                changeInputModule(MOD_MENU_NAME);
                 break;
+                
             case 'D': // Delete
                 std::cout << "delete" << std::endl;
-                output_buffer += "Enter Menu to Delete : ";
-                m_session_data->deliver(output_buffer);
+                changeMenuInputState(MENU_DELETE);
+                displayPrompt(PROMPT_MENU_DELETE);
+                changeInputModule(MOD_MENU_NAME);
                 break;
+                
             case 'Q': // Quit
                 std::cout << "quit" << std::endl;
                 // Reload fall back, or gosub to last menu!
                 m_is_active = false;
                 return;
-        }
-        
-        /*
-        // Check if users enter valid identifier.
-        if (checkUserLogon(key))
-        {               
-            // Testing print user name.
-            std::cout << m_logon_user->sHandle << std::endl;
-            changeNextModule();
-        }
-        else
-        {
-            displayPromptAndNewLine(PROMPT_INVALID_USERNAME);
-            ++m_failure_attempts;
-            
-            // If max, then exit back to matrix.  
-            // NOTE Separate login/password attempts or change to login?
-            if (m_failure_attempts >= m_config->invalid_password_attempts)
-            {
-                m_is_active = false;
-                return false;
-            }
-               
-            redisplayModulePrompt();
-        }*/     
+                
+            default:
+                displayPromptAndNewLine(PROMPT_INPUT_TEXT);
+                redisplayModulePrompt();
+                changeInputModule(MOD_PROMPT);
+                break;
+        }                
     }
     else
     {
@@ -318,6 +325,100 @@ void ModMenuEditor::menuEditorInput(const std::string &input)
     }
 }
    
+   
+/**
+ * @brief Handles Menu Name Input for Add/Change/Delete Methods calls.
+ * @param input
+ */
+void ModMenuEditor::menuEditorMenuNameInput(const std::string &input)
+{
+    std::cout << " *** menuEditorMenuNameInput !!!" << std::endl;
+    std::cout << "**************************" << std::endl;
+    
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
+
+    // ESC was hit
+    if(result == "aborted") 
+    {
+        std::cout << "aborted!" << std::endl;
+        return;
+    }
+    else if(result[0] == '\n')
+    {            
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return;
+        }
+                
+        baseProcessDeliverNewLine();                
+        
+        if (checkMenuExists(key))
+        {
+            
+            //TODO NOTE check input state, add is invalid if exists, and change, delete invalid if doesn't exist!
+            
+            std::cout << " * Menu name matches!" << std::endl;            
+            // Add new menu method here!
+            
+            // Redisplay after adding new menu.
+            changeInputModule(MOD_PROMPT);
+            redisplayModulePrompt();
+        }
+        else 
+        {
+            std::cout << " * Menu name doesn't match!" << std::endl;    
+            displayPromptAndNewLine(PROMPT_INPUT_TEXT);
+            redisplayModulePrompt();
+            changeInputModule(MOD_PROMPT);
+        }
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty") 
+        {
+            baseProcessDeliverInput(result);
+        }
+    }
+}
+   
+/**
+ * @brief Check if the menu exists in the current listing
+ * @param menu_name
+ * @return 
+ */
+bool ModMenuEditor::checkMenuExists(std::string menu_name)
+{
+    directory_ptr directory(new Directory());
+    std::vector<std::string> result_set = directory->getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
+    
+    auto stringToLower = std::bind1st(
+                            std::mem_fun(
+                                &std::ctype<char>::tolower),
+                                &std::use_facet<std::ctype<char> >(std::locale()));
+            
+    // Append the extension to match the directory files.
+    menu_name.append(".yaml");
+    transform(menu_name.begin(), menu_name.end(), menu_name.begin(), stringToLower);
+            
+    // Case Insensitive Search for Menu name, with transformation to lower case
+    for (std::string::size_type i = 0; i < result_set.size(); i++) 
+    {
+        std::string name = result_set[i];
+        transform(name.begin(), name.end(), name.begin(), stringToLower);
+        
+        
+        std::cout << "COMPARE *** " << name << " : " << menu_name << std::endl;
+        if (name == menu_name)
+            return true;
+    }
+    
+    return false;
+}
 
 /**
  * @brief Menu Editor, Read and Modify Menus
