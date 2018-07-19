@@ -229,6 +229,19 @@ void ModMenuEditor::displayCurrentPage(const std::string &input_state)
         }
     }
     
+    // Default Page Input Method
+    unsigned int current_module_input;
+    switch(m_mod_setup_index)
+    {
+        case MOD_DISPLAY_MENU:
+            current_module_input = MOD_MENU_INPUT;
+            break;
+            
+        case MOD_DISPLAY_MENU_OPTIONS:
+            current_module_input = MOD_MENU_OPTION_INPUT;
+            break;
+    }  
+    
     // If we displayed all rows, then display propmpt, otherwise
     // Ask to hit anykey for next page.
     if (displayed_all_rows)
@@ -236,7 +249,7 @@ void ModMenuEditor::displayCurrentPage(const std::string &input_state)
         // Reset Page back to Zero for next display.
         m_page = 0;
         displayPrompt(input_state);
-        changeInputModule(MOD_MENU_INPUT);
+        changeInputModule(current_module_input);
     }
     else 
     {
@@ -256,14 +269,17 @@ void ModMenuEditor::menuEditorPausedInput(const std::string &input)
     std::cout << "**************************" << std::endl;
     
     std::string current_state_input;    
+    unsigned int current_module_input;    
     switch(m_mod_setup_index)
     {
         case MOD_DISPLAY_MENU:
             current_state_input = PROMPT_INPUT_TEXT;
+            current_module_input = MOD_MENU_INPUT;
             break;
             
         case MOD_DISPLAY_MENU_OPTIONS:
             current_state_input = PROMPT_OPTION_INPUT_TEXT;
+            current_module_input = MOD_MENU_OPTION_INPUT;
             break;
     }    
     
@@ -271,7 +287,7 @@ void ModMenuEditor::menuEditorPausedInput(const std::string &input)
     if (input.size() == 1 && std::toupper(input[0]) == 'A')
     {
         displayPrompt(current_state_input);
-        changeInputModule(MOD_MENU_INPUT);
+        changeInputModule(current_module_input);
         return;
     }
     
@@ -349,9 +365,9 @@ void ModMenuEditor::menuEditorInput(const std::string &input)
                 
             default:
                 // Roll back to main Editor screen and input method.
-                displayPromptAndNewLine(PROMPT_INPUT_TEXT);
-                redisplayModulePrompt();
+                //displayPromptAndNewLine(PROMPT_INPUT_TEXT);
                 changeInputModule(MOD_MENU_INPUT);
+                redisplayModulePrompt();
                 break;
         }                
     }
@@ -427,15 +443,16 @@ void ModMenuEditor::menuEditorOptionInput(const std::string &input)
                 break;
                 
             case 'Q': // Quit
-                std::cout << "quit" << std::endl;
+                std::cout << "quit option" << std::endl;
                 // Reload fall back, or gosub to Menu Editor Main
+                changeSetupModule(MOD_DISPLAY_MENU);
                 changeInputModule(MOD_MENU_INPUT);
                 redisplayModulePrompt();
                 return;
                 
             default:
                 // Roll back to main Editor screen and input method.
-                displayPromptAndNewLine(PROMPT_INPUT_TEXT);                
+                //displayPromptAndNewLine(PROMPT_INPUT_TEXT);                
                 changeInputModule(MOD_MENU_INPUT);
                 redisplayModulePrompt();
                 break;
