@@ -76,6 +76,7 @@ void ModMenuEditor::createTextPrompts()
 
     value[PROMPT_HEADER]                  = std::make_pair("Menu Editor Header", "|CS|CR|03--- |15[|11Menu Editor|15] |03--- |CR");
     value[PROMPT_OPTION_HEADER]           = std::make_pair("Menu Options Editor Header", "|CS|CR |03--- |15[|11Menu Option Editor|15] |03--- |CR");
+    value[PROMPT_MENU_EDIT_HEADER]        = std::make_pair("Menu Fields Editor Header", "|CS|CR |03--- |15[|11Menu Editor|15] |03--- |CR");
     value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 ");
     value[PROMPT_INPUT_TEXT]              = std::make_pair("Menu Edit Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
     value[PROMPT_OPTION_INPUT_TEXT]       = std::make_pair("Menu Option Edit Prompt", "|CR|03A|15/dd |03E|15/dit |03D|15/elete |03C|15/opy |03M|15/ove |03T|15/oggle |03Q|15/uit : ");
@@ -209,6 +210,30 @@ void ModMenuEditor::setupMenuOptionEditor()
 }
 
 /**
+ * @brief Setup for the Menu Editor 
+ * @return
+ */
+void ModMenuEditor::setupMenuEditFields() 
+{
+    std::cout << "setupMenuEditFields()" << std::endl;
+    displayPrompt(PROMPT_MENU_EDIT_HEADER);
+    
+    // Build a list of screen lines for the menu display
+    // So we know when to pause in large listing, or use pagenation.
+    std::string menu_display_output = displayMenuEditScreen();    
+    
+    if (m_menu_display_list.size() == 0) 
+    {
+        // Clear Out list if anything already exists.
+        std::vector<std::string>().swap(m_menu_display_list);
+    }
+    
+    m_menu_display_list = m_common_io.splitString(menu_display_output, '\n');           
+    m_page = 0;        
+    displayCurrentEditPage(PROMPT_INPUT_TEXT);
+}
+
+/**
  * @brief Displays the current page of menu items
  */
 void ModMenuEditor::displayCurrentPage(const std::string &input_state) 
@@ -269,6 +294,31 @@ void ModMenuEditor::displayCurrentPage(const std::string &input_state)
     }
 }
  
+/**
+ * @brief Displays the current page of menu items
+ */
+void ModMenuEditor::displayCurrentEditPage(const std::string &input_state) 
+{
+    for (unsigned int i = 0; i < m_menu_display_list.size(); i++) 
+    {
+        std::string display_line = m_session_io.pipe2ansi(m_menu_display_list[i]);
+        display_line.append("\r\n");
+        baseProcessAndDeliver(display_line);        
+    }
+    
+    // Default Page Input Method
+    unsigned int current_module_input;
+    switch(m_mod_setup_index)
+    {
+        case MOD_DISPLAY_MENU_EDIT:
+            current_module_input = MOD_MENU_INPUT;
+            break;             
+    }  
+    
+    displayPrompt(input_state); // prompt for edit
+    changeInputModule(current_module_input); // switch to the input module for field edits.
+}
+
 /**
  * @brief Handles Input (Waiting for Any Key Press)
  * @param input
@@ -630,7 +680,7 @@ void ModMenuEditor::handleMenuInputState(bool does_menu_exist, const std::string
                 // to pull the commands from.
                 m_current_menu = menu_name;
                 changeInputModule(MOD_MENU_OPTION_INPUT);
-                changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);                                                
+                changeSetupModule(MOD_DISPLAY_MENU_EDIT);  // Change to Menu Edit Fields!                                    
             }
             else
             {
@@ -1262,6 +1312,148 @@ std::string ModMenuEditor::displayMenuOptionList()
                     {
                         // Empty, 24 Spaces default menu name size.
                         buffer += "                        ";
+                    }
+                }
+            }
+        }
+        
+        // Were going to split on \n, which will get replaced lateron
+        // with \r\n for full carriage returns.        
+        buffer += "\n";
+    }
+    
+    return (buffer);    
+}
+
+/**
+ * @brief Menu Editor, for Dispalying Menu Fields to Edit
+ */
+std::string ModMenuEditor::displayMenuEditScreen()
+{
+    // Setup Extended ASCII Box Drawing characters.
+    char top_left  = (char)214; // ╓
+    char bot_left  = (char)211; // ╙
+    char row       = (char)196; // ─
+    char top_right = (char)183; // ╖
+    char bot_right = (char)189; // ╜
+
+    char mid_top   = (char)210; // ╥
+    char mid_bot   = (char)208; // ╨
+    char mid       = (char)186; // ║
+   
+
+    // Create Menu Pointer then load the menu into it.
+    menu_ptr current_menu(new Menu());
+    
+    // First load the Source Menu [m_current_menu] file name
+    MenuDao mnu_source(current_menu, m_current_menu, GLOBAL_MENU_PATH);
+    if (mnu_source.fileExists())
+    {
+        mnu_source.loadMenu();
+    }
+    else 
+    {
+        // Error, drop back to Menu Editor.
+        changeSetupModule(MOD_DISPLAY_MENU);
+        return "";
+    }
+
+    // Build a string list of individual menu options, then loop to fit as many per screen!
+    std::vector<std::string> result_set;
+
+    result_set.push_back("     |11File Version       : |03" + m_common_io.rightPadding(current_menu->file_version, 48));
+    result_set.push_back(" |03(|11A|03) |11Menu Title         : |03" + m_common_io.rightPadding(current_menu->menu_title, 48));
+    result_set.push_back(" |03(|11B|03) |11Password           : |03" + m_common_io.rightPadding(current_menu->menu_password, 48));    
+    result_set.push_back(" |03(|11C|03) |11Fallback Menu      : |03" + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
+    result_set.push_back(" |03(|11D|03) |11Help ID            : |03" + m_common_io.rightPadding(current_menu->menu_help_file, 48));
+    result_set.push_back(" |03(|11E|03) |11Name in Prompt     : |03" + m_common_io.rightPadding(current_menu->menu_name, 48));
+    result_set.push_back(" |03(|11F|03) |11Pulldown File      : |03" + m_common_io.rightPadding(current_menu->menu_password, 48));
+    result_set.push_back(" |03(|11H|03) |11Edit Options         " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |03(|11F|03) |11View Generic Menu    " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |03(|11Q|03) |11Quit                 " + m_common_io.rightPadding("", 48));
+                
+    // Not in use Yet, seems legacy only does ACS in option commands.
+    // option_string.append("Menu ACS           : " + m_common_io.rightPadding(current_menu->menu_acs_string, 35);  
+    // option_string.append("Menu FormMenu      : " + m_common_io.rightPadding(current_menu->menu_form_menu, 8); 
+
+    // iterate through and print out
+    int total_rows = result_set.size();
+    int remainder = 0;
+
+    // Add for Header and Footer Row!
+    total_rows += 2;
+    if(remainder > 0)
+        ++total_rows;
+
+    // Could re-calc this on screen width lateron.
+    int max_cols  = 76; // out of 80
+
+    // Vector or Menus, Loop through
+    std::vector<std::string>::iterator i = result_set.begin();
+    std::string buffer = "";
+    
+    for(int rows = 0; rows < total_rows; rows++)
+    {
+        buffer += "  "; // 3 Leading spaces per row.
+        for(int cols = 0; cols < max_cols; cols++)
+        {
+            // Top Row
+            if(rows == 0 && cols == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += top_left;
+            }
+            else if(rows == 0 && cols == max_cols-1)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += top_right;
+            }
+            else if(rows == 0 && cols % 75 == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += mid_top;
+            } 
+            else if(rows == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += row;
+            }
+
+            // Bottom Row
+            else if(rows == total_rows-1 && cols == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += bot_left;
+            }
+            else if(rows == total_rows-1 && cols == max_cols-1)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += bot_right;
+            }
+            else if(rows == total_rows-1 && cols % 75 == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += mid_bot;
+            } 
+            else if(rows == total_rows-1)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += row;
+            }
+            else if(cols % 75 == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += mid;
+            }
+            else
+            {
+                // Here we insert the Menu name and pad through to 8 characters.
+                if(cols == 1)
+                {
+                    if(i != result_set.end())
+                    {
+                        buffer += *i;
+                        ++i;
                     }
                 }
             }

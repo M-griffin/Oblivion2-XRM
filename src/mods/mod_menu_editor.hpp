@@ -47,6 +47,7 @@ public:
         // Setup Modules
         m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuEditor, this));
         m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuOptionEditor, this));
+        m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuEditFields, this));
         
         // Input or Method Modules that handle incoming input per state.
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorInput, this, std::placeholders::_1));
@@ -84,7 +85,8 @@ public:
     enum
     {
         MOD_DISPLAY_MENU         = 0,
-        MOD_DISPLAY_MENU_OPTIONS = 1
+        MOD_DISPLAY_MENU_OPTIONS = 1,
+        MOD_DISPLAY_MENU_EDIT    = 2
     };
     
     // Input Module Index
@@ -122,6 +124,7 @@ public:
     // Create Prompt Constants, these are the keys for key/value lookup
     const std::string PROMPT_HEADER = "menu_header";
     const std::string PROMPT_OPTION_HEADER = "menu_option_header";
+    const std::string PROMPT_MENU_EDIT_HEADER = "menu_field_edit_header";    
     const std::string PROMPT_PAUSE = "pause_prompt";
     const std::string PROMPT_INPUT_TEXT = "menu_input_text";
     const std::string PROMPT_OPTION_INPUT_TEXT = "option_input_text";
@@ -191,11 +194,22 @@ public:
      * @return
      */
     void setupMenuOptionEditor();
+    
+    /**
+     * @brief Setup for the Menu Editor 
+     * @return
+     */
+    void setupMenuEditFields();
 
     /**
      * @brief Displays the current page of menu items
      */
     void displayCurrentPage(const std::string &input_state);
+
+    /**
+     * @brief Displays the current page of menu items
+     */
+    void displayCurrentEditPage(const std::string &input_state);
 
     /**
      * @brief Check if the menu exists in the current listing
@@ -221,6 +235,10 @@ public:
      */
     std::string displayMenuOptionList();
 
+    /**
+     * @brief Menu Editor, for Dispalying Menu Fields to Edit
+     */
+    std::string displayMenuEditScreen();
 
     /**
      * Input Methods below here.
