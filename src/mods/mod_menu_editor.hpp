@@ -33,6 +33,8 @@ public:
         , m_mod_setup_index(MOD_DISPLAY_MENU)
         , m_mod_function_index(MOD_MENU_INPUT)
         , m_mod_menu_state_index(MENU_ADD)
+        , m_mod_toggle_view_index(VIEW_DEFAULT)
+        , m_max_toggled_view_index(VIEW_STRINGS)
         , m_failure_attempts(0)
         , m_is_text_prompt_exist(false)
         , m_page(0)
@@ -107,6 +109,15 @@ public:
         MENU_MOVE_TO   = 5,
         MENU_MOVE_FROM = 6
     };
+    
+    // Menu Option Toggled View State
+    // Lets so switch the views to see other command information.
+    enum
+    {
+        VIEW_DEFAULT = 0,
+        VIEW_NAMES   = 1,
+        VIEW_STRINGS = 2
+    };
 
     // Create Prompt Constants, these are the keys for key/value lookup
     const std::string PROMPT_HEADER = "menu_header";
@@ -151,6 +162,11 @@ public:
      * @param mod_function_index
      */
     void redisplayModulePrompt();
+
+    /**
+     * @brief Toggle the Option View.
+     */
+    void toggleNextOptionView();
 
     /**
      * @brief Pull and Display Prompts
@@ -286,6 +302,8 @@ private:
     unsigned int           m_mod_setup_index;
     unsigned int           m_mod_function_index;
     unsigned int           m_mod_menu_state_index;
+    unsigned int           m_mod_toggle_view_index;
+    unsigned int           m_max_toggled_view_index;
     
     int                    m_failure_attempts;
     bool                   m_is_text_prompt_exist;

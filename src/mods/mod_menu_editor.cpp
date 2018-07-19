@@ -78,7 +78,7 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_OPTION_HEADER]           = std::make_pair("Menu Options Editor Header", "|CS|CR |03--- |15[|11Menu Option Editor|15] |03--- |CR");
     value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 ");
     value[PROMPT_INPUT_TEXT]              = std::make_pair("Menu Edit Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
-    value[PROMPT_OPTION_INPUT_TEXT]       = std::make_pair("Menu Option Edit Prompt", "|CR|03A|15/dd |03E|15/dit |03D|15/elete |03C|15/opy |03M|15/ove |03Q|15/uit : ");
+    value[PROMPT_OPTION_INPUT_TEXT]       = std::make_pair("Menu Option Edit Prompt", "|CR|03A|15/dd |03E|15/dit |03D|15/elete |03C|15/opy |03M|15/ove |03T|15/oggle |03Q|15/uit : ");
     value[PROMPT_INVALID]                 = std::make_pair("Invalid input", "|04Invalid Input! Try again.|CR");
     value[PROMPT_MENU_ADD]                = std::make_pair("Menu Name To Add", "|15Enter menu name to |11CREATE|15 : ");
     value[PROMPT_MENU_DELETE]             = std::make_pair("Menu Name To Delete", "|15Enter menu name to |11DELETE|15 : ");
@@ -130,6 +130,17 @@ void ModMenuEditor::redisplayModulePrompt()
     m_setup_functions[m_mod_setup_index]();
 }
 
+/**
+ * @brief Toggle the Option View.
+ */
+void ModMenuEditor::toggleNextOptionView()
+{
+    if (m_mod_toggle_view_index == m_max_toggled_view_index)
+        m_mod_toggle_view_index = VIEW_DEFAULT;
+    else
+        ++m_mod_toggle_view_index;
+}
+    
 /**
  * @brief Pull and Display Prompts
  * @param prompt
@@ -449,6 +460,11 @@ void ModMenuEditor::menuEditorOptionInput(const std::string &input)
                 changeInputModule(MOD_MENU_INPUT);
                 redisplayModulePrompt();
                 return;
+                
+            case 'T': // Toggle Option View
+                toggleNextOptionView();
+                redisplayModulePrompt();
+                break;
                 
             default:
                 // Roll back to main Editor screen and input method.
@@ -1136,11 +1152,28 @@ std::string ModMenuEditor::displayMenuOptionList()
     {
         auto &m = current_menu->menu_options[i];
         
-        std::string option_string = m_common_io.rightPadding(std::to_string(m.index), 3);        
-        option_string.append(m_common_io.rightPadding(m.menu_key, 9));
-        option_string.append(m_common_io.rightPadding(m.command_key, 4));
-        option_string.append(m_common_io.rightPadding(m.acs_string, 8));
+        std::string option_string = m_common_io.rightPadding(std::to_string(m.index), 3);  
 
+        // Toggled View will show commands strings, while default shows command key info.
+        switch (m_mod_toggle_view_index) 
+        {            
+            case VIEW_DEFAULT:
+                option_string.append(m_common_io.rightPadding(m.menu_key, 9));
+                option_string.append(m_common_io.rightPadding(m.command_key, 4));
+                option_string.append(m_common_io.rightPadding(m.acs_string, 8));
+                break;
+        
+            case VIEW_NAMES:            
+                option_string.append(m_common_io.rightPadding(m.name, 21));
+                break;
+                
+            case VIEW_STRINGS:
+                option_string.append(m_common_io.rightPadding(m.command_string, 15));
+                option_string.append(m_common_io.rightPadding("", 1));
+                option_string.append(m_common_io.rightPadding(m_common_io.boolAlpha(m.hidden), 5));
+                break;
+        }
+                
         result_set.push_back(option_string);
     }
 
@@ -1221,10 +1254,6 @@ std::string ModMenuEditor::displayMenuOptionList()
                 {
                     if(i != result_set.end())
                     {
-                        // Strip Extension, then pad 8 characters.
-                        //menu_name = i->substr(0, i->size()-5);
-                        //menu_name = m_common_io.rightPadding(menu_name, 8);
-                        
                         buffer += baseGetDefaultInputColor();
                         buffer += *i;
                         ++i;
