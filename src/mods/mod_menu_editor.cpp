@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <sstream>
 
 /**
  * @brief Handles Updates or Data Input from Client
@@ -76,7 +77,8 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_HEADER]                  = std::make_pair("Menu Editor Header", "|CS|CR|03--- |15[|11Menu Editor|15] |03--- |CR");
     value[PROMPT_OPTION_HEADER]           = std::make_pair("Menu Options Editor Header", "|CS|CR |03--- |15[|11Menu Option Editor|15] |03--- |CR");
     value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 ");
-    value[PROMPT_INPUT_TEXT]              = std::make_pair("User Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
+    value[PROMPT_INPUT_TEXT]              = std::make_pair("Menu Edit Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
+    value[PROMPT_OPTION_INPUT_TEXT]       = std::make_pair("Menu Option Edit Prompt", "|CR|03A|15/dd |03E|15/dit |03D|15/elete |03C|15/opy |03M|15/ove |03Q|15/uit : ");
     value[PROMPT_INVALID]                 = std::make_pair("Invalid input", "|04Invalid Input! Try again.|CR");
     value[PROMPT_MENU_ADD]                = std::make_pair("Menu Name To Add", "|15Enter menu name to |11CREATE|15 : ");
     value[PROMPT_MENU_DELETE]             = std::make_pair("Menu Name To Delete", "|15Enter menu name to |11DELETE|15 : ");
@@ -167,7 +169,7 @@ void ModMenuEditor::setupMenuEditor()
     
     m_menu_display_list = m_common_io.splitString(menu_display_output, '\n');           
     m_page = 0;        
-    displayCurrentPage();
+    displayCurrentPage(PROMPT_INPUT_TEXT);
 }
 
 /**
@@ -192,13 +194,13 @@ void ModMenuEditor::setupMenuOptionEditor()
     m_menu_display_list = m_common_io.splitString(menu_display_output, '\n');
     m_page = 0;
         
-    displayCurrentPage();
+    displayCurrentPage(PROMPT_OPTION_INPUT_TEXT);
 }
 
 /**
  * @brief Displays the current page of menu items
  */
-void ModMenuEditor::displayCurrentPage() 
+void ModMenuEditor::displayCurrentPage(const std::string &input_state) 
 {
     
     // calculate the rows_per_page.
@@ -233,8 +235,8 @@ void ModMenuEditor::displayCurrentPage()
     {
         // Reset Page back to Zero for next display.
         m_page = 0;
-        displayPrompt(PROMPT_INPUT_TEXT);
-        changeInputModule(MOD_PROMPT);
+        displayPrompt(input_state);
+        changeInputModule(MOD_MENU_INPUT);
     }
     else 
     {
@@ -253,20 +255,31 @@ void ModMenuEditor::menuEditorPausedInput(const std::string &input)
     std::cout << " *** menuEditorPausedInput !!!" << std::endl;
     std::cout << "**************************" << std::endl;
     
+    std::string current_state_input;    
+    switch(m_mod_setup_index)
+    {
+        case MOD_DISPLAY_MENU:
+            current_state_input = PROMPT_INPUT_TEXT;
+            break;
+            
+        case MOD_DISPLAY_MENU_OPTIONS:
+            current_state_input = PROMPT_OPTION_INPUT_TEXT;
+            break;
+    }    
+    
     // Check for abort on pause for next.
     if (input.size() == 1 && std::toupper(input[0]) == 'A')
     {
-        displayPrompt(PROMPT_INPUT_TEXT);
-        changeInputModule(MOD_PROMPT);
+        displayPrompt(current_state_input);
+        changeInputModule(MOD_MENU_INPUT);
         return;
     }
     
     // Any input coming in here is valid
     // Increment to next page, then display remaining results.
     ++m_page;
-    displayCurrentPage();
+    displayCurrentPage(current_state_input);
 }
-
 
 /**
  * @brief Handles Menu Editor Command Selection
@@ -338,7 +351,7 @@ void ModMenuEditor::menuEditorInput(const std::string &input)
                 // Roll back to main Editor screen and input method.
                 displayPromptAndNewLine(PROMPT_INPUT_TEXT);
                 redisplayModulePrompt();
-                changeInputModule(MOD_PROMPT);
+                changeInputModule(MOD_MENU_INPUT);
                 break;
         }                
     }
@@ -352,7 +365,92 @@ void ModMenuEditor::menuEditorInput(const std::string &input)
         }
     }
 }
-   
+      
+/**
+ * @brief Handles Menu Option Editor Command Selection
+ * @param input
+ */
+void ModMenuEditor::menuEditorOptionInput(const std::string &input)
+{
+    std::cout << " *** menuEditorOptionInput !!!" << std::endl;
+    std::cout << "**************************" << std::endl;
+    
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+
+    // ESC was hit
+    if(result == "aborted") 
+    {
+        std::cout << "aborted!" << std::endl;
+        return;
+    }
+    else if(result[0] == '\n')
+    {            
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return;
+        }
+                
+        baseProcessDeliverNewLine();
+        
+        std::string output_buffer = m_config->default_color_regular;
+        switch (toupper(key[0]))
+        {
+            case 'A': // Add
+                std::cout << "add" << std::endl;
+                changeMenuInputState(MENU_ADD);
+                displayPrompt(PROMPT_MENU_ADD);
+                changeInputModule(MOD_MENU_OPTION);
+                break;
+                
+            case 'E': // Change/Edit
+                std::cout << "change" << std::endl;
+                changeMenuInputState(MENU_CHANGE);
+                displayPrompt(PROMPT_MENU_CHANGE);
+                changeInputModule(MOD_MENU_OPTION);
+                break;
+                
+            case 'D': // Delete
+                std::cout << "delete" << std::endl;
+                changeMenuInputState(MENU_DELETE);
+                displayPrompt(PROMPT_MENU_DELETE);
+                changeInputModule(MOD_MENU_OPTION);
+                break;
+                
+            case 'C': // Copy
+                std::cout << "copy" << std::endl;
+                changeMenuInputState(MENU_COPY_FROM);
+                displayPrompt(PROMPT_MENU_COPY_FROM);
+                changeInputModule(MOD_MENU_OPTION);
+                break;
+                
+            case 'Q': // Quit
+                std::cout << "quit" << std::endl;
+                // Reload fall back, or gosub to Menu Editor Main
+                changeInputModule(MOD_MENU_INPUT);
+                redisplayModulePrompt();
+                return;
+                
+            default:
+                // Roll back to main Editor screen and input method.
+                displayPromptAndNewLine(PROMPT_INPUT_TEXT);                
+                changeInputModule(MOD_MENU_INPUT);
+                redisplayModulePrompt();
+                break;
+        }                
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty") 
+        {
+            baseProcessDeliverInput(result);
+        }
+    }
+}
    
 /**
  * @brief Handles Menu Name Input for Add/Change/Delete Methods calls.
@@ -406,7 +504,70 @@ void ModMenuEditor::menuEditorMenuNameInput(const std::string &input)
 }
 
 /**
- * @brief Here we handle each seperate state and what to do next on input.
+ * @brief Handles Menu Option Input for Add/Change/Delete/Copy/Move Methods calls.
+ * @param input
+ */
+void ModMenuEditor::menuEditorMenuOptionInput(const std::string &input)
+{
+    std::cout << " *** menuEditorMenuOptionInput !!!" << std::endl;
+    std::cout << "**************************" << std::endl;
+    
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
+
+    // ESC was hit
+    if(result == "aborted") 
+    {
+        std::cout << "aborted!" << std::endl;
+        return;
+    }
+    else if(result[0] == '\n')
+    {            
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return;
+        }
+                
+        baseProcessDeliverNewLine();                
+        
+        int option_index = 0;
+        std::stringstream ss(key);
+        ss >> option_index;
+        
+        // check for Invalid Index.
+        if (ss.fail() || option_index < 0)
+        {
+            return;
+        }
+        
+        if (checkMenuOptionExists(option_index))
+        {            
+            std::cout << " * Menu option matches!" << std::endl;            
+            handleMenuOptionInputState(true, option_index);
+        }
+        else 
+        {            
+            std::cout << " * Menu option doesn't match!" << std::endl;            
+            handleMenuOptionInputState(false, option_index);
+        }
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty") 
+        {
+            baseProcessDeliverInput(result);
+        }
+    }
+}
+
+/**
+ * @brief handle each menu seperate state and what to do next on input.
+ * @param does_menu_exist
+ * @param menu_name
  */
 void ModMenuEditor::handleMenuInputState(bool does_menu_exist, const std::string &menu_name) 
 {    
@@ -418,12 +579,12 @@ void ModMenuEditor::handleMenuInputState(bool does_menu_exist, const std::string
                 // Error, can't create a menu that already exists!
                 displayPrompt(PROMPT_INVALID_MENU_EXISTS);
                 displayPrompt(PROMPT_INPUT_TEXT);
-                changeInputModule(MOD_PROMPT);
+                changeInputModule(MOD_MENU_INPUT);
             }
             else 
             {
                 createNewMenu(menu_name);
-                changeInputModule(MOD_PROMPT);
+                changeInputModule(MOD_MENU_INPUT);
                 redisplayModulePrompt();
             }
             break;
@@ -435,14 +596,15 @@ void ModMenuEditor::handleMenuInputState(bool does_menu_exist, const std::string
                 // Also set the curent menu for the system to load
                 // to pull the commands from.
                 m_current_menu = menu_name;
-                changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);                
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+                changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);                                                
             }
             else
             {
                 // Error, can't remove a menu that doesn't exist!
                 displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
                 displayPrompt(PROMPT_INPUT_TEXT);
-                changeInputModule(MOD_PROMPT);
+                changeInputModule(MOD_MENU_INPUT);
             }            
             break;
             
@@ -450,7 +612,7 @@ void ModMenuEditor::handleMenuInputState(bool does_menu_exist, const std::string
             if (does_menu_exist)
             {
                 deleteExistingMenu(menu_name);
-                changeInputModule(MOD_PROMPT);
+                changeInputModule(MOD_MENU_INPUT);
                 redisplayModulePrompt();
             }
             else
@@ -458,7 +620,7 @@ void ModMenuEditor::handleMenuInputState(bool does_menu_exist, const std::string
                 // Error, can't remove a menu that doesn't exist!
                 displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
                 displayPrompt(PROMPT_INPUT_TEXT);
-                changeInputModule(MOD_PROMPT);
+                changeInputModule(MOD_MENU_INPUT);
             }
             break;
             
@@ -477,7 +639,7 @@ void ModMenuEditor::handleMenuInputState(bool does_menu_exist, const std::string
                 // Error, can't copy a menu that doesn't exist!
                 displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
                 displayPrompt(PROMPT_INPUT_TEXT);
-                changeInputModule(MOD_PROMPT);
+                changeInputModule(MOD_MENU_INPUT);
             }
             break;
             
@@ -488,12 +650,145 @@ void ModMenuEditor::handleMenuInputState(bool does_menu_exist, const std::string
                 // Error, can't copy or overwrite a destination menu that exists!
                 displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
                 displayPrompt(PROMPT_INPUT_TEXT);
-                changeInputModule(MOD_PROMPT);
+                changeInputModule(MOD_MENU_INPUT);
             }
             else 
             {
                 copyExistingMenu(menu_name);
-                changeInputModule(MOD_PROMPT);
+                changeInputModule(MOD_MENU_INPUT);
+                redisplayModulePrompt();
+            }
+            break;
+    }        
+}
+
+/**
+ * @brief handle each seperate state and what to do next on input.
+ * @param does_option_exist
+ * @param option_index
+ */
+void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int option_index) 
+{    
+    switch (m_mod_menu_state_index)
+    {
+        case MENU_ADD:
+            if (does_option_exist)
+            {
+                // Error, can't create a menu that already exists!
+                displayPrompt(PROMPT_INVALID_MENU_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+            }
+            else 
+            {
+               // createNewMenu(menu_name);
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+                redisplayModulePrompt();
+            }
+            break;
+            
+        case MENU_CHANGE:
+            if (does_option_exist)
+            {
+                // Move to new Default setup for Options vs Menus.
+                // Also set the curent menu for the system to load
+                // to pull the commands from.
+                m_current_option = option_index;
+                changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);                
+            }
+            else
+            {
+                // Error, can't remove a menu that doesn't exist!
+                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+            }            
+            break;
+            
+        case MENU_DELETE:
+            if (does_option_exist)
+            {
+               // deleteExistingMenu(menu_name);
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+                redisplayModulePrompt();
+            }
+            else
+            {
+                // Error, can't remove a menu that doesn't exist!
+                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+            }
+            break;
+            
+        case MENU_COPY_FROM:
+            // [Source]
+            // Notes, this will take the source, then move to the 
+            // MENU_COPY_TO for destination.  Source is saved as m_current Menu
+            if (does_option_exist) 
+            {
+                m_current_option = option_index;
+                changeMenuInputState(MENU_COPY_TO);
+                displayPrompt(PROMPT_MENU_COPY_TO);
+            }
+            else 
+            {
+                // Error, can't copy a menu that doesn't exist!
+                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+            }
+            break;
+            
+        case MENU_COPY_TO:
+            // [Source]
+            // Notes, this will take the source, then move to the 
+            // MENU_COPY_TO for destination.  Source is saved as m_current Menu
+            if (does_option_exist) 
+            {
+                m_current_option = option_index;
+                changeMenuInputState(MENU_COPY_TO);
+                displayPrompt(PROMPT_MENU_COPY_TO);
+            }
+            else 
+            {
+                // Error, can't copy a menu that doesn't exist!
+                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+            }
+            break;
+            
+        case MENU_MOVE_FROM:
+            // [Destination]
+            if (does_option_exist) 
+            {
+                // Error, can't copy or overwrite a destination menu that exists!
+                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+            }
+            else 
+            {
+                //copyExistingMenu(menu_name);
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+                redisplayModulePrompt();
+            }
+            break;
+            
+        case MENU_MOVE_TO:
+            // [Destination]
+            if (does_option_exist) 
+            {
+                // Error, can't copy or overwrite a destination menu that exists!
+                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+            }
+            else 
+            {
+               // copyExistingMenu(menu_name);
+                changeInputModule(MOD_MENU_OPTION_INPUT);
                 redisplayModulePrompt();
             }
             break;
@@ -602,6 +897,47 @@ bool ModMenuEditor::checkMenuExists(std::string menu_name)
         if (name == menu_name)
             return true;
     }
+    
+    return false;
+}
+
+/**
+ * @brief Check if the menu option exists in the current listing
+ * @param menu_option
+ * @return 
+ */
+bool ModMenuEditor::checkMenuOptionExists(int option_index)
+{
+    // Pre-Load Menu, check access, if not valud, then fall back to previous.
+    menu_ptr current_menu(new Menu());
+    
+    // First load the Source Menu [m_current_menu] file name
+    MenuDao mnu_source(current_menu, m_current_menu, GLOBAL_MENU_PATH);
+    if (mnu_source.fileExists())
+    {
+        mnu_source.loadMenu();
+    }
+    else
+    {
+        std::cout << "Source menu file doesn't exist!" << std::endl;
+        return false;
+    }
+    
+    // Check if it's out of bounds, negative already checked on caller.
+    if ((unsigned int)option_index >= current_menu->menu_options.size())
+    {
+        return false;        
+    }
+        
+    // Check input index, and get command that matches.
+    for(unsigned int i = 0; i < current_menu->menu_options.size(); i++)
+    {
+        auto &m = current_menu->menu_options[i];        
+        if (m.index == option_index)
+        {
+            return true;            
+        }
+    }    
     
     return false;
 }
@@ -777,10 +1113,8 @@ std::string ModMenuEditor::displayMenuOptionList()
         return "";
     }
 
-    std::vector<std::string> result_set;
-
-    // TODO WIP!
     // Build a string list of individual menu options, then loop to fit as many per screen!
+    std::vector<std::string> result_set;
     for(unsigned int i = 0; i < current_menu->menu_options.size(); i++)
     {
         auto &m = current_menu->menu_options[i];
@@ -792,8 +1126,6 @@ std::string ModMenuEditor::displayMenuOptionList()
 
         result_set.push_back(option_string);
     }
-    
-    
 
     // iterate through and print out
     int total_rows = result_set.size() / 3;
