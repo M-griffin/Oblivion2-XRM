@@ -601,6 +601,10 @@ void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input)
                 
             case 'Q': // Quit
                 std::cout << "menu field quit" << std::endl;
+                // First Clear the existing menu, TODO ask to save or abort at this point!
+                // Update this after testing!
+                std::vector<menu_ptr>().swap(m_loaded_menu);
+                
                 // Reload fall back, or gosub to Menu Editor Main
                 changeInputModule(MOD_MENU_INPUT);
                 changeSetupModule(MOD_DISPLAY_MENU);                
@@ -666,7 +670,9 @@ void ModMenuEditor::menuEditorMenuFieldHandler(const std::string &input)
         switch(m_current_field)
         {
             case 'A': // Menu Title
-                
+                m_loaded_menu.back()->menu_title = key;
+                changeInputModule(MOD_MENU_FIELD_INPUT);
+                changeSetupModule(MOD_DISPLAY_MENU_EDIT);
                 break;
         }
     }
@@ -1467,23 +1473,30 @@ std::string ModMenuEditor::displayMenuEditScreen()
     // Create Menu Pointer then load the menu into it.
     menu_ptr current_menu(new Menu());
     
-    // First load the Source Menu [m_current_menu] file name
-    MenuDao mnu_source(current_menu, m_current_menu, GLOBAL_MENU_PATH);
-    if (mnu_source.fileExists())
+    if (m_loaded_menu.size() == 0)
     {
-        mnu_source.loadMenu();
-        
-        // Save Menu into memory for changes, and rollbacks
-        std::vector<menu_ptr>().swap(m_loaded_menu);
-        m_loaded_menu.push_back(current_menu);
+        // First load the Source Menu [m_current_menu] file name
+        MenuDao mnu_source(current_menu, m_current_menu, GLOBAL_MENU_PATH);
+        if (mnu_source.fileExists())
+        {
+            mnu_source.loadMenu();
+            
+            // Save Menu into memory for changes, and rollbacks            
+            m_loaded_menu.push_back(current_menu);
+        }
+        else 
+        {
+            // Error, drop back to Menu Editor.
+            changeSetupModule(MOD_DISPLAY_MENU);
+            return "";
+        }
     }
     else 
     {
-        // Error, drop back to Menu Editor.
-        changeSetupModule(MOD_DISPLAY_MENU);
-        return "";
+        //Menu is already loaded, just assigned to current_menu
+        current_menu = m_loaded_menu.back();        
     }
-
+    
     // Build a string list of individual menu options, then loop to fit as many per screen!
     std::vector<std::string> result_set;
 
