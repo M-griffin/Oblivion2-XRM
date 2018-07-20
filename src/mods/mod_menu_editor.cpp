@@ -74,8 +74,8 @@ void ModMenuEditor::createTextPrompts()
     M_TextPrompt value;
 
     value[PROMPT_HEADER]                  = std::make_pair("Menu Editor Header", "|CS|CR|03--- |15[|11Menu Editor|15] |03--- |CR");
-    value[PROMPT_OPTION_HEADER]           = std::make_pair("Menu Options Editor Header |OT Menu Name", "|CS|CR|03--- |15[|11Menu Option Editor|15] |03--- |15|OT |CR");
-    value[PROMPT_MENU_EDIT_HEADER]        = std::make_pair("Menu Fields Editor Header |OT Menu Name", "|CS|CR|03--- |15[|11Menu Editor|15] |03--- |15|OT |CR");
+    value[PROMPT_OPTION_HEADER]           = std::make_pair("Menu Options Editor Header |OT Menu ID", "|CS|CR|03--- |15[|11Menu Option Editor|15] |03--- |11Menu ID : |15|OT |CR");
+    value[PROMPT_MENU_EDIT_HEADER]        = std::make_pair("Menu Fields Editor Header |OT Menu ID", "|CS|CR|03--- |15[|11Menu Editor|15] |03--- |11Menu ID : |15|OT |CR");
     value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 ");
     value[PROMPT_INPUT_TEXT]              = std::make_pair("Menu Edit Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
     value[PROMPT_OPTION_INPUT_TEXT]       = std::make_pair("Menu Option Edit Prompt", "|CR|03A|15/dd |03E|15/dit |03D|15/elete |03C|15/opy |03M|15/ove |03T|15/oggle |03Q|15/uit : ");
@@ -90,7 +90,7 @@ void ModMenuEditor::createTextPrompts()
 
     // Menu Field Edit
     value[PROMPT_MENU_FIELD_INPUT_TEXT]   = std::make_pair("Menu Field Edit Prompt", "|CR|15C|07om|08mand |15: |07");
-    value[PROMPT_MENU_FIELD_TITLE]        = std::make_pair("Menu Field Title", "|CR |03(|11A|03) |15Menu Title         : ");
+    value[PROMPT_MENU_FIELD_TITLE]        = std::make_pair("Menu Field Title", "|CR|11!   |03(|11A|03) |15Menu Title         : ");
 
 
 
@@ -590,6 +590,8 @@ void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input)
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_MENU_FIELD);
                 displayPrompt(PROMPT_MENU_FIELD_TITLE);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_title);
+                break;
             
             case 'H': // Jump into Options Editing.
                 std::cout << "change options" << std::endl;
@@ -633,7 +635,15 @@ void ModMenuEditor::menuEditorMenuFieldHandler(const std::string &input)
     std::cout << "**************************" << std::endl;
     
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
+    std::string result;
+    
+    // Setup input, display data in current field for editing.
+    switch(m_current_field)
+    {
+        case 'A': // Menu Title
+            result = m_session_io.getInputField(input, key, Config::sName_length);
+            break;
+    }
 
     // ESC was hit
     if(result == "aborted") 
@@ -652,7 +662,7 @@ void ModMenuEditor::menuEditorMenuFieldHandler(const std::string &input)
                 
         baseProcessDeliverNewLine();                
         
-         // Handle the assigned input field
+        // Handle the assigned input received for field
         switch(m_current_field)
         {
             case 'A': // Menu Title
@@ -1477,7 +1487,7 @@ std::string ModMenuEditor::displayMenuEditScreen()
     // Build a string list of individual menu options, then loop to fit as many per screen!
     std::vector<std::string> result_set;
 
-    result_set.push_back("     |11File Version       : |03" + m_common_io.rightPadding(current_menu->file_version, 48));
+    result_set.push_back("     |15File Version       : |03" + m_common_io.rightPadding(current_menu->file_version, 48));
     result_set.push_back(" |03(|11A|03) |15Menu Title         : |03" + m_common_io.rightPadding(current_menu->menu_title, 48));
     result_set.push_back(" |03(|11B|03) |15Password           : |03" + m_common_io.rightPadding(current_menu->menu_password, 48));    
     result_set.push_back(" |03(|11C|03) |15Fallback Menu      : |03" + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
