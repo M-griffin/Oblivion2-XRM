@@ -75,8 +75,8 @@ void ModMenuEditor::createTextPrompts()
     M_TextPrompt value;
 
     value[PROMPT_HEADER]                  = std::make_pair("Menu Editor Header", "|CS|CR|03--- |15[|11Menu Editor|15] |03--- |CR");
-    value[PROMPT_OPTION_HEADER]           = std::make_pair("Menu Options Editor Header", "|CS|CR |03--- |15[|11Menu Option Editor|15] |03--- |CR");
-    value[PROMPT_MENU_EDIT_HEADER]        = std::make_pair("Menu Fields Editor Header", "|CS|CR |03--- |15[|11Menu Editor|15] |03--- |CR");
+    value[PROMPT_OPTION_HEADER]           = std::make_pair("Menu Options Editor Header", "|CS|CR|03--- |15[|11Menu Option Editor|15] |03--- |CR");
+    value[PROMPT_MENU_EDIT_HEADER]        = std::make_pair("Menu Fields Editor Header", "|CS|CR|03--- |15[|11Menu Editor|15] |03--- |CR");
     value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 ");
     value[PROMPT_INPUT_TEXT]              = std::make_pair("Menu Edit Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
     value[PROMPT_OPTION_INPUT_TEXT]       = std::make_pair("Menu Option Edit Prompt", "|CR|03A|15/dd |03E|15/dit |03D|15/elete |03C|15/opy |03M|15/ove |03T|15/oggle |03Q|15/uit : ");
@@ -88,6 +88,9 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_MENU_COPY_TO]            = std::make_pair("Menu Name To Copy To", "|15Enter menu name |11SAVE|15 as : ");    
     value[PROMPT_INVALID_MENU_EXISTS]     = std::make_pair("Invalid Menu Exists", "|04Invalid, Menu already exist.|CR");
     value[PROMPT_INVALID_MENU_NOT_EXISTS] = std::make_pair("Invalid Menu Doesn't Exist", "|04Invalid, Menu doesn't exist.|CR");
+
+    // Menu Field Edit
+    value[PROMPT_MENU_FIELD_INPUT_TEXT]   = std::make_pair("Menu Field Edit Prompt", "|CR|15C|07om|08mand |15: |07");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -230,7 +233,7 @@ void ModMenuEditor::setupMenuEditFields()
     
     m_menu_display_list = m_common_io.splitString(menu_display_output, '\n');           
     m_page = 0;        
-    displayCurrentEditPage(PROMPT_INPUT_TEXT);
+    displayCurrentEditPage(PROMPT_MENU_FIELD_INPUT_TEXT);
 }
 
 /**
@@ -311,7 +314,7 @@ void ModMenuEditor::displayCurrentEditPage(const std::string &input_state)
     switch(m_mod_setup_index)
     {
         case MOD_DISPLAY_MENU_EDIT:
-            current_module_input = MOD_MENU_INPUT;
+            current_module_input = MOD_MENU_FIELD_INPUT;
             break;             
     }  
     
@@ -427,7 +430,7 @@ void ModMenuEditor::menuEditorInput(const std::string &input)
             default:
                 // Roll back to main Editor screen and input method.
                 //displayPromptAndNewLine(PROMPT_INPUT_TEXT);
-                changeInputModule(MOD_MENU_INPUT);
+                //changeInputModule(MOD_MENU_INPUT);
                 redisplayModulePrompt();
                 break;
         }                
@@ -506,9 +509,8 @@ void ModMenuEditor::menuEditorOptionInput(const std::string &input)
             case 'Q': // Quit
                 std::cout << "quit option" << std::endl;
                 // Reload fall back, or gosub to Menu Editor Main
-                changeSetupModule(MOD_DISPLAY_MENU);
-                changeInputModule(MOD_MENU_INPUT);
-                redisplayModulePrompt();
+                changeInputModule(MOD_MENU_FIELD_INPUT);
+                changeSetupModule(MOD_DISPLAY_MENU_EDIT);  // Change to Menu Edit Fields!            
                 return;
                 
             case 'T': // Toggle Option View
@@ -519,7 +521,7 @@ void ModMenuEditor::menuEditorOptionInput(const std::string &input)
             default:
                 // Roll back to main Editor screen and input method.
                 //displayPromptAndNewLine(PROMPT_INPUT_TEXT);                
-                changeInputModule(MOD_MENU_INPUT);
+                //changeInputModule(MOD_MENU_INPUT);
                 redisplayModulePrompt();
                 break;
         }                
@@ -534,6 +536,71 @@ void ModMenuEditor::menuEditorOptionInput(const std::string &input)
         }
     }
 }
+   
+/**
+ * @brief Handles Menu Field Editor Command Selection
+ * @param input
+ */
+void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input)
+{
+    std::cout << " *** menuEditorMenuFieldInput !!!" << std::endl;
+    std::cout << "**************************" << std::endl;
+    
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+
+    // ESC was hit
+    if(result == "aborted") 
+    {
+        std::cout << "aborted!" << std::endl;
+        return;
+    }
+    else if(result[0] == '\n')
+    {            
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return;
+        }
+                
+        baseProcessDeliverNewLine();
+        
+        std::string output_buffer = m_config->default_color_regular;
+        switch (toupper(key[0]))
+        {
+                
+            case 'H': // Jump into Options Editing.
+                std::cout << "change options" << std::endl;
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+                changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);                                
+                break;
+                
+            case 'Q': // Quit
+                std::cout << "menu field quit" << std::endl;
+                // Reload fall back, or gosub to Menu Editor Main
+                changeInputModule(MOD_MENU_INPUT);
+                changeSetupModule(MOD_DISPLAY_MENU);                
+                return;
+                
+            default:
+                // Roll back to main Editor screen and input method.
+                //displayPromptAndNewLine(PROMPT_INPUT_TEXT);                
+                //changeInputModule(MOD_MENU_INPUT);
+                redisplayModulePrompt();
+                break;
+        } 
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty") 
+        {
+            baseProcessDeliverInput(result);
+        }
+    }
+}   
    
 /**
  * @brief Handles Menu Name Input for Add/Change/Delete Methods calls.
@@ -679,7 +746,7 @@ void ModMenuEditor::handleMenuInputState(bool does_menu_exist, const std::string
                 // Also set the curent menu for the system to load
                 // to pull the commands from.
                 m_current_menu = menu_name;
-                changeInputModule(MOD_MENU_OPTION_INPUT);
+                changeInputModule(MOD_MENU_FIELD_INPUT);
                 changeSetupModule(MOD_DISPLAY_MENU_EDIT);  // Change to Menu Edit Fields!                                    
             }
             else
@@ -1362,15 +1429,15 @@ std::string ModMenuEditor::displayMenuEditScreen()
     std::vector<std::string> result_set;
 
     result_set.push_back("     |11File Version       : |03" + m_common_io.rightPadding(current_menu->file_version, 48));
-    result_set.push_back(" |03(|11A|03) |11Menu Title         : |03" + m_common_io.rightPadding(current_menu->menu_title, 48));
-    result_set.push_back(" |03(|11B|03) |11Password           : |03" + m_common_io.rightPadding(current_menu->menu_password, 48));    
-    result_set.push_back(" |03(|11C|03) |11Fallback Menu      : |03" + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
-    result_set.push_back(" |03(|11D|03) |11Help ID            : |03" + m_common_io.rightPadding(current_menu->menu_help_file, 48));
-    result_set.push_back(" |03(|11E|03) |11Name in Prompt     : |03" + m_common_io.rightPadding(current_menu->menu_name, 48));
-    result_set.push_back(" |03(|11F|03) |11Pulldown File      : |03" + m_common_io.rightPadding(current_menu->menu_password, 48));
-    result_set.push_back(" |03(|11H|03) |11Edit Options         " + m_common_io.rightPadding("", 48));
-    result_set.push_back(" |03(|11F|03) |11View Generic Menu    " + m_common_io.rightPadding("", 48));
-    result_set.push_back(" |03(|11Q|03) |11Quit                 " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |03(|11A|03) |15Menu Title         : |03" + m_common_io.rightPadding(current_menu->menu_title, 48));
+    result_set.push_back(" |03(|11B|03) |15Password           : |03" + m_common_io.rightPadding(current_menu->menu_password, 48));    
+    result_set.push_back(" |03(|11C|03) |15Fallback Menu      : |03" + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
+    result_set.push_back(" |03(|11D|03) |15Help ID            : |03" + m_common_io.rightPadding(current_menu->menu_help_file, 48));
+    result_set.push_back(" |03(|11E|03) |15Name in Prompt     : |03" + m_common_io.rightPadding(current_menu->menu_name, 48));
+    result_set.push_back(" |03(|11F|03) |15Pulldown File      : |03" + m_common_io.rightPadding(current_menu->menu_password, 48));
+    result_set.push_back(" |03(|11H|03) |15Edit Options         " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |03(|11F|03) |15View Generic Menu    " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |03(|11Q|03) |15Quit                 " + m_common_io.rightPadding("", 48));
                 
     // Not in use Yet, seems legacy only does ACS in option commands.
     // option_string.append("Menu ACS           : " + m_common_io.rightPadding(current_menu->menu_acs_string, 35);  
@@ -1378,15 +1445,10 @@ std::string ModMenuEditor::displayMenuEditScreen()
 
     // iterate through and print out
     int total_rows = result_set.size();
-    int remainder = 0;
-
-    // Add for Header and Footer Row!
     total_rows += 2;
-    if(remainder > 0)
-        ++total_rows;
 
     // Could re-calc this on screen width lateron.
-    int max_cols  = 76; // out of 80
+    int max_cols  = 76;
 
     // Vector or Menus, Loop through
     std::vector<std::string>::iterator i = result_set.begin();

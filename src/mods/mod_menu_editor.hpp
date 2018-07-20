@@ -41,6 +41,7 @@ public:
         , m_rows_per_page(0)
         , m_current_menu("")
         , m_current_option(0)
+        , m_current_field(0)
     {
         std::cout << "ModMenuEditor" << std::endl;
 
@@ -57,6 +58,10 @@ public:
         // Menu Option Input Commands.
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorOptionInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuOptionInput, this, std::placeholders::_1));
+                
+        // Menu Field Input Commands
+        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuFieldInput, this, std::placeholders::_1));
+     //   m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuFieldHandler, this, std::placeholders::_1));
                 
         
         // Check of the Text Prompts exist.
@@ -96,7 +101,9 @@ public:
         MOD_PAUSE             = 1, // Pauses on display of menus/options
         MOD_MENU_NAME         = 2, // Menu Name Handler
         MOD_MENU_OPTION_INPUT = 3, // Menu Option Parser
-        MOD_MENU_OPTION       = 4  // Option Index Handler
+        MOD_MENU_OPTION       = 4, // Option Index Handler
+        MOD_MENU_FIELD_INPUT  = 5, // Menu Field Parser
+        MOD_MENU_FIELD        = 6  // Menu Field Handler
     };
     
     // Input Menu State Index
@@ -137,6 +144,11 @@ public:
     const std::string PROMPT_INVALID_MENU_EXISTS = "invalid_menu_exists";
     const std::string PROMPT_INVALID_MENU_NOT_EXISTS = "invalid_menu_doesnt_exist";    
 
+    // Menu Field Edit Prompts
+    const std::string PROMPT_MENU_FIELD_INPUT_TEXT = "menu_field_input_text";    
+    
+    
+    
     /**
      * @brief Create Default Text Prompts for module
      */
@@ -263,6 +275,12 @@ public:
     void menuEditorOptionInput(const std::string &input);
     
     /**
+     * @brief Handles Menu Field Editor Command Selection
+     * @param input
+     */
+    void menuEditorMenuFieldInput(const std::string &input);
+
+    /**
      * @brief Handles Menu Name Input for Add/Change/Delete Methods calls.
      * @param input
      */
@@ -329,6 +347,7 @@ private:
     unsigned int           m_rows_per_page;
     std::string            m_current_menu;
     unsigned int           m_current_option;
+    unsigned int           m_current_field;
 
     CommonIO               m_common_io;
     directory_ptr          m_directory;
