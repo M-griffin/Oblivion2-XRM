@@ -84,7 +84,7 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_MENU_DELETE]             = std::make_pair("Menu Name To Delete", "|15Enter menu name to |11DELETE|15 : ");
     value[PROMPT_MENU_CHANGE]             = std::make_pair("Menu Name To Change", "|15Enter menu name to |11EDIT|15 : ");
     value[PROMPT_MENU_COPY_FROM]          = std::make_pair("Menu Name To Copy From", "|15Enter menu name to |11COPY|15 : ");
-    value[PROMPT_MENU_COPY_TO]            = std::make_pair("Menu Name To Copy To", "|15Enter menu name |11SAVE|15 as : ");    
+    value[PROMPT_MENU_COPY_TO]            = std::make_pair("Menu Name To Copy To", "|15Enter menu name to |11SAVE|15 as : ");    
     value[PROMPT_INVALID_MENU_EXISTS]     = std::make_pair("Invalid Menu Exists", "|04Invalid, Menu already exist.|CR");
     value[PROMPT_INVALID_MENU_NOT_EXISTS] = std::make_pair("Invalid Menu Doesn't Exist", "|04Invalid, Menu doesn't exist.|CR");
 
@@ -104,7 +104,8 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_INVALID_OPTION_NOT_EXISTS] = std::make_pair("Invalid Option Doesn't Exist", "|04Invalid, Option doesn't exist.|CR");
     value[PROMPT_MENU_OPTION_ADD]           = std::make_pair("Menu Option Add Before Which Command", "|11CREATE|15 and insert before which option : ");
     value[PROMPT_MENU_OPTION_DELETE]        = std::make_pair("Menu Option Delete At Index", "|11DELETE|15 which option number : ");
-    
+    value[PROMPT_MENU_OPTION_COPY_FROM]     = std::make_pair("Menu Option To Copy From", "|15Enter option number to |11COPY|15 : ");
+    value[PROMPT_MENU_OPTION_COPY_TO]       = std::make_pair("Menu Option To Copy To", "|11SAVE|15 as and insert before which option : ");    
     
     m_text_prompts_dao->writeValue(value);
 }
@@ -141,7 +142,7 @@ void ModMenuEditor::changeMenuInputState(int mod_menu_state_index)
 
 /**
  * @brief Redisplay's the current module prompt.
- * @param mod_function_index
+ * @return
  */
 void ModMenuEditor::redisplayModulePrompt()
 {
@@ -150,6 +151,7 @@ void ModMenuEditor::redisplayModulePrompt()
 
 /**
  * @brief Toggle the Option View.
+ * @return
  */
 void ModMenuEditor::toggleNextOptionView()
 {
@@ -171,6 +173,7 @@ void ModMenuEditor::displayPrompt(const std::string &prompt)
 /**
  * @brief Pull and Display Prompts with MCI Code
  * @param prompt
+ * @param mci_field
  */
 void ModMenuEditor::displayPromptMCI(const std::string &prompt, const std::string &mci_field)
 {
@@ -265,6 +268,7 @@ void ModMenuEditor::setupMenuEditFields()
 
 /**
  * @brief Displays the current page of menu items
+ * @param input_state
  */
 void ModMenuEditor::displayCurrentPage(const std::string &input_state) 
 {    
@@ -325,6 +329,7 @@ void ModMenuEditor::displayCurrentPage(const std::string &input_state)
  
 /**
  * @brief Displays the current page of menu items
+ * @param input_state
  */
 void ModMenuEditor::displayCurrentEditPage(const std::string &input_state) 
 {
@@ -525,7 +530,7 @@ void ModMenuEditor::menuEditorOptionInput(const std::string &input)
             case 'C': // Copy
                 std::cout << "copy" << std::endl;
                 changeMenuInputState(MENU_COPY_FROM);
-                displayPrompt(PROMPT_MENU_COPY_FROM);
+                displayPrompt(PROMPT_MENU_OPTION_COPY_FROM);
                 changeInputModule(MOD_MENU_OPTION);
                 break;
                 
@@ -1040,13 +1045,13 @@ void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int optio
             {
                 m_current_option = option_index;
                 changeMenuInputState(MENU_COPY_TO);
-                displayPrompt(PROMPT_MENU_COPY_TO);
+                displayPrompt(PROMPT_MENU_OPTION_COPY_TO);
             }
             else 
             {
                 // Error, can't copy a menu that doesn't exist!
-                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
-                displayPrompt(PROMPT_INPUT_TEXT);
+                displayPrompt(PROMPT_INVALID_OPTION_NOT_EXISTS);
+                displayPrompt(PROMPT_OPTION_INPUT_TEXT);
                 changeInputModule(MOD_MENU_OPTION_INPUT);
             }
             break;
@@ -1057,20 +1062,21 @@ void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int optio
             // MENU_COPY_TO for destination.  Source is saved as m_current Menu
             if (does_option_exist) 
             {
-                m_current_option = option_index;
-                changeMenuInputState(MENU_COPY_TO);
-                displayPrompt(PROMPT_MENU_COPY_TO);
+                copyExistingMenuOption(option_index);
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+                redisplayModulePrompt();
             }
             else 
             {
-                // Error, can't copy a menu that doesn't exist!
-                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
-                displayPrompt(PROMPT_INPUT_TEXT);
+                // Default to last
+                copyExistingMenuOption(m_loaded_menu.back()->menu_options.size());
                 changeInputModule(MOD_MENU_OPTION_INPUT);
+                redisplayModulePrompt();
             }
             break;
             
-        // TODO
+        // TODO overwrite with copy
+        /*
         case MENU_MOVE_FROM:
             // [Destination]
             if (does_option_exist) 
@@ -1103,7 +1109,7 @@ void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int optio
                 changeInputModule(MOD_MENU_OPTION_INPUT);
                 redisplayModulePrompt();
             }
-            break;
+            break;*/
     }        
 }
 
@@ -1133,7 +1139,7 @@ void ModMenuEditor::createNewMenu(const std::string &menu_name)
 
 /**
  * @brief Create a new empty Menu
- * @param menu_name
+ * @param option_index
  */
 void ModMenuEditor::createNewMenuOption(int option_index)
 {   
@@ -1154,7 +1160,7 @@ void ModMenuEditor::createNewMenuOption(int option_index)
 
 /**
  * @brief Delete an existing Menu Option
- * @param menu_name
+ * @param option_index
  */
 void ModMenuEditor::deleteExistingMenuOption(int option_index)
 {   
@@ -1196,7 +1202,7 @@ void ModMenuEditor::deleteExistingMenuOption(int option_index)
 
 /**
  * @brief On Insertion of Menu Options, reorder all after index
- * @param menu_name
+ * @param option_index
  */
 void ModMenuEditor::reorderMenuIndexesInsertion(int option_index)
 {
@@ -1212,7 +1218,7 @@ void ModMenuEditor::reorderMenuIndexesInsertion(int option_index)
 
 /**
  * @brief On Deletion of Menu Options, reorder all after index
- * @param menu_name
+ * @param option_index
  */
 void ModMenuEditor::reorderMenuIndexesDeletion(int option_index)
 {
@@ -1277,8 +1283,39 @@ void ModMenuEditor::copyExistingMenu(const std::string &menu_name)
 }
 
 /**
+ * @brief Copy an Existing Menu Option
+ * @param option_index
+ */
+void ModMenuEditor::copyExistingMenuOption(int option_index)
+{
+    unsigned int option_size = m_loaded_menu.back()->menu_options.size();
+    for(unsigned int i = 0; i < option_size; i++)
+    {
+        auto &m = m_loaded_menu.back()->menu_options[i];        
+        if (m.index == m_current_option)
+        {
+            // Grab source, then update and add as new to the list.
+            MenuOption new_option = m_loaded_menu.back()->menu_options[i];
+            new_option.index = option_index;
+            
+            // Update existing indexes and up
+            reorderMenuIndexesInsertion(option_index);            
+            m_loaded_menu.back()->menu_options.push_back(new_option);            
+            break;
+        }
+    }    
+    
+    sort(
+        m_loaded_menu.back()->menu_options.begin(), m_loaded_menu.back()->menu_options.end(), 
+        [ ] (const MenuOption& lhs, const MenuOption& rhs)
+    {
+        return lhs.index < rhs.index;
+    });  
+}
+
+/**
  * @brief Save Menu Changes
- * @param menu_name
+ * @return 
  */
 void ModMenuEditor::saveMenuChanges()
 {     
@@ -1296,7 +1333,6 @@ void ModMenuEditor::saveMenuChanges()
 /**
  * @brief Check if the menu exists in the current listing
  * @param menu_name
- * @return 
  */
 bool ModMenuEditor::checkMenuExists(std::string menu_name)
 {
@@ -1322,8 +1358,7 @@ bool ModMenuEditor::checkMenuExists(std::string menu_name)
 
 /**
  * @brief Check if the menu option exists in the current listing
- * @param menu_option
- * @return 
+ * @param option_index
  */
 bool ModMenuEditor::checkMenuOptionExists(int option_index)
 {
@@ -1348,7 +1383,7 @@ bool ModMenuEditor::checkMenuOptionExists(int option_index)
 
 /**
  * @brief Menu Editor, Read and Modify Menus
- * Remake of the orignal Menu Editor Screen
+ * @return
  */
 std::string ModMenuEditor::displayMenuList()
 {
@@ -1481,6 +1516,7 @@ std::string ModMenuEditor::displayMenuList()
 
 /**
  * @brief Menu Editor, Read and Modify Menus Options
+ * @return
  */
 std::string ModMenuEditor::displayMenuOptionList()
 {
@@ -1628,6 +1664,7 @@ std::string ModMenuEditor::displayMenuOptionList()
 
 /**
  * @brief Menu Editor, for Dispalying Menu Fields to Edit
+ * @return
  */
 std::string ModMenuEditor::displayMenuEditScreen()
 {

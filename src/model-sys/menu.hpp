@@ -36,14 +36,14 @@ public:
     
     ~MenuOption() { }
     
-    int            index;
+    unsigned int   index;
     std::string    name;
     std::string    acs_string;    
     bool           hidden;
     std::string    menu_key;
     std::string    command_key;
     std::string    command_string;        
-    int            pulldown_id;
+    unsigned       pulldown_id;
     std::string    form_value;
 
 };

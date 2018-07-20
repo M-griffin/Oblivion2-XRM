@@ -160,10 +160,13 @@ public:
     // Menu Options
     const std::string PROMPT_INVALID_OPTION_NOT_EXISTS = "invalid_option_doesnt_exist";
     const std::string PROMPT_MENU_OPTION_ADD = "option_add";
-    const std::string PROMPT_MENU_OPTION_DELETE = "option_delete";
+    const std::string PROMPT_MENU_OPTION_DELETE = "option_delete";    
+    const std::string PROMPT_MENU_OPTION_COPY_FROM = "option_copy_from";
+    const std::string PROMPT_MENU_OPTION_COPY_TO = "option_copy_to";
     
     /**
      * @brief Create Default Text Prompts for module
+     * @return
      */
     void createTextPrompts();
     
@@ -187,12 +190,13 @@ public:
     
     /**
      * @brief Redisplay's the current module prompt.
-     * @param mod_function_index
+     * @return
      */
     void redisplayModulePrompt();
 
     /**
      * @brief Toggle the Option View.
+     * @return
      */
     void toggleNextOptionView();
 
@@ -205,6 +209,7 @@ public:
     /**
      * @brief Pull and Display Prompts with MCI Code
      * @param prompt
+     * @param mci_field
      */
     void displayPromptMCI(const std::string &prompt, const std::string &mci_field);
 
@@ -234,11 +239,13 @@ public:
 
     /**
      * @brief Displays the current page of menu items
+     * @param input_state
      */
     void displayCurrentPage(const std::string &input_state);
 
     /**
      * @brief Displays the current page of menu items
+     * @param input_state
      */
     void displayCurrentEditPage(const std::string &input_state);
 
@@ -277,13 +284,13 @@ public:
 
     /**
      * @brief Handles Input (Waiting for Any Key Press)
-     * @param character_buffer
+     * @param input
      */
     void menuEditorPausedInput(const std::string &input);
 
     /**
      * @brief Handles Menu Editor Command Selection
-     * @param character_buffer
+     * @param input
      */
     void menuEditorInput(const std::string &input);
     
@@ -339,25 +346,25 @@ public:
     
     /**
      * @brief Create a new empty Menu
-     * @param menu_name
+     * @param option_index
      */
     void createNewMenuOption(int option_index);
 
     /**
      * @brief Delete an existing Menu Option
-     * @param menu_name
+     * @param option_index
      */
     void deleteExistingMenuOption(int option_index);
 
     /**
      * @brief On Insertion of Menu Options, reorder all after index
-     * @param menu_name
+     * @param option_index
      */
     void reorderMenuIndexesInsertion(int option_index);
     
     /**
      * @brief On Deletion of Menu Options, reorder all after index
-     * @param menu_name
+     * @param option_index
      */
     void reorderMenuIndexesDeletion(int option_index);
 
@@ -374,8 +381,14 @@ public:
     void copyExistingMenu(const std::string &menu_name);
     
     /**
+     * @brief Copy an Existing Menu Option
+     * @param option_index
+     */
+    void copyExistingMenuOption(int option_index);
+
+    /**
      * @brief Save Menu Changes
-     * @param menu_name
+     * @return
      */
     void saveMenuChanges();
 

@@ -74,7 +74,7 @@ public:
     menu_prompt_ptr  m_menu_prompt;        // Menu Prompt
 
     ansi_process_ptr m_ansi_process;       // Instance for AnsiProcess Methods
-    int              m_active_pulldownID;  // Active Lightbar Position.
+    unsigned int     m_active_pulldownID;  // Active Lightbar Position.
 
     // Flags
     bool             m_fail_flag;                   // If menu or Option fails, kick off the fail flag.
@@ -256,7 +256,7 @@ public:
     /**
      * @brief Updates current and next lightbar positions.
      */
-    void lightbarUpdate(int previous_pulldown_id);
+    void lightbarUpdate(unsigned int previous_pulldown_id);
 
     /**
      * @brief Handles Menu Option Call Back

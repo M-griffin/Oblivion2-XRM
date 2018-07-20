@@ -1098,7 +1098,7 @@ void MenuBase::loadAndStartupMenu()
 /**
  * @brief Updates current and next lightbar positions.
  */
-void MenuBase::lightbarUpdate(int previous_pulldown_id)
+void MenuBase::lightbarUpdate(unsigned int previous_pulldown_id)
 {
 
     std::cout << " *** lightbar update! *** " << std::endl;
@@ -1258,7 +1258,7 @@ bool MenuBase::handleLightbarSelection(const std::string &input)
     int previous_id = m_active_pulldownID;
     if(input == "RT_ARROW" || input == "DN_ARROW")
     {
-        if(m_active_pulldownID < (signed)m_ansi_process->m_pull_down_options.size())
+        if(m_active_pulldownID < m_ansi_process->m_pull_down_options.size())
         {
             ++m_active_pulldownID;
         }
