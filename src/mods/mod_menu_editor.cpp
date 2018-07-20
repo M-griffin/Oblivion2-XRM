@@ -100,6 +100,11 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_MENU_FIELD_NAME]         = std::make_pair("Menu Name Displated in Prompts", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Name in Prompt     : ");
     value[PROMPT_MENU_FIELD_PULLDOWN]     = std::make_pair("Pulldown ANSI with extension (Example 'MATRIX.ANS')", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15Pulldown File      : ");
     
+    // Menu Option Prompts
+    value[PROMPT_INVALID_OPTION_NOT_EXISTS] = std::make_pair("Invalid Option Doesn't Exist", "|04Invalid, Option doesn't exist.|CR");
+    value[PROMPT_MENU_OPTION_ADD]           = std::make_pair("Menu Option Add Before Which Command", "|11CREATE|15 and insert before which option : ");
+    
+    
     m_text_prompts_dao->writeValue(value);
 }
 
@@ -494,10 +499,11 @@ void ModMenuEditor::menuEditorOptionInput(const std::string &input)
         std::string output_buffer = m_config->default_color_regular;
         switch (toupper(key[0]))
         {
+            // These all have to be redone for OPTION COMMANDS
             case 'A': // Add
                 std::cout << "add" << std::endl;
                 changeMenuInputState(MENU_ADD);
-                displayPrompt(PROMPT_MENU_ADD);
+                displayPrompt(PROMPT_MENU_OPTION_ADD); // WIP
                 changeInputModule(MOD_MENU_OPTION);
                 break;
                 
@@ -744,7 +750,7 @@ void ModMenuEditor::menuEditorMenuFieldHandler(const std::string &input)
 
    
 /**
- * @brief Handles Menu Name Input for Add/Change/Delete Methods calls.
+ * @brief Handles Menu Name Input, Parses Strings and checks Valid Menus
  * @param input
  */
 void ModMenuEditor::menuEditorMenuNameInput(const std::string &input)
@@ -798,7 +804,7 @@ void ModMenuEditor::menuEditorMenuNameInput(const std::string &input)
 }
 
 /**
- * @brief Handles Menu Option Input for Add/Change/Delete/Copy/Move Methods calls.
+ * @brief Handles Menu Option Input checking Option Index is Valid
  * @param input
  */
 void ModMenuEditor::menuEditorMenuOptionInput(const std::string &input)
@@ -968,19 +974,25 @@ void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int optio
 {    
     switch (m_mod_menu_state_index)
     {
+        // WIP
         case MENU_ADD:
             if (does_option_exist)
             {
-                // Error, can't create a menu that already exists!
-                displayPrompt(PROMPT_INVALID_MENU_EXISTS);
-                displayPrompt(PROMPT_INPUT_TEXT);
+                createNewMenuOption(option_index);
                 changeInputModule(MOD_MENU_OPTION_INPUT);
+                redisplayModulePrompt();                                
             }
             else 
             {
-               // createNewMenu(menu_name);
+                createNewMenuOption(m_loaded_menu.back()->menu_options.size());
                 changeInputModule(MOD_MENU_OPTION_INPUT);
-                redisplayModulePrompt();
+                redisplayModulePrompt();     
+                
+                /* Error, can't create a menu that already exists!
+                displayPrompt(PROMPT_INVALID_OPTION_NOT_EXISTS);
+                displayPrompt(PROMPT_OPTION_INPUT_TEXT);
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+                */
             }
             break;
             
@@ -1118,6 +1130,43 @@ void ModMenuEditor::createNewMenu(const std::string &menu_name)
 }
 
 /**
+ * @brief Create a new empty Menu
+ * @param menu_name
+ */
+void ModMenuEditor::createNewMenuOption(int option_index)
+{   
+    std::cout << "Creating Option at: " << option_index << std::endl;
+    MenuOption new_option;
+    new_option.index = option_index;
+    
+    reorderMenuIndexes(option_index);
+    m_loaded_menu.back()->menu_options.push_back(new_option);   
+
+    sort(
+        m_loaded_menu.back()->menu_options.begin(), m_loaded_menu.back()->menu_options.end(), 
+        [ ] (const MenuOption& lhs, const MenuOption& rhs)
+    {
+        return lhs.index < rhs.index;
+    }); 
+}
+
+/**
+ * @brief On Insertion of Menu Options, reorder all after index
+ * @param menu_name
+ */
+void ModMenuEditor::reorderMenuIndexes(int option_index)
+{
+    for(unsigned int i = 0; i < m_loaded_menu.back()->menu_options.size(); i++)
+    {
+        auto &m = m_loaded_menu.back()->menu_options[i];        
+        if (m.index >= option_index)
+        {
+            ++m.index;
+        }
+    }    
+}
+
+/**
  * @brief Delete an existing Menu
  * @param menu_name
  */
@@ -1176,7 +1225,7 @@ void ModMenuEditor::saveMenuChanges()
     MenuDao mnu_source(m_loaded_menu.back(), m_current_menu, GLOBAL_MENU_PATH);
     if (mnu_source.saveMenu(m_loaded_menu.back()))
     {
-        std::cout << "Menu Save Successul!" << std::endl;
+        std::cout << "Menu Saved Successul!" << std::endl;
     }
     else
     {
@@ -1218,31 +1267,16 @@ bool ModMenuEditor::checkMenuExists(std::string menu_name)
  */
 bool ModMenuEditor::checkMenuOptionExists(int option_index)
 {
-    // Pre-Load Menu, check access, if not valud, then fall back to previous.
-    menu_ptr current_menu(new Menu());
-    
-    // First load the Source Menu [m_current_menu] file name
-    MenuDao mnu_source(current_menu, m_current_menu, GLOBAL_MENU_PATH);
-    if (mnu_source.fileExists())
-    {
-        mnu_source.loadMenu();
-    }
-    else
-    {
-        std::cout << "Source menu file doesn't exist!" << std::endl;
-        return false;
-    }
-    
     // Check if it's out of bounds, negative already checked on caller.
-    if ((unsigned int)option_index >= current_menu->menu_options.size())
+    if ((unsigned int)option_index >= m_loaded_menu.back()->menu_options.size())
     {
-        return false;        
+        return false;
     }
         
     // Check input index, and get command that matches.
-    for(unsigned int i = 0; i < current_menu->menu_options.size(); i++)
+    for(unsigned int i = 0; i < m_loaded_menu.back()->menu_options.size(); i++)
     {
-        auto &m = current_menu->menu_options[i];        
+        auto &m = m_loaded_menu.back()->menu_options[i];        
         if (m.index == option_index)
         {
             return true;            

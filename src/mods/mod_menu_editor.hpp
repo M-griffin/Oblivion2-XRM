@@ -157,6 +157,11 @@ public:
     const std::string PROMPT_MENU_FIELD_NAME = "menu_field_name";
     const std::string PROMPT_MENU_FIELD_PULLDOWN = "menu_field_pulldown";
     
+    // Menu Options
+    const std::string PROMPT_INVALID_OPTION_NOT_EXISTS = "invalid_option_doesnt_exist";
+    const std::string PROMPT_MENU_OPTION_ADD = "option_add";
+    
+    
     /**
      * @brief Create Default Text Prompts for module
      */
@@ -301,13 +306,13 @@ public:
     void menuEditorMenuFieldHandler(const std::string &input);
 
     /**
-     * @brief Handles Menu Name Input for Add/Change/Delete Methods calls.
+     * @brief Handles Menu Name Input, Parses Strings and checks Valid Menus
      * @param input
      */
     void menuEditorMenuNameInput(const std::string &input);
 
     /**
-     * @brief Handles Menu Option Input for Add/Change/Delete/Copy/Move Methods calls.
+     * @brief Handles Menu Option Input checking Option Index is Valid
      * @param input
      */
     void menuEditorMenuOptionInput(const std::string &input);
@@ -332,6 +337,18 @@ public:
      */
     void createNewMenu(const std::string &menu_name);
     
+    /**
+     * @brief Create a new empty Menu
+     * @param menu_name
+     */
+    void createNewMenuOption(int option_index);
+
+    /**
+     * @brief On Insertion of Menu Options, reorder all after index
+     * @param menu_name
+     */
+    void reorderMenuIndexes(int option_index);
+
     /**
      * @brief Delete an existing Menu
      * @param menu_name
