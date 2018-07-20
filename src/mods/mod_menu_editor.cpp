@@ -91,7 +91,8 @@ void ModMenuEditor::createTextPrompts()
     // Menu Field Edit
     value[PROMPT_MENU_FIELD_INPUT_TEXT]   = std::make_pair("Menu Field Edit Prompt", "|CR|15Editor C|07om|08mand |15: |07");
     
-    // NOTE, added |PD will display the prompt description as HELP text to the user.
+    // NOTE, added |PD will display the prompt description as HELP text to the user 
+    // Usefull when editing fields - Specific to XRM.
     value[PROMPT_MENU_FIELD_TITLE]        = std::make_pair("Menu Title (Shown in ANSI screens with 'MT' MCI code)", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Menu Title         : ");
     value[PROMPT_MENU_FIELD_PASSWORD]     = std::make_pair("Menu Password (Clear Text right now, will be encrypted lateron)", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15Password           : ");
     value[PROMPT_MENU_FIELD_FALLBACK]     = std::make_pair("Fallback Menu (Example 'MAIN')", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15Fallback Menu      : ");    
@@ -260,8 +261,7 @@ void ModMenuEditor::setupMenuEditFields()
  * @brief Displays the current page of menu items
  */
 void ModMenuEditor::displayCurrentPage(const std::string &input_state) 
-{
-    
+{    
     // calculate the rows_per_page.
     unsigned int rows_used = m_ansi_process->getMaxRowsUsedOnScreen();
     unsigned int max_rows = m_ansi_process->getMaxLines();
@@ -347,8 +347,7 @@ void ModMenuEditor::displayCurrentEditPage(const std::string &input_state)
  * @param input
  */
 void ModMenuEditor::menuEditorPausedInput(const std::string &input)
-{    
-    
+{        
     std::cout << " *** menuEditorPausedInput !!!" << std::endl;
     std::cout << "**************************" << std::endl;
     
@@ -396,7 +395,7 @@ void ModMenuEditor::menuEditorInput(const std::string &input)
     // ESC was hit
     if(result == "aborted") 
     {
-        std::cout << "aborted!" << std::endl;
+        std::cout << "aborted!" << std::endl;        
         return;
     }
     else if(result[0] == '\n')
@@ -448,9 +447,6 @@ void ModMenuEditor::menuEditorInput(const std::string &input)
                 return;
                 
             default:
-                // Roll back to main Editor screen and input method.
-                //displayPromptAndNewLine(PROMPT_INPUT_TEXT);
-                //changeInputModule(MOD_MENU_INPUT);
                 redisplayModulePrompt();
                 break;
         }                
@@ -539,9 +535,6 @@ void ModMenuEditor::menuEditorOptionInput(const std::string &input)
                 break;
                 
             default:
-                // Roll back to main Editor screen and input method.
-                //displayPromptAndNewLine(PROMPT_INPUT_TEXT);                
-                //changeInputModule(MOD_MENU_INPUT);
                 redisplayModulePrompt();
                 break;
         }                
@@ -589,10 +582,6 @@ void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input)
         std::string output_buffer = m_config->default_color_regular;
         switch (toupper(key[0]))
         {
-         
-            //Menu mn;
-            //mn.menu_fall_back
-       
             case 'A': // Menu Title
                 std::cout << "change menu title" << std::endl;
                 m_current_field = toupper(key[0]);
@@ -643,8 +632,7 @@ void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input)
             
             case 'G': // View Generate Menu 
                 std::cout << "view generic menu" << std::endl;
-                //changeInputModule(MOD_MENU_OPTION_INPUT);
-                //changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);                                
+                // TODO
                 break; 
                 
             case 'H': // Jump into Options Editing.
@@ -771,6 +759,8 @@ void ModMenuEditor::menuEditorMenuNameInput(const std::string &input)
     if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
+        changeInputModule(MOD_MENU_INPUT);
+        redisplayModulePrompt();
         return;
     }
     else if(result[0] == '\n')
@@ -778,7 +768,8 @@ void ModMenuEditor::menuEditorMenuNameInput(const std::string &input)
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
+            changeInputModule(MOD_MENU_INPUT);
+            redisplayModulePrompt();
             return;
         }
                 
@@ -822,6 +813,8 @@ void ModMenuEditor::menuEditorMenuOptionInput(const std::string &input)
     if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
+        changeInputModule(MOD_MENU_OPTION_INPUT);
+        redisplayModulePrompt();
         return;
     }
     else if(result[0] == '\n')
@@ -829,7 +822,8 @@ void ModMenuEditor::menuEditorMenuOptionInput(const std::string &input)
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
-            // Return and don't do anything.
+            changeInputModule(MOD_MENU_OPTION_INPUT);
+            redisplayModulePrompt();
             return;
         }
                 
