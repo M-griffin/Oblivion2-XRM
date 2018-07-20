@@ -151,7 +151,11 @@ public:
     // Menu Field Edit Prompts
     const std::string PROMPT_MENU_FIELD_INPUT_TEXT = "menu_field_input_text";
     const std::string PROMPT_MENU_FIELD_TITLE = "menu_field_title";
-    
+    const std::string PROMPT_MENU_FIELD_PASSWORD = "menu_field_password";
+    const std::string PROMPT_MENU_FIELD_FALLBACK = "menu_field_fallback";    
+    const std::string PROMPT_MENU_FIELD_HELP_ID  = "menu_field_help_id";
+    const std::string PROMPT_MENU_FIELD_NAME = "menu_field_name";
+    const std::string PROMPT_MENU_FIELD_PULLDOWN = "menu_field_pulldown";
     
     /**
      * @brief Create Default Text Prompts for module

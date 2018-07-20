@@ -73,9 +73,9 @@ void ModMenuEditor::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_HEADER]                  = std::make_pair("Menu Editor Header", "|CS|CR|03--- |15[|11Menu Editor|15] |03--- |CR");
-    value[PROMPT_OPTION_HEADER]           = std::make_pair("Menu Options Editor Header |OT Menu ID", "|CS|CR|03--- |15[|11Menu Option Editor|15] |03--- |11Menu ID : |15|OT |CR");
-    value[PROMPT_MENU_EDIT_HEADER]        = std::make_pair("Menu Fields Editor Header |OT Menu ID", "|CS|CR|03--- |15[|11Menu Editor|15] |03--- |11Menu ID : |15|OT |CR");
+    value[PROMPT_HEADER]                  = std::make_pair("Menu Editor Header", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Menu Editor|15] |03--- |CR");
+    value[PROMPT_OPTION_HEADER]           = std::make_pair("Menu Options Editor Header |OT Menu ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Menu Option Editor|15] |03--- |11Menu ID : |15|OT |CR");
+    value[PROMPT_MENU_EDIT_HEADER]        = std::make_pair("Menu Fields Editor Header |OT Menu ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Menu Editor|15] |03--- |11Menu ID : |15|OT |CR");
     value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 ");
     value[PROMPT_INPUT_TEXT]              = std::make_pair("Menu Edit Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
     value[PROMPT_OPTION_INPUT_TEXT]       = std::make_pair("Menu Option Edit Prompt", "|CR|03A|15/dd |03E|15/dit |03D|15/elete |03C|15/opy |03M|15/ove |03T|15/oggle |03Q|15/uit : ");
@@ -89,11 +89,16 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_INVALID_MENU_NOT_EXISTS] = std::make_pair("Invalid Menu Doesn't Exist", "|04Invalid, Menu doesn't exist.|CR");
 
     // Menu Field Edit
-    value[PROMPT_MENU_FIELD_INPUT_TEXT]   = std::make_pair("Menu Field Edit Prompt", "|CR|15C|07om|08mand |15: |07");
-    value[PROMPT_MENU_FIELD_TITLE]        = std::make_pair("Menu Field Title", "|CR|11!   |03(|11A|03) |15Menu Title         : ");
-
-
-
+    value[PROMPT_MENU_FIELD_INPUT_TEXT]   = std::make_pair("Menu Field Edit Prompt", "|CR|15Editor C|07om|08mand |15: |07");
+    
+    // NOTE, added |PD will display the prompt description as HELP text to the user.
+    value[PROMPT_MENU_FIELD_TITLE]        = std::make_pair("Menu Title (Shown in ANSI screens with 'MT' MCI code)", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Menu Title         : ");
+    value[PROMPT_MENU_FIELD_PASSWORD]     = std::make_pair("Menu Password (Clear Text right now, will be encrypted lateron)", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15Password           : ");
+    value[PROMPT_MENU_FIELD_FALLBACK]     = std::make_pair("Fallback Menu (Example 'MAIN')", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15Fallback Menu      : ");    
+    value[PROMPT_MENU_FIELD_HELP_ID]      = std::make_pair("ANSI Help File (Example 'MATRIX' Without extension) Overrides Generic Menu", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15Help ID            : ");
+    value[PROMPT_MENU_FIELD_NAME]         = std::make_pair("Menu Name Displated in Prompts", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Name in Prompt     : ");
+    value[PROMPT_MENU_FIELD_PULLDOWN]     = std::make_pair("Pulldown ANSI with extension (Example 'MATRIX.ANS')", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15Pulldown File      : ");
+    
     m_text_prompts_dao->writeValue(value);
 }
 
@@ -584,7 +589,10 @@ void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input)
         std::string output_buffer = m_config->default_color_regular;
         switch (toupper(key[0]))
         {
-                
+         
+            //Menu mn;
+            //mn.menu_fall_back
+       
             case 'A': // Menu Title
                 std::cout << "change menu title" << std::endl;
                 m_current_field = toupper(key[0]);
@@ -592,7 +600,53 @@ void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input)
                 displayPrompt(PROMPT_MENU_FIELD_TITLE);
                 m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_title);
                 break;
+                
+            case 'B': // Menu Password
+                std::cout << "change menu pass" << std::endl;
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_PASSWORD);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_password);
+                break;
+                
+             case 'C': // Menu Password
+                std::cout << "change menu fallback" << std::endl;
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_FALLBACK);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_fall_back);
+                break;
             
+            case 'D': // Menu Help ID
+                std::cout << "change menu helpid" << std::endl;
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_HELP_ID);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_help_file);
+                break;
+                
+            case 'E': // Menu Name
+                std::cout << "change menu name" << std::endl;
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_NAME);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_name);
+                break;
+                
+             case 'F': // Menu Pulldown file
+                std::cout << "change menu name" << std::endl;
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_PULLDOWN);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_pulldown_file);
+                break;
+            
+            case 'G': // View Generate Menu 
+                std::cout << "view generic menu" << std::endl;
+                //changeInputModule(MOD_MENU_OPTION_INPUT);
+                //changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);                                
+                break; 
+                
             case 'H': // Jump into Options Editing.
                 std::cout << "change options" << std::endl;
                 changeInputModule(MOD_MENU_OPTION_INPUT);
@@ -611,9 +665,6 @@ void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input)
                 return;
                 
             default:
-                // Roll back to main Editor screen and input method.
-                //displayPromptAndNewLine(PROMPT_INPUT_TEXT);                
-                //changeInputModule(MOD_MENU_INPUT);
                 redisplayModulePrompt();
                 break;
         } 
@@ -639,31 +690,18 @@ void ModMenuEditor::menuEditorMenuFieldHandler(const std::string &input)
     std::cout << "**************************" << std::endl;
     
     std::string key = "";
-    std::string result;
-    
-    // Setup input, display data in current field for editing.
-    switch(m_current_field)
-    {
-        case 'A': // Menu Title
-            result = m_session_io.getInputField(input, key, Config::sName_length);
-            break;
-    }
+    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
 
     // ESC was hit
     if(result == "aborted") 
     {
         std::cout << "aborted!" << std::endl;
+        changeInputModule(MOD_MENU_FIELD_INPUT);
+        changeSetupModule(MOD_DISPLAY_MENU_EDIT);
         return;
     }
     else if(result[0] == '\n')
     {            
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            // Return and don't do anything.
-            return;
-        }
-                
         baseProcessDeliverNewLine();                
         
         // Handle the assigned input received for field
@@ -671,10 +709,31 @@ void ModMenuEditor::menuEditorMenuFieldHandler(const std::string &input)
         {
             case 'A': // Menu Title
                 m_loaded_menu.back()->menu_title = key;
-                changeInputModule(MOD_MENU_FIELD_INPUT);
-                changeSetupModule(MOD_DISPLAY_MENU_EDIT);
                 break;
+                
+            case 'B': // Menu Password
+                m_loaded_menu.back()->menu_password = key;                
+                break;
+                
+            case 'C': // Menu Fallback
+                m_loaded_menu.back()->menu_fall_back = key;                
+                break;
+                
+            case 'D': // Menu Help ID
+                m_loaded_menu.back()->menu_help_file = key;                
+                break;
+                
+            case 'E': // Menu Name
+                m_loaded_menu.back()->menu_name = key;                
+                break;
+                
+            case 'F': // Menu Pulldown
+                m_loaded_menu.back()->menu_pulldown_file = key;                
+                break;                            
         }
+                
+        changeInputModule(MOD_MENU_FIELD_INPUT);
+        changeSetupModule(MOD_DISPLAY_MENU_EDIT);
     }
     else
     {
@@ -995,6 +1054,7 @@ void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int optio
             }
             break;
             
+        // TODO
         case MENU_MOVE_FROM:
             // [Destination]
             if (does_option_exist) 
@@ -1506,9 +1566,9 @@ std::string ModMenuEditor::displayMenuEditScreen()
     result_set.push_back(" |03(|11C|03) |15Fallback Menu      : |03" + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
     result_set.push_back(" |03(|11D|03) |15Help ID            : |03" + m_common_io.rightPadding(current_menu->menu_help_file, 48));
     result_set.push_back(" |03(|11E|03) |15Name in Prompt     : |03" + m_common_io.rightPadding(current_menu->menu_name, 48));
-    result_set.push_back(" |03(|11F|03) |15Pulldown File      : |03" + m_common_io.rightPadding(current_menu->menu_password, 48));
-    result_set.push_back(" |03(|11H|03) |15Edit Options         " + m_common_io.rightPadding("", 48));
-    result_set.push_back(" |03(|11F|03) |15View Generic Menu    " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |03(|11F|03) |15Pulldown File      : |03" + m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
+    result_set.push_back(" |03(|11G|03) |15View Generic Menu    " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |03(|11H|03) |15Edit Options         " + m_common_io.rightPadding("", 48));    
     result_set.push_back(" |03(|11Q|03) |15Quit                 " + m_common_io.rightPadding("", 48));
                 
     // Not in use Yet, seems legacy only does ACS in option commands.
