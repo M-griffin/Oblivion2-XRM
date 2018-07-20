@@ -655,8 +655,16 @@ void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input)
                 
             case 'Q': // Quit
                 std::cout << "menu field quit" << std::endl;
-                // First Clear the existing menu, TODO ask to save or abort at this point!
-                // Update this after testing!
+                saveMenuChanges();
+                std::vector<menu_ptr>().swap(m_loaded_menu);
+                
+                // Reload fall back, or gosub to Menu Editor Main
+                changeInputModule(MOD_MENU_INPUT);
+                changeSetupModule(MOD_DISPLAY_MENU);                
+                return;
+                
+            case 'X': // Exit without Saving
+                std::cout << "menu field quit" << std::endl;
                 std::vector<menu_ptr>().swap(m_loaded_menu);
                 
                 // Reload fall back, or gosub to Menu Editor Main
@@ -1166,6 +1174,23 @@ void ModMenuEditor::copyExistingMenu(const std::string &menu_name)
 }
 
 /**
+ * @brief Save Menu Changes
+ * @param menu_name
+ */
+void ModMenuEditor::saveMenuChanges()
+{     
+    MenuDao mnu_source(m_loaded_menu.back(), m_current_menu, GLOBAL_MENU_PATH);
+    if (mnu_source.saveMenu(m_loaded_menu.back()))
+    {
+        std::cout << "Menu Save Successul!" << std::endl;
+    }
+    else
+    {
+        std::cout << "Menu Save Failed!" << std::endl;    
+    }
+}
+
+/**
  * @brief Check if the menu exists in the current listing
  * @param menu_name
  * @return 
@@ -1561,6 +1586,7 @@ std::string ModMenuEditor::displayMenuEditScreen()
     std::vector<std::string> result_set;
 
     result_set.push_back("     |15File Version       : |03" + m_common_io.rightPadding(current_menu->file_version, 48));
+    result_set.push_back(" |07------------------------ " + m_common_io.rightPadding("", 48));
     result_set.push_back(" |03(|11A|03) |15Menu Title         : |03" + m_common_io.rightPadding(current_menu->menu_title, 48));
     result_set.push_back(" |03(|11B|03) |15Password           : |03" + m_common_io.rightPadding(current_menu->menu_password, 48));    
     result_set.push_back(" |03(|11C|03) |15Fallback Menu      : |03" + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
@@ -1569,7 +1595,9 @@ std::string ModMenuEditor::displayMenuEditScreen()
     result_set.push_back(" |03(|11F|03) |15Pulldown File      : |03" + m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
     result_set.push_back(" |03(|11G|03) |15View Generic Menu    " + m_common_io.rightPadding("", 48));
     result_set.push_back(" |03(|11H|03) |15Edit Options         " + m_common_io.rightPadding("", 48));    
-    result_set.push_back(" |03(|11Q|03) |15Quit                 " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |07------------------------ " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |03(|11Q|03) |15Quit & Save          " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |03(|11X|03) |15Exit without Saving  " + m_common_io.rightPadding("", 48));
                 
     // Not in use Yet, seems legacy only does ACS in option commands.
     // option_string.append("Menu ACS           : " + m_common_io.rightPadding(current_menu->menu_acs_string, 35);  

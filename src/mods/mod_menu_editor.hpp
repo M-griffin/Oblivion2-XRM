@@ -344,6 +344,12 @@ public:
      */
     void copyExistingMenu(const std::string &menu_name);
     
+    /**
+     * @brief Save Menu Changes
+     * @param menu_name
+     */
+    void saveMenuChanges();
+
 private:
 
     // Function Input Vector.
