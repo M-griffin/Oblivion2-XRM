@@ -160,7 +160,7 @@ public:
     // Menu Options
     const std::string PROMPT_INVALID_OPTION_NOT_EXISTS = "invalid_option_doesnt_exist";
     const std::string PROMPT_MENU_OPTION_ADD = "option_add";
-    
+    const std::string PROMPT_MENU_OPTION_DELETE = "option_delete";
     
     /**
      * @brief Create Default Text Prompts for module
@@ -344,10 +344,22 @@ public:
     void createNewMenuOption(int option_index);
 
     /**
+     * @brief Delete an existing Menu Option
+     * @param menu_name
+     */
+    void deleteExistingMenuOption(int option_index);
+
+    /**
      * @brief On Insertion of Menu Options, reorder all after index
      * @param menu_name
      */
-    void reorderMenuIndexes(int option_index);
+    void reorderMenuIndexesInsertion(int option_index);
+    
+    /**
+     * @brief On Deletion of Menu Options, reorder all after index
+     * @param menu_name
+     */
+    void reorderMenuIndexesDeletion(int option_index);
 
     /**
      * @brief Delete an existing Menu

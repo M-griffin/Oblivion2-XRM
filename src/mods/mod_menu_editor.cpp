@@ -103,6 +103,7 @@ void ModMenuEditor::createTextPrompts()
     // Menu Option Prompts
     value[PROMPT_INVALID_OPTION_NOT_EXISTS] = std::make_pair("Invalid Option Doesn't Exist", "|04Invalid, Option doesn't exist.|CR");
     value[PROMPT_MENU_OPTION_ADD]           = std::make_pair("Menu Option Add Before Which Command", "|11CREATE|15 and insert before which option : ");
+    value[PROMPT_MENU_OPTION_DELETE]        = std::make_pair("Menu Option Delete At Index", "|11DELETE|15 which option number : ");
     
     
     m_text_prompts_dao->writeValue(value);
@@ -517,7 +518,7 @@ void ModMenuEditor::menuEditorOptionInput(const std::string &input)
             case 'D': // Delete
                 std::cout << "delete" << std::endl;
                 changeMenuInputState(MENU_DELETE);
-                displayPrompt(PROMPT_MENU_DELETE);
+                displayPrompt(PROMPT_MENU_OPTION_DELETE);
                 changeInputModule(MOD_MENU_OPTION);
                 break;
                 
@@ -997,6 +998,7 @@ void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int optio
             break;
             
         case MENU_CHANGE:
+            /*
             if (does_option_exist)
             {
                 // Move to new Default setup for Options vs Menus.
@@ -1011,21 +1013,21 @@ void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int optio
                 displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
                 displayPrompt(PROMPT_INPUT_TEXT);
                 changeInputModule(MOD_MENU_OPTION_INPUT);
-            }            
+            } */           
             break;
             
         case MENU_DELETE:
             if (does_option_exist)
             {
-               // deleteExistingMenu(menu_name);
+                deleteExistingMenuOption(option_index);
                 changeInputModule(MOD_MENU_OPTION_INPUT);
                 redisplayModulePrompt();
             }
             else
             {
                 // Error, can't remove a menu that doesn't exist!
-                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
-                displayPrompt(PROMPT_INPUT_TEXT);
+                displayPrompt(PROMPT_INVALID_OPTION_NOT_EXISTS);
+                displayPrompt(PROMPT_OPTION_INPUT_TEXT);
                 changeInputModule(MOD_MENU_OPTION_INPUT);
             }
             break;
@@ -1139,7 +1141,7 @@ void ModMenuEditor::createNewMenuOption(int option_index)
     MenuOption new_option;
     new_option.index = option_index;
     
-    reorderMenuIndexes(option_index);
+    reorderMenuIndexesInsertion(option_index);
     m_loaded_menu.back()->menu_options.push_back(new_option);   
 
     sort(
@@ -1151,10 +1153,52 @@ void ModMenuEditor::createNewMenuOption(int option_index)
 }
 
 /**
+ * @brief Delete an existing Menu Option
+ * @param menu_name
+ */
+void ModMenuEditor::deleteExistingMenuOption(int option_index)
+{   
+    std::cout << "Deleting Option at: " << option_index << std::endl;
+    unsigned int option_size = m_loaded_menu.back()->menu_options.size();
+
+    // Check if the last entry, then no need to swap and just pop_back!
+    if (option_index == m_loaded_menu.back()->menu_options[option_size-1].index)
+    {
+        // Last entry, just remove it and done, no need to reorder or sort either.
+        m_loaded_menu.back()->menu_options.pop_back();
+        return;
+    }
+
+    // Remove at Index
+    for(unsigned int i = 0; i < option_size; i++)
+    {
+        auto &m = m_loaded_menu.back()->menu_options[i];        
+        if (m.index == option_index)
+        {
+            // swap with last item then pop_back
+            MenuOption temp = m_loaded_menu.back()->menu_options[i];
+            m_loaded_menu.back()->menu_options[i] = m_loaded_menu.back()->menu_options[option_size-1];
+            m_loaded_menu.back()->menu_options[option_size-1] = temp;            
+            m_loaded_menu.back()->menu_options.pop_back();
+            break;
+        }
+    }    
+
+    reorderMenuIndexesDeletion(option_index);
+
+    sort(
+        m_loaded_menu.back()->menu_options.begin(), m_loaded_menu.back()->menu_options.end(), 
+        [ ] (const MenuOption& lhs, const MenuOption& rhs)
+    {
+        return lhs.index < rhs.index;
+    });   
+}
+
+/**
  * @brief On Insertion of Menu Options, reorder all after index
  * @param menu_name
  */
-void ModMenuEditor::reorderMenuIndexes(int option_index)
+void ModMenuEditor::reorderMenuIndexesInsertion(int option_index)
 {
     for(unsigned int i = 0; i < m_loaded_menu.back()->menu_options.size(); i++)
     {
@@ -1166,6 +1210,22 @@ void ModMenuEditor::reorderMenuIndexes(int option_index)
     }    
 }
 
+/**
+ * @brief On Deletion of Menu Options, reorder all after index
+ * @param menu_name
+ */
+void ModMenuEditor::reorderMenuIndexesDeletion(int option_index)
+{
+    for(unsigned int i = 0; i < m_loaded_menu.back()->menu_options.size(); i++)
+    {
+        auto &m = m_loaded_menu.back()->menu_options[i];        
+        if (m.index >= option_index)
+        {
+            --m.index;
+        }
+    }  
+}
+    
 /**
  * @brief Delete an existing Menu
  * @param menu_name
