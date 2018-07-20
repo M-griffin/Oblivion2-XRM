@@ -8,6 +8,9 @@
 #include <functional>
 #include <vector>
 
+class Menu;
+typedef std::shared_ptr<Menu> menu_ptr;
+
 class SessionData;
 typedef std::shared_ptr<SessionData> session_data_ptr;
 
@@ -61,7 +64,7 @@ public:
                 
         // Menu Field Input Commands
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuFieldInput, this, std::placeholders::_1));
-     //   m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuFieldHandler, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuFieldHandler, this, std::placeholders::_1));
                 
         
         // Check of the Text Prompts exist.
@@ -80,6 +83,7 @@ public:
         std::cout << "~ModMenuEditor" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
+        std::vector<menu_ptr>().swap(m_loaded_menu);
     }
 
     virtual bool update(const std::string &character_buffer, const bool &) override;
@@ -131,22 +135,22 @@ public:
     // Create Prompt Constants, these are the keys for key/value lookup
     const std::string PROMPT_HEADER = "menu_header";
     const std::string PROMPT_OPTION_HEADER = "menu_option_header";
-    const std::string PROMPT_MENU_EDIT_HEADER = "menu_field_edit_header";    
+    const std::string PROMPT_MENU_EDIT_HEADER = "menu_field_edit_header";
     const std::string PROMPT_PAUSE = "pause_prompt";
     const std::string PROMPT_INPUT_TEXT = "menu_input_text";
     const std::string PROMPT_OPTION_INPUT_TEXT = "option_input_text";
-    const std::string PROMPT_INVALID = "invalid_input";    
+    const std::string PROMPT_INVALID = "invalid_input";
     const std::string PROMPT_MENU_ADD = "menu_add";
     const std::string PROMPT_MENU_DELETE = "menu_delete";
-    const std::string PROMPT_MENU_CHANGE = "menu_edit";    
+    const std::string PROMPT_MENU_CHANGE = "menu_edit";
     const std::string PROMPT_MENU_COPY_FROM = "menu_copy_from";
-    const std::string PROMPT_MENU_COPY_TO = "menu_copy_to";    
+    const std::string PROMPT_MENU_COPY_TO = "menu_copy_to";
     const std::string PROMPT_INVALID_MENU_EXISTS = "invalid_menu_exists";
-    const std::string PROMPT_INVALID_MENU_NOT_EXISTS = "invalid_menu_doesnt_exist";    
+    const std::string PROMPT_INVALID_MENU_NOT_EXISTS = "invalid_menu_doesnt_exist";
 
     // Menu Field Edit Prompts
-    const std::string PROMPT_MENU_FIELD_INPUT_TEXT = "menu_field_input_text";    
-    
+    const std::string PROMPT_MENU_FIELD_INPUT_TEXT = "menu_field_input_text";
+    const std::string PROMPT_MENU_FIELD_TITLE = "menu_field_title";
     
     
     /**
@@ -189,6 +193,12 @@ public:
      */
     void displayPrompt(const std::string &prompt);
     
+    /**
+     * @brief Pull and Display Prompts with MCI Code
+     * @param prompt
+     */
+    void displayPromptMCI(const std::string &prompt, const std::string &mci_field);
+
     /**
      * @brief Pull and Display Prompts with following newline
      * @param prompt
@@ -281,6 +291,12 @@ public:
     void menuEditorMenuFieldInput(const std::string &input);
 
     /**
+     * @brief Handles Field Updates for Menu Data
+     * @param input
+     */
+    void menuEditorMenuFieldHandler(const std::string &input);
+
+    /**
      * @brief Handles Menu Name Input for Add/Change/Delete Methods calls.
      * @param input
      */
@@ -330,6 +346,7 @@ private:
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
     std::vector<std::string>                                m_menu_display_list;
+    std::vector<menu_ptr>                                   m_loaded_menu;
 
     SessionIO              m_session_io;
     std::string            m_filename;

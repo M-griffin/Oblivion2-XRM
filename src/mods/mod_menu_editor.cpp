@@ -4,7 +4,6 @@
 #include "directory.hpp"
 
 #include <stdint.h>
-#include <algorithm>
 #include <string>
 #include <vector>
 #include <sstream>
@@ -75,8 +74,8 @@ void ModMenuEditor::createTextPrompts()
     M_TextPrompt value;
 
     value[PROMPT_HEADER]                  = std::make_pair("Menu Editor Header", "|CS|CR|03--- |15[|11Menu Editor|15] |03--- |CR");
-    value[PROMPT_OPTION_HEADER]           = std::make_pair("Menu Options Editor Header", "|CS|CR|03--- |15[|11Menu Option Editor|15] |03--- |CR");
-    value[PROMPT_MENU_EDIT_HEADER]        = std::make_pair("Menu Fields Editor Header", "|CS|CR|03--- |15[|11Menu Editor|15] |03--- |CR");
+    value[PROMPT_OPTION_HEADER]           = std::make_pair("Menu Options Editor Header |OT Menu Name", "|CS|CR|03--- |15[|11Menu Option Editor|15] |03--- |15|OT |CR");
+    value[PROMPT_MENU_EDIT_HEADER]        = std::make_pair("Menu Fields Editor Header |OT Menu Name", "|CS|CR|03--- |15[|11Menu Editor|15] |03--- |15|OT |CR");
     value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 ");
     value[PROMPT_INPUT_TEXT]              = std::make_pair("Menu Edit Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
     value[PROMPT_OPTION_INPUT_TEXT]       = std::make_pair("Menu Option Edit Prompt", "|CR|03A|15/dd |03E|15/dit |03D|15/elete |03C|15/opy |03M|15/ove |03T|15/oggle |03Q|15/uit : ");
@@ -91,6 +90,9 @@ void ModMenuEditor::createTextPrompts()
 
     // Menu Field Edit
     value[PROMPT_MENU_FIELD_INPUT_TEXT]   = std::make_pair("Menu Field Edit Prompt", "|CR|15C|07om|08mand |15: |07");
+    value[PROMPT_MENU_FIELD_TITLE]        = std::make_pair("Menu Field Title", "|CR |03(|11A|03) |15Menu Title         : ");
+
+
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -155,6 +157,15 @@ void ModMenuEditor::displayPrompt(const std::string &prompt)
 }
 
 /**
+ * @brief Pull and Display Prompts with MCI Code
+ * @param prompt
+ */
+void ModMenuEditor::displayPromptMCI(const std::string &prompt, const std::string &mci_field)
+{
+    baseDisplayPromptMCI(prompt, m_text_prompts_dao, mci_field);
+}
+
+/**
  * @brief Pull and Display Prompts with following newline
  * @param prompt
  */
@@ -193,8 +204,10 @@ void ModMenuEditor::setupMenuEditor()
  */
 void ModMenuEditor::setupMenuOptionEditor() 
 {
-    std::cout << "setupMenuOptionEditor()" << std::endl;
-    displayPrompt(PROMPT_OPTION_HEADER);
+    std::cout << "setupMenuOptionEditor() - " << m_current_menu << std::endl;    
+    std::string display_name = m_current_menu;
+    baseTransformToUpper(display_name);
+    displayPromptMCI(PROMPT_OPTION_HEADER, display_name);
     
     // Build a list of screen lines for the menu display
     // So we know when to pause in large listing, or use pagenation.
@@ -218,8 +231,10 @@ void ModMenuEditor::setupMenuOptionEditor()
  */
 void ModMenuEditor::setupMenuEditFields() 
 {
-    std::cout << "setupMenuEditFields()" << std::endl;
-    displayPrompt(PROMPT_MENU_EDIT_HEADER);
+    std::cout << "setupMenuEditFields() - " << m_current_menu << std::endl;
+    std::string display_name = m_current_menu;
+    baseTransformToUpper(display_name);
+    displayPromptMCI(PROMPT_MENU_EDIT_HEADER, display_name);
     
     // Build a list of screen lines for the menu display
     // So we know when to pause in large listing, or use pagenation.
@@ -570,11 +585,17 @@ void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input)
         switch (toupper(key[0]))
         {
                 
+            case 'A': // Menu Title
+                std::cout << "change menu title" << std::endl;
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_TITLE);
+            
             case 'H': // Jump into Options Editing.
                 std::cout << "change options" << std::endl;
                 changeInputModule(MOD_MENU_OPTION_INPUT);
                 changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);                                
-                break;
+                break; 
                 
             case 'Q': // Quit
                 std::cout << "menu field quit" << std::endl;
@@ -601,6 +622,55 @@ void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input)
         }
     }
 }   
+
+/**
+ * @brief Handles Field Updates for Menu Data
+ * @param input
+ */
+void ModMenuEditor::menuEditorMenuFieldHandler(const std::string &input)
+{
+    std::cout << " *** menuEditorMenuNameInput !!!" << std::endl;
+    std::cout << "**************************" << std::endl;
+    
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
+
+    // ESC was hit
+    if(result == "aborted") 
+    {
+        std::cout << "aborted!" << std::endl;
+        return;
+    }
+    else if(result[0] == '\n')
+    {            
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return;
+        }
+                
+        baseProcessDeliverNewLine();                
+        
+         // Handle the assigned input field
+        switch(m_current_field)
+        {
+            case 'A': // Menu Title
+                
+                break;
+        }
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty") 
+        {
+            baseProcessDeliverInput(result);
+        }
+    }
+}
+
    
 /**
  * @brief Handles Menu Name Input for Add/Change/Delete Methods calls.
@@ -1028,21 +1098,16 @@ bool ModMenuEditor::checkMenuExists(std::string menu_name)
 {
     directory_ptr directory(new Directory());
     std::vector<std::string> result_set = directory->getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
-    
-    auto stringToLower = std::bind1st(
-                            std::mem_fun(
-                                &std::ctype<char>::tolower),
-                                &std::use_facet<std::ctype<char> >(std::locale()));
             
     // Append the extension to match the directory files.
-    menu_name.append(".yaml");
-    transform(menu_name.begin(), menu_name.end(), menu_name.begin(), stringToLower);
+    menu_name.append(".yaml");    
+    baseTransformToLower(menu_name);
             
     // Case Insensitive Search for Menu name, with transformation to lower case
     for (std::string::size_type i = 0; i < result_set.size(); i++) 
     {
         std::string name = result_set[i];
-        transform(name.begin(), name.end(), name.begin(), stringToLower);        
+        baseTransformToLower(name);
 
         if (name == menu_name)
             return true;
@@ -1108,12 +1173,7 @@ std::string ModMenuEditor::displayMenuList()
     char mid_top   = (char)210; // ╥
     char mid_bot   = (char)208; // ╨
     char mid       = (char)186; // ║
-   
-    auto stringToUpper = std::bind1st(
-                            std::mem_fun(
-                                &std::ctype<char>::toupper),
-                                &std::use_facet<std::ctype<char> >(std::locale()));
-                
+                      
     directory_ptr directory(new Directory());
     std::vector<std::string> result_set = directory->getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
 
@@ -1207,7 +1267,7 @@ std::string ModMenuEditor::displayMenuList()
                         menu_name = i->substr(0, i->size()-5);
                         menu_name = m_common_io.rightPadding(menu_name, 8);
                         
-                        transform(menu_name.begin(), menu_name.end(), menu_name.begin(), stringToUpper);
+                        baseTransformToUpper(menu_name);
                         
                         buffer += baseGetDefaultInputColor();
                         buffer += menu_name;
@@ -1246,22 +1306,7 @@ std::string ModMenuEditor::displayMenuOptionList()
     char mid_bot   = (char)208; // ╨
     char mid       = (char)186; // ║
    
-
-    // Create Menu Pointer then load the menu into it.
-    menu_ptr current_menu(new Menu());
-    
-    // First load the Source Menu [m_current_menu] file name
-    MenuDao mnu_source(current_menu, m_current_menu, GLOBAL_MENU_PATH);
-    if (mnu_source.fileExists())
-    {
-        mnu_source.loadMenu();
-    }
-    else 
-    {
-        // Error, drop back to Menu Editor.
-        changeSetupModule(MOD_DISPLAY_MENU);
-        return "";
-    }
+    menu_ptr current_menu = m_loaded_menu.back();
 
     // Build a string list of individual menu options, then loop to fit as many per screen!
     std::vector<std::string> result_set;
@@ -1417,6 +1462,10 @@ std::string ModMenuEditor::displayMenuEditScreen()
     if (mnu_source.fileExists())
     {
         mnu_source.loadMenu();
+        
+        // Save Menu into memory for changes, and rollbacks
+        std::vector<menu_ptr>().swap(m_loaded_menu);
+        m_loaded_menu.push_back(current_menu);
     }
     else 
     {

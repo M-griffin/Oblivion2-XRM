@@ -8,6 +8,7 @@
 #include "../session_io.hpp"
 #include "../ansi_processor.hpp"
 
+#include <algorithm>
 #include <memory>
 #include <iostream>
 #include <string>
@@ -40,6 +41,33 @@ public:
         , m_is_active(false)
     { }
 
+    /**
+     * @brief Transform Strings to Uppercase with Locale
+     * @param value
+     */
+    void baseTransformToUpper(std::string &value)
+    {
+        auto stringToUpper = std::bind1st(
+                            std::mem_fun(
+                                &std::ctype<char>::toupper),
+                                &std::use_facet<std::ctype<char> >(std::locale()));
+            
+        transform(value.begin(), value.end(), value.begin(), stringToUpper);    
+    }
+    
+    /**
+     * @brief Transform Strings to Lowercase with Locale
+     * @param value
+     */
+    void baseTransformToLower(std::string &value)
+    {
+        auto stringToLower = std::bind1st(
+                            std::mem_fun(
+                                &std::ctype<char>::tolower),
+                                &std::use_facet<std::ctype<char> >(std::locale()));
+            
+        transform(value.begin(), value.end(), value.begin(), stringToLower);    
+    }
 
     /**
      * @brief Gets the Default Color Sequence
@@ -138,6 +166,43 @@ public:
             std::cout << " *** Detected %IN in prompt string!" << std::endl;
         }
 
+        //std::cout << "prompt: " << result << std::endl;
+        baseProcessAndDeliver(result);    
+    }
+    
+    /**
+     * @brief Pull and Display Prompts, Replace MCI Code |OT
+     * @param prompt
+     */
+    void baseDisplayPromptMCI(const std::string &prompt, text_prompts_dao_ptr m_text_dao, std::string mci_field)
+    {
+        // Set Default String Color, Can be overridden with pipe colors in text prompt.
+        std::string result = baseGetDefaultColor();
+        
+        // Parse Prompt for Input Color And Position Override.
+        // If found, the colors of the MCI Codes should be used as the default color.
+        M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
+        std::string::size_type idx  = prompt_set.second.find("%IN", 0);
+        
+        // Parse and replace the MCI Code with the field value
+        std::string mci_code = "|OT";       
+        m_session_io.m_common_io.parseLocalMCI(prompt_set.second, mci_code, mci_field);        
+
+        // Does pipe2ansi for colors etc..
+        result += std::move(m_session_io.parseTextPrompt(prompt_set));
+        
+        // Not found, set default input color
+        if (idx == std::string::npos) 
+        {
+            result += baseGetDefaultInputColor();        
+        }
+        else
+        {
+            // Testing.
+            std::cout << " *** Detected %IN in prompt string!" << std::endl;
+        }
+         
+        
         //std::cout << "prompt: " << result << std::endl;
         baseProcessAndDeliver(result);    
     }
