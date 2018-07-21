@@ -109,6 +109,11 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_MENU_OPTION_MOVE_FROM]     = std::make_pair("Menu Option To Copy From", "|CR|15Enter option number to |11MOVE|15 : ");
     value[PROMPT_MENU_OPTION_MOVE_TO]       = std::make_pair("Menu Option To Copy To", "|11SAVE|15 as and insert before which option : ");    
     
+    // Menu Option Edit Fields
+    value[PROMPT_MENU_OPTION_EDIT_HEADER]       = std::make_pair("Menu Option Fields Editor Header |OT Menu ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Menu Option Editor|15] |03--- |11Menu ID : |15|OT |CR");
+    value[PROMPT_MENU_OPTION_FIELD_INPUT_TEXT]  = std::make_pair("Menu Option Field Edit Prompt", "|CR|15Editor C|07om|08mand |15: |07");
+
+
     m_text_prompts_dao->writeValue(value);
 }
 
@@ -266,6 +271,32 @@ void ModMenuEditor::setupMenuEditFields()
     m_menu_display_list = m_common_io.splitString(menu_display_output, '\n');           
     m_page = 0;        
     displayCurrentEditPage(PROMPT_MENU_FIELD_INPUT_TEXT);
+}
+
+/**
+ * @brief Setup for the Menu Option Editor 
+ * @return
+ */
+void ModMenuEditor::setupMenuOptionEditFields() 
+{
+    std::cout << "setupMenuOptionEditFields() - " << m_current_menu << std::endl;
+    std::string display_name = m_current_menu;
+    baseTransformToUpper(display_name);
+    displayPromptMCI(PROMPT_MENU_OPTION_EDIT_HEADER, display_name);
+    
+    // Build a list of screen lines for the menu display
+    // So we know when to pause in large listing, or use pagenation.
+    std::string menu_display_output = displayMenuOptionEditScreen();    
+    
+    if (m_menu_display_list.size() == 0) 
+    {
+        // Clear Out list if anything already exists.
+        std::vector<std::string>().swap(m_menu_display_list);
+    }
+    
+    m_menu_display_list = m_common_io.splitString(menu_display_output, '\n');           
+    m_page = 0;        
+    displayCurrentEditPage(PROMPT_MENU_OPTION_FIELD_INPUT_TEXT);
 }
 
 /**
@@ -1011,15 +1042,14 @@ void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int optio
             }
             break;
             
-        case MENU_CHANGE:
-            /*
+        case MENU_CHANGE:            
             if (does_option_exist)
             {
                 // Move to new Default setup for Options vs Menus.
                 // Also set the curent menu for the system to load
                 // to pull the commands from.
                 m_current_option = option_index;
-                changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);                
+                changeSetupModule(MOD_DISPLAY_MENU_OPTIONS_EDIT);                
             }
             else
             {
@@ -1027,7 +1057,7 @@ void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int optio
                 displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
                 displayPrompt(PROMPT_INPUT_TEXT);
                 changeInputModule(MOD_MENU_OPTION_INPUT);
-            } */           
+            }        
             break;
             
         case MENU_DELETE:
@@ -1722,7 +1752,7 @@ std::string ModMenuEditor::displayMenuEditScreen()
     std::vector<std::string> result_set;
 
     result_set.push_back("     |15File Version       : |03" + m_common_io.rightPadding(current_menu->file_version, 48));
-    result_set.push_back(" |07------------------------ " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |07" + std::string(72, '-'));
     result_set.push_back(" |03(|11A|03) |15Menu Title         : |03" + m_common_io.rightPadding(current_menu->menu_title, 48));
     result_set.push_back(" |03(|11B|03) |15Password           : |03" + m_common_io.rightPadding(current_menu->menu_password, 48));    
     result_set.push_back(" |03(|11C|03) |15Fallback Menu      : |03" + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
@@ -1731,13 +1761,139 @@ std::string ModMenuEditor::displayMenuEditScreen()
     result_set.push_back(" |03(|11F|03) |15Pulldown File      : |03" + m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
     result_set.push_back(" |03(|11G|03) |15View Generic Menu    " + m_common_io.rightPadding("", 48));
     result_set.push_back(" |03(|11H|03) |15Edit Options         " + m_common_io.rightPadding("", 48));    
-    result_set.push_back(" |07------------------------ " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |07" + std::string(72, '-'));
     result_set.push_back(" |03(|11Q|03) |15Quit & Save          " + m_common_io.rightPadding("", 48));
     result_set.push_back(" |03(|11X|03) |15Exit without Saving  " + m_common_io.rightPadding("", 48));
                 
     // Not in use Yet, seems legacy only does ACS in option commands.
     // option_string.append("Menu ACS           : " + m_common_io.rightPadding(current_menu->menu_acs_string, 35);  
     // option_string.append("Menu FormMenu      : " + m_common_io.rightPadding(current_menu->menu_form_menu, 8); 
+
+    // iterate through and print out
+    int total_rows = result_set.size();
+    total_rows += 2;
+
+    // Could re-calc this on screen width lateron.
+    int max_cols  = 76;
+
+    // Vector or Menus, Loop through
+    std::vector<std::string>::iterator i = result_set.begin();
+    std::string buffer = "";
+    
+    for(int rows = 0; rows < total_rows; rows++)
+    {
+        buffer += "  "; // 3 Leading spaces per row.
+        for(int cols = 0; cols < max_cols; cols++)
+        {
+            // Top Row
+            if(rows == 0 && cols == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += top_left;
+            }
+            else if(rows == 0 && cols == max_cols-1)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += top_right;
+            }
+            else if(rows == 0 && cols % 75 == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += mid_top;
+            } 
+            else if(rows == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += row;
+            }
+
+            // Bottom Row
+            else if(rows == total_rows-1 && cols == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += bot_left;
+            }
+            else if(rows == total_rows-1 && cols == max_cols-1)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += bot_right;
+            }
+            else if(rows == total_rows-1 && cols % 75 == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += mid_bot;
+            } 
+            else if(rows == total_rows-1)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += row;
+            }
+            else if(cols % 75 == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += mid;
+            }
+            else
+            {
+                // Here we insert the Menu name and pad through to 8 characters.
+                if(cols == 1)
+                {
+                    if(i != result_set.end())
+                    {
+                        buffer += *i;
+                        ++i;
+                    }
+                }
+            }
+        }
+        
+        // Were going to split on \n, which will get replaced lateron
+        // with \r\n for full carriage returns.        
+        buffer += "\n";
+    }
+    
+    return (buffer);    
+}
+
+/**
+ * @brief Menu Editor, for Dispalying Menu Option Fields to Edit
+ * @return
+ */
+std::string ModMenuEditor::displayMenuOptionEditScreen()
+{
+    // Setup Extended ASCII Box Drawing characters.
+    char top_left  = (char)214; // ╓
+    char bot_left  = (char)211; // ╙
+    char row       = (char)196; // ─
+    char top_right = (char)183; // ╖
+    char bot_right = (char)189; // ╜
+
+    char mid_top   = (char)210; // ╥
+    char mid_bot   = (char)208; // ╨
+    char mid       = (char)186; // ║
+
+    //Menu is already loaded, pull by index
+    auto &opt = m_loaded_menu.back()->menu_options[m_current_option];
+    
+    // Build a string list of individual menu options, then loop to fit as many per screen!
+    std::vector<std::string> result_set;
+   
+    result_set.push_back("     |15Option ID          : |03" + m_common_io.rightPadding(std::to_string(opt.index), 48));
+    result_set.push_back(" |07" + std::string(72, '-'));
+    result_set.push_back(" |03(|11A|03) |15Option Name        : |03" + m_common_io.rightPadding(opt.name, 48));
+    result_set.push_back(" |03(|11B|03) |15ACS                : |03" + m_common_io.rightPadding(opt.acs_string, 48));    
+    result_set.push_back(" |03(|11C|03) |15Hidden             : |03" + m_common_io.rightPadding(m_common_io.boolAlpha(opt.hidden), 48));
+    result_set.push_back(" |03(|11D|03) |15Command Keys       : |03" + m_common_io.rightPadding(opt.command_key, 48));
+    result_set.push_back(" |03(|11E|03) |15Keys               : |03" + m_common_io.rightPadding(opt.menu_key, 48));
+    result_set.push_back(" |03(|11F|03) |15Command String     : |03" + m_common_io.rightPadding(opt.command_string, 48));
+    result_set.push_back(" |03(|11G|03) |15Pulldown ID        : |03" + m_common_io.rightPadding(std::to_string(opt.pulldown_id), 48));
+    result_set.push_back(" |03(|11[|03) |15Previous Option      " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |03(|11]|03) |15Next Option          " + m_common_io.rightPadding("", 48));    
+    result_set.push_back(" |07" + std::string(72, '-'));
+    result_set.push_back(" |03(|11Q|03) |15Quit                 " + m_common_io.rightPadding("", 48));
+                
+    // Not in use Yet, seems legacy only does ACS in option commands.
+    // option_string.append("Form Value         : " + m_common_io.rightPadding(opt.form_value, 48));
 
     // iterate through and print out
     int total_rows = result_set.size();

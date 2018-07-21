@@ -858,7 +858,6 @@ std::string CommonIO::getInputBuffer()
     return m_line_buffer;
 }
 
-
 /**
  * @brief Returns processing of field input until NL is received.
  * @param line
@@ -1025,7 +1024,6 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
     return "empty"; // ""
 }
 
-
 /**
  * @brief Converts Pascal Strings to C-Strings Also return std::string for conversions.
  * @param string
@@ -1098,7 +1096,6 @@ std::string CommonIO::boolAlpha(bool value)
     return "False";
 }
 
-
 /**
  * @brief Parse / Replace MCI String from given string.
  * @param AnsiString
@@ -1121,7 +1118,6 @@ void CommonIO::parseLocalMCI(std::string &AnsiString, const std::string &mcicode
     while(id1 != std::string::npos);
 }
 
-
 /**
  * @brief Check if the file exists
  * @return
@@ -1140,7 +1136,6 @@ bool CommonIO::fileExists(std::string FileName)
     ifs.close();
     return true;
 }
-
 
 /**
  * Reads in Ansi file into Buffer Only

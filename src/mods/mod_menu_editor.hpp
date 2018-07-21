@@ -52,6 +52,7 @@ public:
         m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuEditor, this));
         m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuOptionEditor, this));
         m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuEditFields, this));
+        m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuOptionEditFields, this));
         
         // Input or Method Modules that handle incoming input per state.
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorInput, this, std::placeholders::_1));
@@ -93,21 +94,23 @@ public:
     // Setup Module Index
     enum
     {
-        MOD_DISPLAY_MENU         = 0,
-        MOD_DISPLAY_MENU_OPTIONS = 1,
-        MOD_DISPLAY_MENU_EDIT    = 2
+        MOD_DISPLAY_MENU              = 0,
+        MOD_DISPLAY_MENU_OPTIONS      = 1,
+        MOD_DISPLAY_MENU_EDIT         = 2,
+        MOD_DISPLAY_MENU_OPTIONS_EDIT = 3
     };
     
     // Input Module Index
     enum
     {
-        MOD_MENU_INPUT        = 0, // Menu Parser
-        MOD_PAUSE             = 1, // Pauses on display of menus/options
-        MOD_MENU_NAME         = 2, // Menu Name Handler
-        MOD_MENU_OPTION_INPUT = 3, // Menu Option Parser
-        MOD_MENU_OPTION       = 4, // Option Index Handler
-        MOD_MENU_FIELD_INPUT  = 5, // Menu Field Parser
-        MOD_MENU_FIELD        = 6  // Menu Field Handler
+        MOD_MENU_INPUT              = 0, // Menu Parser
+        MOD_PAUSE                   = 1, // Pauses on display of menus/options
+        MOD_MENU_NAME               = 2, // Menu Name Handler
+        MOD_MENU_OPTION_INPUT       = 3, // Menu Option Parser
+        MOD_MENU_OPTION             = 4, // Option Index Handler
+        MOD_MENU_FIELD_INPUT        = 5, // Menu Field Parser
+        MOD_MENU_FIELD              = 6, // Menu Field Handler
+        MOD_MENU_OPTION_FIELD_INPUT = 7  // Menu Option Field Parser
     };
     
     // Input Menu State Index
@@ -127,15 +130,16 @@ public:
     // Lets so switch the views to see other command information.
     enum
     {
-        VIEW_DEFAULT = 0,
-        VIEW_NAMES   = 1,
-        VIEW_STRINGS = 2
+        VIEW_DEFAULT  = 0,
+        VIEW_NAMES    = 1,
+        VIEW_STRINGS  = 2,
+        VIEW_PULLDOWN = 3
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
     const std::string PROMPT_HEADER = "menu_header";
     const std::string PROMPT_OPTION_HEADER = "menu_option_header";
-    const std::string PROMPT_MENU_EDIT_HEADER = "menu_field_edit_header";
+    const std::string PROMPT_MENU_EDIT_HEADER = "menu_field_edit_header";   
     const std::string PROMPT_PAUSE = "pause_prompt";
     const std::string PROMPT_INPUT_TEXT = "menu_input_text";
     const std::string PROMPT_OPTION_INPUT_TEXT = "option_input_text";
@@ -164,7 +168,11 @@ public:
     const std::string PROMPT_MENU_OPTION_COPY_FROM = "option_copy_from";
     const std::string PROMPT_MENU_OPTION_COPY_TO = "option_copy_to";
     const std::string PROMPT_MENU_OPTION_MOVE_FROM = "option_move_from";
-    const std::string PROMPT_MENU_OPTION_MOVE_TO = "option_move_to";
+    const std::string PROMPT_MENU_OPTION_MOVE_TO = "option_move_to";    
+    
+    // Menu Option Field Edit Prompts
+    const std::string PROMPT_MENU_OPTION_EDIT_HEADER = "menu_option_field_edit_header";
+    const std::string PROMPT_MENU_OPTION_FIELD_INPUT_TEXT = "menu_option_field_input_text";
     
     /**
      * @brief Create Default Text Prompts for module
@@ -240,6 +248,12 @@ public:
     void setupMenuEditFields();
 
     /**
+     * @brief Setup for the Menu Option Editor 
+     * @return
+     */
+    void setupMenuOptionEditFields();
+
+    /**
      * @brief Displays the current page of menu items
      * @param input_state
      */
@@ -261,24 +275,32 @@ public:
     /**
      * @brief Check if the menu option exists in the current listing
      * @param menu_option
-     * @return 
      */
     bool checkMenuOptionExists(unsigned int option_index);
 
     /**
      * @brief Menu Editor Display, Runs through all existing menus
+     * @return 
      */
     std::string displayMenuList();
 
     /**
      * @brief Menu Editor, Read and Modify Menus Options
+     * @return 
      */
     std::string displayMenuOptionList();
 
     /**
      * @brief Menu Editor, for Dispalying Menu Fields to Edit
+     * @return 
      */
     std::string displayMenuEditScreen();
+
+    /**
+     * @brief Menu Editor, for Dispalying Menu Option Fields to Edit
+     * @return 
+     */
+    std::string displayMenuOptionEditScreen();
 
     /**
      * Input Methods below here.
