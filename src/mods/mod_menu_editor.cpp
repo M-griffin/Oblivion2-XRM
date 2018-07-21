@@ -89,7 +89,7 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_INVALID_MENU_NOT_EXISTS] = std::make_pair("Invalid Menu Doesn't Exist", "|CR|04Invalid, Menu doesn't exist.|CR");
 
     // Menu Field Edit
-    value[PROMPT_MENU_FIELD_INPUT_TEXT]   = std::make_pair("Menu Field Edit Prompt", "|CR|15Editor C|07om|08mand |15: |07");
+    value[PROMPT_MENU_FIELD_INPUT_TEXT]   = std::make_pair("Menu Field Edit Prompt", "|CR|15Menu Editor C|07om|08mand |15: |07");
     
     // NOTE, added |PD will display the prompt description as HELP text to the user 
     // Usefull when editing fields - Specific to XRM.
@@ -111,7 +111,7 @@ void ModMenuEditor::createTextPrompts()
     
     // Menu Option Edit Fields
     value[PROMPT_MENU_OPTION_EDIT_HEADER]       = std::make_pair("Menu Option Fields Editor Header |OT Menu ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Menu Option Editor|15] |03--- |11Menu ID : |15|OT |CR");
-    value[PROMPT_MENU_OPTION_FIELD_INPUT_TEXT]  = std::make_pair("Menu Option Field Edit Prompt", "|CR|15Editor C|07om|08mand |15: |07");
+    value[PROMPT_MENU_OPTION_FIELD_INPUT_TEXT]  = std::make_pair("Menu Option Field Edit Prompt", "|CR|15Option Editor C|07om|08mand |15: |07");
 
 
     m_text_prompts_dao->writeValue(value);
@@ -342,6 +342,10 @@ void ModMenuEditor::displayCurrentPage(const std::string &input_state)
         case MOD_DISPLAY_MENU_OPTIONS:
             current_module_input = MOD_MENU_OPTION_INPUT;
             break;
+            
+        default:
+            std::cout << "Error, forgot to add new STATE index displayCurrentPage!!";
+            return;
     }  
     
     // If we displayed all rows, then display propmpt, otherwise
@@ -379,7 +383,15 @@ void ModMenuEditor::displayCurrentEditPage(const std::string &input_state)
     {
         case MOD_DISPLAY_MENU_EDIT:
             current_module_input = MOD_MENU_FIELD_INPUT;
-            break;             
+            break;  
+
+        case MOD_DISPLAY_MENU_OPTIONS_EDIT:
+            current_module_input = MOD_MENU_OPTION_FIELD_INPUT;
+            break;   
+
+        default:
+            std::cout << "Error, forgot to add new STATE index displayCurrentEditPage!!";
+            return;
     }  
     
     displayPrompt(input_state); // prompt for edit
@@ -715,7 +727,7 @@ void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input)
             default:
                 redisplayModulePrompt();
                 break;
-        } 
+        }
     }
     else
     {
@@ -727,6 +739,127 @@ void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input)
         }
     }
 }   
+
+/**
+ * @brief Handles Menu Option Field Editor Command Selection
+ * @param input
+ */
+void ModMenuEditor::menuEditorMenuOptionFieldInput(const std::string &input)
+{
+    std::cout << " *** menuEditorMenuOptionFieldInput !!!" << std::endl;
+    std::cout << "**************************" << std::endl;
+    
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+
+    // ESC was hit
+    if(result == "aborted") 
+    {
+        std::cout << "aborted!" << std::endl;
+        return;
+    }
+    else if(result[0] == '\n')
+    {            
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return;
+        }
+                
+        baseProcessDeliverNewLine();
+        
+        std::string output_buffer = m_config->default_color_regular;
+        switch (toupper(key[0]))
+        {
+            /*
+            case 'A': // Menu Title
+                std::cout << "change menu title" << std::endl;
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_OPTION_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_TITLE);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_title);
+                break;
+                
+            case 'B': // Menu Password
+                std::cout << "change menu pass" << std::endl;
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_OPTION_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_PASSWORD);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_password);
+                break;
+                
+             case 'C': // Menu Password
+                std::cout << "change menu fallback" << std::endl;
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_OPTION_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_FALLBACK);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_fall_back);
+                break;
+            
+            case 'D': // Menu Help ID
+                std::cout << "change menu helpid" << std::endl;
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_OPTION_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_HELP_ID);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_help_file);
+                break;
+                
+            case 'E': // Menu Name
+                std::cout << "change menu name" << std::endl;
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_OPTION_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_NAME);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_name);
+                break;
+                
+             case 'F': // Menu Pulldown file
+                std::cout << "change menu name" << std::endl;
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_OPTION_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_PULLDOWN);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_pulldown_file);
+                break;
+            
+            case 'G': // View Generate Menu 
+                std::cout << "view generic menu" << std::endl;
+                // TODO
+                break; */
+                
+            /*    
+            case 'H': // Jump into Options Editing.
+                std::cout << "change options" << std::endl;
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+                changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);                                
+                break; 
+            */
+                
+            case 'Q': // Quit
+                std::cout << "menu field quit" << std::endl;
+                //saveMenuChanges();
+                //std::vector<menu_ptr>().swap(m_loaded_menu);
+                // Only save on Menu Field Exit, not commands!
+                
+                // Reload fall back, or gosub to Menu Editor Main
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+                changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);                
+                return;                
+                
+            default:
+                redisplayModulePrompt();
+                break;
+        }         
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty") 
+        {
+            baseProcessDeliverInput(result);
+        }
+    }
+}
 
 /**
  * @brief Handles Field Updates for Menu Data
@@ -794,6 +927,73 @@ void ModMenuEditor::menuEditorMenuFieldHandler(const std::string &input)
     }
 }
 
+/**
+ * @brief Handles Menu Option Field Updates
+ * @param input
+ */
+void ModMenuEditor::menuEditorMenuOptionFieldHandler(const std::string &input)
+{
+    std::cout << " *** menuEditorMenuOptionFieldHandler !!!" << std::endl;
+    std::cout << "**************************" << std::endl;
+    
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
+
+    // ESC was hit
+    if(result == "aborted") 
+    {
+        std::cout << "aborted!" << std::endl;
+        changeInputModule(MOD_MENU_OPTION_FIELD_INPUT);
+        changeSetupModule(MOD_DISPLAY_MENU_OPTIONS_EDIT);
+        return;
+    }
+    else if(result[0] == '\n')
+    {            
+        baseProcessDeliverNewLine();                
+        
+        // Handle the assigned input received for field
+        switch(m_current_field)
+        {
+            /*
+            case 'A': // Menu Title
+                m_loaded_menu.back()->menu_title = key;
+                break;
+                
+            case 'B': // Menu Password
+                m_loaded_menu.back()->menu_password = key;                
+                break;
+                
+            case 'C': // Menu Fallback
+                m_loaded_menu.back()->menu_fall_back = key;                
+                break;
+                
+            case 'D': // Menu Help ID
+                m_loaded_menu.back()->menu_help_file = key;                
+                break;
+                
+            case 'E': // Menu Name
+                m_loaded_menu.back()->menu_name = key;                
+                break;
+                
+            case 'F': // Menu Pulldown
+                m_loaded_menu.back()->menu_pulldown_file = key;                
+                break;   
+            */
+        }
+                
+        changeInputModule(MOD_MENU_OPTION_FIELD_INPUT);
+        changeSetupModule(MOD_DISPLAY_MENU_OPTIONS_EDIT);
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty") 
+        {
+            baseProcessDeliverInput(result);
+        }
+    }
+}
    
 /**
  * @brief Handles Menu Name Input, Parses Strings and checks Valid Menus
@@ -1020,7 +1220,6 @@ void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int optio
 {    
     switch (m_mod_menu_state_index)
     {
-        // WIP
         case MENU_ADD:
             if (does_option_exist)
             {
@@ -1030,15 +1229,10 @@ void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int optio
             }
             else 
             {
+                // If out of Range, placing after last items, always append to end
                 createNewMenuOption(m_loaded_menu.back()->menu_options.size());
                 changeInputModule(MOD_MENU_OPTION_INPUT);
                 redisplayModulePrompt();     
-                
-                /* Error, can't create a menu that already exists!
-                displayPrompt(PROMPT_INVALID_OPTION_NOT_EXISTS);
-                displayPrompt(PROMPT_OPTION_INPUT_TEXT);
-                changeInputModule(MOD_MENU_OPTION_INPUT);
-                */
             }
             break;
             
@@ -1049,6 +1243,8 @@ void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int optio
                 // Also set the curent menu for the system to load
                 // to pull the commands from.
                 m_current_option = option_index;
+                
+                changeInputModule(MOD_MENU_OPTION_FIELD_INPUT);
                 changeSetupModule(MOD_DISPLAY_MENU_OPTIONS_EDIT);                
             }
             else
@@ -1105,7 +1301,7 @@ void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int optio
             }
             else 
             {
-                // Default to last
+                // If out of Range, placing after last items, always append to end
                 copyExistingMenuOption(m_loaded_menu.back()->menu_options.size());
                 changeInputModule(MOD_MENU_OPTION_INPUT);
                 redisplayModulePrompt();
@@ -1136,18 +1332,16 @@ void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int optio
             if (does_option_exist) 
             {
                 copyExistingMenuOption(option_index);
-                changeInputModule(MOD_MENU_OPTION_INPUT);
-                
                 deleteExistingMenuOption(m_current_option);
+                changeInputModule(MOD_MENU_OPTION_INPUT);
                 redisplayModulePrompt();
             }
             else 
             {
-                // Default to last
+                // If out of Range, placing after last items, always append to end
                 copyExistingMenuOption(m_loaded_menu.back()->menu_options.size());
-                changeInputModule(MOD_MENU_OPTION_INPUT);
-                
                 deleteExistingMenuOption(m_current_option);
+                changeInputModule(MOD_MENU_OPTION_INPUT);
                 redisplayModulePrompt();
             }
             break;
@@ -1427,18 +1621,7 @@ bool ModMenuEditor::checkMenuOptionExists(unsigned int option_index)
  * @return
  */
 std::string ModMenuEditor::displayMenuList()
-{
-    // Setup Extended ASCII Box Drawing characters.
-    char top_left  = (char)214; // ╓
-    char bot_left  = (char)211; // ╙
-    char row       = (char)196; // ─
-    char top_right = (char)183; // ╖
-    char bot_right = (char)189; // ╜
-
-    char mid_top   = (char)210; // ╥
-    char mid_bot   = (char)208; // ╨
-    char mid       = (char)186; // ║
-                      
+{                     
     directory_ptr directory(new Directory());
     std::vector<std::string> result_set = directory->getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
 
@@ -1462,7 +1645,7 @@ std::string ModMenuEditor::displayMenuList()
         ++total_rows;
 
     // Could re-calc this on screen width lateron.
-    int max_cols  = 73; // out of 80
+    int max_cols = 73; // out of 80
 
     // Vector or Menus, Loop through
     std::vector<std::string>::iterator i = result_set.begin();
@@ -1477,49 +1660,49 @@ std::string ModMenuEditor::displayMenuList()
             if(rows == 0 && cols == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += top_left;
+                buffer += BORDER_TOP_LEFT;
             }
             else if(rows == 0 && cols == max_cols-1)
             {
                 buffer += baseGetDefaultColor();
-                buffer += top_right;
+                buffer += BORDER_TOP_RIGHT;
             }
             else if(rows == 0 && cols % 9 == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += mid_top;
+                buffer += BORDER_MID_TOP;
             }
             else if(rows == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += row;
+                buffer += BORDER_ROW;
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += bot_left;
+                buffer += BORDER_BOT_LEFT;
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
                 buffer += baseGetDefaultColor();
-                buffer += bot_right;
+                buffer += BORDER_BOT_RIGHT;
             }
             else if(rows == total_rows-1 && cols % 9 == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += mid_bot;
+                buffer += BORDER_MID_BOT;
             }
             else if(rows == total_rows-1)
             {
                 buffer += baseGetDefaultColor();
-                buffer += row;
+                buffer += BORDER_ROW;
             }
             else if(cols % 9 == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += mid;
+                buffer += BORDER_MID;
             }
             else
             {
@@ -1560,18 +1743,7 @@ std::string ModMenuEditor::displayMenuList()
  * @return
  */
 std::string ModMenuEditor::displayMenuOptionList()
-{
-    // Setup Extended ASCII Box Drawing characters.
-    char top_left  = (char)214; // ╓
-    char bot_left  = (char)211; // ╙
-    char row       = (char)196; // ─
-    char top_right = (char)183; // ╖
-    char bot_right = (char)189; // ╜
-
-    char mid_top   = (char)210; // ╥
-    char mid_bot   = (char)208; // ╨
-    char mid       = (char)186; // ║
-   
+{  
     menu_ptr current_menu = m_loaded_menu.back();
 
     // Build a string list of individual menu options, then loop to fit as many per screen!
@@ -1615,11 +1787,10 @@ std::string ModMenuEditor::displayMenuOptionList()
         ++total_rows;
 
     // Could re-calc this on screen width lateron.
-    int max_cols  = 76; // out of 80
+    int max_cols = 76;
 
     // Vector or Menus, Loop through
     std::vector<std::string>::iterator i = result_set.begin();
-    //std::string menu_name;
     std::string buffer = "";
     
     for(int rows = 0; rows < total_rows; rows++)
@@ -1631,49 +1802,49 @@ std::string ModMenuEditor::displayMenuOptionList()
             if(rows == 0 && cols == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += top_left;
+                buffer += BORDER_TOP_LEFT;
             }
             else if(rows == 0 && cols == max_cols-1)
             {
                 buffer += baseGetDefaultColor();
-                buffer += top_right;
+                buffer += BORDER_TOP_RIGHT;
             }
             else if(rows == 0 && cols % 25 == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += mid_top;
+                buffer += BORDER_MID_TOP;
             } 
             else if(rows == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += row;
+                buffer += BORDER_ROW;
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += bot_left;
+                buffer += BORDER_BOT_LEFT;
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
                 buffer += baseGetDefaultColor();
-                buffer += bot_right;
+                buffer += BORDER_BOT_RIGHT;
             }
             else if(rows == total_rows-1 && cols % 25 == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += mid_bot;
+                buffer += BORDER_MID_BOT;
             } 
             else if(rows == total_rows-1)
             {
                 buffer += baseGetDefaultColor();
-                buffer += row;
+                buffer += BORDER_ROW;
             }
             else if(cols % 25 == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += mid;
+                buffer += BORDER_MID;
             }
             else
             {
@@ -1709,18 +1880,6 @@ std::string ModMenuEditor::displayMenuOptionList()
  */
 std::string ModMenuEditor::displayMenuEditScreen()
 {
-    // Setup Extended ASCII Box Drawing characters.
-    char top_left  = (char)214; // ╓
-    char bot_left  = (char)211; // ╙
-    char row       = (char)196; // ─
-    char top_right = (char)183; // ╖
-    char bot_right = (char)189; // ╜
-
-    char mid_top   = (char)210; // ╥
-    char mid_bot   = (char)208; // ╨
-    char mid       = (char)186; // ║
-   
-
     // Create Menu Pointer then load the menu into it.
     menu_ptr current_menu(new Menu());
     
@@ -1752,7 +1911,7 @@ std::string ModMenuEditor::displayMenuEditScreen()
     std::vector<std::string> result_set;
 
     result_set.push_back("     |15File Version       : |03" + m_common_io.rightPadding(current_menu->file_version, 48));
-    result_set.push_back(" |07" + std::string(72, '-'));
+    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
     result_set.push_back(" |03(|11A|03) |15Menu Title         : |03" + m_common_io.rightPadding(current_menu->menu_title, 48));
     result_set.push_back(" |03(|11B|03) |15Password           : |03" + m_common_io.rightPadding(current_menu->menu_password, 48));    
     result_set.push_back(" |03(|11C|03) |15Fallback Menu      : |03" + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
@@ -1761,7 +1920,7 @@ std::string ModMenuEditor::displayMenuEditScreen()
     result_set.push_back(" |03(|11F|03) |15Pulldown File      : |03" + m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
     result_set.push_back(" |03(|11G|03) |15View Generic Menu    " + m_common_io.rightPadding("", 48));
     result_set.push_back(" |03(|11H|03) |15Edit Options         " + m_common_io.rightPadding("", 48));    
-    result_set.push_back(" |07" + std::string(72, '-'));
+    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
     result_set.push_back(" |03(|11Q|03) |15Quit & Save          " + m_common_io.rightPadding("", 48));
     result_set.push_back(" |03(|11X|03) |15Exit without Saving  " + m_common_io.rightPadding("", 48));
                 
@@ -1774,7 +1933,7 @@ std::string ModMenuEditor::displayMenuEditScreen()
     total_rows += 2;
 
     // Could re-calc this on screen width lateron.
-    int max_cols  = 76;
+    int max_cols = 76;
 
     // Vector or Menus, Loop through
     std::vector<std::string>::iterator i = result_set.begin();
@@ -1789,49 +1948,49 @@ std::string ModMenuEditor::displayMenuEditScreen()
             if(rows == 0 && cols == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += top_left;
+                buffer += BORDER_TOP_LEFT;
             }
             else if(rows == 0 && cols == max_cols-1)
             {
                 buffer += baseGetDefaultColor();
-                buffer += top_right;
+                buffer += BORDER_TOP_RIGHT;
             }
             else if(rows == 0 && cols % 75 == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += mid_top;
+                buffer += BORDER_MID_TOP;
             } 
             else if(rows == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += row;
+                buffer += BORDER_ROW;
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += bot_left;
+                buffer += BORDER_BOT_LEFT;
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
                 buffer += baseGetDefaultColor();
-                buffer += bot_right;
+                buffer += BORDER_BOT_RIGHT;
             }
             else if(rows == total_rows-1 && cols % 75 == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += mid_bot;
+                buffer += BORDER_MID_BOT;
             } 
             else if(rows == total_rows-1)
             {
                 buffer += baseGetDefaultColor();
-                buffer += row;
+                buffer += BORDER_ROW;
             }
             else if(cols % 75 == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += mid;
+                buffer += BORDER_MID;
             }
             else
             {
@@ -1861,25 +2020,14 @@ std::string ModMenuEditor::displayMenuEditScreen()
  */
 std::string ModMenuEditor::displayMenuOptionEditScreen()
 {
-    // Setup Extended ASCII Box Drawing characters.
-    char top_left  = (char)214; // ╓
-    char bot_left  = (char)211; // ╙
-    char row       = (char)196; // ─
-    char top_right = (char)183; // ╖
-    char bot_right = (char)189; // ╜
-
-    char mid_top   = (char)210; // ╥
-    char mid_bot   = (char)208; // ╨
-    char mid       = (char)186; // ║
-
-    //Menu is already loaded, pull by index
+    // Menu is already loaded, pull by index
     auto &opt = m_loaded_menu.back()->menu_options[m_current_option];
     
     // Build a string list of individual menu options, then loop to fit as many per screen!
     std::vector<std::string> result_set;
    
     result_set.push_back("     |15Option ID          : |03" + m_common_io.rightPadding(std::to_string(opt.index), 48));
-    result_set.push_back(" |07" + std::string(72, '-'));
+    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
     result_set.push_back(" |03(|11A|03) |15Option Name        : |03" + m_common_io.rightPadding(opt.name, 48));
     result_set.push_back(" |03(|11B|03) |15ACS                : |03" + m_common_io.rightPadding(opt.acs_string, 48));    
     result_set.push_back(" |03(|11C|03) |15Hidden             : |03" + m_common_io.rightPadding(m_common_io.boolAlpha(opt.hidden), 48));
@@ -1889,7 +2037,7 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
     result_set.push_back(" |03(|11G|03) |15Pulldown ID        : |03" + m_common_io.rightPadding(std::to_string(opt.pulldown_id), 48));
     result_set.push_back(" |03(|11[|03) |15Previous Option      " + m_common_io.rightPadding("", 48));
     result_set.push_back(" |03(|11]|03) |15Next Option          " + m_common_io.rightPadding("", 48));    
-    result_set.push_back(" |07" + std::string(72, '-'));
+    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
     result_set.push_back(" |03(|11Q|03) |15Quit                 " + m_common_io.rightPadding("", 48));
                 
     // Not in use Yet, seems legacy only does ACS in option commands.
@@ -1900,7 +2048,7 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
     total_rows += 2;
 
     // Could re-calc this on screen width lateron.
-    int max_cols  = 76;
+    int max_cols = 76;
 
     // Vector or Menus, Loop through
     std::vector<std::string>::iterator i = result_set.begin();
@@ -1915,49 +2063,49 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
             if(rows == 0 && cols == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += top_left;
+                buffer += BORDER_TOP_LEFT;
             }
             else if(rows == 0 && cols == max_cols-1)
             {
                 buffer += baseGetDefaultColor();
-                buffer += top_right;
+                buffer += BORDER_TOP_RIGHT;
             }
             else if(rows == 0 && cols % 75 == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += mid_top;
+                buffer += BORDER_MID_TOP;
             } 
             else if(rows == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += row;
+                buffer += BORDER_ROW;
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += bot_left;
+                buffer += BORDER_BOT_LEFT;
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
                 buffer += baseGetDefaultColor();
-                buffer += bot_right;
+                buffer += BORDER_BOT_RIGHT;
             }
             else if(rows == total_rows-1 && cols % 75 == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += mid_bot;
+                buffer += BORDER_MID_BOT;
             } 
             else if(rows == total_rows-1)
             {
                 buffer += baseGetDefaultColor();
-                buffer += row;
+                buffer += BORDER_ROW;
             }
             else if(cols % 75 == 0)
             {
                 buffer += baseGetDefaultColor();
-                buffer += mid;
+                buffer += BORDER_MID;
             }
             else
             {

@@ -66,6 +66,11 @@ public:
         // Menu Field Input Commands
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuFieldInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuFieldHandler, this, std::placeholders::_1));
+        
+        // Menu Option Field Input Commands.
+        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuOptionFieldInput, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuOptionFieldHandler, this, std::placeholders::_1));
+        
                 
         
         // Check of the Text Prompts exist.
@@ -110,7 +115,8 @@ public:
         MOD_MENU_OPTION             = 4, // Option Index Handler
         MOD_MENU_FIELD_INPUT        = 5, // Menu Field Parser
         MOD_MENU_FIELD              = 6, // Menu Field Handler
-        MOD_MENU_OPTION_FIELD_INPUT = 7  // Menu Option Field Parser
+        MOD_MENU_OPTION_FIELD_INPUT = 7, // Menu Option Field Parser
+        MOD_MENU_OPTION_FIELD       = 8  // Menu Option Field Handler
     };
     
     // Input Menu State Index
@@ -134,6 +140,19 @@ public:
         VIEW_NAMES    = 1,
         VIEW_STRINGS  = 2,
         VIEW_PULLDOWN = 3
+    };
+    
+    // Box drawing characters
+    enum
+    {
+        BORDER_TOP_LEFT  = (char)214,  // ╓
+        BORDER_BOT_LEFT  = (char)211,  // ╙
+        BORDER_ROW       = (char)196,  // ─
+        BORDER_TOP_RIGHT = (char)183,  // ╖
+        BORDER_BOT_RIGHT = (char)189,  // ╜
+        BORDER_MID_TOP   = (char)210,  // ╥
+        BORDER_MID_BOT   = (char)208,  // ╨
+        BORDER_MID       = (char)186   // ║
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
@@ -331,10 +350,22 @@ public:
     void menuEditorMenuFieldInput(const std::string &input);
 
     /**
+     * @brief Handles Menu Option Field Editor Command Selection
+     * @param input
+     */
+    void menuEditorMenuOptionFieldInput(const std::string &input);
+
+    /**
      * @brief Handles Field Updates for Menu Data
      * @param input
      */
     void menuEditorMenuFieldHandler(const std::string &input);
+
+    /**
+     * @brief Handles Menu Option Field Updates
+     * @param input
+     */
+    void menuEditorMenuOptionFieldHandler(const std::string &input);
 
     /**
      * @brief Handles Menu Name Input, Parses Strings and checks Valid Menus
