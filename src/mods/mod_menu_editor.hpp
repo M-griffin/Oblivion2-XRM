@@ -119,8 +119,8 @@ public:
         MENU_DELETE    = 2,
         MENU_COPY_FROM = 3,
         MENU_COPY_TO   = 4,
-        MENU_MOVE_TO   = 5,
-        MENU_MOVE_FROM = 6
+        MENU_MOVE_FROM = 5,
+        MENU_MOVE_TO   = 6        
     };
     
     // Menu Option Toggled View State
@@ -163,6 +163,8 @@ public:
     const std::string PROMPT_MENU_OPTION_DELETE = "option_delete";    
     const std::string PROMPT_MENU_OPTION_COPY_FROM = "option_copy_from";
     const std::string PROMPT_MENU_OPTION_COPY_TO = "option_copy_to";
+    const std::string PROMPT_MENU_OPTION_MOVE_FROM = "option_move_from";
+    const std::string PROMPT_MENU_OPTION_MOVE_TO = "option_move_to";
     
     /**
      * @brief Create Default Text Prompts for module
@@ -261,7 +263,7 @@ public:
      * @param menu_option
      * @return 
      */
-    bool checkMenuOptionExists(int option_index);
+    bool checkMenuOptionExists(unsigned int option_index);
 
     /**
      * @brief Menu Editor Display, Runs through all existing menus
@@ -348,25 +350,25 @@ public:
      * @brief Create a new empty Menu
      * @param option_index
      */
-    void createNewMenuOption(int option_index);
+    void createNewMenuOption(unsigned int option_index);
 
     /**
      * @brief Delete an existing Menu Option
      * @param option_index
      */
-    void deleteExistingMenuOption(int option_index);
+    void deleteExistingMenuOption(unsigned int option_index);
 
     /**
      * @brief On Insertion of Menu Options, reorder all after index
      * @param option_index
      */
-    void reorderMenuIndexesInsertion(int option_index);
+    void reorderMenuIndexesInsertion(unsigned int option_index);
     
     /**
      * @brief On Deletion of Menu Options, reorder all after index
      * @param option_index
      */
-    void reorderMenuIndexesDeletion(int option_index);
+    void reorderMenuIndexesDeletion(unsigned int option_index);
 
     /**
      * @brief Delete an existing Menu
