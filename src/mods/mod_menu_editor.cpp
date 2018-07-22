@@ -118,12 +118,12 @@ void ModMenuEditor::createTextPrompts()
     // Usefull when editing fields - Specific to XRM.
     
     value[PROMPT_MENU_OPTION_FIELD_NAME]         = std::make_pair("Name Displated in an ANSI screen", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Option Name        : ");    
-    value[PROMPT_MENU_OPTION_FIELD_ACS]          = std::make_pair("(ACS) Access Control String", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15ACS                : ");
-    value[PROMPT_MENU_OPTION_FIELD_HIDDEN]       = std::make_pair("Hidden Option, Name shown in an ANSI screen", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15Hidden       |07(|15y|07/|15N|07)|15 : ");
-    value[PROMPT_MENU_OPTION_FIELD_CMD_KEY]      = std::make_pair("Executes a specific menu function (Example '-/' goes to menu in Command String)", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15Command Keys       : ");
+    value[PROMPT_MENU_OPTION_FIELD_ACS]          = std::make_pair("Access Control String - Setting security and flags", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15ACS                : ");
+    value[PROMPT_MENU_OPTION_FIELD_HIDDEN]       = std::make_pair("Hidden Option, Exclude from ANSI screen", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15Hidden       |07(|15T|07/|15F|07)|15 : ");
+    value[PROMPT_MENU_OPTION_FIELD_CMD_KEY]      = std::make_pair("Executes a specific menu function (Example '-/' to change menu)", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15Command Keys       : ");
     value[PROMPT_MENU_OPTION_FIELD_MENU_KEY]     = std::make_pair("Input keys user enters to execute menu option", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Keys               : ");    
-    value[PROMPT_MENU_OPTION_FIELD_CMD_STRING]   = std::make_pair("String Parameters required by Command Key (Example 'MAIN' when switching menus)", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15Command String     : ");
-    value[PROMPT_MENU_OPTION_FIELD_PULLDOWN]     = std::make_pair("Pulldown ID is the order in which lightbars move from the begining to the end", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15Pulldown ID        : ");
+    value[PROMPT_MENU_OPTION_FIELD_CMD_STRING]   = std::make_pair("Parameters required by Command Key (Example 'MAIN' for switching menus)", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15Command String     : ");
+    value[PROMPT_MENU_OPTION_FIELD_PULLDOWN]     = std::make_pair("Pulldown ID - the order lightbars move from the begining to the end", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15Pulldown ID        : ");
     
     
 
@@ -821,14 +821,18 @@ void ModMenuEditor::menuEditorMenuOptionFieldInput(const std::string &input)
                 break;
                 
              case 'C': // Option Hidden
+             {
                 std::cout << "change option hidden" << std::endl;
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_MENU_OPTION_FIELD);
                 displayPrompt(PROMPT_MENU_OPTION_FIELD_HIDDEN);
-                m_session_io.getInputField("", key, Config::sName_length, 
-                    m_common_io.boolAlpha(m_loaded_menu.back()->menu_options[m_current_option].hidden))[0];
+                
+                // Setup pre-population to display only T or F instead of True / False
+                std::string bool_value = "";
+                bool_value += m_common_io.boolAlpha(m_loaded_menu.back()->menu_options[m_current_option].hidden).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
-            
+             }
             case 'D': // Option Command Key
                 std::cout << "change option cmd_key" << std::endl;
                 m_current_field = toupper(key[0]);
