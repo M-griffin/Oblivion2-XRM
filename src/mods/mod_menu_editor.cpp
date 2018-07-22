@@ -77,7 +77,7 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_HEADER]                  = std::make_pair("Menu Editor Header", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Menu Editor|15] |03--- |CR");
     value[PROMPT_OPTION_HEADER]           = std::make_pair("Menu Options Editor Header |OT Menu ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Menu Option Editor|15] |03--- |11Menu ID : |15|OT |CR");
     value[PROMPT_MENU_EDIT_HEADER]        = std::make_pair("Menu Fields Editor Header |OT Menu ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Menu Editor|15] |03--- |11Menu ID : |15|OT |CR");
-    value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 ");
+    value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 |CR");
     value[PROMPT_INPUT_TEXT]              = std::make_pair("Menu Edit Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
     value[PROMPT_OPTION_INPUT_TEXT]       = std::make_pair("Menu Option Edit Prompt", "|CR|03A|15/dd |03E|15/dit |03D|15/elete |03C|15/opy |03M|15/ove |03T|15/oggle |03Q|15/uit : ");
     value[PROMPT_INVALID]                 = std::make_pair("Invalid input", "|CR|04Invalid Input! Try again.|CR");
@@ -348,12 +348,16 @@ void ModMenuEditor::displayCurrentPage(const std::string &input_state)
     // TODO TESTING multiple page scrolling.
     std::cout << "*** rows_used " << rows_used << std::endl;
     std::cout << "*** max_rows " << max_rows << std::endl;
-    m_rows_per_page = max_rows - rows_used + 2;
+    
+    if (m_page > 0)
+        rows_used -= (m_ansi_process->m_number_lines - 2);
+        
+    m_rows_per_page = max_rows - (rows_used + 2);
     
     std::cout << "*** m_rows_per_page " << m_rows_per_page << std::endl;
     
     bool displayed_all_rows = true;
-    for (unsigned int i = (m_page*m_rows_per_page); i < m_menu_display_list.size(); i++) 
+    for (unsigned int i = (m_page*(m_rows_per_page-2)); i < m_menu_display_list.size(); i++) 
     {
         std::string display_line = m_session_io.pipe2ansi(m_menu_display_list[i]);
         display_line.append("\r\n");
