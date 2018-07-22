@@ -190,8 +190,17 @@ public:
     const std::string PROMPT_MENU_OPTION_MOVE_TO = "option_move_to";    
     
     // Menu Option Field Edit Prompts
-    const std::string PROMPT_MENU_OPTION_EDIT_HEADER = "menu_option_field_edit_header";
-    const std::string PROMPT_MENU_OPTION_FIELD_INPUT_TEXT = "menu_option_field_input_text";
+    const std::string PROMPT_MENU_OPTION_EDIT_HEADER = "option_field_edit_header";
+    const std::string PROMPT_MENU_OPTION_FIELD_INPUT_TEXT = "option_field_input_text";
+    const std::string PROMPT_MENU_OPTION_FIELD_NAME = "option_field_name";
+    const std::string PROMPT_MENU_OPTION_FIELD_ACS = "option_field_acs";
+    const std::string PROMPT_MENU_OPTION_FIELD_HIDDEN = "option_field_hidden";
+    const std::string PROMPT_MENU_OPTION_FIELD_CMD_KEY = "option_field_cmd_key";
+    const std::string PROMPT_MENU_OPTION_FIELD_MENU_KEY = "option_field_menu_key";
+    const std::string PROMPT_MENU_OPTION_FIELD_CMD_STRING = "option_field_cmd_string";
+    const std::string PROMPT_MENU_OPTION_FIELD_PULLDOWN = "option_field_pulldown_id";
+    
+    
     
     /**
      * @brief Create Default Text Prompts for module
