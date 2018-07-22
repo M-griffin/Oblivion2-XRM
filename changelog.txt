@@ -1,10 +1,87 @@
 
+Change Log Update (00.00.112)
+* 2018-07-21
++ Added Command View Display info Header, which gives information on toggling 
+  the views
++ Updated OSX project with latest changes.
++ Updated and Tested Linux Project. All good. 
++ Added Generic Menu View in Menu Editor, users can now make changes and 
+  previews the screen before saving.
++ Added Change Options Prompt, was missing and using the menu change prompt
++ Tweaked the default prompt descriptions and some cleanup.  
+  Everything is testing good.
++ Completed command field assignments.
+  also make next/previous command jumping hot keys, [ ] and ENTER is too annoying 
+  when cycling options and most likely legacy obv/2 did the same.
++ Added Option ID current / total in the display for when moving from/to next 
+  or previous option.
++ Added Option Fields and Prompts for Each field
++ Some slight refactoring for box drawing characters, Completed more state setup 
+  for Option Field editing.
++ Create Menu Option Editor for editing individual fields, Screen layout.
+
+Change Log Update (00.00.111)
+* 2018-07-20
++ Completed Option Move. 
++ Completed Option Copy, and a little extra cleanup. 
++ Completed Menu Option Delete. 
++ Added Menu Option Create initial.
++ Some cleanup and also update black fields for Add/Change/Edit/Delete
+  will return on empty input and also abort on ESC.
++ Menu is saving changes properly, change Quit to default Save and added
+  Exit without saving while menu changes are stored in memory.
++ Finished adding menu fields, added |PD to display to field prompts
+  which display the prompt description as help text when editing fields.
++ Updated Input to allow blacks and clearing fields out.
++ Various Prompt updates
++ Added checking when editing a menu to only reload if menu is not 
+  already loaded. Then on exit we now need to add save/abort question.
++ Some small tweaks and got initial input field formatted properly with
+  leadoff data if Entry already exists it will populate it to edit or 
+  modify the existing.
++ Added Menu Parsing for Prompts in the modules, mainly with |OT pipes
+  for general placeholders for in Editor headers for Menu Name and other data.
+
+Change Log Update (00.00.110)
+* 2018-07-19
++ Menu Field Edit now properly leads into editing Menu Options (Commands)
++ Initial Menu Field edit display is completed
++ Updated new Toggled Options Views to (3) Separate states
++ Some State Updates for the Menu to Options screens.
++ Adding Menu Option Display and Initial Editing functions and callbacks.
+
+Change Log Update (00.00.109)
+* 2018-07-18
++ Menu Editor, Fixed ordering of input Methods, Also added getLineInput for parsing
+  keys. Ready to start building out method and pipe sequence parsing.
+  Initial MenuEditor Option/Command display completed. Next is to add m…  …   
++ Updated Padding (Left/Right) when the string it empty, it will now padd properly.
++ Cleanup on some socket output for debugging Async processing.   
++ Completed Copy Menu Source/Destination  
++ MenuEditor, delete function is completed and tested.  
++ Completed Menu Add Command, Creates a new default menu with a default 
+  menu command for starting out.     
++ Updated Menu editor, added Copy, and changed "change" to "edit" for input keys.   
++ Added initial input method for Add/Change/Delete and checking if the
+  menu exists or not in the folder.  
++ Added colors to menu list, need to add more baseColors for the mods for
+  Theme default colors lateron.
+
+Change Log Update (00.00.108)
+* 2018-07-03
++ Corrected some login issues with rework, removed Enum no longer being used 
+  corrected the issue with the state.
+
+Change Log Update (00.00.107)
+* 2018-06-24
++ Started Initial Rework for Menu Editor
+
 Change Log Update (00.00.106)
 * 2018-06-24
 + Some cleanup after rewrite, updated all project files to the latest
 + Reworked UUID generation support when boost was removed to use new libraries.
 + Removed ARM folder. ARM was for older Pi's running raspberry on an outdated setups,
-  the current linux project builds and handles both x86 and ARM builds.
+  the current Linux project builds and handles both x86 and ARM builds.
 - Next work on sysop interfaces
 
 Change Log Update (00.00.105)

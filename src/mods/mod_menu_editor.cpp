@@ -344,17 +344,11 @@ void ModMenuEditor::displayCurrentPage(const std::string &input_state)
     // calculate the rows_per_page.
     unsigned int rows_used = m_ansi_process->getMaxRowsUsedOnScreen();
     unsigned int max_rows = m_ansi_process->getMaxLines();
-
-    // TODO TESTING multiple page scrolling.
-    std::cout << "*** rows_used " << rows_used << std::endl;
-    std::cout << "*** max_rows " << max_rows << std::endl;
     
     if (m_page > 0)
         rows_used -= (m_ansi_process->m_number_lines - 2);
         
     m_rows_per_page = max_rows - (rows_used + 2);
-    
-    std::cout << "*** m_rows_per_page " << m_rows_per_page << std::endl;
     
     bool displayed_all_rows = true;
     for (unsigned int i = (m_page*(m_rows_per_page-2)); i < m_menu_display_list.size(); i++) 
