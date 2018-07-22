@@ -37,7 +37,7 @@ public:
         , m_mod_function_index(MOD_MENU_INPUT)
         , m_mod_menu_state_index(MENU_ADD)
         , m_mod_toggle_view_index(VIEW_DEFAULT)
-        , m_max_toggled_view_index(VIEW_STRINGS)
+        , m_max_toggled_view_index(VIEW_PULLDOWN)
         , m_is_text_prompt_exist(false)
         , m_page(0)
         , m_rows_per_page(0)
@@ -203,6 +203,8 @@ public:
     const std::string PROMPT_MENU_OPTION_FIELD_MENU_KEY = "option_field_menu_key";
     const std::string PROMPT_MENU_OPTION_FIELD_CMD_STRING = "option_field_cmd_string";
     const std::string PROMPT_MENU_OPTION_FIELD_PULLDOWN = "option_field_pulldown_id";
+    
+    const std::string PROMPT_OPTION_TOGGLE = "option_toggle_view_display";
     
     /**
      * @brief Create Default Text Prompts for module

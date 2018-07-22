@@ -125,6 +125,9 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_MENU_OPTION_FIELD_CMD_STRING]   = std::make_pair("Parameters required by Command Key (Example 'MAIN' for switching menus)", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15Command String     : ");
     value[PROMPT_MENU_OPTION_FIELD_PULLDOWN]     = std::make_pair("Pulldown ID - the order lightbars move from the begining to the end", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15Pulldown ID        : ");
 
+    // Menu commands, some header info for the view toggle.
+    value[PROMPT_OPTION_TOGGLE]                  = std::make_pair("Command View Toggle using 'T' cycles though different displays", "|CR|03%   |15|PD|CR|11!   |15Current View : |11|OT |CR");
+    
     m_text_prompts_dao->writeValue(value);
 }
 
@@ -239,6 +242,32 @@ void ModMenuEditor::setupMenuOptionEditor()
     std::string display_name = m_current_menu;
     baseTransformToUpper(display_name);
     displayPromptMCI(PROMPT_OPTION_HEADER, display_name);
+    
+    std::string view_name = "";
+    switch(m_mod_toggle_view_index)
+    {
+        case VIEW_DEFAULT:
+            view_name = "Default Command Display";
+            break;
+            
+        case VIEW_NAMES:
+            view_name = "Option Name Display";
+            break;
+            
+        case VIEW_STRINGS:
+            view_name = "Command String and Hidden Option Display";
+            break;
+            
+        case VIEW_PULLDOWN:
+            view_name = "Command and Pulldown ID Display";
+            break;
+        
+        default:
+            std::cout << "Error, Didn't add the view display to setupMenuOptionEditor" << std::endl;
+            break;
+    }
+    
+    displayPromptMCI(PROMPT_OPTION_TOGGLE, view_name);
     
     // Build a list of screen lines for the menu display
     // So we know when to pause in large listing, or use pagenation.
@@ -1749,34 +1778,50 @@ std::string ModMenuEditor::displayMenuOptionList()
 {  
     menu_ptr current_menu = m_loaded_menu.back();
 
-    // Build a string list of individual menu options, then loop to fit as many per screen!
-    std::vector<std::string> result_set;
+    std::string header_string = "";
+    std::string boarder_string = "";
+    
+     // Build a string list of individual menu options, then loop to fit as many per screen!
+    std::vector<std::string> result_set;  
     for(unsigned int i = 0; i < current_menu->menu_options.size(); i++)
     {
         auto &m = current_menu->menu_options[i];
         
         std::string option_string = m_common_io.rightPadding(std::to_string(m.index), 3);  
-
+                        
         // Toggled View will show commands strings, while default shows command key info.
         switch (m_mod_toggle_view_index) 
         {            
             case VIEW_DEFAULT:
-                option_string.append(m_common_io.rightPadding(m.menu_key, 9));
-                option_string.append(m_common_io.rightPadding(m.command_key, 4));
-                option_string.append(m_common_io.rightPadding(m.acs_string, 8));
+                option_string.append("|15" + m_common_io.rightPadding(m.menu_key, 9));
+                option_string.append("|11" + m_common_io.rightPadding(m.command_key, 4));
+                option_string.append("|03" + m_common_io.rightPadding(m.acs_string, 8));
                 break;
         
             case VIEW_NAMES:            
-                option_string.append(m_common_io.rightPadding(m.name, 21));
+                option_string.append("|15" + m_common_io.rightPadding(m.name, 21));
                 break;
                 
             case VIEW_STRINGS:
-                option_string.append(m_common_io.rightPadding(m.command_string, 15));
-                option_string.append(m_common_io.rightPadding("", 1));
-                option_string.append(m_common_io.rightPadding(m_common_io.boolAlpha(m.hidden), 5));
+                option_string.append("|15" + m_common_io.rightPadding(m.command_string, 15));
+                option_string.append("|11" + m_common_io.rightPadding("", 1));
+                option_string.append("|03" + m_common_io.rightPadding(m_common_io.boolAlpha(m.hidden), 5));
                 break;
-        }
                 
+            case VIEW_PULLDOWN:
+                option_string.append("|15" + m_common_io.rightPadding(m.menu_key, 9));
+                option_string.append("|11" + m_common_io.rightPadding(m.command_key, 4));
+                
+                if (m.pulldown_id > 0) 
+                {
+                    option_string.append("|03" + m_common_io.rightPadding(std::to_string(m.pulldown_id), 8));                    
+                }
+                else 
+                {
+                    option_string.append(m_common_io.rightPadding("", 8));
+                }
+        }
+        
         result_set.push_back(option_string);
     }
 
