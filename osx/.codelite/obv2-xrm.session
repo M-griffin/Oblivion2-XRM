@@ -5,8 +5,8 @@
   <TabInfoArray Name="TabInfoArray">
     <TabInfo>
       <wxString Value="/Users/admin/code/Oblivion2-XRM/src/ansi_processor.cpp" Name="FileName"/>
-      <int Value="267" Name="FirstVisibleLine"/>
-      <int Value="285" Name="CurrentLine"/>
+      <int Value="266" Name="FirstVisibleLine"/>
+      <int Value="272" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>

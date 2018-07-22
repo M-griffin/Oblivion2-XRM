@@ -38,7 +38,6 @@ public:
         , m_mod_menu_state_index(MENU_ADD)
         , m_mod_toggle_view_index(VIEW_DEFAULT)
         , m_max_toggled_view_index(VIEW_STRINGS)
-        , m_failure_attempts(0)
         , m_is_text_prompt_exist(false)
         , m_page(0)
         , m_rows_per_page(0)
@@ -489,7 +488,6 @@ private:
     unsigned int           m_mod_toggle_view_index;
     unsigned int           m_max_toggled_view_index;
     
-    int                    m_failure_attempts;
     bool                   m_is_text_prompt_exist;
     unsigned int           m_page;
     unsigned int           m_rows_per_page;
