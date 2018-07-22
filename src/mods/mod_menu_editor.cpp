@@ -1,7 +1,8 @@
 #include "mod_menu_editor.hpp"
 #include "model-sys/menu.hpp"
 #include "data-sys/menu_dao.hpp"
-#include "directory.hpp"
+#include "../directory.hpp"
+#include "../menu_base.hpp"
 
 #include <stdint.h>
 #include <string>
@@ -115,8 +116,7 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_MENU_OPTION_FIELD_INPUT_TEXT]  = std::make_pair("Menu Option Field Edit Prompt", "|CR|15Option Editor C|07om|08mand |15: |07");
 
     // NOTE, added |PD will display the prompt description as HELP text to the user 
-    // Usefull when editing fields - Specific to XRM.
-    
+    // Usefull when editing fields - Specific to XRM.    
     value[PROMPT_MENU_OPTION_FIELD_NAME]         = std::make_pair("Name Displated in an ANSI screen", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Option Name        : ");    
     value[PROMPT_MENU_OPTION_FIELD_ACS]          = std::make_pair("Access Control String - Setting security and flags", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15ACS                : ");
     value[PROMPT_MENU_OPTION_FIELD_HIDDEN]       = std::make_pair("Hidden Option, Exclude from ANSI screen", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15Hidden       |07(|15T|07/|15F|07)|15 : ");
@@ -124,8 +124,6 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_MENU_OPTION_FIELD_MENU_KEY]     = std::make_pair("Input keys user enters to execute menu option", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Keys               : ");    
     value[PROMPT_MENU_OPTION_FIELD_CMD_STRING]   = std::make_pair("Parameters required by Command Key (Example 'MAIN' for switching menus)", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15Command String     : ");
     value[PROMPT_MENU_OPTION_FIELD_PULLDOWN]     = std::make_pair("Pulldown ID - the order lightbars move from the begining to the end", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15Pulldown ID        : ");
-    
-    
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -412,7 +410,7 @@ void ModMenuEditor::displayCurrentEditPage(const std::string &input_state)
 }
 
 /**
- * @brief Handles Input (Waiting for Any Key Press)
+ * @brief Handles Input (Waiting for Any Key Press) on Page Display.
  * @param input
  */
 void ModMenuEditor::menuEditorPausedInput(const std::string &input)
@@ -447,6 +445,19 @@ void ModMenuEditor::menuEditorPausedInput(const std::string &input)
     // Increment to next page, then display remaining results.
     ++m_page;
     displayCurrentPage(current_state_input);
+}
+
+/**
+ * @brief Handles Input (Waiting for Any Key Press) View Generic Menu
+ * @param input
+ */
+void ModMenuEditor::menuEditorDisplayPause(const std::string &)
+{        
+    std::cout << " *** menuEditorDisplayPause !!!" << std::endl;
+    std::cout << "**************************" << std::endl;
+    
+    changeInputModule(MOD_MENU_FIELD_INPUT);
+    redisplayModulePrompt();
 }
 
 /**
@@ -709,7 +720,8 @@ void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input)
             
             case 'G': // View Generate Menu 
                 std::cout << "view generic menu" << std::endl;
-                // TODO
+                displayGenericMenu();
+                changeInputModule(MOD_DISPLAY_PAUSE);
                 break; 
                 
             case 'H': // Jump into Options Editing.
@@ -2187,4 +2199,17 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
     }
     
     return (buffer);    
+}
+
+/**
+ * @brief Displays a generic Menu of the current Menu and Options
+ * @return
+ */
+void ModMenuEditor::displayGenericMenu()
+{
+    menu_base_ptr menu(new MenuBase(m_session_data));
+    menu->importMenu(m_loaded_menu.back());
+    
+    std::string generic_screen = menu->processGenericScreens();
+    baseProcessAndDeliver(generic_screen);    
 }

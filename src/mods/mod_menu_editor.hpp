@@ -71,6 +71,9 @@ public:
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuOptionFieldInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuOptionFieldHandler, this, std::placeholders::_1));
         
+        // Display Pause, waits for a key, then returns (Used in View Generic Menu)
+        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorDisplayPause, this, std::placeholders::_1));
+        
                 
         
         // Check of the Text Prompts exist.
@@ -116,7 +119,8 @@ public:
         MOD_MENU_FIELD_INPUT        = 5, // Menu Field Parser
         MOD_MENU_FIELD              = 6, // Menu Field Handler
         MOD_MENU_OPTION_FIELD_INPUT = 7, // Menu Option Field Parser
-        MOD_MENU_OPTION_FIELD       = 8  // Menu Option Field Handler
+        MOD_MENU_OPTION_FIELD       = 8, // Menu Option Field Handler
+        MOD_DISPLAY_PAUSE           = 9  // Display Pause for View Generic Menu
     };
     
     // Input Menu State Index
@@ -340,6 +344,12 @@ public:
     void menuEditorPausedInput(const std::string &input);
 
     /**
+     * @brief Handles Input (Waiting for Any Key Press) View Generic Menu
+     * @param input
+     */
+    void menuEditorDisplayPause(const std::string &input);
+
+    /**
      * @brief Handles Menu Editor Command Selection
      * @param input
      */
@@ -454,6 +464,12 @@ public:
      * @return
      */
     void saveMenuChanges();
+    
+    /**
+     * @brief Displays a generic Menu of the current Menu and Options
+     * @return
+     */
+    void displayGenericMenu();
 
 private:
 
