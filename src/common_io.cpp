@@ -27,6 +27,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <algorithm>
 #include <functional>
 #include <cctype>
@@ -391,15 +392,21 @@ std::string CommonIO::eraseString(const std::string &str,
  */
 std::string CommonIO::rightPadding(const std::string &str, std::string::size_type space)   // Pad Right
 {
+    std::string padded_line = "";
     std::string new_string = str;
-    if(space == 0) return new_string;
+    if(space == 0) 
+        return new_string;
+    
+    // If empty, return padded with spaces!
     if(new_string.empty())
     {
-        //std::cout << "Exception (Common::RightPadding) string length == 0" << std::endl;
-        return new_string;
+        for(std::string::size_type i = 0; i < space; i++)
+        {
+            padded_line += ' ';
+        }
+        return padded_line;
     }
-
-    std::string padded_line = "";
+    
     std::string::size_type s = numberOfChars(new_string);
 
     // if Line > Sapce, Erase to match length
@@ -432,10 +439,15 @@ std::string CommonIO::leftPadding(const std::string &str, std::string::size_type
         return new_string;
     }
 
+    // If empty, return padded with spaces!
     if(new_string.empty())
     {
-        //std::cout << "Exception (Common::leftPadding) string length == 0" << std::endl;
-        return new_string;
+        std::string padded_line = "";
+        for(std::string::size_type i = 0; i < space; i++)
+        {
+            padded_line += ' ';
+        }
+        return padded_line;
     }
 
     std::string::size_type s = numberOfChars(new_string);
@@ -846,7 +858,6 @@ std::string CommonIO::getInputBuffer()
     return m_line_buffer;
 }
 
-
 /**
  * @brief Returns processing of field input until NL is received.
  * @param line
@@ -1013,7 +1024,6 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
     return "empty"; // ""
 }
 
-
 /**
  * @brief Converts Pascal Strings to C-Strings Also return std::string for conversions.
  * @param string
@@ -1086,7 +1096,6 @@ std::string CommonIO::boolAlpha(bool value)
     return "False";
 }
 
-
 /**
  * @brief Parse / Replace MCI String from given string.
  * @param AnsiString
@@ -1109,7 +1118,6 @@ void CommonIO::parseLocalMCI(std::string &AnsiString, const std::string &mcicode
     while(id1 != std::string::npos);
 }
 
-
 /**
  * @brief Check if the file exists
  * @return
@@ -1128,7 +1136,6 @@ bool CommonIO::fileExists(std::string FileName)
     ifs.close();
     return true;
 }
-
 
 /**
  * Reads in Ansi file into Buffer Only
@@ -1225,4 +1232,22 @@ std::string CommonIO::readinAnsi(std::string FileName)
 
     fclose(fp);
     return buff;
+}
+
+/**
+ * @brief Split Strings by delimiter into Vector of Strings.
+ * @param s
+ * @param delimiter
+ * @return
+ */
+std::vector<std::string> CommonIO::splitString(const std::string& s, char delimiter)
+{
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream tokenStream(s);
+    while (std::getline(tokenStream, token, delimiter))
+    {
+        tokens.push_back(token);
+    }
+    return tokens;
 }

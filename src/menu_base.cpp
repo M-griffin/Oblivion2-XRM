@@ -52,7 +52,7 @@ MenuBase::~MenuBase()
     std::vector<std::function< bool(const MenuOption &)> >().swap(m_execute_callback);
 
     // Pop off the stack to deaallocate any active modules.
-    std::vector<module_ptr>().swap(m_module);
+    std::vector<module_ptr>().swap(m_module_stack);
 }
 
 /**
@@ -159,7 +159,7 @@ void MenuBase::readInMenuData()
         // Pre-Load Menu, check access, if not valud, then fall back to previous.
         menu_ptr pre_load_menu(new Menu());
 
-        // Call MenuDao to ready in .yaml file
+        // Call MenuDao to readin .yaml file
         MenuDao mnu(pre_load_menu, m_current_menu, GLOBAL_MENU_PATH);
         if (mnu.fileExists())
         {
@@ -1098,7 +1098,7 @@ void MenuBase::loadAndStartupMenu()
 /**
  * @brief Updates current and next lightbar positions.
  */
-void MenuBase::lightbarUpdate(int previous_pulldown_id)
+void MenuBase::lightbarUpdate(unsigned int previous_pulldown_id)
 {
 
     std::cout << " *** lightbar update! *** " << std::endl;
@@ -1258,7 +1258,7 @@ bool MenuBase::handleLightbarSelection(const std::string &input)
     int previous_id = m_active_pulldownID;
     if(input == "RT_ARROW" || input == "DN_ARROW")
     {
-        if(m_active_pulldownID < (signed)m_ansi_process->m_pull_down_options.size())
+        if(m_active_pulldownID < m_ansi_process->m_pull_down_options.size())
         {
             ++m_active_pulldownID;
         }
@@ -1518,13 +1518,11 @@ bool MenuBase::processMenuOptions(const std::string &input)
             // Pulldown selection.
             if(m_is_active_pulldown_menu)
             {
-
                 std::cout << "handlePulldownHotKeys" << std::endl;
 
                 // Handles ENTER Selection or Hotkeys Command Input.
                 if (handlePulldownHotKeys(m, is_enter, stack_reassignment))
                 {
-
                     if (m_logoff)
                     {
                         return false;

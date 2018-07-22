@@ -219,25 +219,7 @@ public:
      * @brief Shutdown Async Polling Service
      */
     void stop();
-
-    /**
-     * @brief String Split for Hostname : Port on Async Connects
-     * @param s
-     * @param delimiter
-     * @return
-     */
-    std::vector<std::string> split(const std::string& s, char delimiter)
-    {
-        std::vector<std::string> tokens;
-        std::string token;
-        std::istringstream tokenStream(s);
-        while (std::getline(tokenStream, token, delimiter))
-        {
-            tokens.push_back(token);
-        }
-        return tokens;
-    }
-
+    
     SafeVector<service_base_ptr>  m_service_list;
     SafeVector<service_base_ptr>  m_timer_list;
     SafeVector<service_base_ptr>  m_listener_list;

@@ -72,7 +72,6 @@ void SessionIO::createInputField(std::string &field_name, int &len)
 {
     std::string repeat;
     char formatted[1024]= {0};
-
     char sTmp[3]  = {0};
     char sTmp2[3] = {0};
 

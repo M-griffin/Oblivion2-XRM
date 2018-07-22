@@ -198,7 +198,7 @@ SUITE(XRMCommonIO)
         CommonIO common;
         std::string temp = "";
         std::string padd_temp = common.rightPadding(temp, 3);
-        CHECK_EQUAL(padd_temp,"");
+        CHECK_EQUAL(padd_temp,"   ");
     }
 
     TEST(RightPadding0)
@@ -234,7 +234,7 @@ SUITE(XRMCommonIO)
         CommonIO common;
         std::string temp = "";
         std::string padd_temp = common.leftPadding(temp, 3);
-        CHECK_EQUAL(padd_temp,"");
+        CHECK_EQUAL(padd_temp,"   ");
     }
 
     TEST(LeftPadding0)

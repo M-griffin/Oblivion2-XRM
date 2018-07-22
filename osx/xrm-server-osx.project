@@ -37,7 +37,6 @@
     <File Name="../src/main.cpp"/>
     <File Name="../src/menu_system.cpp"/>
     <File Name="../src/menu_system.hpp"/>
-    <File Name="../src/menu_system_editor.cpp"/>
     <File Name="../src/safe_queue.hpp"/>
     <File Name="../src/safe_set.hpp"/>
     <File Name="../src/server.hpp"/>
@@ -120,6 +119,22 @@
       <File Name="../src/mods/mod_signup.hpp"/>
       <File Name="../src/mods/mod_sys_config.cpp"/>
       <File Name="../src/mods/mod_sys_config.hpp"/>
+      <File Name="../src/mods/mod_file_editor.cpp"/>
+      <File Name="../src/mods/mod_file_editor.hpp"/>
+      <File Name="../src/mods/mod_file_lister.cpp"/>
+      <File Name="../src/mods/mod_file_lister.hpp"/>
+      <File Name="../src/mods/mod_menu_editor.cpp"/>
+      <File Name="../src/mods/mod_menu_editor.hpp"/>
+      <File Name="../src/mods/mod_message_editor.cpp"/>
+      <File Name="../src/mods/mod_message_editor.hpp"/>
+      <File Name="../src/mods/mod_message_reader.cpp"/>
+      <File Name="../src/mods/mod_message_reader.hpp"/>
+      <File Name="../src/mods/mod_protocol_editor.cpp"/>
+      <File Name="../src/mods/mod_protocol_editor.hpp"/>
+      <File Name="../src/mods/mod_system_config.cpp"/>
+      <File Name="../src/mods/mod_system_config.hpp"/>
+      <File Name="../src/mods/mod_user_editor.cpp"/>
+      <File Name="../src/mods/mod_user_editor.hpp"/>
     </VirtualDirectory>
     <File Name="../src/menu_base.cpp"/>
     <File Name="../src/menu_base.hpp"/>

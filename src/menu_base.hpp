@@ -47,7 +47,6 @@ public:
     {
         MENU_INPUT,
         MENU_YESNO_BAR,
-        MENU_EDITOR_INPUT,
         MODULE_PRELOGON_INPUT,
         MODULE_LOGON_INPUT,
         MODULE_INPUT,
@@ -75,7 +74,7 @@ public:
     menu_prompt_ptr  m_menu_prompt;        // Menu Prompt
 
     ansi_process_ptr m_ansi_process;       // Instance for AnsiProcess Methods
-    int              m_active_pulldownID;  // Active Lightbar Position.
+    unsigned int     m_active_pulldownID;  // Active Lightbar Position.
 
     // Flags
     bool             m_fail_flag;                   // If menu or Option fails, kick off the fail flag.
@@ -95,7 +94,7 @@ public:
     std::vector<std::function< bool(const MenuOption &)> > m_execute_callback;
 
     // Handle Dynamic modules being executed.
-    std::vector<module_ptr> m_module;
+    std::vector<module_ptr> m_module_stack;
 
 
     /**
@@ -253,16 +252,11 @@ public:
     // Input is passed through to it, then the function returns for the next input
     // Since ere async, nothing stays inside it always returns.
     void loadAndStartupMenu();
-
-    /**
-     * @brief Menu Editor, Runs through all existing menus
-     */
-    std::string displayMenus();
-
+   
     /**
      * @brief Updates current and next lightbar positions.
      */
-    void lightbarUpdate(int previous_pulldown_id);
+    void lightbarUpdate(unsigned int previous_pulldown_id);
 
     /**
      * @brief Handles Menu Option Call Back

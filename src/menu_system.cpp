@@ -4,6 +4,7 @@
 #include "mods/mod_prelogon.hpp"
 #include "mods/mod_logon.hpp"
 #include "mods/mod_signup.hpp"
+#include "mods/mod_menu_editor.hpp"
 
 #include <locale>
 #include <string>
@@ -22,7 +23,6 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     // [Vector] Setup std::function array with available options to pass input to.
     m_menu_functions.push_back(std::bind(&MenuBase::menuInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuBase::menuYesNoBarInput, this, std::placeholders::_1, std::placeholders::_2));
-    m_menu_functions.push_back(std::bind(&MenuSystem::menuEditorInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::modulePreLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleLogonInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
@@ -571,7 +571,9 @@ bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option)
     {
             // Menu Editor
         case '#':
-            return false;
+            std::cout << "Executing startupModuleMenuEditor();" << std::endl;
+            startupModuleMenuEditor();
+            return true;
 
             // Configuration Menu
         case 'C':
@@ -828,75 +830,14 @@ void MenuSystem::startupExternalProcess(const std::string &cmdline)
     m_menu_session_data->startExternalProcess(cmdline);
 }
 
-
-/**
- * @brief Startup Menu Editor and Switch to MenuEditorInput
- */
-void MenuSystem::startupMenuEditor()
-{
-    std::cout << "Entering MenuEditor Input " << std::endl;
-
-    // Setup the input processor
-    resetMenuInputIndex(MENU_EDITOR_INPUT);
-
-    // 2. Handle any init and startup Screen Displays
-
-    // WIP, nothing completed just yet for the startup.
-}
-
-/**
- * @brief Menu Editor, Read and Modify Menus
- */
-void MenuSystem::menuEditorInput(const std::string &character_buffer, const bool &)
-{
-    // If were not using hot keys, loop input until we get ENTER
-    // Then handle only the first key in the buffer.  Other "SYSTEMS"
-    // Will parse for entire line for matching Command Keys.
-    if (!m_use_hotkey)
-    {
-        // Received ENTER, grab the previous input.
-        if (!(character_buffer[0] == 13))
-        {
-            m_line_buffer += character_buffer[0];
-            m_session_data->deliver(m_line_buffer);
-        }
-    }
-    else
-    {
-        m_line_buffer += character_buffer[0];
-    }
-
-    std::string output_buffer = m_config->default_color_regular;
-    switch (std::toupper(m_line_buffer[0]))
-    {
-        case 'A': // Add
-            output_buffer += "Enter Menu Name to Add : ";
-            break;
-        case 'C': // Change/Edit
-            output_buffer += "Enter Menu Name to Change : ";
-            break;
-        case 'D': // Delete
-            output_buffer += "Enter Menu to Delete : ";
-            break;
-        case 'Q': // Quit
-            // Reload fall back, or gosub to last menu!
-
-            return;
-        default : // Return
-            return;
-    }
-
-    m_session_data->deliver(output_buffer);
-}
-
 /**
  * @brief Clears All Modules
  */
 void MenuSystem::clearAllModules()
 {
-    if (m_module.size() > 0)
+    if (m_module_stack.size() > 0)
     {
-        std::vector<module_ptr>().swap(m_module);
+        std::vector<module_ptr>().swap(m_module_stack);
     }
 }
 
@@ -907,8 +848,8 @@ void MenuSystem::shutdownModule()
 {
     // Do module shutdown, only single modules are loaded
     // This makes it easy to allocate and kill on demand.
-    m_module.back()->onExit();
-    m_module.pop_back();
+    m_module_stack.back()->onExit();
+    m_module_stack.pop_back();
 }
 
 /**
@@ -923,7 +864,7 @@ void MenuSystem::startupModule(module_ptr module)
     module->onEnter();
 
     // Push to stack now the new module.
-    m_module.push_back(module);
+    m_module_stack.push_back(module);
 }
 
 /**
@@ -983,6 +924,22 @@ void MenuSystem::startupModuleSignup()
     startupModule(module);
 }
 
+void MenuSystem::startupModuleMenuEditor() 
+{
+    // Setup the input processor
+    resetMenuInputIndex(MODULE_INPUT);
+
+    // Allocate and Create
+    module_ptr module(new ModMenuEditor(m_session_data, m_config, m_ansi_process));
+    if (!module)
+    {
+        std::cout << "ModMenuEditor Allocation Error!" << std::endl;
+        assert(false);
+    }
+
+    startupModule(module);    
+}
+
 /**
  * @brief Handles Input for Login and PreLogin Sequences.
  * @param character_buffer
@@ -991,30 +948,30 @@ void MenuSystem::startupModuleSignup()
 void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8)
 {
     // Make sure we have an allocated module before processing.
-    if (m_module.size() == 0 || character_buffer.size() == 0)
+    if (m_module_stack.size() == 0 || character_buffer.size() == 0)
     {
         return;
     }
 
     // Allocate and Create
-    m_module.back()->update(character_buffer, is_utf8);
+    m_module_stack.back()->update(character_buffer, is_utf8);
 
     // Finished modules processing.
-    if (!m_module.back()->m_is_active)
+    if (!m_module_stack.back()->m_is_active)
     {
         shutdownModule();
 
         // Check if the current user has been logged in yet.
         if (!m_session_data->m_is_session_authorized)
         {
-            std::cout << "!m_is_session_authorized" << std::endl;
+            std::cout << " *** !m_is_session_authorized" << std::endl;
             m_current_menu = "matrix";
         }
         else
         {
             // If Authorized, then we want to move to main! Startup menu should be TOP or
             // Specified in Config file!  TODO
-            std::cout << "m_is_session_authorized" << std::endl;
+            std::cout << " *** m_is_session_authorized: " << m_config->starting_menu_name << std::endl;
 
             if (m_config->starting_menu_name.size() > 0)
             {
@@ -1062,16 +1019,16 @@ void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is
     std::cout << " *** moduleInput" << std::endl;
 
     // Make sure we have an allocated module before processing.
-    if (m_module.size() == 0 || character_buffer.size() == 0)
+    if (m_module_stack.size() == 0 || character_buffer.size() == 0)
     {
         return;
     }
 
     // Execute the modules update pass through input.
-    m_module.back()->update(character_buffer, is_utf8);
+    m_module_stack.back()->update(character_buffer, is_utf8);
 
     // Finished modules processing.
-    if (!m_module.back()->m_is_active)
+    if (!m_module_stack.back()->m_is_active)
     {
         shutdownModule();
 
@@ -1082,4 +1039,3 @@ void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is
         redisplayMenuScreen();
     }
 }
-
