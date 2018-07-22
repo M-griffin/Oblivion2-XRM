@@ -183,7 +183,8 @@ public:
     // Menu Options
     const std::string PROMPT_INVALID_OPTION_NOT_EXISTS = "invalid_option_doesnt_exist";
     const std::string PROMPT_MENU_OPTION_ADD = "option_add";
-    const std::string PROMPT_MENU_OPTION_DELETE = "option_delete";    
+    const std::string PROMPT_MENU_OPTION_DELETE = "option_delete"; 
+    const std::string PROMPT_MENU_OPTION_CHANGE = "option_change";  
     const std::string PROMPT_MENU_OPTION_COPY_FROM = "option_copy_from";
     const std::string PROMPT_MENU_OPTION_COPY_TO = "option_copy_to";
     const std::string PROMPT_MENU_OPTION_MOVE_FROM = "option_move_from";
@@ -199,8 +200,6 @@ public:
     const std::string PROMPT_MENU_OPTION_FIELD_MENU_KEY = "option_field_menu_key";
     const std::string PROMPT_MENU_OPTION_FIELD_CMD_STRING = "option_field_cmd_string";
     const std::string PROMPT_MENU_OPTION_FIELD_PULLDOWN = "option_field_pulldown_id";
-    
-    
     
     /**
      * @brief Create Default Text Prompts for module

@@ -104,6 +104,7 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_INVALID_OPTION_NOT_EXISTS] = std::make_pair("Invalid Option Doesn't Exist", "|CR|04Invalid, Option doesn't exist.|CR");
     value[PROMPT_MENU_OPTION_ADD]           = std::make_pair("Menu Option Add Before Which Command", "|CR|11CREATE|15 and insert before which option : ");
     value[PROMPT_MENU_OPTION_DELETE]        = std::make_pair("Menu Option Delete At Index", "|CR|11DELETE|15 which option number : ");
+    value[PROMPT_MENU_OPTION_CHANGE]        = std::make_pair("Menu Option To Change", "|CR|15Enter option number to |11EDIT|15 : ");
     value[PROMPT_MENU_OPTION_COPY_FROM]     = std::make_pair("Menu Option To Copy From", "|CR|15Enter option number to |11COPY|15 : ");
     value[PROMPT_MENU_OPTION_COPY_TO]       = std::make_pair("Menu Option To Copy To", "|11SAVE|15 as and insert before which option : ");    
     value[PROMPT_MENU_OPTION_MOVE_FROM]     = std::make_pair("Menu Option To Copy From", "|CR|15Enter option number to |11MOVE|15 : ");
@@ -573,7 +574,7 @@ void ModMenuEditor::menuEditorOptionInput(const std::string &input)
             case 'E': // Change/Edit
                 std::cout << "change" << std::endl;
                 changeMenuInputState(MENU_CHANGE);
-                displayPrompt(PROMPT_MENU_CHANGE);
+                displayPrompt(PROMPT_MENU_OPTION_CHANGE);
                 changeInputModule(MOD_MENU_OPTION);
                 break;
                 
@@ -761,6 +762,23 @@ void ModMenuEditor::menuEditorMenuOptionFieldInput(const std::string &input)
     std::cout << " *** menuEditorMenuOptionFieldInput !!!" << std::endl;
     std::cout << "**************************" << std::endl;
     
+    // Provide Hotkeys only for switching to next/previous options
+    switch(input[0]) 
+    {
+        case '[': // previous option
+            if (m_current_option > 0)
+                --m_current_option;
+            redisplayModulePrompt();
+            return;
+                
+        case ']': // next option
+            if (m_current_option < m_loaded_menu.back()->menu_options.size()-1)
+                ++m_current_option;
+            redisplayModulePrompt();
+            return;
+    }
+    
+    
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
@@ -846,19 +864,7 @@ void ModMenuEditor::menuEditorMenuOptionFieldInput(const std::string &input)
                 m_session_io.getInputField("", key, Config::sName_length, 
                     std::to_string(m_loaded_menu.back()->menu_options[m_current_option].pulldown_id));
                 break;
-                
-            case '[': // previous option
-                if (m_current_option > 0)
-                    --m_current_option;
-                redisplayModulePrompt();
-                break;
-                
-            case ']': // next option
-                if (m_current_option < m_loaded_menu.back()->menu_options.size())
-                    ++m_current_option;
-                redisplayModulePrompt();
-                break;
-                
+                                
             case 'Q': // Quit
                 std::cout << "option field quit" << std::endl;
                 changeInputModule(MOD_MENU_OPTION_INPUT);
@@ -969,34 +975,63 @@ void ModMenuEditor::menuEditorMenuOptionFieldHandler(const std::string &input)
     }
     else if(result[0] == '\n')
     {            
-        baseProcessDeliverNewLine();                
-               
+        baseProcessDeliverNewLine();
+
         // Handle the assigned input received for field
         switch(m_current_field)
         {            
             case 'A': // Menu Title
-                m_loaded_menu.back()->menu_title = key;
+                m_loaded_menu.back()->menu_options[m_current_option].name = key;
                 break;
                 
             case 'B': // Menu Password
-                m_loaded_menu.back()->menu_password = key;                
+                m_loaded_menu.back()->menu_options[m_current_option].acs_string = key;
                 break;
                 
             case 'C': // Menu Fallback
-                m_loaded_menu.back()->menu_fall_back = key;                
+            {
+                // change to bool from T/F
+                bool result = false;
+                if (toupper(key[0]) == 'T')
+                    // Set to true
+                    result = true;
+                else if (toupper(key[0]) == 'F') 
+                    // use default false;
+                    { } 
+                else 
+                    // Leave orginial value
+                    break;
+                        
+                m_loaded_menu.back()->menu_options[m_current_option].hidden = result;
                 break;
-                
+            }   
             case 'D': // Menu Help ID
-                m_loaded_menu.back()->menu_help_file = key;                
+                m_loaded_menu.back()->menu_options[m_current_option].command_key = key;        
                 break;
                 
             case 'E': // Menu Name
-                m_loaded_menu.back()->menu_name = key;                
+                m_loaded_menu.back()->menu_options[m_current_option].menu_key = key;    
                 break;
                 
             case 'F': // Menu Pulldown
-                m_loaded_menu.back()->menu_pulldown_file = key;                
-                break;            
+                m_loaded_menu.back()->menu_options[m_current_option].command_string = key;      
+                break;      
+
+            case 'G': // Pulldown ID
+            {
+                int new_id = 0;
+                std::stringstream ss(key);
+                ss >> new_id;
+        
+                // check for Invalid Index.
+                if (ss.fail() || new_id < 0)
+                {
+                    break;
+                }
+        
+                m_loaded_menu.back()->menu_options[m_current_option].pulldown_id = new_id;                   
+                break;
+            }
         }
                 
         changeInputModule(MOD_MENU_OPTION_FIELD_INPUT);
@@ -2044,7 +2079,10 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
     // Build a string list of individual menu options, then loop to fit as many per screen!
     std::vector<std::string> result_set;
    
-    result_set.push_back("     |15Option ID          : |03" + m_common_io.rightPadding(std::to_string(opt.index), 48));
+    // Setup a current ID out of Total Id's display.
+    std::string option_string = std::to_string(opt.index) + " / " + std::to_string(m_loaded_menu.back()->menu_options.size()-1);
+    
+    result_set.push_back("     |15Option ID          : |03" + m_common_io.rightPadding(option_string, 48));
     result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
     result_set.push_back(" |03(|11A|03) |15Option Name        : |03" + m_common_io.rightPadding(opt.name, 48));
     result_set.push_back(" |03(|11B|03) |15ACS                : |03" + m_common_io.rightPadding(opt.acs_string, 48));    
