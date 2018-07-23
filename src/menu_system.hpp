@@ -241,6 +241,11 @@ public:
     void startupModuleMenuEditor();
 
     /**
+     * @brief Startup the User Editor Module
+     */
+    void startupModuleUserEditor();
+
+    /**
      * @brief Handles Input for Login and PreLogin Sequences.
      * @param character_buffer
      * @param is_utf8
