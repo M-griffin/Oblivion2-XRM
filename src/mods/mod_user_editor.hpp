@@ -30,17 +30,18 @@ public:
         , m_session_io(session_data)
         , m_filename("mod_user_editor.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
+        , m_mod_setup_index(MOD_DISPLAY_USER_LIST)
         , m_mod_function_index(MOD_PROMPT)
-        , m_failure_attempts(0)
+        , m_mod_menu_state_index(USER_ADD)
         , m_is_text_prompt_exist(false)
     {
         std::cout << "ModUserEditor" << std::endl;
 
         // Push function pointers to the stack.
         
-        //m_setup_functions.push_back(std::bind(&ModMenuEditor::setupLogon, this));
+        m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserList, this));
 
-        //m_mod_functions.push_back(std::bind(&ModMenuEditor::logon, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModUserEditor::userListInput, this, std::placeholders::_1));
         
         
         // Check of the Text Prompts exist.
@@ -65,6 +66,12 @@ public:
     virtual bool onEnter() override;
     virtual bool onExit() override;
 
+    // Setup Methods
+    enum 
+    {
+        MOD_DISPLAY_USER_LIST
+    };
+
     // This matches the index for mod_functions.push_back
     enum
     {
@@ -74,6 +81,16 @@ public:
         MOD_DELETE
     };
 
+    // Input Menu State Index
+    // Used for both Menus and Options.
+    enum
+    {
+        USER_ADD       = 0,
+        USER_CHANGE    = 1,
+        USER_DELETE    = 2,
+        USER_FILTER    = 3
+    };
+    
     // Create Prompt Constants, these are the keys for key/value lookup
     const std::string PROMPT_HEADER = "header";
     const std::string PROMPT_INPUT_TEXT = "input_text";
@@ -85,12 +102,72 @@ public:
     void createTextPrompts();
     
     /**
-     * @brief Sets an indivdual module index.
+     * @brief Sets an indivdual input module index.
      * @param mod_function_index
      */
-    void changeModule(int mod_function_index);
+    void changeInputModule(int mod_function_index);
     
+    /**
+     * @brief Sets an indivdual setup method module index.
+     * @param mod_function_index
+     */
+    void changeSetupModule(int mod_function_index);
+    
+    /**
+     * @brief Sets an indivdual Menu Input State Add/Change/Delete
+     * @param mod_menu_state_index
+     */
+    void changeMenuInputState(int mod_menu_state_index);
+    
+    /**
+     * @brief Redisplay's the current module prompt.
+     * @return
+     */
+    void redisplayModulePrompt();
 
+    /**
+     * @brief Toggle the Option View.
+     * @return
+     */
+    void toggleNextOptionView();
+
+    /**
+     * @brief Pull and Display Prompts
+     * @param prompt
+     */
+    void displayPrompt(const std::string &prompt);
+    
+    /**
+     * @brief Pull and Display Prompts with MCI Code
+     * @param prompt
+     * @param mci_field
+     */
+    void displayPromptMCI(const std::string &prompt, const std::string &mci_field);
+
+    /**
+     * @brief Pull and Display Prompts with following newline
+     * @param prompt
+     */
+    void displayPromptAndNewLine(const std::string &prompt);
+
+    /**
+     * @brief Setup for the User Editor 
+     * @return
+     */
+    void setupUserList();
+
+
+    /**
+     * Handle Input Commands.
+     */
+
+    /**
+     * @brief Handles input command for User Editor Prompt
+     * @return
+     */
+    void userListInput(const std::string &input);
+    
+    
 private:
 
     // Function Input Vector.
@@ -102,8 +179,10 @@ private:
     std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
 
-    int                    m_mod_function_index;
-    int                    m_failure_attempts;
+    unsigned int           m_mod_setup_index;
+    unsigned int           m_mod_function_index;
+    unsigned int           m_mod_menu_state_index;
+    
     bool                   m_is_text_prompt_exist;
 
     CommonIO               m_common_io;
