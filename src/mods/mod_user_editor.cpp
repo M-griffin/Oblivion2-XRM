@@ -148,7 +148,6 @@ void ModUserEditor::setupUserList()
     
 }
 
-
 /**
  * @brief Handles input command for User Editor Prompt
  * @return
@@ -156,4 +155,67 @@ void ModUserEditor::setupUserList()
 void ModUserEditor::userListInput(const std::string &input) 
 {
 
+}
+
+
+
+
+/**
+ * @brief Displays the current page of users
+ * @param input_state
+ */
+void ModUserEditor::displayCurrentPage(const std::string &input_state) 
+{    
+    // calculate the rows_per_page.
+    unsigned int rows_used = m_ansi_process->getMaxRowsUsedOnScreen();
+    unsigned int max_rows = m_ansi_process->getMaxLines();
+    
+    if (m_page > 0)
+        rows_used -= (m_ansi_process->m_number_lines - 2);
+        
+    m_rows_per_page = max_rows - (rows_used + 2);
+    
+    bool displayed_all_rows = true;
+    for (unsigned int i = (m_page*(m_rows_per_page-2)); i < m_menu_display_list.size(); i++) 
+    {
+        std::string display_line = m_session_io.pipe2ansi(m_menu_display_list[i]);
+        display_line.append("\r\n");
+        baseProcessAndDeliver(display_line);
+        
+        if (i >= (m_page*m_rows_per_page) + m_rows_per_page)
+        {
+            // We've displayed the max amount of rows per the currnet
+            // screen break out and wait for prompt or next page.
+            displayed_all_rows = false;
+            break;
+        }
+    }
+    
+    // Default Page Input Method
+    unsigned int current_module_input;
+    switch(m_mod_setup_index)
+    {
+        case MOD_DISPLAY_USER_LIST:
+            current_module_input = MOD_USER_INPUT;
+            break;
+                       
+        default:
+            std::cout << "Error, forgot to add new STATE index displayCurrentPage!!";
+            return;
+    }  
+    
+    // If we displayed all rows, then display propmpt, otherwise
+    // Ask to hit anykey for next page.
+    if (displayed_all_rows)
+    {
+        // Reset Page back to Zero for next display.
+        m_page = 0;
+        displayPrompt(input_state);
+        changeInputModule(current_module_input);
+    }
+    else 
+    {
+//        displayPrompt(PROMPT_PAUSE);
+//        changeInputModule(MOD_PAUSE);
+    }
 }

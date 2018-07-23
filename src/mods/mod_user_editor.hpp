@@ -8,6 +8,9 @@
 #include <functional>
 #include <vector>
 
+//class User;
+//typedef std::shared_ptr<User> user_ptr;
+
 class SessionData;
 typedef std::shared_ptr<SessionData> session_data_ptr;
 
@@ -31,9 +34,14 @@ public:
         , m_filename("mod_user_editor.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
         , m_mod_setup_index(MOD_DISPLAY_USER_LIST)
-        , m_mod_function_index(MOD_PROMPT)
+        , m_mod_function_index(MOD_USER_INPUT)
         , m_mod_menu_state_index(USER_ADD)
         , m_is_text_prompt_exist(false)
+        , m_page(0)
+        , m_rows_per_page(0)
+        , m_current_user("")
+        , m_current_user_id(0)
+        , m_current_field(0)
     {
         std::cout << "ModUserEditor" << std::endl;
 
@@ -72,13 +80,12 @@ public:
         MOD_DISPLAY_USER_LIST
     };
 
-    // This matches the index for mod_functions.push_back
+    // Input Module Index
     enum
     {
-        MOD_PROMPT,
-        MOD_ADD,
-        MOD_CHANGE,
-        MOD_DELETE
+        MOD_USER_INPUT              = 0, // User List Input Parser
+        MOD_PAUSE                   = 1, // Pauses on display of menus/options
+        MOD_USER_NAME               = 2  // User Name Input Handler
     };
 
     // Input Menu State Index
@@ -180,13 +187,23 @@ public:
      */
     void userListInput(const std::string &input);
     
+    /**
+     * Display Methods
+     */
+     
+    /**
+     * @brief Displays the current page of users
+     * @param input_state
+     */
+    void displayCurrentPage(const std::string &input_state);
     
 private:
 
     // Function Input Vector.
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
-
+    std::vector<std::string>                                m_menu_display_list;
+    std::vector<user_ptr>                                   m_loaded_user;
 
     SessionIO              m_session_io;
     std::string            m_filename;
@@ -197,7 +214,13 @@ private:
     unsigned int           m_mod_menu_state_index;
     
     bool                   m_is_text_prompt_exist;
-
+    unsigned int           m_page;
+    unsigned int           m_rows_per_page;
+    
+    std::string            m_current_user;
+    unsigned int           m_current_user_id;
+    unsigned int           m_current_field;
+    
     CommonIO               m_common_io;
     directory_ptr          m_directory;
     
