@@ -331,8 +331,12 @@ std::string ModUserEditor::displayUserList()
     std::vector<std::string> result_set;  
     for(unsigned int i = 0; i < users.size(); i++)
     {  
-        std::string option_string = m_common_io.rightPadding(std::to_string(users[i]->iId), 5);                                     
-        option_string.append("|03" + m_common_io.rightPadding(users[i]->sHandle, 19));
+        std::string option_string = m_common_io.rightPadding(std::to_string(users[i]->iId), 5);      
+        if (users[i]->sHandle.size() == 0)
+            option_string.append("|03" + m_common_io.rightPadding(users[i]->sRealName, 19));
+        else
+            option_string.append("|03" + m_common_io.rightPadding(users[i]->sHandle, 19));
+            
         result_set.push_back(option_string);
     }
 
