@@ -8,9 +8,6 @@
 #include <functional>
 #include <vector>
 
-//class User;
-//typedef std::shared_ptr<User> user_ptr;
-
 class SessionData;
 typedef std::shared_ptr<SessionData> session_data_ptr;
 
@@ -35,7 +32,7 @@ public:
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
         , m_mod_setup_index(MOD_DISPLAY_USER_LIST)
         , m_mod_function_index(MOD_USER_INPUT)
-        , m_mod_menu_state_index(USER_ADD)
+        , m_mod_user_state_index(USER_ADD)
         , m_is_text_prompt_exist(false)
         , m_page(0)
         , m_rows_per_page(0)
@@ -50,8 +47,8 @@ public:
         m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserList, this));
 
         m_mod_functions.push_back(std::bind(&ModUserEditor::userListInput, this, std::placeholders::_1));
-        
-        
+        m_mod_functions.push_back(std::bind(&ModUserEditor::userListInput, this, std::placeholders::_1));
+    
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
         if (!m_is_text_prompt_exist)
@@ -115,6 +112,7 @@ public:
     const std::string PROMPT_HEADER = "header";
     const std::string PROMPT_INPUT_TEXT = "input_text";
     const std::string PROMPT_INVALID = "invalid_input";
+    const std::string PROMPT_PAUSE = "pause_prompt";
 
     /**
      * @brief Create Default Text Prompts for module
@@ -188,6 +186,12 @@ public:
     void userListInput(const std::string &input);
     
     /**
+     * @brief Handles Input (Waiting for Any Key Press)
+     * @param input
+     */
+    void menuEditorPausedInput(const std::string &input);
+    
+    /**
      * Display Methods
      */
      
@@ -197,12 +201,18 @@ public:
      */
     void displayCurrentPage(const std::string &input_state);
     
+    /**
+     * @brief User Editor, Read and Modify User Preferences
+     * @return
+     */
+    std::string displayUserList();
+
 private:
 
     // Function Input Vector.
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
-    std::vector<std::string>                                m_menu_display_list;
+    std::vector<std::string>                                m_user_display_list;
     std::vector<user_ptr>                                   m_loaded_user;
 
     SessionIO              m_session_io;
@@ -211,7 +221,7 @@ private:
 
     unsigned int           m_mod_setup_index;
     unsigned int           m_mod_function_index;
-    unsigned int           m_mod_menu_state_index;
+    unsigned int           m_mod_user_state_index;
     
     bool                   m_is_text_prompt_exist;
     unsigned int           m_page;
