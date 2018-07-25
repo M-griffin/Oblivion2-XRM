@@ -166,6 +166,7 @@ public:
     const std::string PROMPT_INPUT_TEXT = "menu_input_text";
     const std::string PROMPT_OPTION_INPUT_TEXT = "option_input_text";
     const std::string PROMPT_INVALID = "invalid_input";
+    
     const std::string PROMPT_MENU_ADD = "menu_add";
     const std::string PROMPT_MENU_DELETE = "menu_delete";
     const std::string PROMPT_MENU_CHANGE = "menu_edit";

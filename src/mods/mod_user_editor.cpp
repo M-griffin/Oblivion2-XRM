@@ -74,8 +74,16 @@ void ModUserEditor::createTextPrompts()
     M_TextPrompt value;
 
     value[PROMPT_HEADER]                  = std::make_pair("User Editor Header", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11User Editor|15] |03--- |CR");
-    value[PROMPT_INPUT_TEXT]              = std::make_pair("Menu Editor Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03F|15/ilter Listing |03Q|15/uit : ");
+    value[PROMPT_INPUT_TEXT]              = std::make_pair("User Editor Prompt", "|CR|03A|15/dd Users |03E|15/dit User |03D|15/elete User |03F|15/ilter Listing |03Q|15/uit : ");
     value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 |CR");
+
+    value[PROMPT_USER_CHANGE]             = std::make_pair("User Number To Change", "|CR|15Enter user number to |11EDIT|15 : ");
+    value[PROMPT_USER_DELETE]             = std::make_pair("User Number To Delete", "|CR|15Enter user number to |11DELETE|15 : ");
+    value[PROMPT_USER_COPY]               = std::make_pair("User Number To Copy", "|CR|15Enter user number to |11COPY|15 : ");
+    value[PROMPT_USER_FILTER]             = std::make_pair("User Name(s) To Filter", "|15Enter user name or wildcard to |11FILTER|15 listing : ");    
+
+    value[PROMPT_INVALID_USER_NOT_EXISTS] = std::make_pair("Invalid User Doesn't Exist", "|CR|04Invalid, User doesn't exist.|CR");
+
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -198,31 +206,30 @@ void ModUserEditor::userListInput(const std::string &input)
         
         std::string output_buffer = m_config->default_color_regular;
         switch (toupper(key[0]))
-        {
-            /*
-            case 'A': // Add
-                changeMenuInputState(MENU_ADD);
-                displayPrompt(PROMPT_MENU_ADD);
-                changeInputModule(MOD_MENU_NAME);
-                break;
-                
+        {               
             case 'E': // Change/Edit
-                changeMenuInputState(MENU_CHANGE);
-                displayPrompt(PROMPT_MENU_CHANGE);
-                changeInputModule(MOD_MENU_NAME);
+                changeMenuInputState(USER_CHANGE);
+                displayPrompt(PROMPT_USER_CHANGE);
+                changeInputModule(MOD_USER_NAME);
                 break;
                 
             case 'D': // Delete
-                changeMenuInputState(MENU_DELETE);
-                displayPrompt(PROMPT_MENU_DELETE);
-                changeInputModule(MOD_MENU_NAME);
+                changeMenuInputState(USER_DELETE);
+                displayPrompt(PROMPT_USER_DELETE);
+                changeInputModule(MOD_USER_NAME);
                 break;
                 
             case 'C': // Copy
-                changeMenuInputState(MENU_COPY_FROM);
-                displayPrompt(PROMPT_MENU_COPY_FROM);
-                changeInputModule(MOD_MENU_NAME);
-                break;*/
+                changeMenuInputState(USER_COPY);
+                displayPrompt(PROMPT_USER_COPY);
+                changeInputModule(MOD_USER_NAME);
+                break;
+                
+            case 'F': // Filter
+                changeMenuInputState(USER_FILTER);
+                displayPrompt(PROMPT_USER_FILTER);
+                changeInputModule(MOD_USER_NAME);
+                break;
                 
             case 'Q': // Quit
                 // Reload fall back, or gosub to last menu!
@@ -246,12 +253,108 @@ void ModUserEditor::userListInput(const std::string &input)
 }
 
 /**
+ * @brief Handles User Number Input, Parses Strings and checks Valid User Id
+ * @param input
+ */
+void ModUserEditor::userEditorUserInput(const std::string &input)
+{
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
+
+    // ESC was hit
+    if(result == "aborted") 
+    {
+        std::cout << "aborted!" << std::endl;
+        changeInputModule(MOD_USER_INPUT);
+        redisplayModulePrompt();
+        return;
+    }
+    else if(result[0] == '\n')
+    {            
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            changeInputModule(MOD_USER_INPUT);
+            redisplayModulePrompt();
+            return;
+        }
+                
+        baseProcessDeliverNewLine();                
+        
+        if (checkUserExistsStringToId(key))
+        {            
+ //           handleUserInputState(true, key);
+        }
+        else 
+        {            
+ //           handleUserInputState(false, key);
+        }
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty") 
+        {
+            baseProcessDeliverInput(result);
+        }
+    }
+}
+
+/**
+ * @brief Check if the user exists in the current listing by String Id
+ * @param key_value
+ */
+bool ModUserEditor::checkUserExistsStringToId(std::string key_value)
+{
+    long userId = 0;
+    std::stringstream ss(key_value);
+    ss >> userId;
+
+    // check for Invalid Index.
+    if (ss.fail() || userId < 0)
+    {
+        return false;
+    }
+    
+    users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+    user_ptr lookup_user = user_data->getRecordById(userId);
+    
+    // Default Id when not found is -1
+    if (lookup_user->iId == -1)
+        return false;
+        
+    return true;
+}
+
+/**
  * @brief Handles Input (Waiting for Any Key Press)
  * @param input
  */
-void ModUserEditor::menuEditorPausedInput(const std::string &input)
+void ModUserEditor::userEditorPausedInput(const std::string &input)
 {
+    std::string current_state_input;    
+    unsigned int current_module_input;    
+    switch(m_mod_setup_index)
+    {
+        case MOD_DISPLAY_USER_LIST:
+            current_state_input = PROMPT_INPUT_TEXT;
+            current_module_input = MOD_USER_INPUT;
+            break;
+    }    
     
+    // Check for abort on pause for next.
+    if (input.size() == 1 && std::toupper(input[0]) == 'A')
+    {
+        displayPrompt(current_state_input);
+        changeInputModule(current_module_input);
+        return;
+    }
+    
+    // Any input coming in here is valid
+    // Increment to next page, then display remaining results.
+    ++m_page;
+    displayCurrentPage(current_state_input);
 }
 
 /**
@@ -320,13 +423,9 @@ void ModUserEditor::displayCurrentPage(const std::string &input_state)
  */
 std::string ModUserEditor::displayUserList()
 {  
-
     users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
     std::vector<user_ptr> users = user_data->getAllRecords();
-
-    std::string header_string = "";
-    std::string boarder_string = "";
-    
+   
      // Build a string list of individual menu options, then loop to fit as many per screen!
     std::vector<std::string> result_set;  
     for(unsigned int i = 0; i < users.size(); i++)

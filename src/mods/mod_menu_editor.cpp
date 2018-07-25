@@ -107,9 +107,9 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_MENU_OPTION_DELETE]        = std::make_pair("Menu Option Delete At Index", "|CR|11DELETE|15 which option number : ");
     value[PROMPT_MENU_OPTION_CHANGE]        = std::make_pair("Menu Option To Change", "|CR|15Enter option number to |11EDIT|15 : ");
     value[PROMPT_MENU_OPTION_COPY_FROM]     = std::make_pair("Menu Option To Copy From", "|CR|15Enter option number to |11COPY|15 : ");
-    value[PROMPT_MENU_OPTION_COPY_TO]       = std::make_pair("Menu Option To Copy To", "|11SAVE|15 as and insert before which option : ");    
+    value[PROMPT_MENU_OPTION_COPY_TO]       = std::make_pair("Menu Option To Copy To", "|11SAVE|15 as and insert before which option : ");
     value[PROMPT_MENU_OPTION_MOVE_FROM]     = std::make_pair("Menu Option To Copy From", "|CR|15Enter option number to |11MOVE|15 : ");
-    value[PROMPT_MENU_OPTION_MOVE_TO]       = std::make_pair("Menu Option To Copy To", "|11SAVE|15 as and insert before which option : ");    
+    value[PROMPT_MENU_OPTION_MOVE_TO]       = std::make_pair("Menu Option To Copy To", "|11SAVE|15 as and insert before which option : ");
     
     // Menu Option Edit Fields
     value[PROMPT_MENU_OPTION_EDIT_HEADER]       = std::make_pair("Menu Option Fields Editor Header |OT Menu ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Menu Option Editor|15] |03--- |11Menu ID : |15|OT |CR");

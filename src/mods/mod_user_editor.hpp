@@ -32,7 +32,7 @@ public:
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
         , m_mod_setup_index(MOD_DISPLAY_USER_LIST)
         , m_mod_function_index(MOD_USER_INPUT)
-        , m_mod_user_state_index(USER_ADD)
+        , m_mod_user_state_index(USER_CHANGE)
         , m_is_text_prompt_exist(false)
         , m_page(0)
         , m_rows_per_page(0)
@@ -47,7 +47,9 @@ public:
         m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserList, this));
 
         m_mod_functions.push_back(std::bind(&ModUserEditor::userListInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModUserEditor::userListInput, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorPausedInput, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorUserInput, this, std::placeholders::_1));
+        
     
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
@@ -89,9 +91,9 @@ public:
     // Used for both Menus and Options.
     enum
     {
-        USER_ADD       = 0,
-        USER_CHANGE    = 1,
-        USER_DELETE    = 2,
+        USER_CHANGE    = 0,
+        USER_DELETE    = 1,
+        USER_COPY      = 2,
         USER_FILTER    = 3
     };
     
@@ -113,6 +115,14 @@ public:
     const std::string PROMPT_INPUT_TEXT = "input_text";
     const std::string PROMPT_INVALID = "invalid_input";
     const std::string PROMPT_PAUSE = "pause_prompt";
+
+    const std::string PROMPT_USER_CHANGE = "user_change";
+    const std::string PROMPT_USER_DELETE = "user_delete";    
+    const std::string PROMPT_USER_COPY = "user_copy";
+    const std::string PROMPT_USER_FILTER = "user_filter";
+
+    const std::string PROMPT_INVALID_USER_NOT_EXISTS = "invalid_user_doesnt_exist";
+    
 
     /**
      * @brief Create Default Text Prompts for module
@@ -186,10 +196,22 @@ public:
     void userListInput(const std::string &input);
     
     /**
+     * @brief Handles User Number Input, Parses Strings and checks Valid User Id
+     * @param input
+     */
+    void userEditorUserInput(const std::string &input);
+
+    /**
+     * @brief Check if the user exists in the current listing by String Id
+     * @param key_value
+     */
+    bool checkUserExistsStringToId(std::string key_value);
+
+    /**
      * @brief Handles Input (Waiting for Any Key Press)
      * @param input
      */
-    void menuEditorPausedInput(const std::string &input);
+    void userEditorPausedInput(const std::string &input);
     
     /**
      * Display Methods
