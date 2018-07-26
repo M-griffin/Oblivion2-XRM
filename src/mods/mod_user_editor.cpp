@@ -10,7 +10,9 @@
 #include <string>
 #include <vector>
 #include <cassert>
-
+#include <ctime>
+#include <iomanip>
+ 
 /**
  * @brief Handles Updates or Data Input from Client
  * @return bool, not used anymore?!?
@@ -905,21 +907,6 @@ std::string ModUserEditor::displayUserEditScreen()
     AccessCondition acs;
     user_ptr usr = m_loaded_user.back();
     
-    /*
-    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(" |03(|11A|03) |15Menu Title         : |03" + m_common_io.rightPadding(current_menu->menu_title, 48));
-    result_set.push_back(" |03(|11B|03) |15Password           : |03" + m_common_io.rightPadding(current_menu->menu_password, 48));    
-    result_set.push_back(" |03(|11C|03) |15Fallback Menu      : |03" + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
-    result_set.push_back(" |03(|11D|03) |15Help ID            : |03" + m_common_io.rightPadding(current_menu->menu_help_file, 48));
-    result_set.push_back(" |03(|11E|03) |15Name in Prompt     : |03" + m_common_io.rightPadding(current_menu->menu_name, 48));
-    result_set.push_back(" |03(|11F|03) |15Pulldown File      : |03" + m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
-    result_set.push_back(" |03(|11G|03) |15View Generic Menu    " + m_common_io.rightPadding("", 48));
-    result_set.push_back(" |03(|11H|03) |15Edit Options         " + m_common_io.rightPadding("", 48));    
-    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(" |03(|11Q|03) |15Quit & Save          " + m_common_io.rightPadding("", 48));
-    result_set.push_back(" |03(|11X|03) |15Exit without Saving  " + m_common_io.rightPadding("", 48));
-    */
-    
     result_set.push_back(m_common_io.rightPadding(" |03(|11A|03) |15User Name   : |03" + usr->sHandle, 60) + 
         m_common_io.rightPadding(" |03(|11M|03) |15User Level     : |03" + std::to_string(usr->iLevel), 44));
         
@@ -938,19 +925,24 @@ std::string ModUserEditor::displayUserEditScreen()
     result_set.push_back(m_common_io.rightPadding(" |03(|11F|03) |15Country     : |03" + usr->sCountry, 60) + 
         m_common_io.rightPadding(" |03(|11S|03) |15Use ANSI       : |03" + m_common_io.boolAlpha(usr->bAnsi), 44));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11G|03) |15Country     : |03" + usr->sUserNote, 60) + 
+    result_set.push_back(m_common_io.rightPadding(" |03(|11G|03) |15User Note   : |03" + usr->sUserNote, 60) + 
         m_common_io.rightPadding(" |03(|11T|03) |15VT100 BackSpace: |03" + m_common_io.boolAlpha(usr->bBackSpaceVt100), 44));
-        
-        // TODO iControlFlags to String!
-    result_set.push_back(m_common_io.rightPadding(" |03(|11H|03) |15User Flags1 : |03" + acs.getAccessFlagStringFromBits(usr->iControlFlags1), 60) +
-        m_common_io.rightPadding(" |03(|11U|03) |15Clear or Scroll: |03" + m_common_io.boolAlpha(usr->bClearOrScroll), 44));
-        
-        // TODO iControlFlags to String!
-    result_set.push_back(m_common_io.rightPadding(" |03(|11I|03) |15User Flags2 : |03" + acs.getAccessFlagStringFromBits(usr->iControlFlags2), 60) +
-        m_common_io.rightPadding(" |03(|11V|03) |15Screen Pause   : |03" + m_common_io.boolAlpha(usr->bDoPause), 44));
-                
     
-    
+    std::ostringstream oss;
+    oss << std::put_time(std::gmtime(&usr->dtBirthday), "%Y-%m-%d");    
+    std::string time_string = oss.str();
+        
+    result_set.push_back(m_common_io.rightPadding(" |03(|11H|03) |15Birth Date  : |03" + time_string, 60) + 
+        m_common_io.rightPadding(" |03(|11U|03) |15User Wanted    : |03" + m_common_io.boolAlpha(usr->bWanted), 44));
+        
+    result_set.push_back(m_common_io.rightPadding(" |03(|11I|03) |15User Flags1 : |03" + acs.getAccessFlagStringFromBits(usr->iControlFlags1), 60) +
+        m_common_io.rightPadding(" |03(|11V|03) |15Clear or Scroll: |03" + m_common_io.boolAlpha(usr->bClearOrScroll), 44));
+        
+    result_set.push_back(m_common_io.rightPadding(" |03(|11J|03) |15User Flags2 : |03" + acs.getAccessFlagStringFromBits(usr->iControlFlags2), 60) +
+        m_common_io.rightPadding(" |03(|11W|03) |15Screen Pause   : |03" + m_common_io.boolAlpha(usr->bDoPause), 44));
+                        
+    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(" |03(|11-|03) |15Extended User Details" + m_common_io.rightPadding("", 48));
     result_set.push_back(" |03(|11[|03) |15Previous User        " + m_common_io.rightPadding("", 48));
     result_set.push_back(" |03(|11]|03) |15Next User            " + m_common_io.rightPadding("", 48));    
     result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");

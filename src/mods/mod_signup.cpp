@@ -1027,8 +1027,7 @@ bool ModSignup::birthday(const std::string &input)
 				 * Only GCC 5.1 + Compatible
 				 * Were no longer using boost, so bye bye 4.9 compat for now.
 				 */
-				std::istringstream ss(key);
-
+				std::istringstream ss(key);                
 				ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
 				if(ss.fail())
 				{
