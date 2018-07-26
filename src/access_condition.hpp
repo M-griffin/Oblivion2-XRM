@@ -91,7 +91,7 @@ public:
      * @param bits
      * @return 
      */
-    std::string getAccessFlagStringFromBits(int bits);
+    std::string getAccessConditionFlagStringFromBits(int bits);
 
     // Using Session IO for Code Mapping
     SessionIO  m_session_io;

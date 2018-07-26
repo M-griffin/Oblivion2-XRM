@@ -1,6 +1,7 @@
 #ifndef COMMONIO_HPP
 #define COMMONIO_HPP
 
+#include <ctime>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -326,6 +327,20 @@ public:
      * @return
      */
     std::vector<std::string> splitString(const std::string& s, char delimiter);
+
+    /**
+     * @brief Standard Time to Date String
+     * @param std_time
+     * @return 
+     */
+    std::string standardDateToString(std::time_t std_time);
+
+    /**
+     * @brief Standard Time to Date/Time String
+     * @param std_time
+     * @return 
+     */
+    std::string standardDateTimeToString(std::time_t std_time);
 
     /**
      * @brief Template search quick find

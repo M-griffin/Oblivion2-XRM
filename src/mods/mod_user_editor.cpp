@@ -10,8 +10,6 @@
 #include <string>
 #include <vector>
 #include <cassert>
-#include <ctime>
-#include <iomanip>
  
 /**
  * @brief Handles Updates or Data Input from Client
@@ -927,18 +925,14 @@ std::string ModUserEditor::displayUserEditScreen()
         
     result_set.push_back(m_common_io.rightPadding(" |03(|11G|03) |15User Note   : |03" + usr->sUserNote, 60) + 
         m_common_io.rightPadding(" |03(|11T|03) |15VT100 BackSpace: |03" + m_common_io.boolAlpha(usr->bBackSpaceVt100), 44));
-    
-    std::ostringstream oss;
-    oss << std::put_time(std::gmtime(&usr->dtBirthday), "%Y-%m-%d");    
-    std::string time_string = oss.str();
-        
-    result_set.push_back(m_common_io.rightPadding(" |03(|11H|03) |15Birth Date  : |03" + time_string, 60) + 
+           
+    result_set.push_back(m_common_io.rightPadding(" |03(|11H|03) |15Birth Date  : |03" + m_common_io.standardDateToString(usr->dtBirthday), 60) + 
         m_common_io.rightPadding(" |03(|11U|03) |15User Wanted    : |03" + m_common_io.boolAlpha(usr->bWanted), 44));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11I|03) |15User Flags1 : |03" + acs.getAccessFlagStringFromBits(usr->iControlFlags1), 60) +
+    result_set.push_back(m_common_io.rightPadding(" |03(|11I|03) |15User Flags1 : |03" + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags1), 60) +
         m_common_io.rightPadding(" |03(|11V|03) |15Clear or Scroll: |03" + m_common_io.boolAlpha(usr->bClearOrScroll), 44));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11J|03) |15User Flags2 : |03" + acs.getAccessFlagStringFromBits(usr->iControlFlags2), 60) +
+    result_set.push_back(m_common_io.rightPadding(" |03(|11J|03) |15User Flags2 : |03" + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags2), 60) +
         m_common_io.rightPadding(" |03(|11W|03) |15Screen Pause   : |03" + m_common_io.boolAlpha(usr->bDoPause), 44));
                         
     result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
@@ -1076,18 +1070,14 @@ std::string ModUserEditor::displayUserEditExtendedScreen()
         
     result_set.push_back(m_common_io.rightPadding(" |03(|11G|03) |15User Note   : |03" + usr->sUserNote, 60) + 
         m_common_io.rightPadding(" |03(|11T|03) |15VT100 BackSpace: |03" + m_common_io.boolAlpha(usr->bBackSpaceVt100), 44));
-    
-    std::ostringstream oss;
-    oss << std::put_time(std::gmtime(&usr->dtBirthday), "%Y-%m-%d");    
-    std::string time_string = oss.str();
-        
-    result_set.push_back(m_common_io.rightPadding(" |03(|11H|03) |15Birth Date  : |03" + time_string, 60) + 
+            
+    result_set.push_back(m_common_io.rightPadding(" |03(|11H|03) |15Birth Date  : |03" + m_common_io.standardDateToString(usr->dtBirthday), 60) + 
         m_common_io.rightPadding(" |03(|11U|03) |15User Wanted    : |03" + m_common_io.boolAlpha(usr->bWanted), 44));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11I|03) |15User Flags1 : |03" + acs.getAccessFlagStringFromBits(usr->iControlFlags1), 60) +
+    result_set.push_back(m_common_io.rightPadding(" |03(|11I|03) |15User Flags1 : |03" + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags1), 60) +
         m_common_io.rightPadding(" |03(|11V|03) |15Clear or Scroll: |03" + m_common_io.boolAlpha(usr->bClearOrScroll), 44));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11J|03) |15User Flags2 : |03" + acs.getAccessFlagStringFromBits(usr->iControlFlags2), 60) +
+    result_set.push_back(m_common_io.rightPadding(" |03(|11J|03) |15User Flags2 : |03" + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags2), 60) +
         m_common_io.rightPadding(" |03(|11W|03) |15Screen Pause   : |03" + m_common_io.boolAlpha(usr->bDoPause), 44));
                         
     result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");

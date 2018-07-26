@@ -22,6 +22,8 @@
 #include <cstring>
 #include <climits>
 #include <cstdlib>
+#include <ctime>
+#include <iomanip>
 
 #include <stdexcept>
 
@@ -40,6 +42,7 @@
 #include <cwchar>   // wchar_t wide characters
 
 #include <utf-cpp/utf8.h>
+
 
 /**
  * CP437 -> UTF-8 Character Translation Table
@@ -1250,4 +1253,30 @@ std::vector<std::string> CommonIO::splitString(const std::string& s, char delimi
         tokens.push_back(token);
     }
     return tokens;
+}
+
+/**
+ * @brief Standard Time to Date String
+ * @param std_time
+ * @return 
+ */
+std::string CommonIO::standardDateToString(std::time_t std_time)
+{
+    std::ostringstream oss;
+    oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d");    
+    std::string time_string = oss.str();
+    return time_string;
+}
+
+/**
+ * @brief Standard Time to Date/Time String
+ * @param std_time
+ * @return 
+ */
+std::string CommonIO::standardDateTimeToString(std::time_t std_time)
+{
+    std::ostringstream oss;
+    oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d %H:%M:%S %z");    
+    std::string datetime_string = oss.str();
+    return datetime_string;
 }

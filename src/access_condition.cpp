@@ -321,7 +321,7 @@ bool AccessCondition::validateAcsString(const std::string &acs_string, user_ptr 
  * @param bits
  * @return 
  */
-std::string AccessCondition::getAccessFlagStringFromBits(int bits)
+std::string AccessCondition::getAccessConditionFlagStringFromBits(int bits)
 {    
     std::string bit_string = "";
     for (int i = 0; i < 26; i++)
