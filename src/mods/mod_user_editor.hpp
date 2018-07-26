@@ -283,6 +283,12 @@ public:
     std::string displayUserEditScreen();
     
     /**
+     * @brief User Editor, for Dispalying User Extended Fields to Edit
+     * @return
+     */
+    std::string displayUserEditExtendedScreen();
+    
+    /**
      * @brief Displays the current page of user items
      * @param input_state
      */
