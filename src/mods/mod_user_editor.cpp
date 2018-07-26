@@ -76,7 +76,7 @@ void ModUserEditor::createTextPrompts()
     M_TextPrompt value;
 
     value[PROMPT_HEADER]                  = std::make_pair("User Editor Header", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11User Editor|15] |03--- |CR");
-    value[PROMPT_INPUT_TEXT]              = std::make_pair("User Editor Prompt", "|CR|03A|15/dd Users |03E|15/dit User |03D|15/elete User |03F|15/ilter Listing |03Q|15/uit : ");
+    value[PROMPT_INPUT_TEXT]              = std::make_pair("User Editor Prompt", "|03E|15/dit User |03D|15/elete User |03C|15/opy User |03Q|15/uit : ");
     value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 |CR");
 
     value[PROMPT_USER_CHANGE]             = std::make_pair("User Number To Change", "|CR|15Enter user number to |11EDIT|15 : ");
@@ -84,7 +84,8 @@ void ModUserEditor::createTextPrompts()
     value[PROMPT_USER_COPY]               = std::make_pair("User Number To Copy", "|CR|15Enter user number to |11COPY|15 : ");
 
     value[PROMPT_INVALID_USER_NOT_EXISTS] = std::make_pair("Invalid User Doesn't Exist", "|CR|04Invalid, User doesn't exist.|CR");
-
+    value[PROMPT_USER_EDIT_HEADER]        = std::make_pair("User Fields Editor Header |OT User ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11User Editor|15] |03--- |11User ID : |15|OT |CR");
+    value[PROMPT_USER_FIELD_INPUT_TEXT]   = std::make_pair("User Editor Command", "|CR|15User Editor C|07om|08mand |15: |07");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -177,6 +178,29 @@ void ModUserEditor::setupUserList()
     m_user_display_list = m_common_io.splitString(user_display_output, '\n');           
     m_page = 0;        
     displayCurrentPage(PROMPT_INPUT_TEXT);
+}
+
+/**
+ * @brief Setup for the User Field Editor
+ * @return
+ */
+void ModUserEditor::setupUserEditFields() 
+{
+    displayPromptMCI(PROMPT_USER_EDIT_HEADER, std::to_string(m_current_user_id));
+    
+    // Build a list of screen lines for the menu display
+    // So we know when to pause in large listing, or use pagenation.
+    std::string user_display_output = displayUserEditScreen();    
+    
+    if (m_user_display_list.size() == 0) 
+    {
+        // Clear Out list if anything already exists.
+        std::vector<std::string>().swap(m_user_display_list);
+    }
+    
+    m_user_display_list = m_common_io.splitString(user_display_output, '\n');           
+    m_page = 0;        
+    displayCurrentEditPage(PROMPT_USER_FIELD_INPUT_TEXT);
 }
 
 /**
@@ -322,8 +346,8 @@ void ModUserEditor::handleUserInputState(bool does_user_exist, long user_id)
                 // Also set the curent menu for the system to load
                 // to pull the commands from.
                 m_current_user_id = user_id;
- //               changeInputModule(MOD_USER_FIELD_INPUT);
- //               changeSetupModule(MOD_DISPLAY_USER_FIELDS);  // Change to Menu Edit Fields!                                    
+                changeInputModule(MOD_USER_FIELD_INPUT);
+                changeSetupModule(MOD_DISPLAY_USER_FIELDS);
             }
             else
             {
@@ -416,7 +440,7 @@ void ModUserEditor::copyExistingUser(long user_id)
     long id = 1;
     std::string user_name = "New User";
     while(found) 
-    {        
+    {
         user_ptr check_user = user_data->getUserByRealName(user_name + std::to_string(id));
         if (check_user->iId == -1)
         {
@@ -449,7 +473,7 @@ void ModUserEditor::deleteExistingUser(long user_id)
 
 /**
  * @brief Check if the user exists in the current listing by String Id
- * @param key_value
+ * @param user_id
  */
 bool ModUserEditor::checkUserExistsById(long user_id)
 {    
@@ -460,6 +484,34 @@ bool ModUserEditor::checkUserExistsById(long user_id)
     if (lookup_user->iId == -1)
         return false;
         
+    return true;
+}
+
+/**
+ * @brief Check if the user exists in the current listing by String Id
+ * @param user_id
+ */
+bool ModUserEditor::loadUserById(long user_id)
+{    
+    users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+    user_ptr lookup_user = user_data->getRecordById(user_id);
+    
+    // Default Id when not found is -1
+    if (lookup_user->iId == -1)
+    {
+        std::cout << " *** user lookup == -1!!" << std::endl;
+        return false;        
+    }
+    
+    // If record is already loaded then leave it.
+    if (m_loaded_user.size() > 0)
+    {
+        std::cout << " *** user already loaded!!" << std::endl;
+        return true;
+    }
+    
+    std::cout << " *** user saved loaded!!" << std::endl;
+    m_loaded_user.push_back(lookup_user);    
     return true;
 }
 
@@ -670,4 +722,329 @@ std::string ModUserEditor::displayUserList()
     }
     
     return (buffer);    
+}
+
+/**
+ * @brief Handles User Field Editor Command Selection
+ * @param input
+ */
+void ModUserEditor::userEditorFieldInput(const std::string &input)
+{
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+
+    // ESC was hit
+    if(result == "aborted") 
+    {
+        std::cout << "aborted!" << std::endl;
+        return;
+    }
+    else if(result[0] == '\n')
+    {            
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return;
+        }
+                
+        baseProcessDeliverNewLine();
+        
+        std::string output_buffer = m_config->default_color_regular;
+        switch (toupper(key[0]))
+        {
+            /*
+            case 'A': // Menu Title
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_TITLE);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_title);
+                break;
+                
+            case 'B': // Menu Password
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_PASSWORD);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_password);
+                break;
+                
+             case 'C': // Menu Password
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_FALLBACK);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_fall_back);
+                break;
+            
+            case 'D': // Menu Help ID
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_HELP_ID);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_help_file);
+                break;
+                
+            case 'E': // Menu Name
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_NAME);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_name);
+                break;
+                
+             case 'F': // Menu Pulldown file
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_PULLDOWN);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_pulldown_file);
+                break;
+            
+            case 'G': // View Generate Menu 
+                displayGenericMenu();
+                changeInputModule(MOD_DISPLAY_PAUSE);
+                break; 
+                
+            case 'H': // Jump into Options Editing.
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+                changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);                                
+                break; */
+                
+            case 'Q': // Quit
+                //saveMenuChanges();
+                std::vector<user_ptr>().swap(m_loaded_user);
+                
+                // Reload fall back, or gosub to Menu Editor Main
+                changeInputModule(MOD_USER_INPUT);
+                changeSetupModule(MOD_DISPLAY_USER_LIST);                
+                return;
+                
+            case 'X': // Exit without Saving
+                std::vector<user_ptr>().swap(m_loaded_user);
+                
+                // Reload fall back, or gosub to Menu Editor Main
+                changeInputModule(MOD_USER_INPUT);
+                changeSetupModule(MOD_DISPLAY_USER_LIST);                
+                return;
+                
+            default:
+                redisplayModulePrompt();
+                break;
+        }
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty") 
+        {
+            baseProcessDeliverInput(result);
+        }
+    }
+}   
+
+/**
+ * @brief Handles Field Updates for User Data
+ * @param input
+ */
+void ModUserEditor::userEditorFieldHandler(const std::string &input)
+{
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
+
+    // ESC was hit
+    if(result == "aborted") 
+    {
+        std::cout << "aborted!" << std::endl;
+        changeInputModule(MOD_USER_FIELD_INPUT);
+        changeSetupModule(MOD_DISPLAY_USER_FIELDS);
+        return;
+    }
+    else if(result[0] == '\n')
+    {            
+        baseProcessDeliverNewLine();                
+        
+        // Handle the assigned input received for field
+        switch(m_current_field)
+        {
+            case 'A': // Menu Title
+                m_loaded_user.back()->sHandle = key;
+                break;
+                                         
+        }
+                
+        changeInputModule(MOD_USER_FIELD_INPUT);
+        changeSetupModule(MOD_DISPLAY_USER_FIELDS);
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty") 
+        {
+            baseProcessDeliverInput(result);
+        }
+    }
+}
+
+/**
+ * @brief User Editor, for Dispalying Menu Fields to Edit
+ * @return
+ */
+std::string ModUserEditor::displayUserEditScreen()
+{
+    // Create Menu Pointer then load the menu into it.
+    if (!loadUserById(m_current_user_id) || m_loaded_user.back()->iId == -1)
+    {
+        // Error, drop back to User Editor User Listing
+        changeSetupModule(MOD_DISPLAY_USER_LIST);
+        std::vector<user_ptr>().swap(m_loaded_user);
+        return "";
+    }
+    
+    // Build a string list of individual menu options, then loop to fit as many per screen!
+    std::vector<std::string> result_set;
+
+    user_ptr usr = m_loaded_user.back();
+    
+    std::cout << " **! handle " << usr->sHandle << std::endl;
+    std::cout << " **! handle " << m_loaded_user.back()->sHandle << std::endl;
+    
+    
+    /*
+    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(" |03(|11A|03) |15Menu Title         : |03" + m_common_io.rightPadding(current_menu->menu_title, 48));
+    result_set.push_back(" |03(|11B|03) |15Password           : |03" + m_common_io.rightPadding(current_menu->menu_password, 48));    
+    result_set.push_back(" |03(|11C|03) |15Fallback Menu      : |03" + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
+    result_set.push_back(" |03(|11D|03) |15Help ID            : |03" + m_common_io.rightPadding(current_menu->menu_help_file, 48));
+    result_set.push_back(" |03(|11E|03) |15Name in Prompt     : |03" + m_common_io.rightPadding(current_menu->menu_name, 48));
+    result_set.push_back(" |03(|11F|03) |15Pulldown File      : |03" + m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
+    result_set.push_back(" |03(|11G|03) |15View Generic Menu    " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |03(|11H|03) |15Edit Options         " + m_common_io.rightPadding("", 48));    
+    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(" |03(|11Q|03) |15Quit & Save          " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |03(|11X|03) |15Exit without Saving  " + m_common_io.rightPadding("", 48));
+    */
+    
+    result_set.push_back(m_common_io.rightPadding(" |03(|11A|03) |15User Name   : |03" + usr->sHandle, 52) + 
+        m_common_io.rightPadding(" |03(|11MB|03) |15User Level  : |03" + std::to_string(usr->iLevel), 52));
+        
+    result_set.push_back(m_common_io.rightPadding(" |03(|11B|03) |15Real Name   : |03" + usr->sRealName, 52) + 
+        m_common_io.rightPadding(" |03(|11N|03) |15File Level  : |03" + std::to_string(usr->iFileLevel), 52));
+        
+    result_set.push_back(m_common_io.rightPadding(" |03(|11B|03) |15Eamil       : |03" + usr->sEmail, 52) + 
+        m_common_io.rightPadding(" |03(|11N|03) |15Mesg Level  : |03" + std::to_string(usr->iMessageLevel), 52));
+                
+    
+
+    // iterate through and print out
+    int total_rows = result_set.size();
+    total_rows += 2;
+
+    // Could re-calc this on screen width lateron.
+    int max_cols = 76;
+
+    // Vector or Menus, Loop through
+    std::vector<std::string>::iterator i = result_set.begin();
+    std::string buffer = "";
+    
+    for(int rows = 0; rows < total_rows; rows++)
+    {
+        buffer += "  "; // 3 Leading spaces per row.
+        for(int cols = 0; cols < max_cols; cols++)
+        {
+            // Top Row
+            if(rows == 0 && cols == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += BORDER_TOP_LEFT;
+            }
+            else if(rows == 0 && cols == max_cols-1)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += BORDER_TOP_RIGHT;
+            }
+            else if(rows == 0 && cols % 75 == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += BORDER_MID_TOP;
+            } 
+            else if(rows == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += BORDER_ROW;
+            }
+
+            // Bottom Row
+            else if(rows == total_rows-1 && cols == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += BORDER_BOT_LEFT;
+            }
+            else if(rows == total_rows-1 && cols == max_cols-1)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += BORDER_BOT_RIGHT;
+            }
+            else if(rows == total_rows-1 && cols % 75 == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += BORDER_MID_BOT;
+            } 
+            else if(rows == total_rows-1)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += BORDER_ROW;
+            }
+            else if(cols % 75 == 0)
+            {
+                buffer += baseGetDefaultColor();
+                buffer += BORDER_MID;
+            }
+            else
+            {
+                // Here we insert the Menu name and pad through to 8 characters.
+                if(cols == 1)
+                {
+                    if(i != result_set.end())
+                    {
+                        buffer += *i;
+                        ++i;
+                    }
+                }
+            }
+        }
+        
+        // Were going to split on \n, which will get replaced lateron
+        // with \r\n for full carriage returns.        
+        buffer += "\n";
+    }
+    
+    return (buffer);    
+}
+
+/**
+ * @brief Displays the current page of user items
+ * @param input_state
+ */
+void ModUserEditor::displayCurrentEditPage(const std::string &input_state) 
+{
+    for (unsigned int i = 0; i < m_user_display_list.size(); i++) 
+    {
+        std::string display_line = m_session_io.pipe2ansi(m_user_display_list[i]);
+        display_line.append("\r\n");
+        baseProcessAndDeliver(display_line);        
+    }
+    
+    // Default Page Input Method
+    unsigned int current_module_input;
+    switch(m_mod_setup_index)
+    {
+        case MOD_DISPLAY_USER_FIELDS:
+            current_module_input = MOD_USER_FIELD_INPUT;
+            break;  
+
+        default:
+            std::cout << "Error, forgot to add new STATE index displayCurrentEditPage!!";
+            return;
+    }  
+    
+    displayPrompt(input_state); // prompt for edit
+    changeInputModule(current_module_input); // switch to the input module for field edits.
 }

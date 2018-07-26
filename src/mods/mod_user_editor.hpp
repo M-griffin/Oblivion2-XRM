@@ -44,10 +44,14 @@ public:
         // Push function pointers to the stack.
         
         m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserList, this));
+        m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserEditFields, this));
 
         m_mod_functions.push_back(std::bind(&ModUserEditor::userListInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorPausedInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorUserInput, this, std::placeholders::_1));
+        
+        m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorFieldInput, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorFieldHandler, this, std::placeholders::_1));
             
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
@@ -83,7 +87,9 @@ public:
     {
         MOD_USER_INPUT          = 0, // User List Input Parser
         MOD_PAUSE               = 1, // Pauses on display of menus/options
-        MOD_USER_NAME           = 2  // User Name Input Handler
+        MOD_USER_NAME           = 2, // User Name Input Handler        
+        MOD_USER_FIELD_INPUT    = 3, // Selecting Individual User Fields.
+        MOD_USER_FIELD          = 4  // Updates Current Field
     };
 
     // Input Menu State Index
@@ -120,7 +126,8 @@ public:
     const std::string PROMPT_USER_COPY = "user_copy";
 
     const std::string PROMPT_INVALID_USER_NOT_EXISTS = "invalid_user_doesnt_exist";
-    
+    const std::string PROMPT_USER_EDIT_HEADER = "user_editor_field_header";
+    const std::string PROMPT_USER_FIELD_INPUT_TEXT = "user_editor_field_input";
 
     /**
      * @brief Create Default Text Prompts for module
@@ -182,6 +189,11 @@ public:
      */
     void setupUserList();
 
+    /**
+     * @brief Setup for the User Field Editor
+     * @return
+     */
+    void setupUserEditFields();
 
     /**
      * Handle Input Commands.
@@ -220,9 +232,15 @@ public:
 
     /**
      * @brief Check if the user exists in the current listing by String Id
-     * @param key_value
+     * @param user_id
      */
     bool checkUserExistsById(long user_id);
+
+    /**
+     * @brief Check if the user exists in the current listing by String Id
+     * @param user_id
+     */
+    bool loadUserById(long user_id);
 
     /**
      * @brief Handles Input (Waiting for Any Key Press)
@@ -245,7 +263,31 @@ public:
      * @return
      */
     std::string displayUserList();
-
+    
+    /**
+     * @brief Handles User Field Editor Command Selection
+     * @param input
+     */
+    void userEditorFieldInput(const std::string &input);
+    
+    /**
+     * @brief Handles Field Updates for User Data
+     * @param input
+     */
+    void userEditorFieldHandler(const std::string &input);
+    
+    /**
+     * @brief User Editor, for Dispalying Menu Fields to Edit
+     * @return
+     */
+    std::string displayUserEditScreen();
+    
+    /**
+     * @brief Displays the current page of user items
+     * @param input_state
+     */
+    void displayCurrentEditPage(const std::string &input_state);
+    
 private:
 
     // Function Input Vector.
