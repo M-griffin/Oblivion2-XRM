@@ -86,6 +86,13 @@ public:
      */
     bool validateAcsString(const std::string &acs_string, user_ptr user);
 
+    /**
+     * @brief Bit String to Printable String
+     * @param bits
+     * @return 
+     */
+    std::string getAccessFlagStringFromBits(int bits);
+
     // Using Session IO for Code Mapping
     SessionIO  m_session_io;
 

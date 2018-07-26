@@ -5,6 +5,7 @@
 #include "../data-sys/security_dao.hpp"
 #include "../data-sys/users_dao.hpp"
 #include "../encryption.hpp"
+#include "../access_condition.hpp"
 
 #include <string>
 #include <vector>
@@ -901,11 +902,8 @@ std::string ModUserEditor::displayUserEditScreen()
     // Build a string list of individual menu options, then loop to fit as many per screen!
     std::vector<std::string> result_set;
 
+    AccessCondition acs;
     user_ptr usr = m_loaded_user.back();
-    
-    std::cout << " **! handle " << usr->sHandle << std::endl;
-    std::cout << " **! handle " << m_loaded_user.back()->sHandle << std::endl;
-    
     
     /*
     result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
@@ -922,16 +920,42 @@ std::string ModUserEditor::displayUserEditScreen()
     result_set.push_back(" |03(|11X|03) |15Exit without Saving  " + m_common_io.rightPadding("", 48));
     */
     
-    result_set.push_back(m_common_io.rightPadding(" |03(|11A|03) |15User Name   : |03" + usr->sHandle, 52) + 
-        m_common_io.rightPadding(" |03(|11MB|03) |15User Level  : |03" + std::to_string(usr->iLevel), 52));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11A|03) |15User Name   : |03" + usr->sHandle, 60) + 
+        m_common_io.rightPadding(" |03(|11M|03) |15User Level     : |03" + std::to_string(usr->iLevel), 44));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11B|03) |15Real Name   : |03" + usr->sRealName, 52) + 
-        m_common_io.rightPadding(" |03(|11N|03) |15File Level  : |03" + std::to_string(usr->iFileLevel), 52));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11B|03) |15Real Name   : |03" + usr->sRealName, 60) + 
+        m_common_io.rightPadding(" |03(|11N|03) |15File Level     : |03" + std::to_string(usr->iFileLevel), 44));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11B|03) |15Eamil       : |03" + usr->sEmail, 52) + 
-        m_common_io.rightPadding(" |03(|11N|03) |15Mesg Level  : |03" + std::to_string(usr->iMessageLevel), 52));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11C|03) |15Eamil       : |03" + usr->sEmail, 60) + 
+        m_common_io.rightPadding(" |03(|11O|03) |15Mesg Level     : |03" + std::to_string(usr->iMessageLevel), 44));
+        
+    result_set.push_back(m_common_io.rightPadding(" |03(|11D|03) |15Address     : |03" + usr->sAddress, 60) + 
+        m_common_io.rightPadding(" |03(|11P|03) |15Hack Attempts  : |03" + std::to_string(usr->iHackAttempts), 44));
+        
+    result_set.push_back(m_common_io.rightPadding(" |03(|11E|03) |15Location    : |03" + usr->sLocation, 60) + 
+        m_common_io.rightPadding(" |03(|11R|03) |15No Time Limit  : |03" + m_common_io.boolAlpha(usr->bIgnoreTimeLimit), 44));
+        
+    result_set.push_back(m_common_io.rightPadding(" |03(|11F|03) |15Country     : |03" + usr->sCountry, 60) + 
+        m_common_io.rightPadding(" |03(|11S|03) |15Use ANSI       : |03" + m_common_io.boolAlpha(usr->bAnsi), 44));
+        
+    result_set.push_back(m_common_io.rightPadding(" |03(|11G|03) |15Country     : |03" + usr->sUserNote, 60) + 
+        m_common_io.rightPadding(" |03(|11T|03) |15VT100 BackSpace: |03" + m_common_io.boolAlpha(usr->bBackSpaceVt100), 44));
+        
+        // TODO iControlFlags to String!
+    result_set.push_back(m_common_io.rightPadding(" |03(|11H|03) |15User Flags1 : |03" + acs.getAccessFlagStringFromBits(usr->iControlFlags1), 60) +
+        m_common_io.rightPadding(" |03(|11U|03) |15Clear or Scroll: |03" + m_common_io.boolAlpha(usr->bClearOrScroll), 44));
+        
+        // TODO iControlFlags to String!
+    result_set.push_back(m_common_io.rightPadding(" |03(|11I|03) |15User Flags2 : |03" + acs.getAccessFlagStringFromBits(usr->iControlFlags2), 60) +
+        m_common_io.rightPadding(" |03(|11V|03) |15Screen Pause   : |03" + m_common_io.boolAlpha(usr->bDoPause), 44));
                 
     
+    
+    result_set.push_back(" |03(|11[|03) |15Previous User        " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |03(|11]|03) |15Next User            " + m_common_io.rightPadding("", 48));    
+    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(" |03(|11Q|03) |15Quit & Save          " + m_common_io.rightPadding("", 48));
+    result_set.push_back(" |03(|11X|03) |15Exit without Saving  " + m_common_io.rightPadding("", 48));
 
     // iterate through and print out
     int total_rows = result_set.size();

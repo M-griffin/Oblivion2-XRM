@@ -315,3 +315,25 @@ bool AccessCondition::validateAcsString(const std::string &acs_string, user_ptr 
     }
     return parseCodeMap(code_map, user);
 }
+
+/**
+ * @brief Bit String to Printable String
+ * @param bits
+ * @return 
+ */
+std::string AccessCondition::getAccessFlagStringFromBits(int bits)
+{    
+    std::string bit_string = "";
+    for (int i = 0; i < 26; i++)
+    {
+        if ((bits >> i) & 1)
+        {
+            bit_string += static_cast<char>(i + 65);
+        }
+        else {
+            bit_string += '-';
+        }
+    }
+    
+    return bit_string;
+}
