@@ -774,8 +774,7 @@ void ModMenuEditor::menuEditorMenuOptionFieldInput(const std::string &input)
             redisplayModulePrompt();
             return;
     }
-    
-    
+        
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 

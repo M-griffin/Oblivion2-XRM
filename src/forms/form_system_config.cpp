@@ -37,6 +37,7 @@ bool FormSystemConfig::onEnter()
     setupBuildOptions("password_system", m_config->password_system);
     setupBuildOptions("password_sysop", m_config->password_sysop);
     setupBuildOptions("password_newuser", m_config->password_newuser);
+    setupBuildOptions("password_default_user", m_config->password_default_user);
     setupBuildOptions("port_telnet", m_config->port_telnet);
     setupBuildOptions("use_service_telnet", m_config->use_service_telnet);
     setupBuildOptions("port_ssl", m_config->port_ssl);    

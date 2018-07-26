@@ -4,9 +4,11 @@
 #include "../model-sys/users.hpp"
 #include "../data-sys/security_dao.hpp"
 #include "../data-sys/users_dao.hpp"
+#include "../encryption.hpp"
 
 #include <string>
 #include <vector>
+#include <cassert>
 
 /**
  * @brief Handles Updates or Data Input from Client
@@ -80,7 +82,6 @@ void ModUserEditor::createTextPrompts()
     value[PROMPT_USER_CHANGE]             = std::make_pair("User Number To Change", "|CR|15Enter user number to |11EDIT|15 : ");
     value[PROMPT_USER_DELETE]             = std::make_pair("User Number To Delete", "|CR|15Enter user number to |11DELETE|15 : ");
     value[PROMPT_USER_COPY]               = std::make_pair("User Number To Copy", "|CR|15Enter user number to |11COPY|15 : ");
-    value[PROMPT_USER_FILTER]             = std::make_pair("User Name(s) To Filter", "|15Enter user name or wildcard to |11FILTER|15 listing : ");    
 
     value[PROMPT_INVALID_USER_NOT_EXISTS] = std::make_pair("Invalid User Doesn't Exist", "|CR|04Invalid, User doesn't exist.|CR");
 
@@ -225,12 +226,6 @@ void ModUserEditor::userListInput(const std::string &input)
                 changeInputModule(MOD_USER_NAME);
                 break;
                 
-            case 'F': // Filter
-                changeMenuInputState(USER_FILTER);
-                displayPrompt(PROMPT_USER_FILTER);
-                changeInputModule(MOD_USER_NAME);
-                break;
-                
             case 'Q': // Quit
                 // Reload fall back, or gosub to last menu!
                 m_is_active = false;
@@ -279,15 +274,25 @@ void ModUserEditor::userEditorUserInput(const std::string &input)
             return;
         }
                 
-        baseProcessDeliverNewLine();                
+        baseProcessDeliverNewLine();  
+
+        long user_id = -1;
+        std::stringstream ss(key);
+        ss >> user_id;
+
+        // check for Invalid Index.
+        if (ss.fail() || user_id < 0)
+        {
+            user_id = -1;
+        }              
         
-        if (checkUserExistsStringToId(key))
+        if (user_id != -1 && checkUserExistsById(user_id))
         {            
- //           handleUserInputState(true, key);
+            handleUserInputState(true, user_id);
         }
         else 
         {            
- //           handleUserInputState(false, key);
+            handleUserInputState(false, user_id);
         }
     }
     else
@@ -302,23 +307,154 @@ void ModUserEditor::userEditorUserInput(const std::string &input)
 }
 
 /**
+ * @brief handle each user seperate state and what to do next on input.
+ * @param does_user_exist
+ * @param user_id
+ */
+void ModUserEditor::handleUserInputState(bool does_user_exist, long user_id) 
+{    
+    switch (m_mod_user_state_index)
+    {           
+        case USER_CHANGE:
+            if (does_user_exist)
+            {
+                // Move to new Default setup for Options vs Menus.
+                // Also set the curent menu for the system to load
+                // to pull the commands from.
+                m_current_user_id = user_id;
+ //               changeInputModule(MOD_USER_FIELD_INPUT);
+ //               changeSetupModule(MOD_DISPLAY_USER_FIELDS);  // Change to Menu Edit Fields!                                    
+            }
+            else
+            {
+                // Error, can't remove a menu that doesn't exist!
+                displayPrompt(PROMPT_INVALID_USER_NOT_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_USER_INPUT);
+            }            
+            break;
+            
+        case USER_DELETE:
+            if (does_user_exist)
+            {
+                deleteExistingUser(user_id);
+                changeInputModule(MOD_USER_INPUT);
+                redisplayModulePrompt();
+            }
+            else
+            {
+                // Error, can't remove a menu that doesn't exist!
+                displayPrompt(PROMPT_INVALID_USER_NOT_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_USER_INPUT);
+            }
+            break;
+            
+        case USER_COPY:
+            // Copies and Adds a new record to back of the list.
+            if (does_user_exist) 
+            {
+                copyExistingUser(user_id);
+                changeInputModule(MOD_USER_INPUT);
+                redisplayModulePrompt();
+            }
+            else 
+            {
+                // Error, can't remove a menu that doesn't exist!
+                displayPrompt(PROMPT_INVALID_USER_NOT_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_USER_INPUT);
+            }
+            break;
+    }        
+}
+
+/**
+ * @brief Copy an Existing User Record
+ * @param user_id
+ */
+void ModUserEditor::copyExistingUser(long user_id)
+{
+    users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
+    
+    user_ptr lookup_user = user_data->getRecordById(user_id);
+    
+    // Default Id when not found is -1
+    if (lookup_user->iId == -1)
+        return;
+    
+    // Setup for default password and challenge questions.   
+    encrypt_ptr encryption(new Encrypt());
+
+    std::string salt = encryption->generate_salt(lookup_user->sHandle, m_config->bbs_uuid);
+    std::string password = encryption->generate_password(m_config->password_default_user, salt);
+
+    if(salt.size() == 0 || password.size() == 0)
+    {
+        std::cout << "Error, Salt or Password were empty" << std::endl;
+        assert(false);
+    }
+    
+    security_ptr security_record(new Security());
+    security_record->sChallengeAnswerHash = password;    
+    security_record->sPasswordHash = password;
+    security_record->sSaltHash = salt;
+    
+    long securityIndex = security_dao->insertRecord(security_record);
+    if (securityIndex < 0)
+    {
+        std::cout << "Error, unable to insert new user record." << std::endl;
+        return;
+    }
+    
+    // Save New User Record
+    lookup_user->iSecurityIndex = securityIndex;
+    
+    // Loop existing user records and make sure if we copy, that name is unique
+    bool found = true;
+    long id = 1;
+    std::string user_name = "New User";
+    while(found) 
+    {        
+        user_ptr check_user = user_data->getUserByRealName(user_name + std::to_string(id));
+        if (check_user->iId == -1)
+        {
+            // Not found, were good to go
+            found = false;
+            lookup_user->sRealName = user_name + std::to_string(id);
+            lookup_user->sHandle = user_name + std::to_string(id);
+            lookup_user->sEmail = user_name + std::to_string(id) + "@xrm.com";
+            
+            long userIndex = user_data->insertRecord(lookup_user);
+            if (userIndex < 0)
+            {
+                // If user Index is not created, then remove the secutiry record.
+                security_dao->deleteRecord(securityIndex);
+            }
+        }
+    }
+}
+
+/**
+ * @brief Delete an Existing User Record
+ * @param user_id
+ */
+void ModUserEditor::deleteExistingUser(long user_id)
+{
+    // Should Cascade and remove Security Record also.
+    users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+    user_data->deleteRecord(user_id);
+}
+
+/**
  * @brief Check if the user exists in the current listing by String Id
  * @param key_value
  */
-bool ModUserEditor::checkUserExistsStringToId(std::string key_value)
-{
-    long userId = 0;
-    std::stringstream ss(key_value);
-    ss >> userId;
-
-    // check for Invalid Index.
-    if (ss.fail() || userId < 0)
-    {
-        return false;
-    }
-    
+bool ModUserEditor::checkUserExistsById(long user_id)
+{    
     users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
-    user_ptr lookup_user = user_data->getRecordById(userId);
+    user_ptr lookup_user = user_data->getRecordById(user_id);
     
     // Default Id when not found is -1
     if (lookup_user->iId == -1)

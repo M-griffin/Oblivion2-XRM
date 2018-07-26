@@ -36,7 +36,6 @@ public:
         , m_is_text_prompt_exist(false)
         , m_page(0)
         , m_rows_per_page(0)
-        , m_current_user("")
         , m_current_user_id(0)
         , m_current_field(0)
     {
@@ -49,8 +48,7 @@ public:
         m_mod_functions.push_back(std::bind(&ModUserEditor::userListInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorPausedInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorUserInput, this, std::placeholders::_1));
-        
-    
+            
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
         if (!m_is_text_prompt_exist)
@@ -76,15 +74,16 @@ public:
     // Setup Methods
     enum 
     {
-        MOD_DISPLAY_USER_LIST
+        MOD_DISPLAY_USER_LIST   = 0,
+        MOD_DISPLAY_USER_FIELDS = 1
     };
 
     // Input Module Index
     enum
     {
-        MOD_USER_INPUT              = 0, // User List Input Parser
-        MOD_PAUSE                   = 1, // Pauses on display of menus/options
-        MOD_USER_NAME               = 2  // User Name Input Handler
+        MOD_USER_INPUT          = 0, // User List Input Parser
+        MOD_PAUSE               = 1, // Pauses on display of menus/options
+        MOD_USER_NAME           = 2  // User Name Input Handler
     };
 
     // Input Menu State Index
@@ -119,7 +118,6 @@ public:
     const std::string PROMPT_USER_CHANGE = "user_change";
     const std::string PROMPT_USER_DELETE = "user_delete";    
     const std::string PROMPT_USER_COPY = "user_copy";
-    const std::string PROMPT_USER_FILTER = "user_filter";
 
     const std::string PROMPT_INVALID_USER_NOT_EXISTS = "invalid_user_doesnt_exist";
     
@@ -200,12 +198,31 @@ public:
      * @param input
      */
     void userEditorUserInput(const std::string &input);
+    
+    /**
+     * @brief handle each user seperate state and what to do next on input.
+     * @param does_user_exist
+     * @param user_id
+     */
+    void handleUserInputState(bool does_user_exist, long user_id);
+
+    /**
+     * @brief Copy an Existing User Record
+     * @param user_id
+     */
+    void copyExistingUser(long user_id);
+
+    /**
+     * @brief Delete an Existing User Record
+     * @param user_id
+     */
+    void deleteExistingUser(long user_id);
 
     /**
      * @brief Check if the user exists in the current listing by String Id
      * @param key_value
      */
-    bool checkUserExistsStringToId(std::string key_value);
+    bool checkUserExistsById(long user_id);
 
     /**
      * @brief Handles Input (Waiting for Any Key Press)
@@ -249,7 +266,6 @@ private:
     unsigned int           m_page;
     unsigned int           m_rows_per_page;
     
-    std::string            m_current_user;
     unsigned int           m_current_user_id;
     unsigned int           m_current_field;
     

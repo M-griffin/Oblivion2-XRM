@@ -8,7 +8,7 @@
 #include <cassert>
 
 // Setup the file version for the config file.
-const std::string Config::FILE_VERSION = "1.0.2";
+const std::string Config::FILE_VERSION = "1.0.3";
 
 
 ConfigDao::ConfigDao(config_ptr config, std::string path)
@@ -68,6 +68,7 @@ bool ConfigDao::saveConfig(config_ptr cfg)
     out << YAML::Key << "password_system" << YAML::Value << cfg->password_system;
     out << YAML::Key << "password_sysop" << YAML::Value << cfg->password_sysop;
     out << YAML::Key << "password_newuser" << YAML::Value << cfg->password_newuser;
+    out << YAML::Key << "password_default_user" << YAML::Value << cfg->password_default_user;
     out << YAML::Key << "port_telnet" << YAML::Value << cfg->port_telnet;
     out << YAML::Key << "port_ssl" << YAML::Value << cfg->port_ssl;
     out << YAML::Key << "use_service_telnet" << YAML::Value << cfg->use_service_telnet;
@@ -204,6 +205,7 @@ void ConfigDao::encode(const Config &rhs)
     m_config->password_system = rhs.password_system;
     m_config->password_sysop = rhs.password_sysop;
     m_config->password_newuser = rhs.password_newuser;
+    m_config->password_default_user = rhs.password_default_user;
     m_config->port_telnet = rhs.port_telnet;
     m_config->port_ssl = rhs.port_ssl;
     m_config->use_service_telnet = rhs.use_service_telnet;
