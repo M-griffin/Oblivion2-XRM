@@ -130,6 +130,28 @@ public:
     const std::string PROMPT_INVALID_USER_NOT_EXISTS = "invalid_user_doesnt_exist";
     const std::string PROMPT_USER_EDIT_HEADER = "user_editor_field_header";
     const std::string PROMPT_USER_FIELD_INPUT_TEXT = "user_editor_field_input";
+    
+    const std::string PROMPT_USER_FIELD_USERNAME = "user_field_username";
+    const std::string PROMPT_USER_FIELD_USERLEVEL = "user_field_userlevel";
+    const std::string PROMPT_USER_FIELD_REALNAME = "user_field_realname";
+    const std::string PROMPT_USER_FIELD_FILELEVEL = "user_field_filelevel";
+    const std::string PROMPT_USER_FIELD_EMAIL = "user_field_email";
+    const std::string PROMPT_USER_FIELD_MESGLEVEL = "user_field_messagelevel";
+    const std::string PROMPT_USER_FIELD_ADDRESS = "user_field_address";
+    const std::string PROMPT_USER_FIELD_HACKATTEMPT = "user_field_user_hack_attempts";
+    const std::string PROMPT_USER_FIELD_LOCATION = "user_field_user_location";
+    const std::string PROMPT_USER_FIELD_NOTIMELIMIT = "user_field_user_no_timelimit";
+    const std::string PROMPT_USER_FIELD_COUNTRY = "user_field_user_country";
+    const std::string PROMPT_USER_FIELD_USEANSI = "user_field_user_use_ansi";
+    const std::string PROMPT_USER_FIELD_USERNOTE = "user_field_user_usernote";
+    const std::string PROMPT_USER_FIELD_BACKSPACE = "user_field_user_backspace";
+    const std::string PROMPT_USER_FIELD_BIRTHDATE = "user_field_user_birthdate";
+    const std::string PROMPT_USER_FIELD_WANTED = "user_field_user_wanted";
+    const std::string PROMPT_USER_FIELD_FLAGS1 = "user_field_user_flags1";
+    const std::string PROMPT_USER_FIELD_CLEARSCREEN = "user_field_user_clearscreen";
+    const std::string PROMPT_USER_FIELD_FLAGS2 = "user_field_user_flags2";
+    const std::string PROMPT_USER_FIELD_SCREENPAUSE = "user_field_user_screenpause";
+
 
     /**
      * @brief Create Default Text Prompts for module

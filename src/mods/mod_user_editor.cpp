@@ -89,6 +89,37 @@ void ModUserEditor::createTextPrompts()
     value[PROMPT_USER_EDIT_HEADER]        = std::make_pair("User Fields Editor Header |OT User ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11User Editor|15] |03--- |11User ID : |15|OT |CR");
     value[PROMPT_USER_FIELD_INPUT_TEXT]   = std::make_pair("User Editor Command", "|CR|15User Editor C|07om|08mand |15: |07");
 
+
+    value[PROMPT_USER_FIELD_USERNAME]     = std::make_pair("User Name is the Handle or users Logon ID", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15User Name   : ");
+    value[PROMPT_USER_FIELD_USERLEVEL]    = std::make_pair("User Level is for access control (0 - 255, 255 being Sysop Access)", "|CR|03%   |15|PD|CR|11!   |03(|11M|03) |15User Level     : ");
+
+    value[PROMPT_USER_FIELD_REALNAME]     = std::make_pair("Real Name is users actual First and Last name", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15Real Name   : ");
+    value[PROMPT_USER_FIELD_FILELEVEL]    = std::make_pair("File Level is for access control (0 - 255, 255 being Sysop Access)", "|CR|03%   |15|PD|CR|11!   |03(|11N|03) |15File Level     : ");
+    
+    value[PROMPT_USER_FIELD_EMAIL]        = std::make_pair("Users Email Address", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15Email       : ");
+    value[PROMPT_USER_FIELD_MESGLEVEL]    = std::make_pair("Message Level is for access control (0 - 255, 255 being Sysop Access)", "|CR|03%   |15|PD|CR|11!   |03(|11O|03) |15Mesg Level     : ");
+    
+    value[PROMPT_USER_FIELD_ADDRESS]      = std::make_pair("Users Home Address (Usually Not Required)", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15Address     : ");
+    value[PROMPT_USER_FIELD_HACKATTEMPT]  = std::make_pair("Keeps track of Invalid Logon attempts since last logon", "|CR|03%   |15|PD|CR|11!   |03(|11P|03) |15Hack Attempts  : ");
+    
+    value[PROMPT_USER_FIELD_LOCATION]     = std::make_pair("Users City/State/Provence", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Location    : ");
+    value[PROMPT_USER_FIELD_NOTIMELIMIT]  = std::make_pair("Disable daily time limit for a user", "|CR|03%   |15|PD|CR|11!   |03(|11R|03) |15No Time Limit  : ");
+
+    value[PROMPT_USER_FIELD_COUNTRY]      = std::make_pair("Users Country Code", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15Country     : ");
+    value[PROMPT_USER_FIELD_USEANSI]      = std::make_pair("Enable ANSI Graphics, Otherwise strip ESC color codes", "|CR|03%   |15|PD|CR|11!   |03(|11S|03) |15Use ANSI       : ");
+        
+    value[PROMPT_USER_FIELD_USERNOTE]     = std::make_pair("User Note, Groups, Affiliations, or Tag line", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15User Note   : ");
+    value[PROMPT_USER_FIELD_BACKSPACE]    = std::make_pair("Enable Backspace translation for VT100 terminals", "|CR|03%   |15|PD|CR|11!   |03(|11T|03) |15VT100 BackSpace: ");
+    
+    value[PROMPT_USER_FIELD_BIRTHDATE]    = std::make_pair("User Date of Birth", "|CR|03%   |15|PD|CR|11!   |03(|11H|03) |15Birth Date  : ");
+    value[PROMPT_USER_FIELD_WANTED]       = std::make_pair("Pages the sysop when the user logs on", "|CR|03%   |15|PD|CR|11!   |03(|11U|03) |15User Wanted    : ");
+           
+    value[PROMPT_USER_FIELD_FLAGS1]       = std::make_pair("User Access Restriction Flags Group 1", "|CR|03%   |15|PD|CR|11!   |03(|11I|03) |15User Flags1 : ");
+    value[PROMPT_USER_FIELD_CLEARSCREEN]  = std::make_pair("Clears User Screen when 'True', Otherwise scrolls when 'False'", "|CR|03%   |15|PD|CR|11!   |03(|11V|03) |15Clear or Scroll: ");
+
+    value[PROMPT_USER_FIELD_FLAGS2]       = std::make_pair("User Access Restriction Flags Group 2", "|CR|03%   |15|PD|CR|11!   |03(|11J|03) |15User Flags2 : ");
+    value[PROMPT_USER_FIELD_SCREENPAUSE]  = std::make_pair("Clears User Screen when 'True', Otherwise scrolls when 'False'", "|CR|03%   |15|PD|CR|11!   |03(|11W|03) |15Screen Pause   : ");
+
     m_text_prompts_dao->writeValue(value);
 }
 
