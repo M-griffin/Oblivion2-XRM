@@ -137,19 +137,19 @@ public:
     void createTextPrompts();
     
     /**
-     * @brief Sets an indivdual input module index.
+     * @brief Sets an individual input module index.
      * @param mod_function_index
      */
     void changeInputModule(int mod_function_index);
     
     /**
-     * @brief Sets an indivdual setup method module index.
+     * @brief Sets an individual setup method module index.
      * @param mod_function_index
      */
     void changeSetupModule(int mod_function_index);
     
     /**
-     * @brief Sets an indivdual Menu Input State Add/Change/Delete
+     * @brief Sets an individual Menu Input State Add/Change/Delete
      * @param mod_menu_state_index
      */
     void changeMenuInputState(int mod_menu_state_index);
@@ -214,7 +214,7 @@ public:
     void userEditorUserInput(const std::string &input);
     
     /**
-     * @brief handle each user seperate state and what to do next on input.
+     * @brief handle each user separate state and what to do next on input.
      * @param does_user_exist
      * @param user_id
      */
@@ -279,13 +279,13 @@ public:
     void userEditorFieldHandler(const std::string &input);
     
     /**
-     * @brief User Editor, for Dispalying Menu Fields to Edit
+     * @brief User Editor, for Displaying Menu Fields to Edit
      * @return
      */
     std::string displayUserEditScreen();
     
     /**
-     * @brief User Editor, for Dispalying User Extended Fields to Edit
+     * @brief User Editor, for Displaying User Extended Fields to Edit
      * @return
      */
     std::string displayUserEditExtendedScreen();

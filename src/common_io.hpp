@@ -168,30 +168,30 @@ public:
     std::string getSystemHomeDirectory();
     
     /**
-     * @brief Appends Path Seperator depending on environment.
+     * @brief Appends Path Separator depending on environment.
      * @param path
      * @return 
      */
     void pathAppend(std::string &path);
 
     /**
-     * String Lengh counting actual characters not bytes
+     * String Length counting actual characters not bytes
      * This is for mixed ASCII And UTF-8 Strings.
      */
     std::string::size_type numberOfChars(const std::string &str);
 
     /**
-     * Left Trim Whitepsaces (Front)
+     * Left Trim White spaces (Front)
      */
     std::string leftTrim(const std::string &str);
 
     /**
-     * Right Trim Whitepsaces (Back)
+     * Right Trim White spaces (Back)
      */
     std::string rightTrim(const std::string &str);
 
     /**
-     * Trim Whitepsaces from both ends
+     * Trim White spaces from both ends
      */
     std::string trim(const std::string &str);
 
@@ -236,7 +236,7 @@ public:
     std::string printWideCharacters(const std::wstring &wide_string);
 
     /**
-     * @brief Translation from CP437 to UTF-8 MultiByte Charactes
+     * @brief Translation from CP437 to UTF-8 MultiByte Characters
      * @param standard_string
      */
     std::string translateUnicode(const std::string &standard_string);

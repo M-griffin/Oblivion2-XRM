@@ -230,7 +230,7 @@ std::string CommonIO::getSystemHomeDirectory()
 #endif
 
 /**
- * @brief Appends Path Seperator depending on environment.
+ * @brief Appends Path Separator depending on environment.
  * @param path
  * @return
  */
@@ -244,7 +244,7 @@ void CommonIO::pathAppend(std::string &path)
 }
 
 /**
- * @brief String Lengh counting actual characters not bytes
+ * @brief String Length counting actual characters not bytes
  * @param str
  * @return
  */
@@ -263,7 +263,7 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str)
 }
 
 /**
- * @brief Left Trim Whitepsaces (Front)
+ * @brief Left Trim White spaces (Front)
  * @param str
  * @return
  */
@@ -313,7 +313,7 @@ std::string CommonIO::rightTrim(const std::string &str)
 }
 
 /**
- * @brief Trim Whitepsaces from both ends
+ * @brief Trim White spaces from both ends
  * @param str
  * @return
  */
@@ -542,7 +542,7 @@ std::string CommonIO::maskString(const std::string &str)
 }
 
 /**
- * @brief Check if Digit or Numerics in a String
+ * @brief Check if Digit or Numeric's in a String
  * @param str
  * @return
  */
@@ -596,7 +596,7 @@ std::string CommonIO::printWideCharacters(const std::wstring &wide_string)
 }
 
 /**
- * @brief Translation from CP437 to UTF-8 MultiByte Charactes
+ * @brief Translation from CP437 to UTF-8 MultiByte Characters
  * @param standard_string
  */
 std::string CommonIO::translateUnicode(const std::string &standard_string)
@@ -952,7 +952,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
                 else
                 {
                     // Nothing to delete at begining Skip.
-                    std::cout << "del at begining: " << character_buffer << std::endl;
+                    std::cout << "del at beginning: " << character_buffer << std::endl;
                     return "empty";
                 }
             }
@@ -1000,7 +1000,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         else
         {
             // At begining of Line, nothing to delete.
-            std::cout << "At begining of Line, nothing to bs: " << character_buffer << std::endl;
+            std::cout << "At beginning of Line, nothing to bs: " << character_buffer << std::endl;
             return "empty";
         }
     }
@@ -1141,7 +1141,7 @@ bool CommonIO::fileExists(std::string FileName)
 }
 
 /**
- * Reads in Ansi file into Buffer Only
+ * Reads in ANSI file into Buffer Only
  */
 void CommonIO::readinAnsi(std::string FileName, std::string &buff)
 {
@@ -1198,7 +1198,7 @@ void CommonIO::readinAnsi(std::string FileName, std::string &buff)
 }
 
 /**
- * Reads in Ansi file into Buffer Only
+ * Reads in ANSI file into Buffer Only
  */
 std::string CommonIO::readinAnsi(std::string FileName)
 {

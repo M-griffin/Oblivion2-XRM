@@ -71,7 +71,7 @@ long UsersDao::insertRecord(user_ptr obj)
 
 /**
  * @brief Deletes a Record
- * @param areaId
+ * @param id
  * @return
  */
 bool UsersDao::deleteRecord(long id)

@@ -26,8 +26,8 @@ typedef BaseDao<Users> baseUsersClass;
  * @author Michael Griffin
  * @date 2/28/2016
  * @file users_dao.hpp
- * @brief Handles Reading and Writting Users Class from Database
- *        Database Objects are Instaniated in the Session then passed to the DAO for work.
+ * @brief Handles Reading and Writing Users Class from Database
+ *        Database Objects are Instantiated in the Session then passed to the DAO for work.
  */
 class UsersDao
     : public baseUsersClass
@@ -41,7 +41,7 @@ public:
         m_strTableName = "users";
 
         /**
-         * Pre Popluate Static Queries one Time
+         * Pre Populate Static Queries one Time
          */
         m_cmdFirstTimeSetup =
             "PRAGMA synchronous=Normal; "

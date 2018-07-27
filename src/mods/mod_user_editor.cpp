@@ -39,7 +39,7 @@ bool ModUserEditor::update(const std::string &character_buffer, const bool &)
 }
 
 /**
- * @brief Startup class, setup and display initial screens / interface.
+ * @brief Start-up class, setup and display initial screens / interface.
  * @return
  */
 bool ModUserEditor::onEnter()
@@ -93,7 +93,7 @@ void ModUserEditor::createTextPrompts()
 }
 
 /**
- * @brief Sets an indivdual input module index.
+ * @brief Sets an individual input module index.
  * @param mod_function_index
  */
 void ModUserEditor::changeInputModule(int mod_function_index)
@@ -103,7 +103,7 @@ void ModUserEditor::changeInputModule(int mod_function_index)
 }
 
 /**
- * @brief Sets an indivdual setup method module index.
+ * @brief Sets an individual setup method module index.
  * @param mod_function_index
  */
 void ModUserEditor::changeSetupModule(int mod_function_index)
@@ -114,7 +114,7 @@ void ModUserEditor::changeSetupModule(int mod_function_index)
 }
 
 /**
- * @brief Sets an indivdual Menu Input State Add/Change/Delete
+ * @brief Sets an individual Menu Input State Add/Change/Delete
  * @param mod_menu_state_index
  */
 void ModUserEditor::changeMenuInputState(int mod_menu_state_index)
@@ -358,7 +358,7 @@ void ModUserEditor::userEditorUserInput(const std::string &input)
 }
 
 /**
- * @brief handle each user seperate state and what to do next on input.
+ * @brief handle each user separate state and what to do next on input.
  * @param does_user_exist
  * @param user_id
  */
@@ -437,7 +437,6 @@ void ModUserEditor::copyExistingUser(long user_id)
     
     // Setup for default password and challenge questions.   
     encrypt_ptr encryption(new Encrypt());
-
     std::string salt = encryption->generate_salt(lookup_user->sHandle, m_config->bbs_uuid);
     std::string password = encryption->generate_password(m_config->password_default_user, salt);
 
@@ -1073,7 +1072,7 @@ std::string ModUserEditor::displayUserEditScreen()
 }
 
 /**
- * @brief User Editor, for Dispalying User Extended Fields to Edit
+ * @brief User Editor, for Displaying User Extended Fields to Edit
  * @return
  */
 std::string ModUserEditor::displayUserEditExtendedScreen()

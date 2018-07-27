@@ -45,7 +45,7 @@ bool ModSignup::update(const std::string &character_buffer, const bool &)
 }
 
 /**
- * @brief Startup class, setup and display initial screens / interface.
+ * @brief Start-up class, setup and display initial screens / interface.
  * @return
  */
 bool ModSignup::onEnter()
@@ -129,7 +129,7 @@ void ModSignup::createTextPrompts()
 }
 
 /**
- * @brief Sets an indivdual module index.
+ * @brief Sets an individual module index.
  * @param mod_function_index
  */
 void ModSignup::changeModule(int mod_function_index)
@@ -1031,7 +1031,7 @@ bool ModSignup::birthday(const std::string &input)
 				ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
 				if(ss.fail())
 				{
-					std::cout << "regex passed, ss failed!" << std::endl;
+					std::cout << "regexp passed, ss failed!" << std::endl;
 					ss.clear();
 					displayPromptAndNewLine(PROMPT_DATE_INVALID);
 					redisplayModulePrompt();
@@ -1804,7 +1804,7 @@ void ModSignup::saveNewUserRecord()
         // Remove Secutiry Record if unable to create user record.
         if (!security_dao->deleteRecord(securityIndex))
         {
-            std::cout << "Error, unable to remove secutiry record." << std::endl;
+            std::cout << "Error, unable to remove security record." << std::endl;
         }
 
         baseProcessDeliverNewLine();
