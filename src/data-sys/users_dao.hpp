@@ -273,6 +273,12 @@ public:
      */
     user_ptr getUserByEmail(std::string email);
 
+    /**
+     * @brief Return User Records By WildCard (filtered Searches)
+     * @return
+     */
+    std::vector<user_ptr> getUsersByWildcard(std::string filter);
+
 };
 
 // Handle to Database Queries

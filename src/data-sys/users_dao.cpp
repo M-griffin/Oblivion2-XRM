@@ -518,3 +518,57 @@ user_ptr UsersDao::getUserByEmail(std::string email)
  
     return user;
 }
+
+/**
+ * @brief Return User Records By WildCard (filtered Searches)
+ * @return
+ */
+std::vector<user_ptr> UsersDao::getUsersByWildcard(std::string filter)
+{
+    user_ptr obj(new Users());
+    std::vector<user_ptr> list;
+
+    // Make Sure Database Reference is Connected
+    if (!m_database.isConnected())
+    {
+        std::cout << "Error, Database is not connected!" << std::endl;
+        return list;
+    }
+
+    // Create Pointer and Connect Query Object to Database.
+    query_ptr qry(new SQLW::Query(m_database));
+    if (!qry->isConnected())
+    {
+        std::cout << "Error, Query has no connection to the database" << std::endl;
+        return list;
+    }
+
+    // Build Query String
+    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sHandle like %Q or sRealName like %Q COLLATE NOCASE;",
+        m_strTableName.c_str(), filter.c_str(), filter.c_str());
+
+    // Execute Query.
+    if (qry->getResult(queryString))
+    {
+        long rows = qry->getNumRows();
+        if (rows > 0)
+        {
+            while(qry->fetchRow())
+            {
+                obj.reset(new Users());
+                pullUsersResult(qry, obj);
+                list.push_back(obj);
+            }
+        }
+        else
+        {
+            std::cout << "Error, getUsersByWildcard Returned Rows: " << rows << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << "Error, getResult()" << std::endl;
+    }
+
+    return list;    
+}
