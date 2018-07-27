@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include <string>
-
+#include <algorithm>
 
 /**
  * Base Dao Calls for generic Object Data Calls
@@ -542,6 +542,9 @@ std::vector<user_ptr> UsersDao::getUsersByWildcard(std::string filter)
         std::cout << "Error, Query has no connection to the database" << std::endl;
         return list;
     }
+
+    // Replace * with %
+    std::replace( filter.begin(), filter.end(), '*', '%');
 
     // Build Query String
     std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sHandle like %Q or sRealName like %Q COLLATE NOCASE;",

@@ -38,6 +38,7 @@ public:
         , m_rows_per_page(0)
         , m_current_user_id(0)
         , m_current_field(0)
+        , m_wildcard_filter("")
     {
         std::cout << "ModUserEditor" << std::endl;
 
@@ -124,6 +125,7 @@ public:
     const std::string PROMPT_USER_CHANGE = "user_change";
     const std::string PROMPT_USER_DELETE = "user_delete";    
     const std::string PROMPT_USER_COPY = "user_copy";
+    const std::string PROMPT_USER_FILTER = "user_filter";
 
     const std::string PROMPT_INVALID_USER_NOT_EXISTS = "invalid_user_doesnt_exist";
     const std::string PROMPT_USER_EDIT_HEADER = "user_editor_field_header";
@@ -316,6 +318,7 @@ private:
     
     unsigned int           m_current_user_id;
     unsigned int           m_current_field;
+    std::string            m_wildcard_filter;
     
     CommonIO               m_common_io;
     directory_ptr          m_directory;

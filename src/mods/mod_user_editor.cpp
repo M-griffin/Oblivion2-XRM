@@ -76,13 +76,14 @@ void ModUserEditor::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_HEADER]                  = std::make_pair("User Editor Header", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11User Editor|15] |03--- |CR");
-    value[PROMPT_INPUT_TEXT]              = std::make_pair("User Editor Prompt", "|03E|15/dit User |03D|15/elete User |03C|15/opy User |03Q|15/uit : ");
+    value[PROMPT_HEADER]                  = std::make_pair("User Editor Header", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11User Editor|15] |03--- |11Filtering View : |15|OT |CR");
+    value[PROMPT_INPUT_TEXT]              = std::make_pair("User Editor Prompt", "|CR|03E|15/dit User |03D|15/elete User |03C|15/opy User |03F|15/ilter Users |03Q|15/uit : ");
     value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 |CR");
 
     value[PROMPT_USER_CHANGE]             = std::make_pair("User Number To Change", "|CR|15Enter user number to |11EDIT|15 : ");
     value[PROMPT_USER_DELETE]             = std::make_pair("User Number To Delete", "|CR|15Enter user number to |11DELETE|15 : ");
     value[PROMPT_USER_COPY]               = std::make_pair("User Number To Copy", "|CR|15Enter user number to |11COPY|15 : ");
+    value[PROMPT_USER_FILTER]             = std::make_pair("Wildcard (Example 'me*' lists names starting with 'me')", "|CR|03%   |15|PD|CR|11!   |15Enter wildcard to |11FILTER|15 by, Leave empty for |11ALL|15 : ");
 
     value[PROMPT_INVALID_USER_NOT_EXISTS] = std::make_pair("Invalid User Doesn't Exist", "|CR|04Invalid, User doesn't exist.|CR");
     value[PROMPT_USER_EDIT_HEADER]        = std::make_pair("User Fields Editor Header |OT User ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11User Editor|15] |03--- |11User ID : |15|OT |CR");
@@ -164,7 +165,15 @@ void ModUserEditor::displayPromptAndNewLine(const std::string &prompt)
  */
 void ModUserEditor::setupUserList() 
 {
-    displayPrompt(PROMPT_HEADER);
+    // Display if were filtering or not
+    std::string string_filter = "ALL";
+    if (m_wildcard_filter.size() > 0)
+    {
+        string_filter = m_wildcard_filter;
+    }
+    
+    baseTransformToUpper(string_filter);    
+    displayPromptMCI(PROMPT_HEADER, string_filter);
     
     // Build a list of screen lines for the menu display
     // So we know when to pause in large listing, or use pagenation.
@@ -251,6 +260,12 @@ void ModUserEditor::userListInput(const std::string &input)
                 changeInputModule(MOD_USER_NAME);
                 break;
                 
+            case 'F': // Filter
+                changeMenuInputState(USER_FILTER);
+                displayPrompt(PROMPT_USER_FILTER);
+                changeInputModule(MOD_USER_NAME);
+                break;
+                
             case 'Q': // Quit
                 // Reload fall back, or gosub to last menu!
                 m_is_active = false;
@@ -291,6 +306,17 @@ void ModUserEditor::userEditorUserInput(const std::string &input)
     }
     else if(result[0] == '\n')
     {            
+        // Allow Empty for Filter only!!
+        // If were updating the filter, catch
+        // Adjust user list and return
+        if (m_mod_user_state_index == USER_FILTER)
+        {
+            m_wildcard_filter = key;
+            changeInputModule(MOD_USER_INPUT);
+            redisplayModulePrompt();
+            return;
+        }
+        
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if(key.size() == 0)
         {
@@ -613,10 +639,27 @@ void ModUserEditor::displayCurrentPage(const std::string &input_state)
 std::string ModUserEditor::displayUserList()
 {  
     users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
-    std::vector<user_ptr> users = user_data->getAllRecords();
-   
-     // Build a string list of individual menu options, then loop to fit as many per screen!
+        
+    std::vector<user_ptr> users;
+    if (m_wildcard_filter.size() > 0)
+    {
+        std::cout << "*** Wildcard Active : " << m_wildcard_filter << std::endl;
+        users = user_data->getUsersByWildcard(m_wildcard_filter);
+    }
+    else
+    {
+        std::cout << "*** Wildcard IN-Active : " << m_wildcard_filter << std::endl;
+        users = user_data->getAllRecords();
+    }
+    
+    // If no records, add message to user.
     std::vector<std::string> result_set;  
+    if (users.size() == 0)
+    {
+        result_set.push_back("|03" +m_common_io.rightPadding("No Records Found!", 24));
+    }
+   
+     // Build a string list of individual menu options, then loop to fit as many per screen!    
     for(unsigned int i = 0; i < users.size(); i++)
     {  
         std::string option_string = m_common_io.rightPadding(std::to_string(users[i]->iId), 5);      
