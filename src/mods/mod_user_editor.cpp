@@ -827,58 +827,114 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
         std::string output_buffer = m_config->default_color_regular;
         switch (toupper(key[0]))
         {
+            
             /*
-            case 'A': // Menu Title
+            PROMPT_USER_FIELD_USERNAME
+            PROMPT_USER_FIELD_USERLEVEL
+            PROMPT_USER_FIELD_REALNAME
+            PROMPT_USER_FIELD_FILELEVEL
+            PROMPT_USER_FIELD_EMAIL
+            PROMPT_USER_FIELD_MESGLEVEL
+            PROMPT_USER_FIELD_ADDRESS
+            PROMPT_USER_FIELD_HACKATTEMPT
+            PROMPT_USER_FIELD_LOCATION
+            PROMPT_USER_FIELD_NOTIMELIMIT
+            PROMPT_USER_FIELD_COUNTRY
+            PROMPT_USER_FIELD_USEANSI
+            PROMPT_USER_FIELD_USERNOTE
+            PROMPT_USER_FIELD_BACKSPACE
+            PROMPT_USER_FIELD_BIRTHDATE
+            PROMPT_USER_FIELD_WANTED
+            PROMPT_USER_FIELD_FLAGS1
+            PROMPT_USER_FIELD_CLEARSCREEN
+            PROMPT_USER_FIELD_FLAGS2
+            PROMPT_USER_FIELD_SCREENPAUSE
+            */
+
+            case 'A': // User Name
                 m_current_field = toupper(key[0]);
-                changeInputModule(MOD_MENU_FIELD);
-                displayPrompt(PROMPT_MENU_FIELD_TITLE);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_title);
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_USERNAME);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sHandle);
                 break;
                 
-            case 'B': // Menu Password
+            case 'M': // User Level
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_MENU_FIELD);
-                displayPrompt(PROMPT_MENU_FIELD_PASSWORD);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_password);
+                displayPrompt(PROMPT_USER_FIELD_USERLEVEL);
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_menu.back()->iLevel));
                 break;
-                
-             case 'C': // Menu Password
+        
+             case 'B': // User Real Name
                 m_current_field = toupper(key[0]);
-                changeInputModule(MOD_MENU_FIELD);
-                displayPrompt(PROMPT_MENU_FIELD_FALLBACK);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_fall_back);
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_REALNAME);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sRealName);
                 break;
             
-            case 'D': // Menu Help ID
+            case 'N': // User File Level
                 m_current_field = toupper(key[0]);
-                changeInputModule(MOD_MENU_FIELD);
-                displayPrompt(PROMPT_MENU_FIELD_HELP_ID);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_help_file);
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_FILELEVEL);
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_menu.back()->iFileLevel));
+                break;
+               
+            case 'C': // User Email
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_EMAIL);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->sEmail);
                 break;
                 
-            case 'E': // Menu Name
+             case 'O': // User Message Level
                 m_current_field = toupper(key[0]);
-                changeInputModule(MOD_MENU_FIELD);
-                displayPrompt(PROMPT_MENU_FIELD_NAME);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_name);
-                break;
-                
-             case 'F': // Menu Pulldown file
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_MENU_FIELD);
-                displayPrompt(PROMPT_MENU_FIELD_PULLDOWN);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->menu_pulldown_file);
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_MESGLEVEL);
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_menu.back()->iMessageLevel));
                 break;
             
-            case 'G': // View Generate Menu 
-                displayGenericMenu();
-                changeInputModule(MOD_DISPLAY_PAUSE);
-                break; 
+            case 'D': // User Address
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_ADDRESS);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->sAddress);
+                break;
                 
-            case 'H': // Jump into Options Editing.
-                changeInputModule(MOD_MENU_OPTION_INPUT);
-                changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);                                
-                break; */
+             case 'P': // Numkber Hack Attempts
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_HACKATTEMPT);
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_menu.back()->iHackAttempts));
+                break;
+           
+            case 'E': // User Location
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_LOCATION);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->sLocation);
+                break;
+                
+             case 'R': // Ignore Time Limit
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_NOTIMELIMIT);
+                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(m_loaded_menu.back()->bIgnoreTimeLimit));
+                break;
+       
+            case 'F': // User Country
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_COUNTRY);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->sCountry);
+                break;
+                
+             case 'S': // Use ANSI Graphics
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_USEANSI);
+                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(m_loaded_menu.back()->bAnsi));
+                break;
+
                 
             case 'Q': // Quit
                 //saveMenuChanges();
