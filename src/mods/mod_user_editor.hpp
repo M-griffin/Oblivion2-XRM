@@ -70,6 +70,8 @@ public:
         std::cout << "~ModUserEditor" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
+        std::vector<user_ptr>().swap(m_users_listing);
+        std::vector<user_ptr>().swap(m_loaded_user);        
     }
 
     virtual bool update(const std::string &character_buffer, const bool &) override;
@@ -323,7 +325,8 @@ private:
     // Function Input Vector.
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
-    std::vector<std::string>                                m_user_display_list;
+    std::vector<user_ptr>                                   m_users_listing;
+    std::vector<std::string>                                m_user_display_list;    
     std::vector<user_ptr>                                   m_loaded_user;
 
     SessionIO              m_session_io;
