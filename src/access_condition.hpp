@@ -27,6 +27,14 @@ public:
     ~AccessCondition() { };
     
     /**
+     * @brief Toggle Bit Flag
+     * @param flag
+     * @param first_set
+     * @param user
+     */
+    void setFlagToggle(unsigned char flag, bool first_set, user_ptr user);
+
+    /**
      * @brief Set Bit Flag on
      * @param flag
      * @param first_set

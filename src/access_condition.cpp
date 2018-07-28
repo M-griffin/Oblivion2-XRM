@@ -10,6 +10,33 @@
 #include <cctype>
 
 /**
+ * @brief Toggle Bit Flag
+ * @param flag
+ * @param first_set
+ * @param user
+ */
+void AccessCondition::setFlagToggle(unsigned char flag, bool first_set, user_ptr user)
+{
+    int bit = toupper(flag);
+    bit -= 65; // Handles A - Z
+    
+    if (bit < 0 || bit > 25)
+    {
+        std::cout << "Error, Invalid bit flag: " << bit << std::endl;
+        return;        
+    }
+    
+    if (first_set)
+    {
+        user->iControlFlags1 ^= 1 << bit;
+    }
+    else
+    {
+        user->iControlFlags2 ^= 1 << bit;
+    }    
+}
+
+/**
  * @brief Set Bit Flag on
  * @param flag
  * @param first_set

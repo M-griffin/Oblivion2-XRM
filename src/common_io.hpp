@@ -343,6 +343,41 @@ public:
     std::string standardDateTimeToString(std::time_t std_time);
 
     /**
+     * @brief String to Date Format
+     * @param date
+     * @return 
+     */
+    std::time_t stringToStandardDate(std::string date);
+
+    /**
+     * @brief String to Date/Time Format
+     * @param date_time
+     * @return 
+     */
+    std::time_t stringToStandardDateTime(std::string date_time);
+    
+    /**
+     * @brief Converts std::strings to Long values
+     * @param value
+     * @return 
+     */
+    long stringToLong(std::string value);
+
+    /**
+     * @brief Converts std::strings to Int values
+     * @param value
+     * @return 
+     */
+    int stringToInt(std::string value);
+
+    /**
+     * @brief Tests first char of string for starting T/F returns int with -1 for invalid
+     * @param value
+     * @return 
+     */
+    int stringToBool(std::string value);
+
+    /**
      * @brief Template search quick find
      * @param element
      * @param container

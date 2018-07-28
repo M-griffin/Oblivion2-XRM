@@ -1013,6 +1013,8 @@ void ModMenuEditor::menuEditorMenuOptionFieldHandler(const std::string &input)
                 // check for Invalid Index.
                 if (ss.fail() || new_id < 0)
                 {
+                    ss.clear();
+                    ss.ignore();
                     break;
                 }
         
@@ -1120,6 +1122,8 @@ void ModMenuEditor::menuEditorMenuOptionInput(const std::string &input)
         // check for Invalid Index.
         if (ss.fail() || option_index < 0)
         {
+            ss.clear();
+            ss.ignore();
             return;
         }
         

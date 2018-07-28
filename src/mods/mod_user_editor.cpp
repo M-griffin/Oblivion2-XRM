@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <cassert>
+#include <regex>
  
 /**
  * @brief Handles Updates or Data Input from Client
@@ -114,10 +115,10 @@ void ModUserEditor::createTextPrompts()
     value[PROMPT_USER_FIELD_BIRTHDATE]    = std::make_pair("User Date of Birth", "|CR|03%   |15|PD|CR|11!   |03(|11H|03) |15Birth Date  : ");
     value[PROMPT_USER_FIELD_WANTED]       = std::make_pair("Pages the sysop when the user logs on", "|CR|03%   |15|PD|CR|11!   |03(|11U|03) |15User Wanted |07(|15T|07/|15F|07)|15 : ");
            
-    value[PROMPT_USER_FIELD_FLAGS1]       = std::make_pair("Access Restriction Flags Group 1 - Type Letter to Add/Remove", "|CR|03%   |15|PD|CR|11!   |03(|11I|03) |15User Flags1 : ");
+    value[PROMPT_USER_FIELD_FLAGS1]       = std::make_pair("Access Restriction Flags Group 1 - Type Letters to Add/Remove/Toggle", "|CR|03%   |15|PD|CR|11!   |03(|11I|03) |15User Flags1 : ");
     value[PROMPT_USER_FIELD_CLEARSCREEN]  = std::make_pair("Clears User Screen when 'True', Otherwise scrolls when 'False'", "|CR|03%   |15|PD|CR|11!   |03(|11V|03) |15Clear or Scroll |07(|15T|07/|15F|07)|15 : ");
 
-    value[PROMPT_USER_FIELD_FLAGS2]       = std::make_pair("Access Restriction Flags Group 2 - Type Letter to Add/Remove", "|CR|03%   |15|PD|CR|11!   |03(|11J|03) |15User Flags2 : ");
+    value[PROMPT_USER_FIELD_FLAGS2]       = std::make_pair("Access Restriction Flags Group 2 - Type Letters to Add/Remove/Toggle", "|CR|03%   |15|PD|CR|11!   |03(|11J|03) |15User Flags2 : ");
     value[PROMPT_USER_FIELD_SCREENPAUSE]  = std::make_pair("Clears User Screen when 'True', Otherwise scrolls when 'False'", "|CR|03%   |15|PD|CR|11!   |03(|11W|03) |15Screen Pause  |07(|15T|07/|15F|07)|15 : ");
 
     m_text_prompts_dao->writeValue(value);
@@ -369,6 +370,7 @@ void ModUserEditor::userEditorUserInput(const std::string &input)
         // check for Invalid Index.
         if (ss.fail() || user_id < 0)
         {
+            ss.clear();
             user_id = -1;
         }              
         
@@ -850,6 +852,8 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
     // Provide Hotkeys only for switching to next/previous options
     switch(input[0]) 
     {        
+        // TODO, update current users m_loaded_user -> m_users_list array with update also.
+        // So when we change users we keep the changes made!
         // search m_users_listing for previous / next record.        
         case '[': // previous user
             previousUserById();
@@ -1040,7 +1044,7 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 m_session_io.getInputField("", key, Config::sName_length);
                 break;
 
-            case 'W': // Clear Screen or Scroll Screen
+            case 'W': // Do Screen Pause
             {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
@@ -1052,6 +1056,7 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;        
             }   
             case 'Q': // Quit
+                // TODO, save user, then update m_users_list array with update also.
                 //saveMenuChanges();
                 std::vector<user_ptr>().swap(m_loaded_user);
                 
@@ -1103,15 +1108,111 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
     }
     else if(result[0] == '\n')
     {            
-        baseProcessDeliverNewLine();                
-        
+        baseProcessDeliverNewLine();
+
         // Handle the assigned input received for field
         switch(m_current_field)
         {
-            case 'A': // Menu Title
+            case 'A': // User Name
                 m_loaded_user.back()->sHandle = key;
+                break;                     
+                
+            case 'M': // User Level
+                m_loaded_user.back()->iLevel = m_common_io.stringToInt(key);
                 break;
-                                         
+        
+            case 'B': // User Real Name
+                m_loaded_user.back()->sRealName = key;
+                break;
+            
+            case 'N': // User File Level
+                m_loaded_user.back()->iFileLevel = m_common_io.stringToInt(key);
+                break;
+               
+            case 'C': // User Email
+                m_loaded_user.back()->sEmail = key;
+                break;
+                
+            case 'O': // User Message Level                
+                m_loaded_user.back()->iMessageLevel = m_common_io.stringToInt(key);
+                break;
+            
+            case 'D': // User Address
+                m_loaded_user.back()->sAddress = key;
+                break;
+                
+            case 'P': // Numkber Hack Attempts
+                m_loaded_user.back()->iHackAttempts = m_common_io.stringToInt(key);
+                break;
+           
+            case 'E': // User Location
+                m_loaded_user.back()->sLocation = key;
+                break;
+                
+            case 'R': // Ignore Time Limit                
+                if (m_common_io.stringToBool(key) != -1)
+                    m_loaded_user.back()->bIgnoreTimeLimit = m_common_io.stringToBool(key);
+                break;
+
+            case 'F': // User Country
+                m_loaded_user.back()->sCountry = key;
+                break;
+                
+            case 'S': // Use ANSI Graphics
+                if (m_common_io.stringToBool(key) != -1)
+                    m_loaded_user.back()->bAnsi = m_common_io.stringToBool(key);
+                break;
+
+            case 'G': // User Note
+                m_loaded_user.back()->sUserNote = key;
+                break;
+                
+            case 'T': // Use VT100 Backspace
+                if (m_common_io.stringToBool(key) != -1)
+                    m_loaded_user.back()->bBackSpaceVt100 = m_common_io.stringToBool(key);
+                break;
+
+            case 'H': // User Birth Date
+            {
+                // Make sure Date Format is valid
+                std::regex date_regex { m_config->regexp_date_validation };
+                std::smatch str_matches;
+
+                // If invalid display message, but for now ignore changes
+                if(std::regex_match(key, str_matches, date_regex))
+                {
+                    m_loaded_user.back()->dtBirthday = m_common_io.stringToStandardDate(key);
+                }
+                break;
+            }    
+            case 'U': // User Wanted
+                if (m_common_io.stringToBool(key) != -1)
+                    m_loaded_user.back()->bWanted = m_common_io.stringToBool(key);
+                break;
+
+            case 'I': // Access Restriction Flags 1, Will loop though and toggle each letter.
+            {
+                AccessCondition acs;
+                for (char c : key)
+                    acs.setFlagToggle(c, true, m_loaded_user.back());
+                break;
+            }
+            case 'V': // Clear Screen or Scroll Screen
+                if (m_common_io.stringToBool(key) != -1)
+                    m_loaded_user.back()->bClearOrScroll = m_common_io.stringToBool(key);
+                break;
+
+            case 'J': // Access Restriction Flags 2, Type Letter to Add / Remove only.  
+            {
+                AccessCondition acs;
+                for (char c : key)
+                    acs.setFlagToggle(c, false, m_loaded_user.back());
+                break;
+            }
+            case 'W': // Pause
+                if (m_common_io.stringToBool(key) != -1)
+                    m_loaded_user.back()->bDoPause = m_common_io.stringToBool(key);
+                break;                                         
         }
                 
         changeInputModule(MOD_USER_FIELD_INPUT);

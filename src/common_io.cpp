@@ -1280,3 +1280,107 @@ std::string CommonIO::standardDateTimeToString(std::time_t std_time)
     std::string datetime_string = oss.str();
     return datetime_string;
 }
+
+/**
+ * @brief String to Date Format
+ * @param date
+ * @return 
+ */
+std::time_t CommonIO::stringToStandardDate(std::string date) 
+{
+    // Append Time For Dates, need formattings
+    std::string key = date;    
+    key += " 00:00:00";
+    struct std::tm tm;
+
+    std::istringstream ss(key);                
+    ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+    if(ss.fail())
+    {
+        ss.clear();
+        return -1;
+    }
+
+    std::time_t const time = mktime(&tm);
+    return time;
+}
+
+/**
+ * @brief String to Date/Time Format
+ * @param date_time
+ * @return 
+ */
+std::time_t CommonIO::stringToStandardDateTime(std::string date_time) 
+{
+    struct std::tm tm;
+    std::istringstream ss(date_time);                
+    ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+    if(ss.fail())
+    {
+        ss.clear();
+        return -1;
+    }
+
+    std::time_t const time = mktime(&tm);
+    return time;
+}
+
+/**
+ * @brief Converts std::strings to Long values
+ * @param value
+ * @return 
+ */
+long CommonIO::stringToLong(std::string value)
+{
+    long result_id = -1;
+    std::stringstream ss(value);
+    ss >> result_id;
+
+    // check for Invalid Index.
+    if (ss.fail() || result_id < 0)
+    {
+        ss.clear();
+        ss.ignore();
+        result_id = -1;
+    }
+
+    return result_id;
+}
+
+/**
+ * @brief Converts std::strings to Int values
+ * @param value
+ * @return 
+ */
+int CommonIO::stringToInt(std::string value)
+{
+    int result_id = -1;
+    std::stringstream ss(value);
+    ss >> result_id;
+
+    // check for Invalid Index.
+    if (ss.fail() || result_id < 0)
+    {
+        ss.clear();
+        ss.ignore();
+        result_id = -1;
+    }
+
+    return result_id;
+}
+
+/**
+ * @brief Tests first char of string for starting T/F returns int with -1 for invalid
+ * @param value
+ * @return 
+ */
+int CommonIO::stringToBool(std::string value)
+{
+    // Test if string starts with T or F instead of typing True/False
+    if (toupper(value[0]) == 'T')
+        return 1;
+    else if (toupper(value[0]) == 'F') 
+        return 0;
+    else 
+        return -1;
+}
