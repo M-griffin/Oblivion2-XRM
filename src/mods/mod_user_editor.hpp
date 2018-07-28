@@ -157,6 +157,7 @@ public:
     const std::string PROMPT_USER_FIELD_FLAGS2 = "user_field_user_flags2";
     const std::string PROMPT_USER_FIELD_SCREENPAUSE = "user_field_user_screenpause";
 
+    const std::string PROMPT_USER_EDIT_EXTENDED_HEADER = "user_field_extended_header";
 
     /**
      * @brief Create Default Text Prompts for module
