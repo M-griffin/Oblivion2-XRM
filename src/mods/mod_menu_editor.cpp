@@ -81,6 +81,7 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_INPUT_TEXT]              = std::make_pair("Menu Edit Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
     value[PROMPT_OPTION_INPUT_TEXT]       = std::make_pair("Menu Option Edit Prompt", "|CR|03A|15/dd |03E|15/dit |03D|15/elete |03C|15/opy |03M|15/ove |03T|15/oggle |03Q|15/uit : ");
     value[PROMPT_INVALID]                 = std::make_pair("Invalid input", "|CR|04Invalid Input! Try again.|CR");
+    
     value[PROMPT_MENU_ADD]                = std::make_pair("Menu Name To Add", "|CR|15Enter menu name to |11CREATE|15 : ");
     value[PROMPT_MENU_DELETE]             = std::make_pair("Menu Name To Delete", "|CR|15Enter menu name to |11DELETE|15 : ");
     value[PROMPT_MENU_CHANGE]             = std::make_pair("Menu Name To Change", "|CR|15Enter menu name to |11EDIT|15 : ");

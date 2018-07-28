@@ -39,6 +39,7 @@ public:
         , m_current_user_id(0)
         , m_current_field(0)
         , m_wildcard_filter("")
+        , m_user_array_position(0)
     {
         std::cout << "ModUserEditor" << std::endl;
 
@@ -269,6 +270,16 @@ public:
     bool loadUserById(long user_id);
 
     /**
+     * @brief Check if the next user exists in the current listing by Current Id
+     */
+    bool nextUserById();
+    
+    /**
+     * @brief Check if the previous user exists in the current listing by Current Id
+     */
+    bool previousUserById();
+
+    /**
      * @brief Handles Input (Waiting for Any Key Press)
      * @param input
      */
@@ -341,9 +352,10 @@ private:
     unsigned int           m_page;
     unsigned int           m_rows_per_page;
     
-    unsigned int           m_current_user_id;
+    unsigned long          m_current_user_id;
     unsigned int           m_current_field;
     std::string            m_wildcard_filter;
+    unsigned long          m_user_array_position;
     
     CommonIO               m_common_io;
     directory_ptr          m_directory;

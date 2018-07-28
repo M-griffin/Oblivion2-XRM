@@ -103,22 +103,22 @@ void ModUserEditor::createTextPrompts()
     value[PROMPT_USER_FIELD_HACKATTEMPT]  = std::make_pair("Keeps track of Invalid Logon attempts since last logon", "|CR|03%   |15|PD|CR|11!   |03(|11P|03) |15Hack Attempts  : ");
     
     value[PROMPT_USER_FIELD_LOCATION]     = std::make_pair("Users City/State/Provence", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Location    : ");
-    value[PROMPT_USER_FIELD_NOTIMELIMIT]  = std::make_pair("Disable daily time limit for a user", "|CR|03%   |15|PD|CR|11!   |03(|11R|03) |15No Time Limit  : ");
+    value[PROMPT_USER_FIELD_NOTIMELIMIT]  = std::make_pair("Disable daily time limit for a user", "|CR|03%   |15|PD|CR|11!   |03(|11R|03) |15No Time Limit  |07(|15T|07/|15F|07)|15 : ");
 
     value[PROMPT_USER_FIELD_COUNTRY]      = std::make_pair("Users Country Code", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15Country     : ");
-    value[PROMPT_USER_FIELD_USEANSI]      = std::make_pair("Enable ANSI Graphics, Otherwise strip ESC color codes", "|CR|03%   |15|PD|CR|11!   |03(|11S|03) |15Use ANSI       : ");
+    value[PROMPT_USER_FIELD_USEANSI]      = std::make_pair("Enable ANSI Graphics, Otherwise strip ESC color codes", "|CR|03%   |15|PD|CR|11!   |03(|11S|03) |15Use ANSI  |07(|15T|07/|15F|07)|15 : ");
         
     value[PROMPT_USER_FIELD_USERNOTE]     = std::make_pair("User Note, Groups, Affiliations, or Tag line", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15User Note   : ");
-    value[PROMPT_USER_FIELD_BACKSPACE]    = std::make_pair("Enable Backspace translation for VT100 terminals", "|CR|03%   |15|PD|CR|11!   |03(|11T|03) |15VT100 BackSpace: ");
+    value[PROMPT_USER_FIELD_BACKSPACE]    = std::make_pair("Enable Backspace translation for VT100 terminals", "|CR|03%   |15|PD|CR|11!   |03(|11T|03) |15VT100 BackSpace |07(|15T|07/|15F|07)|15 : ");
     
     value[PROMPT_USER_FIELD_BIRTHDATE]    = std::make_pair("User Date of Birth", "|CR|03%   |15|PD|CR|11!   |03(|11H|03) |15Birth Date  : ");
-    value[PROMPT_USER_FIELD_WANTED]       = std::make_pair("Pages the sysop when the user logs on", "|CR|03%   |15|PD|CR|11!   |03(|11U|03) |15User Wanted    : ");
+    value[PROMPT_USER_FIELD_WANTED]       = std::make_pair("Pages the sysop when the user logs on", "|CR|03%   |15|PD|CR|11!   |03(|11U|03) |15User Wanted |07(|15T|07/|15F|07)|15 : ");
            
     value[PROMPT_USER_FIELD_FLAGS1]       = std::make_pair("Access Restriction Flags Group 1 - Type Letter to Add/Remove", "|CR|03%   |15|PD|CR|11!   |03(|11I|03) |15User Flags1 : ");
-    value[PROMPT_USER_FIELD_CLEARSCREEN]  = std::make_pair("Clears User Screen when 'True', Otherwise scrolls when 'False'", "|CR|03%   |15|PD|CR|11!   |03(|11V|03) |15Clear or Scroll: ");
+    value[PROMPT_USER_FIELD_CLEARSCREEN]  = std::make_pair("Clears User Screen when 'True', Otherwise scrolls when 'False'", "|CR|03%   |15|PD|CR|11!   |03(|11V|03) |15Clear or Scroll |07(|15T|07/|15F|07)|15 : ");
 
     value[PROMPT_USER_FIELD_FLAGS2]       = std::make_pair("Access Restriction Flags Group 2 - Type Letter to Add/Remove", "|CR|03%   |15|PD|CR|11!   |03(|11J|03) |15User Flags2 : ");
-    value[PROMPT_USER_FIELD_SCREENPAUSE]  = std::make_pair("Clears User Screen when 'True', Otherwise scrolls when 'False'", "|CR|03%   |15|PD|CR|11!   |03(|11W|03) |15Screen Pause   : ");
+    value[PROMPT_USER_FIELD_SCREENPAUSE]  = std::make_pair("Clears User Screen when 'True', Otherwise scrolls when 'False'", "|CR|03%   |15|PD|CR|11!   |03(|11W|03) |15Screen Pause  |07(|15T|07/|15F|07)|15 : ");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -226,12 +226,14 @@ void ModUserEditor::setupUserList()
  * @return
  */
 void ModUserEditor::setupUserEditFields() 
-{
-    displayPromptMCI(PROMPT_USER_EDIT_HEADER, std::to_string(m_current_user_id));
-    
+{    
     // Build a list of screen lines for the menu display
     // So we know when to pause in large listing, or use pagenation.
-    std::string user_display_output = displayUserEditScreen();    
+    std::string user_display_output = displayUserEditScreen();   
+    
+    std::string user_count_display = std::to_string(m_current_user_id);
+    user_count_display.append(" |03Record " + std::to_string(m_user_array_position+1) + " of " + std::to_string(m_users_listing.size()));
+    displayPromptMCI(PROMPT_USER_EDIT_HEADER, user_count_display);
     
     if (m_user_display_list.size() == 0) 
     {
@@ -557,11 +559,14 @@ bool ModUserEditor::loadUserById(long user_id)
         return true;
     }
     
-    for (int i = 0; i < m_users_listing.size(); i++)
+    for (unsigned int i = 0; i < m_users_listing.size(); i++)
     {
-        if (m_users_listing[i].iId == user_id)
-        m_loaded_user.push_back(m_users_listing[i]); 
-        return true;
+        if (m_users_listing[i]->iId == user_id)
+        {
+            m_user_array_position = i;
+            m_loaded_user.push_back(m_users_listing[i]); 
+            return true;            
+        }
     }
     
     return false;
@@ -569,62 +574,38 @@ bool ModUserEditor::loadUserById(long user_id)
 
 /**
  * @brief Check if the next user exists in the current listing by Current Id
- * @param user_id
  */
-bool ModUserEditor::nextUserById(long user_id)
+bool ModUserEditor::nextUserById()
 {            
-    for (int i = 0; i < m_users_listing.size(); i++)
+    if (m_user_array_position+1 < m_users_listing.size())
     {
-        if (m_users_listing[i].iId == user_id && i+1 < m_users_listing.size())
-        {
-            if (m_loaded_user.size() > 0)
-                std::vector<user_ptr>().swap(m_loaded_user);
-            m_loaded_user.push_back(m_users_listing[i+1]); 
-            return true;
-        }
+        if (m_loaded_user.size() > 0)
+            std::vector<user_ptr>().swap(m_loaded_user);
+            
+        ++m_user_array_position;
+        m_loaded_user.push_back(m_users_listing[m_user_array_position]);
+        m_current_user_id = m_users_listing[m_user_array_position]->iId;
+        
+        return true;
     }    
     return false;
 }
 
 /**
  * @brief Check if the previous user exists in the current listing by Current Id
- * @param user_id
  */
-bool ModUserEditor::previousUserById(long user_id)
+bool ModUserEditor::previousUserById()
 {            
-    for (int i = 0; i < m_users_listing.size(); i++)
+    if (m_user_array_position > 0)
     {
-        if (m_users_listing[i].iId == user_id && i-1 >= 0)
-        {
-            if (m_loaded_user.size() > 0)
-                std::vector<user_ptr>().swap(m_loaded_user);
-            m_loaded_user.push_back(m_users_listing[i-1]); 
-            return true;
-        }                
+        if (m_loaded_user.size() > 0)
+            std::vector<user_ptr>().swap(m_loaded_user);
+            
+        --m_user_array_position;
+        m_loaded_user.push_back(m_users_listing[m_user_array_position]); 
+        m_current_user_id = m_users_listing[m_user_array_position]->iId;
+        return true;
     }    
-    return false;
-}
-
-/**
- * @brief Check if the user exists in the current listing by String Id
- * @param user_id
- */
-bool ModUserEditor::loadUserById(long user_id)
-{        
-    // If record is already loaded then leave it.
-    if (m_loaded_user.size() > 0)
-    {
-        std::cout << " *** user already loaded!!" << std::endl;
-        return true;
-    }
-    
-    for (int i = 0; i < m_users_listing.size(); i++)
-    {
-        if (m_users_listing[i].iId == user_id)
-        m_loaded_user.push_back(m_users_listing[i]); 
-        return true;
-    }
-    
     return false;
 }
 
@@ -865,19 +846,15 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
 {
     // Provide Hotkeys only for switching to next/previous options
     switch(input[0]) 
-    {
-        
-        // search m_users_listing for previous / next record.
-        
+    {        
+        // search m_users_listing for previous / next record.        
         case '[': // previous user
-            if (m_current_user_id > 0)
-                --m_current_option;
+            previousUserById();
             redisplayModulePrompt();
             return;
                 
-        case ']': // next option
-            if (m_current_option < m_loaded_menu.back()->menu_options.size()-1)
-                ++m_current_option;
+        case ']': // next user
+            nextUserById();
             redisplayModulePrompt();
             return;
     }
@@ -914,9 +891,9 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 
             case 'M': // User Level
                 m_current_field = toupper(key[0]);
-                changeInputModule(MOD_MENU_FIELD);
+                changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_USERLEVEL);
-                m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_menu.back()->iLevel));
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iLevel));
                 break;
         
             case 'B': // User Real Name
@@ -930,94 +907,109 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_FILELEVEL);
-                m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_menu.back()->iFileLevel));
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iFileLevel));
                 break;
                
             case 'C': // User Email
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_EMAIL);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->sEmail);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sEmail);
                 break;
                 
             case 'O': // User Message Level
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_MESGLEVEL);
-                m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_menu.back()->iMessageLevel));
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iMessageLevel));
                 break;
             
             case 'D': // User Address
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_ADDRESS);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->sAddress);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sAddress);
                 break;
                 
             case 'P': // Numkber Hack Attempts
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_HACKATTEMPT);
-                m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_menu.back()->iHackAttempts));
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iHackAttempts));
                 break;
            
             case 'E': // User Location
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_LOCATION);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->sLocation);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sLocation);
                 break;
                 
             case 'R': // Ignore Time Limit
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_NOTIMELIMIT);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(m_loaded_menu.back()->bIgnoreTimeLimit));
+                // Setup pre-population to display only T or F instead of True / False
+                std::string bool_value = "";
+                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bIgnoreTimeLimit).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
-       
+            }
             case 'F': // User Country
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_COUNTRY);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->sCountry);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sCountry);
                 break;
                 
             case 'S': // Use ANSI Graphics
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_USEANSI);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(m_loaded_menu.back()->bAnsi));
+                // Setup pre-population to display only T or F instead of True / False
+                std::string bool_value = "";
+                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bAnsi).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
-
+            }
             case 'G': // User Note
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_USERNOTE);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_menu.back()->sUserNote);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sUserNote);
                 break;
                 
             case 'T': // Use VT100 Backspace
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_BACKSPACE);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(m_loaded_menu.back()->bBackSpaceVt100));
+                // Setup pre-population to display only T or F instead of True / False
+                std::string bool_value = "";
+                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bBackSpaceVt100).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
-            
-            
+            }            
             case 'H': // User Birth Date
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_BIRTHDATE);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.standardDateToString(m_loaded_menu.back()->dtBirthday));
+                m_session_io.getInputField("", key, Config::sName_length, m_common_io.standardDateToString(m_loaded_user.back()->dtBirthday));
                 break;
                 
             case 'U': // User Wanted
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_WANTED);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(m_loaded_menu.back()->bWanted));
+                // Setup pre-population to display only T or F instead of True / False
+                std::string bool_value = "";
+                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bWanted).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
-
+            }
             case 'I': // Access Restriction Flags 1, Type Letter to Add / Remove only.  
                 // No leadoff data, just input single letters to add or remove
                 m_current_field = toupper(key[0]);
@@ -1027,12 +1019,16 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
 
             case 'V': // Clear Screen or Scroll Screen
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_CLEARSCREEN);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(m_loaded_menu.back()->bClearOrScroll));
+                // Setup pre-population to display only T or F instead of True / False
+                std::string bool_value = "";
+                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bClearOrScroll).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
-
+            }
             case 'J': // Access Restriction Flags 2, Type Letter to Add / Remove only.  
                 // No leadoff data, just input single letters to add or remove 
                 m_current_field = toupper(key[0]);
@@ -1042,13 +1038,16 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
 
             case 'W': // Clear Screen or Scroll Screen
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_SCREENPAUSE);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(m_loaded_menu.back()->bDoPause));
-                break;
-        
-                
+                // Setup pre-population to display only T or F instead of True / False
+                std::string bool_value = "";
+                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bDoPause).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                break;        
+            }   
             case 'Q': // Quit
                 //saveMenuChanges();
                 std::vector<user_ptr>().swap(m_loaded_user);
