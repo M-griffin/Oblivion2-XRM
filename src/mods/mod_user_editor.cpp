@@ -13,7 +13,7 @@
  
 /**
  * @brief Handles Updates or Data Input from Client
- * @return bool, not used anymore?!?
+ * @return
  */
 bool ModUserEditor::update(const std::string &character_buffer, const bool &)
 {
@@ -230,6 +230,8 @@ void ModUserEditor::setupUserEditFields()
     // Build a list of screen lines for the menu display
     // So we know when to pause in large listing, or use pagenation.
     std::string user_display_output = displayUserEditScreen();   
+    if (user_display_output.size() == 0)
+        return;
     
     std::string user_count_display = std::to_string(m_current_user_id);
     user_count_display.append(" |03Record " + std::to_string(m_user_array_position+1) + " of " + std::to_string(m_users_listing.size()));
@@ -516,6 +518,7 @@ void ModUserEditor::copyExistingUser(long user_id)
                 security_dao->deleteRecord(securityIndex);
             }
         }
+        ++id;
     }
 }
 
@@ -1135,8 +1138,9 @@ std::string ModUserEditor::displayUserEditScreen()
     if (!loadUserById(m_current_user_id) || m_loaded_user.back()->iId == -1)
     {
         // Error, drop back to User Editor User Listing
-        changeSetupModule(MOD_DISPLAY_USER_LIST);
         std::vector<user_ptr>().swap(m_loaded_user);
+        changeInputModule(MOD_USER_FIELD_INPUT);
+        changeSetupModule(MOD_DISPLAY_USER_LIST);        
         return "";
     }
     

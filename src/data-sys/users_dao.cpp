@@ -547,8 +547,8 @@ std::vector<user_ptr> UsersDao::getUsersByWildcard(std::string filter)
     std::replace( filter.begin(), filter.end(), '*', '%');
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sHandle like %Q like %Q Order By sHandle COLLATE NOCASE;",
-        m_strTableName.c_str(), filter.c_str(), filter.c_str());
+    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sHandle like %Q ORDER BY sHandle COLLATE NOCASE asc;",
+        m_strTableName.c_str(), filter.c_str());
 
     // Execute Query.
     if (qry->getResult(queryString))
