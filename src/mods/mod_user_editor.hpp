@@ -47,6 +47,7 @@ public:
         
         m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserList, this));
         m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserEditFields, this));
+        m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserEditExtendedFields, this));
 
         m_mod_functions.push_back(std::bind(&ModUserEditor::userListInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorPausedInput, this, std::placeholders::_1));
@@ -83,7 +84,8 @@ public:
     enum 
     {
         MOD_DISPLAY_USER_LIST   = 0,
-        MOD_DISPLAY_USER_FIELDS = 1
+        MOD_DISPLAY_USER_FIELDS = 1,
+        MOD_DISPLAY_USER_EXTENDED_FIELDS = 2
     };
 
     // Input Module Index
@@ -223,6 +225,12 @@ public:
     void setupUserEditFields();
 
     /**
+     * @brief Setup for the User Field Editor
+     * @return
+     */
+    void setupUserEditExtendedFields();
+
+    /**
      * Handle Input Commands.
      */
 
@@ -323,7 +331,7 @@ public:
      * @brief User Editor, for Displaying User Extended Fields to Edit
      * @return
      */
-    std::string displayUserEditExtendedScreen();
+    std::string displayUserExtendedEditScreen();
     
     /**
      * @brief Displays the current page of user items

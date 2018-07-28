@@ -121,6 +121,8 @@ void ModUserEditor::createTextPrompts()
     value[PROMPT_USER_FIELD_FLAGS2]       = std::make_pair("Access Restriction Flags Group 2 - Type Letters to Add/Remove/Toggle", "|CR|03%   |15|PD|CR|11!   |03(|11J|03) |15User Flags2 : ");
     value[PROMPT_USER_FIELD_SCREENPAUSE]  = std::make_pair("Clears User Screen when 'True', Otherwise scrolls when 'False'", "|CR|03%   |15|PD|CR|11!   |03(|11W|03) |15Screen Pause  |07(|15T|07/|15F|07)|15 : ");
 
+    value[PROMPT_USER_EDIT_EXTENDED_HEADER] = std::make_pair("User Extended Fields Editor Header |OT User ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11User Extended Editor|15] |03--- |11User ID : |15|OT |CR");
+
     m_text_prompts_dao->writeValue(value);
 }
 
@@ -231,6 +233,33 @@ void ModUserEditor::setupUserEditFields()
     // Build a list of screen lines for the menu display
     // So we know when to pause in large listing, or use pagenation.
     std::string user_display_output = displayUserEditScreen();   
+    if (user_display_output.size() == 0)
+        return;
+    
+    std::string user_count_display = std::to_string(m_current_user_id);
+    user_count_display.append(" |03Record " + std::to_string(m_user_array_position+1) + " of " + std::to_string(m_users_listing.size()));
+    displayPromptMCI(PROMPT_USER_EDIT_EXTENDED_HEADER, user_count_display);
+    
+    if (m_user_display_list.size() == 0) 
+    {
+        // Clear Out list if anything already exists.
+        std::vector<std::string>().swap(m_user_display_list);
+    }
+    
+    m_user_display_list = m_common_io.splitString(user_display_output, '\n');           
+    m_page = 0;        
+    displayCurrentEditPage(PROMPT_USER_FIELD_INPUT_TEXT);
+}
+
+/**
+ * @brief Setup for the User Field Editor
+ * @return
+ */
+void ModUserEditor::setupUserEditExtendedFields() 
+{    
+    // Build a list of screen lines for the menu display
+    // So we know when to pause in large listing, or use pagenation.
+    std::string user_display_output = displayUserExtendedEditScreen();   
     if (user_display_output.size() == 0)
         return;
     
@@ -1379,14 +1408,15 @@ std::string ModUserEditor::displayUserEditScreen()
  * @brief User Editor, for Displaying User Extended Fields to Edit
  * @return
  */
-std::string ModUserEditor::displayUserEditExtendedScreen()
+std::string ModUserEditor::displayUserExtendedEditScreen()
 {
     // Create Menu Pointer then load the menu into it.
     if (!loadUserById(m_current_user_id) || m_loaded_user.back()->iId == -1)
     {
         // Error, drop back to User Editor User Listing
-        changeSetupModule(MOD_DISPLAY_USER_LIST);
         std::vector<user_ptr>().swap(m_loaded_user);
+        changeInputModule(MOD_USER_FIELD_INPUT);
+        changeSetupModule(MOD_DISPLAY_USER_LIST);        
         return "";
     }
     
@@ -1396,6 +1426,44 @@ std::string ModUserEditor::displayUserEditExtendedScreen()
     AccessCondition acs;
     user_ptr usr = m_loaded_user.back();
     
+    /*
+    usr->iNuvVotesNo
+    usr->iNuvVotesYes    
+    usr->sGender
+    
+    usr->dtExpirationDate
+    usr->dtFirstOn
+    usr->dtLastReplyDate
+    usr->dtPassChangeDate
+    
+    usr->sRegColor
+    usr->sInputColor
+    usr->sBoxColor
+    usr->sInverseColor
+    
+    usr->iFilePoints
+    usr->iLastFileArea
+    usr->iLastFileConf
+    
+    usr->iPostCallRatio
+    usr->iLastMessageArea
+    usr->iLastMesConf   
+    
+    usr->iCSPassChange // Control String, force pass change.
+    usr->bAllowPurge   // ? not sure needed. leave for refactoring.        
+    
+    // Not implemented yet, is just an array index.
+    usr->iTimeLimit
+    usr->iTimeLeft
+    
+    usr->sHeaderType
+    usr->sMenuPromptName
+    
+    usr->iStatusSelected
+    usr->iMenuSelected
+    */
+    
+    /*
     result_set.push_back(m_common_io.rightPadding(" |03(|11A|03) |15User Name   : |03" + usr->sHandle, 60) + 
         m_common_io.rightPadding(" |03(|11M|03) |15User Level     : |03" + std::to_string(usr->iLevel), 44));
         
@@ -1416,7 +1484,7 @@ std::string ModUserEditor::displayUserEditExtendedScreen()
         
     result_set.push_back(m_common_io.rightPadding(" |03(|11G|03) |15User Note   : |03" + usr->sUserNote, 60) + 
         m_common_io.rightPadding(" |03(|11T|03) |15VT100 BackSpace: |03" + m_common_io.boolAlpha(usr->bBackSpaceVt100), 44));
-            
+           
     result_set.push_back(m_common_io.rightPadding(" |03(|11H|03) |15Birth Date  : |03" + m_common_io.standardDateToString(usr->dtBirthday), 60) + 
         m_common_io.rightPadding(" |03(|11U|03) |15User Wanted    : |03" + m_common_io.boolAlpha(usr->bWanted), 44));
         
@@ -1433,7 +1501,10 @@ std::string ModUserEditor::displayUserEditExtendedScreen()
     result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
     result_set.push_back(" |03(|11Q|03) |15Quit & Save          " + m_common_io.rightPadding("", 48));
     result_set.push_back(" |03(|11X|03) |15Exit without Saving  " + m_common_io.rightPadding("", 48));
-
+    */
+    
+    result_set.push_back(" |03(|11Q|03) |15Quit & Return          " + m_common_io.rightPadding("", 48));
+    
     // iterate through and print out
     int total_rows = result_set.size();
     total_rows += 2;
@@ -1519,6 +1590,7 @@ std::string ModUserEditor::displayUserEditExtendedScreen()
     
     return (buffer);    
 }
+
 
 /**
  * @brief Displays the current page of user items
