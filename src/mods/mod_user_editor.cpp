@@ -175,6 +175,15 @@ void ModUserEditor::displayPrompt(const std::string &prompt)
 }
 
 /**
+ * @brief Pull and parse and return Display Prompts for use in interfaces
+ * @param prompt
+ */
+std::string ModUserEditor::getDisplayPrompt(const std::string &prompt)
+{
+    return baseGetDisplayPrompt(prompt, m_text_prompts_dao);
+}
+
+/**
  * @brief Pull and Display Prompts with MCI Code
  * @param prompt
  * @param mci_field

@@ -99,7 +99,7 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_MENU_FIELD_PASSWORD]     = std::make_pair("Menu Password (Clear Text right now, will be encrypted lateron)", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15Password           : ");
     value[PROMPT_MENU_FIELD_FALLBACK]     = std::make_pair("Fallback Menu (Example 'MAIN')", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15Fallback Menu      : ");    
     value[PROMPT_MENU_FIELD_HELP_ID]      = std::make_pair("ANSI Help File (Example 'MATRIX' Without extension) Overrides Generic Menu", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15Help ID            : ");
-    value[PROMPT_MENU_FIELD_NAME]         = std::make_pair("Menu Name Displated in Prompts", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Name in Prompt     : ");
+    value[PROMPT_MENU_FIELD_NAME]         = std::make_pair("Menu Name Displayed in Prompts", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Name in Prompt     : ");
     value[PROMPT_MENU_FIELD_PULLDOWN]     = std::make_pair("Pulldown ANSI with extension (Example 'MATRIX.ANS')", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15Pulldown File      : ");
     
     // Menu Option Prompts
@@ -128,6 +128,20 @@ void ModMenuEditor::createTextPrompts()
 
     // Menu commands, some header info for the view toggle.
     value[PROMPT_OPTION_TOGGLE]                  = std::make_pair("Command View Toggle using 'T' cycles though different displays", "|CR|03%   |15|PD|CR|11!   |15Current View : |11|OT |CR");
+    
+    // Display Page for Menu Fields
+    value[DISPLAY_MENU_FIELDS_VERSION_ID]          = std::make_pair("File Version ID", "     |15File Version       : |03");
+    value[DISPLAY_MENU_FIELDS_BORDER_ROW_COLOR]    = std::make_pair("Border Row Color", " |07");
+    value[DISPLAY_MENU_FIELDS_TITLE]               = std::make_pair("Menu Title", " |03(|11A|03) |15Menu Title         : |03");
+    value[DISPLAY_MENU_FIELDS_PASSWORD]            = std::make_pair("Menu Password", " |03(|11B|03) |15Password           : |03");
+    value[DISPLAY_MENU_FIELDS_FALLBACK]            = std::make_pair("Menu Fallback", " |03(|11C|03) |15Fallback Menu      : |03");
+    value[DISPLAY_MENU_FIELDS_HELP_ID]             = std::make_pair("Menu Help ID ANSI", " |03(|11D|03) |15Help ID            : |03");
+    value[DISPLAY_MENU_FIELDS_NAME]                = std::make_pair("Menu Name in Prompt", " |03(|11E|03) |15Name in Prompt     : |03");
+    value[DISPLAY_MENU_FIELDS_PULLDOWN_FILE]       = std::make_pair("Pulldown File", " |03(|11F|03) |15Pulldown File      : |03");
+    value[DISPLAY_MENU_FIELDS_VIEW_GENERIC]        = std::make_pair("View Generic Menu", " |03(|11G|03) |15View Generic Menu    ");
+    value[DISPLAY_MENU_FIELDS_EDIT_OPTIONS]        = std::make_pair("Edit Options", " |03(|11H|03) |15Edit Options         ");    
+    value[DISPLAY_MENU_FIELDS_QUIT_SAVE]           = std::make_pair("Quit and Save", " |03(|11Q|03) |15Quit & Save          ");
+    value[DISPLAY_MENU_FIELDS_QUIT_ABORT]          = std::make_pair("Quit without Save", " |03(|11X|03) |15Exit without Saving  ");
     
     // Dsiplay Page for Option Fields.
     value[DISPLAY_OPT_FIELDS_OPTION_ID]           = std::make_pair("Option ID", "     |15Option ID          : |03");
@@ -1983,19 +1997,19 @@ std::string ModMenuEditor::displayMenuEditScreen()
     // Build a string list of individual menu options, then loop to fit as many per screen!
     std::vector<std::string> result_set;
 
-    result_set.push_back("     |15File Version       : |03" + m_common_io.rightPadding(current_menu->file_version, 48));
-    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(" |03(|11A|03) |15Menu Title         : |03" + m_common_io.rightPadding(current_menu->menu_title, 48));
-    result_set.push_back(" |03(|11B|03) |15Password           : |03" + m_common_io.rightPadding(current_menu->menu_password, 48));    
-    result_set.push_back(" |03(|11C|03) |15Fallback Menu      : |03" + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
-    result_set.push_back(" |03(|11D|03) |15Help ID            : |03" + m_common_io.rightPadding(current_menu->menu_help_file, 48));
-    result_set.push_back(" |03(|11E|03) |15Name in Prompt     : |03" + m_common_io.rightPadding(current_menu->menu_name, 48));
-    result_set.push_back(" |03(|11F|03) |15Pulldown File      : |03" + m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
-    result_set.push_back(" |03(|11G|03) |15View Generic Menu    " + m_common_io.rightPadding("", 48));
-    result_set.push_back(" |03(|11H|03) |15Edit Options         " + m_common_io.rightPadding("", 48));    
-    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(" |03(|11Q|03) |15Quit & Save          " + m_common_io.rightPadding("", 48));
-    result_set.push_back(" |03(|11X|03) |15Exit without Saving  " + m_common_io.rightPadding("", 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_VERSION_ID) + m_common_io.rightPadding(current_menu->file_version, 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_BORDER_ROW_COLOR) + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_TITLE) + m_common_io.rightPadding(current_menu->menu_title, 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_PASSWORD) + m_common_io.rightPadding(current_menu->menu_password, 48));    
+    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_FALLBACK) + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_HELP_ID) + m_common_io.rightPadding(current_menu->menu_help_file, 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_NAME) + m_common_io.rightPadding(current_menu->menu_name, 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_PULLDOWN_FILE) + m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_VIEW_GENERIC) + m_common_io.rightPadding("", 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_EDIT_OPTIONS) + m_common_io.rightPadding("", 48));    
+    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_BORDER_ROW_COLOR) + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_QUIT_SAVE) + m_common_io.rightPadding("", 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_QUIT_ABORT) + m_common_io.rightPadding("", 48));
                 
     // Not in use Yet, seems legacy only does ACS in option commands.
     // option_string.append("Menu ACS           : " + m_common_io.rightPadding(current_menu->menu_acs_string, 35);  

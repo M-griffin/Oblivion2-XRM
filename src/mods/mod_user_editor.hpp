@@ -201,6 +201,12 @@ public:
     void displayPrompt(const std::string &prompt);
     
     /**
+     * @brief Pull and parse and return Display Prompts for use in interfaces
+     * @param prompt
+     */
+    std::string getDisplayPrompt(const std::string &prompt);
+
+    /**
      * @brief Pull and Display Prompts with MCI Code
      * @param prompt
      * @param mci_field
