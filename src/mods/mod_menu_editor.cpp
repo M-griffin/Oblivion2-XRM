@@ -11,7 +11,7 @@
 
 /**
  * @brief Handles Updates or Data Input from Client
- * @return bool, not used anymore?!?
+ * @return
  */
 bool ModMenuEditor::update(const std::string &character_buffer, const bool &)
 {
@@ -130,18 +130,18 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_OPTION_TOGGLE]                  = std::make_pair("Command View Toggle using 'T' cycles though different displays", "|CR|03%   |15|PD|CR|11!   |15Current View : |11|OT |CR");
     
     // Dsiplay Page for Option Fields.
-    value[DISPLAY_OPT_FIELDS_OPTION_ID] = std::make_pair("Option ID", "     |15Option ID          : |03");
-    value[DISPLAY_OPT_FIELDS_BORDER_ROW_COLOR] = std::make_pair("Border Row Color", " |07");
-    value[DISPLAY_OPT_FIELDS_OPTION_NAME] = std::make_pair("Option Name", " |03(|11A|03) |15Option Name        : |03");
-    value[DISPLAY_OPT_FIELDS_OPTION_ACS] = std::make_pair("Access Control String", " |03(|11B|03) |15ACS                : |03");
-    value[DISPLAY_OPT_FIELDS_OPTION_HIDDEN] = std::make_pair("Hidden", " |03(|11C|03) |15Hidden             : |03");
-    value[DISPLAY_OPT_FIELDS_OPTION_CMD_KEYS] = std::make_pair("Command Keys", " |03(|11D|03) |15Command Keys       : |03");
-    value[DISPLAY_OPT_FIELDS_OPTION_MENU_KEY] = std::make_pair("Menu Key", " |03(|11E|03) |15Keys               : |03");
-    value[DISPLAY_OPT_FIELDS_OPTION_CMD_STRING] = std::make_pair("Command String", " |03(|11F|03) |15Command String     : |03");
-    value[DISPLAY_OPT_FIELDS_OPTION_PULLDOWN_ID] = std::make_pair("Pulldown ID", " |03(|11G|03) |15Pulldown ID        : |03");
+    value[DISPLAY_OPT_FIELDS_OPTION_ID]           = std::make_pair("Option ID", "     |15Option ID          : |03");
+    value[DISPLAY_OPT_FIELDS_BORDER_ROW_COLOR]    = std::make_pair("Border Row Color", " |07");
+    value[DISPLAY_OPT_FIELDS_OPTION_NAME]         = std::make_pair("Option Name", " |03(|11A|03) |15Option Name        : |03");
+    value[DISPLAY_OPT_FIELDS_OPTION_ACS]          = std::make_pair("Access Control String", " |03(|11B|03) |15ACS                : |03");
+    value[DISPLAY_OPT_FIELDS_OPTION_HIDDEN]       = std::make_pair("Hidden", " |03(|11C|03) |15Hidden             : |03");
+    value[DISPLAY_OPT_FIELDS_OPTION_CMD_KEYS]     = std::make_pair("Command Keys", " |03(|11D|03) |15Command Keys       : |03");
+    value[DISPLAY_OPT_FIELDS_OPTION_MENU_KEY]     = std::make_pair("Menu Key", " |03(|11E|03) |15Keys               : |03");
+    value[DISPLAY_OPT_FIELDS_OPTION_CMD_STRING]   = std::make_pair("Command String", " |03(|11F|03) |15Command String     : |03");
+    value[DISPLAY_OPT_FIELDS_OPTION_PULLDOWN_ID]  = std::make_pair("Pulldown ID", " |03(|11G|03) |15Pulldown ID        : |03");
     value[DISPLAY_OPT_FIELDS_OPTION_PREVIOUS_OPT] = std::make_pair("Previous Option", " |03(|11[|03) |15Previous Option      ");
-    value[DISPLAY_OPT_FIELDS_OPTION_NEXT_OPT] = std::make_pair("Next Option", " |03(|11]|03) |15Next Option          ");
-    value[DISPLAY_OPT_FIELDS_OPTION_QUIT] = std::make_pair("Quit", " |03(|11Q|03) |15Quit                 ");
+    value[DISPLAY_OPT_FIELDS_OPTION_NEXT_OPT]     = std::make_pair("Next Option", " |03(|11]|03) |15Next Option          ");
+    value[DISPLAY_OPT_FIELDS_OPTION_QUIT]         = std::make_pair("Quit", " |03(|11Q|03) |15Quit                 ");
 
     m_text_prompts_dao->writeValue(value);
 }
