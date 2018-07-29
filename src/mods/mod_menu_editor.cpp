@@ -118,7 +118,7 @@ void ModMenuEditor::createTextPrompts()
 
     // NOTE, added |PD will display the prompt description as HELP text to the user 
     // Usefull when editing fields - Specific to XRM.    
-    value[PROMPT_MENU_OPTION_FIELD_NAME]         = std::make_pair("Name Displated in an ANSI screen", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Option Name        : ");    
+    value[PROMPT_MENU_OPTION_FIELD_NAME]         = std::make_pair("Name Displayed in an ANSI screen", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Option Name        : ");    
     value[PROMPT_MENU_OPTION_FIELD_ACS]          = std::make_pair("Access Control String - Setting security and flags", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15ACS                : ");
     value[PROMPT_MENU_OPTION_FIELD_HIDDEN]       = std::make_pair("Hidden Option, Exclude from ANSI screen", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15Hidden       |07(|15T|07/|15F|07)|15 : ");
     value[PROMPT_MENU_OPTION_FIELD_CMD_KEY]      = std::make_pair("Executes a specific menu function (Example '-/' to change menu)", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15Command Keys       : ");

@@ -95,6 +95,33 @@ public:
     {
         return m_session_io.pipeColors(m_config->default_color_inverse);
     }
+    
+    /**
+     * @brief Gets the Default Box Color Sequence
+     * @return 
+     */
+    std::string baseGetDefaultBoxColor() 
+    {
+        return m_session_io.pipeColors(m_config->default_color_box);
+    }
+    
+    /**
+     * @brief Gets the Default Prompt Color Sequence
+     * @return 
+     */
+    std::string baseGetDefaultPromptColor() 
+    {
+        return m_session_io.pipeColors(m_config->default_color_prompt);
+    }
+
+    /**
+     * @brief Gets the Default Stat Color Sequence
+     * @return 
+     */
+    std::string baseGetDefaultStatColor() 
+    {
+        return m_session_io.pipeColors(m_config->default_color_stat);
+    }
 
     /**
      * @brief Method for Adding outgoing text data to ansi processor
