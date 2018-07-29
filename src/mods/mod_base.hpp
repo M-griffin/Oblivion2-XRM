@@ -171,6 +171,36 @@ public:
     }
     
     /**
+     * @brief Pull and Display Prompts
+     * @param prompt
+     */
+    std::string baseGetDisplayPrompt(const std::string &prompt, text_prompts_dao_ptr m_text_dao)
+    {
+        // Set Default String Color, Can be overridden with pipe colors in text prompt.
+        std::string result = baseGetDefaultColor();
+        
+        // Parse Prompt for Input Color And Position Override.
+        // If found, the colors of the MCI Codes should be used as the default color.
+        M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
+        std::string::size_type idx = prompt_set.second.find("%IN", 0);
+        
+        result += std::move(m_session_io.parseTextPrompt(prompt_set));
+        
+        // Not found, set default input color
+        if (idx == std::string::npos) 
+        {
+            result += baseGetDefaultInputColor();        
+        }
+        else
+        {
+            // Testing.
+            std::cout << " *** Detected %IN in prompt string!" << std::endl;
+        }
+
+        return result;
+    }
+    
+    /**
      * @brief Pull and Display Prompts, Replace MCI Code |OT
      * @param prompt
      */

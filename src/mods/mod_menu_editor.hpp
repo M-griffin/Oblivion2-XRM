@@ -205,7 +205,22 @@ public:
     const std::string PROMPT_MENU_OPTION_FIELD_CMD_STRING = "option_field_cmd_string";
     const std::string PROMPT_MENU_OPTION_FIELD_PULLDOWN = "option_field_pulldown_id";
 
+    // Dsiplay Page for Option Fields.
     const std::string PROMPT_OPTION_TOGGLE = "option_toggle_view_display";
+    
+    // Option Field Diplay For screen 
+    const std::string DISPLAY_OPT_FIELDS_OPTION_ID = "display_option_field_option_id";
+    const std::string DISPLAY_OPT_FIELDS_BORDER_ROW_COLOR = "display_option_field_row_color";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_NAME = "display_option_field_option_name";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_ACS = "display_option_field_option_acs";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_HIDDEN = "display_option_field_option_hidden";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_CMD_KEYS = "display_option_field_option_cmd_keys";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_MENU_KEY = "display_option_field_option_menu_key";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_CMD_STRING = "display_option_field_option_cmd_string";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_PULLDOWN_ID = "display_option_field_option_pulldown_id";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_PREVIOUS_OPT = "display_option_field_option_previous_opt";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_NEXT_OPT = "display_option_field_option_next_opt";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_QUIT = "display_option_field_option_next_quit";
 
     /**
      * @brief Create Default Text Prompts for module
@@ -248,6 +263,12 @@ public:
      * @param prompt
      */
     void displayPrompt(const std::string &prompt);
+
+    /**
+     * @brief Pull and parse and return Display Prompts for use in interfaces
+     * @param prompt
+     */
+    std::string getDisplayPrompt(const std::string &prompt);
 
     /**
      * @brief Pull and Display Prompts with MCI Code

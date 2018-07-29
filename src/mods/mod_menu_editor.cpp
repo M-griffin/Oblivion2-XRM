@@ -129,6 +129,20 @@ void ModMenuEditor::createTextPrompts()
     // Menu commands, some header info for the view toggle.
     value[PROMPT_OPTION_TOGGLE]                  = std::make_pair("Command View Toggle using 'T' cycles though different displays", "|CR|03%   |15|PD|CR|11!   |15Current View : |11|OT |CR");
     
+    // Dsiplay Page for Option Fields.
+    value[DISPLAY_OPT_FIELDS_OPTION_ID] = std::make_pair("Option ID", "     |15Option ID          : |03");
+    value[DISPLAY_OPT_FIELDS_BORDER_ROW_COLOR] = std::make_pair("Border Row Color", " |07");
+    value[DISPLAY_OPT_FIELDS_OPTION_NAME] = std::make_pair("Option Name", " |03(|11A|03) |15Option Name        : |03");
+    value[DISPLAY_OPT_FIELDS_OPTION_ACS] = std::make_pair("Access Control String", " |03(|11B|03) |15ACS                : |03");
+    value[DISPLAY_OPT_FIELDS_OPTION_HIDDEN] = std::make_pair("Hidden", " |03(|11C|03) |15Hidden             : |03");
+    value[DISPLAY_OPT_FIELDS_OPTION_CMD_KEYS] = std::make_pair("Command Keys", " |03(|11D|03) |15Command Keys       : |03");
+    value[DISPLAY_OPT_FIELDS_OPTION_MENU_KEY] = std::make_pair("Menu Key", " |03(|11E|03) |15Keys               : |03");
+    value[DISPLAY_OPT_FIELDS_OPTION_CMD_STRING] = std::make_pair("Command String", " |03(|11F|03) |15Command String     : |03");
+    value[DISPLAY_OPT_FIELDS_OPTION_PULLDOWN_ID] = std::make_pair("Pulldown ID", " |03(|11G|03) |15Pulldown ID        : |03");
+    value[DISPLAY_OPT_FIELDS_OPTION_PREVIOUS_OPT] = std::make_pair("Previous Option", " |03(|11[|03) |15Previous Option      ");
+    value[DISPLAY_OPT_FIELDS_OPTION_NEXT_OPT] = std::make_pair("Next Option", " |03(|11]|03) |15Next Option          ");
+    value[DISPLAY_OPT_FIELDS_OPTION_QUIT] = std::make_pair("Quit", " |03(|11Q|03) |15Quit                 ");
+
     m_text_prompts_dao->writeValue(value);
 }
 
@@ -190,6 +204,15 @@ void ModMenuEditor::toggleNextOptionView()
 void ModMenuEditor::displayPrompt(const std::string &prompt)
 {
     baseDisplayPrompt(prompt, m_text_prompts_dao);
+}
+
+/**
+ * @brief Pull and parse and return Display Prompts for use in interfaces
+ * @param prompt
+ */
+std::string ModMenuEditor::getDisplayPrompt(const std::string &prompt)
+{
+    return baseGetDisplayPrompt(prompt, m_text_prompts_dao);
 }
 
 /**
@@ -2079,19 +2102,19 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
     // Setup a current ID out of Total Id's display.
     std::string option_string = std::to_string(opt.index) + " / " + std::to_string(m_loaded_menu.back()->menu_options.size()-1);
     
-    result_set.push_back("     |15Option ID          : |03" + m_common_io.rightPadding(option_string, 48));
-    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(" |03(|11A|03) |15Option Name        : |03" + m_common_io.rightPadding(opt.name, 48));
-    result_set.push_back(" |03(|11B|03) |15ACS                : |03" + m_common_io.rightPadding(opt.acs_string, 48));    
-    result_set.push_back(" |03(|11C|03) |15Hidden             : |03" + m_common_io.rightPadding(m_common_io.boolAlpha(opt.hidden), 48));
-    result_set.push_back(" |03(|11D|03) |15Command Keys       : |03" + m_common_io.rightPadding(opt.command_key, 48));
-    result_set.push_back(" |03(|11E|03) |15Keys               : |03" + m_common_io.rightPadding(opt.menu_key, 48));
-    result_set.push_back(" |03(|11F|03) |15Command String     : |03" + m_common_io.rightPadding(opt.command_string, 48));
-    result_set.push_back(" |03(|11G|03) |15Pulldown ID        : |03" + m_common_io.rightPadding(std::to_string(opt.pulldown_id), 48));
-    result_set.push_back(" |03(|11[|03) |15Previous Option      " + m_common_io.rightPadding("", 48));
-    result_set.push_back(" |03(|11]|03) |15Next Option          " + m_common_io.rightPadding("", 48));    
-    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(" |03(|11Q|03) |15Quit                 " + m_common_io.rightPadding("", 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_ID) + m_common_io.rightPadding(option_string, 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_BORDER_ROW_COLOR) + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_NAME) + m_common_io.rightPadding(opt.name, 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_ACS) + m_common_io.rightPadding(opt.acs_string, 48));    
+    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_HIDDEN) + m_common_io.rightPadding(m_common_io.boolAlpha(opt.hidden), 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_CMD_KEYS) + m_common_io.rightPadding(opt.command_key, 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_MENU_KEY) + m_common_io.rightPadding(opt.menu_key, 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_CMD_STRING) + m_common_io.rightPadding(opt.command_string, 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_PULLDOWN_ID) + m_common_io.rightPadding(std::to_string(opt.pulldown_id), 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_PREVIOUS_OPT) + m_common_io.rightPadding("", 48));
+    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_NEXT_OPT) + m_common_io.rightPadding("", 48));    
+    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_BORDER_ROW_COLOR) + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_QUIT) + m_common_io.rightPadding("", 48));                    
                 
     // Not in use Yet, seems legacy only does ACS in option commands.
     // option_string.append("Form Value         : " + m_common_io.rightPadding(opt.form_value, 48));
