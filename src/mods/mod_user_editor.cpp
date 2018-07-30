@@ -122,6 +122,8 @@ void ModUserEditor::createTextPrompts()
     value[PROMPT_USER_FIELD_SCREENPAUSE]  = std::make_pair("Clears User Screen when 'True', Otherwise scrolls when 'False'", "|CR|03%   |15|PD|CR|11!   |03(|11W|03) |15Screen Pause  |07(|15T|07/|15F|07)|15 : ");
 
     value[PROMPT_USER_EDIT_EXTENDED_HEADER] = std::make_pair("User Extended Fields Editor Header |OT User ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11User Extended Editor|15] |03--- |11User ID : |15|OT |CR");
+    value[PROMPT_USER_EXTENDED_FIELD_INPUT_TEXT] = std::make_pair("User Editor Extended Command", "|CR|15User Extended Editor C|07om|08mand |15: |07");
+
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -286,7 +288,7 @@ void ModUserEditor::setupUserEditExtendedFields()
     
     m_user_display_list = m_common_io.splitString(user_display_output, '\n');           
     m_page = 0;        
-    displayCurrentEditPage(PROMPT_USER_FIELD_INPUT_TEXT);
+    displayCurrentEditPage(PROMPT_USER_EXTENDED_FIELD_INPUT_TEXT);
 }
 
 /**
@@ -1113,6 +1115,11 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 changeSetupModule(MOD_DISPLAY_USER_LIST);                
                 return;
                 
+            case '-': // Extended User Information
+                changeInputModule(MOD_USER_EXTENDED_FIELD_INPUT);
+                changeSetupModule(MOD_DISPLAY_USER_EXTENDED_FIELDS);
+                break;
+            
             default:
                 redisplayModulePrompt();
                 break;
@@ -1128,6 +1135,72 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
         }
     }
 }   
+
+/**
+ * @brief Handles User Extended Field Editor Command Selection
+ * @param input
+ */
+void ModUserEditor::userEditorExtendedInput(const std::string &input)
+{    
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+
+    // ESC was hit
+    if(result == "aborted") 
+    {
+        std::cout << "aborted!" << std::endl;
+        return;
+    }
+    else if(result[0] == '\n')
+    {            
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            // Return and don't do anything.
+            return;
+        }
+                
+        baseProcessDeliverNewLine();
+        
+        std::string output_buffer = m_config->default_color_regular;
+        switch (toupper(key[0]))
+        {
+            case 'A': // User Name
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_USERNAME);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sHandle);
+                break;
+                
+            case 'M': // User Level
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_USERLEVEL);
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iLevel));
+                break;
+        
+              
+            case 'Q': // Quit
+                // Return to previous screen
+                changeInputModule(MOD_USER_FIELD_INPUT);
+                changeSetupModule(MOD_DISPLAY_USER_FIELDS);                
+                return;
+                                            
+            default:
+                redisplayModulePrompt();
+                break;
+        }
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty") 
+        {
+            baseProcessDeliverInput(result);
+        }
+    }
+}
 
 /**
  * @brief Handles Field Updates for User Data
@@ -1270,6 +1343,148 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
 }
 
 /**
+ * @brief Handles Extended Field Updates for User Data
+ * @param input
+ */
+void ModUserEditor::userEditorExtendedFieldHandler(const std::string &input)
+{
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
+
+    // ESC was hit
+    if(result == "aborted") 
+    {
+        std::cout << "aborted!" << std::endl;
+        changeInputModule(MOD_USER_FIELD_INPUT);
+        changeSetupModule(MOD_DISPLAY_USER_FIELDS);
+        return;
+    }
+    else if(result[0] == '\n')
+    {            
+        baseProcessDeliverNewLine();
+
+        // Handle the assigned input received for field
+        switch(m_current_field)
+        {
+            /*
+            case 'A': // User Name
+                m_loaded_user.back()->sHandle = key;
+                break;                     
+                
+            case 'M': // User Level
+                m_loaded_user.back()->iLevel = m_common_io.stringToInt(key);
+                break;
+        
+            case 'B': // User Real Name
+                m_loaded_user.back()->sRealName = key;
+                break;
+            
+            case 'N': // User File Level
+                m_loaded_user.back()->iFileLevel = m_common_io.stringToInt(key);
+                break;
+               
+            case 'C': // User Email
+                m_loaded_user.back()->sEmail = key;
+                break;
+                
+            case 'O': // User Message Level                
+                m_loaded_user.back()->iMessageLevel = m_common_io.stringToInt(key);
+                break;
+            
+            case 'D': // User Address
+                m_loaded_user.back()->sAddress = key;
+                break;
+                
+            case 'P': // Numkber Hack Attempts
+                m_loaded_user.back()->iHackAttempts = m_common_io.stringToInt(key);
+                break;
+           
+            case 'E': // User Location
+                m_loaded_user.back()->sLocation = key;
+                break;
+                
+            case 'R': // Ignore Time Limit                
+                if (m_common_io.stringToBool(key) != -1)
+                    m_loaded_user.back()->bIgnoreTimeLimit = m_common_io.stringToBool(key);
+                break;
+
+            case 'F': // User Country
+                m_loaded_user.back()->sCountry = key;
+                break;
+                
+            case 'S': // Use ANSI Graphics
+                if (m_common_io.stringToBool(key) != -1)
+                    m_loaded_user.back()->bAnsi = m_common_io.stringToBool(key);
+                break;
+
+            case 'G': // User Note
+                m_loaded_user.back()->sUserNote = key;
+                break;
+                
+            case 'T': // Use VT100 Backspace
+                if (m_common_io.stringToBool(key) != -1)
+                    m_loaded_user.back()->bBackSpaceVt100 = m_common_io.stringToBool(key);
+                break;
+
+            case 'H': // User Birth Date
+            {
+                // Make sure Date Format is valid
+                std::regex date_regex { m_config->regexp_date_validation };
+                std::smatch str_matches;
+
+                // If invalid display message, but for now ignore changes
+                if(std::regex_match(key, str_matches, date_regex))
+                {
+                    m_loaded_user.back()->dtBirthday = m_common_io.stringToStandardDate(key);
+                }
+                break;
+            }    
+            case 'U': // User Wanted
+                if (m_common_io.stringToBool(key) != -1)
+                    m_loaded_user.back()->bWanted = m_common_io.stringToBool(key);
+                break;
+
+            case 'I': // Access Restriction Flags 1, Will loop though and toggle each letter.
+            {
+                AccessCondition acs;
+                for (char c : key)
+                    acs.setFlagToggle(c, true, m_loaded_user.back());
+                break;
+            }
+            case 'V': // Clear Screen or Scroll Screen
+                if (m_common_io.stringToBool(key) != -1)
+                    m_loaded_user.back()->bClearOrScroll = m_common_io.stringToBool(key);
+                break;
+
+            case 'J': // Access Restriction Flags 2, Type Letter to Add / Remove only.  
+            {
+                AccessCondition acs;
+                for (char c : key)
+                    acs.setFlagToggle(c, false, m_loaded_user.back());
+                break;
+            }
+            case 'W': // Pause
+                if (m_common_io.stringToBool(key) != -1)
+                    m_loaded_user.back()->bDoPause = m_common_io.stringToBool(key);
+                break;  
+            */                                       
+        }
+                
+        changeInputModule(MOD_USER_FIELD_INPUT);
+        changeSetupModule(MOD_DISPLAY_USER_FIELDS);
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if (result != "empty") 
+        {
+            baseProcessDeliverInput(result);
+        }
+    }
+}
+
+/**
  * @brief User Editor, for Displaying User Fields to Edit
  * @return
  */
@@ -1291,35 +1506,35 @@ std::string ModUserEditor::displayUserEditScreen()
     AccessCondition acs;
     user_ptr usr = m_loaded_user.back();
     
-    result_set.push_back(m_common_io.rightPadding(" |03(|11A|03) |15User Name   : |03" + usr->sHandle, 60) + 
-        m_common_io.rightPadding(" |03(|11M|03) |15User Level     : |03" + std::to_string(usr->iLevel), 44));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11A|03) |15User Name   : " + baseGetDefaultStatColor() + usr->sHandle, 64) + 
+        m_common_io.rightPadding(" |03(|11M|03) |15User Level     : " + baseGetDefaultStatColor() + std::to_string(usr->iLevel), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11B|03) |15Real Name   : |03" + usr->sRealName, 60) + 
-        m_common_io.rightPadding(" |03(|11N|03) |15File Level     : |03" + std::to_string(usr->iFileLevel), 44));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11B|03) |15Real Name   : " + baseGetDefaultStatColor() + usr->sRealName, 64) + 
+        m_common_io.rightPadding(" |03(|11N|03) |15File Level     : " + baseGetDefaultStatColor() + std::to_string(usr->iFileLevel), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11C|03) |15Eamil       : |03" + usr->sEmail, 60) + 
-        m_common_io.rightPadding(" |03(|11O|03) |15Mesg Level     : |03" + std::to_string(usr->iMessageLevel), 44));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11C|03) |15Eamil       : " + baseGetDefaultStatColor() + usr->sEmail, 64) + 
+        m_common_io.rightPadding(" |03(|11O|03) |15Mesg Level     : " + baseGetDefaultStatColor() + std::to_string(usr->iMessageLevel), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11D|03) |15Address     : |03" + usr->sAddress, 60) + 
-        m_common_io.rightPadding(" |03(|11P|03) |15Hack Attempts  : |03" + std::to_string(usr->iHackAttempts), 44));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11D|03) |15Address     : " + baseGetDefaultStatColor() + usr->sAddress, 64) + 
+        m_common_io.rightPadding(" |03(|11P|03) |15Hack Attempts  : " + baseGetDefaultStatColor() + std::to_string(usr->iHackAttempts), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11E|03) |15Location    : |03" + usr->sLocation, 60) + 
-        m_common_io.rightPadding(" |03(|11R|03) |15No Time Limit  : |03" + m_common_io.boolAlpha(usr->bIgnoreTimeLimit), 44));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11E|03) |15Location    : " + baseGetDefaultStatColor() + usr->sLocation, 64) + 
+        m_common_io.rightPadding(" |03(|11R|03) |15No Time Limit  : " + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bIgnoreTimeLimit), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11F|03) |15Country     : |03" + usr->sCountry, 60) + 
-        m_common_io.rightPadding(" |03(|11S|03) |15Use ANSI       : |03" + m_common_io.boolAlpha(usr->bAnsi), 44));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11F|03) |15Country     : " + baseGetDefaultStatColor() + usr->sCountry, 64) + 
+        m_common_io.rightPadding(" |03(|11S|03) |15Use ANSI       : " + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bAnsi), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11G|03) |15User Note   : |03" + usr->sUserNote, 60) + 
-        m_common_io.rightPadding(" |03(|11T|03) |15VT100 BackSpace: |03" + m_common_io.boolAlpha(usr->bBackSpaceVt100), 44));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11G|03) |15User Note   : " + baseGetDefaultStatColor() + usr->sUserNote, 64) + 
+        m_common_io.rightPadding(" |03(|11T|03) |15VT100 BackSpace: " + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bBackSpaceVt100), 48));
            
-    result_set.push_back(m_common_io.rightPadding(" |03(|11H|03) |15Birth Date  : |03" + m_common_io.standardDateToString(usr->dtBirthday), 60) + 
-        m_common_io.rightPadding(" |03(|11U|03) |15User Wanted    : |03" + m_common_io.boolAlpha(usr->bWanted), 44));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11H|03) |15Birth Date  : " + baseGetDefaultStatColor() + m_common_io.standardDateToString(usr->dtBirthday), 64) + 
+        m_common_io.rightPadding(" |03(|11U|03) |15User Wanted    : " + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bWanted), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11I|03) |15User Flags1 : |03" + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags1), 60) +
-        m_common_io.rightPadding(" |03(|11V|03) |15Clear or Scroll: |03" + m_common_io.boolAlpha(usr->bClearOrScroll), 44));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11I|03) |15User Flags1 : " + baseGetDefaultStatColor() + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags1), 64) +
+        m_common_io.rightPadding(" |03(|11V|03) |15Clear or Scroll: " + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bClearOrScroll), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11J|03) |15User Flags2 : |03" + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags2), 60) +
-        m_common_io.rightPadding(" |03(|11W|03) |15Screen Pause   : |03" + m_common_io.boolAlpha(usr->bDoPause), 44));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11J|03) |15User Flags2 : " + baseGetDefaultStatColor() + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags2), 64) +
+        m_common_io.rightPadding(" |03(|11W|03) |15Screen Pause   : " + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bDoPause), 48));
                         
     result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
     result_set.push_back(" |03(|11-|03) |15Extended User Details" + m_common_io.rightPadding("", 48));
@@ -1437,87 +1652,43 @@ std::string ModUserEditor::displayUserExtendedEditScreen()
     AccessCondition acs;
     user_ptr usr = m_loaded_user.back();
         
-    /*
-    usr->iNuvVotesNo
-    usr->iNuvVotesYes   
+    // Transform Gender to UpperCase
+    std::string gender_string = usr->sGender;
+    baseTransformToUpper(gender_string);
     
-    usr->iSecurityIndex // password
-    usr->sGender
-    
-    usr->dtExpirationDate
-    usr->dtFirstOn
-    usr->dtLastReplyDate
-    usr->dtPassChangeDate
-    
-    usr->sRegColor
-    usr->sInputColor
-    usr->sBoxColor
-    usr->sInverseColor
-    
-    usr->iFilePoints
-    usr->iLastFileArea
-    usr->iLastFileConf
-    
-    usr->iPostCallRatio
-    usr->iLastMessageArea
-    usr->iLastMesConf   
-    
-    usr->iCSPassChange // Control String, force pass change.
-    usr->bAllowPurge   // ? not sure needed. leave for refactoring.        
-    
-    // Not implemented yet, is just an array index.
-    usr->iTimeLimit
-    usr->iTimeLeft
-    
-    usr->sHeaderType
-    usr->sMenuPromptName
-    
-    usr->iStatusSelected
-    usr->iMenuSelected
-    */
-    
-    /*
-    result_set.push_back(m_common_io.rightPadding(" |03(|11A|03) |15User Name   : |03" + usr->sHandle, 60) + 
-        m_common_io.rightPadding(" |03(|11M|03) |15User Level     : |03" + std::to_string(usr->iLevel), 44));
+    // Initial Configuration fields, not all interfaces are implemented so some things 
+    // will be left off for now.
+    result_set.push_back(m_common_io.rightPadding(" |03(|11A|03) |15Password         : " + baseGetDefaultStatColor() + "****** Masked ", 64) + 
+        m_common_io.rightPadding(" |03(|11M|03) |15User Gender    : " + baseGetDefaultStatColor() + gender_string, 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11B|03) |15Real Name   : |03" + usr->sRealName, 60) + 
-        m_common_io.rightPadding(" |03(|11N|03) |15File Level     : |03" + std::to_string(usr->iFileLevel), 44));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11B|03) |15Pass Change Date : " + baseGetDefaultStatColor() + m_common_io.standardDateToString(usr->dtPassChangeDate), 64) + 
+        m_common_io.rightPadding(" |03(|11N|03) |15Force Pass Chng: " + baseGetDefaultStatColor() + std::to_string(usr->iCSPassChange), 48));
+               
+    result_set.push_back(m_common_io.rightPadding(" |03(|11C|03) |15First On Date    : " + baseGetDefaultStatColor() + m_common_io.standardDateToString(usr->dtFirstOn), 64) + 
+        m_common_io.rightPadding(" |03(|11O|03) |15File Points    : " + baseGetDefaultStatColor() + std::to_string(usr->iFilePoints), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11C|03) |15Eamil       : |03" + usr->sEmail, 60) + 
-        m_common_io.rightPadding(" |03(|11O|03) |15Mesg Level     : |03" + std::to_string(usr->iMessageLevel), 44));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11D|03) |15Expiration Date  : " + baseGetDefaultStatColor() + m_common_io.standardDateToString(usr->dtExpirationDate), 64) + 
+        m_common_io.rightPadding(" |03(|11P|03) |15Post Call Ratio: " + baseGetDefaultStatColor() + std::to_string(usr->iPostCallRatio), 48));
+    
+    result_set.push_back(m_common_io.rightPadding(" |03(|11E|03) |15Daily Time Limit : " + baseGetDefaultStatColor() + std::to_string(usr->iTimeLimit), 64) + 
+        m_common_io.rightPadding(" |03(|11Q|03) |15Time Left Today: " + baseGetDefaultStatColor() + std::to_string(usr->iTimeLeft), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11D|03) |15Address     : |03" + usr->sAddress, 60) + 
-        m_common_io.rightPadding(" |03(|11P|03) |15Hack Attempts  : |03" + std::to_string(usr->iHackAttempts), 44));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11F|03) |15NUV Yes Votes    : " + baseGetDefaultStatColor() + std::to_string(usr->iNuvVotesYes), 64) + 
+        m_common_io.rightPadding(" |03(|11R|03) |15NUV No Votes   : " + baseGetDefaultStatColor() + std::to_string(usr->iNuvVotesNo), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11E|03) |15Location    : |03" + usr->sLocation, 60) + 
-        m_common_io.rightPadding(" |03(|11R|03) |15No Time Limit  : |03" + m_common_io.boolAlpha(usr->bIgnoreTimeLimit), 44));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11F|03) |15Country     : |03" + usr->sCountry, 60) + 
-        m_common_io.rightPadding(" |03(|11S|03) |15Use ANSI       : |03" + m_common_io.boolAlpha(usr->bAnsi), 44));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11G|03) |15Regular Color    : " + usr->sRegColor + "***", 60) + 
+        m_common_io.rightPadding(" |03(|11S|03) |15Input Color    : " + usr->sInputColor + "***", 44));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11G|03) |15User Note   : |03" + usr->sUserNote, 60) + 
-        m_common_io.rightPadding(" |03(|11T|03) |15VT100 BackSpace: |03" + m_common_io.boolAlpha(usr->bBackSpaceVt100), 44));
-           
-    result_set.push_back(m_common_io.rightPadding(" |03(|11H|03) |15Birth Date  : |03" + m_common_io.standardDateToString(usr->dtBirthday), 60) + 
-        m_common_io.rightPadding(" |03(|11U|03) |15User Wanted    : |03" + m_common_io.boolAlpha(usr->bWanted), 44));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11H|03) |15Prompt Color     : " + usr->sPromptColor + "***", 60) + 
+        m_common_io.rightPadding(" |03(|11T|03) |15Box Color      : " + usr->sBoxColor + "***", 44));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11I|03) |15User Flags1 : |03" + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags1), 60) +
-        m_common_io.rightPadding(" |03(|11V|03) |15Clear or Scroll: |03" + m_common_io.boolAlpha(usr->bClearOrScroll), 44));
+    result_set.push_back(m_common_io.rightPadding(" |03(|11I|03) |15Status Color     : " + usr->sStatColor + "***", 60) + 
+        m_common_io.rightPadding(" |03(|11U|03) |15Inverse Color  : " + usr->sInverseColor + "***|16" , 47));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11J|03) |15User Flags2 : |03" + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags2), 60) +
-        m_common_io.rightPadding(" |03(|11W|03) |15Screen Pause   : |03" + m_common_io.boolAlpha(usr->bDoPause), 44));
-                        
     result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(" |03(|11-|03) |15Extended User Details" + m_common_io.rightPadding("", 48));
-    result_set.push_back(" |03(|11[|03) |15Previous User        " + m_common_io.rightPadding("", 48));
-    result_set.push_back(" |03(|11]|03) |15Next User            " + m_common_io.rightPadding("", 48));    
-    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(" |03(|11Q|03) |15Quit & Save          " + m_common_io.rightPadding("", 48));
-    result_set.push_back(" |03(|11X|03) |15Exit without Saving  " + m_common_io.rightPadding("", 48));
-    */
-    
-    result_set.push_back(" |03(|11Q|03) |15Quit & Return          " + m_common_io.rightPadding("", 48));
-    
+    result_set.push_back(" |03(|11Q|03) |15Quit & Return        " + m_common_io.rightPadding("", 48));
+      
     // iterate through and print out
     int total_rows = result_set.size();
     total_rows += 2;
@@ -1624,6 +1795,10 @@ void ModUserEditor::displayCurrentEditPage(const std::string &input_state)
     {
         case MOD_DISPLAY_USER_FIELDS:
             current_module_input = MOD_USER_FIELD_INPUT;
+            break;  
+            
+        case MOD_DISPLAY_USER_EXTENDED_FIELDS:
+            current_module_input = MOD_USER_EXTENDED_FIELD_INPUT;
             break;  
 
         default:

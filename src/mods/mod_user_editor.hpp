@@ -55,6 +55,10 @@ public:
         
         m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorFieldInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorFieldHandler, this, std::placeholders::_1));
+        
+        m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorExtendedInput, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorExtendedFieldHandler, this, std::placeholders::_1));
+        
             
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
@@ -91,11 +95,13 @@ public:
     // Input Module Index
     enum
     {
-        MOD_USER_INPUT          = 0, // User List Input Parser
-        MOD_PAUSE               = 1, // Pauses on display of menus/options
-        MOD_USER_NAME           = 2, // User Name Input Handler        
-        MOD_USER_FIELD_INPUT    = 3, // Selecting Individual User Fields.
-        MOD_USER_FIELD          = 4  // Updates Current Field
+        MOD_USER_INPUT                = 0, // User List Input Parser
+        MOD_PAUSE                     = 1, // Pauses on display of menus/options
+        MOD_USER_NAME                 = 2, // User Name Input Handler        
+        MOD_USER_FIELD_INPUT          = 3, // Selecting Individual User Fields.
+        MOD_USER_FIELD                = 4, // Updates Current Field
+        MOD_USER_EXTENDED_FIELD_INPUT = 5, // Selecting Individual Extended User Fields.
+        MOD_USER_EXTENDED_FIELD       = 6  // Updates Current Extended Field
     };
 
     // Input Menu State Index
@@ -158,6 +164,7 @@ public:
     const std::string PROMPT_USER_FIELD_SCREENPAUSE = "user_field_user_screenpause";
 
     const std::string PROMPT_USER_EDIT_EXTENDED_HEADER = "user_field_extended_header";
+    const std::string PROMPT_USER_EXTENDED_FIELD_INPUT_TEXT = "user_editor_extended_field_input";
 
     /**
      * @brief Create Default Text Prompts for module
@@ -322,6 +329,18 @@ public:
      */
     void userEditorFieldInput(const std::string &input);
     
+    /**
+     * @brief Handles User Extended Field Editor Command Selection
+     * @param input
+     */
+    void userEditorExtendedInput(const std::string &input);
+    
+    /**
+     * @brief Handles Extended Field Updates for User Data
+     * @param input
+     */
+    void userEditorExtendedFieldHandler(const std::string &input);
+
     /**
      * @brief Handles Field Updates for User Data
      * @param input

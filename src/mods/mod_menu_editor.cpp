@@ -130,18 +130,18 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_OPTION_TOGGLE]                  = std::make_pair("Command View Toggle using 'T' cycles though different displays", "|CR|03%   |15|PD|CR|11!   |15Current View : |11|OT |CR");
     
     // Display Page for Menu Fields
-    value[DISPLAY_MENU_FIELDS_VERSION_ID]          = std::make_pair("File Version ID", "     |15File Version       : ");
-    value[DISPLAY_MENU_FIELDS_BORDER_ROW_COLOR]    = std::make_pair("Border Row Color", " |07");
-    value[DISPLAY_MENU_FIELDS_TITLE]               = std::make_pair("Menu Title", " |03(|11A|03) |15Menu Title         : ");
-    value[DISPLAY_MENU_FIELDS_PASSWORD]            = std::make_pair("Menu Password", " |03(|11B|03) |15Password           : ");
-    value[DISPLAY_MENU_FIELDS_FALLBACK]            = std::make_pair("Menu Fallback", " |03(|11C|03) |15Fallback Menu      : ");
-    value[DISPLAY_MENU_FIELDS_HELP_ID]             = std::make_pair("Menu Help ID ANSI", " |03(|11D|03) |15Help ID            : ");
-    value[DISPLAY_MENU_FIELDS_NAME]                = std::make_pair("Menu Name in Prompt", " |03(|11E|03) |15Name in Prompt     : ");
-    value[DISPLAY_MENU_FIELDS_PULLDOWN_FILE]       = std::make_pair("Pulldown File", " |03(|11F|03) |15Pulldown File      : ");
-    value[DISPLAY_MENU_FIELDS_VIEW_GENERIC]        = std::make_pair("View Generic Menu", " |03(|11G|03) |15View Generic Menu    ");
-    value[DISPLAY_MENU_FIELDS_EDIT_OPTIONS]        = std::make_pair("Edit Options", " |03(|11H|03) |15Edit Options         ");    
-    value[DISPLAY_MENU_FIELDS_QUIT_SAVE]           = std::make_pair("Quit and Save", " |03(|11Q|03) |15Quit & Save          ");
-    value[DISPLAY_MENU_FIELDS_QUIT_ABORT]          = std::make_pair("Quit without Save", " |03(|11X|03) |15Exit without Saving  ");
+    value[DISPLAY_MENU_FIELDS_VERSION_ID]        = std::make_pair("File Version ID", "     |15File Version       : ");
+    value[DISPLAY_MENU_FIELDS_BORDER_ROW_COLOR]  = std::make_pair("Border Row Color", " |07");
+    value[DISPLAY_MENU_FIELDS_TITLE]             = std::make_pair("Menu Title", " |03(|11A|03) |15Menu Title         : ");
+    value[DISPLAY_MENU_FIELDS_PASSWORD]          = std::make_pair("Menu Password", " |03(|11B|03) |15Password           : ");
+    value[DISPLAY_MENU_FIELDS_FALLBACK]          = std::make_pair("Menu Fallback", " |03(|11C|03) |15Fallback Menu      : ");
+    value[DISPLAY_MENU_FIELDS_HELP_ID]           = std::make_pair("Menu Help ID ANSI", " |03(|11D|03) |15Help ID            : ");
+    value[DISPLAY_MENU_FIELDS_NAME]              = std::make_pair("Menu Name in Prompt", " |03(|11E|03) |15Name in Prompt     : ");
+    value[DISPLAY_MENU_FIELDS_PULLDOWN_FILE]     = std::make_pair("Pulldown File", " |03(|11F|03) |15Pulldown File      : ");
+    value[DISPLAY_MENU_FIELDS_VIEW_GENERIC]      = std::make_pair("View Generic Menu", " |03(|11G|03) |15View Generic Menu    ");
+    value[DISPLAY_MENU_FIELDS_EDIT_OPTIONS]      = std::make_pair("Edit Options", " |03(|11H|03) |15Edit Options         ");    
+    value[DISPLAY_MENU_FIELDS_QUIT_SAVE]         = std::make_pair("Quit and Save", " |03(|11Q|03) |15Quit & Save          ");
+    value[DISPLAY_MENU_FIELDS_QUIT_ABORT]        = std::make_pair("Quit without Save", " |03(|11X|03) |15Exit without Saving  ");
     
     // Dsiplay Page for Option Fields.
     value[DISPLAY_OPT_FIELDS_OPTION_ID]           = std::make_pair("Option ID", "     |15Option ID          : ");
