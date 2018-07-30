@@ -230,6 +230,15 @@ std::string ModMenuEditor::getDisplayPrompt(const std::string &prompt)
 }
 
 /**
+ * @brief Pull and parse and return Display Prompts for use in interfaces
+ * @param prompt
+ */
+std::string ModMenuEditor::getDisplayPromptRaw(const std::string &prompt)
+{
+    return baseGetDisplayPromptRaw(prompt, m_text_prompts_dao);
+}
+
+/**
  * @brief Pull and Display Prompts with MCI Code
  * @param prompt
  * @param mci_field
@@ -1997,19 +2006,19 @@ std::string ModMenuEditor::displayMenuEditScreen()
     // Build a string list of individual menu options, then loop to fit as many per screen!
     std::vector<std::string> result_set;
 
-    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_VERSION_ID) + m_common_io.rightPadding(current_menu->file_version, 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_VERSION_ID) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->file_version, 48));
     result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_TITLE) + m_common_io.rightPadding(current_menu->menu_title, 48));
-    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_PASSWORD) + m_common_io.rightPadding(current_menu->menu_password, 48));    
-    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_FALLBACK) + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
-    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_HELP_ID) + m_common_io.rightPadding(current_menu->menu_help_file, 48));
-    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_NAME) + m_common_io.rightPadding(current_menu->menu_name, 48));
-    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_PULLDOWN_FILE) + m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
-    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_VIEW_GENERIC) + m_common_io.rightPadding("", 48));
-    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_EDIT_OPTIONS) + m_common_io.rightPadding("", 48));    
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_TITLE) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_title, 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_PASSWORD) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_password, 48));    
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_FALLBACK) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_HELP_ID) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_help_file, 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_NAME) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_name, 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_PULLDOWN_FILE) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_VIEW_GENERIC) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_EDIT_OPTIONS) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));    
     result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_QUIT_SAVE) + m_common_io.rightPadding("", 48));
-    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_QUIT_ABORT) + m_common_io.rightPadding("", 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_QUIT_SAVE) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_QUIT_ABORT) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
                 
     // Not in use Yet, seems legacy only does ACS in option commands.
     // option_string.append("Menu ACS           : " + m_common_io.rightPadding(current_menu->menu_acs_string, 35);  
@@ -2116,19 +2125,19 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
     // Setup a current ID out of Total Id's display.
     std::string option_string = std::to_string(opt.index) + " / " + std::to_string(m_loaded_menu.back()->menu_options.size()-1);
     
-    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_ID) + m_common_io.rightPadding(option_string, 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_ID) + baseGetDefaultStatColor() + m_common_io.rightPadding(option_string, 48));
     result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_NAME) + m_common_io.rightPadding(opt.name, 48));
-    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_ACS) + m_common_io.rightPadding(opt.acs_string, 48));    
-    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_HIDDEN) + m_common_io.rightPadding(m_common_io.boolAlpha(opt.hidden), 48));
-    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_CMD_KEYS) + m_common_io.rightPadding(opt.command_key, 48));
-    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_MENU_KEY) + m_common_io.rightPadding(opt.menu_key, 48));
-    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_CMD_STRING) + m_common_io.rightPadding(opt.command_string, 48));
-    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_PULLDOWN_ID) + m_common_io.rightPadding(std::to_string(opt.pulldown_id), 48));
-    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_PREVIOUS_OPT) + m_common_io.rightPadding("", 48));
-    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_NEXT_OPT) + m_common_io.rightPadding("", 48));    
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_NAME) + baseGetDefaultStatColor() + m_common_io.rightPadding(opt.name, 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_ACS) + baseGetDefaultStatColor() + m_common_io.rightPadding(opt.acs_string, 48));    
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_HIDDEN) + baseGetDefaultStatColor() + m_common_io.rightPadding(m_common_io.boolAlpha(opt.hidden), 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_CMD_KEYS) + baseGetDefaultStatColor() + m_common_io.rightPadding(opt.command_key, 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_MENU_KEY) + baseGetDefaultStatColor() + m_common_io.rightPadding(opt.menu_key, 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_CMD_STRING) + baseGetDefaultStatColor() + m_common_io.rightPadding(opt.command_string, 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_PULLDOWN_ID) + baseGetDefaultStatColor() + m_common_io.rightPadding(std::to_string(opt.pulldown_id), 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_PREVIOUS_OPT) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_NEXT_OPT) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));    
     result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_QUIT) + m_common_io.rightPadding("", 48));                    
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_QUIT) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));                    
                 
     // Not in use Yet, seems legacy only does ACS in option commands.
     // option_string.append("Form Value         : " + m_common_io.rightPadding(opt.form_value, 48));

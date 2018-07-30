@@ -1792,6 +1792,7 @@ void ModSignup::saveNewUserRecord()
         m_user_record->iLevel = m_config->default_level;
         m_user_record->iFileLevel = m_config->default_file_level;
         m_user_record->iMessageLevel = m_config->default_message_level;
+        m_user_record->iFilePoints = m_config->default_file_points;
 
         // Also Add Default File points,, missing from user rec.
     }

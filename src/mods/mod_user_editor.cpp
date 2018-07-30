@@ -90,7 +90,7 @@ void ModUserEditor::createTextPrompts()
     value[PROMPT_USER_EDIT_HEADER]        = std::make_pair("User Fields Editor Header |OT User ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11User Editor|15] |03--- |11User ID : |15|OT |CR");
     value[PROMPT_USER_FIELD_INPUT_TEXT]   = std::make_pair("User Editor Command", "|CR|15User Editor C|07om|08mand |15: |07");
 
-
+    // Prompts when editing a user field.
     value[PROMPT_USER_FIELD_USERNAME]     = std::make_pair("User Name is the Handle or users Logon ID", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15User Name   : ");
     value[PROMPT_USER_FIELD_USERLEVEL]    = std::make_pair("User Level is for access control (0 - 255, 255 being Sysop Access)", "|CR|03%   |15|PD|CR|11!   |03(|11M|03) |15User Level     : ");
 
@@ -124,7 +124,33 @@ void ModUserEditor::createTextPrompts()
     value[PROMPT_USER_EDIT_EXTENDED_HEADER] = std::make_pair("User Extended Fields Editor Header |OT User ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11User Extended Editor|15] |03--- |11User ID : |15|OT |CR");
     value[PROMPT_USER_EXTENDED_FIELD_INPUT_TEXT] = std::make_pair("User Editor Extended Command", "|CR|15User Extended Editor C|07om|08mand |15: |07");
 
-
+    // Fields Being Displayed on user edit screen
+    value[DISPLAY_USER_FIELDS_USERNAME]           = std::make_pair("User Name", " |03(|11A|03) |15User Name   : ");
+    value[DISPLAY_USER_FIELDS_LEVEL]              = std::make_pair("Level", " |03(|11M|03) |15User Level     : ");        
+    value[DISPLAY_USER_FIELDS_REALNAME]           = std::make_pair("Real Name"," |03(|11B|03) |15Real Name   : ");
+    value[DISPLAY_USER_FIELDS_FILELEVEL]          = std::make_pair("File Level", " |03(|11N|03) |15File Level     : ");
+    value[DISPLAY_USER_FIELDS_EMAIL]              = std::make_pair("Email Address", " |03(|11C|03) |15Eamil       : ");
+    value[DISPLAY_USER_FIELDS_MESGLEVEL]          = std::make_pair("Message Level", " |03(|11O|03) |15Mesg Level     : ");
+    value[DISPLAY_USER_FIELDS_ADDRESS]            = std::make_pair("Address", " |03(|11D|03) |15Address     : ");
+    value[DISPLAY_USER_FIELDS_HACK_ATTEMPT]       = std::make_pair("Number of Invalid Logons", " |03(|11P|03) |15Hack Attempts  : ");
+    value[DISPLAY_USER_FIELDS_LOCATION]           = std::make_pair("Location", " |03(|11E|03) |15Location    : ");
+    value[DISPLAY_USER_FIELDS_NO_TIMELIMIT]       = std::make_pair("No Time Limit", " |03(|11R|03) |15No Time Limit  : ");    
+    value[DISPLAY_USER_FIELDS_COUNTRY]            = std::make_pair("Country Code", " |03(|11F|03) |15Country     : ");
+    value[DISPLAY_USER_FIELDS_USE_ANSI]           = std::make_pair("Use ANSI Graphics", " |03(|11S|03) |15Use ANSI       : ");   
+    value[DISPLAY_USER_FIELDS_USERNOTE]           = std::make_pair("User Note"," |03(|11G|03) |15User Note   : ");
+    value[DISPLAY_USER_FIELDS_USE_VTBACKSPACE]    = std::make_pair("Use VT100 Backspace"," |03(|11T|03) |15VT100 BackSpace: ");    
+    value[DISPLAY_USER_FIELDS_BIRTHDATE]          = std::make_pair("Date of Birth", " |03(|11H|03) |15Birth Date  : ");
+    value[DISPLAY_USER_FIELDS_WANTED]             = std::make_pair("Page Sysop When user Logs in", " |03(|11U|03) |15User Wanted    : ");    
+    value[DISPLAY_USER_FIELDS_FLAGS1]             = std::make_pair("AR User Flags 1", " |03(|11I|03) |15User Flags1 : ");
+    value[DISPLAY_USER_FIELDS_CLEAR_OR_SCROLL]    = std::make_pair("Clear or Scroll Screen to Clear", " |03(|11V|03) |15Clear or Scroll: ");    
+    value[DISPLAY_USER_FIELDS_FLAGS2]             = std::make_pair("AR User Flags 2", " |03(|11J|03) |15User Flags2 : ");
+    value[DISPLAY_USER_FIELDS_SCREEN_PAUSE]       = std::make_pair("Pause screen when text scrolls screen height", " |03(|11W|03) |15Screen Pause   : ");    
+    value[DISPLAY_USER_FIELDS_EXTENDED_DETAILS]   = std::make_pair("Shows Extended User Details", " |03(|11-|03) |15Extended User Details");    
+    value[DISPLAY_USER_FIELDS_PREVIOUS_USER]      = std::make_pair("Move to Previous User", " |03(|11[|03) |15Previous User        ");
+    value[DISPLAY_USER_FIELDS_NEXT_USER]          = std::make_pair("Move to Next User", " |03(|11]|03) |15Next User            ");    
+    value[DISPLAY_USER_FIELDS_QUIT_SAVE]          = std::make_pair("Quit and Save", " |03(|11Q|03) |15Quit & Save          ");
+    value[DISPLAY_USER_FIELDS_QUIT_ABORT]         = std::make_pair("Exit without Saving", " |03(|11X|03) |15Exit without Saving  ");
+    
     m_text_prompts_dao->writeValue(value);
 }
 
@@ -183,6 +209,15 @@ void ModUserEditor::displayPrompt(const std::string &prompt)
 std::string ModUserEditor::getDisplayPrompt(const std::string &prompt)
 {
     return baseGetDisplayPrompt(prompt, m_text_prompts_dao);
+}
+
+/**
+ * @brief Pull and parse and return Display Prompts for use in interfaces
+ * @param prompt
+ */
+std::string ModUserEditor::getDisplayPromptRaw(const std::string &prompt)
+{
+    return baseGetDisplayPromptRaw(prompt, m_text_prompts_dao);
 }
 
 /**
@@ -760,12 +795,10 @@ std::string ModUserEditor::displayUserList()
     
     if (m_wildcard_filter.size() > 0)
     {
-        std::cout << "*** Wildcard Active : " << m_wildcard_filter << std::endl;
         m_users_listing = user_data->getUsersByWildcard(m_wildcard_filter);
     }
     else
     {
-        std::cout << "*** Wildcard IN-Active : " << m_wildcard_filter << std::endl;
         m_users_listing = user_data->getAllRecords();
     }
     
@@ -773,7 +806,7 @@ std::string ModUserEditor::displayUserList()
     std::vector<std::string> result_set;  
     if (m_users_listing.size() == 0)
     {
-        result_set.push_back("|03" +m_common_io.rightPadding("No Records Found!", 24));
+        result_set.push_back(baseGetDefaultStatColor() + m_common_io.rightPadding("No Records Found!", 24));
     }
    
      // Build a string list of individual menu options, then loop to fit as many per screen!    
@@ -781,9 +814,9 @@ std::string ModUserEditor::displayUserList()
     {  
         std::string option_string = m_common_io.rightPadding(std::to_string(m_users_listing[i]->iId), 5);      
         if (m_users_listing[i]->sHandle.size() == 0)
-            option_string.append("|03" + m_common_io.rightPadding(m_users_listing[i]->sRealName, 19));
+            option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(m_users_listing[i]->sRealName, 19));
         else
-            option_string.append("|03" + m_common_io.rightPadding(m_users_listing[i]->sHandle, 19));
+            option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(m_users_listing[i]->sHandle, 19));
             
         result_set.push_back(option_string);
     }
@@ -812,49 +845,49 @@ std::string ModUserEditor::displayUserList()
             // Top Row
             if(rows == 0 && cols == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_TOP_LEFT;
             }
             else if(rows == 0 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_TOP_RIGHT;
             }
             else if(rows == 0 && cols % 25 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID_TOP;
             } 
             else if(rows == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_ROW;
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_BOT_LEFT;
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_BOT_RIGHT;
             }
             else if(rows == total_rows-1 && cols % 25 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID_BOT;
             } 
             else if(rows == total_rows-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_ROW;
             }
             else if(cols % 25 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID;
             }
             else
@@ -1505,44 +1538,44 @@ std::string ModUserEditor::displayUserEditScreen()
 
     AccessCondition acs;
     user_ptr usr = m_loaded_user.back();
-    
-    result_set.push_back(m_common_io.rightPadding(" |03(|11A|03) |15User Name   : " + baseGetDefaultStatColor() + usr->sHandle, 64) + 
-        m_common_io.rightPadding(" |03(|11M|03) |15User Level     : " + baseGetDefaultStatColor() + std::to_string(usr->iLevel), 48));
+            
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_USERNAME) + baseGetDefaultStatColor() + usr->sHandle, 64) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_LEVEL) + baseGetDefaultStatColor() + std::to_string(usr->iLevel), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11B|03) |15Real Name   : " + baseGetDefaultStatColor() + usr->sRealName, 64) + 
-        m_common_io.rightPadding(" |03(|11N|03) |15File Level     : " + baseGetDefaultStatColor() + std::to_string(usr->iFileLevel), 48));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_REALNAME) + baseGetDefaultStatColor() + usr->sRealName, 64) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_FILELEVEL) + baseGetDefaultStatColor() + std::to_string(usr->iFileLevel), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11C|03) |15Eamil       : " + baseGetDefaultStatColor() + usr->sEmail, 64) + 
-        m_common_io.rightPadding(" |03(|11O|03) |15Mesg Level     : " + baseGetDefaultStatColor() + std::to_string(usr->iMessageLevel), 48));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_EMAIL) + baseGetDefaultStatColor() + usr->sEmail, 64) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_MESGLEVEL) + baseGetDefaultStatColor() + std::to_string(usr->iMessageLevel), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11D|03) |15Address     : " + baseGetDefaultStatColor() + usr->sAddress, 64) + 
-        m_common_io.rightPadding(" |03(|11P|03) |15Hack Attempts  : " + baseGetDefaultStatColor() + std::to_string(usr->iHackAttempts), 48));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_ADDRESS) + baseGetDefaultStatColor() + usr->sAddress, 64) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_HACK_ATTEMPT) + baseGetDefaultStatColor() + std::to_string(usr->iHackAttempts), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11E|03) |15Location    : " + baseGetDefaultStatColor() + usr->sLocation, 64) + 
-        m_common_io.rightPadding(" |03(|11R|03) |15No Time Limit  : " + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bIgnoreTimeLimit), 48));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_LOCATION) + baseGetDefaultStatColor() + usr->sLocation, 64) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_NO_TIMELIMIT) + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bIgnoreTimeLimit), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11F|03) |15Country     : " + baseGetDefaultStatColor() + usr->sCountry, 64) + 
-        m_common_io.rightPadding(" |03(|11S|03) |15Use ANSI       : " + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bAnsi), 48));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_COUNTRY) + baseGetDefaultStatColor() + usr->sCountry, 64) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_USE_ANSI) + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bAnsi), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11G|03) |15User Note   : " + baseGetDefaultStatColor() + usr->sUserNote, 64) + 
-        m_common_io.rightPadding(" |03(|11T|03) |15VT100 BackSpace: " + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bBackSpaceVt100), 48));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_USERNOTE) + baseGetDefaultStatColor() + usr->sUserNote, 64) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_USE_VTBACKSPACE) + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bBackSpaceVt100), 48));
            
-    result_set.push_back(m_common_io.rightPadding(" |03(|11H|03) |15Birth Date  : " + baseGetDefaultStatColor() + m_common_io.standardDateToString(usr->dtBirthday), 64) + 
-        m_common_io.rightPadding(" |03(|11U|03) |15User Wanted    : " + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bWanted), 48));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_BIRTHDATE) + baseGetDefaultStatColor() + m_common_io.standardDateToString(usr->dtBirthday), 64) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_WANTED) + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bWanted), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11I|03) |15User Flags1 : " + baseGetDefaultStatColor() + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags1), 64) +
-        m_common_io.rightPadding(" |03(|11V|03) |15Clear or Scroll: " + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bClearOrScroll), 48));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_FLAGS1) + baseGetDefaultStatColor() + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags1), 64) +
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_CLEAR_OR_SCROLL) + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bClearOrScroll), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11J|03) |15User Flags2 : " + baseGetDefaultStatColor() + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags2), 64) +
-        m_common_io.rightPadding(" |03(|11W|03) |15Screen Pause   : " + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bDoPause), 48));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_FLAGS2) + baseGetDefaultStatColor() + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags2), 64) +
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_SCREEN_PAUSE) + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bDoPause), 48));
                         
-    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(" |03(|11-|03) |15Extended User Details" + m_common_io.rightPadding("", 48));
-    result_set.push_back(" |03(|11[|03) |15Previous User        " + m_common_io.rightPadding("", 48));
-    result_set.push_back(" |03(|11]|03) |15Next User            " + m_common_io.rightPadding("", 48));    
-    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(" |03(|11Q|03) |15Quit & Save          " + m_common_io.rightPadding("", 48));
-    result_set.push_back(" |03(|11X|03) |15Exit without Saving  " + m_common_io.rightPadding("", 48));
+    result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_FIELDS_EXTENDED_DETAILS) + m_common_io.rightPadding("", 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_FIELDS_PREVIOUS_USER) + m_common_io.rightPadding("", 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_FIELDS_NEXT_USER) + m_common_io.rightPadding("", 48));    
+    result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_FIELDS_QUIT_SAVE) + m_common_io.rightPadding("", 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_FIELDS_QUIT_ABORT) + m_common_io.rightPadding("", 48));
 
     // iterate through and print out
     int total_rows = result_set.size();
@@ -1563,49 +1596,49 @@ std::string ModUserEditor::displayUserEditScreen()
             // Top Row
             if(rows == 0 && cols == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_TOP_LEFT;
             }
             else if(rows == 0 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_TOP_RIGHT;
             }
             else if(rows == 0 && cols % 75 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID_TOP;
             } 
             else if(rows == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_ROW;
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_BOT_LEFT;
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_BOT_RIGHT;
             }
             else if(rows == total_rows-1 && cols % 75 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID_BOT;
             } 
             else if(rows == total_rows-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_ROW;
             }
             else if(cols % 75 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID;
             }
             else
@@ -1686,7 +1719,7 @@ std::string ModUserEditor::displayUserExtendedEditScreen()
     result_set.push_back(m_common_io.rightPadding(" |03(|11I|03) |15Status Color     : " + usr->sStatColor + "***", 60) + 
         m_common_io.rightPadding(" |03(|11U|03) |15Inverse Color  : " + usr->sInverseColor + "***|16" , 47));
         
-    result_set.push_back(" |07" + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
     result_set.push_back(" |03(|11Q|03) |15Quit & Return        " + m_common_io.rightPadding("", 48));
       
     // iterate through and print out
@@ -1708,49 +1741,49 @@ std::string ModUserEditor::displayUserExtendedEditScreen()
             // Top Row
             if(rows == 0 && cols == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_TOP_LEFT;
             }
             else if(rows == 0 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_TOP_RIGHT;
             }
             else if(rows == 0 && cols % 75 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID_TOP;
             } 
             else if(rows == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_ROW;
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_BOT_LEFT;
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_BOT_RIGHT;
             }
             else if(rows == total_rows-1 && cols % 75 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID_BOT;
             } 
             else if(rows == total_rows-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_ROW;
             }
             else if(cols % 75 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID;
             }
             else

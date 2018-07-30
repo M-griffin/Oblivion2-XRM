@@ -166,6 +166,34 @@ public:
     const std::string PROMPT_USER_EDIT_EXTENDED_HEADER = "user_field_extended_header";
     const std::string PROMPT_USER_EXTENDED_FIELD_INPUT_TEXT = "user_editor_extended_field_input";
 
+    // Prompts when dispalying the user edit screen
+    // Fields Being Displayed on user edit screen
+    const std::string DISPLAY_USER_FIELDS_USERNAME = "display_user_field_username";
+    const std::string DISPLAY_USER_FIELDS_LEVEL = "display_user_field_level";
+    const std::string DISPLAY_USER_FIELDS_REALNAME = "display_user_field_realname";
+    const std::string DISPLAY_USER_FIELDS_FILELEVEL = "display_user_field_filelevel";
+    const std::string DISPLAY_USER_FIELDS_EMAIL = "display_user_field_email";
+    const std::string DISPLAY_USER_FIELDS_MESGLEVEL = "display_user_field_messagelevel";
+    const std::string DISPLAY_USER_FIELDS_ADDRESS = "display_user_field_address";
+    const std::string DISPLAY_USER_FIELDS_HACK_ATTEMPT = "display_user_field_hack_attempts";
+    const std::string DISPLAY_USER_FIELDS_LOCATION = "display_user_field_location";
+    const std::string DISPLAY_USER_FIELDS_NO_TIMELIMIT = "display_user_field_no_timelimit";
+    const std::string DISPLAY_USER_FIELDS_COUNTRY = "display_user_field_country";
+    const std::string DISPLAY_USER_FIELDS_USE_ANSI = "display_user_field_use_ansi";
+    const std::string DISPLAY_USER_FIELDS_USERNOTE = "display_user_field_usernote";
+    const std::string DISPLAY_USER_FIELDS_USE_VTBACKSPACE = "display_user_field_backspace";
+    const std::string DISPLAY_USER_FIELDS_BIRTHDATE = "display_user_field_birthdate";
+    const std::string DISPLAY_USER_FIELDS_WANTED = "display_user_field_wanted";
+    const std::string DISPLAY_USER_FIELDS_FLAGS1 = "display_user_field_flags1";
+    const std::string DISPLAY_USER_FIELDS_CLEAR_OR_SCROLL = "display_user_field_clearscreen";
+    const std::string DISPLAY_USER_FIELDS_FLAGS2 = "display_user_field_flags2";
+    const std::string DISPLAY_USER_FIELDS_SCREEN_PAUSE = "display_user_field_screenpause";
+    const std::string DISPLAY_USER_FIELDS_EXTENDED_DETAILS = "display_user_field_extended";
+    const std::string DISPLAY_USER_FIELDS_PREVIOUS_USER = "display_user_field_previous_user";
+    const std::string DISPLAY_USER_FIELDS_NEXT_USER = "display_user_field_next_user";
+    const std::string DISPLAY_USER_FIELDS_QUIT_SAVE = "display_user_field_quit_save";
+    const std::string DISPLAY_USER_FIELDS_QUIT_ABORT = "display_user_field_quit_abort";
+    
     /**
      * @brief Create Default Text Prompts for module
      */
@@ -212,6 +240,12 @@ public:
      * @param prompt
      */
     std::string getDisplayPrompt(const std::string &prompt);
+
+    /**
+     * @brief Pull and parse and return Display Prompts for use in interfaces
+     * @param prompt
+     */
+    std::string getDisplayPromptRaw(const std::string &prompt);
 
     /**
      * @brief Pull and Display Prompts with MCI Code

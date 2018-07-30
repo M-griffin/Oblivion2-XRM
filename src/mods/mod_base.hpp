@@ -124,7 +124,7 @@ public:
     }
 
     /**
-     * @brief Method for Adding outgoing text data to ansi processor
+     * @brief Method for Adding outgoing text data to ANSI processor
      *        Then delivering the data to the client
      * @param data
      */
@@ -139,7 +139,7 @@ public:
     }
     
     /**
-     * @brief Deliver Output followed with NewLine.
+     * @brief Deliver Output followed with New Line.
      * @param data
      */
     void baseProcessAndDeliverNewLine(std::string &data)
@@ -198,7 +198,7 @@ public:
     }
     
     /**
-     * @brief Pull and Display Prompts
+     * @brief Pull and Return Display Prompt
      * @param prompt
      */
     std::string baseGetDisplayPrompt(const std::string &prompt, text_prompts_dao_ptr m_text_dao)
@@ -225,6 +225,18 @@ public:
         }
 
         return result;
+    }
+    
+    /**
+     * @brief Pull and Return Raw Display Prompts
+     * @param prompt
+     */
+    std::string baseGetDisplayPromptRaw(const std::string &prompt, text_prompts_dao_ptr m_text_dao)
+    {       
+        // Parse Prompt for Input Color And Position Override.
+        // If found, the colors of the MCI Codes should be used as the default color.
+        M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
+        return prompt_set.second;
     }
     
     /**
@@ -265,7 +277,7 @@ public:
     }
     
     /**
-     * @brief Pull and Display Prompt with a folling new line for info messages.
+     * @brief Pull and Display Prompt with a following new line for info messages.
      * @param prompt
      */
     void baseDisplayPromptAndNewLine(const std::string &prompt, text_prompts_dao_ptr m_text_dao)
