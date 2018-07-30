@@ -130,29 +130,29 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_OPTION_TOGGLE]                  = std::make_pair("Command View Toggle using 'T' cycles though different displays", "|CR|03%   |15|PD|CR|11!   |15Current View : |11|OT |CR");
     
     // Display Page for Menu Fields
-    value[DISPLAY_MENU_FIELDS_VERSION_ID]          = std::make_pair("File Version ID", "     |15File Version       : |03");
+    value[DISPLAY_MENU_FIELDS_VERSION_ID]          = std::make_pair("File Version ID", "     |15File Version       : ");
     value[DISPLAY_MENU_FIELDS_BORDER_ROW_COLOR]    = std::make_pair("Border Row Color", " |07");
-    value[DISPLAY_MENU_FIELDS_TITLE]               = std::make_pair("Menu Title", " |03(|11A|03) |15Menu Title         : |03");
-    value[DISPLAY_MENU_FIELDS_PASSWORD]            = std::make_pair("Menu Password", " |03(|11B|03) |15Password           : |03");
-    value[DISPLAY_MENU_FIELDS_FALLBACK]            = std::make_pair("Menu Fallback", " |03(|11C|03) |15Fallback Menu      : |03");
-    value[DISPLAY_MENU_FIELDS_HELP_ID]             = std::make_pair("Menu Help ID ANSI", " |03(|11D|03) |15Help ID            : |03");
-    value[DISPLAY_MENU_FIELDS_NAME]                = std::make_pair("Menu Name in Prompt", " |03(|11E|03) |15Name in Prompt     : |03");
-    value[DISPLAY_MENU_FIELDS_PULLDOWN_FILE]       = std::make_pair("Pulldown File", " |03(|11F|03) |15Pulldown File      : |03");
+    value[DISPLAY_MENU_FIELDS_TITLE]               = std::make_pair("Menu Title", " |03(|11A|03) |15Menu Title         : ");
+    value[DISPLAY_MENU_FIELDS_PASSWORD]            = std::make_pair("Menu Password", " |03(|11B|03) |15Password           : ");
+    value[DISPLAY_MENU_FIELDS_FALLBACK]            = std::make_pair("Menu Fallback", " |03(|11C|03) |15Fallback Menu      : ");
+    value[DISPLAY_MENU_FIELDS_HELP_ID]             = std::make_pair("Menu Help ID ANSI", " |03(|11D|03) |15Help ID            : ");
+    value[DISPLAY_MENU_FIELDS_NAME]                = std::make_pair("Menu Name in Prompt", " |03(|11E|03) |15Name in Prompt     : ");
+    value[DISPLAY_MENU_FIELDS_PULLDOWN_FILE]       = std::make_pair("Pulldown File", " |03(|11F|03) |15Pulldown File      : ");
     value[DISPLAY_MENU_FIELDS_VIEW_GENERIC]        = std::make_pair("View Generic Menu", " |03(|11G|03) |15View Generic Menu    ");
     value[DISPLAY_MENU_FIELDS_EDIT_OPTIONS]        = std::make_pair("Edit Options", " |03(|11H|03) |15Edit Options         ");    
     value[DISPLAY_MENU_FIELDS_QUIT_SAVE]           = std::make_pair("Quit and Save", " |03(|11Q|03) |15Quit & Save          ");
     value[DISPLAY_MENU_FIELDS_QUIT_ABORT]          = std::make_pair("Quit without Save", " |03(|11X|03) |15Exit without Saving  ");
     
     // Dsiplay Page for Option Fields.
-    value[DISPLAY_OPT_FIELDS_OPTION_ID]           = std::make_pair("Option ID", "     |15Option ID          : |03");
+    value[DISPLAY_OPT_FIELDS_OPTION_ID]           = std::make_pair("Option ID", "     |15Option ID          : ");
     value[DISPLAY_OPT_FIELDS_BORDER_ROW_COLOR]    = std::make_pair("Border Row Color", " |07");
-    value[DISPLAY_OPT_FIELDS_OPTION_NAME]         = std::make_pair("Option Name", " |03(|11A|03) |15Option Name        : |03");
-    value[DISPLAY_OPT_FIELDS_OPTION_ACS]          = std::make_pair("Access Control String", " |03(|11B|03) |15ACS                : |03");
-    value[DISPLAY_OPT_FIELDS_OPTION_HIDDEN]       = std::make_pair("Hidden", " |03(|11C|03) |15Hidden             : |03");
-    value[DISPLAY_OPT_FIELDS_OPTION_CMD_KEYS]     = std::make_pair("Command Keys", " |03(|11D|03) |15Command Keys       : |03");
-    value[DISPLAY_OPT_FIELDS_OPTION_MENU_KEY]     = std::make_pair("Menu Key", " |03(|11E|03) |15Keys               : |03");
-    value[DISPLAY_OPT_FIELDS_OPTION_CMD_STRING]   = std::make_pair("Command String", " |03(|11F|03) |15Command String     : |03");
-    value[DISPLAY_OPT_FIELDS_OPTION_PULLDOWN_ID]  = std::make_pair("Pulldown ID", " |03(|11G|03) |15Pulldown ID        : |03");
+    value[DISPLAY_OPT_FIELDS_OPTION_NAME]         = std::make_pair("Option Name", " |03(|11A|03) |15Option Name        : ");
+    value[DISPLAY_OPT_FIELDS_OPTION_ACS]          = std::make_pair("Access Control String", " |03(|11B|03) |15ACS                : ");
+    value[DISPLAY_OPT_FIELDS_OPTION_HIDDEN]       = std::make_pair("Hidden", " |03(|11C|03) |15Hidden             : ");
+    value[DISPLAY_OPT_FIELDS_OPTION_CMD_KEYS]     = std::make_pair("Command Keys", " |03(|11D|03) |15Command Keys       : ");
+    value[DISPLAY_OPT_FIELDS_OPTION_MENU_KEY]     = std::make_pair("Menu Key", " |03(|11E|03) |15Keys               : ");
+    value[DISPLAY_OPT_FIELDS_OPTION_CMD_STRING]   = std::make_pair("Command String", " |03(|11F|03) |15Command String     : ");
+    value[DISPLAY_OPT_FIELDS_OPTION_PULLDOWN_ID]  = std::make_pair("Pulldown ID", " |03(|11G|03) |15Pulldown ID        : ");
     value[DISPLAY_OPT_FIELDS_OPTION_PREVIOUS_OPT] = std::make_pair("Previous Option", " |03(|11[|03) |15Previous Option      ");
     value[DISPLAY_OPT_FIELDS_OPTION_NEXT_OPT]     = std::make_pair("Next Option", " |03(|11]|03) |15Next Option          ");
     value[DISPLAY_OPT_FIELDS_OPTION_QUIT]         = std::make_pair("Quit", " |03(|11Q|03) |15Quit                 ");
@@ -1730,49 +1730,49 @@ std::string ModMenuEditor::displayMenuList()
             // Top Row
             if(rows == 0 && cols == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_TOP_LEFT;
             }
             else if(rows == 0 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_TOP_RIGHT;
             }
             else if(rows == 0 && cols % 9 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID_TOP;
             }
             else if(rows == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_ROW;
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_BOT_LEFT;
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_BOT_RIGHT;
             }
             else if(rows == total_rows-1 && cols % 9 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID_BOT;
             }
             else if(rows == total_rows-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_ROW;
             }
             else if(cols % 9 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID;
             }
             else
@@ -1832,28 +1832,28 @@ std::string ModMenuEditor::displayMenuOptionList()
         switch (m_mod_toggle_view_index) 
         {            
             case VIEW_DEFAULT:
-                option_string.append("|15" + m_common_io.rightPadding(m.menu_key, 9));
-                option_string.append("|11" + m_common_io.rightPadding(m.command_key, 4));
-                option_string.append("|03" + m_common_io.rightPadding(m.acs_string, 8));
+                option_string.append(baseGetDefaultColor() + m_common_io.rightPadding(m.menu_key, 9));
+                option_string.append(baseGetDefaultInputColor() + m_common_io.rightPadding(m.command_key, 4));
+                option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(m.acs_string, 8));
                 break;
         
             case VIEW_NAMES:            
-                option_string.append("|15" + m_common_io.rightPadding(m.name, 21));
+                option_string.append(baseGetDefaultColor() + m_common_io.rightPadding(m.name, 21));
                 break;
                 
             case VIEW_STRINGS:
-                option_string.append("|15" + m_common_io.rightPadding(m.command_string, 15));
-                option_string.append("|11" + m_common_io.rightPadding("", 1));
-                option_string.append("|03" + m_common_io.rightPadding(m_common_io.boolAlpha(m.hidden), 5));
+                option_string.append(baseGetDefaultColor() + m_common_io.rightPadding(m.command_string, 15));
+                option_string.append(baseGetDefaultInputColor() + m_common_io.rightPadding("", 1));
+                option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(m_common_io.boolAlpha(m.hidden), 5));
                 break;
                 
             case VIEW_PULLDOWN:
-                option_string.append("|15" + m_common_io.rightPadding(m.menu_key, 9));
-                option_string.append("|11" + m_common_io.rightPadding(m.command_key, 4));
+                option_string.append(baseGetDefaultColor() + m_common_io.rightPadding(m.menu_key, 9));
+                option_string.append(baseGetDefaultInputColor() + m_common_io.rightPadding(m.command_key, 4));
                 
                 if (m.pulldown_id > 0) 
                 {
-                    option_string.append("|03" + m_common_io.rightPadding(std::to_string(m.pulldown_id), 8));                    
+                    option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(std::to_string(m.pulldown_id), 8));                    
                 }
                 else 
                 {
@@ -1888,49 +1888,49 @@ std::string ModMenuEditor::displayMenuOptionList()
             // Top Row
             if(rows == 0 && cols == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_TOP_LEFT;
             }
             else if(rows == 0 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_TOP_RIGHT;
             }
             else if(rows == 0 && cols % 25 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID_TOP;
             } 
             else if(rows == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_ROW;
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_BOT_LEFT;
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_BOT_RIGHT;
             }
             else if(rows == total_rows-1 && cols % 25 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID_BOT;
             } 
             else if(rows == total_rows-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_ROW;
             }
             else if(cols % 25 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID;
             }
             else
@@ -1998,7 +1998,7 @@ std::string ModMenuEditor::displayMenuEditScreen()
     std::vector<std::string> result_set;
 
     result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_VERSION_ID) + m_common_io.rightPadding(current_menu->file_version, 48));
-    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_BORDER_ROW_COLOR) + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
     result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_TITLE) + m_common_io.rightPadding(current_menu->menu_title, 48));
     result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_PASSWORD) + m_common_io.rightPadding(current_menu->menu_password, 48));    
     result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_FALLBACK) + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
@@ -2007,7 +2007,7 @@ std::string ModMenuEditor::displayMenuEditScreen()
     result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_PULLDOWN_FILE) + m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
     result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_VIEW_GENERIC) + m_common_io.rightPadding("", 48));
     result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_EDIT_OPTIONS) + m_common_io.rightPadding("", 48));    
-    result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_BORDER_ROW_COLOR) + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
     result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_QUIT_SAVE) + m_common_io.rightPadding("", 48));
     result_set.push_back(getDisplayPrompt(DISPLAY_MENU_FIELDS_QUIT_ABORT) + m_common_io.rightPadding("", 48));
                 
@@ -2034,49 +2034,49 @@ std::string ModMenuEditor::displayMenuEditScreen()
             // Top Row
             if(rows == 0 && cols == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_TOP_LEFT;
             }
             else if(rows == 0 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_TOP_RIGHT;
             }
             else if(rows == 0 && cols % 75 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID_TOP;
             } 
             else if(rows == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_ROW;
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_BOT_LEFT;
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_BOT_RIGHT;
             }
             else if(rows == total_rows-1 && cols % 75 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID_BOT;
             } 
             else if(rows == total_rows-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_ROW;
             }
             else if(cols % 75 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID;
             }
             else
@@ -2117,7 +2117,7 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
     std::string option_string = std::to_string(opt.index) + " / " + std::to_string(m_loaded_menu.back()->menu_options.size()-1);
     
     result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_ID) + m_common_io.rightPadding(option_string, 48));
-    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_BORDER_ROW_COLOR) + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
     result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_NAME) + m_common_io.rightPadding(opt.name, 48));
     result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_ACS) + m_common_io.rightPadding(opt.acs_string, 48));    
     result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_HIDDEN) + m_common_io.rightPadding(m_common_io.boolAlpha(opt.hidden), 48));
@@ -2127,7 +2127,7 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
     result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_PULLDOWN_ID) + m_common_io.rightPadding(std::to_string(opt.pulldown_id), 48));
     result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_PREVIOUS_OPT) + m_common_io.rightPadding("", 48));
     result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_NEXT_OPT) + m_common_io.rightPadding("", 48));    
-    result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_BORDER_ROW_COLOR) + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
     result_set.push_back(getDisplayPrompt(DISPLAY_OPT_FIELDS_OPTION_QUIT) + m_common_io.rightPadding("", 48));                    
                 
     // Not in use Yet, seems legacy only does ACS in option commands.
@@ -2152,49 +2152,49 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
             // Top Row
             if(rows == 0 && cols == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_TOP_LEFT;
             }
             else if(rows == 0 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_TOP_RIGHT;
             }
             else if(rows == 0 && cols % 75 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID_TOP;
             } 
             else if(rows == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_ROW;
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_BOT_LEFT;
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_BOT_RIGHT;
             }
             else if(rows == total_rows-1 && cols % 75 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID_BOT;
             } 
             else if(rows == total_rows-1)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_ROW;
             }
             else if(cols % 75 == 0)
             {
-                buffer += baseGetDefaultColor();
+                buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID;
             }
             else

@@ -288,7 +288,7 @@ public:
         , days_keep_attachments(30)
         , default_color_regular("|15")
         , default_color_stat("|03")
-        , default_color_prompt("|11")
+        , default_color_prompt("|07")
         , default_color_input("|11")
         , default_color_inverse("|19")
         , default_color_box("|08")  

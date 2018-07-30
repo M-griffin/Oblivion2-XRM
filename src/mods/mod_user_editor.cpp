@@ -246,7 +246,8 @@ void ModUserEditor::setupUserEditFields()
         return;
     
     std::string user_count_display = std::to_string(m_current_user_id);
-    user_count_display.append(" |03Record " + std::to_string(m_user_array_position+1) + " of " + std::to_string(m_users_listing.size()));
+    user_count_display.append(baseGetDefaultStatColor() + " Record " + std::to_string(m_user_array_position+1) + 
+        " of " + std::to_string(m_users_listing.size()));
     displayPromptMCI(PROMPT_USER_EDIT_HEADER, user_count_display);
     
     if (m_user_display_list.size() == 0) 
@@ -273,7 +274,8 @@ void ModUserEditor::setupUserEditExtendedFields()
         return;
     
     std::string user_count_display = std::to_string(m_current_user_id);
-    user_count_display.append(" |03Record " + std::to_string(m_user_array_position+1) + " of " + std::to_string(m_users_listing.size()));
+    user_count_display.append(baseGetDefaultStatColor() + " Record " + std::to_string(m_user_array_position+1) + 
+        " of " + std::to_string(m_users_listing.size()));
     displayPromptMCI(PROMPT_USER_EDIT_EXTENDED_HEADER, user_count_display);
     
     if (m_user_display_list.size() == 0) 
