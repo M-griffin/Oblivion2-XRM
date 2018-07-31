@@ -194,6 +194,27 @@ public:
     const std::string DISPLAY_USER_FIELDS_QUIT_SAVE = "display_user_field_quit_save";
     const std::string DISPLAY_USER_FIELDS_QUIT_ABORT = "display_user_field_quit_abort";
     
+    // User Displayed Extended Fields.
+    const std::string DISPLAY_USER_EXT_FIELDS_PASSWORD = "display_user_ext_field_password";
+    const std::string DISPLAY_USER_EXT_FIELDS_GENDER = "display_user_ext_field_gender";
+    const std::string DISPLAY_USER_EXT_FIELDS_PASSCHANGE_DATE = "display_user_ext_field_pass_change_date";
+    const std::string DISPLAY_USER_EXT_FIELDS_PASS_FORCE_CHANCE = "display_user_ext_password_force_change";
+    const std::string DISPLAY_USER_EXT_FIELDS_FIRSTON_DATE = "display_user_ext_field_firston_date";
+    const std::string DISPLAY_USER_EXT_FIELDS_FILEPOINTS = "display_user_ext_field_filepoints";
+    const std::string DISPLAY_USER_EXT_FIELDS_EXPIRE_DATE = "display_user_ext_field_expire_date";
+    const std::string DISPLAY_USER_EXT_FIELDS_POSTCALL_RATIO = "display_user_ext_field_postcall_ratio";
+    const std::string DISPLAY_USER_EXT_FIELDS_TIME_LIMIT = "display_user_ext_field_time_limit";
+    const std::string DISPLAY_USER_EXT_FIELDS_TIME_LEFT = "display_user_ext_field_time_left";
+    const std::string DISPLAY_USER_EXT_FIELDS_NUV_YESVOTES = "display_user_ext_field_nuv_yes_votes";
+    const std::string DISPLAY_USER_EXT_FIELDS_NUV_NOVOTES = "display_user_ext_field_nuv_no_votes";
+    const std::string DISPLAY_USER_EXT_FIELDS_REGULAR_COLOR = "display_user_ext_field_regular_color";
+    const std::string DISPLAY_USER_EXT_FIELDS_INPUT_COLOR = "display_user_ext_field_input_color";
+    const std::string DISPLAY_USER_EXT_FIELDS_PROMPT_COLOR = "display_user_ext_field_prompt_color";
+    const std::string DISPLAY_USER_EXT_FIELDS_BOX_COLOR = "display_user_ext_field_box_color";
+    const std::string DISPLAY_USER_EXT_FIELDS_STATUS_COLOR = "display_user_ext_field_status_color";
+    const std::string DISPLAY_USER_EXT_FIELDS_INVERSE_COLOR = "display_user_ext_field_inverse_color";
+    const std::string DISPLAY_USER_EXT_FIELDS_QUIT_RETURN = "display_user_ext_field_quit_return";
+    
     /**
      * @brief Create Default Text Prompts for module
      */

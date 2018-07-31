@@ -151,6 +151,27 @@ void ModUserEditor::createTextPrompts()
     value[DISPLAY_USER_FIELDS_QUIT_SAVE]          = std::make_pair("Quit and Save", " |03(|11Q|03) |15Quit & Save          ");
     value[DISPLAY_USER_FIELDS_QUIT_ABORT]         = std::make_pair("Exit without Saving", " |03(|11X|03) |15Exit without Saving  ");
     
+    // Extended User Field Display
+    value[DISPLAY_USER_EXT_FIELDS_PASSWORD]           = std::make_pair("Password", " |03(|11A|03) |15Password         : ");
+    value[DISPLAY_USER_EXT_FIELDS_GENDER]             = std::make_pair("Gender", " |03(|11M|03) |15User Gender    : ");    
+    value[DISPLAY_USER_EXT_FIELDS_PASSCHANGE_DATE]    = std::make_pair("Password Last Change Date", " |03(|11B|03) |15Pass Change Date : ");
+    value[DISPLAY_USER_EXT_FIELDS_PASS_FORCE_CHANCE]  = std::make_pair("Days to Force Password Change", " |03(|11N|03) |15Force Pass Chng: ");    
+    value[DISPLAY_USER_EXT_FIELDS_FIRSTON_DATE]       = std::make_pair("Sign-up Date", " |03(|11C|03) |15First On Date    : ");
+    value[DISPLAY_USER_EXT_FIELDS_FILEPOINTS]         = std::make_pair("File Points", " |03(|11O|03) |15File Points    : ");    
+    value[DISPLAY_USER_EXT_FIELDS_EXPIRE_DATE]        = std::make_pair("Expiration Date", " |03(|11D|03) |15Expiration Date  : ");
+    value[DISPLAY_USER_EXT_FIELDS_POSTCALL_RATIO]     = std::make_pair("Post/Call Ratio", " |03(|11P|03) |15Post Call Ratio: ");    
+    value[DISPLAY_USER_EXT_FIELDS_TIME_LIMIT]         = std::make_pair("Time Limit in Minutes Per Day", " |03(|11E|03) |15Daily Time Limit : ");
+    value[DISPLAY_USER_EXT_FIELDS_TIME_LEFT]          = std::make_pair("Time Left Today in Minutes", " |03(|11Q|03) |15Time Left Today: ");    
+    value[DISPLAY_USER_EXT_FIELDS_NUV_YESVOTES]       = std::make_pair("New User Voting - Yes Votes", " |03(|11F|03) |15NUV Yes Votes    : ");
+    value[DISPLAY_USER_EXT_FIELDS_NUV_NOVOTES]        = std::make_pair("New User Voting - No Votes", " |03(|11R|03) |15NUV No Votes   : ");    
+    value[DISPLAY_USER_EXT_FIELDS_REGULAR_COLOR]      = std::make_pair("Regular Color", " |03(|11G|03) |15Regular Color    : ");
+    value[DISPLAY_USER_EXT_FIELDS_INPUT_COLOR]        = std::make_pair("Input Color", " |03(|11S|03) |15Input Color    : ");    
+    value[DISPLAY_USER_EXT_FIELDS_PROMPT_COLOR]       = std::make_pair("Prompt Color", " |03(|11H|03) |15Prompt Color     : ");
+    value[DISPLAY_USER_EXT_FIELDS_BOX_COLOR]          = std::make_pair("Box Color", " |03(|11T|03) |15Box Color      : ");
+    value[DISPLAY_USER_EXT_FIELDS_STATUS_COLOR]       = std::make_pair("Status Color", " |03(|11I|03) |15Status Color     : ");
+    value[DISPLAY_USER_EXT_FIELDS_INVERSE_COLOR]      = std::make_pair("Inverse Color", " |03(|11U|03) |15Inverse Color  : ");
+    value[DISPLAY_USER_EXT_FIELDS_QUIT_RETURN]        = std::make_pair("Quit and Return", " |03(|11Q|03) |15Quit & Return        ");
+    
     m_text_prompts_dao->writeValue(value);
 }
 
@@ -1688,39 +1709,48 @@ std::string ModUserEditor::displayUserExtendedEditScreen()
     // Transform Gender to UpperCase
     std::string gender_string = usr->sGender;
     baseTransformToUpper(gender_string);
-    
+            
     // Initial Configuration fields, not all interfaces are implemented so some things 
     // will be left off for now.
-    result_set.push_back(m_common_io.rightPadding(" |03(|11A|03) |15Password         : " + baseGetDefaultStatColor() + "****** Masked ", 64) + 
-        m_common_io.rightPadding(" |03(|11M|03) |15User Gender    : " + baseGetDefaultStatColor() + gender_string, 48));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_PASSWORD) + baseGetDefaultStatColor() + "****** Masked ", 64) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_GENDER) + baseGetDefaultStatColor() + gender_string, 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11B|03) |15Pass Change Date : " + baseGetDefaultStatColor() + m_common_io.standardDateToString(usr->dtPassChangeDate), 64) + 
-        m_common_io.rightPadding(" |03(|11N|03) |15Force Pass Chng: " + baseGetDefaultStatColor() + std::to_string(usr->iCSPassChange), 48));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_PASSCHANGE_DATE) + baseGetDefaultStatColor() + m_common_io.standardDateToString(usr->dtPassChangeDate), 64) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_PASS_FORCE_CHANCE) + baseGetDefaultStatColor() + std::to_string(usr->iCSPassChange), 48));
                
-    result_set.push_back(m_common_io.rightPadding(" |03(|11C|03) |15First On Date    : " + baseGetDefaultStatColor() + m_common_io.standardDateToString(usr->dtFirstOn), 64) + 
-        m_common_io.rightPadding(" |03(|11O|03) |15File Points    : " + baseGetDefaultStatColor() + std::to_string(usr->iFilePoints), 48));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_FIRSTON_DATE) + baseGetDefaultStatColor() + m_common_io.standardDateToString(usr->dtFirstOn), 64) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_FILEPOINTS) + baseGetDefaultStatColor() + std::to_string(usr->iFilePoints), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11D|03) |15Expiration Date  : " + baseGetDefaultStatColor() + m_common_io.standardDateToString(usr->dtExpirationDate), 64) + 
-        m_common_io.rightPadding(" |03(|11P|03) |15Post Call Ratio: " + baseGetDefaultStatColor() + std::to_string(usr->iPostCallRatio), 48));
+    std::string expiration_date_string = "None";
+    if (m_common_io.standardDateToString(usr->dtExpirationDate) != "1969-12-31")
+        expiration_date_string = m_common_io.standardDateToString(usr->dtExpirationDate);
+
+        
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_EXPIRE_DATE) + baseGetDefaultStatColor() + expiration_date_string, 64) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_POSTCALL_RATIO) + baseGetDefaultStatColor() + std::to_string(usr->iPostCallRatio), 48));
     
-    result_set.push_back(m_common_io.rightPadding(" |03(|11E|03) |15Daily Time Limit : " + baseGetDefaultStatColor() + std::to_string(usr->iTimeLimit), 64) + 
-        m_common_io.rightPadding(" |03(|11Q|03) |15Time Left Today: " + baseGetDefaultStatColor() + std::to_string(usr->iTimeLeft), 48));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_TIME_LIMIT) + baseGetDefaultStatColor() + std::to_string(usr->iTimeLimit), 64) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_TIME_LEFT) + baseGetDefaultStatColor() + std::to_string(usr->iTimeLeft), 48));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11F|03) |15NUV Yes Votes    : " + baseGetDefaultStatColor() + std::to_string(usr->iNuvVotesYes), 64) + 
-        m_common_io.rightPadding(" |03(|11R|03) |15NUV No Votes   : " + baseGetDefaultStatColor() + std::to_string(usr->iNuvVotesNo), 48));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_NUV_YESVOTES) + baseGetDefaultStatColor() + std::to_string(usr->iNuvVotesYes), 64) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_NUV_NOVOTES) + baseGetDefaultStatColor() + std::to_string(usr->iNuvVotesNo), 48));        
         
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_REGULAR_COLOR) + usr->sRegColor + "***", 60) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_INPUT_COLOR) + usr->sInputColor + "***", 44));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11G|03) |15Regular Color    : " + usr->sRegColor + "***", 60) + 
-        m_common_io.rightPadding(" |03(|11S|03) |15Input Color    : " + usr->sInputColor + "***", 44));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_PROMPT_COLOR) + usr->sPromptColor + "***", 60) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_BOX_COLOR) + usr->sBoxColor + "***", 44));
         
-    result_set.push_back(m_common_io.rightPadding(" |03(|11H|03) |15Prompt Color     : " + usr->sPromptColor + "***", 60) + 
-        m_common_io.rightPadding(" |03(|11T|03) |15Box Color      : " + usr->sBoxColor + "***", 44));
-        
-    result_set.push_back(m_common_io.rightPadding(" |03(|11I|03) |15Status Color     : " + usr->sStatColor + "***", 60) + 
-        m_common_io.rightPadding(" |03(|11U|03) |15Inverse Color  : " + usr->sInverseColor + "***|16" , 47));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_STATUS_COLOR) + usr->sStatColor + "***", 60) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_INVERSE_COLOR) + usr->sInverseColor + "***|16" , 47));
         
     result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(" |03(|11Q|03) |15Quit & Return        " + m_common_io.rightPadding("", 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_QUIT_RETURN) + m_common_io.rightPadding("", 48));
+      
+    
+    
+        
+      
       
     // iterate through and print out
     int total_rows = result_set.size();
