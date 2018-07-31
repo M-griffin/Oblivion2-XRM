@@ -1721,10 +1721,10 @@ std::string ModUserEditor::displayUserExtendedEditScreen()
     result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_FIRSTON_DATE) + baseGetDefaultStatColor() + m_common_io.standardDateToString(usr->dtFirstOn), 64) + 
         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_FILEPOINTS) + baseGetDefaultStatColor() + std::to_string(usr->iFilePoints), 48));
         
+    // If Expiration Date Set to Minimun, then set as default None
     std::string expiration_date_string = "None";
     if (m_common_io.standardDateToString(usr->dtExpirationDate) != "1969-12-31")
         expiration_date_string = m_common_io.standardDateToString(usr->dtExpirationDate);
-
         
     result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_EXPIRE_DATE) + baseGetDefaultStatColor() + expiration_date_string, 64) + 
         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_POSTCALL_RATIO) + baseGetDefaultStatColor() + std::to_string(usr->iPostCallRatio), 48));
@@ -1735,22 +1735,17 @@ std::string ModUserEditor::displayUserExtendedEditScreen()
     result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_NUV_YESVOTES) + baseGetDefaultStatColor() + std::to_string(usr->iNuvVotesYes), 64) + 
         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_NUV_NOVOTES) + baseGetDefaultStatColor() + std::to_string(usr->iNuvVotesNo), 48));        
         
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_REGULAR_COLOR) + usr->sRegColor + "***", 60) + 
-        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_INPUT_COLOR) + usr->sInputColor + "***", 44));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_REGULAR_COLOR) + usr->sRegColor + "***|16", 63) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_INPUT_COLOR) + usr->sInputColor + "***|16", 47));
         
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_PROMPT_COLOR) + usr->sPromptColor + "***", 60) + 
-        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_BOX_COLOR) + usr->sBoxColor + "***", 44));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_PROMPT_COLOR) + usr->sPromptColor + "***|16", 63) + 
+        m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_BOX_COLOR) + usr->sBoxColor + "***|16", 47));
         
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_STATUS_COLOR) + usr->sStatColor + "***", 60) + 
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_STATUS_COLOR) + usr->sStatColor + "***|16", 63) + 
         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_INVERSE_COLOR) + usr->sInverseColor + "***|16" , 47));
         
     result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
     result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_QUIT_RETURN) + m_common_io.rightPadding("", 48));
-      
-    
-    
-        
-      
       
     // iterate through and print out
     int total_rows = result_set.size();
