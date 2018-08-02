@@ -3,7 +3,7 @@
  *
  * Rewritten / author: 2016-02-19 / mrmisticismo@hotmail.com
  * Published / author: 2005-08-12 / grymse@alhem.net
- * Copyright (C) 2015-2016  Michael Griffin
+ * Copyright (C) 2015-2018  Michael Griffin
  * Copyright (C) 2001-2006  Anders Hedstrom
  * This program is made available under the terms of the GNU GPL.
  */
@@ -257,7 +257,7 @@ namespace SQLW
      * Should not be used, use sqlite3_mprintf()
      * To avoid Injection Attacks.
      */
-    std::string Database::safestr(const std::string& str)
+    std::string Database::safeString(const std::string& str)
     {
         std::string str2;
         for(size_t i = 0; i < str.size(); i++)
@@ -283,7 +283,7 @@ namespace SQLW
     }
 
 
-    std::string Database::xmlsafestr(const std::string& str)
+    std::string Database::xmlSafeString(const std::string& str)
     {
         std::string str2;
         for(size_t i = 0; i < str.size(); i++)
@@ -313,7 +313,7 @@ namespace SQLW
     }
 
     // Convert String to signed int64
-    int64_t Database::a2bigint(const std::string& str)
+    int64_t Database::alphaToBigInt(const std::string& str)
     {
         std::istringstream ss(str);
         int64_t bitInt;
@@ -326,7 +326,7 @@ namespace SQLW
     }
 
     // Convert String to Unsigned int64
-    uint64_t Database::a2ubigint(const std::string& str)
+    uint64_t Database::alphaToUnsignedBitInt(const std::string& str)
     {
         std::istringstream ss(str);
         uint64_t bitInt;

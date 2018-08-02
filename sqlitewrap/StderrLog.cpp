@@ -3,7 +3,7 @@
  *
  * Rewritten / author: 2016-02-19 / mrmisticismo@hotmail.com
  * Published / author: 2005-08-12 / grymse@alhem.net
- * Copyright (C) 2015-2016  Michael Griffin
+ * Copyright (C) 2015-2018  Michael Griffin
  * Copyright (C) 2001-2006  Anders Hedstrom
  * This program is made available under the terms of the GNU GPL.
  */
@@ -47,7 +47,7 @@ namespace SQLW
         fprintf(stderr,"%d-%02d-%02d %02d:%02d:%02d :: Query: %s: %s(%d)\n",
                 tp.tm_year + 1900,tp.tm_mon + 1,tp.tm_mday,
                 tp.tm_hour,tp.tm_min, tp.tm_sec,
-                str.c_str(),q.GetError().c_str(),q.GetErrno());
+                str.c_str(),q.getError().c_str(),q.getErrorCode());
         fprintf(stderr," (QUERY: \"%s\")\n",q.getLastQuery().c_str());
     }
 

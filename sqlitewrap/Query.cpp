@@ -3,7 +3,7 @@
  *
  * Rewritten / author: 2016-02-19 / mrmisticismo@hotmail.com
  * Published / author: 2005-08-12 / grymse@alhem.net
- * Copyright (C) 2015-2016  Michael Griffin
+ * Copyright (C) 2015-2018  Michael Griffin
  * Copyright (C) 2001-2006  Anders Hedstrom
  * This program is made available under the terms of the GNU GPL.
  */
@@ -295,18 +295,18 @@ namespace SQLW
         return false;
     }
 
-    const char *Query::getstr(const std::string& x)
+    const char *Query::getString(const std::string& x)
     {
         int index = m_nmap[x] - 1;
         if(index >= 0)
         {
-            return getstr(index);
+            return getString(index);
         }
         queryError("Column name lookup failure: " + x);
         return "";
     }
 
-    const char *Query::getstr(int x)
+    const char *Query::getString(int x)
     {
         if(odb && res && row && x < sqlite3_column_count(res))
         {
@@ -316,23 +316,23 @@ namespace SQLW
         return "";
     }
 
-    const char *Query::getstr()
+    const char *Query::getString()
     {
-        return getstr(rowcount++);
+        return getString(rowcount++);
     }
 
-    double Query::getnum(const std::string& x)
+    double Query::getNumber(const std::string& x)
     {
         int index = m_nmap[x] - 1;
         if(index >= 0)
         {
-            return getnum(index);
+            return getNumber(index);
         }
         queryError("Column name lookup failure: " + x);
         return 0;
     }
 
-    double Query::getnum(int x)
+    double Query::getNumber(int x)
     {
         if(odb && res && row)
         {
@@ -341,18 +341,18 @@ namespace SQLW
         return 0;
     }
 
-    long Query::getval(const std::string& x)
+    long Query::getValue(const std::string& x)
     {
         int index = m_nmap[x] - 1;
         if(index >= 0)
         {
-            return getval(index);
+            return getValue(index);
         }
         queryError("Column name lookup failure: " + x);
         return 0;
     }
 
-    long Query::getval(int x)
+    long Query::getValue(int x)
     {
         if(odb && res && row)
         {
@@ -361,30 +361,30 @@ namespace SQLW
         return 0;
     }
 
-    double Query::getnum()
+    double Query::getNumber()
     {
-        return getnum(rowcount++);
+        return getNumber(rowcount++);
     }
 
 
-    long Query::getval()
+    long Query::getValue()
     {
-        return getval(rowcount++);
+        return getValue(rowcount++);
     }
 
 
-    unsigned long Query::getuval(const std::string& x)
+    unsigned long Query::getUnsignedValue(const std::string& x)
     {
         int index = m_nmap[x] - 1;
         if(index >= 0)
         {
-            return getuval(index);
+            return getUnsignedValue(index);
         }
         queryError("Column name lookup failure: " + x);
         return 0;
     }
 
-    unsigned long Query::getuval(int x)
+    unsigned long Query::getUnsignedValue(int x)
     {
         unsigned long l = 0;
         if(odb && res && row)
@@ -394,24 +394,24 @@ namespace SQLW
         return l;
     }
 
-    unsigned long Query::getuval()
+    unsigned long Query::getUnsignedValue()
     {
-        return getuval(rowcount++);
+        return getUnsignedValue(rowcount++);
     }
 
 
-    int64_t Query::getbigint(const std::string& x)
+    int64_t Query::getBigInt(const std::string& x)
     {
         int index = m_nmap[x] - 1;
         if(index >= 0)
         {
-            return getbigint(index);
+            return getBigInt(index);
         }
         queryError("Column name lookup failure: " + x);
         return 0;
     }
 
-    int64_t Query::getbigint(int x)
+    int64_t Query::getBigInt(int x)
     {
         if(odb && res && row)
         {
@@ -420,23 +420,23 @@ namespace SQLW
         return 0;
     }
 
-    int64_t Query::getbigint()
+    int64_t Query::getBigInt()
     {
-        return getbigint(rowcount++);
+        return getBigInt(rowcount++);
     }
 
-    uint64_t Query::getubigint(const std::string& x)
+    uint64_t Query::getUnsignedBitInt(const std::string& x)
     {
         int index = m_nmap[x] - 1;
         if(index >= 0)
         {
-            return getubigint(index);
+            return getUnsignedBitInt(index);
         }
         queryError("Column name lookup failure: " + x);
         return 0;
     }
 
-    uint64_t Query::getubigint(int x)
+    uint64_t Query::getUnsignedBitInt(int x)
     {
         uint64_t l = 0;
         if(odb && res && row)
@@ -446,9 +446,9 @@ namespace SQLW
         return l;
     }
 
-    uint64_t Query::getubigint()
+    uint64_t Query::getUnsignedBitInt()
     {
-        return getubigint(rowcount++);
+        return getUnsignedBitInt(rowcount++);
     }
 
     double Query::exeGetResultDouble(const std::string& sql)
@@ -458,7 +458,7 @@ namespace SQLW
         {
             if(fetchRow())
             {
-                l = getnum();
+                l = getNumber();
             }
             freeResult();
         }
@@ -472,7 +472,7 @@ namespace SQLW
         {
             if(fetchRow())
             {
-                l = getval();
+                l = getValue();
             }
             freeResult();
         }
@@ -486,7 +486,7 @@ namespace SQLW
         {
             if(fetchRow())
             {
-                m_tmpstr = getstr();
+                m_tmpstr = getString();
             }
             freeResult();
         }
@@ -498,7 +498,7 @@ namespace SQLW
         return m_last_query;
     }
 
-    std::string Query::GetError()
+    std::string Query::getError()
     {
         if(odb)
         {
@@ -507,7 +507,7 @@ namespace SQLW
         return "";
     }
 
-    int Query::GetErrno()
+    int Query::getErrorCode()
     {
         if(odb)
         {
