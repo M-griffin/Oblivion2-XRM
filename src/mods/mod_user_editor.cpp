@@ -172,6 +172,25 @@ void ModUserEditor::createTextPrompts()
     value[DISPLAY_USER_EXT_FIELDS_INVERSE_COLOR]      = std::make_pair("Inverse Color", " |03(|11U|03) |15Inverse Color  : ");
     value[DISPLAY_USER_EXT_FIELDS_QUIT_RETURN]        = std::make_pair("Quit and Return", " |03(|11Q|03) |15Quit & Return        ");
     
+    value[PROMPT_USER_EXT_FIELDS_PASSWORD]           = std::make_pair("Password", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Password         : ");
+    value[PROMPT_USER_EXT_FIELDS_GENDER]             = std::make_pair("Gender", "|CR|03%   |15|PD|CR|11!   |03(|11M|03) |15User Gender    : ");    
+    value[PROMPT_USER_EXT_FIELDS_PASSCHANGE_DATE]    = std::make_pair("Password Last Change Date", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15Pass Change Date : ");
+    value[PROMPT_USER_EXT_FIELDS_PASS_FORCE_CHANCE]  = std::make_pair("Days to Force Password Change", "|CR|03%   |15|PD|CR|11!   |03(|11N|03) |15Force Pass Chng: ");    
+    value[PROMPT_USER_EXT_FIELDS_FIRSTON_DATE]       = std::make_pair("Sign-up Date", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15First On Date    : ");
+    value[PROMPT_USER_EXT_FIELDS_FILEPOINTS]         = std::make_pair("File Points", "|CR|03%   |15|PD|CR|11!   |03(|11O|03) |15File Points    : ");    
+    value[PROMPT_USER_EXT_FIELDS_EXPIRE_DATE]        = std::make_pair("Expiration Date", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15Expiration Date  : ");
+    value[PROMPT_USER_EXT_FIELDS_POSTCALL_RATIO]     = std::make_pair("Post/Call Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11P|03) |15Post Call Ratio: ");    
+    value[PROMPT_USER_EXT_FIELDS_TIME_LIMIT]         = std::make_pair("Time Limit in Minutes Per Day", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Daily Time Limit : ");
+    value[PROMPT_USER_EXT_FIELDS_TIME_LEFT]          = std::make_pair("Time Left Today in Minutes", "|CR|03%   |15|PD|CR|11!   |03(|11Q|03) |15Time Left Today: ");    
+    value[PROMPT_USER_EXT_FIELDS_NUV_YESVOTES]       = std::make_pair("New User Voting - Yes Votes", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15NUV Yes Votes    : ");
+    value[PROMPT_USER_EXT_FIELDS_NUV_NOVOTES]        = std::make_pair("New User Voting - No Votes", "|CR|03%   |15|PD|CR|11!   |03(|11R|03) |15NUV No Votes   : ");    
+    value[PROMPT_USER_EXT_FIELDS_REGULAR_COLOR]      = std::make_pair("Regular Color", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15Regular Color    : ");
+    value[PROMPT_USER_EXT_FIELDS_INPUT_COLOR]        = std::make_pair("Input Color", "|CR|03%   |15|PD|CR|11!   |03(|11S|03) |15Input Color    : ");    
+    value[PROMPT_USER_EXT_FIELDS_PROMPT_COLOR]       = std::make_pair("Prompt Color", "|CR|03%   |15|PD|CR|11!   |03(|11H|03) |15Prompt Color     : ");
+    value[PROMPT_USER_EXT_FIELDS_BOX_COLOR]          = std::make_pair("Box Color", "|CR|03%   |15|PD|CR|11!   |03(|11T|03) |15Box Color      : ");
+    value[PROMPT_USER_EXT_FIELDS_STATUS_COLOR]       = std::make_pair("Status Color", "|CR|03%   |15|PD|CR|11!   |03(|11I|03) |15Status Color     : ");
+    value[PROMPT_USER_EXT_FIELDS_INVERSE_COLOR]      = std::make_pair("Inverse Color", "|CR|03%   |15|PD|CR|11!   |03(|11U|03) |15Inverse Color  : ");
+
     m_text_prompts_dao->writeValue(value);
 }
 
@@ -1219,16 +1238,19 @@ void ModUserEditor::userEditorExtendedInput(const std::string &input)
         std::string output_buffer = m_config->default_color_regular;
         switch (toupper(key[0]))
         {
+            
+            // TODO User Extended Prompts!
+            
             case 'A': // User Name
                 m_current_field = toupper(key[0]);
-                changeInputModule(MOD_USER_FIELD);
+                changeInputModule(MOD_USER_EXTENDED_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_USERNAME);
                 m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sHandle);
                 break;
                 
             case 'M': // User Level
                 m_current_field = toupper(key[0]);
-                changeInputModule(MOD_USER_FIELD);
+                changeInputModule(MOD_USER_EXTENDED_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_USERLEVEL);
                 m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iLevel));
                 break;

@@ -215,6 +215,26 @@ public:
     const std::string DISPLAY_USER_EXT_FIELDS_INVERSE_COLOR = "display_user_ext_field_inverse_color";
     const std::string DISPLAY_USER_EXT_FIELDS_QUIT_RETURN = "display_user_ext_field_quit_return";
     
+    // Extended Prompts
+    const std::string PROMPT_USER_EXT_FIELDS_PASSWORD = "prompt_user_ext_field_password";
+    const std::string PROMPT_USER_EXT_FIELDS_GENDER = "prompt_user_ext_field_gender";
+    const std::string PROMPT_USER_EXT_FIELDS_PASSCHANGE_DATE = "prompt_user_ext_field_pass_change_date";
+    const std::string PROMPT_USER_EXT_FIELDS_PASS_FORCE_CHANCE = "prompt_user_ext_password_force_change";
+    const std::string PROMPT_USER_EXT_FIELDS_FIRSTON_DATE = "prompt_user_ext_field_firston_date";
+    const std::string PROMPT_USER_EXT_FIELDS_FILEPOINTS = "prompt_user_ext_field_filepoints";
+    const std::string PROMPT_USER_EXT_FIELDS_EXPIRE_DATE = "prompt_user_ext_field_expire_date";
+    const std::string PROMPT_USER_EXT_FIELDS_POSTCALL_RATIO = "prompt_user_ext_field_postcall_ratio";
+    const std::string PROMPT_USER_EXT_FIELDS_TIME_LIMIT = "prompt_user_ext_field_time_limit";
+    const std::string PROMPT_USER_EXT_FIELDS_TIME_LEFT = "prompt_user_ext_field_time_left";
+    const std::string PROMPT_USER_EXT_FIELDS_NUV_YESVOTES = "prompt_user_ext_field_nuv_yes_votes";
+    const std::string PROMPT_USER_EXT_FIELDS_NUV_NOVOTES = "prompt_user_ext_field_nuv_no_votes";
+    const std::string PROMPT_USER_EXT_FIELDS_REGULAR_COLOR = "prompt_user_ext_field_regular_color";
+    const std::string PROMPT_USER_EXT_FIELDS_INPUT_COLOR = "prompt_user_ext_field_input_color";
+    const std::string PROMPT_USER_EXT_FIELDS_PROMPT_COLOR = "prompt_user_ext_field_prompt_color";
+    const std::string PROMPT_USER_EXT_FIELDS_BOX_COLOR = "prompt_user_ext_field_box_color";
+    const std::string PROMPT_USER_EXT_FIELDS_STATUS_COLOR = "prompt_user_ext_field_status_color";
+    const std::string PROMPT_USER_EXT_FIELDS_INVERSE_COLOR = "prompt_user_ext_field_inverse_color";
+    
     /**
      * @brief Create Default Text Prompts for module
      */
