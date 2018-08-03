@@ -1000,68 +1000,60 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
         }
                 
         baseProcessDeliverNewLine();
+        m_current_field = toupper(key[0]);
         
         std::string output_buffer = m_config->default_color_regular;
-        switch (toupper(key[0]))
+        switch (m_current_field)
         {
             case 'A': // User Name
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_USERNAME);
                 m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sHandle);
                 break;
                 
             case 'M': // User Level
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_USERLEVEL);
                 m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iLevel));
                 break;
         
             case 'B': // User Real Name
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_REALNAME);
                 m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sRealName);
                 break;
             
             case 'N': // User File Level
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_FILELEVEL);
                 m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iFileLevel));
                 break;
                
             case 'C': // User Email
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_EMAIL);
                 m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sEmail);
                 break;
                 
             case 'O': // User Message Level
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_MESGLEVEL);
                 m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iMessageLevel));
                 break;
             
             case 'D': // User Address
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_ADDRESS);
                 m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sAddress);
                 break;
                 
             case 'P': // Numkber Hack Attempts
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_HACKATTEMPT);
                 m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iHackAttempts));
                 break;
            
             case 'E': // User Location
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_LOCATION);
                 m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sLocation);
@@ -1069,7 +1061,6 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 
             case 'R': // Ignore Time Limit
             {
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_NOTIMELIMIT);
                 // Setup pre-population to display only T or F instead of True / False
@@ -1079,7 +1070,6 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
             }
             case 'F': // User Country
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_COUNTRY);
                 m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sCountry);
@@ -1087,7 +1077,6 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 
             case 'S': // Use ANSI Graphics
             {
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_USEANSI);
                 // Setup pre-population to display only T or F instead of True / False
@@ -1097,7 +1086,6 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
             }
             case 'G': // User Note
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_USERNOTE);
                 m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sUserNote);
@@ -1105,7 +1093,6 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 
             case 'T': // Use VT100 Backspace
             {
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_BACKSPACE);
                 // Setup pre-population to display only T or F instead of True / False
@@ -1115,7 +1102,6 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
             }            
             case 'H': // User Birth Date
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_BIRTHDATE);
                 m_session_io.getInputField("", key, Config::sName_length, m_common_io.standardDateToString(m_loaded_user.back()->dtBirthday));
@@ -1123,7 +1109,6 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 
             case 'U': // User Wanted
             {
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_WANTED);
                 // Setup pre-population to display only T or F instead of True / False
@@ -1134,7 +1119,6 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
             }
             case 'I': // Access Restriction Flags 1, Type Letter to Add / Remove only.  
                 // No leadoff data, just input single letters to add or remove
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_FLAGS1);
                 m_session_io.getInputField("", key, Config::sName_length);
@@ -1142,7 +1126,6 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
 
             case 'V': // Clear Screen or Scroll Screen
             {
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_CLEARSCREEN);
                 // Setup pre-population to display only T or F instead of True / False
@@ -1153,7 +1136,6 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
             }
             case 'J': // Access Restriction Flags 2, Type Letter to Add / Remove only.  
                 // No leadoff data, just input single letters to add or remove 
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_FLAGS2);
                 m_session_io.getInputField("", key, Config::sName_length);
@@ -1161,7 +1143,6 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
 
             case 'W': // Do Screen Pause
             {
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_SCREENPAUSE);
                 // Setup pre-population to display only T or F instead of True / False
@@ -1233,117 +1214,121 @@ void ModUserEditor::userEditorExtendedInput(const std::string &input)
             return;
         }
                 
-        baseProcessDeliverNewLine();
+        baseProcessDeliverNewLine();        
+        m_current_field = toupper(key[0]);
         
         std::string output_buffer = m_config->default_color_regular;
-        switch (toupper(key[0]))
-        {
-            
-            // TODO User Extended Prompts!
-            
-            value[PROMPT_USER_EXT_FIELDS_PASSWORD]           = std::make_pair("Password", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Password         : ");
-            value[PROMPT_USER_EXT_FIELDS_GENDER]             = std::make_pair("Gender", "|CR|03%   |15|PD|CR|11!   |03(|11M|03) |15User Gender    : ");    
-            value[PROMPT_USER_EXT_FIELDS_PASSCHANGE_DATE]    = std::make_pair("Password Last Change Date", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15Pass Change Date : ");
-            value[PROMPT_USER_EXT_FIELDS_PASS_FORCE_CHANCE]  = std::make_pair("Days to Force Password Change", "|CR|03%   |15|PD|CR|11!   |03(|11N|03) |15Force Pass Chng: ");    
-            value[PROMPT_USER_EXT_FIELDS_FIRSTON_DATE]       = std::make_pair("Sign-up Date", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15First On Date    : ");
-            value[PROMPT_USER_EXT_FIELDS_FILEPOINTS]         = std::make_pair("File Points", "|CR|03%   |15|PD|CR|11!   |03(|11O|03) |15File Points    : ");    
-            value[PROMPT_USER_EXT_FIELDS_EXPIRE_DATE]        = std::make_pair("Expiration Date", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15Expiration Date  : ");
-            value[PROMPT_USER_EXT_FIELDS_POSTCALL_RATIO]     = std::make_pair("Post/Call Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11P|03) |15Post Call Ratio: ");    
-            value[PROMPT_USER_EXT_FIELDS_TIME_LIMIT]         = std::make_pair("Time Limit in Minutes Per Day", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Daily Time Limit : ");
-            value[PROMPT_USER_EXT_FIELDS_TIME_LEFT]          = std::make_pair("Time Left Today in Minutes", "|CR|03%   |15|PD|CR|11!   |03(|11Q|03) |15Time Left Today: ");    
-            value[PROMPT_USER_EXT_FIELDS_NUV_YESVOTES]       = std::make_pair("New User Voting - Yes Votes", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15NUV Yes Votes    : ");
-            value[PROMPT_USER_EXT_FIELDS_NUV_NOVOTES]        = std::make_pair("New User Voting - No Votes", "|CR|03%   |15|PD|CR|11!   |03(|11R|03) |15NUV No Votes   : ");    
-            value[PROMPT_USER_EXT_FIELDS_REGULAR_COLOR]      = std::make_pair("Regular Color", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15Regular Color    : ");
-            value[PROMPT_USER_EXT_FIELDS_INPUT_COLOR]        = std::make_pair("Input Color", "|CR|03%   |15|PD|CR|11!   |03(|11S|03) |15Input Color    : ");    
-            value[PROMPT_USER_EXT_FIELDS_PROMPT_COLOR]       = std::make_pair("Prompt Color", "|CR|03%   |15|PD|CR|11!   |03(|11H|03) |15Prompt Color     : ");
-            value[PROMPT_USER_EXT_FIELDS_BOX_COLOR]          = std::make_pair("Box Color", "|CR|03%   |15|PD|CR|11!   |03(|11T|03) |15Box Color      : ");
-            value[PROMPT_USER_EXT_FIELDS_STATUS_COLOR]       = std::make_pair("Status Color", "|CR|03%   |15|PD|CR|11!   |03(|11I|03) |15Status Color     : ");
-            value[PROMPT_USER_EXT_FIELDS_INVERSE_COLOR]      = std::make_pair("Inverse Color", "|CR|03%   |15|PD|CR|11!   |03(|11U|03) |15Inverse Color  : ");
-            
-            user_ptr usr;
-            usr->iTimeLimit
-            
+        switch (m_current_field)
+        {            
             case 'A': // Password
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_EXTENDED_FIELD);
                 displayPrompt(PROMPT_USER_EXT_FIELDS_PASSWORD);
-                
-                // No Lead Off,  Passwords are hashed or hidden in Security Index.
                 m_session_io.getInputField("", key, Config::sName_length);
                 break;
                 
             case 'M': // Gender
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_EXTENDED_FIELD);
                 displayPrompt(PROMPT_USER_EXT_FIELDS_GENDER);
                 m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sGender);
                 break;
                 
             case 'B': // Password Last change date
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_EXTENDED_FIELD);
                 displayPrompt(PROMPT_USER_EXT_FIELDS_PASSCHANGE_DATE);
-                
-                // No Lead Off, Previous Passwords are hashed or hidden.
                 m_session_io.getInputField("", key, Config::sName_length, m_common_io.standardDateToString(m_loaded_user.back()->dtFirstOn));
                 break;
                 
             case 'N': // Days to Force Password change
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_EXTENDED_FIELD);
                 displayPrompt(PROMPT_USER_EXT_FIELDS_PASS_FORCE_CHANCE);
                 m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iCSPassChange));
                 break;
                 
             case 'C': // Signup Date / First On
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_EXTENDED_FIELD);
                 displayPrompt(PROMPT_USER_EXT_FIELDS_FIRSTON_DATE);
-                
-                // No Lead Off, Previous Passwords are hashed or hidden.
                 m_session_io.getInputField("", key, Config::sName_length, m_common_io.standardDateToString(m_loaded_user.back()->dtPassChangeDate));
                 break;
                 
             case 'O': // File Points
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_EXTENDED_FIELD);
                 displayPrompt(PROMPT_USER_EXT_FIELDS_FILEPOINTS);
                 m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iFilePoints));
                 break;
                 
             case 'D': // Expiratrion Date
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_EXTENDED_FIELD);
                 displayPrompt(PROMPT_USER_EXT_FIELDS_EXPIRE_DATE);
-                
-                // No Lead Off, Previous Passwords are hashed or hidden.
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.standardDateToString(m_loaded_user.back()->dtPassChangeDate));
+                m_session_io.getInputField("", key, Config::sName_length, m_common_io.standardDateToString(m_loaded_user.back()->dtExpirationDate));
                 break;
                 
             case 'P': // Post/Call Ratio
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_EXTENDED_FIELD);
                 displayPrompt(PROMPT_USER_EXT_FIELDS_POSTCALL_RATIO);
                 m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iPostCallRatio));
                 break;
                 
             case 'E': // Time Limit
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_EXTENDED_FIELD);
                 displayPrompt(PROMPT_USER_EXT_FIELDS_TIME_LIMIT);
-                
-                // No Lead Off, Previous Passwords are hashed or hidden.
                 m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iTimeLimit));
                 break;
                 
             case 'R': // Time Left Today
-                m_current_field = toupper(key[0]);
                 changeInputModule(MOD_USER_EXTENDED_FIELD);
                 displayPrompt(PROMPT_USER_EXT_FIELDS_TIME_LEFT);
                 m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iTimeLeft));
                 break;
         
+            case 'F': // New User Voting (YES) 
+                changeInputModule(MOD_USER_EXTENDED_FIELD);
+                displayPrompt(PROMPT_USER_EXT_FIELDS_NUV_YESVOTES);
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iNuvVotesYes));
+                break;
+                
+            case 'S': // New User Voting (NO)
+                changeInputModule(MOD_USER_EXTENDED_FIELD);
+                displayPrompt(PROMPT_USER_EXT_FIELDS_NUV_NOVOTES);
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iNuvVotesNo));
+                break;
+                
+            case 'G': // Regular Color
+                changeInputModule(MOD_USER_EXTENDED_FIELD);
+                displayPrompt(PROMPT_USER_EXT_FIELDS_REGULAR_COLOR);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sRegColor);
+                break;
+                
+            case 'T': // Input Color
+                changeInputModule(MOD_USER_EXTENDED_FIELD);
+                displayPrompt(PROMPT_USER_EXT_FIELDS_INPUT_COLOR);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sInputColor);
+                break;
               
+            case 'H': // Prompt Color
+                changeInputModule(MOD_USER_EXTENDED_FIELD);
+                displayPrompt(PROMPT_USER_EXT_FIELDS_PROMPT_COLOR);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sPromptColor);
+                break;
+                
+            case 'U': // Box Color
+                changeInputModule(MOD_USER_EXTENDED_FIELD);
+                displayPrompt(PROMPT_USER_EXT_FIELDS_BOX_COLOR);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sBoxColor);
+                break;
+    
+            case 'I': // Prompt Color
+                changeInputModule(MOD_USER_EXTENDED_FIELD);
+                displayPrompt(PROMPT_USER_EXT_FIELDS_STATUS_COLOR);                
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sStatColor);
+                break;
+                
+            case 'V': // Box Color
+                changeInputModule(MOD_USER_EXTENDED_FIELD);
+                displayPrompt(PROMPT_USER_EXT_FIELDS_INVERSE_COLOR);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sInverseColor);
+                break;
+
+
             case 'Q': // Quit
                 // Return to previous screen
                 changeInputModule(MOD_USER_FIELD_INPUT);
@@ -1530,67 +1515,16 @@ void ModUserEditor::userEditorExtendedFieldHandler(const std::string &input)
         // Handle the assigned input received for field
         switch(m_current_field)
         {
-            /*
-            case 'A': // User Name
-                m_loaded_user.back()->sHandle = key;
-                break;                     
-                
-            case 'M': // User Level
-                m_loaded_user.back()->iLevel = m_common_io.stringToInt(key);
-                break;
-        
-            case 'B': // User Real Name
-                m_loaded_user.back()->sRealName = key;
-                break;
-            
-            case 'N': // User File Level
-                m_loaded_user.back()->iFileLevel = m_common_io.stringToInt(key);
-                break;
-               
-            case 'C': // User Email
-                m_loaded_user.back()->sEmail = key;
+            case 'A': // Password
+                // changePasswordMethod = key!
                 break;
                 
-            case 'O': // User Message Level                
-                m_loaded_user.back()->iMessageLevel = m_common_io.stringToInt(key);
-                break;
-            
-            case 'D': // User Address
-                m_loaded_user.back()->sAddress = key;
+            case 'M': // Gender
+                baseTransformToUpper(key);
+                m_loaded_user.back()->sGender = key;
                 break;
                 
-            case 'P': // Numkber Hack Attempts
-                m_loaded_user.back()->iHackAttempts = m_common_io.stringToInt(key);
-                break;
-           
-            case 'E': // User Location
-                m_loaded_user.back()->sLocation = key;
-                break;
-                
-            case 'R': // Ignore Time Limit                
-                if (m_common_io.stringToBool(key) != -1)
-                    m_loaded_user.back()->bIgnoreTimeLimit = m_common_io.stringToBool(key);
-                break;
-
-            case 'F': // User Country
-                m_loaded_user.back()->sCountry = key;
-                break;
-                
-            case 'S': // Use ANSI Graphics
-                if (m_common_io.stringToBool(key) != -1)
-                    m_loaded_user.back()->bAnsi = m_common_io.stringToBool(key);
-                break;
-
-            case 'G': // User Note
-                m_loaded_user.back()->sUserNote = key;
-                break;
-                
-            case 'T': // Use VT100 Backspace
-                if (m_common_io.stringToBool(key) != -1)
-                    m_loaded_user.back()->bBackSpaceVt100 = m_common_io.stringToBool(key);
-                break;
-
-            case 'H': // User Birth Date
+            case 'B': // Password Last change date
             {
                 // Make sure Date Format is valid
                 std::regex date_regex { m_config->regexp_date_validation };
@@ -1599,39 +1533,87 @@ void ModUserEditor::userEditorExtendedFieldHandler(const std::string &input)
                 // If invalid display message, but for now ignore changes
                 if(std::regex_match(key, str_matches, date_regex))
                 {
-                    m_loaded_user.back()->dtBirthday = m_common_io.stringToStandardDate(key);
+                    m_loaded_user.back()->dtFirstOn = m_common_io.stringToStandardDate(key);
                 }
                 break;
-            }    
-            case 'U': // User Wanted
-                if (m_common_io.stringToBool(key) != -1)
-                    m_loaded_user.back()->bWanted = m_common_io.stringToBool(key);
+            }
+            case 'N': // Days to Force Password change
+                m_loaded_user.back()->iCSPassChange = m_common_io.stringToInt(key);
                 break;
-
-            case 'I': // Access Restriction Flags 1, Will loop though and toggle each letter.
+                
+            case 'C': // Signup Date / First On
             {
-                AccessCondition acs;
-                for (char c : key)
-                    acs.setFlagToggle(c, true, m_loaded_user.back());
+                // Make sure Date Format is valid
+                std::regex date_regex { m_config->regexp_date_validation };
+                std::smatch str_matches;
+
+                // If invalid display message, but for now ignore changes
+                if(std::regex_match(key, str_matches, date_regex))
+                {
+                    m_loaded_user.back()->dtPassChangeDate = m_common_io.stringToStandardDate(key);
+                }
                 break;
             }
-            case 'V': // Clear Screen or Scroll Screen
-                if (m_common_io.stringToBool(key) != -1)
-                    m_loaded_user.back()->bClearOrScroll = m_common_io.stringToBool(key);
+            case 'O': // File Points
+                m_loaded_user.back()->iFilePoints = m_common_io.stringToInt(key);
                 break;
-
-            case 'J': // Access Restriction Flags 2, Type Letter to Add / Remove only.  
+                
+            case 'D': // Expiratrion Date
             {
-                AccessCondition acs;
-                for (char c : key)
-                    acs.setFlagToggle(c, false, m_loaded_user.back());
+                // Make sure Date Format is valid
+                std::regex date_regex { m_config->regexp_date_validation };
+                std::smatch str_matches;
+
+                // If invalid display message, but for now ignore changes
+                if(std::regex_match(key, str_matches, date_regex))
+                {
+                    m_loaded_user.back()->dtExpirationDate = m_common_io.stringToStandardDate(key);
+                }
                 break;
             }
-            case 'W': // Pause
-                if (m_common_io.stringToBool(key) != -1)
-                    m_loaded_user.back()->bDoPause = m_common_io.stringToBool(key);
-                break;  
-            */                                       
+            case 'P': // Post/Call Ratio
+                m_loaded_user.back()->iPostCallRatio = m_common_io.stringToInt(key);
+                break;
+                
+            case 'E': // Time Limit
+                m_loaded_user.back()->iTimeLimit = m_common_io.stringToInt(key);
+                break;
+                
+            case 'R': // Time Left Today
+                m_loaded_user.back()->iTimeLeft = m_common_io.stringToInt(key);
+                break;
+        
+            case 'F': // New User Voting (YES) 
+                m_loaded_user.back()->iNuvVotesYes = m_common_io.stringToInt(key);
+                break;
+                
+            case 'S': // New User Voting (NO)
+                m_loaded_user.back()->iNuvVotesNo = m_common_io.stringToInt(key);
+                break;
+                
+            case 'G': // Regular Color
+                m_loaded_user.back()->sRegColor = key;
+                break;
+                
+            case 'T': // Input Color
+                m_loaded_user.back()->sInputColor = key;
+                break;
+              
+            case 'H': // Prompt Color
+                m_loaded_user.back()->sPromptColor = key;
+                break;
+                
+            case 'U': // Box Color
+                m_loaded_user.back()->sBoxColor = key;
+                break;
+    
+            case 'I': // Prompt Color
+                m_loaded_user.back()->sStatColor = key;
+                break;
+                
+            case 'V': // Box Color
+                m_loaded_user.back()->sInverseColor = key;
+                break;                                                            
         }
                 
         changeInputModule(MOD_USER_FIELD_INPUT);
