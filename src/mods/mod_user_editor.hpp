@@ -411,6 +411,12 @@ public:
     void userEditorExtendedInput(const std::string &input);
     
     /**
+     * @brief Updates an existing password index.
+     * @param key_value
+     */
+    void updateExistingPassword(std::string key_value);
+
+    /**
      * @brief Handles Extended Field Updates for User Data
      * @param input
      */

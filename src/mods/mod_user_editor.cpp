@@ -1492,6 +1492,37 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
 }
 
 /**
+ * @brief Updates an existing password index.
+ * @param key_value
+ */
+void ModUserEditor::updateExistingPassword(std::string key_value)
+{
+    // Setup for default password and challenge questions.
+    encrypt_ptr encryption(new Encrypt());
+    std::string salt = encryption->generate_salt(m_loaded_user.back()->sHandle, m_config->bbs_uuid);
+    std::string password = encryption->generate_password(key_value, salt);
+
+    if(salt.size() == 0 || password.size() == 0)
+    {
+        std::cout << "Error, Salt or Password were empty" << std::endl;
+        assert(false);
+    }
+    
+    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
+    security_ptr security_record(new Security());
+    
+    security_record = security_dao->getRecordById(m_loaded_user.back()->iSecurityIndex);    
+    security_record->sPasswordHash = password;
+    security_record->sSaltHash = salt;
+        
+    if (!security_dao->updateRecord(security_record))
+    {
+        std::cout << "Error, unable to update password hash." << std::endl;
+        return;
+    }
+}
+   
+/**
  * @brief Handles Extended Field Updates for User Data
  * @param input
  */
@@ -1516,7 +1547,7 @@ void ModUserEditor::userEditorExtendedFieldHandler(const std::string &input)
         switch(m_current_field)
         {
             case 'A': // Password
-                // changePasswordMethod = key!
+                updateExistingPassword(key);
                 break;
                 
             case 'M': // Gender
