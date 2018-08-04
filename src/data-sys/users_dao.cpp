@@ -154,7 +154,7 @@ void UsersDao::pullUsersResult(query_ptr qry, user_ptr obj)
     qry->getFieldByName("iNuvVotesNo", obj->iNuvVotesNo);
     qry->getFieldByName("dtPassChangeDate", obj->dtPassChangeDate);
     qry->getFieldByName("dtLastReplyDate", obj->dtLastReplyDate);
-    qry->getFieldByName("bScrollFL", obj->bAnsi);  // this should be redone!
+    qry->getFieldByName("bScrollFL", obj->bAnsi);
     qry->getFieldByName("iCSPassChange", obj->iCSPassChange);
     qry->getFieldByName("iControlFlags1", obj->iControlFlags1);
     qry->getFieldByName("iControlFlags2", obj->iControlFlags2);

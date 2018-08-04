@@ -54,7 +54,7 @@ public:
     std::time_t dtPassChangeDate;
     std::time_t dtLastReplyDate;
     bool        bScrollFL;
-    bool        iCSPassChange;
+    int         iCSPassChange;
     uint32_t    iControlFlags1;
     uint32_t    iControlFlags2;
     bool        bWanted;
