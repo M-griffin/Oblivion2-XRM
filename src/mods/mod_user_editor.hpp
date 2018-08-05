@@ -422,6 +422,12 @@ public:
     void updateExistingPassword(std::string key_value);
 
     /**
+     * @brief Updates an existing password index.
+     * @param key_value
+     */
+    void updateExistingChallengeAnswer(std::string key_value);
+
+    /**
      * @brief Handles Extended Field Updates for User Data
      * @param input
      */

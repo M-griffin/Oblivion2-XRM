@@ -1508,25 +1508,54 @@ void ModUserEditor::updateExistingUser()
  * @param key_value
  */
 void ModUserEditor::updateExistingPassword(std::string key_value)
-{
-    // Setup for default password and challenge questions.
-    encrypt_ptr encryption(new Encrypt());
-    std::string salt = encryption->generate_salt(m_loaded_user.back()->sHandle, m_config->bbs_uuid);
-    std::string password = encryption->generate_password(key_value, salt);
-
-    if(salt.size() == 0 || password.size() == 0)
-    {
-        std::cout << "Error, Salt or Password were empty" << std::endl;
-        assert(false);
-    }
-    
+{    
     security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
     security_ptr security_record(new Security());
     
+    // Pull Existing Security Record and re-use existing salt.
     security_record = security_dao->getRecordById(m_loaded_user.back()->iSecurityIndex);    
-    security_record->sPasswordHash = password;
-    security_record->sSaltHash = salt;
-        
+    
+    // Setup for default password and challenge questions.
+    encrypt_ptr encryption(new Encrypt());
+    std::string password = encryption->generate_password(key_value, security_record->sSaltHash);
+
+    if(password.size() == 0)
+    {
+        std::cout << "Error, Password Hash empty" << std::endl;
+        assert(false);
+    }
+    
+    security_record->sPasswordHash = password;        
+    if (!security_dao->updateRecord(security_record))
+    {
+        std::cout << "Error, unable to update password hash." << std::endl;
+        return;
+    }
+}
+
+/**
+ * @brief Updates an existing password index.
+ * @param key_value
+ */
+void ModUserEditor::updateExistingChallengeAnswer(std::string key_value)
+{    
+    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
+    security_ptr security_record(new Security());
+    
+    // Pull Existing Security Record and re-use existing salt.
+    security_record = security_dao->getRecordById(m_loaded_user.back()->iSecurityIndex);    
+    
+    // Setup for default password and challenge questions.
+    encrypt_ptr encryption(new Encrypt());
+    std::string password = encryption->generate_password(key_value, security_record->sSaltHash);
+
+    if(password.size() == 0)
+    {
+        std::cout << "Error, Password Hash empty" << std::endl;
+        assert(false);
+    }
+    
+    security_record->sChallengeAnswerHash = password;        
     if (!security_dao->updateRecord(security_record))
     {
         std::cout << "Error, unable to update password hash." << std::endl;
@@ -1870,6 +1899,8 @@ std::string ModUserEditor::displayUserExtendedEditScreen()
     result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_NUV_YESVOTES) + baseGetDefaultStatColor() + std::to_string(usr->iNuvVotesYes), 64) + 
         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_NUV_NOVOTES) + baseGetDefaultStatColor() + std::to_string(usr->iNuvVotesNo), 48));        
         
+        
+    // NOTE, might need to LEFT Justify instead here if multiple pipe color sequences are used!
     result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_REGULAR_COLOR) + usr->sRegColor + "***|16", 63) + 
         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_INPUT_COLOR) + usr->sInputColor + "***|16", 47));
         
