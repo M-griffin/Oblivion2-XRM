@@ -215,6 +215,9 @@ public:
     const std::string DISPLAY_USER_EXT_FIELDS_INVERSE_COLOR = "display_user_ext_field_inverse_color";
     const std::string DISPLAY_USER_EXT_FIELDS_QUIT_RETURN = "display_user_ext_field_quit_return";
     
+    const std::string DISPLAY_USER_EXT_FIELDS_CHALLENGE_QUESTION = "display_user_ext_field_challenge_question";
+    const std::string DISPLAY_USER_EXT_FIELDS_CHALLENGE_ANSWER = "display_user_ext_field_challenge_answer";
+    
     // Extended Prompts
     const std::string PROMPT_USER_EXT_FIELDS_PASSWORD = "prompt_user_ext_field_password";
     const std::string PROMPT_USER_EXT_FIELDS_GENDER = "prompt_user_ext_field_gender";
@@ -234,6 +237,9 @@ public:
     const std::string PROMPT_USER_EXT_FIELDS_BOX_COLOR = "prompt_user_ext_field_box_color";
     const std::string PROMPT_USER_EXT_FIELDS_STATUS_COLOR = "prompt_user_ext_field_status_color";
     const std::string PROMPT_USER_EXT_FIELDS_INVERSE_COLOR = "prompt_user_ext_field_inverse_color";
+    
+    const std::string PROMPT_USER_EXT_FIELDS_CHALLENGE_QUESTION = "prompt_user_ext_field_challenge_question";
+    const std::string PROMPT_USER_EXT_FIELDS_CHALLENGE_ANSWER = "prompt_user_ext_field_challenge_answer";
     
     /**
      * @brief Create Default Text Prompts for module
@@ -422,10 +428,16 @@ public:
     void updateExistingPassword(std::string key_value);
 
     /**
-     * @brief Updates an existing password index.
+     * @brief Updates an existing Challenge Answer
      * @param key_value
      */
     void updateExistingChallengeAnswer(std::string key_value);
+
+    /**
+     * @brief Updates an existing Challenge Question
+     * @param key_value
+     */
+    void updateExistingChallengeQuestion(std::string key_value);
 
     /**
      * @brief Handles Extended Field Updates for User Data

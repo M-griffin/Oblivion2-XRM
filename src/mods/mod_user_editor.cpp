@@ -11,6 +11,11 @@
 #include <vector>
 #include <cassert>
 #include <regex>
+
+/**
+ * NOTE, changes to password and challenge q/a are saved right away to security record
+ * And are not rolled back on exit without saving.  Might update this later on.
+ */
  
 /**
  * @brief Handles Updates or Data Input from Client
@@ -152,45 +157,49 @@ void ModUserEditor::createTextPrompts()
     value[DISPLAY_USER_FIELDS_QUIT_ABORT]         = std::make_pair("Exit without Saving", " |03(|11X|03) |15Exit without Saving  ");
     
     // Extended User Field Display
-    value[DISPLAY_USER_EXT_FIELDS_PASSWORD]           = std::make_pair("Password", " |03(|11A|03) |15Password         : ");
+    value[DISPLAY_USER_EXT_FIELDS_PASSWORD]           = std::make_pair("Password", " |03(|11A|03) |15Password          : ");
     value[DISPLAY_USER_EXT_FIELDS_GENDER]             = std::make_pair("Gender", " |03(|11M|03) |15User Gender    : ");    
-    value[DISPLAY_USER_EXT_FIELDS_PASSCHANGE_DATE]    = std::make_pair("Password Last Change Date", " |03(|11B|03) |15Pass Change Date : ");
+    value[DISPLAY_USER_EXT_FIELDS_PASSCHANGE_DATE]    = std::make_pair("Password Last Change Date", " |03(|11B|03) |15Pass Change Date  : ");
     value[DISPLAY_USER_EXT_FIELDS_PASS_FORCE_CHANCE]  = std::make_pair("Days to Force Password Change", " |03(|11N|03) |15Force Pass Chng: ");    
-    value[DISPLAY_USER_EXT_FIELDS_FIRSTON_DATE]       = std::make_pair("Sign-up Date", " |03(|11C|03) |15First On Date    : ");
+    value[DISPLAY_USER_EXT_FIELDS_FIRSTON_DATE]       = std::make_pair("Sign-up Date", " |03(|11C|03) |15First On Date     : ");
     value[DISPLAY_USER_EXT_FIELDS_FILEPOINTS]         = std::make_pair("File Points", " |03(|11O|03) |15File Points    : ");    
-    value[DISPLAY_USER_EXT_FIELDS_EXPIRE_DATE]        = std::make_pair("Expiration Date", " |03(|11D|03) |15Expiration Date  : ");
+    value[DISPLAY_USER_EXT_FIELDS_EXPIRE_DATE]        = std::make_pair("Expiration Date", " |03(|11D|03) |15Expiration Date   : ");
     value[DISPLAY_USER_EXT_FIELDS_POSTCALL_RATIO]     = std::make_pair("Post/Call Ratio", " |03(|11P|03) |15Post Call Ratio: ");    
-    value[DISPLAY_USER_EXT_FIELDS_TIME_LIMIT]         = std::make_pair("Time Limit in Minutes Per Day", " |03(|11E|03) |15Daily Time Limit : ");
+    value[DISPLAY_USER_EXT_FIELDS_TIME_LIMIT]         = std::make_pair("Time Limit in Minutes Per Day", " |03(|11E|03) |15Daily Time Limit  : ");
     value[DISPLAY_USER_EXT_FIELDS_TIME_LEFT]          = std::make_pair("Time Left Today in Minutes", " |03(|11R|03) |15Time Left Today: ");    
-    value[DISPLAY_USER_EXT_FIELDS_NUV_YESVOTES]       = std::make_pair("New User Voting - Yes Votes", " |03(|11F|03) |15NUV Yes Votes    : ");
+    value[DISPLAY_USER_EXT_FIELDS_NUV_YESVOTES]       = std::make_pair("New User Voting - Yes Votes", " |03(|11F|03) |15NUV Yes Votes     : ");
     value[DISPLAY_USER_EXT_FIELDS_NUV_NOVOTES]        = std::make_pair("New User Voting - No Votes", " |03(|11S|03) |15NUV No Votes   : ");    
-    value[DISPLAY_USER_EXT_FIELDS_REGULAR_COLOR]      = std::make_pair("Regular Color", " |03(|11G|03) |15Regular Color    : ");
+    value[DISPLAY_USER_EXT_FIELDS_REGULAR_COLOR]      = std::make_pair("Regular Color", " |03(|11G|03) |15Regular Color     : ");
     value[DISPLAY_USER_EXT_FIELDS_INPUT_COLOR]        = std::make_pair("Input Color", " |03(|11T|03) |15Input Color    : ");    
-    value[DISPLAY_USER_EXT_FIELDS_PROMPT_COLOR]       = std::make_pair("Prompt Color", " |03(|11H|03) |15Prompt Color     : ");
+    value[DISPLAY_USER_EXT_FIELDS_PROMPT_COLOR]       = std::make_pair("Prompt Color", " |03(|11H|03) |15Prompt Color      : ");
     value[DISPLAY_USER_EXT_FIELDS_BOX_COLOR]          = std::make_pair("Box Color", " |03(|11U|03) |15Box Color      : ");
-    value[DISPLAY_USER_EXT_FIELDS_STATUS_COLOR]       = std::make_pair("Status Color", " |03(|11I|03) |15Status Color     : ");
+    value[DISPLAY_USER_EXT_FIELDS_STATUS_COLOR]       = std::make_pair("Status Color", " |03(|11I|03) |15Status Color      : ");
     value[DISPLAY_USER_EXT_FIELDS_INVERSE_COLOR]      = std::make_pair("Inverse Color", " |03(|11V|03) |15Inverse Color  : ");
-    value[DISPLAY_USER_EXT_FIELDS_QUIT_RETURN]        = std::make_pair("Quit and Return", " |03(|11Q|03) |15Quit & Return        ");
+    value[DISPLAY_USER_EXT_FIELDS_QUIT_RETURN]        = std::make_pair("Quit and Return", " |03(|11Q|03) |15Quit & Return        ");    
+    value[DISPLAY_USER_EXT_FIELDS_CHALLENGE_QUESTION] = std::make_pair("Challenge Question", " |03(|11J|03) |15Challenge Question: ");
+    value[DISPLAY_USER_EXT_FIELDS_CHALLENGE_ANSWER]   = std::make_pair("Challenge Answer", " |03(|11K|03) |15Challenge Answer  : ");
     
-    value[PROMPT_USER_EXT_FIELDS_PASSWORD]           = std::make_pair("Password", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Password         : ");
+    value[PROMPT_USER_EXT_FIELDS_PASSWORD]           = std::make_pair("Password", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Password          : ");
     value[PROMPT_USER_EXT_FIELDS_GENDER]             = std::make_pair("Gender", "|CR|03%   |15|PD|CR|11!   |03(|11M|03) |15User Gender    : ");    
-    value[PROMPT_USER_EXT_FIELDS_PASSCHANGE_DATE]    = std::make_pair("Password Last Change Date", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15Pass Change Date : ");
+    value[PROMPT_USER_EXT_FIELDS_PASSCHANGE_DATE]    = std::make_pair("Password Last Change Date", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15Pass Change Date  : ");
     value[PROMPT_USER_EXT_FIELDS_PASS_FORCE_CHANCE]  = std::make_pair("Days to Force Password Change", "|CR|03%   |15|PD|CR|11!   |03(|11N|03) |15Force Pass Chng: ");    
-    value[PROMPT_USER_EXT_FIELDS_FIRSTON_DATE]       = std::make_pair("Sign-up Date", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15First On Date    : ");
+    value[PROMPT_USER_EXT_FIELDS_FIRSTON_DATE]       = std::make_pair("Sign-up Date", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15First On Date     : ");
     value[PROMPT_USER_EXT_FIELDS_FILEPOINTS]         = std::make_pair("File Points", "|CR|03%   |15|PD|CR|11!   |03(|11O|03) |15File Points    : ");    
-    value[PROMPT_USER_EXT_FIELDS_EXPIRE_DATE]        = std::make_pair("Expiration Date", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15Expiration Date  : ");
+    value[PROMPT_USER_EXT_FIELDS_EXPIRE_DATE]        = std::make_pair("Expiration Date", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15Expiration Date   : ");
     value[PROMPT_USER_EXT_FIELDS_POSTCALL_RATIO]     = std::make_pair("Post/Call Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11P|03) |15Post Call Ratio: ");    
-    value[PROMPT_USER_EXT_FIELDS_TIME_LIMIT]         = std::make_pair("Time Limit in Minutes Per Day", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Daily Time Limit : ");
+    value[PROMPT_USER_EXT_FIELDS_TIME_LIMIT]         = std::make_pair("Time Limit in Minutes Per Day", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Daily Time Limit  : ");
     value[PROMPT_USER_EXT_FIELDS_TIME_LEFT]          = std::make_pair("Time Left Today in Minutes", "|CR|03%   |15|PD|CR|11!   |03(|11R|03) |15Time Left Today: ");    
-    value[PROMPT_USER_EXT_FIELDS_NUV_YESVOTES]       = std::make_pair("New User Voting - Yes Votes", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15NUV Yes Votes    : ");
+    value[PROMPT_USER_EXT_FIELDS_NUV_YESVOTES]       = std::make_pair("New User Voting - Yes Votes", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15NUV Yes Votes     : ");
     value[PROMPT_USER_EXT_FIELDS_NUV_NOVOTES]        = std::make_pair("New User Voting - No Votes", "|CR|03%   |15|PD|CR|11!   |03(|11S|03) |15NUV No Votes   : ");    
-    value[PROMPT_USER_EXT_FIELDS_REGULAR_COLOR]      = std::make_pair("Regular Color", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15Regular Color    : ");
+    value[PROMPT_USER_EXT_FIELDS_REGULAR_COLOR]      = std::make_pair("Regular Color", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15Regular Color     : ");
     value[PROMPT_USER_EXT_FIELDS_INPUT_COLOR]        = std::make_pair("Input Color", "|CR|03%   |15|PD|CR|11!   |03(|11T|03) |15Input Color    : ");    
-    value[PROMPT_USER_EXT_FIELDS_PROMPT_COLOR]       = std::make_pair("Prompt Color", "|CR|03%   |15|PD|CR|11!   |03(|11H|03) |15Prompt Color     : ");
+    value[PROMPT_USER_EXT_FIELDS_PROMPT_COLOR]       = std::make_pair("Prompt Color", "|CR|03%   |15|PD|CR|11!   |03(|11H|03) |15Prompt Color      : ");
     value[PROMPT_USER_EXT_FIELDS_BOX_COLOR]          = std::make_pair("Box Color", "|CR|03%   |15|PD|CR|11!   |03(|11U|03) |15Box Color      : ");
-    value[PROMPT_USER_EXT_FIELDS_STATUS_COLOR]       = std::make_pair("Status Color", "|CR|03%   |15|PD|CR|11!   |03(|11I|03) |15Status Color     : ");
-    value[PROMPT_USER_EXT_FIELDS_INVERSE_COLOR]      = std::make_pair("Inverse Color", "|CR|03%   |15|PD|CR|11!   |03(|11V|03) |15Inverse Color  : ");
-
+    value[PROMPT_USER_EXT_FIELDS_STATUS_COLOR]       = std::make_pair("Status Color", "|CR|03%   |15|PD|CR|11!   |03(|11I|03) |15Status Color      : ");
+    value[PROMPT_USER_EXT_FIELDS_INVERSE_COLOR]      = std::make_pair("Inverse Color", "|CR|03%   |15|PD|CR|11!   |03(|11V|03) |15Inverse Color  : ");    
+    value[PROMPT_USER_EXT_FIELDS_CHALLENGE_QUESTION] = std::make_pair("Create New Challenge Question", "|CR|03%   |15|PD|CR|11!   |03(|11J|03) |15Challenge Question: ");
+    value[PROMPT_USER_EXT_FIELDS_CHALLENGE_ANSWER]   = std::make_pair("Create New Challenge Answer", "|CR|03%   |15|PD|CR|11!   |03(|11K|03) |15Challenge Answer  : ");
+   
     m_text_prompts_dao->writeValue(value);
 }
 
@@ -1327,7 +1336,16 @@ void ModUserEditor::userEditorExtendedInput(const std::string &input)
                 displayPrompt(PROMPT_USER_EXT_FIELDS_INVERSE_COLOR);
                 m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sInverseColor);
                 break;
-
+                
+            case 'J': // Challenge Question
+                changeInputModule(MOD_USER_EXTENDED_FIELD);
+                displayPrompt(PROMPT_USER_EXT_FIELDS_CHALLENGE_QUESTION);
+                break;
+                
+            case 'K': // Challenge Answer
+                changeInputModule(MOD_USER_EXTENDED_FIELD);
+                displayPrompt(PROMPT_USER_EXT_FIELDS_CHALLENGE_ANSWER);
+                break;
 
             case 'Q': // Quit
                 // Return to previous screen
@@ -1534,7 +1552,7 @@ void ModUserEditor::updateExistingPassword(std::string key_value)
 }
 
 /**
- * @brief Updates an existing password index.
+ * @brief Updates an existing Challenge Answer.
  * @param key_value
  */
 void ModUserEditor::updateExistingChallengeAnswer(std::string key_value)
@@ -1551,14 +1569,34 @@ void ModUserEditor::updateExistingChallengeAnswer(std::string key_value)
 
     if(password.size() == 0)
     {
-        std::cout << "Error, Password Hash empty" << std::endl;
+        std::cout << "Error, Challenge Answer Hash empty" << std::endl;
         assert(false);
     }
     
     security_record->sChallengeAnswerHash = password;        
     if (!security_dao->updateRecord(security_record))
     {
-        std::cout << "Error, unable to update password hash." << std::endl;
+        std::cout << "Error, unable to update Challenge Answer." << std::endl;
+        return;
+    }
+}
+
+/**
+ * @brief Updates an existing Challenge Question
+ * @param key_value
+ */
+void ModUserEditor::updateExistingChallengeQuestion(std::string key_value)
+{    
+    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
+    security_ptr security_record(new Security());
+    
+    // Pull Existing Security Record and re-use existing salt.
+    security_record = security_dao->getRecordById(m_loaded_user.back()->iSecurityIndex);    
+        
+    security_record->sChallengeQuestion = key_value;
+    if (!security_dao->updateRecord(security_record))
+    {
+        std::cout << "Error, unable to update challenge question." << std::endl;
         return;
     }
 }
@@ -1685,7 +1723,15 @@ void ModUserEditor::userEditorExtendedFieldHandler(const std::string &input)
                 
             case 'V': // Box Color
                 m_loaded_user.back()->sInverseColor = key;
-                break;                                                            
+                break;
+
+            case 'J': // Challenge Question
+                updateExistingChallengeQuestion(key);
+                break;
+                
+            case 'K': // Challenge Answer
+                updateExistingChallengeAnswer(key);
+                break;
         }
                 
         changeInputModule(MOD_USER_EXTENDED_FIELD_INPUT);
@@ -1909,6 +1955,12 @@ std::string ModUserEditor::displayUserExtendedEditScreen()
         
     result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_STATUS_COLOR) + usr->sStatColor + "***|16", 63) + 
         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_INVERSE_COLOR) + usr->sInverseColor + "***|16" , 47));
+        
+    
+    // Challenge Question and Answer are Masked since they are in security record.
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_CHALLENGE_QUESTION) + baseGetDefaultStatColor() + "****** Masked ", 93));
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_CHALLENGE_ANSWER) + baseGetDefaultStatColor() + "****** Masked ", 93));
+        
         
     result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
     result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_QUIT_RETURN) + m_common_io.rightPadding("", 48));
