@@ -51,7 +51,8 @@ public:
     std::string bbs_uuid;              // new {unique uuid for this bbs for services etc }
     std::string password_system;       // SysPass,
     std::string password_sysop;        // System1Pass,
-    std::string password_newuser;      // NewUserPass;
+    std::string password_newuser;      // NewUserPass; (NUP)
+    std::string password_default_user; // Password for Copied user records (User Editor)
 
 // int
     int port_telnet;           // new { default telnet port }
@@ -218,6 +219,7 @@ public:
         , password_system("system")
         , password_sysop("sysop")
         , password_newuser("newuser")
+        , password_default_user("default")
         , port_telnet(6023)
         , port_ssl(443)
         , use_service_telnet(true)
@@ -286,7 +288,7 @@ public:
         , days_keep_attachments(30)
         , default_color_regular("|15")
         , default_color_stat("|03")
-        , default_color_prompt("|11")
+        , default_color_prompt("|07")
         , default_color_input("|11")
         , default_color_inverse("|19")
         , default_color_box("|08")  
@@ -357,6 +359,7 @@ namespace YAML
             node["password_system"] = rhs.password_system;
             node["password_sysop"] = rhs.password_sysop;
             node["password_newuser"] = rhs.password_newuser;
+            node["password_default_user"] = rhs.password_default_user;
             node["port_telnet"] = rhs.port_telnet;
             node["port_ssl"] = rhs.port_ssl;
             node["use_service_telnet"] = rhs.use_service_telnet;
@@ -477,6 +480,7 @@ namespace YAML
             rhs.password_system                 = node["password_system"].as<std::string>();
             rhs.password_sysop                  = node["password_sysop"].as<std::string>();
             rhs.password_newuser                = node["password_newuser"].as<std::string>();
+            rhs.password_default_user           = node["password_default_user"].as<std::string>();
             rhs.port_telnet                     = node["port_telnet"].as<int>();
             rhs.port_ssl                        = node["port_ssl"].as<int>();
             rhs.use_service_telnet              = node["use_service_telnet"].as<bool>();

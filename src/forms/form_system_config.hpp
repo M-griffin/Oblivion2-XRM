@@ -51,6 +51,7 @@ namespace YAML
             node["password_system"] = rhs->password_system;
             node["password_sysop"] = rhs->password_sysop;
             node["password_newuser"] = rhs->password_newuser;
+            node["password_default_user"] = rhs->password_default_user;
             node["port_telnet"] = rhs->port_telnet;
             node["port_ssl"] = rhs->port_ssl;
             node["use_service_telnet"] = rhs->use_service_telnet;
@@ -173,6 +174,7 @@ namespace YAML
             rhs->password_system                 = node["password_system"].as<std::string>();
             rhs->password_sysop                  = node["password_sysop"].as<std::string>();
             rhs->password_newuser                = node["password_newuser"].as<std::string>();
+            rhs->password_default_user           = node["password_default_user"].as<std::string>();
             rhs->port_telnet                     = node["port_telnet"].as<int>();
             rhs->port_ssl                        = node["port_ssl"].as<int>();
             rhs->use_service_telnet              = node["use_service_telnet"].as<bool>();

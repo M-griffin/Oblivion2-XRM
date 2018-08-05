@@ -45,7 +45,7 @@ bool ModSignup::update(const std::string &character_buffer, const bool &)
 }
 
 /**
- * @brief Startup class, setup and display initial screens / interface.
+ * @brief Start-up class, setup and display initial screens / interface.
  * @return
  */
 bool ModSignup::onEnter()
@@ -129,7 +129,7 @@ void ModSignup::createTextPrompts()
 }
 
 /**
- * @brief Sets an indivdual module index.
+ * @brief Sets an individual module index.
  * @param mod_function_index
  */
 void ModSignup::changeModule(int mod_function_index)
@@ -1027,12 +1027,11 @@ bool ModSignup::birthday(const std::string &input)
 				 * Only GCC 5.1 + Compatible
 				 * Were no longer using boost, so bye bye 4.9 compat for now.
 				 */
-				std::istringstream ss(key);
-
+				std::istringstream ss(key);                
 				ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
 				if(ss.fail())
 				{
-					std::cout << "regex passed, ss failed!" << std::endl;
+					std::cout << "regexp passed, ss failed!" << std::endl;
 					ss.clear();
 					displayPromptAndNewLine(PROMPT_DATE_INVALID);
 					redisplayModulePrompt();
@@ -1793,6 +1792,7 @@ void ModSignup::saveNewUserRecord()
         m_user_record->iLevel = m_config->default_level;
         m_user_record->iFileLevel = m_config->default_file_level;
         m_user_record->iMessageLevel = m_config->default_message_level;
+        m_user_record->iFilePoints = m_config->default_file_points;
 
         // Also Add Default File points,, missing from user rec.
     }
@@ -1805,7 +1805,7 @@ void ModSignup::saveNewUserRecord()
         // Remove Secutiry Record if unable to create user record.
         if (!security_dao->deleteRecord(securityIndex))
         {
-            std::cout << "Error, unable to remove secutiry record." << std::endl;
+            std::cout << "Error, unable to remove security record." << std::endl;
         }
 
         baseProcessDeliverNewLine();

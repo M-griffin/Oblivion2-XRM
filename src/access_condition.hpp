@@ -27,6 +27,14 @@ public:
     ~AccessCondition() { };
     
     /**
+     * @brief Toggle Bit Flag
+     * @param flag
+     * @param first_set
+     * @param user
+     */
+    void setFlagToggle(unsigned char flag, bool first_set, user_ptr user);
+
+    /**
      * @brief Set Bit Flag on
      * @param flag
      * @param first_set
@@ -54,17 +62,21 @@ public:
     /**
      * @brief Sets a Default String of Bitflags On
      * @param bitString
+     * @param first_set
+     * @param user
      */
     void setAccessConditionsFlagsOn(std::string bitString, bool first_set, user_ptr user);
 
     /**
      * @brief Sets a Default String of Bitflags Off
      * @param bitString
+     * @param first_set
+     * @param user
      */
     void setAccessConditionsFlagsOff(std::string bitString, bool first_set, user_ptr user);
         
     /**
-     * @brief Parse Code Map and Test Secutiry and AR Flags.
+     * @brief Parse Code Map and Test Security and AR Flags.
      * @param code_map
      * @param user
      * @return 
@@ -74,17 +86,24 @@ public:
     /**
      * @brief Parse ASC Strings then test User Flags
      * @param acs_string
-     * @param user
      * @return 
      */
     std::vector<MapType> parseAcsString(const std::string &acs_string);
 
     /**
      * @brief Parses and Validates codemap
-     * @param expression
+     * @param acs_string
+     * @param user
      * @return 
      */
     bool validateAcsString(const std::string &acs_string, user_ptr user);
+
+    /**
+     * @brief Bit String to Printable String
+     * @param bits
+     * @return 
+     */
+    std::string getAccessConditionFlagStringFromBits(int bits);
 
     // Using Session IO for Code Mapping
     SessionIO  m_session_io;

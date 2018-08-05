@@ -288,6 +288,10 @@ std::string AnsiProcessor::buildPullDownBars(int pulldown_id, bool active)
         }
         output = ss.str();
     }
+    
+    ss.clear();
+    ss.ignore();
+    
     return output;
 }
 
@@ -426,6 +430,13 @@ std::string AnsiProcessor::screenBufferParse()
                     ss.str(my_matches.m_code.substr(1, 2));
                     ss >> pull_id;
 
+                    if (ss.fail()) 
+                    {
+                        ss.clear();
+                        ss.ignore();
+                        break;
+                    }
+                    
                     // Grab the highlight color from the second sequence %##.
                     m_screen_buffer[my_matches.m_offset].selected_attribute =
                         m_screen_buffer[my_matches.m_offset+3].attribute;
@@ -438,6 +449,9 @@ std::string AnsiProcessor::screenBufferParse()
 
                     // tear out the y and x positions from the offset.
                     m_pull_down_options[pull_id] = m_screen_buffer[my_matches.m_offset];
+                    
+                    ss.clear();
+                    ss.ignore();
                 }
                 break;
 

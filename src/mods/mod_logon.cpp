@@ -232,6 +232,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
             m_logon_user = user_data->getRecordById(userId);
             if(m_logon_user && m_logon_user->iId != -1) 
             {
+                ss.clear();
                 return true;
             }
         }

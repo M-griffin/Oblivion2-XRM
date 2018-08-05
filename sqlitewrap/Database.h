@@ -3,7 +3,7 @@
  *
  * Rewritten / author: 2016-02-19 / mrmisticismo@hotmail.com
  * Published / author: 2005-08-12 / grymse@alhem.net
- * Copyright (C) 2015-2016  Michael Griffin
+ * Copyright (C) 2015-2018  Michael Griffin
  * Copyright (C) 2001-2006  Anders Hedstrom
  * This program is made available under the terms of the GNU GPL.
  */
@@ -132,31 +132,18 @@ namespace SQLW
         void freeDatabasePool(DatabasePool *odb);
 
     	// Escape string - change all ' to ''.
-    	std::string safestr(const std::string& );
+    	std::string safeString(const std::string& );
 		
         // Make string xml safe.
-        std::string xmlsafestr(const std::string&);
+        std::string xmlSafeString(const std::string&);
 
         // Convert string to 64-bit integer.
-        int64_t a2bigint(const std::string&);
+        int64_t alphaToBigInt(const std::string&);
 
         // Convert string to unsigned 64-bit integer.
-        uint64_t a2ubigint(const std::string&);
+        uint64_t alphaToUnsignedBitInt(const std::string&);
 
     private:
-
-        /*
-        Database(const Database& db)
-            : m_mutex(m_mutex)
-        {
-            this = db;
-        }*/
-
-/*
-        Database& operator=(const Database&)
-        {
-            return *this;
-        }*/
 
         void databaseError(const char *format, ...);
 

@@ -5,6 +5,7 @@
 #include "mods/mod_logon.hpp"
 #include "mods/mod_signup.hpp"
 #include "mods/mod_menu_editor.hpp"
+#include "mods/mod_user_editor.hpp"
 
 #include <locale>
 #include <string>
@@ -573,11 +574,16 @@ bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option)
         case '#':
             std::cout << "Executing startupModuleMenuEditor();" << std::endl;
             startupModuleMenuEditor();
-            return true;
+            break;
+
+        case 'U':
+            std::cout << "Executing startupModuleUserEditor();" << std::endl;
+            startupModuleUserEditor();
+            break;
 
             // Configuration Menu
         case 'C':
-            return false;
+            break;
 
         default:
             return false;
@@ -924,6 +930,9 @@ void MenuSystem::startupModuleSignup()
     startupModule(module);
 }
 
+/**
+ * @brief Startup the Menu Editor Module
+ */
 void MenuSystem::startupModuleMenuEditor() 
 {
     // Setup the input processor
@@ -939,6 +948,26 @@ void MenuSystem::startupModuleMenuEditor()
 
     startupModule(module);    
 }
+
+/**
+ * @brief Startup the User Editor Module
+ */
+void MenuSystem::startupModuleUserEditor() 
+{
+    // Setup the input processor
+    resetMenuInputIndex(MODULE_INPUT);
+
+    // Allocate and Create
+    module_ptr module(new ModUserEditor(m_session_data, m_config, m_ansi_process));
+    if (!module)
+    {
+        std::cout << "ModUserEditor Allocation Error!" << std::endl;
+        assert(false);
+    }
+
+    startupModule(module);    
+}
+
 
 /**
  * @brief Handles Input for Login and PreLogin Sequences.

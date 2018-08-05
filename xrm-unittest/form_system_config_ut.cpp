@@ -22,10 +22,12 @@
 
 
 // Definitions for XRMFormSystemConfig Unit Tests.
-#define MAX_OPTIONS 106
+// NOTE These are position in the config index of the methods,
+// If we add new otpions, then these must be incremented!
+#define MAX_OPTIONS 107
 #define BBS_NAME_SYSOP 0
-#define USE_SSL_SERVICE 9
-#define PORT_TELNET 6
+#define USE_SSL_SERVICE 10
+#define PORT_TELNET 7
 
 
 /**

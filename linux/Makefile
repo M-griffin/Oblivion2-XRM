@@ -1,8 +1,8 @@
 .PHONY: clean All
 
 All:
-	@echo "----------Building project:[ SqliteWrapped - Debug ]----------"
-	@cd "/home/merc/code/Oblivion2-XRM/sqlitewrap" && "$(MAKE)" -f  "SqliteWrapped.mk" && "$(MAKE)" -f  "SqliteWrapped.mk" PostBuild
+	@echo "----------Building project:[ xrm-unittest - Debug ]----------"
+	@cd "/home/merc/code/Oblivion2-XRM/xrm-unittest" && "$(MAKE)" -f  "xrm-unittest.mk"
 clean:
-	@echo "----------Cleaning project:[ SqliteWrapped - Debug ]----------"
-	@cd "/home/merc/code/Oblivion2-XRM/sqlitewrap" && "$(MAKE)" -f  "SqliteWrapped.mk" clean
+	@echo "----------Cleaning project:[ xrm-unittest - Debug ]----------"
+	@cd "/home/merc/code/Oblivion2-XRM/xrm-unittest" && "$(MAKE)" -f  "xrm-unittest.mk" clean

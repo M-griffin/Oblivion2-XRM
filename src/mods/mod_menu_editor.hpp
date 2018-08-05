@@ -52,29 +52,29 @@ public:
         m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuOptionEditor, this));
         m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuEditFields, this));
         m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuOptionEditFields, this));
-        
+
         // Input or Method Modules that handle incoming input per state.
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorPausedInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuNameInput, this, std::placeholders::_1));
-        
+
         // Menu Option Input Commands.
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorOptionInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuOptionInput, this, std::placeholders::_1));
-                
+
         // Menu Field Input Commands
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuFieldInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuFieldHandler, this, std::placeholders::_1));
-        
+
         // Menu Option Field Input Commands.
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuOptionFieldInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuOptionFieldHandler, this, std::placeholders::_1));
-        
+
         // Display Pause, waits for a key, then returns (Used in View Generic Menu)
         m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorDisplayPause, this, std::placeholders::_1));
-        
-                
-        
+
+
+
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
         if (!m_is_text_prompt_exist)
@@ -106,7 +106,7 @@ public:
         MOD_DISPLAY_MENU_EDIT         = 2,
         MOD_DISPLAY_MENU_OPTIONS_EDIT = 3
     };
-    
+
     // Input Module Index
     enum
     {
@@ -121,7 +121,7 @@ public:
         MOD_MENU_OPTION_FIELD       = 8, // Menu Option Field Handler
         MOD_DISPLAY_PAUSE           = 9  // Display Pause for View Generic Menu
     };
-    
+
     // Input Menu State Index
     // Used for both Menus and Options.
     enum
@@ -132,9 +132,9 @@ public:
         MENU_COPY_FROM = 3,
         MENU_COPY_TO   = 4,
         MENU_MOVE_FROM = 5,
-        MENU_MOVE_TO   = 6        
+        MENU_MOVE_TO   = 6
     };
-    
+
     // Menu Option Toggled View State
     // Lets so switch the views to see other command information.
     enum
@@ -144,7 +144,7 @@ public:
         VIEW_STRINGS  = 2,
         VIEW_PULLDOWN = 3
     };
-    
+
     // Box drawing characters
     enum
     {
@@ -161,11 +161,12 @@ public:
     // Create Prompt Constants, these are the keys for key/value lookup
     const std::string PROMPT_HEADER = "menu_header";
     const std::string PROMPT_OPTION_HEADER = "menu_option_header";
-    const std::string PROMPT_MENU_EDIT_HEADER = "menu_field_edit_header";   
+    const std::string PROMPT_MENU_EDIT_HEADER = "menu_field_edit_header";
     const std::string PROMPT_PAUSE = "pause_prompt";
     const std::string PROMPT_INPUT_TEXT = "menu_input_text";
     const std::string PROMPT_OPTION_INPUT_TEXT = "option_input_text";
     const std::string PROMPT_INVALID = "invalid_input";
+
     const std::string PROMPT_MENU_ADD = "menu_add";
     const std::string PROMPT_MENU_DELETE = "menu_delete";
     const std::string PROMPT_MENU_CHANGE = "menu_edit";
@@ -178,21 +179,21 @@ public:
     const std::string PROMPT_MENU_FIELD_INPUT_TEXT = "menu_field_input_text";
     const std::string PROMPT_MENU_FIELD_TITLE = "menu_field_title";
     const std::string PROMPT_MENU_FIELD_PASSWORD = "menu_field_password";
-    const std::string PROMPT_MENU_FIELD_FALLBACK = "menu_field_fallback";    
+    const std::string PROMPT_MENU_FIELD_FALLBACK = "menu_field_fallback";
     const std::string PROMPT_MENU_FIELD_HELP_ID  = "menu_field_help_id";
     const std::string PROMPT_MENU_FIELD_NAME = "menu_field_name";
     const std::string PROMPT_MENU_FIELD_PULLDOWN = "menu_field_pulldown";
-    
+
     // Menu Options
     const std::string PROMPT_INVALID_OPTION_NOT_EXISTS = "invalid_option_doesnt_exist";
     const std::string PROMPT_MENU_OPTION_ADD = "option_add";
-    const std::string PROMPT_MENU_OPTION_DELETE = "option_delete"; 
-    const std::string PROMPT_MENU_OPTION_CHANGE = "option_change";  
+    const std::string PROMPT_MENU_OPTION_DELETE = "option_delete";
+    const std::string PROMPT_MENU_OPTION_CHANGE = "option_change";
     const std::string PROMPT_MENU_OPTION_COPY_FROM = "option_copy_from";
     const std::string PROMPT_MENU_OPTION_COPY_TO = "option_copy_to";
     const std::string PROMPT_MENU_OPTION_MOVE_FROM = "option_move_from";
-    const std::string PROMPT_MENU_OPTION_MOVE_TO = "option_move_to";    
-    
+    const std::string PROMPT_MENU_OPTION_MOVE_TO = "option_move_to";
+
     // Menu Option Field Edit Prompts
     const std::string PROMPT_MENU_OPTION_EDIT_HEADER = "option_field_edit_header";
     const std::string PROMPT_MENU_OPTION_FIELD_INPUT_TEXT = "option_field_input_text";
@@ -203,33 +204,62 @@ public:
     const std::string PROMPT_MENU_OPTION_FIELD_MENU_KEY = "option_field_menu_key";
     const std::string PROMPT_MENU_OPTION_FIELD_CMD_STRING = "option_field_cmd_string";
     const std::string PROMPT_MENU_OPTION_FIELD_PULLDOWN = "option_field_pulldown_id";
-    
+
+    // Dsiplay Page for Option Fields.
     const std::string PROMPT_OPTION_TOGGLE = "option_toggle_view_display";
     
+    // Menu Field Display for screen
+    const std::string DISPLAY_MENU_FIELDS_VERSION_ID = "display_menu_field_version_id";
+    const std::string DISPLAY_MENU_FIELDS_BORDER_ROW_COLOR = "display_menu_field_row_color";
+    const std::string DISPLAY_MENU_FIELDS_TITLE = "display_menu_field_title";
+    const std::string DISPLAY_MENU_FIELDS_PASSWORD = "display_menu_field_passoword";
+    const std::string DISPLAY_MENU_FIELDS_FALLBACK = "display_menu_field_fallback";
+    const std::string DISPLAY_MENU_FIELDS_HELP_ID = "display_menu_field_help_id";
+    const std::string DISPLAY_MENU_FIELDS_NAME = "display_menu_field_name";
+    const std::string DISPLAY_MENU_FIELDS_PULLDOWN_FILE = "display_menu_field_pulldown_file";
+    const std::string DISPLAY_MENU_FIELDS_VIEW_GENERIC = "display_menu_field_view_generic";
+    const std::string DISPLAY_MENU_FIELDS_EDIT_OPTIONS = "display_menu_field_edit_options";
+    const std::string DISPLAY_MENU_FIELDS_QUIT_SAVE = "display_menu_field_save";
+    const std::string DISPLAY_MENU_FIELDS_QUIT_ABORT = "display_menu_field_abort";
+    
+    // Option Field Diplay For screen 
+    const std::string DISPLAY_OPT_FIELDS_OPTION_ID = "display_option_field_option_id";
+    const std::string DISPLAY_OPT_FIELDS_BORDER_ROW_COLOR = "display_option_field_row_color";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_NAME = "display_option_field_option_name";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_ACS = "display_option_field_option_acs";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_HIDDEN = "display_option_field_option_hidden";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_CMD_KEYS = "display_option_field_option_cmd_keys";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_MENU_KEY = "display_option_field_option_menu_key";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_CMD_STRING = "display_option_field_option_cmd_string";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_PULLDOWN_ID = "display_option_field_option_pulldown_id";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_PREVIOUS_OPT = "display_option_field_option_previous_opt";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_NEXT_OPT = "display_option_field_option_next_opt";
+    const std::string DISPLAY_OPT_FIELDS_OPTION_QUIT = "display_option_field_option_next_quit";
+
     /**
      * @brief Create Default Text Prompts for module
      * @return
      */
     void createTextPrompts();
-    
+
     /**
-     * @brief Sets an indivdual input module index.
+     * @brief Sets an individual input module index.
      * @param mod_function_index
      */
     void changeInputModule(int mod_function_index);
 
     /**
-     * @brief Sets an indivdual setup method module index.
+     * @brief Sets an individual setup method module index.
      * @param mod_function_index
      */
     void changeSetupModule(int mod_function_index);
-    
+
     /**
-     * @brief Sets an indivdual Menu Input State Add/Change/Delete
+     * @brief Sets an individual Menu Input State Add/Change/Delete
      * @param mod_menu_state_index
      */
     void changeMenuInputState(int mod_menu_state_index);
-    
+
     /**
      * @brief Redisplay's the current module prompt.
      * @return
@@ -247,7 +277,19 @@ public:
      * @param prompt
      */
     void displayPrompt(const std::string &prompt);
-    
+
+    /**
+     * @brief Pull and parse and return Display Prompts for use in interfaces
+     * @param prompt
+     */
+    std::string getDisplayPrompt(const std::string &prompt);
+
+    /**
+     * @brief Pull and parse and return Display Prompts for use in interfaces
+     * @param prompt
+     */
+    std::string getDisplayPromptRaw(const std::string &prompt);
+
     /**
      * @brief Pull and Display Prompts with MCI Code
      * @param prompt
@@ -266,21 +308,21 @@ public:
      * @return
      */
     void setupMenuEditor();
-    
+
     /**
      * @brief Setup for the Menu Options
      * @return
      */
     void setupMenuOptionEditor();
-    
+
     /**
-     * @brief Setup for the Menu Editor 
+     * @brief Setup for the Menu Editor
      * @return
      */
     void setupMenuEditFields();
 
     /**
-     * @brief Setup for the Menu Option Editor 
+     * @brief Setup for the Menu Option Editor
      * @return
      */
     void setupMenuOptionEditFields();
@@ -300,10 +342,10 @@ public:
     /**
      * @brief Check if the menu exists in the current listing
      * @param menu_name
-     * @return 
+     * @return
      */
     bool checkMenuExists(std::string menu_name);
-    
+
     /**
      * @brief Check if the menu option exists in the current listing
      * @param menu_option
@@ -312,25 +354,25 @@ public:
 
     /**
      * @brief Menu Editor Display, Runs through all existing menus
-     * @return 
+     * @return
      */
     std::string displayMenuList();
 
     /**
      * @brief Menu Editor, Read and Modify Menus Options
-     * @return 
+     * @return
      */
     std::string displayMenuOptionList();
 
     /**
-     * @brief Menu Editor, for Dispalying Menu Fields to Edit
-     * @return 
+     * @brief Menu Editor, for Displaying Menu Fields to Edit
+     * @return
      */
     std::string displayMenuEditScreen();
 
     /**
-     * @brief Menu Editor, for Dispalying Menu Option Fields to Edit
-     * @return 
+     * @brief Menu Editor, for Displaying Menu Option Fields to Edit
+     * @return
      */
     std::string displayMenuOptionEditScreen();
 
@@ -355,13 +397,13 @@ public:
      * @param input
      */
     void menuEditorInput(const std::string &input);
-    
+
     /**
      * @brief Handles Menu Option Editor Command Selection
      * @param input
      */
     void menuEditorOptionInput(const std::string &input);
-    
+
     /**
      * @brief Handles Menu Field Editor Command Selection
      * @param input
@@ -399,14 +441,14 @@ public:
     void menuEditorMenuOptionInput(const std::string &input);
 
     /**
-     * @brief handle each menu seperate state and what to do next on input.
+     * @brief handle each menu separate state and what to do next on input.
      * @param does_menu_exist
      * @param menu_name
      */
     void handleMenuInputState(bool does_menu_exist, const std::string &menu_name);
-    
+
     /**
-     * @brief handle each seperate state and what to do next on input.
+     * @brief handle each separate state and what to do next on input.
      * @param does_option_exist
      * @param option_index
      */
@@ -417,7 +459,7 @@ public:
      * @param menu_name
      */
     void createNewMenu(const std::string &menu_name);
-    
+
     /**
      * @brief Create a new empty Menu
      * @param option_index
@@ -435,7 +477,7 @@ public:
      * @param option_index
      */
     void reorderMenuIndexesInsertion(unsigned int option_index);
-    
+
     /**
      * @brief On Deletion of Menu Options, reorder all after index
      * @param option_index
@@ -447,13 +489,13 @@ public:
      * @param menu_name
      */
     void deleteExistingMenu(const std::string &menu_name);
-    
+
     /**
      * @brief Create a new empty Menu
      * @param menu_name
      */
     void copyExistingMenu(const std::string &menu_name);
-    
+
     /**
      * @brief Copy an Existing Menu Option
      * @param option_index
@@ -465,7 +507,7 @@ public:
      * @return
      */
     void saveMenuChanges();
-    
+
     /**
      * @brief Displays a generic Menu of the current Menu and Options
      * @return
@@ -489,7 +531,7 @@ private:
     unsigned int           m_mod_menu_state_index;
     unsigned int           m_mod_toggle_view_index;
     unsigned int           m_max_toggled_view_index;
-    
+
     bool                   m_is_text_prompt_exist;
     unsigned int           m_page;
     unsigned int           m_rows_per_page;
@@ -499,7 +541,7 @@ private:
 
     CommonIO               m_common_io;
     directory_ptr          m_directory;
-   
+
 };
 
 #endif // MOD_MENU_EDITOR_HPP

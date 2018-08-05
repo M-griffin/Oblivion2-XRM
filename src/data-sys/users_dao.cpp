@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include <string>
-
+#include <algorithm>
 
 /**
  * Base Dao Calls for generic Object Data Calls
@@ -71,7 +71,7 @@ long UsersDao::insertRecord(user_ptr obj)
 
 /**
  * @brief Deletes a Record
- * @param areaId
+ * @param id
  * @return
  */
 bool UsersDao::deleteRecord(long id)
@@ -154,7 +154,7 @@ void UsersDao::pullUsersResult(query_ptr qry, user_ptr obj)
     qry->getFieldByName("iNuvVotesNo", obj->iNuvVotesNo);
     qry->getFieldByName("dtPassChangeDate", obj->dtPassChangeDate);
     qry->getFieldByName("dtLastReplyDate", obj->dtLastReplyDate);
-    qry->getFieldByName("bScrollFL", obj->bAnsi);  // this should be redone!
+    qry->getFieldByName("bScrollFL", obj->bAnsi);
     qry->getFieldByName("iCSPassChange", obj->iCSPassChange);
     qry->getFieldByName("iControlFlags1", obj->iControlFlags1);
     qry->getFieldByName("iControlFlags2", obj->iControlFlags2);
@@ -517,4 +517,61 @@ user_ptr UsersDao::getUserByEmail(std::string email)
     }
  
     return user;
+}
+
+/**
+ * @brief Return User Records By WildCard (filtered Searches)
+ * @return
+ */
+std::vector<user_ptr> UsersDao::getUsersByWildcard(std::string filter)
+{
+    user_ptr obj(new Users());
+    std::vector<user_ptr> list;
+
+    // Make Sure Database Reference is Connected
+    if (!m_database.isConnected())
+    {
+        std::cout << "Error, Database is not connected!" << std::endl;
+        return list;
+    }
+
+    // Create Pointer and Connect Query Object to Database.
+    query_ptr qry(new SQLW::Query(m_database));
+    if (!qry->isConnected())
+    {
+        std::cout << "Error, Query has no connection to the database" << std::endl;
+        return list;
+    }
+
+    // Replace * with %
+    std::replace( filter.begin(), filter.end(), '*', '%');
+
+    // Build Query String
+    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sHandle like %Q ORDER BY sHandle COLLATE NOCASE asc;",
+        m_strTableName.c_str(), filter.c_str());
+
+    // Execute Query.
+    if (qry->getResult(queryString))
+    {
+        long rows = qry->getNumRows();
+        if (rows > 0)
+        {
+            while(qry->fetchRow())
+            {
+                obj.reset(new Users());
+                pullUsersResult(qry, obj);
+                list.push_back(obj);
+            }
+        }
+        else
+        {
+            std::cout << "Error, getUsersByWildcard Returned Rows: " << rows << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << "Error, getResult()" << std::endl;
+    }
+
+    return list;    
 }

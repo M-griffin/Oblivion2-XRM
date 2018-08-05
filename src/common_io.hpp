@@ -1,6 +1,7 @@
 #ifndef COMMONIO_HPP
 #define COMMONIO_HPP
 
+#include <ctime>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -167,30 +168,30 @@ public:
     std::string getSystemHomeDirectory();
     
     /**
-     * @brief Appends Path Seperator depending on environment.
+     * @brief Appends Path Separator depending on environment.
      * @param path
      * @return 
      */
     void pathAppend(std::string &path);
 
     /**
-     * String Lengh counting actual characters not bytes
+     * String Length counting actual characters not bytes
      * This is for mixed ASCII And UTF-8 Strings.
      */
     std::string::size_type numberOfChars(const std::string &str);
 
     /**
-     * Left Trim Whitepsaces (Front)
+     * Left Trim White spaces (Front)
      */
     std::string leftTrim(const std::string &str);
 
     /**
-     * Right Trim Whitepsaces (Back)
+     * Right Trim White spaces (Back)
      */
     std::string rightTrim(const std::string &str);
 
     /**
-     * Trim Whitepsaces from both ends
+     * Trim White spaces from both ends
      */
     std::string trim(const std::string &str);
 
@@ -235,7 +236,7 @@ public:
     std::string printWideCharacters(const std::wstring &wide_string);
 
     /**
-     * @brief Translation from CP437 to UTF-8 MultiByte Charactes
+     * @brief Translation from CP437 to UTF-8 MultiByte Characters
      * @param standard_string
      */
     std::string translateUnicode(const std::string &standard_string);
@@ -326,6 +327,55 @@ public:
      * @return
      */
     std::vector<std::string> splitString(const std::string& s, char delimiter);
+
+    /**
+     * @brief Standard Time to Date String
+     * @param std_time
+     * @return 
+     */
+    std::string standardDateToString(std::time_t std_time);
+
+    /**
+     * @brief Standard Time to Date/Time String
+     * @param std_time
+     * @return 
+     */
+    std::string standardDateTimeToString(std::time_t std_time);
+
+    /**
+     * @brief String to Date Format
+     * @param date
+     * @return 
+     */
+    std::time_t stringToStandardDate(std::string date);
+
+    /**
+     * @brief String to Date/Time Format
+     * @param date_time
+     * @return 
+     */
+    std::time_t stringToStandardDateTime(std::string date_time);
+    
+    /**
+     * @brief Converts std::strings to Long values
+     * @param value
+     * @return 
+     */
+    long stringToLong(std::string value);
+
+    /**
+     * @brief Converts std::strings to Int values
+     * @param value
+     * @return 
+     */
+    int stringToInt(std::string value);
+
+    /**
+     * @brief Tests first char of string for starting T/F returns int with -1 for invalid
+     * @param value
+     * @return 
+     */
+    int stringToBool(std::string value);
 
     /**
      * @brief Template search quick find

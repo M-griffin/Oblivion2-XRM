@@ -22,6 +22,8 @@
 #include <cstring>
 #include <climits>
 #include <cstdlib>
+#include <ctime>
+#include <iomanip>
 
 #include <stdexcept>
 
@@ -40,6 +42,7 @@
 #include <cwchar>   // wchar_t wide characters
 
 #include <utf-cpp/utf8.h>
+
 
 /**
  * CP437 -> UTF-8 Character Translation Table
@@ -227,7 +230,7 @@ std::string CommonIO::getSystemHomeDirectory()
 #endif
 
 /**
- * @brief Appends Path Seperator depending on environment.
+ * @brief Appends Path Separator depending on environment.
  * @param path
  * @return
  */
@@ -241,7 +244,7 @@ void CommonIO::pathAppend(std::string &path)
 }
 
 /**
- * @brief String Lengh counting actual characters not bytes
+ * @brief String Length counting actual characters not bytes
  * @param str
  * @return
  */
@@ -260,7 +263,7 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str)
 }
 
 /**
- * @brief Left Trim Whitepsaces (Front)
+ * @brief Left Trim White spaces (Front)
  * @param str
  * @return
  */
@@ -310,7 +313,7 @@ std::string CommonIO::rightTrim(const std::string &str)
 }
 
 /**
- * @brief Trim Whitepsaces from both ends
+ * @brief Trim White spaces from both ends
  * @param str
  * @return
  */
@@ -539,7 +542,7 @@ std::string CommonIO::maskString(const std::string &str)
 }
 
 /**
- * @brief Check if Digit or Numerics in a String
+ * @brief Check if Digit or Numeric's in a String
  * @param str
  * @return
  */
@@ -593,7 +596,7 @@ std::string CommonIO::printWideCharacters(const std::wstring &wide_string)
 }
 
 /**
- * @brief Translation from CP437 to UTF-8 MultiByte Charactes
+ * @brief Translation from CP437 to UTF-8 MultiByte Characters
  * @param standard_string
  */
 std::string CommonIO::translateUnicode(const std::string &standard_string)
@@ -949,7 +952,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
                 else
                 {
                     // Nothing to delete at begining Skip.
-                    std::cout << "del at begining: " << character_buffer << std::endl;
+                    std::cout << "del at beginning: " << character_buffer << std::endl;
                     return "empty";
                 }
             }
@@ -997,7 +1000,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         else
         {
             // At begining of Line, nothing to delete.
-            std::cout << "At begining of Line, nothing to bs: " << character_buffer << std::endl;
+            std::cout << "At beginning of Line, nothing to bs: " << character_buffer << std::endl;
             return "empty";
         }
     }
@@ -1138,7 +1141,7 @@ bool CommonIO::fileExists(std::string FileName)
 }
 
 /**
- * Reads in Ansi file into Buffer Only
+ * Reads in ANSI file into Buffer Only
  */
 void CommonIO::readinAnsi(std::string FileName, std::string &buff)
 {
@@ -1195,7 +1198,7 @@ void CommonIO::readinAnsi(std::string FileName, std::string &buff)
 }
 
 /**
- * Reads in Ansi file into Buffer Only
+ * Reads in ANSI file into Buffer Only
  */
 std::string CommonIO::readinAnsi(std::string FileName)
 {
@@ -1250,4 +1253,134 @@ std::vector<std::string> CommonIO::splitString(const std::string& s, char delimi
         tokens.push_back(token);
     }
     return tokens;
+}
+
+/**
+ * @brief Standard Time to Date String
+ * @param std_time
+ * @return 
+ */
+std::string CommonIO::standardDateToString(std::time_t std_time)
+{
+    std::ostringstream oss;
+    oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d");    
+    std::string time_string = oss.str();
+    return time_string;
+}
+
+/**
+ * @brief Standard Time to Date/Time String
+ * @param std_time
+ * @return 
+ */
+std::string CommonIO::standardDateTimeToString(std::time_t std_time)
+{
+    std::ostringstream oss;
+    oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d %H:%M:%S %z");    
+    std::string datetime_string = oss.str();
+    return datetime_string;
+}
+
+/**
+ * @brief String to Date Format
+ * @param date
+ * @return 
+ */
+std::time_t CommonIO::stringToStandardDate(std::string date) 
+{
+    // Append Time For Dates, need formattings
+    std::string key = date;    
+    key += " 00:00:00";
+    struct std::tm tm;
+
+    std::istringstream ss(key);                
+    ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+    if(ss.fail())
+    {
+        ss.clear();
+        return -1;
+    }
+
+    std::time_t const time = mktime(&tm);
+    return time;
+}
+
+/**
+ * @brief String to Date/Time Format
+ * @param date_time
+ * @return 
+ */
+std::time_t CommonIO::stringToStandardDateTime(std::string date_time) 
+{
+    struct std::tm tm;
+    std::istringstream ss(date_time);                
+    ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+    if(ss.fail())
+    {
+        ss.clear();
+        return -1;
+    }
+
+    std::time_t const time = mktime(&tm);
+    return time;
+}
+
+/**
+ * @brief Converts std::strings to Long values
+ * @param value
+ * @return 
+ */
+long CommonIO::stringToLong(std::string value)
+{
+    long result_id = -1;
+    std::stringstream ss(value);
+    ss >> result_id;
+
+    // check for Invalid Index.
+    if (ss.fail() || result_id < 0)
+    {
+        ss.clear();
+        ss.ignore();
+        result_id = -1;
+    }
+
+    return result_id;
+}
+
+/**
+ * @brief Converts std::strings to Int values
+ * @param value
+ * @return 
+ */
+int CommonIO::stringToInt(std::string value)
+{
+    int result_id = -1;
+    std::stringstream ss(value);
+    ss >> result_id;
+
+    // check for Invalid Index.
+    if (ss.fail() || result_id < 0)
+    {
+        ss.clear();
+        ss.ignore();
+        result_id = -1;
+    }
+
+    return result_id;
+}
+
+/**
+ * @brief Tests first char of string for starting T/F returns int with -1 for invalid
+ * @param value
+ * @return 
+ */
+int CommonIO::stringToBool(std::string value)
+{
+    // Test if string starts with T or F instead of typing True/False
+    if (toupper(value[0]) == 'T')
+        return 1;
+    else if (toupper(value[0]) == 'F') 
+        return 0;
+    else 
+        return -1;
 }

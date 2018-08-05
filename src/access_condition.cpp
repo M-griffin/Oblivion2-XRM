@@ -10,6 +10,33 @@
 #include <cctype>
 
 /**
+ * @brief Toggle Bit Flag
+ * @param flag
+ * @param first_set
+ * @param user
+ */
+void AccessCondition::setFlagToggle(unsigned char flag, bool first_set, user_ptr user)
+{
+    int bit = toupper(flag);
+    bit -= 65; // Handles A - Z
+    
+    if (bit < 0 || bit > 25)
+    {
+        std::cout << "Error, Invalid bit flag: " << bit << std::endl;
+        return;        
+    }
+    
+    if (first_set)
+    {
+        user->iControlFlags1 ^= 1 << bit;
+    }
+    else
+    {
+        user->iControlFlags2 ^= 1 << bit;
+    }    
+}
+
+/**
  * @brief Set Bit Flag on
  * @param flag
  * @param first_set
@@ -92,6 +119,8 @@ bool AccessCondition::checkAccessConditionFlag(unsigned char flag, bool first_se
 /**
  * @brief Sets a Default String of Bitflags On
  * @param bitString
+ * @param first_set
+ * @param user
  */
 void AccessCondition::setAccessConditionsFlagsOn(std::string bitString, bool first_set, user_ptr user)
 {
@@ -104,6 +133,8 @@ void AccessCondition::setAccessConditionsFlagsOn(std::string bitString, bool fir
 /**
  * @brief Sets a Default String of Bitflags Off
  * @param bitString
+ * @param first_set
+ * @param user
  */
 void AccessCondition::setAccessConditionsFlagsOff(std::string bitString, bool first_set, user_ptr user)
 {
@@ -114,7 +145,7 @@ void AccessCondition::setAccessConditionsFlagsOff(std::string bitString, bool fi
 }
 
 /**
- * @brief Parse Code Map and Test Secutiry and AR Flags.
+ * @brief Parse Code Map and Test Security and AR Flags.
  * @param code_map
  * @param user
  * @return 
@@ -248,8 +279,8 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
 
 /**
  * @brief String Token Parser.
- * @param token
- * @param seperator
+ * @param s
+ * @param delimiter
  */
 std::vector<std::string> split(const std::string& s, char delimiter)
 {
@@ -266,7 +297,6 @@ std::vector<std::string> split(const std::string& s, char delimiter)
 /**
  * @brief Parse ASC Strings then test User Flags
  * @param acs_string
- * @param user
  * @return 
  */
 std::vector<MapType> AccessCondition::parseAcsString(const std::string &acs_string)
@@ -300,7 +330,8 @@ std::vector<MapType> AccessCondition::parseAcsString(const std::string &acs_stri
 
 /**
  * @brief Parses and Validates codemap
- * @param expression
+ * @param acs_string
+ * @param user
  * @return 
  */
 bool AccessCondition::validateAcsString(const std::string &acs_string, user_ptr user)
@@ -314,4 +345,26 @@ bool AccessCondition::validateAcsString(const std::string &acs_string, user_ptr 
         return true;
     }
     return parseCodeMap(code_map, user);
+}
+
+/**
+ * @brief Bit String to Printable String
+ * @param bits
+ * @return 
+ */
+std::string AccessCondition::getAccessConditionFlagStringFromBits(int bits)
+{    
+    std::string bit_string = "";
+    for (int i = 0; i < 26; i++)
+    {
+        if ((bits >> i) & 1)
+        {
+            bit_string += static_cast<char>(i + 65);
+        }
+        else {
+            bit_string += '-';
+        }
+    }
+    
+    return bit_string;
 }
