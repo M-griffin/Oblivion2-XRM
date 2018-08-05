@@ -37,6 +37,7 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_active_pulldownID(0)
     , m_fail_flag(false)
     , m_pulldown_reentrace_flag(false)
+    , m_is_active_pulldown_menu(false)
     , m_use_first_command_execution(true)
     , m_logoff(false)
 {
@@ -65,8 +66,8 @@ std::string MenuBase::upper_case(const std::string &string_sequence)
     {
         new_string += std::toupper(c, std::locale());
     }
-    
-    return new_string;        
+
+    return new_string;
 }
 
 /**
@@ -79,10 +80,10 @@ std::string MenuBase::lower_case(const std::string &string_sequence)
     {
         new_string += std::tolower(c, std::locale());
     }
-    
-    return new_string;        
+
+    return new_string;
 }
- 
+
 /**
  * @brief Clears out Loaded Pulldown options
  */
@@ -230,7 +231,7 @@ void MenuBase::importMenu(menu_ptr menu_info)
     // Remove Options the users might not have access to
     // ie Sysop Commands inside of forms.
     checkMenuOptionsAcsAccess();
-    
+
     // Now we need to process custom screens from module menu
 
 }
@@ -305,7 +306,6 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
     // Loop the code map and determine the number of unique columns for parsing.
     int key_columns = 0;
     int des_columns = 0;
-    std::string lookup = "";
 
     // Loop codes and get max number of columns per code.
     for(unsigned int i = 0; i < code_map.size(); i++)
@@ -800,9 +800,9 @@ void MenuBase::executeFirstAndEachCommands()
  */
 std::vector<std::string> MenuBase::getListOfMenuPrompts()
 {
-    std::vector<std::string> result_list;    
+    std::vector<std::string> result_list;
     std::vector<std::string> result_set = m_directory->getFileListPerDirectory(GLOBAL_MENU_PROMPT_PATH, "yaml");
-      
+
     // check result set, if no menu then return gracefully.
     if(result_set.size() == 0)
     {

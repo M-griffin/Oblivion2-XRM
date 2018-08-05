@@ -28,10 +28,10 @@ const int SERVICE_TYPE_ASYNC_TIMER       = 9;
 const int SERVICE_TYPE_BLOCK_TIMER       = 10;
 
 #define SERVICE_TIMER(x) ((int)(x) <= SERVICE_TYPE_BLOCK_TIMER \
-                && (int)(x) >= SERVICE_TYPE_ASYNC_TIMER)
+                          && (int)(x) >= SERVICE_TYPE_ASYNC_TIMER)
 
 #define SERVICE_LISTENER(x) ((int)(x) <= SERVICE_TYPE_LISTENER_IRC \
-                && (int)(x) >= SERVICE_TYPE_LISTENER_TELNET)
+                             && (int)(x) >= SERVICE_TYPE_LISTENER_TELNET)
 
 /**
  * @class IOService
@@ -91,28 +91,28 @@ public:
                 m_buffer.push_back(buffer[i]);
             }
         }
-        
+
         virtual std::vector<unsigned char> &getBuffer()
         {
             return m_buffer;
         }
-        
+
         virtual std::string getStringSequence()
         {
             return m_string_sequence;
         }
-        
+
         virtual socket_handler_ptr getSocketHandle()
         {
             return m_socket_handle;
         }
-        
+
         virtual void executeCallback(const std::error_code &err, socket_handler_ptr handle)
-        {            
+        {
             callback_function_handler callback(m_callback);
             callback(err, handle);
         }
-        
+
         virtual int getServiceType()
         {
             return m_service_type;
@@ -160,21 +160,22 @@ public:
             // Server Connection Listener Job (1) for each Service.
             m_listener_list.push_back(std::shared_ptr<ServiceBase>(job));
         }
-        else 
+        else
         {
             // Standard Async Job
             m_service_list.push_back(std::shared_ptr<ServiceBase>(job));
-        }        
+        }
     }
-    
+
     /**
+     * NOT IN USE RIGHT NOW
      * @brief Delete an active Async Job in the Vector Queue
      * @param buffer
      * @param string_sequence
      * @param socket_handle
      * @param callback
      * @param service_type
-     */
+     *
     template <typename MutableBufferSequence, typename StringSequence, typename SocketHandle, typename Callback, typename ServiceType>
     void delAsyncJob(MutableBufferSequence &buffer, StringSequence string_sequence, SocketHandle socket_handle,
                      Callback &callback, ServiceType service_type)
@@ -193,16 +194,16 @@ public:
             // Server Connection Listener Job (1) for each Service.
             //m_listener_list.push_back(std::shared_ptr<ServiceBase>(job));
         }
-        else 
+        else
         {
             // Standard Async Job
             //m_service_list.push_back(std::shared_ptr<ServiceBase>(job));
-        }        
-    }
+        }
+    }*/
 
     /**
      * @Brief Always check all timers (Priority each iteration)
-     */            
+     */
     void checkPriorityTimers();
 
     /**
@@ -214,12 +215,12 @@ public:
      * @brief Main looping method
      */
     void run();
-    
+
     /**
      * @brief Shutdown Async Polling Service
      */
     void stop();
-    
+
     SafeVector<service_base_ptr>  m_service_list;
     SafeVector<service_base_ptr>  m_timer_list;
     SafeVector<service_base_ptr>  m_listener_list;

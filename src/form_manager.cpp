@@ -68,36 +68,36 @@ void FormManager::startupForm(form_ptr form)
 
     // Push to stack now the new form.
     m_form.push_back(form);
-        
+
     // Ansi Processor used for Parsing templates and get line size(s).
     // This determines the screen template size and data we can fit between
     // Top and Bottom Templates.
     ansi_process_ptr ansi(new AnsiProcessor(
-                        m_session_data->m_telnet_state->getTermRows(),
-                        m_session_data->m_telnet_state->getTermCols())
-                     );
-    
+                              m_session_data->m_telnet_state->getTermRows(),
+                              m_session_data->m_telnet_state->getTermCols())
+                         );
+
     // Read in ANSI Templates related to the Form.
     m_ansi_top = m_common_io.readinAnsi(m_form.back()->m_ansi_top);
     m_ansi_mid = m_common_io.readinAnsi(m_form.back()->m_ansi_mid);
     m_ansi_bot = m_common_io.readinAnsi(m_form.back()->m_ansi_bot);
-    
+
     // Calc Top Rows, get Ending Y Position
     ansi->parseAnsiScreen((char *)m_ansi_top.c_str());
     int top_rows = ansi->getYPosition();
-    
+
     ansi->clearScreen();
-    
+
     // Calc Bottom Rows
     ansi->parseAnsiScreen((char *)m_ansi_bot.c_str());
     int bot_rows = ansi->getMaxRowsUsedOnScreen();
-    
+
     ansi->clearScreen();
-    
+
     // Calculate the Box Range
     m_box_top = top_rows + 1;
     m_box_bottom = m_session_data->m_telnet_state->getTermRows() - (bot_rows + 1);
-    
+
     // Parse and Process Mid ansi Template for menu display where.
 }
 
@@ -132,41 +132,41 @@ void FormManager::processFormOption(MenuOption &option, std::string value)
  * @param list
  */
 void FormManager::buildPageOptions(std::vector<MenuOption> &page_options, int current_page)
-{    
+{
     // First Clear All Page Options
     std::vector<MenuOption>().swap(page_options);
-    
+
     // Calcuate Box Size and Total Pages
-    // Use this lateron with screen height / size to 
+    // Use this lateron with screen height / size to
     // get dynamic page lengths.
-    int boxsize = m_box_bottom - m_box_top;        
+    int boxsize = m_box_bottom - m_box_top;
     int total_rows = m_loaded_options.size();
-            
+
     m_total_pages = total_rows / boxsize;
     if (total_rows % boxsize > 0)
     {
         ++m_total_pages;
     }
-    
+
     if (total_rows <= boxsize)
     {
-        m_total_pages = 1;        
+        m_total_pages = 1;
     }
-    
-    if (current_page < 1) 
+
+    if (current_page < 1)
     {
         current_page = 1;
     }
-    
+
     // Paging is Zero Based for Array.
     int page = current_page - 1;
 
     // Now Grab as Records that will fit in the box
     for (int i = 1; i < boxsize+1; i++)
     {
-        if (((boxsize*page)+i)-1 >= (signed)m_loaded_options.size()) 
-            break;       
-        page_options.push_back(m_loaded_options[((boxsize*page)+i)-1]);        
+        if (((boxsize*page)+i)-1 >= (signed)m_loaded_options.size())
+            break;
+        page_options.push_back(m_loaded_options[((boxsize*page)+i)-1]);
     }
 }
 
@@ -180,7 +180,7 @@ menu_ptr FormManager::retrieveFormOptions(int page)
     m_menu_info->menu_name = m_form.back()->m_name;
     m_menu_info->menu_title = m_form.back()->m_title;
     m_menu_info->menu_pulldown_file = m_form.back()->m_pulldown_file;
-           
+
     // Populate Menu with the Loaded Page Options.
     std::vector<MenuOption> page_options;
     buildPageOptions(page_options, page);
@@ -261,7 +261,6 @@ std::string FormManager::processMidFormTemplate(const std::string &screen)
     // Loop the code map and determine the number of unique columns for parsing.
     int key_columns = 0;
     int des_columns = 0;
-    std::string lookup = "";
 
     // Loop codes and get max number of columns per code.
     for(unsigned int i = 0; i < code_map.size(); i++)
@@ -423,7 +422,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
     m_session_io.addMCIMapping("^V", m_config->default_color_inverse);
     m_session_io.addMCIMapping("^X", m_config->default_color_box);
     m_session_io.addMCIMapping("^M", "\r\n");
-    
+
     // Depending on the CodeMap return fro the (2)nd group, which are the ending characters
     // We'll need to setup new menus on these features.
     std::vector<MapType> code_map = m_session_io.pipe2promptCodeMap(prompt_string);
@@ -476,7 +475,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
  * @return
  */
 std::string FormManager::processFormScreens()
-{   
+{
     std::string screen_output = "";
 
     // Add the Top section of the template
