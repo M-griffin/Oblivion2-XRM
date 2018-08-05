@@ -44,7 +44,7 @@ void SysLog::databaseError(Database& db,Query& q,const std::string& str)
     {
         std::cout << "Database Not Connected!" << std::endl;
     }
-    syslog(LOG_ERR, "QUERY: \"%s\"", q.getLastQuery().c_str());
+    syslog(LOG_ERR, "QUERY: \"%s\" : %s", q.getLastQuery().c_str(), str.c_str());
 }
 
 } // namespace SQLW
