@@ -1,0 +1,81 @@
+file_version: 1.0.1
+menu_name: Conference Manager
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: CONFMAN
+menu_acs_string: ""
+menu_prompt: Conference Manager
+menu_title: Conference Manager
+menu_pulldown_file: ""
+menu_option:
+  index: 0
+  name: Add
+  acs_string: ""
+  hidden: false
+  menu_key: A*
+  command_key: CA
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 1
+  name: Delete
+  acs_string: ""
+  hidden: false
+  menu_key: D*
+  command_key: CD
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 2
+  name: Edit
+  acs_string: ""
+  hidden: false
+  menu_key: E*
+  command_key: CE
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 3
+  name: List
+  acs_string: ""
+  hidden: false
+  menu_key: L*
+  command_key: CL
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 4
+  name: Reorder
+  acs_string: ""
+  hidden: false
+  menu_key: R*
+  command_key: CR
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 5
+  name: Type
+  acs_string: ""
+  hidden: false
+  menu_key: T*
+  command_key: CT
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 6
+  name: Users
+  acs_string: ""
+  hidden: false
+  menu_key: U*
+  command_key: CU
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 7
+  name: Quit
+  acs_string: ""
+  hidden: false
+  menu_key: Q*
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0

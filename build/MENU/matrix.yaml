@@ -1,0 +1,72 @@
+file_version: 1.0.1
+menu_name: Matrix
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: ""
+menu_acs_string: ""
+menu_prompt: ""
+menu_title: Matrix
+menu_pulldown_file: MATRIX.ANS
+menu_option:
+  index: 0
+  name: Turns on Pulldown Re-entrance
+  acs_string: ""
+  hidden: false
+  menu_key: FIRSTCMD
+  command_key: -'
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 1
+  name: Logon
+  acs_string: ""
+  hidden: false
+  menu_key: L
+  command_key: "{S"
+  command_string: ""
+  pulldown_id: 1
+menu_option:
+  index: 2
+  name: Apply
+  acs_string: ""
+  hidden: false
+  menu_key: A
+  command_key: "{A"
+  command_string: ""
+  pulldown_id: 2
+menu_option:
+  index: 3
+  name: Check
+  acs_string: ""
+  hidden: false
+  menu_key: $
+  command_key: "{C"
+  command_string: ""
+  pulldown_id: 3
+menu_option:
+  index: 4
+  name: Feedback
+  acs_string: ""
+  hidden: false
+  menu_key: F
+  command_key: "{F"
+  command_string: 1
+  pulldown_id: 4
+menu_option:
+  index: 5
+  name: Chat
+  acs_string: ""
+  hidden: false
+  menu_key: C
+  command_key: "{P"
+  command_string: ""
+  pulldown_id: 5
+menu_option:
+  index: 6
+  name: Logoff
+  acs_string: ""
+  hidden: false
+  menu_key: G
+  command_key: "{G"
+  command_string: ""
+  pulldown_id: 6

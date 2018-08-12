@@ -1,0 +1,63 @@
+file_version: 1.0.1
+menu_name: Voting
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: VOTING
+menu_acs_string: ""
+menu_prompt: Voting
+menu_title: Voting Menu
+menu_pulldown_file: ""
+menu_option:
+  index: 0
+  name: List Questions
+  acs_string: ""
+  hidden: false
+  menu_key: L*
+  command_key: VL
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 1
+  name: Add Question
+  acs_string: s250
+  hidden: false
+  menu_key: A*
+  command_key: VA
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 2
+  name: Show Results
+  acs_string: ""
+  hidden: false
+  menu_key: S*
+  command_key: VS
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 3
+  name: Quit
+  acs_string: ""
+  hidden: false
+  menu_key: Q*
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 4
+  name: Delete Question
+  acs_string: s250
+  hidden: false
+  menu_key: D*
+  command_key: VD
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 5
+  name: Respond
+  acs_string: ""
+  hidden: false
+  menu_key: R*
+  command_key: VR
+  command_string: "*"
+  pulldown_id: 0

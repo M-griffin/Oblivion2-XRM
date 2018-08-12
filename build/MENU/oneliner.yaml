@@ -1,0 +1,81 @@
+file_version: 1.0.1
+menu_name: ""
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: ""
+menu_acs_string: ""
+menu_prompt: ^M^RAdd a oneliner? /
+menu_title: ""
+menu_pulldown_file: N
+menu_option:
+  index: 0
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: FIRSTCMD
+  command_key: -L
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 1
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: FIRSTCMD
+  command_key: D*
+  command_string: 3
+  pulldown_id: 0
+menu_option:
+  index: 2
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: FIRSTCMD
+  command_key: -A
+  command_string: One Liners
+  pulldown_id: 0
+menu_option:
+  index: 3
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: FIRSTCMD
+  command_key: DF
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 4
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: Y
+  command_key: -A
+  command_string: Add a Oneliner
+  pulldown_id: 0
+menu_option:
+  index: 5
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: Y
+  command_key: DA
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 6
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: Y
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 7
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: N
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0

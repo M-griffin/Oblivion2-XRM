@@ -1,0 +1,351 @@
+file_version: 1.0.1
+menu_name: Main Menu
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: ""
+menu_acs_string: ""
+menu_prompt: Main
+menu_title: Main Menu
+menu_pulldown_file: ""
+menu_option:
+  index: 0
+  name: ""
+  acs_string: ""
+  hidden: true
+  menu_key: EACH
+  command_key: -B
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 1
+  name: ""
+  acs_string: ""
+  hidden: true
+  menu_key: FIRSTCMD
+  command_key: -C
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 2
+  name: Rumor Print (Goto)
+  acs_string: ""
+  hidden: true
+  menu_key: EACH
+  command_key: -G
+  command_string: 1,20
+  pulldown_id: 0
+menu_option:
+  index: 3
+  name: Rumors (Get it from Data Area)
+  acs_string: ""
+  hidden: true
+  menu_key: EACH
+  command_key: D*
+  command_string: 2
+  pulldown_id: 0
+menu_option:
+  index: 4
+  name: Print Rumor
+  acs_string: ""
+  hidden: true
+  menu_key: EACH
+  command_key: DR
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 5
+  name: Clear Screen (AutoSignature)
+  acs_string: ""
+  hidden: true
+  menu_key: A*
+  command_key: -L
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 6
+  name: Header (Autosignature)
+  acs_string: ""
+  hidden: true
+  menu_key: A*
+  command_key: -A
+  command_string: AutoSignature
+  pulldown_id: 0
+menu_option:
+  index: 7
+  name: AutoSignature
+  acs_string: ""
+  hidden: false
+  menu_key: A*
+  command_key: "[A"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 8
+  name: BBS List
+  acs_string: ""
+  hidden: false
+  menu_key: B*
+  command_key: -/
+  command_string: BBSLIST
+  pulldown_id: 5
+menu_option:
+  index: 9
+  name: Chat
+  acs_string: ""
+  hidden: false
+  menu_key: C*
+  command_key: "[C"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 10
+  name: Daily Log
+  acs_string: ""
+  hidden: false
+  menu_key: D*
+  command_key: -A
+  command_string: Daily Log
+  pulldown_id: 0
+menu_option:
+  index: 11
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: D*
+  command_key: "[V"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 12
+  name: Email
+  acs_string: ""
+  hidden: false
+  menu_key: E*
+  command_key: -/
+  command_string: EMAIL
+  pulldown_id: 4
+menu_option:
+  index: 13
+  name: Feedback
+  acs_string: ""
+  hidden: false
+  menu_key: F*
+  command_key: -/
+  command_string: FEED
+  pulldown_id: 0
+menu_option:
+  index: 14
+  name: Goodbye
+  acs_string: ""
+  hidden: false
+  menu_key: G*
+  command_key: -/
+  command_string: GOODBYE
+  pulldown_id: 0
+menu_option:
+  index: 15
+  name: Infoforms
+  acs_string: ""
+  hidden: false
+  menu_key: I*
+  command_key: "[I"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 16
+  name: Config
+  acs_string: ""
+  hidden: false
+  menu_key: K*
+  command_key: "[K"
+  command_string: ""
+  pulldown_id: 6
+menu_option:
+  index: 17
+  name: List Users
+  acs_string: ""
+  hidden: false
+  menu_key: L*
+  command_key: "[L"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 18
+  name: Messages
+  acs_string: ""
+  hidden: false
+  menu_key: M*
+  command_key: JM
+  command_string: "*"
+  pulldown_id: 3
+menu_option:
+  index: 19
+  name: ""
+  acs_string: ~\
+  hidden: true
+  menu_key: M*
+  command_key: MI
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 20
+  name: ""
+  acs_string: ~\
+  hidden: true
+  menu_key: M*
+  command_key: -^
+  command_string: MSCAN
+  pulldown_id: 0
+menu_option:
+  index: 21
+  name: New User Voting
+  acs_string: ""
+  hidden: false
+  menu_key: N*
+  command_key: ^D
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 22
+  name: QWKMail
+  acs_string: ""
+  hidden: false
+  menu_key: Q*
+  command_key: -/
+  command_string: QWKMail
+  pulldown_id: 0
+menu_option:
+  index: 23
+  name: Rumors
+  acs_string: ""
+  hidden: false
+  menu_key: R*
+  command_key: -/
+  command_string: RUMORS
+  pulldown_id: 0
+menu_option:
+  index: 24
+  name: System Status
+  acs_string: ""
+  hidden: false
+  menu_key: S*
+  command_key: "[S"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 25
+  name: Transfers
+  acs_string: ""
+  hidden: false
+  menu_key: T*
+  command_key: JF
+  command_string: "*"
+  pulldown_id: 2
+menu_option:
+  index: 26
+  name: ""
+  acs_string: ~\
+  hidden: true
+  menu_key: T*
+  command_key: FI
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 27
+  name: ""
+  acs_string: ~\
+  hidden: true
+  menu_key: T*
+  command_key: -^
+  command_string: FSCAN
+  pulldown_id: 0
+menu_option:
+  index: 28
+  name: Time Bank
+  acs_string: ""
+  hidden: false
+  menu_key: U*
+  command_key: "[U"
+  command_string: 60 15
+  pulldown_id: 0
+menu_option:
+  index: 29
+  name: Voting
+  acs_string: ""
+  hidden: false
+  menu_key: V*
+  command_key: -/
+  command_string: VOTING
+  pulldown_id: 0
+menu_option:
+  index: 30
+  name: Last Callers
+  acs_string: ""
+  hidden: false
+  menu_key: W*
+  command_key: "[W"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 31
+  name: Transfer to User
+  acs_string: s250
+  hidden: false
+  menu_key: X*
+  command_key: "[X"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 32
+  name: Your Stats
+  acs_string: ""
+  hidden: false
+  menu_key: Y*
+  command_key: "[Y"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 33
+  name: Change Password
+  acs_string: ""
+  hidden: false
+  menu_key: +*
+  command_key: "[+"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 34
+  name: Top Ten Listing
+  acs_string: ""
+  hidden: false
+  menu_key: -*
+  command_key: -/
+  command_string: TOPTEN
+  pulldown_id: 0
+menu_option:
+  index: 35
+  name: MultiNode Menu
+  acs_string: ""
+  hidden: false
+  menu_key: =*
+  command_key: -/
+  command_string: MULTINOD
+  pulldown_id: 0
+menu_option:
+  index: 36
+  name: Global Newscan
+  acs_string: ""
+  hidden: false
+  menu_key: "!*"
+  command_key: "!A"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 37
+  name: Sysop
+  acs_string: s250
+  hidden: false
+  menu_key: "%*"
+  command_key: -/
+  command_string: GOSYSOP
+  pulldown_id: 1

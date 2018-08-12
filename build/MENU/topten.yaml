@@ -1,0 +1,297 @@
+file_version: 1.0.1
+menu_name: TopTen
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: ""
+menu_acs_string: ""
+menu_prompt: "^RWhich to view:"
+menu_title: ""
+menu_pulldown_file: N
+menu_option:
+  index: 0
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: EACH
+  command_key: -L
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 1
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: EACH
+  command_key: -A
+  command_string: Top Ten Listing
+  pulldown_id: 0
+menu_option:
+  index: 2
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: EACH
+  command_key: -F
+  command_string: TOPTEN.ANS
+  pulldown_id: 0
+menu_option:
+  index: 3
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 1
+  command_key: RA
+  command_string: Best Uploaders
+  pulldown_id: 0
+menu_option:
+  index: 4
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 2
+  command_key: RB
+  command_string: Worst Uploaders
+  pulldown_id: 0
+menu_option:
+  index: 5
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 3
+  command_key: RC
+  command_string: Best Downloaders
+  pulldown_id: 0
+menu_option:
+  index: 6
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 4
+  command_key: RD
+  command_string: Worst Downloaders
+  pulldown_id: 0
+menu_option:
+  index: 7
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 5
+  command_key: RE
+  command_string: Best Post/Call Ratio
+  pulldown_id: 0
+menu_option:
+  index: 8
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 6
+  command_key: RF
+  command_string: Worst Post/Call Ratio
+  pulldown_id: 0
+menu_option:
+  index: 9
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 7
+  command_key: RG
+  command_string: Best Uploaders in Kilobytes
+  pulldown_id: 0
+menu_option:
+  index: 10
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 8
+  command_key: RH
+  command_string: Worst Uploaders in Kilobytes
+  pulldown_id: 0
+menu_option:
+  index: 11
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 9
+  command_key: RI
+  command_string: Best Downloaders in Kilobytes
+  pulldown_id: 0
+menu_option:
+  index: 12
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 10
+  command_key: RJ
+  command_string: Worst Downloaders in Kilobytes
+  pulldown_id: 0
+menu_option:
+  index: 13
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 11
+  command_key: RK
+  command_string: Best Message Posters
+  pulldown_id: 0
+menu_option:
+  index: 14
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 12
+  command_key: RL
+  command_string: Worst Message Posters
+  pulldown_id: 0
+menu_option:
+  index: 15
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 13
+  command_key: RM
+  command_string: Best Callers
+  pulldown_id: 0
+menu_option:
+  index: 16
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 14
+  command_key: RN
+  command_string: Worst Callers
+  pulldown_id: 0
+menu_option:
+  index: 17
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 15
+  command_key: RA
+  command_string: Best Uploaders
+  pulldown_id: 0
+menu_option:
+  index: 18
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 15
+  command_key: RB
+  command_string: Worst Uploaders
+  pulldown_id: 0
+menu_option:
+  index: 19
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 15
+  command_key: RC
+  command_string: Best Downloaders
+  pulldown_id: 0
+menu_option:
+  index: 20
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 15
+  command_key: RD
+  command_string: Worst Downloaders
+  pulldown_id: 0
+menu_option:
+  index: 21
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 15
+  command_key: RE
+  command_string: Best Post/Call Ratio
+  pulldown_id: 0
+menu_option:
+  index: 22
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 15
+  command_key: RF
+  command_string: Worst Post/Call Ratio
+  pulldown_id: 0
+menu_option:
+  index: 23
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 15
+  command_key: RG
+  command_string: Best Uploaders in Kilobytes
+  pulldown_id: 0
+menu_option:
+  index: 24
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 15
+  command_key: RH
+  command_string: Worst Uploaders in Kilobytes
+  pulldown_id: 0
+menu_option:
+  index: 25
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 15
+  command_key: RI
+  command_string: Best Downloaders in Kilobytes
+  pulldown_id: 0
+menu_option:
+  index: 26
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 15
+  command_key: RJ
+  command_string: Worst Downloaders in Kilobytes
+  pulldown_id: 0
+menu_option:
+  index: 27
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 15
+  command_key: RK
+  command_string: Best Message Posters
+  pulldown_id: 0
+menu_option:
+  index: 28
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 15
+  command_key: RL
+  command_string: Worst Message Posters
+  pulldown_id: 0
+menu_option:
+  index: 29
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 15
+  command_key: RM
+  command_string: Best Callers
+  pulldown_id: 0
+menu_option:
+  index: 30
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: 15
+  command_key: RN
+  command_string: Worst Callers
+  pulldown_id: 0
+menu_option:
+  index: 31
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: ""
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0

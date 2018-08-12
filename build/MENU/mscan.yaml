@@ -1,0 +1,72 @@
+file_version: 1.0.1
+menu_name: Scan
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: ""
+menu_acs_string: ""
+menu_prompt: ^RNewscan Bases \
+menu_title: ""
+menu_pulldown_file: N
+menu_option:
+  index: 0
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: FIRSTCMD
+  command_key: MH
+  command_string: 1
+  pulldown_id: 0
+menu_option:
+  index: 1
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: FIRSTCMD
+  command_key: -C
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 2
+  name: ""
+  acs_string: ""
+  hidden: true
+  menu_key: Y
+  command_key: MF
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 3
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: Y
+  command_key: -G
+  command_string: 1,24
+  pulldown_id: 0
+menu_option:
+  index: 4
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: Y
+  command_key: -R
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 5
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: Y
+  command_key: -^
+  command_string: MESSAGES
+  pulldown_id: 0
+menu_option:
+  index: 6
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: N
+  command_key: -^
+  command_string: MESSAGES
+  pulldown_id: 0

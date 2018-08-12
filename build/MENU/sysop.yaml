@@ -1,0 +1,207 @@
+file_version: 1.0.1
+menu_name: Sysop Menu
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: SYSOP
+menu_acs_string: ""
+menu_prompt: Sysop
+menu_title: Sysop Menu
+menu_pulldown_file: ""
+menu_option:
+  index: 0
+  name: Black List
+  acs_string: ""
+  hidden: false
+  menu_key: B*
+  command_key: "*B"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 1
+  name: Conference Editor
+  acs_string: ""
+  hidden: false
+  menu_key: C*
+  command_key: CI
+  command_string: ""
+  pulldown_id: 3
+menu_option:
+  index: 2
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: C*
+  command_key: -/
+  command_string: CONFMAN
+  pulldown_id: 0
+menu_option:
+  index: 3
+  name: Data Sysop
+  acs_string: ""
+  hidden: false
+  menu_key: D*
+  command_key: -/
+  command_string: DATASYSO
+  pulldown_id: 0
+menu_option:
+  index: 4
+  name: Menu Editor
+  acs_string: ""
+  hidden: false
+  menu_key: E*
+  command_key: "*#"
+  command_string: ""
+  pulldown_id: 1
+menu_option:
+  index: 5
+  name: Goodbye
+  acs_string: ""
+  hidden: false
+  menu_key: G*
+  command_key: -/
+  command_string: GOODBYE
+  pulldown_id: 0
+menu_option:
+  index: 6
+  name: Infoforms
+  acs_string: ""
+  hidden: false
+  menu_key: I*
+  command_key: "*I"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 7
+  name: Clear Infoforms
+  acs_string: ""
+  hidden: false
+  menu_key: K*
+  command_key: "*K"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 8
+  name: Show Log
+  acs_string: ""
+  hidden: false
+  menu_key: L*
+  command_key: "*L"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 9
+  name: Make User
+  acs_string: ""
+  hidden: false
+  menu_key: M*
+  command_key: "*M"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 10
+  name: Libraries
+  acs_string: ""
+  hidden: false
+  menu_key: N*
+  command_key: "*S"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 11
+  name: Protocol Editor
+  acs_string: ""
+  hidden: false
+  menu_key: P*
+  command_key: "*P"
+  command_string: ""
+  pulldown_id: 2
+menu_option:
+  index: 12
+  name: Menu Prompts
+  acs_string: ""
+  hidden: false
+  menu_key: R*
+  command_key: "*R"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 13
+  name: Configuration
+  acs_string: ""
+  hidden: false
+  menu_key: S*
+  command_key: "*C"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 14
+  name: User Editor
+  acs_string: ""
+  hidden: false
+  menu_key: U*
+  command_key: "*U"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 15
+  name: Event Editor
+  acs_string: ""
+  hidden: false
+  menu_key: V*
+  command_key: "*V"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 16
+  name: Extract Voting
+  acs_string: ""
+  hidden: false
+  menu_key: X*
+  command_key: "*X"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 17
+  name: MiniDos
+  acs_string: ""
+  hidden: false
+  menu_key: "&*"
+  command_key: "*D"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 18
+  name: Text Editor
+  acs_string: ""
+  hidden: false
+  menu_key: T*
+  command_key: "*T"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 19
+  name: "Level Editor"
+  acs_string: ""
+  hidden: false
+  menu_key: Y*
+  command_key: "*Y"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 20
+  name: Edit Prompts
+  acs_string: ""
+  hidden: false
+  menu_key: "!*"
+  command_key: "*E"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 21
+  name: Quit
+  acs_string: ""
+  hidden: false
+  menu_key: Q*
+  command_key: -\
+  command_string: ""
+  pulldown_id: 4

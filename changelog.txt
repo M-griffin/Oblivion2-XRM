@@ -1,4 +1,13 @@
 
+Change Log Update (00.00.124)
+* 2018-08-12
++ Created default Build folder for Runtime execution with default menus,
+  prompts, and ANSI screen files.
++ Added some build scripts for Linux and OSX to update Makefiles and 
+  build the executable without Codelite IDE.  Package dependences still
+  need to be installed and available.
+- Starting on Level Editor next.
+
 Change Log Update (00.00.123)
 * 2018-08-05
 + Sync OSX Project.
@@ -66,28 +75,28 @@ Change Log Update (00.00.118)
 + Some User Editor Corrections, updated next/previous user to keep track of 
   array index, this is shared with normal ALL view and filtered view, and gets 
   re-populated on filtering. The next and previous with now move properly along the   
-  available users searched. Also incorrect slections will not redisplay the user 
-  listing again untill a valid selection is made.
-+ Updated Boolean prompts to just ask for T/F versus typing out True anfd also 
-  added header count showing current our of total records when swtich between next 
+  available users searched. Also incorrect selections will not redisplay the user 
+  listing again until a valid selection is made.
++ Updated Boolean prompts to just ask for T/F versus typing out True and also 
+  added header count showing current our of total records when switch between next 
   and previous users in the list.  Next it assigning updated value to record, 
   then saving or ignoring changes.
  
 Change Log Update (00.00.117)
 * 2018-07-27
-+ Added move to next / previous user in fiueld editor. Changed record load 
++ Added move to next / previous user in field editor. Changed record load 
   to use pre-loaded list of users order by handle, that will keep the search 
-  results and then iteratorate through that when changing users.
+  results and then Iterator through that when changing users.
 + Coding up the prompt displays on field commands.
-+ Completed initial propmts for User Field editing on main view to .yaml file. 
-  Next is to create the prompts for the Extended Information View and finishin 
++ Completed initial prompts for User Field editing on main view to .yaml file. 
+  Next is to create the prompts for the Extended Information View and finish 
   coding up the field assignments. 
-+ Some minor Spellchecking on files currently being worked on.
++ Some minor Spell checking on files currently being worked on.
  
 Change Log Update (00.00.116)
 * 2018-07-26
 + Adding User List filtering for quick searches. 
-+ Added new user accessflags to sting method to display all user flags as letters.
++ Added new user access flags to sting method to display all user flags as letters.
 + Added more User Fields, will probably add a second screen for extended options
   and keep it smaller and more optimized. 
 + Fixed UnitTests for forms that rely on config class. Added new options 
@@ -102,7 +111,7 @@ Change Log Update (00.00.115)
   added new field to config file password_default_user, config file version has 
   been incremented, the file must be updated manually, or the file removed and 
   will auto re-  generate on startup of the program otherwise it will result in 
-  version mis-match and not startup.
+  version mismatch and not startup.
 + Completed USER_ADD, USER_DELETE, USER_COPY with default renaming of user_name, 
   handle and emails.
  

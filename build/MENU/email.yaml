@@ -1,0 +1,180 @@
+file_version: 1.0.1
+menu_name: Email Menu
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: EMAIL
+menu_acs_string: ""
+menu_prompt: Email
+menu_title: Email Menu
+menu_pulldown_file: ""
+menu_option:
+  index: 0
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: FIRSTCMD
+  command_key: -L
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 1
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: FIRSTCMD
+  command_key: -A
+  command_string: Oblivion/2 Email
+  pulldown_id: 0
+menu_option:
+  index: 2
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: FIRSTCMD
+  command_key: ET
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 3
+  name: Scan Email
+  acs_string: s254
+  hidden: false
+  menu_key: A*
+  command_key: EA
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 4
+  name: Look in MailBox
+  acs_string: s254
+  hidden: false
+  menu_key: B*
+  command_key: EB
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 5
+  name: Delete Incoming
+  acs_string: ""
+  hidden: false
+  menu_key: D*
+  command_key: ED
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 6
+  name: Edit Outgoing
+  acs_string: ""
+  hidden: false
+  menu_key: E*
+  command_key: EE
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 7
+  name: Forward Mail
+  acs_string: ""
+  hidden: false
+  menu_key: F*
+  command_key: EF
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 8
+  name: Edit acs_string
+  acs_string: ""
+  hidden: false
+  menu_key: G*
+  command_key: EG
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 9
+  name: Kill Outgoing
+  acs_string: ""
+  hidden: false
+  menu_key: K*
+  command_key: EK
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 10
+  name: List Mail
+  acs_string: ""
+  hidden: false
+  menu_key: L*
+  command_key: EL
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 11
+  name: New Email Scan
+  acs_string: ""
+  hidden: false
+  menu_key: N*
+  command_key: EN
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 12
+  name: Reply
+  acs_string: ""
+  hidden: false
+  menu_key: P*
+  command_key: EP
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 13
+  name: Read Incoming
+  acs_string: ""
+  hidden: false
+  menu_key: R*
+  command_key: ER
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 14
+  name: Send Mail
+  acs_string: ""
+  hidden: false
+  menu_key: S*
+  command_key: ES
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 15
+  name: View Outgoing
+  acs_string: ""
+  hidden: false
+  menu_key: V*
+  command_key: EV
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 16
+  name: Purge Filemail
+  acs_string: s250
+  hidden: false
+  menu_key: X*
+  command_key: EX
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 17
+  name: Pack Email
+  acs_string: s250
+  hidden: false
+  menu_key: Z*
+  command_key: EZ
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 18
+  name: Quit
+  acs_string: ""
+  hidden: false
+  menu_key: Q*
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0

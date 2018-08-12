@@ -1,0 +1,63 @@
+file_version: 1.0.1
+menu_name: Message Sponsor
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: MESSPON
+menu_acs_string: ""
+menu_prompt: Message Sponsor
+menu_title: Sponsor Menu
+menu_pulldown_file: ""
+menu_option:
+  index: 0
+  name: Edit Base
+  acs_string: ""
+  hidden: false
+  menu_key: E*
+  command_key: SE
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 1
+  name: Make Base
+  acs_string: ""
+  hidden: false
+  menu_key: M*
+  command_key: SM
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 2
+  name: Kill Base
+  acs_string: ""
+  hidden: false
+  menu_key: K*
+  command_key: SK
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 3
+  name: Pack Bases
+  acs_string: ""
+  hidden: false
+  menu_key: P*
+  command_key: SP
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 4
+  name: Reorder
+  acs_string: ""
+  hidden: false
+  menu_key: R*
+  command_key: SR
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 5
+  name: Quit
+  acs_string: ""
+  hidden: false
+  menu_key: Q*
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0
