@@ -1,0 +1,27 @@
+file_version: 1.0.1
+menu_name: Feedback Menu
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: ""
+menu_acs_string: ""
+menu_prompt: Leave Feedback /
+menu_title: ""
+menu_pulldown_file: N
+menu_option:
+  index: 0
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: Y
+  command_key: ES
+  command_string: 1
+  pulldown_id: 0
+menu_option:
+  index: 1
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: "*"
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0

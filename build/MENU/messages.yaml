@@ -1,0 +1,270 @@
+file_version: 1.0.1
+menu_name: Message Menu
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: MESSAGE
+menu_acs_string: ""
+menu_prompt: Message
+menu_title: Message Menu
+menu_pulldown_file: ""
+menu_option:
+  index: 0
+  name: Select Area
+  acs_string: ""
+  hidden: false
+  menu_key: A*
+  command_key: MS
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 1
+  name: Back. Title Scan
+  acs_string: ""
+  hidden: false
+  menu_key: B*
+  command_key: MB
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 2
+  name: Newscan Config
+  acs_string: ""
+  hidden: false
+  menu_key: C*
+  command_key: MC
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 3
+  name: Delete Message
+  acs_string: ""
+  hidden: false
+  menu_key: D*
+  command_key: MD
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 4
+  name: Edit Message
+  acs_string: ""
+  hidden: false
+  menu_key: E*
+  command_key: ME
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 5
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: G*
+  command_key: -/
+  command_string: GOODBYE
+  pulldown_id: 0
+menu_option:
+  index: 6
+  name: Join Conference
+  acs_string: ""
+  hidden: false
+  menu_key: J*
+  command_key: JM
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 7
+  name: ""
+  acs_string: \
+  hidden: false
+  menu_key: J*
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 8
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: J*
+  command_key: MI
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 9
+  name: List Bases
+  acs_string: ""
+  hidden: false
+  menu_key: L*
+  command_key: ML
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 10
+  name: Reply Newscan
+  acs_string: ""
+  hidden: false
+  menu_key: M*
+  command_key: MT
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 11
+  name: Newscan
+  acs_string: ""
+  hidden: false
+  menu_key: N*
+  command_key: MN
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 12
+  name: Post
+  acs_string: ""
+  hidden: false
+  menu_key: P*
+  command_key: MP
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 13
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: Q*
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 14
+  name: Read Messages
+  acs_string: ""
+  hidden: false
+  menu_key: R*
+  command_key: MR
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 15
+  name: Files
+  acs_string: ""
+  hidden: false
+  menu_key: T*
+  command_key: M!
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 16
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: T*
+  command_key: JF
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 17
+  name: ""
+  acs_string: \
+  hidden: false
+  menu_key: T*
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 18
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: T*
+  command_key: FI
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 19
+  name: ""
+  acs_string: ~\
+  hidden: false
+  menu_key: T*
+  command_key: -^
+  command_string: FSCAN
+  pulldown_id: 0
+menu_option:
+  index: 20
+  name: Users
+  acs_string: ""
+  hidden: false
+  menu_key: U*
+  command_key: MU
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 21
+  name: Newscan Base
+  acs_string: ""
+  hidden: false
+  menu_key: V*
+  command_key: MV
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 22
+  name: Forward Title Scan
+  acs_string: ""
+  hidden: false
+  menu_key: W*
+  command_key: MW
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 23
+  name: Select Header
+  acs_string: ""
+  hidden: false
+  menu_key: "!*"
+  command_key: -/
+  command_string: HEADSEL
+  pulldown_id: 0
+menu_option:
+  index: 24
+  name: Previous Base
+  acs_string: ""
+  hidden: false
+  menu_key: "[*"
+  command_key: M[
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 25
+  name: Next base
+  acs_string: ""
+  hidden: false
+  menu_key: "]*"
+  command_key: M]
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 26
+  name: Download Capture
+  acs_string: ""
+  hidden: false
+  menu_key: ^*
+  command_key: M!
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 27
+  name: Quit
+  acs_string: ""
+  hidden: false
+  menu_key: Q*
+  command_key: M!
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 28
+  name: Message Sponsor
+  acs_string: s250
+  hidden: false
+  menu_key: "%*"
+  command_key: -/
+  command_string: MESSPON
+  pulldown_id: 0

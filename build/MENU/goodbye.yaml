@@ -1,0 +1,27 @@
+file_version: 1.0.1
+menu_name: ""
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: ""
+menu_acs_string: ""
+menu_prompt: ^RWould you like to Log off /
+menu_title: ""
+menu_pulldown_file: N
+menu_option:
+  index: 0
+  name: ""
+  acs_string: ""
+  hidden: true
+  menu_key: Y
+  command_key: "[G"
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 1
+  name: ""
+  acs_string: ""
+  hidden: true
+  menu_key: N
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0

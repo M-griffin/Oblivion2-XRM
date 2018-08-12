@@ -1,0 +1,315 @@
+file_version: 1.0.1
+menu_name: File Menu
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: FILE
+menu_acs_string: ""
+menu_prompt: File
+menu_title: File Menu
+menu_pulldown_file: ""
+menu_option:
+  index: 0
+  name: Area Change
+  acs_string: ""
+  hidden: false
+  menu_key: A*
+  command_key: FS
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 1
+  name: Batch Menu
+  acs_string: ""
+  hidden: false
+  menu_key: B*
+  command_key: FB
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 2
+  name: Change File
+  acs_string: ""
+  hidden: false
+  menu_key: C*
+  command_key: FC
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 3
+  name: Download
+  acs_string: ""
+  hidden: false
+  menu_key: D*
+  command_key: FD
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 4
+  name: Goodbye
+  acs_string: ""
+  hidden: false
+  menu_key: G*
+  command_key: -/
+  command_string: GOODBYE
+  pulldown_id: 0
+menu_option:
+  index: 5
+  name: Info
+  acs_string: ""
+  hidden: false
+  menu_key: I*
+  command_key: FO
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 6
+  name: Join Conference
+  acs_string: ""
+  hidden: false
+  menu_key: J*
+  command_key: JF
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 7
+  name: ""
+  acs_string: \
+  hidden: true
+  menu_key: J*
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 8
+  name: ""
+  acs_string: ""
+  hidden: true
+  menu_key: J*
+  command_key: FI
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 9
+  name: ""
+  acs_string: \
+  hidden: true
+  menu_key: J*
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 10
+  name: File List Config
+  acs_string: ""
+  hidden: false
+  menu_key: K*
+  command_key: FK
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 11
+  name: List Files
+  acs_string: ""
+  hidden: false
+  menu_key: L*
+  command_key: FL
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 12
+  name: Messages
+  acs_string: ""
+  hidden: false
+  menu_key: M*
+  command_key: JM
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 13
+  name: ""
+  acs_string: \
+  hidden: false
+  menu_key: M*
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 14
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: M*
+  command_key: MI
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 15
+  name: ""
+  acs_string: ~\
+  hidden: false
+  menu_key: M*
+  command_key: -^
+  command_string: MSCAN
+  pulldown_id: 0
+menu_option:
+  index: 16
+  name: Newscan
+  acs_string: ""
+  hidden: false
+  menu_key: N*
+  command_key: FN
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 17
+  name: Resume
+  acs_string: ""
+  hidden: false
+  menu_key: R*
+  command_key: FR
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 18
+  name: Search for File
+  acs_string: ""
+  hidden: false
+  menu_key: S*
+  command_key: FZ
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 19
+  name: Type File
+  acs_string: ""
+  hidden: false
+  menu_key: T*
+  command_key: FT
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 20
+  name: Upload
+  acs_string: ""
+  hidden: false
+  menu_key: U*
+  command_key: FU
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 21
+  name: View Files
+  acs_string: ""
+  hidden: false
+  menu_key: V*
+  command_key: FV
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 22
+  name: Extract File
+  acs_string: ""
+  hidden: false
+  menu_key: X*
+  command_key: FX
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 23
+  name: Tag Files
+  acs_string: ""
+  hidden: false
+  menu_key: +*
+  command_key: F+
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 24
+  name: Previous Area
+  acs_string: ""
+  hidden: false
+  menu_key: "[*"
+  command_key: F[
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 25
+  name: Next Area
+  acs_string: ""
+  hidden: false
+  menu_key: "]*"
+  command_key: F]
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 26
+  name: File Stats
+  acs_string: ""
+  hidden: false
+  menu_key: Y*
+  command_key: FY
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 27
+  name: Delete Files
+  acs_string: S255D255
+  hidden: false
+  menu_key: $*
+  command_key: TD
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 28
+  name: Move Files
+  acs_string: S255D255
+  hidden: false
+  menu_key: "&*"
+  command_key: TF
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 29
+  name: Edit Area
+  acs_string: S255D255
+  hidden: false
+  menu_key: "!*"
+  command_key: TE
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 30
+  name: Filelist
+  acs_string: ""
+  hidden: false
+  menu_key: "|*"
+  command_key: F|
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 31
+  name: Scrollable Lists
+  acs_string: ""
+  hidden: false
+  menu_key: =*
+  command_key: F=
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 32
+  name: File Sponsor
+  acs_string: s250
+  hidden: false
+  menu_key: "%*"
+  command_key: -/
+  command_string: FSPONSOR
+  pulldown_id: 0
+menu_option:
+  index: 33
+  name: Quit
+  acs_string: ""
+  hidden: false
+  menu_key: Q*
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0

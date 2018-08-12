@@ -1,0 +1,72 @@
+file_version: 1.0.1
+menu_name: QwkMail
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: QWKMAIL
+menu_acs_string: ""
+menu_prompt: QWKMail
+menu_title: QwkMail Menu
+menu_pulldown_file: ""
+menu_option:
+  index: 0
+  name: Set Pointer Date
+  acs_string: ""
+  hidden: false
+  menu_key: A*
+  command_key: QD
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 1
+  name: QwkMail Download
+  acs_string: ""
+  hidden: false
+  menu_key: D*
+  command_key: QM
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 2
+  name: Goodbye
+  acs_string: ""
+  hidden: false
+  menu_key: G*
+  command_key: -/
+  command_string: GOODBYE
+  pulldown_id: 0
+menu_option:
+  index: 3
+  name: Newscan Config
+  acs_string: ""
+  hidden: false
+  menu_key: N*
+  command_key: JM
+  command_string: "*"
+  pulldown_id: 0
+menu_option:
+  index: 4
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: N*
+  command_key: MC
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 5
+  name: QwkMail Upload
+  acs_string: ""
+  hidden: false
+  menu_key: U*
+  command_key: QR
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 6
+  name: Quit
+  acs_string: ""
+  hidden: false
+  menu_key: Q*
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0

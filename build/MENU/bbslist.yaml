@@ -1,0 +1,81 @@
+file_version: 1.0.1
+menu_name: BBS List
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: BBSLIST
+menu_acs_string: ""
+menu_prompt: BBS List
+menu_title: BBS List
+menu_pulldown_file: ""
+menu_option:
+  index: 0
+  name: Quit
+  acs_string: ""
+  hidden: false
+  menu_key: Q*
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 1
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: FIRSTCMD
+  command_key: D*
+  command_string: 1
+  pulldown_id: 0
+menu_option:
+  index: 2
+  name: Add BBS
+  acs_string: ""
+  hidden: false
+  menu_key: A*
+  command_key: -A
+  command_string: Adding a BBS
+  pulldown_id: 0
+menu_option:
+  index: 3
+  name: Delete BBS
+  acs_string: ""
+  hidden: false
+  menu_key: D*
+  command_key: DD
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 4
+  name: List BBS's
+  acs_string: ""
+  hidden: false
+  menu_key: L*
+  command_key: DL
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 5
+  name: Show BBS
+  acs_string: ""
+  hidden: false
+  menu_key: S*
+  command_key: DS
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 6
+  name: ""
+  acs_string: ""
+  hidden: false
+  menu_key: A*
+  command_key: DA
+  command_string: ""
+  pulldown_id: 0
+menu_option:
+  index: 7
+  name: Quit
+  acs_string: ""
+  hidden: false
+  menu_key: Q*
+  command_key: -\
+  command_string: ""
+  pulldown_id: 0

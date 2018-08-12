@@ -1,0 +1,18 @@
+file_version: 1.0.1
+menu_name: ""
+menu_password: ""
+menu_fall_back: ""
+menu_help_file: ""
+menu_acs_string: ""
+menu_prompt: ""
+menu_title: ""
+menu_pulldown_file: ""
+menu_option:
+  index: 0
+  name: Quick Goodbye
+  acs_string: ""
+  hidden: true
+  menu_key: /G
+  command_key: "[G"
+  command_string: ""
+  pulldown_id: 0
