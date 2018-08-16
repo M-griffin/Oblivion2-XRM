@@ -144,6 +144,8 @@
       <File Name="../src/model-sys/menu_stats.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
+      <File Name="../src/mods/mod_level_editor.hpp"/>
+      <File Name="../src/mods/mod_level_editor.cpp"/>
       <File Name="../src/mods/mod_file_lister.cpp"/>
       <File Name="../src/mods/mod_file_lister.hpp"/>
       <File Name="../src/mods/mod_file_editor.cpp"/>

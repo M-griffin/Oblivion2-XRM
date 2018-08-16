@@ -6,6 +6,7 @@
 #include "mods/mod_signup.hpp"
 #include "mods/mod_menu_editor.hpp"
 #include "mods/mod_user_editor.hpp"
+#include "mods/mod_level_editor.hpp"
 
 #include <locale>
 #include <string>
