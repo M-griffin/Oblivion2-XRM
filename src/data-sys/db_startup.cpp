@@ -2,10 +2,12 @@
 
 #include "../model-sys/structures.hpp"
 #include "../model-sys/protocol.hpp"
+#include "../model-sys/access_level.hpp"
 #include "../model-app/oneliners.hpp"
 
 #include "base_dao.hpp"
 #include "protocol_dao.hpp"
+#include "access_level_dao.hpp"
 #include "../data-app/oneliners_dao.hpp"
 
 // Needed for Initializing and checking users data is setup
@@ -123,6 +125,30 @@ void DbStartup::initDatabaseTables()
             std::cout << "sessionstats table created successfully." << std::endl;
         }
 
+        // Link to Access Level dao for data access object
+        AccessLevelDao access_dao(user_database);
+
+        // Verify if the access_level table exists.
+        if (!access_dao.doesTableExist())
+        {
+            std::cout << "doesn't exist (access_level table)." << std::endl;
+
+            // Setup database Param, cache sies etc..
+            if (!access_dao.firstTimeSetupParams())
+            {
+                std::cout << "unable to execute firstTimeSetupParams (access_level table)." << std::endl;
+                assert(false);
+            }
+
+            // Setup create users table and indexes.
+            if (!access_dao.createTable())
+            {
+                std::cout << "unable to create (access_level table)." << std::endl;
+                assert(false);
+            }
+
+            std::cout << "access_level table created successfully." << std::endl;
+        }
         
 
         protocols_ptr prots(new Protocols());

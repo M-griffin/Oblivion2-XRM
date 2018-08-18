@@ -212,8 +212,12 @@ public:
      * One Off Methods SQL Queries not included in the BaseDao
      * (Below This Point)
      */
-     
-
+         
+    /**
+     * @brief Return AccessLevel Record by Level.
+     * @return
+     */
+    access_level_ptr getAccessLevelByLevel(long access_level);
 };
 
 // Handle to Database Queries

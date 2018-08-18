@@ -248,3 +248,51 @@ std::string AccessLevelDao::updateAccessLevelQryString(std::string qry, access_l
  * (Below This Point)
  */
  
+/**
+ * @brief Return AccessLevel Record by Level.
+ * @return
+ */
+access_level_ptr AccessLevelDao::getAccessLevelByLevel(long access_level)
+{
+    access_level_ptr level(new AccessLevel);
+
+    // Make Sure Database Reference is Connected
+    if (!m_database.isConnected())
+    {
+        std::cout << "Error, Database is not connected!" << std::endl;
+        return level;
+    }
+
+    // Create Pointer and Connect Query Object to Database.
+    query_ptr qry(new SQLW::Query(m_database));
+    if (!qry->isConnected())
+    {
+        std::cout << "Error, Query has no connection to the database" << std::endl;
+        return level;
+    }
+
+    // Build Query String
+    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iLevel = %d COLLATE NOCASE;",
+        m_strTableName.c_str(), access_level);
+
+    // create a test3 table
+    if (qry->getResult(queryString))
+    {
+        long rows = qry->getNumRows();
+        if (rows > 0)
+        {
+            qry->fetchRow();
+            pullAccessLevelResult(qry, level);
+        }
+        else
+        {
+            std::cout << "Error, getAccessLevelByLevel Returned Rows: " << rows << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << "Error, getResult()" << std::endl;
+    }
+ 
+    return level;
+}
