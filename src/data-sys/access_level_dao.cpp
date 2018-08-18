@@ -134,7 +134,13 @@ void AccessLevelDao::pullAccessLevelResult(query_ptr qry, access_level_ptr obj)
     qry->getFieldByName("iDownloads", obj->iDownloads);
     qry->getFieldByName("iDownloadMB", obj->iDownloadMB);
     qry->getFieldByName("iARFlags1", obj->iARFlags1);
-    qry->getFieldByName("iARFlags2", obj->iARFlags2);
+    qry->getFieldByName("iARFlags2", obj->iARFlags2);    
+    qry->getFieldByName("bPostCallRatio", obj->bPostCallRatio);
+    qry->getFieldByName("bFileRatio", obj->bFileRatio);
+    qry->getFieldByName("bTimeLimit", obj->bTimeLimit);
+    qry->getFieldByName("bCallLimit", obj->bCallLimit);
+    qry->getFieldByName("bDownloads", obj->bDownloads);
+    qry->getFieldByName("bDownloadMB", obj->bDownloadMB);
 }
 
 /**
@@ -159,8 +165,12 @@ void AccessLevelDao::fillAccessLevelColumnValues(query_ptr qry, access_level_ptr
     values.push_back(qry->translateFieldName("iDownloadMB", obj->iDownloadMB));
     values.push_back(qry->translateFieldName("iARFlags1", obj->iARFlags1));
     values.push_back(qry->translateFieldName("iARFlags2", obj->iARFlags2));
-
-    
+    values.push_back(qry->translateFieldName("bPostCallRatio", obj->bPostCallRatio));
+    values.push_back(qry->translateFieldName("bFileRatio", obj->bFileRatio));
+    values.push_back(qry->translateFieldName("bTimeLimit", obj->bTimeLimit));
+    values.push_back(qry->translateFieldName("bCallLimit", obj->bCallLimit));
+    values.push_back(qry->translateFieldName("bDownloads", obj->bDownloads));
+    values.push_back(qry->translateFieldName("bDownloadMB", obj->bDownloadMB));    
 }
 
 /**
@@ -185,7 +195,13 @@ std::string AccessLevelDao::insertAccessLevelQryString(std::string qry, access_l
         obj->iDownloads,
         obj->iDownloadMB,
         obj->iARFlags1,
-        obj->iARFlags2
+        obj->iARFlags2,
+        obj->bPostCallRatio,
+        obj->bFileRatio,
+        obj->bTimeLimit,
+        obj->bCallLimit,
+        obj->bDownloads,
+        obj->bDownloadMB
     );
 
     return result;
@@ -214,6 +230,12 @@ std::string AccessLevelDao::updateAccessLevelQryString(std::string qry, access_l
         obj->iDownloadMB,
         obj->iARFlags1,
         obj->iARFlags2,
+        obj->bPostCallRatio,
+        obj->bFileRatio,
+        obj->bTimeLimit,
+        obj->bCallLimit,
+        obj->bDownloads,
+        obj->bDownloadMB,
         obj->iId
     );
 

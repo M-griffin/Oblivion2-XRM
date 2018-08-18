@@ -13,7 +13,7 @@ typedef std::shared_ptr<Protocols> protocols_ptr;
  * @author Michael Griffin
  * @date 05/05/2017
  * @file protocol_dao.hpp
- * @brief Handles Reading and Writting Protocols Class from XML
+ * @brief Handles Reading and Writing Protocols Class from XML
  */
 class ProtocolDao
 {
@@ -42,7 +42,7 @@ public:
     bool saveConfig(protocols_ptr prots);
 
     /**
-     * @brief Loads a Configuation file into the m_config stub for access.
+     * @brief Loads a Configuration file into the m_config stub for access.
      * @return
      */
     bool loadConfig();

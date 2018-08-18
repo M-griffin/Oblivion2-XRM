@@ -73,24 +73,26 @@ void ModLevelEditor::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
-    value[PROMPT_HEADER]                  = std::make_pair("Menu Editor Header", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Menu Editor|15] |03--- |CR");
-    value[PROMPT_OPTION_HEADER]           = std::make_pair("Menu Options Editor Header |OT Menu ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Menu Option Editor|15] |03--- |11Menu ID : |15|OT |CR");
-    value[PROMPT_MENU_EDIT_HEADER]        = std::make_pair("Menu Fields Editor Header |OT Menu ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Menu Editor|15] |03--- |11Menu ID : |15|OT |CR");
+    value[PROMPT_HEADER]                  = std::make_pair("Level Editor Header", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Level Editor|15] |03--- |CR");
+    value[PROMPT_OPTION_HEADER]           = std::make_pair("Level Options Editor Header |OT Level ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Level Option Editor|15] |03--- |11Level ID : |15|OT |CR");
+    value[PROMPT_LEVEL_EDIT_HEADER]       = std::make_pair("Level Fields Editor Header |OT Level ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Level Editor|15] |03--- |11Level ID : |15|OT |CR");
+    
     value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 |CR");
-    value[PROMPT_INPUT_TEXT]              = std::make_pair("Menu Edit Prompt", "|CR|03A|15/dd Menu |03E|15/dit Menu |03D|15/elete Menu |03C|15/opy Menu |03Q|15/uit : ");
-    value[PROMPT_OPTION_INPUT_TEXT]       = std::make_pair("Menu Option Edit Prompt", "|CR|03A|15/dd |03E|15/dit |03D|15/elete |03C|15/opy |03M|15/ove |03T|15/oggle |03Q|15/uit : ");
+    value[PROMPT_INPUT_TEXT]              = std::make_pair("Level Edit Prompt", "|CR|03A|15/dd Level |03E|15/dit Level |03D|15/elete Level |03Q|15/uit : ");
+    value[PROMPT_OPTION_INPUT_TEXT]       = std::make_pair("Level Option Edit Prompt", "|CR|03A|15/dd |03E|15/dit |03D|15/elete |03Q|15/uit : ");
     value[PROMPT_INVALID]                 = std::make_pair("Invalid input", "|CR|04Invalid Input! Try again.|CR");
 
-    value[PROMPT_MENU_ADD]                = std::make_pair("Menu Name To Add", "|CR|15Enter menu name to |11CREATE|15 : ");
-    value[PROMPT_MENU_DELETE]             = std::make_pair("Menu Name To Delete", "|CR|15Enter menu name to |11DELETE|15 : ");
-    value[PROMPT_MENU_CHANGE]             = std::make_pair("Menu Name To Change", "|CR|15Enter menu name to |11EDIT|15 : ");
-    value[PROMPT_MENU_COPY_FROM]          = std::make_pair("Menu Name To Copy From", "|CR|15Enter menu name to |11COPY|15 : ");
-    value[PROMPT_MENU_COPY_TO]            = std::make_pair("Menu Name To Copy To", "|15Enter menu name to |11SAVE|15 as : ");
-    value[PROMPT_INVALID_MENU_EXISTS]     = std::make_pair("Invalid Menu Exists", "|CR|04Invalid, Menu already exist.|CR");
-    value[PROMPT_INVALID_MENU_NOT_EXISTS] = std::make_pair("Invalid Menu Doesn't Exist", "|CR|04Invalid, Menu doesn't exist.|CR");
+    value[PROMPT_LEVEL_ADD]                = std::make_pair("Level Name To Add", "|CR|15Enter Level Access to |11CREATE|15 : ");
+    value[PROMPT_LEVEL_DELETE]             = std::make_pair("Level Name To Delete", "|CR|15Enter Level Access to |11DELETE|15 : ");
+    value[PROMPT_LEVEL_CHANGE]             = std::make_pair("Level Name To Change", "|CR|15Enter Level Access to |11EDIT|15 : ");
+    value[PROMPT_INVALID_LEVEL_EXISTS]     = std::make_pair("Invalid Level Exists", "|CR|04Invalid, Level already exist.|CR");
+    value[PROMPT_INVALID_LEVEL_NOT_EXISTS] = std::make_pair("Invalid Level Doesn't Exist", "|CR|04Invalid, Level doesn't exist.|CR");
 
     // Menu Field Edit
-    value[PROMPT_MENU_FIELD_INPUT_TEXT]   = std::make_pair("Menu Field Edit Prompt", "|CR|15Menu Editor C|07om|08mand |15: |07");
+    value[PROMPT_MENU_FIELD_INPUT_TEXT]   = std::make_pair("Level Field Edit Prompt", "|CR|15Level Editor C|07om|08mand |15: |07");
+
+
+// WIP
 
     // NOTE, added |PD will display the prompt description as HELP text to the user
     // Usefull when editing fields - Specific to XRM.
@@ -339,7 +341,7 @@ void ModLevelEditor::setupMenuEditFields()
 {
     std::string display_name = m_current_menu;
     baseTransformToUpper(display_name);
-    displayPromptMCI(PROMPT_MENU_EDIT_HEADER, display_name);
+    displayPromptMCI(PROMPT_LEVEL_EDIT_HEADER, display_name);
 
     // Build a list of screen lines for the menu display
     // So we know when to pause in large listing, or use pagenation.
@@ -554,25 +556,19 @@ void ModLevelEditor::menuEditorInput(const std::string &input)
         {
             case 'A': // Add
                 changeMenuInputState(MENU_ADD);
-                displayPrompt(PROMPT_MENU_ADD);
+                displayPrompt(PROMPT_LEVEL_ADD);
                 changeInputModule(MOD_MENU_NAME);
                 break;
 
             case 'E': // Change/Edit
                 changeMenuInputState(MENU_CHANGE);
-                displayPrompt(PROMPT_MENU_CHANGE);
+                displayPrompt(PROMPT_LEVEL_CHANGE);
                 changeInputModule(MOD_MENU_NAME);
                 break;
 
             case 'D': // Delete
                 changeMenuInputState(MENU_DELETE);
-                displayPrompt(PROMPT_MENU_DELETE);
-                changeInputModule(MOD_MENU_NAME);
-                break;
-
-            case 'C': // Copy
-                changeMenuInputState(MENU_COPY_FROM);
-                displayPrompt(PROMPT_MENU_COPY_FROM);
+                displayPrompt(PROMPT_LEVEL_DELETE);
                 changeInputModule(MOD_MENU_NAME);
                 break;
 
@@ -1210,7 +1206,7 @@ void ModLevelEditor::handleMenuInputState(bool does_menu_exist, const std::strin
             if (does_menu_exist)
             {
                 // Error, can't create a menu that already exists!
-                displayPrompt(PROMPT_INVALID_MENU_EXISTS);
+                displayPrompt(PROMPT_INVALID_LEVEL_EXISTS);
                 displayPrompt(PROMPT_INPUT_TEXT);
                 changeInputModule(MOD_MENU_INPUT);
             }
@@ -1235,7 +1231,7 @@ void ModLevelEditor::handleMenuInputState(bool does_menu_exist, const std::strin
             else
             {
                 // Error, can't remove a menu that doesn't exist!
-                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
+                displayPrompt(PROMPT_INVALID_LEVEL_NOT_EXISTS);
                 displayPrompt(PROMPT_INPUT_TEXT);
                 changeInputModule(MOD_MENU_INPUT);
             }
@@ -1251,45 +1247,9 @@ void ModLevelEditor::handleMenuInputState(bool does_menu_exist, const std::strin
             else
             {
                 // Error, can't remove a menu that doesn't exist!
-                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
+                displayPrompt(PROMPT_INVALID_LEVEL_NOT_EXISTS);
                 displayPrompt(PROMPT_INPUT_TEXT);
                 changeInputModule(MOD_MENU_INPUT);
-            }
-            break;
-
-        case MENU_COPY_FROM:
-            // [Source]
-            // Notes, this will take the source, then move to the
-            // MENU_COPY_TO for destination.  Source is saved as m_current Menu
-            if (does_menu_exist)
-            {
-                m_current_menu = menu_name;
-                changeMenuInputState(MENU_COPY_TO);
-                displayPrompt(PROMPT_MENU_COPY_TO);
-            }
-            else
-            {
-                // Error, can't copy a menu that doesn't exist!
-                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
-                displayPrompt(PROMPT_INPUT_TEXT);
-                changeInputModule(MOD_MENU_INPUT);
-            }
-            break;
-
-        case MENU_COPY_TO:
-            // [Destination]
-            if (does_menu_exist)
-            {
-                // Error, can't copy or overwrite a destination menu that exists!
-                displayPrompt(PROMPT_INVALID_MENU_NOT_EXISTS);
-                displayPrompt(PROMPT_INPUT_TEXT);
-                changeInputModule(MOD_MENU_INPUT);
-            }
-            else
-            {
-                copyExistingMenu(menu_name);
-                changeInputModule(MOD_MENU_INPUT);
-                redisplayModulePrompt();
             }
             break;
     }

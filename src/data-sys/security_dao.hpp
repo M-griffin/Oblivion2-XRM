@@ -27,7 +27,7 @@ typedef BaseDao<Security> baseSecurityClass;
  * @date 8/21/2016
  * @file security_dao.hpp
  * @brief Handles Reading and Writting Security Class from Database
- *        Database Objects are Instaniated in the Session then passed to the DAO for work.
+ *        Database Objects are Instantiated in the Session then passed to the DAO for work.
  */
 class SecurityDao
     : baseSecurityClass
@@ -41,7 +41,7 @@ public:
         m_strTableName = "security";
 
         /**
-         * Pre Popluate Static Queries one Time
+         * Pre Populate Static Queries one Time
          */
         m_cmdFirstTimeSetup =
             "PRAGMA synchronous=Normal; "

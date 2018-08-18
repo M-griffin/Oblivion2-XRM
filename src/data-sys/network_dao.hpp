@@ -40,7 +40,7 @@ public:
         m_strTableName = "network";
 
         /**
-         * Pre Popluate Static Queries one Time
+         * Pre Populate Static Queries one Time
          */
         m_cmdFirstTimeSetup =
             "PRAGMA synchronous=Normal; "

@@ -159,21 +159,19 @@ public:
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
-    const std::string PROMPT_HEADER = "menu_header";
-    const std::string PROMPT_OPTION_HEADER = "menu_option_header";
-    const std::string PROMPT_MENU_EDIT_HEADER = "menu_field_edit_header";
+    const std::string PROMPT_HEADER = "level_header";
+    const std::string PROMPT_OPTION_HEADER = "level_option_header";
+    const std::string PROMPT_LEVEL_EDIT_HEADER = "level_field_edit_header";
     const std::string PROMPT_PAUSE = "pause_prompt";
-    const std::string PROMPT_INPUT_TEXT = "menu_input_text";
+    const std::string PROMPT_INPUT_TEXT = "level_input_text";
     const std::string PROMPT_OPTION_INPUT_TEXT = "option_input_text";
     const std::string PROMPT_INVALID = "invalid_input";
 
-    const std::string PROMPT_MENU_ADD = "menu_add";
-    const std::string PROMPT_MENU_DELETE = "menu_delete";
-    const std::string PROMPT_MENU_CHANGE = "menu_edit";
-    const std::string PROMPT_MENU_COPY_FROM = "menu_copy_from";
-    const std::string PROMPT_MENU_COPY_TO = "menu_copy_to";
-    const std::string PROMPT_INVALID_MENU_EXISTS = "invalid_menu_exists";
-    const std::string PROMPT_INVALID_MENU_NOT_EXISTS = "invalid_menu_doesnt_exist";
+    const std::string PROMPT_LEVEL_ADD = "level_add";
+    const std::string PROMPT_LEVEL_DELETE = "level_delete";
+    const std::string PROMPT_LEVEL_CHANGE = "level_edit";
+    const std::string PROMPT_INVALID_LEVEL_EXISTS = "invalid_level_exists";
+    const std::string PROMPT_INVALID_LEVEL_NOT_EXISTS = "invalid_level_doesnt_exist";
 
     // Menu Field Edit Prompts
     const std::string PROMPT_MENU_FIELD_INPUT_TEXT = "menu_field_input_text";

@@ -39,7 +39,7 @@ public:
         m_strTableName = "accesslevel";
 
         /**
-         * Pre Popluate Static Queries one Time
+         * Pre Populate Static Queries one Time
          */
         m_cmdFirstTimeSetup =
             "PRAGMA synchronous=Normal; "
@@ -67,7 +67,13 @@ public:
             "iDownloads        INTEGER NOT NULL, "
             "iDownloadMB       INTEGER NOT NULL, "
             "iARFlags1         INTEGER NOT NULL, "
-            "iARFlags2         INTEGER NOT NULL "            
+            "iARFlags2         INTEGER NOT NULL, "            
+            "bPostCallRatio    BOOLEAN NOT NULL, "
+            "bFileRatio        BOOLEAN NOT NULL, "
+            "bTimeLimit        BOOLEAN NOT NULL, "
+            "bCallLimit        BOOLEAN NOT NULL, "
+            "bDownloads        BOOLEAN NOT NULL, "
+            "bDownloadMB       BOOLEAN NOT NULL "
             "); ";
         
 
