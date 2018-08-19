@@ -570,16 +570,20 @@ bool MenuSystem::menuOptionsDoorCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option)
 {
     switch(option.command_key[1])
-    {
-            // Menu Editor
-        case '#':
+    {           
+        case '#':  // Menu Editor
             std::cout << "Executing startupModuleMenuEditor();" << std::endl;
             startupModuleMenuEditor();
             break;
 
-        case 'U':
+        case 'U': // User Editor
             std::cout << "Executing startupModuleUserEditor();" << std::endl;
             startupModuleUserEditor();
+            break;
+            
+        case 'Y': // Level Editor
+            std::cout << "Executing startupModuleLevelEditor();" << std::endl;
+            startupModuleLevelEditor();
             break;
 
             // Configuration Menu
@@ -969,6 +973,24 @@ void MenuSystem::startupModuleUserEditor()
     startupModule(module);    
 }
 
+/**
+ * @brief Startup the Level Editor Module
+ */
+void MenuSystem::startupModuleLevelEditor() 
+{
+    // Setup the input processor
+    resetMenuInputIndex(MODULE_INPUT);
+
+    // Allocate and Create
+    module_ptr module(new ModLevelEditor(m_session_data, m_config, m_ansi_process));
+    if (!module)
+    {
+        std::cout << "ModLevelEditor Allocation Error!" << std::endl;
+        assert(false);
+    }
+
+    startupModule(module);    
+}
 
 /**
  * @brief Handles Input for Login and PreLogin Sequences.

@@ -53,7 +53,7 @@ public:
     int iTimeLimit;    
     int iCallLimit;
     int iDownloads;
-    int iDownloadMB;
+    long iDownloadMB;
     uint32_t iARFlags1;
     uint32_t iARFlags2;
     bool bPostCallRatio;
