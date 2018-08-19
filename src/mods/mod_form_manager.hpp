@@ -26,20 +26,20 @@ typedef std::shared_ptr<AnsiProcessor> ansi_process_ptr;
 
 
 /**
- * @class ModSysConfig
+ * @class ModFormManager
  * @author Michael Griffin
  * @date 18/05/2017
- * @file mod_sys_config.hpp
- * @brief System Config Form Module
+ * @file mod_form_manager.hpp
+ * @brief Form Module
  */
-class ModSysConfig
+class ModFormManager
     : public ModBase
 {
 public:
 
-    ModSysConfig(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process);
+    ModFormManager(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process);
         
-    virtual ~ModSysConfig() override
+    virtual ~ModFormManager() override
     { }
 
     virtual bool update(const std::string &character_buffer, const bool &) override;
