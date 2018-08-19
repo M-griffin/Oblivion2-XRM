@@ -159,8 +159,8 @@ public:
     const std::string PROMPT_LEVEL_FIELD_NAME = "level_field_name";
     const std::string PROMPT_LEVEL_FIELD_PULLDOWN = "level_field_pulldown";
 
-    
-    
+
+
     // Menu Field Display for screen
     const std::string DISPLAY_LEVEL_FIELDS_VERSION_ID = "display_menu_field_version_id";
     const std::string DISPLAY_LEVEL_FIELDS_BORDER_ROW_COLOR = "display_menu_field_row_color";
@@ -174,7 +174,7 @@ public:
     const std::string DISPLAY_LEVEL_FIELDS_EDIT_OPTIONS = "display_menu_field_edit_options";
     const std::string DISPLAY_LEVEL_FIELDS_QUIT_SAVE = "display_menu_field_save";
     const std::string DISPLAY_LEVEL_FIELDS_QUIT_ABORT = "display_menu_field_abort";
-        
+
     /**
      * @brief Create Default Text Prompts for module
      * @return

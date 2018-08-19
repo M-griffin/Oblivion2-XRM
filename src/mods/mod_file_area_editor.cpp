@@ -1,4 +1,4 @@
-#include "mod_level_editor.hpp"
+#include "mod_file_area_editor.hpp"
 
 #include "model-sys/access_level.hpp"
 #include "data-sys/access_level_dao.hpp"
@@ -12,7 +12,7 @@
  * @brief Handles Updates or Data Input from Client
  * @return
  */
-bool ModLevelEditor::update(const std::string &character_buffer, const bool &)
+bool ModFileAreaEditor::update(const std::string &character_buffer, const bool &)
 {
     // Make sure system is active, when system is done, success or failes
     // We change this is inactive to single the login process is completed.
@@ -39,7 +39,7 @@ bool ModLevelEditor::update(const std::string &character_buffer, const bool &)
  * @brief Start-up class, setup and display initial screens / interface.
  * @return
  */
-bool ModLevelEditor::onEnter()
+bool ModFileAreaEditor::onEnter()
 {
     std::cout << "OnEnter() ModLevelEditor\n";
     m_is_active = true;
@@ -58,7 +58,7 @@ bool ModLevelEditor::onEnter()
  * @brief Exit, close down, display screens to change over data.
  * @return
  */
-bool ModLevelEditor::onExit()
+bool ModFileAreaEditor::onExit()
 {
     std::cout << "OnExit() ModLevelEditor\n";
     m_is_active = false;
@@ -68,14 +68,14 @@ bool ModLevelEditor::onExit()
 /**
  * @brief Create Default Text Prompts for module
  */
-void ModLevelEditor::createTextPrompts()
+void ModFileAreaEditor::createTextPrompts()
 {
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
     value[PROMPT_HEADER]                  = std::make_pair("Level Editor Header", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Level Editor|15] |03--- |CR");
     value[PROMPT_LEVEL_EDIT_HEADER]       = std::make_pair("Level Fields Editor Header |OT Level ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Level Editor|15] |03--- |11Level ID : |15|OT |CR");
-    
+
     value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 |CR");
     value[PROMPT_INPUT_TEXT]              = std::make_pair("Level Edit Prompt", "|CR|03A|15/dd Level |03E|15/dit Level |03D|15/elete Level |03Q|15/uit : ");
     value[PROMPT_OPTION_INPUT_TEXT]       = std::make_pair("Level Option Edit Prompt", "|CR|03A|15/dd |03E|15/dit |03D|15/elete |03Q|15/uit : ");
@@ -115,7 +115,7 @@ void ModLevelEditor::createTextPrompts()
     value[DISPLAY_LEVEL_FIELDS_EDIT_OPTIONS]      = std::make_pair("Edit Options", " |03(|11H|03) |15Edit Options         ");
     value[DISPLAY_LEVEL_FIELDS_QUIT_SAVE]         = std::make_pair("Quit and Save", " |03(|11Q|03) |15Quit & Save          ");
     value[DISPLAY_LEVEL_FIELDS_QUIT_ABORT]        = std::make_pair("Quit without Save", " |03(|11X|03) |15Exit without Saving  ");
-   
+
     m_text_prompts_dao->writeValue(value);
 }
 
@@ -123,7 +123,7 @@ void ModLevelEditor::createTextPrompts()
  * @brief Sets an individual input module index.
  * @param mod_function_index
  */
-void ModLevelEditor::changeInputModule(int mod_function_index)
+void ModFileAreaEditor::changeInputModule(int mod_function_index)
 {
     // Setup input module
     m_mod_function_index = mod_function_index;
@@ -133,7 +133,7 @@ void ModLevelEditor::changeInputModule(int mod_function_index)
  * @brief Sets an individual setup method module index.
  * @param mod_function_index
  */
-void ModLevelEditor::changeSetupModule(int mod_function_index)
+void ModFileAreaEditor::changeSetupModule(int mod_function_index)
 {
     // Set, and Execute the Setup module.
     m_mod_setup_index = mod_function_index;
@@ -144,7 +144,7 @@ void ModLevelEditor::changeSetupModule(int mod_function_index)
  * @brief Sets an individual Menu Input State Add/Change/Delete
  * @param mod_menu_state_index
  */
-void ModLevelEditor::changeMenuInputState(int mod_menu_state_index)
+void ModFileAreaEditor::changeMenuInputState(int mod_menu_state_index)
 {
     m_mod_menu_state_index = mod_menu_state_index;
 }
@@ -153,7 +153,7 @@ void ModLevelEditor::changeMenuInputState(int mod_menu_state_index)
  * @brief Redisplay's the current module prompt.
  * @return
  */
-void ModLevelEditor::redisplayModulePrompt()
+void ModFileAreaEditor::redisplayModulePrompt()
 {
     m_setup_functions[m_mod_setup_index]();
 }
@@ -162,7 +162,7 @@ void ModLevelEditor::redisplayModulePrompt()
  * @brief Pull and Display Prompts
  * @param prompt
  */
-void ModLevelEditor::displayPrompt(const std::string &prompt)
+void ModFileAreaEditor::displayPrompt(const std::string &prompt)
 {
     baseDisplayPrompt(prompt, m_text_prompts_dao);
 }
@@ -171,7 +171,7 @@ void ModLevelEditor::displayPrompt(const std::string &prompt)
  * @brief Pull and parse and return Display Prompts for use in interfaces
  * @param prompt
  */
-std::string ModLevelEditor::getDisplayPrompt(const std::string &prompt)
+std::string ModFileAreaEditor::getDisplayPrompt(const std::string &prompt)
 {
     return baseGetDisplayPrompt(prompt, m_text_prompts_dao);
 }
@@ -180,7 +180,7 @@ std::string ModLevelEditor::getDisplayPrompt(const std::string &prompt)
  * @brief Pull and parse and return Display Prompts for use in interfaces
  * @param prompt
  */
-std::string ModLevelEditor::getDisplayPromptRaw(const std::string &prompt)
+std::string ModFileAreaEditor::getDisplayPromptRaw(const std::string &prompt)
 {
     return baseGetDisplayPromptRaw(prompt, m_text_prompts_dao);
 }
@@ -190,7 +190,7 @@ std::string ModLevelEditor::getDisplayPromptRaw(const std::string &prompt)
  * @param prompt
  * @param mci_field
  */
-void ModLevelEditor::displayPromptMCI(const std::string &prompt, const std::string &mci_field)
+void ModFileAreaEditor::displayPromptMCI(const std::string &prompt, const std::string &mci_field)
 {
     baseDisplayPromptMCI(prompt, m_text_prompts_dao, mci_field);
 }
@@ -199,7 +199,7 @@ void ModLevelEditor::displayPromptMCI(const std::string &prompt, const std::stri
  * @brief Pull and Display Prompts with following newline
  * @param prompt
  */
-void ModLevelEditor::displayPromptAndNewLine(const std::string &prompt)
+void ModFileAreaEditor::displayPromptAndNewLine(const std::string &prompt)
 {
     baseDisplayPromptAndNewLine(prompt, m_text_prompts_dao);
 }
@@ -208,7 +208,7 @@ void ModLevelEditor::displayPromptAndNewLine(const std::string &prompt)
  * @brief Setup for the Menu Editor
  * @return
  */
-void ModLevelEditor::setupMenuEditor()
+void ModFileAreaEditor::setupMenuEditor()
 {
     displayPrompt(PROMPT_HEADER);
 
@@ -231,7 +231,7 @@ void ModLevelEditor::setupMenuEditor()
  * @brief Setup for the Menu Editor
  * @return
  */
-void ModLevelEditor::setupMenuEditFields()
+void ModFileAreaEditor::setupMenuEditFields()
 {
     std::string display_name = m_current_menu;
     baseTransformToUpper(display_name);
@@ -256,7 +256,7 @@ void ModLevelEditor::setupMenuEditFields()
  * @brief Displays the current page of menu items
  * @param input_state
  */
-void ModLevelEditor::displayCurrentPage(const std::string &input_state)
+void ModFileAreaEditor::displayCurrentPage(const std::string &input_state)
 {
     // calculate the rows_per_page.
     unsigned int rows_used = m_ansi_process->getMaxRowsUsedOnScreen();
@@ -316,7 +316,7 @@ void ModLevelEditor::displayCurrentPage(const std::string &input_state)
  * @brief Displays the current page of menu items
  * @param input_state
  */
-void ModLevelEditor::displayCurrentEditPage(const std::string &input_state)
+void ModFileAreaEditor::displayCurrentEditPage(const std::string &input_state)
 {
     for (unsigned int i = 0; i < m_menu_display_list.size(); i++)
     {
@@ -346,7 +346,7 @@ void ModLevelEditor::displayCurrentEditPage(const std::string &input_state)
  * @brief Handles Input (Waiting for Any Key Press) on Page Display.
  * @param input
  */
-void ModLevelEditor::menuEditorPausedInput(const std::string &input)
+void ModFileAreaEditor::menuEditorPausedInput(const std::string &input)
 {
     std::string current_state_input;
     unsigned int current_module_input;
@@ -376,7 +376,7 @@ void ModLevelEditor::menuEditorPausedInput(const std::string &input)
  * @brief Handles Input (Waiting for Any Key Press) View Generic Menu
  * @param input
  */
-void ModLevelEditor::menuEditorDisplayPause(const std::string &)
+void ModFileAreaEditor::menuEditorDisplayPause(const std::string &)
 {
     changeInputModule(MOD_MENU_FIELD_INPUT);
     redisplayModulePrompt();
@@ -386,7 +386,7 @@ void ModLevelEditor::menuEditorDisplayPause(const std::string &)
  * @brief Handles Menu Editor Command Selection
  * @param input
  */
-void ModLevelEditor::menuEditorInput(const std::string &input)
+void ModFileAreaEditor::menuEditorInput(const std::string &input)
 {
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
@@ -453,7 +453,7 @@ void ModLevelEditor::menuEditorInput(const std::string &input)
  * @brief Handles Menu Field Editor Command Selection
  * @param input
  */
-void ModLevelEditor::menuEditorMenuFieldInput(const std::string &input)
+void ModFileAreaEditor::menuEditorMenuFieldInput(const std::string &input)
 {
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
@@ -477,76 +477,76 @@ void ModLevelEditor::menuEditorMenuFieldInput(const std::string &input)
 
         switch (toupper(key[0]))
         {
-            /*
-            case 'A': // Menu Title
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_MENU_FIELD);
-                displayPrompt(PROMPT_MENU_FIELD_TITLE);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_title);
-                break;
+                /*
+                case 'A': // Menu Title
+                    m_current_field = toupper(key[0]);
+                    changeInputModule(MOD_MENU_FIELD);
+                    displayPrompt(PROMPT_MENU_FIELD_TITLE);
+                    m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_title);
+                    break;
 
-            case 'B': // Menu Password
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_MENU_FIELD);
-                displayPrompt(PROMPT_MENU_FIELD_PASSWORD);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_password);
-                break;
+                case 'B': // Menu Password
+                    m_current_field = toupper(key[0]);
+                    changeInputModule(MOD_MENU_FIELD);
+                    displayPrompt(PROMPT_MENU_FIELD_PASSWORD);
+                    m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_password);
+                    break;
 
-            case 'C': // Menu Password
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_MENU_FIELD);
-                displayPrompt(PROMPT_MENU_FIELD_FALLBACK);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_fall_back);
-                break;
+                case 'C': // Menu Password
+                    m_current_field = toupper(key[0]);
+                    changeInputModule(MOD_MENU_FIELD);
+                    displayPrompt(PROMPT_MENU_FIELD_FALLBACK);
+                    m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_fall_back);
+                    break;
 
-            case 'D': // Menu Help ID
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_MENU_FIELD);
-                displayPrompt(PROMPT_MENU_FIELD_HELP_ID);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_help_file);
-                break;
+                case 'D': // Menu Help ID
+                    m_current_field = toupper(key[0]);
+                    changeInputModule(MOD_MENU_FIELD);
+                    displayPrompt(PROMPT_MENU_FIELD_HELP_ID);
+                    m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_help_file);
+                    break;
 
-            case 'E': // Menu Name
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_MENU_FIELD);
-                displayPrompt(PROMPT_MENU_FIELD_NAME);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_name);
-                break;
+                case 'E': // Menu Name
+                    m_current_field = toupper(key[0]);
+                    changeInputModule(MOD_MENU_FIELD);
+                    displayPrompt(PROMPT_MENU_FIELD_NAME);
+                    m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_name);
+                    break;
 
-            case 'F': // Menu Pulldown file
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_MENU_FIELD);
-                displayPrompt(PROMPT_MENU_FIELD_PULLDOWN);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_pulldown_file);
-                break;
+                case 'F': // Menu Pulldown file
+                    m_current_field = toupper(key[0]);
+                    changeInputModule(MOD_MENU_FIELD);
+                    displayPrompt(PROMPT_MENU_FIELD_PULLDOWN);
+                    m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_pulldown_file);
+                    break;
 
-            case 'G': // View Generate Menu
-                displayGenericMenu();
-                changeInputModule(MOD_DISPLAY_PAUSE);
-                break;
+                case 'G': // View Generate Menu
+                    displayGenericMenu();
+                    changeInputModule(MOD_DISPLAY_PAUSE);
+                    break;
 
-            case 'H': // Jump into Options Editing.
-                changeInputModule(MOD_MENU_OPTION_INPUT);
-                changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);
-                break;
+                case 'H': // Jump into Options Editing.
+                    changeInputModule(MOD_MENU_OPTION_INPUT);
+                    changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);
+                    break;
 
-            case 'Q': // Quit
-                saveMenuChanges();
-                std::vector<menu_ptr>().swap(m_loaded_level);
+                case 'Q': // Quit
+                    saveMenuChanges();
+                    std::vector<menu_ptr>().swap(m_loaded_level);
 
-                // Reload fall back, or gosub to Menu Editor Main
-                changeInputModule(MOD_MENU_INPUT);
-                changeSetupModule(MOD_DISPLAY_MENU);
-                return;
+                    // Reload fall back, or gosub to Menu Editor Main
+                    changeInputModule(MOD_MENU_INPUT);
+                    changeSetupModule(MOD_DISPLAY_MENU);
+                    return;
 
-            case 'X': // Exit without Saving
-                std::vector<menu_ptr>().swap(m_loaded_level);
+                case 'X': // Exit without Saving
+                    std::vector<menu_ptr>().swap(m_loaded_level);
 
-                // Reload fall back, or gosub to Menu Editor Main
-                changeInputModule(MOD_MENU_INPUT);
-                changeSetupModule(MOD_DISPLAY_MENU);
-                return;
-*/
+                    // Reload fall back, or gosub to Menu Editor Main
+                    changeInputModule(MOD_MENU_INPUT);
+                    changeSetupModule(MOD_DISPLAY_MENU);
+                    return;
+                */
             default:
                 redisplayModulePrompt();
                 break;
@@ -567,7 +567,7 @@ void ModLevelEditor::menuEditorMenuFieldInput(const std::string &input)
  * @brief Handles Field Updates for Menu Data
  * @param input
  */
-void ModLevelEditor::menuEditorMenuFieldHandler(const std::string &input)
+void ModFileAreaEditor::menuEditorMenuFieldHandler(const std::string &input)
 {
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sName_length);
@@ -587,31 +587,31 @@ void ModLevelEditor::menuEditorMenuFieldHandler(const std::string &input)
         // Handle the assigned input received for field
         switch(m_current_field)
         {
-/*            
-            case 'A': // Menu Title
-                m_loaded_level.back()->menu_title = key;
-                break;
+                /*
+                            case 'A': // Menu Title
+                                m_loaded_level.back()->menu_title = key;
+                                break;
 
-            case 'B': // Menu Password
-                m_loaded_level.back()->menu_password = key;
-                break;
+                            case 'B': // Menu Password
+                                m_loaded_level.back()->menu_password = key;
+                                break;
 
-            case 'C': // Menu Fallback
-                m_loaded_level.back()->menu_fall_back = key;
-                break;
+                            case 'C': // Menu Fallback
+                                m_loaded_level.back()->menu_fall_back = key;
+                                break;
 
-            case 'D': // Menu Help ID
-                m_loaded_level.back()->menu_help_file = key;
-                break;
+                            case 'D': // Menu Help ID
+                                m_loaded_level.back()->menu_help_file = key;
+                                break;
 
-            case 'E': // Menu Name
-                m_loaded_level.back()->menu_name = key;
-                break;
+                            case 'E': // Menu Name
+                                m_loaded_level.back()->menu_name = key;
+                                break;
 
-            case 'F': // Menu Pulldown
-                m_loaded_level.back()->menu_pulldown_file = key;
-                break;
-*/
+                            case 'F': // Menu Pulldown
+                                m_loaded_level.back()->menu_pulldown_file = key;
+                                break;
+                */
         }
 
         changeInputModule(MOD_MENU_FIELD_INPUT);
@@ -632,7 +632,7 @@ void ModLevelEditor::menuEditorMenuFieldHandler(const std::string &input)
  * @brief Handles Menu Name Input, Parses Strings and checks Valid Menus
  * @param input
  */
-void ModLevelEditor::menuEditorMenuNameInput(const std::string &input)
+void ModFileAreaEditor::menuEditorMenuNameInput(const std::string &input)
 {
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sName_length);
@@ -682,7 +682,7 @@ void ModLevelEditor::menuEditorMenuNameInput(const std::string &input)
  * @param does_menu_exist
  * @param menu_name
  */
-void ModLevelEditor::handleMenuInputState(bool does_menu_exist, const std::string &menu_name)
+void ModFileAreaEditor::handleMenuInputState(bool does_menu_exist, const std::string &menu_name)
 {
     switch (m_mod_menu_state_index)
     {
@@ -743,260 +743,260 @@ void ModLevelEditor::handleMenuInputState(bool does_menu_exist, const std::strin
  * @brief Create a new empty Menu
  * @param menu_name
  */
-void ModLevelEditor::createNewMenu(const std::string &menu_name)
+void ModFileAreaEditor::createNewMenu(const std::string &menu_name)
 {
-/*
-    // Pre-Load Menu, check access, if not valud, then fall back to previous.
-    menu_ptr new_menu(new Menu());
+    /*
+        // Pre-Load Menu, check access, if not valud, then fall back to previous.
+        menu_ptr new_menu(new Menu());
 
-    // Add a default menu option command to the menu
-    std::vector<MenuOption> new_menu_options;
+        // Add a default menu option command to the menu
+        std::vector<MenuOption> new_menu_options;
 
-    MenuOption new_option;
-    new_menu_options.push_back(new_option);
-    new_menu->menu_options = new_menu_options;
+        MenuOption new_option;
+        new_menu_options.push_back(new_option);
+        new_menu->menu_options = new_menu_options;
 
-    // Call MenuDao to save .yaml menu file
-    MenuDao mnu(new_menu, menu_name, GLOBAL_MENU_PATH);
-    if (!mnu.fileExists())
-    {
-        mnu.saveMenu(new_menu);
-    }
-*/
+        // Call MenuDao to save .yaml menu file
+        MenuDao mnu(new_menu, menu_name, GLOBAL_MENU_PATH);
+        if (!mnu.fileExists())
+        {
+            mnu.saveMenu(new_menu);
+        }
+    */
 }
 
 /**
  * @brief Create a new empty Menu
  * @param option_index
  */
-void ModLevelEditor::createNewMenuOption(unsigned int option_index)
+void ModFileAreaEditor::createNewMenuOption(unsigned int option_index)
 {
-/*  
-    MenuOption new_option;
-    new_option.index = option_index;
+    /*
+        MenuOption new_option;
+        new_option.index = option_index;
 
-    reorderMenuIndexesInsertion(option_index);
-    m_loaded_level.back()->menu_options.push_back(new_option);
+        reorderMenuIndexesInsertion(option_index);
+        m_loaded_level.back()->menu_options.push_back(new_option);
 
-    sort(
-        m_loaded_level.back()->menu_options.begin(), m_loaded_level.back()->menu_options.end(),
-        [ ] (const MenuOption& lhs, const MenuOption& rhs)
-    {
-        return lhs.index < rhs.index;
-    });
-*/   
+        sort(
+            m_loaded_level.back()->menu_options.begin(), m_loaded_level.back()->menu_options.end(),
+            [ ] (const MenuOption& lhs, const MenuOption& rhs)
+        {
+            return lhs.index < rhs.index;
+        });
+    */
 }
 
 /**
  * @brief Delete an existing Menu Option
  * @param option_index
  */
-void ModLevelEditor::deleteExistingMenuOption(unsigned int option_index)
+void ModFileAreaEditor::deleteExistingMenuOption(unsigned int option_index)
 {
-/*
-    unsigned int option_size = m_loaded_level.back()->menu_options.size();
+    /*
+        unsigned int option_size = m_loaded_level.back()->menu_options.size();
 
-    // Check if the last entry, then no need to swap and just pop_back!
-    if (option_index == m_loaded_level.back()->menu_options[option_size-1].index)
-    {
-        // Last entry, just remove it and done, no need to reorder or sort either.
-        m_loaded_level.back()->menu_options.pop_back();
-        return;
-    }
-
-    // Remove at Index
-    for(unsigned int i = 0; i < option_size; i++)
-    {
-        auto &m = m_loaded_level.back()->menu_options[i];
-        if (m.index == option_index)
+        // Check if the last entry, then no need to swap and just pop_back!
+        if (option_index == m_loaded_level.back()->menu_options[option_size-1].index)
         {
-            // swap with last item then pop_back
-            MenuOption temp = m_loaded_level.back()->menu_options[i];
-            m_loaded_level.back()->menu_options[i] = m_loaded_level.back()->menu_options[option_size-1];
-            m_loaded_level.back()->menu_options[option_size-1] = temp;
+            // Last entry, just remove it and done, no need to reorder or sort either.
             m_loaded_level.back()->menu_options.pop_back();
-            break;
+            return;
         }
-    }
 
-    reorderMenuIndexesDeletion(option_index);
+        // Remove at Index
+        for(unsigned int i = 0; i < option_size; i++)
+        {
+            auto &m = m_loaded_level.back()->menu_options[i];
+            if (m.index == option_index)
+            {
+                // swap with last item then pop_back
+                MenuOption temp = m_loaded_level.back()->menu_options[i];
+                m_loaded_level.back()->menu_options[i] = m_loaded_level.back()->menu_options[option_size-1];
+                m_loaded_level.back()->menu_options[option_size-1] = temp;
+                m_loaded_level.back()->menu_options.pop_back();
+                break;
+            }
+        }
 
-    sort(
-        m_loaded_level.back()->menu_options.begin(), m_loaded_level.back()->menu_options.end(),
-        [ ] (const MenuOption& lhs, const MenuOption& rhs)
-    {
-        return lhs.index < rhs.index;
-    });
-*/
+        reorderMenuIndexesDeletion(option_index);
+
+        sort(
+            m_loaded_level.back()->menu_options.begin(), m_loaded_level.back()->menu_options.end(),
+            [ ] (const MenuOption& lhs, const MenuOption& rhs)
+        {
+            return lhs.index < rhs.index;
+        });
+    */
 }
 
 /**
  * @brief On Insertion of Menu Options, reorder all after index
  * @param option_index
  */
-void ModLevelEditor::reorderMenuIndexesInsertion(unsigned int option_index)
+void ModFileAreaEditor::reorderMenuIndexesInsertion(unsigned int option_index)
 {
-/*
-    for(unsigned int i = 0; i < m_loaded_level.back()->menu_options.size(); i++)
-    {
-        auto &m = m_loaded_level.back()->menu_options[i];
-        if (m.index >= option_index)
+    /*
+        for(unsigned int i = 0; i < m_loaded_level.back()->menu_options.size(); i++)
         {
-            ++m.index;
+            auto &m = m_loaded_level.back()->menu_options[i];
+            if (m.index >= option_index)
+            {
+                ++m.index;
+            }
         }
-    }
-*/
+    */
 }
 
 /**
  * @brief On Deletion of Menu Options, reorder all after index
  * @param option_index
  */
-void ModLevelEditor::reorderMenuIndexesDeletion(unsigned int option_index)
+void ModFileAreaEditor::reorderMenuIndexesDeletion(unsigned int option_index)
 {
-/*
-    for(unsigned int i = 0; i < m_loaded_level.back()->menu_options.size(); i++)
-    {
-        auto &m = m_loaded_level.back()->menu_options[i];
-        if (m.index >= option_index)
+    /*
+        for(unsigned int i = 0; i < m_loaded_level.back()->menu_options.size(); i++)
         {
-            --m.index;
+            auto &m = m_loaded_level.back()->menu_options[i];
+            if (m.index >= option_index)
+            {
+                --m.index;
+            }
         }
-    }
-*/
+    */
 }
 
 /**
  * @brief Delete an existing Menu
  * @param menu_name
  */
-void ModLevelEditor::deleteExistingMenu(const std::string &menu_name)
+void ModFileAreaEditor::deleteExistingMenu(const std::string &menu_name)
 {
-/*
-    // Pre-Load Menu, check access, if not valud, then fall back to previous.
-    menu_ptr new_menu(new Menu());
+    /*
+        // Pre-Load Menu, check access, if not valud, then fall back to previous.
+        menu_ptr new_menu(new Menu());
 
-    // Call MenuDao to save .yaml menu file
-    MenuDao mnu(new_menu, menu_name, GLOBAL_MENU_PATH);
-    if (mnu.fileExists())
-    {
-        mnu.deleteMenu();
-    }
-*/
+        // Call MenuDao to save .yaml menu file
+        MenuDao mnu(new_menu, menu_name, GLOBAL_MENU_PATH);
+        if (mnu.fileExists())
+        {
+            mnu.deleteMenu();
+        }
+    */
 }
 
 /**
  * @brief Create a new empty Menu
  * @param menu_name
  */
-void ModLevelEditor::copyExistingMenu(const std::string &menu_name)
+void ModFileAreaEditor::copyExistingMenu(const std::string &menu_name)
 {
-/*
-    // Pre-Load Menu, check access, if not valud, then fall back to previous.
-    menu_ptr new_menu(new Menu());
+    /*
+        // Pre-Load Menu, check access, if not valud, then fall back to previous.
+        menu_ptr new_menu(new Menu());
 
-    // First load the Source Menu [m_current_menu] file name
-    MenuDao mnu_source(new_menu, m_current_menu, GLOBAL_MENU_PATH);
-    if (mnu_source.fileExists())
-    {
-        mnu_source.loadMenu();
-    }
-    else
-    {
-        std::cout << "Source menu file doesn't exist!" << std::endl;
-        return;
-    }
+        // First load the Source Menu [m_current_menu] file name
+        MenuDao mnu_source(new_menu, m_current_menu, GLOBAL_MENU_PATH);
+        if (mnu_source.fileExists())
+        {
+            mnu_source.loadMenu();
+        }
+        else
+        {
+            std::cout << "Source menu file doesn't exist!" << std::endl;
+            return;
+        }
 
-    // Next Save a new Destination Menu [menu_name] file name
-    MenuDao mnu_destination(new_menu, menu_name, GLOBAL_MENU_PATH);
-    if (!mnu_destination.fileExists())
-    {
-        mnu_destination.saveMenu(new_menu);
-    }
-    else
-    {
-        std::cout << "Destination menu file already exists!" << std::endl;
-    }
-*/
+        // Next Save a new Destination Menu [menu_name] file name
+        MenuDao mnu_destination(new_menu, menu_name, GLOBAL_MENU_PATH);
+        if (!mnu_destination.fileExists())
+        {
+            mnu_destination.saveMenu(new_menu);
+        }
+        else
+        {
+            std::cout << "Destination menu file already exists!" << std::endl;
+        }
+    */
 }
 
 /**
  * @brief Copy an Existing Menu Option
  * @param option_index
  */
-void ModLevelEditor::copyExistingMenuOption(int option_index)
+void ModFileAreaEditor::copyExistingMenuOption(int option_index)
 {
-/*
-    unsigned int option_size = m_loaded_level.back()->menu_options.size();
-    for(unsigned int i = 0; i < option_size; i++)
-    {
-        auto &m = m_loaded_level.back()->menu_options[i];
-        if (m.index == m_current_option)
+    /*
+        unsigned int option_size = m_loaded_level.back()->menu_options.size();
+        for(unsigned int i = 0; i < option_size; i++)
         {
-            // Grab source, then update and add as new to the list.
-            MenuOption new_option = m_loaded_level.back()->menu_options[i];
-            new_option.index = option_index;
+            auto &m = m_loaded_level.back()->menu_options[i];
+            if (m.index == m_current_option)
+            {
+                // Grab source, then update and add as new to the list.
+                MenuOption new_option = m_loaded_level.back()->menu_options[i];
+                new_option.index = option_index;
 
-            // Update existing indexes and up
-            reorderMenuIndexesInsertion(option_index);
-            m_loaded_level.back()->menu_options.push_back(new_option);
-            break;
+                // Update existing indexes and up
+                reorderMenuIndexesInsertion(option_index);
+                m_loaded_level.back()->menu_options.push_back(new_option);
+                break;
+            }
         }
-    }
 
-    sort(
-        m_loaded_level.back()->menu_options.begin(), m_loaded_level.back()->menu_options.end(),
-        [ ] (const MenuOption& lhs, const MenuOption& rhs)
-    {
-        return lhs.index < rhs.index;
-    });
-*/
+        sort(
+            m_loaded_level.back()->menu_options.begin(), m_loaded_level.back()->menu_options.end(),
+            [ ] (const MenuOption& lhs, const MenuOption& rhs)
+        {
+            return lhs.index < rhs.index;
+        });
+    */
 }
 
 /**
  * @brief Save Menu Changes
  * @return
  */
-void ModLevelEditor::saveMenuChanges()
+void ModFileAreaEditor::saveMenuChanges()
 {
-/*
-    MenuDao mnu_source(m_loaded_level.back(), m_current_menu, GLOBAL_MENU_PATH);
-    if (mnu_source.saveMenu(m_loaded_level.back()))
-    {
-        std::cout << "Menu Saved Successful!" << std::endl;
-    }
-    else
-    {
-        std::cout << "Menu Save Failed!" << std::endl;
-    }
-*/
+    /*
+        MenuDao mnu_source(m_loaded_level.back(), m_current_menu, GLOBAL_MENU_PATH);
+        if (mnu_source.saveMenu(m_loaded_level.back()))
+        {
+            std::cout << "Menu Saved Successful!" << std::endl;
+        }
+        else
+        {
+            std::cout << "Menu Save Failed!" << std::endl;
+        }
+    */
 }
 
 /**
  * @brief Check if the menu exists in the current listing
  * @param menu_name
  */
-bool ModLevelEditor::checkMenuExists(std::string menu_name)
+bool ModFileAreaEditor::checkMenuExists(std::string menu_name)
 {
-/*
-    directory_ptr directory(new Directory());
-    std::vector<std::string> result_set = directory->getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
+    /*
+        directory_ptr directory(new Directory());
+        std::vector<std::string> result_set = directory->getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
 
-    // Append the extension to match the directory files.
-    menu_name.append(".yaml");
-    baseTransformToLower(menu_name);
+        // Append the extension to match the directory files.
+        menu_name.append(".yaml");
+        baseTransformToLower(menu_name);
 
-    // Case Insensitive Search for Menu name, with transformation to lower case
-    for (std::string::size_type i = 0; i < result_set.size(); i++)
-    {
-        std::string name = result_set[i];
-        baseTransformToLower(name);
+        // Case Insensitive Search for Menu name, with transformation to lower case
+        for (std::string::size_type i = 0; i < result_set.size(); i++)
+        {
+            std::string name = result_set[i];
+            baseTransformToLower(name);
 
-        if (name == menu_name)
-            return true;
-    }
+            if (name == menu_name)
+                return true;
+        }
 
-*/
+    */
     return false;
 }
 
@@ -1004,25 +1004,25 @@ bool ModLevelEditor::checkMenuExists(std::string menu_name)
  * @brief Check if the menu option exists in the current listing
  * @param option_index
  */
-bool ModLevelEditor::checkMenuOptionExists(unsigned int option_index)
+bool ModFileAreaEditor::checkMenuOptionExists(unsigned int option_index)
 {
-/*
-    // Check if it's out of bounds, negative already checked on caller.
-    if (option_index >= m_loaded_level.back()->menu_options.size())
-    {
-        return false;
-    }
-
-    // Check input index, and get command that matches.
-    for(unsigned int i = 0; i < m_loaded_level.back()->menu_options.size(); i++)
-    {
-        auto &m = m_loaded_level.back()->menu_options[i];
-        if (m.index == option_index)
+    /*
+        // Check if it's out of bounds, negative already checked on caller.
+        if (option_index >= m_loaded_level.back()->menu_options.size())
         {
-            return true;
+            return false;
         }
-    }
-*/
+
+        // Check input index, and get command that matches.
+        for(unsigned int i = 0; i < m_loaded_level.back()->menu_options.size(); i++)
+        {
+            auto &m = m_loaded_level.back()->menu_options[i];
+            if (m.index == option_index)
+            {
+                return true;
+            }
+        }
+    */
     return false;
 }
 
@@ -1030,123 +1030,123 @@ bool ModLevelEditor::checkMenuOptionExists(unsigned int option_index)
  * @brief Menu Editor, Read and Modify Menus
  * @return
  */
-std::string ModLevelEditor::displayMenuList()
+std::string ModFileAreaEditor::displayMenuList()
 {
-/*
-    directory_ptr directory(new Directory());
-    std::vector<std::string> result_set = directory->getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
+    /*
+        directory_ptr directory(new Directory());
+        std::vector<std::string> result_set = directory->getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
 
-    // check result set, if no menu then return gracefully.
-    if(result_set.size() == 0)
-    {
-        std::cout << "\r\n*** No Menus .yaml files found!" << std::endl;
-        return "No Menu Files found!";
-    }
-
-    // Sort Menu's in accending order
-    std::sort(result_set.begin(), result_set.end());
-
-    // iterate through and print out
-    int total_rows = result_set.size() / 8;
-    int remainder = result_set.size() % 8;
-
-    // Add for Header and Footer Row!
-    total_rows += 2;
-    if(remainder > 0)
-        ++total_rows;
-
-    // Could re-calc this on screen width lateron.
-    int max_cols = 73; // out of 80
-
-    // Vector or Menus, Loop through
-    std::vector<std::string>::iterator i = result_set.begin();
-    std::string menu_name;
-    std::string buffer = "";
-    for(int rows = 0; rows < total_rows; rows++)
-    {
-        buffer += "   "; // 3 Leading spaces per row.
-        for(int cols = 0; cols < max_cols; cols++)
+        // check result set, if no menu then return gracefully.
+        if(result_set.size() == 0)
         {
-            // Top Row
-            if(rows == 0 && cols == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_LEFT;
-            }
-            else if(rows == 0 && cols == max_cols-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_RIGHT;
-            }
-            else if(rows == 0 && cols % 9 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_TOP;
-            }
-            else if(rows == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
-            }
+            std::cout << "\r\n*** No Menus .yaml files found!" << std::endl;
+            return "No Menu Files found!";
+        }
 
-            // Bottom Row
-            else if(rows == total_rows-1 && cols == 0)
+        // Sort Menu's in accending order
+        std::sort(result_set.begin(), result_set.end());
+
+        // iterate through and print out
+        int total_rows = result_set.size() / 8;
+        int remainder = result_set.size() % 8;
+
+        // Add for Header and Footer Row!
+        total_rows += 2;
+        if(remainder > 0)
+            ++total_rows;
+
+        // Could re-calc this on screen width lateron.
+        int max_cols = 73; // out of 80
+
+        // Vector or Menus, Loop through
+        std::vector<std::string>::iterator i = result_set.begin();
+        std::string menu_name;
+        std::string buffer = "";
+        for(int rows = 0; rows < total_rows; rows++)
+        {
+            buffer += "   "; // 3 Leading spaces per row.
+            for(int cols = 0; cols < max_cols; cols++)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_LEFT;
-            }
-            else if(rows == total_rows-1 && cols == max_cols-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_RIGHT;
-            }
-            else if(rows == total_rows-1 && cols % 9 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_BOT;
-            }
-            else if(rows == total_rows-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
-            }
-            else if(cols % 9 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID;
-            }
-            else
-            {
-                // Here we insert the Menu name and pad through to 8 characters.
-                if(cols % 10 == 0 || cols == 1)
+                // Top Row
+                if(rows == 0 && cols == 0)
                 {
-                    if(i != result_set.end())
-                    {
-                        // Strip Extension, then pad 8 characters.
-                        menu_name = i->substr(0, i->size()-5);
-                        menu_name = m_common_io.rightPadding(menu_name, 8);
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_TOP_LEFT;
+                }
+                else if(rows == 0 && cols == max_cols-1)
+                {
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_TOP_RIGHT;
+                }
+                else if(rows == 0 && cols % 9 == 0)
+                {
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_MID_TOP;
+                }
+                else if(rows == 0)
+                {
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_ROW;
+                }
 
-                        baseTransformToUpper(menu_name);
-
-                        buffer += baseGetDefaultInputColor();
-                        buffer += menu_name;
-                        ++i;
-                    }
-                    else
+                // Bottom Row
+                else if(rows == total_rows-1 && cols == 0)
+                {
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_BOT_LEFT;
+                }
+                else if(rows == total_rows-1 && cols == max_cols-1)
+                {
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_BOT_RIGHT;
+                }
+                else if(rows == total_rows-1 && cols % 9 == 0)
+                {
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_MID_BOT;
+                }
+                else if(rows == total_rows-1)
+                {
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_ROW;
+                }
+                else if(cols % 9 == 0)
+                {
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_MID;
+                }
+                else
+                {
+                    // Here we insert the Menu name and pad through to 8 characters.
+                    if(cols % 10 == 0 || cols == 1)
                     {
-                        // Empty, 8 Spaces default menu name size.
-                        buffer += "        ";
+                        if(i != result_set.end())
+                        {
+                            // Strip Extension, then pad 8 characters.
+                            menu_name = i->substr(0, i->size()-5);
+                            menu_name = m_common_io.rightPadding(menu_name, 8);
+
+                            baseTransformToUpper(menu_name);
+
+                            buffer += baseGetDefaultInputColor();
+                            buffer += menu_name;
+                            ++i;
+                        }
+                        else
+                        {
+                            // Empty, 8 Spaces default menu name size.
+                            buffer += "        ";
+                        }
                     }
                 }
             }
-        }
 
-        // Were going to split on \n, which will get replaced lateron
-        // with \r\n for full carriage returns.
-        buffer += "\n";
-    }
-    return (buffer);
-*/
+            // Were going to split on \n, which will get replaced lateron
+            // with \r\n for full carriage returns.
+            buffer += "\n";
+        }
+        return (buffer);
+    */
     return "";
 }
 
@@ -1306,141 +1306,141 @@ std::string ModLevelEditor::displayMenuOptionList()
  * @brief Menu Editor, for Displaying Menu Fields to Edit
  * @return
  */
-std::string ModLevelEditor::displayMenuEditScreen()
+std::string ModFileAreaEditor::displayMenuEditScreen()
 {
-/*
-    // Create Menu Pointer then load the menu into it.
-    menu_ptr current_menu(new Menu());
+    /*
+        // Create Menu Pointer then load the menu into it.
+        menu_ptr current_menu(new Menu());
 
-    if (m_loaded_level.size() == 0)
-    {
-        // First load the Source Menu [m_current_menu] file name
-        MenuDao mnu_source(current_menu, m_current_menu, GLOBAL_MENU_PATH);
-        if (mnu_source.fileExists())
+        if (m_loaded_level.size() == 0)
         {
-            mnu_source.loadMenu();
-
-            // Save Menu into memory for changes, and rollbacks
-            m_loaded_level.push_back(current_menu);
-        }
-        else
-        {
-            // Error, drop back to Menu Editor.
-            changeSetupModule(MOD_DISPLAY_MENU);
-            return "";
-        }
-    }
-    else
-    {
-        //Menu is already loaded, just assigned to current_menu
-        current_menu = m_loaded_level.back();
-    }
-
-    // Build a string list of individual menu options, then loop to fit as many per screen!
-    std::vector<std::string> result_set;
-
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_VERSION_ID) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->file_version, 48));
-    result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_TITLE) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_title, 48));
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_PASSWORD) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_password, 48));
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_FALLBACK) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_HELP_ID) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_help_file, 48));
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_NAME) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_name, 48));
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_PULLDOWN_FILE) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_VIEW_GENERIC) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_EDIT_OPTIONS) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
-    result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_QUIT_SAVE) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_QUIT_ABORT) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
-
-    // Not in use Yet, seems legacy only does ACS in option commands.
-    // option_string.append("Menu ACS           : " + m_common_io.rightPadding(current_menu->menu_acs_string, 35);
-    // option_string.append("Menu FormMenu      : " + m_common_io.rightPadding(current_menu->menu_form_menu, 8);
-
-    // iterate through and print out
-    int total_rows = result_set.size();
-    total_rows += 2;
-
-    // Could re-calc this on screen width lateron.
-    int max_cols = 76;
-
-    // Vector or Menus, Loop through
-    std::vector<std::string>::iterator i = result_set.begin();
-    std::string buffer = "";
-
-    for(int rows = 0; rows < total_rows; rows++)
-    {
-        buffer += "  "; // 3 Leading spaces per row.
-        for(int cols = 0; cols < max_cols; cols++)
-        {
-            // Top Row
-            if(rows == 0 && cols == 0)
+            // First load the Source Menu [m_current_menu] file name
+            MenuDao mnu_source(current_menu, m_current_menu, GLOBAL_MENU_PATH);
+            if (mnu_source.fileExists())
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_LEFT;
-            }
-            else if(rows == 0 && cols == max_cols-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_RIGHT;
-            }
-            else if(rows == 0 && cols % 75 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_TOP;
-            }
-            else if(rows == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
-            }
+                mnu_source.loadMenu();
 
-            // Bottom Row
-            else if(rows == total_rows-1 && cols == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_LEFT;
-            }
-            else if(rows == total_rows-1 && cols == max_cols-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_RIGHT;
-            }
-            else if(rows == total_rows-1 && cols % 75 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_BOT;
-            }
-            else if(rows == total_rows-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
-            }
-            else if(cols % 75 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID;
+                // Save Menu into memory for changes, and rollbacks
+                m_loaded_level.push_back(current_menu);
             }
             else
             {
-                // Here we insert the Menu name and pad through to 8 characters.
-                if(cols == 1)
+                // Error, drop back to Menu Editor.
+                changeSetupModule(MOD_DISPLAY_MENU);
+                return "";
+            }
+        }
+        else
+        {
+            //Menu is already loaded, just assigned to current_menu
+            current_menu = m_loaded_level.back();
+        }
+
+        // Build a string list of individual menu options, then loop to fit as many per screen!
+        std::vector<std::string> result_set;
+
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_VERSION_ID) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->file_version, 48));
+        result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_TITLE) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_title, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_PASSWORD) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_password, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_FALLBACK) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_HELP_ID) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_help_file, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_NAME) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_name, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_PULLDOWN_FILE) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_VIEW_GENERIC) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_EDIT_OPTIONS) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
+        result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_QUIT_SAVE) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_QUIT_ABORT) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
+
+        // Not in use Yet, seems legacy only does ACS in option commands.
+        // option_string.append("Menu ACS           : " + m_common_io.rightPadding(current_menu->menu_acs_string, 35);
+        // option_string.append("Menu FormMenu      : " + m_common_io.rightPadding(current_menu->menu_form_menu, 8);
+
+        // iterate through and print out
+        int total_rows = result_set.size();
+        total_rows += 2;
+
+        // Could re-calc this on screen width lateron.
+        int max_cols = 76;
+
+        // Vector or Menus, Loop through
+        std::vector<std::string>::iterator i = result_set.begin();
+        std::string buffer = "";
+
+        for(int rows = 0; rows < total_rows; rows++)
+        {
+            buffer += "  "; // 3 Leading spaces per row.
+            for(int cols = 0; cols < max_cols; cols++)
+            {
+                // Top Row
+                if(rows == 0 && cols == 0)
                 {
-                    if(i != result_set.end())
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_TOP_LEFT;
+                }
+                else if(rows == 0 && cols == max_cols-1)
+                {
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_TOP_RIGHT;
+                }
+                else if(rows == 0 && cols % 75 == 0)
+                {
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_MID_TOP;
+                }
+                else if(rows == 0)
+                {
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_ROW;
+                }
+
+                // Bottom Row
+                else if(rows == total_rows-1 && cols == 0)
+                {
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_BOT_LEFT;
+                }
+                else if(rows == total_rows-1 && cols == max_cols-1)
+                {
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_BOT_RIGHT;
+                }
+                else if(rows == total_rows-1 && cols % 75 == 0)
+                {
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_MID_BOT;
+                }
+                else if(rows == total_rows-1)
+                {
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_ROW;
+                }
+                else if(cols % 75 == 0)
+                {
+                    buffer += baseGetDefaultBoxColor();
+                    buffer += BORDER_MID;
+                }
+                else
+                {
+                    // Here we insert the Menu name and pad through to 8 characters.
+                    if(cols == 1)
                     {
-                        buffer += *i;
-                        ++i;
+                        if(i != result_set.end())
+                        {
+                            buffer += *i;
+                            ++i;
+                        }
                     }
                 }
             }
+
+            // Were going to split on \n, which will get replaced lateron
+            // with \r\n for full carriage returns.
+            buffer += "\n";
         }
 
-        // Were going to split on \n, which will get replaced lateron
-        // with \r\n for full carriage returns.
-        buffer += "\n";
-    }
-
-    return (buffer);
-*/
+        return (buffer);
+    */
     return "";
 }

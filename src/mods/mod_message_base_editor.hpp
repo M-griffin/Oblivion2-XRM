@@ -1,5 +1,5 @@
-#ifndef MOD_LEVEL_EDITOR_HPP
-#define MOD_LEVEL_EDITOR_HPP
+#ifndef MOD_MESSAGE_BASE_EDITOR_HPP
+#define MOD_MESSAGE_BASE_EDITOR_HPP
 
 #include "mod_base.hpp"
 
@@ -24,14 +24,14 @@ typedef std::shared_ptr<Directory> directory_ptr;
  * @file mod_level_editor.hpp
  * @brief Level Editor
  */
-class ModLevelEditor
+class ModMessageBaseEditor
     : public ModBase
 {
 public:
-    ModLevelEditor(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
+    ModMessageBaseEditor(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
         : ModBase(session_data, config, ansi_process)
         , m_session_io(session_data)
-        , m_filename("mod_level_editor.yaml")
+        , m_filename("mod_message_base_editor.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
         , m_mod_setup_index(MOD_DISPLAY_MENU)
         , m_mod_function_index(MOD_MENU_INPUT)
@@ -45,23 +45,23 @@ public:
         , m_current_option(0)
         , m_current_field(0)
     {
-        std::cout << "ModLevelEditor" << std::endl;
+        std::cout << "ModMessageBaseEditor" << std::endl;
 
         // Setup Modules
-        m_setup_functions.push_back(std::bind(&ModLevelEditor::setupMenuEditor, this));
-        m_setup_functions.push_back(std::bind(&ModLevelEditor::setupMenuEditFields, this));
+        m_setup_functions.push_back(std::bind(&ModMessageBaseEditor::setupMenuEditor, this));
+        m_setup_functions.push_back(std::bind(&ModMessageBaseEditor::setupMenuEditFields, this));
 
         // Input or Method Modules that handle incoming input per state.
-        m_mod_functions.push_back(std::bind(&ModLevelEditor::menuEditorInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModLevelEditor::menuEditorPausedInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModLevelEditor::menuEditorMenuNameInput, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModMessageBaseEditor::menuEditorInput, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModMessageBaseEditor::menuEditorPausedInput, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModMessageBaseEditor::menuEditorMenuNameInput, this, std::placeholders::_1));
 
         // Menu Field Input Commands
-        m_mod_functions.push_back(std::bind(&ModLevelEditor::menuEditorMenuFieldInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModLevelEditor::menuEditorMenuFieldHandler, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModMessageBaseEditor::menuEditorMenuFieldInput, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModMessageBaseEditor::menuEditorMenuFieldHandler, this, std::placeholders::_1));
 
         // Display Pause, waits for a key, then returns (Used in View Generic Menu)
-        m_mod_functions.push_back(std::bind(&ModLevelEditor::menuEditorDisplayPause, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModMessageBaseEditor::menuEditorDisplayPause, this, std::placeholders::_1));
 
 
         // Check of the Text Prompts exist.
@@ -75,9 +75,9 @@ public:
         m_text_prompts_dao->readPrompts();
     }
 
-    virtual ~ModLevelEditor() override
+    virtual ~ModMessageBaseEditor() override
     {
-        std::cout << "~ModLevelEditor" << std::endl;
+        std::cout << "~ModMessageBaseEditor" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
         std::vector<access_level_ptr>().swap(m_loaded_level);
@@ -159,8 +159,8 @@ public:
     const std::string PROMPT_LEVEL_FIELD_NAME = "level_field_name";
     const std::string PROMPT_LEVEL_FIELD_PULLDOWN = "level_field_pulldown";
 
-    
-    
+
+
     // Menu Field Display for screen
     const std::string DISPLAY_LEVEL_FIELDS_VERSION_ID = "display_menu_field_version_id";
     const std::string DISPLAY_LEVEL_FIELDS_BORDER_ROW_COLOR = "display_menu_field_row_color";
@@ -174,7 +174,7 @@ public:
     const std::string DISPLAY_LEVEL_FIELDS_EDIT_OPTIONS = "display_menu_field_edit_options";
     const std::string DISPLAY_LEVEL_FIELDS_QUIT_SAVE = "display_menu_field_save";
     const std::string DISPLAY_LEVEL_FIELDS_QUIT_ABORT = "display_menu_field_abort";
-        
+
     /**
      * @brief Create Default Text Prompts for module
      * @return
@@ -418,4 +418,4 @@ private:
 
 };
 
-#endif // MOD_LEVEL_EDITOR_HPP
+#endif // MOD_MESSAGE_BASE_EDITOR_HPP
