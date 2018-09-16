@@ -1,0 +1,70 @@
+
+Main List of Dependencies for Oblivion/2 XRM for OSX
+Compilation in OSX - Tested on Latest High Sierra distribution.
+09/16/2018
+
+Current versions installed.
+
+	/usr/local/opt/sqlite/lib
+
+	SQLite is also installed in Cellar with version 3.22.0
+	I think it copies the file to the opt/lib,  or i forget right now
+	why I'm pointing here.  :)
+
+
+	/usr/local/Cellar/yaml-cpp/0.6.1/lib
+	/usr/local/Cellar/openssl/1.0.2n/lib
+	/usr/local/Cellar/libssh/0.7.5/lib
+	/usr/local/Cellar/ossp-uuid/1.6.2_2/lib
+
+
+Install homebrew 
+	ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+Update homebrew
+	brew doctor
+	brew update
+
+For unit tests only
+	brew install unittest-cpp
+
+Install dependencies
+	brew install sqlite3
+	brew install libssh
+	brew install yaml-cpp
+	brew install ossp-uuid
+
+Install GIT to pull down project.
+	brew install git
+
+Install latest compiler with c++11 compatibility if NEEDED!
+	I have the following version installed.
+
+	Apple LLVM version 9.0.0 (clang-900.0.39.2)
+	Target: x86_64-apple-darwin17.4.0
+	Thread model: Posix
+	InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+
+	brew install clang
+
+
+check /usr/local/Cellar for program versions installed.
+If the version is newer then shown here, then you will need to update the LIB and INCLUDE paths
+in the make file with the updates path versions.
+
+pull the project..  this will checkout and create project in current folder.
+	git clone https://github.com/M-griffin/Oblivion2-XRM.git .
+	cd build
+	./build-osx.sh
+
+This will build Sqlitewrapped and the main xrm-server project.
+You can follow the same steps in the build-osx.sh for making the other projects, this is just a quickie to get up and 
+running and the main program compiled for execution.
+
+Once the scripts completed the executable should be copied to the build folder where you can just run it.
+The default port will be 6023 and can be updated in the xrm-server.yaml configuration that gets auto-generated on the 
+first execution of the system.
+
+All data files, and configuration file are generated on the initial startup of the system.
+If you goof anything up, simply delete the file and re-run the program and it will re-generate as needed.
+
