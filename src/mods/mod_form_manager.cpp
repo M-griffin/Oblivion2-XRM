@@ -1,4 +1,4 @@
-#include "mod_sys_config.hpp"
+#include "mod_form_manager.hpp"
 
 #include "../model-sys/menu.hpp"
 #include "../forms/form_system_config.hpp"
@@ -6,24 +6,24 @@
 #include "../menu_base.hpp"
 
 
-ModSysConfig::ModSysConfig(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
+ModFormManager::ModFormManager(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
     : ModBase(session_data, config, ansi_process)
     , m_current_page(0)
     , m_menu(new MenuBase(session_data))
     , m_form_manager(new FormManager(config, session_data))
 {
     // Setup the Callback to Menu Option Exection to this base class.
-    m_menu->m_execute_callback.push_back(std::bind(&ModSysConfig::menuOptionsCallback, this, std::placeholders::_1));
+    m_menu->m_execute_callback.push_back(std::bind(&ModFormManager::menuOptionsCallback, this, std::placeholders::_1));
 }
 
 
 /**
- * @brief Update Mehtod, Receives Input Passed Through
+ * @brief Update Method, Receives Input Passed Through
  * @param character_buffer
  * @param is_utf8
  * @return 
  */
-bool ModSysConfig::update(const std::string &character_buffer, const bool &is_utf8)
+bool ModFormManager::update(const std::string &character_buffer, const bool &is_utf8)
 {
     // Were calling single input method, we don't need dynamic input call backs here.
     m_menu->menuInput(character_buffer, is_utf8);
@@ -34,7 +34,7 @@ bool ModSysConfig::update(const std::string &character_buffer, const bool &is_ut
  * @brief Executes on Module Load
  * @return 
  */
-bool ModSysConfig::onEnter() 
+bool ModFormManager::onEnter() 
 {
     startupFormManager();
     return true;
@@ -44,7 +44,7 @@ bool ModSysConfig::onEnter()
  * @brief Executes on Module Exit
  * @return 
  */
-bool ModSysConfig::onExit()
+bool ModFormManager::onExit()
 {
     return true;
 }
@@ -53,9 +53,9 @@ bool ModSysConfig::onExit()
  * @brief Process Command Keys passed from menu selection (Callback)
  * @param option
  */
-bool ModSysConfig::menuOptionsCallback(const MenuOption &option)
+bool ModFormManager::menuOptionsCallback(const MenuOption &option)
 {
-    std::cout << "ModSysConfig::menuOptionsCallback!" << std::endl;
+    std::cout << "ModFormManager::menuOptionsCallback!" << std::endl;
     /* Run through the case and switch over the new interface.
     std::string mnuOption = option.CKeys;
     std::string mnuString = option.CString;
@@ -73,7 +73,7 @@ bool ModSysConfig::menuOptionsCallback(const MenuOption &option)
 /**
  * @brief Starts up Form Manager Module.
  */
-void ModSysConfig::startupFormManager()
+void ModFormManager::startupFormManager()
 {
     // Startup a new Form manager instance.
     m_form_manager.reset(new FormManager(m_config, m_session_data));    

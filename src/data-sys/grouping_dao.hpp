@@ -41,7 +41,7 @@ public:
         m_strTableName = "grouping";
 
         /**
-         * Pre Popluate Static Queries one Time
+         * Pre Populate Static Queries one Time
          */
         m_cmdFirstTimeSetup =
             "PRAGMA synchronous=Normal; "

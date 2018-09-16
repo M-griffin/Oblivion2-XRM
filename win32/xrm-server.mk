@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Blue
-Date                   :=05/08/2018
+Date                   :=19/08/2018
 CodeLitePath           :="C:/Program Files (x86)/CodeLite"
 LinkerName             :=C:/MinGW-5.1.0/mingw32/bin/g++.exe
 SharedObjectLinkerName :=C:/MinGW-5.1.0/mingw32/bin/g++.exe -shared -fPIC
@@ -62,14 +62,14 @@ AS       := C:/MinGW-5.1.0/mingw32/bin/as.exe
 ## User defined environment variables
 ##
 CodeLiteDir:=C:\Program Files (x86)\CodeLite
-Objects0=$(IntermediateDirectory)/up_src_data-app_oneliners_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-app_bbs_list_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_forms_form_system_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_signup.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_menu_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_user_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_system_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_message_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_file_lister.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_file_editor.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/up_src_mods_mod_sys_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_db_startup.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_menu_stats_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_access_level_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_protocol_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_network_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_message_area_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_file_area_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_communicator.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_data.cpp$(ObjectSuffix) \
+Objects0=$(IntermediateDirectory)/up_src_data-app_oneliners_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-app_bbs_list_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_forms_form_system_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_signup.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_menu_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_user_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_system_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_message_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_file_lister.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_level_editor.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/up_src_mods_mod_file_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_db_startup.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_menu_stats_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_access_level_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_protocol_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_network_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_message_area_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_file_area_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_communicator.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_data.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/up_src_data-sys_text_prompts_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_encryption.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_system.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_menu_prompt_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_grouping_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_prelogon.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/up_src_mods_mod_protocol_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_ansi_processor.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_config_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_io_service.cpp$(ObjectSuffix) 
 
 Objects1=$(IntermediateDirectory)/up_src_access_condition.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_telnet_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sdl2_net_SDLnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sdl2_net_SDLnetselect.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_process_win.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/up_src_state_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_menu_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_base.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sdl2_net_SDLnetTCP.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sdl2_net_SDLnetUDP.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_form_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_security_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_users_dao.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/up_src_mods_mod_logon.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_session_stats_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_conference_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_message_reader.cpp$(ObjectSuffix) 
+	$(IntermediateDirectory)/up_src_state_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_menu_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_form_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_base.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sdl2_net_SDLnetTCP.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sdl2_net_SDLnetUDP.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_form_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_security_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_io.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/up_src_data-sys_users_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_logon.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_session_stats_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_conference_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_mods_mod_message_reader.cpp$(ObjectSuffix) 
 
 
 
@@ -173,6 +173,14 @@ $(IntermediateDirectory)/up_src_mods_mod_file_lister.cpp$(DependSuffix): ../src/
 $(IntermediateDirectory)/up_src_mods_mod_file_lister.cpp$(PreprocessSuffix): ../src/mods/mod_file_lister.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_mods_mod_file_lister.cpp$(PreprocessSuffix) ../src/mods/mod_file_lister.cpp
 
+$(IntermediateDirectory)/up_src_mods_mod_level_editor.cpp$(ObjectSuffix): ../src/mods/mod_level_editor.cpp $(IntermediateDirectory)/up_src_mods_mod_level_editor.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/Oblivion2-XRM/src/mods/mod_level_editor.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_mods_mod_level_editor.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_mods_mod_level_editor.cpp$(DependSuffix): ../src/mods/mod_level_editor.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_mods_mod_level_editor.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_mods_mod_level_editor.cpp$(DependSuffix) -MM ../src/mods/mod_level_editor.cpp
+
+$(IntermediateDirectory)/up_src_mods_mod_level_editor.cpp$(PreprocessSuffix): ../src/mods/mod_level_editor.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_mods_mod_level_editor.cpp$(PreprocessSuffix) ../src/mods/mod_level_editor.cpp
+
 $(IntermediateDirectory)/up_src_mods_mod_file_editor.cpp$(ObjectSuffix): ../src/mods/mod_file_editor.cpp $(IntermediateDirectory)/up_src_mods_mod_file_editor.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/Oblivion2-XRM/src/mods/mod_file_editor.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_mods_mod_file_editor.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/up_src_mods_mod_file_editor.cpp$(DependSuffix): ../src/mods/mod_file_editor.cpp
@@ -180,14 +188,6 @@ $(IntermediateDirectory)/up_src_mods_mod_file_editor.cpp$(DependSuffix): ../src/
 
 $(IntermediateDirectory)/up_src_mods_mod_file_editor.cpp$(PreprocessSuffix): ../src/mods/mod_file_editor.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_mods_mod_file_editor.cpp$(PreprocessSuffix) ../src/mods/mod_file_editor.cpp
-
-$(IntermediateDirectory)/up_src_mods_mod_sys_config.cpp$(ObjectSuffix): ../src/mods/mod_sys_config.cpp $(IntermediateDirectory)/up_src_mods_mod_sys_config.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/Oblivion2-XRM/src/mods/mod_sys_config.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_mods_mod_sys_config.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_src_mods_mod_sys_config.cpp$(DependSuffix): ../src/mods/mod_sys_config.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_mods_mod_sys_config.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_mods_mod_sys_config.cpp$(DependSuffix) -MM ../src/mods/mod_sys_config.cpp
-
-$(IntermediateDirectory)/up_src_mods_mod_sys_config.cpp$(PreprocessSuffix): ../src/mods/mod_sys_config.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_mods_mod_sys_config.cpp$(PreprocessSuffix) ../src/mods/mod_sys_config.cpp
 
 $(IntermediateDirectory)/up_src_data-sys_db_startup.cpp$(ObjectSuffix): ../src/data-sys/db_startup.cpp $(IntermediateDirectory)/up_src_data-sys_db_startup.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/Oblivion2-XRM/src/data-sys/db_startup.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_data-sys_db_startup.cpp$(ObjectSuffix) $(IncludePath)
@@ -436,6 +436,14 @@ $(IntermediateDirectory)/up_src_data-sys_menu_dao.cpp$(DependSuffix): ../src/dat
 
 $(IntermediateDirectory)/up_src_data-sys_menu_dao.cpp$(PreprocessSuffix): ../src/data-sys/menu_dao.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_data-sys_menu_dao.cpp$(PreprocessSuffix) ../src/data-sys/menu_dao.cpp
+
+$(IntermediateDirectory)/up_src_mods_mod_form_manager.cpp$(ObjectSuffix): ../src/mods/mod_form_manager.cpp $(IntermediateDirectory)/up_src_mods_mod_form_manager.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/Oblivion2-XRM/src/mods/mod_form_manager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_mods_mod_form_manager.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_mods_mod_form_manager.cpp$(DependSuffix): ../src/mods/mod_form_manager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_mods_mod_form_manager.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_mods_mod_form_manager.cpp$(DependSuffix) -MM ../src/mods/mod_form_manager.cpp
+
+$(IntermediateDirectory)/up_src_mods_mod_form_manager.cpp$(PreprocessSuffix): ../src/mods/mod_form_manager.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_mods_mod_form_manager.cpp$(PreprocessSuffix) ../src/mods/mod_form_manager.cpp
 
 $(IntermediateDirectory)/up_src_main.cpp$(ObjectSuffix): ../src/main.cpp $(IntermediateDirectory)/up_src_main.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/Oblivion2-XRM/src/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_main.cpp$(ObjectSuffix) $(IncludePath)

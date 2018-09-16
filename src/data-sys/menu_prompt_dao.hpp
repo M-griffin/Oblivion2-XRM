@@ -15,7 +15,7 @@ typedef std::shared_ptr<MenuPrompt> menu_prompt_ptr;
  * @author Michael Griffin
  * @date 05/03/2017
  * @file menu_dao.hpp
- * @brief Handles Reading and Writting a MenuPrompt from YAML Files
+ * @brief Handles Reading and Writing a Menu Prompt from YAML Files
  */
 class MenuPromptDao
 {

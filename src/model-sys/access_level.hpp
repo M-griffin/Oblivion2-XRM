@@ -32,6 +32,13 @@ public:
         , iDownloadMB(0)
         , iARFlags1(0)
         , iARFlags2(0)
+        // Flags
+        , bPostCallRatio(false)
+        , bFileRatio(false)
+        , bTimeLimit(false)    
+        , bCallLimit(false)
+        , bDownloads(false)
+        , bDownloadMB(false)
     {
     }
     
@@ -49,6 +56,13 @@ public:
     int iDownloadMB;
     uint32_t iARFlags1;
     uint32_t iARFlags2;
+    bool bPostCallRatio;
+    bool bFileRatio;
+    bool bTimeLimit;    
+    bool bCallLimit;
+    bool bDownloads;
+    bool bDownloadMB;
+    
 
 };
 

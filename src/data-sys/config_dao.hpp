@@ -13,7 +13,7 @@ typedef std::shared_ptr<Config> config_ptr;
  * @author Michael Griffin
  * @date 2/21/2016
  * @file config_dao.hpp
- * @brief Handles Reading and Writting Config Class from XML
+ * @brief Handles Reading and Writing Config Class from XML
  */
 class ConfigDao
 {

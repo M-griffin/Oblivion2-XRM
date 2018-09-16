@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Michae Griffin
-Date                   :=05/08/18
+Date                   :=19/08/18
 CodeLitePath           :="/home/merc/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -65,9 +65,9 @@ Objects0=$(IntermediateDirectory)/src_ansi_processor.cpp$(ObjectSuffix) $(Interm
 	$(IntermediateDirectory)/data-sys_security_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_text_prompts_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_users_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_menu_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_menu_prompt_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_session_stats_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_conference_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_file_area_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_grouping_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_message_area_dao.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/data-sys_network_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_protocol_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_access_level_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_db_startup.cpp$(ObjectSuffix) 
 
-Objects1=$(IntermediateDirectory)/mods_mod_logon.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_prelogon.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_signup.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_sys_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_file_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_file_lister.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/mods_mod_menu_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_message_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_message_reader.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_protocol_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_system_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_user_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/forms_form_system_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-app_bbs_list_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-app_oneliners_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/sdl2_net_SDLnet.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/sdl2_net_SDLnetselect.cpp$(ObjectSuffix) $(IntermediateDirectory)/sdl2_net_SDLnetTCP.cpp$(ObjectSuffix) $(IntermediateDirectory)/sdl2_net_SDLnetUDP.cpp$(ObjectSuffix) 
+Objects1=$(IntermediateDirectory)/mods_mod_logon.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_prelogon.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_signup.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_file_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_file_lister.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_menu_editor.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/mods_mod_message_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_message_reader.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_protocol_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_system_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_user_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_file_area_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_form_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_message_base_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/mods_mod_level_editor.cpp$(ObjectSuffix) $(IntermediateDirectory)/forms_form_system_config.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/data-app_bbs_list_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-app_oneliners_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/sdl2_net_SDLnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/sdl2_net_SDLnetselect.cpp$(ObjectSuffix) $(IntermediateDirectory)/sdl2_net_SDLnetTCP.cpp$(ObjectSuffix) $(IntermediateDirectory)/sdl2_net_SDLnetUDP.cpp$(ObjectSuffix) 
 
 
 
@@ -395,14 +395,6 @@ $(IntermediateDirectory)/mods_mod_signup.cpp$(DependSuffix): ../src/mods/mod_sig
 $(IntermediateDirectory)/mods_mod_signup.cpp$(PreprocessSuffix): ../src/mods/mod_signup.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/mods_mod_signup.cpp$(PreprocessSuffix) "../src/mods/mod_signup.cpp"
 
-$(IntermediateDirectory)/mods_mod_sys_config.cpp$(ObjectSuffix): ../src/mods/mod_sys_config.cpp $(IntermediateDirectory)/mods_mod_sys_config.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/mods/mod_sys_config.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/mods_mod_sys_config.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/mods_mod_sys_config.cpp$(DependSuffix): ../src/mods/mod_sys_config.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/mods_mod_sys_config.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/mods_mod_sys_config.cpp$(DependSuffix) -MM "../src/mods/mod_sys_config.cpp"
-
-$(IntermediateDirectory)/mods_mod_sys_config.cpp$(PreprocessSuffix): ../src/mods/mod_sys_config.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/mods_mod_sys_config.cpp$(PreprocessSuffix) "../src/mods/mod_sys_config.cpp"
-
 $(IntermediateDirectory)/mods_mod_file_editor.cpp$(ObjectSuffix): ../src/mods/mod_file_editor.cpp $(IntermediateDirectory)/mods_mod_file_editor.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/mods/mod_file_editor.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/mods_mod_file_editor.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/mods_mod_file_editor.cpp$(DependSuffix): ../src/mods/mod_file_editor.cpp
@@ -466,6 +458,38 @@ $(IntermediateDirectory)/mods_mod_user_editor.cpp$(DependSuffix): ../src/mods/mo
 
 $(IntermediateDirectory)/mods_mod_user_editor.cpp$(PreprocessSuffix): ../src/mods/mod_user_editor.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/mods_mod_user_editor.cpp$(PreprocessSuffix) "../src/mods/mod_user_editor.cpp"
+
+$(IntermediateDirectory)/mods_mod_file_area_editor.cpp$(ObjectSuffix): ../src/mods/mod_file_area_editor.cpp $(IntermediateDirectory)/mods_mod_file_area_editor.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/mods/mod_file_area_editor.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/mods_mod_file_area_editor.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/mods_mod_file_area_editor.cpp$(DependSuffix): ../src/mods/mod_file_area_editor.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/mods_mod_file_area_editor.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/mods_mod_file_area_editor.cpp$(DependSuffix) -MM "../src/mods/mod_file_area_editor.cpp"
+
+$(IntermediateDirectory)/mods_mod_file_area_editor.cpp$(PreprocessSuffix): ../src/mods/mod_file_area_editor.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/mods_mod_file_area_editor.cpp$(PreprocessSuffix) "../src/mods/mod_file_area_editor.cpp"
+
+$(IntermediateDirectory)/mods_mod_form_manager.cpp$(ObjectSuffix): ../src/mods/mod_form_manager.cpp $(IntermediateDirectory)/mods_mod_form_manager.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/mods/mod_form_manager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/mods_mod_form_manager.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/mods_mod_form_manager.cpp$(DependSuffix): ../src/mods/mod_form_manager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/mods_mod_form_manager.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/mods_mod_form_manager.cpp$(DependSuffix) -MM "../src/mods/mod_form_manager.cpp"
+
+$(IntermediateDirectory)/mods_mod_form_manager.cpp$(PreprocessSuffix): ../src/mods/mod_form_manager.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/mods_mod_form_manager.cpp$(PreprocessSuffix) "../src/mods/mod_form_manager.cpp"
+
+$(IntermediateDirectory)/mods_mod_message_base_editor.cpp$(ObjectSuffix): ../src/mods/mod_message_base_editor.cpp $(IntermediateDirectory)/mods_mod_message_base_editor.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/mods/mod_message_base_editor.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/mods_mod_message_base_editor.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/mods_mod_message_base_editor.cpp$(DependSuffix): ../src/mods/mod_message_base_editor.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/mods_mod_message_base_editor.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/mods_mod_message_base_editor.cpp$(DependSuffix) -MM "../src/mods/mod_message_base_editor.cpp"
+
+$(IntermediateDirectory)/mods_mod_message_base_editor.cpp$(PreprocessSuffix): ../src/mods/mod_message_base_editor.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/mods_mod_message_base_editor.cpp$(PreprocessSuffix) "../src/mods/mod_message_base_editor.cpp"
+
+$(IntermediateDirectory)/mods_mod_level_editor.cpp$(ObjectSuffix): ../src/mods/mod_level_editor.cpp $(IntermediateDirectory)/mods_mod_level_editor.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/mods/mod_level_editor.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/mods_mod_level_editor.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/mods_mod_level_editor.cpp$(DependSuffix): ../src/mods/mod_level_editor.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/mods_mod_level_editor.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/mods_mod_level_editor.cpp$(DependSuffix) -MM "../src/mods/mod_level_editor.cpp"
+
+$(IntermediateDirectory)/mods_mod_level_editor.cpp$(PreprocessSuffix): ../src/mods/mod_level_editor.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/mods_mod_level_editor.cpp$(PreprocessSuffix) "../src/mods/mod_level_editor.cpp"
 
 $(IntermediateDirectory)/forms_form_system_config.cpp$(ObjectSuffix): ../src/forms/form_system_config.cpp $(IntermediateDirectory)/forms_form_system_config.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/forms/form_system_config.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/forms_form_system_config.cpp$(ObjectSuffix) $(IncludePath)
