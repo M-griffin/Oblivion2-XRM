@@ -1,5 +1,5 @@
 #include "access_level_dao.hpp"
-#include "../model-sys/users.hpp"
+#include "../model-sys/access_level.hpp"
 
 #include "libSqliteWrapped.h"
 #include <sqlite3.h>
@@ -12,8 +12,8 @@
  * Base Dao Calls for generic Object Data Calls
  * (Below This Point)
  */
- 
- 
+
+
 /**
  * @brief Check If Database Table Exists.
  * @return
@@ -82,8 +82,8 @@ bool AccessLevelDao::deleteRecord(long id)
 /**
  * @brief Retrieve Record By Id.
  * @param id
- * @return 
- */ 
+ * @return
+ */
 access_level_ptr AccessLevelDao::getRecordById(long id)
 {
     return baseGetRecordById(id);
@@ -112,10 +112,10 @@ long AccessLevelDao::getRecordsCount()
  * Base Dao Call Back for Object Specific Data Mappings
  * (Below This Point)
  */
- 
+
 
 /**
- * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+ * @brief (CallBack) Pulls results by FieldNames into their Class Variables.
  * @param qry
  * @param obj
  */
@@ -134,7 +134,7 @@ void AccessLevelDao::pullAccessLevelResult(query_ptr qry, access_level_ptr obj)
     qry->getFieldByName("iDownloads", obj->iDownloads);
     qry->getFieldByName("iDownloadMB", obj->iDownloadMB);
     qry->getFieldByName("iARFlags1", obj->iARFlags1);
-    qry->getFieldByName("iARFlags2", obj->iARFlags2);    
+    qry->getFieldByName("iARFlags2", obj->iARFlags2);
     qry->getFieldByName("bPostCallRatio", obj->bPostCallRatio);
     qry->getFieldByName("bFileRatio", obj->bFileRatio);
     qry->getFieldByName("bTimeLimit", obj->bTimeLimit);
@@ -148,7 +148,7 @@ void AccessLevelDao::pullAccessLevelResult(query_ptr qry, access_level_ptr obj)
  * @param qry
  * @param obj
  * @param values
- */ 
+ */
 void AccessLevelDao::fillAccessLevelColumnValues(query_ptr qry, access_level_ptr obj, std::vector< std::pair<std::string, std::string> > &values)
 {
     // values.push_back(qry->translateFieldName("iId", obj->iId));
@@ -170,74 +170,74 @@ void AccessLevelDao::fillAccessLevelColumnValues(query_ptr qry, access_level_ptr
     values.push_back(qry->translateFieldName("bTimeLimit", obj->bTimeLimit));
     values.push_back(qry->translateFieldName("bCallLimit", obj->bCallLimit));
     values.push_back(qry->translateFieldName("bDownloads", obj->bDownloads));
-    values.push_back(qry->translateFieldName("bDownloadMB", obj->bDownloadMB));    
+    values.push_back(qry->translateFieldName("bDownloadMB", obj->bDownloadMB));
 }
 
 /**
- * @brief (Callback) Create Record Insert Statement, returns query string 
+ * @brief (Callback) Create Record Insert Statement, returns query string
  * @param qry
  * @param obj
- * @return 
+ * @return
  */
 std::string AccessLevelDao::insertAccessLevelQryString(std::string qry, access_level_ptr obj)
-{    
+{
     // Mprint statement to avoid injections.
     std::string result = sqlite3_mprintf(qry.c_str(),
-        obj->sName.c_str(),
-        obj->sStartMenu.c_str(),
-        obj->iLevel,
-        obj->iFileLevel,
-        obj->iMessageLevel,
-        obj->iPostCallRatio,
-        obj->iFileRatio,
-        obj->iTimeLimit,
-        obj->iCallLimit,
-        obj->iDownloads,
-        obj->iDownloadMB,
-        obj->iARFlags1,
-        obj->iARFlags2,
-        obj->bPostCallRatio,
-        obj->bFileRatio,
-        obj->bTimeLimit,
-        obj->bCallLimit,
-        obj->bDownloads,
-        obj->bDownloadMB
-    );
+                                         obj->sName.c_str(),
+                                         obj->sStartMenu.c_str(),
+                                         obj->iLevel,
+                                         obj->iFileLevel,
+                                         obj->iMessageLevel,
+                                         obj->iPostCallRatio,
+                                         obj->iFileRatio,
+                                         obj->iTimeLimit,
+                                         obj->iCallLimit,
+                                         obj->iDownloads,
+                                         obj->iDownloadMB,
+                                         obj->iARFlags1,
+                                         obj->iARFlags2,
+                                         obj->bPostCallRatio,
+                                         obj->bFileRatio,
+                                         obj->bTimeLimit,
+                                         obj->bCallLimit,
+                                         obj->bDownloads,
+                                         obj->bDownloadMB
+                                        );
 
     return result;
 }
 
 /**
- * @brief (CallBack) Update Existing Record. 
+ * @brief (CallBack) Update Existing Record.
  * @param qry
  * @param obj
- * @return 
+ * @return
  */
 std::string AccessLevelDao::updateAccessLevelQryString(std::string qry, access_level_ptr obj)
 {
     // Mprint statement to avoid injections.
     std::string result = sqlite3_mprintf(qry.c_str(),
-        obj->sName.c_str(),
-        obj->sStartMenu.c_str(),
-        obj->iLevel,
-        obj->iFileLevel,
-        obj->iMessageLevel,
-        obj->iPostCallRatio,
-        obj->iFileRatio,
-        obj->iTimeLimit,
-        obj->iCallLimit,
-        obj->iDownloads,
-        obj->iDownloadMB,
-        obj->iARFlags1,
-        obj->iARFlags2,
-        obj->bPostCallRatio,
-        obj->bFileRatio,
-        obj->bTimeLimit,
-        obj->bCallLimit,
-        obj->bDownloads,
-        obj->bDownloadMB,
-        obj->iId
-    );
+                                         obj->sName.c_str(),
+                                         obj->sStartMenu.c_str(),
+                                         obj->iLevel,
+                                         obj->iFileLevel,
+                                         obj->iMessageLevel,
+                                         obj->iPostCallRatio,
+                                         obj->iFileRatio,
+                                         obj->iTimeLimit,
+                                         obj->iCallLimit,
+                                         obj->iDownloads,
+                                         obj->iDownloadMB,
+                                         obj->iARFlags1,
+                                         obj->iARFlags2,
+                                         obj->bPostCallRatio,
+                                         obj->bFileRatio,
+                                         obj->bTimeLimit,
+                                         obj->bCallLimit,
+                                         obj->bDownloads,
+                                         obj->bDownloadMB,
+                                         obj->iId
+                                        );
 
     return result;
 }
@@ -247,7 +247,7 @@ std::string AccessLevelDao::updateAccessLevelQryString(std::string qry, access_l
  * One Off Methods SQL Queries not included in the BaseDao
  * (Below This Point)
  */
- 
+
 /**
  * @brief Return AccessLevel Record by Level.
  * @return
@@ -257,7 +257,7 @@ access_level_ptr AccessLevelDao::getAccessLevelByLevel(long access_level)
     access_level_ptr level(new AccessLevel);
 
     // Make Sure Database Reference is Connected
-    if (!m_database.isConnected())
+    if(!m_database.isConnected())
     {
         std::cout << "Error, Database is not connected!" << std::endl;
         return level;
@@ -265,7 +265,8 @@ access_level_ptr AccessLevelDao::getAccessLevelByLevel(long access_level)
 
     // Create Pointer and Connect Query Object to Database.
     query_ptr qry(new SQLW::Query(m_database));
-    if (!qry->isConnected())
+
+    if(!qry->isConnected())
     {
         std::cout << "Error, Query has no connection to the database" << std::endl;
         return level;
@@ -273,13 +274,14 @@ access_level_ptr AccessLevelDao::getAccessLevelByLevel(long access_level)
 
     // Build Query String
     std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iLevel = %d COLLATE NOCASE;",
-        m_strTableName.c_str(), access_level);
+                              m_strTableName.c_str(), access_level);
 
     // create a test3 table
-    if (qry->getResult(queryString))
+    if(qry->getResult(queryString))
     {
         long rows = qry->getNumRows();
-        if (rows > 0)
+
+        if(rows > 0)
         {
             qry->fetchRow();
             pullAccessLevelResult(qry, level);
@@ -293,6 +295,6 @@ access_level_ptr AccessLevelDao::getAccessLevelByLevel(long access_level)
     {
         std::cout << "Error, getResult()" << std::endl;
     }
- 
+
     return level;
 }
