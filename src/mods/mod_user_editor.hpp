@@ -44,7 +44,7 @@ public:
         std::cout << "ModUserEditor" << std::endl;
 
         // Push function pointers to the stack.
-        
+
         m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserList, this));
         m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserEditFields, this));
         m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserEditExtendedFields, this));
@@ -52,17 +52,18 @@ public:
         m_mod_functions.push_back(std::bind(&ModUserEditor::userListInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorPausedInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorUserInput, this, std::placeholders::_1));
-        
+
         m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorFieldInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorFieldHandler, this, std::placeholders::_1));
-        
+
         m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorExtendedInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorExtendedFieldHandler, this, std::placeholders::_1));
-        
-            
+
+
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
-        if (!m_is_text_prompt_exist)
+
+        if(!m_is_text_prompt_exist)
         {
             createTextPrompts();
         }
@@ -77,7 +78,7 @@ public:
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
         std::vector<user_ptr>().swap(m_users_listing);
-        std::vector<user_ptr>().swap(m_loaded_user);        
+        std::vector<user_ptr>().swap(m_loaded_user);
     }
 
     virtual bool update(const std::string &character_buffer, const bool &) override;
@@ -85,7 +86,7 @@ public:
     virtual bool onExit() override;
 
     // Setup Methods
-    enum 
+    enum
     {
         MOD_DISPLAY_USER_LIST   = 0,
         MOD_DISPLAY_USER_FIELDS = 1,
@@ -97,7 +98,7 @@ public:
     {
         MOD_USER_INPUT                = 0, // User List Input Parser
         MOD_PAUSE                     = 1, // Pauses on display of menus/options
-        MOD_USER_NAME                 = 2, // User Name Input Handler        
+        MOD_USER_NAME                 = 2, // User Name Input Handler
         MOD_USER_FIELD_INPUT          = 3, // Selecting Individual User Fields.
         MOD_USER_FIELD                = 4, // Updates Current Field
         MOD_USER_EXTENDED_FIELD_INPUT = 5, // Selecting Individual Extended User Fields.
@@ -113,7 +114,7 @@ public:
         USER_COPY      = 2,
         USER_FILTER    = 3
     };
-    
+
     // Box drawing characters
     enum
     {
@@ -126,7 +127,7 @@ public:
         BORDER_MID_BOT   = (char)208,  // ╨
         BORDER_MID       = (char)186   // ║
     };
-    
+
     // Create Prompt Constants, these are the keys for key/value lookup
     const std::string PROMPT_HEADER = "header";
     const std::string PROMPT_INPUT_TEXT = "input_text";
@@ -134,14 +135,14 @@ public:
     const std::string PROMPT_PAUSE = "pause_prompt";
 
     const std::string PROMPT_USER_CHANGE = "user_change";
-    const std::string PROMPT_USER_DELETE = "user_delete";    
+    const std::string PROMPT_USER_DELETE = "user_delete";
     const std::string PROMPT_USER_COPY = "user_copy";
     const std::string PROMPT_USER_FILTER = "user_filter";
 
     const std::string PROMPT_INVALID_USER_NOT_EXISTS = "invalid_user_doesnt_exist";
     const std::string PROMPT_USER_EDIT_HEADER = "user_editor_field_header";
     const std::string PROMPT_USER_FIELD_INPUT_TEXT = "user_editor_field_input";
-    
+
     const std::string PROMPT_USER_FIELD_USERNAME = "user_field_username";
     const std::string PROMPT_USER_FIELD_USERLEVEL = "user_field_userlevel";
     const std::string PROMPT_USER_FIELD_REALNAME = "user_field_realname";
@@ -193,7 +194,7 @@ public:
     const std::string DISPLAY_USER_FIELDS_NEXT_USER = "display_user_field_next_user";
     const std::string DISPLAY_USER_FIELDS_QUIT_SAVE = "display_user_field_quit_save";
     const std::string DISPLAY_USER_FIELDS_QUIT_ABORT = "display_user_field_quit_abort";
-    
+
     // User Displayed Extended Fields.
     const std::string DISPLAY_USER_EXT_FIELDS_PASSWORD = "display_user_ext_field_password";
     const std::string DISPLAY_USER_EXT_FIELDS_GENDER = "display_user_ext_field_gender";
@@ -214,10 +215,10 @@ public:
     const std::string DISPLAY_USER_EXT_FIELDS_STATUS_COLOR = "display_user_ext_field_status_color";
     const std::string DISPLAY_USER_EXT_FIELDS_INVERSE_COLOR = "display_user_ext_field_inverse_color";
     const std::string DISPLAY_USER_EXT_FIELDS_QUIT_RETURN = "display_user_ext_field_quit_return";
-    
+
     const std::string DISPLAY_USER_EXT_FIELDS_CHALLENGE_QUESTION = "display_user_ext_field_challenge_question";
     const std::string DISPLAY_USER_EXT_FIELDS_CHALLENGE_ANSWER = "display_user_ext_field_challenge_answer";
-    
+
     // Extended Prompts
     const std::string PROMPT_USER_EXT_FIELDS_PASSWORD = "prompt_user_ext_field_password";
     const std::string PROMPT_USER_EXT_FIELDS_GENDER = "prompt_user_ext_field_gender";
@@ -237,33 +238,33 @@ public:
     const std::string PROMPT_USER_EXT_FIELDS_BOX_COLOR = "prompt_user_ext_field_box_color";
     const std::string PROMPT_USER_EXT_FIELDS_STATUS_COLOR = "prompt_user_ext_field_status_color";
     const std::string PROMPT_USER_EXT_FIELDS_INVERSE_COLOR = "prompt_user_ext_field_inverse_color";
-    
+
     const std::string PROMPT_USER_EXT_FIELDS_CHALLENGE_QUESTION = "prompt_user_ext_field_challenge_question";
     const std::string PROMPT_USER_EXT_FIELDS_CHALLENGE_ANSWER = "prompt_user_ext_field_challenge_answer";
-    
+
     /**
      * @brief Create Default Text Prompts for module
      */
     void createTextPrompts();
-    
+
     /**
      * @brief Sets an individual input module index.
      * @param mod_function_index
      */
     void changeInputModule(int mod_function_index);
-    
+
     /**
      * @brief Sets an individual setup method module index.
      * @param mod_function_index
      */
     void changeSetupModule(int mod_function_index);
-    
+
     /**
      * @brief Sets an individual Menu Input State Add/Change/Delete
      * @param mod_menu_state_index
      */
     void changeMenuInputState(int mod_menu_state_index);
-    
+
     /**
      * @brief Redisplay's the current module prompt.
      * @return
@@ -281,7 +282,7 @@ public:
      * @param prompt
      */
     void displayPrompt(const std::string &prompt);
-    
+
     /**
      * @brief Pull and parse and return Display Prompts for use in interfaces
      * @param prompt
@@ -308,7 +309,7 @@ public:
     void displayPromptAndNewLine(const std::string &prompt);
 
     /**
-     * @brief Setup for the User Editor 
+     * @brief Setup for the User Editor
      * @return
      */
     void setupUserList();
@@ -334,13 +335,13 @@ public:
      * @return
      */
     void userListInput(const std::string &input);
-    
+
     /**
      * @brief Handles User Number Input, Parses Strings and checks Valid User Id
      * @param input
      */
     void userEditorUserInput(const std::string &input);
-    
+
     /**
      * @brief handle each user separate state and what to do next on input.
      * @param does_user_exist
@@ -376,7 +377,7 @@ public:
      * @brief Check if the next user exists in the current listing by Current Id
      */
     bool nextUserById();
-    
+
     /**
      * @brief Check if the previous user exists in the current listing by Current Id
      */
@@ -387,35 +388,35 @@ public:
      * @param input
      */
     void userEditorPausedInput(const std::string &input);
-    
+
     /**
      * Display Methods
      */
-     
+
     /**
      * @brief Displays the current page of users
      * @param input_state
      */
     void displayCurrentPage(const std::string &input_state);
-    
+
     /**
      * @brief User Editor, Read and Modify User Preferences
      * @return
      */
     std::string displayUserList();
-    
+
     /**
      * @brief Handles User Field Editor Command Selection
      * @param input
      */
     void userEditorFieldInput(const std::string &input);
-    
+
     /**
      * @brief Handles User Extended Field Editor Command Selection
      * @param input
      */
     void userEditorExtendedInput(const std::string &input);
-    
+
     /**
      * @brief Update the selected user record
      */
@@ -450,32 +451,32 @@ public:
      * @param input
      */
     void userEditorFieldHandler(const std::string &input);
-    
+
     /**
      * @brief User Editor, for Displaying Menu Fields to Edit
      * @return
      */
     std::string displayUserEditScreen();
-    
+
     /**
      * @brief User Editor, for Displaying User Extended Fields to Edit
      * @return
      */
     std::string displayUserExtendedEditScreen();
-    
+
     /**
      * @brief Displays the current page of user items
      * @param input_state
      */
     void displayCurrentEditPage(const std::string &input_state);
-    
+
 private:
 
     // Function Input Vector.
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
     std::vector<user_ptr>                                   m_users_listing;
-    std::vector<std::string>                                m_user_display_list;    
+    std::vector<std::string>                                m_user_display_list;
     std::vector<user_ptr>                                   m_loaded_user;
 
     SessionIO              m_session_io;
@@ -485,19 +486,19 @@ private:
     unsigned int           m_mod_setup_index;
     unsigned int           m_mod_function_index;
     unsigned int           m_mod_user_state_index;
-    
+
     bool                   m_is_text_prompt_exist;
     unsigned int           m_page;
     unsigned int           m_rows_per_page;
-    
+
     unsigned long          m_current_user_id;
     unsigned int           m_current_field;
     std::string            m_wildcard_filter;
     unsigned long          m_user_array_position;
-    
+
     CommonIO               m_common_io;
     directory_ptr          m_directory;
-    
+
 };
 
 

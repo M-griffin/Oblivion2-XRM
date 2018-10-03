@@ -296,7 +296,8 @@ void ModUserEditor::setupUserList()
 {
     // Display if were filtering or not
     std::string string_filter = "ALL";
-    if (m_wildcard_filter.size() > 0)
+
+    if(m_wildcard_filter.size() > 0)
     {
         string_filter = m_wildcard_filter;
     }
@@ -308,7 +309,7 @@ void ModUserEditor::setupUserList()
     // So we know when to pause in large listing, or use pagenation.
     std::string user_display_output = displayUserList();
 
-    if (m_user_display_list.size() == 0)
+    if(m_user_display_list.size() == 0)
     {
         // Clear Out list if anything already exists.
         std::vector<std::string>().swap(m_user_display_list);
@@ -328,7 +329,8 @@ void ModUserEditor::setupUserEditFields()
     // Build a list of screen lines for the menu display
     // So we know when to pause in large listing, or use pagenation.
     std::string user_display_output = displayUserEditScreen();
-    if (user_display_output.size() == 0)
+
+    if(user_display_output.size() == 0)
         return;
 
     std::string user_count_display = std::to_string(m_current_user_id);
@@ -336,7 +338,7 @@ void ModUserEditor::setupUserEditFields()
                               " of " + std::to_string(m_users_listing.size()));
     displayPromptMCI(PROMPT_USER_EDIT_HEADER, user_count_display);
 
-    if (m_user_display_list.size() == 0)
+    if(m_user_display_list.size() == 0)
     {
         // Clear Out list if anything already exists.
         std::vector<std::string>().swap(m_user_display_list);
@@ -356,7 +358,8 @@ void ModUserEditor::setupUserEditExtendedFields()
     // Build a list of screen lines for the menu display
     // So we know when to pause in large listing, or use pagenation.
     std::string user_display_output = displayUserExtendedEditScreen();
-    if (user_display_output.size() == 0)
+
+    if(user_display_output.size() == 0)
         return;
 
     std::string user_count_display = std::to_string(m_current_user_id);
@@ -364,7 +367,7 @@ void ModUserEditor::setupUserEditExtendedFields()
                               " of " + std::to_string(m_users_listing.size()));
     displayPromptMCI(PROMPT_USER_EDIT_EXTENDED_HEADER, user_count_display);
 
-    if (m_user_display_list.size() == 0)
+    if(m_user_display_list.size() == 0)
     {
         // Clear Out list if anything already exists.
         std::vector<std::string>().swap(m_user_display_list);
@@ -401,7 +404,7 @@ void ModUserEditor::userListInput(const std::string &input)
 
         baseProcessDeliverNewLine();
 
-        switch (toupper(key[0]))
+        switch(toupper(key[0]))
         {
             case 'E': // Change/Edit
                 changeMenuInputState(USER_CHANGE);
@@ -441,7 +444,7 @@ void ModUserEditor::userListInput(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty")
+        if(result != "empty")
         {
             baseProcessDeliverInput(result);
         }
@@ -470,7 +473,7 @@ void ModUserEditor::userEditorUserInput(const std::string &input)
         // Allow Empty for Filter only!!
         // If were updating the filter, catch
         // Adjust user list and return
-        if (m_mod_user_state_index == USER_FILTER)
+        if(m_mod_user_state_index == USER_FILTER)
         {
             m_wildcard_filter = key;
             changeInputModule(MOD_USER_INPUT);
@@ -493,13 +496,13 @@ void ModUserEditor::userEditorUserInput(const std::string &input)
         ss >> user_id;
 
         // check for Invalid Index.
-        if (ss.fail() || user_id < 0)
+        if(ss.fail() || user_id < 0)
         {
             ss.clear();
             user_id = -1;
         }
 
-        if (user_id != -1 && checkUserExistsById(user_id))
+        if(user_id != -1 && checkUserExistsById(user_id))
         {
             handleUserInputState(true, user_id);
         }
@@ -512,7 +515,7 @@ void ModUserEditor::userEditorUserInput(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty")
+        if(result != "empty")
         {
             baseProcessDeliverInput(result);
         }
@@ -526,10 +529,10 @@ void ModUserEditor::userEditorUserInput(const std::string &input)
  */
 void ModUserEditor::handleUserInputState(bool does_user_exist, long user_id)
 {
-    switch (m_mod_user_state_index)
+    switch(m_mod_user_state_index)
     {
         case USER_CHANGE:
-            if (does_user_exist)
+            if(does_user_exist)
             {
                 // Move to new Default setup for Options vs Menus.
                 // Also set the curent menu for the system to load
@@ -545,10 +548,11 @@ void ModUserEditor::handleUserInputState(bool does_user_exist, long user_id)
                 displayPrompt(PROMPT_INPUT_TEXT);
                 changeInputModule(MOD_USER_INPUT);
             }
+
             break;
 
         case USER_DELETE:
-            if (does_user_exist)
+            if(does_user_exist)
             {
                 deleteExistingUser(user_id);
                 changeInputModule(MOD_USER_INPUT);
@@ -561,11 +565,13 @@ void ModUserEditor::handleUserInputState(bool does_user_exist, long user_id)
                 displayPrompt(PROMPT_INPUT_TEXT);
                 changeInputModule(MOD_USER_INPUT);
             }
+
             break;
 
         case USER_COPY:
+
             // Copies and Adds a new record to back of the list.
-            if (does_user_exist)
+            if(does_user_exist)
             {
                 copyExistingUser(user_id);
                 changeInputModule(MOD_USER_INPUT);
@@ -578,6 +584,7 @@ void ModUserEditor::handleUserInputState(bool does_user_exist, long user_id)
                 displayPrompt(PROMPT_INPUT_TEXT);
                 changeInputModule(MOD_USER_INPUT);
             }
+
             break;
     }
 }
@@ -594,7 +601,7 @@ void ModUserEditor::copyExistingUser(long user_id)
     user_ptr lookup_user = user_data->getRecordById(user_id);
 
     // Default Id when not found is -1
-    if (lookup_user->iId == -1)
+    if(lookup_user->iId == -1)
         return;
 
     // Setup for default password and challenge questions.
@@ -614,7 +621,8 @@ void ModUserEditor::copyExistingUser(long user_id)
     security_record->sSaltHash = salt;
 
     long securityIndex = security_dao->insertRecord(security_record);
-    if (securityIndex < 0)
+
+    if(securityIndex < 0)
     {
         std::cout << "Error, unable to insert new user record." << std::endl;
         return;
@@ -627,10 +635,12 @@ void ModUserEditor::copyExistingUser(long user_id)
     bool found = true;
     long id = 1;
     std::string user_name = "New User";
+
     while(found)
     {
         user_ptr check_user = user_data->getUserByRealName(user_name + std::to_string(id));
-        if (check_user->iId == -1)
+
+        if(check_user->iId == -1)
         {
             // Not found, were good to go
             found = false;
@@ -639,12 +649,14 @@ void ModUserEditor::copyExistingUser(long user_id)
             lookup_user->sEmail = user_name + std::to_string(id) + "@xrm.com";
 
             long userIndex = user_data->insertRecord(lookup_user);
-            if (userIndex < 0)
+
+            if(userIndex < 0)
             {
                 // If user Index is not created, then remove the secutiry record.
                 security_dao->deleteRecord(securityIndex);
             }
         }
+
         ++id;
     }
 }
@@ -670,7 +682,7 @@ bool ModUserEditor::checkUserExistsById(long user_id)
     user_ptr lookup_user = user_data->getRecordById(user_id);
 
     // Default Id when not found is -1
-    if (lookup_user->iId == -1)
+    if(lookup_user->iId == -1)
         return false;
 
     return true;
@@ -683,15 +695,15 @@ bool ModUserEditor::checkUserExistsById(long user_id)
 bool ModUserEditor::loadUserById(long user_id)
 {
     // If record is already loaded then leave it.
-    if (m_loaded_user.size() > 0)
+    if(m_loaded_user.size() > 0)
     {
         std::cout << " *** user already loaded!!" << std::endl;
         return true;
     }
 
-    for (unsigned int i = 0; i < m_users_listing.size(); i++)
+    for(unsigned int i = 0; i < m_users_listing.size(); i++)
     {
-        if (m_users_listing[i]->iId == user_id)
+        if(m_users_listing[i]->iId == user_id)
         {
             m_user_array_position = i;
             m_loaded_user.push_back(m_users_listing[i]);
@@ -707,9 +719,9 @@ bool ModUserEditor::loadUserById(long user_id)
  */
 bool ModUserEditor::nextUserById()
 {
-    if (m_user_array_position+1 < m_users_listing.size())
+    if(m_user_array_position+1 < m_users_listing.size())
     {
-        if (m_loaded_user.size() > 0)
+        if(m_loaded_user.size() > 0)
             std::vector<user_ptr>().swap(m_loaded_user);
 
         ++m_user_array_position;
@@ -718,6 +730,7 @@ bool ModUserEditor::nextUserById()
 
         return true;
     }
+
     return false;
 }
 
@@ -726,9 +739,9 @@ bool ModUserEditor::nextUserById()
  */
 bool ModUserEditor::previousUserById()
 {
-    if (m_user_array_position > 0)
+    if(m_user_array_position > 0)
     {
-        if (m_loaded_user.size() > 0)
+        if(m_loaded_user.size() > 0)
             std::vector<user_ptr>().swap(m_loaded_user);
 
         --m_user_array_position;
@@ -736,6 +749,7 @@ bool ModUserEditor::previousUserById()
         m_current_user_id = m_users_listing[m_user_array_position]->iId;
         return true;
     }
+
     return false;
 }
 
@@ -747,6 +761,7 @@ void ModUserEditor::userEditorPausedInput(const std::string &input)
 {
     std::string current_state_input;
     unsigned int current_module_input;
+
     switch(m_mod_setup_index)
     {
         case MOD_DISPLAY_USER_LIST:
@@ -756,7 +771,7 @@ void ModUserEditor::userEditorPausedInput(const std::string &input)
     }
 
     // Check for abort on pause for next.
-    if (input.size() == 1 && std::toupper(input[0]) == 'A')
+    if(input.size() == 1 && std::toupper(input[0]) == 'A')
     {
         displayPrompt(current_state_input);
         changeInputModule(current_module_input);
@@ -779,19 +794,20 @@ void ModUserEditor::displayCurrentPage(const std::string &input_state)
     unsigned int rows_used = m_ansi_process->getMaxRowsUsedOnScreen();
     unsigned int max_rows = m_ansi_process->getMaxLines();
 
-    if (m_page > 0)
+    if(m_page > 0)
         rows_used -= (m_ansi_process->m_number_lines - 2);
 
     m_rows_per_page = max_rows - (rows_used + 2);
 
     bool displayed_all_rows = true;
-    for (unsigned int i = (m_page*(m_rows_per_page-2)); i < m_user_display_list.size(); i++)
+
+    for(unsigned int i = (m_page*(m_rows_per_page-2)); i < m_user_display_list.size(); i++)
     {
         std::string display_line = m_session_io.pipe2ansi(m_user_display_list[i]);
         display_line.append("\r\n");
         baseProcessAndDeliver(display_line);
 
-        if (i >= (m_page*m_rows_per_page) + m_rows_per_page)
+        if(i >= (m_page*m_rows_per_page) + m_rows_per_page)
         {
             // We've displayed the max amount of rows per the currnet
             // screen break out and wait for prompt or next page.
@@ -802,6 +818,7 @@ void ModUserEditor::displayCurrentPage(const std::string &input_state)
 
     // Default Page Input Method
     unsigned int current_module_input;
+
     switch(m_mod_setup_index)
     {
         case MOD_DISPLAY_USER_LIST:
@@ -815,7 +832,7 @@ void ModUserEditor::displayCurrentPage(const std::string &input_state)
 
     // If we displayed all rows, then display propmpt, otherwise
     // Ask to hit anykey for next page.
-    if (displayed_all_rows)
+    if(displayed_all_rows)
     {
         // Reset Page back to Zero for next display.
         m_page = 0;
@@ -838,10 +855,10 @@ std::string ModUserEditor::displayUserList()
     users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
 
     // Clear All Users
-    if (m_users_listing.size() > 0)
+    if(m_users_listing.size() > 0)
         std::vector<user_ptr>().swap(m_users_listing);
 
-    if (m_wildcard_filter.size() > 0)
+    if(m_wildcard_filter.size() > 0)
     {
         m_users_listing = user_data->getUsersByWildcard(m_wildcard_filter);
     }
@@ -852,7 +869,8 @@ std::string ModUserEditor::displayUserList()
 
     // If no records, add message to user.
     std::vector<std::string> result_set;
-    if (m_users_listing.size() == 0)
+
+    if(m_users_listing.size() == 0)
     {
         result_set.push_back(baseGetDefaultStatColor() + m_common_io.rightPadding("No Records Found!", 24));
     }
@@ -861,7 +879,8 @@ std::string ModUserEditor::displayUserList()
     for(unsigned int i = 0; i < m_users_listing.size(); i++)
     {
         std::string option_string = m_common_io.rightPadding(std::to_string(m_users_listing[i]->iId), 5);
-        if (m_users_listing[i]->sHandle.size() == 0)
+
+        if(m_users_listing[i]->sHandle.size() == 0)
             option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(m_users_listing[i]->sRealName, 19));
         else
             option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(m_users_listing[i]->sHandle, 19));
@@ -875,6 +894,7 @@ std::string ModUserEditor::displayUserList()
 
     // Add for Header and Footer Row!
     total_rows += 2;
+
     if(remainder > 0)
         ++total_rows;
 
@@ -888,6 +908,7 @@ std::string ModUserEditor::displayUserList()
     for(int rows = 0; rows < total_rows; rows++)
     {
         buffer += "  "; // 3 Leading spaces per row.
+
         for(int cols = 0; cols < max_cols; cols++)
         {
             // Top Row
@@ -975,9 +996,9 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
     // Provide Hotkeys only for switching to next/previous options
     switch(input[0])
     {
-            // TODO, update current users m_loaded_user -> m_users_list array with update also.
-            // So when we change users we keep the changes made!
-            // search m_users_listing for previous / next record.
+        // TODO, update current users m_loaded_user -> m_users_list array with update also.
+        // So when we change users we keep the changes made!
+        // search m_users_listing for previous / next record.
         case '[': // previous user
             previousUserById();
             redisplayModulePrompt();
@@ -1010,7 +1031,7 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
         baseProcessDeliverNewLine();
         m_current_field = toupper(key[0]);
 
-        switch (m_current_field)
+        switch(m_current_field)
         {
             case 'A': // User Name
                 changeInputModule(MOD_USER_FIELD);
@@ -1067,15 +1088,16 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
 
             case 'R': // Ignore Time Limit
-                {
-                    changeInputModule(MOD_USER_FIELD);
-                    displayPrompt(PROMPT_USER_FIELD_NOTIMELIMIT);
-                    // Setup pre-population to display only T or F instead of True / False
-                    std::string bool_value = "";
-                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bIgnoreTimeLimit).at(0);
-                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                    break;
-                }
+            {
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_NOTIMELIMIT);
+                // Setup pre-population to display only T or F instead of True / False
+                std::string bool_value = "";
+                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bIgnoreTimeLimit).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                break;
+            }
+
             case 'F': // User Country
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_COUNTRY);
@@ -1083,15 +1105,16 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
 
             case 'S': // Use ANSI Graphics
-                {
-                    changeInputModule(MOD_USER_FIELD);
-                    displayPrompt(PROMPT_USER_FIELD_USEANSI);
-                    // Setup pre-population to display only T or F instead of True / False
-                    std::string bool_value = "";
-                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bAnsi).at(0);
-                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                    break;
-                }
+            {
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_USEANSI);
+                // Setup pre-population to display only T or F instead of True / False
+                std::string bool_value = "";
+                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bAnsi).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                break;
+            }
+
             case 'G': // User Note
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_USERNOTE);
@@ -1099,15 +1122,16 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
 
             case 'T': // Use VT100 Backspace
-                {
-                    changeInputModule(MOD_USER_FIELD);
-                    displayPrompt(PROMPT_USER_FIELD_BACKSPACE);
-                    // Setup pre-population to display only T or F instead of True / False
-                    std::string bool_value = "";
-                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bBackSpaceVt100).at(0);
-                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                    break;
-                }
+            {
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_BACKSPACE);
+                // Setup pre-population to display only T or F instead of True / False
+                std::string bool_value = "";
+                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bBackSpaceVt100).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                break;
+            }
+
             case 'H': // User Birth Date
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_BIRTHDATE);
@@ -1115,15 +1139,16 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
 
             case 'U': // User Wanted
-                {
-                    changeInputModule(MOD_USER_FIELD);
-                    displayPrompt(PROMPT_USER_FIELD_WANTED);
-                    // Setup pre-population to display only T or F instead of True / False
-                    std::string bool_value = "";
-                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bWanted).at(0);
-                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                    break;
-                }
+            {
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_WANTED);
+                // Setup pre-population to display only T or F instead of True / False
+                std::string bool_value = "";
+                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bWanted).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                break;
+            }
+
             case 'I': // Access Restriction Flags 1, Type Letter to Add / Remove only.
                 // No leadoff data, just input single letters to add or remove
                 changeInputModule(MOD_USER_FIELD);
@@ -1132,15 +1157,16 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
 
             case 'V': // Clear Screen or Scroll Screen
-                {
-                    changeInputModule(MOD_USER_FIELD);
-                    displayPrompt(PROMPT_USER_FIELD_CLEARSCREEN);
-                    // Setup pre-population to display only T or F instead of True / False
-                    std::string bool_value = "";
-                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bClearOrScroll).at(0);
-                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                    break;
-                }
+            {
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_CLEARSCREEN);
+                // Setup pre-population to display only T or F instead of True / False
+                std::string bool_value = "";
+                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bClearOrScroll).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                break;
+            }
+
             case 'J': // Access Restriction Flags 2, Type Letter to Add / Remove only.
                 // No leadoff data, just input single letters to add or remove
                 changeInputModule(MOD_USER_FIELD);
@@ -1149,15 +1175,16 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
 
             case 'W': // Do Screen Pause
-                {
-                    changeInputModule(MOD_USER_FIELD);
-                    displayPrompt(PROMPT_USER_FIELD_SCREENPAUSE);
-                    // Setup pre-population to display only T or F instead of True / False
-                    std::string bool_value = "";
-                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bDoPause).at(0);
-                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                    break;
-                }
+            {
+                changeInputModule(MOD_USER_FIELD);
+                displayPrompt(PROMPT_USER_FIELD_SCREENPAUSE);
+                // Setup pre-population to display only T or F instead of True / False
+                std::string bool_value = "";
+                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bDoPause).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                break;
+            }
+
             case 'Q': // Quit
                 updateExistingUser();
                 std::vector<user_ptr>().swap(m_loaded_user);
@@ -1189,7 +1216,7 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty")
+        if(result != "empty")
         {
             baseProcessDeliverInput(result);
         }
@@ -1223,7 +1250,7 @@ void ModUserEditor::userEditorExtendedInput(const std::string &input)
         baseProcessDeliverNewLine();
         m_current_field = toupper(key[0]);
 
-        switch (m_current_field)
+        switch(m_current_field)
         {
             case 'A': // Password
                 changeInputModule(MOD_USER_EXTENDED_FIELD);
@@ -1359,7 +1386,7 @@ void ModUserEditor::userEditorExtendedInput(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty")
+        if(result != "empty")
         {
             baseProcessDeliverInput(result);
         }
@@ -1427,8 +1454,9 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                 break;
 
             case 'R': // Ignore Time Limit
-                if (m_common_io.stringToBool(key) != -1)
+                if(m_common_io.stringToBool(key) != -1)
                     m_loaded_user.back()->bIgnoreTimeLimit = m_common_io.stringToBool(key);
+
                 break;
 
             case 'F': // User Country
@@ -1436,8 +1464,9 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                 break;
 
             case 'S': // Use ANSI Graphics
-                if (m_common_io.stringToBool(key) != -1)
+                if(m_common_io.stringToBool(key) != -1)
                     m_loaded_user.back()->bAnsi = m_common_io.stringToBool(key);
+
                 break;
 
             case 'G': // User Note
@@ -1445,50 +1474,62 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                 break;
 
             case 'T': // Use VT100 Backspace
-                if (m_common_io.stringToBool(key) != -1)
+                if(m_common_io.stringToBool(key) != -1)
                     m_loaded_user.back()->bBackSpaceVt100 = m_common_io.stringToBool(key);
+
                 break;
 
             case 'H': // User Birth Date
-                {
-                    // Make sure Date Format is valid
-                    std::regex date_regex { m_config->regexp_date_validation };
-                    std::smatch str_matches;
+            {
+                // Make sure Date Format is valid
+                std::regex date_regex { m_config->regexp_date_validation };
+                std::smatch str_matches;
 
-                    // If invalid display message, but for now ignore changes
-                    if(std::regex_match(key, str_matches, date_regex))
-                    {
-                        m_loaded_user.back()->dtBirthday = m_common_io.stringToStandardDate(key);
-                    }
-                    break;
+                // If invalid display message, but for now ignore changes
+                if(std::regex_match(key, str_matches, date_regex))
+                {
+                    m_loaded_user.back()->dtBirthday = m_common_io.stringToStandardDate(key);
                 }
+
+                break;
+            }
+
             case 'U': // User Wanted
-                if (m_common_io.stringToBool(key) != -1)
+                if(m_common_io.stringToBool(key) != -1)
                     m_loaded_user.back()->bWanted = m_common_io.stringToBool(key);
+
                 break;
 
             case 'I': // Access Restriction Flags 1, Will loop though and toggle each letter.
-                {
-                    AccessCondition acs;
-                    for (char c : key)
-                        acs.setFlagToggle(c, true, m_loaded_user.back());
-                    break;
-                }
+            {
+                AccessCondition acs;
+
+                for(char c : key)
+                    acs.setFlagToggle(c, true, m_loaded_user.back());
+
+                break;
+            }
+
             case 'V': // Clear Screen or Scroll Screen
-                if (m_common_io.stringToBool(key) != -1)
+                if(m_common_io.stringToBool(key) != -1)
                     m_loaded_user.back()->bClearOrScroll = m_common_io.stringToBool(key);
+
                 break;
 
             case 'J': // Access Restriction Flags 2, Type Letter to Add / Remove only.
-                {
-                    AccessCondition acs;
-                    for (char c : key)
-                        acs.setFlagToggle(c, false, m_loaded_user.back());
-                    break;
-                }
+            {
+                AccessCondition acs;
+
+                for(char c : key)
+                    acs.setFlagToggle(c, false, m_loaded_user.back());
+
+                break;
+            }
+
             case 'W': // Pause
-                if (m_common_io.stringToBool(key) != -1)
+                if(m_common_io.stringToBool(key) != -1)
                     m_loaded_user.back()->bDoPause = m_common_io.stringToBool(key);
+
                 break;
         }
 
@@ -1499,7 +1540,7 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty")
+        if(result != "empty")
         {
             baseProcessDeliverInput(result);
         }
@@ -1511,7 +1552,7 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
  */
 void ModUserEditor::updateExistingUser()
 {
-    if (m_loaded_user.back()->iId == -1)
+    if(m_loaded_user.back()->iId == -1)
         return;
 
     users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
@@ -1541,7 +1582,8 @@ void ModUserEditor::updateExistingPassword(std::string key_value)
     }
 
     security_record->sPasswordHash = password;
-    if (!security_dao->updateRecord(security_record))
+
+    if(!security_dao->updateRecord(security_record))
     {
         std::cout << "Error, unable to update password hash." << std::endl;
         return;
@@ -1571,7 +1613,8 @@ void ModUserEditor::updateExistingChallengeAnswer(std::string key_value)
     }
 
     security_record->sChallengeAnswerHash = password;
-    if (!security_dao->updateRecord(security_record))
+
+    if(!security_dao->updateRecord(security_record))
     {
         std::cout << "Error, unable to update Challenge Answer." << std::endl;
         return;
@@ -1591,7 +1634,8 @@ void ModUserEditor::updateExistingChallengeQuestion(std::string key_value)
     security_record = security_dao->getRecordById(m_loaded_user.back()->iSecurityIndex);
 
     security_record->sChallengeQuestion = key_value;
-    if (!security_dao->updateRecord(security_record))
+
+    if(!security_dao->updateRecord(security_record))
     {
         std::cout << "Error, unable to update challenge question." << std::endl;
         return;
@@ -1632,52 +1676,58 @@ void ModUserEditor::userEditorExtendedFieldHandler(const std::string &input)
                 break;
 
             case 'B': // Password Last change date
-                {
-                    // Make sure Date Format is valid
-                    std::regex date_regex { m_config->regexp_date_validation };
-                    std::smatch str_matches;
+            {
+                // Make sure Date Format is valid
+                std::regex date_regex { m_config->regexp_date_validation };
+                std::smatch str_matches;
 
-                    // If invalid display message, but for now ignore changes
-                    if(std::regex_match(key, str_matches, date_regex))
-                    {
-                        m_loaded_user.back()->dtFirstOn = m_common_io.stringToStandardDate(key);
-                    }
-                    break;
+                // If invalid display message, but for now ignore changes
+                if(std::regex_match(key, str_matches, date_regex))
+                {
+                    m_loaded_user.back()->dtFirstOn = m_common_io.stringToStandardDate(key);
                 }
+
+                break;
+            }
+
             case 'N': // Days to Force Password change
                 m_loaded_user.back()->iCSPassChange = m_common_io.stringToInt(key);
                 break;
 
             case 'C': // Signup Date / First On
-                {
-                    // Make sure Date Format is valid
-                    std::regex date_regex { m_config->regexp_date_validation };
-                    std::smatch str_matches;
+            {
+                // Make sure Date Format is valid
+                std::regex date_regex { m_config->regexp_date_validation };
+                std::smatch str_matches;
 
-                    // If invalid display message, but for now ignore changes
-                    if(std::regex_match(key, str_matches, date_regex))
-                    {
-                        m_loaded_user.back()->dtPassChangeDate = m_common_io.stringToStandardDate(key);
-                    }
-                    break;
+                // If invalid display message, but for now ignore changes
+                if(std::regex_match(key, str_matches, date_regex))
+                {
+                    m_loaded_user.back()->dtPassChangeDate = m_common_io.stringToStandardDate(key);
                 }
+
+                break;
+            }
+
             case 'O': // File Points
                 m_loaded_user.back()->iFilePoints = m_common_io.stringToInt(key);
                 break;
 
             case 'D': // Expiratrion Date
-                {
-                    // Make sure Date Format is valid
-                    std::regex date_regex { m_config->regexp_date_validation };
-                    std::smatch str_matches;
+            {
+                // Make sure Date Format is valid
+                std::regex date_regex { m_config->regexp_date_validation };
+                std::smatch str_matches;
 
-                    // If invalid display message, but for now ignore changes
-                    if(std::regex_match(key, str_matches, date_regex))
-                    {
-                        m_loaded_user.back()->dtExpirationDate = m_common_io.stringToStandardDate(key);
-                    }
-                    break;
+                // If invalid display message, but for now ignore changes
+                if(std::regex_match(key, str_matches, date_regex))
+                {
+                    m_loaded_user.back()->dtExpirationDate = m_common_io.stringToStandardDate(key);
                 }
+
+                break;
+            }
+
             case 'P': // Post/Call Ratio
                 m_loaded_user.back()->iPostCallRatio = m_common_io.stringToInt(key);
                 break;
@@ -1738,7 +1788,7 @@ void ModUserEditor::userEditorExtendedFieldHandler(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty")
+        if(result != "empty")
         {
             baseProcessDeliverInput(result);
         }
@@ -1752,7 +1802,7 @@ void ModUserEditor::userEditorExtendedFieldHandler(const std::string &input)
 std::string ModUserEditor::displayUserEditScreen()
 {
     // Create Menu Pointer then load the menu into it.
-    if (!loadUserById(m_current_user_id) || m_loaded_user.back()->iId == -1)
+    if(!loadUserById(m_current_user_id) || m_loaded_user.back()->iId == -1)
     {
         // Error, drop back to User Editor User Listing
         std::vector<user_ptr>().swap(m_loaded_user);
@@ -1819,6 +1869,7 @@ std::string ModUserEditor::displayUserEditScreen()
     for(int rows = 0; rows < total_rows; rows++)
     {
         buffer += "  "; // 3 Leading spaces per row.
+
         for(int cols = 0; cols < max_cols; cols++)
         {
             // Top Row
@@ -1898,7 +1949,7 @@ std::string ModUserEditor::displayUserEditScreen()
 std::string ModUserEditor::displayUserExtendedEditScreen()
 {
     // Create Menu Pointer then load the menu into it.
-    if (!loadUserById(m_current_user_id) || m_loaded_user.back()->iId == -1)
+    if(!loadUserById(m_current_user_id) || m_loaded_user.back()->iId == -1)
     {
         // Error, drop back to User Editor User Listing
         std::vector<user_ptr>().swap(m_loaded_user);
@@ -1930,7 +1981,8 @@ std::string ModUserEditor::displayUserExtendedEditScreen()
 
     // If Expiration Date Set to Minimun, then set as default None
     std::string expiration_date_string = "None";
-    if (m_common_io.standardDateToString(usr->dtExpirationDate) != "1969-12-31")
+
+    if(m_common_io.standardDateToString(usr->dtExpirationDate) != "1969-12-31")
         expiration_date_string = m_common_io.standardDateToString(usr->dtExpirationDate);
 
     result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_EXPIRE_DATE) + baseGetDefaultStatColor() + expiration_date_string, 64) +
@@ -1951,7 +2003,7 @@ std::string ModUserEditor::displayUserExtendedEditScreen()
                          m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_BOX_COLOR) + usr->sBoxColor + "***|16", 47));
 
     result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_STATUS_COLOR) + usr->sStatColor + "***|16", 63) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_INVERSE_COLOR) + usr->sInverseColor + "***|16" , 47));
+                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_INVERSE_COLOR) + usr->sInverseColor + "***|16", 47));
 
 
     // Challenge Question and Answer are Masked since they are in security record.
@@ -1976,6 +2028,7 @@ std::string ModUserEditor::displayUserExtendedEditScreen()
     for(int rows = 0; rows < total_rows; rows++)
     {
         buffer += "  "; // 3 Leading spaces per row.
+
         for(int cols = 0; cols < max_cols; cols++)
         {
             // Top Row
@@ -2055,7 +2108,7 @@ std::string ModUserEditor::displayUserExtendedEditScreen()
  */
 void ModUserEditor::displayCurrentEditPage(const std::string &input_state)
 {
-    for (unsigned int i = 0; i < m_user_display_list.size(); i++)
+    for(unsigned int i = 0; i < m_user_display_list.size(); i++)
     {
         std::string display_line = m_session_io.pipe2ansi(m_user_display_list[i]);
         display_line.append("\r\n");
@@ -2064,6 +2117,7 @@ void ModUserEditor::displayCurrentEditPage(const std::string &input_state)
 
     // Default Page Input Method
     unsigned int current_module_input;
+
     switch(m_mod_setup_index)
     {
         case MOD_DISPLAY_USER_FIELDS:

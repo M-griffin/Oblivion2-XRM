@@ -3,9 +3,9 @@
 
 #include "mod_base.hpp"
 
-#include <string>
-#include <memory>
 #include <functional>
+#include <memory>
+#include <string>
 #include <vector>
 
 class AccessLevel;
@@ -24,8 +24,7 @@ typedef std::shared_ptr<Directory> directory_ptr;
  * @file mod_level_editor.hpp
  * @brief Level Editor
  */
-class ModLevelEditor
-    : public ModBase
+class ModLevelEditor : public ModBase
 {
 public:
     ModLevelEditor(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
@@ -45,25 +44,22 @@ public:
         std::cout << "ModLevelEditor" << std::endl;
 
         // Setup Modules
-        m_setup_functions.push_back(std::bind(&ModLevelEditor::setupMenuEditor, this));
-        m_setup_functions.push_back(std::bind(&ModLevelEditor::setupMenuEditFields, this));
+        m_setup_functions.push_back(std::bind(&ModLevelEditor::setupLevelEditor, this));
+        m_setup_functions.push_back(std::bind(&ModLevelEditor::setupLevelEditFields, this));
 
         // Input or Method Modules that handle incoming input per state.
-        m_mod_functions.push_back(std::bind(&ModLevelEditor::menuEditorInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModLevelEditor::menuEditorPausedInput, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModLevelEditor::levelEditorInput, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModLevelEditor::levelEditorPausedInput, this, std::placeholders::_1));
         m_mod_functions.push_back(std::bind(&ModLevelEditor::levelEditorLevelInput, this, std::placeholders::_1));
 
         // Menu Field Input Commands
-        m_mod_functions.push_back(std::bind(&ModLevelEditor::menuEditorMenuFieldInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModLevelEditor::menuEditorMenuFieldHandler, this, std::placeholders::_1));
-
-        // Display Pause, waits for a key, then returns (Used in View Generic Menu)
-        m_mod_functions.push_back(std::bind(&ModLevelEditor::menuEditorDisplayPause, this, std::placeholders::_1));
-
+        m_mod_functions.push_back(std::bind(&ModLevelEditor::levelEditorLevelFieldInput, this, std::placeholders::_1));
+        m_mod_functions.push_back(std::bind(&ModLevelEditor::levelEditorLevelFieldHandler, this, std::placeholders::_1));
 
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
-        if (!m_is_text_prompt_exist)
+
+        if(!m_is_text_prompt_exist)
         {
             createTextPrompts();
         }
@@ -75,51 +71,51 @@ public:
     virtual ~ModLevelEditor() override
     {
         std::cout << "~ModLevelEditor" << std::endl;
-        std::vector<std::function< void()> >().swap(m_setup_functions);
-        std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
+        std::vector<std::function<void()>>().swap(m_setup_functions);
+        std::vector<std::function<void(const std::string&)>>().swap(m_mod_functions);
         std::vector<access_level_ptr>().swap(m_loaded_levels);
     }
 
-    virtual bool update(const std::string &character_buffer, const bool &) override;
+    virtual bool update(const std::string& character_buffer, const bool&) override;
     virtual bool onEnter() override;
     virtual bool onExit() override;
 
     // Setup Module Index
     enum
     {
-        MOD_DISPLAY_LEVEL            = 0,
-        MOD_DISPLAY_LEVEL_EDIT       = 1
+        MOD_DISPLAY_LEVEL = 0,
+        MOD_DISPLAY_LEVEL_EDIT = 1
     };
 
     // Input Module Index
     enum
     {
-        MOD_LEVEL_INPUT              = 0, // Level Parser
-        MOD_PAUSE                    = 1, // Pauses on display of menus/options
-        MOD_LEVEL_NAME               = 2, // Level Name Handler
-        MOD_LEVEL_FIELD_INPUT        = 3, // Level Field Parser
-        MOD_LEVEL_FIELD              = 4  // Level Field Handler
+        MOD_LEVEL_INPUT       = 0, // Level Parser
+        MOD_PAUSE             = 1, // Pauses on display of menus/options
+        MOD_LEVEL_NAME        = 2, // Level Name Handler
+        MOD_LEVEL_FIELD_INPUT = 3, // Level Field Parser
+        MOD_LEVEL_FIELD       = 4  // Level Field Handler
     };
 
     // Input Level State Index
     enum
     {
-        LEVEL_ADD       = 0,
-        LEVEL_CHANGE    = 1,
-        LEVEL_DELETE    = 2
+        LEVEL_ADD    = 0,
+        LEVEL_CHANGE = 1,
+        LEVEL_DELETE = 2
     };
 
     // Box drawing characters
     enum
     {
-        BORDER_TOP_LEFT  = (char)214,  // ╓
-        BORDER_BOT_LEFT  = (char)211,  // ╙
-        BORDER_ROW       = (char)196,  // ─
-        BORDER_TOP_RIGHT = (char)183,  // ╖
-        BORDER_BOT_RIGHT = (char)189,  // ╜
-        BORDER_MID_TOP   = (char)210,  // ╥
-        BORDER_MID_BOT   = (char)208,  // ╨
-        BORDER_MID       = (char)186   // ║
+        BORDER_TOP_LEFT  = (char)214, // ╓
+        BORDER_BOT_LEFT  = (char)211, // ╙
+        BORDER_ROW       = (char)196, // ─
+        BORDER_TOP_RIGHT = (char)183, // ╖
+        BORDER_BOT_RIGHT = (char)189, // ╜
+        BORDER_MID_TOP   = (char)210, // ╥
+        BORDER_MID_BOT   = (char)208, // ╨
+        BORDER_MID       = (char)186  // ║
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
@@ -141,7 +137,7 @@ public:
     const std::string PROMPT_LEVEL_FIELD_TITLE = "level_field_title";
     const std::string PROMPT_LEVEL_FIELD_PASSWORD = "level_field_password";
     const std::string PROMPT_LEVEL_FIELD_FALLBACK = "level_field_fallback";
-    const std::string PROMPT_LEVEL_FIELD_HELP_ID  = "level_field_help_id";
+    const std::string PROMPT_LEVEL_FIELD_HELP_ID = "level_field_help_id";
     const std::string PROMPT_LEVEL_FIELD_NAME = "level_field_name";
     const std::string PROMPT_LEVEL_FIELD_PULLDOWN = "level_field_pulldown";
 
@@ -181,7 +177,7 @@ public:
      * @brief Sets an individual Menu Input State Add/Change/Delete
      * @param mod_menu_state_index
      */
-    void changeMenuInputState(int mod_menu_state_index);
+    void changeLevelInputState(int mod_menu_state_index);
 
     /**
      * @brief Redisplay's the current module prompt.
@@ -193,56 +189,56 @@ public:
      * @brief Pull and Display Prompts
      * @param prompt
      */
-    void displayPrompt(const std::string &prompt);
+    void displayPrompt(const std::string& prompt);
 
     /**
      * @brief Pull and parse and return Display Prompts for use in interfaces
      * @param prompt
      */
-    std::string getDisplayPrompt(const std::string &prompt);
+    std::string getDisplayPrompt(const std::string& prompt);
 
     /**
      * @brief Pull and parse and return Display Prompts for use in interfaces
      * @param prompt
      */
-    std::string getDisplayPromptRaw(const std::string &prompt);
+    std::string getDisplayPromptRaw(const std::string& prompt);
 
     /**
      * @brief Pull and Display Prompts with MCI Code
      * @param prompt
      * @param mci_field
      */
-    void displayPromptMCI(const std::string &prompt, const std::string &mci_field);
+    void displayPromptMCI(const std::string& prompt, const std::string& mci_field);
 
     /**
      * @brief Pull and Display Prompts with following newline
      * @param prompt
      */
-    void displayPromptAndNewLine(const std::string &prompt);
+    void displayPromptAndNewLine(const std::string& prompt);
 
     /**
      * @brief Validates user Logon
      * @return
      */
-    void setupMenuEditor();
+    void setupLevelEditor();
 
     /**
      * @brief Setup for the Menu Editor
      * @return
      */
-    void setupMenuEditFields();
+    void setupLevelEditFields();
 
     /**
      * @brief Displays the current page of menu items
      * @param input_state
      */
-    void displayCurrentPage(const std::string &input_state);
+    void displayCurrentPage(const std::string& input_state);
 
     /**
      * @brief Displays the current page of menu items
      * @param input_state
      */
-    void displayCurrentEditPage(const std::string &input_state);
+    void displayCurrentEditPage(const std::string& input_state);
 
     /**
      * @brief Check if the level exists in the current listing
@@ -252,23 +248,16 @@ public:
     bool checkLevelExistsByLevel(int level_code);
 
     /**
-     * @brief Check if the menu option exists in the current listing
-     * @param menu_option
-     */
-    bool checkMenuOptionExists(unsigned int option_index);
-
-    /**
      * @brief Menu Editor Display, Runs through all existing menus
      * @return
      */
-    std::string displayMenuList();
+    std::string displayLevelList();
 
     /**
      * @brief Menu Editor, for Displaying Menu Fields to Edit
      * @return
      */
-    std::string displayMenuEditScreen();
-
+    std::string displayLevelEditScreen();
 
     /**
      * Input Methods below here.
@@ -278,37 +267,37 @@ public:
      * @brief Handles Input (Waiting for Any Key Press)
      * @param input
      */
-    void menuEditorPausedInput(const std::string &input);
+    void levelEditorPausedInput(const std::string& input);
 
     /**
      * @brief Handles Input (Waiting for Any Key Press) View Generic Menu
      * @param input
      */
-    void menuEditorDisplayPause(const std::string &input);
+    void levelEditorDisplayPause(const std::string& input);
 
     /**
      * @brief Handles Menu Editor Command Selection
      * @param input
      */
-    void menuEditorInput(const std::string &input);
+    void levelEditorInput(const std::string& input);
 
     /**
      * @brief Handles Menu Field Editor Command Selection
      * @param input
      */
-    void menuEditorMenuFieldInput(const std::string &input);
+    void levelEditorLevelFieldInput(const std::string& input);
 
     /**
      * @brief Handles Field Updates for Menu Data
      * @param input
      */
-    void menuEditorMenuFieldHandler(const std::string &input);
+    void levelEditorLevelFieldHandler(const std::string& input);
 
     /**
      * @brief Handles Level Input, Parses Strings and checks Valid Levels
      * @param input
      */
-    void levelEditorLevelInput(const std::string &input);
+    void levelEditorLevelInput(const std::string& input);
 
     /**
      * @brief handle each level separate state and what to do next on input.
@@ -324,28 +313,16 @@ public:
     void createNewLevel(int level_code);
 
     /**
-     * @brief Create a new empty Menu
-     * @param option_index
-     */
-    void createNewMenuOption(unsigned int option_index);
-
-    /**
-     * @brief Delete an existing Menu Option
-     * @param option_index
-     */
-    void deleteExistingMenuOption(unsigned int option_index);
-
-    /**
      * @brief On Insertion of Menu Options, reorder all after index
      * @param option_index
      */
-    void reorderMenuIndexesInsertion(unsigned int option_index);
+    void reorderLevelIndexesInsertion(unsigned int option_index);
 
     /**
      * @brief On Deletion of Menu Options, reorder all after index
      * @param option_index
      */
-    void reorderMenuIndexesDeletion(unsigned int option_index);
+    void reorderLevelIndexesDeletion(unsigned int option_index);
 
     /**
      * @brief Delete an existing Level
@@ -357,46 +334,37 @@ public:
      * @brief Create a new empty Menu
      * @param level_code
      */
-    void copyExistingMenu(const std::string &level_code);
-
-    /**
-     * @brief Copy an Existing Menu Option
-     * @param option_index
-     */
-    void copyExistingMenuOption(int option_index);
+    void copyExistingLevel(const std::string& level_code);
 
     /**
      * @brief Save Menu Changes
      * @return
      */
-    void saveMenuChanges();
-
+    void saveLevelChanges();
 
 private:
-
     // Function Input Vector.
-    std::vector<std::function< void()> >                    m_setup_functions;
-    std::vector<std::function< void(const std::string &)> > m_mod_functions;
-    std::vector<std::string>                                m_menu_display_list;    
-    std::vector<access_level_ptr>                           m_loaded_levels;
+    std::vector<std::function<void()>>                   m_setup_functions;
+    std::vector<std::function<void(const std::string&)>> m_mod_functions;
+    std::vector<std::string>                             m_level_display_list;
+    std::vector<access_level_ptr>                        m_loaded_levels;
 
-    SessionIO              m_session_io;
-    std::string            m_filename;
-    text_prompts_dao_ptr   m_text_prompts_dao;
+    SessionIO            m_session_io;
+    std::string          m_filename;
+    text_prompts_dao_ptr m_text_prompts_dao;
 
-    unsigned int           m_mod_setup_index;
-    unsigned int           m_mod_function_index;
-    unsigned int           m_mod_level_state_index;
+    unsigned int         m_mod_setup_index;
+    unsigned int         m_mod_function_index;
+    unsigned int         m_mod_level_state_index;
 
-    bool                   m_is_text_prompt_exist;
-    unsigned int           m_page;
-    unsigned int           m_rows_per_page;
-    int                    m_current_level;
-    unsigned int           m_current_field;
+    bool                 m_is_text_prompt_exist;
+    unsigned int         m_page;
+    unsigned int         m_rows_per_page;
+    int                  m_current_level;
+    unsigned int         m_current_field;
 
-    CommonIO               m_common_io;
-    directory_ptr          m_directory;
-
+    CommonIO             m_common_io;
+    directory_ptr        m_directory;
 };
 
 #endif // MOD_LEVEL_EDITOR_HPP
