@@ -80,9 +80,9 @@ void ModLevelEditor::createTextPrompts()
     value[PROMPT_OPTION_INPUT_TEXT]        = std::make_pair("Level Option Edit Prompt", "|CR|03A|15/dd |03E|15/dit |03D|15/elete |03Q|15/uit : ");
     value[PROMPT_INVALID]                  = std::make_pair("Invalid input", "|CR|04Invalid Input! Try again.|CR");
 
-    value[PROMPT_LEVEL_ADD]                = std::make_pair("Level Name To Add", "|CR|15Enter Level to |11CREATE|15 : ");
-    value[PROMPT_LEVEL_DELETE]             = std::make_pair("Level Name To Delete", "|CR|15Enter Level to |11DELETE|15 : ");
-    value[PROMPT_LEVEL_CHANGE]             = std::make_pair("Level Name To Change", "|CR|15Enter Level to |11EDIT|15 : ");
+    value[PROMPT_LEVEL_ADD]                = std::make_pair("Level Value To Add", "|CR|15Enter Level to |11CREATE|15 : ");
+    value[PROMPT_LEVEL_DELETE]             = std::make_pair("Level Value To Delete", "|CR|15Enter Level to |11DELETE|15 : ");
+    value[PROMPT_LEVEL_CHANGE]             = std::make_pair("Level Value To Change", "|CR|15Enter Level to |11EDIT|15 : ");
     value[PROMPT_INVALID_LEVEL_EXISTS]     = std::make_pair("Invalid Level Exists", "|CR|04Invalid, Level already exist.|CR");
     value[PROMPT_INVALID_LEVEL_NOT_EXISTS] = std::make_pair("Invalid Level Doesn't Exist", "|CR|04Invalid, Level doesn't exist.|CR");
 
@@ -477,6 +477,29 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
 
         baseProcessDeliverNewLine();
 
+        /*
+                , sName("")
+                , sStartMenu("")
+                , iLevel(0)
+                , iFileLevel(0)
+                , iMessageLevel(0)
+                , iPostCallRatio(0)
+                , iFileRatio(0)
+                , iTimeLimit(0)
+                , iCallLimit(0)
+                , iDownloads(0)
+                , iDownloadMB(0)
+                , iARFlags1(0)
+                , iARFlags2(0)
+                // Flags
+                , bPostCallRatio(false)
+                , bFileRatio(false)
+                , bTimeLimit(false)
+                , bCallLimit(false)
+                , bDownloads(false)
+                , bDownloadMB(false)
+        */
+
         switch(toupper(key[0]))
         {
             /*
@@ -585,6 +608,29 @@ void ModLevelEditor::levelEditorLevelFieldHandler(const std::string& input)
     else if(result[0] == '\n')
     {
         baseProcessDeliverNewLine();
+
+        /*
+                , sName("")
+                , sStartMenu("")
+                , iLevel(0)
+                , iFileLevel(0)
+                , iMessageLevel(0)
+                , iPostCallRatio(0)
+                , iFileRatio(0)
+                , iTimeLimit(0)
+                , iCallLimit(0)
+                , iDownloads(0)
+                , iDownloadMB(0)
+                , iARFlags1(0)
+                , iARFlags2(0)
+                // Flags
+                , bPostCallRatio(false)
+                , bFileRatio(false)
+                , bTimeLimit(false)
+                , bCallLimit(false)
+                , bDownloads(false)
+                , bDownloadMB(false)
+                */
 
         // Handle the assigned input received for field
         switch(m_current_field)
@@ -910,127 +956,132 @@ bool ModLevelEditor::checkLevelExistsByLevel(int level_code)
 }
 
 /**
- * @brief Menu Editor, Read and Modify Menus
+ * @brief Level Editor, Read and Modify
  * @return
  */
 std::string ModLevelEditor::displayLevelList()
 {
-    /*
-        directory_ptr directory(new Directory());
-        std::vector<std::string> result_set = directory->getFileListPerDirectory(GLOBAL_LEVEL_PATH, "yaml");
+    access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
 
-        // check result set, if no menu then return gracefully.
-        if(result_set.size() == 0)
+    // Clear All Levels
+    if(m_loaded_levels.size() > 0)
+        std::vector<access_level_ptr>().swap(m_loaded_levels);
+
+    m_loaded_levels = level_dao->getAllRecords();
+
+    // If no records, add message to user.
+    std::vector<std::string> result_set;
+
+    if(m_loaded_levels.size() == 0)
+    {
+        result_set.push_back(baseGetDefaultStatColor() + m_common_io.rightPadding("No Records Found!", 24));
+    }
+
+    // Build a string list of individual menu options, then loop to fit as many per screen!
+    for(unsigned int i = 0; i < m_loaded_levels.size(); i++)
+    {
+        std::string option_string = m_common_io.rightPadding(std::to_string(m_loaded_levels[i]->iLevel), 5);
+        option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(m_loaded_levels[i]->sName, 19));
+        result_set.push_back(option_string);
+    }
+
+    // iterate through and print out
+    int total_rows = result_set.size() / 3;
+    int remainder = result_set.size() % 3;
+
+    // Add for Header and Footer Row!
+    total_rows += 2;
+
+    if(remainder > 0)
+        ++total_rows;
+
+    // Could re-calc this on screen width lateron.
+    int max_cols = 76;
+
+    // Vector or Menus, Loop through
+    std::vector<std::string>::iterator i = result_set.begin();
+    std::string buffer = "";
+
+    for(int rows = 0; rows < total_rows; rows++)
+    {
+        buffer += "  "; // 3 Leading spaces per row.
+
+        for(int cols = 0; cols < max_cols; cols++)
         {
-            std::cout << "\r\n*** No Menus .yaml files found!" << std::endl;
-            return "No Menu Files found!";
-        }
-
-        // Sort Menu's in accending order
-        std::sort(result_set.begin(), result_set.end());
-
-        // iterate through and print out
-        int total_rows = result_set.size() / 8;
-        int remainder = result_set.size() % 8;
-
-        // Add for Header and Footer Row!
-        total_rows += 2;
-        if(remainder > 0)
-            ++total_rows;
-
-        // Could re-calc this on screen width lateron.
-        int max_cols = 73; // out of 80
-
-        // Vector or Menus, Loop through
-        std::vector<std::string>::iterator i = result_set.begin();
-        std::string level_code;
-        std::string buffer = "";
-        for(int rows = 0; rows < total_rows; rows++)
-        {
-            buffer += "   "; // 3 Leading spaces per row.
-            for(int cols = 0; cols < max_cols; cols++)
+            // Top Row
+            if(rows == 0 && cols == 0)
             {
-                // Top Row
-                if(rows == 0 && cols == 0)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_TOP_LEFT;
-                }
-                else if(rows == 0 && cols == max_cols-1)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_TOP_RIGHT;
-                }
-                else if(rows == 0 && cols % 9 == 0)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_MID_TOP;
-                }
-                else if(rows == 0)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_ROW;
-                }
+                buffer += baseGetDefaultBoxColor();
+                buffer += BORDER_TOP_LEFT;
+            }
+            else if(rows == 0 && cols == max_cols-1)
+            {
+                buffer += baseGetDefaultBoxColor();
+                buffer += BORDER_TOP_RIGHT;
+            }
+            else if(rows == 0 && cols % 25 == 0)
+            {
+                buffer += baseGetDefaultBoxColor();
+                buffer += BORDER_MID_TOP;
+            }
+            else if(rows == 0)
+            {
+                buffer += baseGetDefaultBoxColor();
+                buffer += BORDER_ROW;
+            }
 
-                // Bottom Row
-                else if(rows == total_rows-1 && cols == 0)
+            // Bottom Row
+            else if(rows == total_rows-1 && cols == 0)
+            {
+                buffer += baseGetDefaultBoxColor();
+                buffer += BORDER_BOT_LEFT;
+            }
+            else if(rows == total_rows-1 && cols == max_cols-1)
+            {
+                buffer += baseGetDefaultBoxColor();
+                buffer += BORDER_BOT_RIGHT;
+            }
+            else if(rows == total_rows-1 && cols % 25 == 0)
+            {
+                buffer += baseGetDefaultBoxColor();
+                buffer += BORDER_MID_BOT;
+            }
+            else if(rows == total_rows-1)
+            {
+                buffer += baseGetDefaultBoxColor();
+                buffer += BORDER_ROW;
+            }
+            else if(cols % 25 == 0)
+            {
+                buffer += baseGetDefaultBoxColor();
+                buffer += BORDER_MID;
+            }
+            else
+            {
+                // Here we insert the Menu name and pad through to 8 characters.
+                if(cols % 26 == 0 || cols == 1)
                 {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_BOT_LEFT;
-                }
-                else if(rows == total_rows-1 && cols == max_cols-1)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_BOT_RIGHT;
-                }
-                else if(rows == total_rows-1 && cols % 9 == 0)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_MID_BOT;
-                }
-                else if(rows == total_rows-1)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_ROW;
-                }
-                else if(cols % 9 == 0)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_MID;
-                }
-                else
-                {
-                    // Here we insert the Menu name and pad through to 8 characters.
-                    if(cols % 10 == 0 || cols == 1)
+                    if(i != result_set.end())
                     {
-                        if(i != result_set.end())
-                        {
-                            // Strip Extension, then pad 8 characters.
-                            level_code = i->substr(0, i->size()-5);
-                            level_code = m_common_io.rightPadding(level_code, 8);
-
-                            baseTransformToUpper(level_code);
-
-                            buffer += baseGetDefaultInputColor();
-                            buffer += level_code;
-                            ++i;
-                        }
-                        else
-                        {
-                            // Empty, 8 Spaces default menu name size.
-                            buffer += "        ";
-                        }
+                        buffer += baseGetDefaultInputColor();
+                        buffer += *i;
+                        ++i;
+                    }
+                    else
+                    {
+                        // Empty, 24 Spaces default menu name size.
+                        buffer += "                        ";
                     }
                 }
             }
-
-            // Were going to split on \n, which will get replaced lateron
-            // with \r\n for full carriage returns.
-            buffer += "\n";
         }
-        return (buffer);
-    */
-    return "";
+
+        // Were going to split on \n, which will get replaced lateron
+        // with \r\n for full carriage returns.
+        buffer += "\n";
+    }
+
+    return (buffer);
 }
 
 /**
@@ -1223,116 +1274,139 @@ std::string ModLevelEditor::displayLevelEditScreen()
         // Build a string list of individual menu options, then loop to fit as many per screen!
         std::vector<std::string> result_set;
 
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_VERSION_ID) + baseGetDefaultStatColor() +
-       m_common_io.rightPadding(current_menu->file_version, 48)); result_set.push_back(baseGetDefaultPromptColor() + " "
-       + std::string(72, BORDER_ROW) + " "); result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_TITLE) +
-       baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_title, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_PASSWORD) + baseGetDefaultStatColor() +
-       m_common_io.rightPadding(current_menu->menu_password, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_FALLBACK) + baseGetDefaultStatColor() +
-       m_common_io.rightPadding(current_menu->menu_fall_back, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_HELP_ID) + baseGetDefaultStatColor() +
-       m_common_io.rightPadding(current_menu->menu_help_file, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_NAME) + baseGetDefaultStatColor() +
-       m_common_io.rightPadding(current_menu->level_code, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_PULLDOWN_FILE) + baseGetDefaultStatColor() +
-       m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_VIEW_GENERIC) + baseGetDefaultStatColor() +
-       m_common_io.rightPadding("", 48)); result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_EDIT_OPTIONS) +
-       baseGetDefaultStatColor() + m_common_io.rightPadding("", 48)); result_set.push_back(baseGetDefaultPromptColor() +
-       " " + std::string(72, BORDER_ROW) + " ");
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_QUIT_SAVE) + baseGetDefaultStatColor() +
-       m_common_io.rightPadding("", 48)); result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_QUIT_ABORT) +
-       baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
 
-        // Not in use Yet, seems legacy only does ACS in option commands.
-        // option_string.append("Menu ACS           : " + m_common_io.rightPadding(current_menu->menu_acs_string, 35);
-        // option_string.append("Menu FormMenu      : " + m_common_io.rightPadding(current_menu->menu_form_menu, 8);
+                , sName("")
+                , sStartMenu("")
+                , iLevel(0)
+                , iFileLevel(0)
+                , iMessageLevel(0)
+                , iPostCallRatio(0)
+                , iFileRatio(0)
+                , iTimeLimit(0)
+                , iCallLimit(0)
+                , iDownloads(0)
+                , iDownloadMB(0)
+                , iARFlags1(0)
+                , iARFlags2(0)
+                // Flags
+                , bPostCallRatio(false)
+                , bFileRatio(false)
+                , bTimeLimit(false)
+                , bCallLimit(false)
+                , bDownloads(false)
+                , bDownloadMB(false)
 
-        // iterate through and print out
-        int total_rows = result_set.size();
-        total_rows += 2;
 
-        // Could re-calc this on screen width lateron.
-        int max_cols = 76;
+           result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_VERSION_ID) + baseGetDefaultStatColor() +
+          m_common_io.rightPadding(current_menu->file_version, 48)); result_set.push_back(baseGetDefaultPromptColor() + " "
+          + std::string(72, BORDER_ROW) + " "); result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_TITLE) +
+          baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_title, 48));
+           result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_PASSWORD) + baseGetDefaultStatColor() +
+          m_common_io.rightPadding(current_menu->menu_password, 48));
+           result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_FALLBACK) + baseGetDefaultStatColor() +
+          m_common_io.rightPadding(current_menu->menu_fall_back, 48));
+           result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_HELP_ID) + baseGetDefaultStatColor() +
+          m_common_io.rightPadding(current_menu->menu_help_file, 48));
+           result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_NAME) + baseGetDefaultStatColor() +
+          m_common_io.rightPadding(current_menu->level_code, 48));
+           result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_PULLDOWN_FILE) + baseGetDefaultStatColor() +
+          m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
+           result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_VIEW_GENERIC) + baseGetDefaultStatColor() +
+          m_common_io.rightPadding("", 48)); result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_EDIT_OPTIONS) +
+          baseGetDefaultStatColor() + m_common_io.rightPadding("", 48)); result_set.push_back(baseGetDefaultPromptColor() +
+          " " + std::string(72, BORDER_ROW) + " ");
+           result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_QUIT_SAVE) + baseGetDefaultStatColor() +
+          m_common_io.rightPadding("", 48)); result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_QUIT_ABORT) +
+          baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
 
-        // Vector or Menus, Loop through
-        std::vector<std::string>::iterator i = result_set.begin();
-        std::string buffer = "";
+           // Not in use Yet, seems legacy only does ACS in option commands.
+           // option_string.append("Menu ACS           : " + m_common_io.rightPadding(current_menu->menu_acs_string, 35);
+           // option_string.append("Menu FormMenu      : " + m_common_io.rightPadding(current_menu->menu_form_menu, 8);
 
-        for(int rows = 0; rows < total_rows; rows++)
-        {
-            buffer += "  "; // 3 Leading spaces per row.
-            for(int cols = 0; cols < max_cols; cols++)
-            {
-                // Top Row
-                if(rows == 0 && cols == 0)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_TOP_LEFT;
-                }
-                else if(rows == 0 && cols == max_cols-1)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_TOP_RIGHT;
-                }
-                else if(rows == 0 && cols % 75 == 0)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_MID_TOP;
-                }
-                else if(rows == 0)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_ROW;
-                }
+           // iterate through and print out
+           int total_rows = result_set.size();
+           total_rows += 2;
 
-                // Bottom Row
-                else if(rows == total_rows-1 && cols == 0)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_BOT_LEFT;
-                }
-                else if(rows == total_rows-1 && cols == max_cols-1)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_BOT_RIGHT;
-                }
-                else if(rows == total_rows-1 && cols % 75 == 0)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_MID_BOT;
-                }
-                else if(rows == total_rows-1)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_ROW;
-                }
-                else if(cols % 75 == 0)
-                {
-                    buffer += baseGetDefaultBoxColor();
-                    buffer += BORDER_MID;
-                }
-                else
-                {
-                    // Here we insert the Menu name and pad through to 8 characters.
-                    if(cols == 1)
-                    {
-                        if(i != result_set.end())
-                        {
-                            buffer += *i;
-                            ++i;
-                        }
-                    }
-                }
-            }
+           // Could re-calc this on screen width lateron.
+           int max_cols = 76;
 
-            // Were going to split on \n, which will get replaced lateron
-            // with \r\n for full carriage returns.
-            buffer += "\n";
-        }
+           // Vector or Menus, Loop through
+           std::vector<std::string>::iterator i = result_set.begin();
+           std::string buffer = "";
 
-        return (buffer);
-    */
+           for(int rows = 0; rows < total_rows; rows++)
+           {
+               buffer += "  "; // 3 Leading spaces per row.
+               for(int cols = 0; cols < max_cols; cols++)
+               {
+                   // Top Row
+                   if(rows == 0 && cols == 0)
+                   {
+                       buffer += baseGetDefaultBoxColor();
+                       buffer += BORDER_TOP_LEFT;
+                   }
+                   else if(rows == 0 && cols == max_cols-1)
+                   {
+                       buffer += baseGetDefaultBoxColor();
+                       buffer += BORDER_TOP_RIGHT;
+                   }
+                   else if(rows == 0 && cols % 75 == 0)
+                   {
+                       buffer += baseGetDefaultBoxColor();
+                       buffer += BORDER_MID_TOP;
+                   }
+                   else if(rows == 0)
+                   {
+                       buffer += baseGetDefaultBoxColor();
+                       buffer += BORDER_ROW;
+                   }
+
+                   // Bottom Row
+                   else if(rows == total_rows-1 && cols == 0)
+                   {
+                       buffer += baseGetDefaultBoxColor();
+                       buffer += BORDER_BOT_LEFT;
+                   }
+                   else if(rows == total_rows-1 && cols == max_cols-1)
+                   {
+                       buffer += baseGetDefaultBoxColor();
+                       buffer += BORDER_BOT_RIGHT;
+                   }
+                   else if(rows == total_rows-1 && cols % 75 == 0)
+                   {
+                       buffer += baseGetDefaultBoxColor();
+                       buffer += BORDER_MID_BOT;
+                   }
+                   else if(rows == total_rows-1)
+                   {
+                       buffer += baseGetDefaultBoxColor();
+                       buffer += BORDER_ROW;
+                   }
+                   else if(cols % 75 == 0)
+                   {
+                       buffer += baseGetDefaultBoxColor();
+                       buffer += BORDER_MID;
+                   }
+                   else
+                   {
+                       // Here we insert the Menu name and pad through to 8 characters.
+                       if(cols == 1)
+                       {
+                           if(i != result_set.end())
+                           {
+                               buffer += *i;
+                               ++i;
+                           }
+                       }
+                   }
+               }
+
+               // Were going to split on \n, which will get replaced lateron
+               // with \r\n for full carriage returns.
+               buffer += "\n";
+           }
+
+           return (buffer);
+       */
     return "";
 }
