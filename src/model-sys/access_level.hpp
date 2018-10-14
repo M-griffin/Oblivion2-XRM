@@ -17,11 +17,11 @@ class AccessLevel
 {
 public:
 
-    explicit AccessLevel()    
+    explicit AccessLevel()
         : iId(-1)
-        , sName("")
-        , sStartMenu("")
-        , iLevel(0)        
+        , sName("New Access Level")
+        , sStartMenu("top")
+        , iLevel(0)
         , iFileLevel(0)
         , iMessageLevel(0)
         , iPostCallRatio(0)
@@ -32,16 +32,16 @@ public:
         , iDownloadMB(0)
         , iARFlags1(0)
         , iARFlags2(0)
-        // Flags
+          // Flags
         , bPostCallRatio(false)
         , bFileRatio(false)
-        , bTimeLimit(false)    
+        , bTimeLimit(false)
         , bCallLimit(false)
         , bDownloads(false)
         , bDownloadMB(false)
     {
     }
-    
+
     long iId;
     std::string sName;
     std::string sStartMenu;
@@ -50,7 +50,7 @@ public:
     int iMessageLevel;
     int iPostCallRatio;
     int iFileRatio;
-    int iTimeLimit;    
+    int iTimeLimit;
     int iCallLimit;
     int iDownloads;
     long iDownloadMB;
@@ -58,11 +58,11 @@ public:
     uint32_t iARFlags2;
     bool bPostCallRatio;
     bool bFileRatio;
-    bool bTimeLimit;    
+    bool bTimeLimit;
     bool bCallLimit;
     bool bDownloads;
     bool bDownloadMB;
-    
+
 
 };
 

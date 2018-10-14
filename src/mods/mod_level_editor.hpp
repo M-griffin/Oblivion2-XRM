@@ -313,18 +313,6 @@ public:
     void createNewLevel(int level_code);
 
     /**
-     * @brief On Insertion of Menu Options, reorder all after index
-     * @param option_index
-     */
-    void reorderLevelIndexesInsertion(unsigned int option_index);
-
-    /**
-     * @brief On Deletion of Menu Options, reorder all after index
-     * @param option_index
-     */
-    void reorderLevelIndexesDeletion(unsigned int option_index);
-
-    /**
      * @brief Delete an existing Level
      * @param level_code
      */
@@ -334,7 +322,7 @@ public:
      * @brief Create a new empty Menu
      * @param level_code
      */
-    void copyExistingLevel(const std::string& level_code);
+    void copyExistingLevel(int level_code);
 
     /**
      * @brief Save Menu Changes

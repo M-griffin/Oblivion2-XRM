@@ -802,65 +802,27 @@ void ModLevelEditor::handleLevelInputState(bool does_level_exist, int level_code
 }
 
 /**
- * @brief Create a new empty Menu
+ * @brief Create a new empty Level
  * @param level_code
  */
 void ModLevelEditor::createNewLevel(int level_code)
 {
-    /*
-        // Pre-Load Menu, check access, if not valud, then fall back to previous.
-        menu_ptr new_menu(new Menu());
+    access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
+    access_level_ptr new_level(new AccessLevel());
 
-        // Add a default menu option command to the menu
-        std::vector<MenuOption> new_menu_options;
+    // Test Distincation Level
+    access_level_ptr destination_level = level_dao->getAccessLevelByLevel(level_code);
 
-        MenuOption new_option;
-        new_menu_options.push_back(new_option);
-        new_menu->menu_options = new_menu_options;
+    if(checkLevelExistsByLevel(level_code))
+    {
+        std::cout << "Destination level already exists!" << std::endl;
+        return;
+    }
 
-        // Call MenuDao to save .yaml menu file
-        MenuDao mnu(new_menu, level_code, GLOBAL_LEVEL_PATH);
-        if (!mnu.fileExists())
-        {
-            mnu.saveMenu(new_menu);
-        }
-    */
-}
-
-/**
- * @brief On Insertion of Menu Options, reorder all after index
- * @param option_index
- */
-void ModLevelEditor::reorderLevelIndexesInsertion(unsigned int option_index)
-{
-    /*
-        for(unsigned int i = 0; i < m_loaded_level.back()->menu_options.size(); i++)
-        {
-            auto &m = m_loaded_level.back()->menu_options[i];
-            if (m.index >= option_index)
-            {
-                ++m.index;
-            }
-        }
-    */
-}
-
-/**
- * @brief On Deletion of Menu Options, reorder all after index
- * @param option_index
- */
-void ModLevelEditor::reorderLevelIndexesDeletion(unsigned int option_index)
-{
-    /*
-        for(unsigned int i = 0; i < m_loaded_level.back()->menu_options.size(); i++)
-        {
-            auto &m = m_loaded_level.back()->menu_options[i];
-            if (m.index >= option_index)
-            {
-                --m.index;
-            }
-        }
-    */
+    if(level_dao->insertRecord(new_level) < 0)
+    {
+        std::cout << "Error, unable to insert new level: " << level_code << std::endl;
+    }
 }
 
 /**
@@ -869,55 +831,39 @@ void ModLevelEditor::reorderLevelIndexesDeletion(unsigned int option_index)
  */
 void ModLevelEditor::deleteExistingLevel(int level_code)
 {
-    // First grab current level from array list
-    // Then remove it. then remove for array and re-sort.
-    /*
+    access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
+    access_level_ptr existing_level = level_dao->getAccessLevelByLevel(level_code);
 
-    // Pre-Load Menu, check access, if not valud, then fall back to previous.
-    level_access_ptr new_level(new LevelAccess());
-
-    // Call MenuDao to save .yaml menu file
-    LevelAccessDao lvl(new_level, level_code, GLOBAL_LEVEL_PATH);
-    if (lvl.fileExists())
+    if(existing_level->iId == -1 || !level_dao->deleteRecord(existing_level->iId))
     {
-        lvl.deleteLevel();
+        std::cout << "Error, unable to delete existing level: " << level_code << std::endl;
     }
-    */
 }
 
 /**
  * @brief Create a new empty Menu
  * @param level_code
  */
-void ModLevelEditor::copyExistingLevel(const std::string& level_code)
+void ModLevelEditor::copyExistingLevel(int level_code)
 {
-    /*
-        // Pre-Load Menu, check access, if not valud, then fall back to previous.
-        menu_ptr new_menu(new Menu());
+    access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
+    access_level_ptr existing_level = level_dao->getAccessLevelByLevel(m_current_level);
 
-        // First load the Source Menu [m_current_menu] file name
-        MenuDao mnu_source(new_menu, m_current_menu, GLOBAL_LEVEL_PATH);
-        if (mnu_source.fileExists())
-        {
-            mnu_source.loadMenu();
-        }
-        else
-        {
-            std::cout << "Source menu file doesn't exist!" << std::endl;
-            return;
-        }
+    if(checkLevelExistsByLevel(level_code))
+    {
+        std::cout << "Destination level already exists!" << std::endl;
+        return;
+    }
 
-        // Next Save a new Destination Menu [level_code] file name
-        MenuDao mnu_destination(new_menu, level_code, GLOBAL_LEVEL_PATH);
-        if (!mnu_destination.fileExists())
-        {
-            mnu_destination.saveMenu(new_menu);
-        }
-        else
-        {
-            std::cout << "Destination menu file already exists!" << std::endl;
-        }
-    */
+    existing_level->iId = -1;
+    existing_level->iLevel = level_code;
+    existing_level->sName = "Copied Level for " + std::to_string(level_code);
+
+    if(level_dao->insertRecord(existing_level) < 0)
+    {
+        std::cout << "Error, unable to copy existing level: " << m_current_level << " to "
+                  << level_code << std::endl;
+    }
 }
 
 /**
@@ -926,17 +872,21 @@ void ModLevelEditor::copyExistingLevel(const std::string& level_code)
  */
 void ModLevelEditor::saveLevelChanges()
 {
-    /*
-        MenuDao mnu_source(m_loaded_level.back(), m_current_menu, GLOBAL_LEVEL_PATH);
-        if (mnu_source.saveMenu(m_loaded_level.back()))
+    access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
+    access_level_ptr existing_level = nullptr;
+
+    for(unsigned int i = 0; i < m_loaded_levels.size(); i++)
+    {
+        if(m_loaded_levels[i]->iLevel == m_current_level)
         {
-            std::cout << "Menu Saved Successful!" << std::endl;
+            existing_level = m_loaded_levels[i];
         }
-        else
-        {
-            std::cout << "Menu Save Failed!" << std::endl;
-        }
-    */
+    }
+
+    if(existing_level == nullptr || !level_dao->updateRecord(existing_level))
+    {
+        std::cout << "Error, unable to update existing level: " << m_current_level;
+    }
 }
 
 /**

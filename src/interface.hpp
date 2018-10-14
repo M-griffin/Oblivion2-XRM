@@ -62,12 +62,16 @@ public:
         }
 
         std::cout << "Interface Created" << std::endl;
+
+        unsigned int n = std::thread::hardware_concurrency();
+        std::cout << n << " concurrent threads are supported.\n";
+
         // Start up worker thread of ASIO. We want socket communications in a separate thread.
         // We only spawn a single thread for IO_Service on start up
         m_thread = create_thread();
 
         // Setup Telnet Server Connection Listener.
-        if (!m_socket_acceptor->createTelnetAcceptor("127.0.0.1", port))
+        if(!m_socket_acceptor->createTelnetAcceptor("127.0.0.1", port))
         {
             std::cout << "Unable to start Telnet Acceptor" << std::endl;
             TheCommunicator::instance()->shutdown();
