@@ -273,7 +273,7 @@ access_level_ptr AccessLevelDao::getAccessLevelByLevel(long access_level)
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iLevel = %d COLLATE NOCASE;",
+    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iLevel = %d;",
                               m_strTableName.c_str(), access_level);
 
     // create a test3 table

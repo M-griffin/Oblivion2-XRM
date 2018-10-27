@@ -57,7 +57,7 @@ public:
             "iId               INTEGER PRIMARY KEY, "
             "sName             TEXT NOT NULL COLLATE NOCASE, "
             "sStartMenu        TEXT NOT NULL COLLATE NOCASE, "
-            "ilevel            INTEGER NOT NULL, "
+            "iLevel            INTEGER NOT NULL, "
             "iFileLevel        INTEGER NOT NULL, "
             "iMessageLevel     INTEGER NOT NULL, "
             "iPostCallRatio    INTEGER NOT NULL, "

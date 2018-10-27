@@ -810,7 +810,7 @@ void ModLevelEditor::createNewLevel(int level_code)
     access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
     access_level_ptr new_level(new AccessLevel());
 
-    // Test Distincation Level
+    // Check if Level Already Exists.
     access_level_ptr destination_level = level_dao->getAccessLevelByLevel(level_code);
 
     if(checkLevelExistsByLevel(level_code))
@@ -818,6 +818,9 @@ void ModLevelEditor::createNewLevel(int level_code)
         std::cout << "Destination level already exists!" << std::endl;
         return;
     }
+
+    // Set New Level Code assignment and save.
+    new_level->iLevel = level_code;
 
     if(level_dao->insertRecord(new_level) < 0)
     {
@@ -838,6 +841,8 @@ void ModLevelEditor::deleteExistingLevel(int level_code)
     {
         std::cout << "Error, unable to delete existing level: " << level_code << std::endl;
     }
+
+    level_dao->deleteRecord(existing_level->iId);
 }
 
 /**
@@ -918,6 +923,13 @@ std::string ModLevelEditor::displayLevelList()
         std::vector<access_level_ptr>().swap(m_loaded_levels);
 
     m_loaded_levels = level_dao->getAllRecords();
+
+    sort(
+        m_loaded_levels.begin(), m_loaded_levels.end(),
+        [ ](const access_level_ptr& lhs, const access_level_ptr& rhs)
+    {
+        return lhs->iLevel < rhs->iLevel;
+    });
 
     // If no records, add message to user.
     std::vector<std::string> result_set;
