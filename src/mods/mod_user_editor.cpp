@@ -309,7 +309,7 @@ void ModUserEditor::setupUserList()
     // So we know when to pause in large listing, or use pagenation.
     std::string user_display_output = displayUserList();
 
-    if(m_user_display_list.size() == 0)
+    if(m_user_display_list.size() > 0)
     {
         // Clear Out list if anything already exists.
         std::vector<std::string>().swap(m_user_display_list);
@@ -338,7 +338,7 @@ void ModUserEditor::setupUserEditFields()
                               " of " + std::to_string(m_users_listing.size()));
     displayPromptMCI(PROMPT_USER_EDIT_HEADER, user_count_display);
 
-    if(m_user_display_list.size() == 0)
+    if(m_user_display_list.size() > 0)
     {
         // Clear Out list if anything already exists.
         std::vector<std::string>().swap(m_user_display_list);
@@ -367,7 +367,7 @@ void ModUserEditor::setupUserEditExtendedFields()
                               " of " + std::to_string(m_users_listing.size()));
     displayPromptMCI(PROMPT_USER_EDIT_EXTENDED_HEADER, user_count_display);
 
-    if(m_user_display_list.size() == 0)
+    if(m_user_display_list.size() > 0)
     {
         // Clear Out list if anything already exists.
         std::vector<std::string>().swap(m_user_display_list);

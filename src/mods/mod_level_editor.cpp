@@ -214,7 +214,7 @@ void ModLevelEditor::setupLevelEditor()
     // So we know when to pause in large listing, or use pagenation.
     std::string level_display_output = displayLevelList();
 
-    if(m_level_display_list.size() == 0)
+    if(m_level_display_list.size() > 0)
     {
         // Clear Out list if anything already exists.
         std::vector<std::string>().swap(m_level_display_list);
@@ -239,7 +239,7 @@ void ModLevelEditor::setupLevelEditFields()
     // So we know when to pause in large listing, or use pagenation.
     std::string level_display_output = displayLevelEditScreen();
 
-    if(m_level_display_list.size() == 0)
+    if(m_level_display_list.size() > 0)
     {
         // Clear Out list if anything already exists.
         std::vector<std::string>().swap(m_level_display_list);

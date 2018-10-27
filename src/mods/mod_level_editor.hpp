@@ -14,9 +14,6 @@ typedef std::shared_ptr<AccessLevel> access_level_ptr;
 class SessionData;
 typedef std::shared_ptr<SessionData> session_data_ptr;
 
-class Directory;
-typedef std::shared_ptr<Directory> directory_ptr;
-
 /**
  * @class ModLevelEditor
  * @author Michael Griffin
@@ -352,7 +349,6 @@ private:
     unsigned int         m_current_field;
 
     CommonIO             m_common_io;
-    directory_ptr        m_directory;
 };
 
 #endif // MOD_LEVEL_EDITOR_HPP
