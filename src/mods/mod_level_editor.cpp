@@ -92,28 +92,51 @@ void ModLevelEditor::createTextPrompts()
     // Menu Field Edit
     value[PROMPT_LEVEL_FIELD_INPUT_TEXT]   = std::make_pair("Level Field Edit Prompt", "|CR|15Level Editor C|07om|08mand |15: |07");
 
-    // WIP
-
     // NOTE, added |PD will display the prompt description as HELP text to the user
     // Usefull when editing fields - Specific to XRM.
-    value[PROMPT_LEVEL_FIELD_TITLE]      = std::make_pair("Menu Title (Shown in ANSI screens with 'MT' MCI code)", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Menu Title         : ");
-    value[PROMPT_LEVEL_FIELD_PASSWORD]   = std::make_pair("Menu Password (Clear Text right now, will be encrypted lateron)", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15Password           : ");
-    value[PROMPT_LEVEL_FIELD_FALLBACK]   = std::make_pair("Fallback Menu (Example 'MAIN')", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15Fallback Menu      : ");
-    value[PROMPT_LEVEL_FIELD_HELP_ID]    = std::make_pair("ANSI Help File (Example 'MATRIX' Without extension) Overrides Generic Menu", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15Help ID            : ");
-    value[PROMPT_LEVEL_FIELD_NAME]       = std::make_pair("Menu Name Displayed in Prompts", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Name in Prompt     : ");
-    value[PROMPT_LEVEL_FIELD_PULLDOWN]   = std::make_pair("Pulldown ANSI with extension (Example 'MATRIX.ANS')", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15Pulldown File      : ");
+    value[PROMPT_LEVEL_FIELD_NAME]            = std::make_pair("Level Name", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Level Name         : ");
+    value[PROMPT_LEVEL_FIELD_START_MENU]      = std::make_pair("Start Menu", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15Start Menu         : ");
+    value[PROMPT_LEVEL_FIELD_LEVEL]           = std::make_pair("Level", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15Level              : ");
+    value[PROMPT_LEVEL_FIELD_FILE_LEVEL]      = std::make_pair("File Level", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15File Level         : ");
+    value[PROMPT_LEVEL_FIELD_MESG_LEVEL]      = std::make_pair("Message Level", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Message Level      : ");
+    value[PROMPT_LEVEL_FIELD_POST_CALL_RATIO] = std::make_pair("Post/Call Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15Post/Call Ratio    : ");
+    value[PROMPT_LEVEL_FIELD_FILE_RATIO]      = std::make_pair("File Ratio - Uploads to Downloads", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15File Ratio         : ");
+    value[PROMPT_LEVEL_FIELD_TIME_LIMIT]      = std::make_pair("Time Limit Per Day", "|CR|03%   |15|PD|CR|11!   |03(|11H|03) |15Time Limit         : ");
+    value[PROMPT_LEVEL_FIELD_CALL_LIMIT]      = std::make_pair("Call Limit Per Day", "|CR|03%   |15|PD|CR|11!   |03(|11I|03) |15Call Limit         : ");
+    value[PROMPT_LEVEL_FIELD_DOWNLOADS]       = std::make_pair("Download Limits By # of Files", "|CR|03%   |15|PD|CR|11!   |03(|11J|03) |15Download Files     : ");
+    value[PROMPT_LEVEL_FIELD_DOWNLOAD_MB]     = std::make_pair("Download Limit in MBs", "|CR|03%   |15|PD|CR|11!   |03(|11K|03) |15Download MBs       : ");
+    value[PROMPT_LEVEL_FIELD_ARFLAGS1]        = std::make_pair("Access Control Flags 1", "|CR|03%   |15|PD|CR|11!   |03(|11L|03) |15AR Flags 1         : ");
+    value[PROMPT_LEVEL_FIELD_ARFLAGS2]        = std::make_pair("Access Control Flags 2", "|CR|03%   |15|PD|CR|11!   |03(|11M|03) |15AR Flags 2         : ");
+    value[PROMPT_LEVEL_BOOL_POST_CALL_RATIO]  = std::make_pair("Enable Post/Call Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11N|03) |15Use Post/Call Ratio: ");
+    value[PROMPT_LEVEL_BOOL_FILE_RATIO]       = std::make_pair("Enable File Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11O|03) |15Use File Ratio     : ");
+    value[PROMPT_LEVEL_BOOL_TIME_LIMIT]       = std::make_pair("Enable Time Limit", "|CR|03%   |15|PD|CR|11!   |03(|11P|03) |15Use Time Limit     : ");
+    value[PROMPT_LEVEL_BOOL_CALL_LIMIT]       = std::make_pair("Enable Call Limit", "|CR|03%   |15|PD|CR|11!   |03(|11R|03) |15Use Call Limit     : ");
+    value[PROMPT_LEVEL_BOOL_DOWNLOADS]        = std::make_pair("Enable Download Limits by Files", "|CR|03%   |15|PD|CR|11!   |03(|11S|03) |15Use Download Files : ");
+    value[PROMPT_LEVEL_BOOL_DOWNLOAD_MB]      = std::make_pair("Enable Download Limit in MBs", "|CR|03%   |15|PD|CR|11!   |03(|11T|03) |15Use Download MBs   : ");
 
     // Display Page for Menu Fields
-    value[DISPLAY_LEVEL_FIELDS_VERSION_ID]       = std::make_pair("File Version ID", "     |15File Version       : ");
     value[DISPLAY_LEVEL_FIELDS_BORDER_ROW_COLOR] = std::make_pair("Border Row Color", " |07");
-    value[DISPLAY_LEVEL_FIELDS_TITLE]            = std::make_pair("Menu Title", " |03(|11A|03) |15Menu Title         : ");
-    value[DISPLAY_LEVEL_FIELDS_PASSWORD]         = std::make_pair("Menu Password", " |03(|11B|03) |15Password           : ");
-    value[DISPLAY_LEVEL_FIELDS_FALLBACK]         = std::make_pair("Menu Fallback", " |03(|11C|03) |15Fallback Menu      : ");
-    value[DISPLAY_LEVEL_FIELDS_HELP_ID]          = std::make_pair("Menu Help ID ANSI", " |03(|11D|03) |15Help ID            : ");
-    value[DISPLAY_LEVEL_FIELDS_NAME]             = std::make_pair("Menu Name in Prompt", " |03(|11E|03) |15Name in Prompt     : ");
-    value[DISPLAY_LEVEL_FIELDS_PULLDOWN_FILE]    = std::make_pair("Pulldown File", " |03(|11F|03) |15Pulldown File      : ");
-    value[DISPLAY_LEVEL_FIELDS_VIEW_GENERIC]     = std::make_pair("View Generic Menu", " |03(|11G|03) |15View Generic Menu    ");
-    value[DISPLAY_LEVEL_FIELDS_EDIT_OPTIONS]     = std::make_pair("Edit Options", " |03(|11H|03) |15Edit Options         ");
+
+    value[DISPLAY_LEVEL_FIELD_NAME]            = std::make_pair("Level Name", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Level Name         : ");
+    value[DISPLAY_LEVEL_FIELD_START_MENU]      = std::make_pair("Start Menu", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15Start Menu         : ");
+    value[DISPLAY_LEVEL_FIELD_LEVEL]           = std::make_pair("Level", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15Level              : ");
+    value[DISPLAY_LEVEL_FIELD_FILE_LEVEL]      = std::make_pair("File Level", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15File Level         : ");
+    value[DISPLAY_LEVEL_FIELD_MESG_LEVEL]      = std::make_pair("Message Level", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Message Level      : ");
+    value[DISPLAY_LEVEL_FIELD_POST_CALL_RATIO] = std::make_pair("Post/Call Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15Post/Call Ratio    : ");
+    value[DISPLAY_LEVEL_FIELD_FILE_RATIO]      = std::make_pair("File Ratio - Uploads to Downloads", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15File Ratio         : ");
+    value[DISPLAY_LEVEL_FIELD_TIME_LIMIT]      = std::make_pair("Time Limit Per Day", "|CR|03%   |15|PD|CR|11!   |03(|11H|03) |15Time Limit         : ");
+    value[DISPLAY_LEVEL_FIELD_CALL_LIMIT]      = std::make_pair("Call Limit Per Day", "|CR|03%   |15|PD|CR|11!   |03(|11I|03) |15Call Limit         : ");
+    value[DISPLAY_LEVEL_FIELD_DOWNLOADS]       = std::make_pair("Download Limits By # of Files", "|CR|03%   |15|PD|CR|11!   |03(|11J|03) |15Download Files     : ");
+    value[DISPLAY_LEVEL_FIELD_DOWNLOAD_MB]     = std::make_pair("Download Limit in MBs", "|CR|03%   |15|PD|CR|11!   |03(|11K|03) |15Download MBs       : ");
+    value[DISPLAY_LEVEL_FIELD_ARFLAGS1]        = std::make_pair("Access Control Flags 1", "|CR|03%   |15|PD|CR|11!   |03(|11L|03) |15AR Flags 1         : ");
+    value[DISPLAY_LEVEL_FIELD_ARFLAGS2]        = std::make_pair("Access Control Flags 2", "|CR|03%   |15|PD|CR|11!   |03(|11M|03) |15AR Flags 2         : ");
+    value[DISPLAY_LEVEL_BOOL_POST_CALL_RATIO]  = std::make_pair("Enable Post/Call Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11N|03) |15Use Post/Call Ratio: ");
+    value[DISPLAY_LEVEL_BOOL_FILE_RATIO]       = std::make_pair("Enable File Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11O|03) |15Use File Ratio     : ");
+    value[DISPLAY_LEVEL_BOOL_TIME_LIMIT]       = std::make_pair("Enable Time Limit", "|CR|03%   |15|PD|CR|11!   |03(|11P|03) |15Use Time Limit     : ");
+    value[DISPLAY_LEVEL_BOOL_CALL_LIMIT]       = std::make_pair("Enable Call Limit", "|CR|03%   |15|PD|CR|11!   |03(|11R|03) |15Use Call Limit     : ");
+    value[DISPLAY_LEVEL_BOOL_DOWNLOADS]        = std::make_pair("Enable Download Limits by Files", "|CR|03%   |15|PD|CR|11!   |03(|11S|03) |15Use Download Files : ");
+    value[DISPLAY_LEVEL_BOOL_DOWNLOAD_MB]      = std::make_pair("Enable Download Limit in MBs", "|CR|03%   |15|PD|CR|11!   |03(|11T|03) |15Use Download MBs   : ");
+
     value[DISPLAY_LEVEL_FIELDS_QUIT_SAVE]        = std::make_pair("Quit and Save", " |03(|11Q|03) |15Quit & Save          ");
     value[DISPLAY_LEVEL_FIELDS_QUIT_ABORT]       = std::make_pair("Quit without Save", " |03(|11X|03) |15Exit without Saving  ");
 

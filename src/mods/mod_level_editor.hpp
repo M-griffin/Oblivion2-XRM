@@ -132,27 +132,52 @@ public:
     const std::string PROMPT_LEVEL_COPY_TO = "level_copy_to";
     const std::string PROMPT_INVALID_LEVEL_EXISTS = "invalid_level_exists";
     const std::string PROMPT_INVALID_LEVEL_NOT_EXISTS = "invalid_level_doesnt_exist";
+    const std::string PROMPT_LEVEL_FIELD_INPUT_TEXT = "level_field_input_text";
 
     // Level Field Edit Prompts
-    const std::string PROMPT_LEVEL_FIELD_INPUT_TEXT = "level_field_input_text";
-    const std::string PROMPT_LEVEL_FIELD_TITLE = "level_field_title";
-    const std::string PROMPT_LEVEL_FIELD_PASSWORD = "level_field_password";
-    const std::string PROMPT_LEVEL_FIELD_FALLBACK = "level_field_fallback";
-    const std::string PROMPT_LEVEL_FIELD_HELP_ID = "level_field_help_id";
-    const std::string PROMPT_LEVEL_FIELD_NAME = "level_field_name";
-    const std::string PROMPT_LEVEL_FIELD_PULLDOWN = "level_field_pulldown";
+    const std::string PROMPT_LEVEL_FIELD_NAME = "prompt_level_field_name";
+    const std::string PROMPT_LEVEL_FIELD_START_MENU = "prompt_level_field_start_menu";
+    const std::string PROMPT_LEVEL_FIELD_LEVEL = "prompt_level_field_level";
+    const std::string PROMPT_LEVEL_FIELD_FILE_LEVEL = "prompt_level_field_file_level";
+    const std::string PROMPT_LEVEL_FIELD_MESG_LEVEL = "prompt_level_field_mesg_level";
+    const std::string PROMPT_LEVEL_FIELD_POST_CALL_RATIO = "prompt_level_field_pc_ratio";
+    const std::string PROMPT_LEVEL_FIELD_FILE_RATIO = "prompt_level_file_ratio";
+    const std::string PROMPT_LEVEL_FIELD_TIME_LIMIT = "prompt_level_field_time_limit";
+    const std::string PROMPT_LEVEL_FIELD_CALL_LIMIT = "prompt_level_field_call_limit";
+    const std::string PROMPT_LEVEL_FIELD_DOWNLOADS = "prompt_level_field_downloads";
+    const std::string PROMPT_LEVEL_FIELD_DOWNLOAD_MB = "prompt_level_field_downloads_mb";
+    const std::string PROMPT_LEVEL_FIELD_ARFLAGS1 = "prompt_level_fields_arflags1";
+    const std::string PROMPT_LEVEL_FIELD_ARFLAGS2 = "prompt_level_fields_arflags2";
+    const std::string PROMPT_LEVEL_BOOL_POST_CALL_RATIO = "prompt_level_bool_pc_ratio";
+    const std::string PROMPT_LEVEL_BOOL_FILE_RATIO = "prompt_level_bool_file_ratio";
+    const std::string PROMPT_LEVEL_BOOL_TIME_LIMIT = "prompt_level_bool_time_limit";
+    const std::string PROMPT_LEVEL_BOOL_CALL_LIMIT = "prompt_level_bool_call_limit";
+    const std::string PROMPT_LEVEL_BOOL_DOWNLOADS = "prompt_level_bool_downloads";
+    const std::string PROMPT_LEVEL_BOOL_DOWNLOAD_MB = "prompt_level_bool_download_mb";
 
     // Level Field Display for screen
-    const std::string DISPLAY_LEVEL_FIELDS_VERSION_ID = "display_level_field_version_id";
     const std::string DISPLAY_LEVEL_FIELDS_BORDER_ROW_COLOR = "display_level_field_row_color";
-    const std::string DISPLAY_LEVEL_FIELDS_TITLE = "display_level_field_title";
-    const std::string DISPLAY_LEVEL_FIELDS_PASSWORD = "display_level_field_passoword";
-    const std::string DISPLAY_LEVEL_FIELDS_FALLBACK = "display_level_field_fallback";
-    const std::string DISPLAY_LEVEL_FIELDS_HELP_ID = "display_level_field_help_id";
-    const std::string DISPLAY_LEVEL_FIELDS_NAME = "display_level_field_name";
-    const std::string DISPLAY_LEVEL_FIELDS_PULLDOWN_FILE = "display_level_field_pulldown_file";
-    const std::string DISPLAY_LEVEL_FIELDS_VIEW_GENERIC = "display_level_field_view_generic";
-    const std::string DISPLAY_LEVEL_FIELDS_EDIT_OPTIONS = "display_level_field_edit_options";
+
+    const std::string DISPLAY_LEVEL_FIELD_NAME = "display_level_field_name";
+    const std::string DISPLAY_LEVEL_FIELD_START_MENU = "display_level_field_start_menu";
+    const std::string DISPLAY_LEVEL_FIELD_LEVEL = "display_level_field_level";
+    const std::string DISPLAY_LEVEL_FIELD_FILE_LEVEL = "display_level_field_file_level";
+    const std::string DISPLAY_LEVEL_FIELD_MESG_LEVEL = "display_level_field_mesg_level";
+    const std::string DISPLAY_LEVEL_FIELD_POST_CALL_RATIO = "display_level_field_pc_ratio";
+    const std::string DISPLAY_LEVEL_FIELD_FILE_RATIO = "display_level_file_ratio";
+    const std::string DISPLAY_LEVEL_FIELD_TIME_LIMIT = "display_level_field_time_limit";
+    const std::string DISPLAY_LEVEL_FIELD_CALL_LIMIT = "display_level_field_call_limit";
+    const std::string DISPLAY_LEVEL_FIELD_DOWNLOADS = "display_level_field_downloads";
+    const std::string DISPLAY_LEVEL_FIELD_DOWNLOAD_MB = "display_level_field_downloads_mb";
+    const std::string DISPLAY_LEVEL_FIELD_ARFLAGS1 = "display_level_fields_arflags1";
+    const std::string DISPLAY_LEVEL_FIELD_ARFLAGS2 = "display_level_fields_arflags2";
+    const std::string DISPLAY_LEVEL_BOOL_POST_CALL_RATIO = "display_level_bool_pc_ratio";
+    const std::string DISPLAY_LEVEL_BOOL_FILE_RATIO = "display_level_bool_file_ratio";
+    const std::string DISPLAY_LEVEL_BOOL_TIME_LIMIT = "display_level_bool_time_limit";
+    const std::string DISPLAY_LEVEL_BOOL_CALL_LIMIT = "display_level_bool_call_limit";
+    const std::string DISPLAY_LEVEL_BOOL_DOWNLOADS = "display_level_bool_downloads";
+    const std::string DISPLAY_LEVEL_BOOL_DOWNLOAD_MB = "display_level_bool_download_mb";
+
     const std::string DISPLAY_LEVEL_FIELDS_QUIT_SAVE = "display_level_field_save";
     const std::string DISPLAY_LEVEL_FIELDS_QUIT_ABORT = "display_level_field_abort";
 
