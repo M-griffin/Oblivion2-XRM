@@ -97,9 +97,11 @@ public:
     // Input Level State Index
     enum
     {
-        LEVEL_ADD    = 0,
-        LEVEL_CHANGE = 1,
-        LEVEL_DELETE = 2
+        LEVEL_ADD       = 0,
+        LEVEL_CHANGE    = 1,
+        LEVEL_DELETE    = 2,
+        LEVEL_COPY_FROM = 3,
+        LEVEL_COPY_TO   = 4
     };
 
     // Box drawing characters
@@ -126,6 +128,8 @@ public:
     const std::string PROMPT_LEVEL_ADD = "level_add";
     const std::string PROMPT_LEVEL_DELETE = "level_delete";
     const std::string PROMPT_LEVEL_CHANGE = "level_edit";
+    const std::string PROMPT_LEVEL_COPY_FROM = "level_copy_from";
+    const std::string PROMPT_LEVEL_COPY_TO = "level_copy_to";
     const std::string PROMPT_INVALID_LEVEL_EXISTS = "invalid_level_exists";
     const std::string PROMPT_INVALID_LEVEL_NOT_EXISTS = "invalid_level_doesnt_exist";
 

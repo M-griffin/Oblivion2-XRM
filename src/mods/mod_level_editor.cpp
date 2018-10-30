@@ -76,13 +76,16 @@ void ModLevelEditor::createTextPrompts()
     value[PROMPT_HEADER]                   = std::make_pair("Level Editor Header", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Level Editor|15] |03--- |CR");
     value[PROMPT_LEVEL_EDIT_HEADER]        = std::make_pair("Level Fields Editor Header |OT Level ID", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11Level Editor|15] |03--- |11Level ID : |15|OT |CR");
     value[PROMPT_PAUSE]                    = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 |CR");
-    value[PROMPT_INPUT_TEXT]               = std::make_pair("Level Edit Prompt", "|CR|03A|15/dd Level |03E|15/dit Level |03D|15/elete Level |03Q|15/uit : ");
-    value[PROMPT_OPTION_INPUT_TEXT]        = std::make_pair("Level Option Edit Prompt", "|CR|03A|15/dd |03E|15/dit |03D|15/elete |03Q|15/uit : ");
+    value[PROMPT_INPUT_TEXT]               = std::make_pair("Level Edit Prompt", "|CR|03A|15/dd Level |03E|15/dit Level |03C|15/opy Level |03D|15/elete Level |03Q|15/uit : ");
+    value[PROMPT_OPTION_INPUT_TEXT]        = std::make_pair("Level Option Edit Prompt", "|CR|03A|15/dd |03E|15/dit |03C|15/opy |03D|15/elete |03Q|15/uit : ");
     value[PROMPT_INVALID]                  = std::make_pair("Invalid input", "|CR|04Invalid Input! Try again.|CR");
 
     value[PROMPT_LEVEL_ADD]                = std::make_pair("Level Value To Add", "|CR|15Enter Level to |11CREATE|15 : ");
     value[PROMPT_LEVEL_DELETE]             = std::make_pair("Level Value To Delete", "|CR|15Enter Level to |11DELETE|15 : ");
     value[PROMPT_LEVEL_CHANGE]             = std::make_pair("Level Value To Change", "|CR|15Enter Level to |11EDIT|15 : ");
+    value[PROMPT_LEVEL_COPY_FROM]          = std::make_pair("Level Value To Copy From", "|CR|15Enter level to |11COPY|15 : ");
+    value[PROMPT_LEVEL_COPY_TO]            = std::make_pair("Level Value To Copy To", "|15Enter level to |11SAVE|15 as : ");
+
     value[PROMPT_INVALID_LEVEL_EXISTS]     = std::make_pair("Invalid Level Exists", "|CR|04Invalid, Level already exist.|CR");
     value[PROMPT_INVALID_LEVEL_NOT_EXISTS] = std::make_pair("Invalid Level Doesn't Exist", "|CR|04Invalid, Level doesn't exist.|CR");
 
@@ -427,6 +430,12 @@ void ModLevelEditor::levelEditorInput(const std::string& input)
             case 'D': // Delete
                 changeLevelInputState(LEVEL_DELETE);
                 displayPrompt(PROMPT_LEVEL_DELETE);
+                changeInputModule(MOD_LEVEL_NAME);
+                break;
+
+            case 'C': // Copy
+                changeLevelInputState(LEVEL_COPY_FROM);
+                displayPrompt(PROMPT_LEVEL_COPY_FROM);
                 changeInputModule(MOD_LEVEL_NAME);
                 break;
 
@@ -798,6 +807,46 @@ void ModLevelEditor::handleLevelInputState(bool does_level_exist, int level_code
             }
 
             break;
+
+        case LEVEL_COPY_FROM:
+
+            // [Source]
+            // Notes, this will take the source, then move to the
+            // LEVEL_COPY_TO for destination.  Source is saved as m_current Menu
+            if(does_level_exist)
+            {
+                m_current_level = level_code;
+                changeLevelInputState(LEVEL_COPY_TO);
+                displayPrompt(PROMPT_LEVEL_COPY_TO);
+            }
+            else
+            {
+                // Error, can't remove a menu that doesn't exist!
+                displayPrompt(PROMPT_INVALID_LEVEL_NOT_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_LEVEL_INPUT);
+            }
+
+            break;
+
+        case LEVEL_COPY_TO:
+
+            // [Destination]
+            if(does_level_exist)
+            {
+                // Error, can't remove a menu that doesn't exist!
+                displayPrompt(PROMPT_INVALID_LEVEL_NOT_EXISTS);
+                displayPrompt(PROMPT_INPUT_TEXT);
+                changeInputModule(MOD_LEVEL_INPUT);
+            }
+            else
+            {
+                copyExistingLevel(level_code);
+                changeInputModule(MOD_LEVEL_INPUT);
+                redisplayModulePrompt();
+            }
+
+            break;
     }
 }
 
@@ -862,7 +911,7 @@ void ModLevelEditor::copyExistingLevel(int level_code)
 
     existing_level->iId = -1;
     existing_level->iLevel = level_code;
-    existing_level->sName = "Copied Level for " + std::to_string(level_code);
+    existing_level->sName = "Copied From " + std::to_string(m_current_level);
 
     if(level_dao->insertRecord(existing_level) < 0)
     {
