@@ -23,7 +23,7 @@ typedef std::shared_ptr<SQLW::Query> query_ptr;
 template <class T>
 class BaseDao
 {
-    
+
 public:
 
     explicit BaseDao(SQLW::Database &database)
@@ -36,11 +36,11 @@ public:
         , m_cmdDropTable("")
         , m_cmdDropIndex("")
     { }
-        
+
     ~BaseDao()
     { }
 
-    
+
     // Handle to Database
     SQLW::Database &m_database;
 
@@ -52,16 +52,16 @@ public:
     std::string m_cmdCreateIndex;
     std::string m_cmdDropTable;
     std::string m_cmdDropIndex;
-    
+
     // Dynamic Callbacks to Calling Class for Specific Object Mappings
     std::function<void(query_ptr qry, std::shared_ptr<T> obj)>          m_result_callback;
-    std::function<void(query_ptr qry, std::shared_ptr<T> obj, 
-        std::vector< std::pair<std::string, std::string> > &values)>      m_columns_callback;
-        
+    std::function<void(query_ptr qry, std::shared_ptr<T> obj,
+                       std::vector< std::pair<std::string, std::string> > &values)>      m_columns_callback;
+
     std::function<std::string(std::string qry, std::shared_ptr<T> obj)> m_insert_callback;
     std::function<std::string(std::string qry, std::shared_ptr<T> obj)> m_update_callback;
 
-    
+
     /**
      * @brief Check if the Table Exists in Database
      * @return
@@ -71,7 +71,7 @@ public:
         bool result = false;
 
         // Make Sure Database Reference is Connected
-        if (!m_database.isConnected())
+        if(!m_database.isConnected())
         {
             std::cout << "Error, Database is not connected!" << std::endl;
             return result;
@@ -79,30 +79,32 @@ public:
 
         // Create Pointer and Connect Query Object to Database.
         query_ptr qry(new SQLW::Query(m_database));
-        if (!qry || !qry->isConnected())
+
+        if(!qry || !qry->isConnected())
         {
             std::cout << "Error, Query has no connection to the database" << std::endl;
             return result;
         }
 
         // Execute and get result.
-        if (qry->getResult(m_cmdTableExists))
+        if(qry->getResult(m_cmdTableExists))
         {
             long rows = qry->getNumRows();
-            if (rows > 0)
+
+            if(rows > 0)
             {
-                std::cout << "Table Exists!" << std::endl;
+                std::cout << m_strTableName << " Table Exists!" << std::endl;
                 result = true;
             }
             else
             {
                 // No rows means the table doesn't exist!
-                std::cout << "Error, table Exists Returned Rows: " << rows << std::endl;
+                std::cout << "Error, " << m_strTableName << " table Exists Returned Rows: " << rows << std::endl;
             }
         }
         else
         {
-            std::cout << "Error, getResult()" << std::endl;
+            std::cout << "Error, " << m_strTableName << " getResult()" << std::endl;
         }
 
         return result;
@@ -116,7 +118,7 @@ public:
         bool result = false;
 
         // Make Sure Database Reference is Connected
-        if (!m_database.isConnected())
+        if(!m_database.isConnected())
         {
             std::cout << "Error, Database is not connected!" << std::endl;
             return result;
@@ -124,7 +126,8 @@ public:
 
         // Create Pointer and Connect Query Object to Database.
         query_ptr qry(new SQLW::Query(m_database));
-        if (!qry || !qry->isConnected())
+
+        if(!qry || !qry->isConnected())
         {
             std::cout << "Error, Query has no connection to the database" << std::endl;
             return result;
@@ -143,7 +146,7 @@ public:
         bool result = false;
 
         // Make Sure Database Reference is Connected
-        if (!m_database.isConnected())
+        if(!m_database.isConnected())
         {
             std::cout << "Error, Database is not connected!" << std::endl;
             return result;
@@ -151,7 +154,8 @@ public:
 
         // Create Pointer and Connect Query Object to Database.
         query_ptr qry(new SQLW::Query(m_database));
-        if (!qry || !qry->isConnected())
+
+        if(!qry || !qry->isConnected())
         {
             std::cout << "Error, Query has no connection to the database" << std::endl;
             return result;
@@ -160,14 +164,15 @@ public:
         // Create List of statements to execute in a single transaction.
         std::vector<std::string> statements;
         statements.push_back(m_cmdCreateTable);
-        if (m_cmdCreateIndex.size() > 0)
+
+        if(m_cmdCreateIndex.size() > 0)
         {
             statements.push_back(m_cmdCreateIndex);
         }
 
         // Execute Transaction.
         result = qry->executeTransaction(statements);
-        return result;  
+        return result;
     }
 
     /**
@@ -178,7 +183,7 @@ public:
         bool result = false;
 
         // Make Sure Database Reference is Connected
-        if (!m_database.isConnected())
+        if(!m_database.isConnected())
         {
             std::cout << "Error, Database is not connected!" << std::endl;
             return result;
@@ -186,7 +191,8 @@ public:
 
         // Create Pointer and Connect Query Object to Database.
         query_ptr qry(new SQLW::Query(m_database));
-        if (!qry || !qry->isConnected())
+
+        if(!qry || !qry->isConnected())
         {
             std::cout << "Error, Query has no connection to the database" << std::endl;
             return result;
@@ -194,10 +200,12 @@ public:
 
         // Create List of statements to execute in a single transaction.
         std::vector<std::string> statements;
-        if (m_cmdDropIndex.size() > 0)
+
+        if(m_cmdDropIndex.size() > 0)
         {
             statements.push_back(m_cmdDropIndex);
         }
+
         statements.push_back(m_cmdDropTable);
 
         // Execute Transaction.
@@ -206,12 +214,12 @@ public:
     }
 
     /**
-     * @brief Pulls results by FieldNames into their Class Variables. 
+     * @brief Pulls results by FieldNames into their Class Variables.
      * @param qry
      * @param one
      */
     void basePullResult(query_ptr qry, std::shared_ptr<T> obj)
-    {    
+    {
         m_result_callback(qry, obj);
     }
 
@@ -221,10 +229,10 @@ public:
      * @param qry
      * @param one
      * @param values
-     */ 
-    void baseFillColumnValues(query_ptr qry, std::shared_ptr<T> obj, 
-        std::vector< std::pair<std::string, std::string> > &values)
-    {    
+     */
+    void baseFillColumnValues(query_ptr qry, std::shared_ptr<T> obj,
+                              std::vector< std::pair<std::string, std::string> > &values)
+    {
         m_columns_callback(qry, obj, values);
     }
 
@@ -232,7 +240,7 @@ public:
      * @brief Builds Insert Insert Query String from object
      * @param qry
      * @param obj
-     * @return 
+     * @return
      */
     std::string baseInsertQryString(query_ptr qry, std::shared_ptr<T> obj)
     {
@@ -249,14 +257,16 @@ public:
 
         // Build Query (Columns) VALUES (Types) ..  ie %d, %Q into a full string.
         it = values.begin();
-        for (int i = 0; it != values.end(); i++)
+
+        for(int i = 0; it != values.end(); i++)
         {
             // First Build Column Names
             ssColumn << (*it).first;
             ssType << (*it).second;
 
             ++it;
-            if (it != values.end())
+
+            if(it != values.end())
             {
                 ssColumn << ", ";
                 ssType << ", ";
@@ -272,7 +282,7 @@ public:
 
         // Mprint statement to avoid injections.
         std::string result = m_insert_callback(newQueryString, obj);
-        
+
         return result;
     }
 
@@ -280,7 +290,7 @@ public:
      * @brief Builds Query Update String From Object
      * @param qry
      * @param obj
-     * @return 
+     * @return
      */
     std::string baseUpdateQryString(query_ptr qry, std::shared_ptr<T> obj)
     {
@@ -296,11 +306,13 @@ public:
 
         // Build Query (Columns) = (Values) ..  ie %d, %Q into a full string.
         it = values.begin();
-        for (int i = 0; it != values.end(); i++)
+
+        for(int i = 0; it != values.end(); i++)
         {
             ssColumn << (*it).first << "=" << (*it).second;
             ++it;
-            if (it != values.end())
+
+            if(it != values.end())
             {
                 ssColumn << ", ";
             }
@@ -326,7 +338,7 @@ public:
         bool result = false;
 
         // Make Sure Database Reference is Connected
-        if (!m_database.isConnected())
+        if(!m_database.isConnected())
         {
             std::cout << "Error, Database is not connected!" << std::endl;
             return result;
@@ -334,7 +346,8 @@ public:
 
         // Create Pointer and Connect Query Object to Database.
         query_ptr qry(new SQLW::Query(m_database));
-        if (!qry || !qry->isConnected())
+
+        if(!qry || !qry->isConnected())
         {
             std::cout << "Error, Query has no connection to the database" << std::endl;
             return result;
@@ -357,12 +370,12 @@ public:
      * @return
      */
     long baseInsertRecord(std::shared_ptr<T> obj)
-    {    
+    {
         bool result = false;
         long lastInsertId = -1;
 
         // Make Sure Database Reference is Connected
-        if (!m_database.isConnected())
+        if(!m_database.isConnected())
         {
             std::cout << "Error, Database is not connected!" << std::endl;
             return result;
@@ -370,7 +383,8 @@ public:
 
         // Create Pointer and Connect Query Object to Database.
         query_ptr qry(new SQLW::Query(m_database));
-        if (!qry || !qry->isConnected())
+
+        if(!qry || !qry->isConnected())
         {
             std::cout << "Error, Query has no connection to the database" << std::endl;
             return result;
@@ -385,7 +399,7 @@ public:
         result = qry->executeTransaction(statements);
 
         // We need the insert id for table
-        if (result)
+        if(result)
         {
             lastInsertId = qry->getInsertId();
         }
@@ -403,7 +417,7 @@ public:
         bool result = false;
 
         // Make Sure Database Reference is Connected
-        if (!m_database.isConnected())
+        if(!m_database.isConnected())
         {
             std::cout << "Error, Database is not connected!" << std::endl;
             return result;
@@ -411,7 +425,8 @@ public:
 
         // Create Pointer and Connect Query Object to Database.
         query_ptr qry(new SQLW::Query(m_database));
-        if (!qry || !qry->isConnected())
+
+        if(!qry || !qry->isConnected())
         {
             std::cout << "Error, Query has no connection to the database" << std::endl;
             return result;
@@ -431,14 +446,14 @@ public:
     /**
      * @brief Retrieve Record By Id.
      * @param id
-     * @return 
-     */ 
+     * @return
+     */
     std::shared_ptr<T> baseGetRecordById(long id)
     {
         std::shared_ptr<T> obj(new T);
 
         // Make Sure Database Reference is Connected
-        if (!m_database.isConnected())
+        if(!m_database.isConnected())
         {
             std::cout << "Error, Database is not connected!" << std::endl;
             return obj;
@@ -446,7 +461,8 @@ public:
 
         // Create Pointer and Connect Query Object to Database.
         query_ptr qry(new SQLW::Query(m_database));
-        if (!qry->isConnected())
+
+        if(!qry->isConnected())
         {
             std::cout << "Error, Query has no connection to the database" << std::endl;
             return obj;
@@ -456,10 +472,11 @@ public:
         std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iID = %ld;", m_strTableName.c_str(), id);
 
         // Execute Query.
-        if (qry->getResult(queryString))
+        if(qry->getResult(queryString))
         {
             long rows = qry->getNumRows();
-            if (rows > 0)
+
+            if(rows > 0)
             {
                 qry->fetchRow();
                 basePullResult(qry, obj);
@@ -487,7 +504,7 @@ public:
         std::vector<std::shared_ptr<T>> list;
 
         // Make Sure Database Reference is Connected
-        if (!m_database.isConnected())
+        if(!m_database.isConnected())
         {
             std::cout << "Error, Database is not connected!" << std::endl;
             return list;
@@ -495,7 +512,8 @@ public:
 
         // Create Pointer and Connect Query Object to Database.
         query_ptr qry(new SQLW::Query(m_database));
-        if (!qry->isConnected())
+
+        if(!qry->isConnected())
         {
             std::cout << "Error, Query has no connection to the database" << std::endl;
             return list;
@@ -505,10 +523,11 @@ public:
         std::string queryString = sqlite3_mprintf("SELECT * FROM %Q;", m_strTableName.c_str());
 
         // Execute Query.
-        if (qry->getResult(queryString))
+        if(qry->getResult(queryString))
         {
             long rows = qry->getNumRows();
-            if (rows > 0)
+
+            if(rows > 0)
             {
                 while(qry->fetchRow())
                 {
@@ -529,7 +548,7 @@ public:
 
         return list;
     }
-    
+
     /**
      * @brief Retrieve Count of All Records in a Table
      * @return
@@ -540,7 +559,7 @@ public:
         std::vector<std::shared_ptr<T>> list;
 
         // Make Sure Database Reference is Connected
-        if (!m_database.isConnected())
+        if(!m_database.isConnected())
         {
             std::cout << "Error, Database is not connected!" << std::endl;
             return list.size();
@@ -548,7 +567,8 @@ public:
 
         // Create Pointer and Connect Query Object to Database.
         query_ptr qry(new SQLW::Query(m_database));
-        if (!qry->isConnected())
+
+        if(!qry->isConnected())
         {
             std::cout << "Error, Query has no connection to the database" << std::endl;
             return list.size();
@@ -558,10 +578,11 @@ public:
         std::string queryString = sqlite3_mprintf("SELECT * FROM %Q;", m_strTableName.c_str());
 
         // Execute Query.
-        if (qry->getResult(queryString))
+        if(qry->getResult(queryString))
         {
             long rows = qry->getNumRows();
-            if (rows > 0)
+
+            if(rows > 0)
             {
                 while(qry->fetchRow())
                 {

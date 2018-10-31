@@ -246,6 +246,11 @@ public:
     void startupModuleUserEditor();
 
     /**
+     * @brief Startup the Level Editor Module
+     */
+    void startupModuleLevelEditor();
+
+    /**
      * @brief Handles Input for Login and PreLogin Sequences.
      * @param character_buffer
      * @param is_utf8

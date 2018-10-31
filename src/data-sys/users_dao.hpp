@@ -33,7 +33,7 @@ class UsersDao
     : public baseUsersClass
 {
 public:
-    
+
     explicit UsersDao(SQLW::Database &database)
         : baseUsersClass(database)
     {
@@ -49,7 +49,7 @@ public:
             "PRAGMA foreign_keys=ON; "
             "PRAGMA default_cache_size=10000; "
             "PRAGMA cache_size=10000; ";
-        
+
         // Check if Database Exists.
         m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
 
@@ -107,32 +107,32 @@ public:
             "bIgnoreTimeLimit  BOOLEAN NOT NULL, "
             "bAllowPurge       BOOLEAN NOT NULL, "
             "iSecurityIndex    INT NOT NULL, "
-            "FOREIGN KEY(iSecurityIndex) REFERENCES Secutiry(iId) ON DELETE CASCADE "
+            "FOREIGN KEY(iSecurityIndex) REFERENCES Security(iId) ON DELETE CASCADE "
             "); ";
 
         m_cmdCreateIndex = "";
-            "CREATE INDEX IF NOT EXISTS users_idx "
-            "ON " + m_strTableName + " (sHandle COLLATE NOCASE, sRealName COLLATE NOCASE, sEmail COLLATE NOCASE); ";
+        "CREATE INDEX IF NOT EXISTS users_idx "
+        "ON " + m_strTableName + " (sHandle COLLATE NOCASE, sRealName COLLATE NOCASE, sEmail COLLATE NOCASE); ";
 
         // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
         m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
         m_cmdDropIndex = "DROP INDEX IF EXISTS users_idx; ";
-        
+
         // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
         m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
-        
+
         // Setup the CallBack for Result Field Mapping
-        m_result_callback = std::bind(&UsersDao::pullUsersResult, this, 
-            std::placeholders::_1, std::placeholders::_2);
-            
-        m_columns_callback = std::bind(&UsersDao::fillUsersColumnValues, this, 
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-            
-        m_insert_callback = std::bind(&UsersDao::insertUsersQryString, this, 
-            std::placeholders::_1, std::placeholders::_2);
-        
-        m_update_callback = std::bind(&UsersDao::updateUsersQryString, this, 
-            std::placeholders::_1, std::placeholders::_2);
+        m_result_callback = std::bind(&UsersDao::pullUsersResult, this,
+                                      std::placeholders::_1, std::placeholders::_2);
+
+        m_columns_callback = std::bind(&UsersDao::fillUsersColumnValues, this,
+                                       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+
+        m_insert_callback = std::bind(&UsersDao::insertUsersQryString, this,
+                                      std::placeholders::_1, std::placeholders::_2);
+
+        m_update_callback = std::bind(&UsersDao::updateUsersQryString, this,
+                                      std::placeholders::_1, std::placeholders::_2);
     }
 
     ~UsersDao()
@@ -140,19 +140,19 @@ public:
         std::cout << "~UsersDao" << std::endl;
     }
 
-    
+
     /**
      * Base Dao Calls for generic Object Data Calls
      * (Below This Point)
      */
- 
- 
+
+
     /**
      * @brief Check If Database Table Exists.
      * @return
      */
     bool doesTableExist();
-    
+
     /**
      * @brief Run Setup Params for SQL Database Table.
      */
@@ -169,7 +169,7 @@ public:
      * @return
      */
     bool dropTable();
-    
+
     /**
      * @brief Updates a Record in the database!
      * @param obj
@@ -183,58 +183,58 @@ public:
      * @return
      */
     long insertRecord(user_ptr obj);
-        
+
     /**
      * @brief Deletes a MessageArea Record
      * @param areaId
      * @return
      */
     bool deleteRecord(long id);
-    
+
     /**
      * @brief Retrieve Record By Id.
      * @param id
-     * @return 
-     */ 
+     * @return
+     */
     user_ptr getRecordById(long id);
-    
+
     /**
      * @brief Retrieve All Records in a Table
      * @return
      */
     std::vector<user_ptr> getAllRecords();
-    
+
     /**
      * @brief Retrieve Count of All Records in a Table
      * @return
      */
     long getRecordsCount();
 
-    
+
     /**
      * Base Dao Call Back for Object Specific Data Mappings
      * (Below This Point)
      */
-     
-     
+
+
     /**
-     * @brief (Callback) Create Record Insert Statement, returns query string 
+     * @brief (Callback) Create Record Insert Statement, returns query string
      * @param qry
      * @param obj
-     * @return 
+     * @return
      */
     std::string insertUsersQryString(std::string qry, user_ptr obj);
 
     /**
-     * @brief (CallBack) Update Existing Record. 
+     * @brief (CallBack) Update Existing Record.
      * @param qry
      * @param obj
-     * @return 
+     * @return
      */
     std::string updateUsersQryString(std::string qry, user_ptr obj);
-    
+
     /**
-     * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+     * @brief (CallBack) Pulls results by FieldNames into their Class Variables.
      * @param qry
      * @param obj
      */
@@ -245,7 +245,7 @@ public:
      * @param qry
      * @param obj
      * @param values
-     */ 
+     */
     void fillUsersColumnValues(query_ptr qry, user_ptr obj, std::vector< std::pair<std::string, std::string> > &values);
 
 
@@ -253,8 +253,8 @@ public:
      * One Off Methods SQL Queries not included in the BaseDao
      * (Below This Point)
      */
-     
-     
+
+
     /**
      * @brief Return User Record By Handle.
      * @return

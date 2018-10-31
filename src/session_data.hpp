@@ -76,10 +76,12 @@ public:
     ~SessionData()
     {
         std::cout << "~SessionData" << std::endl;
-        for (unsigned int i = 0; i < m_processes.size(); i++)
+
+        for(unsigned int i = 0; i < m_processes.size(); i++)
         {
             m_processes[i]->terminate();
         }
+
         std::vector<process_ptr>().swap(m_processes);
     }
 
@@ -91,14 +93,15 @@ public:
         // Important, clear out buffer before each read.
         //memset(&m_raw_data, 0, max_length);
         std::vector<unsigned char>().swap(m_in_data_vector);
+
         if(m_connection->isActive() && TheCommunicator::instance()->isActive())
         {
             m_connection->asyncRead(m_in_data_vector,
-                                     std::bind(
-                                         &SessionData::handleRead,
-                                         shared_from_this(),
-                                         std::placeholders::_1,
-                                         std::placeholders::_2));
+                                    std::bind(
+                                        &SessionData::handleRead,
+                                        shared_from_this(),
+                                        std::placeholders::_1,
+                                        std::placeholders::_2));
         }
     }
 
@@ -110,6 +113,7 @@ public:
     void handleTeloptCodes()
     {
         unsigned char ch = 0;
+
         for(auto c : m_in_data_vector)
         {
             try
@@ -163,7 +167,8 @@ public:
 
         // handle output encoding, if utf-8 translate data accordingly.
         std::string outputBuffer = "";
-        if (m_output_encoding != "cp437")
+
+        if(m_output_encoding != "cp437")
         {
             outputBuffer = m_common_io.translateUnicode(msg);
         }
@@ -175,11 +180,11 @@ public:
         if(m_connection->isActive() && TheCommunicator::instance()->isActive())
         {
             m_connection->asyncWrite(outputBuffer,
-                                      std::bind(
-                                          &SessionData::handleWrite,
-                                          shared_from_this(),
-                                          std::placeholders::_1,
-                                          std::placeholders::_2));
+                                     std::bind(
+                                         &SessionData::handleWrite,
+                                         shared_from_this(),
+                                         std::placeholders::_1,
+                                         std::placeholders::_2));
         }
     }
 
@@ -197,6 +202,7 @@ public:
         }
 
         session_manager_ptr session_manager = m_session_manager.lock();
+
         if(session_manager && error && (!m_is_leaving))
         {
             m_is_leaving = true;
@@ -239,7 +245,7 @@ public:
         m_esc_input_timer->setWaitInMilliseconds(400);
         m_esc_input_timer->asyncWait(
             std::bind(&SessionData::handleEscTimer, shared_from_this())
-        );                    
+        );
     }
 
     /**
@@ -248,6 +254,7 @@ public:
     void logoff()
     {
         session_manager_ptr session_manager = m_session_manager.lock();
+
         if(session_manager)
         {
             // Room is the session.
@@ -288,7 +295,8 @@ public:
         // Only (1) Process will run at a time per session.
 #ifdef _WIN32
         process_ptr proc(new ProcessWin(shared_from_this(), path));
-        if (proc)
+
+        if(proc)
         {
             std::cout << "SessionData Starting Process SUCCESS!" << std::endl;
             m_is_process_running = true;
@@ -299,9 +307,11 @@ public:
             std::cout << "SessionData Starting Process FAILED!" << std::endl;
             m_is_process_running = false;
         }
+
 #else
         process_ptr proc(new ProcessPosix(shared_from_this(), path));
-        if (proc)
+
+        if(proc)
         {
             std::cout << "SessionData Starting Process SUCCESS!" << std::endl;
             m_is_process_running = true;
@@ -312,6 +322,7 @@ public:
             std::cout << "SessionData Starting Process FAILED!" << std::endl;
             m_is_process_running = false;
         }
+
 #endif
         std::cout << "SessionData Starting Done" << std::endl;
     }
@@ -321,7 +332,7 @@ public:
      */
     void clearProcess()
     {
-        for (unsigned int i = 0; i < m_processes.size(); i++)
+        for(unsigned int i = 0; i < m_processes.size(); i++)
         {
             m_processes[i]->terminate();
         }

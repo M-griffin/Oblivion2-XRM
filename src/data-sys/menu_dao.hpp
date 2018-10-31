@@ -15,7 +15,7 @@ typedef std::shared_ptr<Menu> menu_ptr;
   * @author Michael Griffin
   * @date 15/11/2016
   * @file menu_dao.hpp
-  * @brief Handles Reading and Writting a Menu from YAML Files
+  * @brief Handles Reading and Writing a Menu from YAML Files
   */
 class MenuDao
 {

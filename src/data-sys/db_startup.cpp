@@ -2,10 +2,12 @@
 
 #include "../model-sys/structures.hpp"
 #include "../model-sys/protocol.hpp"
+#include "../model-sys/access_level.hpp"
 #include "../model-app/oneliners.hpp"
 
 #include "base_dao.hpp"
 #include "protocol_dao.hpp"
+#include "access_level_dao.hpp"
 #include "../data-app/oneliners_dao.hpp"
 
 // Needed for Initializing and checking users data is setup
@@ -56,19 +58,19 @@ void DbStartup::initDatabaseTables()
 
         // Verify if the security table exists.
         // Security must be present before user becasue of foreign key.
-        if (!security_dao.doesTableExist())
+        if(!security_dao.doesTableExist())
         {
             std::cout << "doesn't exist (security table)." << std::endl;
 
             // Setup database Param, cache sies etc..
-            if (!security_dao.firstTimeSetupParams())
+            if(!security_dao.firstTimeSetupParams())
             {
                 std::cout << "unable to execute firstTimeSetupParams (security table)." << std::endl;
                 assert(false);
             }
 
             // Setup create users table and indexes.
-            if (!security_dao.createTable())
+            if(!security_dao.createTable())
             {
                 std::cout << "unable to create (security table)." << std::endl;
                 assert(false);
@@ -78,19 +80,19 @@ void DbStartup::initDatabaseTables()
         }
 
         // Verify if the user table exists.
-        if (!user_dao.doesTableExist())
+        if(!user_dao.doesTableExist())
         {
             std::cout << "doesn't exist (user table)." << std::endl;
 
             // Setup database Param, cache sies etc..
-            if (!user_dao.firstTimeSetupParams())
+            if(!user_dao.firstTimeSetupParams())
             {
                 std::cout << "unable to execute firstTimeSetupParams (user table)." << std::endl;
                 assert(false);
             }
 
             // Setup create users table and indexes.
-            if (!user_dao.createTable())
+            if(!user_dao.createTable())
             {
                 std::cout << "unable to create (user table)." << std::endl;
                 assert(false);
@@ -101,20 +103,21 @@ void DbStartup::initDatabaseTables()
 
         // Check Table setup for Session Stats
         SessionStatsDao session_stat_dao(user_database);
+
         // Verify if the user table exists.
-        if (!session_stat_dao.doesTableExist())
+        if(!session_stat_dao.doesTableExist())
         {
             std::cout << "doesn't exist (sessionstats table)." << std::endl;
 
             // Setup database Param, cache sies etc..
-            if (!session_stat_dao.firstTimeSetupParams())
+            if(!session_stat_dao.firstTimeSetupParams())
             {
                 std::cout << "unable to execute firstTimeSetupParams (sessionstats table)." << std::endl;
                 assert(false);
             }
 
             // Setup create users table and indexes.
-            if (!session_stat_dao.createTable())
+            if(!session_stat_dao.createTable())
             {
                 std::cout << "unable to create (sessionstats table)." << std::endl;
                 assert(false);
@@ -123,12 +126,68 @@ void DbStartup::initDatabaseTables()
             std::cout << "sessionstats table created successfully." << std::endl;
         }
 
-        
+        // Link to Access Level dao for data access object
+        AccessLevelDao access_dao(user_database);
+
+        // Verify if the access_level table exists.
+        if(!access_dao.doesTableExist())
+        {
+            std::cout << "doesn't exist (access_level table)." << std::endl;
+
+            // Setup database Param, cache sies etc..
+            if(!access_dao.firstTimeSetupParams())
+            {
+                std::cout << "unable to execute firstTimeSetupParams (access_level table)." << std::endl;
+                assert(false);
+            }
+
+            // Setup create users table and indexes.
+            if(!access_dao.createTable())
+            {
+                std::cout << "unable to create (access_level table)." << std::endl;
+                assert(false);
+            }
+
+            std::cout << "access_level table created successfully." << std::endl;
+
+            // Check and Setup default Access Levels.
+            access_level_ptr level(new AccessLevel());
+
+            // Set Initial Defaults for Not Validated Level
+            // the reest are populated on Class Defaults.
+            level->sName = "Not Validated";
+            level->sStartMenu ="top";
+            level->iLevel = 10;
+            level->iTimeLimit = 120;
+            level->bTimeLimit = true;
+
+            access_dao.insertRecord(level);
+
+            // Validated User
+            level.reset(new AccessLevel());
+            level->sName = "Validated User";
+            level->sStartMenu ="top";
+            level->iLevel = 20;
+            level->iTimeLimit = 1440;
+            level->bTimeLimit = true;
+
+            access_dao.insertRecord(level);
+
+            // Admininstrator (time Limit false by default)
+            level.reset(new AccessLevel());
+            level->sName = "Sysop";
+            level->sStartMenu ="top";
+            level->iLevel = 255;
+            level->iTimeLimit = 1440;
+
+            access_dao.insertRecord(level);
+        }
+
 
         protocols_ptr prots(new Protocols());
         ProtocolDao protdb(prots, GLOBAL_DATA_PATH);
 
-        if (!protdb.fileExists())
+        if(!protdb.fileExists())
         {
             // Create Genric Protocol Entry to Test File Creation
             Protocol p1("Sexyz", "D", "Z", "C:\\TESTPATH\\", "--Test", false, false);
@@ -136,61 +195,42 @@ void DbStartup::initDatabaseTables()
             prots->protocols.push_back(p1);
             protdb.saveConfig(prots);
         }
-        
-        
-        OnelinerDao onedb(user_database);
-        
-        if (!onedb.doesTableExist())
+
+
+        OnelinerDao oneLineDao(user_database);
+
+        if(!oneLineDao.doesTableExist())
         {
             std::cout << "doesn't exist (oneliner table)." << std::endl;
 
             // Setup database Param, cache sies etc..
-            if (!onedb.firstTimeSetupParams())
+            if(!oneLineDao.firstTimeSetupParams())
             {
                 std::cout << "unable to execute firstTimeSetupParams (oneliner table)." << std::endl;
                 assert(false);
             }
 
             // Setup create users table and indexes.
-            if (!onedb.createTable())
+            if(!oneLineDao.createTable())
             {
                 std::cout << "unable to create (oneliner table)." << std::endl;
                 assert(false);
             }
 
             std::cout << "oneliner table created successfully." << std::endl;
+
+            // Insert a default record the first time the table
+            // is created only.
+            oneliner_ptr one(new Oneliners());
+            one->iUserId = 1;
+            one->sText = "Welcome to a new system running Oblivion/2 XRM";
+            one->sUserInitials = "MF";
+            one->sUserName = "Mercyful Fate";
+            //one->dtDatePosted
+
+            oneLineDao.insertRecord(one);
+
         }
-
-        oneliner_ptr one(new Oneliners());
-        one->iUserId = 1;
-        one->sText = "Testing";
-        one->sUserInitials = "MF";
-        one->sUserName = "Mercyful Fate";
-        //one->dtDatePosted
-        onedb.insertRecord(one);
-        
-        
-        /*
-        // Check and Setup default Access Levels.
-        access_level_ptr levels(new AccessLevels());
-        AccessLevelDao acl(levels, GLOBAL_DATA_PATH);
-
-        if (!acl.fileExists())
-        {
-            // Create Genric levels for First Time Startup
-            Level al1(10,  "unauthorized");
-            Level al2(20,  "validated");
-            Level al3(255, "sysop");
-
-            levels->access_levels.push_back(al1);
-            levels->access_levels.push_back(al2);
-            levels->access_levels.push_back(al3);
-
-            acl.saveConfig(levels);
-        }
-        */
     }
 
-
-    
 }
