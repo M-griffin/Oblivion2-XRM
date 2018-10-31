@@ -137,7 +137,6 @@ public:
     // Level Field Edit Prompts
     const std::string PROMPT_LEVEL_FIELD_NAME = "prompt_level_field_name";
     const std::string PROMPT_LEVEL_FIELD_START_MENU = "prompt_level_field_start_menu";
-    const std::string PROMPT_LEVEL_FIELD_LEVEL = "prompt_level_field_level";
     const std::string PROMPT_LEVEL_FIELD_FILE_LEVEL = "prompt_level_field_file_level";
     const std::string PROMPT_LEVEL_FIELD_MESG_LEVEL = "prompt_level_field_mesg_level";
     const std::string PROMPT_LEVEL_FIELD_POST_CALL_RATIO = "prompt_level_field_pc_ratio";
@@ -160,7 +159,6 @@ public:
 
     const std::string DISPLAY_LEVEL_FIELD_NAME = "display_level_field_name";
     const std::string DISPLAY_LEVEL_FIELD_START_MENU = "display_level_field_start_menu";
-    const std::string DISPLAY_LEVEL_FIELD_LEVEL = "display_level_field_level";
     const std::string DISPLAY_LEVEL_FIELD_FILE_LEVEL = "display_level_field_file_level";
     const std::string DISPLAY_LEVEL_FIELD_MESG_LEVEL = "display_level_field_mesg_level";
     const std::string DISPLAY_LEVEL_FIELD_POST_CALL_RATIO = "display_level_field_pc_ratio";

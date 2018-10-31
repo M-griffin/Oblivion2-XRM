@@ -2,6 +2,7 @@
 
 #include "data-sys/access_level_dao.hpp"
 #include "model-sys/access_level.hpp"
+#include "../access_condition.hpp"
 
 #include <sstream>
 #include <stdint.h>
@@ -96,46 +97,44 @@ void ModLevelEditor::createTextPrompts()
     // Usefull when editing fields - Specific to XRM.
     value[PROMPT_LEVEL_FIELD_NAME]            = std::make_pair("Level Name", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Level Name         : ");
     value[PROMPT_LEVEL_FIELD_START_MENU]      = std::make_pair("Start Menu", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15Start Menu         : ");
-    value[PROMPT_LEVEL_FIELD_LEVEL]           = std::make_pair("Level", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15Level              : ");
-    value[PROMPT_LEVEL_FIELD_FILE_LEVEL]      = std::make_pair("File Level", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15File Level         : ");
-    value[PROMPT_LEVEL_FIELD_MESG_LEVEL]      = std::make_pair("Message Level", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Message Level      : ");
-    value[PROMPT_LEVEL_FIELD_POST_CALL_RATIO] = std::make_pair("Post/Call Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15Post/Call Ratio    : ");
-    value[PROMPT_LEVEL_FIELD_FILE_RATIO]      = std::make_pair("File Ratio - Uploads to Downloads", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15File Ratio         : ");
-    value[PROMPT_LEVEL_FIELD_TIME_LIMIT]      = std::make_pair("Time Limit Per Day", "|CR|03%   |15|PD|CR|11!   |03(|11H|03) |15Time Limit         : ");
-    value[PROMPT_LEVEL_FIELD_CALL_LIMIT]      = std::make_pair("Call Limit Per Day", "|CR|03%   |15|PD|CR|11!   |03(|11I|03) |15Call Limit         : ");
-    value[PROMPT_LEVEL_FIELD_DOWNLOADS]       = std::make_pair("Download Limits By # of Files", "|CR|03%   |15|PD|CR|11!   |03(|11J|03) |15Download Files     : ");
-    value[PROMPT_LEVEL_FIELD_DOWNLOAD_MB]     = std::make_pair("Download Limit in MBs", "|CR|03%   |15|PD|CR|11!   |03(|11K|03) |15Download MBs       : ");
-    value[PROMPT_LEVEL_FIELD_ARFLAGS1]        = std::make_pair("Access Control Flags 1", "|CR|03%   |15|PD|CR|11!   |03(|11L|03) |15AR Flags 1         : ");
-    value[PROMPT_LEVEL_FIELD_ARFLAGS2]        = std::make_pair("Access Control Flags 2", "|CR|03%   |15|PD|CR|11!   |03(|11M|03) |15AR Flags 2         : ");
-    value[PROMPT_LEVEL_BOOL_POST_CALL_RATIO]  = std::make_pair("Enable Post/Call Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11N|03) |15Use Post/Call Ratio: ");
-    value[PROMPT_LEVEL_BOOL_FILE_RATIO]       = std::make_pair("Enable File Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11O|03) |15Use File Ratio     : ");
+    value[PROMPT_LEVEL_FIELD_FILE_LEVEL]      = std::make_pair("File Level", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15File Level         : ");
+    value[PROMPT_LEVEL_FIELD_MESG_LEVEL]      = std::make_pair("Message Level", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15Message Level      : ");
+    value[PROMPT_LEVEL_FIELD_POST_CALL_RATIO] = std::make_pair("Post/Call Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Post/Call Ratio    : ");
+    value[PROMPT_LEVEL_FIELD_FILE_RATIO]      = std::make_pair("File Ratio - Uploads to Downloads", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15File Ratio         : ");
+    value[PROMPT_LEVEL_FIELD_TIME_LIMIT]      = std::make_pair("Time Limit Per Day", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15Time Limit         : ");
+    value[PROMPT_LEVEL_FIELD_CALL_LIMIT]      = std::make_pair("Call Limit Per Day", "|CR|03%   |15|PD|CR|11!   |03(|11H|03) |15Call Limit         : ");
+    value[PROMPT_LEVEL_FIELD_DOWNLOADS]       = std::make_pair("Download Limits By # of Files", "|CR|03%   |15|PD|CR|11!   |03(|11I|03) |15Download Files     : ");
+    value[PROMPT_LEVEL_FIELD_DOWNLOAD_MB]     = std::make_pair("Download Limit in MBs", "|CR|03%   |15|PD|CR|11!   |03(|11J|03) |15Download MBs       : ");
+    value[PROMPT_LEVEL_FIELD_ARFLAGS1]        = std::make_pair("Access Control Flags 1", "|CR|03%   |15|PD|CR|11!   |03(|11K|03) |15AR Flags 1         : ");
+    value[PROMPT_LEVEL_FIELD_ARFLAGS2]        = std::make_pair("Access Control Flags 2", "|CR|03%   |15|PD|CR|11!   |03(|11L|03) |15AR Flags 2         : ");
+    value[PROMPT_LEVEL_BOOL_POST_CALL_RATIO]  = std::make_pair("Enable Post/Call Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11M|03) |15Use Post/Call Ratio: ");
+    value[PROMPT_LEVEL_BOOL_FILE_RATIO]       = std::make_pair("Enable File Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11N|03) |15Use File Ratio     : ");
     value[PROMPT_LEVEL_BOOL_TIME_LIMIT]       = std::make_pair("Enable Time Limit", "|CR|03%   |15|PD|CR|11!   |03(|11P|03) |15Use Time Limit     : ");
-    value[PROMPT_LEVEL_BOOL_CALL_LIMIT]       = std::make_pair("Enable Call Limit", "|CR|03%   |15|PD|CR|11!   |03(|11R|03) |15Use Call Limit     : ");
-    value[PROMPT_LEVEL_BOOL_DOWNLOADS]        = std::make_pair("Enable Download Limits by Files", "|CR|03%   |15|PD|CR|11!   |03(|11S|03) |15Use Download Files : ");
-    value[PROMPT_LEVEL_BOOL_DOWNLOAD_MB]      = std::make_pair("Enable Download Limit in MBs", "|CR|03%   |15|PD|CR|11!   |03(|11T|03) |15Use Download MBs   : ");
+    value[PROMPT_LEVEL_BOOL_CALL_LIMIT]       = std::make_pair("Enable Call Limit", "|CR|03%   |15|PD|CR|11!   |03(|11P|03) |15Use Call Limit     : ");
+    value[PROMPT_LEVEL_BOOL_DOWNLOADS]        = std::make_pair("Enable Download Limits by Files", "|CR|03%   |15|PD|CR|11!   |03(|11R|03) |15Use Download Files : ");
+    value[PROMPT_LEVEL_BOOL_DOWNLOAD_MB]      = std::make_pair("Enable Download Limit in MBs", "|CR|03%   |15|PD|CR|11!   |03(|11S|03) |15Use Download MBs   : ");
 
     // Display Page for Menu Fields
     value[DISPLAY_LEVEL_FIELDS_BORDER_ROW_COLOR] = std::make_pair("Border Row Color", " |07");
 
-    value[DISPLAY_LEVEL_FIELD_NAME]            = std::make_pair("Level Name", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Level Name         : ");
-    value[DISPLAY_LEVEL_FIELD_START_MENU]      = std::make_pair("Start Menu", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15Start Menu         : ");
-    value[DISPLAY_LEVEL_FIELD_LEVEL]           = std::make_pair("Level", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15Level              : ");
-    value[DISPLAY_LEVEL_FIELD_FILE_LEVEL]      = std::make_pair("File Level", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15File Level         : ");
-    value[DISPLAY_LEVEL_FIELD_MESG_LEVEL]      = std::make_pair("Message Level", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Message Level      : ");
-    value[DISPLAY_LEVEL_FIELD_POST_CALL_RATIO] = std::make_pair("Post/Call Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15Post/Call Ratio    : ");
-    value[DISPLAY_LEVEL_FIELD_FILE_RATIO]      = std::make_pair("File Ratio - Uploads to Downloads", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15File Ratio         : ");
-    value[DISPLAY_LEVEL_FIELD_TIME_LIMIT]      = std::make_pair("Time Limit Per Day", "|CR|03%   |15|PD|CR|11!   |03(|11H|03) |15Time Limit         : ");
-    value[DISPLAY_LEVEL_FIELD_CALL_LIMIT]      = std::make_pair("Call Limit Per Day", "|CR|03%   |15|PD|CR|11!   |03(|11I|03) |15Call Limit         : ");
-    value[DISPLAY_LEVEL_FIELD_DOWNLOADS]       = std::make_pair("Download Limits By # of Files", "|CR|03%   |15|PD|CR|11!   |03(|11J|03) |15Download Files     : ");
-    value[DISPLAY_LEVEL_FIELD_DOWNLOAD_MB]     = std::make_pair("Download Limit in MBs", "|CR|03%   |15|PD|CR|11!   |03(|11K|03) |15Download MBs       : ");
-    value[DISPLAY_LEVEL_FIELD_ARFLAGS1]        = std::make_pair("Access Control Flags 1", "|CR|03%   |15|PD|CR|11!   |03(|11L|03) |15AR Flags 1         : ");
-    value[DISPLAY_LEVEL_FIELD_ARFLAGS2]        = std::make_pair("Access Control Flags 2", "|CR|03%   |15|PD|CR|11!   |03(|11M|03) |15AR Flags 2         : ");
-    value[DISPLAY_LEVEL_BOOL_POST_CALL_RATIO]  = std::make_pair("Enable Post/Call Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11N|03) |15Use Post/Call Ratio: ");
-    value[DISPLAY_LEVEL_BOOL_FILE_RATIO]       = std::make_pair("Enable File Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11O|03) |15Use File Ratio     : ");
-    value[DISPLAY_LEVEL_BOOL_TIME_LIMIT]       = std::make_pair("Enable Time Limit", "|CR|03%   |15|PD|CR|11!   |03(|11P|03) |15Use Time Limit     : ");
-    value[DISPLAY_LEVEL_BOOL_CALL_LIMIT]       = std::make_pair("Enable Call Limit", "|CR|03%   |15|PD|CR|11!   |03(|11R|03) |15Use Call Limit     : ");
-    value[DISPLAY_LEVEL_BOOL_DOWNLOADS]        = std::make_pair("Enable Download Limits by Files", "|CR|03%   |15|PD|CR|11!   |03(|11S|03) |15Use Download Files : ");
-    value[DISPLAY_LEVEL_BOOL_DOWNLOAD_MB]      = std::make_pair("Enable Download Limit in MBs", "|CR|03%   |15|PD|CR|11!   |03(|11T|03) |15Use Download MBs   : ");
+    value[DISPLAY_LEVEL_FIELD_NAME]            = std::make_pair("Level Name", " |03(|11A|03) |15Level Name         : ");
+    value[DISPLAY_LEVEL_FIELD_START_MENU]      = std::make_pair("Start Menu", " |03(|11B|03) |15Start Menu         : ");
+    value[DISPLAY_LEVEL_FIELD_FILE_LEVEL]      = std::make_pair("File Level", " |03(|11C|03) |15File Level         : ");
+    value[DISPLAY_LEVEL_FIELD_MESG_LEVEL]      = std::make_pair("Message Level", " |03(|11D|03) |15Message Level      : ");
+    value[DISPLAY_LEVEL_FIELD_POST_CALL_RATIO] = std::make_pair("Post/Call Ratio", " |03(|11E|03) |15Post/Call Ratio    : ");
+    value[DISPLAY_LEVEL_FIELD_FILE_RATIO]      = std::make_pair("File Ratio - Uploads to Downloads", " |03(|11F|03) |15File Ratio         : ");
+    value[DISPLAY_LEVEL_FIELD_TIME_LIMIT]      = std::make_pair("Time Limit Per Day", " |03(|11G|03) |15Time Limit         : ");
+    value[DISPLAY_LEVEL_FIELD_CALL_LIMIT]      = std::make_pair("Call Limit Per Day", " |03(|11H|03) |15Call Limit         : ");
+    value[DISPLAY_LEVEL_FIELD_DOWNLOADS]       = std::make_pair("Download Limits By # of Files", " |03(|11I|03) |15Download Files     : ");
+    value[DISPLAY_LEVEL_FIELD_DOWNLOAD_MB]     = std::make_pair("Download Limit in MBs", " |03(|11J|03) |15Download MBs       : ");
+    value[DISPLAY_LEVEL_FIELD_ARFLAGS1]        = std::make_pair("Access Control Flags 1", " |03(|11K|03) |15AR Flags 1         : ");
+    value[DISPLAY_LEVEL_FIELD_ARFLAGS2]        = std::make_pair("Access Control Flags 2", " |03(|11L|03) |15AR Flags 2         : ");
+    value[DISPLAY_LEVEL_BOOL_POST_CALL_RATIO]  = std::make_pair("Enable Post/Call Ratio", " |03(|11M|03) |15Use Post/Call Ratio: ");
+    value[DISPLAY_LEVEL_BOOL_FILE_RATIO]       = std::make_pair("Enable File Ratio", " |03(|11N|03) |15Use File Ratio     : ");
+    value[DISPLAY_LEVEL_BOOL_TIME_LIMIT]       = std::make_pair("Enable Time Limit", " |03(|11O|03) |15Use Time Limit     : ");
+    value[DISPLAY_LEVEL_BOOL_CALL_LIMIT]       = std::make_pair("Enable Call Limit", " |03(|11P|03) |15Use Call Limit     : ");
+    value[DISPLAY_LEVEL_BOOL_DOWNLOADS]        = std::make_pair("Enable Download Limits by Files", " |03(|11R|03) |15Use Download Files : ");
+    value[DISPLAY_LEVEL_BOOL_DOWNLOAD_MB]      = std::make_pair("Enable Download Limit in MBs", " |03(|11S|03) |15Use Download MBs   : ");
 
     value[DISPLAY_LEVEL_FIELDS_QUIT_SAVE]        = std::make_pair("Quit and Save", " |03(|11Q|03) |15Quit & Save          ");
     value[DISPLAY_LEVEL_FIELDS_QUIT_ABORT]       = std::make_pair("Quit without Save", " |03(|11X|03) |15Exit without Saving  ");
@@ -586,10 +585,11 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
                 changeInputModule(MOD_LEVEL_OPTION_INPUT);
                 changeSetupModule(MOD_DISPLAY_LEVEL_OPTIONS);
                 break;
+            */
 
             case 'Q': // Quit
-                saveMenuChanges();
-                std::vector<menu_ptr>().swap(m_loaded_level);
+                saveLevelChanges();
+                std::vector<access_level_ptr>().swap(m_loaded_levels);
 
                 // Reload fall back, or gosub to Menu Editor Main
                 changeInputModule(MOD_LEVEL_INPUT);
@@ -597,13 +597,13 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
                 return;
 
             case 'X': // Exit without Saving
-                std::vector<menu_ptr>().swap(m_loaded_level);
+                std::vector<access_level_ptr>().swap(m_loaded_levels);
 
                 // Reload fall back, or gosub to Menu Editor Main
                 changeInputModule(MOD_LEVEL_INPUT);
                 changeSetupModule(MOD_DISPLAY_LEVEL);
                 return;
-            */
+
             default:
                 redisplayModulePrompt();
                 break;
@@ -963,7 +963,10 @@ void ModLevelEditor::saveLevelChanges()
     if(existing_level == nullptr || !level_dao->updateRecord(existing_level))
     {
         std::cout << "Error, unable to update existing level: " << m_current_level;
+        return;
     }
+
+    level_dao->updateRecord(existing_level);
 }
 
 /**
@@ -972,7 +975,6 @@ void ModLevelEditor::saveLevelChanges()
  */
 bool ModLevelEditor::checkLevelExistsByLevel(int level_code)
 {
-    // Case Insensitive Search for Menu name, with transformation to lower case
     for(std::string::size_type i = 0; i < m_loaded_levels.size(); i++)
     {
         if(m_loaded_levels[i]->iLevel == level_code)
@@ -1119,68 +1121,93 @@ std::string ModLevelEditor::displayLevelList()
 }
 
 /**
- * REFERENCE ONLY!
- * @brief Menu Editor, Read and Modify Menus Options
+ * @brief Menu Editor, for Displaying Level Fields to Edit
  * @return
- *
-std::string ModLevelEditor::displayLevelOptionList()
+ */
+std::string ModLevelEditor::displayLevelEditScreen()
 {
+    // Create Menu Pointer then load the menu into it.
+    access_level_ptr current_level = nullptr;
 
-    menu_ptr current_menu = m_loaded_level.back();
+    for(unsigned int i = 0; i < m_loaded_levels.size(); i++)
+    {
+        if(m_loaded_levels[i]->iLevel == m_current_level)
+        {
+            current_level = m_loaded_levels[i];
+        }
+    }
+
+    if(current_level == nullptr)
+    {
+        std::cout << "Level Not Found: " << std::to_string(m_current_level);
+        return "Level Not Found: " + std::to_string(m_current_level);
+    }
 
     // Build a string list of individual menu options, then loop to fit as many per screen!
     std::vector<std::string> result_set;
-    for(unsigned int i = 0; i < current_menu->menu_options.size(); i++)
-    {
-        auto &m = current_menu->menu_options[i];
+    AccessCondition acs;
 
-        std::string option_string = m_common_io.rightPadding(std::to_string(m.index), 3);
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_NAME) + baseGetDefaultStatColor() +
+                         m_common_io.rightPadding(current_level->sName, 48));
 
-        // Toggled View will show commands strings, while default shows command key info.
-        switch (m_mod_toggle_view_index)
-        {
-            case VIEW_DEFAULT:
-                option_string.append(baseGetDefaultColor() + m_common_io.rightPadding(m.menu_key, 9));
-                option_string.append(baseGetDefaultInputColor() + m_common_io.rightPadding(m.command_key, 4));
-                option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(m.acs_string, 8));
-                break;
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_START_MENU) + baseGetDefaultStatColor() +
+                         m_common_io.rightPadding(current_level->sStartMenu, 48));
 
-            case VIEW_NAMES:
-                option_string.append(baseGetDefaultColor() + m_common_io.rightPadding(m.name, 21));
-                break;
 
-            case VIEW_STRINGS:
-                option_string.append(baseGetDefaultColor() + m_common_io.rightPadding(m.command_string, 15));
-                option_string.append(baseGetDefaultInputColor() + m_common_io.rightPadding("", 1));
-                option_string.append(baseGetDefaultStatColor() +
-m_common_io.rightPadding(m_common_io.boolAlpha(m.hidden), 5)); break;
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_FILE_LEVEL) + baseGetDefaultStatColor() +
+                         m_common_io.rightPadding(std::to_string(current_level->iFileLevel), 48));
 
-            case VIEW_PULLDOWN:
-                option_string.append(baseGetDefaultColor() + m_common_io.rightPadding(m.menu_key, 9));
-                option_string.append(baseGetDefaultInputColor() + m_common_io.rightPadding(m.command_key, 4));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_MESG_LEVEL) + baseGetDefaultStatColor() +
+                         m_common_io.rightPadding(std::to_string(current_level->iMessageLevel), 48));
 
-                if (m.pulldown_id > 0)
-                {
-                    option_string.append(baseGetDefaultStatColor() +
-m_common_io.rightPadding(std::to_string(m.pulldown_id), 8));
-                }
-                else
-                {
-                    option_string.append(m_common_io.rightPadding("", 8));
-                }
-        }
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_POST_CALL_RATIO) + baseGetDefaultStatColor() +
+                         m_common_io.rightPadding(std::to_string(current_level->iPostCallRatio), 48));
 
-        result_set.push_back(option_string);
-    }
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_FILE_RATIO) + baseGetDefaultStatColor() +
+                         m_common_io.rightPadding(std::to_string(current_level->iFileRatio), 48));
+
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_TIME_LIMIT) + baseGetDefaultStatColor() +
+                         m_common_io.rightPadding(std::to_string(current_level->iTimeLimit), 48));
+
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_CALL_LIMIT) + baseGetDefaultStatColor() +
+                         m_common_io.rightPadding(std::to_string(current_level->iCallLimit), 48));
+
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_DOWNLOADS) + baseGetDefaultStatColor() +
+                         m_common_io.rightPadding(std::to_string(current_level->iDownloads), 48));
+
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_DOWNLOAD_MB) + baseGetDefaultStatColor() +
+                         m_common_io.rightPadding(std::to_string(current_level->iDownloadMB), 48));
+
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_ARFLAGS1) + baseGetDefaultStatColor() +
+                         m_common_io.rightPadding(acs.getAccessConditionFlagStringFromBits(current_level->iARFlags1), 48));
+
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_ARFLAGS2) + baseGetDefaultStatColor() +
+                         m_common_io.rightPadding(acs.getAccessConditionFlagStringFromBits(current_level->iARFlags2), 48));
+
+
+
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_POST_CALL_RATIO) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bPostCallRatio), 56) +
+                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_CALL_LIMIT) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bCallLimit), 56));
+
+
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_FILE_RATIO) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bFileRatio), 56) +
+                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_DOWNLOADS) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bDownloads), 56));
+
+    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_TIME_LIMIT) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bTimeLimit), 56) +
+                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_DOWNLOAD_MB) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bDownloadMB), 56));
+
+
+    result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
+
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_QUIT_SAVE) + baseGetDefaultStatColor() +
+                         m_common_io.rightPadding("", 48));
+
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_QUIT_ABORT) + baseGetDefaultStatColor() +
+                         m_common_io.rightPadding("", 48));
+
 
     // iterate through and print out
-    int total_rows = result_set.size() / 3;
-    int remainder = result_set.size() % 3;
-
-    // Add for Header and Footer Row!
-    total_rows += 2;
-    if(remainder > 0)
-        ++total_rows;
+    int total_rows = result_set.size()+2;
 
     // Could re-calc this on screen width lateron.
     int max_cols = 76;
@@ -1192,6 +1219,7 @@ m_common_io.rightPadding(std::to_string(m.pulldown_id), 8));
     for(int rows = 0; rows < total_rows; rows++)
     {
         buffer += "  "; // 3 Leading spaces per row.
+
         for(int cols = 0; cols < max_cols; cols++)
         {
             // Top Row
@@ -1205,7 +1233,7 @@ m_common_io.rightPadding(std::to_string(m.pulldown_id), 8));
                 buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_TOP_RIGHT;
             }
-            else if(rows == 0 && cols % 25 == 0)
+            else if(rows == 0 && cols % 75 == 0)
             {
                 buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID_TOP;
@@ -1227,7 +1255,7 @@ m_common_io.rightPadding(std::to_string(m.pulldown_id), 8));
                 buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_BOT_RIGHT;
             }
-            else if(rows == total_rows-1 && cols % 25 == 0)
+            else if(rows == total_rows-1 && cols % 75 == 0)
             {
                 buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID_BOT;
@@ -1237,7 +1265,7 @@ m_common_io.rightPadding(std::to_string(m.pulldown_id), 8));
                 buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_ROW;
             }
-            else if(cols % 25 == 0)
+            else if(cols % 75 == 0)
             {
                 buffer += baseGetDefaultBoxColor();
                 buffer += BORDER_MID;
@@ -1245,18 +1273,12 @@ m_common_io.rightPadding(std::to_string(m.pulldown_id), 8));
             else
             {
                 // Here we insert the Menu name and pad through to 8 characters.
-                if(cols % 26 == 0 || cols == 1)
+                if(cols == 1)
                 {
                     if(i != result_set.end())
                     {
-                        buffer += baseGetDefaultInputColor();
                         buffer += *i;
                         ++i;
-                    }
-                    else
-                    {
-                        // Empty, 24 Spaces default menu name size.
-                        buffer += "                        ";
                     }
                 }
             }
@@ -1268,179 +1290,5 @@ m_common_io.rightPadding(std::to_string(m.pulldown_id), 8));
     }
 
     return (buffer);
-}
-*/
 
-/**
- * @brief Menu Editor, for Displaying Menu Fields to Edit
- * @return
- */
-std::string ModLevelEditor::displayLevelEditScreen()
-{
-    /*
-        // Create Menu Pointer then load the menu into it.
-        menu_ptr current_menu(new Menu());
-
-        if (m_loaded_level.size() == 0)
-        {
-            // First load the Source Menu [m_current_menu] file name
-            MenuDao mnu_source(current_menu, m_current_menu, GLOBAL_LEVEL_PATH);
-            if (mnu_source.fileExists())
-            {
-                mnu_source.loadMenu();
-
-                // Save Menu into memory for changes, and rollbacks
-                m_loaded_level.push_back(current_menu);
-            }
-            else
-            {
-                // Error, drop back to Menu Editor.
-                changeSetupModule(MOD_DISPLAY_LEVEL);
-                return "";
-            }
-        }
-        else
-        {
-            //Menu is already loaded, just assigned to current_menu
-            current_menu = m_loaded_level.back();
-        }
-
-        // Build a string list of individual menu options, then loop to fit as many per screen!
-        std::vector<std::string> result_set;
-
-
-                , sName("")
-                , sStartMenu("")
-                , iLevel(0)
-                , iFileLevel(0)
-                , iMessageLevel(0)
-                , iPostCallRatio(0)
-                , iFileRatio(0)
-                , iTimeLimit(0)
-                , iCallLimit(0)
-                , iDownloads(0)
-                , iDownloadMB(0)
-                , iARFlags1(0)
-                , iARFlags2(0)
-                // Flags
-                , bPostCallRatio(false)
-                , bFileRatio(false)
-                , bTimeLimit(false)
-                , bCallLimit(false)
-                , bDownloads(false)
-                , bDownloadMB(false)
-
-
-           result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_VERSION_ID) + baseGetDefaultStatColor() +
-          m_common_io.rightPadding(current_menu->file_version, 48)); result_set.push_back(baseGetDefaultPromptColor() + " "
-          + std::string(72, BORDER_ROW) + " "); result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_TITLE) +
-          baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_title, 48));
-           result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_PASSWORD) + baseGetDefaultStatColor() +
-          m_common_io.rightPadding(current_menu->menu_password, 48));
-           result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_FALLBACK) + baseGetDefaultStatColor() +
-          m_common_io.rightPadding(current_menu->menu_fall_back, 48));
-           result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_HELP_ID) + baseGetDefaultStatColor() +
-          m_common_io.rightPadding(current_menu->menu_help_file, 48));
-           result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_NAME) + baseGetDefaultStatColor() +
-          m_common_io.rightPadding(current_menu->level_code, 48));
-           result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_PULLDOWN_FILE) + baseGetDefaultStatColor() +
-          m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
-           result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_VIEW_GENERIC) + baseGetDefaultStatColor() +
-          m_common_io.rightPadding("", 48)); result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_EDIT_OPTIONS) +
-          baseGetDefaultStatColor() + m_common_io.rightPadding("", 48)); result_set.push_back(baseGetDefaultPromptColor() +
-          " " + std::string(72, BORDER_ROW) + " ");
-           result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_QUIT_SAVE) + baseGetDefaultStatColor() +
-          m_common_io.rightPadding("", 48)); result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_QUIT_ABORT) +
-          baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
-
-           // Not in use Yet, seems legacy only does ACS in option commands.
-           // option_string.append("Menu ACS           : " + m_common_io.rightPadding(current_menu->menu_acs_string, 35);
-           // option_string.append("Menu FormMenu      : " + m_common_io.rightPadding(current_menu->menu_form_menu, 8);
-
-           // iterate through and print out
-           int total_rows = result_set.size();
-           total_rows += 2;
-
-           // Could re-calc this on screen width lateron.
-           int max_cols = 76;
-
-           // Vector or Menus, Loop through
-           std::vector<std::string>::iterator i = result_set.begin();
-           std::string buffer = "";
-
-           for(int rows = 0; rows < total_rows; rows++)
-           {
-               buffer += "  "; // 3 Leading spaces per row.
-               for(int cols = 0; cols < max_cols; cols++)
-               {
-                   // Top Row
-                   if(rows == 0 && cols == 0)
-                   {
-                       buffer += baseGetDefaultBoxColor();
-                       buffer += BORDER_TOP_LEFT;
-                   }
-                   else if(rows == 0 && cols == max_cols-1)
-                   {
-                       buffer += baseGetDefaultBoxColor();
-                       buffer += BORDER_TOP_RIGHT;
-                   }
-                   else if(rows == 0 && cols % 75 == 0)
-                   {
-                       buffer += baseGetDefaultBoxColor();
-                       buffer += BORDER_MID_TOP;
-                   }
-                   else if(rows == 0)
-                   {
-                       buffer += baseGetDefaultBoxColor();
-                       buffer += BORDER_ROW;
-                   }
-
-                   // Bottom Row
-                   else if(rows == total_rows-1 && cols == 0)
-                   {
-                       buffer += baseGetDefaultBoxColor();
-                       buffer += BORDER_BOT_LEFT;
-                   }
-                   else if(rows == total_rows-1 && cols == max_cols-1)
-                   {
-                       buffer += baseGetDefaultBoxColor();
-                       buffer += BORDER_BOT_RIGHT;
-                   }
-                   else if(rows == total_rows-1 && cols % 75 == 0)
-                   {
-                       buffer += baseGetDefaultBoxColor();
-                       buffer += BORDER_MID_BOT;
-                   }
-                   else if(rows == total_rows-1)
-                   {
-                       buffer += baseGetDefaultBoxColor();
-                       buffer += BORDER_ROW;
-                   }
-                   else if(cols % 75 == 0)
-                   {
-                       buffer += baseGetDefaultBoxColor();
-                       buffer += BORDER_MID;
-                   }
-                   else
-                   {
-                       // Here we insert the Menu name and pad through to 8 characters.
-                       if(cols == 1)
-                       {
-                           if(i != result_set.end())
-                           {
-                               buffer += *i;
-                               ++i;
-                           }
-                       }
-                   }
-               }
-
-               // Were going to split on \n, which will get replaced lateron
-               // with \r\n for full carriage returns.
-               buffer += "\n";
-           }
-
-           return (buffer);
-       */
-    return "";
 }
