@@ -105,14 +105,15 @@ void ModLevelEditor::createTextPrompts()
     value[PROMPT_LEVEL_FIELD_CALL_LIMIT]      = std::make_pair("Call Limit Per Day", "|CR|03%   |15|PD|CR|11!   |03(|11H|03) |15Call Limit         : ");
     value[PROMPT_LEVEL_FIELD_DOWNLOADS]       = std::make_pair("Download Limits By # of Files", "|CR|03%   |15|PD|CR|11!   |03(|11I|03) |15Download Files     : ");
     value[PROMPT_LEVEL_FIELD_DOWNLOAD_MB]     = std::make_pair("Download Limit in MBs", "|CR|03%   |15|PD|CR|11!   |03(|11J|03) |15Download MBs       : ");
-    value[PROMPT_LEVEL_FIELD_ARFLAGS1]        = std::make_pair("Access Control Flags 1", "|CR|03%   |15|PD|CR|11!   |03(|11K|03) |15AR Flags 1         : ");
-    value[PROMPT_LEVEL_FIELD_ARFLAGS2]        = std::make_pair("Access Control Flags 2", "|CR|03%   |15|PD|CR|11!   |03(|11L|03) |15AR Flags 2         : ");
-    value[PROMPT_LEVEL_BOOL_POST_CALL_RATIO]  = std::make_pair("Enable Post/Call Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11M|03) |15Use Post/Call Ratio: ");
-    value[PROMPT_LEVEL_BOOL_FILE_RATIO]       = std::make_pair("Enable File Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11N|03) |15Use File Ratio     : ");
-    value[PROMPT_LEVEL_BOOL_TIME_LIMIT]       = std::make_pair("Enable Time Limit", "|CR|03%   |15|PD|CR|11!   |03(|11P|03) |15Use Time Limit     : ");
-    value[PROMPT_LEVEL_BOOL_CALL_LIMIT]       = std::make_pair("Enable Call Limit", "|CR|03%   |15|PD|CR|11!   |03(|11P|03) |15Use Call Limit     : ");
-    value[PROMPT_LEVEL_BOOL_DOWNLOADS]        = std::make_pair("Enable Download Limits by Files", "|CR|03%   |15|PD|CR|11!   |03(|11R|03) |15Use Download Files : ");
-    value[PROMPT_LEVEL_BOOL_DOWNLOAD_MB]      = std::make_pair("Enable Download Limit in MBs", "|CR|03%   |15|PD|CR|11!   |03(|11S|03) |15Use Download MBs   : ");
+    value[PROMPT_LEVEL_FIELD_ARFLAGS1]        = std::make_pair("Access Restriction Flags Group 1 - Type Letters to Add/Remove/Toggle", "|CR|03%   |15|PD|CR|11!   |03(|11K|03) |15AR Flags 1         : ");
+    value[PROMPT_LEVEL_FIELD_ARFLAGS2]        = std::make_pair("Access Restriction Flags Group 2 - Type Letters to Add/Remove/Toggle", "|CR|03%   |15|PD|CR|11!   |03(|11L|03) |15AR Flags 2         : ");
+
+    value[PROMPT_LEVEL_BOOL_POST_CALL_RATIO]  = std::make_pair("Enable Post/Call Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11M|03) |15Use Post/Call Ratio |07(|15T|07/|15F|07)|15: ");
+    value[PROMPT_LEVEL_BOOL_FILE_RATIO]       = std::make_pair("Enable File Ratio", "|CR|03%   |15|PD|CR|11!   |03(|11N|03) |15Use File Ratio |07(|15T|07/|15F|07)|15    : ");
+    value[PROMPT_LEVEL_BOOL_TIME_LIMIT]       = std::make_pair("Enable Time Limit", "|CR|03%   |15|PD|CR|11!   |03(|11P|03) |15Use Time Limit |07(|15T|07/|15F|07)|15    : ");
+    value[PROMPT_LEVEL_BOOL_CALL_LIMIT]       = std::make_pair("Enable Call Limit", "|CR|03%   |15|PD|CR|11!   |03(|11P|03) |15Use Call Limit |07(|15T|07/|15F|07)|15    : ");
+    value[PROMPT_LEVEL_BOOL_DOWNLOADS]        = std::make_pair("Enable Download Limits by Files", "|CR|03%   |15|PD|CR|11!   |03(|11R|03) |15Use Download Files |07(|15T|07/|15F|07)|15: ");
+    value[PROMPT_LEVEL_BOOL_DOWNLOAD_MB]      = std::make_pair("Enable Download Limit in MBs", "|CR|03%   |15|PD|CR|11!   |03(|11S|03) |15Use Download MBs |07(|15T|07/|15F|07)|15  : ");
 
     // Display Page for Menu Fields
     value[DISPLAY_LEVEL_FIELDS_BORDER_ROW_COLOR] = std::make_pair("Border Row Color", " |07");
@@ -508,84 +509,141 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
 
         baseProcessDeliverNewLine();
 
-        /*
-                , sName("")
-                , sStartMenu("")
-                , iLevel(0)
-                , iFileLevel(0)
-                , iMessageLevel(0)
-                , iPostCallRatio(0)
-                , iFileRatio(0)
-                , iTimeLimit(0)
-                , iCallLimit(0)
-                , iDownloads(0)
-                , iDownloadMB(0)
-                , iARFlags1(0)
-                , iARFlags2(0)
-                // Flags
-                , bPostCallRatio(false)
-                , bFileRatio(false)
-                , bTimeLimit(false)
-                , bCallLimit(false)
-                , bDownloads(false)
-                , bDownloadMB(false)
-        */
+        AccessCondition acs;
+        access_level_ptr current_level = getCurrentLevel();
+
+        if(current_level == nullptr)
+        {
+            return;
+        }
 
         switch(toupper(key[0]))
         {
-            /*
-            case 'A': // Menu Title
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_LEVEL_FIELD);
-                displayPrompt(PROMPT_LEVEL_FIELD_TITLE);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_title);
-                break;
-
-            case 'B': // Menu Password
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_LEVEL_FIELD);
-                displayPrompt(PROMPT_LEVEL_FIELD_PASSWORD);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_password);
-                break;
-
-            case 'C': // Menu Password
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_LEVEL_FIELD);
-                displayPrompt(PROMPT_LEVEL_FIELD_FALLBACK);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_fall_back);
-                break;
-
-            case 'D': // Menu Help ID
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_LEVEL_FIELD);
-                displayPrompt(PROMPT_LEVEL_FIELD_HELP_ID);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_help_file);
-                break;
-
-            case 'E': // Menu Name
+            case 'A': // Level Name
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_FIELD_NAME);
-                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->level_code);
+                m_session_io.getInputField("", key, Config::sName_length, current_level->sName);
                 break;
 
-            case 'F': // Menu Pulldown file
+            case 'B': // Level Start Menu
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
-                displayPrompt(PROMPT_LEVEL_FIELD_PULLDOWN);
-                m_session_io.getInputField("", key, Config::sName_length,
-            m_loaded_level.back()->menu_pulldown_file); break;
-
-            case 'G': // View Generate Menu
-                displayGenericMenu();
-                changeInputModule(MOD_DISPLAY_PAUSE);
+                displayPrompt(PROMPT_LEVEL_FIELD_START_MENU);
+                m_session_io.getInputField("", key, Config::sName_length, current_level->sStartMenu);
                 break;
 
-            case 'H': // Jump into Options Editing.
-                changeInputModule(MOD_LEVEL_OPTION_INPUT);
-                changeSetupModule(MOD_DISPLAY_LEVEL_OPTIONS);
+            case 'C': // Level File Level
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_FIELD_FILE_LEVEL);
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(current_level->iFileLevel));
                 break;
-            */
+
+            case 'D': // Level Message Level
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_FIELD_MESG_LEVEL);
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(current_level->iMessageLevel));
+                break;
+
+            case 'E': // Level Post/Call Ratio
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_FIELD_POST_CALL_RATIO);
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(current_level->iPostCallRatio));
+                break;
+
+            case 'F': // Level File Ratio
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_FIELD_FILE_RATIO);
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(current_level->iFileRatio));
+                break;
+
+            case 'G': // Level Time Limit
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_FIELD_TIME_LIMIT);
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(current_level->iTimeLimit));
+                break;
+
+            case 'H': // Level Call Limit
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_FIELD_CALL_LIMIT);
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(current_level->iCallLimit));
+                break;
+
+            case 'I': // Level Downloads
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_FIELD_DOWNLOADS);
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(current_level->iDownloads));
+                break;
+
+            case 'J': // Level Downloads MB
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_FIELD_DOWNLOAD_MB);
+                m_session_io.getInputField("", key, Config::sName_length, std::to_string(current_level->iDownloadMB));
+                break;
+
+            case 'K': // Level AR Flags 1
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_FIELD_ARFLAGS1);
+                m_session_io.getInputField("", key, Config::sName_length);
+                break;
+
+            case 'L': // Level AR Flags 2
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_FIELD_ARFLAGS2);
+                m_session_io.getInputField("", key, Config::sName_length);
+                break;
+
+            case 'M': // Bool PostCallRatio
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_BOOL_POST_CALL_RATIO);
+                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bPostCallRatio));
+                break;
+
+            case 'N': // Bool File Ratio
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_BOOL_FILE_RATIO);
+                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bFileRatio));
+                break;
+
+            case 'O': // Bool Time Limit
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_BOOL_TIME_LIMIT);
+                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bTimeLimit));
+                break;
+
+            case 'P': // Bool Call Limit
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_BOOL_CALL_LIMIT);
+                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bCallLimit));
+                break;
+
+            case 'R': // Bool Download File Limit
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_BOOL_DOWNLOADS);
+                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bDownloads));
+                break;
+
+            case 'S': // Bool Download Limit MB
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_BOOL_DOWNLOAD_MB);
+                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bDownloadMB));
+                break;
 
             case 'Q': // Quit
                 saveLevelChanges();
@@ -641,57 +699,94 @@ void ModLevelEditor::levelEditorLevelFieldHandler(const std::string& input)
     {
         baseProcessDeliverNewLine();
 
-        /*
-                , sName("")
-                , sStartMenu("")
-                , iLevel(0)
-                , iFileLevel(0)
-                , iMessageLevel(0)
-                , iPostCallRatio(0)
-                , iFileRatio(0)
-                , iTimeLimit(0)
-                , iCallLimit(0)
-                , iDownloads(0)
-                , iDownloadMB(0)
-                , iARFlags1(0)
-                , iARFlags2(0)
-                // Flags
-                , bPostCallRatio(false)
-                , bFileRatio(false)
-                , bTimeLimit(false)
-                , bCallLimit(false)
-                , bDownloads(false)
-                , bDownloadMB(false)
-                */
+        access_level_ptr current_level = getCurrentLevel();
 
         // Handle the assigned input received for field
         switch(m_current_field)
         {
-                /*
-                            case 'A': // Menu Title
-                                m_loaded_level.back()->menu_title = key;
-                                break;
+            case 'A': // Level Name
+                current_level->sName = key;
+                break;
 
-                            case 'B': // Menu Password
-                                m_loaded_level.back()->menu_password = key;
-                                break;
+            case 'B': // Level Start Menu
+                current_level->sStartMenu = key;
+                break;
 
-                            case 'C': // Menu Fallback
-                                m_loaded_level.back()->menu_fall_back = key;
-                                break;
+            case 'C': // Level File Level
+                current_level->iFileLevel = m_common_io.stringToInt(key);
+                break;
 
-                            case 'D': // Menu Help ID
-                                m_loaded_level.back()->menu_help_file = key;
-                                break;
+            case 'D': // Level Message Level
+                current_level->iMessageLevel = m_common_io.stringToInt(key);
+                break;
 
-                            case 'E': // Menu Name
-                                m_loaded_level.back()->level_code = key;
-                                break;
+            case 'E': // Level Post/Call Ratio
+                current_level->iPostCallRatio = m_common_io.stringToInt(key);
+                break;
 
-                            case 'F': // Menu Pulldown
-                                m_loaded_level.back()->menu_pulldown_file = key;
-                                break;
-                */
+            case 'F': // Level File Ratio
+                current_level->iFileRatio = m_common_io.stringToInt(key);
+                break;
+
+            case 'G': // Level Time Limit
+                current_level->iTimeLimit = m_common_io.stringToInt(key);
+                break;
+
+            case 'H': // Level Call Limit
+                current_level->iCallLimit = m_common_io.stringToInt(key);
+                break;
+
+            case 'I': // Level Downloads
+                current_level->iDownloads = m_common_io.stringToInt(key);
+                break;
+
+            case 'J': // Level Downloads MB
+                current_level->iDownloadMB = m_common_io.stringToInt(key);
+                break;
+
+            case 'K': // Level AR Flags 1
+            {
+                AccessCondition acs;
+
+                for(char c : key)
+                    acs.setFlagLevelToggle(c, true, current_level);
+
+                break;
+            }
+
+            case 'L': // Level AR Flags 2
+            {
+                AccessCondition acs;
+
+                for(char c : key)
+                    acs.setFlagLevelToggle(c, false, current_level);
+
+                break;
+            }
+
+            case 'M': // Bool PostCallRatio
+                current_level->bPostCallRatio = m_common_io.stringToBool(key);
+                break;
+
+            case 'N': // Bool File Ratio
+                current_level->bFileRatio = m_common_io.stringToBool(key);
+                break;
+
+            case 'O': // Bool Time Limit
+                current_level->bTimeLimit = m_common_io.stringToBool(key);
+                break;
+
+            case 'P': // Bool Call Limit
+                current_level->bCallLimit = m_common_io.stringToBool(key);
+                break;
+
+            case 'R': // Bool Download File Limit
+                current_level->bDownloads = m_common_io.stringToBool(key);
+                break;
+
+            case 'S': // Bool Download Limit MB
+                current_level->bDownloadMB = m_common_io.stringToBool(key);
+                break;
         }
 
         changeInputModule(MOD_LEVEL_FIELD_INPUT);
@@ -985,6 +1080,21 @@ bool ModLevelEditor::checkLevelExistsByLevel(int level_code)
 }
 
 /**
+ * @brief Retrieve Current Level
+ */
+access_level_ptr ModLevelEditor::getCurrentLevel()
+{
+    for(std::string::size_type i = 0; i < m_loaded_levels.size(); i++)
+    {
+        if(m_loaded_levels[i]->iLevel == m_current_level)
+            return m_loaded_levels[i];
+    }
+
+    return nullptr;
+}
+
+
+/**
  * @brief Level Editor, Read and Modify
  * @return
  */
@@ -1129,13 +1239,7 @@ std::string ModLevelEditor::displayLevelEditScreen()
     // Create Menu Pointer then load the menu into it.
     access_level_ptr current_level = nullptr;
 
-    for(unsigned int i = 0; i < m_loaded_levels.size(); i++)
-    {
-        if(m_loaded_levels[i]->iLevel == m_current_level)
-        {
-            current_level = m_loaded_levels[i];
-        }
-    }
+    current_level = getCurrentLevel();
 
     if(current_level == nullptr)
     {

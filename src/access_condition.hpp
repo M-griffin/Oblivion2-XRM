@@ -10,8 +10,12 @@
 #include <vector>
 #include <map>
 
+
 class Users;
 typedef std::shared_ptr<Users> user_ptr;
+
+class AccessLevel;
+typedef std::shared_ptr<AccessLevel> access_level_ptr;
 
 /**
  * @class AccessCondition
@@ -25,7 +29,7 @@ class AccessCondition
 public:
     explicit AccessCondition()  { };
     ~AccessCondition() { };
-    
+
     /**
      * @brief Toggle Bit Flag
      * @param flag
@@ -33,6 +37,14 @@ public:
      * @param user
      */
     void setFlagToggle(unsigned char flag, bool first_set, user_ptr user);
+
+    /**
+     * @brief Toggle Bit Flag
+     * @param flag
+     * @param first_set
+     * @param level
+     */
+    void setFlagLevelToggle(unsigned char flag, bool first_set, access_level_ptr level);
 
     /**
      * @brief Set Bit Flag on
@@ -55,10 +67,10 @@ public:
      * @param flag
      * @param first_set
      * @param user
-     * @return 
+     * @return
      */
     bool checkAccessConditionFlag(unsigned char flag, bool first_set, user_ptr user);
-    
+
     /**
      * @brief Sets a Default String of Bitflags On
      * @param bitString
@@ -74,19 +86,19 @@ public:
      * @param user
      */
     void setAccessConditionsFlagsOff(std::string bitString, bool first_set, user_ptr user);
-        
+
     /**
      * @brief Parse Code Map and Test Security and AR Flags.
      * @param code_map
      * @param user
-     * @return 
+     * @return
      */
     bool parseCodeMap(const std::vector<MapType> &code_map, user_ptr user);
 
     /**
      * @brief Parse ASC Strings then test User Flags
      * @param acs_string
-     * @return 
+     * @return
      */
     std::vector<MapType> parseAcsString(const std::string &acs_string);
 
@@ -94,14 +106,14 @@ public:
      * @brief Parses and Validates codemap
      * @param acs_string
      * @param user
-     * @return 
+     * @return
      */
     bool validateAcsString(const std::string &acs_string, user_ptr user);
 
     /**
      * @brief Bit String to Printable String
      * @param bits
-     * @return 
+     * @return
      */
     std::string getAccessConditionFlagStringFromBits(int bits);
 
@@ -112,11 +124,13 @@ public:
     // start with NOT s255 then test for s255
     // start with all not, but all normal will get caught and never pass through.
     // seperate expressons with | or. and ( )
-    const std::string ACS_EXPRESSION = {
+    const std::string ACS_EXPRESSION =
+    {
         "([~]{1}[sS]{1}\\d{1,3})|([sS]{1}\\d{1,3})|"
         "([~]{1}[fF]{1}[A-Z]{1})|([fF]{1}[A-Z]{1})|"
-        "([~]{1}[oO]{1}[A-Z]{1})|([oO]{1}[A-Z]{1})"};
-        
+        "([~]{1}[oO]{1}[A-Z]{1})|([oO]{1}[A-Z]{1})"
+    };
+
 
 };
 

@@ -272,6 +272,11 @@ public:
     bool checkLevelExistsByLevel(int level_code);
 
     /**
+     * @brief Retrieve Current Level
+     */
+    access_level_ptr getCurrentLevel();
+
+    /**
      * @brief Menu Editor Display, Runs through all existing menus
      * @return
      */
