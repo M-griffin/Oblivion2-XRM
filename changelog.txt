@@ -1,4 +1,89 @@
 
+Change Log Update (00.00.141)
+* 2018-10-31
++ Completed Level Editor. 
+
+Change Log Update (00.00.140)
+* 2018-10-31
++ Level Editors display screen set, next is to plug in all fields for 
+  making edits for saving changes.
+
+Change Log Update (00.00.139)
+* 2018-10-30
++ Setup the Prompt and Display Text Files for the Level Editor Screen Next is 
+  to plug in the for screen display.
+
+Change Log Update (00.00.138)
+* 2018-10-30
++ Added Copy Levels for the Level Editor. Next is work on Editing the Individual 
+  level field options.
+
+Change Log Update (00.00.137)
+* 2018-10-27
++ Correction to type-o on iLevel case in SQL Field Creation.
++ Added sort on Level in Level Editor display screen.
+
+Change Log Update (00.00.136)
+* 2018-10-27
++ Fixed checking on Populated list before clearing in Editors. 
+
+Change Log Update (00.00.135)
+* 2018-10-20
++ Fixed Issue with Foreign Key on for Security Table on User Table. 
+
+Change Log Update (00.00.134)
+* 2018-10-14
++ Some work on the Level Editor save, update, delete and copy methods.
++ Next is to work on display and editing of the fields and flags.
+
+Change Log Update (00.00.133)
+* 2018-10-04
++ Wip on Level Editor, Started work on Level Display screen. 
+
+Change Log Update (00.00.132)
+* 2018-10-03
++ Updated DbStartup Class to generate default Access Levels for first
+  time table creating and system defaults. This will also be used for testing the Level Editor.
++ Added Notes on what table exists when the startup does table checking.
+
+Change Log Update (00.00.131)
+* 2018-10-03
++ WIP Rework for Level Editor
++ Fixed Editing formatting and styling that was off.
+
+Change Log Update (00.00.130)
+* 2018-09-16
++ Created OSX_INSTALL.TXT for compiling the program
++ Basic dependency setup for OS/X using Homebrew package manager.
+
+Change Log Update (00.00.129)
+* 2018-08-19
++ Added in the Level Access Mod to the menu system. Now slowly reworking
+  the initial display to pull and display all levels and add new ones.
++ Sync OSX Project with Latest Module Additions 
++ Sync Linux project for latest module file additions
++ Also updates new message and file area modules with their own definitions.
+
+Change Log Update (00.00.128)
+* 2018-08-19
++ Renamed Module Config_Sys to FormManager Editor
++ Added Initial Module Files for Message Base and File Areas Editors for rework.
+
+Change Log Update (00.00.127)
+* 2018-08-18
++ Added AccessLevelDao to Db_Startup class to create table if it doesn't exist.
++ Added new AccessLevelDao method to lookup access_level by level.
+
+Change Log Update (00.00.126)
+* 2018-08-18
++ Added Bool Flags for Access_Level models, each individual level can have it's own limits on/off
++ Updated DAO objects to match new Access Level object.
++ Some cleanup on text
+
+Change Log Update (00.00.125)
+* 2018-08-15
++ Initial Stub for Level Editor. Started from rework of Menu editor. 
+
 Change Log Update (00.00.124)
 * 2018-08-12
 + Created default Build folder for Runtime execution with default menus,
