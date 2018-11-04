@@ -12,10 +12,12 @@ void StateManager::clean()
     if(!m_the_state.empty())
     {
         m_the_state.back()->onExit();
+
         while(m_the_state.size() > 0)
         {
             m_the_state.pop_back();
         }
+
         m_the_state.clear();
     }
 }
@@ -43,11 +45,14 @@ void StateManager::update()
             std::string::iterator line_end = incoming_data.end();
 
             int length = utf8::distance(it, line_end);
-            while (it != line_end)
+
+            while(it != line_end)
             {
                 utf_found = false;
                 uint32_t code_point = utf8::next(it, line_end);
 
+                // UT check for next code point.
+                // ESC squence usually have [, ESC alone is blank or '\0'
                 std::cout << "ut: " << *it << std::endl;
                 std::cout << "code_point: " << code_point << std::endl;
 
@@ -59,17 +64,22 @@ void StateManager::update()
                 new_string_builder += (char *)character;
 
                 // NOTE Not really used at this time,  might just remove!
-                if (strlen((const char *)character) > 1 || code_point > 512)
+                if(strlen((const char *)character) > 1 || code_point > 512)
                     utf_found = true;
 
                 //std::cout << "char_count: " << char_count << " " << code_point << std::endl;
                 ++char_count;
 
                 // End of Sequences or single ESC's.
-                if (length == char_count && character[0] == 27)
+                if(length == char_count && character[0] == 27 && *it == '\0')
                 {
+                    new_string_builder = '\x1b';
+                    m_the_state.back()->update(new_string_builder, utf_found);
+
+                    new_string_builder = '\0';
+                    m_the_state.back()->update(new_string_builder, utf_found);
                     new_string_builder.erase();
-                    new_string_builder += '\0';
+                    return;
                 }
 
                 m_the_state.back()->update(new_string_builder, utf_found);
@@ -98,6 +108,7 @@ void StateManager::popState()
         m_the_state.back()->onExit();
         m_the_state.pop_back();
     }
+
     m_the_state.back()->resume();
 }
 
@@ -114,6 +125,7 @@ void StateManager::changeState(state_ptr &the_state)
         {
             return; // do nothing
         }
+
         m_the_state.back()->onExit();
 
         // Rework this lateron,  lets allow multiple states,, the most recent state will be active

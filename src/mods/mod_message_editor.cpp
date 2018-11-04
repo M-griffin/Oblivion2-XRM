@@ -336,9 +336,49 @@ void ModMessageEditor::setupEditor()
  */
 void ModMessageEditor::editorInput(const std::string &input)
 {
-    if(input[0] == 'Q')
+    std::string result = m_session_io.getKeyInput(input);
+
+    if(result.size() == 0)
     {
+        std::cout << "[editorInput] [result.size() == 0] input result: " << result << std::endl;
+        return;
+    }
+    else if(result[0] == 13 || result[0] == 10)
+    {
+        // Translations for ENTER next line
+        //input = "ENTER";
+        std::cout << "[editorInput] [ENTER HIT] input result: " << result << std::endl;
+        std::string output = "\r\n\x1b[" + std::to_string(m_text_box_left - 1) + "C";
+        baseProcessDeliverInput(output);
+    }
+    else if(result[0] == '\x1b' && result.size() > 2)
+    {
+        // ESC SEQUENCE - check movement / arrow keys.
+        //input = result;
+        std::cout << "[editorInput] ESC Sequence input result: " << result << std::endl;
+    }
+    else if(result[0] == '\x1b' && result.size() == 1)
+    {
+        // Check Single ESC KEY - command options
+        //input = "ESC";  - quit for now
+        std::cout << "[editorInput] ESC HIT! " << result << std::endl;
+
         m_is_active = false;
+    }
+    else
+    {
+
+        // Handle Input Characters here and control chars.
+        std::cout << "[editorInput] STDIO input result: " << result << std::endl;
+
+        for(char c : result)
+            std::cout << "[editorInput] c HIT! " << static_cast<int>(c) << std::endl;
+
+        std::string escape_sequence = m_common_io.getEscapeSequence();
+        std::cout << "[editorInput] ESC Sequence: " << static_cast<int>(escape_sequence[0]) << std::endl;
+
+        // Hot Key Input.
+        baseProcessDeliverInput(result);
     }
 
     return;
