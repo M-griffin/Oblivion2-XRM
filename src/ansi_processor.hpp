@@ -16,7 +16,7 @@
  */
 typedef struct ScreenPixel
 {
-    unsigned char c;
+    std::string c;
     int x_position;
     int y_position;
     int attribute;

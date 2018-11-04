@@ -66,9 +66,9 @@ std::string AnsiProcessor::screenBufferToString()
     {
         auto &buff = m_screen_buffer[i];
 
-        if(buff.c == '\r')
+        if(buff.c[0] == '\r')
         { } //  character = "\x1b[40m\r\n";
-        else if(buff.c == '\0')
+        else if(buff.c[0] == '\0')
             m_ansi_output += " ";
         else
             m_ansi_output += buff.c;
@@ -125,9 +125,9 @@ void AnsiProcessor::screenBufferDisplayTest()
             ss.ignore();
 
             // buff.c;
-            if(buff.c == '\r')
+            if(buff.c[0] == '\r')
             { } //  character = "\x1b[40m\r\n";
-            else if(buff.c == '\0')
+            else if(buff.c[0] == '\0')
                 character = " ";
             else
                 character = buff.c;
@@ -171,8 +171,8 @@ int AnsiProcessor::getMCIOffSet(std::string mci_code)
         // Check for MCI Code, if it matches, return position.
         if(i+2 < max)
         {
-            if(m_screen_buffer[i].c == (unsigned char)mci_code[0] && m_screen_buffer[i+1].c == (unsigned char)mci_code[1]
-                    && m_screen_buffer[i+2].c == (unsigned char)mci_code[2])
+            if(m_screen_buffer[i].c[0] == (unsigned char)mci_code[0] && m_screen_buffer[i+1].c[0] == (unsigned char)mci_code[1]
+                    && m_screen_buffer[i+2].c[0] == (unsigned char)mci_code[2])
             {
                 return i+1;
             }
@@ -244,7 +244,7 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
 
         // Options and skip null non plotted characters by
         // moving the drawing position forward.
-        if(padding > 0 && buff.c != '\0')
+        if(padding > 0 && buff.c[0] != '\0')
         {
             ansi_output += "\x1b[" + std::to_string(padding) + "C";
             // Get the Color change or first character after padding.
@@ -264,9 +264,9 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
             ansi_output.append("\x1B[1D\r\n");
         }
 
-        if(buff.c == '\r')
+        if(buff.c[0] == '\r')
         { } //  character = "\x1b[40m\r\n";
-        else if(buff.c == '\0')
+        else if(buff.c[0] == '\0')
         {
             ++padding;
             ++count;
