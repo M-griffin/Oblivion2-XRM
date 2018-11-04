@@ -48,22 +48,22 @@ public:
     {
         return m_menuID;
     }
-    
+
     //int m_next_state;
     static const std::string m_menuID;
     std::vector<std::string> m_system_fallback;
-    
+
     // handle to form interface.
     form_manager_ptr         m_form_manager;
 
-    
+
     // Dynamic Map of all Menu Option Command functions
-    typedef std::function< bool(const MenuOption & option)> CommandFuncType;    
+    typedef std::function< bool(const MenuOption & option)> CommandFuncType;
     typedef std::map<char, CommandFuncType> MappedCommandFunctions;
-    
+
     // Holds map of Menu Option Commands for quick lookup and execution
     MappedCommandFunctions   m_menu_command_functions;
-            
+
     /**
      * @brief Control Commands
      * @param option
@@ -99,13 +99,13 @@ public:
      * @param option
      */
     bool menuOptionsDoorCommands(const MenuOption &option);
-    
+
     /**
      * @brief Sysop Commands
      * @param option
      */
     bool menuOptionsSysopCommands(const MenuOption &option);
-    
+
     /**
      * @brief New User Voting Commands
      * @param option
@@ -117,7 +117,7 @@ public:
      * @param option
      */
     bool menuOptionsConferenceEditorCommands(const MenuOption &option);
-    
+
     /**
      * @brief Data Area Commands
      * @param option
@@ -147,7 +147,7 @@ public:
      * @param option
      */
     bool menuOptionsJoinConference(const MenuOption &option);
-    
+
     /**
      * @brief QWK Mail Commands
      * @param option
@@ -159,30 +159,30 @@ public:
      * @param option
      */
     bool menuOptionsTopTenListingCommands(const MenuOption &option);
-    
+
     /**
      * @brief Message Base Sponsor Commands
      * @param option
      */
     bool menuOptionsMessageBaseSponsorCommands(const MenuOption &option);
-    
+
     /**
      * @brief File Base Sponsor Commands
      * @param option
      */
     bool menuOptionsFileBaseSponsorCommands(const MenuOption &option);
-    
+
     /**
      * @brief Voting Commands
      * @param option
      */
     bool menuOptionsVotingCommands(const MenuOption &option);
-    
+
     /**
      * @brief Color Setting Commands
      * @param option
      */
-    bool menuOptionsColorSettingCommands(const MenuOption &option);    
+    bool menuOptionsColorSettingCommands(const MenuOption &option);
 
     /**
      * @brief Process Command Keys passed from menu selection (Callback)
@@ -209,12 +209,12 @@ public:
      * @brief Clears All Modules
      */
     void clearAllModules();
-    
+
     /**
      * @brief Exists and Shutsdown the current module
      */
     void shutdownModule();
-    
+
     /**
      * @brief Exists and Shutsdown the current module
      */
@@ -234,7 +234,7 @@ public:
      * @brief Starts up Signup Module
      */
     void startupModuleSignup();
-    
+
     /**
      * @brief Starts up Menu Editor
      */
@@ -249,6 +249,11 @@ public:
      * @brief Startup the Level Editor Module
      */
     void startupModuleLevelEditor();
+
+    /**
+     * @brief Startup the Full Screen Message Editor Module
+     */
+    void startupModuleMessageEditor();
 
     /**
      * @brief Handles Input for Login and PreLogin Sequences.
@@ -266,12 +271,12 @@ public:
      * @brief Handles parsing input for Logon current module.
      */
     void moduleLogonInput(const std::string &character_buffer, const bool &is_utf8);
-    
+
     /**
      * @brief Handles parsing input for current module.
      */
     void moduleInput(const std::string &character_buffer, const bool &is_utf8);
-    
+
 };
 
 #endif // MENU_SYSTEM_HPP

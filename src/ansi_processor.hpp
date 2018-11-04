@@ -139,6 +139,15 @@ public:
     void screenBufferDisplayTest();
 
     /**
+     * @brief MCI Off-Set if Mid ANSI
+     * Used for Single Line ANSI Inserts to determine where special MCI Codes are located.
+     *
+     * @param clearScreen
+     * @return
+     */
+    int getMCIOffSet(std::string mci_code);
+
+    /**
      * @brief Takes buffer and displays parsed sequences
      */
     std::string getScreenFromBuffer(bool clearScreen);
@@ -157,13 +166,22 @@ public:
 
     // Process ANSI screen inserts into the Screen Buffer
     void parseAnsiScreen(char *buff);  // 1
-    
-    
+
+
     // Helpers
-    int getYPosition() const { return m_y_position; }
-    int getXPosition() const { return m_x_position; }
-    
-    int getMaxLines() const { return m_number_lines; }
+    int getYPosition() const
+    {
+        return m_y_position;
+    }
+    int getXPosition() const
+    {
+        return m_x_position;
+    }
+
+    int getMaxLines() const
+    {
+        return m_number_lines;
+    }
 
 };
 

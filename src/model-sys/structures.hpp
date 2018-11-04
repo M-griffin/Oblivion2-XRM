@@ -4,7 +4,7 @@
 
 #include <string>
 
-extern std::string GLOBAL_BBS_PATH;      // BBS System
+extern std::string GLOBAL_BBS_PATH;
 extern std::string GLOBAL_DATA_PATH;
 extern std::string GLOBAL_MENU_PATH;
 extern std::string GLOBAL_MENU_PROMPT_PATH;

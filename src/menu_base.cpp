@@ -281,7 +281,8 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
     // Use a Local Ansi Parser for Pasrsing Menu Template with Mid.
     ansi_process_ptr ansi_process(new AnsiProcessor(
                                       m_menu_session_data->m_telnet_state->getTermRows(),
-                                      m_menu_session_data->m_telnet_state->getTermCols()));
+                                      m_menu_session_data->m_telnet_state->getTermCols())
+                                 );
     std::string output_screen;
     std::string new_screen = screen;
 

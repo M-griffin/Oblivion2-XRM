@@ -11,6 +11,10 @@
 class SessionData;
 typedef std::shared_ptr<SessionData> session_data_ptr;
 
+class AnsiProcessor;
+typedef std::shared_ptr<AnsiProcessor> ansi_process_ptr;
+
+
 /**
  * @class ModMessageEditor
  * @author Michael Griffin
@@ -32,6 +36,12 @@ public:
         , m_mod_user_state_index(MOD_FSE_INPUT)
         , m_failure_attempts(0)
         , m_is_text_prompt_exist(false)
+
+          // Later on default to 1, and screen width!!!
+        , m_text_box_top(0)
+        , m_text_box_bottom(24)
+        , m_text_box_left(0)
+        , m_text_box_right(80)
     {
         std::cout << "ModMessageEditor" << std::endl;
 
@@ -162,6 +172,30 @@ public:
     void displayPromptAndNewLine(const std::string &prompt);
 
     /**
+     * @brief Processes a TOP Template Screen
+     * @param ansi_process
+     * @param screen
+     * @return
+     */
+    std::string processTopTemplate(ansi_process_ptr ansi_process, const std::string &screen);
+
+    /**
+     * @brief Processes a MID Template Screen
+     * @param ansi_process
+     * @param screen
+     * @return
+     */
+    std::string processMidTemplate(ansi_process_ptr ansi_process, const std::string &screen);
+
+    /**
+     * @brief Processes a Bottom Template Screen
+     * @param ansi_process
+     * @param screen
+     * @return
+     */
+    std::string processBottomTemplate(ansi_process_ptr ansi_process, const std::string &screen);
+
+    /**
      * @brief Setup for the Message Editor
      * @return
      */
@@ -190,6 +224,10 @@ private:
     int                    m_mod_user_state_index;
     int                    m_failure_attempts;
     bool                   m_is_text_prompt_exist;
+    int                    m_text_box_top;
+    int                    m_text_box_bottom;
+    int                    m_text_box_left;
+    int                    m_text_box_right;
 
     CommonIO               m_common_io;
 

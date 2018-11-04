@@ -1,4 +1,5 @@
 #include "mod_message_editor.hpp"
+#include "../ansi_processor.hpp"
 
 #include <string>
 #include <vector>
@@ -161,28 +162,172 @@ void ModMessageEditor::displayPromptAndNewLine(const std::string &prompt)
 }
 
 /**
+ * @brief Processes a TOP Template Screen
+ * @param ansi_process
+ * @param screen
+ * @return
+ */
+std::string ModMessageEditor::processTopTemplate(ansi_process_ptr ansi_process, const std::string &screen)
+{
+    /**
+     * When we get 2J alone, it clears but leaves cursor.
+     * In most cases we need to add a pre-home cursor!
+     */
+    std::string new_screen = screen;
+    std::string::size_type index = 0;
+
+    while(index != std::string::npos)
+    {
+        index = new_screen.find("\x1b[2J", index);
+
+        if(index != std::string::npos)
+        {
+            new_screen.replace(index, 4, "\x1b[1;1H\x1b[2J");
+            // Incriment past previous replacement.
+            index += 9;
+        }
+    }
+
+    ansi_process->clearScreen();
+    ansi_process->parseAnsiScreen((char *)new_screen.c_str());
+    m_text_box_top = ansi_process->getMaxRowsUsedOnScreen() + 1;
+
+    return ansi_process->getScreenFromBuffer(true);
+}
+
+/**
+ * @brief Processes a Bottom Template Screen
+ * @param ansi_process
+ * @param screen
+ * @return
+ */
+std::string ModMessageEditor::processBottomTemplate(ansi_process_ptr ansi_process, const std::string &screen)
+{
+    ansi_process->clearScreen();
+    ansi_process->parseAnsiScreen((char *)screen.c_str());
+    int rows_used = ansi_process->getMaxRowsUsedOnScreen();
+
+    // We have size of footer, now subtract from screen height to get bottom margin.
+    int max_lines = ansi_process->getMaxLines();
+    m_text_box_bottom = max_lines - rows_used;
+
+    return screen;
+}
+
+/**
+ * @brief Processes a MID Template Screen
+ * @param ansi_process
+ * @param screen
+ * @return
+ */
+std::string ModMessageEditor::processMidTemplate(ansi_process_ptr ansi_process, const std::string &screen)
+{
+    std::string new_screen = screen;
+    std::string::size_type index = 0;
+
+    // MID Ansi, remove any extra CR / LF carriage returns.
+    while(index != std::string::npos)
+    {
+        index = new_screen.find("\r", index);
+
+        if(index != std::string::npos)
+        {
+            new_screen.erase(index, 1);
+        }
+    }
+
+    index = 0;
+
+    while(index != std::string::npos)
+    {
+        index = new_screen.find("\n", index);
+
+        if(index != std::string::npos)
+        {
+            new_screen.erase(index, 1);
+        }
+    }
+
+    // Clear All Mappings
+    m_session_io.clearAllMCIMapping();
+    m_session_io.addMCIMapping("|LT", "");
+    m_session_io.addMCIMapping("|RT", "");
+
+    // Build a single code map that can be reused.
+    std::vector<MapType> code_map = m_session_io.pipe2genericCodeMap(new_screen);
+
+
+    // Load, then pull MCI off-sets on the screen for margins.
+    ansi_process->clearScreen();
+    ansi_process->parseAnsiScreen((char *)new_screen.c_str());
+    m_text_box_left  = ansi_process->getMCIOffSet("|LT");
+    m_text_box_right = ansi_process->getMCIOffSet("|RT");
+
+    // remove length of left side MCI code if exists.
+    if(m_text_box_right > 0 && m_text_box_left > 0)
+    {
+        m_text_box_right -= 3;
+    }
+
+    // Remove Code Mappings from screen the sets up ansi screen
+    ansi_process->clearScreen();
+    std::string output_screen = m_session_io.parseCodeMapGenerics(new_screen, code_map);
+    ansi_process->parseAnsiScreen((char *)output_screen.c_str());
+
+    std::string mid_screen_line = ansi_process->getScreenFromBuffer(false);
+    new_screen.erase();
+    new_screen = "";
+
+    for(int i = 0; i < (m_text_box_bottom - m_text_box_top) + 1; i++)
+    {
+        new_screen += mid_screen_line;
+    }
+
+    return new_screen;
+}
+
+/**
  * @brief Setup for the Message Editor
  * @return
  */
 void ModMessageEditor::setupEditor()
 {
-    //displayPromptMCI(PROMPT_HEADER, string_filter);
+    // NOTE Possiable make these class instances, so we don't have to keep reloading.
+    std::string top_template = m_common_io.readinAnsi("FSESRT.ANS");
+    std::string mid_template = m_common_io.readinAnsi("FSEMID.ANS");
+    std::string bot_template = m_common_io.readinAnsi("FSEEND.ANS");
 
-    // Build a list of screen lines for the menu display
-    // So we know when to pause in large listing, or use pagenation.
-    //std::string user_display_output = displayUserList();
+    // Use a Local Ansi Parser for Pasrsing Menu Templates and determine boundaries.
+    ansi_process_ptr ansi_process(new AnsiProcessor(
+                                      m_session_data->m_telnet_state->getTermRows(),
+                                      m_session_data->m_telnet_state->getTermCols())
+                                 );
 
-    /*
-    if(m_user_display_list.size() > 0)
-    {
-        // Clear Out list if anything already exists.
-        std::vector<std::string>().swap(m_user_display_list);
-    }
+    // Parse the TOP Screen to get Top Text Margin
+    std::string top_screen = processTopTemplate(ansi_process, top_template);
 
-    m_user_display_list = m_common_io.splitString(user_display_output, '\n');
-    m_page = 0;
-    displayCurrentPage(PROMPT_INPUT_TEXT);
-    */
+    // Parse the BOTTOM Screen to get Bot Text Margin
+    std::string bot_screen = processBottomTemplate(ansi_process, bot_template);
+
+    // Parse The Mid to get Left / Right Margins |RT and |LT specify Right and Left.
+    // Only after Top and Bottom are calucated, this will geenrate the apporiate
+    // Rows uses inbetween top / bot templates on current screen size.
+    std::string mid_screen = processMidTemplate(ansi_process, mid_template);
+
+    // Stats
+    std::cout << "========================" << std::endl;
+    std::cout << "m_text_box_top    : " << m_text_box_top << std::endl;
+    std::cout << "m_text_box_bottom : " << m_text_box_bottom << std::endl;
+    std::cout << "m_text_box_left   : " << m_text_box_left << std::endl;
+    std::cout << "m_text_box_right  : " << m_text_box_right << std::endl;
+
+    // Next combine and output.. Move cursor to top left in box.
+    std::string screen_output = top_screen + mid_screen + bot_screen;
+    screen_output += "\x1b[" + std::to_string(m_text_box_top) + ";" + std::to_string(m_text_box_left) + "H";
+
+    std::cout << screen_output << std::endl;
+
+    baseProcessDeliverInput(screen_output);
 }
 
 /**
@@ -191,5 +336,10 @@ void ModMessageEditor::setupEditor()
  */
 void ModMessageEditor::editorInput(const std::string &input)
 {
+    if(input[0] == 'Q')
+    {
+        m_is_active = false;
+    }
 
+    return;
 }
