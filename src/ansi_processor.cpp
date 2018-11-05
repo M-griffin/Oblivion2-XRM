@@ -66,12 +66,12 @@ std::string AnsiProcessor::screenBufferToString()
     {
         auto &buff = m_screen_buffer[i];
 
-        if(buff.c[0] == '\r')
+        if(buff.char_sequence[0] == '\r')
         { } //  character = "\x1b[40m\r\n";
-        else if(buff.c[0] == '\0')
+        else if(buff.char_sequence[0] == '\0')
             m_ansi_output += " ";
         else
-            m_ansi_output += buff.c;
+            m_ansi_output += buff.char_sequence;
     }
 
     return m_ansi_output;
@@ -125,12 +125,12 @@ void AnsiProcessor::screenBufferDisplayTest()
             ss.ignore();
 
             // buff.c;
-            if(buff.c[0] == '\r')
+            if(buff.char_sequence[0] == '\r')
             { } //  character = "\x1b[40m\r\n";
-            else if(buff.c[0] == '\0')
+            else if(buff.char_sequence[0] == '\0')
                 character = " ";
             else
-                character = buff.c;
+                character = buff.char_sequence;
 
             m_ansi_output.append(character);
             ++count;
@@ -169,10 +169,11 @@ int AnsiProcessor::getMCIOffSet(std::string mci_code)
         }
 
         // Check for MCI Code, if it matches, return position.
-        if(i+2 < max)
+        if(i + 2 < max)
         {
-            if(m_screen_buffer[i].c[0] == (unsigned char)mci_code[0] && m_screen_buffer[i+1].c[0] == (unsigned char)mci_code[1]
-                    && m_screen_buffer[i+2].c[0] == (unsigned char)mci_code[2])
+            if(m_screen_buffer[i].char_sequence[0] == (unsigned char)mci_code[0] &&
+                    m_screen_buffer[i+1].char_sequence[0] == (unsigned char)mci_code[1] &&
+                    m_screen_buffer[i+2].char_sequence[0] == (unsigned char)mci_code[2])
             {
                 return i+1;
             }
@@ -244,7 +245,7 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
 
         // Options and skip null non plotted characters by
         // moving the drawing position forward.
-        if(padding > 0 && buff.c[0] != '\0')
+        if(padding > 0 && buff.char_sequence[0] != '\0')
         {
             ansi_output += "\x1b[" + std::to_string(padding) + "C";
             // Get the Color change or first character after padding.
@@ -264,9 +265,9 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
             ansi_output.append("\x1B[1D\r\n");
         }
 
-        if(buff.c[0] == '\r')
+        if(buff.char_sequence[0] == '\r')
         { } //  character = "\x1b[40m\r\n";
-        else if(buff.c[0] == '\0')
+        else if(buff.char_sequence[0] == '\0')
         {
             ++padding;
             ++count;
@@ -274,7 +275,7 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
         }
         else
         {
-            character = buff.c;
+            character = buff.char_sequence;
         }
 
         ansi_output.append(character);
@@ -518,7 +519,7 @@ std::string AnsiProcessor::screenBufferParse()
  * @brief Plots Characters on the Screen into the Buffer.
  * @param c
  */
-void AnsiProcessor::screenBufferSetPixel(char c)
+void AnsiProcessor::screenBufferSetPixel(std::string char_sequence)
 {
     // Keep track of the lonest line in buffer for Centering screen.
     if(m_x_position > m_max_x_position)
@@ -535,7 +536,7 @@ void AnsiProcessor::screenBufferSetPixel(char c)
         m_y_position = m_number_lines;
     }
 
-    m_screen_pixel.c = c;
+    m_screen_pixel.char_sequence = char_sequence;
     m_screen_pixel.x_position = m_x_position;
     m_screen_pixel.y_position = m_y_position;
     m_screen_pixel.attribute  = m_attribute;
@@ -564,7 +565,7 @@ void AnsiProcessor::screenBufferSetPixel(char c)
     }
 
     // Clear for next sequences.
-    m_screen_pixel.c = '\0';
+    m_screen_pixel.char_sequence = '\0';
     m_screen_pixel.x_position = 1;
     m_screen_pixel.y_position = 1;
     m_screen_pixel.attribute  = 0;
@@ -631,7 +632,7 @@ void AnsiProcessor::screenBufferClearRange(int start, int end)
     {
         try
         {
-            m_screen_buffer[i].c = '\0';
+            m_screen_buffer[i].char_sequence = '\0';
         }
         catch(std::exception &e)
         {
@@ -691,6 +692,65 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
     for(int z = 0; z <= (signed)strlen(buff); z++)
     {
         c = buff[z];
+
+        /**
+         * Determine here if were dealing with multi-bytes sequences
+         * If so skip processing and append straight to char buffer.
+         *
+         * WIP
+         */
+
+        /*
+        std::string incoming_data = std::move(m_the_state.back()->m_session_data->m_parsed_data);
+
+        if(incoming_data.size() > 0)
+        {
+            std::string::iterator it = incoming_data.begin();
+            std::string::iterator line_end = incoming_data.end();
+
+            int length = utf8::distance(it, line_end);
+
+            while(it != line_end)
+            {
+                utf_found = false;
+                uint32_t code_point = utf8::next(it, line_end);
+
+                // UT check for next code point.
+                // ESC squence usually have [, ESC alone is blank or '\0'
+                std::cout << "ut: " << *it << std::endl;
+                std::cout << "code_point: " << code_point << std::endl;
+
+                //std::cout << "append" << std::endl;
+                // This convert the uint32_t code point to char array
+                // So each sequence can be writen as seperate byte.
+                unsigned char character[5] = {0};
+                utf8::append(code_point, character);
+                new_string_builder += (char *)character;
+
+                // NOTE Not really used at this time,  might just remove!
+                if(strlen((const char *)character) > 1 || code_point > 512)
+                    utf_found = true;
+
+                //std::cout << "char_count: " << char_count << " " << code_point << std::endl;
+                ++char_count;
+
+                // End of Sequences or single ESC's.
+                if(length == char_count && character[0] == 27 && *it == '\0')
+                {
+                    new_string_builder = '\x1b';
+                    m_the_state.back()->update(new_string_builder, utf_found);
+
+                    new_string_builder = '\0';
+                    m_the_state.back()->update(new_string_builder, utf_found);
+                    new_string_builder.erase();
+                    return;
+                }
+
+                m_the_state.back()->update(new_string_builder, utf_found);
+                new_string_builder.erase();
+            }
+        } */
+
 
         //Handle escape sequence
         if(c == '\x1b')
@@ -766,18 +826,18 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
 
             } // End While (more_params)
 
-            // Great ESC Sequence in entirity
+// Great ESC Sequence in entirity
             ending_seq = z;
 
-            // loop and cut out full ESC Sequence to store it.
-            // We only store with input key if it's parsed
-            // Otherwise we skip it.
+// loop and cut out full ESC Sequence to store it.
+// We only store with input key if it's parsed
+// Otherwise we skip it.
             for(int seq = starting_seq; seq < ending_seq+1; seq++)
             {
                 esc_sequence += buff[seq];
             }
 
-            // Handle specific escape sequences
+// Handle specific escape sequences
             switch(c)
             {
 
@@ -1204,7 +1264,10 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
                     m_max_y_position = m_y_position;
                 }
 
-                screenBufferSetPixel(c);
+                // Converts Char to proper std::string
+                std::string char_sequence(1, c);
+                screenBufferSetPixel(char_sequence);
+                //screenBufferSetPixel(c, char_sequence);
             }
 
             esc_sequence.erase();

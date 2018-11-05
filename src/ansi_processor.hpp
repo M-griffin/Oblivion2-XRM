@@ -16,7 +16,7 @@
  */
 typedef struct ScreenPixel
 {
-    std::string c;
+    std::string char_sequence;
     int x_position;
     int y_position;
     int attribute;
@@ -154,7 +154,7 @@ public:
 
 
     // Screen Buffer Modifiers
-    void screenBufferSetPixel(char c);
+    void screenBufferSetPixel(std::string char_sequence);
     void screenBufferScrollUp();
     void screenBufferClearRange(int start, int end);
     void screenBufferClear();
