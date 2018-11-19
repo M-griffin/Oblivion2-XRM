@@ -39,8 +39,8 @@ SUITE(XRMAnsiProcessor)
     {
         AnsiProcessor ansi(25,80);
         ansi.parseAnsiScreen((char *)"ABC1234");
-        CHECK(ansi.m_screen_buffer[0].c == 'A');
-        CHECK(ansi.m_screen_buffer[6].c == '4');
+        CHECK(ansi.m_screen_buffer[0].char_sequence == "A");
+        CHECK(ansi.m_screen_buffer[6].char_sequence == "4");
 
     }
 

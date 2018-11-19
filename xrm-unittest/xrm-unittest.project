@@ -26,19 +26,27 @@
  }]]]>
     </Plugin>
   </Plugins>
-  <VirtualDirectory Name="sdl2_net">
-    <File Name="../src/sdl2_net/SDLnetUDP.cpp"/>
-    <File Name="../src/sdl2_net/SDLnetTCP.cpp"/>
-    <File Name="../src/sdl2_net/SDLnetsys.hpp"/>
-    <File Name="../src/sdl2_net/SDLnetselect.cpp"/>
-    <File Name="../src/sdl2_net/SDLnet.cpp"/>
-    <File Name="../src/sdl2_net/SDL_net.hpp"/>
-    <File Name="../src/sdl2_net/close_code.h"/>
-    <File Name="../src/sdl2_net/begin_code.h"/>
-  </VirtualDirectory>
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <VirtualDirectory Name="utf-cpp">
+      <VirtualDirectory Name="utf8">
+        <File Name="../src/utf-cpp/utf8/unchecked.h"/>
+        <File Name="../src/utf-cpp/utf8/core.h"/>
+        <File Name="../src/utf-cpp/utf8/checked.h"/>
+      </VirtualDirectory>
+      <File Name="../src/utf-cpp/utf8.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="sdl2_net">
+      <File Name="../src/sdl2_net/SDLnetUDP.cpp"/>
+      <File Name="../src/sdl2_net/SDLnetTCP.cpp"/>
+      <File Name="../src/sdl2_net/SDLnetsys.hpp"/>
+      <File Name="../src/sdl2_net/SDLnetselect.cpp"/>
+      <File Name="../src/sdl2_net/SDLnet.cpp"/>
+      <File Name="../src/sdl2_net/SDL_net.hpp"/>
+      <File Name="../src/sdl2_net/close_code.h"/>
+      <File Name="../src/sdl2_net/begin_code.h"/>
+    </VirtualDirectory>
     <File Name="../src/uuid.hpp"/>
     <File Name="../src/communicator.hpp"/>
     <File Name="../src/communicator.cpp"/>
@@ -82,6 +90,8 @@
     <File Name="../src/model-sys/message_area.hpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="data-sys">
+    <File Name="../src/data-sys/access_level_dao.hpp"/>
+    <File Name="../src/data-sys/access_level_dao.cpp"/>
     <File Name="../src/data-sys/text_prompts_dao.hpp"/>
     <File Name="../src/data-sys/text_prompts_dao.cpp"/>
     <File Name="../src/data-sys/config_dao.cpp"/>
