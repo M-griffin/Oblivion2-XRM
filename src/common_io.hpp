@@ -166,11 +166,11 @@ public:
      * Get The BBS System Users HOME directory
      */
     std::string getSystemHomeDirectory();
-    
+
     /**
      * @brief Appends Path Separator depending on environment.
      * @param path
-     * @return 
+     * @return
      */
     void pathAppend(std::string &path);
 
@@ -312,11 +312,11 @@ public:
      * @param buff
      */
     void readinAnsi(std::string FileName, std::string &buff);
-    
+
     /**
      * @brief Reads in Ansi file into Buffer Only
      * @param FileName
-     * @return 
+     * @return
      */
     std::string readinAnsi(std::string FileName);
 
@@ -331,49 +331,49 @@ public:
     /**
      * @brief Standard Time to Date String
      * @param std_time
-     * @return 
+     * @return
      */
     std::string standardDateToString(std::time_t std_time);
 
     /**
      * @brief Standard Time to Date/Time String
      * @param std_time
-     * @return 
+     * @return
      */
     std::string standardDateTimeToString(std::time_t std_time);
 
     /**
      * @brief String to Date Format
      * @param date
-     * @return 
+     * @return
      */
     std::time_t stringToStandardDate(std::string date);
 
     /**
      * @brief String to Date/Time Format
      * @param date_time
-     * @return 
+     * @return
      */
     std::time_t stringToStandardDateTime(std::string date_time);
-    
+
     /**
      * @brief Converts std::strings to Long values
      * @param value
-     * @return 
+     * @return
      */
     long stringToLong(std::string value);
 
     /**
      * @brief Converts std::strings to Int values
      * @param value
-     * @return 
+     * @return
      */
     int stringToInt(std::string value);
 
     /**
      * @brief Tests first char of string for starting T/F returns int with -1 for invalid
      * @param value
-     * @return 
+     * @return
      */
     int stringToBool(std::string value);
 
@@ -389,6 +389,14 @@ public:
         return std::find(std::begin(container), std::end(container), element)
                != std::end(container);
     }
+
+    template<typename octet_type>
+    inline uint8_t mask8(octet_type oc)
+    {
+        return static_cast<uint8_t>(0xff & oc);
+    }
+    
+    void testUnicode(std::string incoming_data);
 
 private:
 

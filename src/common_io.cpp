@@ -250,16 +250,23 @@ void CommonIO::pathAppend(std::string &path)
  */
 std::string::size_type CommonIO::numberOfChars(const std::string &str)
 {
+
+
+
+
+
+    /* Doesn't properly handle high-ascii!!  this is a problem.
     std::string line = str;
     std::string::iterator end_it = utf8::find_invalid(line.begin(), line.end());
-    if (end_it != line.end()) 
+    if (end_it != line.end())
     {
         std::cout << "This part is fine: " << std::string(line.begin(), end_it) << std::endl;
     }
-    
+
     // Get the line length (at least for the valid part)
     int length = utf8::distance(line.begin(), end_it);
     return length;
+    */
 }
 
 /**
@@ -306,7 +313,7 @@ std::string CommonIO::rightTrim(const std::string &str)
                          new_string.rbegin(),
                          new_string.rend(),
                          std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
-                         new_string.end()
+                     new_string.end()
                     );
 
     return new_string;
@@ -356,21 +363,22 @@ std::string CommonIO::eraseString(const std::string &str,
             end_position = string_size;
         }
     }
-   
+
     std::string new_string_builder = "";
     if(new_string.empty())
     {
         std::cout << "Exception (Common::EraseString) string length == 0" << std::endl;
         return new_string;
     }
-    
+
     unsigned char_count = 0;
     std::string::iterator it = new_string.begin();
-    std::string::iterator line_end = new_string.end();    
-    
-    while (it != line_end) {                
+    std::string::iterator line_end = new_string.end();
+
+    while (it != line_end)
+    {
         uint32_t code_point = utf8::next(it, line_end);
-        
+
         if(char_count < start_position || char_count > end_position)
         {
             //std::cout << "append" << std::endl;
@@ -380,10 +388,10 @@ std::string CommonIO::eraseString(const std::string &str,
             utf8::append(code_point, character);
             new_string_builder += (char *)character;
         }
-              
+
         ++char_count;
     }
-    
+
     return new_string_builder;
 }
 
@@ -397,9 +405,9 @@ std::string CommonIO::rightPadding(const std::string &str, std::string::size_typ
 {
     std::string padded_line = "";
     std::string new_string = str;
-    if(space == 0) 
+    if(space == 0)
         return new_string;
-    
+
     // If empty, return padded with spaces!
     if(new_string.empty())
     {
@@ -409,7 +417,7 @@ std::string CommonIO::rightPadding(const std::string &str, std::string::size_typ
         }
         return padded_line;
     }
-    
+
     std::string::size_type s = numberOfChars(new_string);
 
     // if Line > Sapce, Erase to match length
@@ -548,14 +556,17 @@ std::string CommonIO::maskString(const std::string &str)
  */
 bool CommonIO::isDigit(const std::string &str)
 {
-    // Later reference for 
+    // Later reference for
     // Better wide characters.
     // https://www.cs.helsinki.fi/group/boi2016/doc/cppreference/reference
     //     /en.cppreference.com/w/cpp/locale/isdigit.html
-    std::string::size_type num_digits = std::count_if(str.begin(), str.end(), 
-                            [](unsigned char c){ return std::isdigit(c); }
-                        );
-                        
+    std::string::size_type num_digits = std::count_if(str.begin(), str.end(),
+                                        [](unsigned char c)
+    {
+        return std::isdigit(c);
+    }
+                                                     );
+
     return num_digits == str.size();
 }
 
@@ -884,7 +895,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         m_line_buffer.erase();
         m_column_position = 0;
     }
-    
+
     // If were starting Off Input with a String already in buffer!  display it!
     if(m_is_new_leadoff && leadoff.size() > 0)
     {
@@ -918,7 +929,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         m_is_new_leadoff = true;
         return "\n";
     }
-    
+
     // Escape in this case, ignore, later add movement in string
     std::string sequence = "";
     if(character_buffer[0] == 27)
@@ -926,10 +937,10 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         sequence = getEscapeSequence();
         if(sequence.size() == 0)
         {
-            
+
             // WIP, update to clear field line CTRL + Y
-            
-            
+
+
             // Received ESC, Abort!
             //std::cout << "Received ESC!!!!!" << std::endl;
             //m_is_new_getline = true;
@@ -1258,12 +1269,12 @@ std::vector<std::string> CommonIO::splitString(const std::string& s, char delimi
 /**
  * @brief Standard Time to Date String
  * @param std_time
- * @return 
+ * @return
  */
 std::string CommonIO::standardDateToString(std::time_t std_time)
 {
     std::ostringstream oss;
-    oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d");    
+    oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d");
     std::string time_string = oss.str();
     return time_string;
 }
@@ -1271,12 +1282,12 @@ std::string CommonIO::standardDateToString(std::time_t std_time)
 /**
  * @brief Standard Time to Date/Time String
  * @param std_time
- * @return 
+ * @return
  */
 std::string CommonIO::standardDateTimeToString(std::time_t std_time)
 {
     std::ostringstream oss;
-    oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d %H:%M:%S %z");    
+    oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d %H:%M:%S %z");
     std::string datetime_string = oss.str();
     return datetime_string;
 }
@@ -1284,16 +1295,16 @@ std::string CommonIO::standardDateTimeToString(std::time_t std_time)
 /**
  * @brief String to Date Format
  * @param date
- * @return 
+ * @return
  */
-std::time_t CommonIO::stringToStandardDate(std::string date) 
+std::time_t CommonIO::stringToStandardDate(std::string date)
 {
     // Append Time For Dates, need formattings
-    std::string key = date;    
+    std::string key = date;
     key += " 00:00:00";
     struct std::tm tm;
 
-    std::istringstream ss(key);                
+    std::istringstream ss(key);
     ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
     if(ss.fail())
     {
@@ -1308,12 +1319,12 @@ std::time_t CommonIO::stringToStandardDate(std::string date)
 /**
  * @brief String to Date/Time Format
  * @param date_time
- * @return 
+ * @return
  */
-std::time_t CommonIO::stringToStandardDateTime(std::string date_time) 
+std::time_t CommonIO::stringToStandardDateTime(std::string date_time)
 {
     struct std::tm tm;
-    std::istringstream ss(date_time);                
+    std::istringstream ss(date_time);
     ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
     if(ss.fail())
     {
@@ -1328,7 +1339,7 @@ std::time_t CommonIO::stringToStandardDateTime(std::string date_time)
 /**
  * @brief Converts std::strings to Long values
  * @param value
- * @return 
+ * @return
  */
 long CommonIO::stringToLong(std::string value)
 {
@@ -1350,7 +1361,7 @@ long CommonIO::stringToLong(std::string value)
 /**
  * @brief Converts std::strings to Int values
  * @param value
- * @return 
+ * @return
  */
 int CommonIO::stringToInt(std::string value)
 {
@@ -1372,15 +1383,99 @@ int CommonIO::stringToInt(std::string value)
 /**
  * @brief Tests first char of string for starting T/F returns int with -1 for invalid
  * @param value
- * @return 
+ * @return
  */
 int CommonIO::stringToBool(std::string value)
 {
     // Test if string starts with T or F instead of typing True/False
     if (toupper(value[0]) == 'T')
         return 1;
-    else if (toupper(value[0]) == 'F') 
+    else if (toupper(value[0]) == 'F')
         return 0;
-    else 
+    else
         return -1;
+}
+
+
+/**
+ * @brief This is more a test for multi-byte string parsing
+ * @param incoming_data
+ */
+void CommonIO::testUnicode(std::string incoming_data)
+{
+    int byte_count = 0;
+    std::string new_string_builder = "";
+    bool utf_found = false;
+
+
+    if(incoming_data.size() > 0)
+    {
+        std::string::iterator it = incoming_data.begin();
+        std::string::iterator line_end = incoming_data.end();
+
+        while(it != line_end)
+        {
+
+            // Were doing a test for CodePage High Ascii 128-255
+            // Unicode will bomb on these as invalid, so in these
+            // Instances we work around by testing the lead
+            // If it return 0 then it's a single byte High Ascii.
+            // And not valid in any UTF-8 Sequence
+            uint8_t lead = mask8(*it);
+            std::cout << lead << " : " << static_cast<int>(lead) << std::endl;
+
+            if (lead < 0x80)
+            {
+                std::cout << "lead = 1" << std::endl;
+                byte_count = 1;
+            }
+            else if ((lead >> 5) == 0x6)
+            {
+                std::cout << "lead = 2" << std::endl;
+                byte_count = 2;
+            }
+            else if ((lead >> 4) == 0xe)
+            {
+                std::cout << "lead = 3" << std::endl;
+                byte_count = 3;
+            }
+            else if ((lead >> 3) == 0x1e)
+            {
+                std::cout << "lead = 4" << std::endl;
+                byte_count = 4;
+            }
+            else
+            {
+                // High ASCII > 127 < 256
+                std::cout << "lead = 0" << std::endl;
+                char_count = 0;
+                *it++; // Force it to next one.
+            }
+
+            utf_found = false;
+            if (byte_count > 0)
+            {
+                uint32_t code_point = utf8::next(it, line_end);
+
+                // UT check for next code point.
+                // ESC squence usually have [, ESC alone is blank or '\0'
+                std::cout << "ut: " << *it << std::endl;
+                std::cout << "code_point: " << code_point << std::endl;
+
+                //std::cout << "append" << std::endl;
+                // This convert the uint32_t code point to char array
+                // So each sequence can be writen as seperate byte.
+                unsigned char character[5] = {0};
+                utf8::append(code_point, character);
+                new_string_builder += (char *)character;
+
+                // NOTE Not really used at this time,  might just remove!
+                if(strlen((const char *)character) > 1 || code_point > 512)
+                    utf_found = true;
+
+                std::cout << "byte_count: " << byte_count << " " << code_point << std::endl;
+                //++char_count;
+            }
+        }
+    }
 }
