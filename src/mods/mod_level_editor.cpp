@@ -604,46 +604,70 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
                 break;
 
             case 'M': // Bool PostCallRatio
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_POST_CALL_RATIO);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bPostCallRatio));
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
+            }
 
             case 'N': // Bool File Ratio
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_FILE_RATIO);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bFileRatio));
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
+            }
 
             case 'O': // Bool Time Limit
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_TIME_LIMIT);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bTimeLimit));
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
+            }
 
             case 'P': // Bool Call Limit
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_CALL_LIMIT);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bCallLimit));
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
+            }
 
             case 'R': // Bool Download File Limit
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_DOWNLOADS);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bDownloads));
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
+            }
 
             case 'S': // Bool Download Limit MB
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_DOWNLOAD_MB);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bDownloadMB));
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
+            }
 
             case 'Q': // Quit
                 saveLevelChanges();

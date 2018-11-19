@@ -1982,6 +1982,7 @@ std::string ModUserEditor::displayUserExtendedEditScreen()
     // If Expiration Date Set to Minimun, then set as default None
     std::string expiration_date_string = "None";
 
+    // SQLite default.
     if(m_common_io.standardDateToString(usr->dtExpirationDate) != "1969-12-31")
         expiration_date_string = m_common_io.standardDateToString(usr->dtExpirationDate);
 
@@ -2100,7 +2101,6 @@ std::string ModUserEditor::displayUserExtendedEditScreen()
 
     return (buffer);
 }
-
 
 /**
  * @brief Displays the current page of user items
