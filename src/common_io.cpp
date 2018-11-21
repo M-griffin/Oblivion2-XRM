@@ -250,23 +250,72 @@ void CommonIO::pathAppend(std::string &path)
  */
 std::string::size_type CommonIO::numberOfChars(const std::string &str)
 {
+    int byte_count = 0;
+    std::string::size_type number_characters = 0;
 
-
-
-
-
-    /* Doesn't properly handle high-ascii!!  this is a problem.
-    std::string line = str;
-    std::string::iterator end_it = utf8::find_invalid(line.begin(), line.end());
-    if (end_it != line.end())
+    if(str.size() == 0)
     {
-        std::cout << "This part is fine: " << std::string(line.begin(), end_it) << std::endl;
+        return number_characters;
     }
 
-    // Get the line length (at least for the valid part)
-    int length = utf8::distance(line.begin(), end_it);
-    return length;
-    */
+    std::string string_builder = str;
+    std::string::iterator it = string_builder.begin();
+    std::string::iterator line_end = string_builder.end();
+
+    while(it != line_end)
+    {
+        // Were doing a test for CodePage High Ascii 128-255
+        // Unicode will bomb on these as invalid, so in these
+        // Instances we work around by testing the lead
+        // If it return 0 then it's a single byte High Ascii.
+        // And not valid in any UTF-8 Sequence
+        uint8_t lead = mask8(*it);
+
+        if (lead < 0x80)
+        {
+            byte_count = 1;
+            *it++; // Force it to next one.
+        }
+        else if ((lead >> 5) == 0x6)
+        {
+            byte_count = 2;
+        }
+        else if ((lead >> 4) == 0xe)
+        {
+            byte_count = 3;
+        }
+        else if ((lead >> 3) == 0x1e)
+        {
+            byte_count = 4;
+        }
+        else
+        {
+            // High ASCII > 127 < 256
+            byte_count = 0;
+            *it++;
+        }
+
+        if (byte_count <= 1)
+        {
+            ++number_characters;
+            continue;
+        }
+        else
+        {
+            try
+            {
+                // Iterate quickly to next sequence.
+                uint32_t code_point = utf8::next(it, line_end);
+                ++number_characters;
+            }
+            catch (utf8::exception &ex)
+            {
+                std::cout << "Invalid UTF-8 Sequence" << ex.what() << std::endl;
+            }
+        }
+    }
+
+    return number_characters;
 }
 
 /**
@@ -1448,7 +1497,7 @@ void CommonIO::testUnicode(std::string incoming_data)
             {
                 // High ASCII > 127 < 256
                 std::cout << "lead = 0" << std::endl;
-                char_count = 0;
+                byte_count = 0;
                 *it++; // Force it to next one.
             }
 

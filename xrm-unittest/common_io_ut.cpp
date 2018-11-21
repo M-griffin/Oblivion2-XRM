@@ -400,5 +400,12 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(result, "\x1b");
     }
 
+    TEST(parseAnsiScreenTest)
+    {
+        CommonIO common;
+        std::string temp = std::string(1, static_cast<unsigned char>(148));
+        common.testUnicode(temp);
+
+    }
 
 }

@@ -26,7 +26,20 @@ SUITE(XRM_MockUTTestClass)
         temp += std::string(1, static_cast<unsigned char>(126));
         temp += std::string(1, static_cast<unsigned char>(155));
         int result = common.numberOfChars(temp);
-        std::cout << "result: " << result << std::endl;
+        CHECK_EQUAL(result, 3);
+    }
+
+    TEST(numberOfCharsWithHighAsciiAndUtf8BeforeAndAfter)
+    {
+        // 21 Bytes, should be 9 seperate characters
+        CommonIO common;
+        std::string temp = "あにま"; // 3 + 3 + 3 = 9 bytes
+        temp += std::string(1, static_cast<unsigned char>(148)); // 1 byte
+        temp += std::string(1, static_cast<unsigned char>(126)); // 1 byte
+        temp += std::string(1, static_cast<unsigned char>(155)); // 1 byte
+        temp += "あにま"; // 3 + 3 + 3 = 9 bytes
+        int result = common.numberOfChars(temp);
+        CHECK_EQUAL(result, 9);
     }
 
     TEST(parseAnsiScreenTestHighAscii)
