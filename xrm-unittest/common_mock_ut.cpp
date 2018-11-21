@@ -19,6 +19,10 @@
 SUITE(XRM_MockUTTestClass)
 {
 
+    /**
+     * @brief Test Number of Characters with High ASCII mix-ins.
+     * @return
+     */
     TEST(numberOfCharsWithHighAscii)
     {
         CommonIO common;
@@ -49,6 +53,23 @@ SUITE(XRM_MockUTTestClass)
         temp += std::string(1, static_cast<unsigned char>(126));
         temp += std::string(1, static_cast<unsigned char>(155));
         common.testUnicode(temp);
+    }
+
+
+    /**
+     * @brief Erase Data in a String w/ start, end range. w/ High Ascii
+     * @return
+     */
+    TEST(EraseStringWithHighAscii)
+    {
+        CommonIO common;
+        std::string temp = std::string(1, static_cast<unsigned char>(155));
+        temp += "   Linux----";
+        std::string trim_temp = common.eraseString(temp, 6);
+
+        std::string result = std::string(1, static_cast<unsigned char>(155));
+        result += "   Li";
+        CHECK_EQUAL(trim_temp, result);
     }
 
 }

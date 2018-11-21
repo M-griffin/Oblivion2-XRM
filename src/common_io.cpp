@@ -424,18 +424,61 @@ std::string CommonIO::eraseString(const std::string &str,
     std::string::iterator it = new_string.begin();
     std::string::iterator line_end = new_string.end();
 
+    int byte_count = 0;
     while (it != line_end)
     {
-        uint32_t code_point = utf8::next(it, line_end);
+        // Were doing a test for CodePage High Ascii 128-255
+        // Unicode will bomb on these as invalid, so in these
+        // Instances we work around by testing the lead
+        // If it return 0 then it's a single byte High Ascii.
+        // And not valid in any UTF-8 Sequence
+        uint8_t lead = mask8(*it);
 
-        if(char_count < start_position || char_count > end_position)
+        if (lead < 0x80)
         {
-            //std::cout << "append" << std::endl;
-            // This convert the uint32_t code point to char array
-            // So each sequence can be writen as seperate byte.
-            unsigned char character[5] = {0};
-            utf8::append(code_point, character);
-            new_string_builder += (char *)character;
+            byte_count = 1;
+        }
+        else if ((lead >> 5) == 0x6)
+        {
+            byte_count = 2;
+        }
+        else if ((lead >> 4) == 0xe)
+        {
+            byte_count = 3;
+        }
+        else if ((lead >> 3) == 0x1e)
+        {
+            byte_count = 4;
+        }
+        else
+        {
+            // High ASCII > 127 < 256
+            byte_count = 0;
+
+        }
+
+        if (byte_count <= 1)
+        {
+            if(char_count < start_position || char_count > end_position)
+            {
+                new_string_builder += static_cast<unsigned char>(*it);
+            }
+
+            *it++;
+        }
+        else
+        {
+            uint32_t code_point = utf8::next(it, line_end);
+
+            if(char_count < start_position || char_count > end_position)
+            {
+                //std::cout << "append" << std::endl;
+                // This convert the uint32_t code point to char array
+                // So each sequence can be writen as seperate byte.
+                unsigned char character[5] = {0};
+                utf8::append(code_point, character);
+                new_string_builder += (char *)character;
+            }
         }
 
         ++char_count;
