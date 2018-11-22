@@ -19,7 +19,6 @@ class StateManager
 {
 public:
     explicit StateManager()
-        //: m_is_state_changed(false)
     {
         std::cout << "StateManager Created" << std::endl;
     }
@@ -27,13 +26,16 @@ public:
     ~StateManager()
     {
         std::cout << "~StateManager" << std::endl;
+
         if(!m_the_state.empty())
         {
             m_the_state.back()->onExit();
+
             while(m_the_state.size() > 0)
             {
                 m_the_state.pop_back();
             }
+
             m_the_state.clear();
         }
     }
@@ -44,6 +46,12 @@ public:
     void popState();
     void clean();
 
+    template<typename octet_type>
+    inline uint8_t mask8(octet_type oc)
+    {
+        return static_cast<uint8_t>(0xff & oc);
+    }
+
     // List of Active States per session.
     std::vector<state_ptr>& getTermStates()
     {
@@ -52,7 +60,6 @@ public:
 
 private:
 
-    //bool                   m_is_state_changed;
     std::vector<state_ptr> m_the_state;
 
 };

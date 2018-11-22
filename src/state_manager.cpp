@@ -1,6 +1,7 @@
 #include "state_manager.hpp"
 
-#include <utf-cpp/utf8.h>
+#include "utf-cpp/utf8.h"
+
 #include <cstring>
 #include <string>
 
@@ -31,7 +32,7 @@ void StateManager::clean()
  */
 void StateManager::update()
 {
-    int char_count = 0;
+    int byte_count = 0;
     std::string new_string_builder = "";
     bool utf_found = false;
 
@@ -44,42 +45,63 @@ void StateManager::update()
             std::string::iterator it = incoming_data.begin();
             std::string::iterator line_end = incoming_data.end();
 
-            int length = utf8::distance(it, line_end);
-
+            /**
+             * This loops a string, each next should be a single character code point.
+             */
             while(it != line_end)
             {
-                utf_found = false;
-                uint32_t code_point = utf8::next(it, line_end);
+                uint8_t lead = mask8(*it);
 
-                // UT check for next code point.
-                // ESC squence usually have [, ESC alone is blank or '\0'
-                std::cout << "ut: " << *it << std::endl;
-                std::cout << "code_point: " << code_point << std::endl;
-
-                //std::cout << "append" << std::endl;
-                // This convert the uint32_t code point to char array
-                // So each sequence can be writen as seperate byte.
-                unsigned char character[5] = {0};
-                utf8::append(code_point, character);
-                new_string_builder += (char *)character;
-
-                // NOTE Not really used at this time,  might just remove!
-                if(strlen((const char *)character) > 1 || code_point > 512)
-                    utf_found = true;
-
-                //std::cout << "char_count: " << char_count << " " << code_point << std::endl;
-                ++char_count;
-
-                // End of Sequences or single ESC's.
-                if(length == char_count && character[0] == 27 && *it == '\0')
+                if(lead < 0x80)
                 {
-                    new_string_builder = '\x1b';
-                    m_the_state.back()->update(new_string_builder, utf_found);
+                    byte_count = 1;
+                }
+                else if((lead >> 5) == 0x6)
+                {
+                    byte_count = 2;
+                }
+                else if((lead >> 4) == 0xe)
+                {
+                    byte_count = 3;
+                }
+                else if((lead >> 3) == 0x1e)
+                {
+                    byte_count = 4;
+                }
+                else
+                {
+                    // High ASCII > 127 < 256
+                    byte_count = 0;
+                }
 
-                    new_string_builder = '\0';
-                    m_the_state.back()->update(new_string_builder, utf_found);
-                    new_string_builder.erase();
-                    return;
+                if(byte_count <= 1)
+                {
+                    utf_found = false;
+                    *it++;
+
+                    // Only if ESC and next char is empty
+                    // Then we want to pass both to registed single ESC hit
+                    if(lead == '\x1b' && *it == '\0')
+                    {
+                        new_string_builder += '\x1b';
+                        m_the_state.back()->update(new_string_builder, utf_found);
+
+                        new_string_builder += '\0';
+                        m_the_state.back()->update(new_string_builder, utf_found);
+                        new_string_builder.erase();
+                        continue;
+                    }
+
+                    new_string_builder += lead;
+                }
+                else
+                {
+                    // Only gets here on multi-byte sequences.
+                    uint32_t code_point = utf8::next(it, line_end);
+                    unsigned char character[5] = {0};
+                    utf8::append(code_point, character);
+                    new_string_builder += (char *)character;
+                    utf_found = true;
                 }
 
                 m_the_state.back()->update(new_string_builder, utf_found);
