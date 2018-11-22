@@ -36,6 +36,7 @@ SUITE(XRMCommonIO)
         temp += std::string(1, static_cast<unsigned char>(126));
         temp += std::string(1, static_cast<unsigned char>(155));
         common.testUnicode(temp);
+        CHECK_EQUAL(1, 1);
     }
 
     TEST(NumberOfCharacters)
@@ -461,7 +462,7 @@ SUITE(XRMCommonIO)
         CommonIO common;
         std::string temp = std::string(1, static_cast<unsigned char>(148));
         common.testUnicode(temp);
-
+        CHECK_EQUAL(1, 1);
     }
 
 }

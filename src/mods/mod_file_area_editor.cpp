@@ -216,7 +216,7 @@ void ModFileAreaEditor::setupMenuEditor()
     // So we know when to pause in large listing, or use pagenation.
     std::string menu_display_output = displayMenuList();
 
-    if (m_menu_display_list.size() == 0)
+    if(m_menu_display_list.size() == 0)
     {
         // Clear Out list if anything already exists.
         std::vector<std::string>().swap(m_menu_display_list);
@@ -241,7 +241,7 @@ void ModFileAreaEditor::setupMenuEditFields()
     // So we know when to pause in large listing, or use pagenation.
     std::string menu_display_output = displayMenuEditScreen();
 
-    if (m_menu_display_list.size() == 0)
+    if(m_menu_display_list.size() == 0)
     {
         // Clear Out list if anything already exists.
         std::vector<std::string>().swap(m_menu_display_list);
@@ -262,19 +262,20 @@ void ModFileAreaEditor::displayCurrentPage(const std::string &input_state)
     unsigned int rows_used = m_ansi_process->getMaxRowsUsedOnScreen();
     unsigned int max_rows = m_ansi_process->getMaxLines();
 
-    if (m_page > 0)
+    if(m_page > 0)
         rows_used -= (m_ansi_process->m_number_lines - 2);
 
     m_rows_per_page = max_rows - (rows_used + 2);
 
     bool displayed_all_rows = true;
-    for (unsigned int i = (m_page*(m_rows_per_page-2)); i < m_menu_display_list.size(); i++)
+
+    for(unsigned int i = (m_page*(m_rows_per_page-2)); i < m_menu_display_list.size(); i++)
     {
         std::string display_line = m_session_io.pipe2ansi(m_menu_display_list[i]);
         display_line.append("\r\n");
         baseProcessAndDeliver(display_line);
 
-        if (i >= (m_page*m_rows_per_page) + m_rows_per_page)
+        if(i >= (m_page*m_rows_per_page) + m_rows_per_page)
         {
             // We've displayed the max amount of rows per the currnet
             // screen break out and wait for prompt or next page.
@@ -285,6 +286,7 @@ void ModFileAreaEditor::displayCurrentPage(const std::string &input_state)
 
     // Default Page Input Method
     unsigned int current_module_input;
+
     switch(m_mod_setup_index)
     {
         case MOD_DISPLAY_MENU:
@@ -298,7 +300,7 @@ void ModFileAreaEditor::displayCurrentPage(const std::string &input_state)
 
     // If we displayed all rows, then display propmpt, otherwise
     // Ask to hit anykey for next page.
-    if (displayed_all_rows)
+    if(displayed_all_rows)
     {
         // Reset Page back to Zero for next display.
         m_page = 0;
@@ -318,7 +320,7 @@ void ModFileAreaEditor::displayCurrentPage(const std::string &input_state)
  */
 void ModFileAreaEditor::displayCurrentEditPage(const std::string &input_state)
 {
-    for (unsigned int i = 0; i < m_menu_display_list.size(); i++)
+    for(unsigned int i = 0; i < m_menu_display_list.size(); i++)
     {
         std::string display_line = m_session_io.pipe2ansi(m_menu_display_list[i]);
         display_line.append("\r\n");
@@ -327,6 +329,7 @@ void ModFileAreaEditor::displayCurrentEditPage(const std::string &input_state)
 
     // Default Page Input Method
     unsigned int current_module_input;
+
     switch(m_mod_setup_index)
     {
         case MOD_DISPLAY_MENU_EDIT:
@@ -350,6 +353,7 @@ void ModFileAreaEditor::menuEditorPausedInput(const std::string &input)
 {
     std::string current_state_input;
     unsigned int current_module_input;
+
     switch(m_mod_setup_index)
     {
         case MOD_DISPLAY_MENU:
@@ -359,7 +363,7 @@ void ModFileAreaEditor::menuEditorPausedInput(const std::string &input)
     }
 
     // Check for abort on pause for next.
-    if (input.size() == 1 && std::toupper(input[0]) == 'A')
+    if(input.size() == 1 && std::toupper(input[0]) == 'A')
     {
         displayPrompt(current_state_input);
         changeInputModule(current_module_input);
@@ -408,7 +412,7 @@ void ModFileAreaEditor::menuEditorInput(const std::string &input)
 
         baseProcessDeliverNewLine();
 
-        switch (toupper(key[0]))
+        switch(toupper(key[0]))
         {
             case 'A': // Add
                 changeMenuInputState(MENU_ADD);
@@ -442,7 +446,7 @@ void ModFileAreaEditor::menuEditorInput(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty")
+        if(result != "empty")
         {
             baseProcessDeliverInput(result);
         }
@@ -475,78 +479,78 @@ void ModFileAreaEditor::menuEditorMenuFieldInput(const std::string &input)
 
         baseProcessDeliverNewLine();
 
-        switch (toupper(key[0]))
+        switch(toupper(key[0]))
         {
-                /*
-                case 'A': // Menu Title
-                    m_current_field = toupper(key[0]);
-                    changeInputModule(MOD_MENU_FIELD);
-                    displayPrompt(PROMPT_MENU_FIELD_TITLE);
-                    m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_title);
-                    break;
+            /*
+            case 'A': // Menu Title
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_TITLE);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_title);
+                break;
 
-                case 'B': // Menu Password
-                    m_current_field = toupper(key[0]);
-                    changeInputModule(MOD_MENU_FIELD);
-                    displayPrompt(PROMPT_MENU_FIELD_PASSWORD);
-                    m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_password);
-                    break;
+            case 'B': // Menu Password
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_PASSWORD);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_password);
+                break;
 
-                case 'C': // Menu Password
-                    m_current_field = toupper(key[0]);
-                    changeInputModule(MOD_MENU_FIELD);
-                    displayPrompt(PROMPT_MENU_FIELD_FALLBACK);
-                    m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_fall_back);
-                    break;
+            case 'C': // Menu Password
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_FALLBACK);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_fall_back);
+                break;
 
-                case 'D': // Menu Help ID
-                    m_current_field = toupper(key[0]);
-                    changeInputModule(MOD_MENU_FIELD);
-                    displayPrompt(PROMPT_MENU_FIELD_HELP_ID);
-                    m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_help_file);
-                    break;
+            case 'D': // Menu Help ID
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_HELP_ID);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_help_file);
+                break;
 
-                case 'E': // Menu Name
-                    m_current_field = toupper(key[0]);
-                    changeInputModule(MOD_MENU_FIELD);
-                    displayPrompt(PROMPT_MENU_FIELD_NAME);
-                    m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_name);
-                    break;
+            case 'E': // Menu Name
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_NAME);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_name);
+                break;
 
-                case 'F': // Menu Pulldown file
-                    m_current_field = toupper(key[0]);
-                    changeInputModule(MOD_MENU_FIELD);
-                    displayPrompt(PROMPT_MENU_FIELD_PULLDOWN);
-                    m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_pulldown_file);
-                    break;
+            case 'F': // Menu Pulldown file
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_FIELD);
+                displayPrompt(PROMPT_MENU_FIELD_PULLDOWN);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_pulldown_file);
+                break;
 
-                case 'G': // View Generate Menu
-                    displayGenericMenu();
-                    changeInputModule(MOD_DISPLAY_PAUSE);
-                    break;
+            case 'G': // View Generate Menu
+                displayGenericMenu();
+                changeInputModule(MOD_DISPLAY_PAUSE);
+                break;
 
-                case 'H': // Jump into Options Editing.
-                    changeInputModule(MOD_MENU_OPTION_INPUT);
-                    changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);
-                    break;
+            case 'H': // Jump into Options Editing.
+                changeInputModule(MOD_MENU_OPTION_INPUT);
+                changeSetupModule(MOD_DISPLAY_MENU_OPTIONS);
+                break;
 
-                case 'Q': // Quit
-                    saveMenuChanges();
-                    std::vector<menu_ptr>().swap(m_loaded_level);
+            case 'Q': // Quit
+                saveMenuChanges();
+                std::vector<menu_ptr>().swap(m_loaded_level);
 
-                    // Reload fall back, or gosub to Menu Editor Main
-                    changeInputModule(MOD_MENU_INPUT);
-                    changeSetupModule(MOD_DISPLAY_MENU);
-                    return;
+                // Reload fall back, or gosub to Menu Editor Main
+                changeInputModule(MOD_MENU_INPUT);
+                changeSetupModule(MOD_DISPLAY_MENU);
+                return;
 
-                case 'X': // Exit without Saving
-                    std::vector<menu_ptr>().swap(m_loaded_level);
+            case 'X': // Exit without Saving
+                std::vector<menu_ptr>().swap(m_loaded_level);
 
-                    // Reload fall back, or gosub to Menu Editor Main
-                    changeInputModule(MOD_MENU_INPUT);
-                    changeSetupModule(MOD_DISPLAY_MENU);
-                    return;
-                */
+                // Reload fall back, or gosub to Menu Editor Main
+                changeInputModule(MOD_MENU_INPUT);
+                changeSetupModule(MOD_DISPLAY_MENU);
+                return;
+            */
             default:
                 redisplayModulePrompt();
                 break;
@@ -556,7 +560,7 @@ void ModFileAreaEditor::menuEditorMenuFieldInput(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty")
+        if(result != "empty")
         {
             baseProcessDeliverInput(result);
         }
@@ -621,7 +625,7 @@ void ModFileAreaEditor::menuEditorMenuFieldHandler(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty")
+        if(result != "empty")
         {
             baseProcessDeliverInput(result);
         }
@@ -657,7 +661,7 @@ void ModFileAreaEditor::menuEditorMenuNameInput(const std::string &input)
 
         baseProcessDeliverNewLine();
 
-        if (checkMenuExists(key))
+        if(checkMenuExists(key))
         {
             handleMenuInputState(true, key);
         }
@@ -670,7 +674,7 @@ void ModFileAreaEditor::menuEditorMenuNameInput(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty")
+        if(result != "empty")
         {
             baseProcessDeliverInput(result);
         }
@@ -684,10 +688,10 @@ void ModFileAreaEditor::menuEditorMenuNameInput(const std::string &input)
  */
 void ModFileAreaEditor::handleMenuInputState(bool does_menu_exist, const std::string &menu_name)
 {
-    switch (m_mod_menu_state_index)
+    switch(m_mod_menu_state_index)
     {
         case MENU_ADD:
-            if (does_menu_exist)
+            if(does_menu_exist)
             {
                 // Error, can't create a menu that already exists!
                 displayPrompt(PROMPT_INVALID_LEVEL_EXISTS);
@@ -700,10 +704,11 @@ void ModFileAreaEditor::handleMenuInputState(bool does_menu_exist, const std::st
                 changeInputModule(MOD_MENU_INPUT);
                 redisplayModulePrompt();
             }
+
             break;
 
         case MENU_CHANGE:
-            if (does_menu_exist)
+            if(does_menu_exist)
             {
                 // Move to new Default setup for Options vs Menus.
                 // Also set the curent menu for the system to load
@@ -719,10 +724,11 @@ void ModFileAreaEditor::handleMenuInputState(bool does_menu_exist, const std::st
                 displayPrompt(PROMPT_INPUT_TEXT);
                 changeInputModule(MOD_MENU_INPUT);
             }
+
             break;
 
         case MENU_DELETE:
-            if (does_menu_exist)
+            if(does_menu_exist)
             {
                 deleteExistingMenu(menu_name);
                 changeInputModule(MOD_MENU_INPUT);
@@ -735,6 +741,7 @@ void ModFileAreaEditor::handleMenuInputState(bool does_menu_exist, const std::st
                 displayPrompt(PROMPT_INPUT_TEXT);
                 changeInputModule(MOD_MENU_INPUT);
             }
+
             break;
     }
 }
@@ -743,7 +750,7 @@ void ModFileAreaEditor::handleMenuInputState(bool does_menu_exist, const std::st
  * @brief Create a new empty Menu
  * @param menu_name
  */
-void ModFileAreaEditor::createNewMenu(const std::string &menu_name)
+void ModFileAreaEditor::createNewMenu(const std::string &)//menu_name)
 {
     /*
         // Pre-Load Menu, check access, if not valud, then fall back to previous.
@@ -769,7 +776,7 @@ void ModFileAreaEditor::createNewMenu(const std::string &menu_name)
  * @brief Create a new empty Menu
  * @param option_index
  */
-void ModFileAreaEditor::createNewMenuOption(unsigned int option_index)
+void ModFileAreaEditor::createNewMenuOption(unsigned int) //option_index)
 {
     /*
         MenuOption new_option;
@@ -791,7 +798,7 @@ void ModFileAreaEditor::createNewMenuOption(unsigned int option_index)
  * @brief Delete an existing Menu Option
  * @param option_index
  */
-void ModFileAreaEditor::deleteExistingMenuOption(unsigned int option_index)
+void ModFileAreaEditor::deleteExistingMenuOption(unsigned int) // option_index)
 {
     /*
         unsigned int option_size = m_loaded_level.back()->menu_options.size();
@@ -834,7 +841,7 @@ void ModFileAreaEditor::deleteExistingMenuOption(unsigned int option_index)
  * @brief On Insertion of Menu Options, reorder all after index
  * @param option_index
  */
-void ModFileAreaEditor::reorderMenuIndexesInsertion(unsigned int option_index)
+void ModFileAreaEditor::reorderMenuIndexesInsertion(unsigned int) // option_index)
 {
     /*
         for(unsigned int i = 0; i < m_loaded_level.back()->menu_options.size(); i++)
@@ -852,7 +859,7 @@ void ModFileAreaEditor::reorderMenuIndexesInsertion(unsigned int option_index)
  * @brief On Deletion of Menu Options, reorder all after index
  * @param option_index
  */
-void ModFileAreaEditor::reorderMenuIndexesDeletion(unsigned int option_index)
+void ModFileAreaEditor::reorderMenuIndexesDeletion(unsigned int) //option_index)
 {
     /*
         for(unsigned int i = 0; i < m_loaded_level.back()->menu_options.size(); i++)
@@ -870,7 +877,7 @@ void ModFileAreaEditor::reorderMenuIndexesDeletion(unsigned int option_index)
  * @brief Delete an existing Menu
  * @param menu_name
  */
-void ModFileAreaEditor::deleteExistingMenu(const std::string &menu_name)
+void ModFileAreaEditor::deleteExistingMenu(const std::string &)//menu_name)
 {
     /*
         // Pre-Load Menu, check access, if not valud, then fall back to previous.
@@ -889,7 +896,7 @@ void ModFileAreaEditor::deleteExistingMenu(const std::string &menu_name)
  * @brief Create a new empty Menu
  * @param menu_name
  */
-void ModFileAreaEditor::copyExistingMenu(const std::string &menu_name)
+void ModFileAreaEditor::copyExistingMenu(const std::string &) //menu_name)
 {
     /*
         // Pre-Load Menu, check access, if not valud, then fall back to previous.
@@ -924,7 +931,7 @@ void ModFileAreaEditor::copyExistingMenu(const std::string &menu_name)
  * @brief Copy an Existing Menu Option
  * @param option_index
  */
-void ModFileAreaEditor::copyExistingMenuOption(int option_index)
+void ModFileAreaEditor::copyExistingMenuOption(int) //option_index)
 {
     /*
         unsigned int option_size = m_loaded_level.back()->menu_options.size();
@@ -976,7 +983,7 @@ void ModFileAreaEditor::saveMenuChanges()
  * @brief Check if the menu exists in the current listing
  * @param menu_name
  */
-bool ModFileAreaEditor::checkMenuExists(std::string menu_name)
+bool ModFileAreaEditor::checkMenuExists(std::string) //menu_name)
 {
     /*
         directory_ptr directory(new Directory());
@@ -1004,7 +1011,7 @@ bool ModFileAreaEditor::checkMenuExists(std::string menu_name)
  * @brief Check if the menu option exists in the current listing
  * @param option_index
  */
-bool ModFileAreaEditor::checkMenuOptionExists(unsigned int option_index)
+bool ModFileAreaEditor::checkMenuOptionExists(unsigned int) //option_index)
 {
     /*
         // Check if it's out of bounds, negative already checked on caller.
