@@ -64,8 +64,8 @@ public:
     int m_foreground_color;
     int m_background_color;
 
-    ScreenPixel m_screen_pixel;
-    std::vector <ScreenPixel> m_screen_buffer;
+    ScreenPixel                m_screen_pixel;
+    std::vector <ScreenPixel>  m_screen_buffer;
     std::map<int, ScreenPixel> m_pull_down_options;
 
     // ANSI escape sequences

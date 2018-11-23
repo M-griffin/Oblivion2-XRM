@@ -2,6 +2,7 @@
 #include "common_io.hpp"
 
 #include "model-sys/structures.hpp"
+#include "utf-cpp/utf8.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -676,97 +677,59 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
     if(strlen(buff) == 0)
         return;
 
-    std::string esc_sequence;
+    std::string esc_sequence = "";
 
     int  param[10]             = {0};
-    unsigned char c            = 0;
     int  p = 0, dig = 0;
 
     bool more_params           = false;
     bool at_least_one_digit    = false;
     bool first_param_implied   = false;
 
-    int starting_seq = 0;
-    int ending_seq   = 0;
+    std::string incoming_data = std::string(
+                                    reinterpret_cast<const char *>(buff),
+                                    strlen((const char *)buff)
+                                );
 
-    for(int z = 0; z <= (signed)strlen(buff); z++)
+    std::string::iterator it = incoming_data.begin();
+    std::string::iterator line_end = incoming_data.end();
+
+    CommonIO common_io;
+    LocalizedBuffer buffer;
+
+    while(it != line_end)
     {
-        c = buff[z];
+        common_io.getNextGlyph(buffer, it, line_end);
 
-        /**
-         * Determine here if were dealing with multi-bytes sequences
-         * If so skip processing and append straight to char buffer.
-         *
-         * WIP
-         */
-
-        /*
-        std::string incoming_data = std::move(m_the_state.back()->m_session_data->m_parsed_data);
-
-        if(incoming_data.size() > 0)
+        if(buffer.length == 1 && buffer.character[0] == '\x1b')
         {
-            std::string::iterator it = incoming_data.begin();
-            std::string::iterator line_end = incoming_data.end();
+            esc_sequence.erase();
+            esc_sequence += buffer.character;
 
-            int length = utf8::distance(it, line_end);
+            common_io.getNextGlyph(buffer, it, line_end);
 
-            while(it != line_end)
-            {
-                utf_found = false;
-                uint32_t code_point = utf8::next(it, line_end);
-
-                // UT check for next code point.
-                // ESC squence usually have [, ESC alone is blank or '\0'
-                std::cout << "ut: " << *it << std::endl;
-                std::cout << "code_point: " << code_point << std::endl;
-
-                //std::cout << "append" << std::endl;
-                // This convert the uint32_t code point to char array
-                // So each sequence can be writen as seperate byte.
-                unsigned char character[5] = {0};
-                utf8::append(code_point, character);
-                new_string_builder += (char *)character;
-
-                // NOTE Not really used at this time,  might just remove!
-                if(strlen((const char *)character) > 1 || code_point > 512)
-                    utf_found = true;
-
-                //std::cout << "char_count: " << char_count << " " << code_point << std::endl;
-                ++char_count;
-
-                // End of Sequences or single ESC's.
-                if(length == char_count && character[0] == 27 && *it == '\0')
-                {
-                    new_string_builder = '\x1b';
-                    m_the_state.back()->update(new_string_builder, utf_found);
-
-                    new_string_builder = '\0';
-                    m_the_state.back()->update(new_string_builder, utf_found);
-                    new_string_builder.erase();
-                    return;
-                }
-
-                m_the_state.back()->update(new_string_builder, utf_found);
-                new_string_builder.erase();
-            }
-        } */
-
-
-        //Handle escape sequence
-        if(c == '\x1b')
-        {
-            // Store entire ESC Sequence
-            starting_seq = z;
+            if(buffer.length == 0)
+                break;
 
             // grab the left bracket
-            c = buff[++z];
+            if(buffer.length == 1 && buffer.character[0] == '?')
+            {
+                // Setup for ESC?7h or ESC?7l commands etc..
+                esc_sequence += buffer.character;
+            }
+            else if(buffer.length == 1 && buffer.character[0] == '[')
+            {
+                // Else Normal ESC Sequence, check parameters.
+                esc_sequence += buffer.character;
+            }
 
+            /*
             if(buff[z+1] == '7' && buff[z+2] == 'h')
             {
                 //std::cout << "line wrapping enabled!" << std::endl;
                 m_is_line_wrapping = true;
                 z+= 2;
-            }
+            }*/
 
             more_params = true;
             first_param_implied = false;
@@ -775,42 +738,51 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
             while(more_params == true)
             {
                 at_least_one_digit = false;
-                ++z;
+                common_io.getNextGlyph(buffer, it, line_end);
 
-                for(dig = 0; (isdigit(c = buff[z])) && (dig < 3); dig++)
+                if(buffer.length == 0)
+                    break;
+
+                for(dig = 0; dig < 3; dig++)
                 {
+                    if(buffer.length != 1 || !isdigit(buffer.character[0]))
+                        break;
+
                     at_least_one_digit = true;
 
                     // 3 digits at most (255) in a byte size decimal number */
                     if(dig == 0)
                     {
-                        param[p] = c - '0';
+                        param[p] = buffer.character[0] - '0';
                     }
                     else if(dig == 1)
                     {
                         param[p] *= 10;
-                        param[p] += c - '0';
+                        param[p] += buffer.character[0] - '0';
                     }
                     else
                     {
                         param[p] *= 100;
-                        param[p] += c - '0';
+                        param[p] += buffer.character[0] - '0';
                     }
 
-                    z++;
+                    esc_sequence += buffer.character;
+                    common_io.getNextGlyph(buffer, it, line_end);
                 }
 
                 //   ESC[C     p should = 0
                 //   ESC[6C    p should = 1
                 //   ESC[1;1H  p should = 2
                 //   ESC[;79H  p should = 2
-                if(c != '?')     // Skip Screen Wrap (The Draw)
+                if(buffer.character[0] != '?')     // Skip Screen Wrap (The Draw)
                 {
-                    if((at_least_one_digit == true) && (c == ';'))
+                    if((at_least_one_digit == true) &&
+                            (buffer.character[0] == ';'))
                     {
                         p++;
                     }
-                    else if((!(at_least_one_digit == true)) && (c == ';'))
+                    else if((!(at_least_one_digit == true)) &&
+                            (buffer.character[0] == ';'))
                     {
                         p++;
                         first_param_implied = true;
@@ -824,21 +796,11 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
                         more_params = false;
                 }
 
+                esc_sequence += buffer.character;
+
             } // End While (more_params)
 
-// Great ESC Sequence in entirity
-            ending_seq = z;
-
-// loop and cut out full ESC Sequence to store it.
-// We only store with input key if it's parsed
-// Otherwise we skip it.
-            for(int seq = starting_seq; seq < ending_seq+1; seq++)
-            {
-                esc_sequence += buff[seq];
-            }
-
-// Handle specific escape sequences
-            switch(c)
+            switch(buffer.character[0])
             {
 
                 case CURSOR_POSITION:
@@ -1204,10 +1166,15 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
         } // end of main escape sequence handler
         else   // otherwise output character using current color */
         {
+
+            LocalizedBuffer nextBuffer;
+            common_io.peekNextGlyph(nextBuffer, it, line_end);
+
             // Handle New Line in ANSI Files properly.
-            if(c == '\r' && buff[z+1] == '\n')
+            if(buffer.length == 1 && nextBuffer.length == 1 &&
+                    buffer.character[0] == '\r' && nextBuffer.character[0] == '\n')
             {
-                ++z; // Incriment past \n (2) char combo.
+                *it++; // Incriment to \n (2) char combo.
                 m_x_position = 1;
                 ++m_y_position;
 
@@ -1230,7 +1197,8 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
 
                 continue;
             }
-            else if(c == '\r' || c == '\n')
+            else if(buffer.length == 1 &&
+                    (buffer.character[0] == '\r' ||  buffer.character[0] == '\n'))
             {
                 m_x_position = 1;
                 ++m_y_position;
@@ -1256,7 +1224,7 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
             }
 
             // Append Character to Screen Buffer.
-            if(c != '\0')
+            if(buffer.length >= 1 && !buffer.character[0] == '\0')
             {
                 // Set the Current Max Row Position.
                 if(m_max_y_position < m_y_position)
@@ -1265,9 +1233,10 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
                 }
 
                 // Converts Char to proper std::string
-                std::string char_sequence(1, c);
-                screenBufferSetPixel(char_sequence);
+                // std::string char_sequence(1, c);
+                // screenBufferSetPixel(char_sequence);
                 //screenBufferSetPixel(c, char_sequence);
+                screenBufferSetPixel(buffer.character);
             }
 
             esc_sequence.erase();

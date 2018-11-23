@@ -8,6 +8,20 @@
 #include <map>
 #include <stdint.h>
 
+// Localized Buffer.
+typedef struct localized_buffer
+{
+    std::string character;
+    uint8_t     length;
+
+    void clear()
+    {
+        character.erase();
+        length = 0;
+    }
+
+} LocalizedBuffer;
+
 /**
  * @class CommonIO
  * @author Michael Griffin
@@ -395,7 +409,21 @@ public:
     {
         return static_cast<uint8_t>(0xff & oc);
     }
-    
+
+    /**
+     * @brief Parses screen data into the Screen Buffer.
+     * @return
+     */
+    void getNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
+                      std::string::iterator &line_end);
+
+    /**
+     * @brief Parses screen data into the Screen Buffer.
+     * @return
+     */
+    void peekNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
+                       std::string::iterator &line_end);
+
     void testUnicode(std::string incoming_data);
 
 private:

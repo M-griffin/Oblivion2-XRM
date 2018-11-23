@@ -96,12 +96,19 @@ void StateManager::update()
                 }
                 else
                 {
-                    // Only gets here on multi-byte sequences.
-                    uint32_t code_point = utf8::next(it, line_end);
-                    unsigned char character[5] = {0};
-                    utf8::append(code_point, character);
-                    new_string_builder += (char *)character;
-                    utf_found = true;
+                    try
+                    {
+                        // Only gets here on multi-byte sequences.
+                        uint32_t code_point = utf8::next(it, line_end);
+                        unsigned char character[5] = {0};
+                        utf8::append(code_point, character);
+                        new_string_builder += (char *)character;
+                        utf_found = true;
+                    }
+                    catch(utf8::exception &ex)
+                    {
+                        std::cout << "Utf8 Parsing Exception: " << ex.what() << " Line: " << __LINE__ << " File: "<< __FILE__ << std::endl;
+                    }
                 }
 
                 m_the_state.back()->update(new_string_builder, utf_found);

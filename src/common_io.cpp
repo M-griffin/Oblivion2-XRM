@@ -289,7 +289,6 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str)
         if(lead < 0x80)
         {
             byte_count = 1;
-            *it++; // Force it to next one.
         }
         else if((lead >> 5) == 0x6)
         {
@@ -307,12 +306,12 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str)
         {
             // High ASCII > 127 < 256
             byte_count = 0;
-            *it++;
         }
 
         if(byte_count <= 1)
         {
             ++number_characters;
+            *it++;
             continue;
         }
         else
@@ -325,7 +324,7 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str)
             }
             catch(utf8::exception &ex)
             {
-                std::cout << "Invalid UTF-8 Sequence" << ex.what() << std::endl;
+                std::cout << "Utf8 Parsing Exception: " << ex.what() << " Line: " << __LINE__ << " File: "<< __FILE__ << std::endl;
             }
         }
     }
@@ -488,16 +487,23 @@ std::string CommonIO::eraseString(const std::string &str,
         }
         else
         {
-            uint32_t code_point = utf8::next(it, line_end);
-
-            if(char_count < start_position || char_count > end_position)
+            try
             {
-                //std::cout << "append" << std::endl;
-                // This convert the uint32_t code point to char array
-                // So each sequence can be writen as seperate byte.
-                unsigned char character[5] = {0};
-                utf8::append(code_point, character);
-                new_string_builder += (char *)character;
+                uint32_t code_point = utf8::next(it, line_end);
+
+                if(char_count < start_position || char_count > end_position)
+                {
+                    //std::cout << "append" << std::endl;
+                    // This convert the uint32_t code point to char array
+                    // So each sequence can be writen as seperate byte.
+                    unsigned char character[5] = {0};
+                    utf8::append(code_point, character);
+                    new_string_builder += (char *)character;
+                }
+            }
+            catch(utf8::exception &ex)
+            {
+                std::cout << "Utf8 Parsing Exception: " << ex.what() << " Line: " << __LINE__ << " File: "<< __FILE__ << std::endl;
             }
         }
 
@@ -1556,6 +1562,160 @@ int CommonIO::stringToBool(std::string value)
         return -1;
 }
 
+/**
+ * @brief Parses screen data into the Screen Buffer.
+ * @return
+ */
+void CommonIO::getNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
+                            std::string::iterator &line_end)
+{
+    buffer.clear();
+
+    if(it == line_end)
+    {
+        return;
+    }
+
+    int byte_count = 0;
+    uint8_t lead = mask8(*it);
+
+    int byte_value = static_cast<int>((uint8_t)*it);
+
+    if(byte_value > 127 || byte_value < 226)
+    {
+        byte_count = 1;
+    }
+    else if(lead < 0x80)
+    {
+        byte_count = 1;
+    }
+    else if((lead >> 5) == 0x6)
+    {
+        byte_count = 2;
+    }
+    else if((lead >> 4) == 0xe)
+    {
+        byte_count = 3;
+    }
+    else if((lead >> 3) == 0x1e)
+    {
+        byte_count = 4;
+    }
+    else
+    {
+        // High ASCII > 127 < 256
+        byte_count = 1;
+    }
+
+    if(byte_count <= 1)
+    {
+        buffer.character = std::string(1, *it);
+        buffer.length = 1;
+        *it++;
+    }
+    else
+    {
+        try
+        {
+
+            std::cout << "IT : " << *it << std::endl;
+            std::cout << "IT (int) : " << static_cast<int>((uint8_t)*it) << std::endl;
+            std::cout << "byte_count : " << byte_count << std::endl;
+
+            uint32_t code_point = utf8::next(it, line_end);
+            unsigned char character[5] = {0, 0, 0, 0, 0};
+            utf8::append(code_point, character);
+            buffer.character = std::string(
+                                   reinterpret_cast<const char *>(character),
+                                   strlen((const char *)character)
+                               );
+            buffer.length = byte_count;
+        }
+        catch(utf8::exception &ex)
+        {
+            std::cout << "Utf8 Parsing Exception: " << ex.what() << " Line: " << __LINE__ << " File: "<< __FILE__ << std::endl;
+            ++*it;
+        }
+    }
+}
+
+/**
+ * @brief Parses screen data into the Screen Buffer.
+ * @return
+ */
+void CommonIO::peekNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
+                             std::string::iterator &line_end)
+{
+    buffer.clear();
+
+    if(it == line_end)
+    {
+        return;
+    }
+
+    int byte_count = 0;
+    uint8_t lead = mask8(*it);
+
+    // Chcek for High Ascii first, ignore any single byte uncode at this point
+    // Might need a flag or to re-think this parsing.
+    int byte_value = static_cast<int>((uint8_t)*it);
+
+    if(byte_value > 127 || byte_value < 226)
+    {
+        byte_count = 1;
+    }
+    else if(lead < 0x80)
+    {
+        byte_count = 1;
+    }
+    else if((lead >> 5) == 0x6)
+    {
+        byte_count = 2;
+    }
+    else if((lead >> 4) == 0xe)
+    {
+        byte_count = 3;
+    }
+    else if((lead >> 3) == 0x1e)
+    {
+        byte_count = 4;
+    }
+    else
+    {
+        // High ASCII > 127 < 256
+        byte_count = 1;
+    }
+
+    if(byte_count <= 1)
+    {
+        buffer.character = std::string(1, *it);
+        buffer.length = 1;
+    }
+    else
+    {
+        try
+        {
+            std::cout << "IT : " << *it << std::endl;
+            std::cout << "IT (int) : " << static_cast<int>((uint8_t)*it) << std::endl;
+            std::cout << "byte_count : " << byte_count << std::endl;
+
+            uint32_t code_point = utf8::next(it, line_end);
+            unsigned char character[5] = {0, 0, 0, 0, 0};
+            utf8::append(code_point, character);
+            buffer.character = std::string(
+                                   reinterpret_cast<const char *>(character),
+                                   strlen((const char *)character)
+                               );
+            buffer.length = byte_count;
+            *it--;
+        }
+        catch(utf8::exception &ex)
+        {
+            std::cout << "Utf8 Parsing Exception: " << ex.what() << " Line: " << __LINE__ << " File: "<< __FILE__ << std::endl;
+            ++*it;
+        }
+    }
+}
 
 /**
  * @brief This is more a test for multi-byte string parsing
