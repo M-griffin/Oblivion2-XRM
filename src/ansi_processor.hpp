@@ -154,7 +154,7 @@ public:
 
 
     // Screen Buffer Modifiers
-    void screenBufferSetPixel(std::string char_sequence);
+    void screenBufferSetGlyph(std::string char_sequence);
     void screenBufferScrollUp();
     void screenBufferClearRange(int start, int end);
     void screenBufferClear();

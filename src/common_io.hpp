@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 #include <stdint.h>
+#include <mutex>
 
 // Localized Buffer.
 typedef struct localized_buffer
@@ -243,11 +244,14 @@ public:
      */
     bool isDigit(const std::string &str);
 
+    // Multi-Byte to WIDE (UTF-8 to UTF-16)
+    std::wstring multibyte_to_wide(const char* mbstr);
+
     /**
      * @brief Used for printing multibyte (Unicode Translations)
      * @param wide_string
      */
-    std::string printWideCharacters(const std::wstring &wide_string);
+    std::string wide_to_multibyte(const std::wstring &wide_string);
 
     /**
      * @brief Translation from CP437 to UTF-8 MultiByte Characters
@@ -443,5 +447,7 @@ private:
 
     // Parameterized ESC Sequcnes Translations.
     std::map<std::string, std::string> m_sequence_map;
+
+    mutable std::mutex m;
 };
 #endif

@@ -520,7 +520,7 @@ std::string AnsiProcessor::screenBufferParse()
  * @brief Plots Characters on the Screen into the Buffer.
  * @param c
  */
-void AnsiProcessor::screenBufferSetPixel(std::string char_sequence)
+void AnsiProcessor::screenBufferSetGlyph(std::string char_sequence)
 {
     // Keep track of the lonest line in buffer for Centering screen.
     if(m_x_position > m_max_x_position)
@@ -1232,11 +1232,7 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
                     m_max_y_position = m_y_position;
                 }
 
-                // Converts Char to proper std::string
-                // std::string char_sequence(1, c);
-                // screenBufferSetPixel(char_sequence);
-                //screenBufferSetPixel(c, char_sequence);
-                screenBufferSetPixel(buffer.character);
+                screenBufferSetGlyph(buffer.character);
             }
 
             esc_sequence.erase();

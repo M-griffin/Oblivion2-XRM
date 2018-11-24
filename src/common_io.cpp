@@ -47,6 +47,11 @@
 /**
  * CP437 -> UTF-8 Character Translation Table
  */
+
+// Map for Wide UTF-16 back to CP437.
+static std::map <wchar_t, uint8_t> map_wide_to_cp437;
+
+
 wchar_t CP437_TABLE[] =
 {
     L'\u0000', L'\u263A', L'\u263B', L'\u2665', L'\u2666', L'\u2663', // 5
@@ -324,6 +329,8 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str)
             }
             catch(utf8::exception &ex)
             {
+                *it++;
+                ++number_characters;
                 std::cout << "Utf8 Parsing Exception: " << ex.what() << " Line: " << __LINE__ << " File: "<< __FILE__ << std::endl;
             }
         }
@@ -503,7 +510,9 @@ std::string CommonIO::eraseString(const std::string &str,
             }
             catch(utf8::exception &ex)
             {
+                new_string_builder += static_cast<unsigned char>(*it);
                 std::cout << "Utf8 Parsing Exception: " << ex.what() << " Line: " << __LINE__ << " File: "<< __FILE__ << std::endl;
+                *it++;
             }
         }
 
@@ -704,7 +713,35 @@ bool CommonIO::isDigit(const std::string &str)
  * @brief Used for printing output multibyte (Unicode Translations)
  * @param wide_string
  */
-std::string CommonIO::printWideCharacters(const std::wstring &wide_string)
+// Multi-Byte to WIDE (UTF-8 to UTF-16)
+std::wstring CommonIO::multibyte_to_wide(const char* mbstr)
+{
+    std::locale::global(std::locale(""));
+    std::cout.imbue(std::locale());
+
+    std::wstring result = L"";
+    std::mbstate_t state = std::mbstate_t();
+    std::size_t len = 1 + std::mbsrtowcs(NULL, &mbstr, 0, &state);
+    std::vector<wchar_t> wstr(len);
+    std::mbsrtowcs(&wstr[0], &mbstr, wstr.size(), &state);
+
+    for(unsigned int i = 0; i < wstr.size(); i++)
+    {
+        //std::wcout << "Wide string: " << wstr[i] << '\n'
+        //<< "The length, including '\\0': " << wstr.size() << '\n';
+        result += wstr[i];
+    }
+
+    return result;
+}
+
+/**
+ * @brief Used for printing output multibyte (Unicode Translations)
+ * @param wide_string
+ */
+
+// Wide To Multi-Byte (UTF-16 to UTF-8)
+std::string CommonIO::wide_to_multibyte(const std::wstring &wide_string)
 {
     std::locale::global(std::locale(""));
     std::cout.imbue(std::locale());
@@ -748,6 +785,21 @@ std::string CommonIO::translateUnicode(const std::string &standard_string)
     std::wstring wide_string = L"";
     int ascii_value = 0;
 
+
+    // TEMP, work out the reverse method next
+    // For now create the cache here for reverse translations.
+    if(map_wide_to_cp437.size() == 0)
+    {
+        // Lock and populate map cache so other threads do not interfear.
+        std::unique_lock<std::mutex> lock(m);
+
+        for(unsigned int char_value = 0; char_value < 256; char_value++)
+        {
+            map_wide_to_cp437[CP437_TABLE[char_value]] = char_value;
+        }
+    }
+
+
     // Loop and write out after translation to Unicode
     for(std::string::size_type i = 0; i < standard_string.size(); i++)
     {
@@ -763,7 +815,7 @@ std::string CommonIO::translateUnicode(const std::string &standard_string)
         }
     }
 
-    output += printWideCharacters(wide_string);
+    output += wide_to_multibyte(wide_string);
     return output;
 }
 
