@@ -171,6 +171,12 @@ public:
         m_escape_sequence.erase();
     }
 
+    static const std::string ENCODING_TEXT_UTF8;
+    static const std::string ENCODING_TEXT_CP437;
+
+    static constexpr int ENCODE_CP437 = 0;
+    static constexpr int ENCODE_UTF8  = 1;
+
     /* This function will read the OS specific functions
      * To Determine where the executable is located.
      * This has only been tested in Windows, Linux, OSX.

@@ -62,12 +62,12 @@ public:
         , m_session_stats(new SessionStats())
         , m_node_number(0)
         , m_is_use_ansi(true)
-        , m_output_encoding("cp437")
+        , m_encoding_text(CommonIO::ENCODING_TEXT_CP437)
+        , m_encoding(CommonIO::ENCODE_CP437)
         , m_is_session_authorized(false)
         , m_is_leaving(false)
         , m_is_esc_timer(false)
         , m_is_process_running(false)
-//        , m_raw_data()
         , m_parsed_data("")
     {
         std::cout << "SessionData" << std::endl;
@@ -168,7 +168,8 @@ public:
         // handle output encoding, if utf-8 translate data accordingly.
         std::string outputBuffer = "";
 
-        if(m_output_encoding != "cp437")
+        // TODO, if internal will become utf8, then need to rework this some.
+        if(m_encoding != CommonIO::ENCODE_CP437)
         {
             outputBuffer = m_common_io.translateUnicode(msg);
         }
@@ -368,7 +369,8 @@ public:
 
     int                   m_node_number;
     bool                  m_is_use_ansi;
-    std::string           m_output_encoding;
+    std::string           m_encoding_text;
+    int                   m_encoding;
     bool                  m_is_session_authorized;
     bool                  m_is_leaving;
     bool                  m_is_esc_timer;

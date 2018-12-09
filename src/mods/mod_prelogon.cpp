@@ -199,7 +199,7 @@ void ModPreLogon::displayTerminalDetection()
     {
         std::string result = prompt_term.second;
         std::string term = m_session_data->m_telnet_state->getTermType();
-        std::cout << "Term Type: " << term << std::endl;        
+        std::cout << "Term Type: " << term << std::endl;
         m_session_io.m_common_io.parseLocalMCI(result, mci_code, term);
         result = m_session_io.pipe2ansi(result);
         baseProcessAndDeliver(result);
@@ -228,7 +228,7 @@ void ModPreLogon::displayTerminalDetection()
  * @return
  */
 void ModPreLogon::setupAskCodePage()
-{   
+{
     std::cout << "setupAskCodePage()" << std::endl;
     // Fill the local term type to work with.
     m_term_type = m_session_data->m_telnet_state->getTermType();
@@ -252,6 +252,7 @@ void ModPreLogon::setupAskCodePage()
 bool ModPreLogon::emulationDetection(const std::string &input)
 {
     bool result = false;
+
     if(input.size() != 0)
     {
         unsigned int ch = 0;
@@ -311,6 +312,7 @@ bool ModPreLogon::emulationDetection(const std::string &input)
             }
         }*/
     }
+
     return result;
 }
 
@@ -321,6 +323,7 @@ bool ModPreLogon::emulationDetection(const std::string &input)
 void ModPreLogon::emulationCompleted()
 {
     std::cout << "emulationCompleted: " << std::endl;
+
     if(m_session_data->m_is_use_ansi)
     {
         displayPrompt(PROMPT_DETECTED_ANSI);
@@ -344,7 +347,7 @@ bool ModPreLogon::askANSIColor(const std::string &input)
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         return false;
@@ -384,11 +387,12 @@ bool ModPreLogon::askANSIColor(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty") 
+        if(result != "empty")
         {
             baseProcessDeliverInput(result);
         }
     }
+
     return true;
 }
 
@@ -402,9 +406,9 @@ bool ModPreLogon::askCodePage(const std::string &input)
     std::string blackColor = "|00";
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
-    
+
     // ESC was hit
-    if(result == "aborted") 
+    if(result == "aborted")
     {
         std::cout << "aborted!" << std::endl;
         return false;
@@ -421,37 +425,40 @@ bool ModPreLogon::askCodePage(const std::string &input)
                 std::string yes_prompt = "Yes";
                 baseProcessAndDeliverNewLine(yes_prompt);
             }
-            
+
             baseProcessDeliverNewLine();
 
             std::string message = "";
+
             if(m_term_type == "undetected" || m_term_type == "ansi")
             {
                 // Switch to ISO, then CP437 Character Set.
                 message = "\x1b[0m" + m_session_io.pipeColors(blackColor);
-                message += "\x1b%@\x1b(U \r\n\x1b[A";                
+                message += "\x1b%@\x1b(U \r\n\x1b[A";
                 m_session_data->deliver(message);
-                
+
                 message = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
-                         );
+                              m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
+                          );
 
                 // Even though it's default, lets set it anyways/
-                m_session_data->m_output_encoding = "cp437";
+                m_session_data->m_encoding_text = CommonIO::ENCODING_TEXT_CP437;
+                m_session_data->m_encoding = CommonIO::ENCODE_CP437;
             }
             else
             {
                 // Switch to Unicode Character Set.
                 message = "\x1b[0m" + m_session_io.pipeColors(blackColor);
-                message += "\x1b%@\x1b%G \r\n\x1b[A";                
+                message += "\x1b%@\x1b%G \r\n\x1b[A";
                 m_session_data->deliver(message);
-                
+
                 message = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
-                         );
+                              m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
+                          );
 
                 // Even though it's default, lets set it anyways/
-                m_session_data->m_output_encoding = "utf-8";
+                m_session_data->m_encoding_text = CommonIO::ENCODING_TEXT_UTF8;
+                m_session_data->m_encoding = CommonIO::ENCODE_UTF8;
             }
 
             baseProcessAndDeliverNewLine(message);
@@ -459,23 +466,25 @@ bool ModPreLogon::askCodePage(const std::string &input)
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
-        {            
+        {
             baseProcessDeliverNewLine();
-            
+
             std::string message = "";
+
             if(m_term_type == "undetected" || m_term_type == "ansi")
             {
                 // Switch to Unicode Character Set.
                 message = "\x1b[0m" + m_session_io.pipeColors(blackColor);
                 message += "\x1b%@\x1b%G \r\n\x1b[A";
                 m_session_data->deliver(message);
-                
+
                 message = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
-                         );
+                              m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
+                          );
 
                 // Even though it's default, lets set it anyways/
-                m_session_data->m_output_encoding = "utf-8";
+                m_session_data->m_encoding_text = CommonIO::ENCODING_TEXT_UTF8;
+                m_session_data->m_encoding = CommonIO::ENCODE_UTF8;
             }
             else
             {
@@ -483,13 +492,14 @@ bool ModPreLogon::askCodePage(const std::string &input)
                 message = "\x1b[0m" + m_session_io.pipeColors(blackColor);
                 message += "\x1b%@\x1b(U \r\n\x1b[A";
                 m_session_data->deliver(message);
-                
+
                 message = m_session_io.parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
-                         );
+                              m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
+                          );
 
                 // Even though it's default, lets set it anyways/
-                m_session_data->m_output_encoding = "cp437";
+                m_session_data->m_encoding_text = CommonIO::ENCODING_TEXT_CP437;
+                m_session_data->m_encoding = CommonIO::ENCODE_CP437;
             }
 
             baseProcessAndDeliverNewLine(message);
@@ -506,10 +516,11 @@ bool ModPreLogon::askCodePage(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty") 
+        if(result != "empty")
         {
             baseProcessDeliverInput(result);
         }
     }
+
     return true;
 }
