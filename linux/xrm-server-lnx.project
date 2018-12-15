@@ -196,6 +196,8 @@
       <File Name="../src/utf-cpp/utf8.h"/>
     </VirtualDirectory>
     <File Name="../src/uuid.hpp"/>
+    <File Name="../src/encoding.cpp"/>
+    <File Name="../src/encoding.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
