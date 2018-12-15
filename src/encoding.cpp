@@ -79,6 +79,9 @@ Encoding::Encoding()
     }
 }
 
+Encoding::~Encoding()
+{
+}
 
 /**
  * @brief Used for printing output multibyte (Unicode Translations)

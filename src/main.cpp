@@ -29,6 +29,7 @@
 #include "interface.hpp"
 #include "communicator.hpp"
 #include "common_io.hpp"
+#include "encoding.hpp"
 
 #include <memory>
 #include <cstdlib>
@@ -69,6 +70,11 @@ auto main() -> int
     GLOBAL_TEXTFILE_PATH = GLOBAL_BBS_PATH + "TEXTFILE";
     GLOBAL_SCRIPT_PATH = GLOBAL_BBS_PATH + "SCRIPTS";
 
+    // Startup the Encoding Instance and Char Mappings.
+    {
+        Encoding::instance();
+    }
+
     // Loading and saving default Configuration file to XML
     {
         config_ptr config(new Config());
@@ -91,6 +97,7 @@ auto main() -> int
         cfg.loadConfig();
         if (!cfg.validation())
         {
+            Encoding::releaseInstance();
             return 0;
         }
     }
@@ -108,6 +115,7 @@ auto main() -> int
         if (!config)
         {
             std::cout << "Unable to allocate config structure" << std::endl;
+            Encoding::releaseInstance();
             assert(false);
         }
 
@@ -118,6 +126,7 @@ auto main() -> int
         {
             // TODO Throws exception right now, need to work in
             // better shutdown on from this point! just assert for now.
+            Encoding::releaseInstance();
             exit(1);
         }
 
@@ -148,5 +157,6 @@ auto main() -> int
 
     // Release Communicator Instance
     TheCommunicator::releaseInstance();
+    Encoding::releaseInstance();
     return 0;
 }
