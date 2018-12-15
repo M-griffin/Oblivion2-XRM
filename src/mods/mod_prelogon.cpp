@@ -1,5 +1,6 @@
 #include "mod_prelogon.hpp"
 #include "../model-sys/config.hpp"
+#include "../encoding.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -442,8 +443,8 @@ bool ModPreLogon::askCodePage(const std::string &input)
                           );
 
                 // Even though it's default, lets set it anyways/
-                m_session_data->m_encoding_text = CommonIO::ENCODING_TEXT_CP437;
-                m_session_data->m_encoding = CommonIO::ENCODE_CP437;
+                m_session_data->m_encoding_text = Encoding::ENCODING_TEXT_CP437;
+                m_session_data->m_encoding = Encoding::ENCODE_CP437;
             }
             else
             {
@@ -457,8 +458,8 @@ bool ModPreLogon::askCodePage(const std::string &input)
                           );
 
                 // Even though it's default, lets set it anyways/
-                m_session_data->m_encoding_text = CommonIO::ENCODING_TEXT_UTF8;
-                m_session_data->m_encoding = CommonIO::ENCODE_UTF8;
+                m_session_data->m_encoding_text = Encoding::ENCODING_TEXT_UTF8;
+                m_session_data->m_encoding = Encoding::ENCODE_UTF8;
             }
 
             baseProcessAndDeliverNewLine(message);
@@ -483,8 +484,8 @@ bool ModPreLogon::askCodePage(const std::string &input)
                           );
 
                 // Even though it's default, lets set it anyways/
-                m_session_data->m_encoding_text = CommonIO::ENCODING_TEXT_UTF8;
-                m_session_data->m_encoding = CommonIO::ENCODE_UTF8;
+                m_session_data->m_encoding_text = Encoding::ENCODING_TEXT_UTF8;
+                m_session_data->m_encoding = Encoding::ENCODE_UTF8;
             }
             else
             {
@@ -498,8 +499,8 @@ bool ModPreLogon::askCodePage(const std::string &input)
                           );
 
                 // Even though it's default, lets set it anyways/
-                m_session_data->m_encoding_text = CommonIO::ENCODING_TEXT_CP437;
-                m_session_data->m_encoding = CommonIO::ENCODE_CP437;
+                m_session_data->m_encoding_text = Encoding::ENCODING_TEXT_CP437;
+                m_session_data->m_encoding = Encoding::ENCODE_CP437;
             }
 
             baseProcessAndDeliverNewLine(message);

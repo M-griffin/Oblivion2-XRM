@@ -7,6 +7,8 @@
 #include "process_posix.hpp"
 #endif
 
+#include "encoding.hpp"
+
 #include "io_service.hpp"
 #include "async_connection.hpp"
 #include "telnet_decoder.hpp"
@@ -62,8 +64,8 @@ public:
         , m_session_stats(new SessionStats())
         , m_node_number(0)
         , m_is_use_ansi(true)
-        , m_encoding_text(CommonIO::ENCODING_TEXT_CP437)
-        , m_encoding(CommonIO::ENCODE_CP437)
+        , m_encoding_text(Encoding::ENCODING_TEXT_CP437)
+        , m_encoding(Encoding::ENCODE_CP437)
         , m_is_session_authorized(false)
         , m_is_leaving(false)
         , m_is_esc_timer(false)
@@ -169,14 +171,18 @@ public:
         std::string outputBuffer = "";
 
         // TODO, if internal will become utf8, then need to rework this some.
-        if(m_encoding != CommonIO::ENCODE_CP437)
+        // Temp Disable while testing internal UTF8 Encoding.
+        /*
+        if(m_encoding != Encoding::ENCODE_CP437)
         {
-            outputBuffer = m_common_io.translateUnicode(msg);
+            outputBuffer = m_common_io.utf8Encode(msg);
         }
         else
         {
             outputBuffer = msg;
-        }
+        }*/
+
+        outputBuffer = msg;
 
         if(m_connection->isActive() && TheCommunicator::instance()->isActive())
         {

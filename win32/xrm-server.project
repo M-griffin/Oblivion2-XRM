@@ -21,6 +21,8 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="..\src">
+    <File Name="../src/encoding.hpp"/>
+    <File Name="../src/encoding.cpp"/>
     <File Name="../src/uuid.hpp"/>
     <File Name="../src/directory.hpp"/>
     <File Name="../src/async_acceptor.hpp"/>
