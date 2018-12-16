@@ -636,7 +636,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
                     match_found = true;
                     break;
 
-                // Handle yes /no /continue
+                    // Handle yes /no /continue
 
                 default:
                     break;
@@ -686,7 +686,7 @@ std::string MenuBase::loadMenuScreen()
         // if file doesn't exist, then use generic template
         if(m_common_io.fileExists(screen_file))
         {
-            m_common_io.readinAnsi(screen_file, screen_data);
+            screen_data = m_common_io.readinAnsi(screen_file);
         }
         else
         {
@@ -707,7 +707,7 @@ std::string MenuBase::loadMenuScreen()
         // if file doesn't exist, then use generic template
         if(m_common_io.fileExists(screen_file))
         {
-            m_common_io.readinAnsi(screen_file, screen_data);
+            screen_data = m_common_io.readinAnsi(screen_file);
         }
         else
         {
@@ -933,8 +933,7 @@ std::string MenuBase::loadMenuPrompt()
         m_session_io.addMCIMapping("%MN", m_menu_info->menu_prompt);
 
         std::string output = m_session_io.pipe2ansi(prompt_display);
-        //std::cout << "prompt: " << output << std::endl;
-        return output;
+        return Encoding::instance()->utf8Encode(output);
     }
     else
     {

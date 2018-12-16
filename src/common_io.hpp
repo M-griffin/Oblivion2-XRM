@@ -174,21 +174,14 @@ public:
      * @brief Check if the file exists
      * @return
      */
-    bool fileExists(std::string FileName);
-
-    /**
-     * @brief Read In ANSI text files for parsing.
-     * @param FileName
-     * @param buff
-     */
-    void readinAnsi(std::string FileName, std::string &buff);
+    bool fileExists(std::string file_name);
 
     /**
      * @brief Reads in Ansi file into Buffer Only
      * @param FileName
      * @return
      */
-    std::string readinAnsi(std::string FileName);
+    std::string readinAnsi(std::string file_name);
 
     /**
      * @brief Split Strings by delimiter into Vector of Strings.

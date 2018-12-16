@@ -73,6 +73,7 @@ wchar_t CP437_TABLE[] =
 
 Encoding::Encoding()
 {
+    // Populate UCS2 to CP437 Translation Mapping.
     for(unsigned int char_value = 0; char_value < 256; char_value++)
     {
         map_wide_to_cp437.insert(std::make_pair(CP437_TABLE[char_value], char_value));

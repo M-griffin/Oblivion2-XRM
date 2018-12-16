@@ -1,6 +1,7 @@
 #include "common_io.hpp"
 
 #include "model-sys/structures.hpp"
+#include "encoding.hpp"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -907,7 +908,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                     m_string_buffer.erase();
                     return "\x1b";
 
-                // Numbers all end in Tildes ~
+                    // Numbers all end in Tildes ~
                 case '1': // Home
                 case '2': // Insert
                 case '3': // DEL
@@ -922,8 +923,8 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                     m_string_buffer += character_buffer;
                     return "";
 
-                // Only SCO F3 ends with [[O, otherwise it
-                // preceeds in other sequences.
+                    // Only SCO F3 ends with [[O, otherwise it
+                    // preceeds in other sequences.
                 case 'O': // Precursor to Fucntion Keys [OA etc..
                     if(m_string_buffer == "[[")
                     {
@@ -973,7 +974,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                     m_string_buffer.erase();
                     return "\x1b";
 
-                // End of Number Sequence.
+                    // End of Number Sequence.
                 case '~': // Function
                 case '$': // Shift Function RXVT
                 case '^': // CTRL Function RXVT
@@ -1306,11 +1307,11 @@ void CommonIO::parseLocalMCI(std::string &AnsiString, const std::string &mcicode
  * @brief Check if the file exists
  * @return
  */
-bool CommonIO::fileExists(std::string FileName)
+bool CommonIO::fileExists(std::string file_name)
 {
     std::string path = GLOBAL_TEXTFILE_PATH;
     pathAppend(path);
-    path += FileName;
+    path += file_name;
 
     std::ifstream ifs(path);
 
@@ -1326,72 +1327,11 @@ bool CommonIO::fileExists(std::string FileName)
 /**
  * Reads in ANSI file into Buffer Only
  */
-void CommonIO::readinAnsi(std::string FileName, std::string &buff)
+std::string CommonIO::readinAnsi(std::string file_name)
 {
     std::string path = GLOBAL_TEXTFILE_PATH;
     pathAppend(path);
-    path += FileName;
-
-    std::cout << "readinAnsi: " << path << std::endl;
-
-    // If files diesn't exist, change from .ANS to .ASC
-    if(!fileExists(FileName))
-    {
-        std::string newFileName = FileName.substr(0, FileName.size() - 4);
-        newFileName.append(".ASC");
-
-        if(fileExists(newFileName))
-        {
-            std::cout << "Updated Filename to .ASC: " << path << std::endl;
-            path = GLOBAL_TEXTFILE_PATH;
-            pathAppend(path);
-            path += newFileName;
-        }
-        else
-        {
-            std::cout << "Not Found .ASC: " << newFileName << std::endl;
-            return;
-        }
-    }
-
-    FILE *fp;
-    int c = 0;
-
-    if((fp = fopen(path.c_str(), "r+")) ==  NULL)
-    {
-        // File not found
-        return;
-    }
-
-    do
-    {
-        c = getc(fp);
-
-        if(c != EOF)
-        {
-            if(c == '\n')
-            {
-                buff += "\r\n";
-            }
-            else
-            {
-                buff += c;
-            }
-        }
-    }
-    while(c != EOF);
-
-    fclose(fp);
-}
-
-/**
- * Reads in ANSI file into Buffer Only
- */
-std::string CommonIO::readinAnsi(std::string FileName)
-{
-    std::string path = GLOBAL_TEXTFILE_PATH;
-    pathAppend(path);
-    path += FileName;
+    path += file_name;
 
     std::cout << "readinAnsi: " << path << std::endl;
     std::string buff;
@@ -1424,7 +1364,7 @@ std::string CommonIO::readinAnsi(std::string FileName)
     while(c != EOF);
 
     fclose(fp);
-    return buff;
+    return Encoding::instance()->utf8Encode(buff);
 }
 
 /**
