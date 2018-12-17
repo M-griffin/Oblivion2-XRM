@@ -198,6 +198,8 @@
     <File Name="../src/socket_state.hpp"/>
     <File Name="../src/socket_telnet.cpp"/>
     <File Name="../src/uuid.hpp"/>
+    <File Name="../src/encoding.cpp"/>
+    <File Name="../src/encoding.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

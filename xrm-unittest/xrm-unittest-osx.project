@@ -84,6 +84,8 @@
     <File Name="../src/communicator.cpp"/>
     <File Name="../src/communicator.hpp"/>
     <File Name="../src/uuid.hpp"/>
+    <File Name="../src/encoding.cpp"/>
+    <File Name="../src/encoding.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
