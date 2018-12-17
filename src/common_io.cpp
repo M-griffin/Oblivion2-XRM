@@ -908,7 +908,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                     m_string_buffer.erase();
                     return "\x1b";
 
-                    // Numbers all end in Tildes ~
+                // Numbers all end in Tildes ~
                 case '1': // Home
                 case '2': // Insert
                 case '3': // DEL
@@ -923,8 +923,8 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                     m_string_buffer += character_buffer;
                     return "";
 
-                    // Only SCO F3 ends with [[O, otherwise it
-                    // preceeds in other sequences.
+                // Only SCO F3 ends with [[O, otherwise it
+                // preceeds in other sequences.
                 case 'O': // Precursor to Fucntion Keys [OA etc..
                     if(m_string_buffer == "[[")
                     {
@@ -974,7 +974,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                     m_string_buffer.erase();
                     return "\x1b";
 
-                    // End of Number Sequence.
+                // End of Number Sequence.
                 case '~': // Function
                 case '$': // Shift Function RXVT
                 case '^': // CTRL Function RXVT

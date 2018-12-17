@@ -16,6 +16,8 @@
 #include <vector>
 #include <stdexcept>
 
+#include "encoding.hpp"
+
 // Mocking Paths
 std::string GLOBAL_BBS_PATH      = "";
 std::string GLOBAL_DATA_PATH     = "";
@@ -23,8 +25,31 @@ std::string GLOBAL_MENU_PATH     = "";
 std::string GLOBAL_TEXTFILE_PATH = "";
 std::string USERS_DATABASE       = "";
 
+/**
+ * @brief Unit Testing for Initial Form Configuration Implimentation
+ * @return
+ */
+SUITE(XRMEncoding)
+{
 
 
+    // Tests Node Type Casting from CP437 -> UTF8 -> CP437
+    TEST(Encoding_Test_encode_decode)
+    {
+
+        std::string test = "\x1b[0m\x1b[1;37m\x1b[?25h\x1b[1;36m";
+
+        std::string result = Encoding::instance()->utf8Encode(test);
+        std::string original = Encoding::instance()->utf8Decode(result);
+
+        std::cout << result << " : " << original << std::endl;
+
+        // Test Value.
+        CHECK_EQUAL(test, original);
+
+    }
+
+}
 
 /*
 * These Unit Tests are To test the core logic of classes and methods.

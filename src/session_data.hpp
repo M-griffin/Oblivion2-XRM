@@ -170,19 +170,15 @@ public:
         // handle output encoding, if utf-8 translate data accordingly.
         std::string outputBuffer = "";
 
-        // TODO, if internal will become utf8, then need to rework this some.
-        // Temp Disable while testing internal UTF8 Encoding.
-        /*
-        if(m_encoding != Encoding::ENCODE_CP437)
+        // On Output, We have internal UTF8 now, translate to CP437
+        if(m_encoding == Encoding::ENCODE_CP437)
         {
-            outputBuffer = m_common_io.utf8Encode(msg);
+            outputBuffer = Encoding::instance()->utf8Decode(msg);
         }
         else
         {
             outputBuffer = msg;
-        }*/
-
-        outputBuffer = msg;
+        }
 
         if(m_connection->isActive() && TheCommunicator::instance()->isActive())
         {

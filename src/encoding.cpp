@@ -7,6 +7,10 @@
 #include <clocale>  // locale
 #include <cwchar>   // wchar_t wide characters
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 /**
  * CP437 -> UTF-8 Character Translation Table
  */
@@ -84,6 +88,40 @@ Encoding::~Encoding()
 {
 }
 
+
+/**
+ * Windows apperently needs to use it's own WINAPI methods for Wide to Multi-bytes translations
+ * Where as Linux can do it with default c++ libs and settin the locale.
+ *
+ */
+#ifdef _WIN32
+
+// Convert an UTF8 string to a wide Unicode String
+std::wstring Encoding::multibyte_to_wide(const char* mbstr)
+{
+    int str_size = strlen(mbstr);
+
+    if(str_size == 0) return std::wstring();
+
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, &mbstr[0], str_size, NULL, 0);
+    std::wstring wstrTo(size_needed, 0);
+    MultiByteToWideChar(CP_UTF8, 0, &mbstr[0], str_size, &wstrTo[0], size_needed);
+    return wstrTo;
+}
+
+// Convert a wide Unicode string to an UTF8 string
+std::string Encoding::wide_to_multibyte(const std::wstring &wstr)
+{
+    if(wstr.empty()) return std::string();
+
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+    std::string strTo(size_needed, 0);
+    WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+    return strTo;
+}
+
+#else
+
 /**
  * @brief Used for printing output multibyte (Unicode Translations)
  * @param wide_string
@@ -91,8 +129,9 @@ Encoding::~Encoding()
 // Multi-Byte to WIDE (UTF-8 to UTF-16/UCS2)
 std::wstring Encoding::multibyte_to_wide(const char* mbstr)
 {
+    //std::setlocale(LC_ALL, "");
     std::setlocale(LC_ALL, Encoding::ENCODING_TEXT_UTF8.c_str());
-    //std::locale::global(std::locale(""));
+    //std::locale::global(std::locale(Encoding::ENCODING_TEXT_UTF8.c_str()));
     std::cout.imbue(std::locale());
 
     std::wstring result = L"";
@@ -103,8 +142,8 @@ std::wstring Encoding::multibyte_to_wide(const char* mbstr)
 
     for(unsigned int i = 0; i < wstr.size(); i++)
     {
-        //std::wcout << "Wide string: " << wstr[i] << '\n'
-        //<< "The length, including '\\0': " << wstr.size() << '\n';
+        std::wcout << "Wide string: " << wstr[i] << '\n'
+                   << "The length, including '\\0': " << wstr.size() << '\n';
         result += wstr[i];
     }
 
@@ -119,8 +158,9 @@ std::wstring Encoding::multibyte_to_wide(const char* mbstr)
 // Wide To Multi-Byte (UTF-16/UCS2 to UTF-8)
 std::string Encoding::wide_to_multibyte(const std::wstring &wide_string)
 {
+    //std::setlocale(LC_ALL, "");
     std::setlocale(LC_ALL, Encoding::ENCODING_TEXT_UTF8.c_str());
-    //std::locale::global(std::locale(""));
+    //std::locale::global(std::locale(Encoding::ENCODING_TEXT_UTF8.c_str()));
     std::cout.imbue(std::locale());
 
     std::string output = "";
@@ -151,6 +191,8 @@ std::string Encoding::wide_to_multibyte(const std::wstring &wide_string)
 
     return output;
 }
+
+#endif
 
 /**
  * @brief Translation from CP437 to UTF-8 MultiByte Characters

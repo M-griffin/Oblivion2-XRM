@@ -29,6 +29,8 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="../src/encoding.hpp"/>
+    <File Name="../src/encoding.cpp"/>
     <VirtualDirectory Name="utf-cpp">
       <VirtualDirectory Name="utf8">
         <File Name="../src/utf-cpp/utf8/unchecked.h"/>
