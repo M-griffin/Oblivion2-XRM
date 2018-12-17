@@ -142,8 +142,8 @@ std::wstring Encoding::multibyte_to_wide(const char* mbstr)
 
     for(unsigned int i = 0; i < wstr.size(); i++)
     {
-        std::wcout << "Wide string: " << wstr[i] << '\n'
-                   << "The length, including '\\0': " << wstr.size() << '\n';
+        //std::wcout << "Wide string: " << wstr[i] << '\n'
+        //           << "The length, including '\\0': " << wstr.size() << '\n';
         result += wstr[i];
     }
 
@@ -238,7 +238,16 @@ std::string Encoding::utf8Decode(const std::string &standard_string)
     for(wchar_t usc2_char : wide_string)
     {
         if(map_wide_to_cp437.find(usc2_char) == map_wide_to_cp437.end())
+        {
+            // Null Characters should be excluded, extra byes in transformation to USC2/UTF-16.
+            if (usc2_char == '\0')
+            {
+                continue;
+            }
+
+            std::wcout << "Invalid usc2_char: " << usc2_char << " : " << std::hex << usc2_char << std::endl;
             c  = '?';
+        }
         else
             c = map_wide_to_cp437.find(usc2_char)->second;
 
