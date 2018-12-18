@@ -6,10 +6,12 @@
 #include <map>
 #include <clocale>  // locale
 #include <cwchar>   // wchar_t wide characters
+#include <codecvt>
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
+
 
 /**
  * CP437 -> UTF-8 Character Translation Table
@@ -20,8 +22,11 @@
  */
 Encoding* Encoding::m_global_encoding_instance = nullptr;
 
-
+#ifdef TARGET_OS_MAC
+const std::string Encoding::ENCODING_TEXT_UTF8  = "en_US.UTF-8";
+#else
 const std::string Encoding::ENCODING_TEXT_UTF8  = "en_US.utf8";
+#endif
 const std::string Encoding::ENCODING_TEXT_CP437 = "CP437";
 
 static std::map<wchar_t, uint8_t> map_wide_to_cp437;
@@ -118,6 +123,48 @@ std::string Encoding::wide_to_multibyte(const std::wstring &wstr)
     std::string strTo(size_needed, 0);
     WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
     return strTo;
+}
+
+#elif TARGET_OS_MAC
+
+std::wstring Encoding::multibyte_to_wide(const char* mbstr) 
+{
+	/*
+	std::string incoming_data = std::string(
+                                    reinterpret_cast<const char *>(mbstr),
+                                    strlen((const char *)mbstr)
+                                );*/	
+								
+    // the UTF-8 / UTF-16 standard conversion facet
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> utf16conv;    
+	
+	std::wstring ucs2 = L"";
+    try 
+	{
+        ucs2 = utf16conv.from_bytes(mbstr);	
+    } 
+	catch(const std::range_error& e) 
+	{
+        std::cout << "UCS2 failed after producing " << std::dec << ucs2.size()<<" characters:\n";        
+    }
+	
+	return ucs2;
+}
+
+std::string Encoding::wide_to_multibyte(const std::wstring& wstr) 
+{	
+    std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> ucs2conv;	
+	
+	std::string utf8 = "";
+    try 
+	{
+        utf8 = ucs2conv.to_bytes(wstr);	
+    } 
+	catch(const std::range_error& e) 
+	{
+        std::cout << "UTF8 failed after producing " << std::dec << utf8.size()<<" characters:\n";        
+    }
+	return utf8;
 }
 
 #else

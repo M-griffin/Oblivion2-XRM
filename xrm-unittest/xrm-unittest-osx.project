@@ -144,7 +144,7 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="clang++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O0;-pedantic;-std=c++11;-Wall;" C_Options="-O3;-pedantic;-std=c++11;-Wall;" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-O0;-pedantic;-std=c++11;-stdlib=libc++" C_Options="-O3;-pedantic;-std=c++11;-stdlib=libc++" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
@@ -164,7 +164,6 @@
         <LibraryPath Value="../src"/>
         <LibraryPath Value="../sqlitewrap"/>
         <LibraryPath Value="/usr/local/opt/sqlite/lib"/>
-        <LibraryPath Value="/usr/local/opt/icu4c/lib"/>
         <LibraryPath Value="/usr/local/Cellar/yaml-cpp/0.6.1/lib"/>
         <LibraryPath Value="/usr/local/Cellar/openssl/1.0.2n/lib"/>
         <LibraryPath Value="/usr/local/Cellar/unittest-cpp/2.0.0/lib"/>

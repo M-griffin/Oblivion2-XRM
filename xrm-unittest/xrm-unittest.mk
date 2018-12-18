@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Admin
-Date                   :=17/12/2018
+Date                   :=18/12/2018
 CodeLitePath           :="/Users/admin/Library/Application Support/codelite"
 LinkerName             :=clang++
 SharedObjectLinkerName :=clang++ -shared -fPIC
@@ -41,7 +41,7 @@ IncludePCH             :=
 RcIncludePath          := 
 Libs                   := $(LibrarySwitch)c++ $(LibrarySwitch)c++abi $(LibrarySwitch)m $(LibrarySwitch)c $(LibrarySwitch)UnitTest++ $(LibrarySwitch)SqliteWrapped $(LibrarySwitch)sqlite3 $(LibrarySwitch)pthread $(LibrarySwitch)ssl $(LibrarySwitch)crypto $(LibrarySwitch)yaml-cpp $(LibrarySwitch)ssh $(LibrarySwitch)uuid 
 ArLibs                 :=  "c++" "c++abi" "m" "c" "libUnitTest++.a" "libSqliteWrapped.a" "sqlite3" "pthread" "ssl" "crypto" "yaml-cpp" "libssh" "uuid" 
-LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryPathSwitch)../src $(LibraryPathSwitch)../sqlitewrap $(LibraryPathSwitch)/usr/local/opt/sqlite/lib $(LibraryPathSwitch)/usr/local/opt/icu4c/lib $(LibraryPathSwitch)/usr/local/Cellar/yaml-cpp/0.6.1/lib $(LibraryPathSwitch)/usr/local/Cellar/openssl/1.0.2n/lib $(LibraryPathSwitch)/usr/local/Cellar/unittest-cpp/2.0.0/lib $(LibraryPathSwitch)/usr/local/Cellar/libssh/0.7.5/lib $(LibraryPathSwitch)/usr/local/Cellar/ossp-uuid/1.6.2_2/lib 
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryPathSwitch)../src $(LibraryPathSwitch)../sqlitewrap $(LibraryPathSwitch)/usr/local/opt/sqlite/lib $(LibraryPathSwitch)/usr/local/Cellar/yaml-cpp/0.6.1/lib $(LibraryPathSwitch)/usr/local/Cellar/openssl/1.0.2n/lib $(LibraryPathSwitch)/usr/local/Cellar/unittest-cpp/2.0.0/lib $(LibraryPathSwitch)/usr/local/Cellar/libssh/0.7.5/lib $(LibraryPathSwitch)/usr/local/Cellar/ossp-uuid/1.6.2_2/lib 
 
 ##
 ## Common variables
@@ -50,8 +50,8 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryP
 AR       := ar rcus
 CXX      := clang++
 CC       := clang
-CXXFLAGS :=  -O0 -pedantic -std=c++11 -Wall  $(Preprocessors)
-CFLAGS   :=  -O3 -pedantic -std=c++11 -Wall  $(Preprocessors)
+CXXFLAGS :=  -O0 -pedantic -std=c++11 -stdlib=libc++ $(Preprocessors)
+CFLAGS   :=  -O3 -pedantic -std=c++11 -stdlib=libc++ $(Preprocessors)
 ASFLAGS  := 
 AS       := llvm-as
 
