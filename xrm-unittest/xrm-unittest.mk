@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Admin
-Date                   :=18/12/2018
+Date                   :=19/12/2018
 CodeLitePath           :="/Users/admin/Library/Application Support/codelite"
 LinkerName             :=clang++
 SharedObjectLinkerName :=clang++ -shared -fPIC
@@ -36,12 +36,12 @@ ObjectsFileList        :="xrm-unittest.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
 LinkOptions            :=  
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)../src $(IncludeSwitch)../sqlitewrap $(IncludeSwitch)/usr/local/opt/sqlite/include $(IncludeSwitch)/usr/local/Cellar/yaml-cpp/0.6.1/include $(IncludeSwitch)/usr/local/Cellar/openssl/1.0.2n/include $(IncludeSwitch)/usr/local/Cellar/unittest-cpp/2.0.0/include/UnitTest++ $(IncludeSwitch)/usr/local/Cellar/libssh/0.7.5/include $(IncludeSwitch)/usr/local/Cellar/ossp-uuid/1.6.2_2/include $(IncludeSwitch)../src/sdl2_net $(IncludeSwitch)../src/utf-cpp 
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)../src $(IncludeSwitch)../sqlitewrap $(IncludeSwitch)/usr/local/opt/sqlite/include $(IncludeSwitch)/usr/local/Cellar/yaml-cpp/0.6.2_1/include $(IncludeSwitch)/usr/local/Cellar/openssl/1.0.2n/include $(IncludeSwitch)/usr/local/Cellar/unittest-cpp/2.0.0/include/UnitTest++ $(IncludeSwitch)/usr/local/Cellar/libssh/0.7.5/include $(IncludeSwitch)/usr/local/Cellar/ossp-uuid/1.6.2_2/include $(IncludeSwitch)../src/sdl2_net $(IncludeSwitch)../src/utf-cpp 
 IncludePCH             := 
 RcIncludePath          := 
 Libs                   := $(LibrarySwitch)c++ $(LibrarySwitch)c++abi $(LibrarySwitch)m $(LibrarySwitch)c $(LibrarySwitch)UnitTest++ $(LibrarySwitch)SqliteWrapped $(LibrarySwitch)sqlite3 $(LibrarySwitch)pthread $(LibrarySwitch)ssl $(LibrarySwitch)crypto $(LibrarySwitch)yaml-cpp $(LibrarySwitch)ssh $(LibrarySwitch)uuid 
 ArLibs                 :=  "c++" "c++abi" "m" "c" "libUnitTest++.a" "libSqliteWrapped.a" "sqlite3" "pthread" "ssl" "crypto" "yaml-cpp" "libssh" "uuid" 
-LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryPathSwitch)../src $(LibraryPathSwitch)../sqlitewrap $(LibraryPathSwitch)/usr/local/opt/sqlite/lib $(LibraryPathSwitch)/usr/local/Cellar/yaml-cpp/0.6.1/lib $(LibraryPathSwitch)/usr/local/Cellar/openssl/1.0.2n/lib $(LibraryPathSwitch)/usr/local/Cellar/unittest-cpp/2.0.0/lib $(LibraryPathSwitch)/usr/local/Cellar/libssh/0.7.5/lib $(LibraryPathSwitch)/usr/local/Cellar/ossp-uuid/1.6.2_2/lib 
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryPathSwitch)../src $(LibraryPathSwitch)../sqlitewrap $(LibraryPathSwitch)/usr/local/opt/sqlite/lib $(LibraryPathSwitch)/usr/local/Cellar/yaml-cpp/0.6.2_1/lib $(LibraryPathSwitch)/usr/local/Cellar/openssl/1.0.2n/lib $(LibraryPathSwitch)/usr/local/Cellar/unittest-cpp/2.0.0/lib $(LibraryPathSwitch)/usr/local/Cellar/libssh/0.7.5/lib $(LibraryPathSwitch)/usr/local/Cellar/ossp-uuid/1.6.2_2/lib 
 
 ##
 ## Common variables

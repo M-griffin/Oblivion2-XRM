@@ -212,14 +212,14 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="clang++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-Wall;" C_Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-Wall;" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-stdlib=libc++" C_Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-stdlib=libc++" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
         <IncludePath Value="../sqlitewrap/Debug"/>
         <IncludePath Value="/usr/local/opt/sqlite/include"/>
         <IncludePath Value="/usr/local/Cellar/boost/1.66.0/include"/>
-        <IncludePath Value="/usr/local/Cellar/yaml-cpp/0.6.1/include"/>
+        <IncludePath Value="/usr/local/Cellar/yaml-cpp/0.6.2_1/include"/>
         <IncludePath Value="/usr/local/Cellar/openssl/1.0.2n/include"/>
         <IncludePath Value="/usr/local/Cellar/libssh/0.7.5/include"/>
         <IncludePath Value="/usr/local/Cellar/ossp-uuid/1.6.2_2/include"/>
@@ -232,7 +232,7 @@
         <LibraryPath Value="."/>
         <LibraryPath Value="../sqlitewrap"/>
         <LibraryPath Value="/usr/local/opt/sqlite/lib"/>
-        <LibraryPath Value="/usr/local/Cellar/yaml-cpp/0.6.1/lib"/>
+        <LibraryPath Value="/usr/local/Cellar/yaml-cpp/0.6.2_1/lib"/>
         <LibraryPath Value="/usr/local/Cellar/openssl/1.0.2n/lib"/>
         <LibraryPath Value="/usr/local/Cellar/libssh/0.7.5/lib"/>
         <LibraryPath Value="/usr/local/Cellar/ossp-uuid/1.6.2_2/lib"/>

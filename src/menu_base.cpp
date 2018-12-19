@@ -20,14 +20,14 @@
 MenuBase::MenuBase(session_data_ptr session_data)
     : m_menu_session_data(session_data)
     , m_session_io(session_data)
-    , m_config(new Config())
+    , m_config(new Config())       // TODO MOVE THIS TO A SINGLETON, only one confirm per system! shared.
     , m_directory(new Directory())
     , m_line_buffer("")
     , m_use_hotkey(false)
     , m_current_menu("")
     , m_previous_menu("")
     , m_fallback_menu("")
-    , m_starting_menu("") // Note Update this from config!
+    , m_starting_menu("") // Note Update this from config! / ACL Levels!!
     , m_input_index(MENU_INPUT)
     , m_menu_info(new Menu())
     , m_menu_prompt()

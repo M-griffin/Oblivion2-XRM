@@ -1,6 +1,6 @@
 #include "menu_system.hpp"
 
-#include "data-sys/config_dao.hpp"
+//#include "data-sys/config_dao.hpp"
 #include "mods/mod_prelogon.hpp"
 #include "mods/mod_logon.hpp"
 #include "mods/mod_signup.hpp"
@@ -56,13 +56,15 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     m_menu_command_functions['+'] = std::bind(&MenuSystem::menuOptionsColorSettingCommands, this, std::placeholders::_1);
 
     // Load the configuration file into m_config
+	// UPDATE THIS, EACH INSTANCE DOES NOT NEED A CONFIG.
+	/*
     ConfigDao config_dao(m_config, GLOBAL_BBS_PATH);
 
     if(!config_dao.loadConfig())
     {
         std::cout << "Error: unable to load configuration file" << std::endl;
         assert(false);
-    }
+    }*/
 }
 
 MenuSystem::~MenuSystem()

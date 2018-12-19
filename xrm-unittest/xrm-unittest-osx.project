@@ -149,7 +149,7 @@
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
         <IncludePath Value="/usr/local/opt/sqlite/include"/>
-        <IncludePath Value="/usr/local/Cellar/yaml-cpp/0.6.1/include"/>
+        <IncludePath Value="/usr/local/Cellar/yaml-cpp/0.6.2_1/include"/>
         <IncludePath Value="/usr/local/Cellar/openssl/1.0.2n/include"/>
         <IncludePath Value="/usr/local/Cellar/unittest-cpp/2.0.0/include/UnitTest++"/>
         <IncludePath Value="/usr/local/Cellar/libssh/0.7.5/include"/>
@@ -164,7 +164,7 @@
         <LibraryPath Value="../src"/>
         <LibraryPath Value="../sqlitewrap"/>
         <LibraryPath Value="/usr/local/opt/sqlite/lib"/>
-        <LibraryPath Value="/usr/local/Cellar/yaml-cpp/0.6.1/lib"/>
+        <LibraryPath Value="/usr/local/Cellar/yaml-cpp/0.6.2_1/lib"/>
         <LibraryPath Value="/usr/local/Cellar/openssl/1.0.2n/lib"/>
         <LibraryPath Value="/usr/local/Cellar/unittest-cpp/2.0.0/lib"/>
         <LibraryPath Value="/usr/local/Cellar/libssh/0.7.5/lib"/>

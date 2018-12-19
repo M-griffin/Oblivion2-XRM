@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Admin
-Date                   :=18/12/2018
+Date                   :=19/12/2018
 CodeLitePath           :="/Users/admin/Library/Application Support/codelite"
 LinkerName             :=clang++
 SharedObjectLinkerName :=clang++ -shared -fPIC
@@ -36,12 +36,12 @@ ObjectsFileList        :="xrm-server.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
 LinkOptions            :=  
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)../src $(IncludeSwitch)../sqlitewrap $(IncludeSwitch)../sqlitewrap/Debug $(IncludeSwitch)/usr/local/opt/sqlite/include $(IncludeSwitch)/usr/local/Cellar/boost/1.66.0/include $(IncludeSwitch)/usr/local/Cellar/yaml-cpp/0.6.1/include $(IncludeSwitch)/usr/local/Cellar/openssl/1.0.2n/include $(IncludeSwitch)/usr/local/Cellar/libssh/0.7.5/include $(IncludeSwitch)/usr/local/Cellar/ossp-uuid/1.6.2_2/include $(IncludeSwitch)../src/sdl2_net $(IncludeSwitch)../src/utf-cpp 
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)../src $(IncludeSwitch)../sqlitewrap $(IncludeSwitch)../sqlitewrap/Debug $(IncludeSwitch)/usr/local/opt/sqlite/include $(IncludeSwitch)/usr/local/Cellar/boost/1.66.0/include $(IncludeSwitch)/usr/local/Cellar/yaml-cpp/0.6.2_1/include $(IncludeSwitch)/usr/local/Cellar/openssl/1.0.2n/include $(IncludeSwitch)/usr/local/Cellar/libssh/0.7.5/include $(IncludeSwitch)/usr/local/Cellar/ossp-uuid/1.6.2_2/include $(IncludeSwitch)../src/sdl2_net $(IncludeSwitch)../src/utf-cpp 
 IncludePCH             := 
 RcIncludePath          := 
 Libs                   := $(LibrarySwitch)SqliteWrapped $(LibrarySwitch)sqlite3 $(LibrarySwitch)pthread $(LibrarySwitch)ssl $(LibrarySwitch)crypto $(LibrarySwitch)yaml-cpp $(LibrarySwitch)util $(LibrarySwitch)ssh $(LibrarySwitch)uuid 
 ArLibs                 :=  "libSqliteWrapped.a" "sqlite3" "pthread" "ssl" "crypto" "yaml-cpp" "util" "libssh" "uuid" 
-LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryPathSwitch)../sqlitewrap $(LibraryPathSwitch)/usr/local/opt/sqlite/lib $(LibraryPathSwitch)/usr/local/Cellar/yaml-cpp/0.6.1/lib $(LibraryPathSwitch)/usr/local/Cellar/openssl/1.0.2n/lib $(LibraryPathSwitch)/usr/local/Cellar/libssh/0.7.5/lib $(LibraryPathSwitch)/usr/local/Cellar/ossp-uuid/1.6.2_2/lib 
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryPathSwitch)../sqlitewrap $(LibraryPathSwitch)/usr/local/opt/sqlite/lib $(LibraryPathSwitch)/usr/local/Cellar/yaml-cpp/0.6.2_1/lib $(LibraryPathSwitch)/usr/local/Cellar/openssl/1.0.2n/lib $(LibraryPathSwitch)/usr/local/Cellar/libssh/0.7.5/lib $(LibraryPathSwitch)/usr/local/Cellar/ossp-uuid/1.6.2_2/lib 
 
 ##
 ## Common variables
@@ -50,8 +50,8 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryP
 AR       := ar rcus
 CXX      := clang++
 CC       := clang
-CXXFLAGS :=  -Wfatal-errors -g -O0 -pedantic -W -std=c++11 -Wall  $(Preprocessors)
-CFLAGS   :=  -Wfatal-errors -g -O0 -pedantic -W -std=c++11 -Wall  $(Preprocessors)
+CXXFLAGS :=  -Wfatal-errors -g -O0 -pedantic -W -std=c++11 -stdlib=libc++ $(Preprocessors)
+CFLAGS   :=  -Wfatal-errors -g -O0 -pedantic -W -std=c++11 -stdlib=libc++ $(Preprocessors)
 ASFLAGS  := 
 AS       := llvm-as
 
