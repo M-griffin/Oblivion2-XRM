@@ -5,7 +5,6 @@
 #include "access_condition.hpp"
 #include "directory.hpp"
 
-
 #include <locale>
 #include <cstring>
 #include <string>
@@ -42,6 +41,7 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_logoff(false)
 {
     std::cout << "MenuBase" << std::endl;
+    m_config = TheCommunicator::instance()->getConfiguration();
 }
 
 MenuBase::~MenuBase()
@@ -636,7 +636,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
                     match_found = true;
                     break;
 
-                    // Handle yes /no /continue
+                // Handle yes /no /continue
 
                 default:
                     break;

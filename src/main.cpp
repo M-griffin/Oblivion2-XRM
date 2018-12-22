@@ -55,8 +55,8 @@ std::string USERS_DATABASE = "";
 auto main() -> int
 {
     std::cout << "Oblivion/2 XRM Server (c) 2015-2018 Michael Griffin."
-    << std::endl
-    << std::endl;
+              << std::endl
+              << std::endl;
 
     CommonIO common;
     GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
@@ -78,7 +78,8 @@ auto main() -> int
     // Loading and saving default Configuration file to XML
     {
         config_ptr config(new Config());
-        if (!config)
+
+        if(!config)
         {
             std::cout << "Unable to allocate config structure" << std::endl;
             assert(false);
@@ -88,18 +89,23 @@ auto main() -> int
         // Setup in the config, everything is branched from the main path.
         // Later on we'll check config for overides only.
         ConfigDao cfg(config, GLOBAL_BBS_PATH);
-        if (!cfg.fileExists())
+
+        if(!cfg.fileExists())
         {
             cfg.saveConfig(config);
         }
 
         // Load Config and lets do some validation
         cfg.loadConfig();
-        if (!cfg.validation())
+
+        if(!cfg.validation())
         {
             Encoding::releaseInstance();
             return 0;
         }
+
+        // All Good, Attached to Global Communicator Instance.
+        TheCommunicator::instance()->attachConfiguration(config);
     }
 
     // Database Startup in it's own context.
@@ -112,7 +118,8 @@ auto main() -> int
     {
         // Default Config Instance
         config_ptr config(new Config());
-        if (!config)
+
+        if(!config)
         {
             std::cout << "Unable to allocate config structure" << std::endl;
             Encoding::releaseInstance();
@@ -122,7 +129,8 @@ auto main() -> int
         // Setup the Data Access Object
         //config_dao_ptr cfg(config, GLOBAL_BBS_PATH);
         ConfigDao cfg(config, GLOBAL_BBS_PATH);
-        if (!cfg.loadConfig())
+
+        if(!cfg.loadConfig())
         {
             // TODO Throws exception right now, need to work in
             // better shutdown on from this point! just assert for now.
@@ -132,10 +140,10 @@ auto main() -> int
 
         // TODO, from rework, right now single asio server is setup,
         // One we have SSH server setup we can split this up again.
-        if (cfg.m_config->use_service_telnet)
+        if(cfg.m_config->use_service_telnet)
         {
             std::cout << "Setting up telnet connections on port "
-            << cfg.m_config->port_telnet << std::endl;
+                      << cfg.m_config->port_telnet << std::endl;
         }
 
         // Isolate to code block for smart pointer deallocation.
