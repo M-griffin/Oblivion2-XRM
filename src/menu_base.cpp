@@ -19,14 +19,14 @@
 MenuBase::MenuBase(session_data_ptr session_data)
     : m_menu_session_data(session_data)
     , m_session_io(session_data)
-    , m_config(new Config())       // TODO MOVE THIS TO A SINGLETON, only one confirm per system! shared.
+    , m_config(new Config())
     , m_directory(new Directory())
     , m_line_buffer("")
     , m_use_hotkey(false)
     , m_current_menu("")
     , m_previous_menu("")
     , m_fallback_menu("")
-    , m_starting_menu("") // Note Update this from config! / ACL Levels!!
+    , m_starting_menu("")
     , m_input_index(MENU_INPUT)
     , m_menu_info(new Menu())
     , m_menu_prompt()
@@ -636,7 +636,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
                     match_found = true;
                     break;
 
-                // Handle yes /no /continue
+                    // Handle yes /no /continue
 
                 default:
                     break;
@@ -947,7 +947,8 @@ std::string MenuBase::loadMenuPrompt()
             prompt +=  m_session_io.pipe2ansi(m_menu_info->menu_prompt);
         }
 
-        // Pull prompt from menu text if exists.
+        // Otherwise Noting loads here, Pull down Menu with no prompt
+        // So only lightbars display.
     }
 
     return prompt;

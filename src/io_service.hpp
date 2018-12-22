@@ -52,7 +52,7 @@ public:
      */
     typedef std::function<void(const std::error_code&, socket_handler_ptr)> callback_function_handler;
 
-    static const int MAX_BUFFER_SIZE = 8193;
+    static const int MAX_BUFFER_SIZE = 16384;
 
     /**
      * @class ServiceBase

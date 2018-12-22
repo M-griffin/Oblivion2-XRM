@@ -29,9 +29,6 @@
     <File Name="../src/common_io.hpp"/>
     <File Name="../src/communicator.cpp"/>
     <File Name="../src/communicator.hpp"/>
-    <File Name="../src/connection_base.hpp"/>
-    <File Name="../src/connection_ssl.hpp"/>
-    <File Name="../src/connection_tcp.hpp"/>
     <File Name="../src/encryption.cpp"/>
     <File Name="../src/encryption.hpp"/>
     <File Name="../src/main.cpp"/>

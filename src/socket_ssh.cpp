@@ -9,6 +9,8 @@
 #include <cerrno>
 #include <iostream>
 
+#define MAX_BUFFER 16384
+
 /*
  * Start of SSH_Socket Derived Class (SSH)
  */
@@ -37,7 +39,7 @@ int SSH_Socket::recvSocket(char *message)
     int result = 0;
     if (m_is_socket_active)
     {
-        result = ssh_channel_read_nonblocking(m_ssh_channel, message, 8192, 0);
+        result = ssh_channel_read_nonblocking(m_ssh_channel, message, MAX_BUFFER, 0);
         if(result < 0)
         {
             std::cout << "Error: ssh_channel_read_nonblocking" << std::endl;

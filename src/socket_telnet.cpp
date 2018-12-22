@@ -115,7 +115,7 @@ socket_handler_ptr SDL_Socket::pollSocketAccepts()
 
             // Setup the State, SDL_Socket
             config_ptr config = TheCommunicator::instance()->getConfiguration();
-            socket_state_ptr state(new SDL_Socket("127.0.0.1", config->telnet_port));
+            socket_state_ptr state(new SDL_Socket("127.0.0.1", config->port_telnet));
             state->spawnSocket(socket);
 
             // Setup a Handle, which will link back to Async_Connection

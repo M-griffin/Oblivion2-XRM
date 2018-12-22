@@ -125,7 +125,7 @@ public:
      * @brief Telopt Sequences timer
      */
     void startDetectionTimer()
-    {       
+    {
         // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences reponses
         m_deadline_timer->setWaitInMilliseconds(1500);
         m_deadline_timer->asyncWait(
@@ -157,9 +157,22 @@ public:
             return;
         }
 
+        // handle output encoding, if utf-8 translate data accordingly.
+        std::string outputBuffer = "";
+
+        // On Output, We have internal UTF8 now, translate to CP437
+        if(m_session_data->m_encoding == Encoding::ENCODE_CP437)
+        {
+            outputBuffer = msg; //Encoding::instance()->utf8Decode(msg);
+        }
+        else
+        {
+            outputBuffer = msg;
+        }
+
         if(m_connection->isActive() && TheCommunicator::instance()->isActive())
         {
-            m_connection->asyncWrite(msg,
+            m_connection->asyncWrite(outputBuffer,
                                      std::bind(
                                          &Session::handleWrite,
                                          shared_from_this(),

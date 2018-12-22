@@ -200,7 +200,7 @@ void SessionIO::createInputField(std::string &field_name, int &len)
             repeat.c_str(),       // Padding length of Field
             len+1);               // Move back to starting position of field.
 
-    field_name = Encoding::instance()->utf8Encode(formatted);
+    field_name = formatted;
 }
 
 /**
@@ -354,7 +354,7 @@ std::string SessionIO::pipeReplaceForground(int foreground)
             break;
     }
 
-    return Encoding::instance()->utf8Encode(escape_sequence);
+    return escape_sequence;
 }
 
 /**
@@ -409,7 +409,7 @@ std::string SessionIO::pipeReplaceBackground(int background)
             break;
     }
 
-    return Encoding::instance()->utf8Encode(escape_sequence);
+    return escape_sequence;
 }
 
 /**
@@ -570,7 +570,7 @@ std::string SessionIO::parsePipeWithCharsDigits(const std::string &code, int val
 
     }
 
-    return Encoding::instance()->utf8Encode(sequence);
+    return sequence;
 }
 
 /**
@@ -1147,7 +1147,7 @@ bool SessionIO::checkRegex(const std::string &sequence, const std::string &expre
 std::string SessionIO::parseTextPrompt(const M_StringPair &prompt)
 {
     // |PD is new for XRM, Prompt Description.
-    std::string text_prompt = Encoding::instance()->utf8Encode(prompt.second);
+    std::string text_prompt = prompt.second;
     std::string mci_code = "|PD";
 
     // If Description Flag is in Prompt, then replace code with Description

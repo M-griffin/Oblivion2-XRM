@@ -604,70 +604,70 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
                 break;
 
             case 'M': // Bool PostCallRatio
-            {
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_LEVEL_FIELD);
-                displayPrompt(PROMPT_LEVEL_BOOL_POST_CALL_RATIO);
-                std::string bool_value = "";
-                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                break;
-            }
+                {
+                    m_current_field = toupper(key[0]);
+                    changeInputModule(MOD_LEVEL_FIELD);
+                    displayPrompt(PROMPT_LEVEL_BOOL_POST_CALL_RATIO);
+                    std::string bool_value = "";
+                    bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                    break;
+                }
 
             case 'N': // Bool File Ratio
-            {
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_LEVEL_FIELD);
-                displayPrompt(PROMPT_LEVEL_BOOL_FILE_RATIO);
-                std::string bool_value = "";
-                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                break;
-            }
+                {
+                    m_current_field = toupper(key[0]);
+                    changeInputModule(MOD_LEVEL_FIELD);
+                    displayPrompt(PROMPT_LEVEL_BOOL_FILE_RATIO);
+                    std::string bool_value = "";
+                    bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                    break;
+                }
 
             case 'O': // Bool Time Limit
-            {
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_LEVEL_FIELD);
-                displayPrompt(PROMPT_LEVEL_BOOL_TIME_LIMIT);
-                std::string bool_value = "";
-                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                break;
-            }
+                {
+                    m_current_field = toupper(key[0]);
+                    changeInputModule(MOD_LEVEL_FIELD);
+                    displayPrompt(PROMPT_LEVEL_BOOL_TIME_LIMIT);
+                    std::string bool_value = "";
+                    bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                    break;
+                }
 
             case 'P': // Bool Call Limit
-            {
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_LEVEL_FIELD);
-                displayPrompt(PROMPT_LEVEL_BOOL_CALL_LIMIT);
-                std::string bool_value = "";
-                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                break;
-            }
+                {
+                    m_current_field = toupper(key[0]);
+                    changeInputModule(MOD_LEVEL_FIELD);
+                    displayPrompt(PROMPT_LEVEL_BOOL_CALL_LIMIT);
+                    std::string bool_value = "";
+                    bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                    break;
+                }
 
             case 'R': // Bool Download File Limit
-            {
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_LEVEL_FIELD);
-                displayPrompt(PROMPT_LEVEL_BOOL_DOWNLOADS);
-                std::string bool_value = "";
-                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                break;
-            }
+                {
+                    m_current_field = toupper(key[0]);
+                    changeInputModule(MOD_LEVEL_FIELD);
+                    displayPrompt(PROMPT_LEVEL_BOOL_DOWNLOADS);
+                    std::string bool_value = "";
+                    bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                    break;
+                }
 
             case 'S': // Bool Download Limit MB
-            {
-                m_current_field = toupper(key[0]);
-                changeInputModule(MOD_LEVEL_FIELD);
-                displayPrompt(PROMPT_LEVEL_BOOL_DOWNLOAD_MB);
-                std::string bool_value = "";
-                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                break;
-            }
+                {
+                    m_current_field = toupper(key[0]);
+                    changeInputModule(MOD_LEVEL_FIELD);
+                    displayPrompt(PROMPT_LEVEL_BOOL_DOWNLOAD_MB);
+                    std::string bool_value = "";
+                    bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                    break;
+                }
 
             case 'Q': // Quit
                 saveLevelChanges();
@@ -769,24 +769,24 @@ void ModLevelEditor::levelEditorLevelFieldHandler(const std::string& input)
                 break;
 
             case 'K': // Level AR Flags 1
-            {
-                AccessCondition acs;
+                {
+                    AccessCondition acs;
 
-                for(char c : key)
-                    acs.setFlagLevelToggle(c, true, current_level);
+                    for(char c : key)
+                        acs.setFlagLevelToggle(c, true, current_level);
 
-                break;
-            }
+                    break;
+                }
 
             case 'L': // Level AR Flags 2
-            {
-                AccessCondition acs;
+                {
+                    AccessCondition acs;
 
-                for(char c : key)
-                    acs.setFlagLevelToggle(c, false, current_level);
+                    for(char c : key)
+                        acs.setFlagLevelToggle(c, false, current_level);
 
-                break;
-            }
+                    break;
+                }
 
             case 'M': // Bool PostCallRatio
                 current_level->bPostCallRatio = m_common_io.stringToBool(key);
@@ -1181,50 +1181,41 @@ std::string ModLevelEditor::displayLevelList()
             // Top Row
             if(rows == 0 && cols == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_LEFT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_TOP_LEFT);
             }
             else if(rows == 0 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_RIGHT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_TOP_RIGHT);
             }
             else if(rows == 0 && cols % 25 == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_TOP;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID_TOP);
             }
             else if(rows == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_ROW);
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_LEFT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_BOT_LEFT);
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_RIGHT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_BOT_RIGHT);
             }
             else if(rows == total_rows-1 && cols % 25 == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_BOT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID_BOT);
             }
             else if(rows == total_rows-1)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_ROW);
             }
             else if(cols % 25 == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID);
             }
             else
             {
@@ -1313,7 +1304,6 @@ std::string ModLevelEditor::displayLevelEditScreen()
                          m_common_io.rightPadding(acs.getAccessConditionFlagStringFromBits(current_level->iARFlags2), 48));
 
 
-
     result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_POST_CALL_RATIO) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bPostCallRatio), 56) +
                          m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_CALL_LIMIT) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bCallLimit), 56));
 
@@ -1325,7 +1315,7 @@ std::string ModLevelEditor::displayLevelEditScreen()
                          m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_DOWNLOAD_MB) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bDownloadMB), 56));
 
 
-    result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(baseGetDefaultPromptColor() + " " + Encoding::instance()->utf8Encode(std::string(72, M_BORDER_ROW)) + " ");
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_QUIT_SAVE) + baseGetDefaultStatColor() +
                          m_common_io.rightPadding("", 48));
@@ -1340,83 +1330,5 @@ std::string ModLevelEditor::displayLevelEditScreen()
     // Could re-calc this on screen width lateron.
     int max_cols = 76;
 
-    // Vector or Menus, Loop through
-    std::vector<std::string>::iterator i = result_set.begin();
-    std::string buffer = "";
-
-    for(int rows = 0; rows < total_rows; rows++)
-    {
-        buffer += "  "; // 3 Leading spaces per row.
-
-        for(int cols = 0; cols < max_cols; cols++)
-        {
-            // Top Row
-            if(rows == 0 && cols == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_LEFT;
-            }
-            else if(rows == 0 && cols == max_cols-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_RIGHT;
-            }
-            else if(rows == 0 && cols % 75 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_TOP;
-            }
-            else if(rows == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
-            }
-
-            // Bottom Row
-            else if(rows == total_rows-1 && cols == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_LEFT;
-            }
-            else if(rows == total_rows-1 && cols == max_cols-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_RIGHT;
-            }
-            else if(rows == total_rows-1 && cols % 75 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_BOT;
-            }
-            else if(rows == total_rows-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
-            }
-            else if(cols % 75 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID;
-            }
-            else
-            {
-                // Here we insert the Menu name and pad through to 8 characters.
-                if(cols == 1)
-                {
-                    if(i != result_set.end())
-                    {
-                        buffer += *i;
-                        ++i;
-                    }
-                }
-            }
-        }
-
-        // Were going to split on \n, which will get replaced lateron
-        // with \r\n for full carriage returns.
-        buffer += "\n";
-    }
-
-    return (buffer);
-
+    return baseCreateBorderedDisplay(result_set, total_rows, max_cols);
 }

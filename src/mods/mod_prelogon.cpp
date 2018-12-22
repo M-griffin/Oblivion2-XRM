@@ -143,8 +143,8 @@ void ModPreLogon::setupEmulationDetection()
     // Deliver ANSI Location Sequence to Detect Emulation Response
     // Only detects if terminal handles ESC responses.
     // Windows Console Telnet will response it's at 259 y!
-    std::string detection = Encoding::instance()->utf8Encode(m_session_io.pipe2ansi("|00\x1b[s\x1b[255B\x1b[6n"));
-    std::string restore_position = Encoding::instance()->utf8Encode("\x1b[u");
+    std::string detection = m_session_io.pipe2ansi("|00\x1b[255B\x1b[6n");
+    std::string restore_position = "\x1b[1;1H\x1b[2J";
 
     baseProcessAndDeliver(detection);
     baseProcessAndDeliver(restore_position);
@@ -156,7 +156,7 @@ void ModPreLogon::setupEmulationDetection()
 
     // If response is echoed back, make it black on black.
     result.append("|00");
-    std::string output = Encoding::instance()->utf8Encode(m_session_io.pipe2ansi(result));
+    std::string output = m_session_io.pipe2ansi(result);
 
     baseProcessAndDeliver(output);
 
@@ -202,7 +202,7 @@ void ModPreLogon::displayTerminalDetection()
         std::string term = m_session_data->m_telnet_state->getTermType();
         std::cout << "Term Type: " << term << std::endl;
         m_session_io.m_common_io.parseLocalMCI(result, mci_code, term);
-        result = Encoding::instance()->utf8Encode(m_session_io.pipe2ansi(result));
+        result = m_session_io.pipe2ansi(result);
         baseProcessAndDeliver(result);
     }
 
@@ -215,7 +215,7 @@ void ModPreLogon::displayTerminalDetection()
         term_size.append(std::to_string(m_session_data->m_telnet_state->getTermRows()));
         std::cout << "Term Size: " << term_size << std::endl;
         m_session_io.m_common_io.parseLocalMCI(result, mci_code, term_size);
-        result = Encoding::instance()->utf8Encode(m_session_io.pipe2ansi(result));
+        result = m_session_io.pipe2ansi(result);
         baseProcessAndDeliver(result);
     }
 
