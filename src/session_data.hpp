@@ -115,6 +115,7 @@ public:
     void handleTeloptCodes()
     {
         unsigned char ch = 0;
+        std::string incoming_data = "";
 
         for(auto c : m_in_data_vector)
         {
@@ -136,11 +137,14 @@ public:
             }
 
             // Incoming Buffer is filled and Telnet options are parsed out.
-            m_parsed_data += ch;
+            incoming_data += ch;
         }
 
-        // Clear the Session's Socket Buffer for next set of data.
-        //memset(&m_raw_data, 0, max_length);
+        // Encode all incoming data as UTF8 unless we are not utf8
+        if (m_encoding != Encoding::ENCODE_UTF8)
+            m_parsed_data = Encoding::instance()->utf8Encode(incoming_data);
+        else
+            m_parsed_data = incoming_data;
     }
 
     /**
@@ -378,7 +382,7 @@ public:
     bool                  m_is_esc_timer;
     bool                  m_is_process_running;
 
-    enum { max_length = 8192 };
+    enum { max_length = 16384 };
     //char m_raw_data[max_length];  // Raw Incoming
     std::vector<unsigned char> m_in_data_vector;
     std::string m_parsed_data;      // Telnet Opts parsed out

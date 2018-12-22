@@ -1,24 +1,28 @@
 #ifndef UUID_HPP
 #define UUID_HPP
 
+#include "encoding.hpp"
+
 extern "C"
 {
 #ifdef _WIN32
 // Winsock needed becasue Rpc includes windows.h.
-    #include <winsock2.h>
-    #include <Rpc.h>
+#include <winsock2.h>
+#include <Rpc.h>
 #else
-    #include <uuid/uuid.h>
+#include <uuid/uuid.h>
 #endif
 }
 
 #include <string>
 #include <cstring>
 
+
+
 class Uuid
 {
-    
-public:    
+
+public:
 
     std::string createUuidString()
     {
@@ -38,7 +42,7 @@ public:
         memset(&uuid_string, 0, strlen(uuid_string));
         uuid_unparse (uuid, uuid_string);
 #endif
-        return uuid_string;
+        return Encoding::instance()->utf8Encode(uuid_string);
     }
 };
 

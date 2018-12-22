@@ -1,5 +1,6 @@
 #include "socket_state.hpp"
 #include "socket_handler.hpp"
+#include "communicator.hpp"
 
 #include <sdl2_net/SDL_net.hpp>
 
@@ -9,6 +10,7 @@
 #include <cerrno>
 #include <time.h>
 
+#define MAX_BUFFER 16384
 
 /**
  * @brief Send Data Over the Socket
@@ -46,7 +48,7 @@ int SDL_Socket::recvSocket(char *message)
     int result = -1;
     if (m_is_socket_active)
     {
-        result = SDLNet_TCP_Recv(m_tcp_socket, message, 8192);
+        result = SDLNet_TCP_Recv(m_tcp_socket, message, MAX_BUFFER);
         if(result <= 0)
         {
             // -1 is Error 0 is Server Closed Connection
@@ -112,7 +114,8 @@ socket_handler_ptr SDL_Socket::pollSocketAccepts()
             socket = SDLNet_TCP_Accept(m_tcp_socket);
 
             // Setup the State, SDL_Socket
-            socket_state_ptr state(new SDL_Socket("127.0.0.1", 6023));
+            config_ptr config = TheCommunicator::instance()->getConfiguration();
+            socket_state_ptr state(new SDL_Socket("127.0.0.1", config->telnet_port));
             state->spawnSocket(socket);
 
             // Setup a Handle, which will link back to Async_Connection
