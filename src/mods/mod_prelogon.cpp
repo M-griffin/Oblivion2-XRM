@@ -1,5 +1,6 @@
 #include "mod_prelogon.hpp"
 #include "../model-sys/config.hpp"
+#include "../encoding.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -142,8 +143,8 @@ void ModPreLogon::setupEmulationDetection()
     // Deliver ANSI Location Sequence to Detect Emulation Response
     // Only detects if terminal handles ESC responses.
     // Windows Console Telnet will response it's at 259 y!
-    std::string detection = m_session_io.pipe2ansi("|00\x1b[s\x1b[255B\x1b[6n");
-    std::string restore_position = "\x1b[u";
+    std::string detection = m_session_io.pipe2ansi("|00\x1b[255B\x1b[6n");
+    std::string restore_position = "\x1b[1;1H\x1b[2J";
 
     baseProcessAndDeliver(detection);
     baseProcessAndDeliver(restore_position);
@@ -442,8 +443,8 @@ bool ModPreLogon::askCodePage(const std::string &input)
                           );
 
                 // Even though it's default, lets set it anyways/
-                m_session_data->m_encoding_text = CommonIO::ENCODING_TEXT_CP437;
-                m_session_data->m_encoding = CommonIO::ENCODE_CP437;
+                m_session_data->m_encoding_text = Encoding::ENCODING_TEXT_CP437;
+                m_session_data->m_encoding = Encoding::ENCODE_CP437;
             }
             else
             {
@@ -457,8 +458,8 @@ bool ModPreLogon::askCodePage(const std::string &input)
                           );
 
                 // Even though it's default, lets set it anyways/
-                m_session_data->m_encoding_text = CommonIO::ENCODING_TEXT_UTF8;
-                m_session_data->m_encoding = CommonIO::ENCODE_UTF8;
+                m_session_data->m_encoding_text = Encoding::ENCODING_TEXT_UTF8;
+                m_session_data->m_encoding = Encoding::ENCODE_UTF8;
             }
 
             baseProcessAndDeliverNewLine(message);
@@ -483,8 +484,8 @@ bool ModPreLogon::askCodePage(const std::string &input)
                           );
 
                 // Even though it's default, lets set it anyways/
-                m_session_data->m_encoding_text = CommonIO::ENCODING_TEXT_UTF8;
-                m_session_data->m_encoding = CommonIO::ENCODE_UTF8;
+                m_session_data->m_encoding_text = Encoding::ENCODING_TEXT_UTF8;
+                m_session_data->m_encoding = Encoding::ENCODE_UTF8;
             }
             else
             {
@@ -498,8 +499,8 @@ bool ModPreLogon::askCodePage(const std::string &input)
                           );
 
                 // Even though it's default, lets set it anyways/
-                m_session_data->m_encoding_text = CommonIO::ENCODING_TEXT_CP437;
-                m_session_data->m_encoding = CommonIO::ENCODE_CP437;
+                m_session_data->m_encoding_text = Encoding::ENCODING_TEXT_CP437;
+                m_session_data->m_encoding = Encoding::ENCODE_CP437;
             }
 
             baseProcessAndDeliverNewLine(message);

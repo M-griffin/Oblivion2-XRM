@@ -57,6 +57,8 @@
       <File Name="../src/compat/menu_compat_dao.hpp"/>
       <File Name="../src/compat/prompts_compat_dao.hpp"/>
     </VirtualDirectory>
+    <File Name="../src/encoding.cpp"/>
+    <File Name="../src/encoding.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

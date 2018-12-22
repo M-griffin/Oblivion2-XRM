@@ -145,19 +145,6 @@ public:
         VIEW_PULLDOWN = 3
     };
 
-    // Box drawing characters
-    enum
-    {
-        BORDER_TOP_LEFT  = (char)214,  // ╓
-        BORDER_BOT_LEFT  = (char)211,  // ╙
-        BORDER_ROW       = (char)196,  // ─
-        BORDER_TOP_RIGHT = (char)183,  // ╖
-        BORDER_BOT_RIGHT = (char)189,  // ╜
-        BORDER_MID_TOP   = (char)210,  // ╥
-        BORDER_MID_BOT   = (char)208,  // ╨
-        BORDER_MID       = (char)186   // ║
-    };
-
     // Create Prompt Constants, these are the keys for key/value lookup
     const std::string PROMPT_HEADER = "menu_header";
     const std::string PROMPT_OPTION_HEADER = "menu_option_header";
@@ -207,7 +194,7 @@ public:
 
     // Dsiplay Page for Option Fields.
     const std::string PROMPT_OPTION_TOGGLE = "option_toggle_view_display";
-    
+
     // Menu Field Display for screen
     const std::string DISPLAY_MENU_FIELDS_VERSION_ID = "display_menu_field_version_id";
     const std::string DISPLAY_MENU_FIELDS_BORDER_ROW_COLOR = "display_menu_field_row_color";
@@ -221,8 +208,8 @@ public:
     const std::string DISPLAY_MENU_FIELDS_EDIT_OPTIONS = "display_menu_field_edit_options";
     const std::string DISPLAY_MENU_FIELDS_QUIT_SAVE = "display_menu_field_save";
     const std::string DISPLAY_MENU_FIELDS_QUIT_ABORT = "display_menu_field_abort";
-    
-    // Option Field Diplay For screen 
+
+    // Option Field Diplay For screen
     const std::string DISPLAY_OPT_FIELDS_OPTION_ID = "display_option_field_option_id";
     const std::string DISPLAY_OPT_FIELDS_BORDER_ROW_COLOR = "display_option_field_row_color";
     const std::string DISPLAY_OPT_FIELDS_OPTION_NAME = "display_option_field_option_name";

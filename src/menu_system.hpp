@@ -15,9 +15,6 @@
 #include <functional>
 
 
-class Config;
-typedef std::shared_ptr<Config> config_ptr;
-
 class ModBase;
 typedef std::shared_ptr<ModBase> module_ptr;
 

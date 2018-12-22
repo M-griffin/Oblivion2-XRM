@@ -47,10 +47,12 @@ bool TextPromptsDao::fileExists()
     path.append(m_filename);
 
     std::ifstream ifs(path);
-    if (!ifs.is_open())
+
+    if(!ifs.is_open())
     {
         return false;
     }
+
     ifs.close();
     return true;
 }
@@ -66,7 +68,8 @@ void TextPromptsDao::writeValue(M_TextPrompt &value)
     path.append(m_filename);
 
     std::ofstream ofs(path);
-    if (!ofs.is_open())
+
+    if(!ofs.is_open())
     {
         std::cout << "Error, unable to write to: " << path << std::endl;
         return;
@@ -75,7 +78,7 @@ void TextPromptsDao::writeValue(M_TextPrompt &value)
     YAML::Emitter out;
 
     // Clear and start fresh
-    m_is_loaded = false;    
+    m_is_loaded = false;
 
     out << YAML::BeginMap;
     out << YAML::Flow;
@@ -109,34 +112,37 @@ bool TextPromptsDao::readPrompts()
     try
     {
         // Clear and Existing Nodes first beload loading.
-        if (m_node.size() > 0)
+        if(m_node.size() > 0)
         {
             m_node.reset();
         }
 
         // Load file fresh.
-        m_node = YAML::LoadFile(path);  
+        m_node = YAML::LoadFile(path);
 
-        if (m_node.size() == 0) 
+        if(m_node.size() == 0)
         {
             return false; //File Not Found?
-        }      
-        
+        }
+
         std::string file_version = m_node["file_version"].as<std::string>();
-        
+
         // Validate File Version
         std::cout << "Text Prompt File Version: " << file_version << std::endl;
-        if (file_version != TextPromptsDao::FILE_VERSION) {
+
+        if(file_version != TextPromptsDao::FILE_VERSION)
+        {
             throw std::invalid_argument("Invalid file_version, expected: " + TextPromptsDao::FILE_VERSION);
         }
-                
+
         m_is_loaded = true;
     }
-    catch (std::exception &ex)
+    catch(std::exception &ex)
     {
         std::cout << "Exception YAML::readPrompts(" << m_filename << ") " << ex.what() << std::endl;
         assert(false);
     }
+
     return m_is_loaded;
 }
 
@@ -149,18 +155,19 @@ M_StringPair TextPromptsDao::getPrompt(const std::string &lookup)
 {
     M_StringPair temp;
 
-    if (!m_is_loaded)
+    if(!m_is_loaded)
     {
         return temp;
     }
 
     std::string key = "";
-    for (YAML::const_iterator it = m_node.begin(); it != m_node.end(); ++it)
+
+    for(YAML::const_iterator it = m_node.begin(); it != m_node.end(); ++it)
     {
         key = it->first.as<std::string>();
 
         // Check key for selected prompt to pull
-        if (key.compare(lookup) == 0)
+        if(key.compare(lookup) == 0)
         {
             M_StringPair value = it->second.as<M_StringPair>();
             return value;
@@ -175,7 +182,7 @@ M_StringPair TextPromptsDao::getPrompt(const std::string &lookup)
  */
 void TextPromptsDao::displayAll()
 {
-    for (YAML::const_iterator it = m_node.begin(); it != m_node.end(); ++it)
+    for(YAML::const_iterator it = m_node.begin(); it != m_node.end(); ++it)
     {
         std::string key = it->first.as<std::string>();
         M_StringPair value = it->second.as<M_StringPair>();

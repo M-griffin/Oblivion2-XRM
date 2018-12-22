@@ -26,10 +26,9 @@
 
 namespace SQLW
 {
-    void StderrLog::databaseError(Database& db, const std::string& str)
+    void StderrLog::databaseError(Database&, const std::string& str)
     {
-        UNUSED(db);
-        time_t t = time(nullptr);
+         time_t t = time(nullptr);
         struct tm tp;
         localtime_r(&t, &tp);
         fprintf(stderr,"%d-%02d-%02d %02d:%02d:%02d :: Database: %s\n",
@@ -38,9 +37,8 @@ namespace SQLW
                 str.c_str());
     }
 
-    void StderrLog::databaseError(Database& db, Query& q, const std::string& str)
+    void StderrLog::databaseError(Database&, Query& q, const std::string& str)
     {
-        UNUSED(db);
         time_t t = time(nullptr);
         struct tm tp;
         localtime_r(&t, &tp);

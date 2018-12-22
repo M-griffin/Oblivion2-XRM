@@ -1224,7 +1224,7 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
             }
 
             // Append Character to Screen Buffer.
-            if(buffer.length >= 1 && !buffer.character[0] == '\0')
+            if(buffer.character[0] != '\0' && buffer.length >= 1)
             {
                 // Set the Current Max Row Position.
                 if(m_max_y_position < m_y_position)

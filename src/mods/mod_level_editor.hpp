@@ -104,19 +104,6 @@ public:
         LEVEL_COPY_TO   = 4
     };
 
-    // Box drawing characters
-    enum
-    {
-        BORDER_TOP_LEFT  = (char)214, // ╓
-        BORDER_BOT_LEFT  = (char)211, // ╙
-        BORDER_ROW       = (char)196, // ─
-        BORDER_TOP_RIGHT = (char)183, // ╖
-        BORDER_BOT_RIGHT = (char)189, // ╜
-        BORDER_MID_TOP   = (char)210, // ╥
-        BORDER_MID_BOT   = (char)208, // ╨
-        BORDER_MID       = (char)186  // ║
-    };
-
     // Create Prompt Constants, these are the keys for key/value lookup
     const std::string PROMPT_HEADER = "level_header";
     const std::string PROMPT_LEVEL_EDIT_HEADER = "level_field_edit_header";

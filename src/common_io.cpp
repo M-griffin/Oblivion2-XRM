@@ -1,6 +1,7 @@
 #include "common_io.hpp"
 
 #include "model-sys/structures.hpp"
+#include "encoding.hpp"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -33,75 +34,146 @@
 #include <algorithm>
 #include <functional>
 #include <cctype>
-#include <locale>
 #include <sstream>
 #include <fstream>
-#include <map>
-
-#include <clocale>  // locale
-#include <cwchar>   // wchar_t wide characters
 
 #include <utf-cpp/utf8.h>
 
-
-/**
- * CP437 -> UTF-8 Character Translation Table
- */
-
-const std::string CommonIO::ENCODING_TEXT_UTF8  = "en_US.utf8";
-const std::string CommonIO::ENCODING_TEXT_CP437 = "CP437";
-
-
-// Map for Wide UTF-16 back to CP437.
-static std::map <wchar_t, uint8_t> map_wide_to_cp437;
-
-// UCS2 Table Taranslations.
-wchar_t CP437_TABLE[] =
+CommonIO::CommonIO()
+    : m_escape_sequence("")
+    , m_string_buffer("")
+    , m_incoming_data("")
+    , m_line_buffer("")
+    , m_column_position(0)
+    , m_is_escape_sequence(false)
+    , m_is_new_getline(true)
+    , m_is_new_leadoff(true)
 {
-    L'\u0000', L'\u263A', L'\u263B', L'\u2665', L'\u2666', L'\u2663',
-    L'\u2660', L'\u2022', L'\u0008', L'\u0009', L'\u000A', L'\u2642',
-    L'\u2640', L'\u000D', L'\u266C', L'\u263C', L'\u25BA', L'\u25C4',
-    L'\u2195', L'\u203C', L'\u00B6', L'\u00A7', L'\u25AC', L'\u21A8',
-    L'\u2191', L'\u2193', L'\u2192', L'\u001B', L'\u221F', L'\u2194',
-    L'\u25B2', L'\u25BC', L'\u0020', L'\u0021', L'\u0022', L'\u0023',
-    L'\u0024', L'\u0025', L'\u0026', L'\u0027', L'\u0028', L'\u0029',
-    L'\u002A', L'\u002B', L'\u002C', L'\u002D', L'\u002E', L'\u002F',
-    L'\u0030', L'\u0031', L'\u0032', L'\u0033', L'\u0034', L'\u0035',
-    L'\u0036', L'\u0037', L'\u0038', L'\u0039', L'\u003A', L'\u003B',
-    L'\u003C', L'\u003D', L'\u003E', L'\u003F', L'\u0040', L'\u0041',
-    L'\u0042', L'\u0043', L'\u0044', L'\u0045', L'\u0046', L'\u0047',
-    L'\u0048', L'\u0049', L'\u004A', L'\u004B', L'\u004C', L'\u004D',
-    L'\u004E', L'\u004F', L'\u0050', L'\u0051', L'\u0052', L'\u0053',
-    L'\u0054', L'\u0055', L'\u0056', L'\u0057', L'\u0058', L'\u0059',
-    L'\u005A', L'\u005B', L'\u005C', L'\u005D', L'\u005E', L'\u005F',
-    L'\u0060', L'\u0061', L'\u0062', L'\u0063', L'\u0064', L'\u0065',
-    L'\u0066', L'\u0067', L'\u0068', L'\u0069', L'\u006A', L'\u006B',
-    L'\u006C', L'\u006D', L'\u006E', L'\u006F', L'\u0070', L'\u0071',
-    L'\u0072', L'\u0073', L'\u0074', L'\u0075', L'\u0076', L'\u0077',
-    L'\u0078', L'\u0079', L'\u007A', L'\u007B', L'\u007C', L'\u007D',
-    L'\u007E', L'\u007F', L'\u00C7', L'\u00FC', L'\u00E9', L'\u00E2',
-    L'\u00E4', L'\u00E0', L'\u00E5', L'\u00E7', L'\u00EA', L'\u00EB',
-    L'\u00E8', L'\u00EF', L'\u00EE', L'\u00EC', L'\u00C4', L'\u00C5',
-    L'\u00C9', L'\u00E6', L'\u00C6', L'\u00F4', L'\u00F6', L'\u00F2',
-    L'\u00FB', L'\u00F9', L'\u00FF', L'\u00D6', L'\u00DC', L'\u00A2',
-    L'\u00A3', L'\u00A5', L'\u20A7', L'\u0192', L'\u00E1', L'\u00ED',
-    L'\u00F3', L'\u00FA', L'\u00F1', L'\u00D1', L'\u00AA', L'\u00BA',
-    L'\u00BF', L'\u2310', L'\u00AC', L'\u00BD', L'\u00BC', L'\u00A1',
-    L'\u00AB', L'\u00BB', L'\u2591', L'\u2592', L'\u2593', L'\u2502',
-    L'\u2524', L'\u2561', L'\u2562', L'\u2556', L'\u2555', L'\u2563',
-    L'\u2551', L'\u2557', L'\u255D', L'\u255C', L'\u255B', L'\u2510',
-    L'\u2514', L'\u2534', L'\u252C', L'\u251C', L'\u2500', L'\u253C',
-    L'\u255E', L'\u255F', L'\u255A', L'\u2554', L'\u2569', L'\u2566',
-    L'\u2560', L'\u2550', L'\u256C', L'\u2567', L'\u2568', L'\u2564',
-    L'\u2565', L'\u2559', L'\u2558', L'\u2552', L'\u2553', L'\u256B',
-    L'\u256A', L'\u2518', L'\u250C', L'\u2588', L'\u2584', L'\u258C',
-    L'\u2590', L'\u2580', L'\u03B1', L'\u00DF', L'\u0393', L'\u03C0',
-    L'\u03A3', L'\u03C3', L'\u00B5', L'\u03C4', L'\u03A6', L'\u0398',
-    L'\u03A9', L'\u03B4', L'\u221E', L'\u03C6', L'\u03B5', L'\u2229',
-    L'\u2261', L'\u00B1', L'\u2265', L'\u2264', L'\u2320', L'\u2321',
-    L'\u00F7', L'\u2248', L'\u00B0', L'\u2219', L'\u00B7', L'\u221A',
-    L'\u207F', L'\u00B2', L'\u25A0', L'\u00A0'
-};
+    // Arror Keys, Hardware OA are translated to [A on the fly
+    m_sequence_map.insert(std::make_pair("[A",    "up_arrow"));
+    m_sequence_map.insert(std::make_pair("[B",    "dn_arrow"));
+    m_sequence_map.insert(std::make_pair("[C",    "rt_arrow"));
+    m_sequence_map.insert(std::make_pair("[D",    "lt_arrow"));
+
+    // Hardware Keys, or Numpad.
+    m_sequence_map.insert(std::make_pair("OA",    "up_arrow"));
+    m_sequence_map.insert(std::make_pair("OB",    "dn_arrow"));
+    m_sequence_map.insert(std::make_pair("OC",    "rt_arrow"));
+    m_sequence_map.insert(std::make_pair("OD",    "lt_arrow"));
+    m_sequence_map.insert(std::make_pair("OE",    "clear"));
+    m_sequence_map.insert(std::make_pair("OF",    "end"));
+    m_sequence_map.insert(std::make_pair("OH",    "home"));
+
+    // Shift Arrow Keys
+    m_sequence_map.insert(std::make_pair("[1;2A", "shift_up_arrow"));
+    m_sequence_map.insert(std::make_pair("[1;2B", "shift_dn_arrow"));
+    m_sequence_map.insert(std::make_pair("[1;2C", "shift_rt_arrow"));
+    m_sequence_map.insert(std::make_pair("[1;2D", "shift_lt_arrow"));
+
+    // Shift TAB
+    m_sequence_map.insert(std::make_pair("[Z",    "shift_tab"));
+
+    // Function Keys ANSI
+    m_sequence_map.insert(std::make_pair("[@",    "insert"));
+    m_sequence_map.insert(std::make_pair("[H",    "home"));
+    m_sequence_map.insert(std::make_pair("[K",    "end"));
+    m_sequence_map.insert(std::make_pair("[F",    "end")); // = 0F
+    m_sequence_map.insert(std::make_pair("[V",    "pg_up"));
+    m_sequence_map.insert(std::make_pair("[U",    "pg_dn"));
+    m_sequence_map.insert(std::make_pair("[OP",   "f1"));
+    m_sequence_map.insert(std::make_pair("[OQ",   "f2"));
+    m_sequence_map.insert(std::make_pair("[OR",   "f3"));
+    m_sequence_map.insert(std::make_pair("[OS",   "f4"));
+    m_sequence_map.insert(std::make_pair("[OT",   "f5"));
+    m_sequence_map.insert(std::make_pair("[[17~", "f6"));
+    m_sequence_map.insert(std::make_pair("[[18~", "f7"));
+    m_sequence_map.insert(std::make_pair("[[19~", "f8"));
+    m_sequence_map.insert(std::make_pair("[[20~", "f9"));
+    m_sequence_map.insert(std::make_pair("[[21~", "f10"));
+    m_sequence_map.insert(std::make_pair("[[23~", "f11"));
+    m_sequence_map.insert(std::make_pair("[[24~", "f12"));
+
+    // VT-100 Putty
+    m_sequence_map.insert(std::make_pair("[1~",   "home"));
+    m_sequence_map.insert(std::make_pair("[2~",   "insert"));
+    m_sequence_map.insert(std::make_pair("[3~",   "del"));
+    m_sequence_map.insert(std::make_pair("[4~",   "end"));
+    m_sequence_map.insert(std::make_pair("[5~",   "pg_up"));
+    m_sequence_map.insert(std::make_pair("[6~",   "pg_dn"));
+    m_sequence_map.insert(std::make_pair("[OU",   "f6"));
+    m_sequence_map.insert(std::make_pair("[OV",   "f7"));
+    m_sequence_map.insert(std::make_pair("[OW",   "f8"));
+    m_sequence_map.insert(std::make_pair("[OX",   "f9"));
+    m_sequence_map.insert(std::make_pair("[OY",   "f10"));
+    m_sequence_map.insert(std::make_pair("[OZ",   "f11"));
+    m_sequence_map.insert(std::make_pair("[O[",   "f12"));
+
+    // Linux Console
+    m_sequence_map.insert(std::make_pair("[[A",   "f1"));
+    m_sequence_map.insert(std::make_pair("[[B",   "f2"));
+    m_sequence_map.insert(std::make_pair("[[C",   "f3"));
+    m_sequence_map.insert(std::make_pair("[[D",   "f4"));
+    m_sequence_map.insert(std::make_pair("[[E",   "f5"));
+
+    // SCO
+    m_sequence_map.insert(std::make_pair("[L",    "insert"));
+    m_sequence_map.insert(std::make_pair("[I",    "pg_up"));
+    m_sequence_map.insert(std::make_pair("[G",    "pg_dn"));
+
+    m_sequence_map.insert(std::make_pair("[[M",   "f1"));
+    m_sequence_map.insert(std::make_pair("[[N",   "f2"));
+    m_sequence_map.insert(std::make_pair("[[O",   "f3"));
+    m_sequence_map.insert(std::make_pair("[[P",   "f4"));
+    m_sequence_map.insert(std::make_pair("[[Q",   "f5"));
+    m_sequence_map.insert(std::make_pair("[[R",   "f6"));
+    m_sequence_map.insert(std::make_pair("[[S",   "f7"));
+    m_sequence_map.insert(std::make_pair("[[T",   "f8"));
+    m_sequence_map.insert(std::make_pair("[[U",   "f9"));
+    m_sequence_map.insert(std::make_pair("[[V",   "f10"));
+    m_sequence_map.insert(std::make_pair("[[W",   "f11"));
+    m_sequence_map.insert(std::make_pair("[[X",   "f12"));
+
+    // rxvt
+    m_sequence_map.insert(std::make_pair("[7~",   "home"));
+    m_sequence_map.insert(std::make_pair("[8~",   "end"));
+
+    // Shift Arrow Keys
+    m_sequence_map.insert(std::make_pair("[a",    "shift_up_arrow"));
+    m_sequence_map.insert(std::make_pair("[b",    "shift_dn_arrow"));
+    m_sequence_map.insert(std::make_pair("[c",    "shift_rt_arrow"));
+    m_sequence_map.insert(std::make_pair("[d",    "shift_lt_arrow"));
+    m_sequence_map.insert(std::make_pair("[e",    "shift_clear"));
+
+    // Shift Function
+    m_sequence_map.insert(std::make_pair("[2$",   "insert"));
+    m_sequence_map.insert(std::make_pair("[3$",   "del"));
+    m_sequence_map.insert(std::make_pair("[5$",   "pg_up"));
+    m_sequence_map.insert(std::make_pair("[6$",   "pg_dn"));
+    m_sequence_map.insert(std::make_pair("[7$",   "home"));
+    m_sequence_map.insert(std::make_pair("[8$",   "end"));
+
+    // Ctrl
+    m_sequence_map.insert(std::make_pair("Oa",    "ctrl_up_arrow"));
+    m_sequence_map.insert(std::make_pair("Ob",    "ctrl_dn_arrow"));
+    m_sequence_map.insert(std::make_pair("Oc",    "ctrl_rt_arrow"));
+    m_sequence_map.insert(std::make_pair("Od",    "ctrl_lt_arrow"));
+    m_sequence_map.insert(std::make_pair("Oe",    "ctrl_clear"));
+
+    // Shift Function
+    m_sequence_map.insert(std::make_pair("[2^",   "ctrl_insert"));
+    m_sequence_map.insert(std::make_pair("[3^",   "ctrl_del"));
+    m_sequence_map.insert(std::make_pair("[5^",   "ctrl_pg_up"));
+    m_sequence_map.insert(std::make_pair("[6^",   "ctrl_pg_dn"));
+    m_sequence_map.insert(std::make_pair("[7^",   "ctrl_home"));
+    m_sequence_map.insert(std::make_pair("[8^",   "ctrl_end"));
+}
+
+CommonIO::~CommonIO()
+{
+    std::cout << "~CommonIO" << std::endl;
+    m_sequence_map.clear();
+    m_escape_sequence.erase();
+}
 
 /**
  * @brief Determine where the executable is located.
@@ -714,121 +786,6 @@ bool CommonIO::isDigit(const std::string &str)
 }
 
 /**
- * @brief Used for printing output multibyte (Unicode Translations)
- * @param wide_string
- */
-// Multi-Byte to WIDE (UTF-8 to UTF-16)
-std::wstring CommonIO::multibyte_to_wide(const char* mbstr)
-{
-    std::setlocale(LC_ALL, CommonIO::ENCODING_TEXT_UTF8.c_str());
-    //std::locale::global(std::locale(""));
-    std::cout.imbue(std::locale());
-
-    std::wstring result = L"";
-    std::mbstate_t state = std::mbstate_t();
-    std::size_t len = 1 + std::mbsrtowcs(NULL, &mbstr, 0, &state);
-    std::vector<wchar_t> wstr(len);
-    std::mbsrtowcs(&wstr[0], &mbstr, wstr.size(), &state);
-
-    for(unsigned int i = 0; i < wstr.size(); i++)
-    {
-        //std::wcout << "Wide string: " << wstr[i] << '\n'
-        //<< "The length, including '\\0': " << wstr.size() << '\n';
-        result += wstr[i];
-    }
-
-    return result;
-}
-
-/**
- * @brief Used for printing output multibyte (Unicode Translations)
- * @param wide_string
- */
-
-// Wide To Multi-Byte (UTF-16 to UTF-8)
-std::string CommonIO::wide_to_multibyte(const std::wstring &wide_string)
-{
-    std::setlocale(LC_ALL, CommonIO::ENCODING_TEXT_UTF8.c_str());
-    //std::locale::global(std::locale(""));
-    std::cout.imbue(std::locale());
-
-    std::string output = "";
-
-    std::mbstate_t state = std::mbstate_t();
-
-    for(wchar_t wc : wide_string)
-    {
-        std::string mb(MB_CUR_MAX, '\0');
-        int ret = std::wcrtomb(&mb[0], wc, &state);
-
-        if(ret == 0)
-        {
-            break;
-        }
-
-        // Skip any Trailing / Embedded null from Wide -> multibtye
-        // Conversion, don't send NULL's to the screen.
-        for(char ch: mb)
-        {
-            if(ch != '\0')
-            {
-                //std::cout << ch << flush;
-                output += ch;
-            }
-        }
-    }
-
-    return output;
-}
-
-/**
- * @brief Translation from CP437 to UTF-8 MultiByte Characters
- * @param standard_string
- */
-std::string CommonIO::translateUnicode(const std::string &standard_string)
-{
-    std::string output = "";
-    std::wstring wide_string = L"";
-    int ascii_value = 0;
-
-    // TEMP, work out the reverse method next
-    // For now create the cache here for reverse translations.
-    if(map_wide_to_cp437.size() == 0 || map_wide_to_cp437.size() < 255)
-    {
-        // Lock and populate map cache so other threads do not interfear.
-        std::unique_lock<std::mutex> lock(m);
-
-        if(map_wide_to_cp437.size() != 255)
-        {
-            for(unsigned int char_value = 0; char_value < 256; char_value++)
-            {
-                map_wide_to_cp437[CP437_TABLE[char_value]] = char_value;
-            }
-        }
-    }
-
-
-
-    // Loop and write out after translation to Unicode
-    for(std::string::size_type i = 0; i < standard_string.size(); i++)
-    {
-        ascii_value = std::char_traits<char>().to_int_type(standard_string[i]);
-
-        if(ascii_value < 256)
-        {
-            wide_string += CP437_TABLE[ascii_value];
-        }
-        else
-        {
-            wide_string += standard_string[i];
-        }
-    }
-
-    output += wide_to_multibyte(wide_string);
-    return output;
-}
-
-/**
  * @brief Return the Escape Sequence Parsed.
  * @return
  */
@@ -1350,11 +1307,11 @@ void CommonIO::parseLocalMCI(std::string &AnsiString, const std::string &mcicode
  * @brief Check if the file exists
  * @return
  */
-bool CommonIO::fileExists(std::string FileName)
+bool CommonIO::fileExists(std::string file_name)
 {
     std::string path = GLOBAL_TEXTFILE_PATH;
     pathAppend(path);
-    path += FileName;
+    path += file_name;
 
     std::ifstream ifs(path);
 
@@ -1370,72 +1327,11 @@ bool CommonIO::fileExists(std::string FileName)
 /**
  * Reads in ANSI file into Buffer Only
  */
-void CommonIO::readinAnsi(std::string FileName, std::string &buff)
+std::string CommonIO::readinAnsi(std::string file_name)
 {
     std::string path = GLOBAL_TEXTFILE_PATH;
     pathAppend(path);
-    path += FileName;
-
-    std::cout << "readinAnsi: " << path << std::endl;
-
-    // If files diesn't exist, change from .ANS to .ASC
-    if(!fileExists(FileName))
-    {
-        std::string newFileName = FileName.substr(0, FileName.size() - 4);
-        newFileName.append(".ASC");
-
-        if(fileExists(newFileName))
-        {
-            std::cout << "Updated Filename to .ASC: " << path << std::endl;
-            path = GLOBAL_TEXTFILE_PATH;
-            pathAppend(path);
-            path += newFileName;
-        }
-        else
-        {
-            std::cout << "Not Found .ASC: " << newFileName << std::endl;
-            return;
-        }
-    }
-
-    FILE *fp;
-    int c = 0;
-
-    if((fp = fopen(path.c_str(), "r+")) ==  NULL)
-    {
-        // File not found
-        return;
-    }
-
-    do
-    {
-        c = getc(fp);
-
-        if(c != EOF)
-        {
-            if(c == '\n')
-            {
-                buff += "\r\n";
-            }
-            else
-            {
-                buff += c;
-            }
-        }
-    }
-    while(c != EOF);
-
-    fclose(fp);
-}
-
-/**
- * Reads in ANSI file into Buffer Only
- */
-std::string CommonIO::readinAnsi(std::string FileName)
-{
-    std::string path = GLOBAL_TEXTFILE_PATH;
-    pathAppend(path);
-    path += FileName;
+    path += file_name;
 
     std::cout << "readinAnsi: " << path << std::endl;
     std::string buff;
@@ -1468,7 +1364,7 @@ std::string CommonIO::readinAnsi(std::string FileName)
     while(c != EOF);
 
     fclose(fp);
-    return buff;
+    return Encoding::instance()->utf8Encode(buff);
 }
 
 /**

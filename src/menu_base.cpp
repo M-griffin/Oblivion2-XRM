@@ -5,7 +5,6 @@
 #include "access_condition.hpp"
 #include "directory.hpp"
 
-
 #include <locale>
 #include <cstring>
 #include <string>
@@ -27,7 +26,7 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_current_menu("")
     , m_previous_menu("")
     , m_fallback_menu("")
-    , m_starting_menu("") // Note Update this from config!
+    , m_starting_menu("")
     , m_input_index(MENU_INPUT)
     , m_menu_info(new Menu())
     , m_menu_prompt()
@@ -42,6 +41,7 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_logoff(false)
 {
     std::cout << "MenuBase" << std::endl;
+    m_config = TheCommunicator::instance()->getConfiguration();
 }
 
 MenuBase::~MenuBase()
@@ -636,7 +636,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
                     match_found = true;
                     break;
 
-                // Handle yes /no /continue
+                    // Handle yes /no /continue
 
                 default:
                     break;
@@ -686,7 +686,7 @@ std::string MenuBase::loadMenuScreen()
         // if file doesn't exist, then use generic template
         if(m_common_io.fileExists(screen_file))
         {
-            m_common_io.readinAnsi(screen_file, screen_data);
+            screen_data = m_common_io.readinAnsi(screen_file);
         }
         else
         {
@@ -707,7 +707,7 @@ std::string MenuBase::loadMenuScreen()
         // if file doesn't exist, then use generic template
         if(m_common_io.fileExists(screen_file))
         {
-            m_common_io.readinAnsi(screen_file, screen_data);
+            screen_data = m_common_io.readinAnsi(screen_file);
         }
         else
         {
@@ -933,8 +933,7 @@ std::string MenuBase::loadMenuPrompt()
         m_session_io.addMCIMapping("%MN", m_menu_info->menu_prompt);
 
         std::string output = m_session_io.pipe2ansi(prompt_display);
-        //std::cout << "prompt: " << output << std::endl;
-        return output;
+        return Encoding::instance()->utf8Encode(output);
     }
     else
     {
@@ -948,7 +947,8 @@ std::string MenuBase::loadMenuPrompt()
             prompt +=  m_session_io.pipe2ansi(m_menu_info->menu_prompt);
         }
 
-        // Pull prompt from menu text if exists.
+        // Otherwise Noting loads here, Pull down Menu with no prompt
+        // So only lightbars display.
     }
 
     return prompt;

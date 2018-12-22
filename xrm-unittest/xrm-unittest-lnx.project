@@ -30,18 +30,28 @@
   <Dependencies/>
   <VirtualDirectory Name="src">
     <File Name="main.cpp"/>
+    <File Name="common_io_ut.cpp"/>
+    <File Name="session_io_ut.cpp"/>
+    <File Name="ansi_processor_ut.cpp"/>
     <File Name="../src/ansi_processor.cpp"/>
     <File Name="../src/ansi_processor.hpp"/>
+    <File Name="users_dao_ut.cpp"/>
     <File Name="../src/session_manager.cpp"/>
     <File Name="../src/session_manager.hpp"/>
     <File Name="../src/common_io.cpp"/>
     <File Name="../src/common_io.hpp"/>
     <File Name="../src/session_io.cpp"/>
     <File Name="../src/session_io.hpp"/>
+    <File Name="access_condition_ut.cpp"/>
     <File Name="../src/access_condition.cpp"/>
     <File Name="../src/access_condition.hpp"/>
+    <File Name="form_system_config_ut.cpp"/>
     <File Name="../src/form_manager.cpp"/>
     <File Name="../src/form_manager.hpp"/>
+    <File Name="conference_dao_it.cpp"/>
+    <File Name="file_area_dao_it.cpp"/>
+    <File Name="message_area_dao_it.cpp"/>
+    <File Name="oneliners_dao_it.cpp"/>
     <File Name="../src/io_service.cpp"/>
     <File Name="../src/io_service.hpp"/>
     <File Name="../src/communicator.cpp"/>
@@ -70,7 +80,8 @@
       <File Name="../src/utf-cpp/utf8.h"/>
     </VirtualDirectory>
     <File Name="../src/uuid.hpp"/>
-    <File Name="common_mock_ut.cpp"/>
+    <File Name="../src/encoding.cpp"/>
+    <File Name="../src/encoding.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

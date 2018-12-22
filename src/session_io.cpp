@@ -1,6 +1,7 @@
 #include "session_io.hpp"
 #include "session_data.hpp"
 #include "common_io.hpp"
+#include "encoding.hpp"
 
 #include "model-sys/config.hpp"
 
@@ -80,9 +81,10 @@ void SessionIO::createInputField(std::string &field_name, int &len)
     char sTmp2[3] = {0};
 
     // Parse for Input String Modifiers
-    std::string::size_type tempLength;
-    std::string::size_type position;
-    std::string::size_type stringSize;
+    std::string::size_type tempLength = 0;
+    std::string::size_type stringSize = 0;
+    std::string::size_type position   = 0;
+
 
     char INPUT_COLOR[255]= {0};
     bool isColorOverRide = false; //found input color
@@ -398,7 +400,7 @@ std::string SessionIO::pipeReplaceBackground(int background)
             escape_sequence = "\x1b[47m";
             break;
 
-        // Default to none.
+            // Default to none.
         case 24:
             escape_sequence = "\x1b[0m";
             break;
@@ -623,9 +625,7 @@ std::string SessionIO::parseFilename(const std::string &pipe_code)
     // Strip %%DF and grab the 'Filename.ext
     CommonIO common_io;
     std::string str = pipe_code.substr(4);
-    std::string buffer = "";
-
-    common_io.readinAnsi(str, buffer);
+    std::string buffer = common_io.readinAnsi(str);
 
     if(buffer.size() > 0)
     {
@@ -650,8 +650,8 @@ std::string SessionIO::parsePipeWithChars(const std::string &pipe_code)
 
     switch(pipe_code[1])
     {
-        // Most likely will break these out later bye pipe[1] and send [2] to other functions
-        // To Keep small and compact!
+            // Most likely will break these out later bye pipe[1] and send [2] to other functions
+            // To Keep small and compact!
         case 'C':
             switch(pipe_code[2])
             {
@@ -734,103 +734,103 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
         switch(my_matches.m_match)
         {
             case 1: // Pipe w/ 2 DIDIT Colors
-            {
-//                    std::cout << "Pipe w/ 2 DIDIT Colors |00" << std::endl;
-                std::string result = pipeColors(my_matches.m_code);
-
-                if(result.size() != 0)
                 {
-                    // Replace the Color, if not ansi then remove the color!
-                    if(m_session_data->m_is_use_ansi)
+//                    std::cout << "Pipe w/ 2 DIDIT Colors |00" << std::endl;
+                    std::string result = pipeColors(my_matches.m_code);
+
+                    if(result.size() != 0)
+                    {
+                        // Replace the Color, if not ansi then remove the color!
+                        if(m_session_data->m_is_use_ansi)
+                        {
+                            ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
+                        }
+                        else
+                        {
+                            ansi_string.replace(my_matches.m_offset, my_matches.m_length, "");
+                        }
+                    }
+                    else
+                    {
+                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
+                    }
+                }
+                break;
+
+            case 2: // Pipe w/ 2 Chars and 4 Digits // |XY0101
+                {
+//                    std::cout << "Pipe w/ 2 Chars and 4 Digits // |XY0101" << std::endl;
+                    // Remove for now, haven't gotten this far!
+                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, "       ");
+                }
+                break;
+
+            case 3: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
+                {
+//                    std::cout << "Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33" << std::endl;
+                    std::string result = seperatePipeWithCharsDigits(my_matches.m_code);
+
+                    if(result.size() != 0)
+                    {
+                        // Replace the string
+                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
+                    }
+                }
+                break;
+
+            case 4: // Pipe w/ 2 CHARS
+                // This one will need replacement in the string parsing
+                // Pass the original string becasue of |DE for delay!
+                {
+//                    std::cout << "Pipe w/ 2 CHARS // |AA" << std::endl;
+                    std::string result = parsePipeWithChars(my_matches.m_code);
+
+                    if(result.size() != 0)
+                    {
+                        // Replace the string
+                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
+                    }
+                    else
+                    {
+                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
+                    }
+                }
+                break;
+
+            case 5: // %%FILENAME.EXT  get filenames for loading from string prompts
+                {
+//                    std::cout << "replacing %%FILENAME.EXT codes" << std::endl;
+                    std::string result = parseFilename(my_matches.m_code);
+
+                    if(result.size() != 0)
                     {
                         ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
                     }
                     else
                     {
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, "");
+                        std::string s(my_matches.m_length, ' ');
+                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, s);
                     }
                 }
-                else
-                {
-                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
-                }
-            }
-            break;
-
-            case 2: // Pipe w/ 2 Chars and 4 Digits // |XY0101
-            {
-//                    std::cout << "Pipe w/ 2 Chars and 4 Digits // |XY0101" << std::endl;
-                // Remove for now, haven't gotten this far!
-                ansi_string.replace(my_matches.m_offset, my_matches.m_length, "       ");
-            }
-            break;
-
-            case 3: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
-            {
-//                    std::cout << "Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33" << std::endl;
-                std::string result = seperatePipeWithCharsDigits(my_matches.m_code);
-
-                if(result.size() != 0)
-                {
-                    // Replace the string
-                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
-                }
-            }
-            break;
-
-            case 4: // Pipe w/ 2 CHARS
-                // This one will need replacement in the string parsing
-                // Pass the original string becasue of |DE for delay!
-            {
-//                    std::cout << "Pipe w/ 2 CHARS // |AA" << std::endl;
-                std::string result = parsePipeWithChars(my_matches.m_code);
-
-                if(result.size() != 0)
-                {
-                    // Replace the string
-                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
-                }
-                else
-                {
-                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
-                }
-            }
-            break;
-
-            case 5: // %%FILENAME.EXT  get filenames for loading from string prompts
-            {
-//                    std::cout << "replacing %%FILENAME.EXT codes" << std::endl;
-                std::string result = parseFilename(my_matches.m_code);
-
-                if(result.size() != 0)
-                {
-                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
-                }
-                else
-                {
-                    std::string s(my_matches.m_length, ' ');
-                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, s);
-                }
-            }
-            break;
+                break;
 
             case 6: // Percent w/ 2 CHARS
-            {
+                {
 //                    std::cout << "Percent w/ 2 CHARS" << std::endl;
-                // Remove for now, haven't gotten this far!
-                ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
-            }
-            break;
+                    // Remove for now, haven't gotten this far!
+                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
+                }
+                break;
 
             case 7: // Percent with 2 digits, custom codes
-            {
-                // Were just removing them becasue they are processed.
-                // Now that first part of sequence |01 etc.. are processed!
+                {
+                    // Were just removing them becasue they are processed.
+                    // Now that first part of sequence |01 etc.. are processed!
 //                    std::cout << "replacing %## codes" << std::endl;
-                // Remove for now, haven't gotten this far!
-                ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
-            }
-            break;
+                    // Remove for now, haven't gotten this far!
+                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
+                }
+                break;
 
             default:
                 break;
@@ -1118,7 +1118,7 @@ std::string SessionIO::pipe2promptFormat(const std::string &sequence, config_ptr
 bool SessionIO::checkRegex(const std::string &sequence, const std::string &expression)
 {
     // Create system default locale
-    std::locale::global(std::locale(""));
+    std::setlocale(LC_ALL, Encoding::ENCODING_TEXT_UTF8.c_str());
     std::cout.imbue(std::locale());
 
     std::smatch match;

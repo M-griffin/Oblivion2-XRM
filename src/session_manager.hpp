@@ -9,9 +9,6 @@
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
 
-class SessionSSL;
-typedef std::shared_ptr<SessionSSL> session_ssl_ptr;
-
 /**
  * @class SessionManager
  * @author Michael Griffin
@@ -44,7 +41,6 @@ public:
 private:
 
     std::set<session_ptr> m_sessions;
-    std::set<session_ssl_ptr> m_sessions_ssl;
 };
 
 typedef std::shared_ptr<SessionManager> session_manager_ptr;
