@@ -28,7 +28,7 @@ std::string USERS_DATABASE       = "";
 /**
  * @brief Unit Testing for Initial Form Configuration Implimentation
  * @return
- */
+ *
 SUITE(XRMEncoding)
 {
 
@@ -40,8 +40,8 @@ SUITE(XRMEncoding)
 
         std::string result = Encoding::instance()->utf8Encode(test);
 		std::cout << "result " << result << std::endl;
-		
-		
+
+
         std::string original = Encoding::instance()->utf8Decode(result);
 		std::cout << "original " << original << std::endl;
 
@@ -51,8 +51,7 @@ SUITE(XRMEncoding)
         CHECK_EQUAL(test, original);
 
     }
-
-}
+}*/
 
 /*
 * These Unit Tests are To test the core logic of classes and methods.
