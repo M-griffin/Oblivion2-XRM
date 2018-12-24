@@ -189,7 +189,7 @@ std::string ModMessageEditor::processTopTemplate(ansi_process_ptr ansi_process, 
     }
 
     ansi_process->clearScreen();
-    ansi_process->parseAnsiScreen((char *)new_screen.c_str());
+    ansi_process->parseAnsiScreen2((char *)new_screen.c_str());
     m_text_box_top = ansi_process->getMaxRowsUsedOnScreen() + 1;
 
     return ansi_process->getScreenFromBuffer(true);
@@ -259,7 +259,7 @@ std::string ModMessageEditor::processMidTemplate(ansi_process_ptr ansi_process, 
 
     // Load, then pull MCI off-sets on the screen for margins.
     ansi_process->clearScreen();
-    ansi_process->parseAnsiScreen((char *)new_screen.c_str());
+    ansi_process->parseAnsiScreen((char *)new_screen.c_str());  // A
     m_text_box_left  = ansi_process->getMCIOffSet("|LT");
     m_text_box_right = ansi_process->getMCIOffSet("|RT");
 
@@ -272,7 +272,10 @@ std::string ModMessageEditor::processMidTemplate(ansi_process_ptr ansi_process, 
     // Remove Code Mappings from screen the sets up ansi screen
     ansi_process->clearScreen();
     std::string output_screen = m_session_io.parseCodeMapGenerics(new_screen, code_map);
-    ansi_process->parseAnsiScreen((char *)output_screen.c_str());
+
+    std::cout << " output_screen: " << output_screen << std::endl;
+
+    ansi_process->parseAnsiScreen2((char *)output_screen.c_str()); // A 2
 
     std::string mid_screen_line = ansi_process->getScreenFromBuffer(false);
     new_screen.erase();

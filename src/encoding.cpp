@@ -127,44 +127,47 @@ std::string Encoding::wide_to_multibyte(const std::wstring &wstr)
 
 #elif TARGET_OS_MAC
 
-std::wstring Encoding::multibyte_to_wide(const char* mbstr) 
+std::wstring Encoding::multibyte_to_wide(const char* mbstr)
 {
-	/*
-	std::string incoming_data = std::string(
+    /*
+    std::string incoming_data = std::string(
                                     reinterpret_cast<const char *>(mbstr),
                                     strlen((const char *)mbstr)
-                                );*/	
-								
+                                );*/
+
     // the UTF-8 / UTF-16 standard conversion facet
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> utf16conv;    
-	
-	std::wstring ucs2 = L"";
-    try 
-	{
-        ucs2 = utf16conv.from_bytes(mbstr);	
-    } 
-	catch(const std::range_error& e) 
-	{
-        std::cout << "UCS2 failed after producing " << std::dec << ucs2.size()<<" characters:\n";        
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> utf16conv;
+
+    std::wstring ucs2 = L"";
+
+    try
+    {
+        ucs2 = utf16conv.from_bytes(mbstr);
     }
-	
-	return ucs2;
+    catch(const std::range_error& e)
+    {
+        std::cout << "UCS2 failed after producing " << std::dec << ucs2.size()<<" characters:\n";
+    }
+
+    return ucs2;
 }
 
-std::string Encoding::wide_to_multibyte(const std::wstring& wstr) 
-{	
-    std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> ucs2conv;	
-	
-	std::string utf8 = "";
-    try 
-	{
-        utf8 = ucs2conv.to_bytes(wstr);	
-    } 
-	catch(const std::range_error& e) 
-	{
-        std::cout << "UTF8 failed after producing " << std::dec << utf8.size()<<" characters:\n";        
+std::string Encoding::wide_to_multibyte(const std::wstring& wstr)
+{
+    std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> ucs2conv;
+
+    std::string utf8 = "";
+
+    try
+    {
+        utf8 = ucs2conv.to_bytes(wstr);
     }
-	return utf8;
+    catch(const std::range_error& e)
+    {
+        std::cout << "UTF8 failed after producing " << std::dec << utf8.size()<<" characters:\n";
+    }
+
+    return utf8;
 }
 
 #else
@@ -262,7 +265,9 @@ std::string Encoding::utf8Encode(const std::string &standard_string)
         }
         else
         {
-            wide_string += standard_string[i];
+            // Possiable Issue
+            std::cout << " UTF-8 encoding issue: " << standard_string[i] << std::endl;
+            //wide_string += standard_string[i];
         }
     }
 
@@ -287,7 +292,7 @@ std::string Encoding::utf8Decode(const std::string &standard_string)
         if(map_wide_to_cp437.find(usc2_char) == map_wide_to_cp437.end())
         {
             // Null Characters should be excluded, extra byes in transformation to USC2/UTF-16.
-            if (usc2_char == '\0')
+            if(usc2_char == '\0')
             {
                 continue;
             }

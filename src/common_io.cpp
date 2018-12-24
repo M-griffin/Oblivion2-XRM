@@ -1097,9 +1097,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
 
         if(sequence.size() == 0)
         {
-
             // WIP, update to clear field line CTRL + Y
-
 
             // Received ESC, Abort!
             //std::cout << "Received ESC!!!!!" << std::endl;
@@ -1533,66 +1531,123 @@ void CommonIO::getNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
         return;
     }
 
-    int byte_count = 0;
-    uint8_t lead = mask8(*it);
-
     int byte_value = static_cast<int>((uint8_t)*it);
 
-    if(byte_value > 127 || byte_value < 226)
-    {
-        byte_count = 1;
-    }
-    else if(lead < 0x80)
-    {
-        byte_count = 1;
-    }
-    else if((lead >> 5) == 0x6)
-    {
-        byte_count = 2;
-    }
-    else if((lead >> 4) == 0xe)
-    {
-        byte_count = 3;
-    }
-    else if((lead >> 3) == 0x1e)
-    {
-        byte_count = 4;
-    }
-    else
-    {
-        // High ASCII > 127 < 256
-        byte_count = 1;
-    }
-
-    if(byte_count <= 1)
+    if(byte_value < 128)
     {
         buffer.character = std::string(1, *it);
         buffer.length = 1;
         *it++;
+
+        //std::cout << "buffer.character 1 : [" << buffer.character << "] len: " << buffer.character.size() << std::endl;
     }
     else
     {
         try
         {
-
-            std::cout << "IT : " << *it << std::endl;
-            std::cout << "IT (int) : " << static_cast<int>((uint8_t)*it) << std::endl;
-            std::cout << "byte_count : " << byte_count << std::endl;
+            // Debugging.
+            //std::cout << "IT : " << *it << std::endl;
 
             uint32_t code_point = utf8::next(it, line_end);
             unsigned char character[5] = {0, 0, 0, 0, 0};
             utf8::append(code_point, character);
+
+            for(int i = 0; i < 5; i++)
+            {
+                if(character[i] != 0)
+                {
+                    buffer.character += std::string(1, character[i]);
+                }
+            }
+
+            buffer.length = buffer.character.size();
+
+            //std::cout << "buffer.character 2 : [" << buffer.character << "] len: " << buffer.character.size() << std::endl;
+
+            /*
+            buffer.character = std::string(
+                                   reinterpret_cast<const char *>(character),
+                                   4 // strlen((const char *)character)
+                               );
+
+            std::cout << "buffer.character 2 : " << buffer.character << " len: " << buffer.character.size() << std::endl;
+            buffer.length = buffer.character.size();
+            */
+        }
+        catch(utf8::exception &ex)
+        {
+            std::cout << "getNextGlyph - Utf8 Parsing Exception: " << ex.what() << " Line: " << __LINE__ << " File: "<< __FILE__ << std::endl;
+            ++*it; // Bad, other iterate past it, otherwise stuck in endless loop.
+        }
+
+
+    }
+}
+
+/**
+ * @brief Parses screen data into the Screen Buffer.
+ * @return
+ */
+void CommonIO::getNextGlyph2(LocalizedBuffer &buffer, std::string::iterator &it,
+                             std::string::iterator &line_end)
+{
+    buffer.clear();
+
+    if(it == line_end)
+    {
+        return;
+    }
+
+    int byte_value = static_cast<int>((uint8_t)*it);
+
+    if(byte_value < 128)
+    {
+        buffer.character = std::string(1, *it);
+        buffer.length = 1;
+        *it++;
+
+        std::cout << "buffer.character 1 : [" << buffer.character << "] len: " << buffer.character.size() << std::endl;
+    }
+    else
+    {
+        try
+        {
+            // Debugging.
+            //std::cout << "IT : " << *it << std::endl;
+
+            uint32_t code_point = utf8::next(it, line_end);
+            unsigned char character[5] = {0, 0, 0, 0, 0};
+            utf8::append(code_point, character);
+
+            for(int i = 0; i < 5; i++)
+            {
+                if(character[i] != 0)
+                {
+                    buffer.character += std::string(1, character[i]);
+                }
+            }
+
+            buffer.length = buffer.character.size();
+
+            std::cout << "buffer.character 2 : [" << buffer.character << "] len: " << buffer.character.size() << std::endl;
+
+            /*
             buffer.character = std::string(
                                    reinterpret_cast<const char *>(character),
                                    strlen((const char *)character)
                                );
-            buffer.length = byte_count;
+
+            std::cout << "buffer.character 2 : " << buffer.character << " len: " << buffer.character.size() << std::endl;
+            buffer.length = buffer.character.size();
+            */
         }
         catch(utf8::exception &ex)
         {
-            std::cout << "Utf8 Parsing Exception: " << ex.what() << " Line: " << __LINE__ << " File: "<< __FILE__ << std::endl;
-            ++*it;
+            std::cout << "getNextGlyph - Utf8 Parsing Exception: " << ex.what() << " Line: " << __LINE__ << " File: "<< __FILE__ << std::endl;
+            ++*it; // Bad, other iterate past it, otherwise stuck in endless loop.
         }
+
+
     }
 }
 
@@ -1610,40 +1665,9 @@ void CommonIO::peekNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
         return;
     }
 
-    int byte_count = 0;
-    uint8_t lead = mask8(*it);
-
-    // Chcek for High Ascii first, ignore any single byte uncode at this point
-    // Might need a flag or to re-think this parsing.
     int byte_value = static_cast<int>((uint8_t)*it);
 
-    if(byte_value > 127 || byte_value < 226)
-    {
-        byte_count = 1;
-    }
-    else if(lead < 0x80)
-    {
-        byte_count = 1;
-    }
-    else if((lead >> 5) == 0x6)
-    {
-        byte_count = 2;
-    }
-    else if((lead >> 4) == 0xe)
-    {
-        byte_count = 3;
-    }
-    else if((lead >> 3) == 0x1e)
-    {
-        byte_count = 4;
-    }
-    else
-    {
-        // High ASCII > 127 < 256
-        byte_count = 1;
-    }
-
-    if(byte_count <= 1)
+    if(byte_value < 128)
     {
         buffer.character = std::string(1, *it);
         buffer.length = 1;
@@ -1652,24 +1676,35 @@ void CommonIO::peekNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
     {
         try
         {
-            std::cout << "IT : " << *it << std::endl;
-            std::cout << "IT (int) : " << static_cast<int>((uint8_t)*it) << std::endl;
-            std::cout << "byte_count : " << byte_count << std::endl;
-
             uint32_t code_point = utf8::next(it, line_end);
             unsigned char character[5] = {0, 0, 0, 0, 0};
             utf8::append(code_point, character);
+
+            /*
             buffer.character = std::string(
                                    reinterpret_cast<const char *>(character),
                                    strlen((const char *)character)
                                );
-            buffer.length = byte_count;
+
+            buffer.length = buffer.character.size();
+            */
+
+            for(int i = 0; i < 5; i++)
+            {
+                if(character[i] != 0)
+                {
+                    buffer.character += std::string(1, character[i]);
+                }
+            }
+
+            buffer.length = buffer.character.size();
+
             *it--;
         }
         catch(utf8::exception &ex)
         {
-            std::cout << "Utf8 Parsing Exception: " << ex.what() << " Line: " << __LINE__ << " File: "<< __FILE__ << std::endl;
-            ++*it;
+            std::cout << "peekNextGlyph - Utf8 Parsing Exception: " << ex.what() << " Line: " << __LINE__ << " File: "<< __FILE__ << std::endl;
+            ++*it; // Bad, iterate past otherwise stuck in endless loop!
         }
     }
 }

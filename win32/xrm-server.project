@@ -242,6 +242,7 @@
         <Library Value="libsqlite3.a"/>
         <Library Value="yaml-cpp.dll"/>
         <Library Value="Rpcrt4"/>
+        <Library Value="libiconv.a"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
