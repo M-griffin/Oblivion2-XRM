@@ -172,6 +172,12 @@ public:
     void displayPromptAndNewLine(const std::string &prompt);
 
     /**
+     * @brief Scrub CR LF from Screen Templates
+     * @param screen
+     */
+    void scrubNewLinesChars(std::string &screen);
+
+    /**
      * @brief Processes a TOP Template Screen
      * @param ansi_process
      * @param screen

@@ -1025,9 +1025,6 @@ std::string SessionIO::pipe2ansi(const std::string &sequence)
  */
 std::vector<MapType> SessionIO::pipe2genericCodeMap(const std::string &sequence)
 {
-
-    std::cout << "seq: " << sequence << std::endl;
-
     std::vector<MapType> code_map = parseToCodeMap(sequence, MID_EXPRESSION);
     return code_map;
 }

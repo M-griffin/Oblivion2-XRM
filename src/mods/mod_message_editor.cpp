@@ -189,7 +189,7 @@ std::string ModMessageEditor::processTopTemplate(ansi_process_ptr ansi_process, 
     }
 
     ansi_process->clearScreen();
-    ansi_process->parseAnsiScreen2((char *)new_screen.c_str());
+    ansi_process->parseAnsiScreen((char *)new_screen.c_str());
     m_text_box_top = ansi_process->getMaxRowsUsedOnScreen() + 1;
 
     return ansi_process->getScreenFromBuffer(true);
@@ -215,6 +215,38 @@ std::string ModMessageEditor::processBottomTemplate(ansi_process_ptr ansi_proces
 }
 
 /**
+ * @brief Scrub CR LF from Screen Templates
+ * @param screen
+ */
+void ModMessageEditor::scrubNewLinesChars(std::string &screen)
+{
+    // MID Ansi, remove any extra CR / LF carriage returns.
+    std::string::size_type index = 0;
+
+    while(index != std::string::npos)
+    {
+        index = screen.find("\r", index);
+
+        if(index != std::string::npos)
+        {
+            screen.erase(index, 1);
+        }
+    }
+
+    index = 0;
+
+    while(index != std::string::npos)
+    {
+        index = screen.find("\n", index);
+
+        if(index != std::string::npos)
+        {
+            screen.erase(index, 1);
+        }
+    }
+}
+
+/**
  * @brief Processes a MID Template Screen
  * @param ansi_process
  * @param screen
@@ -223,30 +255,7 @@ std::string ModMessageEditor::processBottomTemplate(ansi_process_ptr ansi_proces
 std::string ModMessageEditor::processMidTemplate(ansi_process_ptr ansi_process, const std::string &screen)
 {
     std::string new_screen = screen;
-    std::string::size_type index = 0;
-
-    // MID Ansi, remove any extra CR / LF carriage returns.
-    while(index != std::string::npos)
-    {
-        index = new_screen.find("\r", index);
-
-        if(index != std::string::npos)
-        {
-            new_screen.erase(index, 1);
-        }
-    }
-
-    index = 0;
-
-    while(index != std::string::npos)
-    {
-        index = new_screen.find("\n", index);
-
-        if(index != std::string::npos)
-        {
-            new_screen.erase(index, 1);
-        }
-    }
+    scrubNewLinesChars(new_screen);
 
     // Clear All Mappings
     m_session_io.clearAllMCIMapping();
@@ -259,7 +268,7 @@ std::string ModMessageEditor::processMidTemplate(ansi_process_ptr ansi_process, 
 
     // Load, then pull MCI off-sets on the screen for margins.
     ansi_process->clearScreen();
-    ansi_process->parseAnsiScreen((char *)new_screen.c_str());  // A
+    ansi_process->parseAnsiScreen((char *)new_screen.c_str());
     m_text_box_left  = ansi_process->getMCIOffSet("|LT");
     m_text_box_right = ansi_process->getMCIOffSet("|RT");
 
@@ -273,9 +282,7 @@ std::string ModMessageEditor::processMidTemplate(ansi_process_ptr ansi_process, 
     ansi_process->clearScreen();
     std::string output_screen = m_session_io.parseCodeMapGenerics(new_screen, code_map);
 
-    std::cout << " output_screen: " << output_screen << std::endl;
-
-    ansi_process->parseAnsiScreen2((char *)output_screen.c_str()); // A 2
+    ansi_process->parseAnsiScreen((char *)output_screen.c_str());
 
     std::string mid_screen_line = ansi_process->getScreenFromBuffer(false);
     new_screen.erase();
@@ -318,17 +325,19 @@ void ModMessageEditor::setupEditor()
     std::string mid_screen = processMidTemplate(ansi_process, mid_template);
 
     // Stats
+    /*
     std::cout << "========================" << std::endl;
     std::cout << "m_text_box_top    : " << m_text_box_top << std::endl;
     std::cout << "m_text_box_bottom : " << m_text_box_bottom << std::endl;
     std::cout << "m_text_box_left   : " << m_text_box_left << std::endl;
     std::cout << "m_text_box_right  : " << m_text_box_right << std::endl;
+    */
 
     // Next combine and output.. Move cursor to top left in box.
     std::string screen_output = top_screen + mid_screen + bot_screen;
     screen_output += "\x1b[" + std::to_string(m_text_box_top) + ";" + std::to_string(m_text_box_left) + "H";
 
-    std::cout << screen_output << std::endl;
+    //std::cout << screen_output << std::endl;
 
     baseProcessDeliverInput(screen_output);
 }
