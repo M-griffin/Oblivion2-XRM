@@ -94,7 +94,7 @@ public:
     void xrmLog(Types ... rest)
     {
         config_ptr config = Communicator::instance()->getConfiguration();
-        config_log_level = config->logging_level;
+        std::string config_log_level = config->logging_level;
 
         std::string log_string = log<level>(rest...);
 
