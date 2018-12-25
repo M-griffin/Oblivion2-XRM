@@ -1,7 +1,13 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
+#include "communicator.hpp"
+#include "model-sys/config.hpp"
+
+#include <yaml-cpp/yaml.h>
+
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <mutex>
 #include <map>
@@ -19,11 +25,11 @@ public:
 
     static enum
     {
-        INFO = 0,
-        DEBUG = 1,
-        ERROR = 2,
-        CONSOLE = 3,
-        ALL = 4
+        INFO_LOG = 0,
+        DEBUG_LOG = 1,
+        ERROR_LOG = 2,
+        CONSOLE_LOG = 3,
+        ALL_LOGS = 4
 
     } LOGGING_LEVELS;
 
@@ -64,23 +70,105 @@ public:
         return;
     }
 
-    void console_level();
-    void info_level();
-    void debug_level();
-    void error_level();
-    void all_levels();
-    void writeOutYamlLog(std::string path, std::string file_name);
+    template<int level>
+    std::string log()
+    {
+        return "";
+    }
+
+    template<int level, typename T>
+    std::string log(const T& t)
+    {
+        std::ostringstream oss;
+        oss << t;
+        return oss.str();
+    }
+
+    template<int level, typename T, typename ... Types>
+    std::string log(const T& first, Types ... rest)
+    {
+        return log<level>(first) + " " + log<level>(rest...);
+    }
+
+    template<int level, typename ... Types>
+    void xrmLog(Types ... rest)
+    {
+        config_ptr config = Communicator::instance()->getConfiguration();
+        config_log_level = config->logging_level;
+
+        std::string log_string = log<level>(rest...);
+
+        switch(level)
+        {
+            // Incoming Logging Level
+            case INFO_LOG:
+                break;
+
+            case DEBUG_LOG:
+                break;
+
+            case ERROR_LOG:
+                break;
+
+            case CONSOLE_LOG:
+                break;
+
+            case ALL_LOGS:
+                break;
+
+            default:
+                break;
+        }
+
+        // Testing Parameter Packs
+        std::cout << log_string << std::endl;
+    }
+
+    void writeOutYamlLog(std::string path, std::string file_name)
+    {
+        std::string log_file;
+        log_file.append(path);
+        log_file.append(file_name);
+
+        YAML::Emitter out;
+
+        out << YAML::BeginMap;
+        out << YAML::Flow;
+
+        out << YAML::Key << "DateTime" << YAML::Value << "10pm etc.. ";
+        out << YAML::Key << "Detail";
+        out << YAML::Value << YAML::BeginSeq << "INFO" << "Testing Info Level" << YAML::EndSeq;
+
+        out << YAML::EndMap;
+
+
+        // Setup file to Write out File.
+        std::ofstream ofs(log_file, std::ios_base::app);
+
+        if(!ofs.is_open())
+        {
+            std::cout << "Error, unable to open file: " << log_file << std::endl;
+            return;
+        }
+
+        ofs << out.c_str();
+        ofs.close();
+
+        return;
+    }
 
 private:
 
     mutable std::mutex     m_encoding_mutex;
     static Logging*        m_global_logging_instance;
 
-    explicit Logging();
-    ~Logging();
+    explicit Logging() { };
+    ~Logging() { };
     Logging(const Logging&);
     Logging& operator=(const Logging&);
 
 };
+
+Logging* Logging::m_global_logging_instance = nullptr;
 
 #endif // LOGGING_H
