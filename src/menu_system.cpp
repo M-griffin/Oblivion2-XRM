@@ -20,8 +20,6 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     : StateBase(session_data)
     , MenuBase(session_data)
 {
-    std::cout << "MenuSystem" << std::endl;
-
     // [Vector] Setup std::function array with available options to pass input to.
     m_menu_functions.push_back(std::bind(&MenuBase::menuInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuBase::menuYesNoBarInput, this, std::placeholders::_1, std::placeholders::_2));
@@ -53,13 +51,10 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     m_menu_command_functions['T'] = std::bind(&MenuSystem::menuOptionsFileBaseSponsorCommands, this, std::placeholders::_1);
     m_menu_command_functions['V'] = std::bind(&MenuSystem::menuOptionsVotingCommands, this, std::placeholders::_1);
     m_menu_command_functions['+'] = std::bind(&MenuSystem::menuOptionsColorSettingCommands, this, std::placeholders::_1);
-
 }
 
 MenuSystem::~MenuSystem()
 {
-    std::cout << "~MenuSystem" << std::endl;
-
     // Clear All Menu Command Functions.
     MappedCommandFunctions().swap(m_menu_command_functions);
 }

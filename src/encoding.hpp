@@ -31,7 +31,6 @@ public:
     {
         if(!m_global_encoding_instance)
         {
-            std::cout << "Encoding" << std::endl;
             m_global_encoding_instance = new Encoding();
             return m_global_encoding_instance;
         }
@@ -46,7 +45,6 @@ public:
     {
         if(m_global_encoding_instance)
         {
-            std::cout << "~Encoding" << std::endl;
             delete m_global_encoding_instance;
             m_global_encoding_instance = nullptr;
         }

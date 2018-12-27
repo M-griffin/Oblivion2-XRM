@@ -45,8 +45,6 @@ public:
         , m_current_option(0)
         , m_current_field(0)
     {
-        std::cout << "ModMessageBaseEditor" << std::endl;
-
         // Setup Modules
         m_setup_functions.push_back(std::bind(&ModMessageBaseEditor::setupMenuEditor, this));
         m_setup_functions.push_back(std::bind(&ModMessageBaseEditor::setupMenuEditFields, this));
@@ -77,7 +75,6 @@ public:
 
     virtual ~ModMessageBaseEditor() override
     {
-        std::cout << "~ModMessageBaseEditor" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
         std::vector<access_level_ptr>().swap(m_loaded_level);

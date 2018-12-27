@@ -41,8 +41,6 @@ public:
         , m_wildcard_filter("")
         , m_user_array_position(0)
     {
-        std::cout << "ModUserEditor" << std::endl;
-
         // Push function pointers to the stack.
 
         m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserList, this));
@@ -74,7 +72,6 @@ public:
 
     virtual ~ModUserEditor() override
     {
-        std::cout << "~ModUserEditor" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
         std::vector<user_ptr>().swap(m_users_listing);

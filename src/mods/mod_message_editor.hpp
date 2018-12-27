@@ -43,8 +43,6 @@ public:
         , m_text_box_left(0)
         , m_text_box_right(80)
     {
-        std::cout << "ModMessageEditor" << std::endl;
-
         // Push function pointers to the stack.
 
         m_setup_functions.push_back(std::bind(&ModMessageEditor::setupEditor, this));
@@ -66,7 +64,6 @@ public:
 
     virtual ~ModMessageEditor() override
     {
-        std::cout << "~ModMessageEditor" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
     }

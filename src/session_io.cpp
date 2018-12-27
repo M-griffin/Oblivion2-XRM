@@ -17,19 +17,16 @@
 SessionIO::SessionIO()
     : m_session_data(nullptr)
 {
-    std::cout << "SessionIO base" << std::endl;
 }
 
 SessionIO::SessionIO(session_data_ptr session_data)
     : m_session_data(session_data)
 {
-    std::cout << "SessionIO" << std::endl;
 }
 
 SessionIO::~SessionIO()
 {
     clearAllMCIMapping();
-    std::cout << "~SessionIO" << std::endl;
 }
 
 /**

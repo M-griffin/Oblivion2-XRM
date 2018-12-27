@@ -3,9 +3,11 @@
 
 #include "communicator.hpp"
 #include "model-sys/config.hpp"
+#include "safe_queue.hpp"
 
 #include <yaml-cpp/yaml.h>
 
+#include <memory>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -14,6 +16,33 @@
 #include <ctime>
 #include <mutex>
 #include <map>
+
+
+/**
+ * @class LogEntry
+ * @author Michael Griffin
+ * @date 24/12/2018
+ * @file logging.hpp
+ * @brief LogEntry used to Queue up Messages for file writes.
+ */
+class LogEntry
+{
+public:
+    LogEntry() {}
+    ~LogEntry()
+    {
+        std::vector<std::string>().swap(m_details);
+    }
+
+    LogEntry(std::string date_time, std::vector<std::string> details)
+        : m_date_time(date_time)
+        , m_details(details)
+    { }
+    std::string m_date_time;
+    std::vector<std::string> m_details;
+};
+
+typedef std::shared_ptr<LogEntry> log_entry_ptr;
 
 /**
  * @class Logging
@@ -44,6 +73,8 @@ public:
     const std::string CONSOLE_LEVEL = "Console Output";
     const std::string ALL_LEVELS = "All Level Information";
 
+    SafeQueue<log_entry_ptr> m_log_enteries;
+
     /**
      * @brief Creates Singleton Instatce of Class
      * @return
@@ -52,7 +83,6 @@ public:
     {
         if(!m_global_logging_instance)
         {
-            std::cout << "Logging" << std::endl;
             m_global_logging_instance = new Logging();
             return m_global_logging_instance;
         }
@@ -67,7 +97,6 @@ public:
     {
         if(m_global_logging_instance)
         {
-            std::cout << "~Logging" << std::endl;
             delete m_global_logging_instance;
             m_global_logging_instance = nullptr;
         }
@@ -75,6 +104,44 @@ public:
         return;
     }
 
+    /**
+     * @brief Helper, appends forward/backward slash to path
+     * @param value
+     */
+    void pathSeperator(std::string &value)
+    {
+#ifdef _WIN32
+        value.append("\\");
+#else
+        value.append("/");
+#endif
+    }
+
+    /**
+     * @brief Return number of Logs in Queue
+     * @return
+     */
+    int getNumberOfLogEntries()
+    {
+        return m_log_enteries.size();
+    }
+
+    /**
+     * @brief Pull Queued log entries.
+     * @return
+     */
+    log_entry_ptr getLogQueueEntry()
+    {
+        if(!m_log_enteries.isEmpty())
+            return m_log_enteries.dequeue();
+
+        return nullptr;
+    }
+
+    /**
+     * @brief Current Time Stamp (LOCAL TIME)
+     * @return
+     */
     std::string getCurrentDateTime()
     {
         std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -83,6 +150,11 @@ public:
         return s.erase(s.size()-1, 1);
     }
 
+    /**
+     * @brief Configration String to Int Log Level
+     * @param log_level
+     * @return
+     */
     int getConfigurationLogState(std::string log_level)
     {
         if(log_level == "INFO")
@@ -139,6 +211,7 @@ public:
                 if(config_level == INFO_LOG || INFO_LOG == ALL_LOGS)
                 {
                     details.push_back(INFO_LEVEL);
+                    details.push_back(log_string);
                 }
 
                 break;
@@ -147,26 +220,41 @@ public:
                 if(config_level == DEBUG_LOG || INFO_LOG == ALL_LOGS)
                 {
                     details.push_back(DEBUG_LEVEL);
+                    details.push_back(log_string);
                 }
 
                 break;
 
             case ERROR_LOG:
-                // Always write out logs set to error
+                // Always write out logs set to error, and write error to console.
                 details.push_back(ERROR_LEVEL);
+                details.push_back(log_string);
                 writeOutYamlConsole(date_time, details);
                 break;
 
             case CONSOLE_LOG:
                 // Always write out logs set to console
                 details.push_back(CONSOLE_LEVEL);
+                details.push_back(log_string);
+                writeOutYamlConsole(date_time, details);
                 break;
 
             default:
-                break;
+                return;
+        }
+
+        if(details.size() > 0)
+        {
+            log_entry_ptr entry(new LogEntry(date_time, details));
+            m_log_enteries.enqueue(entry);
         }
     }
 
+    /**
+     * @brief Write out Log to console in YAML formated output.
+     * @param date_time
+     * @param details
+     */
     void writeOutYamlConsole(std::string date_time, std::vector<std::string> details)
     {
         YAML::Emitter out;
@@ -190,40 +278,49 @@ public:
         return;
     }
 
-    /*
-        void writeOutYamlFile(int level, std::vector<std::string> details)
+    /**
+     * @brief Write out Log Entries to File.
+     * @param entry
+     */
+    void writeOutYamlFile(log_entry_ptr entry)
+    {
+        std::string path = GLOBAL_LOG_PATH;
+        pathSeperator(path);
+        path.append("systemLog.txt");
+
+        YAML::Emitter out;
+
+        out << YAML::BeginMap;
+        out << YAML::Flow;
+
+        out << YAML::Key << "Log DateTime" << YAML::Value << entry->m_date_time;
+        out << YAML::Key << "Log Details";
+        out << YAML::Value << YAML::BeginSeq;
+
+        for(std::string &d : entry->m_details)
         {
-            std::string log_file;
-            log_file.append(path);
-            log_file.append(file_name);
+            out << d;
+        }
 
-            YAML::Emitter out;
-
-            out << YAML::BeginMap;
-            out << YAML::Flow;
-
-            out << YAML::Key << "DateTime" << YAML::Value << "10pm etc.. ";
-            out << YAML::Key << "Detail";
-            out << YAML::Value << YAML::BeginSeq << "INFO" << "Testing Info Level" << YAML::EndSeq;
-
-            out << YAML::EndMap;
+        out << YAML::EndSeq;
+        out << YAML::EndMap;
 
 
-            // Setup file to Write out File.
-            std::ofstream ofs(log_file, std::ios_base::app);
+        // Setup file to Write out File.
+        std::ofstream ofs(path, std::ios_base::app);
 
-            if(!ofs.is_open())
-            {
-                std::cout << "Error, unable to open file: " << log_file << std::endl;
-                return;
-            }
-
-            ofs << out.c_str();
-            ofs.close();
-
+        if(!ofs.is_open())
+        {
+            std::cout << "Error, unable to open file: " << path << std::endl;
             return;
         }
-         */
+
+        ofs << out.c_str() << std::endl;
+        ofs.close();
+
+        return;
+    }
+
 
 private:
 
@@ -236,7 +333,5 @@ private:
     Logging& operator=(const Logging&);
 
 };
-
-Logging* Logging::m_global_logging_instance = nullptr;
 
 #endif // LOGGING_H

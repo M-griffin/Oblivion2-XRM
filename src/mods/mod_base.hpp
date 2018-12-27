@@ -29,7 +29,6 @@ public:
 
     virtual ~ModBase()
     {
-        std::cout << "~ModBase." << std::endl;
     }
     virtual bool update(const std::string &character_buffer, const bool &is_utf8) = 0;
     virtual bool onEnter() = 0;
@@ -299,7 +298,7 @@ public:
         result += std::move(m_session_io.parseTextPrompt(prompt_set));
 
         // Not found, set default input color
-        if (idx == std::string::npos)
+        if(idx == std::string::npos)
         {
             result += baseGetDefaultInputColor();
         }
@@ -330,7 +329,7 @@ public:
         result += std::move(m_session_io.parseTextPrompt(prompt_set));
 
         // Not found, set default input color
-        if (idx == std::string::npos)
+        if(idx == std::string::npos)
         {
             result += baseGetDefaultInputColor();
         }
@@ -377,7 +376,7 @@ public:
         result += std::move(m_session_io.parseTextPrompt(prompt_set));
 
         // Not found, set default input color
-        if (idx == std::string::npos)
+        if(idx == std::string::npos)
         {
             result += baseGetDefaultInputColor();
         }
@@ -409,7 +408,7 @@ public:
         result += m_session_io.parseTextPrompt(prompt_set);
 
         // Not found, set default input color
-        if (idx == std::string::npos)
+        if(idx == std::string::npos)
         {
             result += baseGetDefaultInputColor();
         }

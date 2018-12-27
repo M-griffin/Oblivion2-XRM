@@ -1,9 +1,8 @@
 #include "io_service.hpp"
 #include "common_io.hpp"
 #include "socket_handler.hpp"
+#include "logging.hpp"
 
-
-#include <iostream>
 #include <cstring>
 #include <string>
 #include <thread>
@@ -13,12 +12,10 @@
 IOService::IOService()
     : m_is_active(false)
 {
-    std::cout << "IOService Started" << std::endl;
 }
 
 IOService::~IOService()
 {
-    std::cout << "~IOService" << std::endl;
     m_service_list.clear();
     m_listener_list.clear();
 }
@@ -28,13 +25,16 @@ IOService::~IOService()
  */
 void IOService::checkAsyncListenersForConnections()
 {
+    Logging *log = Logging::instance();
+
     // Timers are not removed each iteration
     // Async stay active until exprired or canceled
     // And wait, will block socket polling for (x) amount of time
     for(unsigned int i = 0; i < m_listener_list.size(); i++)
     {
         service_base_ptr listener_work = m_listener_list.get(i);
-        if (!listener_work || !listener_work->getSocketHandle()->isActive())
+
+        if(!listener_work || !listener_work->getSocketHandle()->isActive())
         {
             m_listener_list.remove(i);
             --i; // Compensate for item removed.
@@ -42,19 +42,21 @@ void IOService::checkAsyncListenersForConnections()
         }
 
         socket_handler_ptr handler = listener_work->getSocketHandle()->acceptTelnetConnection();
-        if (handler != nullptr)
+
+        if(handler != nullptr)
         {
-            std::cout << "async accept - connection created." << std::endl;
-            std::error_code success_code (0, std::generic_category());
+            log->xrmLog<Logging::DEBUG_LOG>("async accept - connection created.");
+            std::error_code success_code(0, std::generic_category());
+
             try
             {
                 // Check for max nodes here, if we like can limit, send a message and drop
                 // connection on hander by not passing it through the callback.
                 listener_work->executeCallback(success_code, handler);
             }
-            catch (std::exception &ex)
+            catch(std::exception &ex)
             {
-                std::cout << "Exception Async-Accept: " << ex.what() << std::endl;
+                log->xrmLog<Logging::ERROR_LOG>("Exception Async-Accept", ex.what(), __FILE__, __LINE__);
             }
         }
     }
@@ -66,6 +68,8 @@ void IOService::checkAsyncListenersForConnections()
  */
 void IOService::run()
 {
+    Logging *log = Logging::instance();
+
     char msg_buffer[MAX_BUFFER_SIZE];
     m_is_active = true;
 
@@ -80,7 +84,8 @@ void IOService::run()
         for(unsigned int i = 0; i < m_service_list.size(); i++)
         {
             service_base_ptr job_work = m_service_list.get(i);
-            if (!job_work || !job_work->getSocketHandle()->isActive())
+
+            if(!job_work || !job_work->getSocketHandle()->isActive())
             {
                 m_service_list.remove(i);
                 --i; // Compensate for item removed.
@@ -90,21 +95,23 @@ void IOService::run()
             /**
              * Handle Read Service if Data is Available.
              */
-            if (job_work->getServiceType() == SERVICE_TYPE_READ)
+            if(job_work->getServiceType() == SERVICE_TYPE_READ)
             {
                 // If Data Available, read, then populate buffer
                 // Otherwise keep polling till data is available.
                 int result = job_work->getSocketHandle()->poll();
-                if (result > 0)
+
+                if(result > 0)
                 {
                     memset(&msg_buffer, 0, MAX_BUFFER_SIZE);
                     int length = job_work->getSocketHandle()->recvSocket(msg_buffer);
+
                     if(length < 0)
                     {
                         // Error - Lost Connection
-                        std::cout << "async_read - lost connection!: " << length << std::endl;
+                        log->xrmLog<Logging::ERROR_LOG>("async_read - lost connection!: ", length);
                         job_work->getSocketHandle()->setInactive();
-                        std::error_code lost_connect_error_code (1, std::system_category());
+                        std::error_code lost_connect_error_code(1, std::system_category());
                         job_work->executeCallback(lost_connect_error_code, nullptr);
                         m_service_list.remove(i);
                         --i; // Compensate for item removed.
@@ -112,16 +119,16 @@ void IOService::run()
                     else
                     {
                         job_work->setBuffer((unsigned char *)msg_buffer);
-                        std::error_code success_code (0, std::generic_category());
+                        std::error_code success_code(0, std::generic_category());
                         job_work->executeCallback(success_code, nullptr);
                         m_service_list.remove(i);
                         --i; // Compensate for item removed.
                     }
                 }
-                else if (result == -1)
+                else if(result == -1)
                 {
-                    std::cout << "async_poll - lost connection" << std::endl;
-                    std::error_code lost_connect_error_code (1, std::system_category());
+                    log->xrmLog<Logging::ERROR_LOG>("async_poll - lost connection!");
+                    std::error_code lost_connect_error_code(1, std::system_category());
                     job_work->executeCallback(lost_connect_error_code, nullptr);
                     m_service_list.remove(i);
                     --i; // Compensate for item removed.
@@ -131,26 +138,26 @@ void IOService::run()
             /**
              * Handle Write Service if Data is Available.
              */
-            else if (job_work->getServiceType() == SERVICE_TYPE_WRITE)
+            else if(job_work->getServiceType() == SERVICE_TYPE_WRITE)
             {
                 // std::cout << "* SERVICE_TYPE_WRITE" << std::endl;
                 int result = job_work->getSocketHandle()->sendSocket(
                                  (unsigned char*)job_work->getStringSequence().c_str(),
                                  job_work->getStringSequence().size());
 
-                if (result <= 0)
+                if(result <= 0)
                 {
                     // Error - Lost Connection
-                    std::cout << "async_write - lost connection!" << std::endl;
+                    log->xrmLog<Logging::ERROR_LOG>("async_write - lost connection!");
                     job_work->getSocketHandle()->setInactive();
-                    std::error_code lost_connect_error_code (1, std::system_category());
+                    std::error_code lost_connect_error_code(1, std::system_category());
                     job_work->executeCallback(lost_connect_error_code, nullptr);
                     m_service_list.remove(i);
                     --i; // Compensate for item removed.
                 }
                 else
                 {
-                    std::error_code success_code (0, std::generic_category());
+                    std::error_code success_code(0, std::generic_category());
                     job_work->executeCallback(success_code, nullptr);
                     m_service_list.remove(i);
                     --i; // Compensate for item removed.

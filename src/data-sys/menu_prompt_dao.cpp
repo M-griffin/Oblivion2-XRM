@@ -16,12 +16,10 @@ MenuPromptDao::MenuPromptDao(menu_prompt_ptr menu_prompt, std::string menu_promp
     , m_path(path)
     , m_filename(menu_prompt_name)
 {
-    std::cout << "MenuPromptDao" << std::endl;
 }
 
 MenuPromptDao::~MenuPromptDao()
 {
-    std::cout << "~MenuPromptDao" << std::endl;
 }
 
 /**
@@ -51,10 +49,12 @@ bool MenuPromptDao::fileExists()
     std::cout << "menu_prompt_path: " << path << std::endl;
 
     std::ifstream ifs(path);
-    if (!ifs.is_open())
+
+    if(!ifs.is_open())
     {
         return false;
     }
+
     ifs.close();
     return true;
 }
@@ -79,7 +79,8 @@ bool MenuPromptDao::saveMenuPrompt(menu_prompt_ptr menu_prompt)
 
     // Setup file to Write out File.
     std::ofstream ofs(path);
-    if (!ofs.is_open())
+
+    if(!ofs.is_open())
     {
         std::cout << "Error, unable to write to: " << path << std::endl;
         return false;
@@ -131,7 +132,7 @@ bool MenuPromptDao::loadMenuPrompt()
         node = YAML::LoadFile(path);
 
         // Testing Is on nodes always throws exceptions.
-        if (node.size() == 0)
+        if(node.size() == 0)
         {
             std::cout << "Not Found: " << path << std::endl;
             return false; //File Not Found?
@@ -141,7 +142,8 @@ bool MenuPromptDao::loadMenuPrompt()
 
         // Validate File Version
         std::cout << "MenuPrompt File Version: " << file_version << std::endl;
-        if (file_version != MenuPrompt::FILE_VERSION)
+
+        if(file_version != MenuPrompt::FILE_VERSION)
         {
             throw std::invalid_argument("Invalid file_version, expected: " + MenuPrompt::FILE_VERSION);
         }
@@ -151,13 +153,13 @@ bool MenuPromptDao::loadMenuPrompt()
         // Moves the Loaded config to m_config shared pointer.
         encode(m);
     }
-    catch (YAML::Exception &ex)
+    catch(YAML::Exception &ex)
     {
         std::cout << "Exception YAML::LoadFile(" << m_filename << ".yaml) " << ex.what() << std::endl;
         std::cout << "Most likely a required field in the menu file is missing. " << std::endl;
         assert(false);
     }
-    catch (std::exception &ex)
+    catch(std::exception &ex)
     {
         std::cout << "Unexpected YAML::LoadFile(" << m_filename << ".yaml) " << ex.what() << std::endl;
         assert(false);

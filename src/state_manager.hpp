@@ -20,13 +20,10 @@ class StateManager
 public:
     explicit StateManager()
     {
-        std::cout << "StateManager Created" << std::endl;
     }
 
     ~StateManager()
     {
-        std::cout << "~StateManager" << std::endl;
-
         if(!m_the_state.empty())
         {
             m_the_state.back()->onExit();

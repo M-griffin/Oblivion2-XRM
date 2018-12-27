@@ -13,7 +13,6 @@ public:
 
     virtual ~ProcessBase()
     {
-        std::cout << "~ProcessBase." << std::endl;
     }
 
     // Note this is called within the class, no need to make it virtual.
@@ -37,5 +36,3 @@ public:
 typedef std::shared_ptr<ProcessBase> process_ptr;
 
 #endif // PROCESS_BASE_HPP
-
-

@@ -29,6 +29,7 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="../src/logging.hpp"/>
     <File Name="../src/encoding.hpp"/>
     <File Name="../src/encoding.cpp"/>
     <VirtualDirectory Name="utf-cpp">
@@ -84,6 +85,7 @@
     <File Name="message_area_dao_it.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="model-sys">
+    <File Name="../src/model-sys/structures.hpp"/>
     <File Name="../src/model-sys/config.hpp"/>
     <File Name="../src/model-sys/users.hpp"/>
     <File Name="../src/model-sys/menu.hpp"/>

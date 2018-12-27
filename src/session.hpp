@@ -41,11 +41,10 @@ public:
     {
         // Free the Node Number from this session.
         TheCommunicator::instance()->freeNodeNumber(m_session_data->m_node_number);
-        std::cout << "~Session, Node: " << m_session_data->m_node_number << std::endl;
+        //std::cout << "~Session, Node: " << m_session_data->m_node_number << std::endl;
 
         // Free the menu system state and modules when session closes.
         m_state_manager->clean();
-        std::cout << "m_menu_manager->clean() Completd!" << std::endl;
     }
 
     /**
@@ -59,6 +58,7 @@ public:
                               session_manager_ptr session_manager)
     {
         session_ptr new_session(new Session(io_service, connection, deadline_timer, session_manager));
+
         if(connection->isActive())
         {
             new_session->m_session_data->startUpSessionStats("Telnet");
@@ -70,7 +70,6 @@ public:
         {
             // On initial Session Connection,  setup and send TELNET Options to
             // start the negotiation of client features.
-            std::cout << "send initial IAC sequences started." << std::endl;
 
             // On initial connection, clear and home cursor
             std::string clear_screen = "\x1b[1;1H\x1b[2J";
@@ -110,12 +109,8 @@ public:
             //new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_NEW_ENVIRON);
             //new_session->m_session_data->m_telnet_state->addReply(TELOPT_NEW_ENVIRON);
 
-            std::cout << "send initial IAC sequences ended." << std::endl;
-
             // Wait 1.5 Seconds for respones.
             new_session->startDetectionTimer();
-
-            std::cout << "sleep ended." << std::endl;
         }
 
         return new_session;
@@ -139,8 +134,6 @@ public:
      */
     void handleDetectionTimer()
     {
-        std::cout << "handleDetectionTimer Completed!" << std::endl;
-
         // Detection Completed, start ip the Pre-Logon Sequence State.
         state_ptr new_state(new MenuSystem(m_session_data));
         m_state_manager->changeState(new_state);
@@ -195,6 +188,7 @@ public:
         }
 
         session_manager_ptr session_manager = m_session_data->m_session_manager.lock();
+
         if(session_manager && error && (!m_session_data->m_is_leaving))
         {
             m_session_data->m_is_leaving = true;

@@ -170,7 +170,6 @@ CommonIO::CommonIO()
 
 CommonIO::~CommonIO()
 {
-    std::cout << "~CommonIO" << std::endl;
     m_sequence_map.clear();
     m_escape_sequence.erase();
 }

@@ -38,8 +38,6 @@ public:
         , m_current_level(0)
         , m_current_field(0)
     {
-        std::cout << "ModLevelEditor" << std::endl;
-
         // Setup Modules
         m_setup_functions.push_back(std::bind(&ModLevelEditor::setupLevelEditor, this));
         m_setup_functions.push_back(std::bind(&ModLevelEditor::setupLevelEditFields, this));
@@ -67,7 +65,6 @@ public:
 
     virtual ~ModLevelEditor() override
     {
-        std::cout << "~ModLevelEditor" << std::endl;
         std::vector<std::function<void()>>().swap(m_setup_functions);
         std::vector<std::function<void(const std::string&)>>().swap(m_mod_functions);
         std::vector<access_level_ptr>().swap(m_loaded_levels);

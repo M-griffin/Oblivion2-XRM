@@ -21,7 +21,7 @@ public:
     /**
      * @brief Setup for Database and Tables
      */
-    void initDatabaseTables();
+    bool initDatabaseTables();
 
 };
 

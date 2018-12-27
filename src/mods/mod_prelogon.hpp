@@ -49,8 +49,6 @@ public:
         , m_y_position(0)
         , m_term_type("undetected")
     {
-        std::cout << "ModPreLogon" << std::endl;
-
         // Push function pointers to the stack.
         m_setup_functions.push_back(std::bind(&ModPreLogon::setupEmulationDetection, this));
         m_setup_functions.push_back(std::bind(&ModPreLogon::setupAskANSIColor, this));
@@ -62,14 +60,15 @@ public:
 
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
-        if (!m_is_text_prompt_exist)
+
+        if(!m_is_text_prompt_exist)
         {
             createTextPrompts();
         }
 
         // Loads all Text Prompts for current module
         m_text_prompts_dao->readPrompts();
-        
+
         // On Initial Startup, setup user record with system colors for menu system
         // this is overwritten once the user logs in, otherwise the menu system
         // will use these defaults for theming.
@@ -83,7 +82,6 @@ public:
 
     virtual ~ModPreLogon() override
     {
-        std::cout << "~ModPreLogon" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
     }
@@ -130,7 +128,7 @@ public:
      * @param mod_function_index
      */
     void changeModule(int mod_function_index);
-    
+
     /**
      * @brief Redisplay's the current module prompt.
      * @param mod_function_index
@@ -142,7 +140,7 @@ public:
      * @param prompt
      */
     void displayPrompt(const std::string &prompt);
-    
+
     /**
      * @brief Pull and Display Prompts with following newline
      * @param prompt
@@ -242,7 +240,7 @@ private:
     text_prompts_dao_ptr   m_text_prompts_dao;
     deadline_timer_ptr     m_deadline_timer;
 
-    int                    m_mod_function_index;   
+    int                    m_mod_function_index;
     bool                   m_is_text_prompt_exist;
     bool                   m_is_esc_detected;
     std::string            m_input_buffer;

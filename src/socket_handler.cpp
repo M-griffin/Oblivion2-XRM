@@ -9,7 +9,7 @@
  * @brief Send Socket Data
  * @param buffer
  * @param length
- * @return 
+ * @return
  */
 int SocketHandler::sendSocket(unsigned char *buffer, Uint32 length)
 {
@@ -28,14 +28,16 @@ int SocketHandler::recvSocket(char *message)
 
 /**
  * @brief Poll if Socket has any data to retrieve
- * @return 
+ * @return
  */
 int SocketHandler::poll()
 {
     int ret = 0;
+
     if(m_is_active)
     {
         ret = m_socket.back()->pollSocket();
+
         if(ret == -1)
         {
             std::cout << "Socket Closed by host, disconnecting." << std::endl;
@@ -58,6 +60,7 @@ int SocketHandler::poll()
         std::cout << "Showdown received, Socket Closed." << std::endl;
         ret = -1;
     }
+
     return ret;
 }
 
@@ -69,7 +72,6 @@ int SocketHandler::poll()
  */
 bool SocketHandler::connectTelnetSocket(std::string host, int port)
 {
-    std::cout << "SocketHandler::initTelnet" << std::endl;
     if(!m_is_active)
     {
         try
@@ -77,6 +79,7 @@ bool SocketHandler::connectTelnetSocket(std::string host, int port)
             m_socket_type = SOCKET_TYPE_TELNET;
             socket_state_ptr sdl_socket(new SDL_Socket(host, port));
             m_socket.push_back(sdl_socket);
+
             if(m_socket.back()->onConnect())
             {
                 m_is_active = true;
@@ -101,6 +104,7 @@ bool SocketHandler::connectTelnetSocket(std::string host, int port)
         std::cout << "Telnet Socket already Active!" << std::endl;
         return false;
     }
+
     return true;
 }
 
@@ -122,6 +126,7 @@ bool SocketHandler::connectSshSocket(std::string host, int port,
             m_socket_type = SOCKET_TYPE_SSH;
             socket_state_ptr ssh_socket(new SSH_Socket(host, port, username, password));
             m_socket.push_back(ssh_socket);
+
             if(m_socket.back()->onConnect())
             {
                 m_is_active = true;
@@ -148,6 +153,7 @@ bool SocketHandler::connectSshSocket(std::string host, int port,
         std::cout << "SSH Socket already Active!" << std::endl;
         return false;
     }
+
     return true;
 }
 
@@ -157,7 +163,7 @@ bool SocketHandler::connectSshSocket(std::string host, int port,
  * @param port
  * @return
  *
- // TODO, this will need nick etc.. 
+ // TODO, this will need nick etc..
 bool SocketHandler::connectIrcSocket(std::string host, int port)
 {
     std::cout << "SocketHandler::initIRC" << std::endl;
@@ -204,7 +210,6 @@ bool SocketHandler::connectIrcSocket(std::string host, int port)
  */
 bool SocketHandler::createTelnetAcceptor(std::string host, int port)
 {
-    std::cout << "SocketHandler::initTelnet Server" << std::endl;
     if(!m_is_active)
     {
         try
@@ -212,6 +217,7 @@ bool SocketHandler::createTelnetAcceptor(std::string host, int port)
             m_socket_type = SOCKET_TYPE_TELNET;
             socket_state_ptr sdl_socket(new SDL_Socket(host, port));
             m_socket.push_back(sdl_socket);
+
             if(m_socket.back()->onListen())
             {
                 m_is_active = true;
@@ -236,12 +242,13 @@ bool SocketHandler::createTelnetAcceptor(std::string host, int port)
         std::cout << "Telnet Socket already Active!" << std::endl;
         return false;
     }
+
     return true;
 }
 
 /**
  * @brief Check and return handler on Connections
- * @return 
+ * @return
  */
 socket_handler_ptr SocketHandler::acceptTelnetConnection()
 {
@@ -286,6 +293,7 @@ void SocketHandler::close()
         {
             m_socket.back()->onExit();
         }
+
         m_is_active = false;
         m_socket_type.erase();
         m_socket.pop_back();

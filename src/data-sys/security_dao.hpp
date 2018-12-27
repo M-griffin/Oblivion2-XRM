@@ -33,7 +33,7 @@ class SecurityDao
     : baseSecurityClass
 {
 public:
-        
+
     explicit SecurityDao(SQLW::Database &database)
         : baseSecurityClass(database)
     {
@@ -52,7 +52,7 @@ public:
 
         // Check if Database Exists.
         m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' "
-            "AND name='" + m_strTableName + "' COLLATE NOCASE;";
+                           "AND name='" + m_strTableName + "' COLLATE NOCASE;";
 
         // Crate Seciroty Table Query (SQLite Only for the moment)
         m_cmdCreateTable =
@@ -66,39 +66,38 @@ public:
 
         // Drops and cleanup security table.
         m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
-        
+
         // Setup the CallBack for Result Field Mapping
-        m_result_callback = std::bind(&SecurityDao::pullSecurityResult, this, 
-            std::placeholders::_1, std::placeholders::_2);
-            
-        m_columns_callback = std::bind(&SecurityDao::fillSecurityColumnValues, this, 
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-            
-        m_insert_callback = std::bind(&SecurityDao::insertSecurityQryString, this, 
-            std::placeholders::_1, std::placeholders::_2);
-        
-        m_update_callback = std::bind(&SecurityDao::updateSecurityQryString, this, 
-            std::placeholders::_1, std::placeholders::_2);
+        m_result_callback = std::bind(&SecurityDao::pullSecurityResult, this,
+                                      std::placeholders::_1, std::placeholders::_2);
+
+        m_columns_callback = std::bind(&SecurityDao::fillSecurityColumnValues, this,
+                                       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+
+        m_insert_callback = std::bind(&SecurityDao::insertSecurityQryString, this,
+                                      std::placeholders::_1, std::placeholders::_2);
+
+        m_update_callback = std::bind(&SecurityDao::updateSecurityQryString, this,
+                                      std::placeholders::_1, std::placeholders::_2);
     }
 
     ~SecurityDao()
     {
-        std::cout << "~SecurityDao" << std::endl;
     }
 
-    
+
     /**
      * Base Dao Calls for generic Object Data Calls
      * (Below This Point)
      */
- 
- 
+
+
     /**
      * @brief Check If Database Table Exists.
      * @return
      */
     bool doesTableExist();
-    
+
     /**
      * @brief Run Setup Params for SQL Database Table.
      */
@@ -115,7 +114,7 @@ public:
      * @return
      */
     bool dropTable();
-    
+
     /**
      * @brief Updates a Record in the database!
      * @param obj
@@ -129,58 +128,58 @@ public:
      * @return
      */
     long insertRecord(security_ptr obj);
-        
+
     /**
      * @brief Deletes a MessageArea Record
      * @param areaId
      * @return
      */
     bool deleteRecord(long id);
-    
+
     /**
      * @brief Retrieve Record By Id.
      * @param id
-     * @return 
-     */ 
+     * @return
+     */
     security_ptr getRecordById(long id);
-    
+
     /**
      * @brief Retrieve All Records in a Table
      * @return
      */
     std::vector<security_ptr> getAllRecords();
-    
+
     /**
      * @brief Retrieve Count of All Records in a Table
      * @return
      */
     long getRecordsCount();
-    
-    
+
+
     /**
      * Base Dao Call Back for Object Specific Data Mappings
      * (Below This Point)
      */
-     
+
 
     /**
-     * @brief (Callback) Create Record Insert Statement, returns query string 
+     * @brief (Callback) Create Record Insert Statement, returns query string
      * @param qry
      * @param obj
-     * @return 
+     * @return
      */
     std::string insertSecurityQryString(std::string qry, security_ptr obj);
 
     /**
-     * @brief (CallBack) Update Existing Record. 
+     * @brief (CallBack) Update Existing Record.
      * @param qry
      * @param obj
-     * @return 
+     * @return
      */
     std::string updateSecurityQryString(std::string qry, security_ptr obj);
-   
+
     /**
-     * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+     * @brief (CallBack) Pulls results by FieldNames into their Class Variables.
      * @param qry
      * @param obj
      */
@@ -191,7 +190,7 @@ public:
      * @param qry
      * @param obj
      * @param values
-     */ 
+     */
     void fillSecurityColumnValues(query_ptr qry, security_ptr obj, std::vector< std::pair<std::string, std::string> > &values);
 
 };

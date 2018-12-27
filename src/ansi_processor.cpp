@@ -44,14 +44,12 @@ AnsiProcessor::AnsiProcessor(int term_height, int term_width)
     , m_background_color(BG_BLACK)
     , m_screen_pixel()
 {
-    std::cout << "AnsiProcessor" << std::endl;
     m_screen_buffer.reserve(m_number_lines * m_characters_per_line);
     m_screen_buffer.resize(m_number_lines * m_characters_per_line);
 }
 
 AnsiProcessor::~AnsiProcessor()
 {
-    std::cout << "~AnsiProcessor" << std::endl;
 }
 
 

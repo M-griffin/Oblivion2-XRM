@@ -20,9 +20,9 @@
  * Error Exit Codes (2) Unable to use Fallback IPv4 Acceptor (Accept Connections).
  */
 
-
-#include "data-sys/text_prompts_dao.hpp"
+#include "model-sys/structures.hpp"
 #include "model-sys/config.hpp"
+#include "data-sys/text_prompts_dao.hpp"
 #include "data-sys/config_dao.hpp"
 #include "data-sys/db_startup.hpp"
 
@@ -30,6 +30,7 @@
 #include "communicator.hpp"
 #include "common_io.hpp"
 #include "encoding.hpp"
+#include "logging.hpp"
 
 #include <memory>
 #include <cstdlib>
@@ -43,8 +44,10 @@ std::string GLOBAL_MENU_PATH = "";
 std::string GLOBAL_MENU_PROMPT_PATH = "";
 std::string GLOBAL_TEXTFILE_PATH = "";
 std::string GLOBAL_SCRIPT_PATH = "";
+std::string GLOBAL_LOG_PATH = "";
 std::string USERS_DATABASE = "";
 
+Logging* Logging::m_global_logging_instance = nullptr;
 
 /**
  * @brief Main Program Entrance.
@@ -54,7 +57,7 @@ std::string USERS_DATABASE = "";
 // auto main(int argc, char* argv[]) -> int
 auto main() -> int
 {
-    std::cout << "Oblivion/2 XRM Server (c) 2015-2018 Michael Griffin."
+    std::cout << "Oblivion/2 XRM-Server (c) 2015-2018 Michael Griffin."
               << std::endl
               << std::endl;
 
@@ -69,6 +72,7 @@ auto main() -> int
     GLOBAL_MENU_PROMPT_PATH = GLOBAL_BBS_PATH + "MPROMPT";
     GLOBAL_TEXTFILE_PATH = GLOBAL_BBS_PATH + "TEXTFILE";
     GLOBAL_SCRIPT_PATH = GLOBAL_BBS_PATH + "SCRIPTS";
+    GLOBAL_LOG_PATH = GLOBAL_BBS_PATH + "LOGS";
 
     // Startup the Encoding Instance and Char Mappings.
     {
@@ -106,12 +110,7 @@ auto main() -> int
 
         // All Good, Attached to Global Communicator Instance.
         TheCommunicator::instance()->attachConfiguration(config);
-    }
-
-    // Database Startup in it's own context.
-    {
-        db_startup_ptr db(new DbStartup());
-        db->initDatabaseTables();
+        Logging::instance()->xrmLog<Logging::CONSOLE_LOG>("Starting up Oblivion/2 XRM-Server");
     }
 
     // Initial Config File Read, and Start ASIO Server.
@@ -137,34 +136,71 @@ auto main() -> int
             Encoding::releaseInstance();
             exit(1);
         }
+    }
 
-        // TODO, from rework, right now single asio server is setup,
-        // One we have SSH server setup we can split this up again.
-        if(cfg.m_config->use_service_telnet)
+    // Database Startup in it's own context.
+    {
+        db_startup_ptr db(new DbStartup());
+        bool db_startup = db->initDatabaseTables();
+
+        // Write all error logs and exit.
+        if(!db_startup)
         {
-            std::cout << "Setting up telnet connections on port "
-                      << cfg.m_config->port_telnet << std::endl;
-        }
+            int log_entries = Logging::instance()->getNumberOfLogEntries();
 
-        // Isolate to code block for smart pointer deallocation.
-        {
-            // Create Handles to Services, and starts up connection listener and ASIO Thread Worker
-            IOService io_service;
-            interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", cfg.m_config->port_telnet));
-
-            while(TheCommunicator::instance()->isActive())
+            for(int i = 0; i < log_entries; i++)
             {
-                // Main Thread - While system is active loop,  This will be external event processor
-                // Or notifications, etc.. lets see what else we want to do here.
+                log_entry_ptr entry = Logging::instance()->getLogQueueEntry();
 
-                // Timer, for cpu useage
-                std::this_thread::sleep_for(std::chrono::milliseconds(20));
+                if(entry != nullptr)
+                {
+                    Logging::instance()->writeOutYamlFile(entry);
+                }
             }
+
+            Logging::releaseInstance();
+            Encoding::releaseInstance();
+            TheCommunicator::releaseInstance();
+
+            assert(false);
         }
     }
 
-    // Release Communicator Instance
-    TheCommunicator::releaseInstance();
+    // Isolate to code block for smart pointer deallocation.
+    {
+        // Create Handles to Services, and starts up connection listener and ASIO Thread Worker
+        config_ptr config = TheCommunicator::instance()->getConfiguration();
+
+        IOService io_service;
+        interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", config->port_telnet));
+
+
+        while(TheCommunicator::instance()->isActive())
+        {
+            // Main Thread - While system is active loop,  This will be external event processor
+            // Or notifications, etc.. lets see what else we want to do here.
+            int log_entries = Logging::instance()->getNumberOfLogEntries();
+
+            for(int i = 0; i < log_entries; i++)
+            {
+                log_entry_ptr entry = Logging::instance()->getLogQueueEntry();
+
+                if(entry != nullptr)
+                {
+                    Logging::instance()->writeOutYamlFile(entry);
+                }
+            }
+
+            // Timer, for cpu useage
+            std::this_thread::sleep_for(std::chrono::milliseconds(40));
+        }
+    }
+
+
+    // Release singleton instances Instance
+    Logging::releaseInstance();
     Encoding::releaseInstance();
+    TheCommunicator::releaseInstance();
+
     return 0;
 }

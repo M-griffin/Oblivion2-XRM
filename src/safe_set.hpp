@@ -26,39 +26,41 @@ public:
     // Copy Constructor (Overridden with MOVE)
     SafeSet& operator=(SafeSet& other)
     {
-        if (this != &other)
+        if(this != &other)
         {
             std::lock_guard<std::mutex> lock(m);
+
             //std::cout << "Copy construct" << std::endl;
-            if (!&other.isEmpty())
+            if(!&other.isEmpty())
             {
                 q = other.q;
                 m = other.m;
                 c = other.c;
             }
         }
+
         return *this;
     }
 
     // Move Constructor.
     SafeSet& operator=(SafeSet&& other)
     {
-        if (this != &other)
+        if(this != &other)
         {
             std::lock_guard<std::mutex> lock(m);
+
             //std::cout << "Move construct" << std::endl;
-            if (!other.isEmpty())
+            if(!other.isEmpty())
             {
                 q.swap(other.q);
             }
         }
+
         return *this;
     }
 
     ~SafeSet(void)
     {
-        std::cout << "~SafeSet" << std::endl;
-
         //should be queue or vector!  most likely vector!
         std::set<T>().swap(q);
     }
@@ -76,10 +78,12 @@ public:
     T dequeue(void)
     {
         std::unique_lock<std::mutex> lock(m);
+
         while(q.empty())
         {
             c.wait(lock);
         }
+
         T val = q.front();
         q.pop();
         return val;

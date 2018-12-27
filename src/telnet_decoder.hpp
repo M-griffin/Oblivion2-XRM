@@ -4,6 +4,7 @@
 #include "async_connection.hpp"
 #include "communicator.hpp"
 #include "telnet.hpp"
+#include "logging.hpp"
 
 #include <memory>
 #include <iostream>
@@ -40,14 +41,12 @@ public:
         , m_currentOption(0)
         , m_subnegoOption(0)
     {
-        std::cout << "TelnetState Loaded!" << std::endl;
     }
 
     ~TelnetDecoder()
     {
         std::vector<unsigned char>().swap(reply_sequence);
         std::vector<unsigned char>().swap(active_sequence);
-        std::cout << "Shutting Down ~TelnetState" << std::endl;
     }
 
     /**
@@ -173,17 +172,17 @@ private:
         {
             return;
         }
-        
+
         if(m_connection->getSocketHandle()->isActive() && TheCommunicator::instance()->isActive())
         {
             m_connection->asyncWrite(string_msg,
-                                      std::bind(
-                                          &TelnetDecoder::handleWrite,
-                                          shared_from_this(),
-                                          std::placeholders::_1,
-                                          std::placeholders::_2));
+                                     std::bind(
+                                         &TelnetDecoder::handleWrite,
+                                         shared_from_this(),
+                                         std::placeholders::_1,
+                                         std::placeholders::_2));
         }
-        
+
     }
 
     /**
@@ -218,7 +217,7 @@ private:
         std::vector<std::string> vars = { "USER", "TERM", "SHELL", "COLUMNS", "LINES",
                                           "C_CTYPE", "XTERM_LOCALE", "DISPLAY", "SSH_CLIENT",
                                           "SSH_CONNECTION", "SSH_TTY", "HOME", "HOSTNAME",
-                                          "PWD", "MAIL" ,"LANG", "PWD", "UID", "USER_ID",
+                                          "PWD", "MAIL","LANG", "PWD", "UID", "USER_ID",
                                           "EDITOR", "LOGNAME", "SYSTEMTYPE"
                                         };
         //IAC SB TTYPE SEND IAC SE
@@ -269,13 +268,9 @@ private:
 
         if(it == t.end())
         {
-            //std::cout << option << " not found" << std::endl;
             return false;
         }
-        else
-        {
-            //std::cout << option << " found" << std::endl;
-        }
+
         return true;
     }
 
@@ -283,7 +278,7 @@ private:
     void addSequence(T &t, unsigned char option)
     {
         //typename T::iterator it =
-            //find_if(t.begin(), t.end(), FindFirst(option));
+        //find_if(t.begin(), t.end(), FindFirst(option));
 
         // Sequence Not Found, add new sequence.
         //if(it == t.end())

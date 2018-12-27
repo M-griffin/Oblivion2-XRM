@@ -40,14 +40,11 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_use_first_command_execution(true)
     , m_logoff(false)
 {
-    std::cout << "MenuBase" << std::endl;
     m_config = TheCommunicator::instance()->getConfiguration();
 }
 
 MenuBase::~MenuBase()
 {
-    std::cout << "~MenuBase" << std::endl;
-
     // Pop Functions off the stack.
     std::vector<std::function< void(const std::string &, const bool &is_utf8)> >().swap(m_menu_functions);
     std::vector<std::function< bool(const MenuOption &)> >().swap(m_execute_callback);
@@ -636,7 +633,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
                     match_found = true;
                     break;
 
-                    // Handle yes /no /continue
+                // Handle yes /no /continue
 
                 default:
                     break;

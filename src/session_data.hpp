@@ -72,13 +72,10 @@ public:
         , m_is_process_running(false)
         , m_parsed_data("")
     {
-        std::cout << "SessionData" << std::endl;
     }
 
     ~SessionData()
     {
-        std::cout << "~SessionData" << std::endl;
-
         for(unsigned int i = 0; i < m_processes.size(); i++)
         {
             m_processes[i]->terminate();
@@ -141,7 +138,7 @@ public:
         }
 
         // Encode all incoming data as UTF8 unless we are not utf8
-        if (m_encoding != Encoding::ENCODE_UTF8)
+        if(m_encoding != Encoding::ENCODE_UTF8)
             m_parsed_data = Encoding::instance()->utf8Encode(incoming_data);
         else
             m_parsed_data = incoming_data;

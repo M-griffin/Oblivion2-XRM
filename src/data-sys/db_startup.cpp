@@ -9,6 +9,7 @@
 #include "protocol_dao.hpp"
 #include "access_level_dao.hpp"
 #include "../data-app/oneliners_dao.hpp"
+#include "../logging.hpp"
 
 // Needed for Initializing and checking users data is setup
 // On startup.
@@ -31,7 +32,7 @@ DbStartup::~DbStartup()
 /**
  * @brief Setup for Database and Tables
  */
-void DbStartup::initDatabaseTables()
+bool DbStartup::initDatabaseTables()
 {
 
     // Setup Users Database name and path
@@ -44,6 +45,8 @@ void DbStartup::initDatabaseTables()
 #endif
 
     USERS_DATABASE.append("xrm_users.sqlite3");
+
+    Logging *log = Logging::instance();
 
     // Setup isolated scope for smart pointers and clean up.
     {
@@ -60,45 +63,45 @@ void DbStartup::initDatabaseTables()
         // Security must be present before user becasue of foreign key.
         if(!security_dao.doesTableExist())
         {
-            std::cout << "doesn't exist (security table)." << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("doesn't exist (security table).");
 
             // Setup database Param, cache sies etc..
             if(!security_dao.firstTimeSetupParams())
             {
-                std::cout << "unable to execute firstTimeSetupParams (security table)." << std::endl;
-                assert(false);
+                log->xrmLog<Logging::ERROR_LOG>("unable to execute firstTimeSetupParams (security table).");
+                return(false);
             }
 
             // Setup create users table and indexes.
             if(!security_dao.createTable())
             {
-                std::cout << "unable to create (security table)." << std::endl;
-                assert(false);
+                log->xrmLog<Logging::ERROR_LOG>("unable to create (security table).");
+                return(false);
             }
 
-            std::cout << "security table created successfully." << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("security table created successfully.");
         }
 
         // Verify if the user table exists.
         if(!user_dao.doesTableExist())
         {
-            std::cout << "doesn't exist (user table)." << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("doesn't exist (user table).");
 
             // Setup database Param, cache sies etc..
             if(!user_dao.firstTimeSetupParams())
             {
-                std::cout << "unable to execute firstTimeSetupParams (user table)." << std::endl;
-                assert(false);
+                log->xrmLog<Logging::ERROR_LOG>("unable to execute firstTimeSetupParams (user table).");
+                return(false);
             }
 
             // Setup create users table and indexes.
             if(!user_dao.createTable())
             {
-                std::cout << "unable to create (user table)." << std::endl;
-                assert(false);
+                log->xrmLog<Logging::ERROR_LOG>("unable to create (user table).");
+                return(false);
             }
 
-            std::cout << "user table created successfully." << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("user table created successfully.");
         }
 
         // Check Table setup for Session Stats
@@ -107,23 +110,23 @@ void DbStartup::initDatabaseTables()
         // Verify if the user table exists.
         if(!session_stat_dao.doesTableExist())
         {
-            std::cout << "doesn't exist (sessionstats table)." << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("doesn't exist (sessionstats table).");
 
             // Setup database Param, cache sies etc..
             if(!session_stat_dao.firstTimeSetupParams())
             {
-                std::cout << "unable to execute firstTimeSetupParams (sessionstats table)." << std::endl;
-                assert(false);
+                log->xrmLog<Logging::ERROR_LOG>("unable to execute firstTimeSetupParams (sessionstats table).");
+                return(false);
             }
 
             // Setup create users table and indexes.
             if(!session_stat_dao.createTable())
             {
-                std::cout << "unable to create (sessionstats table)." << std::endl;
-                assert(false);
+                log->xrmLog<Logging::ERROR_LOG>("unable to create (sessionstats table).");
+                return(false);
             }
 
-            std::cout << "sessionstats table created successfully." << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("sessionstats table created successfully.");
         }
 
         // Link to Access Level dao for data access object
@@ -132,23 +135,23 @@ void DbStartup::initDatabaseTables()
         // Verify if the access_level table exists.
         if(!access_dao.doesTableExist())
         {
-            std::cout << "doesn't exist (access_level table)." << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("doesn't exist (access_level table).");
 
             // Setup database Param, cache sies etc..
             if(!access_dao.firstTimeSetupParams())
             {
-                std::cout << "unable to execute firstTimeSetupParams (access_level table)." << std::endl;
-                assert(false);
+                log->xrmLog<Logging::ERROR_LOG>("unable to execute firstTimeSetupParams (access_level table).");
+                return(false);
             }
 
             // Setup create users table and indexes.
             if(!access_dao.createTable())
             {
-                std::cout << "unable to create (access_level table)." << std::endl;
-                assert(false);
+                log->xrmLog<Logging::ERROR_LOG>("unable to create (access_level table).");
+                return(false);
             }
 
-            std::cout << "access_level table created successfully." << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("access_level table created successfully.");
 
             // Check and Setup default Access Levels.
             access_level_ptr level(new AccessLevel());
@@ -189,11 +192,15 @@ void DbStartup::initDatabaseTables()
 
         if(!protdb.fileExists())
         {
+            log->xrmLog<Logging::CONSOLE_LOG>("Protocol configuration doesn't exist.");
+
             // Create Genric Protocol Entry to Test File Creation
             Protocol p1("Sexyz", "D", "Z", "C:\\TESTPATH\\", "--Test", false, false);
 
             prots->protocols.push_back(p1);
             protdb.saveConfig(prots);
+
+            log->xrmLog<Logging::CONSOLE_LOG>("Protocol configuration created successfully");
         }
 
 
@@ -201,23 +208,23 @@ void DbStartup::initDatabaseTables()
 
         if(!oneLineDao.doesTableExist())
         {
-            std::cout << "doesn't exist (oneliner table)." << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("doesn't exist (oneliner table).");
 
             // Setup database Param, cache sies etc..
             if(!oneLineDao.firstTimeSetupParams())
             {
-                std::cout << "unable to execute firstTimeSetupParams (oneliner table)." << std::endl;
-                assert(false);
+                log->xrmLog<Logging::ERROR_LOG>("unable to execute firstTimeSetupParams (oneliner table).");
+                return(false);
             }
 
             // Setup create users table and indexes.
             if(!oneLineDao.createTable())
             {
-                std::cout << "unable to create (oneliner table)." << std::endl;
-                assert(false);
+                log->xrmLog<Logging::ERROR_LOG>("unable to create (oneliner table).");
+                return(false);
             }
 
-            std::cout << "oneliner table created successfully." << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("oneliner table created successfully.");
 
             // Insert a default record the first time the table
             // is created only.
@@ -229,8 +236,8 @@ void DbStartup::initDatabaseTables()
             //one->dtDatePosted
 
             oneLineDao.insertRecord(one);
-
         }
     }
 
+    return true;
 }

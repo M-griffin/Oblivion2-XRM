@@ -20,7 +20,6 @@ public:
 
     virtual ~StateBase()
     {
-        std::cout << "~StateBase." << std::endl;
     }
     virtual void update(const std::string &character_buffer, const bool &is_utf8)  = 0;
     virtual bool onEnter() = 0;
