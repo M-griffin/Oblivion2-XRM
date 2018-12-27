@@ -158,7 +158,8 @@ private:
         // Just log errors for now.
         if(error)
         {
-            std::cout << "async_write error: " << error.message() << std::endl;
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("async_write error=", error.message(), __LINE__, __FILE__);
         }
     }
 

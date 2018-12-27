@@ -21,7 +21,7 @@ ModFormManager::ModFormManager(session_data_ptr session_data, config_ptr config,
  * @brief Update Method, Receives Input Passed Through
  * @param character_buffer
  * @param is_utf8
- * @return 
+ * @return
  */
 bool ModFormManager::update(const std::string &character_buffer, const bool &is_utf8)
 {
@@ -32,9 +32,9 @@ bool ModFormManager::update(const std::string &character_buffer, const bool &is_
 
 /**
  * @brief Executes on Module Load
- * @return 
+ * @return
  */
-bool ModFormManager::onEnter() 
+bool ModFormManager::onEnter()
 {
     startupFormManager();
     return true;
@@ -42,7 +42,7 @@ bool ModFormManager::onEnter()
 
 /**
  * @brief Executes on Module Exit
- * @return 
+ * @return
  */
 bool ModFormManager::onExit()
 {
@@ -55,7 +55,7 @@ bool ModFormManager::onExit()
  */
 bool ModFormManager::menuOptionsCallback(const MenuOption &option)
 {
-    std::cout << "ModFormManager::menuOptionsCallback!" << std::endl;
+    //std::cout << "ModFormManager::menuOptionsCallback!" << std::endl;
     /* Run through the case and switch over the new interface.
     std::string mnuOption = option.CKeys;
     std::string mnuString = option.CString;
@@ -76,14 +76,14 @@ bool ModFormManager::menuOptionsCallback(const MenuOption &option)
 void ModFormManager::startupFormManager()
 {
     // Startup a new Form manager instance.
-    m_form_manager.reset(new FormManager(m_config, m_session_data));    
-    if (m_form_manager)
+    m_form_manager.reset(new FormManager(m_config, m_session_data));
+
+    if(m_form_manager)
     {
         m_form_manager->startupFormSystemConfiguration();
         menu_ptr menu = m_form_manager->retrieveFormOptions(m_current_page);
-        
+
         // Load the Form Menu Options into the Menu System.
         m_menu->importMenu(menu);
     }
 }
-
