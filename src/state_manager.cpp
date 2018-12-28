@@ -148,8 +148,6 @@ void StateManager::changeState(state_ptr &the_state)
 {
     if(!m_the_state.empty())
     {
-        std::cout << "changeState: " << the_state->getStateID() << std::endl;
-
         if(m_the_state.back()->getStateID() == the_state->getStateID())
         {
             return; // do nothing
@@ -159,11 +157,9 @@ void StateManager::changeState(state_ptr &the_state)
 
         // Rework this lateron,  lets allow multiple states,, the most recent state will be active
         // Allowing the main state to keep all information!
-        std::cout << "Deleteing Current MenuSystem!: " << m_the_state.size() << std::endl;
         m_the_state.pop_back();
 
         // Clear the Memory!
-        std::cout << "Clearing Memory of MenuSystem!: " << m_the_state.size() << std::endl;
         std::vector<state_ptr>().swap(m_the_state);
     }
 

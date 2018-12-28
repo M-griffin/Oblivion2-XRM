@@ -39,16 +39,6 @@ Query::Query(Database& dbin)
     , m_row_count(0)
     , m_num_cols(0)
 {
-    /*
-    if(m_db.isConnected())
-        std::cout << "qry() is connected" << std::endl;
-    else
-        std::cout << "qry() is not connected" << std::endl;
-
-    if(odb)
-        std::cout << "odb is connected" << std::endl;
-    else
-        std::cout << "odb is not connected" << std::endl;*/
 }
 
 Query::Query(Database& dbin,const std::string& sql)
@@ -83,10 +73,6 @@ Query::~Query()
     if(odb)
     {
         m_db.freeDatabasePool(odb);
-    }
-    else
-    {
-        std::cout << "~unable to free database" << std::endl;
     }
 
     std::map<std::string, int>().swap(m_nmap);
@@ -597,7 +583,7 @@ bool Query::executeTransaction(const std::vector<std::string> &statements)
 
     if(rc != SQLITE_OK)
     {
-        std::cout << "BEGIN Transaction Failed." << std::endl;
+        queryError("BEGIN Transaction Failed.");
         // queryError("BEGIN Transaction Failed. ");
         return result;
     }
@@ -609,7 +595,9 @@ bool Query::executeTransaction(const std::vector<std::string> &statements)
 
         if(rc != SQLITE_OK)
         {
-            std::cout << "Statement in Transaction Failed: " << errorMsg << std::endl;
+            queryError("Statement in Transaction Failed");
+            queryError(errorMsg);
+
             sqlite3_free(errorMsg);
 
             // rollback all update/insert to sqlite
@@ -617,12 +605,9 @@ bool Query::executeTransaction(const std::vector<std::string> &statements)
 
             if(rc != SQLITE_OK)
             {
-                std::cout << "Unable to Rollback Transaction." << std::endl;
+                queryError("Unable to Rollback Transaction.");
             }
-            else
-            {
-                std::cout << "Rollback Transaction Completed." << std::endl;
-            }
+
 
             return result;
         }
@@ -633,7 +618,7 @@ bool Query::executeTransaction(const std::vector<std::string> &statements)
 
     if(rc != SQLITE_OK)
     {
-        std::cout << "COMMIT Transaction Failed." << std::endl;
+        queryError("COMMIT Transaction Failed.");
         return result;
     }
     else

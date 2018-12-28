@@ -55,7 +55,6 @@ bool ModFormManager::onExit()
  */
 bool ModFormManager::menuOptionsCallback(const MenuOption &option)
 {
-    //std::cout << "ModFormManager::menuOptionsCallback!" << std::endl;
     /* Run through the case and switch over the new interface.
     std::string mnuOption = option.CKeys;
     std::string mnuString = option.CString;

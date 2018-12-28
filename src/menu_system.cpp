@@ -80,8 +80,6 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
  */
 bool MenuSystem::onEnter()
 {
-    std::cout << "OnEnter() MenuSystem" << std::endl;
-
     // Startup the Prelogon sequence
     startupModulePreLogon();
     m_is_active = true;
@@ -94,7 +92,6 @@ bool MenuSystem::onEnter()
  */
 bool MenuSystem::onExit()
 {
-    std::cout << "OnExit() MenuSystem\n";
     m_is_active = false;
     return true;
 }
@@ -108,11 +105,6 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
     // Some of these options set actual flags for behavior.
     // In this case, we will need to parse for specific Control commands
     // and set Menu System Flags!
-
-    // Create system default locale
-    std::locale::global(std::locale(""));
-    std::cout.imbue(std::locale());
-
     switch(option.command_key[1])
     {
         // Turns on Pulldown Menu Re-entrance

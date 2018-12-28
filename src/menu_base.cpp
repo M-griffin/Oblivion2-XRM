@@ -317,7 +317,6 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
     {
         auto &map = code_map[i];
 
-        //std::cout << "Generic Code: " << map.m_code << std::endl;
         if(map.m_code[1] == 'K')
         {
             ++key_columns;
@@ -332,7 +331,6 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
     // No codes found in ansi, or invalid combination exit!
     if(key_columns == 0 || key_columns != des_columns)
     {
-        //std::cout << "No Generic Code Maps found." << std::endl;
         return output_screen;
     }
 
@@ -785,22 +783,17 @@ void MenuBase::redisplayMenuScreen()
  */
 void MenuBase::executeFirstAndEachCommands()
 {
-    //std::locale::global(std::locale(""));
-    //std::cout.imbue(std::locale());
-
     // Now loop and scan for first cmd and each time
     for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
     {
         auto &m = m_menu_info->menu_options[i];
+
         // Process all First Commands or commands that should run every action.
-        //std::cout << "index: " << m.index << std::endl;
-        //std::cout << "menu_key: " << m.menu_key << std::endl;
         std::string new_key = upper_case(m.menu_key);
         m.menu_key = std::move(new_key);
 
         if(m.menu_key == "FIRSTCMD" || m.menu_key == "EACH")
         {
-            //std::cout << "*** FOUND FIRSTCMD! EXECUTE: " << m.command_key << std::endl;
             executeMenuOptions(m);
         }
     }
@@ -1199,9 +1192,6 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
     Logging *log = Logging::instance();
     log->xrmLog<Logging::DEBUG_LOG>("STANDARD INPUT=", input, "KEY=", key);
 
-    //std::locale::global(std::locale(""));
-    //std::cout.imbue(std::locale());
-
     // Check for wildcard command input.
     std::string::size_type idx;
     idx = key.find("*", 0);
@@ -1434,9 +1424,6 @@ void MenuBase::executeEachCommands()
  */
 bool MenuBase::processMenuOptions(const std::string &input)
 {
-    // Create system default locale
-    //std::locale::global(std::locale(""));
-    //std::cout.imbue(std::locale());
     Logging *log = Logging::instance();
 
     bool is_enter = false;

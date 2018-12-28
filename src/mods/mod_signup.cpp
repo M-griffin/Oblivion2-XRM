@@ -2,14 +2,12 @@
 
 #include "../model-sys/config.hpp"
 #include "../model-sys/users.hpp"
-#include "../encryption.hpp"
-
-// DataBase
 #include "../data-sys/security_dao.hpp"
 #include "../data-sys/users_dao.hpp"
+#include "../encryption.hpp"
+#include "../logging.hpp"
 
 #include <regex>
-
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -27,14 +25,12 @@ bool ModSignup::update(const std::string &character_buffer, const bool &)
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
-        std::cout << "ModSignup() !m_is_active" << std::endl;
         return false;
     }
 
     // Return True when were keeping module active / else false;
     if(character_buffer.size() == 0)
     {
-        std::cout << "ModSignup() !character_buffer size 0" << std::endl;
         return true;
     }
 
@@ -50,7 +46,6 @@ bool ModSignup::update(const std::string &character_buffer, const bool &)
  */
 bool ModSignup::onEnter()
 {
-    std::cout << "OnEnter() ModSignup\n";
     m_is_active = true;
 
     // Check if NUP is active,  if not, move to disclaimer!
@@ -69,7 +64,6 @@ bool ModSignup::onEnter()
  */
 bool ModSignup::onExit()
 {
-    std::cout << "OnExit() ModSignup\n";
     m_is_active = false;
     return true;
 }
@@ -196,11 +190,12 @@ void ModSignup::setupNewUserPassword()
     if(m_config->use_newuser_password)
     {
         // Kick back to Matrix if we exceed the number of attempts.
-        if (m_newuser_password_attempts >= m_config->invalid_newuser_password_attempts)
+        if(m_newuser_password_attempts >= m_config->invalid_newuser_password_attempts)
         {
             m_is_active = false;
             return;
         }
+
         displayPrompt(PROMPT_NUP);
     }
     else
@@ -530,7 +525,8 @@ void ModSignup::setupVerifyAndSave()
  */
 bool ModSignup::newUserPassword(const std::string &input)
 {
-    std::cout << "newUserPassword: " << input << std::endl;
+    Logging *log = Logging::instance();
+
     std::string key = "";
     bool useHiddenOutput = true;
     std::string result = m_session_io.getInputField(input, key, Config::sPassword_length, "", useHiddenOutput);
@@ -538,7 +534,6 @@ bool ModSignup::newUserPassword(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -555,12 +550,12 @@ bool ModSignup::newUserPassword(const std::string &input)
         // Pull in and test aginst new user password.
         if(key.compare(m_config->password_newuser) == 0)
         {
-            std::cout << "Match" << key.size() << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("NewUserPassword Accepted", __LINE__, __FILE__);
             changeNextModule();
         }
         else
         {
-            std::cout << "No Match" << key.size() << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("Error, Incorrect NewUserPassword!", __LINE__, __FILE__);
             ++m_newuser_password_attempts;
             displayPromptAndNewLine(PROMPT_PASS_INVALID);
             redisplayModulePrompt();
@@ -585,8 +580,6 @@ bool ModSignup::newUserPassword(const std::string &input)
  */
 bool ModSignup::disclaimer(const std::string &input)
 {
-    std::cout << "disclaimer: " << input << std::endl;
-
     // handle input for using ansi color, hot key or ENTER after..  hmm
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
@@ -594,7 +587,6 @@ bool ModSignup::disclaimer(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -645,14 +637,12 @@ bool ModSignup::disclaimer(const std::string &input)
  */
 bool ModSignup::handle(const std::string &input)
 {
-    std::cout << "handle: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sName_length);
 
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -672,13 +662,11 @@ bool ModSignup::handle(const std::string &input)
 
         if(!search || search->iId == -1)
         {
-            std::cout << "no match found" << std::endl;
             m_user_record->sHandle = key;
             changeNextModule();
         }
         else
         {
-            std::cout << "match found" << std::endl;
             displayPromptAndNewLine(PROMPT_HANDLE_INVALID);
             redisplayModulePrompt();
         }
@@ -702,14 +690,12 @@ bool ModSignup::handle(const std::string &input)
  */
 bool ModSignup::realName(const std::string &input)
 {
-    std::cout << "realName: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sName_length);
 
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -728,13 +714,11 @@ bool ModSignup::realName(const std::string &input)
 
         if(!search || search->iId == -1)
         {
-            std::cout << "no match found" << std::endl;
             m_user_record->sRealName = key;
             changeNextModule();
         }
         else
         {
-            std::cout << "match found" << std::endl;
             displayPromptAndNewLine(PROMPT_NAME_INVALID);
             redisplayModulePrompt();
         }
@@ -758,14 +742,12 @@ bool ModSignup::realName(const std::string &input)
  */
 bool ModSignup::address(const std::string &input)
 {
-    std::cout << "address: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
 
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -800,14 +782,12 @@ bool ModSignup::address(const std::string &input)
  */
 bool ModSignup::location(const std::string &input)
 {
-    std::cout << "location: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
 
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -842,14 +822,12 @@ bool ModSignup::location(const std::string &input)
  */
 bool ModSignup::country(const std::string &input)
 {
-    std::cout << "country: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
 
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -884,14 +862,12 @@ bool ModSignup::country(const std::string &input)
  */
 bool ModSignup::email(const std::string &input)
 {
-    std::cout << "email: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
 
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -911,13 +887,11 @@ bool ModSignup::email(const std::string &input)
 
         if(!search || search->iId == -1)
         {
-            std::cout << "no match found" << std::endl;
             m_user_record->sEmail = key;
             changeNextModule();
         }
         else
         {
-            std::cout << "match found" << std::endl;
             displayPromptAndNewLine(PROMPT_EMAIL_INVALID);
             redisplayModulePrompt();
         }
@@ -941,14 +915,12 @@ bool ModSignup::email(const std::string &input)
  */
 bool ModSignup::userNote(const std::string &input)
 {
-    std::cout << "userNote: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
 
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -983,14 +955,12 @@ bool ModSignup::userNote(const std::string &input)
  */
 bool ModSignup::birthday(const std::string &input)
 {
-    std::cout << "birthday: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sDate_length);
 
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -1004,55 +974,47 @@ bool ModSignup::birthday(const std::string &input)
 
         baseProcessDeliverNewLine();
 
-        // Validate Date Here,  ie.. 2016-01-01 format.
-		std::cout << "exp: " << m_config->regexp_date_validation << std::endl;
-		try
-		{
-			std::regex date_regex { m_config->regexp_date_validation };
-			std::smatch str_matches;
+        try
+        {
+            std::regex date_regex { m_config->regexp_date_validation };
+            std::smatch str_matches;
 
-			if(std::regex_match(key, str_matches, date_regex))
-			{
-				// Append Time For Date.
-				key += " 00:00:00";
-				struct std::tm tm;
+            if(std::regex_match(key, str_matches, date_regex))
+            {
+                // Append Time For Date.
+                key += " 00:00:00";
+                struct std::tm tm;
 
-				// Test lateron, this should work on < 5.1 gcc
-				//strptime(key, "%Y-%m-%d %H:%M:%S", &tm);
-				
-				
-				//tm = boost::posix_time::to_tm(boost::posix_time::time_from_string(key));
+                /**
+                 * Only GCC 5.1 + Compatible
+                 * Were no longer using boost, so bye bye 4.9 compat for now.
+                 */
+                std::istringstream ss(key);
+                ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
 
-				/**
-				 * Only GCC 5.1 + Compatible
-				 * Were no longer using boost, so bye bye 4.9 compat for now.
-				 */
-				std::istringstream ss(key);                
-				ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
-				if(ss.fail())
-				{
-					std::cout << "regexp passed, ss failed!" << std::endl;
-					ss.clear();
-					displayPromptAndNewLine(PROMPT_DATE_INVALID);
-					redisplayModulePrompt();
-					return true;
-				}
+                if(ss.fail())
+                {
+                    ss.clear();
+                    displayPromptAndNewLine(PROMPT_DATE_INVALID);
+                    redisplayModulePrompt();
+                    return true;
+                }
 
-				std::time_t const time = mktime(&tm);
-				m_user_record->dtBirthday = time;
-				changeNextModule();
-			}
-			else
-			{
-				displayPromptAndNewLine(PROMPT_DATE_INVALID);
-				redisplayModulePrompt();
-			}			
-		}
-		catch(std::regex_error &ex)
-		{
-			std::cout << ex.what() << std::endl;
-			std::cout << "CODE IS: " << ex.code() << " " << __FILE__ << __LINE__ << std::endl;
-		}
+                std::time_t const time = mktime(&tm);
+                m_user_record->dtBirthday = time;
+                changeNextModule();
+            }
+            else
+            {
+                displayPromptAndNewLine(PROMPT_DATE_INVALID);
+                redisplayModulePrompt();
+            }
+        }
+        catch(std::regex_error &ex)
+        {
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error, regex date error=", ex.what(), ex.code, __LINE__, __FILE__);
+        }
     }
     else
     {
@@ -1073,14 +1035,12 @@ bool ModSignup::birthday(const std::string &input)
  */
 bool ModSignup::gender(const std::string &input)
 {
-    std::cout << "gender: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -1132,7 +1092,6 @@ bool ModSignup::gender(const std::string &input)
  */
 bool ModSignup::password(const std::string &input)
 {
-    std::cout << "password: " << input << std::endl;
     std::string key = "";
     bool useHiddenOutput = true;
     std::string result = m_session_io.getInputField(
@@ -1146,7 +1105,6 @@ bool ModSignup::password(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -1181,7 +1139,7 @@ bool ModSignup::password(const std::string &input)
  */
 bool ModSignup::verifyPassword(const std::string &input)
 {
-    std::cout << "password: " << input << std::endl;
+    Logging *log = Logging::instance();
     std::string key = "";
     bool useHiddenOutput = true;
     std::string result = m_session_io.getInputField(
@@ -1195,7 +1153,6 @@ bool ModSignup::verifyPassword(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -1215,9 +1172,10 @@ bool ModSignup::verifyPassword(const std::string &input)
         {
             // Load pointer to encrypt methods.
             encrypt_ptr encryption(new Encrypt());
-            if (!encryption)
+
+            if(!encryption)
             {
-                std::cout << "Error, unable to allocate encryption" << std::endl;
+                log->xrmLog<Logging::ERROR_LOG>("Error, unable to allocate encryption", __LINE__, __FILE__);
                 displayPromptAndNewLine(PROMPT_PASS_INVALID);
                 changePreviousModule();
                 return false;
@@ -1228,7 +1186,7 @@ bool ModSignup::verifyPassword(const std::string &input)
 
             if(salt.size() == 0 || password.size() == 0)
             {
-                std::cout << "Error, Salt or Password were empty" << std::endl;
+                log->xrmLog<Logging::ERROR_LOG>("Error, Salt or Password were empty", __LINE__, __FILE__);
                 assert(false);
             }
 
@@ -1239,7 +1197,7 @@ bool ModSignup::verifyPassword(const std::string &input)
         }
         else
         {
-            std::cout << "no match found" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Error, Password Verify Failed.", __LINE__, __FILE__);
             m_security_record->sPasswordHash = "";
             displayPromptAndNewLine(PROMPT_PASS_INVALID);
             changePreviousModule();
@@ -1264,14 +1222,12 @@ bool ModSignup::verifyPassword(const std::string &input)
  */
 bool ModSignup::challengeQuestion(const std::string &input)
 {
-    std::cout << "challengeQuestion: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sPassword_length);
 
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -1308,7 +1264,6 @@ bool ModSignup::challengeQuestion(const std::string &input)
  */
 bool ModSignup::challengeAnswer(const std::string &input)
 {
-    std::cout << "challengeAnswer: " << input << std::endl;
     std::string key = "";
     bool useHiddenOutput = true;
     std::string result = m_session_io.getInputField(
@@ -1322,7 +1277,6 @@ bool ModSignup::challengeAnswer(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -1358,7 +1312,7 @@ bool ModSignup::challengeAnswer(const std::string &input)
  */
 bool ModSignup::verifyChallengeAnswer(const std::string &input)
 {
-    std::cout << "password: " << input << std::endl;
+    Logging *log = Logging::instance();
     std::string key = "";
     bool useHiddenOutput = true;
     std::string result = m_session_io.getInputField(
@@ -1372,7 +1326,6 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -1391,9 +1344,10 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
         if(m_security_record->sChallengeAnswerHash.compare(key) == 0)
         {
             encrypt_ptr encryption(new Encrypt());
-            if (!encryption)
+
+            if(!encryption)
             {
-                std::cout << "Error, unable to allocate encryption" << std::endl;
+                log->xrmLog<Logging::ERROR_LOG>("Error, unable to allocate encryption.", __LINE__, __FILE__);
                 m_security_record->sChallengeAnswerHash = "";
                 displayPromptAndNewLine(PROMPT_PASS_INVALID);
                 changePreviousModule();
@@ -1409,8 +1363,8 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
             if(password.size() == 0)
             {
                 // Shouldn't have any empty fields.
-                std::cout << "Error, ChallengeAnswer was empty" << std::endl;
-                assert(false);
+                log->xrmLog<Logging::ERROR_LOG>("Error, ChallengeAnswer was empty", __LINE__, __FILE__);
+                return(false);
             }
 
             m_security_record->sChallengeAnswerHash = password;
@@ -1418,7 +1372,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
         }
         else
         {
-            std::cout << "no match found" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Error, ChallengeAnswer verify failed.", __LINE__, __FILE__);
             m_security_record->sChallengeAnswerHash = "";
             displayPromptAndNewLine(PROMPT_PASS_INVALID);
             changePreviousModule();
@@ -1443,14 +1397,12 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
  */
 bool ModSignup::yesNoBars(const std::string &input)
 {
-    std::cout << "yesNoBars: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -1504,14 +1456,12 @@ bool ModSignup::yesNoBars(const std::string &input)
  */
 bool ModSignup::doPause(const std::string &input)
 {
-    std::cout << "doPause: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -1565,14 +1515,12 @@ bool ModSignup::doPause(const std::string &input)
  */
 bool ModSignup::clearOrScroll(const std::string &input)
 {
-    std::cout << "clearOrScroll: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -1626,14 +1574,12 @@ bool ModSignup::clearOrScroll(const std::string &input)
  */
 bool ModSignup::ansiColor(const std::string &input)
 {
-    std::cout << "ansiColor: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -1687,14 +1633,12 @@ bool ModSignup::ansiColor(const std::string &input)
  */
 bool ModSignup::backSpace(const std::string &input)
 {
-    std::cout << "backSpace: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }
@@ -1755,14 +1699,16 @@ bool ModSignup::backSpace(const std::string &input)
 void ModSignup::saveNewUserRecord()
 {
     // StartUp Data Access Objects for SQL
+    Logging *log = Logging::instance();
     users_dao_ptr user_dao(new UsersDao(m_session_data->m_user_database));
     security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
 
     // Save New Security Record, index is then inserted into user record
     long securityIndex = security_dao->insertRecord(m_security_record);
-    if (securityIndex < 0)
+
+    if(securityIndex < 0)
     {
-        std::cout << "Error, unable to insert new user record." << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to insert new user record", __LINE__, __FILE__);
         displayPrompt(PROMPT_NOT_SAVED);
         m_is_active = false;
         return;
@@ -1787,7 +1733,7 @@ void ModSignup::saveNewUserRecord()
     m_user_record->sBoxColor = m_config->default_color_box;
 
     // Check for User Auto Validation
-    if (m_config->use_auto_validate_users)
+    if(m_config->use_auto_validate_users)
     {
         m_user_record->iLevel = m_config->default_level;
         m_user_record->iFileLevel = m_config->default_file_level;
@@ -1798,14 +1744,15 @@ void ModSignup::saveNewUserRecord()
     }
 
     long userIndex = user_dao->insertRecord(m_user_record);
-    if (userIndex < 0)
+
+    if(userIndex < 0)
     {
-        std::cout << "Error, unable to insert new user record." << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to insert new user record", __LINE__, __FILE__);
 
         // Remove Secutiry Record if unable to create user record.
-        if (!security_dao->deleteRecord(securityIndex))
+        if(!security_dao->deleteRecord(securityIndex))
         {
-            std::cout << "Error, unable to remove security record." << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Error, unable to remove security record.", __LINE__, __FILE__);
         }
 
         baseProcessDeliverNewLine();
@@ -1820,7 +1767,8 @@ void ModSignup::saveNewUserRecord()
 
     // Display if user is validated or waiting validation.
     baseProcessDeliverNewLine();
-    if (m_config->use_auto_validate_users)
+
+    if(m_config->use_auto_validate_users)
     {
         displayPromptAndNewLine(PROMPT_AUTO_VALIDATION);
     }
@@ -1842,14 +1790,12 @@ void ModSignup::saveNewUserRecord()
  */
 bool ModSignup::verifyAndSave(const std::string &input)
 {
-    std::cout << "verifyAndSave: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         m_is_active = false;
         return false;
     }

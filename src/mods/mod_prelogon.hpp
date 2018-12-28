@@ -198,8 +198,6 @@ public:
      */
     void handleDetectionTimer()
     {
-        std::cout << "Deadline ANSI Detection, EXPIRED!" << std::endl;
-
         // Jump to Emulation completed.
         emulationCompleted();
     }

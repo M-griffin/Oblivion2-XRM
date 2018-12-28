@@ -2,6 +2,7 @@
 
 #include "model-sys/access_level.hpp"
 #include "data-sys/access_level_dao.hpp"
+#include "../logging.hpp"
 
 #include <stdint.h>
 #include <string>
@@ -18,14 +19,12 @@ bool ModFileAreaEditor::update(const std::string &character_buffer, const bool &
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
-        std::cout << "ModLevelEditor() !m_is_active" << std::endl;
         return false;
     }
 
     // Return True when were keeping module active / else false;
     if(character_buffer.size() == 0)
     {
-        std::cout << "ModLevelEditor() !character_buffer size 0" << std::endl;
         return true;
     }
 
@@ -41,7 +40,6 @@ bool ModFileAreaEditor::update(const std::string &character_buffer, const bool &
  */
 bool ModFileAreaEditor::onEnter()
 {
-    std::cout << "OnEnter() ModLevelEditor\n";
     m_is_active = true;
 
     // Grab ANSI Screen, display, if desired.. logon.ans maybe?
@@ -60,7 +58,6 @@ bool ModFileAreaEditor::onEnter()
  */
 bool ModFileAreaEditor::onExit()
 {
-    std::cout << "OnExit() ModLevelEditor\n";
     m_is_active = false;
     return true;
 }
@@ -294,7 +291,8 @@ void ModFileAreaEditor::displayCurrentPage(const std::string &input_state)
             break;
 
         default:
-            std::cout << "Error, forgot to add new STATE index displayCurrentPage!!";
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentPage!!", __FILE__, __LINE__);
             return;
     }
 
@@ -337,7 +335,8 @@ void ModFileAreaEditor::displayCurrentEditPage(const std::string &input_state)
             break;
 
         default:
-            std::cout << "Error, forgot to add new STATE index displayCurrentEditPage!!";
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentEditPage!!", __FILE__, __LINE__);
             return;
     }
 
@@ -398,7 +397,6 @@ void ModFileAreaEditor::menuEditorInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -465,7 +463,6 @@ void ModFileAreaEditor::menuEditorMenuFieldInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -579,7 +576,6 @@ void ModFileAreaEditor::menuEditorMenuFieldHandler(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_MENU_FIELD_INPUT);
         changeSetupModule(MOD_DISPLAY_MENU_EDIT);
         return;
@@ -644,7 +640,6 @@ void ModFileAreaEditor::menuEditorMenuNameInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_MENU_INPUT);
         redisplayModulePrompt();
         return;

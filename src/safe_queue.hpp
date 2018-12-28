@@ -30,7 +30,6 @@ public:
         {
             std::lock_guard<std::mutex> lock(m);
 
-            //std::cout << "Copy construct" << std::endl;
             if(!&other.isEmpty())
             {
                 q = other.q;
@@ -49,7 +48,6 @@ public:
         {
             std::lock_guard<std::mutex> lock(m);
 
-            //std::cout << "Move construct" << std::endl;
             if(!other.isEmpty())
             {
                 q.swap(other.q);

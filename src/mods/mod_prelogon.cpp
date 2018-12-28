@@ -348,7 +348,6 @@ bool ModPreLogon::askANSIColor(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return false;
     }
     else if(result[0] == '\n')
@@ -414,7 +413,6 @@ bool ModPreLogon::askCodePage(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return false;
     }
     else if(result[0] == '\n')
