@@ -149,7 +149,8 @@ std::wstring Encoding::multibyte_to_wide(const char* mbstr)
     }
     catch(const std::range_error& e)
     {
-        std::cout << "UCS failed after producing " << std::dec << ucs2.size()<<" characters:\n";
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("UCS multibyte_to_wide", e.what(), __LINE__, __FILE__);
     }
 
     return ucs2;
@@ -171,7 +172,8 @@ std::string Encoding::wide_to_multibyte(const std::wstring& wstr)
     }
     catch(const std::range_error& e)
     {
-        std::cout << "UTF8 failed after producing " << std::dec << utf8.size()<<" characters:\n";
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("UCS wide_to_multibyte", e.what(), __LINE__, __FILE__);
     }
 
     return utf8;
@@ -261,8 +263,8 @@ std::string Encoding::utf8Encode(const std::string &standard_string)
         }
         else
         {
-            // Possiable Issue
-            std::cout << " UTF-8 encoding issue: " << ascii_value << standard_string[i] << std::endl;
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error, utf8Encode ascii_value=", ascii_value, __LINE__, __FILE__);
         }
     }
 
@@ -290,8 +292,14 @@ std::string Encoding::utf8Decode(const std::string &standard_string)
                 continue;
             }
 
-            std::wcout << "Invalid usc_char: " << usc_char << " : " << std::hex << usc_char << std::endl;
-            c  = '?';
+            // Convert it back to UTF-8 Sequence, so users see some character data anyways.
+            std::wstring usc_string = L"";
+            usc_string += usc_char;
+            std::string utf8_data = wide_to_multibyte(usc_string);
+
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::DEBUG_LOG>("Warning, Invalid CP437 Conversion, convert glyph back to utf8=",  utf8_data, __LINE__, __FILE__);
+            output += utf8_data;
         }
         else
             c = map_wide_to_cp437.find(usc_char)->second;

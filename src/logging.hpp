@@ -195,45 +195,55 @@ public:
     template<int level, typename ... Types>
     void xrmLog(Types ... rest)
     {
-        std::vector<std::string> details;
         config_ptr config = Communicator::instance()->getConfiguration();
         std::string config_log_text = config->logging_level;
+        int config_level = getConfigurationLogState(config_log_text);
 
+        // Quick Case Statement, in Logging level, if were not logging anything
+        // then return right away to save processing.
+        switch(level)
+        {
+            // Incoming Logging Level
+            case INFO_LOG:
+                if(config_level != INFO_LOG && INFO_LOG != ALL_LOGS)
+                    return;
+
+                break;
+
+            case DEBUG_LOG:
+                if(config_level != DEBUG_LOG && INFO_LOG != ALL_LOGS)
+                    return;
+
+                break;
+
+            default:
+                break;
+        }
+
+        std::vector<std::string> details;
         std::string date_time = getCurrentDateTime();
         std::string log_string = log<level>(rest...);
-
-        int config_level = getConfigurationLogState(config_log_text);
 
         switch(level)
         {
             // Incoming Logging Level
             case INFO_LOG:
-                if(config_level == INFO_LOG || INFO_LOG == ALL_LOGS)
-                {
-                    details.push_back(INFO_LEVEL);
-                    details.push_back(log_string);
-                }
-
+                details.push_back(INFO_LEVEL);
+                details.push_back(log_string);
                 break;
 
             case DEBUG_LOG:
-                if(config_level == DEBUG_LOG || INFO_LOG == ALL_LOGS)
-                {
-                    details.push_back(DEBUG_LEVEL);
-                    details.push_back(log_string);
-                }
-
+                details.push_back(DEBUG_LEVEL);
+                details.push_back(log_string);
                 break;
 
             case ERROR_LOG:
-                // Always write out logs set to error, and write error to console.
                 details.push_back(ERROR_LEVEL);
                 details.push_back(log_string);
                 writeOutYamlConsole(date_time, details);
                 break;
 
             case CONSOLE_LOG:
-                // Always write out logs set to console
                 details.push_back(CONSOLE_LEVEL);
                 details.push_back(log_string);
                 writeOutYamlConsole(date_time, details);
@@ -245,8 +255,11 @@ public:
 
         if(details.size() > 0)
         {
+// Don't Queue Logging during unit tests.
+#ifndef UNIT_TEST
             log_entry_ptr entry(new LogEntry(date_time, details));
             m_log_enteries.enqueue(entry);
+#endif
         }
     }
 
@@ -262,8 +275,8 @@ public:
         out << YAML::BeginMap;
         out << YAML::Flow;
 
-        out << YAML::Key << "Log DateTime" << YAML::Value << date_time;
-        out << YAML::Key << "Log Details";
+        out << YAML::Key << "LogDateTime" << YAML::Value << date_time;
+        out << YAML::Key << "Details";
         out << YAML::Value << YAML::BeginSeq;
 
         for(std::string &d : details)
@@ -293,8 +306,8 @@ public:
         out << YAML::BeginMap;
         out << YAML::Flow;
 
-        out << YAML::Key << "Log DateTime" << YAML::Value << entry->m_date_time;
-        out << YAML::Key << "Log Details";
+        out << YAML::Key << "LogDateTime" << YAML::Value << entry->m_date_time;
+        out << YAML::Key << "Details:";
         out << YAML::Value << YAML::BeginSeq;
 
         for(std::string &d : entry->m_details)

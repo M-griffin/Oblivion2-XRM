@@ -156,6 +156,7 @@
         <IncludePath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/include"/>
         <IncludePath Value="C:/libssh-0.7.2/include"/>
         <Preprocessor Value="WITHOUT_SDL"/>
+        <Preprocessor Value="UNIT_TEST"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>

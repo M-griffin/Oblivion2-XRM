@@ -28,7 +28,7 @@ SUITE(XRMCommonIO)
     /**
      * @brief General Test Method for debugging.
      * @return
-     */
+     *
     TEST(parseAnsiScreenTestHighAscii)
     {
         CommonIO common;
@@ -37,7 +37,7 @@ SUITE(XRMCommonIO)
         temp += std::string(1, static_cast<unsigned char>(155));
         common.testUnicode(temp);
         CHECK_EQUAL(1, 1);
-    }
+    }*/
 
     TEST(NumberOfCharacters)
     {
@@ -66,7 +66,7 @@ SUITE(XRMCommonIO)
     /**
      * @brief Test Number of Characters with High ASCII mix-ins.
      * @return
-     */
+     *
     TEST(numberOfCharsWithHighAscii)
     {
         CommonIO common;
@@ -88,7 +88,7 @@ SUITE(XRMCommonIO)
         temp += "あにま"; // 3 + 3 + 3 = 9 bytes
         int result = common.numberOfChars(temp);
         CHECK_EQUAL(result, 9);
-    }
+    }*/
 
     /**
      * @brief Left of string, remove spaces.
@@ -217,7 +217,7 @@ SUITE(XRMCommonIO)
     /**
      * @brief Erase Data in a String w/ start, end range. w/ High Ascii
      * @return
-     */
+     *
     TEST(EraseStringWithHighAscii)
     {
         CommonIO common;
@@ -228,7 +228,7 @@ SUITE(XRMCommonIO)
         std::string result = std::string(1, static_cast<unsigned char>(155));
         result += "   Li";
         CHECK_EQUAL(trim_temp, result);
-    }
+    }*/
 
     /**
      * @brief Pad Sapces on the right of the string, also truncates for absolute field lengths.
@@ -457,12 +457,13 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(result, "\x1b");
     }
 
+    /*
     TEST(parseAnsiScreenTest)
     {
         CommonIO common;
         std::string temp = std::string(1, static_cast<unsigned char>(148));
         common.testUnicode(temp);
         CHECK_EQUAL(1, 1);
-    }
+    }*/
 
 }

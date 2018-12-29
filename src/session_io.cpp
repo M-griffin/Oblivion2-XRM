@@ -2,6 +2,7 @@
 #include "session_data.hpp"
 #include "common_io.hpp"
 #include "encoding.hpp"
+#include "logging.hpp"
 
 #include "model-sys/config.hpp"
 #include "utf-cpp/utf8.h"
@@ -36,13 +37,14 @@ SessionIO::~SessionIO()
  */
 std::string SessionIO::getKeyInput(const std::string &character_buffer)
 {
+    Logging *log = Logging::instance();
     std::string input = m_common_io.parseInput(character_buffer);
 
     if(input.size() == 0)
     {
         // No Data received, could be in mid ESC sequence
         // Return for next key.
-        std::cout << "MID ESCAPE" << std::endl;
+        log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Mid Escape");
         return "";
     }
 
@@ -54,17 +56,17 @@ std::string SessionIO::getKeyInput(const std::string &character_buffer)
 
         if(escape_sequence.size() == 0)
         {
-            std::cout << "Single ESC" << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Single Escape");
             return "\x1b";
         }
         else
         {
-            std::cout << "Translated ESC Sequence: "  << escape_sequence << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Translated Escape Sequence=", escape_sequence);
             return (escape_sequence.insert(0, "\x1b"));
         }
     }
 
-    std::cout << "Normal Input: "  << input << std::endl;
+    log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Normal Input=", input);
     return input;
 }
 
@@ -75,6 +77,8 @@ std::string SessionIO::getKeyInput(const std::string &character_buffer)
  */
 void SessionIO::createInputField(std::string &field_name, int &len)
 {
+    Logging *log = Logging::instance();
+
     std::string repeat;
     char formatted[1024]= {0};
     char sTmp[3]  = {0};
@@ -129,10 +133,7 @@ void SessionIO::createInputField(std::string &field_name, int &len)
                 }
                 else
                 {
-                    std::cout << "createInputField() Incorrect |FL field length.  Length cannot be larger than "
-                              << "max size of the field, which is: "
-                              << len
-                              << std::endl;
+                    log->xrmLog<Logging::ERROR_LOG>("createInputField() Incorrect |FL field length=", tempLength, "cannot exceed max size=", len);
                 }
             }
             else
@@ -145,9 +146,7 @@ void SessionIO::createInputField(std::string &field_name, int &len)
     // Overide Foreground/Background Input Field Colors
     // This is now for OBV/2 .. Not in Legacy.
     position = field_name.find("|FB",0);
-
-    std::cout << "position: " <<  position << std::endl;
-    std::cout << "compare : " << position+4 << " " <<  stringSize << std::endl;
+    log->xrmLog<Logging::DEBUG_LOG>("createInputField() |FB position=", position, "compare=", position+4, stringSize);
 
     if(position != std::string::npos)
     {
@@ -218,6 +217,7 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
                                      std::string leadoff,
                                      bool hidden)
 {
+    Logging *log = Logging::instance();
     // Setup the leadoff, if it's first time, then print it out
     // Other if empty or follow-up calls to inputfield field skip it!
     static bool is_leadoff = true;
@@ -265,12 +265,12 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
         // Updates on Keypresses.
         else
         {
-            std::cout << "input_system result: " << result << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("getInputField() result=", result, "string_data=", string_data);
             return string_data;
         }
     }
 
-    std::cout << "result empty!" << std::endl;
+    log->xrmLog<Logging::DEBUG_LOG>("getInputField() result empty");
     return "";
 }
 
@@ -505,15 +505,13 @@ std::string SessionIO::getDefaultBoxColor(config_ptr config)
 }
 
 /**
- * @brief Parsed Pipe Codes with 1 or 2 Digits
+ * @brief Parsed Pipe Codes with 1 or 2 Digits (Handle OBV/2 Legacy Movements)
  * @param pipe_code
  * @return
  */
 std::string SessionIO::parsePipeWithCharsDigits(const std::string &code, int value)
 {
     std::string sequence = "";
-
-    std::cout << "parsePipeWithCharsDigits single digit movement." << std::endl;
 
     // Check Single letter Sequences
     if(code.size() == 1)
@@ -567,7 +565,7 @@ std::string SessionIO::parsePipeWithCharsDigits(const std::string &code, int val
     // Double Letter Sequences
     else
     {
-
+        // Updates, is this still needed? test lateron.
     }
 
     return sequence;
@@ -702,7 +700,9 @@ std::string SessionIO::parsePipeWithChars(const std::string &pipe_code)
  */
 std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapType> &code_map)
 {
-    std::cout << "code_map.size(): " << code_map.size() << std::endl;
+    Logging *log = Logging::instance();
+    log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMap] code_map.size()=", code_map.size(), __LINE__, __FILE__);
+
     std::string ansi_string = screen;
     MapType my_matches;
 
@@ -853,7 +853,9 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
  */
 std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std::vector<MapType> &code_map)
 {
-    std::cout << "generic code_map.size(): " << code_map.size() << std::endl;
+    Logging *log = Logging::instance();
+    log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMapGenerics] code_map.size()=", code_map.size(), __LINE__, __FILE__);
+
     std::string ansi_string = screen;
     MapType my_matches;
 
@@ -948,7 +950,8 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
             // is not the same as the next!
             if(start == matches[0].second)
             {
-                std::cout << "no more matches!" << std::endl;
+                Logging *log = Logging::instance();
+                log->xrmLog<Logging::DEBUG_LOG>("[parseToCodeMap] no Code Maps Found", __LINE__, __FILE__);
                 break;
             }
 
@@ -996,11 +999,10 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
     }
     catch(std::regex_error &ex)
     {
-        std::cout << ex.what() << std::endl;
-        std::cout << "CODE IS: " << ex.code() << " " << __FILE__ << __LINE__ << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("[parseToCodeMap] Exception=", ex.what(), __LINE__, __FILE__);
     }
 
-    std::cout << "code_map.size(): " << code_map.size() << std::endl;
     return code_map;
 }
 
@@ -1092,7 +1094,9 @@ std::string SessionIO::pipe2promptFormat(const std::string &sequence, config_ptr
     for(unsigned int i = 0; i < code_map.size(); i++)
     {
         auto &map = code_map[i];
-        std::cout << "Menu Format Code: " << map.m_code << std::endl;
+
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("[pipe2promptFormat] Menu Format Code=", map.m_code, __LINE__, __FILE__);
 
         // Control Codes are in Group 2
         switch(map.m_match)
@@ -1144,8 +1148,8 @@ bool SessionIO::checkRegex(const std::string &sequence, const std::string &expre
     }
     catch(std::regex_error &ex)
     {
-        std::cout << ex.what() << std::endl;
-        std::cout << "CODE IS: " << ex.code() << " " << __FILE__ << __LINE__ << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("[checkRegex] Expression=", expression, "Exception=", ex.what(), __LINE__, __FILE__);
     }
 
     return result;

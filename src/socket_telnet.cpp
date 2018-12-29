@@ -168,7 +168,7 @@ void SDL_Socket::spawnSocket(TCPsocket socket)
 
     // Successful Startup
     m_is_socket_active = true;
-    std::cout << "Connection Spawn Successful" << std::endl;
+    std::cout << std::endl << "Connection Spawn Successful" << std::endl;
 }
 
 /**
@@ -217,7 +217,7 @@ bool SDL_Socket::onConnect()
 
     // Successful Startup
     m_is_socket_active = true;
-    std::cout << "Connection Successful" << std::endl;
+    std::cout << std::endl << "Connection Successful" << std::endl;
 
     return true;
 }
@@ -240,7 +240,7 @@ bool SDL_Socket::onListen()
     }
 
     /* Resolve the argument into an IP address type */
-    std::cout << "Listening for Telnet on port " << m_port << std::endl;
+    std::cout << std::endl << "Listening for Telnet on port " << m_port << std::endl;
 
     if(SDLNet_ResolveHost(&ip, NULL, m_port) == -1)
     {

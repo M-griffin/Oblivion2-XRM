@@ -1,5 +1,6 @@
 #include "access_level_dao.hpp"
 #include "../model-sys/access_level.hpp"
+#include "../logging.hpp"
 
 #include "libSqliteWrapped.h"
 #include <sqlite3.h>
@@ -254,12 +255,13 @@ std::string AccessLevelDao::updateAccessLevelQryString(std::string qry, access_l
  */
 access_level_ptr AccessLevelDao::getAccessLevelByLevel(long access_level)
 {
+    Logging *log = Logging::instance();
     access_level_ptr level(new AccessLevel);
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        std::cout << "Error, Database is not connected!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return level;
     }
 
@@ -268,7 +270,7 @@ access_level_ptr AccessLevelDao::getAccessLevelByLevel(long access_level)
 
     if(!qry->isConnected())
     {
-        std::cout << "Error, Query has no connection to the database" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return level;
     }
 
@@ -288,12 +290,12 @@ access_level_ptr AccessLevelDao::getAccessLevelByLevel(long access_level)
         }
         else
         {
-            std::cout << "Error, getAccessLevelByLevel Returned Rows: " << rows << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Error, getAccessLevelByLevel Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        std::cout << "Error, getResult()" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return level;

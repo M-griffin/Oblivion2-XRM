@@ -76,22 +76,22 @@ int main()
 {
     // Startup OBV/2 Configurations for proper unit coverage.
 
-    std::cout << "Oblivion/2 XRM-Server (c) 2015-2018 Michael Griffin."
+    std::cout << "Oblivion/2 XRM-Server Unit Tests (c) 2015-2018 Michael Griffin."
               << std::endl
               << std::endl;
 
     CommonIO common;
-    GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
+    GLOBAL_BBS_PATH = common.getProgramPath("xrm-unittest");
     std::cout << "BBS HOME Directory Registered: " << std::endl;
     std::cout << GLOBAL_BBS_PATH << std::endl;
 
     // Setup System Folder Paths off main BBS Path.
-    GLOBAL_DATA_PATH = GLOBAL_BBS_PATH + "DATA";
-    GLOBAL_MENU_PATH = GLOBAL_BBS_PATH + "MENU";
-    GLOBAL_MENU_PROMPT_PATH = GLOBAL_BBS_PATH + "MPROMPT";
-    GLOBAL_TEXTFILE_PATH = GLOBAL_BBS_PATH + "TEXTFILE";
-    GLOBAL_SCRIPT_PATH = GLOBAL_BBS_PATH + "SCRIPTS";
-    GLOBAL_LOG_PATH = GLOBAL_BBS_PATH + "LOGS";
+    GLOBAL_DATA_PATH = GLOBAL_BBS_PATH;
+    GLOBAL_MENU_PATH = GLOBAL_BBS_PATH;
+    GLOBAL_MENU_PROMPT_PATH = GLOBAL_BBS_PATH;
+    GLOBAL_TEXTFILE_PATH = GLOBAL_BBS_PATH;
+    GLOBAL_SCRIPT_PATH = GLOBAL_BBS_PATH;
+    GLOBAL_LOG_PATH = GLOBAL_BBS_PATH;
 
     // Startup the Encoding Instance and Char Mappings.
     {
