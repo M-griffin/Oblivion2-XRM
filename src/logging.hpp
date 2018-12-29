@@ -311,7 +311,7 @@ public:
 
         if(!ofs.is_open())
         {
-            std::cout << "Error, unable to open file: " << path << std::endl;
+            std::cout << "Error, unable to open log file: " << path << std::endl;
             return;
         }
 

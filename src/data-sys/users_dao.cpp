@@ -1,5 +1,6 @@
 #include "users_dao.hpp"
 #include "../model-sys/users.hpp"
+#include "../logging.hpp"
 
 #include "libSqliteWrapped.h"
 #include <sqlite3.h>
@@ -12,8 +13,8 @@
  * Base Dao Calls for generic Object Data Calls
  * (Below This Point)
  */
- 
- 
+
+
 /**
  * @brief Check If Database Table Exists.
  * @return
@@ -82,8 +83,8 @@ bool UsersDao::deleteRecord(long id)
 /**
  * @brief Retrieve Record By Id.
  * @param id
- * @return 
- */ 
+ * @return
+ */
 user_ptr UsersDao::getRecordById(long id)
 {
     return baseGetRecordById(id);
@@ -112,10 +113,10 @@ long UsersDao::getRecordsCount()
  * Base Dao Call Back for Object Specific Data Mappings
  * (Below This Point)
  */
- 
+
 
 /**
- * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+ * @brief (CallBack) Pulls results by FieldNames into their Class Variables.
  * @param qry
  * @param obj
  */
@@ -143,7 +144,7 @@ void UsersDao::pullUsersResult(query_ptr qry, user_ptr obj)
     qry->getFieldByName("sInverseColor", obj->sInverseColor);
     qry->getFieldByName("sStatColor", obj->sStatColor);
     qry->getFieldByName("sBoxColor", obj->sBoxColor);
-    qry->getFieldByName("iFilePoints", obj->iFilePoints);    
+    qry->getFieldByName("iFilePoints", obj->iFilePoints);
     qry->getFieldByName("iPostCallRatio", obj->iPostCallRatio);
     qry->getFieldByName("sMenuPromptName", obj->sMenuPromptName);
     qry->getFieldByName("iMenuSelected", obj->iMenuSelected);
@@ -179,7 +180,7 @@ void UsersDao::pullUsersResult(query_ptr qry, user_ptr obj)
  * @param qry
  * @param obj
  * @param values
- */ 
+ */
 void UsersDao::fillUsersColumnValues(query_ptr qry, user_ptr obj, std::vector< std::pair<std::string, std::string> > &values)
 {
     // values.push_back(qry->translateFieldName("iId", obj->iId));
@@ -203,7 +204,7 @@ void UsersDao::fillUsersColumnValues(query_ptr qry, user_ptr obj, std::vector< s
     values.push_back(qry->translateFieldName("sInputColor", obj->sInputColor));
     values.push_back(qry->translateFieldName("sInverseColor", obj->sInverseColor));
     values.push_back(qry->translateFieldName("sStatColor", obj->sStatColor));
-    values.push_back(qry->translateFieldName("sBoxColor", obj->sBoxColor));    
+    values.push_back(qry->translateFieldName("sBoxColor", obj->sBoxColor));
     values.push_back(qry->translateFieldName("iFilePoints", obj->iFilePoints));
     values.push_back(qry->translateFieldName("iPostCallRatio", obj->iPostCallRatio));
     values.push_back(qry->translateFieldName("sMenuPromptName", obj->sMenuPromptName));
@@ -236,132 +237,132 @@ void UsersDao::fillUsersColumnValues(query_ptr qry, user_ptr obj, std::vector< s
 }
 
 /**
- * @brief (Callback) Create Record Insert Statement, returns query string 
+ * @brief (Callback) Create Record Insert Statement, returns query string
  * @param qry
  * @param obj
- * @return 
+ * @return
  */
 std::string UsersDao::insertUsersQryString(std::string qry, user_ptr obj)
-{    
+{
     // Mprint statement to avoid injections.
     std::string result = sqlite3_mprintf(qry.c_str(),
-        obj->sHandle.c_str(),
-        obj->sRealName.c_str(),
-        obj->sAddress.c_str(),
-        obj->sLocation.c_str(),
-        obj->sCountry.c_str(),
-        obj->sEmail.c_str(),
-        obj->sUserNote.c_str(),
-        obj->dtBirthday,
-        obj->iLevel,
-        obj->iFileLevel,
-        obj->iMessageLevel,
-        obj->iLastFileArea,
-        obj->iLastMessageArea,
-        obj->iTimeLeft,
-        obj->iTimeLimit,
-        obj->sRegColor.c_str(),
-        obj->sPromptColor.c_str(),
-        obj->sInputColor.c_str(),
-        obj->sInverseColor.c_str(),
-        obj->sStatColor.c_str(),
-        obj->sBoxColor.c_str(),
-        obj->iFilePoints,
-        obj->iPostCallRatio,
-        obj->sMenuPromptName.c_str(),
-        obj->iMenuSelected,
-        obj->iStatusSelected,
-        obj->bAnsi,
-        obj->bBackSpaceVt100,
-        obj->iNuvVotesYes,
-        obj->iNuvVotesNo,
-        obj->dtPassChangeDate,
-        obj->dtLastReplyDate,
-        obj->bAnsi,
-        obj->iCSPassChange,
-        obj->iControlFlags1,
-        obj->iControlFlags2,
-        obj->bWanted,
-        obj->sHeaderType.c_str(),
-        obj->iLastMesConf,
-        obj->iLastFileConf,
-        obj->dtExpirationDate,
-        obj->sGender.c_str(),
-        obj->dtFirstOn,
-        obj->bYesNoBars,
-        obj->iHackAttempts,
-        obj->bDoPause,
-        obj->bClearOrScroll,
-        obj->bIgnoreTimeLimit,
-        obj->bAllowPurge,
-        obj->iSecurityIndex
-    );
+                                         obj->sHandle.c_str(),
+                                         obj->sRealName.c_str(),
+                                         obj->sAddress.c_str(),
+                                         obj->sLocation.c_str(),
+                                         obj->sCountry.c_str(),
+                                         obj->sEmail.c_str(),
+                                         obj->sUserNote.c_str(),
+                                         obj->dtBirthday,
+                                         obj->iLevel,
+                                         obj->iFileLevel,
+                                         obj->iMessageLevel,
+                                         obj->iLastFileArea,
+                                         obj->iLastMessageArea,
+                                         obj->iTimeLeft,
+                                         obj->iTimeLimit,
+                                         obj->sRegColor.c_str(),
+                                         obj->sPromptColor.c_str(),
+                                         obj->sInputColor.c_str(),
+                                         obj->sInverseColor.c_str(),
+                                         obj->sStatColor.c_str(),
+                                         obj->sBoxColor.c_str(),
+                                         obj->iFilePoints,
+                                         obj->iPostCallRatio,
+                                         obj->sMenuPromptName.c_str(),
+                                         obj->iMenuSelected,
+                                         obj->iStatusSelected,
+                                         obj->bAnsi,
+                                         obj->bBackSpaceVt100,
+                                         obj->iNuvVotesYes,
+                                         obj->iNuvVotesNo,
+                                         obj->dtPassChangeDate,
+                                         obj->dtLastReplyDate,
+                                         obj->bAnsi,
+                                         obj->iCSPassChange,
+                                         obj->iControlFlags1,
+                                         obj->iControlFlags2,
+                                         obj->bWanted,
+                                         obj->sHeaderType.c_str(),
+                                         obj->iLastMesConf,
+                                         obj->iLastFileConf,
+                                         obj->dtExpirationDate,
+                                         obj->sGender.c_str(),
+                                         obj->dtFirstOn,
+                                         obj->bYesNoBars,
+                                         obj->iHackAttempts,
+                                         obj->bDoPause,
+                                         obj->bClearOrScroll,
+                                         obj->bIgnoreTimeLimit,
+                                         obj->bAllowPurge,
+                                         obj->iSecurityIndex
+                                        );
 
     return result;
 }
 
 /**
- * @brief (CallBack) Update Existing Record. 
+ * @brief (CallBack) Update Existing Record.
  * @param qry
  * @param obj
- * @return 
+ * @return
  */
 std::string UsersDao::updateUsersQryString(std::string qry, user_ptr obj)
 {
     // Mprint statement to avoid injections.
     std::string result = sqlite3_mprintf(qry.c_str(),
-        obj->sHandle.c_str(),
-        obj->sRealName.c_str(),
-        obj->sAddress.c_str(),
-        obj->sLocation.c_str(),
-        obj->sCountry.c_str(),
-        obj->sEmail.c_str(),
-        obj->sUserNote.c_str(),
-        obj->dtBirthday,
-        obj->iLevel,
-        obj->iFileLevel,
-        obj->iMessageLevel,
-        obj->iLastFileArea,
-        obj->iLastMessageArea,
-        obj->iTimeLeft,
-        obj->iTimeLimit,
-        obj->sRegColor.c_str(),
-        obj->sPromptColor.c_str(),
-        obj->sInputColor.c_str(),
-        obj->sInverseColor.c_str(),
-        obj->sStatColor.c_str(),
-        obj->sBoxColor.c_str(),
-        obj->iFilePoints,
-        obj->iPostCallRatio,
-        obj->sMenuPromptName.c_str(),
-        obj->iMenuSelected,
-        obj->iStatusSelected,
-        obj->bAnsi,
-        obj->bBackSpaceVt100,
-        obj->iNuvVotesYes,
-        obj->iNuvVotesNo,
-        obj->dtPassChangeDate,
-        obj->dtLastReplyDate,
-        obj->bAnsi,
-        obj->iCSPassChange,
-        obj->iControlFlags1,
-        obj->iControlFlags2,
-        obj->bWanted,
-        obj->sHeaderType.c_str(),
-        obj->iLastMesConf,
-        obj->iLastFileConf,
-        obj->dtExpirationDate,
-        obj->sGender.c_str(),
-        obj->dtFirstOn,
-        obj->bYesNoBars,
-        obj->iHackAttempts,
-        obj->bDoPause,
-        obj->bClearOrScroll,
-        obj->bIgnoreTimeLimit,
-        obj->bAllowPurge,
-        obj->iSecurityIndex,
-        obj->iId
-    );
+                                         obj->sHandle.c_str(),
+                                         obj->sRealName.c_str(),
+                                         obj->sAddress.c_str(),
+                                         obj->sLocation.c_str(),
+                                         obj->sCountry.c_str(),
+                                         obj->sEmail.c_str(),
+                                         obj->sUserNote.c_str(),
+                                         obj->dtBirthday,
+                                         obj->iLevel,
+                                         obj->iFileLevel,
+                                         obj->iMessageLevel,
+                                         obj->iLastFileArea,
+                                         obj->iLastMessageArea,
+                                         obj->iTimeLeft,
+                                         obj->iTimeLimit,
+                                         obj->sRegColor.c_str(),
+                                         obj->sPromptColor.c_str(),
+                                         obj->sInputColor.c_str(),
+                                         obj->sInverseColor.c_str(),
+                                         obj->sStatColor.c_str(),
+                                         obj->sBoxColor.c_str(),
+                                         obj->iFilePoints,
+                                         obj->iPostCallRatio,
+                                         obj->sMenuPromptName.c_str(),
+                                         obj->iMenuSelected,
+                                         obj->iStatusSelected,
+                                         obj->bAnsi,
+                                         obj->bBackSpaceVt100,
+                                         obj->iNuvVotesYes,
+                                         obj->iNuvVotesNo,
+                                         obj->dtPassChangeDate,
+                                         obj->dtLastReplyDate,
+                                         obj->bAnsi,
+                                         obj->iCSPassChange,
+                                         obj->iControlFlags1,
+                                         obj->iControlFlags2,
+                                         obj->bWanted,
+                                         obj->sHeaderType.c_str(),
+                                         obj->iLastMesConf,
+                                         obj->iLastFileConf,
+                                         obj->dtExpirationDate,
+                                         obj->sGender.c_str(),
+                                         obj->dtFirstOn,
+                                         obj->bYesNoBars,
+                                         obj->iHackAttempts,
+                                         obj->bDoPause,
+                                         obj->bClearOrScroll,
+                                         obj->bIgnoreTimeLimit,
+                                         obj->bAllowPurge,
+                                         obj->iSecurityIndex,
+                                         obj->iId
+                                        );
 
     return result;
 }
@@ -371,52 +372,55 @@ std::string UsersDao::updateUsersQryString(std::string qry, user_ptr obj)
  * One Off Methods SQL Queries not included in the BaseDao
  * (Below This Point)
  */
- 
- 
+
+
 /**
  * @brief Return User Record By Handle.
  * @return
  */
 user_ptr UsersDao::getUserByHandle(std::string name)
 {
+    Logging *log = Logging::instance();
     user_ptr user(new Users);
 
     // Make Sure Database Reference is Connected
-    if (!m_database.isConnected())
+    if(!m_database.isConnected())
     {
-        std::cout << "Error, Database is not connected!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return user;
     }
 
     // Create Pointer and Connect Query Object to Database.
     query_ptr qry(new SQLW::Query(m_database));
-    if (!qry->isConnected())
+
+    if(!qry->isConnected())
     {
-        std::cout << "Error, Query has no connection to the database" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return user;
     }
 
     // Build Query String
     std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sHandle = %Q; COLLATE NOCASE;",
-        m_strTableName.c_str(), name.c_str());
+                              m_strTableName.c_str(), name.c_str());
 
     // Execute Query.
-    if (qry->getResult(queryString))
+    if(qry->getResult(queryString))
     {
         long rows = qry->getNumRows();
-        if (rows > 0)
+
+        if(rows > 0)
         {
             qry->fetchRow();
             pullUsersResult(qry, user);
         }
         else
         {
-            std::cout << "Error, getUserByHandle Returned Rows: " << rows << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Error, getUserByHandle Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        std::cout << "Error, getResult()" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return user;
@@ -428,45 +432,49 @@ user_ptr UsersDao::getUserByHandle(std::string name)
  */
 user_ptr UsersDao::getUserByRealName(std::string name)
 {
+    Logging *log = Logging::instance();
     user_ptr user(new Users);
 
     // Make Sure Database Reference is Connected
-    if (!m_database.isConnected())
+    if(!m_database.isConnected())
     {
-        std::cout << "Error, Database is not connected!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return user;
     }
 
     // Create Pointer and Connect Query Object to Database.
     query_ptr qry(new SQLW::Query(m_database));
-    if (!qry->isConnected())
+
+    if(!qry->isConnected())
     {
-        std::cout << "Error, Query has no connection to the database" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return user;
     }
 
     // Build Query String
     std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sRealName = %Q COLLATE NOCASE;",
-        m_strTableName.c_str(), name.c_str());
+                              m_strTableName.c_str(), name.c_str());
 
     // Execute Query.
-    if (qry->getResult(queryString))
+    if(qry->getResult(queryString))
     {
         long rows = qry->getNumRows();
-        if (rows > 0)
+
+        if(rows > 0)
         {
             qry->fetchRow();
             pullUsersResult(qry, user);
         }
         else
         {
-            std::cout << "Error, getUserByRealName Returned Rows: " << rows << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Error, getUserByRealName Returned Rows", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        std::cout << "Error, getResult()" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
+
     return user;
 }
 
@@ -476,46 +484,49 @@ user_ptr UsersDao::getUserByRealName(std::string name)
  */
 user_ptr UsersDao::getUserByEmail(std::string email)
 {
+    Logging *log = Logging::instance();
     user_ptr user(new Users);
 
     // Make Sure Database Reference is Connected
-    if (!m_database.isConnected())
+    if(!m_database.isConnected())
     {
-        std::cout << "Error, Database is not connected!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return user;
     }
 
     // Create Pointer and Connect Query Object to Database.
     query_ptr qry(new SQLW::Query(m_database));
-    if (!qry->isConnected())
+
+    if(!qry->isConnected())
     {
-        std::cout << "Error, Query has no connection to the database" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return user;
     }
 
     // Build Query String
     std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sEmail = %Q COLLATE NOCASE;",
-        m_strTableName.c_str(), email.c_str());
+                              m_strTableName.c_str(), email.c_str());
 
     // create a test3 table
-    if (qry->getResult(queryString))
+    if(qry->getResult(queryString))
     {
         long rows = qry->getNumRows();
-        if (rows > 0)
+
+        if(rows > 0)
         {
             qry->fetchRow();
             pullUsersResult(qry, user);
         }
         else
         {
-            std::cout << "Error, getUserByEmail Returned Rows: " << rows << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Error, getUserByEmail Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        std::cout << "Error, getResult()" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
- 
+
     return user;
 }
 
@@ -525,36 +536,39 @@ user_ptr UsersDao::getUserByEmail(std::string email)
  */
 std::vector<user_ptr> UsersDao::getUsersByWildcard(std::string filter)
 {
+    Logging *log = Logging::instance();
     user_ptr obj(new Users());
     std::vector<user_ptr> list;
 
     // Make Sure Database Reference is Connected
-    if (!m_database.isConnected())
+    if(!m_database.isConnected())
     {
-        std::cout << "Error, Database is not connected!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
     // Create Pointer and Connect Query Object to Database.
     query_ptr qry(new SQLW::Query(m_database));
-    if (!qry->isConnected())
+
+    if(!qry->isConnected())
     {
-        std::cout << "Error, Query has no connection to the database" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
     // Replace * with %
-    std::replace( filter.begin(), filter.end(), '*', '%');
+    std::replace(filter.begin(), filter.end(), '*', '%');
 
     // Build Query String
     std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sHandle like %Q ORDER BY sHandle COLLATE NOCASE asc;",
-        m_strTableName.c_str(), filter.c_str());
+                              m_strTableName.c_str(), filter.c_str());
 
     // Execute Query.
-    if (qry->getResult(queryString))
+    if(qry->getResult(queryString))
     {
         long rows = qry->getNumRows();
-        if (rows > 0)
+
+        if(rows > 0)
         {
             while(qry->fetchRow())
             {
@@ -565,13 +579,13 @@ std::vector<user_ptr> UsersDao::getUsersByWildcard(std::string filter)
         }
         else
         {
-            std::cout << "Error, getUsersByWildcard Returned Rows: " << rows << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Error, getUsersByWildcard Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        std::cout << "Error, getResult()" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
-    return list;    
+    return list;
 }

@@ -1,5 +1,6 @@
 #include "session_manager.hpp"
 #include "session.hpp"
+#include "logging.hpp"
 
 #include <functional>
 #include <algorithm>
@@ -24,14 +25,15 @@ void SessionManager::join(session_ptr session)
  */
 void SessionManager::leave(int node_number)
 {
-    std::cout << "disconnecting Node Session: " << node_number << std::endl;
+    Logging *log = Logging::instance();
+    log->xrmLog<Logging::CONSOLE_LOG>("disconnecting Node Session=", node_number);
 
     for(auto it = m_sessions.begin(); it != m_sessions.end(); it++)
     {
         if((*it)->m_session_data->m_node_number == node_number)
         {
             m_sessions.erase(it);
-            std::cout << "disconnecting Session completed." << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("disconnecting Node Session completed=", node_number);
             break;
         }
     }
@@ -46,7 +48,8 @@ void SessionManager::deliver(std::string msg)
     if(msg.size() == 0)
         return;
 
-    std::cout << "deliver SessionManager notices: " << msg << std::endl;
+    Logging *log = Logging::instance();
+    log->xrmLog<Logging::DEBUG_LOG>("deliver SessionManager notices=", msg);
     std::for_each(m_sessions.begin(), m_sessions.end(),
                   std::bind(&Session::deliver, std::placeholders::_1, std::ref(msg)));
 }

@@ -140,7 +140,6 @@ void IOService::run()
              */
             else if(job_work->getServiceType() == SERVICE_TYPE_WRITE)
             {
-                // std::cout << "* SERVICE_TYPE_WRITE" << std::endl;
                 int result = job_work->getSocketHandle()->sendSocket(
                                  (unsigned char*)job_work->getStringSequence().c_str(),
                                  job_work->getStringSequence().size());

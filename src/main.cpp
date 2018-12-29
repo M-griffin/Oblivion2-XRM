@@ -86,7 +86,8 @@ auto main() -> int
         if(!config)
         {
             std::cout << "Unable to allocate config structure" << std::endl;
-            assert(false);
+            Encoding::releaseInstance();
+            exit(1);
         }
 
         // Handle to Data Access Object,  at the moment were not using directories
@@ -105,7 +106,7 @@ auto main() -> int
         if(!cfg.validation())
         {
             Encoding::releaseInstance();
-            return 0;
+            exit(1);
         }
 
         // All Good, Attached to Global Communicator Instance.
@@ -122,7 +123,9 @@ auto main() -> int
         {
             std::cout << "Unable to allocate config structure" << std::endl;
             Encoding::releaseInstance();
-            assert(false);
+            Logging::releaseInstance();
+            Communicator::releaseInstance();
+            exit(1);
         }
 
         // Setup the Data Access Object
@@ -134,6 +137,8 @@ auto main() -> int
             // TODO Throws exception right now, need to work in
             // better shutdown on from this point! just assert for now.
             Encoding::releaseInstance();
+            Logging::releaseInstance();
+            Communicator::releaseInstance();
             exit(1);
         }
     }
@@ -158,11 +163,11 @@ auto main() -> int
                 }
             }
 
-            Logging::releaseInstance();
             Encoding::releaseInstance();
+            Logging::releaseInstance();
             TheCommunicator::releaseInstance();
 
-            assert(false);
+            exit(1);
         }
     }
 
@@ -198,8 +203,8 @@ auto main() -> int
 
 
     // Release singleton instances Instance
-    Logging::releaseInstance();
     Encoding::releaseInstance();
+    Logging::releaseInstance();
     TheCommunicator::releaseInstance();
 
     return 0;

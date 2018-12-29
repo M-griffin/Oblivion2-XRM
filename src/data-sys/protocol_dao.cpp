@@ -1,5 +1,6 @@
 #include "protocol_dao.hpp"
 #include "../model-sys/protocol.hpp"
+#include "../logging.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -65,6 +66,7 @@ bool ProtocolDao::fileExists()
  */
 bool ProtocolDao::saveConfig(protocols_ptr prot)
 {
+    Logging *log = Logging::instance();
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
@@ -104,7 +106,7 @@ bool ProtocolDao::saveConfig(protocols_ptr prot)
 
     if(!ofs.is_open())
     {
-        std::cout << "Error, unable to write to: " << path << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to write to=", path, __LINE__, __FILE__);
         return false;
     }
 
@@ -141,6 +143,7 @@ void ProtocolDao::encode(const Protocols &rhs)
  */
 bool ProtocolDao::loadConfig()
 {
+    Logging *log = Logging::instance();
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
@@ -163,11 +166,12 @@ bool ProtocolDao::loadConfig()
         std::string file_version = node["file_version"].as<std::string>();
 
         // Validate File Version
-        std::cout << "Protocols File Version: " << file_version << std::endl;
+        log->xrmLog<Logging::CONSOLE_LOG>("Protocols File Version=", file_version);
 
         if(file_version != Protocols::FILE_VERSION)
         {
-            throw std::invalid_argument("Invalid file_version, expected: " + Protocols::FILE_VERSION);
+            log->xrmLog<Logging::ERROR_LOG>("Protocols File Version=", file_version, "Expected=", Protocols::FILE_VERSION, __LINE__, __FILE__);
+            return false;
         }
 
         // When doing node.as (all fields must be present on file)
@@ -178,14 +182,13 @@ bool ProtocolDao::loadConfig()
     }
     catch(YAML::Exception &ex)
     {
-        std::cout << "YAML::LoadFile(protocols.yaml) " << ex.what() << std::endl;
-        std::cout << "Most likely a required field in the config file is missing. " << std::endl;
-        assert(false);
+        log->xrmLog<Logging::ERROR_LOG>("YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
+        return(false);
     }
     catch(std::exception &ex)
     {
-        std::cout << "Unexpected YAML::LoadFile(protocols.yaml) " << ex.what() << std::endl;
-        assert(false);
+        log->xrmLog<Logging::ERROR_LOG>("Unexpected YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
+        return(false);
     }
 
     return true;

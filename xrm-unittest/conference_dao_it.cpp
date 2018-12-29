@@ -21,7 +21,6 @@ public:
         // Can't remove database on closure, becasue the
         // Object is not cleared till Destructor is finished.
         // Before Each Test, we need to remove existing database.
-        std::cout << "xrm_itConferenceTest.sqlite3" << std::endl;
         remove("xrm_itConferenceTest.sqlite3");
     }
 

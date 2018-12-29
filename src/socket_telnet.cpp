@@ -102,7 +102,6 @@ int SDL_Socket::pollSocket()
  */
 socket_handler_ptr SDL_Socket::pollSocketAccepts()
 {
-    // std::cout << "pollSocketAccepts : m_is_socket_active = " << m_is_socket_active << std::endl;
     TCPsocket socket = nullptr;
 
     int numActiveSockets = SDLNet_CheckSockets(m_socket_set, 0);

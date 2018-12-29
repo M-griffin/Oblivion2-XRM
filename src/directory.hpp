@@ -1,6 +1,8 @@
 #ifndef DIRECTORY_HPP
 #define DIRECTORY_HPP
 
+#include "logging.hpp"
+
 #include <dirent.h>
 #include <string>
 #include <iostream>
@@ -41,10 +43,12 @@ public:
     {
         std::string::size_type idx = value.rfind(".");
         std::string extension = "";
-        if (idx != std::string::npos)
+
+        if(idx != std::string::npos)
         {
             extension = value.substr(idx+1);
         }
+
         return extension;
     }
 
@@ -59,33 +63,38 @@ public:
 
         // Check if were pulling by specific or all files with extensions.
         bool isAllExtenasions = false;
-        if (extension.size() > 0)
+
+        if(extension.size() > 0)
         {
             isAllExtenasions = true;
         }
 
         std::vector<std::string> file_list;
-        std::shared_ptr<DIR> local_directory_ptr(opendir(dir.c_str()), [] (DIR* directory)
+        std::shared_ptr<DIR> local_directory_ptr(opendir(dir.c_str()), [](DIR* directory)
         {
             directory && closedir(directory);
         });
 
-        if (!local_directory_ptr)
+        if(!local_directory_ptr)
         {
-            std::cout << "Error dir opening: " << errno << dir << std::endl;
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error opening directory=", errno, dir, __LINE__, __FILE__);
             return file_list;
         }
 
         struct dirent *dirent_ptr;
-        while ((dirent_ptr = readdir(local_directory_ptr.get())) != nullptr)
+
+        while((dirent_ptr = readdir(local_directory_ptr.get())) != nullptr)
         {
             // Skip All Directories "., .." in current folder.
             std::string file_name = dirent_ptr->d_name;
-            if (file_name[file_name.size()-1] != '.')
+
+            if(file_name[file_name.size()-1] != '.')
             {
                 // If File Extension matches then add to the list.
                 std::string file_ext = getFileExtension(file_name);
-                if (isAllExtenasions && file_ext == extension)
+
+                if(isAllExtenasions && file_ext == extension)
                 {
                     // By Specific Extension
                     file_list.push_back(file_name);
