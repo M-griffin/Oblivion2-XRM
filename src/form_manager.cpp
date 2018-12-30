@@ -4,6 +4,7 @@
 #include "forms/form_system_config.hpp"
 #include "ansi_processor.hpp"
 #include "session_data.hpp"
+#include "logging.hpp"
 
 #include <iostream>
 #include <string>
@@ -110,8 +111,9 @@ void FormManager::startupFormSystemConfiguration()
 
     if(!form)
     {
-        std::cout << "FormSystemConfig Allocation Error!" << std::endl;
-        assert(false);
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("FormSystemConfig Allocation Error!", __FILE__, __LINE__);
+        return;
     }
 
     startupForm(form);
@@ -499,7 +501,6 @@ std::string FormManager::processFormScreens()
 
     if(idx != std::string::npos)
     {
-        std::cout << "parsing form code title" << std::endl;
         m_ansi_top.replace(
             idx,
             3,

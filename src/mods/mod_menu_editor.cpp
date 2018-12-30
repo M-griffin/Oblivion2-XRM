@@ -3,6 +3,7 @@
 #include "data-sys/menu_dao.hpp"
 #include "../directory.hpp"
 #include "../menu_base.hpp"
+#include "../logging.hpp"
 
 #include <stdint.h>
 #include <string>
@@ -19,14 +20,12 @@ bool ModMenuEditor::update(const std::string &character_buffer, const bool &)
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
-        std::cout << "ModMenuEditor() !m_is_active" << std::endl;
         return false;
     }
 
     // Return True when were keeping module active / else false;
     if(character_buffer.size() == 0)
     {
-        std::cout << "ModMenuEditor() !character_buffer size 0" << std::endl;
         return true;
     }
 
@@ -42,7 +41,6 @@ bool ModMenuEditor::update(const std::string &character_buffer, const bool &)
  */
 bool ModMenuEditor::onEnter()
 {
-    std::cout << "OnEnter() ModMenuEditor\n";
     m_is_active = true;
 
     // Grab ANSI Screen, display, if desired.. logon.ans maybe?
@@ -61,7 +59,6 @@ bool ModMenuEditor::onEnter()
  */
 bool ModMenuEditor::onExit()
 {
-    std::cout << "OnExit() ModMenuEditor\n";
     m_is_active = false;
     return true;
 }
@@ -286,6 +283,7 @@ void ModMenuEditor::setupMenuEditor()
  */
 void ModMenuEditor::setupMenuOptionEditor()
 {
+    Logging *log = Logging::instance();
     std::string display_name = m_current_menu;
     baseTransformToUpper(display_name);
     displayPromptMCI(PROMPT_OPTION_HEADER, display_name);
@@ -311,7 +309,7 @@ void ModMenuEditor::setupMenuOptionEditor()
             break;
 
         default:
-            std::cout << "Error, Didn't add the view display to setupMenuOptionEditor" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Error, Didn't add the view display to setupMenuOptionEditor", __FILE__, __LINE__);
             break;
     }
 
@@ -429,7 +427,8 @@ void ModMenuEditor::displayCurrentPage(const std::string &input_state)
             break;
 
         default:
-            std::cout << "Error, forgot to add new STATE index displayCurrentPage!!";
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentPage!!", __FILE__, __LINE__);
             return;
     }
 
@@ -476,7 +475,8 @@ void ModMenuEditor::displayCurrentEditPage(const std::string &input_state)
             break;
 
         default:
-            std::cout << "Error, forgot to add new STATE index displayCurrentEditPage!!";
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentEditPage!!", __FILE__, __LINE__);
             return;
     }
 
@@ -542,7 +542,6 @@ void ModMenuEditor::menuEditorInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -615,7 +614,6 @@ void ModMenuEditor::menuEditorOptionInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -631,7 +629,7 @@ void ModMenuEditor::menuEditorOptionInput(const std::string &input)
 
         switch(toupper(key[0]))
         {
-                // These all have to be redone for OPTION COMMANDS
+            // These all have to be redone for OPTION COMMANDS
             case 'A': // Add
                 changeMenuInputState(MENU_ADD);
                 displayPrompt(PROMPT_MENU_OPTION_ADD);
@@ -701,7 +699,6 @@ void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -832,7 +829,6 @@ void ModMenuEditor::menuEditorMenuOptionFieldInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -865,17 +861,17 @@ void ModMenuEditor::menuEditorMenuOptionFieldInput(const std::string &input)
                 break;
 
             case 'C': // Option Hidden
-                {
-                    m_current_field = toupper(key[0]);
-                    changeInputModule(MOD_MENU_OPTION_FIELD);
-                    displayPrompt(PROMPT_MENU_OPTION_FIELD_HIDDEN);
+            {
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_MENU_OPTION_FIELD);
+                displayPrompt(PROMPT_MENU_OPTION_FIELD_HIDDEN);
 
-                    // Setup pre-population to display only T or F instead of True / False
-                    std::string bool_value = "";
-                    bool_value += m_common_io.boolAlpha(m_loaded_menu.back()->menu_options[m_current_option].hidden).at(0);
-                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                    break;
-                }
+                // Setup pre-population to display only T or F instead of True / False
+                std::string bool_value = "";
+                bool_value += m_common_io.boolAlpha(m_loaded_menu.back()->menu_options[m_current_option].hidden).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                break;
+            }
 
             case 'D': // Option Command Key
                 m_current_field = toupper(key[0]);
@@ -1005,7 +1001,6 @@ void ModMenuEditor::menuEditorMenuOptionFieldHandler(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_MENU_OPTION_FIELD_INPUT);
         changeSetupModule(MOD_DISPLAY_MENU_OPTIONS_EDIT);
         return;
@@ -1026,23 +1021,23 @@ void ModMenuEditor::menuEditorMenuOptionFieldHandler(const std::string &input)
                 break;
 
             case 'C': // Menu Fallback
-                {
-                    // change to bool from T/F
-                    bool result = false;
+            {
+                // change to bool from T/F
+                bool result = false;
 
-                    if(toupper(key[0]) == 'T')
-                        // Set to true
-                        result = true;
-                    else if(toupper(key[0]) == 'F')
-                        // use default false;
-                    { }
-                    else
-                        // Leave orginial value
-                        break;
-
-                    m_loaded_menu.back()->menu_options[m_current_option].hidden = result;
+                if(toupper(key[0]) == 'T')
+                    // Set to true
+                    result = true;
+                else if(toupper(key[0]) == 'F')
+                    // use default false;
+                { }
+                else
+                    // Leave orginial value
                     break;
-                }
+
+                m_loaded_menu.back()->menu_options[m_current_option].hidden = result;
+                break;
+            }
 
             case 'D': // Menu Help ID
                 m_loaded_menu.back()->menu_options[m_current_option].command_key = key;
@@ -1057,22 +1052,22 @@ void ModMenuEditor::menuEditorMenuOptionFieldHandler(const std::string &input)
                 break;
 
             case 'G': // Pulldown ID
+            {
+                int new_id = 0;
+                std::stringstream ss(key);
+                ss >> new_id;
+
+                // check for Invalid Index.
+                if(ss.fail() || new_id < 0)
                 {
-                    int new_id = 0;
-                    std::stringstream ss(key);
-                    ss >> new_id;
-
-                    // check for Invalid Index.
-                    if(ss.fail() || new_id < 0)
-                    {
-                        ss.clear();
-                        ss.ignore();
-                        break;
-                    }
-
-                    m_loaded_menu.back()->menu_options[m_current_option].pulldown_id = new_id;
+                    ss.clear();
+                    ss.ignore();
                     break;
                 }
+
+                m_loaded_menu.back()->menu_options[m_current_option].pulldown_id = new_id;
+                break;
+            }
         }
 
         changeInputModule(MOD_MENU_OPTION_FIELD_INPUT);
@@ -1101,7 +1096,6 @@ void ModMenuEditor::menuEditorMenuNameInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_MENU_INPUT);
         redisplayModulePrompt();
         return;
@@ -1150,7 +1144,6 @@ void ModMenuEditor::menuEditorMenuOptionInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_MENU_OPTION_INPUT);
         redisplayModulePrompt();
         return;
@@ -1181,12 +1174,10 @@ void ModMenuEditor::menuEditorMenuOptionInput(const std::string &input)
 
         if(checkMenuOptionExists(option_index))
         {
-            std::cout << " * Menu option matches!" << std::endl;
             handleMenuOptionInputState(true, option_index);
         }
         else
         {
-            std::cout << " * Menu option doesn't match!" << std::endl;
             handleMenuOptionInputState(false, option_index);
         }
     }
@@ -1599,6 +1590,7 @@ void ModMenuEditor::deleteExistingMenu(const std::string &menu_name)
  */
 void ModMenuEditor::copyExistingMenu(const std::string &menu_name)
 {
+    Logging *log = Logging::instance();
     // Pre-Load Menu, check access, if not valud, then fall back to previous.
     menu_ptr new_menu(new Menu());
 
@@ -1611,7 +1603,7 @@ void ModMenuEditor::copyExistingMenu(const std::string &menu_name)
     }
     else
     {
-        std::cout << "Source menu file doesn't exist!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Source menu file doesn't exist=", m_current_menu, __FILE__, __LINE__);
         return;
     }
 
@@ -1624,7 +1616,7 @@ void ModMenuEditor::copyExistingMenu(const std::string &menu_name)
     }
     else
     {
-        std::cout << "Destination menu file already exists!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Destination menu file already exist=", new_menu, __FILE__, __LINE__);
     }
 }
 
@@ -1667,15 +1659,16 @@ void ModMenuEditor::copyExistingMenuOption(int option_index)
  */
 void ModMenuEditor::saveMenuChanges()
 {
+    Logging *log = Logging::instance();
     MenuDao mnu_source(m_loaded_menu.back(), m_current_menu, GLOBAL_MENU_PATH);
 
     if(mnu_source.saveMenu(m_loaded_menu.back()))
     {
-        std::cout << "Menu Saved Successful!" << std::endl;
+        log->xrmLog<Logging::DEBUG_LOG>("Menu Saved Successful=", m_current_menu, __FILE__, __LINE__);
     }
     else
     {
-        std::cout << "Menu Save Failed!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Menu Save Failed=", m_current_menu, __FILE__, __LINE__);
     }
 }
 
@@ -1743,7 +1736,8 @@ std::string ModMenuEditor::displayMenuList()
     // check result set, if no menu then return gracefully.
     if(result_set.size() == 0)
     {
-        std::cout << "\r\n*** No Menus .yaml files found!" << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::CONSOLE_LOG>("No Menus .yaml files found", __FILE__, __LINE__);
         return "No Menu Files found!";
     }
 

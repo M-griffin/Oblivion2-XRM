@@ -1,6 +1,7 @@
 #include "message_area_dao.hpp"
 
 #include "../model-sys/message_area.hpp"
+#include "../logging.hpp"
 
 #include "libSqliteWrapped.h"
 #include <sqlite3.h>
@@ -12,7 +13,7 @@
  * Base Dao Calls for generic Object Data Calls
  * (Below This Point)
  */
- 
+
 /**
  * @brief Check If Database Table Exists.
  * @return
@@ -81,8 +82,8 @@ bool MessageAreaDao::deleteRecord(long id)
 /**
  * @brief Retrieve Record By Id.
  * @param id
- * @return 
- */ 
+ * @return
+ */
 message_area_ptr MessageAreaDao::getRecordById(long id)
 {
     return baseGetRecordById(id);
@@ -112,14 +113,14 @@ long MessageAreaDao::getRecordsCount()
  */
 
 /**
- * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+ * @brief (CallBack) Pulls results by FieldNames into their Class Variables.
  * @param qry
  * @param obj
  */
 void MessageAreaDao::pullMessageAreaResult(query_ptr qry, message_area_ptr obj)
 {
     qry->getFieldByName("iId", obj->iId);
-    qry->getFieldByName("sName", obj->sName);    
+    qry->getFieldByName("sName", obj->sName);
     qry->getFieldByName("sAcsAccess", obj->sAcsAccess);
     qry->getFieldByName("sAcsAccess", obj->sAcsAccess);
     qry->getFieldByName("sAcsPost", obj->sAcsPost);
@@ -143,9 +144,9 @@ void MessageAreaDao::pullMessageAreaResult(query_ptr qry, message_area_ptr obj)
  * @param qry
  * @param obj
  * @param values
- */ 
-void MessageAreaDao::fillMessageAreaColumnValues(query_ptr qry, message_area_ptr obj, 
-    std::vector< std::pair<std::string, std::string> > &values)
+ */
+void MessageAreaDao::fillMessageAreaColumnValues(query_ptr qry, message_area_ptr obj,
+        std::vector< std::pair<std::string, std::string> > &values)
 {
     // values.push_back(qry->translateFieldName("iId", conf->iId));
     values.push_back(qry->translateFieldName("sName", obj->sName));
@@ -167,64 +168,64 @@ void MessageAreaDao::fillMessageAreaColumnValues(query_ptr qry, message_area_ptr
 }
 
 /**
- * @brief (Callback) Create Record Insert Statement, returns query string 
+ * @brief (Callback) Create Record Insert Statement, returns query string
  * @param qry
  * @param obj
- * @return 
+ * @return
  */
 std::string MessageAreaDao::insertMessageAreaQryString(std::string qry, message_area_ptr obj)
-{    
+{
     // Mprint statement to avoid injections.
     std::string result = sqlite3_mprintf(qry.c_str(),
-        obj->sName.c_str(),
-        obj->sAcsAccess.c_str(),
-        obj->sAcsPost.c_str(),
-        obj->bAnonymous,
-        obj->sSponsor.c_str(),  
-        obj->sOriginLine.c_str(),
-        obj->sFidoPath.c_str(),
-        obj->iNetworkId,
-        obj->sQwkName.c_str(),
-        obj->iMaxMessages,
-        obj->bRealName,
-        obj->sLinkname.c_str(),
-        obj->bRequired,
-        obj->bPrivate,
-        obj->bNetmail,
-        obj->iSortOrder
-    );
+                                         obj->sName.c_str(),
+                                         obj->sAcsAccess.c_str(),
+                                         obj->sAcsPost.c_str(),
+                                         obj->bAnonymous,
+                                         obj->sSponsor.c_str(),
+                                         obj->sOriginLine.c_str(),
+                                         obj->sFidoPath.c_str(),
+                                         obj->iNetworkId,
+                                         obj->sQwkName.c_str(),
+                                         obj->iMaxMessages,
+                                         obj->bRealName,
+                                         obj->sLinkname.c_str(),
+                                         obj->bRequired,
+                                         obj->bPrivate,
+                                         obj->bNetmail,
+                                         obj->iSortOrder
+                                        );
 
     return result;
 }
 
 /**
- * @brief (CallBack) Update Existing Record. 
+ * @brief (CallBack) Update Existing Record.
  * @param qry
  * @param obj
- * @return 
+ * @return
  */
 std::string MessageAreaDao::updateMessageAreaQryString(std::string qry, message_area_ptr obj)
-{    
+{
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),        
-        obj->sName.c_str(),
-        obj->sAcsAccess.c_str(),
-        obj->sAcsPost.c_str(),
-        obj->bAnonymous,
-        obj->sSponsor.c_str(),  
-        obj->sOriginLine.c_str(),
-        obj->sFidoPath.c_str(),
-        obj->iNetworkId,
-        obj->sQwkName.c_str(),
-        obj->iMaxMessages,
-        obj->bRealName,
-        obj->sLinkname.c_str(),
-        obj->bRequired,
-        obj->bPrivate,
-        obj->bNetmail,
-        obj->iSortOrder,
-        obj->iId
-    );
+    std::string result = sqlite3_mprintf(qry.c_str(),
+                                         obj->sName.c_str(),
+                                         obj->sAcsAccess.c_str(),
+                                         obj->sAcsPost.c_str(),
+                                         obj->bAnonymous,
+                                         obj->sSponsor.c_str(),
+                                         obj->sOriginLine.c_str(),
+                                         obj->sFidoPath.c_str(),
+                                         obj->iNetworkId,
+                                         obj->sQwkName.c_str(),
+                                         obj->iMaxMessages,
+                                         obj->bRealName,
+                                         obj->sLinkname.c_str(),
+                                         obj->bRequired,
+                                         obj->bPrivate,
+                                         obj->bNetmail,
+                                         obj->iSortOrder,
+                                         obj->iId
+                                        );
 
     return result;
 }
@@ -240,24 +241,26 @@ std::string MessageAreaDao::updateMessageAreaQryString(std::string qry, message_
  * @brief Return List of All MessageArea by ConferenceId
  * @param areas
  * @return
- */ 
+ */
 std::vector<message_area_ptr> MessageAreaDao::getAllMessageAreasByConference(long id)
 {
+    Logging *log = Logging::instance();
     message_area_ptr area(new MessageArea);
     std::vector<message_area_ptr> list;
 
     // Make Sure Database Reference is Connected
-    if (!m_database.isConnected())
+    if(!m_database.isConnected())
     {
-        std::cout << "Error, Database is not connected!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
         return list;
     }
 
     // Create Pointer and Connect Query Object to Database.
     query_ptr qry(new SQLW::Query(m_database));
-    if (!qry->isConnected())
+
+    if(!qry->isConnected())
     {
-        std::cout << "Error, Query has no connection to the database" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__, __LINE__);
         return list;
     }
 
@@ -265,10 +268,11 @@ std::vector<message_area_ptr> MessageAreaDao::getAllMessageAreasByConference(lon
     std::string queryString = sqlite3_mprintf("SELECT a.* FROM %Q a, Grouping g WHERE g.iConferenceId = %ld AND a.iID = g.iMsgAreaId;", m_strTableName.c_str(), id);
 
     // Execute Query.
-    if (qry->getResult(queryString))
+    if(qry->getResult(queryString))
     {
         long rows = qry->getNumRows();
-        if (rows > 0)
+
+        if(rows > 0)
         {
             while(qry->fetchRow())
             {
@@ -279,12 +283,12 @@ std::vector<message_area_ptr> MessageAreaDao::getAllMessageAreasByConference(lon
         }
         else
         {
-            std::cout << "Error, getAllMessageAreasByConference Returned Rows: " << rows << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Error, getAllMessageAreasByConference Returned Rows", rows, m_strTableName, __FILE__, __LINE__);
         }
     }
     else
     {
-        std::cout << "Error, getResult()" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __FILE__, __LINE__);
     }
 
     return list;

@@ -183,7 +183,6 @@ SUITE(XRMCommonIO)
         CommonIO common;
         std::string temp = "testing";
         std::string trim_temp = common.eraseString(temp, 0, 4);
-        std::cout << "[" << trim_temp << "]" << std::endl;
         CHECK_EQUAL(trim_temp,"ing");
     }
 
@@ -192,7 +191,6 @@ SUITE(XRMCommonIO)
         CommonIO common;
         std::string temp = "testing";
         std::string trim_temp = common.eraseString(temp, 2, 20);
-        std::cout << "[" << trim_temp << "]" << std::endl;
         CHECK_EQUAL(trim_temp,"te");
     }
 
@@ -201,7 +199,6 @@ SUITE(XRMCommonIO)
         CommonIO common;
         std::string temp = "あにま! Lin";
         std::string trim_temp = common.eraseString(temp, 0, 2);
-        std::cout << "[" << trim_temp << "]" << std::endl;
         CHECK_EQUAL(trim_temp,"ま! Lin");
     }
 
@@ -210,7 +207,6 @@ SUITE(XRMCommonIO)
         CommonIO common;
         std::string temp = "あにま! Lin";
         std::string trim_temp = common.eraseString(temp, 1, 4);
-        std::cout << "[" << trim_temp << "]" << std::endl;
         CHECK_EQUAL(trim_temp,"あLin");
     }
 

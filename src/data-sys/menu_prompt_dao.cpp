@@ -1,5 +1,6 @@
 #include "menu_prompt_dao.hpp"
 #include "../model-sys/menu_prompt.hpp"
+#include "../logging.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -46,8 +47,6 @@ bool MenuPromptDao::fileExists()
     path.append(m_filename);
     path.append(".yaml");
 
-    std::cout << "menu_prompt_path: " << path << std::endl;
-
     std::ifstream ifs(path);
 
     if(!ifs.is_open())
@@ -71,7 +70,6 @@ bool MenuPromptDao::saveMenuPrompt(menu_prompt_ptr menu_prompt)
      * We need to keep the CP437 char set, so we write out
      * Yaml format manually so no conversion is done.
      */
-
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
@@ -82,7 +80,8 @@ bool MenuPromptDao::saveMenuPrompt(menu_prompt_ptr menu_prompt)
 
     if(!ofs.is_open())
     {
-        std::cout << "Error, unable to write to: " << path << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to write menu prompt=", path, __FILE__, __LINE__);
         return false;
     }
 
@@ -118,6 +117,7 @@ void MenuPromptDao::encode(const MenuPrompt &rhs)
  */
 bool MenuPromptDao::loadMenuPrompt()
 {
+    Logging *log = Logging::instance();
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
@@ -128,41 +128,38 @@ bool MenuPromptDao::loadMenuPrompt()
     // Load the file into the class.
     try
     {
-        // Load file fresh.
         node = YAML::LoadFile(path);
 
-        // Testing Is on nodes always throws exceptions.
         if(node.size() == 0)
         {
-            std::cout << "Not Found: " << path << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("YAML Node not found=", path, __FILE__, __LINE__);
             return false; //File Not Found?
         }
 
         std::string file_version = node["file_version"].as<std::string>();
 
         // Validate File Version
-        std::cout << "MenuPrompt File Version: " << file_version << std::endl;
+        log->xrmLog<Logging::CONSOLE_LOG>("MenuPrompt File Version=", file_version);
 
         if(file_version != MenuPrompt::FILE_VERSION)
         {
-            throw std::invalid_argument("Invalid file_version, expected: " + MenuPrompt::FILE_VERSION);
+            log->xrmLog<Logging::ERROR_LOG>("MenuPrompt File Version=", file_version,
+                                            "Expected=", MenuPrompt::FILE_VERSION);
+            return false;
         }
 
         MenuPrompt m = node.as<MenuPrompt>();
-
-        // Moves the Loaded config to m_config shared pointer.
         encode(m);
     }
     catch(YAML::Exception &ex)
     {
-        std::cout << "Exception YAML::LoadFile(" << m_filename << ".yaml) " << ex.what() << std::endl;
-        std::cout << "Most likely a required field in the menu file is missing. " << std::endl;
-        assert(false);
+        log->xrmLog<Logging::ERROR_LOG>("YAML::LoadFile=", m_filename, "Exception=", ex.what(), __LINE__, __FILE__);
+        return false;
     }
     catch(std::exception &ex)
     {
-        std::cout << "Unexpected YAML::LoadFile(" << m_filename << ".yaml) " << ex.what() << std::endl;
-        assert(false);
+        log->xrmLog<Logging::ERROR_LOG>("Unexpected YAML::LoadFile=", m_filename, "Exception=", ex.what(), __LINE__, __FILE__);
+        return false;
     }
 
     return true;

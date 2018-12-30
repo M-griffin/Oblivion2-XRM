@@ -1355,7 +1355,6 @@ bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, 
                 /*
                 // Testing for Stack Reassignment on FeedBack Lightbars
                 executeMenuOptions(m);
-                std::cout << "set stack_reassignment = true " << std::endl;
                 // Now assign the m.menu_key to the input, so on next loop, we hit any stacked commands!
                 // If were in pulldown menu, and the first lightbar has stacked commands, then we need
                 // to cycle through the remaining command's for stacked on lightbars.

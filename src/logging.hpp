@@ -4,6 +4,7 @@
 #include "communicator.hpp"
 #include "model-sys/config.hpp"
 #include "safe_queue.hpp"
+#include "common_io.hpp"
 
 #include <yaml-cpp/yaml.h>
 
@@ -144,10 +145,9 @@ public:
      */
     std::string getCurrentDateTime()
     {
+        CommonIO common;
         std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        std::string s(20, '\0');
-        std::strftime(&s[0], s.size(), "%Y-%m-%d %H:%M:%S", std::localtime(&now));
-        return s.erase(s.size()-1, 1);
+        return common.standardDateTimeToString(now);
     }
 
     /**

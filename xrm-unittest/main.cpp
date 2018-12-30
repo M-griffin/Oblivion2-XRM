@@ -105,6 +105,7 @@ int main()
         if(!config)
         {
             std::cout << "Unable to allocate config structure" << std::endl;
+            Encoding::releaseInstance();
             return(1);
         }
 

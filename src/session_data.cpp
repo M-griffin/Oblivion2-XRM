@@ -166,20 +166,6 @@ void SessionData::handleRead(const std::error_code& error, socket_handler_ptr)
  */
 void SessionData::handleEscTimer()
 {
-    /*
-    if(timer->expires_at() <= deadline_timer::traits_type::now())
-    {
-        // The deadline has passed. Stop the session. The other actors will
-        // terminate as soon as possible.
-        //stop();
-        std::cout << "Deadline Checking, EXPIRED!" << std::endl;
-    }
-    else
-    {
-        // Got more input while waiting, FOUND MORE DATA!
-        std::cout << "Deadline Checking, CAUGHT REMAINING SEQUENCE!" << std::endl;
-    }*/
-
     // Move text to State Machine, Timer has passed, or remainer of Sequence caught up!
     m_state_manager->update();
     m_is_esc_timer = false;

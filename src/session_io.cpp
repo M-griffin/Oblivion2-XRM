@@ -246,7 +246,6 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
 
             if(esc_sequence.size() == 0 && character_buffer[0] == '\0')
             {
-                //std::cout << "ESC -> Field Input aborted!" << std::endl;
                 is_leadoff = true;    // Reset for next run
                 esc_sequence.erase();
                 string_data.erase();
@@ -257,7 +256,6 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
         else if((string_data[0] == '\n' && string_data.size() == 1) || character_buffer[0] == '\n')
         {
             result = m_common_io.getInputBuffer();
-            //std::cout << "Field: " << result << std::endl;
             string_data.erase();
             is_leadoff = true;    // Reset for next run
             return "\n";
