@@ -212,10 +212,6 @@ public:
     int verify_knownhost();
     int authenticate_console();
     int authenticate_kbdint();
-    void error()
-    {
-        std::cout << "Authentication failed: " << ssh_get_error(m_ssh_session) << std::endl;
-    }
 
 private:
 

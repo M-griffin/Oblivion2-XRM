@@ -402,7 +402,6 @@ std::string CommonIO::leftTrim(const std::string &str)
 
     if(new_string.empty())
     {
-        //std::cout << "Exception (Common::LeftTrim) string length == 0" << std::endl;
         return new_string;
     }
 
@@ -427,7 +426,6 @@ std::string CommonIO::rightTrim(const std::string &str)
 
     if(new_string.empty())
     {
-        //std::cout << "Exception (Common::RightTrim) string length == 0" << std::endl;
         return new_string;
     }
 
@@ -452,7 +450,6 @@ std::string CommonIO::trim(const std::string &str)
 
     if(new_string.empty())
     {
-        //std::cout << "Exception (Common::trim) string length == 0" << std::endl;
         return new_string;
     }
 
@@ -523,7 +520,6 @@ std::string CommonIO::eraseString(const std::string &str,
 
                 if(char_count < start_position || char_count > end_position)
                 {
-                    //std::cout << "append" << std::endl;
                     // This convert the uint32_t code point to char array
                     // So each sequence can be writen as seperate byte.
                     unsigned char character[5] = {0,0,0,0,0};
@@ -652,7 +648,6 @@ std::string CommonIO::centerPadding(const std::string &str, int term_width)
 
     if(new_string.empty())
     {
-        //std::cout << "Exception (Common::centerPadding) string empty" << std::endl;
         return new_string;
     }
 
@@ -660,7 +655,6 @@ std::string CommonIO::centerPadding(const std::string &str, int term_width)
 
     if(length == 0)
     {
-        //std::cout << "Exception (Common::centerPadding) string length == 0" << std::endl;
         return new_string;
     }
 
@@ -696,7 +690,6 @@ std::string CommonIO::maskString(const std::string &str)
 
     if(new_string.empty())
     {
-        //std::cout << "Exception (Common::maskString) string empty" << std::endl;
         return new_string;
     }
 
@@ -704,7 +697,6 @@ std::string CommonIO::maskString(const std::string &str)
 
     if(string_size == 0)
     {
-        //std::cout << "Exception (Common::maskString) string length == 0" << std::endl;
         return new_string;
     }
 
@@ -967,7 +959,6 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
         return "\n";
     }
 
-    //std::cout << "character_buffer: " << character_buffer << std::endl;
     return character_buffer;
 }
 
@@ -1050,12 +1041,6 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
 
         if(sequence.size() == 0)
         {
-            // WIP, update to clear field line CTRL + Y
-
-            // Received ESC, Abort!
-            //std::cout << "Received ESC!!!!!" << std::endl;
-            //m_is_new_getline = true;
-            //m_is_new_leadoff = true;
             return "\x1b";
         }
         else

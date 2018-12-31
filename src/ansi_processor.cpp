@@ -1,7 +1,8 @@
 #include "ansi_processor.hpp"
-#include "common_io.hpp"
-
 #include "model-sys/structures.hpp"
+#include "common_io.hpp"
+#include "logging.hpp"
+
 #include "utf-cpp/utf8.h"
 
 #include <cstdio>
@@ -266,7 +267,6 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
         }
         else
         {
-            //std::cout << "buf : " << buff.char_sequence << " len: " << buff.char_sequence.size() << std::endl;
             ansi_output.append(buff.char_sequence);
         }
 
@@ -372,8 +372,7 @@ std::string AnsiProcessor::screenBufferParse()
     // Make a copy that we can modify and process on.
     std::string ansi_string = m_ansi_output;
 
-    std::cout << "exp: (\\|[0-9]{2}[%][0-9]{2}) " << std::endl;
-
+    //std::cout << "exp: (\\|[0-9]{2}[%][0-9]{2}) " << std::endl;
     // Each Set of Codes for Expression Matches 1 set. will need more for char screens.
     try
     {
@@ -399,7 +398,8 @@ std::string AnsiProcessor::screenBufferParse()
             // is not the same as the next!
             if(start == matches[0].second)
             {
-                std::cout << "no more matches!" << std::endl;
+                Logging *log = Logging::instance();
+                log->xrmLog<Logging::DEBUG_LOG>("[screenBufferParse] no matches!", __LINE__, __FILE__);
                 break;
             }
 
@@ -444,8 +444,8 @@ std::string AnsiProcessor::screenBufferParse()
     }
     catch(std::regex_error &ex)
     {
-        std::cout << ex.what() << std::endl;
-        std::cout << "CODE IS: " << ex.code() << " " << __FILE__ << __LINE__ << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("[screenBufferParse] regex=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
     // All Global MCI Codes likes standard screens and colors will
@@ -522,6 +522,8 @@ std::string AnsiProcessor::screenBufferParse()
  */
 void AnsiProcessor::screenBufferSetGlyph(std::string char_sequence)
 {
+    Logging *log = Logging::instance();
+
     // Keep track of the lonest line in buffer for Centering screen.
     if(m_x_position > m_max_x_position)
     {
@@ -556,13 +558,12 @@ void AnsiProcessor::screenBufferSetGlyph(std::string char_sequence)
         }
         else
         {
-            std::cout << "position out of bounds: " << m_x_position-1 << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("[screenBufferSetGlyph] out of bounds pos=", m_x_position-1, __LINE__, __FILE__);
         }
     }
     catch(std::exception &e)
     {
-        std::cout << "Exception setScreenBuffer: " << e.what() << std::endl;
-        std::cout << "Server sent data that exceeds screen dimensions." << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("[screenBufferSetGlyph] exceeds screen dimensions Exception=", e.what(), __LINE__, __FILE__);
     }
 
     // Clear for next sequences.
@@ -608,7 +609,8 @@ void AnsiProcessor::screenBufferScrollUp()
     }
     catch(std::exception &e)
     {
-        std::cout << "Exception scrollScreenBuffer: " << e.what() << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("[screenBufferScrollUp] Exception=", e.what(), __LINE__, __FILE__);
     }
 
     // Readd The last Line back to the buffer.
@@ -637,13 +639,11 @@ void AnsiProcessor::screenBufferClearRange(int start, int end)
         }
         catch(std::exception &e)
         {
-            std::cout << "Exception clearScreenBufferRange: "
-                      << e.what() << std::endl;
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("[screenBufferClearRange] Exception=", e.what(),
+                                            "start=", start, "end=", end, __LINE__, __FILE__);
         }
     }
-
-    // Debugging
-    //getScreenBufferText();
 }
 
 /**
@@ -914,7 +914,6 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
                     {
                         if(param[0] > m_x_position)
                         {
-                            std::cout << "###" << param[0];
                             m_x_position = 1;
                         }
                         else

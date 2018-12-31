@@ -252,6 +252,8 @@ bool SSH_Socket::onExit()
 // Verify if Server is a known host.
 int SSH_Socket::verify_knownhost()
 {
+    Logging *log = Logging::instance();
+
     int state;
     size_t hlen;
     unsigned char *hash = nullptr;
@@ -279,27 +281,26 @@ int SSH_Socket::verify_knownhost()
     switch(state)
     {
         case SSH_SERVER_KNOWN_OK:
+            log->xrmLog<Logging::CONSOLE_LOG>("SSH_SERVER_KNOWN_OK", __LINE__, __FILE__);
             break; /* ok */
 
         case SSH_SERVER_KNOWN_CHANGED:
-            std::cout << "Host key for server changed: it is now" << std::endl;
+
             ssh_print_hexa("Public key hash", hash, hlen);
-            std::cout << "For security reasons, connection will be stopped" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Host key for server changed: it is now=", hash);
+            log->xrmLog<Logging::ERROR_LOG>("For security reasons, connection will be stopped", __LINE__, __FILE__);
             free(hash);
             return -1;
 
         case SSH_SERVER_FOUND_OTHER:
-            std::cout << "The host key for this server was not found but an other"
-                      << "type of key exists." << std::endl;
-            std::cout << "An attacker might change the default server key to"
-                      << "confuse your client into thinking the key does not exist" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("The host key for this server was not found but an other",
+                                            "type of key exists.", __LINE__, __FILE__);
             free(hash);
             return -1;
 
         case SSH_SERVER_FILE_NOT_FOUND:
-            std::cout << "Could not find known host file." << std::endl;
-            std::cout << "If you accept the host key here, the file will be"
-                      << "automatically created." << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("SSH_SERVER_FILE_NOT_FOUND.",
+                                              "If you accept, host key is automatically created.", __LINE__, __FILE__);
 #if __GNUC__ >= 6
             [[gnu::fallthrough]]; // c++11 and c++14
 #endif
@@ -308,8 +309,8 @@ int SSH_Socket::verify_knownhost()
         case SSH_SERVER_NOT_KNOWN:
             hexa = ssh_get_hexa(hash, hlen);
             //Do you trust the host key?\n");
-            std::cout << "The server is unknown. Adding Key." << std::endl;
-            std::cout << "Public key hash: " << hexa << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("SSH_SERVER_NOT_KNOWN. Adding Key.",
+                                              "Public key hash=", hexa, __LINE__, __FILE__);
             free(hexa);
 
             /*
@@ -326,7 +327,7 @@ int SSH_Socket::verify_knownhost()
             */
             if(ssh_write_knownhost(m_ssh_session) < 0)
             {
-                std::cout << "Error: " << strerror(errno) << std::endl;
+                log->xrmLog<Logging::ERROR_LOG>("Error, ssh_write_knownhost=", strerror(errno), __LINE__, __FILE__);
                 free(hash);
                 return -1;
             }
@@ -334,7 +335,7 @@ int SSH_Socket::verify_knownhost()
             break;
 
         case SSH_SERVER_ERROR:
-            std::cout << "Error: " << ssh_get_error(m_ssh_session) << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Error, SSH_SERVER_ERROR=", ssh_get_error(m_ssh_session), __LINE__, __FILE__);
             free(hash);
             return -1;
     }
@@ -411,25 +412,26 @@ int SSH_Socket::authenticate_console()
     // Try to authenticate
     rc = ssh_userauth_none(m_ssh_session, nullptr);
 
+    Logging *log = Logging::instance();
+
     switch(rc)
     {
         case SSH_AUTH_ERROR:   //some error happened during authentication
-            std::cout << "ssh_userauth_none SSH_AUTH_ERROR!" << std::endl;
-            error();
+            log->xrmLog<Logging::ERROR_LOG>("ssh_userauth_none SSH_AUTH_ERROR=", ssh_get_error(m_ssh_session), __LINE__, __FILE__);
             return rc;
 
         case SSH_AUTH_DENIED:  //no key matched
-            std::cout << "ssh_userauth_none SSH_AUTH_DENIED!" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("ssh_userauth_none SSH_AUTH_DENIED", __LINE__, __FILE__);
             break;
 
         case SSH_AUTH_SUCCESS: //you are now authenticated
-            std::cout << "ssh_userauth_none SSH_AUTH_SUCCESS!" << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("ssh_userauth_none SSH_AUTH_SUCCESS", __LINE__, __FILE__);
             break;
 
         case SSH_AUTH_PARTIAL:
             //some key matched but you still have
             //to provide an other mean of authentication (like a password).
-            std::cout << "ssh_userauth_none SSH_AUTH_PARTIAL!" << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("ssh_userauth_none SSH_AUTH_PARTIAL", __LINE__, __FILE__);
             break;
     }
 
@@ -461,23 +463,22 @@ int SSH_Socket::authenticate_console()
             switch(rc)
             {
                 case SSH_AUTH_ERROR:   //some serious error happened during authentication
-                    std::cout << "SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_ERROR!" << std::endl;
-                    error();
+                    log->xrmLog<Logging::ERROR_LOG>("SSH_AUTH_METHOD_PUBLICKEY SSH_AUTH_ERROR=", ssh_get_error(m_ssh_session), __LINE__, __FILE__);
                     return rc;
 
                 case SSH_AUTH_DENIED:  //no key matched
-                    std::cout << "SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_DENIED!" << std::endl;
+                    log->xrmLog<Logging::ERROR_LOG>("SSH_AUTH_METHOD_PUBLICKEY SSH_AUTH_DENIED", __LINE__, __FILE__);
                     ++failureCounter;
                     break;
 
                 case SSH_AUTH_SUCCESS: //you are now authenticated
-                    std::cout << "SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_SUCCESS!" << std::endl;
+                    log->xrmLog<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_PUBLICKEY SSH_AUTH_SUCCESS", __LINE__, __FILE__);
                     break;
 
                 case SSH_AUTH_PARTIAL:
                     // some key matched but you still have
                     // to provide an other mean of authentication (like a password).
-                    std::cout << "SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_PARTIAL!" << std::endl;
+                    log->xrmLog<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_PUBLICKEY SSH_AUTH_PARTIAL", __LINE__, __FILE__);
                     ++failureCounter;
                     break;
 
@@ -517,22 +518,21 @@ int SSH_Socket::authenticate_console()
             switch(rc)
             {
                 case SSH_AUTH_ERROR:   //some serious error happened during authentication
-                    std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_ERROR!" << std::endl;
-                    error();
+                    log->xrmLog<Logging::ERROR_LOG>("SSH_AUTH_METHOD_INTERACTIVE SSH_AUTH_ERROR=", ssh_get_error(m_ssh_session), __LINE__, __FILE__);
                     return rc;
 
                 case SSH_AUTH_DENIED:  //no key matched
-                    std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_DENIED!" << std::endl;
+                    log->xrmLog<Logging::ERROR_LOG>("SSH_AUTH_METHOD_INTERACTIVE SSH_AUTH_DENIED", __LINE__, __FILE__);
                     ++failureCounter;
                     break;
 
                 case SSH_AUTH_SUCCESS: //you are now authenticated
-                    std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_SUCCESS!" << std::endl;
+                    log->xrmLog<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_INTERACTIVE SSH_AUTH_SUCCESS", __LINE__, __FILE__);
                     break;
 
                 case SSH_AUTH_PARTIAL: //some key matched but you still have to
                     //provide an other mean of authentication (like a password).
-                    std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_PARTIAL!" << std::endl;
+                    log->xrmLog<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_INTERACTIVE SSH_AUTH_PARTIAL", __LINE__, __FILE__);
                     ++failureCounter;
                     break;
 
@@ -552,28 +552,27 @@ int SSH_Socket::authenticate_console()
         {
             if(m_password != "")
             {
-                std::cout << "*** manual login *** " << std::endl;
+                log->xrmLog<Logging::CONSOLE_LOG>("Manual Login=", m_user_id, __LINE__, __FILE__);
                 rc = ssh_userauth_password(m_ssh_session, m_user_id.c_str(), m_password.c_str());
 
                 switch(rc)
                 {
                     case SSH_AUTH_ERROR:   //some serious error happened during authentication
-                        std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_ERROR!" << std::endl;
-                        error();
+                        log->xrmLog<Logging::ERROR_LOG>("SSH_AUTH_METHOD_PASSWORD SSH_AUTH_ERROR=", ssh_get_error(m_ssh_session), __LINE__, __FILE__);
                         return rc;
 
                     case SSH_AUTH_DENIED:  //no key matched
-                        std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_DENIED!" << std::endl;
+                        log->xrmLog<Logging::ERROR_LOG>("SSH_AUTH_METHOD_PASSWORD SSH_AUTH_DENIED", __LINE__, __FILE__);
                         ++failureCounter;
                         break;
 
                     case SSH_AUTH_SUCCESS: //you are now authenticated
-                        std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_SUCCESS!" << std::endl;
+                        log->xrmLog<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_PASSWORD SSH_AUTH_SUCCESS", __LINE__, __FILE__);
                         break;
 
                     case SSH_AUTH_PARTIAL: //some key matched but you still have to
                         // provide an other mean of authentication (like a password).
-                        std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_PARTIAL!" << std::endl;
+                        log->xrmLog<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_PASSWORD SSH_AUTH_PARTIAL", __LINE__, __FILE__);
                         ++failureCounter;
                         break;
 
@@ -588,10 +587,11 @@ int SSH_Socket::authenticate_console()
 
     if(banner)
     {
-        std::cout << banner << std::endl;
+        log->xrmLog<Logging::CONSOLE_LOG>("SSH Banner=", banner, __LINE__, __FILE__);
         ssh_string_free_char(banner);
     }
 
-    std::cout << " *** SSH Authenticate Completed." << std::endl;
+    log->xrmLog<Logging::CONSOLE_LOG>("SSH Authenticate Completed", __LINE__, __FILE__);
+
     return rc;
 }

@@ -302,13 +302,7 @@ public:
         {
             result += baseGetDefaultInputColor();
         }
-        else
-        {
-            // Testing.
-            std::cout << " *** Detected %IN in prompt string!" << std::endl;
-        }
 
-        //std::cout << "prompt: " << result << std::endl;
         baseProcessAndDeliver(result);
     }
 
@@ -332,11 +326,6 @@ public:
         if(idx == std::string::npos)
         {
             result += baseGetDefaultInputColor();
-        }
-        else
-        {
-            // Testing.
-            std::cout << " *** Detected %IN in prompt string!" << std::endl;
         }
 
         return result;
@@ -380,14 +369,7 @@ public:
         {
             result += baseGetDefaultInputColor();
         }
-        else
-        {
-            // Testing.
-            std::cout << " *** Detected %IN in prompt string!" << std::endl;
-        }
 
-
-        //std::cout << "prompt: " << result << std::endl;
         baseProcessAndDeliver(result);
     }
 
@@ -411,11 +393,6 @@ public:
         if(idx == std::string::npos)
         {
             result += baseGetDefaultInputColor();
-        }
-        else
-        {
-            // Testing.
-            std::cout << " *** Detected %IN in prompt string!" << std::endl;
         }
 
         // Add New Line.
@@ -468,7 +445,7 @@ public:
     // Checked after each stage, onEnter, Update, onExit
 };
 
-typedef std::shared_ptr<ModBase>	module_ptr;
+typedef std::shared_ptr<ModBase> module_ptr;
 
 
 #endif // MOD_BASE_HPP

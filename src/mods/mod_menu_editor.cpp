@@ -938,7 +938,6 @@ void ModMenuEditor::menuEditorMenuFieldHandler(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_MENU_FIELD_INPUT);
         changeSetupModule(MOD_DISPLAY_MENU_EDIT);
         return;

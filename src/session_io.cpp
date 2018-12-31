@@ -733,7 +733,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
         {
             case 1: // Pipe w/ 2 DIDIT Colors
             {
-//                    std::cout << "Pipe w/ 2 DIDIT Colors |00" << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("Pipe w/ 2 DIDIT Colors |00");
                 std::string result = pipeColors(my_matches.m_code);
 
                 if(result.size() != 0)
@@ -757,7 +757,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 2: // Pipe w/ 2 Chars and 4 Digits // |XY0101
             {
-//                    std::cout << "Pipe w/ 2 Chars and 4 Digits // |XY0101" << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("Pipe w/ 2 Chars and 4 Digits // |XY0101");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "       ");
             }
@@ -765,7 +765,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 3: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
             {
-//                    std::cout << "Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33" << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33");
                 std::string result = seperatePipeWithCharsDigits(my_matches.m_code);
 
                 if(result.size() != 0)
@@ -780,7 +780,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
                 // This one will need replacement in the string parsing
                 // Pass the original string becasue of |DE for delay!
             {
-//                    std::cout << "Pipe w/ 2 CHARS // |AA" << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("Pipe w/ 2 CHARS // |AA");
                 std::string result = parsePipeWithChars(my_matches.m_code);
 
                 if(result.size() != 0)
@@ -797,7 +797,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 5: // %%FILENAME.EXT  get filenames for loading from string prompts
             {
-//                    std::cout << "replacing %%FILENAME.EXT codes" << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("Replacing %%FILENAME.EXT codes");
                 std::string result = parseFilename(my_matches.m_code);
 
                 if(result.size() != 0)
@@ -814,7 +814,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 6: // Percent w/ 2 CHARS
             {
-//                    std::cout << "Percent w/ 2 CHARS" << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("Percent w/ 2 CHARS");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
             }
@@ -824,7 +824,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
             {
                 // Were just removing them becasue they are processed.
                 // Now that first part of sequence |01 etc.. are processed!
-//                    std::cout << "replacing %## codes" << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("replacing %## codes");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
             }
@@ -879,13 +879,14 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
 
             if(it != m_mapped_codes.end())
             {
-                //std::cout << "gen found: " << my_matches.m_code << " : " << it->second << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen found=", my_matches.m_code, it->second, __LINE__, __FILE__);
+
                 // If found, replace mci sequence with text
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, it->second);
             }
             else
             {
-                //std::cout << "gen not found: " << my_matches.m_code << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen not found=", my_matches.m_code, it->second, __LINE__, __FILE__);
                 std::string remove_code = "";
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, remove_code);
             }
@@ -998,7 +999,7 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
     catch(std::regex_error &ex)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("[parseToCodeMap] Exception=", ex.what(), __LINE__, __FILE__);
+        log->xrmLog<Logging::ERROR_LOG>("[parseToCodeMap] Exception=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
     return code_map;
@@ -1147,7 +1148,7 @@ bool SessionIO::checkRegex(const std::string &sequence, const std::string &expre
     catch(std::regex_error &ex)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("[checkRegex] Expression=", expression, "Exception=", ex.what(), __LINE__, __FILE__);
+        log->xrmLog<Logging::ERROR_LOG>("[checkRegex] Expression=", expression, "Exception=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
     return result;

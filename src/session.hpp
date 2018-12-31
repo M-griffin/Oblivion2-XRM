@@ -11,6 +11,7 @@
 #include "session_data.hpp"
 #include "session_io.hpp"
 #include "menu_system.hpp"
+#include "logging.hpp"
 
 #include <memory>
 #include <list>
@@ -180,10 +181,11 @@ public:
      */
     void handleWrite(const std::error_code& error, socket_handler_ptr)
     {
+        Logging *log = Logging::instance();
+
         if(error)
         {
-            std::cout << "async_write error: " << error.message() << std::endl;
-            std::cout << "Session Closed()" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Async_Write Session Closed() error=", error.message(), __LINE__, __FILE__);
         }
 
         session_manager_ptr session_manager = m_session_data->m_session_manager.lock();
@@ -199,15 +201,12 @@ public:
             {
                 try
                 {
-                    std::cout << "Leaving (NORMAL SESSION) Client IP: "
-                              //<< m_connection->m_normal_socket.remote_endpoint().address().to_string()
-                              << std::endl;
-
+                    log->xrmLog<Logging::DEBUG_LOG>("Leaving (NORMAL SESSION)", __LINE__, __FILE__);
                     m_connection->shutdown();
                 }
                 catch(std::exception &ex)
                 {
-                    std::cout << "Exception closing socket(): " << ex.what() << std::endl;
+                    log->xrmLog<Logging::ERROR_LOG>("Exception closing socket()", ex.what(), __LINE__, __FILE__);
                 }
             }
         }
@@ -226,24 +225,23 @@ public:
         , m_session_data(new SessionData(connection, session_manager, io_service, m_state_manager))
         , m_deadline_timer(deadline_timer)
     {
+        Logging *log = Logging::instance();
+
         if(m_connection->isActive())
         {
             try
             {
-                std::cout << "New Connection Session ! " << std::endl;
-                std::cout << "Client IP Address: "
-                          //<< m_connection->m_normal_socket.remote_endpoint().address().to_string()
-                          << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("New Session Accepted", __LINE__, __FILE__);
             }
             catch(std::exception &ex)
             {
-                std::cout << "Exception remote_endpoint(): " << ex.what() << std::endl;
+                log->xrmLog<Logging::ERROR_LOG>("Exception remote_endpoint()=", ex.what(), __LINE__, __FILE__);
             }
         }
 
         // Get The First available node number.
         m_session_data->m_node_number = TheCommunicator::instance()->getNodeNumber();
-        std::cout << " **** Node Number: " << m_session_data->m_node_number << std::endl;
+        log->xrmLog<Logging::CONSOLE_LOG>("New Session ConnectionNode Number=", m_session_data->m_node_number);
     }
 
     connection_ptr	    m_connection;
