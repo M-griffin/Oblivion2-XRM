@@ -46,6 +46,8 @@
       <File Name="../src/data-sys/config_dao.hpp"/>
       <File Name="../src/data-sys/menu_prompt_dao.cpp"/>
       <File Name="../src/data-sys/menu_prompt_dao.hpp"/>
+      <File Name="../src/data-sys/text_prompts_dao.cpp"/>
+      <File Name="../src/data-sys/text_prompts_dao.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="model-sys">
       <File Name="../src/model-sys/config.hpp"/>
@@ -57,6 +59,11 @@
       <File Name="../src/compat/menu_compat_dao.hpp"/>
       <File Name="../src/compat/prompts_compat_dao.hpp"/>
     </VirtualDirectory>
+    <File Name="../src/communicator.cpp"/>
+    <File Name="../src/communicator.hpp"/>
+    <File Name="../src/encoding.cpp"/>
+    <File Name="../src/encoding.hpp"/>
+    <File Name="../src/logging.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

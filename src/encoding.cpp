@@ -153,7 +153,7 @@ std::wstring Encoding::multibyte_to_wide(const char* mbstr)
         log->xrmLog<Logging::ERROR_LOG>("UCS multibyte_to_wide", e.what(), __LINE__, __FILE__);
     }
 
-    return ucs2;
+    return ucs;
 }
 
 /**
