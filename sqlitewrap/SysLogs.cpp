@@ -31,20 +31,14 @@ SysLog::~SysLog()
 
 void SysLog::databaseError(Database& db,const std::string& str)
 {
-    if (!db.isConnected())
-    {
-        std::cout << "Database Not Connected!" << std::endl;
-    }
-    syslog(LOG_ERR, "%s", str.c_str());
+    if(!db.isConnected())
+        syslog(LOG_ERR, "%s", str.c_str());
 }
 
 void SysLog::databaseError(Database& db,Query& q,const std::string& str)
 {
-    if (!db.isConnected())
-    {
-        std::cout << "Database Not Connected!" << std::endl;
-    }
-    syslog(LOG_ERR, "QUERY: \"%s\" : %s", q.getLastQuery().c_str(), str.c_str());
+    if(!db.isConnected())
+        syslog(LOG_ERR, "QUERY: \"%s\" : %s", q.getLastQuery().c_str(), str.c_str());
 }
 
 } // namespace SQLW

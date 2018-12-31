@@ -1,6 +1,7 @@
 #include "file_area_dao.hpp"
 
 #include "../model-sys/file_area.hpp"
+#include "../logging.hpp"
 
 #include "libSqliteWrapped.h"
 #include <sqlite3.h>
@@ -13,8 +14,8 @@
  * Base Dao Calls for generic Object Data Calls
  * (Below This Point)
  */
- 
- 
+
+
 /**
  * @brief Check If Database Table Exists.
  * @return
@@ -83,8 +84,8 @@ bool FileAreaDao::deleteRecord(long id)
 /**
  * @brief Retrieve Record By Id.
  * @param id
- * @return 
- */ 
+ * @return
+ */
 file_area_ptr FileAreaDao::getRecordById(long id)
 {
     return baseGetRecordById(id);
@@ -114,14 +115,14 @@ long FileAreaDao::getRecordsCount()
  */
 
 /**
- * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+ * @brief (CallBack) Pulls results by FieldNames into their Class Variables.
  * @param qry
  * @param obj
  */
 void FileAreaDao::pullFileAreaResult(query_ptr qry, file_area_ptr obj)
 {
     qry->getFieldByName("iId", obj->iId);
-    qry->getFieldByName("sName", obj->sName);    
+    qry->getFieldByName("sName", obj->sName);
     qry->getFieldByName("sAcsAccess", obj->sAcsAccess);
     qry->getFieldByName("sAcsUpload", obj->sAcsUpload);
     qry->getFieldByName("sAcsDownload", obj->sAcsDownload);
@@ -132,7 +133,7 @@ void FileAreaDao::pullFileAreaResult(query_ptr qry, file_area_ptr obj)
     qry->getFieldByName("sSort", obj->sSort);
     qry->getFieldByName("iMultiplier", obj->iMultiplier);
     qry->getFieldByName("bFreeArea", obj->bFreeArea);
-    qry->getFieldByName("iSortOrder", obj->iSortOrder);    
+    qry->getFieldByName("iSortOrder", obj->iSortOrder);
 }
 
 /**
@@ -140,9 +141,9 @@ void FileAreaDao::pullFileAreaResult(query_ptr qry, file_area_ptr obj)
  * @param qry
  * @param obj
  * @param values
- */ 
-void FileAreaDao::fillFileAreaColumnValues(query_ptr qry, file_area_ptr obj, 
-    std::vector< std::pair<std::string, std::string> > &values)
+ */
+void FileAreaDao::fillFileAreaColumnValues(query_ptr qry, file_area_ptr obj,
+        std::vector< std::pair<std::string, std::string> > &values)
 {
     // values.push_back(qry->translateFieldName("iId", conf->iId));
     values.push_back(qry->translateFieldName("sName", obj->sName));
@@ -160,56 +161,56 @@ void FileAreaDao::fillFileAreaColumnValues(query_ptr qry, file_area_ptr obj,
 }
 
 /**
- * @brief (Callback) Create Record Insert Statement, returns query string 
+ * @brief (Callback) Create Record Insert Statement, returns query string
  * @param qry
  * @param obj
- * @return 
+ * @return
  */
 std::string FileAreaDao::insertFileAreaQryString(std::string qry, file_area_ptr obj)
 {
     // Mprint statement to avoid injections.
     std::string result = sqlite3_mprintf(qry.c_str(),
-        obj->sName.c_str(),
-        obj->sAcsAccess.c_str(),
-        obj->sAcsUpload.c_str(),
-        obj->sAcsDownload.c_str(),
-        obj->sAcsList.c_str(),
-        obj->sSponsor.c_str(),
-        obj->iSecurityIndex,
-        obj->sLinkname.c_str(),
-        obj->sSort.c_str(),
-        obj->iMultiplier,
-        obj->bFreeArea,
-        obj->iSortOrder
-    );
+                                         obj->sName.c_str(),
+                                         obj->sAcsAccess.c_str(),
+                                         obj->sAcsUpload.c_str(),
+                                         obj->sAcsDownload.c_str(),
+                                         obj->sAcsList.c_str(),
+                                         obj->sSponsor.c_str(),
+                                         obj->iSecurityIndex,
+                                         obj->sLinkname.c_str(),
+                                         obj->sSort.c_str(),
+                                         obj->iMultiplier,
+                                         obj->bFreeArea,
+                                         obj->iSortOrder
+                                        );
 
     return result;
 }
 
 /**
- * @brief (CallBack) Update Existing Record. 
+ * @brief (CallBack) Update Existing Record.
  * @param qry
  * @param obj
- * @return 
+ * @return
  */
 std::string FileAreaDao::updateFileAreaQryString(std::string qry, file_area_ptr obj)
-{    
+{
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),        
-        obj->sName.c_str(),
-        obj->sAcsAccess.c_str(),
-        obj->sAcsUpload.c_str(),
-        obj->sAcsDownload.c_str(),
-        obj->sAcsList.c_str(),
-        obj->sSponsor.c_str(),
-        obj->iSecurityIndex,
-        obj->sLinkname.c_str(),
-        obj->sSort.c_str(),
-        obj->iMultiplier,
-        obj->bFreeArea,
-        obj->iSortOrder,
-        obj->iId
-    );
+    std::string result = sqlite3_mprintf(qry.c_str(),
+                                         obj->sName.c_str(),
+                                         obj->sAcsAccess.c_str(),
+                                         obj->sAcsUpload.c_str(),
+                                         obj->sAcsDownload.c_str(),
+                                         obj->sAcsList.c_str(),
+                                         obj->sSponsor.c_str(),
+                                         obj->iSecurityIndex,
+                                         obj->sLinkname.c_str(),
+                                         obj->sSort.c_str(),
+                                         obj->iMultiplier,
+                                         obj->bFreeArea,
+                                         obj->iSortOrder,
+                                         obj->iId
+                                        );
 
     return result;
 }
@@ -219,30 +220,32 @@ std::string FileAreaDao::updateFileAreaQryString(std::string qry, file_area_ptr 
  * One Off Methods SQL Queries not included in the BaseDao
  * (Below This Point)
  */
- 
- 
+
+
 /**
  * @brief Return List of All FileArea by ConferenceId
  * @param areas
  * @return
- */ 
+ */
 std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(long id)
 {
+    Logging *log = Logging::instance();
     file_area_ptr area(new FileArea);
     std::vector<file_area_ptr> list;
 
     // Make Sure Database Reference is Connected
-    if (!m_database.isConnected())
+    if(!m_database.isConnected())
     {
-        std::cout << "Error, Database is not connected!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
     // Create Pointer and Connect Query Object to Database.
     query_ptr qry(new SQLW::Query(m_database));
-    if (!qry->isConnected())
+
+    if(!qry->isConnected())
     {
-        std::cout << "Error, Query has no connection to the database" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -250,10 +253,11 @@ std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(long id)
     std::string queryString = sqlite3_mprintf("SELECT a.* FROM %Q a, Grouping g WHERE g.iConferenceId = %ld AND a.iID = g.iFileAreaId;", m_strTableName.c_str(), id);
 
     // Execute Query.
-    if (qry->getResult(queryString))
+    if(qry->getResult(queryString))
     {
         long rows = qry->getNumRows();
-        if (rows > 0)
+
+        if(rows > 0)
         {
             while(qry->fetchRow())
             {
@@ -264,12 +268,12 @@ std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(long id)
         }
         else
         {
-            std::cout << "Error, getAllFileAreasByConference Returned Rows: " << rows << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Error, getAllFileAreasByConference Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        std::cout << "Error, getResult()" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return list;

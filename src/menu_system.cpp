@@ -7,6 +7,7 @@
 #include "mods/mod_user_editor.hpp"
 #include "mods/mod_level_editor.hpp"
 #include "mods/mod_message_editor.hpp"
+#include "logging.hpp"
 
 #include <locale>
 #include <string>
@@ -20,8 +21,6 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     : StateBase(session_data)
     , MenuBase(session_data)
 {
-    std::cout << "MenuSystem" << std::endl;
-
     // [Vector] Setup std::function array with available options to pass input to.
     m_menu_functions.push_back(std::bind(&MenuBase::menuInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuBase::menuYesNoBarInput, this, std::placeholders::_1, std::placeholders::_2));
@@ -53,13 +52,10 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
     m_menu_command_functions['T'] = std::bind(&MenuSystem::menuOptionsFileBaseSponsorCommands, this, std::placeholders::_1);
     m_menu_command_functions['V'] = std::bind(&MenuSystem::menuOptionsVotingCommands, this, std::placeholders::_1);
     m_menu_command_functions['+'] = std::bind(&MenuSystem::menuOptionsColorSettingCommands, this, std::placeholders::_1);
-
 }
 
 MenuSystem::~MenuSystem()
 {
-    std::cout << "~MenuSystem" << std::endl;
-
     // Clear All Menu Command Functions.
     MappedCommandFunctions().swap(m_menu_command_functions);
 }
@@ -85,8 +81,6 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
  */
 bool MenuSystem::onEnter()
 {
-    std::cout << "OnEnter() MenuSystem" << std::endl;
-
     // Startup the Prelogon sequence
     startupModulePreLogon();
     m_is_active = true;
@@ -99,7 +93,6 @@ bool MenuSystem::onEnter()
  */
 bool MenuSystem::onExit()
 {
-    std::cout << "OnExit() MenuSystem\n";
     m_is_active = false;
     return true;
 }
@@ -110,14 +103,11 @@ bool MenuSystem::onExit()
  */
 bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
 {
+    Logging *log = Logging::instance();
+
     // Some of these options set actual flags for behavior.
     // In this case, we will need to parse for specific Control commands
     // and set Menu System Flags!
-
-    // Create system default locale
-    std::locale::global(std::locale(""));
-    std::cout.imbue(std::locale());
-
     switch(option.command_key[1])
     {
         // Turns on Pulldown Menu Re-entrance
@@ -279,12 +269,13 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             if(m_system_fallback.size() > 0)
             {
                 m_current_menu = m_system_fallback.back();
-                std::cout << "FallBack reset to current: " << m_current_menu << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("FallBack reset to current=", m_current_menu);
+
                 m_system_fallback.pop_back();
             }
             else
             {
-                std::cout << "FallBack reset to menu_fall_back: " << m_menu_info->menu_fall_back << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("FallBack reset to menu_fall_back=", m_menu_info->menu_fall_back);
                 m_current_menu = m_menu_info->menu_fall_back;
             }
 
@@ -299,7 +290,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
                 m_starting_menu = m_current_menu;
             }
 
-            std::cout << "Set Fallback Starting Menu: " << m_starting_menu << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("Set Fallback Starting Menu=", m_starting_menu);
             m_system_fallback.push_back(m_starting_menu);
             m_current_menu = lower_case(option.command_string);
             loadAndStartupMenu();
@@ -435,6 +426,8 @@ bool MenuSystem::menuOptionsMultiNodeCommands(const MenuOption &option)
  */
 bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
 {
+    Logging *log = Logging::instance();
+
     switch(option.command_key[1])
     {
         // Logon
@@ -443,7 +436,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
         //: USERLOG.X, and SYSPASS.X will be displayed.
         // { Note: add 0 for random! }
         case 'S':
-            std::cout << "Executing startupModuleLogon()" << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("Executing startupModuleLogon()");
             startupModuleLogon();
             break;
 
@@ -459,7 +452,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
 
         // Apply
         case 'A':
-            std::cout << "Executing startupModuleSignup();" << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("Executing startupModuleSignup()");
             startupModuleSignup();
             return true;
 
@@ -467,7 +460,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
         case 'C':
         {
             // Testing processes
-
+            log->xrmLog<Logging::DEBUG_LOG>("Executing startupModuleMessageEditor()");
             startupModuleMessageEditor();
             return true;
             /*
@@ -492,7 +485,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
 
         // Logoff
         case 'G':
-            std::cout << "Goodbye;" << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("User Logoff()");
             // Base Class
             m_logoff = true;
             m_session_data->logoff();
@@ -530,6 +523,8 @@ bool MenuSystem::menuOptionsGlobalNewScanCommands(const MenuOption &option)
  */
 bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
 {
+    Logging *log = Logging::instance();
+
     switch(option.command_key[1])
     {
         // autosig
@@ -548,9 +543,9 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
         case 'F':
             return false;
 
-        // Logsoff
+        // Logoff
         case 'G':
-            std::cout << "Goodbye;" << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("Logoff()");
             // Add Logoff ANSI Display here.
             // Base Class
             m_logoff = true;
@@ -559,7 +554,7 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
 
         // logoff without ansi
         case 'H':
-            std::cout << "Goodbye;" << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("Logoff() Without ANSI");
             // Base Class
             m_logoff = true;
             m_session_data->logoff();
@@ -637,20 +632,22 @@ bool MenuSystem::menuOptionsDoorCommands(const MenuOption &option)
  */
 bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option)
 {
+    Logging *log = Logging::instance();
+
     switch(option.command_key[1])
     {
         case '#':  // Menu Editor
-            std::cout << "Executing startupModuleMenuEditor();" << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("Executing startupModuleMenuEditor()");
             startupModuleMenuEditor();
             break;
 
         case 'U': // User Editor
-            std::cout << "Executing startupModuleUserEditor();" << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("Executing startupModuleUserEditor()");
             startupModuleUserEditor();
             break;
 
         case 'Y': // Level Editor
-            std::cout << "Executing startupModuleLevelEditor();" << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("Executing startupModuleLevelEditor()");
             startupModuleLevelEditor();
             break;
 
@@ -906,7 +903,8 @@ void MenuSystem::resetMenuInputIndex(int index)
  */
 void MenuSystem::startupExternalProcess(const std::string &cmdline)
 {
-    std::cout << "MenuSystem Starting Process" << std::endl;
+    Logging *log = Logging::instance();
+    log->xrmLog<Logging::CONSOLE_LOG>("Executing startExternalProcess()=", cmdline);
     m_menu_session_data->startExternalProcess(cmdline);
 }
 
@@ -960,8 +958,9 @@ void MenuSystem::startupModulePreLogon()
 
     if(!module)
     {
-        std::cout << "ModPreLogon Allocation Error!" << std::endl;
-        assert(false);
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("startupModulePreLogon Allocation Error");
+        return;
     }
 
     startupModule(module);
@@ -980,8 +979,9 @@ void MenuSystem::startupModuleLogon()
 
     if(!module)
     {
-        std::cout << "ModLogon Allocation Error!" << std::endl;
-        assert(false);
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("startupModuleLogon Allocation Error");
+        return;
     }
 
     startupModule(module);
@@ -1000,8 +1000,9 @@ void MenuSystem::startupModuleSignup()
 
     if(!module)
     {
-        std::cout << "ModSignup Allocation Error!" << std::endl;
-        assert(false);
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("startupModuleSignup Allocation Error");
+        return;
     }
 
     startupModule(module);
@@ -1020,8 +1021,9 @@ void MenuSystem::startupModuleMenuEditor()
 
     if(!module)
     {
-        std::cout << "ModMenuEditor Allocation Error!" << std::endl;
-        assert(false);
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("startupModuleMenuEditor Allocation Error");
+        return;
     }
 
     startupModule(module);
@@ -1040,8 +1042,9 @@ void MenuSystem::startupModuleUserEditor()
 
     if(!module)
     {
-        std::cout << "ModUserEditor Allocation Error!" << std::endl;
-        assert(false);
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("startupModuleUserEditor Allocation Error");
+        return;
     }
 
     startupModule(module);
@@ -1060,8 +1063,9 @@ void MenuSystem::startupModuleLevelEditor()
 
     if(!module)
     {
-        std::cout << "ModLevelEditor Allocation Error!" << std::endl;
-        assert(false);
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("startupModuleLevelEditor Allocation Error");
+        return;
     }
 
     startupModule(module);
@@ -1080,8 +1084,9 @@ void MenuSystem::startupModuleMessageEditor()
 
     if(!module)
     {
-        std::cout << "ModMessageEditor Allocation Error!" << std::endl;
-        assert(false);
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("startupModuleMessageEditor Allocation Error");
+        return;
     }
 
     startupModule(module);
@@ -1095,6 +1100,8 @@ void MenuSystem::startupModuleMessageEditor()
  */
 void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8)
 {
+    Logging *log = Logging::instance();
+
     // Make sure we have an allocated module before processing.
     if(m_module_stack.size() == 0 || character_buffer.size() == 0)
     {
@@ -1112,14 +1119,14 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
         // Check if the current user has been logged in yet.
         if(!m_session_data->m_is_session_authorized)
         {
-            std::cout << " *** !m_is_session_authorized" << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("!m_is_session_authorized");
             m_current_menu = "matrix";
         }
         else
         {
             // If Authorized, then we want to move to main! Startup menu should be TOP or
             // Specified in Config file!  TODO
-            std::cout << " *** m_is_session_authorized: " << m_config->starting_menu_name << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("m_is_session_authorized");
 
             if(m_config->starting_menu_name.size() > 0)
             {
@@ -1144,7 +1151,6 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
  */
 void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8)
 {
-    std::cout << " *** modulePreLogonInput" << std::endl;
     handleLoginInputSystem(character_buffer, is_utf8);
 }
 
@@ -1154,7 +1160,6 @@ void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const 
  */
 void MenuSystem::moduleLogonInput(const std::string &character_buffer, const bool &is_utf8)
 {
-    std::cout << " *** modulePreLogonInput" << std::endl;
     handleLoginInputSystem(character_buffer, is_utf8);
 }
 
@@ -1164,8 +1169,6 @@ void MenuSystem::moduleLogonInput(const std::string &character_buffer, const boo
  */
 void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is_utf8)
 {
-    std::cout << " *** moduleInput" << std::endl;
-
     // Make sure we have an allocated module before processing.
     if(m_module_stack.size() == 0 || character_buffer.size() == 0)
     {

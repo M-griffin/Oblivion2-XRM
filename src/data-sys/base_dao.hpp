@@ -1,6 +1,8 @@
 #ifndef BASE_DAO_HPP
 #define BASE_DAO_HPP
 
+#include "logging.hpp"
+
 #define WIN32_LEAN_AND_MEAN
 #include "libSqliteWrapped.h"
 #include <sqlite3.h>
@@ -54,9 +56,9 @@ public:
     std::string m_cmdDropIndex;
 
     // Dynamic Callbacks to Calling Class for Specific Object Mappings
-    std::function<void(query_ptr qry, std::shared_ptr<T> obj)>          m_result_callback;
+    std::function<void(query_ptr qry, std::shared_ptr<T> obj)> m_result_callback;
     std::function<void(query_ptr qry, std::shared_ptr<T> obj,
-                       std::vector< std::pair<std::string, std::string> > &values)>      m_columns_callback;
+                       std::vector< std::pair<std::string, std::string> > &values)> m_columns_callback;
 
     std::function<std::string(std::string qry, std::shared_ptr<T> obj)> m_insert_callback;
     std::function<std::string(std::string qry, std::shared_ptr<T> obj)> m_update_callback;
@@ -69,11 +71,12 @@ public:
     bool baseDoesTableExist()
     {
         bool result = false;
+        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            std::cout << "Error, Database is not connected!" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -82,7 +85,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            std::cout << "Error, Query has no connection to the database" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -93,18 +96,18 @@ public:
 
             if(rows > 0)
             {
-                std::cout << m_strTableName << " Table Exists!" << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>(m_strTableName, "Table Exists!", __LINE__, __FILE__);
                 result = true;
             }
             else
             {
                 // No rows means the table doesn't exist!
-                std::cout << "Error, " << m_strTableName << " table Exists Returned Rows: " << rows << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>(m_strTableName, "table doesn't exist returned rows", rows, __LINE__, __FILE__);
             }
         }
         else
         {
-            std::cout << "Error, " << m_strTableName << " getResult()" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "baseDoesTableExist getResult()", __LINE__, __FILE__);
         }
 
         return result;
@@ -116,11 +119,12 @@ public:
     bool baseFirstTimeSetupParams()
     {
         bool result = false;
+        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            std::cout << "Error, Database is not connected!" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -129,7 +133,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            std::cout << "Error, Query has no connection to the database" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -144,11 +148,12 @@ public:
     bool baseCreateTable()
     {
         bool result = false;
+        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            std::cout << "Error, Database is not connected!" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -157,7 +162,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            std::cout << "Error, Query has no connection to the database" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -181,11 +186,12 @@ public:
     bool baseDropTable()
     {
         bool result = false;
+        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            std::cout << "Error, Database is not connected!" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -194,7 +200,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            std::cout << "Error, Query has no connection to the database" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -336,11 +342,12 @@ public:
     bool baseUpdateRecord(std::shared_ptr<T> obj)
     {
         bool result = false;
+        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            std::cout << "Error, Database is not connected!" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -349,7 +356,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            std::cout << "Error, Query has no connection to the database" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -373,11 +380,12 @@ public:
     {
         bool result = false;
         long lastInsertId = -1;
+        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            std::cout << "Error, Database is not connected!" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -386,7 +394,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            std::cout << "Error, Query has no connection to the database" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -415,11 +423,12 @@ public:
     bool baseDeleteRecord(long id)
     {
         bool result = false;
+        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            std::cout << "Error, Database is not connected!" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -428,7 +437,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            std::cout << "Error, Query has no connection to the database" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -451,11 +460,12 @@ public:
     std::shared_ptr<T> baseGetRecordById(long id)
     {
         std::shared_ptr<T> obj(new T);
+        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            std::cout << "Error, Database is not connected!" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return obj;
         }
 
@@ -464,7 +474,7 @@ public:
 
         if(!qry->isConnected())
         {
-            std::cout << "Error, Query has no connection to the database" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return obj;
         }
 
@@ -483,12 +493,12 @@ public:
             }
             else
             {
-                std::cout << "Error, getRecordById Returned Rows: " << rows << std::endl;
+                log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, getRecordById Returned Rows", rows, __LINE__, __FILE__);
             }
         }
         else
         {
-            std::cout << "Error, getResult()" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, getRecordById getResult()", __LINE__, __FILE__);
         }
 
         return obj;
@@ -502,11 +512,12 @@ public:
     {
         std::shared_ptr<T> obj(new T);
         std::vector<std::shared_ptr<T>> list;
+        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            std::cout << "Error, Database is not connected!" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return list;
         }
 
@@ -515,7 +526,7 @@ public:
 
         if(!qry->isConnected())
         {
-            std::cout << "Error, Query has no connection to the database" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return list;
         }
 
@@ -538,12 +549,12 @@ public:
             }
             else
             {
-                std::cout << "Error, getAllOnelinerss Returned Rows: " << rows << std::endl;
+                log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetAllRecords Returned Rows", rows, __LINE__, __FILE__);
             }
         }
         else
         {
-            std::cout << "Error, getResult()" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetAllRecords getResult()", __LINE__, __FILE__);
         }
 
         return list;
@@ -557,11 +568,12 @@ public:
     {
         std::shared_ptr<T> obj(new T);
         std::vector<std::shared_ptr<T>> list;
+        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            std::cout << "Error, Database is not connected!" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return list.size();
         }
 
@@ -570,7 +582,7 @@ public:
 
         if(!qry->isConnected())
         {
-            std::cout << "Error, Query has no connection to the database" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return list.size();
         }
 
@@ -593,12 +605,12 @@ public:
             }
             else
             {
-                std::cout << "Error, getAllOnelinerss Returned Rows: " << rows << std::endl;
+                log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetRecordsCount Returned Rows", rows, __LINE__, __FILE__);
             }
         }
         else
         {
-            std::cout << "Error, getResult()" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetRecordsCount getResult()", __LINE__, __FILE__);
         }
 
         return list.size();

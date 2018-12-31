@@ -23,15 +23,13 @@ public:
     AsyncAcceptor(IOService& io_service, socket_handler_ptr socket_handler)
         : AsyncBase(io_service, socket_handler)
     {
-        std::cout << "AsyncAcceptor Created" << std::endl;
     }
 
     ~AsyncAcceptor()
     {
-        std::cout << "~AsyncAcceptor" << std::endl;
     }
-    
-       
+
+
     /**
      * @brief Async Listener Callback for IOService Work
      * @param StringSequence - Host:Port
@@ -45,25 +43,25 @@ public:
         // nullptr can't be passed as reference for vector
         std::vector<unsigned char> place_holder;
         std::string string_place_holder;
-        
+
         int service_type = SERVICE_TYPE_NONE;
 
         if(protocol == "TELNET")
         {
             service_type = SERVICE_TYPE_LISTENER_TELNET;
         }
-        else if (protocol == "SSH")
+        else if(protocol == "SSH")
         {
             service_type = SERVICE_TYPE_LISTENER_SSH;
         }
-        else if (protocol == "IRC")
+        else if(protocol == "IRC")
         {
             service_type = SERVICE_TYPE_LISTENER_IRC;
         }
 
         m_io_service.addAsyncJob(place_holder, string_place_holder, m_socket_handler, callback, service_type);
     }
-    
+
 };
 
 typedef std::shared_ptr<AsyncAcceptor> acceptor_ptr;

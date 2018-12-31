@@ -3,6 +3,8 @@
 
 #include "../model-sys/structures.hpp"
 #include "../model-sys/struct_compat.hpp"
+#include "../logging.hpp"
+
 #include <string>
 
 /**
@@ -15,7 +17,7 @@
 class PromptDao
 {
 public:
-    
+
     explicit PromptDao()
     { }
 
@@ -57,22 +59,27 @@ public:
 
         int x = 0;
         FILE *stream = fopen(path.c_str(), "rb+");
+
         if(stream == nullptr)
         {
             // Create File if it doesn't exist.
             stream = fopen(path.c_str(), "wb");
+
             if(stream == nullptr)
             {
-                std::cout << "Error writing " << filename << std::endl;
+                Logging *log = Logging::instance();
+                log->xrmLog<Logging::ERROR_LOG>("Error writing file=", filename, __FILE__, __LINE__);
                 return x;
             }
         }
+
         if(fseek(stream, (int)idx * sizeof(T), SEEK_SET) == 0)
             x = fwrite(t, sizeof(T), 1, stream);
+
         fclose(stream);
         return x;
     }
-    
+
     /**
      * @brief Reading Binary Data Records from Disk.
      * @param t
@@ -90,61 +97,32 @@ public:
 
         int x = 0;
         FILE *stream = fopen(path.c_str(), "rb+");
+
         if(stream == nullptr)
         {
             // Create File if it doesn't exist.
-            std::cout << "Error Reading, Re-creating file. " << filename << std::endl;
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error Reading/creating file=", filename, __FILE__, __LINE__);
             stream = fopen(path.c_str(), "wb");
+
             if(stream == nullptr)
             {
-                std::cout << "Error Reading " << filename << std::endl;
+                log->xrmLog<Logging::ERROR_LOG>("Error Reading file=", filename, __FILE__, __LINE__);
                 return x;
             }
         }
+
         fclose(stream);
 
         stream = fopen(path.c_str(), "rb");
+
         if(fseek(stream, (int)idx * sizeof(T), SEEK_SET) == 0)
             x = fread(t, sizeof(T), 1, stream);
+
         fclose(stream);
         return x;
     }
 
-    /*
-    void exportToXML()
-    {
-        // Testing!
-        TextPrompt tp;
-        PromptDao  prompt;
-        CommonIO   common_io;
-
-        //m_session_data->deliver(m_session_io.pipe2ansi("|CS|07"));
-        std::string filename = "PROMPTS.DAT";
-
-
-        // Loop each Option after Reading the Menu.
-        int u = 0;
-
-        std::string path = GLOBAL_DATA_PATH;
-        path.append("\\");
-        path.append("prompts.xml");
-        std::ofstream ofs(path);
-
-        while(prompt.recordRead(&tp, filename, u++))
-        {
-            // Convert Pascal to C Strings.
-            common_io.PascalToCString(tp.Desc);
-            common_io.PascalToCString(tp.Prompt);
-
-            ofs << "<prompt>" << std::endl;
-            ofs << "<id>" << u << "</id>" << std::endl;
-            ofs << "<description>" << tp.Desc << "</description>" << std::endl;
-            ofs << "<text>" << tp.Prompt << "</text>" << std::endl;
-            ofs << "</prompt>" << std::endl;
-            //if (u == 25) break;
-        }
-        ofs.close();
-    }*/
 };
 
 #endif // PROMPT_DAO_HPP

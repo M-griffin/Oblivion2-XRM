@@ -32,7 +32,6 @@ public:
     {
         if(!m_global_instance)
         {
-            std::cout << "Communicator" << std::endl;
             m_global_instance = new Communicator();
             return m_global_instance;
         }
@@ -47,7 +46,6 @@ public:
     {
         if(m_global_instance)
         {
-            std::cout << "~Communicator" << std::endl;
             delete m_global_instance;
             m_global_instance = nullptr;
         }
@@ -177,7 +175,7 @@ public:
 
         // Create Mapping to pass for file creation (default values)
         M_TextPrompt value;
-        value[GLOBAL_PROMPT_PAUSE]            = std::make_pair("Displayed for Pause Prompts", "|03Hit any Key |08-- |03OBV/2 XRM");
+        value[GLOBAL_PROMPT_PAUSE] = std::make_pair("Displayed for Pause Prompts", "|03Hit any Key |08-- |03OBV/2 XRM");
 
         m_text_prompts_dao->writeValue(value);
     }
@@ -215,6 +213,7 @@ private:
     text_prompts_dao_ptr   m_text_prompts_dao;
     bool                   m_is_text_prompt_exist;
     bool                   m_active;
+    config_ptr             m_config;
 
     mutable std::mutex     m_node_mutex;
     mutable std::mutex     m_data_mutex;
@@ -224,7 +223,7 @@ private:
     std::vector<int>       m_node_array;
     static Communicator*   m_global_instance;
     CommonIO               m_common_io;
-    config_ptr             m_config;
+
 
     explicit Communicator();
     ~Communicator();

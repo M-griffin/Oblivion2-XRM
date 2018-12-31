@@ -1,14 +1,16 @@
 #include "config_dao.hpp"
 #include "../model-sys/config.hpp"
 
-#include <iostream>
+// NOTE can't use logging here, circular dependency on communicator.
+//#include "logging.hpp"
+
 #include <fstream>
 #include <string>
 #include <mutex>
 #include <cassert>
 
 // Setup the file version for the config file.
-const std::string Config::FILE_VERSION = "1.0.3";
+const std::string Config::FILE_VERSION = "1.0.4";
 
 
 ConfigDao::ConfigDao(config_ptr config, std::string path)
@@ -16,12 +18,10 @@ ConfigDao::ConfigDao(config_ptr config, std::string path)
     , m_path(path)
     , m_filename("xrm_config.yaml")
 {
-    std::cout << "ConfigDAO" << std::endl;
 }
 
 ConfigDao::~ConfigDao()
 {
-    std::cout << "~ConfigDAO" << std::endl;
 }
 
 
@@ -35,10 +35,12 @@ bool ConfigDao::fileExists()
     path.append(m_filename);
 
     std::ifstream ifs(path);
-    if (!ifs.is_open())
+
+    if(!ifs.is_open())
     {
         return false;
     }
+
     ifs.close();
     return true;
 }
@@ -60,7 +62,7 @@ bool ConfigDao::saveConfig(config_ptr cfg)
     out << YAML::Flow;
 
     // Start Creating the Key/Value Output for the Config File.
-    
+
     out << YAML::Key << "file_version" << YAML::Value << cfg->file_version;
     out << YAML::Key << "bbs_name_sysop" << YAML::Value << cfg->bbs_name_sysop;
     out << YAML::Key << "bbs_name" << YAML::Value << cfg->bbs_name;
@@ -107,7 +109,7 @@ bool ConfigDao::saveConfig(config_ptr cfg)
     out << YAML::Key << "use_screen_welcome" << YAML::Value << cfg->use_screen_welcome;
     out << YAML::Key << "use_matrix_login" << YAML::Value << cfg->use_matrix_login;
     out << YAML::Key << "use_newuser_password" << YAML::Value << cfg->use_newuser_password;
-    out << YAML::Key << "use_disclaimer" << YAML::Value << cfg->use_disclaimer;        
+    out << YAML::Key << "use_disclaimer" << YAML::Value << cfg->use_disclaimer;
     out << YAML::Key << "use_address" << YAML::Value << cfg->use_address;
     out << YAML::Key << "use_handle" << YAML::Value << cfg->use_handle;
     out << YAML::Key << "use_real_name" << YAML::Value << cfg->use_real_name;
@@ -122,7 +124,7 @@ bool ConfigDao::saveConfig(config_ptr cfg)
     out << YAML::Key << "use_pause" << YAML::Value << cfg->use_pause;
     out << YAML::Key << "use_clear_screen" << YAML::Value << cfg->use_clear_screen;
     out << YAML::Key << "use_ansi_color" << YAML::Value << cfg->use_ansi_color;
-    out << YAML::Key << "use_backspace" << YAML::Value << cfg->use_backspace;        
+    out << YAML::Key << "use_backspace" << YAML::Value << cfg->use_backspace;
     out << YAML::Key << "hidden_input_character" << YAML::Value << cfg->hidden_input_character;
     out << YAML::Key << "use_auto_validate_users" << YAML::Value << cfg->use_auto_validate_users;
     out << YAML::Key << "use_newuser_voting" << YAML::Value << cfg->use_newuser_voting;
@@ -160,7 +162,7 @@ bool ConfigDao::saveConfig(config_ptr cfg)
     out << YAML::Key << "filename_bbs_ad" << YAML::Value << cfg->filename_bbs_ad;
     out << YAML::Key << "filename_archive_comments" << YAML::Value << cfg->filename_archive_comments;
     out << YAML::Key << "directory_bad_files" << YAML::Value << cfg->directory_bad_files;
-    out << YAML::Key << "use_greater_then_for_quotes" << YAML::Value << cfg->use_greater_then_for_quotes;    
+    out << YAML::Key << "use_greater_then_for_quotes" << YAML::Value << cfg->use_greater_then_for_quotes;
     out << YAML::Key << "regexp_generic_validation" << YAML::Value << cfg->regexp_generic_validation;
     out << YAML::Key << "regexp_generic_validation_msg" << YAML::Value << cfg->regexp_generic_validation_msg;
     out << YAML::Key << "regexp_handle_validation" << YAML::Value << cfg->regexp_handle_validation;
@@ -169,17 +171,19 @@ bool ConfigDao::saveConfig(config_ptr cfg)
     out << YAML::Key << "regexp_password_validation_msg" << YAML::Value << cfg->regexp_password_validation_msg;
     out << YAML::Key << "regexp_date_validation" << YAML::Value << cfg->regexp_date_validation;
     out << YAML::Key << "regexp_date_validation_msg" << YAML::Value << cfg->regexp_date_validation_msg;
-    out << YAML::Key << "regexp_email_validation" << YAML::Value << cfg->regexp_email_validation;    
+    out << YAML::Key << "regexp_email_validation" << YAML::Value << cfg->regexp_email_validation;
     out << YAML::Key << "regexp_email_validation_msg" << YAML::Value << cfg->regexp_email_validation_msg;
-    
+    out << YAML::Key << "logging_level" << YAML::Value << cfg->logging_level;
+
     out << YAML::EndMap;
 
 
     // Setup file to Write out File.
     std::ofstream ofs(path);
-    if (!ofs.is_open())
+
+    if(!ofs.is_open())
     {
-        std::cout << "Error, unable to write to: " << path << std::endl;
+        std::cout << "Error, unable to write to" << path << std::endl;
         return false;
     }
 
@@ -197,7 +201,7 @@ bool ConfigDao::saveConfig(config_ptr cfg)
  * @return
  */
 void ConfigDao::encode(const Config &rhs)
-{      
+{
     m_config->file_version = rhs.file_version;
     m_config->bbs_name_sysop = rhs.bbs_name_sysop;
     m_config->bbs_name = rhs.bbs_name;
@@ -231,7 +235,7 @@ void ConfigDao::encode(const Config &rhs)
     m_config->access_hidden_files = rhs.access_hidden_files;
     m_config->access_mail_attachment = rhs.access_mail_attachment;
     m_config->access_top_ten = rhs.access_top_ten;
-    m_config->access_check_sysop_avail = rhs.access_check_sysop_avail;    
+    m_config->access_check_sysop_avail = rhs.access_check_sysop_avail;
     m_config->invalid_password_attempts = rhs.invalid_password_attempts;
     m_config->invalid_newuser_password_attempts = rhs.invalid_newuser_password_attempts;
     m_config->use_file_points = rhs.use_file_points;
@@ -244,7 +248,7 @@ void ConfigDao::encode(const Config &rhs)
     m_config->use_screen_welcome = rhs.use_screen_welcome;
     m_config->use_matrix_login = rhs.use_matrix_login;
     m_config->use_newuser_password = rhs.use_newuser_password;
-    m_config->use_disclaimer = rhs.use_disclaimer;    
+    m_config->use_disclaimer = rhs.use_disclaimer;
     m_config->use_address = rhs.use_address;
     m_config->use_handle = rhs.use_handle;
     m_config->use_real_name = rhs.use_real_name;
@@ -259,7 +263,7 @@ void ConfigDao::encode(const Config &rhs)
     m_config->use_pause = rhs.use_pause;
     m_config->use_clear_screen = rhs.use_clear_screen;
     m_config->use_ansi_color = rhs.use_ansi_color;
-    m_config->use_backspace = rhs.use_backspace;    
+    m_config->use_backspace = rhs.use_backspace;
     m_config->hidden_input_character = rhs.hidden_input_character;
     m_config->use_auto_validate_users = rhs.use_auto_validate_users;
     m_config->use_newuser_voting = rhs.use_newuser_voting;
@@ -281,8 +285,8 @@ void ConfigDao::encode(const Config &rhs)
     m_config->default_user_flags = rhs.default_user_flags;
     m_config->flag_change_daily = rhs.flag_change_daily;
     m_config->flag_change_session = rhs.flag_change_session;
-    
-    // NOTE, Lets move to to access_levels, so each level has it own 
+
+    // NOTE, Lets move to to access_levels, so each level has it own
     // configurable defaults.
     // Also change kilobyte to megabyte
     m_config->default_level = rhs.default_level;
@@ -295,14 +299,14 @@ void ConfigDao::encode(const Config &rhs)
     m_config->default_post_call_ratio = rhs.default_post_call_ratio;
     m_config->default_time_limit = rhs.default_time_limit;
     m_config->default_user_timeout = rhs.default_user_timeout;
-    
+
     m_config->use_auto_validate_files = rhs.use_auto_validate_files;
     m_config->use_upload_checker = rhs.use_upload_checker;
     m_config->cmdline_virus_scan = rhs.cmdline_virus_scan;
     m_config->filename_bbs_ad = rhs.filename_bbs_ad;
     m_config->filename_archive_comments = rhs.filename_archive_comments;
     m_config->directory_bad_files = rhs.directory_bad_files;
-    m_config->use_greater_then_for_quotes = rhs.use_greater_then_for_quotes;    
+    m_config->use_greater_then_for_quotes = rhs.use_greater_then_for_quotes;
     m_config->regexp_generic_validation = rhs.regexp_generic_validation;
     m_config->regexp_generic_validation_msg = rhs.regexp_generic_validation_msg;
     m_config->regexp_handle_validation = rhs.regexp_handle_validation;
@@ -311,9 +315,9 @@ void ConfigDao::encode(const Config &rhs)
     m_config->regexp_password_validation_msg = rhs.regexp_password_validation_msg;
     m_config->regexp_date_validation = rhs.regexp_date_validation;
     m_config->regexp_date_validation_msg = rhs.regexp_date_validation_msg;
-    m_config->regexp_email_validation = rhs.regexp_email_validation;    
+    m_config->regexp_email_validation = rhs.regexp_email_validation;
     m_config->regexp_email_validation_msg = rhs.regexp_email_validation_msg;
-    
+
 }
 
 /**
@@ -329,40 +333,42 @@ bool ConfigDao::loadConfig()
 
     // Load the file into the class.
     try
-    {        
+    {
         // Load file fresh.
         node = YAML::LoadFile(path);
-        
+
         // Testing Is on nodes always throws exceptions.
-        if (node.size() == 0) 
+        if(node.size() == 0)
         {
             return false; //File Not Found?
         }
-        
+
         std::string file_version = node["file_version"].as<std::string>();
-        
+
         // Validate File Version
-        std::cout << "Config File Version: " << file_version << std::endl;
-        if (file_version != Config::FILE_VERSION) {
-            throw std::invalid_argument("Invalid file_version, expected: " + Config::FILE_VERSION);
+        std::cout << std::endl << "Config File Version: " << file_version << std::endl;
+
+        if(file_version != Config::FILE_VERSION)
+        {
+            std::cout << "Config File Version=" << file_version << " Expected Version=" << Config::FILE_VERSION << std::endl;
+            return false;
         }
-        
+
         // When doing node.as (all fields must be present on file)
         Config c = node.as<Config>();
 
         // Moves the Loaded config to m_config shared pointer.
         encode(c);
     }
-    catch (YAML::Exception &ex)
+    catch(YAML::Exception &ex)
     {
-        std::cout << "YAML::LoadFile(xrm-config.yaml) " << ex.what() << std::endl;
-        std::cout << "Most likely a required field in the config file is missing. " << std::endl;
-        assert(false);
+        std::cout << "YAML::LoadFile(xrm-config.yaml) " << ex.what() << "Missing required field maybe." << std::endl;
+        return(false);
     }
-    catch (std::exception &ex)
+    catch(std::exception &ex)
     {
-        std::cout << "Unexpected YAML::LoadFile(xrm-config.yaml) " << ex.what() << std::endl;
-        assert(false);
+        std::cout << "UnexpectedYAML::LoadFile(xrm-config.yaml) " << ex.what() << std::endl;
+        return(false);
     }
 
     return true;
@@ -372,15 +378,15 @@ bool ConfigDao::loadConfig()
  * @brief Validates settings for possiable conflicts
  * @return
  */
-bool ConfigDao::validation() 
+bool ConfigDao::validation()
 {
     // Check if Handle and Real Name are configured.
-    if (!m_config->use_handle && !m_config->use_real_name) {
-        std::cout << "Config Validation Error:" << std::endl;
-        std::cout << "use_handle and use_real_name can't both be false." << std::endl;
+    if(!m_config->use_handle && !m_config->use_real_name)
+    {
+        std::cout << "Config Validation - use_handle and use_real_name can't both be false." << std::endl;
         return false;
     }
-    
-    // Add More checks as needed    
+
+    // Add More checks as needed
     return true;
 }

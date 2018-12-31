@@ -3,6 +3,7 @@
 #include "data-sys/access_level_dao.hpp"
 #include "model-sys/access_level.hpp"
 #include "../access_condition.hpp"
+#include "../logging.hpp"
 
 #include <sstream>
 #include <stdint.h>
@@ -19,14 +20,12 @@ bool ModLevelEditor::update(const std::string& character_buffer, const bool&)
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
-        std::cout << "ModLevelEditor() !m_is_active" << std::endl;
         return false;
     }
 
     // Return True when were keeping module active / else false;
     if(character_buffer.size() == 0)
     {
-        std::cout << "ModLevelEditor() !character_buffer size 0" << std::endl;
         return true;
     }
 
@@ -42,7 +41,6 @@ bool ModLevelEditor::update(const std::string& character_buffer, const bool&)
  */
 bool ModLevelEditor::onEnter()
 {
-    std::cout << "OnEnter() ModLevelEditor\n";
     m_is_active = true;
 
     // Grab ANSI Screen, display, if desired.. logon.ans maybe?
@@ -61,7 +59,6 @@ bool ModLevelEditor::onEnter()
  */
 bool ModLevelEditor::onExit()
 {
-    std::cout << "OnExit() ModLevelEditor\n";
     m_is_active = false;
     return true;
 }
@@ -318,7 +315,8 @@ void ModLevelEditor::displayCurrentPage(const std::string& input_state)
             break;
 
         default:
-            std::cout << "Error, forgot to add new STATE index displayCurrentPage!!";
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentPage!!", __LINE__, __FILE__);
             return;
     }
 
@@ -361,7 +359,8 @@ void ModLevelEditor::displayCurrentEditPage(const std::string& input_state)
             break;
 
         default:
-            std::cout << "Error, forgot to add new STATE index displayCurrentEditPage!!";
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentEditPage!!", __LINE__, __FILE__);
             return;
     }
 
@@ -422,7 +421,6 @@ void ModLevelEditor::levelEditorInput(const std::string& input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -495,7 +493,6 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -604,70 +601,70 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
                 break;
 
             case 'M': // Bool PostCallRatio
-                {
-                    m_current_field = toupper(key[0]);
-                    changeInputModule(MOD_LEVEL_FIELD);
-                    displayPrompt(PROMPT_LEVEL_BOOL_POST_CALL_RATIO);
-                    std::string bool_value = "";
-                    bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                    break;
-                }
+            {
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_BOOL_POST_CALL_RATIO);
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                break;
+            }
 
             case 'N': // Bool File Ratio
-                {
-                    m_current_field = toupper(key[0]);
-                    changeInputModule(MOD_LEVEL_FIELD);
-                    displayPrompt(PROMPT_LEVEL_BOOL_FILE_RATIO);
-                    std::string bool_value = "";
-                    bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                    break;
-                }
+            {
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_BOOL_FILE_RATIO);
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                break;
+            }
 
             case 'O': // Bool Time Limit
-                {
-                    m_current_field = toupper(key[0]);
-                    changeInputModule(MOD_LEVEL_FIELD);
-                    displayPrompt(PROMPT_LEVEL_BOOL_TIME_LIMIT);
-                    std::string bool_value = "";
-                    bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                    break;
-                }
+            {
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_BOOL_TIME_LIMIT);
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                break;
+            }
 
             case 'P': // Bool Call Limit
-                {
-                    m_current_field = toupper(key[0]);
-                    changeInputModule(MOD_LEVEL_FIELD);
-                    displayPrompt(PROMPT_LEVEL_BOOL_CALL_LIMIT);
-                    std::string bool_value = "";
-                    bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                    break;
-                }
+            {
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_BOOL_CALL_LIMIT);
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                break;
+            }
 
             case 'R': // Bool Download File Limit
-                {
-                    m_current_field = toupper(key[0]);
-                    changeInputModule(MOD_LEVEL_FIELD);
-                    displayPrompt(PROMPT_LEVEL_BOOL_DOWNLOADS);
-                    std::string bool_value = "";
-                    bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                    break;
-                }
+            {
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_BOOL_DOWNLOADS);
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                break;
+            }
 
             case 'S': // Bool Download Limit MB
-                {
-                    m_current_field = toupper(key[0]);
-                    changeInputModule(MOD_LEVEL_FIELD);
-                    displayPrompt(PROMPT_LEVEL_BOOL_DOWNLOAD_MB);
-                    std::string bool_value = "";
-                    bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                    break;
-                }
+            {
+                m_current_field = toupper(key[0]);
+                changeInputModule(MOD_LEVEL_FIELD);
+                displayPrompt(PROMPT_LEVEL_BOOL_DOWNLOAD_MB);
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                break;
+            }
 
             case 'Q': // Quit
                 saveLevelChanges();
@@ -714,7 +711,6 @@ void ModLevelEditor::levelEditorLevelFieldHandler(const std::string& input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_LEVEL_FIELD_INPUT);
         changeSetupModule(MOD_DISPLAY_LEVEL_EDIT);
         return;
@@ -769,24 +765,24 @@ void ModLevelEditor::levelEditorLevelFieldHandler(const std::string& input)
                 break;
 
             case 'K': // Level AR Flags 1
-                {
-                    AccessCondition acs;
+            {
+                AccessCondition acs;
 
-                    for(char c : key)
-                        acs.setFlagLevelToggle(c, true, current_level);
+                for(char c : key)
+                    acs.setFlagLevelToggle(c, true, current_level);
 
-                    break;
-                }
+                break;
+            }
 
             case 'L': // Level AR Flags 2
-                {
-                    AccessCondition acs;
+            {
+                AccessCondition acs;
 
-                    for(char c : key)
-                        acs.setFlagLevelToggle(c, false, current_level);
+                for(char c : key)
+                    acs.setFlagLevelToggle(c, false, current_level);
 
-                    break;
-                }
+                break;
+            }
 
             case 'M': // Bool PostCallRatio
                 current_level->bPostCallRatio = m_common_io.stringToBool(key);
@@ -839,7 +835,6 @@ void ModLevelEditor::levelEditorLevelInput(const std::string& input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_LEVEL_INPUT);
         redisplayModulePrompt();
         return;
@@ -998,6 +993,7 @@ void ModLevelEditor::handleLevelInputState(bool does_level_exist, int level_code
  */
 void ModLevelEditor::createNewLevel(int level_code)
 {
+    Logging *log = Logging::instance();
     access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
     access_level_ptr new_level(new AccessLevel());
 
@@ -1006,7 +1002,7 @@ void ModLevelEditor::createNewLevel(int level_code)
 
     if(checkLevelExistsByLevel(level_code))
     {
-        std::cout << "Destination level already exists!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Destination level already exists=", level_code, __LINE__, __FILE__);
         return;
     }
 
@@ -1015,7 +1011,7 @@ void ModLevelEditor::createNewLevel(int level_code)
 
     if(level_dao->insertRecord(new_level) < 0)
     {
-        std::cout << "Error, unable to insert new level: " << level_code << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to insert new level=", level_code, __LINE__, __FILE__);
     }
 }
 
@@ -1030,7 +1026,8 @@ void ModLevelEditor::deleteExistingLevel(int level_code)
 
     if(existing_level->iId == -1 || !level_dao->deleteRecord(existing_level->iId))
     {
-        std::cout << "Error, unable to delete existing level: " << level_code << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to delete existing level=", level_code, __LINE__, __FILE__);
     }
 
     level_dao->deleteRecord(existing_level->iId);
@@ -1042,12 +1039,14 @@ void ModLevelEditor::deleteExistingLevel(int level_code)
  */
 void ModLevelEditor::copyExistingLevel(int level_code)
 {
+    Logging *log = Logging::instance();
+
     access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
     access_level_ptr existing_level = level_dao->getAccessLevelByLevel(m_current_level);
 
     if(checkLevelExistsByLevel(level_code))
     {
-        std::cout << "Destination level already exists!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Destination level already exists=", level_code, __LINE__, __FILE__);
         return;
     }
 
@@ -1057,8 +1056,7 @@ void ModLevelEditor::copyExistingLevel(int level_code)
 
     if(level_dao->insertRecord(existing_level) < 0)
     {
-        std::cout << "Error, unable to copy existing level: " << m_current_level << " to "
-                  << level_code << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to copy existing level=", m_current_level, "to=", level_code,__LINE__, __FILE__);
     }
 }
 
@@ -1081,7 +1079,8 @@ void ModLevelEditor::saveLevelChanges()
 
     if(existing_level == nullptr || !level_dao->updateRecord(existing_level))
     {
-        std::cout << "Error, unable to update existing level: " << m_current_level;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to update existing level=", m_current_level, __LINE__, __FILE__);
         return;
     }
 
@@ -1258,7 +1257,8 @@ std::string ModLevelEditor::displayLevelEditScreen()
 
     if(current_level == nullptr)
     {
-        std::cout << "Level Not Found: " << std::to_string(m_current_level);
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("Error, Level Not Found=", m_current_level, __LINE__, __FILE__);
         return "Level Not Found: " + std::to_string(m_current_level);
     }
 

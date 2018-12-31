@@ -1,5 +1,5 @@
 #include "state_manager.hpp"
-
+#include "logging.hpp"
 #include "utf-cpp/utf8.h"
 
 #include <cstring>
@@ -32,7 +32,6 @@ void StateManager::clean()
  */
 void StateManager::update()
 {
-    int byte_count = 0;
     std::string new_string_builder = "";
     bool utf_found = false;
 
@@ -50,49 +49,27 @@ void StateManager::update()
              */
             while(it != line_end)
             {
-                uint8_t lead = mask8(*it);
+                int byte_value = static_cast<int>((uint8_t)*it);
 
-                if(lead < 0x80)
-                {
-                    byte_count = 1;
-                }
-                else if((lead >> 5) == 0x6)
-                {
-                    byte_count = 2;
-                }
-                else if((lead >> 4) == 0xe)
-                {
-                    byte_count = 3;
-                }
-                else if((lead >> 3) == 0x1e)
-                {
-                    byte_count = 4;
-                }
-                else
-                {
-                    // High ASCII > 127 < 256
-                    byte_count = 0;
-                }
-
-                if(byte_count <= 1)
+                if(byte_value < 128)
                 {
                     utf_found = false;
                     *it++;
 
                     // Only if ESC and next char is empty
                     // Then we want to pass both to registed single ESC hit
-                    if(lead == '\x1b' && *it == '\0')
+                    if(byte_value == '\x1b' && *it == '\0')
                     {
                         new_string_builder += '\x1b';
                         m_the_state.back()->update(new_string_builder, utf_found);
 
-                        new_string_builder += '\0';
+                        new_string_builder = '\0';
                         m_the_state.back()->update(new_string_builder, utf_found);
                         new_string_builder.erase();
                         continue;
                     }
 
-                    new_string_builder += lead;
+                    new_string_builder += std::string(1, byte_value);
                 }
                 else
                 {
@@ -100,14 +77,23 @@ void StateManager::update()
                     {
                         // Only gets here on multi-byte sequences.
                         uint32_t code_point = utf8::next(it, line_end);
-                        unsigned char character[5] = {0};
+                        unsigned char character[5] = {0, 0, 0, 0, 0};
                         utf8::append(code_point, character);
-                        new_string_builder += (char *)character;
+
+                        for(int i = 0; i < 5; i++)
+                        {
+                            if(character[i] != 0)
+                            {
+                                new_string_builder += std::string(1, character[i]);
+                            }
+                        }
+
                         utf_found = true;
                     }
                     catch(utf8::exception &ex)
                     {
-                        std::cout << "Utf8 Parsing Exception: " << ex.what() << " Line: " << __LINE__ << " File: "<< __FILE__ << std::endl;
+                        Logging *log = Logging::instance();
+                        log->xrmLog<Logging::ERROR_LOG>("Utf8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
                     }
                 }
 
@@ -148,8 +134,6 @@ void StateManager::changeState(state_ptr &the_state)
 {
     if(!m_the_state.empty())
     {
-        std::cout << "changeState: " << the_state->getStateID() << std::endl;
-
         if(m_the_state.back()->getStateID() == the_state->getStateID())
         {
             return; // do nothing
@@ -159,11 +143,9 @@ void StateManager::changeState(state_ptr &the_state)
 
         // Rework this lateron,  lets allow multiple states,, the most recent state will be active
         // Allowing the main state to keep all information!
-        std::cout << "Deleteing Current MenuSystem!: " << m_the_state.size() << std::endl;
         m_the_state.pop_back();
 
         // Clear the Memory!
-        std::cout << "Clearing Memory of MenuSystem!: " << m_the_state.size() << std::endl;
         std::vector<state_ptr>().swap(m_the_state);
     }
 

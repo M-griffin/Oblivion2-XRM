@@ -35,7 +35,6 @@ public:
 
     virtual ~SocketState()
     {
-        std::cout << "Shutting Down SocketState" << std::endl;
     }
 
     virtual int sendSocket(unsigned char *message, Uint32 len) = 0;
@@ -74,7 +73,6 @@ public:
 
     virtual ~SDL_Socket()
     {
-        std::cout << "Shutting Down SDL_SocketState" << std::endl;
     }
 
     virtual int sendSocket(unsigned char *message, Uint32 len);
@@ -199,7 +197,6 @@ public:
 
     virtual  ~SSH_Socket()
     {
-        std::cout << "Shutting Down SSH_SocketState" << std::endl;
     }
 
     virtual int sendSocket(unsigned char *message, Uint32 len);
@@ -215,11 +212,6 @@ public:
     int verify_knownhost();
     int authenticate_console();
     int authenticate_kbdint();
-    void error()
-    {
-        std::cout << "Authentication failed: "
-                  << ssh_get_error(m_ssh_session) << std::endl;
-    }
 
 private:
 

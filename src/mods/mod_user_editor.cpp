@@ -6,6 +6,7 @@
 #include "../data-sys/users_dao.hpp"
 #include "../encryption.hpp"
 #include "../access_condition.hpp"
+#include "../logging.hpp"
 
 #include <string>
 #include <vector>
@@ -27,14 +28,12 @@ bool ModUserEditor::update(const std::string &character_buffer, const bool &)
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
-        std::cout << "ModUserEditor() !m_is_active" << std::endl;
         return false;
     }
 
     // Return True when were keeping module active / else false;
     if(character_buffer.size() == 0)
     {
-        std::cout << "ModUserEditor() !character_buffer size 0" << std::endl;
         return true;
     }
 
@@ -50,7 +49,6 @@ bool ModUserEditor::update(const std::string &character_buffer, const bool &)
  */
 bool ModUserEditor::onEnter()
 {
-    std::cout << "OnEnter() ModUserEditor\n";
     m_is_active = true;
 
     // Grab ANSI Screen, display, if desired.. logon.ans maybe?
@@ -69,7 +67,6 @@ bool ModUserEditor::onEnter()
  */
 bool ModUserEditor::onExit()
 {
-    std::cout << "OnExit() ModUserEditor\n";
     m_is_active = false;
     return true;
 }
@@ -390,7 +387,6 @@ void ModUserEditor::userListInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -463,7 +459,6 @@ void ModUserEditor::userEditorUserInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_USER_INPUT);
         redisplayModulePrompt();
         return;
@@ -595,6 +590,7 @@ void ModUserEditor::handleUserInputState(bool does_user_exist, long user_id)
  */
 void ModUserEditor::copyExistingUser(long user_id)
 {
+    Logging *log = Logging::instance();
     users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
     security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
 
@@ -611,8 +607,8 @@ void ModUserEditor::copyExistingUser(long user_id)
 
     if(salt.size() == 0 || password.size() == 0)
     {
-        std::cout << "Error, Salt or Password were empty" << std::endl;
-        assert(false);
+        log->xrmLog<Logging::ERROR_LOG>("Error, Salt or Password were empty", __LINE__, __FILE__);
+        return;
     }
 
     security_ptr security_record(new Security());
@@ -624,7 +620,7 @@ void ModUserEditor::copyExistingUser(long user_id)
 
     if(securityIndex < 0)
     {
-        std::cout << "Error, unable to insert new user record." << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to insert new user record", __LINE__, __FILE__);
         return;
     }
 
@@ -697,7 +693,8 @@ bool ModUserEditor::loadUserById(long user_id)
     // If record is already loaded then leave it.
     if(m_loaded_user.size() > 0)
     {
-        std::cout << " *** user already loaded!!" << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Error, user already loaded", __LINE__, __FILE__);
         return true;
     }
 
@@ -826,7 +823,8 @@ void ModUserEditor::displayCurrentPage(const std::string &input_state)
             break;
 
         default:
-            std::cout << "Error, forgot to add new STATE index displayCurrentPage!!";
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentPage", __LINE__, __FILE__);
             return;
     }
 
@@ -1016,7 +1014,6 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -1235,7 +1232,6 @@ void ModUserEditor::userEditorExtendedInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -1405,7 +1401,6 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_USER_FIELD_INPUT);
         changeSetupModule(MOD_DISPLAY_USER_FIELDS);
         return;
@@ -1565,6 +1560,7 @@ void ModUserEditor::updateExistingUser()
  */
 void ModUserEditor::updateExistingPassword(std::string key_value)
 {
+    Logging *log = Logging::instance();
     security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
     security_ptr security_record(new Security());
 
@@ -1577,7 +1573,7 @@ void ModUserEditor::updateExistingPassword(std::string key_value)
 
     if(password.size() == 0)
     {
-        std::cout << "Error, Password Hash empty" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Password Hash empty", __LINE__, __FILE__);
         assert(false);
     }
 
@@ -1585,7 +1581,7 @@ void ModUserEditor::updateExistingPassword(std::string key_value)
 
     if(!security_dao->updateRecord(security_record))
     {
-        std::cout << "Error, unable to update password hash." << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to update password hash", __LINE__, __FILE__);
         return;
     }
 }
@@ -1596,6 +1592,7 @@ void ModUserEditor::updateExistingPassword(std::string key_value)
  */
 void ModUserEditor::updateExistingChallengeAnswer(std::string key_value)
 {
+    Logging *log = Logging::instance();
     security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
     security_ptr security_record(new Security());
 
@@ -1608,7 +1605,7 @@ void ModUserEditor::updateExistingChallengeAnswer(std::string key_value)
 
     if(password.size() == 0)
     {
-        std::cout << "Error, Challenge Answer Hash empty" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Challenge Answer Hash empty", __LINE__, __FILE__);
         assert(false);
     }
 
@@ -1616,7 +1613,7 @@ void ModUserEditor::updateExistingChallengeAnswer(std::string key_value)
 
     if(!security_dao->updateRecord(security_record))
     {
-        std::cout << "Error, unable to update Challenge Answer." << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to update Challenge Answer", __LINE__, __FILE__);
         return;
     }
 }
@@ -1637,7 +1634,8 @@ void ModUserEditor::updateExistingChallengeQuestion(std::string key_value)
 
     if(!security_dao->updateRecord(security_record))
     {
-        std::cout << "Error, unable to update challenge question." << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to update Challenge Question", __LINE__, __FILE__);
         return;
     }
 }
@@ -1654,7 +1652,6 @@ void ModUserEditor::userEditorExtendedFieldHandler(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_USER_FIELD_INPUT);
         changeSetupModule(MOD_DISPLAY_USER_FIELDS);
         return;
@@ -1975,7 +1972,8 @@ void ModUserEditor::displayCurrentEditPage(const std::string &input_state)
             break;
 
         default:
-            std::cout << "Error, forgot to add new STATE index displayCurrentEditPage!!";
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentEditPage", __LINE__, __FILE__);
             return;
     }
 

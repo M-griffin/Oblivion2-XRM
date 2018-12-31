@@ -29,7 +29,6 @@ public:
 
     virtual ~ModBase()
     {
-        std::cout << "~ModBase." << std::endl;
     }
     virtual bool update(const std::string &character_buffer, const bool &is_utf8) = 0;
     virtual bool onEnter() = 0;
@@ -299,17 +298,11 @@ public:
         result += std::move(m_session_io.parseTextPrompt(prompt_set));
 
         // Not found, set default input color
-        if (idx == std::string::npos)
+        if(idx == std::string::npos)
         {
             result += baseGetDefaultInputColor();
         }
-        else
-        {
-            // Testing.
-            std::cout << " *** Detected %IN in prompt string!" << std::endl;
-        }
 
-        //std::cout << "prompt: " << result << std::endl;
         baseProcessAndDeliver(result);
     }
 
@@ -330,14 +323,9 @@ public:
         result += std::move(m_session_io.parseTextPrompt(prompt_set));
 
         // Not found, set default input color
-        if (idx == std::string::npos)
+        if(idx == std::string::npos)
         {
             result += baseGetDefaultInputColor();
-        }
-        else
-        {
-            // Testing.
-            std::cout << " *** Detected %IN in prompt string!" << std::endl;
         }
 
         return result;
@@ -377,18 +365,11 @@ public:
         result += std::move(m_session_io.parseTextPrompt(prompt_set));
 
         // Not found, set default input color
-        if (idx == std::string::npos)
+        if(idx == std::string::npos)
         {
             result += baseGetDefaultInputColor();
         }
-        else
-        {
-            // Testing.
-            std::cout << " *** Detected %IN in prompt string!" << std::endl;
-        }
 
-
-        //std::cout << "prompt: " << result << std::endl;
         baseProcessAndDeliver(result);
     }
 
@@ -409,14 +390,9 @@ public:
         result += m_session_io.parseTextPrompt(prompt_set);
 
         // Not found, set default input color
-        if (idx == std::string::npos)
+        if(idx == std::string::npos)
         {
             result += baseGetDefaultInputColor();
-        }
-        else
-        {
-            // Testing.
-            std::cout << " *** Detected %IN in prompt string!" << std::endl;
         }
 
         // Add New Line.
@@ -469,7 +445,7 @@ public:
     // Checked after each stage, onEnter, Update, onExit
 };
 
-typedef std::shared_ptr<ModBase>	module_ptr;
+typedef std::shared_ptr<ModBase> module_ptr;
 
 
 #endif // MOD_BASE_HPP

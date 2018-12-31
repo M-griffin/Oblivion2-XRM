@@ -45,8 +45,6 @@ public:
         , m_current_option(0)
         , m_current_field(0)
     {
-        std::cout << "ModMenuEditor" << std::endl;
-
         // Setup Modules
         m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuEditor, this));
         m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuOptionEditor, this));
@@ -77,7 +75,8 @@ public:
 
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
-        if (!m_is_text_prompt_exist)
+
+        if(!m_is_text_prompt_exist)
         {
             createTextPrompts();
         }
@@ -88,7 +87,6 @@ public:
 
     virtual ~ModMenuEditor() override
     {
-        std::cout << "~ModMenuEditor" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
         std::vector<menu_ptr>().swap(m_loaded_menu);

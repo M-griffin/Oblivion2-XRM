@@ -1,6 +1,7 @@
 #include "process_win.hpp"
 #include "session_data.hpp"
 #include "model-sys/structures.hpp"
+#include "logging.hpp"
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -83,6 +84,7 @@ DWORD WINAPI ProcessWin::terminateApp(DWORD pid, DWORD timeout)
     // If we can't open the process with PROCESS_TERMINATE rights,
     // then we give up immediately.
     proc = OpenProcess(SYNCHRONIZE | PROCESS_TERMINATE, FALSE, pid);
+
     if(!proc)
     {
         return TA_FAILED;
@@ -124,18 +126,21 @@ void ProcessWin::executeProcessLoop()
     while(1)
     {
         GetExitCodeProcess(m_process_info.hProcess, &exit);      //while the process is running
+
         if(exit != STILL_ACTIVE)
         {
-            std::cout << "Exiting Process" << std::endl;
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::CONSOLE_LOG>("exiting process");
 
             CloseHandle(m_process_info.hThread);
             CloseHandle(m_process_info.hProcess);
 
-            if (m_session)
+            if(m_session)
             {
                 // Reset the socket and read waiting data refresh.
                 m_session->m_is_process_running = false;
             }
+
             break;
         }
 
@@ -143,17 +148,15 @@ void ProcessWin::executeProcessLoop()
         // Handle Naped Pipes for STDIO Output of protocols.
         PeekNamedPipe(m_read_stdout, buf, RCVBUFSIZE, &bread, &avail, NULL);
 
-        if (bread > 0)
+        if(bread > 0)
         {
             memset(&buf, 0, sizeof(buf));
             memset(&tmpbuf, 0, sizeof(tmpbuf));
             ReadFile(m_read_stdout, tmpbuf, RCVBUFSIZE, &bread, NULL);  //read the stdout pipe
 
-            if (strlen((const char *)tmpbuf) > 0)
+            if(strlen((const char *)tmpbuf) > 0)
             {
-                std::cout << "buffer [" << tmpbuf << "] " <<std::endl;
-
-                if (m_session)
+                if(m_session)
                 {
                     std::string buffer(reinterpret_cast<char*>(tmpbuf));
                     m_session->deliver(buffer);
@@ -182,7 +185,7 @@ bool ProcessWin::createProcess()
     SECURITY_ATTRIBUTES security_attrib;
     SECURITY_DESCRIPTOR secutiry_descrip;
 
-    if (isWinNT())        //initialize security descriptor (Windows NT)
+    if(isWinNT())         //initialize security descriptor (Windows NT)
     {
         InitializeSecurityDescriptor(&secutiry_descrip, SECURITY_DESCRIPTOR_REVISION);
         SetSecurityDescriptorDacl(&secutiry_descrip, true, NULL, false);
@@ -198,15 +201,17 @@ bool ProcessWin::createProcess()
     security_attrib.bInheritHandle = true;
 
     // Create stdin pipe
-    if (!CreatePipe(&m_new_stdin, &m_write_stdin, &security_attrib, 0))
+    Logging *log = Logging::instance();
+
+    if(!CreatePipe(&m_new_stdin, &m_write_stdin, &security_attrib, 0))
     {
-        std::cout << "Error Creating STDIN Pipe" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error Creating STDIN Pipe", __LINE__, __FILE__);
         return false;
     }
 
-    if (!CreatePipe(&m_read_stdout, &m_new_stdout, &security_attrib, 0))
+    if(!CreatePipe(&m_read_stdout, &m_new_stdout, &security_attrib, 0))
     {
-        std::cout << "Error Creating STDOUT Pipe" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error Creating STDOUT Pipe", __LINE__, __FILE__);
         CloseHandle(m_new_stdin);
         CloseHandle(m_write_stdin);
         return false;
@@ -225,15 +230,15 @@ bool ProcessWin::createProcess()
     startup_info.hStdError = m_new_stdout;
     startup_info.hStdInput = m_new_stdin;
 
-    char app[1024] = {0};
+    char app[2048] = {0};
     strcpy((char *)app, m_command_line.c_str());
-    std::cout << "cmdline: " << app << std::endl;
+    log->xrmLog<Logging::DEBUG_LOG>("cmdline=", app, __LINE__, __FILE__);
 
     //spawn the child process
-    if (!CreateProcess(app, NULL, NULL, NULL, TRUE, CREATE_NEW_CONSOLE,
-                       NULL, NULL, &startup_info, &m_process_info))
+    if(!CreateProcess(app, NULL, NULL, NULL, TRUE, CREATE_NEW_CONSOLE,
+                      NULL, NULL, &startup_info, &m_process_info))
     {
-        std::cout << "Error Creating Child Process" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error Creating Child Process", __LINE__, __FILE__);
         CloseHandle(m_new_stdin);
         CloseHandle(m_new_stdout);
         CloseHandle(m_read_stdout);
@@ -268,19 +273,18 @@ bool ProcessWin::isRunning()
  */
 void ProcessWin::update()
 {
-    if (m_session)
+    if(m_session)
     {
         unsigned char buf[50] = {0};
         unsigned long bread = 0;
         std::string session_data = std::move(m_session->m_parsed_data);
-        std::cout << "Process Update(): " << session_data << std::endl;
 
         strcat((char *)buf, session_data.c_str());
 
-        if (buf[0] == 13)
+        if(buf[0] == 13)
             sprintf((char *)buf,"\r\n");
 
-        if (session_data.size() > 0)
+        if(session_data.size() > 0)
         {
             WriteFile(m_write_stdin, buf, strlen((char *)buf),&bread,NULL);
             m_session->deliver(session_data);
@@ -288,7 +292,8 @@ void ProcessWin::update()
     }
     else
     {
-        std::cout << "Process Update: Session is no longer active." << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("Process Update: Session is no longer active.", __LINE__, __FILE__);
     }
 }
 

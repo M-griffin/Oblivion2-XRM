@@ -15,6 +15,7 @@
 #include "session_manager.hpp"
 #include "common_io.hpp"
 #include "deadline_timer.hpp"
+#include "logging.hpp"
 
 #include "model-sys/structures.hpp"
 #include "model-sys/struct_compat.hpp"
@@ -72,13 +73,10 @@ public:
         , m_is_process_running(false)
         , m_parsed_data("")
     {
-        std::cout << "SessionData" << std::endl;
     }
 
     ~SessionData()
     {
-        std::cout << "~SessionData" << std::endl;
-
         for(unsigned int i = 0; i < m_processes.size(); i++)
         {
             m_processes[i]->terminate();
@@ -126,7 +124,8 @@ public:
             }
             catch(std::exception& e)
             {
-                std::cout << "Exception telnet_process_char: " << e.what() << std::endl;
+                Logging *log = Logging::instance();
+                log->xrmLog<Logging::ERROR_LOG>("Exception telnet_process_char", e.what(), __LINE__, __FILE__);
             }
 
             // Skip any incoming nulls, nulls are also return on Telnet options received
@@ -141,7 +140,7 @@ public:
         }
 
         // Encode all incoming data as UTF8 unless we are not utf8
-        if (m_encoding != Encoding::ENCODE_UTF8)
+        if(m_encoding != Encoding::ENCODE_UTF8)
             m_parsed_data = Encoding::instance()->utf8Encode(incoming_data);
         else
             m_parsed_data = incoming_data;
@@ -202,10 +201,11 @@ public:
      */
     void handleWrite(const std::error_code& error, socket_handler_ptr)
     {
+        Logging *log = Logging::instance();
+
         if(error)
         {
-            std::cout << "async_write error: " << error.message() << std::endl;
-            std::cout << "Session Closed()" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("async_write error - session closed()", error.message(), __LINE__, __FILE__);
         }
 
         session_manager_ptr session_manager = m_session_manager.lock();
@@ -223,7 +223,8 @@ public:
                 }
                 catch(std::exception &e)
                 {
-                    std::cout << "Caught: " << e.what();
+                    // Sometime this doesn't close when it's already existed, just extra checking here.
+                    log->xrmLog<Logging::DEBUG_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
                 }
             }
         }
@@ -248,7 +249,6 @@ public:
         // Add Deadline Timer for .400 milliseconds for complete ESC Sequences.
         // Is no other input or part of ESC Sequecnes ie.. [A following the ESC
         // Then it's an ESC key, otherwise capture the rest of the sequence.
-        std::cout << "Start ESC Timer" << std::endl;
         m_esc_input_timer->setWaitInMilliseconds(400);
         m_esc_input_timer->asyncWait(
             std::bind(&SessionData::handleEscTimer, shared_from_this())
@@ -276,7 +276,9 @@ public:
             }
             catch(std::exception &e)
             {
-                std::cout << "Caught: " << e.what();
+                // Sometime this doesn't close when it's already existed, just extra checking here.
+                Logging *log = Logging::instance();
+                log->xrmLog<Logging::DEBUG_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
             }
         }
     }
@@ -293,9 +295,6 @@ public:
      */
     void startExternalProcess(const std::string &cmdline)
     {
-        std::cout << "SessionData Starting Process" << std::endl;
-        std::cout << GLOBAL_SCRIPT_PATH << std::endl;
-
         //std::string path = GLOBAL_SCRIPT_PATH + "\\" + cmdline;
         std::string path = cmdline;
 
@@ -305,13 +304,11 @@ public:
 
         if(proc)
         {
-            std::cout << "SessionData Starting Process SUCCESS!" << std::endl;
             m_is_process_running = true;
             m_processes.push_back(proc);
         }
         else
         {
-            std::cout << "SessionData Starting Process FAILED!" << std::endl;
             m_is_process_running = false;
         }
 
@@ -320,18 +317,15 @@ public:
 
         if(proc)
         {
-            std::cout << "SessionData Starting Process SUCCESS!" << std::endl;
             m_is_process_running = true;
             m_processes.push_back(proc);
         }
         else
         {
-            std::cout << "SessionData Starting Process FAILED!" << std::endl;
             m_is_process_running = false;
         }
 
 #endif
-        std::cout << "SessionData Starting Done" << std::endl;
     }
 
     /**

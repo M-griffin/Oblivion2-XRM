@@ -2,8 +2,10 @@
 #include "session_data.hpp"
 #include "common_io.hpp"
 #include "encoding.hpp"
+#include "logging.hpp"
 
 #include "model-sys/config.hpp"
+#include "utf-cpp/utf8.h"
 
 #include <clocale>
 #include <regex>
@@ -11,22 +13,21 @@
 #include <iostream>
 #include <sstream>
 
+
+
 SessionIO::SessionIO()
     : m_session_data(nullptr)
 {
-    std::cout << "SessionIO base" << std::endl;
 }
 
 SessionIO::SessionIO(session_data_ptr session_data)
     : m_session_data(session_data)
 {
-    std::cout << "SessionIO" << std::endl;
 }
 
 SessionIO::~SessionIO()
 {
     clearAllMCIMapping();
-    std::cout << "~SessionIO" << std::endl;
 }
 
 /**
@@ -36,13 +37,14 @@ SessionIO::~SessionIO()
  */
 std::string SessionIO::getKeyInput(const std::string &character_buffer)
 {
+    Logging *log = Logging::instance();
     std::string input = m_common_io.parseInput(character_buffer);
 
     if(input.size() == 0)
     {
         // No Data received, could be in mid ESC sequence
         // Return for next key.
-        std::cout << "MID ESCAPE" << std::endl;
+        log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Mid Escape");
         return "";
     }
 
@@ -54,17 +56,17 @@ std::string SessionIO::getKeyInput(const std::string &character_buffer)
 
         if(escape_sequence.size() == 0)
         {
-            std::cout << "Single ESC" << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Single Escape");
             return "\x1b";
         }
         else
         {
-            std::cout << "Translated ESC Sequence: "  << escape_sequence << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Translated Escape Sequence=", escape_sequence);
             return (escape_sequence.insert(0, "\x1b"));
         }
     }
 
-    std::cout << "Normal Input: "  << input << std::endl;
+    log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Normal Input=", input);
     return input;
 }
 
@@ -75,6 +77,8 @@ std::string SessionIO::getKeyInput(const std::string &character_buffer)
  */
 void SessionIO::createInputField(std::string &field_name, int &len)
 {
+    Logging *log = Logging::instance();
+
     std::string repeat;
     char formatted[1024]= {0};
     char sTmp[3]  = {0};
@@ -129,10 +133,7 @@ void SessionIO::createInputField(std::string &field_name, int &len)
                 }
                 else
                 {
-                    std::cout << "createInputField() Incorrect |FL field length.  Length cannot be larger than "
-                              << "max size of the field, which is: "
-                              << len
-                              << std::endl;
+                    log->xrmLog<Logging::ERROR_LOG>("createInputField() Incorrect |FL field length=", tempLength, "cannot exceed max size=", len);
                 }
             }
             else
@@ -145,9 +146,7 @@ void SessionIO::createInputField(std::string &field_name, int &len)
     // Overide Foreground/Background Input Field Colors
     // This is now for OBV/2 .. Not in Legacy.
     position = field_name.find("|FB",0);
-
-    std::cout << "position: " <<  position << std::endl;
-    std::cout << "compare : " << position+4 << " " <<  stringSize << std::endl;
+    log->xrmLog<Logging::DEBUG_LOG>("createInputField() |FB position=", position, "compare=", position+4, stringSize);
 
     if(position != std::string::npos)
     {
@@ -218,6 +217,7 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
                                      std::string leadoff,
                                      bool hidden)
 {
+    Logging *log = Logging::instance();
     // Setup the leadoff, if it's first time, then print it out
     // Other if empty or follow-up calls to inputfield field skip it!
     static bool is_leadoff = true;
@@ -246,7 +246,6 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
 
             if(esc_sequence.size() == 0 && character_buffer[0] == '\0')
             {
-                //std::cout << "ESC -> Field Input aborted!" << std::endl;
                 is_leadoff = true;    // Reset for next run
                 esc_sequence.erase();
                 string_data.erase();
@@ -257,7 +256,6 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
         else if((string_data[0] == '\n' && string_data.size() == 1) || character_buffer[0] == '\n')
         {
             result = m_common_io.getInputBuffer();
-            //std::cout << "Field: " << result << std::endl;
             string_data.erase();
             is_leadoff = true;    // Reset for next run
             return "\n";
@@ -265,12 +263,12 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
         // Updates on Keypresses.
         else
         {
-            std::cout << "input_system result: " << result << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("getInputField() result=", result, "string_data=", string_data);
             return string_data;
         }
     }
 
-    std::cout << "result empty!" << std::endl;
+    log->xrmLog<Logging::DEBUG_LOG>("getInputField() result empty");
     return "";
 }
 
@@ -400,7 +398,7 @@ std::string SessionIO::pipeReplaceBackground(int background)
             escape_sequence = "\x1b[47m";
             break;
 
-            // Default to none.
+        // Default to none.
         case 24:
             escape_sequence = "\x1b[0m";
             break;
@@ -505,15 +503,13 @@ std::string SessionIO::getDefaultBoxColor(config_ptr config)
 }
 
 /**
- * @brief Parsed Pipe Codes with 1 or 2 Digits
+ * @brief Parsed Pipe Codes with 1 or 2 Digits (Handle OBV/2 Legacy Movements)
  * @param pipe_code
  * @return
  */
 std::string SessionIO::parsePipeWithCharsDigits(const std::string &code, int value)
 {
     std::string sequence = "";
-
-    std::cout << "parsePipeWithCharsDigits single digit movement." << std::endl;
 
     // Check Single letter Sequences
     if(code.size() == 1)
@@ -567,7 +563,7 @@ std::string SessionIO::parsePipeWithCharsDigits(const std::string &code, int val
     // Double Letter Sequences
     else
     {
-
+        // Updates, is this still needed? test lateron.
     }
 
     return sequence;
@@ -650,8 +646,8 @@ std::string SessionIO::parsePipeWithChars(const std::string &pipe_code)
 
     switch(pipe_code[1])
     {
-            // Most likely will break these out later bye pipe[1] and send [2] to other functions
-            // To Keep small and compact!
+        // Most likely will break these out later bye pipe[1] and send [2] to other functions
+        // To Keep small and compact!
         case 'C':
             switch(pipe_code[2])
             {
@@ -702,7 +698,9 @@ std::string SessionIO::parsePipeWithChars(const std::string &pipe_code)
  */
 std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapType> &code_map)
 {
-    std::cout << "code_map.size(): " << code_map.size() << std::endl;
+    Logging *log = Logging::instance();
+    log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMap] code_map.size()=", code_map.size(), __LINE__, __FILE__);
+
     std::string ansi_string = screen;
     MapType my_matches;
 
@@ -734,103 +732,103 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
         switch(my_matches.m_match)
         {
             case 1: // Pipe w/ 2 DIDIT Colors
-                {
-//                    std::cout << "Pipe w/ 2 DIDIT Colors |00" << std::endl;
-                    std::string result = pipeColors(my_matches.m_code);
+            {
+                log->xrmLog<Logging::DEBUG_LOG>("Pipe w/ 2 DIDIT Colors |00");
+                std::string result = pipeColors(my_matches.m_code);
 
-                    if(result.size() != 0)
+                if(result.size() != 0)
+                {
+                    // Replace the Color, if not ansi then remove the color!
+                    if(m_session_data->m_is_use_ansi)
                     {
-                        // Replace the Color, if not ansi then remove the color!
-                        if(m_session_data->m_is_use_ansi)
-                        {
-                            ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
-                        }
-                        else
-                        {
-                            ansi_string.replace(my_matches.m_offset, my_matches.m_length, "");
-                        }
+                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
                     }
                     else
                     {
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
+                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, "");
                     }
                 }
-                break;
+                else
+                {
+                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
+                }
+            }
+            break;
 
             case 2: // Pipe w/ 2 Chars and 4 Digits // |XY0101
-                {
-//                    std::cout << "Pipe w/ 2 Chars and 4 Digits // |XY0101" << std::endl;
-                    // Remove for now, haven't gotten this far!
-                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, "       ");
-                }
-                break;
+            {
+                log->xrmLog<Logging::DEBUG_LOG>("Pipe w/ 2 Chars and 4 Digits // |XY0101");
+                // Remove for now, haven't gotten this far!
+                ansi_string.replace(my_matches.m_offset, my_matches.m_length, "       ");
+            }
+            break;
 
             case 3: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
-                {
-//                    std::cout << "Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33" << std::endl;
-                    std::string result = seperatePipeWithCharsDigits(my_matches.m_code);
+            {
+                log->xrmLog<Logging::DEBUG_LOG>("Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33");
+                std::string result = seperatePipeWithCharsDigits(my_matches.m_code);
 
-                    if(result.size() != 0)
-                    {
-                        // Replace the string
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
-                    }
+                if(result.size() != 0)
+                {
+                    // Replace the string
+                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
                 }
-                break;
+            }
+            break;
 
             case 4: // Pipe w/ 2 CHARS
                 // This one will need replacement in the string parsing
                 // Pass the original string becasue of |DE for delay!
-                {
-//                    std::cout << "Pipe w/ 2 CHARS // |AA" << std::endl;
-                    std::string result = parsePipeWithChars(my_matches.m_code);
+            {
+                log->xrmLog<Logging::DEBUG_LOG>("Pipe w/ 2 CHARS // |AA");
+                std::string result = parsePipeWithChars(my_matches.m_code);
 
-                    if(result.size() != 0)
-                    {
-                        // Replace the string
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
-                    }
-                    else
-                    {
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
-                    }
+                if(result.size() != 0)
+                {
+                    // Replace the string
+                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
                 }
-                break;
+                else
+                {
+                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
+                }
+            }
+            break;
 
             case 5: // %%FILENAME.EXT  get filenames for loading from string prompts
-                {
-//                    std::cout << "replacing %%FILENAME.EXT codes" << std::endl;
-                    std::string result = parseFilename(my_matches.m_code);
+            {
+                log->xrmLog<Logging::DEBUG_LOG>("Replacing %%FILENAME.EXT codes");
+                std::string result = parseFilename(my_matches.m_code);
 
-                    if(result.size() != 0)
-                    {
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
-                    }
-                    else
-                    {
-                        std::string s(my_matches.m_length, ' ');
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, s);
-                    }
+                if(result.size() != 0)
+                {
+                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
                 }
-                break;
+                else
+                {
+                    std::string s(my_matches.m_length, ' ');
+                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, s);
+                }
+            }
+            break;
 
             case 6: // Percent w/ 2 CHARS
-                {
-//                    std::cout << "Percent w/ 2 CHARS" << std::endl;
-                    // Remove for now, haven't gotten this far!
-                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
-                }
-                break;
+            {
+                log->xrmLog<Logging::DEBUG_LOG>("Percent w/ 2 CHARS");
+                // Remove for now, haven't gotten this far!
+                ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
+            }
+            break;
 
             case 7: // Percent with 2 digits, custom codes
-                {
-                    // Were just removing them becasue they are processed.
-                    // Now that first part of sequence |01 etc.. are processed!
-//                    std::cout << "replacing %## codes" << std::endl;
-                    // Remove for now, haven't gotten this far!
-                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
-                }
-                break;
+            {
+                // Were just removing them becasue they are processed.
+                // Now that first part of sequence |01 etc.. are processed!
+                log->xrmLog<Logging::DEBUG_LOG>("replacing %## codes");
+                // Remove for now, haven't gotten this far!
+                ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
+            }
+            break;
 
             default:
                 break;
@@ -853,7 +851,9 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
  */
 std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std::vector<MapType> &code_map)
 {
-    std::cout << "generic code_map.size(): " << code_map.size() << std::endl;
+    Logging *log = Logging::instance();
+    log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMapGenerics] code_map.size()=", code_map.size(), __LINE__, __FILE__);
+
     std::string ansi_string = screen;
     MapType my_matches;
 
@@ -879,13 +879,14 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
 
             if(it != m_mapped_codes.end())
             {
-                //std::cout << "gen found: " << my_matches.m_code << " : " << it->second << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen found=", my_matches.m_code, it->second, __LINE__, __FILE__);
+
                 // If found, replace mci sequence with text
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, it->second);
             }
             else
             {
-                //std::cout << "gen not found: " << my_matches.m_code << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen not found=", my_matches.m_code, it->second, __LINE__, __FILE__);
                 std::string remove_code = "";
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, remove_code);
             }
@@ -948,7 +949,8 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
             // is not the same as the next!
             if(start == matches[0].second)
             {
-                std::cout << "no more matches!" << std::endl;
+                Logging *log = Logging::instance();
+                log->xrmLog<Logging::DEBUG_LOG>("[parseToCodeMap] no Code Maps Found", __LINE__, __FILE__);
                 break;
             }
 
@@ -977,6 +979,18 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
                     my_matches.m_length = matches[s].length();
                     my_matches.m_match  = s;
                     my_matches.m_code   = matches[s].str();
+
+                    // TODO, check, might not be needed here, might be pre-parsing!!
+                    // UTF-8. meed to use a utf8-distance to get actual char off-set to match
+                    // screen buffer now vs. raw byte off-set.
+                    /*
+                    int match_off_set = my_matches.m_offset;
+                    auto new_it = ansi_string.begin() + match_off_set;
+                    int char_length = utf8::distance(ansi_string.begin(), new_it);
+
+                    my_matches.m_offset = char_length;
+                    */
+
                     code_map.push_back(std::move(my_matches));
                 }
             }
@@ -984,11 +998,10 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
     }
     catch(std::regex_error &ex)
     {
-        std::cout << ex.what() << std::endl;
-        std::cout << "CODE IS: " << ex.code() << " " << __FILE__ << __LINE__ << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("[parseToCodeMap] Exception=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
-    std::cout << "code_map.size(): " << code_map.size() << std::endl;
     return code_map;
 }
 
@@ -1080,7 +1093,9 @@ std::string SessionIO::pipe2promptFormat(const std::string &sequence, config_ptr
     for(unsigned int i = 0; i < code_map.size(); i++)
     {
         auto &map = code_map[i];
-        std::cout << "Menu Format Code: " << map.m_code << std::endl;
+
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("[pipe2promptFormat] Menu Format Code=", map.m_code, __LINE__, __FILE__);
 
         // Control Codes are in Group 2
         switch(map.m_match)
@@ -1132,8 +1147,8 @@ bool SessionIO::checkRegex(const std::string &sequence, const std::string &expre
     }
     catch(std::regex_error &ex)
     {
-        std::cout << ex.what() << std::endl;
-        std::cout << "CODE IS: " << ex.code() << " " << __FILE__ << __LINE__ << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("[checkRegex] Expression=", expression, "Exception=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
     return result;

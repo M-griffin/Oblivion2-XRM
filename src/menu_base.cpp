@@ -4,6 +4,7 @@
 #include "data-sys/menu_prompt_dao.hpp"
 #include "access_condition.hpp"
 #include "directory.hpp"
+#include "logging.hpp"
 
 #include <locale>
 #include <cstring>
@@ -40,14 +41,11 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_use_first_command_execution(true)
     , m_logoff(false)
 {
-    std::cout << "MenuBase" << std::endl;
     m_config = TheCommunicator::instance()->getConfiguration();
 }
 
 MenuBase::~MenuBase()
 {
-    std::cout << "~MenuBase" << std::endl;
-
     // Pop Functions off the stack.
     std::vector<std::function< void(const std::string &, const bool &is_utf8)> >().swap(m_menu_functions);
     std::vector<std::function< bool(const MenuOption &)> >().swap(m_execute_callback);
@@ -183,11 +181,12 @@ void MenuBase::readInMenuData()
         else
         {
             // Fallck is if user doesn't have access.  update this lateron.
-            std::cout << "Menu doesn't exist, loading fallback if exists." << std::endl;
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::DEBUG_LOG>("Menu doesn't exist, loading fallback if exists.", __LINE__, __FILE__);
 
             if(m_fallback_menu.size() > 0)
             {
-                std::cout << "Loading Fallback menu " << m_fallback_menu << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("Loading fallback menu", m_fallback_menu, __LINE__, __FILE__);
                 m_current_menu = m_fallback_menu;
                 return readInMenuData();
             }
@@ -214,15 +213,9 @@ void MenuBase::loadInMenu(std::string menu_name)
     // Read in the Current Menu
     readInMenuData();
 
-    // Testing Information pulled in.
-    std::cout << "Menu Name: " << m_menu_info->menu_name << std::endl;
-    std::cout << "Menu Pulldown: " << m_menu_info->menu_pulldown_file << std::endl;
-    std::cout << "Menu Helpfile: " << m_menu_info->menu_help_file << std::endl;
-
-    // Check If user has access for menu.
-
-    // if not load fallback menu.. etc..
-    std::cout << "Fallback Menu: " << m_fallback_menu << std::endl;
+    Logging *log = Logging::instance();
+    log->xrmLog<Logging::DEBUG_LOG>("Menu Name=", m_menu_info->menu_name, "Menu Pulldown=", m_menu_info->menu_pulldown_file,
+                                    "Menu Helpfile=", m_menu_info->menu_help_file, "Fallback Menu=", m_fallback_menu);
 }
 
 /**
@@ -239,7 +232,6 @@ void MenuBase::importMenu(menu_ptr menu_info)
     checkMenuOptionsAcsAccess();
 
     // Now we need to process custom screens from module menu
-
 }
 
 /**
@@ -325,7 +317,6 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
     {
         auto &map = code_map[i];
 
-        //std::cout << "Generic Code: " << map.m_code << std::endl;
         if(map.m_code[1] == 'K')
         {
             ++key_columns;
@@ -340,7 +331,6 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
     // No codes found in ansi, or invalid combination exit!
     if(key_columns == 0 || key_columns != des_columns)
     {
-        //std::cout << "No Generic Code Maps found." << std::endl;
         return output_screen;
     }
 
@@ -426,7 +416,6 @@ std::string MenuBase::processGenericScreens()
 
     if(idx != std::string::npos)
     {
-        std::cout << "parsing menu code title" << std::endl;
         top_screen.replace(
             idx,
             3,
@@ -617,7 +606,6 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
     for(unsigned int i = 0; i < code_map.size(); i++)
     {
         auto &map = code_map[i];
-        std::cout << "Menu Prompt Code: " << map.m_code << std::endl;
 
         // Control Codes are in Group 2
         if(map.m_match == 2)
@@ -636,7 +624,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
                     match_found = true;
                     break;
 
-                    // Handle yes /no /continue
+                // Handle yes /no /continue
 
                 default:
                     break;
@@ -659,8 +647,6 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string)
  */
 std::string MenuBase::loadMenuScreen()
 {
-    std::cout << "loadMenuScreen" << std::endl;
-
     // Check Pulldown FileID
     std::string screen_data = "";
 
@@ -764,7 +750,6 @@ std::string MenuBase::buildLightBars()
  */
 void MenuBase::redisplayMenuScreen()
 {
-    std::cout << " *** redisplay Menu Screen *** " << std::endl;
     // Read in the Menu ANSI
     std::string buffer = loadMenuScreen();
     std::string output = m_session_io.pipe2ansi(buffer);
@@ -798,22 +783,17 @@ void MenuBase::redisplayMenuScreen()
  */
 void MenuBase::executeFirstAndEachCommands()
 {
-    std::locale::global(std::locale(""));
-    std::cout.imbue(std::locale());
-
     // Now loop and scan for first cmd and each time
     for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
     {
         auto &m = m_menu_info->menu_options[i];
+
         // Process all First Commands or commands that should run every action.
-        //std::cout << "index: " << m.index << std::endl;
-        //std::cout << "menu_key: " << m.menu_key << std::endl;
         std::string new_key = upper_case(m.menu_key);
         m.menu_key = std::move(new_key);
 
         if(m.menu_key == "FIRSTCMD" || m.menu_key == "EACH")
         {
-            //std::cout << "*** FOUND FIRSTCMD! EXECUTE: " << m.command_key << std::endl;
             executeMenuOptions(m);
         }
     }
@@ -831,7 +811,8 @@ std::vector<std::string> MenuBase::getListOfMenuPrompts()
     // check result set, if no menu then return gracefully.
     if(result_set.size() == 0)
     {
-        std::cout << "\r\n*** No Menu Prompt .yaml files found!" << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("No Menu Prompt .yaml files found!");
         return result_list;
     }
 
@@ -898,8 +879,6 @@ std::string MenuBase::loadMenuPrompt()
     // Load Menu prompt.
     m_menu_prompt.reset(new MenuPrompt());
 
-    std::cout << "Loading Menu Prompt: " << prompt << std::endl;
-
     // Load YAML Menu Prompt
     MenuPromptDao mnu_prompt(m_menu_prompt, prompt, GLOBAL_MENU_PROMPT_PATH);
     bool is_loaded = mnu_prompt.loadMenuPrompt();
@@ -938,11 +917,11 @@ std::string MenuBase::loadMenuPrompt()
     else
     {
         prompt = "";
-        std::cout << "No Menu prompts loaded." << std::endl;
 
         if(m_menu_info->menu_prompt.size() > 0)
         {
-            std::cout << "Use Default Prompt String in Menu." << std::endl;
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::DEBUG_LOG>("Use Default Prompt String in Menu.");
             prompt = "\x1b[?25h"; // Turn on Cursor.
             prompt +=  m_session_io.pipe2ansi(m_menu_info->menu_prompt);
         }
@@ -991,7 +970,6 @@ void MenuBase::loadAndStartupMenu()
 {
     // Check Configuration here,  if use SpecialLogin (Matrix Menu)
     // Then load it, otherwise jump to Entering UserID / P
-    std::cout << "Loading Matrix Menu -  Menu Input " << std::endl;
 
     // 1. Make sure the Input is set to the
     m_input_index = 0; // MENU_INPUT;
@@ -1004,7 +982,8 @@ void MenuBase::loadAndStartupMenu()
     // Validate menu options loaded.
     if(m_menu_info->menu_options.size() < 1)
     {
-        std::cout << "Menu has no menu_options: " << m_current_menu << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("Menu has no menu_options", m_current_menu);
         return;
     }
 
@@ -1090,8 +1069,6 @@ void MenuBase::loadAndStartupMenu()
             // Process buffer for PullDown Codes. results for TESTING, are discarded.
             std::string result = m_ansi_process->screenBufferParse();
 
-
-            std::cout << " *** push out lightbars *** " << std::endl;
             // Now Build the Light bars
             std::string light_bars = buildLightBars();
 
@@ -1129,8 +1106,6 @@ void MenuBase::loadAndStartupMenu()
  */
 void MenuBase::lightbarUpdate(unsigned int previous_pulldown_id)
 {
-
-    std::cout << " *** lightbar update! *** " << std::endl;
     // Draw Light bars, use next item to determine next/previous id to pull.
     std::string light_bars = "";
     // Moved to Next Item
@@ -1214,10 +1189,8 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
      * on yes/ no..  yes executes then does * to return,, n just returns on *
      */
 
-    std::cout << "STANDARD INPUT: " << input << " KEY: " << key << std::endl;
-
-    std::locale::global(std::locale(""));
-    std::cout.imbue(std::locale());
+    Logging *log = Logging::instance();
+    log->xrmLog<Logging::DEBUG_LOG>("STANDARD INPUT=", input, "KEY=", key);
 
     // Check for wildcard command input.
     std::string::size_type idx;
@@ -1240,8 +1213,7 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
         std::string key_match = key.substr(0, idx);
         std::string input_match = input.substr(0, m_common_io.numberOfChars(key_match));
 
-        std::cout << "key_match: " << key_match << std::endl;
-        std::cout << "input_match: " << input_match << std::endl;
+        log->xrmLog<Logging::DEBUG_LOG>("key_match=", key_match, "input_match=", input_match);
 
         // Normalize and upper case for testing key input
         key_match = upper_case(key_match);
@@ -1262,7 +1234,7 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
     }
     else if(idx == 0)
     {
-        std::cout << "Wild Card Key * By Itself: " << key << std::endl;
+        log->xrmLog<Logging::DEBUG_LOG>("Wild Card Key * By Itself=", key);
         return true;
     }
 
@@ -1272,7 +1244,7 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
     // Handle one to one matches.
     if(input_normailized.compare(key_normalized) == 0)
     {
-        std::cout << "Match Found " << input_normailized << std::endl;
+        log->xrmLog<Logging::DEBUG_LOG>("Match Found=", input_normailized);
         return true;
     }
 
@@ -1321,7 +1293,8 @@ bool MenuBase::handleLightbarSelection(const std::string &input)
     else
     {
         // Add home end.  page etc..
-        std::cout << "lightbar ELSE!" << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("lightbar ELSE!=", input);
     }
 
     if(executed > 0)
@@ -1344,6 +1317,8 @@ bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, 
     std::string current_menu = m_current_menu;
     int executed = 0;
 
+    Logging *log = Logging::instance();
+
     // First Check for Execute on LightBar Selection.
     // If no valid pulldown id matched the active pulldown ID, then it's not valid.
     if(is_enter)
@@ -1353,7 +1328,7 @@ bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, 
         if(m.pulldown_id == m_active_pulldownID)
         {
             // Then we have a match!  Execute the Menu Command with this ID!
-            std::cout << "[ENTER] Menu Command HOTKEY Executed for: " << m.menu_key << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("[ENTER] Menu Command HOTKEY Executed for=", m.menu_key);
 
             if(m.menu_key != "FIRSTCMD" && m.menu_key != "EACH")
             {
@@ -1369,7 +1344,7 @@ bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, 
                         return false;
                     }
 
-                    std::cout << "set stack_reassignment = true " << std::endl;
+                    log->xrmLog<Logging::DEBUG_LOG>("set stack_reassignment = true");
                     // Now assign the m.menu_key to the input, so on next loop, we hit any stacked commands!
                     // If were in pulldown menu, and the first lightbar has stacked commands, then we need
                     // to cycle through the remaining command's for stacked on lightbars.
@@ -1380,7 +1355,6 @@ bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, 
                 /*
                 // Testing for Stack Reassignment on FeedBack Lightbars
                 executeMenuOptions(m);
-                std::cout << "set stack_reassignment = true " << std::endl;
                 // Now assign the m.menu_key to the input, so on next loop, we hit any stacked commands!
                 // If were in pulldown menu, and the first lightbar has stacked commands, then we need
                 // to cycle through the remaining command's for stacked on lightbars.
@@ -1393,7 +1367,7 @@ bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, 
     else
     {
         // NOT ENTER and pulldown,  check hotkeys here!!
-        std::cout << "[HOTKEY] Menu Command HOTKEY Executed for: " << m.menu_key << std::endl;
+        log->xrmLog<Logging::DEBUG_LOG>("[HOTKEY] Menu Command HOTKEY Executed for=", m.menu_key);
 
         if(executeMenuOptions(m))
         {
@@ -1423,6 +1397,8 @@ bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, 
  */
 void MenuBase::executeEachCommands()
 {
+    Logging *log = Logging::instance();
+
     // Then do not loop and execute this!
     // Get Pulldown menu commands, Load all from menu options (disk)
     for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
@@ -1435,7 +1411,7 @@ void MenuBase::executeEachCommands()
         {
             // Process, although should each be execure before, or after a menu command!
             // OR is each just on each load/reload of menu i think!!
-            std::cout << "FOUND EACH! EXECUTE: " << m.command_key << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("FOUND EACH! EXECUTE=", m.command_key);
             executeMenuOptions(m);
         }
     }
@@ -1447,11 +1423,7 @@ void MenuBase::executeEachCommands()
  */
 bool MenuBase::processMenuOptions(const std::string &input)
 {
-    std::cout << "processMenuOptions: " << input << std::endl;
-
-    // Create system default locale
-    std::locale::global(std::locale(""));
-    std::cout.imbue(std::locale());
+    Logging *log = Logging::instance();
 
     bool is_enter = false;
     int  executed = 0;
@@ -1470,7 +1442,7 @@ bool MenuBase::processMenuOptions(const std::string &input)
     // Check if ENTER was hit as a command!
     if(input_text == "ENTER")
     {
-        std::cout << "EXECUTE ENTER!: " << input_text << std::endl;
+        log->xrmLog<Logging::DEBUG_LOG>("EXECUTE ENTER=", input_text);
         is_enter = true;
 
         // Push out a NewLine after ENTER Executions
@@ -1485,8 +1457,7 @@ bool MenuBase::processMenuOptions(const std::string &input)
     {
         auto &m = m_menu_info->menu_options[i];
 
-        std::cout << "MENU KEY: " << m.menu_key << std::endl;
-        std::cout << "Input: " << input_text << std::endl;
+        log->xrmLog<Logging::DEBUG_LOG>("MENU KEY=", m.menu_key, "Input=", input_text);
 
         // Skip all first CMD's.. where only processing input here.
         // FIRSTCMD are executed when the menu loads.
@@ -1508,12 +1479,10 @@ bool MenuBase::processMenuOptions(const std::string &input)
                 // First Make sure the pulldown menu, doesn't have menu keys set to specific
                 // Control Sequence,  If so, they are normal menu commands, execute first
                 // Instead of lightbar interaction.
-                std::cout << "Handle 1 " << m.menu_key << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("Pulldown Handle 1=", m.menu_key);
 
                 if(handleStandardMenuInput(clean_sequence, m.menu_key))
                 {
-                    std::cout << "STANDARD MATCH, EXECUTING " << m.menu_key << std::endl;
-
                     if(executeMenuOptions(m))
                     {
                         ++executed;
@@ -1536,12 +1505,10 @@ bool MenuBase::processMenuOptions(const std::string &input)
             else
             {
                 // Handle Standard Input for CONTROL KEYS.
-                std::cout << "Handle 2 " << m.menu_key << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("Pulldown Handle 2=", m.menu_key);
 
                 if(handleStandardMenuInput(clean_sequence, m.menu_key))
                 {
-                    std::cout << "STANDARD MATCH, EXECUTING " << m.menu_key << std::endl;
-
                     if(executeMenuOptions(m))
                     {
                         ++executed;
@@ -1564,7 +1531,7 @@ bool MenuBase::processMenuOptions(const std::string &input)
             // Pulldown selection.
             if(m_is_active_pulldown_menu)
             {
-                std::cout << "handlePulldownHotKeys" << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("handlePulldownHotKeys");
 
                 // Handles ENTER Selection or Hotkeys Command Input.
                 if(handlePulldownHotKeys(m, is_enter, stack_reassignment))
@@ -1578,7 +1545,7 @@ bool MenuBase::processMenuOptions(const std::string &input)
                     // With Same Menu Key are executed (stacked commands) afterwords in order.
                     if(stack_reassignment && is_enter)
                     {
-                        std::cout << "stack_reassignment TRUE, KEY: " << m.menu_key << std::endl;
+                        log->xrmLog<Logging::DEBUG_LOG>("stack_reassignment TRUE, KEY=", m.menu_key);
                         input_text.clear();
                         input_text = m.menu_key;
                         stack_reassignment = false;
@@ -1591,7 +1558,7 @@ bool MenuBase::processMenuOptions(const std::string &input)
             else
             {
                 // They m.menu_key compared, execute it
-                std::cout << "ENTER OR HOT KEY MATCH and EXECUTE! " << m.menu_key << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("ENTER OR HOT KEY MATCH and EXECUTE!=", m.menu_key);
 
                 if(executeMenuOptions(m))
                 {
@@ -1602,12 +1569,10 @@ bool MenuBase::processMenuOptions(const std::string &input)
         else
         {
             // Handle Standard Menu, Input Field processing.
-            std::cout << "Handle 3 " << m.menu_key << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("Pulldown Handle 3=", m.menu_key);
 
             if(handleStandardMenuInput(input_text, m.menu_key))
             {
-                std::cout << "STANDARD MATCH, EXECUTING " << m.menu_key << std::endl;
-
                 if(executeMenuOptions(m))
                 {
                     ++executed;
@@ -1621,8 +1586,6 @@ bool MenuBase::processMenuOptions(const std::string &input)
             return false;
         }
     }
-
-
 
     // Check for Change Menu before this point, if we changed the menu
     // Then do not re-execute menu commands for previous menu
@@ -1697,10 +1660,9 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
     std::string key = "";
     std::string result = m_session_io.getInputField(character_buffer, key, Config::sMenuPrompt_length);
 
-    //std::cout << "result: " << result << std::endl;
-    if(result == "aborted") // ESC was hit, make this just clear the input text, or start over!
+    // ESC was hit, make this just clear the input text, or start over!
+    if(result == "aborted")
     {
-        std::cout << "ESC aborted!" << std::endl;
     }
     else if(result[0] == '\n')
     {
@@ -1749,17 +1711,13 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
  */
 void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf8)
 {
-    std::cout << " *** menuInput" << std::endl;
-
     // If were in lightbar mode, then we are using hotkeys.
     if(m_is_active_pulldown_menu)
     {
-        std::cout << "handlePulldown" << std::endl;
         handlePulldownInput(character_buffer, is_utf8);
     }
     else
     {
-        std::cout << "handleStandard" << std::endl;
         handleStandardInput(character_buffer);
     }
 }
@@ -1770,6 +1728,5 @@ void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf
  */
 void MenuBase::menuYesNoBarInput(const std::string &character_buffer, const bool &is_utf8)
 {
-    std::cout << "*** yesNO Menu Bar Input" << std::endl;
     handlePulldownInput(character_buffer, is_utf8);
 }

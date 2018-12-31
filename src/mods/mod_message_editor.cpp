@@ -1,5 +1,6 @@
 #include "mod_message_editor.hpp"
 #include "../ansi_processor.hpp"
+#include "../logging.hpp"
 
 #include <string>
 #include <vector>
@@ -14,14 +15,12 @@ bool ModMessageEditor::update(const std::string &character_buffer, const bool &)
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
-        std::cout << "ModMessageEditor() !m_is_active" << std::endl;
         return false;
     }
 
     // Return True when were keeping module active / else false;
     if(character_buffer.size() == 0)
     {
-        std::cout << "ModMessageEditor() !character_buffer size 0" << std::endl;
         return true;
     }
 
@@ -37,7 +36,6 @@ bool ModMessageEditor::update(const std::string &character_buffer, const bool &)
  */
 bool ModMessageEditor::onEnter()
 {
-    std::cout << "OnEnter() ModMessageEditor\n";
     m_is_active = true;
 
     // Grab ANSI Screen, display, if desired.. logon.ans maybe?
@@ -56,7 +54,6 @@ bool ModMessageEditor::onEnter()
  */
 bool ModMessageEditor::onExit()
 {
-    std::cout << "OnExit() ModMessageEditor\n";
     m_is_active = false;
     return true;
 }
@@ -215,6 +212,38 @@ std::string ModMessageEditor::processBottomTemplate(ansi_process_ptr ansi_proces
 }
 
 /**
+ * @brief Scrub CR LF from Screen Templates
+ * @param screen
+ */
+void ModMessageEditor::scrubNewLinesChars(std::string &screen)
+{
+    // MID Ansi, remove any extra CR / LF carriage returns.
+    std::string::size_type index = 0;
+
+    while(index != std::string::npos)
+    {
+        index = screen.find("\r", index);
+
+        if(index != std::string::npos)
+        {
+            screen.erase(index, 1);
+        }
+    }
+
+    index = 0;
+
+    while(index != std::string::npos)
+    {
+        index = screen.find("\n", index);
+
+        if(index != std::string::npos)
+        {
+            screen.erase(index, 1);
+        }
+    }
+}
+
+/**
  * @brief Processes a MID Template Screen
  * @param ansi_process
  * @param screen
@@ -223,30 +252,7 @@ std::string ModMessageEditor::processBottomTemplate(ansi_process_ptr ansi_proces
 std::string ModMessageEditor::processMidTemplate(ansi_process_ptr ansi_process, const std::string &screen)
 {
     std::string new_screen = screen;
-    std::string::size_type index = 0;
-
-    // MID Ansi, remove any extra CR / LF carriage returns.
-    while(index != std::string::npos)
-    {
-        index = new_screen.find("\r", index);
-
-        if(index != std::string::npos)
-        {
-            new_screen.erase(index, 1);
-        }
-    }
-
-    index = 0;
-
-    while(index != std::string::npos)
-    {
-        index = new_screen.find("\n", index);
-
-        if(index != std::string::npos)
-        {
-            new_screen.erase(index, 1);
-        }
-    }
+    scrubNewLinesChars(new_screen);
 
     // Clear All Mappings
     m_session_io.clearAllMCIMapping();
@@ -272,6 +278,7 @@ std::string ModMessageEditor::processMidTemplate(ansi_process_ptr ansi_process, 
     // Remove Code Mappings from screen the sets up ansi screen
     ansi_process->clearScreen();
     std::string output_screen = m_session_io.parseCodeMapGenerics(new_screen, code_map);
+
     ansi_process->parseAnsiScreen((char *)output_screen.c_str());
 
     std::string mid_screen_line = ansi_process->getScreenFromBuffer(false);
@@ -314,18 +321,13 @@ void ModMessageEditor::setupEditor()
     // Rows uses inbetween top / bot templates on current screen size.
     std::string mid_screen = processMidTemplate(ansi_process, mid_template);
 
-    // Stats
-    std::cout << "========================" << std::endl;
-    std::cout << "m_text_box_top    : " << m_text_box_top << std::endl;
-    std::cout << "m_text_box_bottom : " << m_text_box_bottom << std::endl;
-    std::cout << "m_text_box_left   : " << m_text_box_left << std::endl;
-    std::cout << "m_text_box_right  : " << m_text_box_right << std::endl;
+    Logging *log = Logging::instance();
+    log->xrmLog<Logging::DEBUG_LOG>("m_text_box_top=", m_text_box_top, "m_text_box_bottom=", m_text_box_bottom,
+                                    "m_text_box_left=", m_text_box_left, "m_text_box_right=", m_text_box_right);
 
     // Next combine and output.. Move cursor to top left in box.
     std::string screen_output = top_screen + mid_screen + bot_screen;
     screen_output += "\x1b[" + std::to_string(m_text_box_top) + ";" + std::to_string(m_text_box_left) + "H";
-
-    std::cout << screen_output << std::endl;
 
     baseProcessDeliverInput(screen_output);
 }
@@ -336,18 +338,19 @@ void ModMessageEditor::setupEditor()
  */
 void ModMessageEditor::editorInput(const std::string &input)
 {
+    Logging *log = Logging::instance();
     std::string result = m_session_io.getKeyInput(input);
 
     if(result.size() == 0)
     {
-        std::cout << "[editorInput] [result.size() == 0] input result: " << result << std::endl;
+        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [result.size() == 0] input result=", result);
         return;
     }
     else if(result[0] == 13 || result[0] == 10)
     {
         // Translations for ENTER next line
         //input = "ENTER";
-        std::cout << "[editorInput] [ENTER HIT] input result: " << result << std::endl;
+        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ENTER HIT] input result=", result);
         std::string output = "\r\n\x1b[" + std::to_string(m_text_box_left - 1) + "C";
         baseProcessDeliverInput(output);
     }
@@ -355,27 +358,26 @@ void ModMessageEditor::editorInput(const std::string &input)
     {
         // ESC SEQUENCE - check movement / arrow keys.
         //input = result;
-        std::cout << "[editorInput] ESC Sequence input result: " << result << std::endl;
+        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ESC Sequence] input result=", result);
     }
     else if(result[0] == '\x1b' && result.size() == 1)
     {
         // Check Single ESC KEY - command options
         //input = "ESC";  - quit for now
-        std::cout << "[editorInput] ESC HIT! " << result << std::endl;
+        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ESC HIT!] input result=", result);
 
         m_is_active = false;
     }
     else
     {
-
         // Handle Input Characters here and control chars.
-        std::cout << "[editorInput] STDIO input result: " << result << std::endl;
+        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [STDIO] input result=", result);
 
         for(char c : result)
-            std::cout << "[editorInput] c HIT! " << static_cast<int>(c) << std::endl;
+            log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [c HIT] input result=", static_cast<int>(c));
 
         std::string escape_sequence = m_common_io.getEscapeSequence();
-        std::cout << "[editorInput] ESC Sequence: " << static_cast<int>(escape_sequence[0]) << std::endl;
+        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ESC Sequence] input result=", static_cast<int>(escape_sequence[0]));
 
         // Hot Key Input.
         baseProcessDeliverInput(result);

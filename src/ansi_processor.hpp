@@ -167,7 +167,6 @@ public:
     // Process ANSI screen inserts into the Screen Buffer
     void parseAnsiScreen(char *buff);  // 1
 
-
     // Helpers
     int getYPosition() const
     {

@@ -22,7 +22,6 @@ class SessionManager
 public:
     explicit SessionManager()
     {
-        std::cout << "SessionManager" << std::endl;
     }
     ~SessionManager();
 

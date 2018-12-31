@@ -1,17 +1,17 @@
 #include "encoding.hpp"
+#include "logging.hpp"
 
 #include <string>
 #include <vector>
-#include <locale>
-#include <map>
-#include <clocale>  // locale
-#include <cwchar>   // wchar_t wide characters
 #include <codecvt>
+#include <locale>
+#include <clocale>
+#include <cwchar>
+#include <map>
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
-
 
 /**
  * CP437 -> UTF-8 Character Translation Table
@@ -79,10 +79,9 @@ wchar_t CP437_TABLE[] =
     L'\u207F', L'\u00B2', L'\u25A0', L'\u00A0'
 };
 
-
 Encoding::Encoding()
 {
-    // Populate UCS2 to CP437 Translation Mapping.
+    // Populate UCS to CP437 Translation Back Mapping.
     for(unsigned int char_value = 0; char_value < 256; char_value++)
     {
         map_wide_to_cp437.insert(std::make_pair(CP437_TABLE[char_value], char_value));
@@ -93,7 +92,6 @@ Encoding::~Encoding()
 {
 }
 
-
 /**
  * Windows apperently needs to use it's own WINAPI methods for Wide to Multi-bytes translations
  * Where as Linux can do it with default c++ libs and settin the locale.
@@ -101,7 +99,11 @@ Encoding::~Encoding()
  */
 #ifdef _WIN32
 
-// Convert an UTF8 string to a wide Unicode String
+/**
+ * @brief Convert an UTF8 string to a wide Unicode String
+ * @param mbstr
+ * @return
+ */
 std::wstring Encoding::multibyte_to_wide(const char* mbstr)
 {
     int str_size = strlen(mbstr);
@@ -114,7 +116,11 @@ std::wstring Encoding::multibyte_to_wide(const char* mbstr)
     return wstrTo;
 }
 
-// Convert a wide Unicode string to an UTF8 string
+/**
+ * @brief Convert a wide Unicode string to an UTF8 string
+ * @param wstr
+ * @return
+ */
 std::string Encoding::wide_to_multibyte(const std::wstring &wstr)
 {
     if(wstr.empty()) return std::string();
@@ -127,58 +133,61 @@ std::string Encoding::wide_to_multibyte(const std::wstring &wstr)
 
 #elif TARGET_OS_MAC
 
-std::wstring Encoding::multibyte_to_wide(const char* mbstr) 
+/**
+ * @brief Convert an UTF8 string to a wide Unicode String
+ * @param mbstr
+ * @return
+ */
+std::wstring Encoding::multibyte_to_wide(const char* mbstr)
 {
-	/*
-	std::string incoming_data = std::string(
-                                    reinterpret_cast<const char *>(mbstr),
-                                    strlen((const char *)mbstr)
-                                );*/	
-								
-    // the UTF-8 / UTF-16 standard conversion facet
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> utf16conv;    
-	
-	std::wstring ucs2 = L"";
-    try 
-	{
-        ucs2 = utf16conv.from_bytes(mbstr);	
-    } 
-	catch(const std::range_error& e) 
-	{
-        std::cout << "UCS2 failed after producing " << std::dec << ucs2.size()<<" characters:\n";        
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> utf16conv;
+    std::wstring ucs = L"";
+
+    try
+    {
+        ucs = utf16conv.from_bytes(mbstr);
     }
-	
-	return ucs2;
+    catch(const std::range_error& e)
+    {
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("UCS multibyte_to_wide", e.what(), __LINE__, __FILE__);
+    }
+
+    return ucs;
 }
 
-std::string Encoding::wide_to_multibyte(const std::wstring& wstr) 
-{	
-    std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> ucs2conv;	
-	
-	std::string utf8 = "";
-    try 
-	{
-        utf8 = ucs2conv.to_bytes(wstr);	
-    } 
-	catch(const std::range_error& e) 
-	{
-        std::cout << "UTF8 failed after producing " << std::dec << utf8.size()<<" characters:\n";        
+/**
+ * @brief Convert a wide Unicode string to an UTF8 string
+ * @param wstr
+ * @return
+ */
+std::string Encoding::wide_to_multibyte(const std::wstring& wstr)
+{
+    std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> ucs2conv;
+    std::string utf8 = "";
+
+    try
+    {
+        utf8 = ucs2conv.to_bytes(wstr);
     }
-	return utf8;
+    catch(const std::range_error& e)
+    {
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("UCS wide_to_multibyte", e.what(), __LINE__, __FILE__);
+    }
+
+    return utf8;
 }
 
 #else
 
 /**
- * @brief Used for printing output multibyte (Unicode Translations)
- * @param wide_string
+ * @brief Convert an UTF8 string to a wide Unicode String
+ * @param mbstr
  */
-// Multi-Byte to WIDE (UTF-8 to UTF-16/UCS2)
 std::wstring Encoding::multibyte_to_wide(const char* mbstr)
 {
-    //std::setlocale(LC_ALL, "");
     std::setlocale(LC_ALL, Encoding::ENCODING_TEXT_UTF8.c_str());
-    //std::locale::global(std::locale(Encoding::ENCODING_TEXT_UTF8.c_str()));
     std::cout.imbue(std::locale());
 
     std::wstring result = L"";
@@ -189,8 +198,6 @@ std::wstring Encoding::multibyte_to_wide(const char* mbstr)
 
     for(unsigned int i = 0; i < wstr.size(); i++)
     {
-        //std::wcout << "Wide string: " << wstr[i] << '\n'
-        //           << "The length, including '\\0': " << wstr.size() << '\n';
         result += wstr[i];
     }
 
@@ -198,20 +205,15 @@ std::wstring Encoding::multibyte_to_wide(const char* mbstr)
 }
 
 /**
- * @brief Used for printing output multibyte (Unicode Translations)
+ * @brief Convert a wide Unicode string to an UTF8 string
  * @param wide_string
  */
-
-// Wide To Multi-Byte (UTF-16/UCS2 to UTF-8)
 std::string Encoding::wide_to_multibyte(const std::wstring &wide_string)
 {
-    //std::setlocale(LC_ALL, "");
     std::setlocale(LC_ALL, Encoding::ENCODING_TEXT_UTF8.c_str());
-    //std::locale::global(std::locale(Encoding::ENCODING_TEXT_UTF8.c_str()));
     std::cout.imbue(std::locale());
 
     std::string output = "";
-
     std::mbstate_t state = std::mbstate_t();
 
     for(wchar_t wc : wide_string)
@@ -230,7 +232,6 @@ std::string Encoding::wide_to_multibyte(const std::wstring &wide_string)
         {
             if(ch != '\0')
             {
-                //std::cout << ch << flush;
                 output += ch;
             }
         }
@@ -242,7 +243,7 @@ std::string Encoding::wide_to_multibyte(const std::wstring &wide_string)
 #endif
 
 /**
- * @brief Translation from CP437 to UTF-8 MultiByte Characters
+ * @brief Encode CP437 to UTF-8 Method
  * @param standard_string
  */
 std::string Encoding::utf8Encode(const std::string &standard_string)
@@ -262,7 +263,8 @@ std::string Encoding::utf8Encode(const std::string &standard_string)
         }
         else
         {
-            wide_string += standard_string[i];
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error, utf8Encode ascii_value=", ascii_value, __LINE__, __FILE__);
         }
     }
 
@@ -271,32 +273,36 @@ std::string Encoding::utf8Encode(const std::string &standard_string)
 }
 
 /**
- * @brief Translation from CP437 to UTF-8 MultiByte Characters
+ * @brief Decode UTF-8 to CP437 Method
  * @param standard_string
  */
 std::string Encoding::utf8Decode(const std::string &standard_string)
 {
     std::string output = "";
     const std::wstring wide_string = multibyte_to_wide(standard_string.c_str());
-
-    // loop through UCS2/16 Bit and convert to Single Byte CP437.
     unsigned char c = '\0';
 
-    for(wchar_t usc2_char : wide_string)
+    for(wchar_t usc_char : wide_string)
     {
-        if(map_wide_to_cp437.find(usc2_char) == map_wide_to_cp437.end())
+        if(map_wide_to_cp437.find(usc_char) == map_wide_to_cp437.end())
         {
-            // Null Characters should be excluded, extra byes in transformation to USC2/UTF-16.
-            if (usc2_char == '\0')
+            // Null Characters should be excluded,
+            if(usc_char == '\0')
             {
                 continue;
             }
 
-            std::wcout << "Invalid usc2_char: " << usc2_char << " : " << std::hex << usc2_char << std::endl;
-            c  = '?';
+            // Convert it back to UTF-8 Sequence, so users see some character data anyways.
+            std::wstring usc_string = L"";
+            usc_string += usc_char;
+            std::string utf8_data = wide_to_multibyte(usc_string);
+
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::DEBUG_LOG>("Warning, Invalid CP437 Conversion, convert glyph back to utf8=",  utf8_data, __LINE__, __FILE__);
+            output += utf8_data;
         }
         else
-            c = map_wide_to_cp437.find(usc2_char)->second;
+            c = map_wide_to_cp437.find(usc_char)->second;
 
         output += std::string(1, c);
     }
