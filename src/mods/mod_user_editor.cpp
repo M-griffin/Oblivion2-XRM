@@ -694,7 +694,7 @@ bool ModUserEditor::loadUserById(long user_id)
     if(m_loaded_user.size() > 0)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("Error, user already loaded", __LINE__, __FILE__);
+        log->xrmLog<Logging::DEBUG_LOG>("Error, user already loaded", __LINE__, __FILE__);
         return true;
     }
 
@@ -994,9 +994,9 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
     // Provide Hotkeys only for switching to next/previous options
     switch(input[0])
     {
-        // TODO, update current users m_loaded_user -> m_users_list array with update also.
-        // So when we change users we keep the changes made!
-        // search m_users_listing for previous / next record.
+            // TODO, update current users m_loaded_user -> m_users_list array with update also.
+            // So when we change users we keep the changes made!
+            // search m_users_listing for previous / next record.
         case '[': // previous user
             previousUserById();
             redisplayModulePrompt();
@@ -1085,15 +1085,15 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
 
             case 'R': // Ignore Time Limit
-            {
-                changeInputModule(MOD_USER_FIELD);
-                displayPrompt(PROMPT_USER_FIELD_NOTIMELIMIT);
-                // Setup pre-population to display only T or F instead of True / False
-                std::string bool_value = "";
-                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bIgnoreTimeLimit).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                break;
-            }
+                {
+                    changeInputModule(MOD_USER_FIELD);
+                    displayPrompt(PROMPT_USER_FIELD_NOTIMELIMIT);
+                    // Setup pre-population to display only T or F instead of True / False
+                    std::string bool_value = "";
+                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bIgnoreTimeLimit).at(0);
+                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                    break;
+                }
 
             case 'F': // User Country
                 changeInputModule(MOD_USER_FIELD);
@@ -1102,15 +1102,15 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
 
             case 'S': // Use ANSI Graphics
-            {
-                changeInputModule(MOD_USER_FIELD);
-                displayPrompt(PROMPT_USER_FIELD_USEANSI);
-                // Setup pre-population to display only T or F instead of True / False
-                std::string bool_value = "";
-                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bAnsi).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                break;
-            }
+                {
+                    changeInputModule(MOD_USER_FIELD);
+                    displayPrompt(PROMPT_USER_FIELD_USEANSI);
+                    // Setup pre-population to display only T or F instead of True / False
+                    std::string bool_value = "";
+                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bAnsi).at(0);
+                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                    break;
+                }
 
             case 'G': // User Note
                 changeInputModule(MOD_USER_FIELD);
@@ -1119,15 +1119,15 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
 
             case 'T': // Use VT100 Backspace
-            {
-                changeInputModule(MOD_USER_FIELD);
-                displayPrompt(PROMPT_USER_FIELD_BACKSPACE);
-                // Setup pre-population to display only T or F instead of True / False
-                std::string bool_value = "";
-                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bBackSpaceVt100).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                break;
-            }
+                {
+                    changeInputModule(MOD_USER_FIELD);
+                    displayPrompt(PROMPT_USER_FIELD_BACKSPACE);
+                    // Setup pre-population to display only T or F instead of True / False
+                    std::string bool_value = "";
+                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bBackSpaceVt100).at(0);
+                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                    break;
+                }
 
             case 'H': // User Birth Date
                 changeInputModule(MOD_USER_FIELD);
@@ -1136,15 +1136,15 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
 
             case 'U': // User Wanted
-            {
-                changeInputModule(MOD_USER_FIELD);
-                displayPrompt(PROMPT_USER_FIELD_WANTED);
-                // Setup pre-population to display only T or F instead of True / False
-                std::string bool_value = "";
-                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bWanted).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                break;
-            }
+                {
+                    changeInputModule(MOD_USER_FIELD);
+                    displayPrompt(PROMPT_USER_FIELD_WANTED);
+                    // Setup pre-population to display only T or F instead of True / False
+                    std::string bool_value = "";
+                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bWanted).at(0);
+                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                    break;
+                }
 
             case 'I': // Access Restriction Flags 1, Type Letter to Add / Remove only.
                 // No leadoff data, just input single letters to add or remove
@@ -1154,15 +1154,15 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
 
             case 'V': // Clear Screen or Scroll Screen
-            {
-                changeInputModule(MOD_USER_FIELD);
-                displayPrompt(PROMPT_USER_FIELD_CLEARSCREEN);
-                // Setup pre-population to display only T or F instead of True / False
-                std::string bool_value = "";
-                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bClearOrScroll).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                break;
-            }
+                {
+                    changeInputModule(MOD_USER_FIELD);
+                    displayPrompt(PROMPT_USER_FIELD_CLEARSCREEN);
+                    // Setup pre-population to display only T or F instead of True / False
+                    std::string bool_value = "";
+                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bClearOrScroll).at(0);
+                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                    break;
+                }
 
             case 'J': // Access Restriction Flags 2, Type Letter to Add / Remove only.
                 // No leadoff data, just input single letters to add or remove
@@ -1172,15 +1172,15 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 break;
 
             case 'W': // Do Screen Pause
-            {
-                changeInputModule(MOD_USER_FIELD);
-                displayPrompt(PROMPT_USER_FIELD_SCREENPAUSE);
-                // Setup pre-population to display only T or F instead of True / False
-                std::string bool_value = "";
-                bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bDoPause).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
-                break;
-            }
+                {
+                    changeInputModule(MOD_USER_FIELD);
+                    displayPrompt(PROMPT_USER_FIELD_SCREENPAUSE);
+                    // Setup pre-population to display only T or F instead of True / False
+                    std::string bool_value = "";
+                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bDoPause).at(0);
+                    m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                    break;
+                }
 
             case 'Q': // Quit
                 updateExistingUser();
@@ -1475,19 +1475,19 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                 break;
 
             case 'H': // User Birth Date
-            {
-                // Make sure Date Format is valid
-                std::regex date_regex { m_config->regexp_date_validation };
-                std::smatch str_matches;
-
-                // If invalid display message, but for now ignore changes
-                if(std::regex_match(key, str_matches, date_regex))
                 {
-                    m_loaded_user.back()->dtBirthday = m_common_io.stringToStandardDate(key);
-                }
+                    // Make sure Date Format is valid
+                    std::regex date_regex { m_config->regexp_date_validation };
+                    std::smatch str_matches;
 
-                break;
-            }
+                    // If invalid display message, but for now ignore changes
+                    if(std::regex_match(key, str_matches, date_regex))
+                    {
+                        m_loaded_user.back()->dtBirthday = m_common_io.stringToStandardDate(key);
+                    }
+
+                    break;
+                }
 
             case 'U': // User Wanted
                 if(m_common_io.stringToBool(key) != -1)
@@ -1496,14 +1496,14 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                 break;
 
             case 'I': // Access Restriction Flags 1, Will loop though and toggle each letter.
-            {
-                AccessCondition acs;
+                {
+                    AccessCondition acs;
 
-                for(char c : key)
-                    acs.setFlagToggle(c, true, m_loaded_user.back());
+                    for(char c : key)
+                        acs.setFlagToggle(c, true, m_loaded_user.back());
 
-                break;
-            }
+                    break;
+                }
 
             case 'V': // Clear Screen or Scroll Screen
                 if(m_common_io.stringToBool(key) != -1)
@@ -1512,14 +1512,14 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                 break;
 
             case 'J': // Access Restriction Flags 2, Type Letter to Add / Remove only.
-            {
-                AccessCondition acs;
+                {
+                    AccessCondition acs;
 
-                for(char c : key)
-                    acs.setFlagToggle(c, false, m_loaded_user.back());
+                    for(char c : key)
+                        acs.setFlagToggle(c, false, m_loaded_user.back());
 
-                break;
-            }
+                    break;
+                }
 
             case 'W': // Pause
                 if(m_common_io.stringToBool(key) != -1)
@@ -1673,57 +1673,57 @@ void ModUserEditor::userEditorExtendedFieldHandler(const std::string &input)
                 break;
 
             case 'B': // Password Last change date
-            {
-                // Make sure Date Format is valid
-                std::regex date_regex { m_config->regexp_date_validation };
-                std::smatch str_matches;
-
-                // If invalid display message, but for now ignore changes
-                if(std::regex_match(key, str_matches, date_regex))
                 {
-                    m_loaded_user.back()->dtFirstOn = m_common_io.stringToStandardDate(key);
-                }
+                    // Make sure Date Format is valid
+                    std::regex date_regex { m_config->regexp_date_validation };
+                    std::smatch str_matches;
 
-                break;
-            }
+                    // If invalid display message, but for now ignore changes
+                    if(std::regex_match(key, str_matches, date_regex))
+                    {
+                        m_loaded_user.back()->dtFirstOn = m_common_io.stringToStandardDate(key);
+                    }
+
+                    break;
+                }
 
             case 'N': // Days to Force Password change
                 m_loaded_user.back()->iCSPassChange = m_common_io.stringToInt(key);
                 break;
 
             case 'C': // Signup Date / First On
-            {
-                // Make sure Date Format is valid
-                std::regex date_regex { m_config->regexp_date_validation };
-                std::smatch str_matches;
-
-                // If invalid display message, but for now ignore changes
-                if(std::regex_match(key, str_matches, date_regex))
                 {
-                    m_loaded_user.back()->dtPassChangeDate = m_common_io.stringToStandardDate(key);
-                }
+                    // Make sure Date Format is valid
+                    std::regex date_regex { m_config->regexp_date_validation };
+                    std::smatch str_matches;
 
-                break;
-            }
+                    // If invalid display message, but for now ignore changes
+                    if(std::regex_match(key, str_matches, date_regex))
+                    {
+                        m_loaded_user.back()->dtPassChangeDate = m_common_io.stringToStandardDate(key);
+                    }
+
+                    break;
+                }
 
             case 'O': // File Points
                 m_loaded_user.back()->iFilePoints = m_common_io.stringToInt(key);
                 break;
 
             case 'D': // Expiratrion Date
-            {
-                // Make sure Date Format is valid
-                std::regex date_regex { m_config->regexp_date_validation };
-                std::smatch str_matches;
-
-                // If invalid display message, but for now ignore changes
-                if(std::regex_match(key, str_matches, date_regex))
                 {
-                    m_loaded_user.back()->dtExpirationDate = m_common_io.stringToStandardDate(key);
-                }
+                    // Make sure Date Format is valid
+                    std::regex date_regex { m_config->regexp_date_validation };
+                    std::smatch str_matches;
 
-                break;
-            }
+                    // If invalid display message, but for now ignore changes
+                    if(std::regex_match(key, str_matches, date_regex))
+                    {
+                        m_loaded_user.back()->dtExpirationDate = m_common_io.stringToStandardDate(key);
+                    }
+
+                    break;
+                }
 
             case 'P': // Post/Call Ratio
                 m_loaded_user.back()->iPostCallRatio = m_common_io.stringToInt(key);

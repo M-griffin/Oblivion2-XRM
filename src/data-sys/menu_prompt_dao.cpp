@@ -139,7 +139,7 @@ bool MenuPromptDao::loadMenuPrompt()
         std::string file_version = node["file_version"].as<std::string>();
 
         // Validate File Version
-        log->xrmLog<Logging::CONSOLE_LOG>("MenuPrompt File Version=", file_version);
+        log->xrmLog<Logging::DEBUG_LOG>("MenuPrompt File Version=", file_version);
 
         if(file_version != MenuPrompt::FILE_VERSION)
         {

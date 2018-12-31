@@ -1013,7 +1013,7 @@ bool ModSignup::birthday(const std::string &input)
         catch(std::regex_error &ex)
         {
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("Error, regex date error=", ex.what(), ex.code, __LINE__, __FILE__);
+            log->xrmLog<Logging::ERROR_LOG>("Error, regex date error=", ex.what(), ex.code(), __LINE__, __FILE__);
         }
     }
     else
