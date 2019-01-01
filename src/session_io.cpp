@@ -14,7 +14,6 @@
 #include <sstream>
 
 
-
 SessionIO::SessionIO()
     : m_session_data(nullptr)
 {
@@ -699,7 +698,7 @@ std::string SessionIO::parsePipeWithChars(const std::string &pipe_code)
 std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapType> &code_map)
 {
     Logging *log = Logging::instance();
-    log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMap] code_map.size()=", code_map.size(), __LINE__, __FILE__);
+    log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMap]", __LINE__, __FILE__);
 
     std::string ansi_string = screen;
     MapType my_matches;
@@ -852,7 +851,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std::vector<MapType> &code_map)
 {
     Logging *log = Logging::instance();
-    log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMapGenerics] code_map.size()=", code_map.size(), __LINE__, __FILE__);
+    log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMapGenerics]", __LINE__, __FILE__);
 
     std::string ansi_string = screen;
     MapType my_matches;
@@ -880,13 +879,12 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
             if(it != m_mapped_codes.end())
             {
                 log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen found=", my_matches.m_code, it->second, __LINE__, __FILE__);
-
                 // If found, replace mci sequence with text
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, it->second);
             }
             else
             {
-                log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen not found=", my_matches.m_code, it->second, __LINE__, __FILE__);
+                log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen not found=", __LINE__, __FILE__);
                 std::string remove_code = "";
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, remove_code);
             }
