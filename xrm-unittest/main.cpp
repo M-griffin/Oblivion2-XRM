@@ -76,7 +76,7 @@ int main()
 {
     // Startup OBV/2 Configurations for proper unit coverage.
 
-    std::cout << "Oblivion/2 XRM-Server Unit Tests (c) 2015-2018 Michael Griffin."
+    std::cout << "Oblivion/2 XRM-Server Unit Tests (c) 2015-2019 Michael Griffin."
               << std::endl
               << std::endl;
 

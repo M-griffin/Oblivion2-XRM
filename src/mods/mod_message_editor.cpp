@@ -326,8 +326,8 @@ void ModMessageEditor::setupEditor()
     std::string mid_screen = processMidTemplate(ansi_process, mid_template);
 
     Logging *log = Logging::instance();
-    log->xrmLog<Logging::CONSOLE_LOG>("m_text_box_top=", m_text_box_top, "m_text_box_bottom=", m_text_box_bottom,
-                                      "m_text_box_left=", m_text_box_left, "m_text_box_right=", m_text_box_right);
+    log->xrmLog<Logging::DEBUG_LOG>("m_text_box_top=", m_text_box_top, "m_text_box_bottom=", m_text_box_bottom,
+                                    "m_text_box_left=", m_text_box_left, "m_text_box_right=", m_text_box_right);
 
     // Next combine and output.. Move cursor to top left in box.
     std::string screen_output = top_screen + mid_screen + bot_screen;

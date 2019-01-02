@@ -1,5 +1,5 @@
 /**
- * Oblivion/2 XRM (c) 2015-2018 Michael Griffin
+ * Oblivion/2 XRM (c) 2015-2019 Michael Griffin
  * A Telnet Server and BBS system modeled after Oblivion/2 bbs software.
  *
  * XRM = Extreme Remake!
@@ -57,7 +57,7 @@ Logging* Logging::m_global_logging_instance = nullptr;
 // auto main(int argc, char* argv[]) -> int
 auto main() -> int
 {
-    std::cout << "Oblivion/2 XRM-Server (c) 2015-2018 Michael Griffin."
+    std::cout << "Oblivion/2 XRM-Server (c) 2015-2019 Michael Griffin."
               << std::endl
               << std::endl;
 

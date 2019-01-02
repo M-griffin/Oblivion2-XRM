@@ -297,12 +297,12 @@ bool ModLogon::logon(const std::string &input)
         // Check if users enter valid identifier.
         if(checkUserLogon(key))
         {
-            log->xrmLog<Logging::CONSOLE_LOG>("PROMPT_USERNAME=", m_logon_user->sHandle, __FILE__, __LINE__);
+            log->xrmLog<Logging::CONSOLE_LOG>("PROMPT_USERNAME=", m_logon_user->sHandle);
             changeNextModule();
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>("PROMPT_INVALID_USERNAME=", key, __FILE__, __LINE__);
+            log->xrmLog<Logging::ERROR_LOG>("PROMPT_INVALID_USERNAME=", key);
 
             displayPromptAndNewLine(PROMPT_INVALID_USERNAME);
             ++m_failure_attempts;
@@ -373,11 +373,11 @@ bool ModLogon::validate_password(const std::string &input)
 
     if(security->sPasswordHash.compare(password) == 0)
     {
-        log->xrmLog<Logging::CONSOLE_LOG>("Password Successful=", m_logon_user->sHandle, __FILE__, __LINE__);
+        log->xrmLog<Logging::CONSOLE_LOG>("Password Successful=", m_logon_user->sHandle);
         return true;
     }
 
-    log->xrmLog<Logging::ERROR_LOG>("Password Failure=", m_logon_user->sHandle, __FILE__, __LINE__);
+    log->xrmLog<Logging::ERROR_LOG>("Password Failure=", m_logon_user->sHandle);
     return false;
 }
 

@@ -3,7 +3,7 @@
  *
  * Rewritten / author: 2016-02-19 / mrmisticismo@hotmail.com
  * Published / author: 2005-08-12 / grymse@alhem.net
- * Copyright (C) 2015-2018  Michael Griffin
+ * Copyright (C) 2015-2019  Michael Griffin
  * Copyright (C) 2001-2006  Anders Hedstrom
  * This program is made available under the terms of the GNU GPL.
  */
@@ -15,16 +15,16 @@
 
 namespace SQLW
 {
-    class Database;
-    class Query;
+class Database;
+class Query;
 
-    /** Log class interface. */
-    class IError
-    {
-    public:
-        virtual void databaseError(Database&, const std::string&) = 0;
-        virtual void databaseError(Database&, Query&, const std::string&) = 0;
-    };
+/** Log class interface. */
+class IError
+{
+public:
+    virtual void databaseError(Database&, const std::string&) = 0;
+    virtual void databaseError(Database&, Query&, const std::string&) = 0;
+};
 
 } // namespace SQLW {
 

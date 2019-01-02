@@ -11,7 +11,7 @@
 
 // Setup the file version for the config file.
 const std::string Config::FILE_VERSION = "1.0.4";
-
+static bool is_version_displayed = false;
 
 ConfigDao::ConfigDao(config_ptr config, std::string path)
     : m_config(config)
@@ -346,7 +346,11 @@ bool ConfigDao::loadConfig()
         std::string file_version = node["file_version"].as<std::string>();
 
         // Validate File Version
-        std::cout << std::endl << "Config File Version: " << file_version << std::endl;
+        if(!is_version_displayed)
+        {
+            std::cout << std::endl << "Config File Version: " << file_version << std::endl;
+            is_version_displayed = true;
+        }
 
         if(file_version != Config::FILE_VERSION)
         {
