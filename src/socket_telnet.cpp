@@ -32,7 +32,7 @@ int SDL_Socket::sendSocket(unsigned char *buffer, Uint32 length)
             if(SDLNet_GetError() && strlen(SDLNet_GetError()))
             {
                 Logging *log = Logging::instance();
-                log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_Send=", SDLNet_GetError, __FILE__, __LINE__);
+                log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_Send=", SDLNet_GetError(), __FILE__, __LINE__);
                 return(0);
             }
         }
@@ -150,7 +150,7 @@ void SDL_Socket::spawnSocket(TCPsocket socket)
 
     if(!m_socket_set)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_AllocSocketSet=", SDLNet_GetError, __FILE__, __LINE__);
+        log->xrmLog<Logging::ERROR_LOG>("SDLNet_AllocSocketSet=", SDLNet_GetError(), __FILE__, __LINE__);
         onExit();
         return;
     }
@@ -158,7 +158,7 @@ void SDL_Socket::spawnSocket(TCPsocket socket)
     // Attached New Socket from Accept to it's own session instance.
     if(SDLNet_TCP_AddSocket(m_socket_set, m_tcp_socket) == -1)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_AddSocket=", SDLNet_GetError, __FILE__, __LINE__);
+        log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_AddSocket=", SDLNet_GetError(), __FILE__, __LINE__);
         onExit();
         return;
     }
@@ -180,7 +180,7 @@ bool SDL_Socket::onConnect()
 
     if(!m_socket_set)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_AllocSocketSet=", SDLNet_GetError, __FILE__, __LINE__);
+        log->xrmLog<Logging::ERROR_LOG>("SDLNet_AllocSocketSet=", SDLNet_GetError(), __FILE__, __LINE__);
         onExit();
         return false;
     }
@@ -190,7 +190,7 @@ bool SDL_Socket::onConnect()
 
     if(SDLNet_ResolveHost(&ip, m_host.c_str(), m_port) == -1)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_ResolveHost=", SDLNet_GetError, __FILE__, __LINE__);
+        log->xrmLog<Logging::ERROR_LOG>("SDLNet_ResolveHost=", SDLNet_GetError(), __FILE__, __LINE__);
         m_tcp_socket = nullptr;
         onExit();
         return false;
@@ -200,14 +200,14 @@ bool SDL_Socket::onConnect()
 
     if(!m_tcp_socket)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_Open=", SDLNet_GetError, __FILE__, __LINE__);
+        log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_Open=", SDLNet_GetError(), __FILE__, __LINE__);
         onExit();
         return false;
     }
 
     if(SDLNet_TCP_AddSocket(m_socket_set, m_tcp_socket) == -1)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_AddSocket=", SDLNet_GetError, __FILE__, __LINE__);
+        log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_AddSocket=", SDLNet_GetError(), __FILE__, __LINE__);
         onExit();
         return false;
     }
@@ -231,7 +231,7 @@ bool SDL_Socket::onListen()
 
     if(!m_socket_set)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_AllocSocketSet=", SDLNet_GetError, __FILE__, __LINE__);
+        log->xrmLog<Logging::ERROR_LOG>("SDLNet_AllocSocketSet=", SDLNet_GetError(), __FILE__, __LINE__);
         onExit();
         return false;
     }
@@ -241,7 +241,7 @@ bool SDL_Socket::onListen()
 
     if(SDLNet_ResolveHost(&ip, NULL, m_port) == -1)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_ResolveHost=", SDLNet_GetError, __FILE__, __LINE__);
+        log->xrmLog<Logging::ERROR_LOG>("SDLNet_ResolveHost=", SDLNet_GetError(), __FILE__, __LINE__);
         m_tcp_socket = nullptr;
         onExit();
         return false;
@@ -251,14 +251,14 @@ bool SDL_Socket::onListen()
 
     if(!m_tcp_socket)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_Open=", SDLNet_GetError, __FILE__, __LINE__);
+        log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_Open=", SDLNet_GetError(), __FILE__, __LINE__);
         onExit();
         return false;
     }
 
     if(SDLNet_TCP_AddSocket(m_socket_set, m_tcp_socket) == -1)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_AddSocket=", SDLNet_GetError, __FILE__, __LINE__);
+        log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_AddSocket=", SDLNet_GetError(), __FILE__, __LINE__);
         onExit();
         return false;
     }

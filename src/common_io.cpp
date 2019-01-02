@@ -37,6 +37,7 @@
 #include <cctype>
 #include <sstream>
 #include <fstream>
+#include <regex>
 
 #include <utf-cpp/utf8.h>
 
@@ -1287,28 +1288,25 @@ std::string CommonIO::readinAnsi(std::string file_name)
 
         if(c != EOF)
         {
-            if(c == '\n')
-            {
-                buff += "\r\n";
-            }
-            else
-            {
-                buff += c;
-            }
+            buff += c;
         }
     }
     while(c != EOF);
 
     fclose(fp);
-    return Encoding::instance()->utf8Encode(buff);
+
+    // Normalize Line Ending for consistent display to users.
+    std::regex exp("(\\r\\n|\\r|\\n)+");
+    std::string fixed_newlines = std::regex_replace(buff, exp, "\r\n");
+    return Encoding::instance()->utf8Encode(fixed_newlines);
 }
 
 /**
- * @brief Split Strings by delimiter into Vector of Strings.
- * @param s
- * @param delimiter
- * @return
- */
+* @brief Split Strings by delimiter into Vector of Strings.
+* @param s
+* @param delimiter
+* @return
+*/
 std::vector<std::string> CommonIO::splitString(const std::string& s, char delimiter)
 {
     std::vector<std::string> tokens;
@@ -1324,10 +1322,10 @@ std::vector<std::string> CommonIO::splitString(const std::string& s, char delimi
 }
 
 /**
- * @brief Standard Time to Date String
- * @param std_time
- * @return
- */
+* @brief Standard Time to Date String
+* @param std_time
+* @return
+*/
 std::string CommonIO::standardDateToString(std::time_t std_time)
 {
     std::ostringstream oss;
@@ -1337,10 +1335,10 @@ std::string CommonIO::standardDateToString(std::time_t std_time)
 }
 
 /**
- * @brief Standard Time to Date/Time String
- * @param std_time
- * @return
- */
+* @brief Standard Time to Date/Time String
+* @param std_time
+* @return
+*/
 std::string CommonIO::standardDateTimeToString(std::time_t std_time)
 {
     std::ostringstream oss;
@@ -1350,10 +1348,10 @@ std::string CommonIO::standardDateTimeToString(std::time_t std_time)
 }
 
 /**
- * @brief String to Date Format
- * @param date
- * @return
- */
+* @brief String to Date Format
+* @param date
+* @return
+*/
 std::time_t CommonIO::stringToStandardDate(std::string date)
 {
     // Append Time For Dates, need formattings
@@ -1375,10 +1373,10 @@ std::time_t CommonIO::stringToStandardDate(std::string date)
 }
 
 /**
- * @brief String to Date/Time Format
- * @param date_time
- * @return
- */
+* @brief String to Date/Time Format
+* @param date_time
+* @return
+*/
 std::time_t CommonIO::stringToStandardDateTime(std::string date_time)
 {
     struct std::tm tm;
@@ -1396,10 +1394,10 @@ std::time_t CommonIO::stringToStandardDateTime(std::string date_time)
 }
 
 /**
- * @brief Converts std::strings to Long values
- * @param value
- * @return
- */
+* @brief Converts std::strings to Long values
+* @param value
+* @return
+*/
 long CommonIO::stringToLong(std::string value)
 {
     long result_id = -1;
@@ -1418,10 +1416,10 @@ long CommonIO::stringToLong(std::string value)
 }
 
 /**
- * @brief Converts std::strings to Int values
- * @param value
- * @return
- */
+* @brief Converts std::strings to Int values
+* @param value
+* @return
+*/
 int CommonIO::stringToInt(std::string value)
 {
     int result_id = -1;
@@ -1440,10 +1438,10 @@ int CommonIO::stringToInt(std::string value)
 }
 
 /**
- * @brief Tests first char of string for starting T/F returns int with -1 for invalid
- * @param value
- * @return
- */
+* @brief Tests first char of string for starting T/F returns int with -1 for invalid
+* @param value
+* @return
+*/
 int CommonIO::stringToBool(std::string value)
 {
     // Test if string starts with T or F instead of typing True/False
@@ -1456,9 +1454,9 @@ int CommonIO::stringToBool(std::string value)
 }
 
 /**
- * @brief Parses screen data into the Screen Buffer.
- * @return
- */
+* @brief Parses screen data into the Screen Buffer.
+* @return
+*/
 void CommonIO::getNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
                             std::string::iterator &line_end)
 {
@@ -1505,9 +1503,9 @@ void CommonIO::getNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
 }
 
 /**
- * @brief Parses screen data into the Screen Buffer.
- * @return
- */
+* @brief Parses screen data into the Screen Buffer.
+* @return
+*/
 void CommonIO::peekNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
                              std::string::iterator &line_end)
 {

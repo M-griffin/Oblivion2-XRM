@@ -475,36 +475,36 @@ std::string AnsiProcessor::screenBufferParse()
         {
             case 1:
                 // Then process and display the lightbars.
-            {
-                int pull_id = 0;
-                std::stringstream ss;
-                ss.str(my_matches.m_code.substr(1, 2));
-                ss >> pull_id;
-
-                if(ss.fail())
                 {
+                    int pull_id = 0;
+                    std::stringstream ss;
+                    ss.str(my_matches.m_code.substr(1, 2));
+                    ss >> pull_id;
+
+                    if(ss.fail())
+                    {
+                        ss.clear();
+                        ss.ignore();
+                        break;
+                    }
+
+                    // Grab the highlight color from the second sequence %##.
+                    m_screen_buffer[my_matches.m_offset].selected_attribute =
+                        m_screen_buffer[my_matches.m_offset+3].attribute;
+
+                    m_screen_buffer[my_matches.m_offset].selected_foreground =
+                        m_screen_buffer[my_matches.m_offset+3].foreground;
+
+                    m_screen_buffer[my_matches.m_offset].selected_background =
+                        m_screen_buffer[my_matches.m_offset+3].background;
+
+                    // tear out the y and x positions from the offset.
+                    m_pull_down_options[pull_id] = m_screen_buffer[my_matches.m_offset];
+
                     ss.clear();
                     ss.ignore();
-                    break;
                 }
-
-                // Grab the highlight color from the second sequence %##.
-                m_screen_buffer[my_matches.m_offset].selected_attribute =
-                    m_screen_buffer[my_matches.m_offset+3].attribute;
-
-                m_screen_buffer[my_matches.m_offset].selected_foreground =
-                    m_screen_buffer[my_matches.m_offset+3].foreground;
-
-                m_screen_buffer[my_matches.m_offset].selected_background =
-                    m_screen_buffer[my_matches.m_offset+3].background;
-
-                // tear out the y and x positions from the offset.
-                m_pull_down_options[pull_id] = m_screen_buffer[my_matches.m_offset];
-
-                ss.clear();
-                ss.ignore();
-            }
-            break;
+                break;
 
             default:
                 break;
@@ -537,6 +537,9 @@ void AnsiProcessor::screenBufferSetGlyph(std::string char_sequence)
         screenBufferScrollUp();
         //m_y_position = m_number_lines-1;
         m_y_position = m_number_lines;
+
+        // Set the Current Max Row Position.
+        m_max_y_position = m_y_position;
     }
 
     m_screen_pixel.char_sequence = char_sequence;
@@ -1199,11 +1202,35 @@ void AnsiProcessor::parseAnsiScreen(char *buff)
 
                 continue;
             }
-            else if(buffer.length == 1 &&
-                    (buffer.character[0] == '\r' ||  buffer.character[0] == '\n'))
+            else if(buffer.length == 1 && buffer.character[0] == '\n')
+            {
+                //m_x_position = 1;
+                ++m_y_position;
+
+                esc_sequence.erase();
+
+                // Set the Current Max Row Position.
+                if(m_max_y_position < m_y_position)
+                {
+                    m_max_y_position = m_y_position;
+                }
+
+                // catch screen screen scrolling here one shot.
+                //if (m_y_position >= m_number_lines)
+                if(m_y_position > m_number_lines)
+                {
+                    screenBufferScrollUp();
+                    //m_y_position = m_number_lines-1;
+                    m_y_position = m_number_lines;
+                }
+
+                continue;
+            }
+
+            else if(buffer.length == 1 && buffer.character[0] == '\r')
             {
                 m_x_position = 1;
-                ++m_y_position;
+                //++m_y_position;
 
                 esc_sequence.erase();
 

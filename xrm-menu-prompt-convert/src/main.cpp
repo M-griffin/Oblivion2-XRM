@@ -1,5 +1,5 @@
 /*
- * Oblivion/2 XRM - Legacy to XRM Menu Prompt Converter (c) 2015-2018 Michael Griffin
+ * Oblivion/2 XRM - Legacy to XRM Menu Prompt Converter (c) 2015-2019 Michael Griffin
  * This converts legacy MENUPROMPT.DAT files to new .yaml configuration file
  *
  * Compiles under MingW32/64 5.1.0 g++
@@ -204,7 +204,7 @@ void MenuPromptConvert::readMenuAllPrompts()
 auto main() -> int
 {
     std::cout << "Oblivion/2 XRM Server - Legacy to XRM Menu Prompt Converter" << std::endl;
-    std::cout << "(c) 2015-2018 Michael Griffin." << std::endl << std::endl;
+    std::cout << "(c) 2015-2019 Michael Griffin." << std::endl << std::endl;
     std::cout << "Important, you must run this from the root directory," << std::endl;
     std::cout << "Otherwise you can set the OBV2 environment variable." << std::endl << std::endl;
 

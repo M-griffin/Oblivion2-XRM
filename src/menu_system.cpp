@@ -1111,6 +1111,8 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
     // Allocate and Create
     m_module_stack.back()->update(character_buffer, is_utf8);
 
+    log->xrmLog<Logging::DEBUG_LOG>("update - handleLoginInputSystem");
+
     // Finished modules processing.
     if(!m_module_stack.back()->m_is_active)
     {
@@ -1128,6 +1130,7 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
             // Specified in Config file!  TODO
             log->xrmLog<Logging::DEBUG_LOG>("m_is_session_authorized");
 
+            // TODO This should be individual users start menu!
             if(m_config->starting_menu_name.size() > 0)
             {
                 m_current_menu = m_config->starting_menu_name;
@@ -1140,6 +1143,9 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
                 m_starting_menu = "main";
             }
         }
+
+        //Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("loadAndStartupMenu on initial login");
 
         loadAndStartupMenu();
     }

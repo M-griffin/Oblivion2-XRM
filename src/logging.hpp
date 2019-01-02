@@ -70,7 +70,7 @@ public:
     // Descriptions
     const std::string INFO_LEVEL = "Information";
     const std::string DEBUG_LEVEL = "Debugging";
-    const std::string ERROR_LEVEL = "Critial Error";
+    const std::string ERROR_LEVEL = "Critical Error";
     const std::string CONSOLE_LEVEL = "Console Output";
     const std::string ALL_LEVELS = "All Level Information";
 

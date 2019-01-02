@@ -171,6 +171,8 @@ std::string ModMessageEditor::processTopTemplate(ansi_process_ptr ansi_process, 
      * In most cases we need to add a pre-home cursor!
      */
     std::string new_screen = screen;
+    //scrubNewLinesChars(new_screen);
+
     std::string::size_type index = 0;
 
     while(index != std::string::npos)
@@ -200,15 +202,17 @@ std::string ModMessageEditor::processTopTemplate(ansi_process_ptr ansi_process, 
  */
 std::string ModMessageEditor::processBottomTemplate(ansi_process_ptr ansi_process, const std::string &screen)
 {
+    std::string new_screen = screen;
+    //scrubNewLinesChars(new_screen);
     ansi_process->clearScreen();
-    ansi_process->parseAnsiScreen((char *)screen.c_str());
+    ansi_process->parseAnsiScreen((char *)new_screen.c_str());
     int rows_used = ansi_process->getMaxRowsUsedOnScreen();
 
     // We have size of footer, now subtract from screen height to get bottom margin.
     int max_lines = ansi_process->getMaxLines();
     m_text_box_bottom = max_lines - rows_used;
 
-    return screen;
+    return new_screen;
 }
 
 /**

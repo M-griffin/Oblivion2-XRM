@@ -9,6 +9,7 @@
 #include <cassert>
 
 const std::string TextPromptsDao::FILE_VERSION = "1.0.1";
+static bool is_version_displayed = false;
 
 TextPromptsDao::TextPromptsDao(std::string path, std::string filename)
     : m_path(path)
@@ -126,7 +127,11 @@ bool TextPromptsDao::readPrompts()
         std::string file_version = m_node["file_version"].as<std::string>();
 
         // Validate File Version
-        std::cout << "Text Prompt File Version: " << file_version << std::endl;
+        if(!is_version_displayed)
+        {
+            std::cout << "Text Prompt File Version: " << file_version << std::endl;
+            is_version_displayed = true;
+        }
 
         if(file_version != TextPromptsDao::FILE_VERSION)
         {

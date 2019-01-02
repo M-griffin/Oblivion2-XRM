@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Michae Griffin
-Date                   :=31/12/18
+Date                   :=01/01/19
 CodeLitePath           :="/home/merc/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -94,10 +94,6 @@ MakeIntermediateDirs:
 	@test -d ./Debug || $(MakeDirCommand) ./Debug
 
 PreBuild:
-	@echo Executing Pre Build commands ...
-	rm libSqliteWrapped.h
-	rm libSqliteWrapped.a
-	@echo Done
 
 
 ##

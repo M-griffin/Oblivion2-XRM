@@ -41,7 +41,7 @@ typedef struct SDLNet_version
 } SDLNet_version;
 
 
-// Michael Griffin 2018-002-17
+// Michael Griffin 2018-02-17
 // Add method alias (this was missed in original implementation)
 #define SDL_vsnprintf vsnprintf
 #define SDL_malloc    malloc
