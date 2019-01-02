@@ -171,6 +171,8 @@ std::string ModMessageEditor::processTopTemplate(ansi_process_ptr ansi_process, 
      * In most cases we need to add a pre-home cursor!
      */
     std::string new_screen = screen;
+    //scrubNewLinesChars(new_screen);
+
     std::string::size_type index = 0;
 
     while(index != std::string::npos)
@@ -200,15 +202,17 @@ std::string ModMessageEditor::processTopTemplate(ansi_process_ptr ansi_process, 
  */
 std::string ModMessageEditor::processBottomTemplate(ansi_process_ptr ansi_process, const std::string &screen)
 {
+    std::string new_screen = screen;
+    //scrubNewLinesChars(new_screen);
     ansi_process->clearScreen();
-    ansi_process->parseAnsiScreen((char *)screen.c_str());
+    ansi_process->parseAnsiScreen((char *)new_screen.c_str());
     int rows_used = ansi_process->getMaxRowsUsedOnScreen();
 
     // We have size of footer, now subtract from screen height to get bottom margin.
     int max_lines = ansi_process->getMaxLines();
     m_text_box_bottom = max_lines - rows_used;
 
-    return screen;
+    return new_screen;
 }
 
 /**
@@ -322,8 +326,8 @@ void ModMessageEditor::setupEditor()
     std::string mid_screen = processMidTemplate(ansi_process, mid_template);
 
     Logging *log = Logging::instance();
-    log->xrmLog<Logging::DEBUG_LOG>("m_text_box_top=", m_text_box_top, "m_text_box_bottom=", m_text_box_bottom,
-                                    "m_text_box_left=", m_text_box_left, "m_text_box_right=", m_text_box_right);
+    log->xrmLog<Logging::CONSOLE_LOG>("m_text_box_top=", m_text_box_top, "m_text_box_bottom=", m_text_box_bottom,
+                                      "m_text_box_left=", m_text_box_left, "m_text_box_right=", m_text_box_right);
 
     // Next combine and output.. Move cursor to top left in box.
     std::string screen_output = top_screen + mid_screen + bot_screen;

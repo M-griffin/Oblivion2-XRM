@@ -68,10 +68,7 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild>
-        <Command Enabled="yes">rm libSqliteWrapped.h</Command>
-        <Command Enabled="yes">rm libSqliteWrapped.a</Command>
-      </PreBuild>
+      <PreBuild/>
       <PostBuild>
         <Command Enabled="no"># Linux /OSX / BSD</Command>
         <Command Enabled="yes">cat IError.h StderrLog.h SysLogs.h Database.h Query.h &gt; lib$(ProjectName).h</Command>
