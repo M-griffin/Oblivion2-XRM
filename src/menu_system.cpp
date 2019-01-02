@@ -1111,7 +1111,7 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
     // Allocate and Create
     m_module_stack.back()->update(character_buffer, is_utf8);
 
-    log->xrmLog<Logging::CONSOLE_LOG>("update - handleLoginInputSystem");
+    log->xrmLog<Logging::DEBUG_LOG>("update - handleLoginInputSystem");
 
     // Finished modules processing.
     if(!m_module_stack.back()->m_is_active)
