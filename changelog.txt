@@ -1,3 +1,103 @@
+Change Log Update (00.00.144)
+* 2019-01-01 - 2019-01-02
++ Fixed Typo on Critical Logging text.
++ Fixed missing () parenthesis on SDL Socket Error Method passed to logging.
++ Corrections to Ansi Parser, CR should only move to beginning of Line, LF should 
+  only move down a line. This can different from a telnet client that gets a 
+  variety. Then need to be pre-normalized for consistence display with CRLF on 
+  all screens. This fixes cross platform ANSI Templates.
++ Some more code cleanup, removed debugging for final testing, Putty, EtherTerm 
+  and Linux terminal on both platform are now all matching output and display properly.
+  Next, final OSX testing.
++ OSX Project tested and synced. All Good. 
+
+Change Log Update (00.00.143)
+* 2018-12-24 - 2018-12-31
++ Starting roughing out new logging class for different logging levels. Added new 
+  default INFO logging level to CONFIG and incremented file version. Config can be 
+  deleted and auto re-created for latest version. Also making this a header only class.
+  Testing example:  Logging::instance()->xrmLog<Logging::INFO_LOG>("Test1", 2, 4.5);
+  Logging with export to YAML and or Console Text for logging level set in config.
++ More work on the logging system using variadic templates for parameter packs.
++ Add missed type.. next to setup filtering on log levels, add buffer queue for 
+  async log writes.
++ A little more on testing logging yaml console output. File output i think will be 
+  queued and handled by main thread leaving the i/o thread free for all session / socket work.
++ WIP - Large Refactoring for new logging and output noise reduction. Startup has been 
+  reworked a little, and next is to go through remaining systems to move output to 
+  console, info, debug logging levels
++ Cont. Logging and Cleanup. Ready for Multi-Platform Testing on Encoding and Logging next.
++ Initial Linux Testing Completed, Next check OSX 
++ Updated OSX projects to sync with Linux and Windows. Notice some templates are off, 
+  think adjustments are needed for new lines
+
+Change Log Update (00.00.142)
+* 2018-10-31 - 2018-01-23
++ Started initial work on the Full Screen message editor
++ Initial Templates are now displaying and expanded depending on users screen size.
++ Fixed issue with ESC detection on SingleHotKey input vs GetLine Input Had to 
+  updated to push tailing '\0' on Individual ESC so it would detect it wasn't 
+  a sequence such as arrow key(s).
++ Rolled back some test changes on Ansi Parser
+  First Step in Ansi Parser Update, Screen Buffer character sequence store to 
+  std::string from unsigned char.  Next work through the ansi parser calls one 
+  by one to see where things break.
++ Added Initial code for checking utf-8 sequence for rework
++ Small fixes to the Level editor for boolean output 
++ Unit Test corrections.
++ Found some issues with High-Ascii and UTF-8 parsing of string. Started unit test 
+  for drilling down. Now need to update the rest of the methods to properly handle 
+  high ASCII mix-ins
++ Rewrote numberOfCharacters, now properly handles mix of HighAscii and Utf-8 when 
+  counting glyphs vs. bytes.
++ Updated Erase String to handle High ASCII with Unicode mix. 
++ Added using Tests for updated methods covering extras (HighAscii Tests). 
++ Cleaned up some message warning for stub classes not yet reworked. 
++ Updated the State_Manager - which handles incoming data from the client to parse 
+  and handle High ASCII input with Multi-bytes sequence parsing.
++ Worked on the Ansi Sequence parser to now handle glyphs instead of single characters. 
+  Some more work need to be done to pass the current encoding used or selected at login 
+  since chars > 127 - 255 in UTF-8 are considered partially 2 Bytes glyphs and there is 
+  no real working detection to differentiate them from high ASCII. Right now it's hard 
+  coded for High ASCII until encoding is passed through. (Temp Fix).
++ Started a Map cache of the translation table. This will store the UTF-16 WIDE CP437 
+  translations with their 8 bit CP437 characters for quick translations back from UTF-8.
++ Initial setup for tracking encoding selection on connection, then deciding on internal 
+  translations to single encoding for internal usage.
++ Creating new Encoding class singleton to separate encoding methods from CommonIO methods. 
+  The singleton will keep pre-loaded mappings for object sharing vs each instance having a 
+  separate copy. Creating Encoding-tests branch to further test internal UTF-8 internal processing.
++ Also created a Multi-Byte to Wide for using the new Mappings, and updated the existing 
+  Wide to Milti-Byte. Left is to write and test the translation from UTF-8 back to CP437.
++ Added new Encoding class Files. 
++ Corrected some Initialization on the Encoding Class. 
++ ANSI screens and Menu prompts are now default Encoded UTF-8 on load, Parsers are testing 
+  well, next to Decode back to CP437 on output.
++ Initial Tests from Linux Terminal To Windows Machine is good now, had to add Win API specific 
+  translations for Wide and MultiByte Characters.
+  Initial Tests from Windows CP437 on CP437 -> UTF8 -> CP437 is working much better now.  
+  More internal systems now need to be converted to UTF-8.
++ Sync Linux Project, Also handle UTF-8 -> UCS2 / UTF-16 conversion and exclude extra null bytes.
++ Updated OSX Project and Encoding to Convert Cp437 -> UCS2 -> UTF8 and back, long struggle. 
+  Found some issues with .yaml file reading errors which need to be debugged on OSX now.
++ Debugged issues with YAML and loading the CONFIG Dao multiple times per sessions. Don't 
+  appears to have issues with other instances for Text Prompts, Menu's Etc.. CONFIG should 
+  anyway's be moved to a single shared instance and removed for loading in the Menu Base Constructor. 
+  So far commented out and using default constructor no longer crashes in OSX. Other Platforms 
+  not an issue but lets make this smarted for all.
+  NOTE: out.SetStringFormat(YAML::DoubleQuoted);  could be a nice option but ass double quotes 
+  around all keys as well as string values.
++ Re sync Linux Project with latest changes. Notes, xrm convert project need encoding and should 
+  be updated lateron to encoding data to UTF-8 for yaml files.
++ Re-enabled older idea that was already in place to use Gobal Node Manager "Communicator" 
+  to store the configuration. Updated code to pull this for session instances and then pass this 
+  around as needed. - Next Back to Encoding..
++ Adding Encoding for On Text Generated Internal Methods Also some Internal cleanup.
++ Initial Encoding Completed for Internal UTF-8, Continue Testing and debugging on Windows now.
+  Reworked some of the editors as well.
++ Fixed several issues with encoding and display output of screens. Especially the Full Screen editor 
+  templating which found most of the issues. code is full of debugging,  cleanup will follow!!
++ Removed Debugging out. Next add some logging levels and get rid of a lot of STDOUT debugging.
 
 Change Log Update (00.00.141)
 * 2018-10-31
