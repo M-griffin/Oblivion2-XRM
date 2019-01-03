@@ -84,6 +84,9 @@
     <File Name="../src/communicator.cpp"/>
     <File Name="../src/communicator.hpp"/>
     <File Name="../src/uuid.hpp"/>
+    <File Name="../src/encoding.cpp"/>
+    <File Name="../src/encoding.hpp"/>
+    <File Name="../src/logging.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
@@ -142,12 +145,12 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="clang++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O0;-pedantic;-std=c++11;-Wall;" C_Options="-O3;-pedantic;-std=c++11;-Wall;" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-O0;-pedantic;-std=c++11;-stdlib=libc++" C_Options="-O3;-pedantic;-std=c++11;-stdlib=libc++" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
         <IncludePath Value="/usr/local/opt/sqlite/include"/>
-        <IncludePath Value="/usr/local/Cellar/yaml-cpp/0.6.1/include"/>
+        <IncludePath Value="/usr/local/Cellar/yaml-cpp/0.6.2_1/include"/>
         <IncludePath Value="/usr/local/Cellar/openssl/1.0.2n/include"/>
         <IncludePath Value="/usr/local/Cellar/unittest-cpp/2.0.0/include/UnitTest++"/>
         <IncludePath Value="/usr/local/Cellar/libssh/0.7.5/include"/>
@@ -156,14 +159,14 @@
         <IncludePath Value="../src/utf-cpp"/>
         <Preprocessor Value="TARGET_OS_MAC"/>
         <Preprocessor Value="WITHOUT_SDL"/>
+        <Preprocessor Value="UNIT_TEST"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
         <LibraryPath Value="../src"/>
         <LibraryPath Value="../sqlitewrap"/>
         <LibraryPath Value="/usr/local/opt/sqlite/lib"/>
-        <LibraryPath Value="/usr/local/opt/icu4c/lib"/>
-        <LibraryPath Value="/usr/local/Cellar/yaml-cpp/0.6.1/lib"/>
+        <LibraryPath Value="/usr/local/Cellar/yaml-cpp/0.6.2_1/lib"/>
         <LibraryPath Value="/usr/local/Cellar/openssl/1.0.2n/lib"/>
         <LibraryPath Value="/usr/local/Cellar/unittest-cpp/2.0.0/lib"/>
         <LibraryPath Value="/usr/local/Cellar/libssh/0.7.5/lib"/>

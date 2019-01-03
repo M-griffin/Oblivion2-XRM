@@ -1,8 +1,8 @@
 #include "menu_dao.hpp"
 #include "../model-sys/menu.hpp"
+#include "logging.hpp"
 
 #include <cstdio>
-#include <iostream>
 #include <fstream>
 #include <string>
 #include <algorithm>
@@ -17,12 +17,10 @@ MenuDao::MenuDao(menu_ptr menu, std::string menu_name, std::string path)
     , m_path(path)
     , m_filename(menu_name)
 {
-    std::cout << "MenuDao" << std::endl;
 }
 
 MenuDao::~MenuDao()
 {
-    std::cout << "~MenuDao" << std::endl;
 }
 
 
@@ -47,17 +45,17 @@ void MenuDao::pathSeperator(std::string &value)
 bool MenuDao::fileExists()
 {
     std::string path = m_path;
-    pathSeperator(path);    
+    pathSeperator(path);
     path.append(m_filename);
     path.append(".yaml");
-    
-    std::cout << "menu_path: " << path << std::endl;
 
     std::ifstream ifs(path);
-    if (!ifs.is_open())
+
+    if(!ifs.is_open())
     {
         return false;
     }
+
     ifs.close();
     return true;
 }
@@ -80,7 +78,7 @@ bool MenuDao::saveMenu(menu_ptr menu)
     out << YAML::BeginMap;
     out << YAML::Flow;
 
-    // Start Creating the Key/Value Output for the Menu File.    
+    // Start Creating the Key/Value Output for the Menu File.
     out << YAML::Key << "file_version" << YAML::Value << menu->file_version;
     out << YAML::Key << "menu_name" << YAML::Value << menu->menu_name;
     out << YAML::Key << "menu_password" << YAML::Value << menu->menu_password;
@@ -95,30 +93,32 @@ bool MenuDao::saveMenu(menu_ptr menu)
     for(unsigned int i = 0; i < menu->menu_options.size(); i++)
     {
         auto &opt = menu->menu_options[i];
-        
+
         out << YAML::Key << "menu_option";
         out << YAML::Value << YAML::BeginMap;
-                
+
         out << YAML::Key << "index" << YAML::Value << opt.index;
         out << YAML::Key << "name" << YAML::Value << opt.name;
-        out << YAML::Key << "acs_string" << YAML::Value << opt.acs_string;  
+        out << YAML::Key << "acs_string" << YAML::Value << opt.acs_string;
         out << YAML::Key << "hidden" << YAML::Value << opt.hidden;
         out << YAML::Key << "menu_key" << YAML::Value << opt.menu_key;
         out << YAML::Key << "command_key" << YAML::Value << opt.command_key;
         out << YAML::Key << "command_string" << YAML::Value << opt.command_string;
         out << YAML::Key << "pulldown_id" << YAML::Value << opt.pulldown_id;
-        
+
         out << YAML::EndMap;
     }
-            
+
     out << YAML::EndMap;
 
 
     // Setup file to Write out File.
     std::ofstream ofs(path);
-    if (!ofs.is_open())
+
+    if(!ofs.is_open())
     {
-        std::cout << "Error, unable to write to: " << path << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to write to", path);
         return false;
     }
 
@@ -139,13 +139,14 @@ bool MenuDao::deleteMenu()
     pathSeperator(path);
     path.append(m_filename);
     path.append(".yaml");
-    
-    if (std::remove(path.c_str()) != 0)
+
+    if(std::remove(path.c_str()) != 0)
     {
-        std::cout << "Error removing menu file: " << path << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("Error, removing menu file", path);
         return false;
     }
-    
+
     return true;
 }
 
@@ -156,7 +157,7 @@ bool MenuDao::deleteMenu()
  * @return
  */
 void MenuDao::encode(const Menu &rhs)
-{   
+{
     m_menu->file_version        = rhs.file_version;
     m_menu->menu_name           = rhs.menu_name;
     m_menu->menu_password       = rhs.menu_password;
@@ -167,12 +168,12 @@ void MenuDao::encode(const Menu &rhs)
     m_menu->menu_title          = rhs.menu_title;
     m_menu->menu_pulldown_file  = rhs.menu_pulldown_file;
     m_menu->menu_options        = rhs.menu_options;
-    
+
     // Now Sort All Menu Options once they have been loaded.
     // Unforunatally YAML does not keep ordering properly.
     sort(
-        m_menu->menu_options.begin( ), m_menu->menu_options.end( ), 
-        [ ] (const MenuOption& lhs, const MenuOption& rhs)
+        m_menu->menu_options.begin(), m_menu->menu_options.end(),
+        [ ](const MenuOption& lhs, const MenuOption& rhs)
     {
         return lhs.index < rhs.index;
     });
@@ -191,43 +192,46 @@ bool MenuDao::loadMenu()
     path.append(".yaml");
 
     YAML::Node node;
+    Logging *log = Logging::instance();
 
     // Load the file into the class.
     try
     {
         // Load file fresh.
         node = YAML::LoadFile(path);
+
         // Testing Is on nodes always throws exceptions.
-        if (node.size() == 0) 
+        if(node.size() == 0)
         {
             return false; //File Not Found?
         }
-        
+
         std::string file_version = node["file_version"].as<std::string>();
-        
+
         // Validate File Version
-        std::cout << "Menu File Version: " << file_version << std::endl;
-        if (file_version != Menu::FILE_VERSION) {
-            throw std::invalid_argument("Invalid file_version, expected: " + Menu::FILE_VERSION);
+        log->xrmLog<Logging::DEBUG_LOG>("Menu File Version", file_version);
+
+        if(file_version != Menu::FILE_VERSION)
+        {
+            log->xrmLog<Logging::ERROR_LOG>("Menu File Version=", file_version, "Expected Version=", Menu::FILE_VERSION);
+            return false;
         }
-        
+
         Menu m = node.as<Menu>();
 
         // Moves the Loaded config to m_config shared pointer.
         encode(m);
-    }   
-    catch (YAML::Exception &ex)
-    {
-        std::cout << "Exception YAML::LoadFile(" << m_filename << ".yaml) " << ex.what() << std::endl;
-        std::cout << "Most likely a required field in the menu file is missing. " << std::endl;
-        assert(false);
     }
-    catch (std::exception &ex)
+    catch(YAML::Exception &ex)
     {
-        std::cout << "Unexpected YAML::LoadFile(" << m_filename << ".yaml) " << ex.what() << std::endl;
-        assert(false);
+        log->xrmLog<Logging::ERROR_LOG>("YAML::LoadFile", m_filename + ".yaml", ex.what(), "Missing required field maybe.");
+        return(false);
+    }
+    catch(std::exception &ex)
+    {
+        log->xrmLog<Logging::ERROR_LOG>("Unexpected YAML::LoadFile", m_filename + ".yaml", ex.what());
+        return(false);
     }
 
     return true;
 }
-

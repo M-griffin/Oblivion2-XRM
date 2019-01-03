@@ -28,7 +28,6 @@ public:
 
     ~SocketHandler()
     {
-        std::cout << "~SocketHandler" << std::endl;
         std::vector<socket_state_ptr>().swap(m_socket);
     }
 
@@ -40,24 +39,24 @@ public:
     int sendSocket(unsigned char *buf, Uint32 len);
     int recvSocket(char *message);
     int poll();
-    
+
     // Telnet
     bool connectTelnetSocket(std::string host, int port);
     bool createTelnetAcceptor(std::string host, int port);
     socket_handler_ptr acceptTelnetConnection();
-    
+
     // SSH
     bool connectSshSocket(std::string host, int port, std::string username, std::string password);
-    
+
     // IRC
     bool connectIrcSocket(std::string host, int port);
-    
+
     std::string getSocketType() const;
     bool isActive() const;
     void setInactive();
 
     void close();
-    
+
     void setSocketType(std::string type);
     void setSocketState(socket_state_ptr state);
 

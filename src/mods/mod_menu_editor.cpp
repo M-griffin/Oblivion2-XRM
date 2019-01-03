@@ -3,6 +3,7 @@
 #include "data-sys/menu_dao.hpp"
 #include "../directory.hpp"
 #include "../menu_base.hpp"
+#include "../logging.hpp"
 
 #include <stdint.h>
 #include <string>
@@ -19,14 +20,12 @@ bool ModMenuEditor::update(const std::string &character_buffer, const bool &)
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
-        std::cout << "ModMenuEditor() !m_is_active" << std::endl;
         return false;
     }
 
     // Return True when were keeping module active / else false;
     if(character_buffer.size() == 0)
     {
-        std::cout << "ModMenuEditor() !character_buffer size 0" << std::endl;
         return true;
     }
 
@@ -42,7 +41,6 @@ bool ModMenuEditor::update(const std::string &character_buffer, const bool &)
  */
 bool ModMenuEditor::onEnter()
 {
-    std::cout << "OnEnter() ModMenuEditor\n";
     m_is_active = true;
 
     // Grab ANSI Screen, display, if desired.. logon.ans maybe?
@@ -61,7 +59,6 @@ bool ModMenuEditor::onEnter()
  */
 bool ModMenuEditor::onExit()
 {
-    std::cout << "OnExit() ModMenuEditor\n";
     m_is_active = false;
     return true;
 }
@@ -286,6 +283,7 @@ void ModMenuEditor::setupMenuEditor()
  */
 void ModMenuEditor::setupMenuOptionEditor()
 {
+    Logging *log = Logging::instance();
     std::string display_name = m_current_menu;
     baseTransformToUpper(display_name);
     displayPromptMCI(PROMPT_OPTION_HEADER, display_name);
@@ -311,7 +309,7 @@ void ModMenuEditor::setupMenuOptionEditor()
             break;
 
         default:
-            std::cout << "Error, Didn't add the view display to setupMenuOptionEditor" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Error, Didn't add the view display to setupMenuOptionEditor", __FILE__, __LINE__);
             break;
     }
 
@@ -429,7 +427,8 @@ void ModMenuEditor::displayCurrentPage(const std::string &input_state)
             break;
 
         default:
-            std::cout << "Error, forgot to add new STATE index displayCurrentPage!!";
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentPage!!", __FILE__, __LINE__);
             return;
     }
 
@@ -476,7 +475,8 @@ void ModMenuEditor::displayCurrentEditPage(const std::string &input_state)
             break;
 
         default:
-            std::cout << "Error, forgot to add new STATE index displayCurrentEditPage!!";
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentEditPage!!", __FILE__, __LINE__);
             return;
     }
 
@@ -542,7 +542,6 @@ void ModMenuEditor::menuEditorInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -615,7 +614,6 @@ void ModMenuEditor::menuEditorOptionInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -701,7 +699,6 @@ void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -832,7 +829,6 @@ void ModMenuEditor::menuEditorMenuOptionFieldInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -942,7 +938,6 @@ void ModMenuEditor::menuEditorMenuFieldHandler(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_MENU_FIELD_INPUT);
         changeSetupModule(MOD_DISPLAY_MENU_EDIT);
         return;
@@ -1005,7 +1000,6 @@ void ModMenuEditor::menuEditorMenuOptionFieldHandler(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_MENU_OPTION_FIELD_INPUT);
         changeSetupModule(MOD_DISPLAY_MENU_OPTIONS_EDIT);
         return;
@@ -1101,7 +1095,6 @@ void ModMenuEditor::menuEditorMenuNameInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_MENU_INPUT);
         redisplayModulePrompt();
         return;
@@ -1150,7 +1143,6 @@ void ModMenuEditor::menuEditorMenuOptionInput(const std::string &input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_MENU_OPTION_INPUT);
         redisplayModulePrompt();
         return;
@@ -1181,12 +1173,10 @@ void ModMenuEditor::menuEditorMenuOptionInput(const std::string &input)
 
         if(checkMenuOptionExists(option_index))
         {
-            std::cout << " * Menu option matches!" << std::endl;
             handleMenuOptionInputState(true, option_index);
         }
         else
         {
-            std::cout << " * Menu option doesn't match!" << std::endl;
             handleMenuOptionInputState(false, option_index);
         }
     }
@@ -1599,6 +1589,7 @@ void ModMenuEditor::deleteExistingMenu(const std::string &menu_name)
  */
 void ModMenuEditor::copyExistingMenu(const std::string &menu_name)
 {
+    Logging *log = Logging::instance();
     // Pre-Load Menu, check access, if not valud, then fall back to previous.
     menu_ptr new_menu(new Menu());
 
@@ -1611,7 +1602,7 @@ void ModMenuEditor::copyExistingMenu(const std::string &menu_name)
     }
     else
     {
-        std::cout << "Source menu file doesn't exist!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Source menu file doesn't exist=", m_current_menu, __FILE__, __LINE__);
         return;
     }
 
@@ -1624,7 +1615,7 @@ void ModMenuEditor::copyExistingMenu(const std::string &menu_name)
     }
     else
     {
-        std::cout << "Destination menu file already exists!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Destination menu file already exist=", new_menu, __FILE__, __LINE__);
     }
 }
 
@@ -1667,15 +1658,16 @@ void ModMenuEditor::copyExistingMenuOption(int option_index)
  */
 void ModMenuEditor::saveMenuChanges()
 {
+    Logging *log = Logging::instance();
     MenuDao mnu_source(m_loaded_menu.back(), m_current_menu, GLOBAL_MENU_PATH);
 
     if(mnu_source.saveMenu(m_loaded_menu.back()))
     {
-        std::cout << "Menu Saved Successful!" << std::endl;
+        log->xrmLog<Logging::DEBUG_LOG>("Menu Saved Successful=", m_current_menu, __FILE__, __LINE__);
     }
     else
     {
-        std::cout << "Menu Save Failed!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Menu Save Failed=", m_current_menu, __FILE__, __LINE__);
     }
 }
 
@@ -1743,7 +1735,8 @@ std::string ModMenuEditor::displayMenuList()
     // check result set, if no menu then return gracefully.
     if(result_set.size() == 0)
     {
-        std::cout << "\r\n*** No Menus .yaml files found!" << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::CONSOLE_LOG>("No Menus .yaml files found", __FILE__, __LINE__);
         return "No Menu Files found!";
     }
 
@@ -1777,50 +1770,41 @@ std::string ModMenuEditor::displayMenuList()
             // Top Row
             if(rows == 0 && cols == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_LEFT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_TOP_LEFT);
             }
             else if(rows == 0 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_RIGHT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_TOP_RIGHT);
             }
             else if(rows == 0 && cols % 9 == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_TOP;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID_TOP);
             }
             else if(rows == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_ROW);
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_LEFT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_BOT_LEFT);
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_RIGHT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_BOT_RIGHT);
             }
             else if(rows == total_rows-1 && cols % 9 == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_BOT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID_BOT);
             }
             else if(rows == total_rows-1)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_ROW);
             }
             else if(cols % 9 == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID);
             }
             else
             {
@@ -1935,50 +1919,41 @@ std::string ModMenuEditor::displayMenuOptionList()
             // Top Row
             if(rows == 0 && cols == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_LEFT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_TOP_LEFT);
             }
             else if(rows == 0 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_RIGHT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_TOP_RIGHT);
             }
             else if(rows == 0 && cols % 25 == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_TOP;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID_TOP);
             }
             else if(rows == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_ROW);
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_LEFT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_BOT_LEFT);
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_RIGHT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_BOT_RIGHT);
             }
             else if(rows == total_rows-1 && cols % 25 == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_BOT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID_BOT);
             }
             else if(rows == total_rows-1)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_ROW);
             }
             else if(cols % 25 == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID);
             }
             else
             {
@@ -2046,7 +2021,7 @@ std::string ModMenuEditor::displayMenuEditScreen()
     std::vector<std::string> result_set;
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_VERSION_ID) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->file_version, 48));
-    result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(baseGetDefaultPromptColor() + " " + Encoding::instance()->utf8Encode(std::string(72, M_BORDER_ROW)) + " ");
     result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_TITLE) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_title, 48));
     result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_PASSWORD) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_password, 48));
     result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_FALLBACK) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
@@ -2055,7 +2030,7 @@ std::string ModMenuEditor::displayMenuEditScreen()
     result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_PULLDOWN_FILE) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
     result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_VIEW_GENERIC) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
     result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_EDIT_OPTIONS) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
-    result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(baseGetDefaultPromptColor() + " " + Encoding::instance()->utf8Encode(std::string(72, M_BORDER_ROW)) + " ");
     result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_QUIT_SAVE) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
     result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_QUIT_ABORT) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
 
@@ -2070,84 +2045,7 @@ std::string ModMenuEditor::displayMenuEditScreen()
     // Could re-calc this on screen width lateron.
     int max_cols = 76;
 
-    // Vector or Menus, Loop through
-    std::vector<std::string>::iterator i = result_set.begin();
-    std::string buffer = "";
-
-    for(int rows = 0; rows < total_rows; rows++)
-    {
-        buffer += "  "; // 3 Leading spaces per row.
-
-        for(int cols = 0; cols < max_cols; cols++)
-        {
-            // Top Row
-            if(rows == 0 && cols == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_LEFT;
-            }
-            else if(rows == 0 && cols == max_cols-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_RIGHT;
-            }
-            else if(rows == 0 && cols % 75 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_TOP;
-            }
-            else if(rows == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
-            }
-
-            // Bottom Row
-            else if(rows == total_rows-1 && cols == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_LEFT;
-            }
-            else if(rows == total_rows-1 && cols == max_cols-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_RIGHT;
-            }
-            else if(rows == total_rows-1 && cols % 75 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_BOT;
-            }
-            else if(rows == total_rows-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
-            }
-            else if(cols % 75 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID;
-            }
-            else
-            {
-                // Here we insert the Menu name and pad through to 8 characters.
-                if(cols == 1)
-                {
-                    if(i != result_set.end())
-                    {
-                        buffer += *i;
-                        ++i;
-                    }
-                }
-            }
-        }
-
-        // Were going to split on \n, which will get replaced lateron
-        // with \r\n for full carriage returns.
-        buffer += "\n";
-    }
-
-    return (buffer);
+    return baseCreateBorderedDisplay(result_set, total_rows, max_cols);
 }
 
 /**
@@ -2166,7 +2064,7 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
     std::string option_string = std::to_string(opt.index) + " / " + std::to_string(m_loaded_menu.back()->menu_options.size()-1);
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_ID) + baseGetDefaultStatColor() + m_common_io.rightPadding(option_string, 48));
-    result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(baseGetDefaultPromptColor() + " " + Encoding::instance()->utf8Encode(std::string(72, M_BORDER_ROW)) + " ");
     result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_NAME) + baseGetDefaultStatColor() + m_common_io.rightPadding(opt.name, 48));
     result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_ACS) + baseGetDefaultStatColor() + m_common_io.rightPadding(opt.acs_string, 48));
     result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_HIDDEN) + baseGetDefaultStatColor() + m_common_io.rightPadding(m_common_io.boolAlpha(opt.hidden), 48));
@@ -2176,7 +2074,7 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
     result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_PULLDOWN_ID) + baseGetDefaultStatColor() + m_common_io.rightPadding(std::to_string(opt.pulldown_id), 48));
     result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_PREVIOUS_OPT) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
     result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_NEXT_OPT) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
-    result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(baseGetDefaultPromptColor() + " " + Encoding::instance()->utf8Encode(std::string(72, M_BORDER_ROW)) + " ");
     result_set.push_back(getDisplayPromptRaw(DISPLAY_OPT_FIELDS_OPTION_QUIT) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
 
     // Not in use Yet, seems legacy only does ACS in option commands.
@@ -2189,84 +2087,7 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
     // Could re-calc this on screen width lateron.
     int max_cols = 76;
 
-    // Vector or Menus, Loop through
-    std::vector<std::string>::iterator i = result_set.begin();
-    std::string buffer = "";
-
-    for(int rows = 0; rows < total_rows; rows++)
-    {
-        buffer += "  "; // 3 Leading spaces per row.
-
-        for(int cols = 0; cols < max_cols; cols++)
-        {
-            // Top Row
-            if(rows == 0 && cols == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_LEFT;
-            }
-            else if(rows == 0 && cols == max_cols-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_RIGHT;
-            }
-            else if(rows == 0 && cols % 75 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_TOP;
-            }
-            else if(rows == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
-            }
-
-            // Bottom Row
-            else if(rows == total_rows-1 && cols == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_LEFT;
-            }
-            else if(rows == total_rows-1 && cols == max_cols-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_RIGHT;
-            }
-            else if(rows == total_rows-1 && cols % 75 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_BOT;
-            }
-            else if(rows == total_rows-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
-            }
-            else if(cols % 75 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID;
-            }
-            else
-            {
-                // Here we insert the Menu name and pad through to 8 characters.
-                if(cols == 1)
-                {
-                    if(i != result_set.end())
-                    {
-                        buffer += *i;
-                        ++i;
-                    }
-                }
-            }
-        }
-
-        // Were going to split on \n, which will get replaced lateron
-        // with \r\n for full carriage returns.
-        buffer += "\n";
-    }
-
-    return (buffer);
+    return baseCreateBorderedDisplay(result_set, total_rows, max_cols);
 }
 
 /**

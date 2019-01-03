@@ -1,5 +1,6 @@
 #include "communicator.hpp"
 
+#include "data-sys/text_prompts_dao.hpp"
 #include "model-sys/structures.hpp"
 #include "model-sys/struct_compat.hpp"
 
@@ -21,11 +22,11 @@ Communicator::Communicator()
     , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
     , m_is_text_prompt_exist(false)
     , m_active(true)
+    , m_config(nullptr)
 {
-    std::cout << "Communicator" << std::endl;
-
     // Check of the Text Prompts exist.
     m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
+
     if(!m_is_text_prompt_exist)
     {
         createTextPrompts();
@@ -37,5 +38,4 @@ Communicator::Communicator()
 
 Communicator::~Communicator()
 {
-    std::cout << "~Communicator" << std::endl;
 }

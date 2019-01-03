@@ -3,6 +3,7 @@
 #include "data-sys/access_level_dao.hpp"
 #include "model-sys/access_level.hpp"
 #include "../access_condition.hpp"
+#include "../logging.hpp"
 
 #include <sstream>
 #include <stdint.h>
@@ -19,14 +20,12 @@ bool ModLevelEditor::update(const std::string& character_buffer, const bool&)
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
-        std::cout << "ModLevelEditor() !m_is_active" << std::endl;
         return false;
     }
 
     // Return True when were keeping module active / else false;
     if(character_buffer.size() == 0)
     {
-        std::cout << "ModLevelEditor() !character_buffer size 0" << std::endl;
         return true;
     }
 
@@ -42,7 +41,6 @@ bool ModLevelEditor::update(const std::string& character_buffer, const bool&)
  */
 bool ModLevelEditor::onEnter()
 {
-    std::cout << "OnEnter() ModLevelEditor\n";
     m_is_active = true;
 
     // Grab ANSI Screen, display, if desired.. logon.ans maybe?
@@ -61,7 +59,6 @@ bool ModLevelEditor::onEnter()
  */
 bool ModLevelEditor::onExit()
 {
-    std::cout << "OnExit() ModLevelEditor\n";
     m_is_active = false;
     return true;
 }
@@ -318,7 +315,8 @@ void ModLevelEditor::displayCurrentPage(const std::string& input_state)
             break;
 
         default:
-            std::cout << "Error, forgot to add new STATE index displayCurrentPage!!";
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentPage!!", __LINE__, __FILE__);
             return;
     }
 
@@ -361,7 +359,8 @@ void ModLevelEditor::displayCurrentEditPage(const std::string& input_state)
             break;
 
         default:
-            std::cout << "Error, forgot to add new STATE index displayCurrentEditPage!!";
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentEditPage!!", __LINE__, __FILE__);
             return;
     }
 
@@ -422,7 +421,6 @@ void ModLevelEditor::levelEditorInput(const std::string& input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -495,7 +493,6 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         return;
     }
     else if(result[0] == '\n')
@@ -604,46 +601,70 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
                 break;
 
             case 'M': // Bool PostCallRatio
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_POST_CALL_RATIO);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bPostCallRatio));
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
+            }
 
             case 'N': // Bool File Ratio
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_FILE_RATIO);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bFileRatio));
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
+            }
 
             case 'O': // Bool Time Limit
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_TIME_LIMIT);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bTimeLimit));
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
+            }
 
             case 'P': // Bool Call Limit
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_CALL_LIMIT);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bCallLimit));
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
+            }
 
             case 'R': // Bool Download File Limit
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_DOWNLOADS);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bDownloads));
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
+            }
 
             case 'S': // Bool Download Limit MB
+            {
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_DOWNLOAD_MB);
-                m_session_io.getInputField("", key, Config::sName_length, m_common_io.boolAlpha(current_level->bDownloadMB));
+                std::string bool_value = "";
+                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io.getInputField("", key, Config::sName_length, bool_value);
                 break;
+            }
 
             case 'Q': // Quit
                 saveLevelChanges();
@@ -690,7 +711,6 @@ void ModLevelEditor::levelEditorLevelFieldHandler(const std::string& input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_LEVEL_FIELD_INPUT);
         changeSetupModule(MOD_DISPLAY_LEVEL_EDIT);
         return;
@@ -815,7 +835,6 @@ void ModLevelEditor::levelEditorLevelInput(const std::string& input)
     // ESC was hit
     if(result == "aborted")
     {
-        std::cout << "aborted!" << std::endl;
         changeInputModule(MOD_LEVEL_INPUT);
         redisplayModulePrompt();
         return;
@@ -974,6 +993,7 @@ void ModLevelEditor::handleLevelInputState(bool does_level_exist, int level_code
  */
 void ModLevelEditor::createNewLevel(int level_code)
 {
+    Logging *log = Logging::instance();
     access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
     access_level_ptr new_level(new AccessLevel());
 
@@ -982,7 +1002,7 @@ void ModLevelEditor::createNewLevel(int level_code)
 
     if(checkLevelExistsByLevel(level_code))
     {
-        std::cout << "Destination level already exists!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Destination level already exists=", level_code, __LINE__, __FILE__);
         return;
     }
 
@@ -991,7 +1011,7 @@ void ModLevelEditor::createNewLevel(int level_code)
 
     if(level_dao->insertRecord(new_level) < 0)
     {
-        std::cout << "Error, unable to insert new level: " << level_code << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to insert new level=", level_code, __LINE__, __FILE__);
     }
 }
 
@@ -1006,7 +1026,8 @@ void ModLevelEditor::deleteExistingLevel(int level_code)
 
     if(existing_level->iId == -1 || !level_dao->deleteRecord(existing_level->iId))
     {
-        std::cout << "Error, unable to delete existing level: " << level_code << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to delete existing level=", level_code, __LINE__, __FILE__);
     }
 
     level_dao->deleteRecord(existing_level->iId);
@@ -1018,12 +1039,14 @@ void ModLevelEditor::deleteExistingLevel(int level_code)
  */
 void ModLevelEditor::copyExistingLevel(int level_code)
 {
+    Logging *log = Logging::instance();
+
     access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
     access_level_ptr existing_level = level_dao->getAccessLevelByLevel(m_current_level);
 
     if(checkLevelExistsByLevel(level_code))
     {
-        std::cout << "Destination level already exists!" << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, Destination level already exists=", level_code, __LINE__, __FILE__);
         return;
     }
 
@@ -1033,8 +1056,7 @@ void ModLevelEditor::copyExistingLevel(int level_code)
 
     if(level_dao->insertRecord(existing_level) < 0)
     {
-        std::cout << "Error, unable to copy existing level: " << m_current_level << " to "
-                  << level_code << std::endl;
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to copy existing level=", m_current_level, "to=", level_code,__LINE__, __FILE__);
     }
 }
 
@@ -1057,7 +1079,8 @@ void ModLevelEditor::saveLevelChanges()
 
     if(existing_level == nullptr || !level_dao->updateRecord(existing_level))
     {
-        std::cout << "Error, unable to update existing level: " << m_current_level;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("Error, unable to update existing level=", m_current_level, __LINE__, __FILE__);
         return;
     }
 
@@ -1157,50 +1180,41 @@ std::string ModLevelEditor::displayLevelList()
             // Top Row
             if(rows == 0 && cols == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_LEFT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_TOP_LEFT);
             }
             else if(rows == 0 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_RIGHT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_TOP_RIGHT);
             }
             else if(rows == 0 && cols % 25 == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_TOP;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID_TOP);
             }
             else if(rows == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_ROW);
             }
 
             // Bottom Row
             else if(rows == total_rows-1 && cols == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_LEFT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_BOT_LEFT);
             }
             else if(rows == total_rows-1 && cols == max_cols-1)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_RIGHT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_BOT_RIGHT);
             }
             else if(rows == total_rows-1 && cols % 25 == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_BOT;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID_BOT);
             }
             else if(rows == total_rows-1)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_ROW);
             }
             else if(cols % 25 == 0)
             {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID;
+                buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID);
             }
             else
             {
@@ -1243,7 +1257,8 @@ std::string ModLevelEditor::displayLevelEditScreen()
 
     if(current_level == nullptr)
     {
-        std::cout << "Level Not Found: " << std::to_string(m_current_level);
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("Error, Level Not Found=", m_current_level, __LINE__, __FILE__);
         return "Level Not Found: " + std::to_string(m_current_level);
     }
 
@@ -1289,7 +1304,6 @@ std::string ModLevelEditor::displayLevelEditScreen()
                          m_common_io.rightPadding(acs.getAccessConditionFlagStringFromBits(current_level->iARFlags2), 48));
 
 
-
     result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_POST_CALL_RATIO) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bPostCallRatio), 56) +
                          m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_CALL_LIMIT) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bCallLimit), 56));
 
@@ -1301,7 +1315,7 @@ std::string ModLevelEditor::displayLevelEditScreen()
                          m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_DOWNLOAD_MB) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bDownloadMB), 56));
 
 
-    result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
+    result_set.push_back(baseGetDefaultPromptColor() + " " + Encoding::instance()->utf8Encode(std::string(72, M_BORDER_ROW)) + " ");
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_QUIT_SAVE) + baseGetDefaultStatColor() +
                          m_common_io.rightPadding("", 48));
@@ -1316,83 +1330,5 @@ std::string ModLevelEditor::displayLevelEditScreen()
     // Could re-calc this on screen width lateron.
     int max_cols = 76;
 
-    // Vector or Menus, Loop through
-    std::vector<std::string>::iterator i = result_set.begin();
-    std::string buffer = "";
-
-    for(int rows = 0; rows < total_rows; rows++)
-    {
-        buffer += "  "; // 3 Leading spaces per row.
-
-        for(int cols = 0; cols < max_cols; cols++)
-        {
-            // Top Row
-            if(rows == 0 && cols == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_LEFT;
-            }
-            else if(rows == 0 && cols == max_cols-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_TOP_RIGHT;
-            }
-            else if(rows == 0 && cols % 75 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_TOP;
-            }
-            else if(rows == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
-            }
-
-            // Bottom Row
-            else if(rows == total_rows-1 && cols == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_LEFT;
-            }
-            else if(rows == total_rows-1 && cols == max_cols-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_BOT_RIGHT;
-            }
-            else if(rows == total_rows-1 && cols % 75 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID_BOT;
-            }
-            else if(rows == total_rows-1)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_ROW;
-            }
-            else if(cols % 75 == 0)
-            {
-                buffer += baseGetDefaultBoxColor();
-                buffer += BORDER_MID;
-            }
-            else
-            {
-                // Here we insert the Menu name and pad through to 8 characters.
-                if(cols == 1)
-                {
-                    if(i != result_set.end())
-                    {
-                        buffer += *i;
-                        ++i;
-                    }
-                }
-            }
-        }
-
-        // Were going to split on \n, which will get replaced lateron
-        // with \r\n for full carriage returns.
-        buffer += "\n";
-    }
-
-    return (buffer);
-
+    return baseCreateBorderedDisplay(result_set, total_rows, max_cols);
 }

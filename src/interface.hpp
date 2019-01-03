@@ -1,7 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "model-sys/config.hpp"
+//#include "model-sys/config.hpp"
 #include "session_manager.hpp"
 #include "session.hpp"
 #include "communicator.hpp"
@@ -10,6 +10,7 @@
 #include "io_service.hpp"
 #include "socket_handler.hpp"
 #include "async_acceptor.hpp"
+#include "logging.hpp"
 
 // For Startup.
 #include <sdl2_net/SDL_net.hpp>
@@ -54,17 +55,18 @@ public:
         , m_protocol(protocol)
     {
 
+        Logging *log = Logging::instance();
+
         // Startup SDL NET.
         if(SDLNet_Init() == -1)
         {
-            fprintf(stderr, "ER: SDLNet_Init: %s\n", SDLNet_GetError());
-            exit(-1);
+            log->xrmLog<Logging::ERROR_LOG>("SDLNet_Init", SDLNet_GetError());
+            TheCommunicator::instance()->shutdown();
+            return;
         }
 
-        std::cout << "Interface Created" << std::endl;
-
-        unsigned int n = std::thread::hardware_concurrency();
-        std::cout << n << " concurrent threads are supported.\n";
+        unsigned int num_threads = std::thread::hardware_concurrency();
+        log->xrmLog<Logging::INFO_LOG>("concurrent threads supported", num_threads);
 
         // Start up worker thread of ASIO. We want socket communications in a separate thread.
         // We only spawn a single thread for IO_Service on start up
@@ -73,7 +75,7 @@ public:
         // Setup Telnet Server Connection Listener.
         if(!m_socket_acceptor->createTelnetAcceptor("127.0.0.1", port))
         {
-            std::cout << "Unable to start Telnet Acceptor" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Unable to start Telnet Acceptor");
             TheCommunicator::instance()->shutdown();
             return;
         }
@@ -82,13 +84,12 @@ public:
         // And send messages to other nodes.
         TheCommunicator::instance()->setupServer(m_session_manager);
 
-        std::cout << "Telnet Server Ready." << std::endl;
+        log->xrmLog<Logging::CONSOLE_LOG>("Telnet Server Waiting for Connection.");
         waitingForConnection();
     }
 
     ~Interface()
     {
-        std::cout << "~Interface" << std::endl;
         m_io_service.stop();
         m_thread.join();
         SDLNet_Quit();
@@ -99,7 +100,8 @@ public:
      */
     void waitingForConnection()
     {
-        std::cout << "Waiting For Connection, Adding Async Job to Listener" << std::endl;
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Waiting For Connection, Adding Async Job to Listener");
         m_async_listener->asyncAccept(
             m_protocol,
             std::bind(&Interface::handle_accept,
@@ -119,7 +121,9 @@ private:
     {
         if(!error)
         {
-            std::cout << "TCP Connection accepted" << std::endl;
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::DEBUG_LOG>("TCP Connection accepted");
+
             connection_ptr async_conn(new AsyncConnection(m_io_service, socket_handler));
 
             // Create DeadlineTimer and attach to new session
@@ -139,7 +143,8 @@ private:
         }
         else
         {
-            std::cout << "Connection refused: " << error.message() << std::endl;
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("Connection refused", error.message());
         }
     }
 

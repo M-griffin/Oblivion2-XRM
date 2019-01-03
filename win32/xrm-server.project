@@ -21,6 +21,9 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="..\src">
+    <File Name="../src/logging.hpp"/>
+    <File Name="../src/encoding.hpp"/>
+    <File Name="../src/encoding.cpp"/>
     <File Name="../src/uuid.hpp"/>
     <File Name="../src/directory.hpp"/>
     <File Name="../src/async_acceptor.hpp"/>
@@ -240,6 +243,7 @@
         <Library Value="libsqlite3.a"/>
         <Library Value="yaml-cpp.dll"/>
         <Library Value="Rpcrt4"/>
+        <Library Value="libiconv.a"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>

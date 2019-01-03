@@ -3,6 +3,7 @@
 
 #include "io_service.hpp"
 #include "socket_handler.hpp"
+#include "logging.hpp"
 
 #include <iostream>
 
@@ -22,12 +23,12 @@ public:
     { }
     ~AsyncBase()
     { }
-    
+
     /**
      * @brief Is the Socket Created and Open
      * @return
      */
-    bool isActive() 
+    bool isActive()
     {
         return m_socket_handler->isActive();
     }
@@ -48,17 +49,18 @@ public:
     {
         try
         {
-            if (m_socket_handler->isActive())
+            if(m_socket_handler->isActive())
             {
                 m_socket_handler->close();
             }
         }
-        catch (std::exception &ex)
+        catch(std::exception &ex)
         {
-            std::cout << "AsyncBase shutdown() - Caught exception: " << ex.what();
+            Logging *log = Logging::instance();
+            log->xrmLog<Logging::ERROR_LOG>("AsyncBase shutdown() - Caught exception=", ex.what());
         }
     }
-   
+
     IOService          &m_io_service;
     socket_handler_ptr  m_socket_handler;
 };

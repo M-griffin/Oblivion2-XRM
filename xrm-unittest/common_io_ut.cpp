@@ -25,6 +25,20 @@ SUITE(XRMCommonIO)
         CHECK(!myPath.empty());
     }
 
+    /**
+     * @brief General Test Method for debugging.
+     * @return
+     *
+    TEST(parseAnsiScreenTestHighAscii)
+    {
+        CommonIO common;
+        std::string temp = std::string(1, static_cast<unsigned char>(148));
+        temp += std::string(1, static_cast<unsigned char>(126));
+        temp += std::string(1, static_cast<unsigned char>(155));
+        common.testUnicode(temp);
+        CHECK_EQUAL(1, 1);
+    }*/
+
     TEST(NumberOfCharacters)
     {
         CommonIO common;
@@ -48,6 +62,33 @@ SUITE(XRMCommonIO)
         int length = common.numberOfChars(temp);
         CHECK_EQUAL(length,10);
     }
+
+    /**
+     * @brief Test Number of Characters with High ASCII mix-ins.
+     * @return
+     *
+    TEST(numberOfCharsWithHighAscii)
+    {
+        CommonIO common;
+        std::string temp = std::string(1, static_cast<unsigned char>(148));
+        temp += std::string(1, static_cast<unsigned char>(126));
+        temp += std::string(1, static_cast<unsigned char>(155));
+        int result = common.numberOfChars(temp);
+        CHECK_EQUAL(result, 3);
+    }
+
+    TEST(numberOfCharsWithHighAsciiAndUtf8BeforeAndAfter)
+    {
+        // 21 Bytes, should be 9 seperate characters
+        CommonIO common;
+        std::string temp = "あにま"; // 3 + 3 + 3 = 9 bytes
+        temp += std::string(1, static_cast<unsigned char>(148)); // 1 byte
+        temp += std::string(1, static_cast<unsigned char>(126)); // 1 byte
+        temp += std::string(1, static_cast<unsigned char>(155)); // 1 byte
+        temp += "あにま"; // 3 + 3 + 3 = 9 bytes
+        int result = common.numberOfChars(temp);
+        CHECK_EQUAL(result, 9);
+    }*/
 
     /**
      * @brief Left of string, remove spaces.
@@ -142,7 +183,6 @@ SUITE(XRMCommonIO)
         CommonIO common;
         std::string temp = "testing";
         std::string trim_temp = common.eraseString(temp, 0, 4);
-        std::cout << "[" << trim_temp << "]" << std::endl;
         CHECK_EQUAL(trim_temp,"ing");
     }
 
@@ -151,7 +191,6 @@ SUITE(XRMCommonIO)
         CommonIO common;
         std::string temp = "testing";
         std::string trim_temp = common.eraseString(temp, 2, 20);
-        std::cout << "[" << trim_temp << "]" << std::endl;
         CHECK_EQUAL(trim_temp,"te");
     }
 
@@ -160,7 +199,6 @@ SUITE(XRMCommonIO)
         CommonIO common;
         std::string temp = "あにま! Lin";
         std::string trim_temp = common.eraseString(temp, 0, 2);
-        std::cout << "[" << trim_temp << "]" << std::endl;
         CHECK_EQUAL(trim_temp,"ま! Lin");
     }
 
@@ -169,9 +207,24 @@ SUITE(XRMCommonIO)
         CommonIO common;
         std::string temp = "あにま! Lin";
         std::string trim_temp = common.eraseString(temp, 1, 4);
-        std::cout << "[" << trim_temp << "]" << std::endl;
         CHECK_EQUAL(trim_temp,"あLin");
     }
+
+    /**
+     * @brief Erase Data in a String w/ start, end range. w/ High Ascii
+     * @return
+     *
+    TEST(EraseStringWithHighAscii)
+    {
+        CommonIO common;
+        std::string temp = std::string(1, static_cast<unsigned char>(155));
+        temp += "   Linux----";
+        std::string trim_temp = common.eraseString(temp, 6);
+
+        std::string result = std::string(1, static_cast<unsigned char>(155));
+        result += "   Li";
+        CHECK_EQUAL(trim_temp, result);
+    }*/
 
     /**
      * @brief Pad Sapces on the right of the string, also truncates for absolute field lengths.
@@ -400,5 +453,13 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(result, "\x1b");
     }
 
+    /*
+    TEST(parseAnsiScreenTest)
+    {
+        CommonIO common;
+        std::string temp = std::string(1, static_cast<unsigned char>(148));
+        common.testUnicode(temp);
+        CHECK_EQUAL(1, 1);
+    }*/
 
 }

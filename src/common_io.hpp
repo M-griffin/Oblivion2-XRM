@@ -8,6 +8,21 @@
 #include <map>
 #include <stdint.h>
 
+
+// Localized Buffer.
+typedef struct localized_buffer
+{
+    std::string character;
+    uint8_t     length;
+
+    void clear()
+    {
+        character.erase();
+        length = 0;
+    }
+
+} LocalizedBuffer;
+
 /**
  * @class CommonIO
  * @author Michael Griffin
@@ -20,141 +35,9 @@ class CommonIO
 
 public:
 
-    explicit CommonIO()
-        : m_escape_sequence("")
-        , m_string_buffer("")
-        , m_incoming_data("")
-        , m_line_buffer("")
-        , m_column_position(0)
-        , m_is_escape_sequence(false)
-        , m_is_new_getline(true)
-        , m_is_new_leadoff(true)
-    {
-        // Arror Keys, Hardware OA are translated to [A on the fly
-        m_sequence_map.insert(std::make_pair("[A",    "up_arrow"));
-        m_sequence_map.insert(std::make_pair("[B",    "dn_arrow"));
-        m_sequence_map.insert(std::make_pair("[C",    "rt_arrow"));
-        m_sequence_map.insert(std::make_pair("[D",    "lt_arrow"));
+    explicit CommonIO();
+    ~CommonIO();
 
-        // Hardware Keys, or Numpad.
-        m_sequence_map.insert(std::make_pair("OA",    "up_arrow"));
-        m_sequence_map.insert(std::make_pair("OB",    "dn_arrow"));
-        m_sequence_map.insert(std::make_pair("OC",    "rt_arrow"));
-        m_sequence_map.insert(std::make_pair("OD",    "lt_arrow"));
-        m_sequence_map.insert(std::make_pair("OE",    "clear"));
-        m_sequence_map.insert(std::make_pair("OF",    "end"));
-        m_sequence_map.insert(std::make_pair("OH",    "home"));
-
-        // Shift Arrow Keys
-        m_sequence_map.insert(std::make_pair("[1;2A", "shift_up_arrow"));
-        m_sequence_map.insert(std::make_pair("[1;2B", "shift_dn_arrow"));
-        m_sequence_map.insert(std::make_pair("[1;2C", "shift_rt_arrow"));
-        m_sequence_map.insert(std::make_pair("[1;2D", "shift_lt_arrow"));
-
-        // Shift TAB
-        m_sequence_map.insert(std::make_pair("[Z",    "shift_tab"));
-
-        // Function Keys ANSI
-        m_sequence_map.insert(std::make_pair("[@",    "insert"));
-        m_sequence_map.insert(std::make_pair("[H",    "home"));
-        m_sequence_map.insert(std::make_pair("[K",    "end"));
-        m_sequence_map.insert(std::make_pair("[F",    "end")); // = 0F
-        m_sequence_map.insert(std::make_pair("[V",    "pg_up"));
-        m_sequence_map.insert(std::make_pair("[U",    "pg_dn"));
-        m_sequence_map.insert(std::make_pair("[OP",   "f1"));
-        m_sequence_map.insert(std::make_pair("[OQ",   "f2"));
-        m_sequence_map.insert(std::make_pair("[OR",   "f3"));
-        m_sequence_map.insert(std::make_pair("[OS",   "f4"));
-        m_sequence_map.insert(std::make_pair("[OT",   "f5"));
-        m_sequence_map.insert(std::make_pair("[[17~", "f6"));
-        m_sequence_map.insert(std::make_pair("[[18~", "f7"));
-        m_sequence_map.insert(std::make_pair("[[19~", "f8"));
-        m_sequence_map.insert(std::make_pair("[[20~", "f9"));
-        m_sequence_map.insert(std::make_pair("[[21~", "f10"));
-        m_sequence_map.insert(std::make_pair("[[23~", "f11"));
-        m_sequence_map.insert(std::make_pair("[[24~", "f12"));
-
-        // VT-100 Putty
-        m_sequence_map.insert(std::make_pair("[1~",   "home"));
-        m_sequence_map.insert(std::make_pair("[2~",   "insert"));
-        m_sequence_map.insert(std::make_pair("[3~",   "del"));
-        m_sequence_map.insert(std::make_pair("[4~",   "end"));
-        m_sequence_map.insert(std::make_pair("[5~",   "pg_up"));
-        m_sequence_map.insert(std::make_pair("[6~",   "pg_dn"));
-        m_sequence_map.insert(std::make_pair("[OU",   "f6"));
-        m_sequence_map.insert(std::make_pair("[OV",   "f7"));
-        m_sequence_map.insert(std::make_pair("[OW",   "f8"));
-        m_sequence_map.insert(std::make_pair("[OX",   "f9"));
-        m_sequence_map.insert(std::make_pair("[OY",   "f10"));
-        m_sequence_map.insert(std::make_pair("[OZ",   "f11"));
-        m_sequence_map.insert(std::make_pair("[O[",   "f12"));
-
-        // Linux Console
-        m_sequence_map.insert(std::make_pair("[[A",   "f1"));
-        m_sequence_map.insert(std::make_pair("[[B",   "f2"));
-        m_sequence_map.insert(std::make_pair("[[C",   "f3"));
-        m_sequence_map.insert(std::make_pair("[[D",   "f4"));
-        m_sequence_map.insert(std::make_pair("[[E",   "f5"));
-
-        // SCO
-        m_sequence_map.insert(std::make_pair("[L",    "insert"));
-        m_sequence_map.insert(std::make_pair("[I",    "pg_up"));
-        m_sequence_map.insert(std::make_pair("[G",    "pg_dn"));
-
-        m_sequence_map.insert(std::make_pair("[[M",   "f1"));
-        m_sequence_map.insert(std::make_pair("[[N",   "f2"));
-        m_sequence_map.insert(std::make_pair("[[O",   "f3"));
-        m_sequence_map.insert(std::make_pair("[[P",   "f4"));
-        m_sequence_map.insert(std::make_pair("[[Q",   "f5"));
-        m_sequence_map.insert(std::make_pair("[[R",   "f6"));
-        m_sequence_map.insert(std::make_pair("[[S",   "f7"));
-        m_sequence_map.insert(std::make_pair("[[T",   "f8"));
-        m_sequence_map.insert(std::make_pair("[[U",   "f9"));
-        m_sequence_map.insert(std::make_pair("[[V",   "f10"));
-        m_sequence_map.insert(std::make_pair("[[W",   "f11"));
-        m_sequence_map.insert(std::make_pair("[[X",   "f12"));
-
-        // rxvt
-        m_sequence_map.insert(std::make_pair("[7~",   "home"));
-        m_sequence_map.insert(std::make_pair("[8~",   "end"));
-
-        // Shift Arrow Keys
-        m_sequence_map.insert(std::make_pair("[a",    "shift_up_arrow"));
-        m_sequence_map.insert(std::make_pair("[b",    "shift_dn_arrow"));
-        m_sequence_map.insert(std::make_pair("[c",    "shift_rt_arrow"));
-        m_sequence_map.insert(std::make_pair("[d",    "shift_lt_arrow"));
-        m_sequence_map.insert(std::make_pair("[e",    "shift_clear"));
-
-        // Shift Function
-        m_sequence_map.insert(std::make_pair("[2$",   "insert"));
-        m_sequence_map.insert(std::make_pair("[3$",   "del"));
-        m_sequence_map.insert(std::make_pair("[5$",   "pg_up"));
-        m_sequence_map.insert(std::make_pair("[6$",   "pg_dn"));
-        m_sequence_map.insert(std::make_pair("[7$",   "home"));
-        m_sequence_map.insert(std::make_pair("[8$",   "end"));
-
-        // Ctrl
-        m_sequence_map.insert(std::make_pair("Oa",    "ctrl_up_arrow"));
-        m_sequence_map.insert(std::make_pair("Ob",    "ctrl_dn_arrow"));
-        m_sequence_map.insert(std::make_pair("Oc",    "ctrl_rt_arrow"));
-        m_sequence_map.insert(std::make_pair("Od",    "ctrl_lt_arrow"));
-        m_sequence_map.insert(std::make_pair("Oe",    "ctrl_clear"));
-
-        // Shift Function
-        m_sequence_map.insert(std::make_pair("[2^",   "ctrl_insert"));
-        m_sequence_map.insert(std::make_pair("[3^",   "ctrl_del"));
-        m_sequence_map.insert(std::make_pair("[5^",   "ctrl_pg_up"));
-        m_sequence_map.insert(std::make_pair("[6^",   "ctrl_pg_dn"));
-        m_sequence_map.insert(std::make_pair("[7^",   "ctrl_home"));
-        m_sequence_map.insert(std::make_pair("[8^",   "ctrl_end"));
-    }
-
-    ~CommonIO()
-    {
-        std::cout << "~CommonIO" << std::endl;
-        m_sequence_map.clear();
-        m_escape_sequence.erase();
-    }
 
     /* This function will read the OS specific functions
      * To Determine where the executable is located.
@@ -166,11 +49,11 @@ public:
      * Get The BBS System Users HOME directory
      */
     std::string getSystemHomeDirectory();
-    
+
     /**
      * @brief Appends Path Separator depending on environment.
      * @param path
-     * @return 
+     * @return
      */
     void pathAppend(std::string &path);
 
@@ -228,19 +111,6 @@ public:
      * This is for mixed ASCII And UTF-8 Strings.
      */
     bool isDigit(const std::string &str);
-
-    /**
-     * @brief Used for printing multibyte (Unicode Translations)
-     * @param wide_string
-     */
-    std::string printWideCharacters(const std::wstring &wide_string);
-
-    /**
-     * @brief Translation from CP437 to UTF-8 MultiByte Characters
-     * @param standard_string
-     */
-    std::string translateUnicode(const std::string &standard_string);
-
 
     /**
     * @brief Return the Escape Sequence
@@ -304,21 +174,14 @@ public:
      * @brief Check if the file exists
      * @return
      */
-    bool fileExists(std::string FileName);
+    bool fileExists(std::string file_name);
 
-    /**
-     * @brief Read In ANSI text files for parsing.
-     * @param FileName
-     * @param buff
-     */
-    void readinAnsi(std::string FileName, std::string &buff);
-    
     /**
      * @brief Reads in Ansi file into Buffer Only
      * @param FileName
-     * @return 
+     * @return
      */
-    std::string readinAnsi(std::string FileName);
+    std::string readinAnsi(std::string file_name);
 
     /**
      * @brief Split Strings by delimiter into Vector of Strings.
@@ -331,49 +194,49 @@ public:
     /**
      * @brief Standard Time to Date String
      * @param std_time
-     * @return 
+     * @return
      */
     std::string standardDateToString(std::time_t std_time);
 
     /**
      * @brief Standard Time to Date/Time String
      * @param std_time
-     * @return 
+     * @return
      */
     std::string standardDateTimeToString(std::time_t std_time);
 
     /**
      * @brief String to Date Format
      * @param date
-     * @return 
+     * @return
      */
     std::time_t stringToStandardDate(std::string date);
 
     /**
      * @brief String to Date/Time Format
      * @param date_time
-     * @return 
+     * @return
      */
     std::time_t stringToStandardDateTime(std::string date_time);
-    
+
     /**
      * @brief Converts std::strings to Long values
      * @param value
-     * @return 
+     * @return
      */
     long stringToLong(std::string value);
 
     /**
      * @brief Converts std::strings to Int values
      * @param value
-     * @return 
+     * @return
      */
     int stringToInt(std::string value);
 
     /**
      * @brief Tests first char of string for starting T/F returns int with -1 for invalid
      * @param value
-     * @return 
+     * @return
      */
     int stringToBool(std::string value);
 
@@ -389,6 +252,35 @@ public:
         return std::find(std::begin(container), std::end(container), element)
                != std::end(container);
     }
+
+    template<typename octet_type>
+    inline uint8_t mask8(octet_type oc)
+    {
+        return static_cast<uint8_t>(0xff & oc);
+    }
+
+    /**
+     * @brief Parses screen data into the Screen Buffer.
+     * @return
+     */
+    void getNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
+                      std::string::iterator &line_end);
+
+    /**  TEMP EXTRA LOGGING!
+     * @brief Parses screen data into the Screen Buffer.
+     * @return
+     */
+    void getNextGlyph2(LocalizedBuffer &buffer, std::string::iterator &it,
+                       std::string::iterator &line_end);
+
+    /**
+     * @brief Parses screen data into the Screen Buffer.
+     * @return
+     */
+    void peekNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
+                       std::string::iterator &line_end);
+
+    void testUnicode(std::string incoming_data);
 
 private:
 
@@ -407,5 +299,6 @@ private:
 
     // Parameterized ESC Sequcnes Translations.
     std::map<std::string, std::string> m_sequence_map;
+
 };
 #endif

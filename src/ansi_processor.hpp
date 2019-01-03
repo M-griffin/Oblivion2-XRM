@@ -16,7 +16,7 @@
  */
 typedef struct ScreenPixel
 {
-    unsigned char c;
+    std::string char_sequence;
     int x_position;
     int y_position;
     int attribute;
@@ -64,8 +64,8 @@ public:
     int m_foreground_color;
     int m_background_color;
 
-    ScreenPixel m_screen_pixel;
-    std::vector <ScreenPixel> m_screen_buffer;
+    ScreenPixel                m_screen_pixel;
+    std::vector <ScreenPixel>  m_screen_buffer;
     std::map<int, ScreenPixel> m_pull_down_options;
 
     // ANSI escape sequences
@@ -139,13 +139,22 @@ public:
     void screenBufferDisplayTest();
 
     /**
+     * @brief MCI Off-Set if Mid ANSI
+     * Used for Single Line ANSI Inserts to determine where special MCI Codes are located.
+     *
+     * @param clearScreen
+     * @return
+     */
+    int getMCIOffSet(std::string mci_code);
+
+    /**
      * @brief Takes buffer and displays parsed sequences
      */
     std::string getScreenFromBuffer(bool clearScreen);
 
 
     // Screen Buffer Modifiers
-    void screenBufferSetPixel(char c);
+    void screenBufferSetGlyph(std::string char_sequence);
     void screenBufferScrollUp();
     void screenBufferClearRange(int start, int end);
     void screenBufferClear();
@@ -157,13 +166,21 @@ public:
 
     // Process ANSI screen inserts into the Screen Buffer
     void parseAnsiScreen(char *buff);  // 1
-    
-    
+
     // Helpers
-    int getYPosition() const { return m_y_position; }
-    int getXPosition() const { return m_x_position; }
-    
-    int getMaxLines() const { return m_number_lines; }
+    int getYPosition() const
+    {
+        return m_y_position;
+    }
+    int getXPosition() const
+    {
+        return m_x_position;
+    }
+
+    int getMaxLines() const
+    {
+        return m_number_lines;
+    }
 
 };
 

@@ -8,9 +8,6 @@
 
 #include "libSqliteWrapped.h"
 
-
-
-
     SQLW::StderrLog log;
     SQLW::Database db("test3.db", &log);
 

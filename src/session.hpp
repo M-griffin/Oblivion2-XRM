@@ -11,6 +11,7 @@
 #include "session_data.hpp"
 #include "session_io.hpp"
 #include "menu_system.hpp"
+#include "logging.hpp"
 
 #include <memory>
 #include <list>
@@ -41,11 +42,9 @@ public:
     {
         // Free the Node Number from this session.
         TheCommunicator::instance()->freeNodeNumber(m_session_data->m_node_number);
-        std::cout << "~Session, Node: " << m_session_data->m_node_number << std::endl;
 
         // Free the menu system state and modules when session closes.
         m_state_manager->clean();
-        std::cout << "m_menu_manager->clean() Completd!" << std::endl;
     }
 
     /**
@@ -59,6 +58,7 @@ public:
                               session_manager_ptr session_manager)
     {
         session_ptr new_session(new Session(io_service, connection, deadline_timer, session_manager));
+
         if(connection->isActive())
         {
             new_session->m_session_data->startUpSessionStats("Telnet");
@@ -70,7 +70,6 @@ public:
         {
             // On initial Session Connection,  setup and send TELNET Options to
             // start the negotiation of client features.
-            std::cout << "send initial IAC sequences started." << std::endl;
 
             // On initial connection, clear and home cursor
             std::string clear_screen = "\x1b[1;1H\x1b[2J";
@@ -110,12 +109,8 @@ public:
             //new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_NEW_ENVIRON);
             //new_session->m_session_data->m_telnet_state->addReply(TELOPT_NEW_ENVIRON);
 
-            std::cout << "send initial IAC sequences ended." << std::endl;
-
             // Wait 1.5 Seconds for respones.
             new_session->startDetectionTimer();
-
-            std::cout << "sleep ended." << std::endl;
         }
 
         return new_session;
@@ -125,7 +120,7 @@ public:
      * @brief Telopt Sequences timer
      */
     void startDetectionTimer()
-    {       
+    {
         // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences reponses
         m_deadline_timer->setWaitInMilliseconds(1500);
         m_deadline_timer->asyncWait(
@@ -139,8 +134,6 @@ public:
      */
     void handleDetectionTimer()
     {
-        std::cout << "handleDetectionTimer Completed!" << std::endl;
-
         // Detection Completed, start ip the Pre-Logon Sequence State.
         state_ptr new_state(new MenuSystem(m_session_data));
         m_state_manager->changeState(new_state);
@@ -157,9 +150,22 @@ public:
             return;
         }
 
+        // handle output encoding, if utf-8 translate data accordingly.
+        std::string outputBuffer = "";
+
+        // On Output, We have internal UTF8 now, translate to CP437
+        if(m_session_data->m_encoding == Encoding::ENCODE_CP437)
+        {
+            outputBuffer = msg; //Encoding::instance()->utf8Decode(msg);
+        }
+        else
+        {
+            outputBuffer = msg;
+        }
+
         if(m_connection->isActive() && TheCommunicator::instance()->isActive())
         {
-            m_connection->asyncWrite(msg,
+            m_connection->asyncWrite(outputBuffer,
                                      std::bind(
                                          &Session::handleWrite,
                                          shared_from_this(),
@@ -175,13 +181,15 @@ public:
      */
     void handleWrite(const std::error_code& error, socket_handler_ptr)
     {
+        Logging *log = Logging::instance();
+
         if(error)
         {
-            std::cout << "async_write error: " << error.message() << std::endl;
-            std::cout << "Session Closed()" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("Async_Write Session Closed() error=", error.message(), __LINE__, __FILE__);
         }
 
         session_manager_ptr session_manager = m_session_data->m_session_manager.lock();
+
         if(session_manager && error && (!m_session_data->m_is_leaving))
         {
             m_session_data->m_is_leaving = true;
@@ -193,15 +201,12 @@ public:
             {
                 try
                 {
-                    std::cout << "Leaving (NORMAL SESSION) Client IP: "
-                              //<< m_connection->m_normal_socket.remote_endpoint().address().to_string()
-                              << std::endl;
-
+                    log->xrmLog<Logging::DEBUG_LOG>("Leaving (NORMAL SESSION)", __LINE__, __FILE__);
                     m_connection->shutdown();
                 }
                 catch(std::exception &ex)
                 {
-                    std::cout << "Exception closing socket(): " << ex.what() << std::endl;
+                    log->xrmLog<Logging::ERROR_LOG>("Exception closing socket()", ex.what(), __LINE__, __FILE__);
                 }
             }
         }
@@ -220,24 +225,23 @@ public:
         , m_session_data(new SessionData(connection, session_manager, io_service, m_state_manager))
         , m_deadline_timer(deadline_timer)
     {
+        Logging *log = Logging::instance();
+
         if(m_connection->isActive())
         {
             try
             {
-                std::cout << "New Connection Session ! " << std::endl;
-                std::cout << "Client IP Address: "
-                          //<< m_connection->m_normal_socket.remote_endpoint().address().to_string()
-                          << std::endl;
+                log->xrmLog<Logging::DEBUG_LOG>("New Session Accepted", __LINE__, __FILE__);
             }
             catch(std::exception &ex)
             {
-                std::cout << "Exception remote_endpoint(): " << ex.what() << std::endl;
+                log->xrmLog<Logging::ERROR_LOG>("Exception remote_endpoint()=", ex.what(), __LINE__, __FILE__);
             }
         }
 
         // Get The First available node number.
         m_session_data->m_node_number = TheCommunicator::instance()->getNodeNumber();
-        std::cout << " **** Node Number: " << m_session_data->m_node_number << std::endl;
+        log->xrmLog<Logging::CONSOLE_LOG>("New Session ConnectionNode Number=", m_session_data->m_node_number);
     }
 
     connection_ptr	    m_connection;

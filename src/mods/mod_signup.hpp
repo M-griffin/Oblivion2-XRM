@@ -36,7 +36,7 @@ class ModSignup
 {
 public:
     ModSignup(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
-        : ModBase(session_data, config, ansi_process)        
+        : ModBase(session_data, config, ansi_process)
         , m_session_io(session_data)
         , m_menu_base(new MenuBase(session_data))
         , m_filename("mod_signup.yaml")
@@ -47,8 +47,6 @@ public:
         , m_is_text_prompt_exist(false)
         , m_newuser_password_attempts(0)
     {
-        std::cout << "ModSignup" << std::endl;
-
         // Push function pointers to the stack.
         m_setup_functions.push_back(std::bind(&ModSignup::setupNewUserPassword, this));
         m_setup_functions.push_back(std::bind(&ModSignup::setupDisclaimer, this));
@@ -103,7 +101,8 @@ public:
 
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
-        if (!m_is_text_prompt_exist)
+
+        if(!m_is_text_prompt_exist)
         {
             createTextPrompts();
         }
@@ -114,7 +113,6 @@ public:
 
     virtual ~ModSignup() override
     {
-        std::cout << "~ModSignup" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
     }
@@ -155,7 +153,7 @@ public:
     const std::string PROMPT_DISCLAIMER = "disclaimer";
     const std::string PROMPT_HANDLE = "handle";
     const std::string PROMPT_REAL_NAME = "real_name";
-    const std::string PROMPT_USER_NUMBER = "user_number";    
+    const std::string PROMPT_USER_NUMBER = "user_number";
     const std::string PROMPT_ADDRESS = "address";
     const std::string PROMPT_LOCATION = "location";
     const std::string PROMPT_COUNTRY = "country";
@@ -184,11 +182,11 @@ public:
 
     const std::string PROMPT_SAVED = "confirmed_save";
     const std::string PROMPT_NOT_SAVED = "record_not_saved";
-    
+
     const std::string PROMPT_AUTO_VALIDATION = "auto_validation";
     const std::string PROMPT_NOT_VALIDATED = "not_validated";
     const std::string PROMPT_NEWUSER_VOTING = "new_user_voting";
-    
+
 
     /**
      * @brief Create Default Text Prompts for module
@@ -205,7 +203,7 @@ public:
      * @brief Changes to Next module index.
      */
     void changeNextModule();
-    
+
     /**
      * @brief Changes to Previous module index.
      */
@@ -239,7 +237,7 @@ public:
      * @return
      */
     void setupDisclaimer();
-    
+
     /**
      * @brief Get Handle from User
      * @return
@@ -505,7 +503,7 @@ private:
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
     SessionIO              m_session_io;
-    menu_base_ptr          m_menu_base;    
+    menu_base_ptr          m_menu_base;
     std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
     user_ptr               m_user_record;

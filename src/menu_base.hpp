@@ -8,7 +8,6 @@
 #include "communicator.hpp"
 
 #include "model-sys/struct_compat.hpp"
-#include "model-sys/config.hpp"
 #include "model-sys/menu.hpp"
 #include "model-sys/menu_prompt.hpp"
 
@@ -252,7 +251,7 @@ public:
     // Input is passed through to it, then the function returns for the next input
     // Since ere async, nothing stays inside it always returns.
     void loadAndStartupMenu();
-   
+
     /**
      * @brief Updates current and next lightbar positions.
      */

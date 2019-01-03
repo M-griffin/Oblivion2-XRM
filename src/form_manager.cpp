@@ -4,6 +4,7 @@
 #include "forms/form_system_config.hpp"
 #include "ansi_processor.hpp"
 #include "session_data.hpp"
+#include "logging.hpp"
 
 #include <iostream>
 #include <string>
@@ -29,7 +30,6 @@ FormManager::FormManager(config_ptr config, session_data_ptr session)
 
 FormManager::~FormManager()
 {
-    std::cout << "~FormManager()" << std::endl;
 }
 
 /**
@@ -37,7 +37,7 @@ FormManager::~FormManager()
  */
 void FormManager::clearAllForms()
 {
-    if (m_form.size() > 0)
+    if(m_form.size() > 0)
     {
         std::vector<form_ptr>().swap(m_form);
         std::vector<MenuOption>().swap(m_loaded_options);
@@ -108,10 +108,12 @@ void FormManager::startupFormSystemConfiguration()
 {
     // Allocate and Create
     form_ptr form(new FormSystemConfig(m_config));
-    if (!form)
+
+    if(!form)
     {
-        std::cout << "FormSystemConfig Allocation Error!" << std::endl;
-        assert(false);
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::ERROR_LOG>("FormSystemConfig Allocation Error!", __FILE__, __LINE__);
+        return;
     }
 
     startupForm(form);
@@ -143,17 +145,18 @@ void FormManager::buildPageOptions(std::vector<MenuOption> &page_options, int cu
     int total_rows = m_loaded_options.size();
 
     m_total_pages = total_rows / boxsize;
-    if (total_rows % boxsize > 0)
+
+    if(total_rows % boxsize > 0)
     {
         ++m_total_pages;
     }
 
-    if (total_rows <= boxsize)
+    if(total_rows <= boxsize)
     {
         m_total_pages = 1;
     }
 
-    if (current_page < 1)
+    if(current_page < 1)
     {
         current_page = 1;
     }
@@ -162,10 +165,11 @@ void FormManager::buildPageOptions(std::vector<MenuOption> &page_options, int cu
     int page = current_page - 1;
 
     // Now Grab as Records that will fit in the box
-    for (int i = 1; i < boxsize+1; i++)
+    for(int i = 1; i < boxsize+1; i++)
     {
-        if (((boxsize*page)+i)-1 >= (signed)m_loaded_options.size())
+        if(((boxsize*page)+i)-1 >= (signed)m_loaded_options.size())
             break;
+
         page_options.push_back(m_loaded_options[((boxsize*page)+i)-1]);
     }
 }
@@ -203,10 +207,12 @@ std::string FormManager::processTopFormTemplate(const std::string &screen)
      */
     std::string new_screen = screen;
     std::string::size_type index = 0;
+
     while(index != std::string::npos)
     {
         index = new_screen.find("\x1b[2J", index);
-        if (index != std::string::npos)
+
+        if(index != std::string::npos)
         {
             new_screen.replace(index, 4, "\x1b[1;1H\x1b[2J");
             // Incriment past previous replacement.
@@ -233,20 +239,24 @@ std::string FormManager::processMidFormTemplate(const std::string &screen)
     std::string new_screen = screen;
 
     std::string::size_type index = 0;
+
     while(index != std::string::npos)
     {
         index = new_screen.find("\r", index);
-        if (index != std::string::npos)
+
+        if(index != std::string::npos)
         {
             new_screen.erase(index, 1);
         }
     }
 
     index = 0;
+
     while(index != std::string::npos)
     {
         index = new_screen.find("\n", index);
-        if (index != std::string::npos)
+
+        if(index != std::string::npos)
         {
             new_screen.erase(index, 1);
         }
@@ -266,20 +276,21 @@ std::string FormManager::processMidFormTemplate(const std::string &screen)
     for(unsigned int i = 0; i < code_map.size(); i++)
     {
         auto &map = code_map[i];
+
         //std::cout << "Generic Code: " << map.m_code << std::endl;
-        if (map.m_code[1] == 'K')
+        if(map.m_code[1] == 'K')
         {
             ++key_columns;
         }
 
-        if (map.m_code[1] == 'D')
+        if(map.m_code[1] == 'D')
         {
             ++des_columns;
         }
     }
 
     // No codes found in ansi, or invalid combination exit!
-    if (key_columns == 0 || key_columns != des_columns)
+    if(key_columns == 0 || key_columns != des_columns)
     {
         //std::cout << "No Generic Code Maps found." << std::endl;
         return output_screen;
@@ -289,9 +300,11 @@ std::string FormManager::processMidFormTemplate(const std::string &screen)
     int column = 1;
     std::string key, value;
     std::string::size_type idx;
+
     for(unsigned int i = 0; i < m_menu_info->menu_options.size(); i++)
     {
         auto &m = m_menu_info->menu_options[i];
+
         // Skip Options that are Automatic Exection, or Stacked with no name and hidden
         if(m.menu_key == "FIRSTCMD" || m.menu_key == "EACH" ||
                 m.name.size() == 0 || m.hidden)
@@ -304,7 +317,8 @@ std::string FormManager::processMidFormTemplate(const std::string &screen)
 
         // Clean any wildcard from menu key.
         idx = m.menu_key.find("*");
-        if (idx != std::string::npos)
+
+        if(idx != std::string::npos)
         {
             value = m.menu_key.substr(0, idx);
         }
@@ -312,6 +326,7 @@ std::string FormManager::processMidFormTemplate(const std::string &screen)
         {
             value = m.menu_key;
         }
+
         m_session_io.addMCIMapping(key, value);
 
         // Build Key/Value for Menu Description
@@ -319,18 +334,19 @@ std::string FormManager::processMidFormTemplate(const std::string &screen)
         value = m.name;
         m_session_io.addMCIMapping(key, value);
 
-        if (column % key_columns == 0)
+        if(column % key_columns == 0)
         {
             // Process template menu row and all columns added.
             output_screen += m_session_io.parseCodeMapGenerics(new_screen, code_map);
             output_screen += "\x1b[D\r\n";
             column = 0;
         }
+
         ++column;
     }
 
     // Process any remaining not caught in offset.
-    if (m_session_io.getMCIMappingCount() > 0)
+    if(m_session_io.getMCIMappingCount() > 0)
     {
         output_screen += m_session_io.parseCodeMapGenerics(new_screen, code_map);
         output_screen += "\x1b[D\r\n";
@@ -482,9 +498,9 @@ std::string FormManager::processFormScreens()
     // Do a simple MCI Code replace for title
     // |TI - Menu Title
     std::string::size_type idx = m_ansi_top.find("|TI");
-    if (idx != std::string::npos)
+
+    if(idx != std::string::npos)
     {
-        std::cout << "parsing form code title" << std::endl;
         m_ansi_top.replace(
             idx,
             3,

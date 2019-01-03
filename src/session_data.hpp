@@ -7,12 +7,15 @@
 #include "process_posix.hpp"
 #endif
 
+#include "encoding.hpp"
+
 #include "io_service.hpp"
 #include "async_connection.hpp"
 #include "telnet_decoder.hpp"
 #include "session_manager.hpp"
 #include "common_io.hpp"
 #include "deadline_timer.hpp"
+#include "logging.hpp"
 
 #include "model-sys/structures.hpp"
 #include "model-sys/struct_compat.hpp"
@@ -62,21 +65,18 @@ public:
         , m_session_stats(new SessionStats())
         , m_node_number(0)
         , m_is_use_ansi(true)
-        , m_output_encoding("cp437")
+        , m_encoding_text(Encoding::ENCODING_TEXT_UTF8)
+        , m_encoding(Encoding::ENCODE_UTF8)
         , m_is_session_authorized(false)
         , m_is_leaving(false)
         , m_is_esc_timer(false)
         , m_is_process_running(false)
-//        , m_raw_data()
         , m_parsed_data("")
     {
-        std::cout << "SessionData" << std::endl;
     }
 
     ~SessionData()
     {
-        std::cout << "~SessionData" << std::endl;
-
         for(unsigned int i = 0; i < m_processes.size(); i++)
         {
             m_processes[i]->terminate();
@@ -113,6 +113,7 @@ public:
     void handleTeloptCodes()
     {
         unsigned char ch = 0;
+        std::string incoming_data = "";
 
         for(auto c : m_in_data_vector)
         {
@@ -123,7 +124,8 @@ public:
             }
             catch(std::exception& e)
             {
-                std::cout << "Exception telnet_process_char: " << e.what() << std::endl;
+                Logging *log = Logging::instance();
+                log->xrmLog<Logging::ERROR_LOG>("Exception telnet_process_char", e.what(), __LINE__, __FILE__);
             }
 
             // Skip any incoming nulls, nulls are also return on Telnet options received
@@ -134,11 +136,14 @@ public:
             }
 
             // Incoming Buffer is filled and Telnet options are parsed out.
-            m_parsed_data += ch;
+            incoming_data += ch;
         }
 
-        // Clear the Session's Socket Buffer for next set of data.
-        //memset(&m_raw_data, 0, max_length);
+        // Encode all incoming data as UTF8 unless we are not utf8
+        if(m_encoding != Encoding::ENCODE_UTF8)
+            m_parsed_data = Encoding::instance()->utf8Encode(incoming_data);
+        else
+            m_parsed_data = incoming_data;
     }
 
     /**
@@ -168,9 +173,10 @@ public:
         // handle output encoding, if utf-8 translate data accordingly.
         std::string outputBuffer = "";
 
-        if(m_output_encoding != "cp437")
+        // On Output, We have internal UTF8 now, translate to CP437
+        if(m_encoding == Encoding::ENCODE_CP437)
         {
-            outputBuffer = m_common_io.translateUnicode(msg);
+            outputBuffer = Encoding::instance()->utf8Decode(msg);
         }
         else
         {
@@ -195,10 +201,11 @@ public:
      */
     void handleWrite(const std::error_code& error, socket_handler_ptr)
     {
+        Logging *log = Logging::instance();
+
         if(error)
         {
-            std::cout << "async_write error: " << error.message() << std::endl;
-            std::cout << "Session Closed()" << std::endl;
+            log->xrmLog<Logging::ERROR_LOG>("async_write error - session closed()", error.message(), __LINE__, __FILE__);
         }
 
         session_manager_ptr session_manager = m_session_manager.lock();
@@ -216,7 +223,8 @@ public:
                 }
                 catch(std::exception &e)
                 {
-                    std::cout << "Caught: " << e.what();
+                    // Sometime this doesn't close when it's already existed, just extra checking here.
+                    log->xrmLog<Logging::DEBUG_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
                 }
             }
         }
@@ -241,7 +249,6 @@ public:
         // Add Deadline Timer for .400 milliseconds for complete ESC Sequences.
         // Is no other input or part of ESC Sequecnes ie.. [A following the ESC
         // Then it's an ESC key, otherwise capture the rest of the sequence.
-        std::cout << "Start ESC Timer" << std::endl;
         m_esc_input_timer->setWaitInMilliseconds(400);
         m_esc_input_timer->asyncWait(
             std::bind(&SessionData::handleEscTimer, shared_from_this())
@@ -269,7 +276,9 @@ public:
             }
             catch(std::exception &e)
             {
-                std::cout << "Caught: " << e.what();
+                // Sometime this doesn't close when it's already existed, just extra checking here.
+                Logging *log = Logging::instance();
+                log->xrmLog<Logging::DEBUG_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
             }
         }
     }
@@ -286,9 +295,6 @@ public:
      */
     void startExternalProcess(const std::string &cmdline)
     {
-        std::cout << "SessionData Starting Process" << std::endl;
-        std::cout << GLOBAL_SCRIPT_PATH << std::endl;
-
         //std::string path = GLOBAL_SCRIPT_PATH + "\\" + cmdline;
         std::string path = cmdline;
 
@@ -298,13 +304,11 @@ public:
 
         if(proc)
         {
-            std::cout << "SessionData Starting Process SUCCESS!" << std::endl;
             m_is_process_running = true;
             m_processes.push_back(proc);
         }
         else
         {
-            std::cout << "SessionData Starting Process FAILED!" << std::endl;
             m_is_process_running = false;
         }
 
@@ -313,18 +317,15 @@ public:
 
         if(proc)
         {
-            std::cout << "SessionData Starting Process SUCCESS!" << std::endl;
             m_is_process_running = true;
             m_processes.push_back(proc);
         }
         else
         {
-            std::cout << "SessionData Starting Process FAILED!" << std::endl;
             m_is_process_running = false;
         }
 
 #endif
-        std::cout << "SessionData Starting Done" << std::endl;
     }
 
     /**
@@ -368,13 +369,14 @@ public:
 
     int                   m_node_number;
     bool                  m_is_use_ansi;
-    std::string           m_output_encoding;
+    std::string           m_encoding_text;
+    int                   m_encoding;
     bool                  m_is_session_authorized;
     bool                  m_is_leaving;
     bool                  m_is_esc_timer;
     bool                  m_is_process_running;
 
-    enum { max_length = 8192 };
+    enum { max_length = 16384 };
     //char m_raw_data[max_length];  // Raw Incoming
     std::vector<unsigned char> m_in_data_vector;
     std::string m_parsed_data;      // Telnet Opts parsed out

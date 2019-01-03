@@ -38,8 +38,6 @@ public:
         , m_current_level(0)
         , m_current_field(0)
     {
-        std::cout << "ModLevelEditor" << std::endl;
-
         // Setup Modules
         m_setup_functions.push_back(std::bind(&ModLevelEditor::setupLevelEditor, this));
         m_setup_functions.push_back(std::bind(&ModLevelEditor::setupLevelEditFields, this));
@@ -67,7 +65,6 @@ public:
 
     virtual ~ModLevelEditor() override
     {
-        std::cout << "~ModLevelEditor" << std::endl;
         std::vector<std::function<void()>>().swap(m_setup_functions);
         std::vector<std::function<void(const std::string&)>>().swap(m_mod_functions);
         std::vector<access_level_ptr>().swap(m_loaded_levels);
@@ -102,19 +99,6 @@ public:
         LEVEL_DELETE    = 2,
         LEVEL_COPY_FROM = 3,
         LEVEL_COPY_TO   = 4
-    };
-
-    // Box drawing characters
-    enum
-    {
-        BORDER_TOP_LEFT  = (char)214, // ╓
-        BORDER_BOT_LEFT  = (char)211, // ╙
-        BORDER_ROW       = (char)196, // ─
-        BORDER_TOP_RIGHT = (char)183, // ╖
-        BORDER_BOT_RIGHT = (char)189, // ╜
-        BORDER_MID_TOP   = (char)210, // ╥
-        BORDER_MID_BOT   = (char)208, // ╨
-        BORDER_MID       = (char)186  // ║
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup

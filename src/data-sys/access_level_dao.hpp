@@ -97,7 +97,6 @@ public:
 
     ~AccessLevelDao()
     {
-        std::cout << "~AccessLevelDao" << std::endl;
     }
 
 

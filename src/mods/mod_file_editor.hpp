@@ -34,18 +34,17 @@ public:
         , m_failure_attempts(0)
         , m_is_text_prompt_exist(false)
     {
-        std::cout << "ModFileEditor" << std::endl;
-
         // Push function pointers to the stack.
-        
+
         //m_setup_functions.push_back(std::bind(&ModMenuEditor::setupLogon, this));
 
         //m_mod_functions.push_back(std::bind(&ModMenuEditor::logon, this, std::placeholders::_1));
-        
-        
+
+
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
-        if (!m_is_text_prompt_exist)
+
+        if(!m_is_text_prompt_exist)
         {
             createTextPrompts();
         }
@@ -56,7 +55,6 @@ public:
 
     virtual ~ModFileEditor() override
     {
-        std::cout << "~ModFileEditor" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
     }
@@ -83,13 +81,13 @@ public:
      * @brief Create Default Text Prompts for module
      */
     void createTextPrompts();
-    
+
     /**
      * @brief Sets an indivdual module index.
      * @param mod_function_index
      */
     void changeModule(int mod_function_index);
-    
+
 private:
 
     // Function Input Vector.

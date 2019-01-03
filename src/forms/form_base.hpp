@@ -25,15 +25,14 @@ public:
 
     virtual ~FormBase()
     {
-        std::cout << "~FormBase." << std::endl;
     }
 
     virtual bool onEnter() = 0;
     virtual bool onExit() = 0;
     virtual void onSave() = 0;
-    
+
     FormBase(config_ptr config, std::string form_name, std::string form_title, std::string pulldown_file,
-            std::string ansi_top, std::string ansi_mid, std::string ansi_bot)
+             std::string ansi_top, std::string ansi_mid, std::string ansi_bot)
         : m_config(config)
         , m_name(form_name)
         , m_title(form_title)
@@ -42,7 +41,7 @@ public:
         , m_ansi_mid(ansi_mid)
         , m_ansi_bot(ansi_bot)
     { }
-        
+
     /**
      * @brief Updates the YAML Mapping Value along with Menu Option.
      * @param m
@@ -51,9 +50,9 @@ public:
     void updateNodeMapping(MenuOption &m, const std::string &value)
     {
         m.form_value = value;
-        m_node[m.name] = value;        
+        m_node[m.name] = value;
     }
-    
+
     /**
      * @brief Set the YAML::Node Mapping, this should be Smart Pointer.
      * @param data
@@ -63,7 +62,7 @@ public:
     {
         m_node = data;
     }
-    
+
     /**
      * @brief Retrieves all Mappings and return as Instance Class Pointer.
      * @param m
@@ -77,60 +76,60 @@ public:
         std::shared_ptr<T> c = std::make_shared<T>(conf);
         return c;
     }
-            
+
     /**
      * @brief Clear All Menu Options
      */
-    void baseClearOptions() 
+    void baseClearOptions()
     {
         std::vector<MenuOption>().swap(m_menu_options);
     }
 
     /**
      * @brief Gets the Default Color Sequence
-     * @return 
+     * @return
      */
-    std::string baseGetDefaultColor() 
+    std::string baseGetDefaultColor()
     {
         return m_session_io.pipeColors(m_config->default_color_regular);
     }
-    
+
     /**
      * @brief Gets the Default Input Color Sequence
-     * @return 
+     * @return
      */
-    std::string baseGetDefaultInputColor() 
+    std::string baseGetDefaultInputColor()
     {
         return m_session_io.pipeColors(m_config->default_color_input);
     }
-    
+
     /**
      * @brief Gets the Default Input Color Sequence
-     * @return 
+     * @return
      */
-    std::string baseGetDefaultInverseColor() 
+    std::string baseGetDefaultInverseColor()
     {
         return m_session_io.pipeColors(m_config->default_color_inverse);
-    }    
-    
+    }
+
     /**
      * @brief Pull Generated Menu Options
-     * @return 
+     * @return
      */
-    std::vector<MenuOption> baseGetFormOptions() 
+    std::vector<MenuOption> baseGetFormOptions()
     {
         return m_menu_options;
-    }    
-    
+    }
+
     /**
      * @brief Insert Generated Menu Options
-     * @return 
+     * @return
      */
-    void baseSetFormOption(MenuOption option) 
+    void baseSetFormOption(MenuOption option)
     {
         m_menu_options.push_back(option);
-    }    
-    
+    }
+
     /**
      * @brief Build Options, String
      * @param value
@@ -148,7 +147,7 @@ public:
     void baseBuildOptions(MenuOption &m, int value)
     {
         m.form_value = std::to_string(value);
-        baseSetFormOption(m);        
+        baseSetFormOption(m);
     }
 
     /**
@@ -158,7 +157,7 @@ public:
     void baseBuildOptions(MenuOption &m, bool value)
     {
         m.form_value = (value) ? "true" : "false";
-        baseSetFormOption(m);        
+        baseSetFormOption(m);
     }
 
     /**
@@ -168,22 +167,22 @@ public:
     void baseBuildOptions(MenuOption &m, unsigned char value)
     {
         m.form_value = std::to_string(value);
-        baseSetFormOption(m);        
+        baseSetFormOption(m);
     }
-    
+
     /**
      * @brief Template for building Options List.
      * @param name
      * @param value
      */
     template <typename T>
-    void setupBuildOptions(std::string name, T value) 
+    void setupBuildOptions(std::string name, T value)
     {
         MenuOption opt;
         opt.name = name;
         baseBuildOptions(opt, value);
     }
-                    
+
     config_ptr              m_config;
     std::string             m_name;
     std::string             m_title;
@@ -191,10 +190,10 @@ public:
     std::string             m_ansi_top;
     std::string             m_ansi_mid;
     std::string             m_ansi_bot;
-    
+
     YAML::Node              m_node;
     SessionIO               m_session_io;
-    
+
     // Holds all pulldown menu options.
     std::vector<MenuOption> m_menu_options;
 

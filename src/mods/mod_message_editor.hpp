@@ -11,8 +11,9 @@
 class SessionData;
 typedef std::shared_ptr<SessionData> session_data_ptr;
 
-class Directory;
-typedef std::shared_ptr<Directory> directory_ptr;
+class AnsiProcessor;
+typedef std::shared_ptr<AnsiProcessor> ansi_process_ptr;
+
 
 /**
  * @class ModMessageEditor
@@ -31,21 +32,28 @@ public:
         , m_filename("mod_message_editor.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
         , m_mod_function_index(MOD_PROMPT)
+        , m_mod_setup_index(MOD_DISPLAY_EDITOR)
+        , m_mod_user_state_index(MOD_FSE_INPUT)
         , m_failure_attempts(0)
         , m_is_text_prompt_exist(false)
+
+          // Later on default to 1, and screen width!!!
+        , m_text_box_top(0)
+        , m_text_box_bottom(24)
+        , m_text_box_left(0)
+        , m_text_box_right(80)
     {
-        std::cout << "ModMessageEditor" << std::endl;
-
         // Push function pointers to the stack.
-        
-        //m_setup_functions.push_back(std::bind(&ModMenuEditor::setupLogon, this));
 
-        //m_mod_functions.push_back(std::bind(&ModMenuEditor::logon, this, std::placeholders::_1));
-        
-        
+        m_setup_functions.push_back(std::bind(&ModMessageEditor::setupEditor, this));
+
+        m_mod_functions.push_back(std::bind(&ModMessageEditor::editorInput, this, std::placeholders::_1));
+
+
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
-        if (!m_is_text_prompt_exist)
+
+        if(!m_is_text_prompt_exist)
         {
             createTextPrompts();
         }
@@ -56,7 +64,6 @@ public:
 
     virtual ~ModMessageEditor() override
     {
-        std::cout << "~ModMessageEditor" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
     }
@@ -64,6 +71,22 @@ public:
     virtual bool update(const std::string &character_buffer, const bool &) override;
     virtual bool onEnter() override;
     virtual bool onExit() override;
+
+    // Setup Methods
+    enum
+    {
+        // Most likely add extra here for asking TOPIC, TAGS, TO etc..
+        MOD_DISPLAY_EDITOR      = 0
+
+    };
+
+    // Input Menu State Index
+    // Used for both Menus and Options.
+    enum
+    {
+        // Most likely add more for options and titles, tags etc..
+        MOD_FSE_INPUT    = 0
+    };
 
     // This matches the index for mod_functions.push_back
     enum
@@ -83,17 +106,109 @@ public:
      * @brief Create Default Text Prompts for module
      */
     void createTextPrompts();
-    
+
     /**
      * @brief Sets an indivdual module index.
      * @param mod_function_index
      */
     void changeModule(int mod_function_index);
-    
+
     /**
-     * @brief Menu Editor Display, Runs through all existing menus
+        * @brief Sets an individual input module index.
+        * @param mod_function_index
+        */
+    void changeInputModule(int mod_function_index);
+
+    /**
+     * @brief Sets an individual setup method module index.
+     * @param mod_function_index
      */
-    std::string displayOfMenus();
+    void changeSetupModule(int mod_function_index);
+
+    /**
+     * @brief Sets an individual Menu Input State Add/Change/Delete
+     * @param mod_menu_state_index
+     */
+    void changeMenuInputState(int mod_menu_state_index);
+
+    /**
+     * @brief Redisplay's the current module prompt.
+     * @return
+     */
+    void redisplayModulePrompt();
+
+    /**
+     * @brief Pull and Display Prompts
+     * @param prompt
+     */
+    void displayPrompt(const std::string &prompt);
+
+    /**
+     * @brief Pull and parse and return Display Prompts for use in interfaces
+     * @param prompt
+     */
+    std::string getDisplayPrompt(const std::string &prompt);
+
+    /**
+     * @brief Pull and parse and return Display Prompts for use in interfaces
+     * @param prompt
+     */
+    std::string getDisplayPromptRaw(const std::string &prompt);
+
+    /**
+     * @brief Pull and Display Prompts with MCI Code
+     * @param prompt
+     * @param mci_field
+     */
+    void displayPromptMCI(const std::string &prompt, const std::string &mci_field);
+
+    /**
+     * @brief Pull and Display Prompts with following newline
+     * @param prompt
+     */
+    void displayPromptAndNewLine(const std::string &prompt);
+
+    /**
+     * @brief Scrub CR LF from Screen Templates
+     * @param screen
+     */
+    void scrubNewLinesChars(std::string &screen);
+
+    /**
+     * @brief Processes a TOP Template Screen
+     * @param ansi_process
+     * @param screen
+     * @return
+     */
+    std::string processTopTemplate(ansi_process_ptr ansi_process, const std::string &screen);
+
+    /**
+     * @brief Processes a MID Template Screen
+     * @param ansi_process
+     * @param screen
+     * @return
+     */
+    std::string processMidTemplate(ansi_process_ptr ansi_process, const std::string &screen);
+
+    /**
+     * @brief Processes a Bottom Template Screen
+     * @param ansi_process
+     * @param screen
+     * @return
+     */
+    std::string processBottomTemplate(ansi_process_ptr ansi_process, const std::string &screen);
+
+    /**
+     * @brief Setup for the Message Editor
+     * @return
+     */
+    void setupEditor();
+
+    /**
+     * @brief General Input for Message Editor
+     * @return
+     */
+    void editorInput(const std::string &input);
 
 
 private:
@@ -108,14 +223,17 @@ private:
     text_prompts_dao_ptr   m_text_prompts_dao;
 
     int                    m_mod_function_index;
+    int                    m_mod_setup_index;
+    int                    m_mod_user_state_index;
     int                    m_failure_attempts;
     bool                   m_is_text_prompt_exist;
+    int                    m_text_box_top;
+    int                    m_text_box_bottom;
+    int                    m_text_box_left;
+    int                    m_text_box_right;
 
     CommonIO               m_common_io;
-    directory_ptr          m_directory;
 
-    // Hold instatnce of user trying to login to the system.
-    //user_ptr             m_logon_user;
 };
 
 #endif // MOD_MESSAGE_EDITOR_HPP

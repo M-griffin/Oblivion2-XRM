@@ -80,6 +80,9 @@
       <File Name="../src/utf-cpp/utf8.h"/>
     </VirtualDirectory>
     <File Name="../src/uuid.hpp"/>
+    <File Name="../src/encoding.cpp"/>
+    <File Name="../src/encoding.hpp"/>
+    <File Name="../src/logging.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
@@ -148,6 +151,7 @@
         <IncludePath Value="../src/utf-cpp"/>
         <IncludePath Value="../src/utf8"/>
         <Preprocessor Value="WITHOUT_SDL"/>
+        <Preprocessor Value="UNIT_TEST"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>

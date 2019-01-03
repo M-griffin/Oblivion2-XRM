@@ -1,5 +1,5 @@
 /*
- * Oblivion/2 XRM - Legacy to XRM Menu Prompt Converter (c) 2015-2018 Michael Griffin
+ * Oblivion/2 XRM - Legacy to XRM Menu Prompt Converter (c) 2015-2019 Michael Griffin
  * This converts legacy MENUPROMPT.DAT files to new .yaml configuration file
  *
  * Compiles under MingW32/64 5.1.0 g++
@@ -19,6 +19,7 @@
 #include "data-sys/menu_prompt_dao.hpp"
 
 #include "common_io.hpp"
+#include "logging.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/locale.hpp>
@@ -41,6 +42,10 @@ std::string GLOBAL_DATA_PATH = "";
 std::string GLOBAL_MENU_PATH = "";
 std::string GLOBAL_MENU_PROMPT_PATH = "";
 std::string GLOBAL_TEXTFILE_PATH = "";
+std::string GLOBAL_LOG_PATH = "";
+
+Logging* Logging::m_global_logging_instance = nullptr;
+
 
 /**
  * @class MenuConvert
@@ -122,7 +127,7 @@ void MenuPromptConvert::convert_menu_prompts()
     menu_prompt_ptr menu_prompt(new MenuPrompt());
     menu_prompt.reset(new MenuPrompt());
 
-    for (unsigned int i = 0; i < m_loaded_menu_prompts.size(); i++)
+    for(unsigned int i = 0; i < m_loaded_menu_prompts.size(); i++)
     {
         auto &m = m_loaded_menu_prompts[i];
 
@@ -178,6 +183,7 @@ void MenuPromptConvert::readMenuAllPrompts()
 
     // Loop each Option after Reading the Menu.
     int u = 0;
+
     while(recordRead(&m_menu_prompt, filename, u++))
     {
         // Convert Pascal to C Strings.
@@ -198,7 +204,7 @@ void MenuPromptConvert::readMenuAllPrompts()
 auto main() -> int
 {
     std::cout << "Oblivion/2 XRM Server - Legacy to XRM Menu Prompt Converter" << std::endl;
-    std::cout << "(c) 2015-2018 Michael Griffin." << std::endl << std::endl;
+    std::cout << "(c) 2015-2019 Michael Griffin." << std::endl << std::endl;
     std::cout << "Important, you must run this from the root directory," << std::endl;
     std::cout << "Otherwise you can set the OBV2 environment variable." << std::endl << std::endl;
 
@@ -212,8 +218,10 @@ auto main() -> int
     GLOBAL_TEXTFILE_PATH = GLOBAL_BBS_PATH + "TEXTFILE";
 
     // Load System Configuration
-    try {
+    try
+    {
         config_ptr config(new Config());
+
         if(!config)
         {
             std::cout << "Unable to allocate config structure" << std::endl;
@@ -228,12 +236,20 @@ auto main() -> int
         if(!cfg.fileExists())
         {
             std::cout << "Unable to locate xrm-config.yaml, you must run this from root bbs directory." << std::endl;
+            Logging::releaseInstance();
+            //Encoding::releaseInstance();
+            TheCommunicator::releaseInstance();
+
             exit(1);
         }
     }
     catch(std::exception& e)
     {
         std::cout << "Unable to load configuration in bbs root." << std::endl;
+
+        Logging::releaseInstance();
+        //Encoding::releaseInstance();
+        TheCommunicator::releaseInstance();
         exit(2);
     }
 
@@ -251,8 +267,15 @@ auto main() -> int
     {
         std::cout << "Exception: Unable to process menus." << std::endl;
         std::cout << e.what() << std::endl;
+        Logging::releaseInstance();
+        //Encoding::releaseInstance();
+        TheCommunicator::releaseInstance();
         exit(3);
     }
+
+    Logging::releaseInstance();
+    //Encoding::releaseInstance();
+    TheCommunicator::releaseInstance();
 
     return 0;
 }

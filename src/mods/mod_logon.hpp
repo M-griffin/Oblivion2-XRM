@@ -39,8 +39,6 @@ public:
         , m_failure_attempts(0)
         , m_is_text_prompt_exist(false)
     {
-        std::cout << "ModLogon" << std::endl;
-
         // Push function pointers to the stack.
         m_setup_functions.push_back(std::bind(&ModLogon::setupLogon, this));
         m_setup_functions.push_back(std::bind(&ModLogon::setupPassword, this));
@@ -56,7 +54,8 @@ public:
 
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
-        if (!m_is_text_prompt_exist)
+
+        if(!m_is_text_prompt_exist)
         {
             createTextPrompts();
         }
@@ -67,7 +66,6 @@ public:
 
     virtual ~ModLogon() override
     {
-        std::cout << "~ModLogon" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
     }
@@ -130,7 +128,7 @@ public:
      * @param prompt
      */
     void displayPrompt(const std::string &prompt);
-    
+
     /**
      * @brief Pull and Display Prompts with following newline
      * @param prompt

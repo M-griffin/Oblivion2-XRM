@@ -137,7 +137,6 @@ public:
 
     ~UsersDao()
     {
-        std::cout << "~UsersDao" << std::endl;
     }
 
 

@@ -4,13 +4,15 @@
 
 #include <string>
 
-extern std::string GLOBAL_BBS_PATH;      // BBS System
+extern std::string GLOBAL_BBS_PATH;
 extern std::string GLOBAL_DATA_PATH;
 extern std::string GLOBAL_MENU_PATH;
 extern std::string GLOBAL_MENU_PROMPT_PATH;
 extern std::string GLOBAL_TEXTFILE_PATH;
 extern std::string GLOBAL_SCRIPT_PATH;
+extern std::string GLOBAL_LOG_PATH;
 extern std::string USERS_DATABASE;
+
 
 /**
  * @brief Const Key values for global text prompt lookup

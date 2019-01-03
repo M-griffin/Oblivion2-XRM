@@ -41,8 +41,6 @@ public:
         , m_wildcard_filter("")
         , m_user_array_position(0)
     {
-        std::cout << "ModUserEditor" << std::endl;
-
         // Push function pointers to the stack.
 
         m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserList, this));
@@ -74,7 +72,6 @@ public:
 
     virtual ~ModUserEditor() override
     {
-        std::cout << "~ModUserEditor" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
         std::vector<user_ptr>().swap(m_users_listing);
@@ -113,19 +110,6 @@ public:
         USER_DELETE    = 1,
         USER_COPY      = 2,
         USER_FILTER    = 3
-    };
-
-    // Box drawing characters
-    enum
-    {
-        BORDER_TOP_LEFT  = (char)214,  // ╓
-        BORDER_BOT_LEFT  = (char)211,  // ╙
-        BORDER_ROW       = (char)196,  // ─
-        BORDER_TOP_RIGHT = (char)183,  // ╖
-        BORDER_BOT_RIGHT = (char)189,  // ╜
-        BORDER_MID_TOP   = (char)210,  // ╥
-        BORDER_MID_BOT   = (char)208,  // ╨
-        BORDER_MID       = (char)186   // ║
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup

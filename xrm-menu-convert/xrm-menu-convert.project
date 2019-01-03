@@ -20,6 +20,11 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="../src/logging.hpp"/>
+    <File Name="../src/communicator.hpp"/>
+    <File Name="../src/communicator.cpp"/>
+    <File Name="../src/encoding.hpp"/>
+    <File Name="../src/encoding.cpp"/>
     <File Name="src/main.cpp"/>
     <File Name="../src/common_io.cpp"/>
     <File Name="../src/common_io.hpp"/>
@@ -28,6 +33,8 @@
       <File Name="../src/compat/prompts_compat_dao.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="data-sys">
+      <File Name="../src/data-sys/text_prompts_dao.hpp"/>
+      <File Name="../src/data-sys/text_prompts_dao.cpp"/>
       <File Name="../src/data-sys/config_dao.cpp"/>
       <File Name="../src/data-sys/config_dao.hpp"/>
       <File Name="../src/data-sys/menu_dao.cpp"/>

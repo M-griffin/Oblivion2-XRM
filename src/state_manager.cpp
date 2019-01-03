@@ -1,6 +1,7 @@
 #include "state_manager.hpp"
+#include "logging.hpp"
+#include "utf-cpp/utf8.h"
 
-#include <utf-cpp/utf8.h>
 #include <cstring>
 #include <string>
 
@@ -12,10 +13,12 @@ void StateManager::clean()
     if(!m_the_state.empty())
     {
         m_the_state.back()->onExit();
+
         while(m_the_state.size() > 0)
         {
             m_the_state.pop_back();
         }
+
         m_the_state.clear();
     }
 }
@@ -29,7 +32,6 @@ void StateManager::clean()
  */
 void StateManager::update()
 {
-    int char_count = 0;
     std::string new_string_builder = "";
     bool utf_found = false;
 
@@ -42,34 +44,57 @@ void StateManager::update()
             std::string::iterator it = incoming_data.begin();
             std::string::iterator line_end = incoming_data.end();
 
-            int length = utf8::distance(it, line_end);
-            while (it != line_end)
+            /**
+             * This loops a string, each next should be a single character code point.
+             */
+            while(it != line_end)
             {
-                utf_found = false;
-                uint32_t code_point = utf8::next(it, line_end);
+                int byte_value = static_cast<int>((uint8_t)*it);
 
-                std::cout << "ut: " << *it << std::endl;
-                std::cout << "code_point: " << code_point << std::endl;
-
-                //std::cout << "append" << std::endl;
-                // This convert the uint32_t code point to char array
-                // So each sequence can be writen as seperate byte.
-                unsigned char character[5] = {0};
-                utf8::append(code_point, character);
-                new_string_builder += (char *)character;
-
-                // NOTE Not really used at this time,  might just remove!
-                if (strlen((const char *)character) > 1 || code_point > 512)
-                    utf_found = true;
-
-                //std::cout << "char_count: " << char_count << " " << code_point << std::endl;
-                ++char_count;
-
-                // End of Sequences or single ESC's.
-                if (length == char_count && character[0] == 27)
+                if(byte_value < 128)
                 {
-                    new_string_builder.erase();
-                    new_string_builder += '\0';
+                    utf_found = false;
+                    *it++;
+
+                    // Only if ESC and next char is empty
+                    // Then we want to pass both to registed single ESC hit
+                    if(byte_value == '\x1b' && *it == '\0')
+                    {
+                        new_string_builder += '\x1b';
+                        m_the_state.back()->update(new_string_builder, utf_found);
+
+                        new_string_builder = '\0';
+                        m_the_state.back()->update(new_string_builder, utf_found);
+                        new_string_builder.erase();
+                        continue;
+                    }
+
+                    new_string_builder += std::string(1, byte_value);
+                }
+                else
+                {
+                    try
+                    {
+                        // Only gets here on multi-byte sequences.
+                        uint32_t code_point = utf8::next(it, line_end);
+                        unsigned char character[5] = {0, 0, 0, 0, 0};
+                        utf8::append(code_point, character);
+
+                        for(int i = 0; i < 5; i++)
+                        {
+                            if(character[i] != 0)
+                            {
+                                new_string_builder += std::string(1, character[i]);
+                            }
+                        }
+
+                        utf_found = true;
+                    }
+                    catch(utf8::exception &ex)
+                    {
+                        Logging *log = Logging::instance();
+                        log->xrmLog<Logging::ERROR_LOG>("Utf8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
+                    }
                 }
 
                 m_the_state.back()->update(new_string_builder, utf_found);
@@ -98,6 +123,7 @@ void StateManager::popState()
         m_the_state.back()->onExit();
         m_the_state.pop_back();
     }
+
     m_the_state.back()->resume();
 }
 
@@ -108,21 +134,18 @@ void StateManager::changeState(state_ptr &the_state)
 {
     if(!m_the_state.empty())
     {
-        std::cout << "changeState: " << the_state->getStateID() << std::endl;
-
         if(m_the_state.back()->getStateID() == the_state->getStateID())
         {
             return; // do nothing
         }
+
         m_the_state.back()->onExit();
 
         // Rework this lateron,  lets allow multiple states,, the most recent state will be active
         // Allowing the main state to keep all information!
-        std::cout << "Deleteing Current MenuSystem!: " << m_the_state.size() << std::endl;
         m_the_state.pop_back();
 
         // Clear the Memory!
-        std::cout << "Clearing Memory of MenuSystem!: " << m_the_state.size() << std::endl;
         std::vector<state_ptr>().swap(m_the_state);
     }
 

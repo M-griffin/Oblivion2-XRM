@@ -653,7 +653,6 @@ SUITE(XRMSessionIO)
         result.clear();
         value = sess.getInputField(character_buffer, result, length);
 
-        std::cout << value << std::endl;
         CHECK_EQUAL(value, "empty");  // String Aborted Return on ESC Press.
         CHECK_EQUAL(result, "");      // Result Blank on Aborts
 
@@ -728,7 +727,7 @@ SUITE(XRMSessionIO)
 
         character_buffer = "\n";
         value = sess.getInputField(character_buffer, result, length);
-        std::cout << "RESULT: " << result << " : " << value << std::endl;
+
         CHECK_EQUAL(value, "\n");  // String Aborted Return on ESC Press.
         CHECK_EQUAL(result, "");   // Result Blank on Aborts
     }

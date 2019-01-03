@@ -45,8 +45,6 @@ public:
         , m_current_option(0)
         , m_current_field(0)
     {
-        std::cout << "ModFileAreaEditor" << std::endl;
-
         // Setup Modules
         m_setup_functions.push_back(std::bind(&ModFileAreaEditor::setupMenuEditor, this));
         m_setup_functions.push_back(std::bind(&ModFileAreaEditor::setupMenuEditFields, this));
@@ -66,7 +64,8 @@ public:
 
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
-        if (!m_is_text_prompt_exist)
+
+        if(!m_is_text_prompt_exist)
         {
             createTextPrompts();
         }
@@ -77,7 +76,6 @@ public:
 
     virtual ~ModFileAreaEditor() override
     {
-        std::cout << "~ModFileAreaEditor" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
         std::vector<access_level_ptr>().swap(m_loaded_level);
@@ -121,19 +119,6 @@ public:
         VIEW_NAMES    = 1,
         VIEW_STRINGS  = 2,
         VIEW_PULLDOWN = 3
-    };
-
-    // Box drawing characters
-    enum
-    {
-        BORDER_TOP_LEFT  = (char)214,  // ╓
-        BORDER_BOT_LEFT  = (char)211,  // ╙
-        BORDER_ROW       = (char)196,  // ─
-        BORDER_TOP_RIGHT = (char)183,  // ╖
-        BORDER_BOT_RIGHT = (char)189,  // ╜
-        BORDER_MID_TOP   = (char)210,  // ╥
-        BORDER_MID_BOT   = (char)208,  // ╨
-        BORDER_MID       = (char)186   // ║
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup

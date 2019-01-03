@@ -20,7 +20,6 @@ public:
 
     virtual ~StateBase()
     {
-        std::cout << "~StateBase." << std::endl;
     }
     virtual void update(const std::string &character_buffer, const bool &is_utf8)  = 0;
     virtual bool onEnter() = 0;
@@ -37,13 +36,10 @@ public:
     session_data_ptr m_session_data;
     bool             m_is_active;
 
-
-    // All Data is saved to this buffer, which is then
-    // Checked after each stage, onEnter, Update, onExit    
 };
 
 typedef std::shared_ptr<StateBase> state_ptr;
-typedef std::weak_ptr<StateBase>	 state_wptr;
+typedef std::weak_ptr<StateBase>   state_wptr;
 
 
 #endif // THE_STATE_HPP
