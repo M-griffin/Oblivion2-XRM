@@ -920,6 +920,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                     return "\x1b";
 
                 // End of Number Sequence.
+                case '@': // Insert
                 case '~': // Function
                 case '$': // Shift Function RXVT
                 case '^': // CTRL Function RXVT
