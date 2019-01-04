@@ -230,11 +230,13 @@ public:
             case INFO_LOG:
                 details.push_back(INFO_LEVEL);
                 details.push_back(log_string);
+                writeOutYamlConsole(date_time, details);
                 break;
 
             case DEBUG_LOG:
                 details.push_back(DEBUG_LEVEL);
                 details.push_back(log_string);
+                writeOutYamlConsole(date_time, details);
                 break;
 
             case ERROR_LOG:
@@ -307,7 +309,7 @@ public:
         out << YAML::Flow;
 
         out << YAML::Key << "LogDateTime" << YAML::Value << entry->m_date_time;
-        out << YAML::Key << "Details:";
+        out << YAML::Key << "Details";
         out << YAML::Value << YAML::BeginSeq;
 
         for(std::string &d : entry->m_details)

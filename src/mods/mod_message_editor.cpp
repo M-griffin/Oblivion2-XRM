@@ -171,8 +171,6 @@ std::string ModMessageEditor::processTopTemplate(ansi_process_ptr ansi_process, 
      * In most cases we need to add a pre-home cursor!
      */
     std::string new_screen = screen;
-    //scrubNewLinesChars(new_screen);
-
     std::string::size_type index = 0;
 
     while(index != std::string::npos)
@@ -203,7 +201,6 @@ std::string ModMessageEditor::processTopTemplate(ansi_process_ptr ansi_process, 
 std::string ModMessageEditor::processBottomTemplate(ansi_process_ptr ansi_process, const std::string &screen)
 {
     std::string new_screen = screen;
-    //scrubNewLinesChars(new_screen);
     ansi_process->clearScreen();
     ansi_process->parseAnsiScreen((char *)new_screen.c_str());
     int rows_used = ansi_process->getMaxRowsUsedOnScreen();
@@ -273,7 +270,7 @@ std::string ModMessageEditor::processMidTemplate(ansi_process_ptr ansi_process, 
     m_text_box_left  = ansi_process->getMCIOffSet("|LT");
     m_text_box_right = ansi_process->getMCIOffSet("|RT");
 
-    // remove length of left side MCI code if exists.
+    // remove length of left side MCI code if both exists.
     if(m_text_box_right > 0 && m_text_box_left > 0)
     {
         m_text_box_right -= 3;
