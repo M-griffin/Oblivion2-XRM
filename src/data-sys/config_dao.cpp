@@ -317,6 +317,7 @@ void ConfigDao::encode(const Config &rhs)
     m_config->regexp_date_validation_msg = rhs.regexp_date_validation_msg;
     m_config->regexp_email_validation = rhs.regexp_email_validation;
     m_config->regexp_email_validation_msg = rhs.regexp_email_validation_msg;
+    m_config->logging_level = rhs.logging_level;
 
 }
 

@@ -1,3 +1,10 @@
+Change Log Update (00.00.145)
+* 2019-01-03
++ Fixed some logging level issues, missed logging on encoding so wasn't 
+  reading the pre-set level from the config file properly.
++ Also made all selected logging levels output to console as well as file.
++ Updated ANSI FSE Templates to 1 extra column to the right.
+
 Change Log Update (00.00.144)
 * 2019-01-01 - 2019-01-02
 + Fixed Typo on Critical Logging text.
