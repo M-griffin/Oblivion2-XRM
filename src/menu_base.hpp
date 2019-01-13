@@ -72,7 +72,7 @@ public:
     menu_ptr         m_menu_info;          // Menu Info
     menu_prompt_ptr  m_menu_prompt;        // Menu Prompt
 
-    ansi_process_ptr m_ansi_process;       // Instance for AnsiProcess Methods
+    processor_ansi_ptr m_ansi_process;       // Instance for AnsiProcess Methods
     unsigned int     m_active_pulldownID;  // Active Lightbar Position.
 
     // Flags

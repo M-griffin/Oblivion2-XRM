@@ -34,7 +34,7 @@ public:
     virtual bool onEnter() = 0;
     virtual bool onExit()  = 0;
 
-    ModBase(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
+    ModBase(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
         : m_session_data(session_data)
         , m_config(config)
         , m_session_io(session_data)
@@ -437,7 +437,7 @@ public:
     session_data_ptr  m_session_data;
     config_ptr        m_config;
     SessionIO         m_session_io;
-    ansi_process_ptr  m_ansi_process;
+    processor_ansi_ptr  m_ansi_process;
     bool              m_is_active;
 
 

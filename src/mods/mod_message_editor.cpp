@@ -1,5 +1,7 @@
 #include "mod_message_editor.hpp"
+
 #include "../processor_ansi.hpp"
+#include "../processor_text.hpp"
 #include "../logging.hpp"
 
 #include <string>
@@ -164,7 +166,7 @@ void ModMessageEditor::displayPromptAndNewLine(const std::string &prompt)
  * @param screen
  * @return
  */
-std::string ModMessageEditor::processTopTemplate(ansi_process_ptr ansi_process, const std::string &screen)
+std::string ModMessageEditor::processTopTemplate(processor_ansi_ptr ansi_process, const std::string &screen)
 {
     /**
      * When we get 2J alone, it clears but leaves cursor.
@@ -198,7 +200,7 @@ std::string ModMessageEditor::processTopTemplate(ansi_process_ptr ansi_process, 
  * @param screen
  * @return
  */
-std::string ModMessageEditor::processBottomTemplate(ansi_process_ptr ansi_process, const std::string &screen)
+std::string ModMessageEditor::processBottomTemplate(processor_ansi_ptr ansi_process, const std::string &screen)
 {
     std::string new_screen = screen;
     ansi_process->clearScreen();
@@ -250,7 +252,7 @@ void ModMessageEditor::scrubNewLinesChars(std::string &screen)
  * @param screen
  * @return
  */
-std::string ModMessageEditor::processMidTemplate(ansi_process_ptr ansi_process, const std::string &screen)
+std::string ModMessageEditor::processMidTemplate(processor_ansi_ptr ansi_process, const std::string &screen)
 {
     std::string new_screen = screen;
     scrubNewLinesChars(new_screen);
@@ -305,11 +307,11 @@ void ModMessageEditor::setupEditor()
     std::string mid_template = m_common_io.readinAnsi("FSEMID.ANS");
     std::string bot_template = m_common_io.readinAnsi("FSEEND.ANS");
 
-    // Use a Local Ansi Parser for Pasrsing Menu Templates and determine boundaries.
-    ansi_process_ptr ansi_process(new AnsiProcessor(
-                                      m_session_data->m_telnet_state->getTermRows(),
-                                      m_session_data->m_telnet_state->getTermCols())
-                                 );
+    // Use a Local Ansi Parser for Parsing Menu Templates and determine boundaries.
+    processor_ansi_ptr ansi_process(new ProcessorAnsi(
+                                        m_session_data->m_telnet_state->getTermRows(),
+                                        m_session_data->m_telnet_state->getTermCols())
+                                   );
 
     // Parse the TOP Screen to get Top Text Margin
     std::string top_screen = processTopTemplate(ansi_process, top_template);
@@ -325,6 +327,13 @@ void ModMessageEditor::setupEditor()
     Logging *log = Logging::instance();
     log->xrmLog<Logging::DEBUG_LOG>("m_text_box_top=", m_text_box_top, "m_text_box_bottom=", m_text_box_bottom,
                                     "m_text_box_left=", m_text_box_left, "m_text_box_right=", m_text_box_right);
+
+    // Setup the Text Parser Init the Parser with template data.
+    int height = m_text_box_bottom - m_text_box_top;
+    int width = m_text_box_right - m_text_box_left;
+
+    log->xrmLog<Logging::CONSOLE_LOG>("m_text_process - height=", height, "width=", width);
+    m_text_process.reset(new ProcessorText(height, width));
 
     // Next combine and output.. Move cursor to top left in box.
     std::string screen_output = top_screen + mid_screen + bot_screen;

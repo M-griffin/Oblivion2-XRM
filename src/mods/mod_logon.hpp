@@ -16,8 +16,8 @@
 class Config;
 typedef std::shared_ptr<Config> config_ptr;
 
-class AnsiProcessor;
-typedef std::shared_ptr<AnsiProcessor> ansi_process_ptr;
+class ProcessorAnsi;
+typedef std::shared_ptr<ProcessorAnsi> processor_ansi_ptr;
 
 /**
  * @class ModLogin
@@ -30,7 +30,7 @@ class ModLogon
     : public ModBase
 {
 public:
-    ModLogon(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
+    ModLogon(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
         : ModBase(session_data, config, ansi_process)
         , m_session_io(session_data)
         , m_filename("mod_logon.yaml")

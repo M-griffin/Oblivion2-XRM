@@ -1,4 +1,4 @@
-#include "processor_ansi.hpp"
+#include "processor_text.hpp"
 #include "model-sys/structures.hpp"
 #include "common_io.hpp"
 #include "logging.hpp"
@@ -26,7 +26,7 @@
 /**
  * @brief Buffer to String for Parsing
  */
-std::string ProcessorAnsi::screenBufferToString()
+std::string ProcessorText::screenBufferToString()
 {
     m_ansi_output.erase();
     m_ansi_output = "";
@@ -50,7 +50,7 @@ std::string ProcessorAnsi::screenBufferToString()
 /**
  * @brief Test, displays screen buffer.
  */
-void ProcessorAnsi::screenBufferDisplayTest()
+void ProcessorText::screenBufferDisplayTest()
 {
     int attr = 0;
     int fore = 0;
@@ -119,7 +119,7 @@ void ProcessorAnsi::screenBufferDisplayTest()
  * @param clearScreen
  * @return
  */
-int ProcessorAnsi::getMCIOffSet(std::string mci_code)
+int ProcessorText::getMCIOffSet(std::string mci_code)
 {
     unsigned int max = (m_x_position + (m_y_position * m_characters_per_line));
 
@@ -152,7 +152,7 @@ int ProcessorAnsi::getMCIOffSet(std::string mci_code)
  * NOTE, this can add a new line at the end of screen
  * Should exclude for BOTTOM Ansi Screens.
  */
-std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen)
+std::string ProcessorText::getScreenFromBuffer(bool clearScreen)
 {
     int attr = 0;
     int fore = 0;
@@ -253,7 +253,7 @@ std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen)
  * @param pulldown_id
  * @return
  */
-std::string ProcessorAnsi::buildPullDownBars(int pulldown_id, bool active)
+std::string ProcessorText::buildPullDownBars(int pulldown_id, bool active)
 {
     std::string output = "";
     std::stringstream ss;
@@ -306,7 +306,7 @@ std::string ProcessorAnsi::buildPullDownBars(int pulldown_id, bool active)
 /**
  * @brief // Clear Pull Down Bars once menu options are reset.
  */
-void ProcessorAnsi::clearPullDownBars()
+void ProcessorText::clearPullDownBars()
 {
     std::map<int, ScreenPixel>().swap(m_pull_down_options);
 }
@@ -316,7 +316,7 @@ void ProcessorAnsi::clearPullDownBars()
  * @brief Return the max rows used on the screen
  * @return
  */
-int ProcessorAnsi::getMaxRowsUsedOnScreen()
+int ProcessorText::getMaxRowsUsedOnScreen()
 {
     return m_max_y_position;
 }
@@ -325,7 +325,7 @@ int ProcessorAnsi::getMaxRowsUsedOnScreen()
 /**
  * @brief Parses through MCI Codes for Lightbars and Char Parameters.
  */
-std::string ProcessorAnsi::screenBufferParse()
+std::string ProcessorText::screenBufferParse()
 {
     // Contains all matches found so we can iterate and reaplace
     // Without Multiple loops through the string.
@@ -489,7 +489,7 @@ std::string ProcessorAnsi::screenBufferParse()
  * @brief Plots Characters on the Screen into the Buffer.
  * @param c
  */
-void ProcessorAnsi::screenBufferSetGlyph(std::string char_sequence)
+void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
 {
     Logging *log = Logging::instance();
 
@@ -563,7 +563,7 @@ void ProcessorAnsi::screenBufferSetGlyph(std::string char_sequence)
 /*
  * Moves the Screen Buffer Up a line to match the internal SDL_Surface
  */
-void ProcessorAnsi::screenBufferScrollUp()
+void ProcessorText::screenBufferScrollUp()
 {
     //*** IMPORTANT (WIP), must add check for region scrolling only!
     //TheTerminal::Instance()->scrollRegionActive &&
@@ -592,7 +592,7 @@ void ProcessorAnsi::screenBufferScrollUp()
 /*
  * Clear Range of Screen Buffer for Erase Sequences.
  */
-void ProcessorAnsi::screenBufferClearRange(int start, int end)
+void ProcessorText::screenBufferClearRange(int start, int end)
 {
     int startPosition = ((m_y_position-1) * m_characters_per_line) + (start);
     int endPosition = startPosition + (end - start);
@@ -621,7 +621,7 @@ void ProcessorAnsi::screenBufferClearRange(int start, int end)
 /**
  * @brief Clears the Buffer for Fresh Parsing.
  */
-void ProcessorAnsi::screenBufferClear()
+void ProcessorText::screenBufferClear()
 {
     // Allocate the Size
     m_screen_buffer.clear();
@@ -631,7 +631,7 @@ void ProcessorAnsi::screenBufferClear()
 /**
  * @brief Clears The Screen And Buffer
  */
-void ProcessorAnsi::clearScreen()
+void ProcessorText::clearScreen()
 {
     m_is_screen_cleared = true;
     screenBufferClear();
@@ -644,7 +644,7 @@ void ProcessorAnsi::clearScreen()
  * @brief Parses screen data into the Screen Buffer.
  * @return
  */
-void ProcessorAnsi::parseTextToBuffer(char *buff)
+void ProcessorText::parseTextToBuffer(char *buff)
 {
     if(strlen(buff) == 0)
         return;

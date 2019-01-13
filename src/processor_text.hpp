@@ -1,30 +1,29 @@
-#ifndef ANSI_PROCESSOR_HPP
-#define ANSI_PROCESSOR_HPP
+#ifndef PROCESSOR_TEXT_HPP
+#define PROCESSOR_TEXT_HPP
 
 #include "processor_base.hpp"
 
 #include <memory>
-#include <stdint.h>
 #include <string>
-#include <vector>
-#include <map>
+
 
 /**
- * @class AnsiProcessor
+ * @class ProcessorText
  * @author Michael Griffin
- * @date 10/8/2015
- * @file ansi_processor.hpp
- * @brief Processes Screen data into a Screen Buffer
+ * @date 01/13/2019
+ * @file processor_text.hpp
+ * @brief Processes Text or Message Text into Screen Buffer Data
  */
-class ProcessorAnsi
+class ProcessorText
     : public ProcessorBase
 {
 public:
-    ProcessorAnsi(int term_height, int term_width)
+
+    ProcessorText(int term_height, int term_width)
         : ProcessorBase(term_height, term_width)
     { }
 
-    virtual ~ProcessorAnsi() {}
+    virtual ~ProcessorText() {}
 
     virtual std::string buildPullDownBars(int pulldown_id, bool active) override;
     virtual void clearPullDownBars() override;
@@ -47,6 +46,6 @@ public:
 
 };
 
-typedef std::shared_ptr<ProcessorAnsi> processor_ansi_ptr;
+typedef std::shared_ptr<ProcessorText> processor_text_ptr;
 
-#endif // ANSI_PROCESSOR_HPP
+#endif // PROCESSOR_TEXT_HPP

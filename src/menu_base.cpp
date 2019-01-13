@@ -31,7 +31,7 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_input_index(MENU_INPUT)
     , m_menu_info(new Menu())
     , m_menu_prompt()
-    , m_ansi_process(new AnsiProcessor(
+    , m_ansi_process(new ProcessorAnsi(
                          session_data->m_telnet_state->getTermRows(),
                          session_data->m_telnet_state->getTermCols()))
     , m_active_pulldownID(0)
@@ -271,7 +271,7 @@ std::string MenuBase::processTopGenericTemplate(const std::string &screen)
 std::string MenuBase::processMidGenericTemplate(const std::string &screen)
 {
     // Use a Local Ansi Parser for Pasrsing Menu Template with Mid.
-    ansi_process_ptr ansi_process(new AnsiProcessor(
+    processor_ansi_ptr ansi_process(new ProcessorAnsi(
                                       m_menu_session_data->m_telnet_state->getTermRows(),
                                       m_menu_session_data->m_telnet_state->getTermCols())
                                  );

@@ -21,8 +21,8 @@ typedef std::shared_ptr<FormManager> form_manager_ptr;
 class Config;
 typedef std::shared_ptr<Config> config_ptr;
 
-class AnsiProcessor;
-typedef std::shared_ptr<AnsiProcessor> ansi_process_ptr;
+class ProcessorAnsi;
+typedef std::shared_ptr<ProcessorAnsi> processor_ansi_ptr;
 
 
 /**
@@ -37,15 +37,15 @@ class ModFormManager
 {
 public:
 
-    ModFormManager(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process);
-        
+    ModFormManager(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process);
+
     virtual ~ModFormManager() override
     { }
 
     virtual bool update(const std::string &character_buffer, const bool &) override;
     virtual bool onEnter() override;
     virtual bool onExit() override;
-    
+
     /**
      * @brief Process Command Keys passed from menu selection (Callback)
      * @param option
@@ -56,12 +56,12 @@ public:
      * @brief Starts up Form Manager Module.
      */
     void startupFormManager();
-    
+
     int                m_current_page;
     menu_base_ptr      m_menu;
-    form_manager_ptr   m_form_manager;    
+    form_manager_ptr   m_form_manager;
     SessionIO          m_session_io;
-        
+
 };
 
 #endif // MOD_SYS_CONFIG_HPP

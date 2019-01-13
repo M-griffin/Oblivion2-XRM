@@ -72,7 +72,7 @@ void FormManager::startupForm(form_ptr form)
     // Ansi Processor used for Parsing templates and get line size(s).
     // This determines the screen template size and data we can fit between
     // Top and Bottom Templates.
-    ansi_process_ptr ansi(new AnsiProcessor(
+    processor_ansi_ptr ansi(new ProcessorAnsi(
                               m_session_data->m_telnet_state->getTermRows(),
                               m_session_data->m_telnet_state->getTermCols())
                          );
@@ -232,9 +232,9 @@ std::string FormManager::processTopFormTemplate(const std::string &screen)
 std::string FormManager::processMidFormTemplate(const std::string &screen)
 {
     // Use a Local Ansi Parser for Pasrsing Menu Template with Mid.
-    ansi_process_ptr ansi_process(new AnsiProcessor(
-                                      m_session_data->m_telnet_state->getTermRows(),
-                                      m_session_data->m_telnet_state->getTermCols()));
+    processor_ansi_ptr ansi_process(new ProcessorAnsi(
+                                        m_session_data->m_telnet_state->getTermRows(),
+                                        m_session_data->m_telnet_state->getTermCols()));
     std::string output_screen;
     std::string new_screen = screen;
 
