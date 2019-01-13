@@ -56,15 +56,18 @@ Logging* Logging::m_global_logging_instance = nullptr;
 void atExitFunction()
 {
     // Check for any remaining LOG Writes, then exit gracefully.
-    int log_entries = Logging::instance()->getNumberOfLogEntries();
-
-    for(int i = 0; i < log_entries; i++)
+    if(Logging::isActive())
     {
-        log_entry_ptr entry = Logging::instance()->getLogQueueEntry();
+        int log_entries = Logging::instance()->getNumberOfLogEntries();
 
-        if(entry != nullptr)
+        for(int i = 0; i < log_entries; i++)
         {
-            Logging::instance()->writeOutYamlFile(entry);
+            log_entry_ptr entry = Logging::instance()->getLogQueueEntry();
+
+            if(entry != nullptr)
+            {
+                Logging::instance()->writeOutYamlFile(entry);
+            }
         }
     }
 
