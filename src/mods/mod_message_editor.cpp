@@ -1,5 +1,5 @@
 #include "mod_message_editor.hpp"
-#include "../ansi_processor.hpp"
+#include "../processor_ansi.hpp"
 #include "../logging.hpp"
 
 #include <string>
@@ -186,7 +186,7 @@ std::string ModMessageEditor::processTopTemplate(ansi_process_ptr ansi_process, 
     }
 
     ansi_process->clearScreen();
-    ansi_process->parseAnsiScreen((char *)new_screen.c_str());
+    ansi_process->parseTextToBuffer((char *)new_screen.c_str());
     m_text_box_top = ansi_process->getMaxRowsUsedOnScreen() + 1;
 
     return ansi_process->getScreenFromBuffer(true);
@@ -202,7 +202,7 @@ std::string ModMessageEditor::processBottomTemplate(ansi_process_ptr ansi_proces
 {
     std::string new_screen = screen;
     ansi_process->clearScreen();
-    ansi_process->parseAnsiScreen((char *)new_screen.c_str());
+    ansi_process->parseTextToBuffer((char *)new_screen.c_str());
     int rows_used = ansi_process->getMaxRowsUsedOnScreen();
 
     // We have size of footer, now subtract from screen height to get bottom margin.
@@ -266,7 +266,7 @@ std::string ModMessageEditor::processMidTemplate(ansi_process_ptr ansi_process, 
 
     // Load, then pull MCI off-sets on the screen for margins.
     ansi_process->clearScreen();
-    ansi_process->parseAnsiScreen((char *)new_screen.c_str());
+    ansi_process->parseTextToBuffer((char *)new_screen.c_str());
     m_text_box_left  = ansi_process->getMCIOffSet("|LT");
     m_text_box_right = ansi_process->getMCIOffSet("|RT");
 
@@ -280,7 +280,7 @@ std::string ModMessageEditor::processMidTemplate(ansi_process_ptr ansi_process, 
     ansi_process->clearScreen();
     std::string output_screen = m_session_io.parseCodeMapGenerics(new_screen, code_map);
 
-    ansi_process->parseAnsiScreen((char *)output_screen.c_str());
+    ansi_process->parseTextToBuffer((char *)output_screen.c_str());
 
     std::string mid_screen_line = ansi_process->getScreenFromBuffer(false);
     new_screen.erase();

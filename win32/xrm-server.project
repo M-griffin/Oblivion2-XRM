@@ -21,6 +21,9 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="..\src">
+    <File Name="../src/processor_ansi.cpp"/>
+    <File Name="../src/processor_ansi.hpp"/>
+    <File Name="../src/processor_base.hpp"/>
     <File Name="../src/logging.hpp"/>
     <File Name="../src/encoding.hpp"/>
     <File Name="../src/encoding.cpp"/>
@@ -57,8 +60,6 @@
         <File Name="../src/utf-cpp/utf8/checked.h"/>
       </VirtualDirectory>
     </VirtualDirectory>
-    <File Name="../src/ansi_processor.cpp"/>
-    <File Name="../src/ansi_processor.hpp"/>
     <File Name="../src/common_io.cpp"/>
     <File Name="../src/common_io.hpp"/>
     <File Name="../src/communicator.cpp"/>
@@ -198,7 +199,6 @@
     <File Name="../src/process_win.cpp"/>
     <File Name="../src/process_win.hpp"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -320,4 +320,5 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug"/>
 </CodeLite_Project>

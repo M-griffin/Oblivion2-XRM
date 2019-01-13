@@ -4,7 +4,7 @@
 #include "session_io.hpp"
 #include "common_io.hpp"
 #include "session_data.hpp"
-#include "ansi_processor.hpp"
+#include "processor_ansi.hpp"
 #include "communicator.hpp"
 
 #include "model-sys/struct_compat.hpp"
@@ -113,7 +113,7 @@ public:
      */
     void baseProcessAndDeliver(std::string data)
     {
-        m_ansi_process->parseAnsiScreen((char *)data.c_str());
+        m_ansi_process->parseTextToBuffer((char *)data.c_str());
         m_menu_session_data->deliver(data);
     }
 

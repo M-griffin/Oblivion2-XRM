@@ -6,7 +6,7 @@
 
 #include "../session_data.hpp"
 #include "../session_io.hpp"
-#include "../ansi_processor.hpp"
+#include "../processor_ansi.hpp"
 #include "../encoding.hpp"
 
 #include <algorithm>
@@ -248,7 +248,7 @@ public:
         // Clear out attributes on new strings no bleeding of colors.
         std::string output = "\x1b[0m" + baseGetDefaultColor();
         output += std::move(data);
-        m_ansi_process->parseAnsiScreen((char *)output.c_str());
+        m_ansi_process->parseTextToBuffer((char *)output.c_str());
         output += baseGetDefaultInputColor();
         m_session_data->deliver(output);
     }
@@ -277,7 +277,7 @@ public:
      */
     void baseProcessDeliverInput(std::string &data)
     {
-        m_ansi_process->parseAnsiScreen((char *)data.c_str());
+        m_ansi_process->parseTextToBuffer((char *)data.c_str());
         m_session_data->deliver(data);
     }
 

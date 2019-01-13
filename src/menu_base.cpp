@@ -392,7 +392,7 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
 
     // Clear Codemap.
     std::vector<MapType>().swap(code_map);
-    ansi_process->parseAnsiScreen((char *)output_screen.c_str());
+    ansi_process->parseTextToBuffer((char *)output_screen.c_str());
 
     // Return with no clear screen, since this is a mid ansi.
     return ansi_process->getScreenFromBuffer(false);
@@ -465,7 +465,7 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
     yesNoBars.insert(0, display_prompt);
 
     // Parse the Screen to the Screen Buffer.
-    m_ansi_process->parseAnsiScreen((char *)yesNoBars.c_str());
+    m_ansi_process->parseTextToBuffer((char *)yesNoBars.c_str());
 
     // Screen to String so it can be processed.
     m_ansi_process->screenBufferToString();
@@ -757,7 +757,7 @@ void MenuBase::redisplayMenuScreen()
     if(m_is_active_pulldown_menu)
     {
         // Parse the Screen to the Screen Buffer.
-        m_ansi_process->parseAnsiScreen((char *)buffer.c_str());
+        m_ansi_process->parseTextToBuffer((char *)buffer.c_str());
 
         // Screen to String so it can be processed.
         m_ansi_process->screenBufferToString();
@@ -1061,7 +1061,7 @@ void MenuBase::loadAndStartupMenu()
             m_is_active_pulldown_menu = true;
 
             // Parse the Screen to the Screen Buffer.
-            m_ansi_process->parseAnsiScreen((char *)buffer.c_str());
+            m_ansi_process->parseTextToBuffer((char *)buffer.c_str());
 
             // Screen to String so it can be processed.
             m_ansi_process->screenBufferToString();
