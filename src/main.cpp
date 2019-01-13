@@ -119,7 +119,6 @@ auto main() -> int
         if(!config)
         {
             std::cout << "Unable to allocate config structure" << std::endl;
-            Encoding::releaseInstance();
             exit(1);
         }
 
@@ -138,12 +137,10 @@ auto main() -> int
 
         if(!cfg.validation())
         {
-            Encoding::releaseInstance();
             exit(1);
         }
 
         // All Good, Attached to Global Communicator Instance.
-        TheCommunicator::instance()->attachConfiguration(config);
         Logging::instance()->xrmLog<Logging::CONSOLE_LOG>("Starting up Oblivion/2 XRM-Server");
     }
 
@@ -155,9 +152,6 @@ auto main() -> int
         if(!config)
         {
             std::cout << "Unable to allocate config structure" << std::endl;
-            Encoding::releaseInstance();
-            Logging::releaseInstance();
-            Communicator::releaseInstance();
             exit(1);
         }
 
@@ -167,11 +161,6 @@ auto main() -> int
 
         if(!cfg.loadConfig())
         {
-            // TODO Throws exception right now, need to work in
-            // better shutdown on from this point! just assert for now.
-            Encoding::releaseInstance();
-            Logging::releaseInstance();
-            Communicator::releaseInstance();
             exit(1);
         }
     }
@@ -195,10 +184,6 @@ auto main() -> int
                     Logging::instance()->writeOutYamlFile(entry);
                 }
             }
-
-            Encoding::releaseInstance();
-            Logging::releaseInstance();
-            TheCommunicator::releaseInstance();
 
             exit(1);
         }
