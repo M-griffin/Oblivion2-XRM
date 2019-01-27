@@ -1137,7 +1137,6 @@ void ProcessorText::parseTextToBuffer(char *buff)
         } // end of main escape sequence handler
         else   // otherwise output character using current color */
         {
-
             LocalizedBuffer nextBuffer;
 
             // Only Peak Next if were at CR.

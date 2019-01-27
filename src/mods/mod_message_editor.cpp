@@ -332,7 +332,7 @@ void ModMessageEditor::setupEditor()
     int height = m_text_box_bottom - m_text_box_top;
     int width = m_text_box_right - m_text_box_left;
 
-    log->xrmLog<Logging::CONSOLE_LOG>("m_text_process - height=", height, "width=", width);
+    log->xrmLog<Logging::DEBUG_LOG>("m_text_process - height=", height, "width=", width);
     m_text_process.reset(new ProcessorText(height, width));
 
     // Next combine and output.. Move cursor to top left in box.
@@ -362,20 +362,20 @@ void ModMessageEditor::editorInput(const std::string &input)
         //input = "ENTER";
         log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ENTER HIT] input result=", result);
         std::string output = "\r\n\x1b[" + std::to_string(m_text_box_left - 1) + "C";
-        baseProcessDeliverInput(output);
+        processTextInput(input);
     }
     else if(result[0] == '\x1b' && result.size() > 2)
     {
         // ESC SEQUENCE - check movement / arrow keys.
-        //input = result;
         log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ESC Sequence] input result=", result);
+        processControlInput(input);
     }
     else if(result[0] == '\x1b' && result.size() == 1)
     {
         // Check Single ESC KEY - command options
         //input = "ESC";  - quit for now
         log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ESC HIT!] input result=", result);
-
+        processControlInput(input);
         m_is_active = false;
     }
     else
@@ -390,8 +390,46 @@ void ModMessageEditor::editorInput(const std::string &input)
         log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ESC Sequence] input result=", static_cast<int>(escape_sequence[0]));
 
         // Hot Key Input.
-        baseProcessDeliverInput(result);
+        processTextInput(input);
     }
 
     return;
+}
+
+/**
+ * @brief Process Input Text for Editor
+ * @return
+ */
+void ModMessageEditor::processTextInput(std::string input)
+{
+    int x_position = m_text_process->getXPosition();
+    int y_position = m_text_process->getYPosition();
+    std::cout << "x_pos: " << x_position << std::endl;
+    std::cout << "y_pos: " << y_position << std::endl;
+
+    m_text_process->parseTextToBuffer((char *)input.c_str());
+
+    std::cout << "x_pos: " << m_text_process->getXPosition() << std::endl;
+    std::cout << "y_pos: " << m_text_process->getYPosition() << std::endl;
+
+    baseProcessDeliverInput(input);
+}
+
+/**
+ * @brief Process Input Control for Editor
+ * @return
+ */
+void ModMessageEditor::processControlInput(std::string input)
+{
+    int x_position = m_text_process->getXPosition();
+    int y_position = m_text_process->getYPosition();
+    std::cout << "x_pos: " << x_position << std::endl;
+    std::cout << "y_pos: " << y_position << std::endl;
+
+    m_text_process->parseTextToBuffer((char *)input.c_str());
+
+    std::cout << "x_pos: " << m_text_process->getXPosition() << std::endl;
+    std::cout << "y_pos: " << m_text_process->getYPosition() << std::endl;
+
+    baseProcessDeliverInput(input);
 }

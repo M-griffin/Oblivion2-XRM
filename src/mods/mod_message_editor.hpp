@@ -209,6 +209,18 @@ public:
      */
     void editorInput(const std::string &input);
 
+    /**
+     * @brief Process Text Input for Editor
+     * @return
+     */
+    void processTextInput(std::string input);
+
+    /**
+     * @brief Process Control Input for Editor
+     * @return
+     */
+    void processControlInput(std::string input);
+
 
 private:
 
