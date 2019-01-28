@@ -407,6 +407,18 @@ void ModMessageEditor::editorInput(const std::string &input)
 }
 
 /**
+ * @brief Move to the Cursor to the Buffer Position
+ */
+std::string ModMessageEditor::moveCursorToPosition()
+{
+    std::string output = "";
+    output += "\x1b[";
+    output += std::to_string((m_text_process->getYPosition()-1) + m_text_box_top) + ";";
+    output += std::to_string((m_text_process->getXPosition()-1) + m_text_box_left) + "H";
+    return output;
+}
+
+/**
  * @brief Process Input Text for Editor
  * @return
  */
@@ -418,34 +430,37 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
     std::cout << "x_pos: " << x_position << std::endl;
     std::cout << "y_pos: " << y_position << std::endl;
 
-    if(result[0] != '\r' && result[0] != '\n' && result[0] != '\x1b')
+    if(result[0] != '\b' && result[0] != '\r' && result[0] != '\n' && result[0] != '\x1b')
     {
         m_text_process->parseTextToBuffer((char *)input.c_str());
         output = input;
     }
 
-    // End of Line, move down to next
-    if(x_position == m_text_box_width && y_position != m_text_box_height)
+    // Move down to next on CR/LF
+    if(result[0] == '\b' && x_position > 1)
     {
-        output += "\x1b[";
-        output += std::to_string((m_text_process->getYPosition()-1) + m_text_box_top) + ";";
-        output += std::to_string((m_text_process->getXPosition()-1) + m_text_box_left) + "H";
+        m_text_process->parseTextToBuffer((char *)"\b");
+        output += "\b \b";
     }
-
-    // Bottom of box, scroll up a line
-    if(y_position == m_text_box_height && x_position == m_text_box_width)
+    else if(result[0] == '\b' && x_position == 1)
     {
-        output += "\x1b[";
-        output += std::to_string((m_text_process->getYPosition()-1) + m_text_box_top) + ";";
-        output += std::to_string((m_text_process->getXPosition()-1) + m_text_box_left) + "H";
+        m_text_process->parseTextToBuffer((char *)"\b");
+        output += moveCursorToPosition();
     }
-
-    if(result[0] == '\r' || result[0] == '\n')
+    else if(result[0] == '\r' || result[0] == '\n')
     {
         m_text_process->parseTextToBuffer((char *)"\r\n");
-        output += "\x1b[";
-        output += std::to_string((m_text_process->getYPosition()-1) + m_text_box_top) + ";";
-        output += std::to_string((m_text_process->getXPosition()-1) + m_text_box_left) + "H";
+        output += moveCursorToPosition();
+    }
+    // Wrap Around and Move Down at end of line
+    else if(x_position == m_text_box_width && y_position != m_text_box_height)
+    {
+        output += moveCursorToPosition();
+    }
+    // Bottom of box, scroll up a line up, and move to begininng.
+    else if(y_position == m_text_box_height && x_position == m_text_box_width)
+    {
+        output += moveCursorToPosition();
     }
 
     std::cout << "=========w max " << m_text_box_width << " " << m_text_box_left << std::endl;
@@ -463,29 +478,5 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
  */
 void ModMessageEditor::processControlInput(std::string input)
 {
-    std::string output = "";
-    int x_position = m_text_process->getXPosition();
-    int y_position = m_text_process->getYPosition();
-    std::cout << "x_pos: " << x_position << std::endl;
-    std::cout << "y_pos: " << y_position << std::endl;
 
-    m_text_process->parseTextToBuffer((char *)input.c_str());
-
-    // End of Line, move down to next
-    if(x_position == m_text_box_width)
-    {
-        output += "\x1b[";
-        output += std::to_string((m_text_process->getYPosition()-1) + m_text_box_top) + ";";
-        output += std::to_string((m_text_process->getXPosition()-1) + m_text_box_left) + "H";
-    }
-
-    output += input;
-
-    std::cout << "=========w max " << m_text_box_width << " " << m_text_box_left << std::endl;
-    std::cout << "=========h max " << m_text_box_height << " " << m_text_box_top << std::endl;
-
-    std::cout << "x_pos: " << m_text_process->getXPosition() << std::endl;
-    std::cout << "y_pos: " << m_text_process->getYPosition() << std::endl;
-
-    baseProcessDeliverInput(output);
 }

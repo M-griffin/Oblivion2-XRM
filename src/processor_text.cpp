@@ -555,13 +555,32 @@ void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
     }
     else
     {
-        ++m_x_position;
+        // Backspaces come over a \0
+        if(char_sequence[0] == '\0' && m_x_position > 1)
+        {
+            --m_x_position;
+        }
+        else if(char_sequence[0] == '\0' && m_x_position == 1)
+        {
+            std::cout << "- Y" << std::endl;
+
+            if(m_y_position > 1)
+            {
+                std::cout << "- Y2" << std::endl;
+                --m_y_position;
+            }
+        }
+        else
+        {
+            ++m_x_position;
+        }
+
+        // Make sure the x/y position does go over num lines
+        if(m_y_position > m_number_lines)
+        {
+            m_y_position = m_number_lines;
+        }
     }
-
-    // Make sure the x/y position does go over num lines
-    if(m_y_position > m_number_lines)
-        m_y_position = m_number_lines;
-
 }
 
 /*
@@ -1141,6 +1160,14 @@ void ProcessorText::parseTextToBuffer(char *buff)
         } // end of main escape sequence handler
         else   // otherwise output character using current color */
         {
+
+            // Catch Backspace
+            if(buffer.character[0] == '\b')
+            {
+                screenBufferSetGlyph((char *)"\0");
+                continue;
+            }
+
             LocalizedBuffer nextBuffer;
 
             // Only Peak Next if were at CR.

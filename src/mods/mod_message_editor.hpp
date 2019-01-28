@@ -213,6 +213,11 @@ public:
     void editorInput(const std::string &input);
 
     /**
+     * @brief Move to the Cursor to the Buffer Position
+     */
+    std::string moveCursorToPosition();
+
+    /**
      * @brief Process Text Input for Editor
      * @return
      */
