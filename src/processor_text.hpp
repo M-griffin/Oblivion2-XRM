@@ -2,6 +2,7 @@
 #define PROCESSOR_TEXT_HPP
 
 #include "processor_base.hpp"
+#include "common_io.hpp"
 
 #include <memory>
 #include <string>
@@ -21,7 +22,10 @@ public:
 
     ProcessorText(int term_height, int term_width)
         : ProcessorBase(term_height, term_width)
+        , m_line_number(1)
     { }
+
+    int m_line_number;
 
     virtual ~ProcessorText() {}
 
@@ -41,8 +45,23 @@ public:
     virtual void screenBufferScrollUp() override;
     virtual void screenBufferClearRange(int start, int end) override;
     virtual void screenBufferClear() override;
+
     virtual void clearScreen() override;
     virtual void parseTextToBuffer(char *buff) override;
+
+    // Processor Text Specific
+    void moveNextXPosition();
+    void moveNextYPosition();
+    void movePreviousXPosition();
+    void movePreviousYPosition();
+    void moveNewLine();
+
+    void screenBufferScrollDown();
+
+    // This could be shared.
+    void escapeSequenceParsing(LocalizedBuffer buffer,
+                               std::string::iterator it,
+                               std::string::iterator line_end);
 
 };
 

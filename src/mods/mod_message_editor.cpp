@@ -436,17 +436,19 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
         output = input;
     }
 
-    // Move down to next on CR/LF
+    // destructive backspace
     if(result[0] == '\b' && x_position > 1)
     {
         m_text_process->parseTextToBuffer((char *)"\b");
         output += "\b \b";
     }
+    // detsructive backspace move up and end of line
     else if(result[0] == '\b' && x_position == 1)
     {
         m_text_process->parseTextToBuffer((char *)"\b");
         output += moveCursorToPosition();
     }
+    // CRLF New Line
     else if(result[0] == '\r' || result[0] == '\n')
     {
         m_text_process->parseTextToBuffer((char *)"\r\n");
