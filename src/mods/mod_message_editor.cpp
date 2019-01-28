@@ -329,11 +329,15 @@ void ModMessageEditor::setupEditor()
                                     "m_text_box_left=", m_text_box_left, "m_text_box_right=", m_text_box_right);
 
     // Setup the Text Parser Init the Parser with template data.
-    int height = m_text_box_bottom - m_text_box_top;
-    int width = m_text_box_right - m_text_box_left;
+    m_text_box_height = m_text_box_bottom - m_text_box_top;
+    m_text_box_width = m_text_box_right - m_text_box_left;
 
-    log->xrmLog<Logging::DEBUG_LOG>("m_text_process - height=", height, "width=", width);
-    m_text_process.reset(new ProcessorText(height, width));
+    // Adjust to minus 1 from bottom.
+    m_text_box_height += 1;
+
+
+    log->xrmLog<Logging::DEBUG_LOG>("m_text_process - height=", m_text_box_height, "width=", m_text_box_width);
+    m_text_process.reset(new ProcessorText(m_text_box_height, m_text_box_width));
 
     // Next combine and output.. Move cursor to top left in box.
     std::string screen_output = top_screen + mid_screen + bot_screen;
@@ -348,14 +352,20 @@ void ModMessageEditor::setupEditor()
  */
 void ModMessageEditor::editorInput(const std::string &input)
 {
-    Logging *log = Logging::instance();
+    //Logging *log = Logging::instance();
     std::string result = m_session_io.getKeyInput(input);
 
     if(result.size() == 0)
     {
-        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [result.size() == 0] input result=", result);
+        //log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [result.size() == 0] input result=", result);
         return;
     }
+
+    std::cout << "result: " << result << ", input: " << input << std::endl;
+
+    processTextInput(result, input);
+
+    /*
     else if(result[0] == 13 || result[0] == 10)
     {
         // Translations for ENTER next line
@@ -391,7 +401,7 @@ void ModMessageEditor::editorInput(const std::string &input)
 
         // Hot Key Input.
         processTextInput(input);
-    }
+    }*/
 
     return;
 }
@@ -400,19 +410,51 @@ void ModMessageEditor::editorInput(const std::string &input)
  * @brief Process Input Text for Editor
  * @return
  */
-void ModMessageEditor::processTextInput(std::string input)
+void ModMessageEditor::processTextInput(std::string result, std::string input)
 {
+    std::string output = "";
     int x_position = m_text_process->getXPosition();
     int y_position = m_text_process->getYPosition();
     std::cout << "x_pos: " << x_position << std::endl;
     std::cout << "y_pos: " << y_position << std::endl;
 
-    m_text_process->parseTextToBuffer((char *)input.c_str());
+    if(result[0] != '\r' && result[0] != '\n' && result[0] != '\x1b')
+    {
+        m_text_process->parseTextToBuffer((char *)input.c_str());
+        output = input;
+    }
+
+    // End of Line, move down to next
+    if(x_position == m_text_box_width && y_position != m_text_box_height)
+    {
+        output += "\x1b[";
+        output += std::to_string((m_text_process->getYPosition()-1) + m_text_box_top) + ";";
+        output += std::to_string((m_text_process->getXPosition()-1) + m_text_box_left) + "H";
+    }
+
+    // Bottom of box, scroll up a line
+    if(y_position == m_text_box_height && x_position == m_text_box_width)
+    {
+        output += "\x1b[";
+        output += std::to_string((m_text_process->getYPosition()-1) + m_text_box_top) + ";";
+        output += std::to_string((m_text_process->getXPosition()-1) + m_text_box_left) + "H";
+    }
+
+    if(result[0] == '\r' || result[0] == '\n')
+    {
+        m_text_process->parseTextToBuffer((char *)"\r\n");
+        output += "\x1b[";
+        output += std::to_string((m_text_process->getYPosition()-1) + m_text_box_top) + ";";
+        output += std::to_string((m_text_process->getXPosition()-1) + m_text_box_left) + "H";
+    }
+
+    std::cout << "=========w max " << m_text_box_width << " " << m_text_box_left << std::endl;
+    std::cout << "=========h max " << m_text_box_height << " " << m_text_box_top << std::endl;
 
     std::cout << "x_pos: " << m_text_process->getXPosition() << std::endl;
     std::cout << "y_pos: " << m_text_process->getYPosition() << std::endl;
 
-    baseProcessDeliverInput(input);
+    baseProcessDeliverInput(output);
 }
 
 /**
@@ -421,6 +463,7 @@ void ModMessageEditor::processTextInput(std::string input)
  */
 void ModMessageEditor::processControlInput(std::string input)
 {
+    std::string output = "";
     int x_position = m_text_process->getXPosition();
     int y_position = m_text_process->getYPosition();
     std::cout << "x_pos: " << x_position << std::endl;
@@ -428,8 +471,21 @@ void ModMessageEditor::processControlInput(std::string input)
 
     m_text_process->parseTextToBuffer((char *)input.c_str());
 
+    // End of Line, move down to next
+    if(x_position == m_text_box_width)
+    {
+        output += "\x1b[";
+        output += std::to_string((m_text_process->getYPosition()-1) + m_text_box_top) + ";";
+        output += std::to_string((m_text_process->getXPosition()-1) + m_text_box_left) + "H";
+    }
+
+    output += input;
+
+    std::cout << "=========w max " << m_text_box_width << " " << m_text_box_left << std::endl;
+    std::cout << "=========h max " << m_text_box_height << " " << m_text_box_top << std::endl;
+
     std::cout << "x_pos: " << m_text_process->getXPosition() << std::endl;
     std::cout << "y_pos: " << m_text_process->getYPosition() << std::endl;
 
-    baseProcessDeliverInput(input);
+    baseProcessDeliverInput(output);
 }

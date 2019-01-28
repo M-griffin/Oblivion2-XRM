@@ -45,6 +45,9 @@ public:
         , m_text_box_bottom(24)
         , m_text_box_left(0)
         , m_text_box_right(80)
+        , m_text_box_height(0)
+        , m_text_box_width(0)
+
     {
         // Push function pointers to the stack.
         m_setup_functions.push_back(std::bind(&ModMessageEditor::setupEditor, this));
@@ -213,7 +216,7 @@ public:
      * @brief Process Text Input for Editor
      * @return
      */
-    void processTextInput(std::string input);
+    void processTextInput(std::string result, std::string input);
 
     /**
      * @brief Process Control Input for Editor
@@ -243,6 +246,8 @@ private:
     int                    m_text_box_bottom;
     int                    m_text_box_left;
     int                    m_text_box_right;
+    int                    m_text_box_height;
+    int                    m_text_box_width;
 
     CommonIO               m_common_io;
 

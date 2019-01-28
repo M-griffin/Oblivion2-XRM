@@ -558,6 +558,10 @@ void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
         ++m_x_position;
     }
 
+    // Make sure the x/y position does go over num lines
+    if(m_y_position > m_number_lines)
+        m_y_position = m_number_lines;
+
 }
 
 /*
