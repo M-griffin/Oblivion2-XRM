@@ -29,11 +29,11 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="../xrm-unittest/xrm_test.cpp"/>
     <File Name="../xrm-unittest/users_dao_ut.cpp"/>
     <File Name="../xrm-unittest/session_io_ut.cpp"/>
     <File Name="../xrm-unittest/oneliners_dao_it.cpp"/>
     <File Name="../xrm-unittest/message_area_dao_it.cpp"/>
-    <File Name="../xrm-unittest/main.cpp"/>
     <File Name="../xrm-unittest/form_system_config_ut.cpp"/>
     <File Name="../xrm-unittest/file_area_dao_it.cpp"/>
     <File Name="../xrm-unittest/conference_dao_it.cpp"/>

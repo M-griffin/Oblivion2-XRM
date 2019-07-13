@@ -20,7 +20,7 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="../xrm-menu-convert/src/main.cpp"/>
+    <File Name="../xrm-menu-convert/src/menu_convert.cpp"/>
     <File Name="../src/logging.hpp"/>
     <File Name="../src/communicator.hpp"/>
     <File Name="../src/communicator.cpp"/>
