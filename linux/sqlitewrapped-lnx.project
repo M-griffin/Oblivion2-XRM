@@ -29,15 +29,16 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="Database.cpp"/>
-    <File Name="Database.h"/>
-    <File Name="IError.h"/>
-    <File Name="Query.cpp"/>
-    <File Name="Query.h"/>
-    <File Name="StderrLog.cpp"/>
-    <File Name="StderrLog.h"/>
-    <File Name="SysLogs.cpp"/>
-    <File Name="SysLogs.h"/>
+    <File Name="../sqlitewrap/Database.cpp"/>
+    <File Name="../sqlitewrap/Database.h"/>
+    <File Name="../sqlitewrap/IError.h"/>
+    <File Name="../sqlitewrap/Query.cpp"/>
+    <File Name="../sqlitewrap/Query.h"/>
+    <File Name="../sqlitewrap/sqlite3test.cpp" ExcludeProjConfig="Debug"/>
+    <File Name="../sqlitewrap/StderrLog.cpp"/>
+    <File Name="../sqlitewrap/StderrLog.h"/>
+    <File Name="../sqlitewrap/SysLogs.cpp"/>
+    <File Name="../sqlitewrap/SysLogs.h"/>
   </VirtualDirectory>
   <Settings Type="Static Library">
     <GlobalSettings>
@@ -71,7 +72,8 @@
       <PreBuild/>
       <PostBuild>
         <Command Enabled="no"># Linux /OSX / BSD</Command>
-        <Command Enabled="yes">cat IError.h StderrLog.h SysLogs.h Database.h Query.h &gt; lib$(ProjectName).h</Command>
+        <Command Enabled="yes">cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h &gt; $(IntermediateDirectory)/lib$(ProjectName).h</Command>
+        <Command Enabled="yes"/>
         <Command Enabled="yes"/>
         <Command Enabled="no"># Windows</Command>
         <Command Enabled="no">#type IError.h StderrLog.h SysLog.h Database.h Query.h &gt; lib$(ProjectName).h</Command>

@@ -212,13 +212,13 @@
         <IncludePath Value="."/>
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
-        <IncludePath Value="../sqlitewrap/Debug"/>
+        <IncludePath Value="../linux/Debug"/>
         <Preprocessor Value="WITHOUT_SDL"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
         <LibraryPath Value="../sqlitewrap"/>
-        <LibraryPath Value="../sqlitewrap/Debug"/>
+        <LibraryPath Value="../linux/Debug"/>
         <Library Value="libSqliteWrapped.a"/>
         <Library Value="sqlite3"/>
         <Library Value="pthread"/>

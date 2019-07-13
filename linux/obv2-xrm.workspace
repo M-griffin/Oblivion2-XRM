@@ -3,11 +3,10 @@
   <Environment>
     <![CDATA[]]>
   </Environment>
-  <Project Name="sqlitewrapped" Path="../sqlitewrap/sqlitewrapped-lnx.project" Active="No"/>
-  <Project Name="xrm-server" Path="xrm-server-lnx.project" Active="Yes"/>
-  <Project Name="xrm-unittest" Path="../xrm-unittest/xrm-unittest-lnx.project" Active="No"/>
-  <Project Name="xrm-menu-convert-lnx" Path="../xrm-menu-convert/xrm-menu-convert-lnx.project" Active="No"/>
-  <Project Name="xrm-menu-convert-prompt-lnx" Path="../xrm-menu-prompt-convert/xrm-menu-convert-prompt-lnx.project" Active="No"/>
+  <Project Name="xrm-server" Path="xrm-server-lnx.project" Active="No"/>
+  <Project Name="sqlitewrapped-lnx" Path="sqlitewrapped-lnx.project" Active="No"/>
+  <Project Name="xrm-menu-convert-lnx" Path="xrm-menu-convert-lnx.project" Active="No"/>
+  <Project Name="xrm-menu-convert-prompt-lnx" Path="xrm-menu-convert-prompt-lnx.project" Active="No"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Environment/>
@@ -16,12 +15,18 @@
       <Project Name="xrm-unittest" ConfigName="Debug"/>
       <Project Name="xrm-menu-convert" ConfigName="Debug"/>
       <Project Name="xrm-menu-prompt-convert" ConfigName="Debug"/>
+      <Project Name="SqliteWrapped" ConfigName="Debug"/>
+      <Project Name="xrm-menu-convert" ConfigName="Debug"/>
+      <Project Name="xrm-menu-prompt-convert" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
       <Project Name="SqliteWrapped" ConfigName="Release"/>
       <Project Name="xrm-server" ConfigName="Release"/>
       <Project Name="xrm-unittest" ConfigName="Release"/>
+      <Project Name="xrm-menu-convert" ConfigName="Release"/>
+      <Project Name="xrm-menu-prompt-convert" ConfigName="Release"/>
+      <Project Name="SqliteWrapped" ConfigName="Release"/>
       <Project Name="xrm-menu-convert" ConfigName="Release"/>
       <Project Name="xrm-menu-prompt-convert" ConfigName="Release"/>
     </WorkspaceConfiguration>
