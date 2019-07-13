@@ -60,8 +60,8 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/src_ansi_processor.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_communicator.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_encryption.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_system.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_data.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_state_manager.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_telnet_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_base.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_access_condition.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_process_posix.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_form_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_io_service.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_ssh.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_telnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_encoding.cpp$(ObjectSuffix) \
+Objects0=$(IntermediateDirectory)/src_ansi_processor.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_communicator.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_encryption.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_system.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_data.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_state_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_telnet_decoder.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_menu_base.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_access_condition.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_process_posix.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_form_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_io_service.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_ssh.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_telnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_encoding.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_xrm_server.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/data-sys_config_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_security_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_text_prompts_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_users_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_menu_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_menu_prompt_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_session_stats_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_conference_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_file_area_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_grouping_dao.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/data-sys_message_area_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_network_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_protocol_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_access_level_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/data-sys_db_startup.cpp$(ObjectSuffix) 
 
@@ -130,14 +130,6 @@ $(IntermediateDirectory)/src_encryption.cpp$(DependSuffix): ../src/encryption.cp
 
 $(IntermediateDirectory)/src_encryption.cpp$(PreprocessSuffix): ../src/encryption.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_encryption.cpp$(PreprocessSuffix) "../src/encryption.cpp"
-
-$(IntermediateDirectory)/src_main.cpp$(ObjectSuffix): ../src/main.cpp $(IntermediateDirectory)/src_main.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/src_main.cpp$(DependSuffix): ../src/main.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_main.cpp$(DependSuffix) -MM "../src/main.cpp"
-
-$(IntermediateDirectory)/src_main.cpp$(PreprocessSuffix): ../src/main.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_main.cpp$(PreprocessSuffix) "../src/main.cpp"
 
 $(IntermediateDirectory)/src_menu_system.cpp$(ObjectSuffix): ../src/menu_system.cpp $(IntermediateDirectory)/src_menu_system.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/menu_system.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_menu_system.cpp$(ObjectSuffix) $(IncludePath)
@@ -258,6 +250,14 @@ $(IntermediateDirectory)/src_encoding.cpp$(DependSuffix): ../src/encoding.cpp
 
 $(IntermediateDirectory)/src_encoding.cpp$(PreprocessSuffix): ../src/encoding.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_encoding.cpp$(PreprocessSuffix) "../src/encoding.cpp"
+
+$(IntermediateDirectory)/src_xrm_server.cpp$(ObjectSuffix): ../src/xrm_server.cpp $(IntermediateDirectory)/src_xrm_server.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/xrm_server.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_xrm_server.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_xrm_server.cpp$(DependSuffix): ../src/xrm_server.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_xrm_server.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_xrm_server.cpp$(DependSuffix) -MM "../src/xrm_server.cpp"
+
+$(IntermediateDirectory)/src_xrm_server.cpp$(PreprocessSuffix): ../src/xrm_server.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_xrm_server.cpp$(PreprocessSuffix) "../src/xrm_server.cpp"
 
 $(IntermediateDirectory)/data-sys_config_dao.cpp$(ObjectSuffix): ../src/data-sys/config_dao.cpp $(IntermediateDirectory)/data-sys_config_dao.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/data-sys/config_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/data-sys_config_dao.cpp$(ObjectSuffix) $(IncludePath)

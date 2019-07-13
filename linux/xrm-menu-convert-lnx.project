@@ -66,7 +66,7 @@
     <File Name="../src/logging.hpp"/>
     <File Name="../src/communicator.cpp"/>
     <File Name="../src/communicator.hpp"/>
-    <File Name="../xrm-menu-convert/src/main.cpp"/>
+    <File Name="../xrm-menu-convert/src/menu_convert.cpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
