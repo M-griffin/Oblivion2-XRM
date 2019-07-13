@@ -733,7 +733,22 @@ bool CommonIO::isDigit(const std::string &str)
 }
 
 /**
- * @brief Return the Escape Sequence Parsed.
+ * @brief Return the Input Full Screen Editor Escape Sequence Parsed.
+ * @return
+ */
+std::string CommonIO::getFSEEscapeSequence()
+{
+    // Check if Sequences Exists, otherwise return blank.
+    if(m_sequence_map.find(m_escape_sequence) != m_sequence_map.end())
+    {
+        return m_sequence_map[m_escape_sequence];
+    }
+
+    return m_escape_sequence;
+}
+
+/**
+ * @brief Return the Input Escape Sequence Parsed.
  * @return
  */
 std::string CommonIO::getEscapeSequence()

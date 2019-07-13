@@ -22,9 +22,11 @@ public:
 
     ProcessorText(int term_height, int term_width)
         : ProcessorBase(term_height, term_width)
+        , m_tab_width(4)
         , m_line_number(1)
     { }
 
+    int m_tab_width;
     int m_line_number;
 
     virtual ~ProcessorText() {}
@@ -54,7 +56,10 @@ public:
     void moveNextYPosition();
     void movePreviousXPosition();
     void movePreviousYPosition();
+    void moveBackSpace();
+    void moveDelete();
     void moveNewLine();
+    void moveTabWidth();
 
     void screenBufferScrollDown();
 

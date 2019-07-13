@@ -38,7 +38,6 @@ public:
     explicit CommonIO();
     ~CommonIO();
 
-
     /* This function will read the OS specific functions
      * To Determine where the executable is located.
      * This has only been tested in Windows, Linux, OSX.
@@ -111,6 +110,12 @@ public:
      * This is for mixed ASCII And UTF-8 Strings.
      */
     bool isDigit(const std::string &str);
+
+    /**
+     * @brief Return the Input Full Screen Editor Escape Sequence Parsed.
+     * @return
+     */
+    std::string getFSEEscapeSequence();
 
     /**
     * @brief Return the Escape Sequence

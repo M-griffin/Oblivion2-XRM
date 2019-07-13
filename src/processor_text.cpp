@@ -462,61 +462,6 @@ std::string ProcessorText::screenBufferParse()
 }
 
 /**
- * @brief Handle FORWARD chacter movements
- */
-void ProcessorText::moveNextXPosition()
-{
-
-}
-
-/**
- * @brief Handle DOWN character movements
- */
-void ProcessorText::moveNextYPosition()
-{
-
-}
-
-/**
- * @brief Handle BACKWARDS chacters movements
- */
-void ProcessorText::movePreviousXPosition()
-{
-
-}
-
-/**
- * @brief Handle UP character movements
- */
-void ProcessorText::movePreviousYPosition()
-{
-
-}
-
-/**
- * @brief Move to Next Line.
- */
-void ProcessorText::moveNewLine()
-{
-    m_x_position = 1;
-    ++m_y_position;
-    ++m_line_number;
-
-    // Set the Current Max Row Position.
-    if(m_max_y_position < m_y_position)
-    {
-        m_max_y_position = m_y_position;
-    }
-
-    // catch screen screen scrolling here one shot.
-    if(m_y_position > m_number_lines)
-    {
-        screenBufferScrollUp();
-        m_y_position = m_number_lines;
-    }
-}
-
-/**
  * @brief Plots Characters on the Screen into the Buffer.
  * @param c
  */
@@ -591,22 +536,10 @@ void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
     }
     else
     {
-        // Backspaces come over a \0
-        if(char_sequence[0] == '\0' && m_x_position > 1)
-        {
-            --m_x_position;
-        }
-        else if(char_sequence[0] == '\0' && m_x_position == 1)
-        {
-            if(m_y_position > 1)
-            {
-                --m_y_position;
-            }
-        }
-        else
-        {
-            ++m_x_position;
-        }
+
+
+        ++m_x_position;
+
 
         // Make sure the x/y position does go over num lines
         if(m_y_position > m_number_lines)
@@ -616,8 +549,8 @@ void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
     }
 }
 
-/*
- * Moves the Screen Buffer Up a line to match the internal SDL_Surface
+/**
+ * @brief Moves the Screen Buffer Up a line to match the internal SDL_Surface
  */
 void ProcessorText::screenBufferScrollUp()
 {
@@ -625,8 +558,8 @@ void ProcessorText::screenBufferScrollUp()
     // Buffer and re-display on screen
 }
 
-/*
- * Moves the Screen Buffer Up a line to match the internal SDL_Surface
+/**
+ * @brief Moves the Screen Buffer Up a line to match the internal SDL_Surface
  */
 void ProcessorText::screenBufferScrollDown()
 {
@@ -679,6 +612,111 @@ void ProcessorText::clearScreen()
     m_y_position = 1;
     m_max_y_position = 1;
     m_line_number = 1;
+}
+
+/**
+ * @brief Handle FORWARD chacter movements
+ */
+void ProcessorText::moveNextXPosition()
+{
+    if(m_x_position < m_characters_per_line)
+        ++m_x_position;
+}
+
+/**
+ * @brief Handle DOWN character movements
+ */
+void ProcessorText::moveNextYPosition()
+{
+    if(m_y_position < m_number_lines)
+        ++m_y_position;
+}
+
+/**
+ * @brief Handle BACKWARDS chacters movements
+ */
+void ProcessorText::movePreviousXPosition()
+{
+    if(m_x_position > 1)
+        --m_x_position;
+}
+
+/**
+ * @brief Handle UP character movements
+ */
+void ProcessorText::movePreviousYPosition()
+{
+    if(m_y_position > 1)
+        --m_y_position;
+}
+
+/**
+ * @brief Move to Next Line.
+ */
+void ProcessorText::moveNewLine()
+{
+    m_x_position = 1;
+    ++m_y_position;
+    ++m_line_number;
+
+    // catch screen screen scrolling here one shot.
+    if(m_y_position > m_number_lines)
+    {
+        screenBufferScrollUp();
+        m_y_position = m_number_lines;
+    }
+
+    // Set the Current Max Row Position.
+    if(m_max_y_position < m_y_position)
+    {
+        m_max_y_position = m_y_position;
+    }
+}
+
+/**
+ * @brief Handle Descructive Backspace
+ */
+void ProcessorText::moveBackSpace()
+{
+    if(m_x_position > 1)
+    {
+        --m_x_position;
+        return;
+    }
+
+
+    if(m_y_position > 1)
+    {
+        --m_y_position;
+    }
+
+    if(m_line_number > 1)
+    {
+        --m_line_number;
+    }
+
+    // We moved up a line, now we need to
+    // move to end of current line
+
+}
+
+/**
+ * @brief Handle Destructive Delete key
+ */
+void ProcessorText::moveDelete()
+{
+    // clear current, or erase on on line so next char move back
+}
+
+/**
+ * @brief Move Tab Width = 4 Spaces if Available.
+ */
+void ProcessorText::moveTabWidth()
+{
+    if(m_tab_width < m_characters_per_line - m_x_position)
+    {
+        screenBufferSetGlyph(std::string(m_tab_width, ' '));
+    }
 }
 
 /**
@@ -1200,37 +1238,20 @@ void ProcessorText::parseTextToBuffer(char *buff)
         // Catch Backspace
         if(buffer.character[0] == '\b')
         {
-            screenBufferSetGlyph((char *)"\0");
+            moveBackSpace();
             continue;
         }
 
-        LocalizedBuffer nextBuffer;
-
-        // Only Peak Next if were at CR.
-        if(buffer.character[0] == '\r')
-            common_io.peekNextGlyph(nextBuffer, it, line_end);
-
-        // Handle New Line in Message Editor,
-        // All News Lines work the same way in in the editor.
-        if(buffer.length == 1 && nextBuffer.length == 1 &&
-                buffer.character[0] == '\r' && nextBuffer.character[0] == '\n')
+        // Catch Tabs
+        if(buffer.character[0] == '\t')
         {
-            *it++; // Incriment to \n (2) char combo.
-            moveNewLine();
-
+            moveTabWidth();
             continue;
         }
+
         else if(buffer.length == 1 && buffer.character[0] == '\n')
         {
             moveNewLine();
-
-            continue;
-        }
-
-        else if(buffer.length == 1 && buffer.character[0] == '\r')
-        {
-            moveNewLine();
-
             continue;
         }
 

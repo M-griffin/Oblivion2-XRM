@@ -352,40 +352,36 @@ void ModMessageEditor::setupEditor()
  */
 void ModMessageEditor::editorInput(const std::string &input)
 {
-    //Logging *log = Logging::instance();
-    std::string result = m_session_io.getKeyInput(input);
+    Logging *log = Logging::instance();
+    std::string result = m_session_io.getFSEKeyInput(input);
 
     if(result.size() == 0)
     {
-        //log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [result.size() == 0] input result=", result);
         return;
     }
 
     std::cout << "result: " << result << ", input: " << input << std::endl;
 
-    processTextInput(result, input);
-
-    /*
-    else if(result[0] == 13 || result[0] == 10)
+    if(result[0] == 13 || result[0] == 10)
     {
         // Translations for ENTER next line
         //input = "ENTER";
         log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ENTER HIT] input result=", result);
-        std::string output = "\r\n\x1b[" + std::to_string(m_text_box_left - 1) + "C";
-        processTextInput(input);
+        //std::string output = "\r\n\x1b[" + std::to_string(m_text_box_left - 1) + "C";
+
+        processTextInput(result, input);
     }
     else if(result[0] == '\x1b' && result.size() > 2)
     {
         // ESC SEQUENCE - check movement / arrow keys.
         log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ESC Sequence] input result=", result);
-        processControlInput(input);
+        processTextInput(result, input);
     }
-    else if(result[0] == '\x1b' && result.size() == 1)
+    else if(result[0] == '\x1b' && result.size() == 2 && result[1] == '\x1b')
     {
         // Check Single ESC KEY - command options
         //input = "ESC";  - quit for now
         log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ESC HIT!] input result=", result);
-        processControlInput(input);
         m_is_active = false;
     }
     else
@@ -400,8 +396,8 @@ void ModMessageEditor::editorInput(const std::string &input)
         log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ESC Sequence] input result=", static_cast<int>(escape_sequence[0]));
 
         // Hot Key Input.
-        processTextInput(input);
-    }*/
+        processTextInput(result, input);
+    }
 
     return;
 }
@@ -424,13 +420,16 @@ std::string ModMessageEditor::moveCursorToPosition()
  */
 void ModMessageEditor::processTextInput(std::string result, std::string input)
 {
+
+    // Just some testing figuring out the best design.
+
     std::string output = "";
     int x_position = m_text_process->getXPosition();
     int y_position = m_text_process->getYPosition();
     std::cout << "x_pos: " << x_position << std::endl;
     std::cout << "y_pos: " << y_position << std::endl;
 
-    if(result[0] != '\b' && result[0] != '\r' && result[0] != '\n' && result[0] != '\x1b')
+    if(result[0] != '\b' && result[0] != '\r' && result[0] != '\n') // && result[0] != '\x1b')
     {
         m_text_process->parseTextToBuffer((char *)input.c_str());
         output = input;
@@ -451,7 +450,7 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
     // CRLF New Line
     else if(result[0] == '\r' || result[0] == '\n')
     {
-        m_text_process->parseTextToBuffer((char *)"\r\n");
+        m_text_process->parseTextToBuffer((char *)"\n");
         output += moveCursorToPosition();
     }
     // Wrap Around and Move Down at end of line
