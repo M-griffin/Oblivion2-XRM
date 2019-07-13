@@ -46,6 +46,7 @@ SUITE(XRM_MockUTTestClass)
         CHECK_EQUAL(result, 9);
     }
 
+    /* This was remove from the code.
     TEST(parseAnsiScreenTestHighAscii)
     {
         CommonIO common;
@@ -53,8 +54,7 @@ SUITE(XRM_MockUTTestClass)
         temp += std::string(1, static_cast<unsigned char>(126));
         temp += std::string(1, static_cast<unsigned char>(155));
         common.testUnicode(temp);
-    }
-
+    }*/
 
     /**
      * @brief Erase Data in a String w/ start, end range. w/ High Ascii

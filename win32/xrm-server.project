@@ -213,6 +213,7 @@
     <Configuration Name="Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-Wall" C_Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
+        <IncludePath Value="../win32/Debug"/>
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
         <IncludePath Value="../src/sql2_net"/>
@@ -224,6 +225,7 @@
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
+        <LibraryPath Value="../win32/Debug"/>
         <LibraryPath Value="../sqlitewrap/Debug"/>
         <LibraryPath Value="C:/sqlite3/lib"/>
         <LibraryPath Value="mingw32/lib"/>
