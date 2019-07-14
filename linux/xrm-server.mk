@@ -36,12 +36,12 @@ ObjectsFileList        :="xrm-server.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
 LinkOptions            :=  
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)../src $(IncludeSwitch)../sqlitewrap $(IncludeSwitch)../linux/Debug 
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)./Debug $(IncludeSwitch)../src $(IncludeSwitch)../sqlitewrap $(IncludeSwitch)../linux/Debug 
 IncludePCH             := 
 RcIncludePath          := 
 Libs                   := $(LibrarySwitch)SqliteWrapped $(LibrarySwitch)sqlite3 $(LibrarySwitch)pthread $(LibrarySwitch)ssl $(LibrarySwitch)crypto $(LibrarySwitch)yaml-cpp $(LibrarySwitch)util $(LibrarySwitch)ssh $(LibrarySwitch)uuid 
 ArLibs                 :=  "libSqliteWrapped.a" "sqlite3" "pthread" "ssl" "crypto" "yaml-cpp" "util" "libssh" "uuid" 
-LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryPathSwitch)../sqlitewrap $(LibraryPathSwitch)../linux/Debug 
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryPathSwitch)./Debug $(LibraryPathSwitch)../sqlitewrap $(LibraryPathSwitch)../linux/Debug 
 
 ##
 ## Common variables

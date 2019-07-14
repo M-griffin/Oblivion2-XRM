@@ -56,10 +56,10 @@ SUITE(XRM_MockUTTestClass)
         common.testUnicode(temp);
     }*/
 
-    /**
+    /** No Longer a Valid Test.
      * @brief Erase Data in a String w/ start, end range. w/ High Ascii
      * @return
-     */
+     *
     TEST(EraseStringWithHighAscii)
     {
         CommonIO common;
@@ -70,6 +70,6 @@ SUITE(XRM_MockUTTestClass)
         std::string result = std::string(1, static_cast<unsigned char>(155));
         result += "   Li";
         CHECK_EQUAL(trim_temp, result);
-    }
+    }*/
 
 }
