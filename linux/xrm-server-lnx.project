@@ -210,6 +210,7 @@
     <Configuration Name="Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-Wall;-Wno-psabi" C_Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-Wall;-Wno-psabi" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
+        <IncludePath Value="./Debug"/>
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
         <IncludePath Value="../linux/Debug"/>
@@ -217,6 +218,7 @@
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
+        <LibraryPath Value="./Debug"/>
         <LibraryPath Value="../sqlitewrap"/>
         <LibraryPath Value="../linux/Debug"/>
         <Library Value="libSqliteWrapped.a"/>
@@ -239,7 +241,9 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild/>
+      <PreBuild>
+        <Command Enabled="yes">sed -i 's+/home/merc/code/Oblivion2-XRM/+../+' xrm-server.mk</Command>
+      </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">
         <RebuildCommand/>

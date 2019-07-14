@@ -29,29 +29,18 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="main.cpp"/>
-    <File Name="common_io_ut.cpp"/>
-    <File Name="session_io_ut.cpp"/>
-    <File Name="ansi_processor_ut.cpp"/>
     <File Name="../src/ansi_processor.cpp"/>
     <File Name="../src/ansi_processor.hpp"/>
-    <File Name="users_dao_ut.cpp"/>
     <File Name="../src/session_manager.cpp"/>
     <File Name="../src/session_manager.hpp"/>
     <File Name="../src/common_io.cpp"/>
     <File Name="../src/common_io.hpp"/>
     <File Name="../src/session_io.cpp"/>
     <File Name="../src/session_io.hpp"/>
-    <File Name="access_condition_ut.cpp"/>
     <File Name="../src/access_condition.cpp"/>
     <File Name="../src/access_condition.hpp"/>
-    <File Name="form_system_config_ut.cpp"/>
     <File Name="../src/form_manager.cpp"/>
     <File Name="../src/form_manager.hpp"/>
-    <File Name="conference_dao_it.cpp"/>
-    <File Name="file_area_dao_it.cpp"/>
-    <File Name="message_area_dao_it.cpp"/>
-    <File Name="oneliners_dao_it.cpp"/>
     <File Name="../src/io_service.cpp"/>
     <File Name="../src/io_service.hpp"/>
     <File Name="../src/communicator.cpp"/>
@@ -83,6 +72,18 @@
     <File Name="../src/encoding.cpp"/>
     <File Name="../src/encoding.hpp"/>
     <File Name="../src/logging.hpp"/>
+    <File Name="../xrm-unittest/src/access_condition_ut.cpp"/>
+    <File Name="../xrm-unittest/src/access_condition_ut.hpp"/>
+    <File Name="../xrm-unittest/src/ansi_processor_ut.cpp"/>
+    <File Name="../xrm-unittest/src/common_io_ut.cpp"/>
+    <File Name="../xrm-unittest/src/common_mock_ut.cpp"/>
+    <File Name="../xrm-unittest/src/conference_dao_it.cpp"/>
+    <File Name="../xrm-unittest/src/file_area_dao_it.cpp"/>
+    <File Name="../xrm-unittest/src/form_system_config_ut.cpp"/>
+    <File Name="../xrm-unittest/src/message_area_dao_it.cpp"/>
+    <File Name="../xrm-unittest/src/oneliners_dao_it.cpp"/>
+    <File Name="../xrm-unittest/src/session_io_ut.cpp"/>
+    <File Name="../xrm-unittest/src/xrm_test.cpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
@@ -145,6 +146,7 @@
         <IncludePath Value="."/>
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
+        <IncludePath Value="../linux/Debug"/>
         <IncludePath Value="/usr/include/unittest++"/>
         <IncludePath Value="/usr/include/UnitTest++"/>
         <IncludePath Value="../src/sdl2_net"/>
@@ -156,7 +158,7 @@
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
         <LibraryPath Value="$(UNIT_TEST_PP_SRC_DIR)/Debug"/>
-        <LibraryPath Value="../sqlitewrap/Debug"/>
+        <LibraryPath Value="../linux/Debug"/>
         <LibraryPath Value="../sqlitewrap"/>
         <LibraryPath Value="../src"/>
         <Library Value="libUnitTest++.a"/>
@@ -170,7 +172,7 @@
         <Library Value="uuid"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -179,7 +181,9 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild/>
+      <PreBuild>
+        <Command Enabled="yes">sed -i 's+/home/merc/code/Oblivion2-XRM/+../+' xrm-unittest.mk</Command>
+      </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">
         <RebuildCommand/>

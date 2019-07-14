@@ -104,7 +104,10 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild/>
+      <PreBuild>
+        <Command Enabled="yes">sed -i 's+/home/merc/code/Oblivion2-XRM/+../+' xrm-menu-convert.mk</Command>
+        <Command Enabled="yes"/>
+      </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">
         <RebuildCommand/>

@@ -1,8 +1,8 @@
 .PHONY: clean All
 
 All:
-	@echo "----------Building project:[ xrm-server - Debug ]----------"
-	@"$(MAKE)" -f  "xrm-server.mk"
+	@echo "----------Building project:[ SqliteWrapped - Debug ]----------"
+	@"$(MAKE)" -f  "SqliteWrapped.mk" PreBuild && "$(MAKE)" -f  "SqliteWrapped.mk" && "$(MAKE)" -f  "SqliteWrapped.mk" PostBuild
 clean:
-	@echo "----------Cleaning project:[ xrm-server - Debug ]----------"
-	@"$(MAKE)" -f  "xrm-server.mk" clean
+	@echo "----------Cleaning project:[ SqliteWrapped - Debug ]----------"
+	@"$(MAKE)" -f  "SqliteWrapped.mk" clean

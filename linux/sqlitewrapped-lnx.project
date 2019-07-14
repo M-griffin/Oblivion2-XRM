@@ -69,14 +69,13 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild/>
+      <PreBuild>
+        <Command Enabled="yes">sed -i 's+/home/merc/code/Oblivion2-XRM/+../+' SqliteWrapped.mk</Command>
+      </PreBuild>
       <PostBuild>
         <Command Enabled="no"># Linux /OSX / BSD</Command>
-        <Command Enabled="yes">cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h &gt; $(IntermediateDirectory)/lib$(ProjectName).h</Command>
+        <Command Enabled="yes">cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h &gt; ./Debug/lib$(ProjectName).h</Command>
         <Command Enabled="yes"/>
-        <Command Enabled="yes"/>
-        <Command Enabled="no"># Windows</Command>
-        <Command Enabled="no">#type IError.h StderrLog.h SysLog.h Database.h Query.h &gt; lib$(ProjectName).h</Command>
       </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
