@@ -29,19 +29,19 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="../xrm-unittest/xrm_test.cpp"/>
-    <File Name="../xrm-unittest/users_dao_ut.cpp"/>
-    <File Name="../xrm-unittest/session_io_ut.cpp"/>
-    <File Name="../xrm-unittest/oneliners_dao_it.cpp"/>
-    <File Name="../xrm-unittest/message_area_dao_it.cpp"/>
-    <File Name="../xrm-unittest/form_system_config_ut.cpp"/>
-    <File Name="../xrm-unittest/file_area_dao_it.cpp"/>
-    <File Name="../xrm-unittest/conference_dao_it.cpp"/>
-    <File Name="../xrm-unittest/common_mock_ut.cpp"/>
-    <File Name="../xrm-unittest/common_io_ut.cpp"/>
-    <File Name="../xrm-unittest/ansi_processor_ut.cpp"/>
-    <File Name="../xrm-unittest/access_condition_ut.hpp"/>
-    <File Name="../xrm-unittest/access_condition_ut.cpp"/>
+    <File Name="../xrm-unittest/src/xrm_test.cpp"/>
+    <File Name="../xrm-unittest/src/users_dao_ut.cpp"/>
+    <File Name="../xrm-unittest/src/session_io_ut.cpp"/>
+    <File Name="../xrm-unittest/src/oneliners_dao_it.cpp"/>
+    <File Name="../xrm-unittest/src/message_area_dao_it.cpp"/>
+    <File Name="../xrm-unittest/src/form_system_config_ut.cpp"/>
+    <File Name="../xrm-unittest/src/file_area_dao_it.cpp"/>
+    <File Name="../xrm-unittest/src/conference_dao_it.cpp"/>
+    <File Name="../xrm-unittest/src/common_mock_ut.cpp"/>
+    <File Name="../xrm-unittest/src/common_io_ut.cpp"/>
+    <File Name="../xrm-unittest/src/ansi_processor_ut.cpp"/>
+    <File Name="../xrm-unittest/src/access_condition_ut.hpp"/>
+    <File Name="../xrm-unittest/src/access_condition_ut.cpp"/>
     <File Name="../src/logging.hpp"/>
     <File Name="../src/encoding.hpp"/>
     <File Name="../src/encoding.cpp"/>
