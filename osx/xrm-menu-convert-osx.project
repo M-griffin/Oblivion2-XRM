@@ -38,7 +38,7 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="src/main.cpp"/>
+    <File Name="../xrm-menu-convert/src/menu_convert.cpp"/>
     <File Name="../src/common_io.cpp"/>
     <File Name="../src/common_io.hpp"/>
     <VirtualDirectory Name="data-sys">
@@ -76,27 +76,17 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-Wall" C_Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++14;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
-        <IncludePath Value="."/>
+      <Compiler Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11" C_Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="../src"/>
-        <IncludePath Value="../sqlitewrap"/>
-        <IncludePath Value="../sqlitewrap/Debug"/>
-        <IncludePath Value="/usr/local/Cellar/boost/1.66.0/include"/>
-        <IncludePath Value="/usr/local/Cellar/yaml-cpp/0.6.1/include"/>
+        <IncludePath Value="/usr/local/opt/boost/include"/>
+        <IncludePath Value="/usr/local/opt/yaml-cpp/include"/>
         <Preprocessor Value="TARGET_OS_MAC"/>
       </Compiler>
       <Linker Options="" Required="yes">
-        <LibraryPath Value="."/>
-        <LibraryPath Value="../src"/>
-        <LibraryPath Value="/usr/local/Cellar/boost/1.66.0/lib"/>
-        <LibraryPath Value="/usr/local/Cellar/yaml-cpp/0.6.1/lib"/>
+        <LibraryPath Value="/usr/local/opt/boost/lib"/>
+        <LibraryPath Value="/usr/local/opt/yaml-cpp/lib"/>
         <Library Value="boost_system-mt"/>
-        <Library Value="boost_thread-mt"/>
-        <Library Value="boost_chrono-mt"/>
-        <Library Value="boost_locale-mt"/>
         <Library Value="boost_filesystem-mt"/>
-        <Library Value="boost_timer-mt"/>
-        <Library Value="boost_regex-mt"/>
         <Library Value="yaml-cpp"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
@@ -110,7 +100,9 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild/>
+      <PreBuild>
+        <Command Enabled="yes">sed -i '' 's+/Users/admin/code/Oblivion2-XRM/+../+' xrm-menu-convert.mk</Command>
+      </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">
         <RebuildCommand/>

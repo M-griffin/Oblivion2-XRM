@@ -1,0 +1,1 @@
+./Debug/up_sqlitewrap_Database.cpp.o ./Debug/up_sqlitewrap_Query.cpp.o ./Debug/up_sqlitewrap_SysLogs.cpp.o ./Debug/up_sqlitewrap_StderrLog.cpp.o

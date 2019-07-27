@@ -29,29 +29,31 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="main.cpp"/>
-    <File Name="common_io_ut.cpp"/>
-    <File Name="session_io_ut.cpp"/>
-    <File Name="ansi_processor_ut.cpp"/>
+    <File Name="../xrm-unittest/src/users_dao_ut.cpp"/>
+    <File Name="../xrm-unittest/src/session_io_ut.cpp"/>
+    <File Name="../xrm-unittest/src/oneliners_dao_it.cpp"/>
+    <File Name="../xrm-unittest/src/message_area_dao_it.cpp"/>
+    <File Name="../xrm-unittest/src/form_system_config_ut.cpp"/>
+    <File Name="../xrm-unittest/src/file_area_dao_it.cpp"/>
+    <File Name="../xrm-unittest/src/conference_dao_it.cpp"/>
+    <File Name="../xrm-unittest/src/common_mock_ut.cpp"/>
+    <File Name="../xrm-unittest/src/common_io_ut.cpp"/>
+    <File Name="../xrm-unittest/src/ansi_processor_ut.cpp"/>
+    <File Name="../xrm-unittest/src/access_condition_ut.hpp"/>
+    <File Name="../xrm-unittest/src/access_condition_ut.cpp"/>
+    <File Name="../xrm-unittest/src/xrm_test.cpp"/>
     <File Name="../src/ansi_processor.cpp"/>
     <File Name="../src/ansi_processor.hpp"/>
-    <File Name="users_dao_ut.cpp"/>
     <File Name="../src/session_manager.cpp"/>
     <File Name="../src/session_manager.hpp"/>
     <File Name="../src/common_io.cpp"/>
     <File Name="../src/common_io.hpp"/>
     <File Name="../src/session_io.cpp"/>
     <File Name="../src/session_io.hpp"/>
-    <File Name="access_condition_ut.cpp"/>
     <File Name="../src/access_condition.cpp"/>
     <File Name="../src/access_condition.hpp"/>
-    <File Name="form_system_config_ut.cpp"/>
     <File Name="../src/form_manager.cpp"/>
     <File Name="../src/form_manager.hpp"/>
-    <File Name="conference_dao_it.cpp"/>
-    <File Name="file_area_dao_it.cpp"/>
-    <File Name="message_area_dao_it.cpp"/>
-    <File Name="oneliners_dao_it.cpp"/>
     <File Name="../src/async_acceptor.hpp"/>
     <File Name="../src/async_base.hpp"/>
     <File Name="../src/async_connection.hpp"/>
@@ -145,16 +147,16 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="clang++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O0;-pedantic;-std=c++11;-stdlib=libc++" C_Options="-O3;-pedantic;-std=c++11;-stdlib=libc++" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
-        <IncludePath Value="."/>
+      <Compiler Options="-O0;-std=c++11;-stdlib=libc++" C_Options="-O0;-std=c++11;-stdlib=libc++" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
+        <IncludePath Value="./Debug"/>
         <IncludePath Value="/usr/local/opt/sqlite/include"/>
-        <IncludePath Value="/usr/local/Cellar/yaml-cpp/0.6.2_1/include"/>
-        <IncludePath Value="/usr/local/Cellar/openssl/1.0.2n/include"/>
-        <IncludePath Value="/usr/local/Cellar/unittest-cpp/2.0.0/include/UnitTest++"/>
-        <IncludePath Value="/usr/local/Cellar/libssh/0.7.5/include"/>
-        <IncludePath Value="/usr/local/Cellar/ossp-uuid/1.6.2_2/include"/>
+        <IncludePath Value="/usr/local/opt/yaml-cpp/include"/>
+        <IncludePath Value="/usr/local/opt/openssl/include"/>
+        <IncludePath Value="/usr/local/opt/unittest-cpp/include/UnitTest++"/>
+        <IncludePath Value="/usr/local/opt/libssh/include"/>
+        <IncludePath Value="/usr/local/opt/ossp-uuid/include"/>
         <IncludePath Value="../src/sdl2_net"/>
         <IncludePath Value="../src/utf-cpp"/>
         <Preprocessor Value="TARGET_OS_MAC"/>
@@ -165,12 +167,13 @@
         <LibraryPath Value="."/>
         <LibraryPath Value="../src"/>
         <LibraryPath Value="../sqlitewrap"/>
+        <LibraryPath Value="./Debug"/>
         <LibraryPath Value="/usr/local/opt/sqlite/lib"/>
-        <LibraryPath Value="/usr/local/Cellar/yaml-cpp/0.6.2_1/lib"/>
-        <LibraryPath Value="/usr/local/Cellar/openssl/1.0.2n/lib"/>
-        <LibraryPath Value="/usr/local/Cellar/unittest-cpp/2.0.0/lib"/>
-        <LibraryPath Value="/usr/local/Cellar/libssh/0.7.5/lib"/>
-        <LibraryPath Value="/usr/local/Cellar/ossp-uuid/1.6.2_2/lib"/>
+        <LibraryPath Value="/usr/local/opt/yaml-cpp/lib"/>
+        <LibraryPath Value="/usr/local/opt/openssl/lib"/>
+        <LibraryPath Value="/usr/local/opt/unittest-cpp/lib"/>
+        <LibraryPath Value="/usr/local/opt/libssh/lib"/>
+        <LibraryPath Value="/usr/local/opt/ossp-uuid/lib"/>
         <Library Value="c++"/>
         <Library Value="c++abi"/>
         <Library Value="m"/>
@@ -196,7 +199,10 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild/>
+      <PreBuild>
+        <Command Enabled="yes"/>
+        <Command Enabled="yes">sed -i '' 's+/Users/admin/code/Oblivion2-XRM/+../+' xrm-unittest.mk</Command>
+      </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
