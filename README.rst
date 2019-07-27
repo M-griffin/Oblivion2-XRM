@@ -69,6 +69,7 @@ Sample of the Menu Editor modeled after the classic style
 
    
 Work In Progress (Latest Feature Branch) - Full Screen Message Editor
+Initial design concept with expanding height templates that the are used in the rest of the system.
 
 .. image:: https://i.imgur.com/QEmSMEn.png
    :alt: Screenshot
