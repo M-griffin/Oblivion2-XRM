@@ -1,6 +1,6 @@
 
 .. image:: http://htc.zapto.org:1024/jenkins/job/Oblivion2-XRM%20-%20Pipeline/job/master/badge/icon
-    :target: https://htc.zapto.org/jenkins/job/Oblivion2-XRM%20-%20Pipeline/job/master/
+   :target: https://htc.zapto.org/jenkins/job/Oblivion2-XRM%20-%20Pipeline/job/master/
 
 
 
@@ -31,7 +31,10 @@ Main development is current under Windows with releases planned for Linux, OSX, 
 
 Using CodeLite http://codelite.org/ IDE for W32/64 and Linux Workspace(s).
 
-Built under C++ with Boost and compiles under g++ MingW32/64 5.1.0 using latest c++14.
+Built under g++ MingW32/64 5.1.0 using latest c++11.
+
+The Build/DOCS folder has information on installing and compiling in Linux and OSX
+The root folder also has new build scripts that will compile and setup everthing once the dependencies are installed.
 
 
 Follow Project Status `Project Tracker <https://github.com/M-griffin/Oblivion2-XRM/projects/1>`_
@@ -56,6 +59,18 @@ The menu system is still pretty raw and a lot of logic still needs to be complet
 Then some screen shots in Linux Mint (Vmware) of the most recent updates.
 
 .. image:: http://i.imgur.com/MNF58pV.png
+   :alt: Screenshot
+   
+
+Sample of the Menu Editor modeled after the classic style
+
+.. image:: https://i.imgur.com/5U1nXHD.png
+   :alt: Screenshot
+
+   
+Work In Progress (Latest Feature Branch) - Full Screen Message Editor
+
+.. image:: https://i.imgur.com/QEmSMEn.png
    :alt: Screenshot
 
 Support
