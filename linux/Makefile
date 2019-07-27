@@ -1,8 +1,8 @@
 .PHONY: clean All
 
 All:
-	@echo "----------Building project:[ xrm-server - Debug ]----------"
-	@"$(MAKE)" -f  "xrm-server.mk"
+	@echo "----------Building project:[ xrm-unittest - Debug ]----------"
+	@"$(MAKE)" -f  "xrm-unittest.mk" PreBuild && "$(MAKE)" -f  "xrm-unittest.mk"
 clean:
-	@echo "----------Cleaning project:[ xrm-server - Debug ]----------"
-	@"$(MAKE)" -f  "xrm-server.mk" clean
+	@echo "----------Cleaning project:[ xrm-unittest - Debug ]----------"
+	@"$(MAKE)" -f  "xrm-unittest.mk" clean

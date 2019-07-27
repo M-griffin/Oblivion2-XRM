@@ -1,3 +1,29 @@
+Change Log Update (00.00.146)
+* 2019-07-27
++ Entire Project update and rework so each environment strictly uses it's own 
+  folder for storing it's projects make files. This avoid one app overwrite another
+  and one environment overwritten another.
++ Makefiles, each project has a .mk Makefile now.  Developer paths are also removed
+  and each make file per environment is now easier to compile from the commandline.
+  (Exception is windows) since it needs hard coded library paths, (Code Lite recommended here)
++ Linux (build-linux.sh) and OSX (build-osx.sh) script file are now updated and reworked to 
+  build the complete project from the command line easier then ever before.
+  These scripts will now build all dependencies, tools, unit tests and the full projects 
+  from the script located in the Build folder.  All compiled executables are copied back to the 
+  build folder once completed so you can run you system right away.
+  The build script now has an added command line parameter -j# (# being the number of CPU Core)
+  using a number greater then 1 on multi-core machines will increate the command line compile time
+  (Example I have 4 CPU's each with 2 Cores - I use -j8 and it compiles pretty quick on my Desktop)
+  And in my VMware's I allocate 2 CPU's usually and it's a bit slower to compile.
++ Moved OSX-INSTALL.TXT to the Build/Docs folder, and also created an initial LINUX-INSTALL.TXT
+  this is mainly for installing libraries and dependencies prior to building the project and 
+  should make things a lot easier.
++ Added Socket HOT Fixes for some issues with SDL_Net.  Also small updates on creating the new
+  LOG Folder when it doesn't exist on startup of the program the first time.
++ Project dependency cleanup, removed libs and paths no longer needed.
++ NOTE- the MenuConvert and PromptConvert tools still used boost, eventually I'll remove it and 
+  use the new internal directory methods I've re-written.
+
 Change Log Update (00.00.145)
 * 2019-01-03
 + Fixed some logging level issues, missed logging on encoding so wasn't 

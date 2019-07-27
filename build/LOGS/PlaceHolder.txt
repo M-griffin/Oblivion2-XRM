@@ -1,2 +1,0 @@
-Folder where file will be written to. 
-Next Update, rolling log files  

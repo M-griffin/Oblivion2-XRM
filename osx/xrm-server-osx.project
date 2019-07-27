@@ -18,11 +18,20 @@
  }]]]>
     </Plugin>
   </Plugins>
+  <Reconciliation>
+    <Regexes/>
+    <Excludepaths/>
+    <Ignorefiles/>
+    <Extensions>
+      <![CDATA[*.cpp;*.c;*.h;*.hpp;*.xrc;*.wxcp;*.fbp]]>
+    </Extensions>
+    <Topleveldir>/Users/admin/code/Oblivion2-XRM/osx</Topleveldir>
+  </Reconciliation>
   <Description/>
   <Dependencies/>
-  <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
   <VirtualDirectory Name="..\src">
+    <File Name="../src/xrm_server.cpp"/>
     <File Name="../src/ansi_processor.cpp"/>
     <File Name="../src/ansi_processor.hpp"/>
     <File Name="../src/common_io.cpp"/>
@@ -34,7 +43,6 @@
     <File Name="../src/connection_tcp.hpp"/>
     <File Name="../src/encryption.cpp"/>
     <File Name="../src/encryption.hpp"/>
-    <File Name="../src/main.cpp"/>
     <File Name="../src/menu_system.cpp"/>
     <File Name="../src/menu_system.hpp"/>
     <File Name="../src/safe_queue.hpp"/>
@@ -215,14 +223,13 @@
       <Compiler Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-stdlib=libc++" C_Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-stdlib=libc++" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="../src"/>
+        <IncludePath Value="./Debug"/>
         <IncludePath Value="../sqlitewrap"/>
-        <IncludePath Value="../sqlitewrap/Debug"/>
         <IncludePath Value="/usr/local/opt/sqlite/include"/>
-        <IncludePath Value="/usr/local/Cellar/boost/1.66.0/include"/>
-        <IncludePath Value="/usr/local/Cellar/yaml-cpp/0.6.2_1/include"/>
-        <IncludePath Value="/usr/local/Cellar/openssl/1.0.2n/include"/>
-        <IncludePath Value="/usr/local/Cellar/libssh/0.7.5/include"/>
-        <IncludePath Value="/usr/local/Cellar/ossp-uuid/1.6.2_2/include"/>
+        <IncludePath Value="/usr/local/opt/yaml-cpp/include"/>
+        <IncludePath Value="/usr/local/opt/openssl/include"/>
+        <IncludePath Value="/usr/local/opt/libssh/include"/>
+        <IncludePath Value="/usr/local/opt/ossp-uuid/include"/>
         <IncludePath Value="../src/sdl2_net"/>
         <IncludePath Value="../src/utf-cpp"/>
         <Preprocessor Value="TARGET_OS_MAC"/>
@@ -230,12 +237,12 @@
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
-        <LibraryPath Value="../sqlitewrap"/>
+        <LibraryPath Value="./Debug"/>
         <LibraryPath Value="/usr/local/opt/sqlite/lib"/>
-        <LibraryPath Value="/usr/local/Cellar/yaml-cpp/0.6.2_1/lib"/>
-        <LibraryPath Value="/usr/local/Cellar/openssl/1.0.2n/lib"/>
-        <LibraryPath Value="/usr/local/Cellar/libssh/0.7.5/lib"/>
-        <LibraryPath Value="/usr/local/Cellar/ossp-uuid/1.6.2_2/lib"/>
+        <LibraryPath Value="/usr/local/opt/yaml-cpp/lib"/>
+        <LibraryPath Value="/usr/local/opt/openssl/lib"/>
+        <LibraryPath Value="/usr/local/opt/libssh/lib"/>
+        <LibraryPath Value="/usr/local/opt/ossp-uuid/lib"/>
         <Library Value="libSqliteWrapped.a"/>
         <Library Value="sqlite3"/>
         <Library Value="pthread"/>
@@ -257,7 +264,9 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild/>
+      <PreBuild>
+        <Command Enabled="yes">sed -i '' 's+/Users/admin/code/Oblivion2-XRM/+../+' xrm-server.mk</Command>
+      </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
@@ -321,4 +330,10 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug">
+    <Project Name="SqliteWrapped"/>
+    <Project Name="xrm-menu-prompt-convert"/>
+    <Project Name="xrm-menu-convert"/>
+    <Project Name="xrm-unittest"/>
+  </Dependencies>
 </CodeLite_Project>

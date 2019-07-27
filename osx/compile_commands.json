@@ -1,0 +1,1173 @@
+[{
+  "file": "/Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/checked.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/checked.h -o /Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/checked.h.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8.h -o /Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8.h.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetUDP.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetUDP.cpp -o /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetUDP.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDL_net.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDL_net.hpp -o /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDL_net.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/sdl2_net/begin_code.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/sdl2_net/begin_code.h -o /Users/admin/code/Oblivion2-XRM/src/sdl2_net/begin_code.h.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-app/oneliners_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-app/oneliners_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-app/oneliners_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/forms/form_system_config.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/forms/form_system_config.cpp -o /Users/admin/code/Oblivion2-XRM/src/forms/form_system_config.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/forms/form_base.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/forms/form_base.hpp -o /Users/admin/code/Oblivion2-XRM/src/forms/form_base.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/file_area.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/file_area.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/file_area.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/users.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/users.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/users.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/forms/form_system_config.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/forms/form_system_config.hpp -o /Users/admin/code/Oblivion2-XRM/src/forms/form_system_config.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/menu.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/menu.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/menu.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnet.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnet.cpp -o /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnet.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/conference.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/conference.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/conference.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/config.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/config.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/config.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/users_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/users_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/users_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/session_stats_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/session_stats_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/session_stats_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/session_stats_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/session_stats_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/session_stats_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetselect.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetselect.cpp -o /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetselect.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/security_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/security_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/security_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/protocol_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/protocol_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/protocol_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/access_level_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/access_level_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/access_level_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/message_area_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/message_area_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/message_area_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/message_area_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/message_area_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/message_area_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/file_area_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/file_area_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/file_area_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/file_area_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/file_area_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/file_area_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/socket_handler.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/socket_handler.cpp -o /Users/admin/code/Oblivion2-XRM/src/socket_handler.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/conference_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/conference_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/conference_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetsys.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetsys.hpp -o /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetsys.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/encoding.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/encoding.hpp -o /Users/admin/code/Oblivion2-XRM/src/encoding.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/uuid.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/uuid.hpp -o /Users/admin/code/Oblivion2-XRM/src/uuid.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/users_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/users_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/users_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/socket_telnet.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/socket_telnet.cpp -o /Users/admin/code/Oblivion2-XRM/src/socket_telnet.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/encoding.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/encoding.cpp -o /Users/admin/code/Oblivion2-XRM/src/encoding.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/session_manager.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/session_manager.hpp -o /Users/admin/code/Oblivion2-XRM/src/session_manager.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/socket_state.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/socket_state.hpp -o /Users/admin/code/Oblivion2-XRM/src/socket_state.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/deadline_timer.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/deadline_timer.hpp -o /Users/admin/code/Oblivion2-XRM/src/deadline_timer.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/socket_handler.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/socket_handler.hpp -o /Users/admin/code/Oblivion2-XRM/src/socket_handler.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/session_io.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/session_io.cpp -o /Users/admin/code/Oblivion2-XRM/src/session_io.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/io_service.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/io_service.hpp -o /Users/admin/code/Oblivion2-XRM/src/io_service.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/io_service.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/io_service.cpp -o /Users/admin/code/Oblivion2-XRM/src/io_service.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/async_base.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/async_base.hpp -o /Users/admin/code/Oblivion2-XRM/src/async_base.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-app/oneliners_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-app/oneliners_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-app/oneliners_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/message_area.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/message_area.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/message_area.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/osx/oneliners_dao_it.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/osx/oneliners_dao_it.cpp -o /Users/admin/code/Oblivion2-XRM/osx/oneliners_dao_it.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/session_manager.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/session_manager.cpp -o /Users/admin/code/Oblivion2-XRM/src/session_manager.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/security_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/security_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/security_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/osx/message_area_dao_it.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/osx/message_area_dao_it.cpp -o /Users/admin/code/Oblivion2-XRM/osx/message_area_dao_it.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/osx/conference_dao_it.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/osx/conference_dao_it.cpp -o /Users/admin/code/Oblivion2-XRM/osx/conference_dao_it.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/async_connection.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/async_connection.hpp -o /Users/admin/code/Oblivion2-XRM/src/async_connection.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/form_manager.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/form_manager.hpp -o /Users/admin/code/Oblivion2-XRM/src/form_manager.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/common_io.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/common_io.cpp -o /Users/admin/code/Oblivion2-XRM/src/common_io.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/osx/form_system_config_ut.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/osx/form_system_config_ut.cpp -o /Users/admin/code/Oblivion2-XRM/osx/form_system_config_ut.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/conference_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/conference_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/conference_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/socket_ssh.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/socket_ssh.cpp -o /Users/admin/code/Oblivion2-XRM/src/socket_ssh.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/osx/access_condition_ut.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/osx/access_condition_ut.cpp -o /Users/admin/code/Oblivion2-XRM/osx/access_condition_ut.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/ansi_processor.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/ansi_processor.cpp -o /Users/admin/code/Oblivion2-XRM/src/ansi_processor.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/session_io.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/session_io.hpp -o /Users/admin/code/Oblivion2-XRM/src/session_io.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/communicator.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/communicator.hpp -o /Users/admin/code/Oblivion2-XRM/src/communicator.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/communicator.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/communicator.cpp -o /Users/admin/code/Oblivion2-XRM/src/communicator.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/protocol_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/protocol_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/protocol_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/ansi_processor.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/ansi_processor.hpp -o /Users/admin/code/Oblivion2-XRM/src/ansi_processor.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/access_condition.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/access_condition.hpp -o /Users/admin/code/Oblivion2-XRM/src/access_condition.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/unchecked.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/unchecked.h -o /Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/unchecked.h.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/common_io.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/common_io.hpp -o /Users/admin/code/Oblivion2-XRM/src/common_io.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/logging.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/logging.hpp -o /Users/admin/code/Oblivion2-XRM/src/logging.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-app/oneliners.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-app/oneliners.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-app/oneliners.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/base_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/base_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/base_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/osx/ansi_processor_ut.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/osx/ansi_processor_ut.cpp -o /Users/admin/code/Oblivion2-XRM/osx/ansi_processor_ut.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetTCP.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetTCP.cpp -o /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetTCP.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/sdl2_net/close_code.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/sdl2_net/close_code.h -o /Users/admin/code/Oblivion2-XRM/src/sdl2_net/close_code.h.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/access_condition.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/access_condition.cpp -o /Users/admin/code/Oblivion2-XRM/src/access_condition.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/osx/session_io_ut.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/osx/session_io_ut.cpp -o /Users/admin/code/Oblivion2-XRM/osx/session_io_ut.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/osx/file_area_dao_it.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/osx/file_area_dao_it.cpp -o /Users/admin/code/Oblivion2-XRM/osx/file_area_dao_it.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/core.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/core.h -o /Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/core.h.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/form_manager.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/form_manager.cpp -o /Users/admin/code/Oblivion2-XRM/src/form_manager.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/osx/users_dao_ut.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/osx/users_dao_ut.cpp -o /Users/admin/code/Oblivion2-XRM/osx/users_dao_ut.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/osx/common_io_ut.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/osx/common_io_ut.cpp -o /Users/admin/code/Oblivion2-XRM/osx/common_io_ut.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/async_acceptor.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/async_acceptor.hpp -o /Users/admin/code/Oblivion2-XRM/src/async_acceptor.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/xrm-unittest/src/xrm_test.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/xrm-unittest/src/xrm_test.cpp -o /Users/admin/code/Oblivion2-XRM/xrm-unittest/src/xrm_test.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -DUNIT_TEST -I. -I../src -I../sqlitewrap -I./Debug -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/unittest-cpp/include/UnitTest++ -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -O0  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/structures.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/structures.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/structures.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/struct_compat.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/struct_compat.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/struct_compat.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.cpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/compat/prompts_compat_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/compat/prompts_compat_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/compat/prompts_compat_dao.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/menu_prompt_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_prompt_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_prompt_dao.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/compat/menu_compat_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/compat/menu_compat_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/compat/menu_compat_dao.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.cpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/config.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/config.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/config.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/communicator.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/communicator.cpp -o /Users/admin/code/Oblivion2-XRM/src/communicator.cpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/common_io.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/common_io.hpp -o /Users/admin/code/Oblivion2-XRM/src/common_io.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/logging.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/logging.hpp -o /Users/admin/code/Oblivion2-XRM/src/logging.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/encoding.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/encoding.hpp -o /Users/admin/code/Oblivion2-XRM/src/encoding.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/encoding.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/encoding.cpp -o /Users/admin/code/Oblivion2-XRM/src/encoding.cpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/xrm-menu-prompt-convert/src/prompt_convert.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/xrm-menu-prompt-convert/src/prompt_convert.cpp -o /Users/admin/code/Oblivion2-XRM/xrm-menu-prompt-convert/src/prompt_convert.cpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/menu_prompt.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/menu_prompt.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/menu_prompt.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/communicator.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/communicator.hpp -o /Users/admin/code/Oblivion2-XRM/src/communicator.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/menu_prompt_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_prompt_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_prompt_dao.cpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/common_io.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/common_io.cpp -o /Users/admin/code/Oblivion2-XRM/src/common_io.cpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/structures.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/structures.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/structures.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/compat/prompts_compat_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/compat/prompts_compat_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/compat/prompts_compat_dao.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/struct_compat.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/struct_compat.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/struct_compat.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.cpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/compat/menu_compat_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/compat/menu_compat_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/compat/menu_compat_dao.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/menu.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/menu.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/menu.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.cpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/communicator.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/communicator.hpp -o /Users/admin/code/Oblivion2-XRM/src/communicator.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/config.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/config.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/config.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/common_io.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/common_io.hpp -o /Users/admin/code/Oblivion2-XRM/src/common_io.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/logging.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/logging.hpp -o /Users/admin/code/Oblivion2-XRM/src/logging.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/communicator.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/communicator.cpp -o /Users/admin/code/Oblivion2-XRM/src/communicator.cpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.cpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/encoding.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/encoding.cpp -o /Users/admin/code/Oblivion2-XRM/src/encoding.cpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/encoding.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/encoding.hpp -o /Users/admin/code/Oblivion2-XRM/src/encoding.hpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/common_io.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/common_io.cpp -o /Users/admin/code/Oblivion2-XRM/src/common_io.cpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/xrm-menu-convert/src/menu_convert.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/xrm-menu-convert/src/menu_convert.cpp -o /Users/admin/code/Oblivion2-XRM/xrm-menu-convert/src/menu_convert.cpp.o  -DTARGET_OS_MAC -I. -I../src -I/usr/local/opt/boost/include -I/usr/local/opt/yaml-cpp/include  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/unchecked.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/unchecked.h -o /Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/unchecked.h.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/core.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/core.h -o /Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/core.h.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/checked.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/checked.h -o /Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8/checked.h.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8.h -o /Users/admin/code/Oblivion2-XRM/src/utf-cpp/utf8.h.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetUDP.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetUDP.cpp -o /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetUDP.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetTCP.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetTCP.cpp -o /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetTCP.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetselect.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetselect.cpp -o /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetselect.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/sdl2_net/close_code.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/sdl2_net/close_code.h -o /Users/admin/code/Oblivion2-XRM/src/sdl2_net/close_code.h.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/sdl2_net/begin_code.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/sdl2_net/begin_code.h -o /Users/admin/code/Oblivion2-XRM/src/sdl2_net/begin_code.h.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-app/bbs_list.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-app/bbs_list.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-app/bbs_list.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-app/oneliners_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-app/oneliners_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-app/oneliners_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/forms/form_base.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/forms/form_base.hpp -o /Users/admin/code/Oblivion2-XRM/src/forms/form_base.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_message_base_editor.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_message_base_editor.hpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_message_base_editor.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_level_editor.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_level_editor.hpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_level_editor.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_form_manager.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_form_manager.hpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_form_manager.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_form_manager.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_form_manager.cpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_form_manager.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_file_area_editor.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_file_area_editor.hpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_file_area_editor.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_file_area_editor.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_file_area_editor.cpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_file_area_editor.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/forms/form_system_config.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/forms/form_system_config.hpp -o /Users/admin/code/Oblivion2-XRM/src/forms/form_system_config.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_system_config.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_system_config.cpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_system_config.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_message_reader.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_message_reader.hpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_message_reader.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_message_editor.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_message_editor.hpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_message_editor.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_message_editor.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_message_editor.cpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_message_editor.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_menu_editor.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_menu_editor.hpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_menu_editor.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnet.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnet.cpp -o /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnet.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_menu_editor.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_menu_editor.cpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_menu_editor.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_file_lister.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_file_lister.cpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_file_lister.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetsys.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetsys.hpp -o /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDLnetsys.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_file_editor.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_file_editor.cpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_file_editor.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_signup.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_signup.hpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_signup.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_prelogon.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_prelogon.hpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_prelogon.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_user_editor.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_user_editor.cpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_user_editor.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_prelogon.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_prelogon.cpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_prelogon.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_logon.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_logon.hpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_logon.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/access_level.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/access_level.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/access_level.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/menu_stats.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/menu_stats.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/menu_stats.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_system_config.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_system_config.hpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_system_config.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/grouping.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/grouping.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/grouping.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/network.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/network.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/network.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/message_area.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/message_area.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/message_area.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/file_area.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/file_area.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/file_area.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/conference.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/conference.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/conference.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/access_condition.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/access_condition.cpp -o /Users/admin/code/Oblivion2-XRM/src/access_condition.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/session_stats.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/session_stats.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/session_stats.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/menu_prompt.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/menu_prompt.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/menu_prompt.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/menu.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/menu.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/menu.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/menu_prompt_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_prompt_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_prompt_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/connection_base.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/connection_base.hpp -o /Users/admin/code/Oblivion2-XRM/src/connection_base.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/users.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/users.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/users.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/structures.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/structures.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/structures.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/struct_compat.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/struct_compat.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/struct_compat.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/session_manager.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/session_manager.cpp -o /Users/admin/code/Oblivion2-XRM/src/session_manager.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/security.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/security.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/security.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/config.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/config.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/config.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/form_manager.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/form_manager.hpp -o /Users/admin/code/Oblivion2-XRM/src/form_manager.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/base_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/base_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/base_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/protocol_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/protocol_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/protocol_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/message_area_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/message_area_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/message_area_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/server_ssl.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/server_ssl.hpp -o /Users/admin/code/Oblivion2-XRM/src/server_ssl.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/grouping_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/grouping_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/grouping_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/file_area_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/file_area_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/file_area_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/conference_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/conference_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/conference_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/db_startup.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/db_startup.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/db_startup.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/encoding.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/encoding.cpp -o /Users/admin/code/Oblivion2-XRM/src/encoding.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/conference_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/conference_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/conference_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/session_stats_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/session_stats_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/session_stats_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/grouping_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/grouping_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/grouping_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/session_stats_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/session_stats_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/session_stats_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDL_net.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDL_net.hpp -o /Users/admin/code/Oblivion2-XRM/src/sdl2_net/SDL_net.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/menu_prompt_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_prompt_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_prompt_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/session_io.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/session_io.hpp -o /Users/admin/code/Oblivion2-XRM/src/session_io.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/access_condition.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/access_condition.hpp -o /Users/admin/code/Oblivion2-XRM/src/access_condition.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-app/oneliners.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-app/oneliners.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-app/oneliners.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-app/bbs_list_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-app/bbs_list_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-app/bbs_list_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/forms/form_system_config.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/forms/form_system_config.cpp -o /Users/admin/code/Oblivion2-XRM/src/forms/form_system_config.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_file_lister.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_file_lister.hpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_file_lister.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/ansi_processor.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/ansi_processor.cpp -o /Users/admin/code/Oblivion2-XRM/src/ansi_processor.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/access_level_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/access_level_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/access_level_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/security_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/security_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/security_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/security_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/security_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/security_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/compat/prompts_compat_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/compat/prompts_compat_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/compat/prompts_compat_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-app/bbs_list_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-app/bbs_list_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-app/bbs_list_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/compat/menu_compat_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/compat/menu_compat_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/compat/menu_compat_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_message_reader.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_message_reader.cpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_message_reader.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_signup.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_signup.cpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_signup.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/encoding.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/encoding.hpp -o /Users/admin/code/Oblivion2-XRM/src/encoding.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/uuid.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/uuid.hpp -o /Users/admin/code/Oblivion2-XRM/src/uuid.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/users_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/users_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/users_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/socket_telnet.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/socket_telnet.cpp -o /Users/admin/code/Oblivion2-XRM/src/socket_telnet.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/socket_ssh.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/socket_ssh.cpp -o /Users/admin/code/Oblivion2-XRM/src/socket_ssh.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/menu_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/socket_handler.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/socket_handler.cpp -o /Users/admin/code/Oblivion2-XRM/src/socket_handler.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/io_service.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/io_service.cpp -o /Users/admin/code/Oblivion2-XRM/src/io_service.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_base.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_base.hpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_base.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/db_startup.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/db_startup.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/db_startup.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/network_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/network_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/network_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/network_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/network_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/network_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/directory.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/directory.hpp -o /Users/admin/code/Oblivion2-XRM/src/directory.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_user_editor.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_user_editor.hpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_user_editor.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/async_connection.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/async_connection.hpp -o /Users/admin/code/Oblivion2-XRM/src/async_connection.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/async_base.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/async_base.hpp -o /Users/admin/code/Oblivion2-XRM/src/async_base.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/form_manager.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/form_manager.cpp -o /Users/admin/code/Oblivion2-XRM/src/form_manager.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/process_posix.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/process_posix.cpp -o /Users/admin/code/Oblivion2-XRM/src/process_posix.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/message_area_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/message_area_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/message_area_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/encryption.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/encryption.cpp -o /Users/admin/code/Oblivion2-XRM/src/encryption.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/interface.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/interface.hpp -o /Users/admin/code/Oblivion2-XRM/src/interface.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-app/oneliners_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-app/oneliners_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-app/oneliners_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/menu_base.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/menu_base.hpp -o /Users/admin/code/Oblivion2-XRM/src/menu_base.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/protocol_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/protocol_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/protocol_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/ansi_processor.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/ansi_processor.hpp -o /Users/admin/code/Oblivion2-XRM/src/ansi_processor.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/model-sys/protocol.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/model-sys/protocol.hpp -o /Users/admin/code/Oblivion2-XRM/src/model-sys/protocol.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/process_base.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/process_base.hpp -o /Users/admin/code/Oblivion2-XRM/src/process_base.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/menu_base.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/menu_base.cpp -o /Users/admin/code/Oblivion2-XRM/src/menu_base.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/telnet_decoder.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/telnet_decoder.hpp -o /Users/admin/code/Oblivion2-XRM/src/telnet_decoder.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/state_manager.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/state_manager.hpp -o /Users/admin/code/Oblivion2-XRM/src/state_manager.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/session_data.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/session_data.cpp -o /Users/admin/code/Oblivion2-XRM/src/session_data.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/users_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/users_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/users_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_protocol_editor.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_protocol_editor.hpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_protocol_editor.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/safe_set.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/safe_set.hpp -o /Users/admin/code/Oblivion2-XRM/src/safe_set.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/encryption.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/encryption.hpp -o /Users/admin/code/Oblivion2-XRM/src/encryption.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/file_area_dao.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/file_area_dao.hpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/file_area_dao.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/session.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/session.hpp -o /Users/admin/code/Oblivion2-XRM/src/session.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/communicator.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/communicator.hpp -o /Users/admin/code/Oblivion2-XRM/src/communicator.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/state_manager.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/state_manager.cpp -o /Users/admin/code/Oblivion2-XRM/src/state_manager.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/socket_state.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/socket_state.hpp -o /Users/admin/code/Oblivion2-XRM/src/socket_state.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/safe_queue.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/safe_queue.hpp -o /Users/admin/code/Oblivion2-XRM/src/safe_queue.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_file_editor.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_file_editor.hpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_file_editor.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/session_manager.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/session_manager.hpp -o /Users/admin/code/Oblivion2-XRM/src/session_manager.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/communicator.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/communicator.cpp -o /Users/admin/code/Oblivion2-XRM/src/communicator.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/server.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/server.hpp -o /Users/admin/code/Oblivion2-XRM/src/server.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/telnet_decoder.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/telnet_decoder.cpp -o /Users/admin/code/Oblivion2-XRM/src/telnet_decoder.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/common_io.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/common_io.hpp -o /Users/admin/code/Oblivion2-XRM/src/common_io.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/menu_system.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/menu_system.cpp -o /Users/admin/code/Oblivion2-XRM/src/menu_system.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_logon.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_logon.cpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_logon.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/async_acceptor.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/async_acceptor.hpp -o /Users/admin/code/Oblivion2-XRM/src/async_acceptor.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/socket_handler.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/socket_handler.hpp -o /Users/admin/code/Oblivion2-XRM/src/socket_handler.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/process_posix.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/process_posix.hpp -o /Users/admin/code/Oblivion2-XRM/src/process_posix.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/config_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_level_editor.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_level_editor.cpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_level_editor.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/connection_tcp.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/connection_tcp.hpp -o /Users/admin/code/Oblivion2-XRM/src/connection_tcp.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/io_service.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/io_service.hpp -o /Users/admin/code/Oblivion2-XRM/src/io_service.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/session_io.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/session_io.cpp -o /Users/admin/code/Oblivion2-XRM/src/session_io.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/session_data.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/session_data.hpp -o /Users/admin/code/Oblivion2-XRM/src/session_data.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/xrm_server.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/xrm_server.cpp -o /Users/admin/code/Oblivion2-XRM/src/xrm_server.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/telnet.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/telnet.hpp -o /Users/admin/code/Oblivion2-XRM/src/telnet.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_message_base_editor.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_message_base_editor.cpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_message_base_editor.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/mods/mod_protocol_editor.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/mods/mod_protocol_editor.cpp -o /Users/admin/code/Oblivion2-XRM/src/mods/mod_protocol_editor.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/menu_system.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/menu_system.hpp -o /Users/admin/code/Oblivion2-XRM/src/menu_system.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/data-sys/access_level_dao.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/data-sys/access_level_dao.cpp -o /Users/admin/code/Oblivion2-XRM/src/data-sys/access_level_dao.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/deadline_timer.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/deadline_timer.hpp -o /Users/admin/code/Oblivion2-XRM/src/deadline_timer.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/common_io.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/common_io.cpp -o /Users/admin/code/Oblivion2-XRM/src/common_io.cpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/connection_ssl.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/connection_ssl.hpp -o /Users/admin/code/Oblivion2-XRM/src/connection_ssl.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/src/state_base.hpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/src/state_base.hpp -o /Users/admin/code/Oblivion2-XRM/src/state_base.hpp.o  -DTARGET_OS_MAC -DWITHOUT_SDL -I. -I. -I../src -I./Debug -I../sqlitewrap -I/usr/local/opt/sqlite/include -I/usr/local/opt/yaml-cpp/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libssh/include -I/usr/local/opt/ossp-uuid/include -I../src/sdl2_net -I../src/utf-cpp  -Wfatal-errors  -g  -O0  -pedantic  -W  -std=c++11  -stdlib=libc++"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/sqlitewrap/Database.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/sqlitewrap/Database.cpp -o /Users/admin/code/Oblivion2-XRM/sqlitewrap/Database.cpp.o  -I. -I.. -I./Debug -I/usr/local/opt/sqlite/include  -Wfatal-errors  -g  -O0  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/sqlitewrap/IError.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/sqlitewrap/IError.h -o /Users/admin/code/Oblivion2-XRM/sqlitewrap/IError.h.o  -I. -I.. -I./Debug -I/usr/local/opt/sqlite/include  -Wfatal-errors  -g  -O0  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/sqlitewrap/Query.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/sqlitewrap/Query.cpp -o /Users/admin/code/Oblivion2-XRM/sqlitewrap/Query.cpp.o  -I. -I.. -I./Debug -I/usr/local/opt/sqlite/include  -Wfatal-errors  -g  -O0  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/sqlitewrap/Query.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/sqlitewrap/Query.h -o /Users/admin/code/Oblivion2-XRM/sqlitewrap/Query.h.o  -I. -I.. -I./Debug -I/usr/local/opt/sqlite/include  -Wfatal-errors  -g  -O0  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/sqlitewrap/SysLogs.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/sqlitewrap/SysLogs.cpp -o /Users/admin/code/Oblivion2-XRM/sqlitewrap/SysLogs.cpp.o  -I. -I.. -I./Debug -I/usr/local/opt/sqlite/include  -Wfatal-errors  -g  -O0  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/sqlitewrap/sqlite3test.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/sqlitewrap/sqlite3test.cpp -o /Users/admin/code/Oblivion2-XRM/sqlitewrap/sqlite3test.cpp.o  -I. -I.. -I./Debug -I/usr/local/opt/sqlite/include  -Wfatal-errors  -g  -O0  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/sqlitewrap/StderrLog.cpp",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/sqlitewrap/StderrLog.cpp -o /Users/admin/code/Oblivion2-XRM/sqlitewrap/StderrLog.cpp.o  -I. -I.. -I./Debug -I/usr/local/opt/sqlite/include  -Wfatal-errors  -g  -O0  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/sqlitewrap/Database.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/sqlitewrap/Database.h -o /Users/admin/code/Oblivion2-XRM/sqlitewrap/Database.h.o  -I. -I.. -I./Debug -I/usr/local/opt/sqlite/include  -Wfatal-errors  -g  -O0  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/sqlitewrap/StderrLog.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/sqlitewrap/StderrLog.h -o /Users/admin/code/Oblivion2-XRM/sqlitewrap/StderrLog.h.o  -I. -I.. -I./Debug -I/usr/local/opt/sqlite/include  -Wfatal-errors  -g  -O0  -std=c++11"
+ }, {
+  "file": "/Users/admin/code/Oblivion2-XRM/sqlitewrap/SysLogs.h",
+  "directory": "/Users/admin/code/Oblivion2-XRM/osx",
+  "command": "clang  -c /Users/admin/code/Oblivion2-XRM/sqlitewrap/SysLogs.h -o /Users/admin/code/Oblivion2-XRM/sqlitewrap/SysLogs.h.o  -I. -I.. -I./Debug -I/usr/local/opt/sqlite/include  -Wfatal-errors  -g  -O0  -std=c++11"
+ }]

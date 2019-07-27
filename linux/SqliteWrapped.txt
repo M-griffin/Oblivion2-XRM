@@ -1,0 +1,1 @@
+./Debug/sqlitewrap_Database.cpp.o ./Debug/sqlitewrap_Query.cpp.o ./Debug/sqlitewrap_StderrLog.cpp.o ./Debug/sqlitewrap_SysLogs.cpp.o

@@ -2,7 +2,7 @@
 
 All:
 	@echo "----------Building project:[ xrm-unittest - Debug ]----------"
-	@cd "C:\Users\Blue\Desktop\Oblivion2-XRM\xrm-unittest" && "$(MAKE)" -f  "xrm-unittest.mk"
+	@"$(MAKE)" -f  "xrm-unittest.mk" PreBuild && "$(MAKE)" -f  "xrm-unittest.mk"
 clean:
 	@echo "----------Cleaning project:[ xrm-unittest - Debug ]----------"
-	@cd "C:\Users\Blue\Desktop\Oblivion2-XRM\xrm-unittest" && "$(MAKE)" -f  "xrm-unittest.mk" clean
+	@"$(MAKE)" -f  "xrm-unittest.mk" clean

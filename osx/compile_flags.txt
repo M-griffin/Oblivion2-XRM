@@ -1,0 +1,4 @@
+-I/Users/admin/code/Oblivion2-XRM/osx
+-I/Users/admin/code/Oblivion2-XRM
+-I/Users/admin/code/Oblivion2-XRM/osx/Debug
+-I/usr/local/opt/sqlite/include

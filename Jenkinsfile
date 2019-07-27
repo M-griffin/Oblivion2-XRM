@@ -5,22 +5,17 @@ pipeline {
 	stages {
 		stage('\u2776 Build SqliteWrapped') {
 			steps {								
-				dir ('sqlitewrap') {        
-					sh 'make -f Makefile clean'
-					sh 'make -f Makefile -j2'
+				dir ('linux') {        
+					sh 'make -f SqliteWrapped.mk clean'
+					sh 'make -f SqliteWrapped.mk -j2'
+					sh 'cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h > ./Debug/libSqliteWrapped.h'
 				}
 			}
 		}
 		
 		stage('\u2776 Build Xrm-Menu-Convert') {
 			steps {								
-				dir ('xrm-menu-convert') {        
-					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/xrm-menu-convert/src/+src/+' xrm-menu-convert.mk'''
-					sh '''sed -i 's+/home/merc/code/Oblivion2-XRM/xrm-menu-convert/src/+src/+' xrm-menu-convert.mk'''
-					
-					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/src/+../src/+' xrm-menu-convert.mk'''
-					sh '''sed -i 's+/home/merc/code/Oblivion2-XRM/src/+../src/+' xrm-menu-convert.mk'''
-					sh 'make -f xrm-menu-convert.mk clean'
+				dir ('linux') {        
 					sh 'make -f xrm-menu-convert.mk -j2'
 				}
 			}
@@ -28,13 +23,7 @@ pipeline {
 		
 		stage('\u2776 Build Xrm-Menu-Prompt-Convert') {
 			steps {								
-				dir ('xrm-menu-prompt-convert') {        
-					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/xrm-menu-prompt-convert/src/+src/+' xrm-menu-prompt-convert.mk'''
-					sh '''sed -i 's+/home/merc/code/Oblivion2-XRM/xrm-menu-prompt-convert/src/+src/+' xrm-menu-prompt-convert.mk'''
-					
-					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/src/+../src/+' xrm-menu-prompt-convert.mk'''
-					sh '''sed -i 's+/home/merc/code/Oblivion2-XRM/src/+../src/+' xrm-menu-prompt-convert.mk'''
-					sh 'make -f xrm-menu-prompt-convert.mk clean'
+				dir ('linux') {        
 					sh 'make -f xrm-menu-prompt-convert.mk -j2'
 				}
 			}
@@ -42,13 +31,7 @@ pipeline {
 		
 		stage('\u2776 Build Xrm-UnitTests') {
 			steps {								
-				dir ('xrm-unittest') {        									
-					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/xrm-unittest/++' xrm-unittest.mk'''
-					sh '''sed -i 's+/home/merc/code/Oblivion2-XRM/xrm-unittest/++' xrm-unittest.mk'''
-					
-					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/src/+../src/+' xrm-unittest.mk'''
-					sh '''sed -i 's+/home/merc/code/Oblivion2-XRM/src/+../src/+' xrm-unittest.mk'''
-					sh 'make -f xrm-unittest.mk clean'
+				dir ('linux') {        									
 					sh 'make -f xrm-unittest.mk -j2'
 					
 					// Run tests
@@ -63,13 +46,9 @@ pipeline {
 		stage('\u2776 Build Xrm-Server') {
 			 steps {												
 				dir ('linux') {
-					sh '''sed -i 's+/home/blue/code/Oblivion2-XRM/src/+../src/+' xrm-server.mk'''
-					sh '''sed -i 's+/home/merc/code/Oblivion2-XRM/src/+../src/+' xrm-server.mk'''
-					sh 'make -f xrm-server.mk clean'
 					sh 'make -f xrm-server.mk -j2'
 				}
-			 }
+			}
 		}
 	}
 }
-

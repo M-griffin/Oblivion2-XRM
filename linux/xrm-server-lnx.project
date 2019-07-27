@@ -31,7 +31,6 @@
     <File Name="../src/communicator.hpp"/>
     <File Name="../src/encryption.cpp"/>
     <File Name="../src/encryption.hpp"/>
-    <File Name="../src/main.cpp"/>
     <File Name="../src/menu_system.cpp"/>
     <File Name="../src/menu_system.hpp"/>
     <File Name="../src/safe_queue.hpp"/>
@@ -196,6 +195,7 @@
     <File Name="../src/encoding.cpp"/>
     <File Name="../src/encoding.hpp"/>
     <File Name="../src/logging.hpp"/>
+    <File Name="../src/xrm_server.cpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -210,15 +210,17 @@
     <Configuration Name="Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-Wall;-Wno-psabi" C_Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-Wall;-Wno-psabi" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
+        <IncludePath Value="./Debug"/>
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
-        <IncludePath Value="../sqlitewrap/Debug"/>
+        <IncludePath Value="../linux/Debug"/>
         <Preprocessor Value="WITHOUT_SDL"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
+        <LibraryPath Value="./Debug"/>
         <LibraryPath Value="../sqlitewrap"/>
-        <LibraryPath Value="../sqlitewrap/Debug"/>
+        <LibraryPath Value="../linux/Debug"/>
         <Library Value="libSqliteWrapped.a"/>
         <Library Value="sqlite3"/>
         <Library Value="pthread"/>
@@ -239,7 +241,9 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild/>
+      <PreBuild>
+        <Command Enabled="yes">sed -i 's+/home/merc/code/Oblivion2-XRM/+../+' xrm-server.mk</Command>
+      </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
