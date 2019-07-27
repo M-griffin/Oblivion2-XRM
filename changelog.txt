@@ -1,5 +1,5 @@
 Change Log Update (00.00.146)
-* 2019-07-2703
+* 2019-07-27
 + Entire Project update and rework so each environment strictly uses it's own 
   folder for storing it's projects make files. This avoid one app overwrite another
   and one environment overwritten another.
