@@ -104,7 +104,9 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild/>
+      <PreBuild>
+        <Command Enabled="yes">sed -i 's+C:/Users/Blue/Desktop/Oblivion2-XRM/+../+' xrm-menu-prompt-convert.mk</Command>
+      </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">
         <RebuildCommand/>

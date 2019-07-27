@@ -46,10 +46,12 @@
     <Configuration Name="Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Static Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-Wfatal-errors;-g;-O0;-W;-std=c++11;-Wall;-static" C_Options="-Wfatal-errors;-g;-O0;-W;-std=c++11;-Wall;-static" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
+        <IncludePath Value="../Debug"/>
+        <IncludePath Value="../sqlitewrap"/>
         <IncludePath Value="C:/sqlite3/include"/>
       </Compiler>
       <Linker Options="" Required="yes">
-        <LibraryPath Value="."/>
+        <LibraryPath Value="../Debug"/>
         <LibraryPath Value="C:/sqlite3/lib"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
@@ -63,7 +65,9 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild/>
+      <PreBuild>
+        <Command Enabled="yes">sed -i 's+C:/Users/Blue/Desktop/Oblivion2-XRM/+../+' SqliteWrapped.mk</Command>
+      </PreBuild>
       <PostBuild>
         <Command Enabled="no"># Linux /OSX / BSD</Command>
         <Command Enabled="no">#rm lib$(ProjectName).h</Command>
