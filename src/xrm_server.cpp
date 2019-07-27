@@ -29,7 +29,6 @@
 #include "interface.hpp"
 #include "communicator.hpp"
 #include "common_io.hpp"
-#include "directory.hpp"
 #include "encoding.hpp"
 #include "logging.hpp"
 
@@ -41,6 +40,8 @@
 
 #ifndef _WIN32
 #include <sys/stat.h>
+#else
+#include <direct.h>
 #endif
 
 std::string GLOBAL_BBS_PATH = "";
@@ -78,12 +79,24 @@ auto main() -> int
     GLOBAL_TEXTFILE_PATH = GLOBAL_BBS_PATH + "TEXTFILE";
     GLOBAL_SCRIPT_PATH = GLOBAL_BBS_PATH + "SCRIPTS";
     GLOBAL_LOG_PATH = GLOBAL_BBS_PATH + "LOGS";
-    
-    // Create LOG Directory if it doesn't exist. 
-    if (mkdir(GLOBAL_LOG_PATH.c_str(), 0770) == -1 && errno != EEXIST) {
+
+#ifdef _WIN32
+
+    // Create LOG Directory if it doesn't exist.
+    if(_mkdir(GLOBAL_LOG_PATH.c_str()) != 0 && errno != EEXIST)
+    {
         std::cout << "Unable to create LOG folder: " << GLOBAL_LOG_PATH << std::endl;
     }
 
+#else
+
+    // Create LOG Directory if it doesn't exist.
+    if(mkdir(GLOBAL_LOG_PATH.c_str(), 0770) == -1 && errno != EEXIST)
+    {
+        std::cout << "Unable to create LOG folder: " << GLOBAL_LOG_PATH << std::endl;
+    }
+
+#endif
     // Startup the Encoding Instance and Char Mappings.
     {
         Encoding::instance();
