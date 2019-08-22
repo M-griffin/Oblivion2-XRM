@@ -31,9 +31,12 @@
   <Dependencies/>
   <Dependencies Name="Release"/>
   <VirtualDirectory Name="..\src">
+    <File Name="../src/processor_text.hpp"/>
+    <File Name="../src/processor_text.cpp"/>
+    <File Name="../src/processor_base.hpp"/>
+    <File Name="../src/processor_ansi.hpp"/>
+    <File Name="../src/processor_ansi.cpp"/>
     <File Name="../src/xrm_server.cpp"/>
-    <File Name="../src/ansi_processor.cpp"/>
-    <File Name="../src/ansi_processor.hpp"/>
     <File Name="../src/common_io.cpp"/>
     <File Name="../src/common_io.hpp"/>
     <File Name="../src/communicator.cpp"/>
