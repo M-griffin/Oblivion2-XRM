@@ -105,12 +105,17 @@ cp ../osx/Debug/xrm-unittest .
 
 if [ -d "./Debug" ] 
 then
+    cd Debug
     echo "Directory ./Debug Exists."
+    cp ../../osx/Debug/libSqliteWrapped.a .
 else
+    cd Debug
     echo "Creating ./Debug Folder for Dynamic Libraries."
     mkdir ./Debug 
-    cp ../osx/Debug/libSqliteWrapped.a .
+    cp ../../osx/Debug/libSqliteWrapped.a .    
 fi
+
+cd $cwd
 
 echo ''
 echo -e "\033[1;31m"Running Unit Tests
