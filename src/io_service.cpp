@@ -302,7 +302,7 @@ void IOService::run()
         }
 
         // Temp timer, change to 10/20 miliseconds for cpu useage
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
 }

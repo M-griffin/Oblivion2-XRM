@@ -1,4 +1,4 @@
-#include "ansi_processor.hpp"
+#include "processor_ansi.hpp"
 #include "model-sys/structures.hpp"
 #include "common_io.hpp"
 #include "logging.hpp"
@@ -23,41 +23,10 @@
 #include <sstream>
 
 
-AnsiProcessor::AnsiProcessor(int term_height, int term_width)
-    : m_ansi_output("")
-    , m_is_screen_cleared(false)
-    , m_is_line_wrapping(false)
-    , m_position(0)
-    , m_y_position(1)
-    , m_number_lines(term_height)
-    , m_characters_per_line(term_width)
-    , m_x_position(1)
-    , m_max_x_position(1)
-    , m_max_y_position(1)
-    , m_center_ansi_output(false)
-    , m_saved_cursor_x(1)
-    , m_saved_cursor_y(1)
-    , m_attribute(0)
-    , m_saved_attribute(0)
-    , m_saved_foreground(FG_WHITE)
-    , m_saved_background(BG_BLACK)
-    , m_foreground_color(FG_WHITE)
-    , m_background_color(BG_BLACK)
-    , m_screen_pixel()
-{
-    m_screen_buffer.reserve(m_number_lines * m_characters_per_line);
-    m_screen_buffer.resize(m_number_lines * m_characters_per_line);
-}
-
-AnsiProcessor::~AnsiProcessor()
-{
-}
-
-
 /**
  * @brief Buffer to String for Parsing
  */
-std::string AnsiProcessor::screenBufferToString()
+std::string ProcessorAnsi::screenBufferToString()
 {
     m_ansi_output.erase();
     m_ansi_output = "";
@@ -81,7 +50,7 @@ std::string AnsiProcessor::screenBufferToString()
 /**
  * @brief Test, displays screen buffer.
  */
-void AnsiProcessor::screenBufferDisplayTest()
+void ProcessorAnsi::screenBufferDisplayTest()
 {
     int attr = 0;
     int fore = 0;
@@ -150,7 +119,7 @@ void AnsiProcessor::screenBufferDisplayTest()
  * @param clearScreen
  * @return
  */
-int AnsiProcessor::getMCIOffSet(std::string mci_code)
+int ProcessorAnsi::getMCIOffSet(std::string mci_code)
 {
     unsigned int max = (m_x_position + (m_y_position * m_characters_per_line));
 
@@ -183,7 +152,7 @@ int AnsiProcessor::getMCIOffSet(std::string mci_code)
  * NOTE, this can add a new line at the end of screen
  * Should exclude for BOTTOM Ansi Screens.
  */
-std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
+std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen)
 {
     int attr = 0;
     int fore = 0;
@@ -284,7 +253,7 @@ std::string AnsiProcessor::getScreenFromBuffer(bool clearScreen)
  * @param pulldown_id
  * @return
  */
-std::string AnsiProcessor::buildPullDownBars(int pulldown_id, bool active)
+std::string ProcessorAnsi::buildPullDownBars(int pulldown_id, bool active)
 {
     std::string output = "";
     std::stringstream ss;
@@ -337,7 +306,7 @@ std::string AnsiProcessor::buildPullDownBars(int pulldown_id, bool active)
 /**
  * @brief // Clear Pull Down Bars once menu options are reset.
  */
-void AnsiProcessor::clearPullDownBars()
+void ProcessorAnsi::clearPullDownBars()
 {
     std::map<int, ScreenPixel>().swap(m_pull_down_options);
 }
@@ -347,7 +316,7 @@ void AnsiProcessor::clearPullDownBars()
  * @brief Return the max rows used on the screen
  * @return
  */
-int AnsiProcessor::getMaxRowsUsedOnScreen()
+int ProcessorAnsi::getMaxRowsUsedOnScreen()
 {
     return m_max_y_position;
 }
@@ -356,7 +325,7 @@ int AnsiProcessor::getMaxRowsUsedOnScreen()
 /**
  * @brief Parses through MCI Codes for Lightbars and Char Parameters.
  */
-std::string AnsiProcessor::screenBufferParse()
+std::string ProcessorAnsi::screenBufferParse()
 {
     // Contains all matches found so we can iterate and reaplace
     // Without Multiple loops through the string.
@@ -475,36 +444,36 @@ std::string AnsiProcessor::screenBufferParse()
         {
             case 1:
                 // Then process and display the lightbars.
+            {
+                int pull_id = 0;
+                std::stringstream ss;
+                ss.str(my_matches.m_code.substr(1, 2));
+                ss >> pull_id;
+
+                if(ss.fail())
                 {
-                    int pull_id = 0;
-                    std::stringstream ss;
-                    ss.str(my_matches.m_code.substr(1, 2));
-                    ss >> pull_id;
-
-                    if(ss.fail())
-                    {
-                        ss.clear();
-                        ss.ignore();
-                        break;
-                    }
-
-                    // Grab the highlight color from the second sequence %##.
-                    m_screen_buffer[my_matches.m_offset].selected_attribute =
-                        m_screen_buffer[my_matches.m_offset+3].attribute;
-
-                    m_screen_buffer[my_matches.m_offset].selected_foreground =
-                        m_screen_buffer[my_matches.m_offset+3].foreground;
-
-                    m_screen_buffer[my_matches.m_offset].selected_background =
-                        m_screen_buffer[my_matches.m_offset+3].background;
-
-                    // tear out the y and x positions from the offset.
-                    m_pull_down_options[pull_id] = m_screen_buffer[my_matches.m_offset];
-
                     ss.clear();
                     ss.ignore();
+                    break;
                 }
-                break;
+
+                // Grab the highlight color from the second sequence %##.
+                m_screen_buffer[my_matches.m_offset].selected_attribute =
+                    m_screen_buffer[my_matches.m_offset+3].attribute;
+
+                m_screen_buffer[my_matches.m_offset].selected_foreground =
+                    m_screen_buffer[my_matches.m_offset+3].foreground;
+
+                m_screen_buffer[my_matches.m_offset].selected_background =
+                    m_screen_buffer[my_matches.m_offset+3].background;
+
+                // tear out the y and x positions from the offset.
+                m_pull_down_options[pull_id] = m_screen_buffer[my_matches.m_offset];
+
+                ss.clear();
+                ss.ignore();
+            }
+            break;
 
             default:
                 break;
@@ -520,7 +489,7 @@ std::string AnsiProcessor::screenBufferParse()
  * @brief Plots Characters on the Screen into the Buffer.
  * @param c
  */
-void AnsiProcessor::screenBufferSetGlyph(std::string char_sequence)
+void ProcessorAnsi::screenBufferSetGlyph(std::string char_sequence)
 {
     Logging *log = Logging::instance();
 
@@ -594,7 +563,7 @@ void AnsiProcessor::screenBufferSetGlyph(std::string char_sequence)
 /*
  * Moves the Screen Buffer Up a line to match the internal SDL_Surface
  */
-void AnsiProcessor::screenBufferScrollUp()
+void ProcessorAnsi::screenBufferScrollUp()
 {
     //*** IMPORTANT (WIP), must add check for region scrolling only!
     //TheTerminal::Instance()->scrollRegionActive &&
@@ -623,7 +592,7 @@ void AnsiProcessor::screenBufferScrollUp()
 /*
  * Clear Range of Screen Buffer for Erase Sequences.
  */
-void AnsiProcessor::screenBufferClearRange(int start, int end)
+void ProcessorAnsi::screenBufferClearRange(int start, int end)
 {
     int startPosition = ((m_y_position-1) * m_characters_per_line) + (start);
     int endPosition = startPosition + (end - start);
@@ -652,7 +621,7 @@ void AnsiProcessor::screenBufferClearRange(int start, int end)
 /**
  * @brief Clears the Buffer for Fresh Parsing.
  */
-void AnsiProcessor::screenBufferClear()
+void ProcessorAnsi::screenBufferClear()
 {
     // Allocate the Size
     m_screen_buffer.clear();
@@ -662,7 +631,7 @@ void AnsiProcessor::screenBufferClear()
 /**
  * @brief Clears The Screen And Buffer
  */
-void AnsiProcessor::clearScreen()
+void ProcessorAnsi::clearScreen()
 {
     m_is_screen_cleared = true;
     screenBufferClear();
@@ -675,7 +644,7 @@ void AnsiProcessor::clearScreen()
  * @brief Parses screen data into the Screen Buffer.
  * @return
  */
-void AnsiProcessor::parseAnsiScreen(char *buff)
+void ProcessorAnsi::parseTextToBuffer(char *buff)
 {
     if(strlen(buff) == 0)
         return;

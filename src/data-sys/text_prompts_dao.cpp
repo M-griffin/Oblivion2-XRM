@@ -121,7 +121,8 @@ bool TextPromptsDao::readPrompts()
 
         if(m_node.size() == 0)
         {
-            return false; //File Not Found?
+            std::cout << std::endl << "TextPromptsDao Node size == 0" << std::endl;
+            return false;
         }
 
         std::string file_version = m_node["file_version"].as<std::string>();
@@ -135,7 +136,8 @@ bool TextPromptsDao::readPrompts()
 
         if(file_version != TextPromptsDao::FILE_VERSION)
         {
-            throw std::invalid_argument("Invalid file_version, expected: " + TextPromptsDao::FILE_VERSION);
+            std::cout << "Invalid file_version, expected: " << TextPromptsDao::FILE_VERSION << std::endl;
+            return(false);
         }
 
         m_is_loaded = true;
@@ -143,7 +145,7 @@ bool TextPromptsDao::readPrompts()
     catch(std::exception &ex)
     {
         std::cout << "Exception YAML::readPrompts(" << m_filename << ") " << ex.what() << std::endl;
-        assert(false);
+        return(false);
     }
 
     return m_is_loaded;

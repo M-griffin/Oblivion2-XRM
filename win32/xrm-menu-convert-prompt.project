@@ -69,7 +69,7 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++14;-Wall;-Wno-deprecated -Wno-unused-local-typedefs" C_Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++14;-Wall;-Wno-deprecated -Wno-unused-local-typedefs" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-Wall;-Wno-deprecated -Wno-unused-local-typedefs" C_Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-Wall;-Wno-deprecated -Wno-unused-local-typedefs" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="../src"/>
         <IncludePath Value="C:/boost64"/>
@@ -82,14 +82,7 @@
         <LibraryPath Value="C:/msys/1.0/icu/dist/lib"/>
         <LibraryPath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/build"/>
         <Library Value="libboost_system-mgw51-mt-1_64"/>
-        <Library Value="libboost_thread-mgw51-mt-1_64"/>
-        <Library Value="libboost_locale-mgw51-mt-1_64"/>
         <Library Value="libboost_filesystem-mgw51-mt-1_64"/>
-        <Library Value="libboost_timer-mgw51-mt-1_64"/>
-        <Library Value="libboost_regex-mgw51-mt-1_64"/>
-        <Library Value="libiconv.a"/>
-        <Library Value="libicuuc.dll.a"/>
-        <Library Value="libicuin.dll.a"/>
         <Library Value="yaml-cpp.dll"/>
         <Library Value="Rpcrt4"/>
       </Linker>

@@ -1,8 +1,8 @@
 .PHONY: clean All
 
 All:
-	@echo "----------Building project:[ xrm-unittest - Debug ]----------"
-	@"$(MAKE)" -f  "xrm-unittest.mk" PreBuild && "$(MAKE)" -f  "xrm-unittest.mk"
+	@echo "----------Building project:[ xrm-menu-convert - Debug ]----------"
+	@"$(MAKE)" -f  "xrm-menu-convert.mk" PreBuild && "$(MAKE)" -f  "xrm-menu-convert.mk"
 clean:
-	@echo "----------Cleaning project:[ xrm-unittest - Debug ]----------"
-	@"$(MAKE)" -f  "xrm-unittest.mk" clean
+	@echo "----------Cleaning project:[ xrm-menu-convert - Debug ]----------"
+	@"$(MAKE)" -f  "xrm-menu-convert.mk" clean

@@ -4,9 +4,9 @@
     <![CDATA[]]>
   </Environment>
   <Project Name="xrm-server" Path="xrm-server.project" Active="No"/>
-  <Project Name="xrm-unittest" Path="xrm-unittest.project" Active="Yes"/>
+  <Project Name="xrm-unittest" Path="xrm-unittest.project" Active="No"/>
   <Project Name="xrm-menu-convert-prompt" Path="xrm-menu-convert-prompt.project" Active="No"/>
-  <Project Name="xrm-menu-convert" Path="xrm-menu-convert.project" Active="No"/>
+  <Project Name="xrm-menu-convert" Path="xrm-menu-convert.project" Active="Yes"/>
   <Project Name="sqlitewrapped" Path="sqlitewrapped.project" Active="No"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="yes">

@@ -2,7 +2,7 @@
 
 #include "model-sys/menu.hpp"
 #include "forms/form_system_config.hpp"
-#include "ansi_processor.hpp"
+#include "processor_ansi.hpp"
 #include "session_data.hpp"
 #include "logging.hpp"
 
@@ -72,7 +72,7 @@ void FormManager::startupForm(form_ptr form)
     // Ansi Processor used for Parsing templates and get line size(s).
     // This determines the screen template size and data we can fit between
     // Top and Bottom Templates.
-    ansi_process_ptr ansi(new AnsiProcessor(
+    processor_ansi_ptr ansi(new ProcessorAnsi(
                               m_session_data->m_telnet_state->getTermRows(),
                               m_session_data->m_telnet_state->getTermCols())
                          );
@@ -83,13 +83,13 @@ void FormManager::startupForm(form_ptr form)
     m_ansi_bot = m_common_io.readinAnsi(m_form.back()->m_ansi_bot);
 
     // Calc Top Rows, get Ending Y Position
-    ansi->parseAnsiScreen((char *)m_ansi_top.c_str());
+    ansi->parseTextToBuffer((char *)m_ansi_top.c_str());
     int top_rows = ansi->getYPosition();
 
     ansi->clearScreen();
 
     // Calc Bottom Rows
-    ansi->parseAnsiScreen((char *)m_ansi_bot.c_str());
+    ansi->parseTextToBuffer((char *)m_ansi_bot.c_str());
     int bot_rows = ansi->getMaxRowsUsedOnScreen();
 
     ansi->clearScreen();
@@ -232,9 +232,9 @@ std::string FormManager::processTopFormTemplate(const std::string &screen)
 std::string FormManager::processMidFormTemplate(const std::string &screen)
 {
     // Use a Local Ansi Parser for Pasrsing Menu Template with Mid.
-    ansi_process_ptr ansi_process(new AnsiProcessor(
-                                      m_session_data->m_telnet_state->getTermRows(),
-                                      m_session_data->m_telnet_state->getTermCols()));
+    processor_ansi_ptr ansi_process(new ProcessorAnsi(
+                                        m_session_data->m_telnet_state->getTermRows(),
+                                        m_session_data->m_telnet_state->getTermCols()));
     std::string output_screen;
     std::string new_screen = screen;
 
@@ -354,7 +354,7 @@ std::string FormManager::processMidFormTemplate(const std::string &screen)
 
     // Clear Codemap.
     std::vector<MapType>().swap(code_map);
-    ansi_process->parseAnsiScreen((char *)output_screen.c_str());
+    ansi_process->parseTextToBuffer((char *)output_screen.c_str());
 
     // Return with no clear screen, since this is a mid ansi.
     return ansi_process->getScreenFromBuffer(false);
