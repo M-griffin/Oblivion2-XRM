@@ -5,15 +5,15 @@
 ## Debug
 ProjectName            :=xrm-menu-prompt-convert
 ConfigurationName      :=Debug
-WorkspacePath          := "../linux"
-ProjectPath            := "../linux"
+WorkspacePath          := "/home/merc/code/Oblivion2-XRM/linux"
+ProjectPath            := "/home/merc/code/Oblivion2-XRM/linux"
 IntermediateDirectory  :=./Debug
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Michae Griffin
-Date                   :=26/07/19
+Date                   :=22/08/19
 CodeLitePath           :="/home/merc/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -87,7 +87,7 @@ $(IntermediateDirectory)/.d:
 
 PreBuild:
 	@echo Executing Pre Build commands ...
-	sed -i 's+../+../+' xrm-menu-prompt-convert.mk
+	sed -i 's+/home/merc/code/Oblivion2-XRM/+../+' xrm-menu-prompt-convert.mk
 	@echo Done
 
 
@@ -95,7 +95,7 @@ PreBuild:
 ## Objects
 ##
 $(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix): ../src/common_io.cpp $(IntermediateDirectory)/src_common_io.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/common_io.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/common_io.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_common_io.cpp$(DependSuffix): ../src/common_io.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_common_io.cpp$(DependSuffix) -MM "../src/common_io.cpp"
 
@@ -103,7 +103,7 @@ $(IntermediateDirectory)/src_common_io.cpp$(PreprocessSuffix): ../src/common_io.
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_common_io.cpp$(PreprocessSuffix) "../src/common_io.cpp"
 
 $(IntermediateDirectory)/src_encoding.cpp$(ObjectSuffix): ../src/encoding.cpp $(IntermediateDirectory)/src_encoding.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/encoding.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_encoding.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/encoding.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_encoding.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_encoding.cpp$(DependSuffix): ../src/encoding.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_encoding.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_encoding.cpp$(DependSuffix) -MM "../src/encoding.cpp"
 
@@ -111,7 +111,7 @@ $(IntermediateDirectory)/src_encoding.cpp$(PreprocessSuffix): ../src/encoding.cp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_encoding.cpp$(PreprocessSuffix) "../src/encoding.cpp"
 
 $(IntermediateDirectory)/src_communicator.cpp$(ObjectSuffix): ../src/communicator.cpp $(IntermediateDirectory)/src_communicator.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/communicator.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_communicator.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/communicator.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_communicator.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_communicator.cpp$(DependSuffix): ../src/communicator.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_communicator.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_communicator.cpp$(DependSuffix) -MM "../src/communicator.cpp"
 
@@ -119,7 +119,7 @@ $(IntermediateDirectory)/src_communicator.cpp$(PreprocessSuffix): ../src/communi
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_communicator.cpp$(PreprocessSuffix) "../src/communicator.cpp"
 
 $(IntermediateDirectory)/src_prompt_convert.cpp$(ObjectSuffix): ../xrm-menu-prompt-convert/src/prompt_convert.cpp $(IntermediateDirectory)/src_prompt_convert.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../xrm-menu-prompt-convert/src/prompt_convert.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_prompt_convert.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/xrm-menu-prompt-convert/src/prompt_convert.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_prompt_convert.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_prompt_convert.cpp$(DependSuffix): ../xrm-menu-prompt-convert/src/prompt_convert.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_prompt_convert.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_prompt_convert.cpp$(DependSuffix) -MM "../xrm-menu-prompt-convert/src/prompt_convert.cpp"
 
@@ -127,7 +127,7 @@ $(IntermediateDirectory)/src_prompt_convert.cpp$(PreprocessSuffix): ../xrm-menu-
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_prompt_convert.cpp$(PreprocessSuffix) "../xrm-menu-prompt-convert/src/prompt_convert.cpp"
 
 $(IntermediateDirectory)/data-sys_config_dao.cpp$(ObjectSuffix): ../src/data-sys/config_dao.cpp $(IntermediateDirectory)/data-sys_config_dao.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/data-sys/config_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/data-sys_config_dao.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/data-sys/config_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/data-sys_config_dao.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/data-sys_config_dao.cpp$(DependSuffix): ../src/data-sys/config_dao.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/data-sys_config_dao.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/data-sys_config_dao.cpp$(DependSuffix) -MM "../src/data-sys/config_dao.cpp"
 
@@ -135,7 +135,7 @@ $(IntermediateDirectory)/data-sys_config_dao.cpp$(PreprocessSuffix): ../src/data
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/data-sys_config_dao.cpp$(PreprocessSuffix) "../src/data-sys/config_dao.cpp"
 
 $(IntermediateDirectory)/data-sys_menu_prompt_dao.cpp$(ObjectSuffix): ../src/data-sys/menu_prompt_dao.cpp $(IntermediateDirectory)/data-sys_menu_prompt_dao.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/data-sys/menu_prompt_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/data-sys_menu_prompt_dao.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/data-sys/menu_prompt_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/data-sys_menu_prompt_dao.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/data-sys_menu_prompt_dao.cpp$(DependSuffix): ../src/data-sys/menu_prompt_dao.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/data-sys_menu_prompt_dao.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/data-sys_menu_prompt_dao.cpp$(DependSuffix) -MM "../src/data-sys/menu_prompt_dao.cpp"
 
@@ -143,7 +143,7 @@ $(IntermediateDirectory)/data-sys_menu_prompt_dao.cpp$(PreprocessSuffix): ../src
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/data-sys_menu_prompt_dao.cpp$(PreprocessSuffix) "../src/data-sys/menu_prompt_dao.cpp"
 
 $(IntermediateDirectory)/data-sys_text_prompts_dao.cpp$(ObjectSuffix): ../src/data-sys/text_prompts_dao.cpp $(IntermediateDirectory)/data-sys_text_prompts_dao.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/data-sys/text_prompts_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/data-sys_text_prompts_dao.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/merc/code/Oblivion2-XRM/src/data-sys/text_prompts_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/data-sys_text_prompts_dao.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/data-sys_text_prompts_dao.cpp$(DependSuffix): ../src/data-sys/text_prompts_dao.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/data-sys_text_prompts_dao.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/data-sys_text_prompts_dao.cpp$(DependSuffix) -MM "../src/data-sys/text_prompts_dao.cpp"
 
