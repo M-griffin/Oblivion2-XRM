@@ -218,16 +218,38 @@ public:
     std::string moveCursorToPosition();
 
     /**
+     * @brief Scroll Screen the Text Up
+     */
+    std::string scrollTextBoxUp(std::string &output);
+
+    /**
+     * @brief Scroll Screen the Text Down
+     */
+    std::string scrollTextBoxDown(std::string &output);
+
+    /**
+     * @brief Handle Backspaces
+     * @param output
+     */
+    void handleBackSpace(std::string &output);
+
+    /**
+     * @brief Handle Deletes Inline
+     * @param output
+     */
+    void handleDelete(std::string &output);
+
+    /**
+     * @brief Handle New Lines
+     * @param output
+     */
+    void handleNewLines(std::string &output);
+
+    /**
      * @brief Process Text Input for Editor
      * @return
      */
     void processTextInput(std::string result, std::string input);
-
-    /**
-     * @brief Process Control Input for Editor
-     * @return
-     */
-    void processControlInput(std::string input);
 
 
 private:

@@ -781,6 +781,14 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
         m_string_buffer.erase();
         return "\x1b";
     }
+    // Handle Single Char BS and DEL from Terminals
+    // Depending on User Setting to handle Windows or Terminal - these get flipped.
+    else if(num == 1 && (character_buffer[0] == '\x7f' || character_buffer[0] == '\x08'))
+    {
+        m_is_escape_sequence = false;
+        m_escape_sequence.erase();
+        return character_buffer;
+    }
     else if(num != 1)
     {
         Logging *log = Logging::instance();
@@ -880,6 +888,8 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                 case '9': // Function Keys.
                 case '0': // Function Keys.
                 case ';': // Seperator for Shift ARROW Keys! ie [1;2A
+                    std::cout << "common io: " << character_buffer << std::endl;
+
                     m_string_buffer += character_buffer;
                     return "";
 

@@ -53,6 +53,8 @@ std::string SessionIO::getFSEKeyInput(const std::string &character_buffer)
     {
         escape_sequence = m_common_io.getFSEEscapeSequence();
 
+        std::cout << "FSE escape_sequence: " << escape_sequence << std::endl;
+
         if(escape_sequence.size() == 0)
         {
             log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Single Escape");

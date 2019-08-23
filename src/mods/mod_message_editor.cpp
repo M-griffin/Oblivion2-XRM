@@ -415,6 +415,84 @@ std::string ModMessageEditor::moveCursorToPosition()
 }
 
 /**
+ * @brief Scroll Screen the Text Up
+ */
+std::string ModMessageEditor::scrollTextBoxUp(std::string &output)
+{
+    // Placeholder
+    return output;
+}
+
+/**
+ * @brief Scroll Screen the Text Down
+ */
+std::string ModMessageEditor::scrollTextBoxDown(std::string &output)
+{
+    // Placeholder
+    return output;
+}
+
+/**
+ * @brief Handle Backspaces
+ * @param output
+ */
+void ModMessageEditor::handleBackSpace(std::string &output)
+{
+    int x_position = m_text_process->getXPosition();
+
+    // destructive backspace
+    if(x_position > 1)
+    {
+        m_text_process->parseTextToBuffer((char *)"\b");
+        output += "\x1b[D \x1b[D";
+    }
+    // detsructive backspace move up and end of line
+    else if(x_position == 1)
+    {
+        m_text_process->parseTextToBuffer((char *)"\b");
+        output += moveCursorToPosition();
+
+        // Also need to bring text up with it!
+    }
+}
+
+/**
+ * @brief Handle Deletes Inline
+ * @param output
+ */
+void ModMessageEditor::handleDelete(std::string &output)
+{
+    /** Need to Write code to delete char or space and move everything left **/
+
+    int x_position = m_text_process->getXPosition();
+
+    // destructive backspace
+    if(x_position > 1)
+    {
+        m_text_process->parseTextToBuffer((char *)"\b");
+        output += "\x1b[D \x1b[D";
+    }
+    // detsructive backspace move up and end of line
+    else if(x_position == 1)
+    {
+        m_text_process->parseTextToBuffer((char *)"\b");
+        output += moveCursorToPosition();
+
+        // Also need to bring text up with it!
+    }
+}
+
+/**
+ * @brief Handle New Lines
+ * @param output
+ */
+void ModMessageEditor::handleNewLines(std::string &output)
+{
+    m_text_process->parseTextToBuffer((char *)"\n");
+    output += moveCursorToPosition();
+}
+
+/**
  * @brief Process Input Text for Editor
  * @return
  */
@@ -429,29 +507,31 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
     std::cout << "x_pos: " << x_position << std::endl;
     std::cout << "y_pos: " << y_position << std::endl;
 
-    if(result[0] != '\b' && result[0] != '\r' && result[0] != '\n') // && result[0] != '\x1b')
+    if(result[0] != '\x7f' && result[0] != '\x08' && result[0] != '\r' && result[0] != '\n') // && result[0] != '\x1b')
     {
         m_text_process->parseTextToBuffer((char *)input.c_str());
         output = input;
     }
 
-    // destructive backspace
-    if(result[0] == '\b' && x_position > 1)
+    // Handle Backspaces or Delete depending on User Switch
+    if(result[0] == '\x7f')
     {
-        m_text_process->parseTextToBuffer((char *)"\b");
-        output += "\b \b";
+        if(m_session_data->m_user_record->bBackSpaceVt100)
+            handleBackSpace(output);
+        else
+            handleDelete(output);
     }
-    // detsructive backspace move up and end of line
-    else if(result[0] == '\b' && x_position == 1)
+    else if(result[0] == '\x08')
     {
-        m_text_process->parseTextToBuffer((char *)"\b");
-        output += moveCursorToPosition();
+        if(!m_session_data->m_user_record->bBackSpaceVt100)
+            handleBackSpace(output);
+        else
+            handleDelete(output);
     }
     // CRLF New Line
     else if(result[0] == '\r' || result[0] == '\n')
     {
-        m_text_process->parseTextToBuffer((char *)"\n");
-        output += moveCursorToPosition();
+        handleNewLines(output);
     }
     // Wrap Around and Move Down at end of line
     else if(x_position == m_text_box_width && y_position != m_text_box_height)
@@ -461,23 +541,21 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
     // Bottom of box, scroll up a line up, and move to begininng.
     else if(y_position == m_text_box_height && x_position == m_text_box_width)
     {
+        //output += moveCursorToPosition();
+        m_text_process->parseTextToBuffer((char *)"\n");
         output += moveCursorToPosition();
+        // Scroll Box Up!
+
     }
 
+    /*
     std::cout << "=========w max " << m_text_box_width << " " << m_text_box_left << std::endl;
     std::cout << "=========h max " << m_text_box_height << " " << m_text_box_top << std::endl;
 
     std::cout << "x_pos: " << m_text_process->getXPosition() << std::endl;
     std::cout << "y_pos: " << m_text_process->getYPosition() << std::endl;
+    */
 
+    // Write output to Client Screen
     baseProcessDeliverInput(output);
-}
-
-/**
- * @brief Process Input Control for Editor
- * @return
- */
-void ModMessageEditor::processControlInput(std::string input)
-{
-
 }

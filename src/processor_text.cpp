@@ -655,6 +655,8 @@ void ProcessorText::movePreviousYPosition()
  */
 void ProcessorText::moveNewLine()
 {
+    std::cout << "ProcessorT moveNewLine" << std::endl;
+
     m_x_position = 1;
     ++m_y_position;
     ++m_line_number;
@@ -678,6 +680,8 @@ void ProcessorText::moveNewLine()
  */
 void ProcessorText::moveBackSpace()
 {
+    std::cout << "ProcessorT moveBackSpace" << std::endl;
+
     if(m_x_position > 1)
     {
         --m_x_position;
@@ -705,6 +709,7 @@ void ProcessorText::moveBackSpace()
  */
 void ProcessorText::moveDelete()
 {
+    std::cout << "ProcessorT moveDelete" << std::endl;
     // clear current, or erase on on line so next char move back
 }
 
@@ -713,6 +718,8 @@ void ProcessorText::moveDelete()
  */
 void ProcessorText::moveTabWidth()
 {
+    std::cout << "ProcessorT moveTabWidth" << std::endl;
+
     if(m_tab_width < m_characters_per_line - m_x_position)
     {
         screenBufferSetGlyph(std::string(m_tab_width, ' '));
@@ -1228,6 +1235,8 @@ void ProcessorText::parseTextToBuffer(char *buff)
     while(it != line_end)
     {
         common_io.getNextGlyph(buffer, it, line_end);
+
+        std::cout << "char <int>: " << static_cast<int>(buffer.character[0]) << std::endl;
 
         if(buffer.length == 1 && buffer.character[0] == '\x1b')
         {
