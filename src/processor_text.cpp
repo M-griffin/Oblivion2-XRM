@@ -536,10 +536,7 @@ void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
     }
     else
     {
-
-
         ++m_x_position;
-
 
         // Make sure the x/y position does go over num lines
         if(m_y_position > m_number_lines)
@@ -729,9 +726,9 @@ void ProcessorText::moveTabWidth()
 /**
  * @brief Escape Sequence Parsing
  */
-void ProcessorText::escapeSequenceParsing(LocalizedBuffer buffer,
-        std::string::iterator it,
-        std::string::iterator line_end)
+void ProcessorText::escapeSequenceParsing(LocalizedBuffer &buffer,
+        std::string::iterator &it,
+        std::string::iterator &line_end)
 {
     CommonIO common_io;
     std::string esc_sequence = "";
@@ -836,6 +833,10 @@ void ProcessorText::escapeSequenceParsing(LocalizedBuffer buffer,
             esc_sequence += buffer.character;
 
         } // End While (more_params)
+
+        std::cout << "ESCAPE SEQUENCE: " << esc_sequence << std::endl;
+        std::cout << "buffer.character[0]: " << buffer.character[0] << std::endl;
+        std::cout << "p: " << p << std::endl;
 
         switch(buffer.character[0])
         {
@@ -1236,10 +1237,11 @@ void ProcessorText::parseTextToBuffer(char *buff)
     {
         common_io.getNextGlyph(buffer, it, line_end);
 
-        std::cout << "char <int>: " << static_cast<int>(buffer.character[0]) << std::endl;
+        std::cout << "loop char <int>: " << static_cast<int>(buffer.character[0]) << std::endl;
 
         if(buffer.length == 1 && buffer.character[0] == '\x1b')
         {
+            std::cout << "escapeSequenceParsing !! " << std::endl;
             escapeSequenceParsing(buffer, it, line_end);
             continue;
         }

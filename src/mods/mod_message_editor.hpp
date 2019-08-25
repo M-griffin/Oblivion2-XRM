@@ -251,6 +251,12 @@ public:
      */
     void processTextInput(std::string result, std::string input);
 
+    /**
+     * @brief Process Escaped and Control Input Keys for Editor
+     * @return
+     */
+    void processEscapedInput(std::string result, std::string input);
+
 
 private:
 

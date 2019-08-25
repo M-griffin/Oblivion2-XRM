@@ -366,7 +366,7 @@ void ModMessageEditor::editorInput(const std::string &input)
     {
         // Translations for ENTER next line
         //input = "ENTER";
-        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ENTER HIT] input result=", result);
+        log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [ENTER HIT] input result=", result);
         //std::string output = "\r\n\x1b[" + std::to_string(m_text_box_left - 1) + "C";
 
         processTextInput(result, input);
@@ -374,28 +374,37 @@ void ModMessageEditor::editorInput(const std::string &input)
     else if(result[0] == '\x1b' && result.size() > 2)
     {
         // ESC SEQUENCE - check movement / arrow keys.
-        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ESC Sequence] input result=", result);
-        processTextInput(result, input);
+        std::string escape_sequence = m_common_io.getEscapeSequence();
+        std::cout << "ESC= " << escape_sequence << std::endl;
+        log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 1] input result=", result);
+        processEscapedInput(result.substr(1), input);
     }
     else if(result[0] == '\x1b' && result.size() == 2 && result[1] == '\x1b')
     {
         // Check Single ESC KEY - command options
         //input = "ESC";  - quit for now
-        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ESC HIT!] input result=", result);
+        log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [ESC HIT!] input result=", result);
         m_is_active = false;
     }
     else
     {
         // Handle Input Characters here and control chars.
-        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [STDIO] input result=", result);
+        log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [STDIO] input result=", result);
+
+        if(result[0] == '\x1b')
+        {
+            std::string escape_sequence = m_common_io.getEscapeSequence();
+            std::cout << "ESC= " << escape_sequence << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 2] input result=", static_cast<int>(escape_sequence[0]));
+
+            // Hot Key Input, cutoff leading escape for control key.
+            processEscapedInput(result.substr(1), input);
+            return;
+        }
 
         for(char c : result)
-            log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [c HIT] input result=", static_cast<int>(c));
+            log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [c HIT] input result=", static_cast<int>(c));
 
-        std::string escape_sequence = m_common_io.getEscapeSequence();
-        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ESC Sequence] input result=", static_cast<int>(escape_sequence[0]));
-
-        // Hot Key Input.
         processTextInput(result, input);
     }
 
@@ -555,6 +564,62 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
     std::cout << "x_pos: " << m_text_process->getXPosition() << std::endl;
     std::cout << "y_pos: " << m_text_process->getYPosition() << std::endl;
     */
+
+    // Write output to Client Screen
+    baseProcessDeliverInput(output);
+}
+
+/**
+ * @brief Process Escaped and Control Input Keys for Editor
+ * @return
+ */
+void ModMessageEditor::processEscapedInput(std::string result, std::string input)
+{
+
+    // Just some testing figuring out the best design.
+
+    std::string output = "";
+    int x_position = m_text_process->getXPosition();
+    int y_position = m_text_process->getYPosition();
+    std::cout << "x_pos: " << x_position << std::endl;
+    std::cout << "y_pos: " << y_position << std::endl;
+
+    std::cout << "processedEscapedInput result= " << result << ", input= " << input << std::endl;
+
+    if(result == "rt_arrow")
+    {
+        if(x_position < m_text_box_width)
+        {
+            output = "\x1b[C";
+            m_text_process->parseTextToBuffer((char *)output.c_str());
+        }
+    }
+    else if(result == "lt_arrow")
+    {
+        if(x_position > 1)
+        {
+            output = "\x1b[D";
+            m_text_process->parseTextToBuffer((char *)output.c_str());
+        }
+    }
+    else if(result == "up_arrow")
+    {
+        if(y_position > 1)
+        {
+            output = "\x1b[A";
+            m_text_process->parseTextToBuffer((char *)output.c_str());
+        }
+    }
+    else if(result == "dn_arrow")
+    {
+        if(y_position < m_text_box_height)
+        {
+            output = "\x1b[B";
+            m_text_process->parseTextToBuffer((char *)output.c_str());
+        }
+    }
+
+    std::cout << "output: " << output << std::endl;
 
     // Write output to Client Screen
     baseProcessDeliverInput(output);

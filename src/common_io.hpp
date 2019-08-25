@@ -38,6 +38,12 @@ public:
     explicit CommonIO();
     ~CommonIO();
 
+    /**
+     * @brief Retrieve Key Sequence by Value
+     * @param value
+     */
+    std::string getSequenceFromMap(std::string value);
+
     /* This function will read the OS specific functions
      * To Determine where the executable is located.
      * This has only been tested in Windows, Linux, OSX.

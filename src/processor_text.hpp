@@ -64,9 +64,9 @@ public:
     void screenBufferScrollDown();
 
     // This could be shared.
-    void escapeSequenceParsing(LocalizedBuffer buffer,
-                               std::string::iterator it,
-                               std::string::iterator line_end);
+    void escapeSequenceParsing(LocalizedBuffer &buffer,
+                               std::string::iterator &it,
+                               std::string::iterator &line_end);
 
 };
 

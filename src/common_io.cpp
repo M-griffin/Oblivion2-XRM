@@ -177,6 +177,27 @@ CommonIO::~CommonIO()
 }
 
 /**
+ * @brief Retrieve Key Sequence by Value
+ * @param value
+ */
+std::string CommonIO::getSequenceFromMap(std::string value)
+{
+    std::string key = "";
+
+    for(auto &i : m_sequence_map)
+    {
+        if(i.second == value)
+        {
+            key = "\x1b";
+            key += i.first;
+            break;
+        }
+    }
+
+    return key;
+}
+
+/**
  * @brief Determine where the executable is located.
  * This has only been tested in Windows, Linux, OSX.
  * @return
