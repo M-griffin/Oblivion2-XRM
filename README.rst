@@ -1,5 +1,5 @@
 
-.. image:: https://htc.zapto.org/jenkins/job/Oblivion2-XRM%20-%20Pipeline/job/master/badge/icon
+.. image:: http://htc.zapto.org:1024/jenkins/job/Oblivion2-XRM%20-%20Pipeline/job/master/badge/icon
    :target: https://htc.zapto.org/jenkins/job/Oblivion2-XRM%20-%20Pipeline/job/master/
 
 
