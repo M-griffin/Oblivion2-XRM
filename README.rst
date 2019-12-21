@@ -1,6 +1,6 @@
 
 .. image:: http://htc.zapto.org:8090/job/Oblivion2-XRM%20-%20Pipeline/job/master/badge/icon
-   :target: https://htc.zapto.org:8090/job/Oblivion2-XRM%20-%20Pipeline/job/master/
+   :target: http://htc.zapto.org:8090/job/Oblivion2-XRM%20-%20Pipeline/job/master/
 
 
 
