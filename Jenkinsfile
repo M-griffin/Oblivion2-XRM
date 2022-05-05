@@ -12,28 +12,28 @@ pipeline {
 				}
 			}
 		}
-		stage('\u2777 Build Xrm-Menu-Convert') {
+		stage('\u2777 Build MenuConvert') {
 			steps {
 				dir ('linux') {
 					sh 'make -f xrm-menu-convert.mk -j2'
 				}
 			}
 		}
-		stage('\u2778 Build Xrm-Menu-Prompt-Convert') {
+		stage('\u2778 Build PromptConvert') {
 			steps {
 				dir ('linux') {
 					sh 'make -f xrm-menu-prompt-convert.mk -j2'
 				}
 			}
 		}
-		stage('\u2779 Build Xrm-UnitTests') {
+		stage('\u2779 Build UnitTests') {
 			steps {
 				dir ('linux') {
 					sh 'make -f xrm-unittest.mk -j2'
 				}
 			}
 		}
-		stage('\u277A Run Xrm-UnitTests') {
+		stage('\u277A Run UnitTests') {
 			steps {
 				dir ('linux') {
 					echo 'Running Unit Tests...'
@@ -43,7 +43,7 @@ pipeline {
 				}
 			}
 		}
-		stage('\u277B Build Xrm-Server') {
+		stage('\u277B Build Appplication') {
 			 steps {
 				dir ('linux') {
 					sh 'make -f xrm-server.mk -j2'
