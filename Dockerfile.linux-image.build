@@ -1,0 +1,86 @@
+# Dockerfile.linux-image.build
+#------------------------------------------------------------------------------------------
+# Dockerfile to create a Linux Ubuntu Image for Testing from you current local branch.
+# You can use this to create a local image then run it.
+# --- This is for Development and Testing Purposes Only. ---
+#
+# - Usage: In Visual Studio Code when Docker Extensions are Installed
+# - you can right click this file and select build.  Or From the command Line:
+# $ docker build --pull --rm -f "Dockerfile.linux-image.build" -t oblivion2xrm:latest "."
+# - To start-up the image you can use "docker-compose up" OR run the following command:
+# $ docker run -t -dit oblivion2xrm
+#------------------------------------------------------------------------------------------
+
+# Get the Latest base Ubuntu image from Docker Hub
+FROM ubuntu:latest
+
+# Update apps on the base image
+RUN apt-get -y update && apt-get install -y
+
+# ----------------------
+# Install Dependencies
+# ----------------------
+
+# Debugging, good to have a local editor, and git for changes
+RUN apt-get install nano --yes
+RUN apt-get install git --yes
+
+# Build Essentials for the Compiler
+RUN apt install -y software-properties-common ca-certificates wget curl ssh
+RUN apt install -y build-essential
+
+# Build Application Dependencies
+RUN apt-get install libyaml-cpp-dev --yes
+RUN apt-get install libssh-dev --yes
+RUN apt-get install libboost-all-dev --yes
+RUN apt-get install libsqlite3-dev --yes
+RUN apt-get install uuid-dev --yes
+RUN apt-get install libunittest++-dev --yes
+
+# Terminal Setup - Encodings and Locales needed
+RUN apt-get install -y locales-all
+
+# Setup Enviroment Variables for locales
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
+# Copy the current folder base projust to the Docker Container.
+COPY . /usr/src/Oblivion2-XRM
+
+# Specify the working directory on the Container
+WORKDIR /usr/src/Oblivion2-XRM/linux
+RUN mkdir -p ./Debug
+
+# ----------------------
+# Build The System
+# ----------------------
+
+# Build the SQLite Wrapper Dependency
+RUN make -f SqliteWrapped.mk
+
+# SQLITE Wrapped - Setup Compiled Header File for other Modules to use.
+RUN cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h > ./Debug/libSqliteWrapped.h
+
+# Build the Main XRM Server And Helper Apps Along with Unit Tests
+RUN make -f xrm-menu-convert.mk
+RUN make -f xrm-menu-prompt-convert.mk
+RUN make -f xrm-unittest.mk
+RUN make -f xrm-server.mk
+
+# Switch to the Debug Directory, and copy executables to the Build folder.
+WORKDIR /usr/src/Oblivion2-XRM/linux/Debug
+RUN cp ./xrm-menu-convert ../../build
+RUN cp ./xrm-menu-prompt-convert ../../build
+RUN cp ./xrm-unittest ../../build
+RUN cp ./xrm-server ../../build
+
+# Update permissions to avoid any issues, this runs as root, so should revisit this
+# However, this is a development image/build so not for prodution use.
+WORKDIR /usr/src/Oblivion2-XRM
+RUN chmod 077 * -R
+
+# -------------------------------------------------------------------------------
+# Startup the BBS when the container starts
+# -------------------------------------------------------------------------------
+WORKDIR /usr/src/Oblivion2-XRM/build
+ENTRYPOINT ["./xrm-server"]

@@ -44,3 +44,4 @@ Temporary Items
 changelog.txt
 src/form_manager.cpp
 sqlitewrap/libSqliteWrapped.h
+.vscode/settings.json

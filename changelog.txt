@@ -1,3 +1,14 @@
+Change Log Update (00.00.147)
+* 2022-05-05
++ Created Dockerfile (Dockerfile.linux-image.build) and docker-compose for generating
+  a local docker image with build enviroment from the pulled branch.
+  Initial testing and and recompiles can be made, but it not setup for git pushes.
+  WIP - Addon to this would be to setup git commits and changes for active development.
++ Fixed Yaml (xml_config.yaml) Load issues. 
+  config.hpp hidden_input_field_char was an unsigned char which seems to be an 
+  issue in the latest yaml-cpp v7.0.  Converted the variable to an std::string.
++ Added a missed "use_address" configuration option.
+
 Change Log Update (00.00.146)
 * 2019-07-27
 + Entire Project update and rework so each environment strictly uses it's own 
@@ -400,7 +411,7 @@ Change Log Update (00.00.109)
 * 2018-07-18
 + Menu Editor, Fixed ordering of input Methods, Also added getLineInput for parsing
   keys. Ready to start building out method and pipe sequence parsing.
-  Initial MenuEditor Option/Command display completed. Next is to add m…  …   
+  Initial MenuEditor Option/Command display completed. Next is to add mï¿½  ï¿½   
 + Updated Padding (Left/Right) when the string it empty, it will now padd properly.
 + Cleanup on some socket output for debugging Async processing.   
 + Completed Copy Menu Source/Destination  

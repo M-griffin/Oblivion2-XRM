@@ -21,16 +21,16 @@ Linux using apt-get:
 
         sudo apt-get install build-essential
         sudo apt-get install libyaml-cpp-dev
-        sudo apt-get install libssh-dev 
-        sudo apt-get install libboost-dev
+        sudo apt-get install libssh-dev
+        sudo apt-get install libboost-all-dev
         sudo apt-get install libsqlite3-dev
         sudo apt-get install uuid-dev
         sudo apt-get install libunittest++-dev
 
 Clone the project - This will checkout and create project in current folder.
-	
+
         git clone https://github.com/M-griffin/Oblivion2-XRM.git .
-	
+
         cd build
 	   ./build-linux.sh -j2  (Notes, -j# is number of cpu cores for faster compiling, use a high number if you have more cores)
 
@@ -41,7 +41,7 @@ once completed.
         ./xrm-unittest            - to run the unit tests
         ./xrm-menu-convert        - convert Legacy Obv/2 menus to yaml format for XRM.
         ./xrm-menu-prompt-comvert - convert Legacy Obv/2 prompt to yaml format for XRM.
- 
+
 The default port will be 6023 and can be updated in the xrm-server.yaml configuration that gets auto-generated after you run the system the first time.
 
 All data files, and configuration file are generated on the initial startup of the system.
