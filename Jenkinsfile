@@ -30,8 +30,12 @@ pipeline {
 			steps {
 				dir ('linux') {
 					sh 'make -f xrm-unittest.mk -j2'
-
-					// Run tests
+				}
+			}
+		}
+		stage('\u277A Run Xrm-UnitTests') {
+			steps {
+				dir ('linux') {
 					echo 'Running Unit Tests...'
 					dir ('Debug') {
 						sh './xrm-unittest'
@@ -39,7 +43,7 @@ pipeline {
 				}
 			}
 		}
-		stage('\u277A Build Xrm-Server') {
+		stage('\u277B Build Xrm-Server') {
 			 steps {
 				dir ('linux') {
 					sh 'make -f xrm-server.mk -j2'
