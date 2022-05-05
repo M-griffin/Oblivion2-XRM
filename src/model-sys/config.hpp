@@ -125,8 +125,8 @@ public:
     bool use_backspace;           // Ask Backspace
 
 
-// char
-    char hidden_input_character;  // HiddenInputChar;
+// string
+    std::string hidden_input_character;  // HiddenInputChar;
 
 // bool
     bool use_auto_validate_users; // AutoValNewUsers;
@@ -275,7 +275,7 @@ public:
         , use_clear_screen(true)
         , use_ansi_color(true)
         , use_backspace(true)
-        , hidden_input_character('*')
+        , hidden_input_character("*")
         , use_auto_validate_users(true)
         , use_newuser_voting(false)
         , use_auto_kick_unvalidated(false)
@@ -401,6 +401,7 @@ struct convert<Config>
         node["use_matrix_login"] = rhs.use_matrix_login;
         node["use_newuser_password"] = rhs.use_newuser_password;
         node["use_disclaimer"] = rhs.use_disclaimer;
+        node["use_address"] = rhs.use_address;
         node["use_handle"] = rhs.use_handle;
         node["use_real_name"] = rhs.use_real_name;
         node["use_location"] = rhs.use_location;
@@ -523,6 +524,7 @@ struct convert<Config>
         rhs.use_matrix_login                = node["use_matrix_login"].as<bool>();
         rhs.use_newuser_password            = node["use_newuser_password"].as<bool>();
         rhs.use_disclaimer                  = node["use_disclaimer"].as<bool>();
+        rhs.use_address                     = node["use_address"].as<bool>();
         rhs.use_handle                      = node["use_handle"].as<bool>();
         rhs.use_real_name                   = node["use_real_name"].as<bool>();
         rhs.use_location                    = node["use_location"].as<bool>();
@@ -537,7 +539,7 @@ struct convert<Config>
         rhs.use_clear_screen                = node["use_clear_screen"].as<bool>();
         rhs.use_ansi_color                  = node["use_ansi_color"].as<bool>();
         rhs.use_backspace                   = node["use_backspace"].as<bool>();
-        rhs.hidden_input_character          = node["hidden_input_character"].as<unsigned char>();
+        rhs.hidden_input_character          = node["hidden_input_character"].as<std::string>();
         rhs.use_auto_validate_users         = node["use_auto_validate_users"].as<bool>();
         rhs.use_newuser_voting              = node["use_newuser_voting"].as<bool>();
         rhs.use_auto_kick_unvalidated       = node["use_auto_kick_unvalidated"].as<bool>();

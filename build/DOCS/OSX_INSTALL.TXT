@@ -11,11 +11,15 @@ Requirements:
 	/usr/local/opt/libssh
 	/usr/local/opt/ossp-uuid
 	/usr/local/opt/boost
-        /usr/local/opt/unittest-cpp
+    /usr/local/opt/unittest-cpp
 
 Note, Boost is only used for the menu and prompt conversion utilities
 
-
+#---------------------------------------------------------------------------------------
+Homebrew Note, Some might not use Homebrew for their package management
+However, I needed to setup specific Include file locations in the .mk Makefiles
+And so if you do NOT use Homebrew, then these paths would need to be updated manually.
+#---------------------------------------------------------------------------------------
 
 Install Homebrew:
 	ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -29,14 +33,14 @@ Install Dependencies:
 	brew install labs
 	brew install yaml-cpp
 	brew install ossp-uuid
-        brew install unittest-cpp
-        brew install boost
+    brew install unittest-cpp
+    brew install boost
 
 Install GIT to pull down project:
 	brew install git
 
 Install latest compiler with c++11 compatibility is NEEDED!
-	I have the following version installed.
+	I have the following version installed or later..
 
 	Apple LLVM version 9.0.0 (clang-900.0.39.2)
 	Target: x86_64-apple-darwin17.4.0
@@ -45,17 +49,16 @@ Install latest compiler with c++11 compatibility is NEEDED!
 
 	brew install clang
 
-
 You can check check /usr/local/Cellar for program versions installed
 All Lib and Include files are linked to /usr/local/opt
 
 
 Clone the project - This will checkout and create project in current folder.
-	
+
         git clone https://github.com/M-griffin/Oblivion2-XRM.git .
-	
+
         cd build
-	./build-osx.sh -j2  (Notes, -j# is number of cpu cores for faster compiling)
+        ./build-osx.sh -j2  (Notes, -j# is number of cpu cores for faster compiling)
 
 This will build all project files and copy the executables back to the build folder
 once completed.
@@ -64,7 +67,7 @@ once completed.
         ./xrm-unittest            - to run the unit tests
         ./xrm-menu-convert        - convert Legacy Obv/2 menus to yaml format for XRM.
         ./xrm-menu-prompt-comvert - convert Legacy Obv/2 prompt to yaml format for XRM.
- 
+
 The default port will be 6023 and can be updated in the xrm-server.yaml configuration that gets auto-generated after you run the system the first time.
 
 All data files, and configuration file are generated on the initial startup of the system.
