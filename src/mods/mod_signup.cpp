@@ -520,10 +520,82 @@ void ModSignup::setupVerifyAndSave()
 }
 
 /**
+ * @brief Base Class for shared input (receives function pointer for custom execution)
+ * @param field_length 
+ */
+bool ModSignup::fieldInputAndProcess(std::string &input, int field_length, bool useHiddenOutput, 
+    std::function<bool(std::string &, std::string &)> &func_pointer) 
+{
+    Logging *log = Logging::instance();
+
+    std::string key = "";
+    std::string result = m_session_io.getInputField(input, key, field_length, "", useHiddenOutput);
+
+    // ESC was hit
+    if(result == "aborted")
+    {
+        m_is_active = false;
+        return false;
+    }
+    else if(result[0] == '\n')
+    {
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+        if(key.size() == 0)
+        {
+            return false;
+        }
+
+        baseProcessDeliverNewLine();
+
+        // Execution Lambda Function Passed in.
+        func_pointer(&input, &key);
+    }
+    else
+    {
+        // Send back the single input received to show client key presses.
+        // Only if return data shows a processed key returned.
+        if(result != "empty")
+        {
+            baseProcessDeliverInput(result);
+        }
+    }
+
+    return true;
+
+}
+
+/**
  * @brief Check for New User Password
  * @return
  */
 bool ModSignup::newUserPassword(const std::string &input)
+{
+    bool useHiddenOutput = true;
+    auto lambda_function = [&input, &key](bool pass) { 
+
+        // Pull in and test aginst new user password.
+        if(key.compare(m_config->password_newuser) == 0)
+        {
+            log->xrmLog<Logging::CONSOLE_LOG>("NewUserPassword Accepted", __LINE__, __FILE__);
+            changeNextModule();
+        }
+        else
+        {
+            log->xrmLog<Logging::CONSOLE_LOG>("Error, Incorrect NewUserPassword!", __LINE__, __FILE__);
+            ++m_newuser_password_attempts;
+            displayPromptAndNewLine(PROMPT_PASS_INVALID);
+            redisplayModulePrompt();
+        }
+    };
+
+    return fieldInputAndProcess(input, Config::sPassword_length, useHiddenOutput, lambda_function);
+}
+
+/**
+ * @brief Check for New User Password
+ * @return
+ */
+bool ModSignup::newUserPassword_orig(const std::string &input)
 {
     Logging *log = Logging::instance();
 
