@@ -521,15 +521,19 @@ void ModSignup::setupVerifyAndSave()
 
 /**
  * @brief Base Class for shared input (receives function pointer for custom execution)
+ * 
+ * @param input 
  * @param field_length 
+ * @param useHiddenOutput 
+ * @param func_pointer 
+ * @return true 
+ * @return false 
  */
-bool ModSignup::fieldInputAndProcess(std::string &input, int field_length, bool useHiddenOutput, 
-    std::function<bool(std::string &, std::string &)> &func_pointer) 
+bool ModSignup::fieldInputAndProcess(std::string input, int field_length, bool use_hidden_output, 
+    std::function<bool(std::string &, std::string &)> function_pointer) 
 {
-    Logging *log = Logging::instance();
-
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, field_length, "", useHiddenOutput);
+    std::string result = m_session_io.getInputField(input, key, field_length, "", use_hidden_output);
 
     // ESC was hit
     if(result == "aborted")
@@ -547,8 +551,8 @@ bool ModSignup::fieldInputAndProcess(std::string &input, int field_length, bool 
 
         baseProcessDeliverNewLine();
 
-        // Execution Lambda Function Passed in.
-        func_pointer(&input, &key);
+        // Execution Lambda Function Passed in. Test if it can use the log, or we need to pass
+        return function_pointer(input, key);
     }
     else
     {
@@ -561,7 +565,6 @@ bool ModSignup::fieldInputAndProcess(std::string &input, int field_length, bool 
     }
 
     return true;
-
 }
 
 /**
@@ -570,10 +573,14 @@ bool ModSignup::fieldInputAndProcess(std::string &input, int field_length, bool 
  */
 bool ModSignup::newUserPassword(const std::string &input)
 {
-    bool useHiddenOutput = true;
-    auto lambda_function = [&input, &key](bool pass) { 
+    // Create a STD Function Lambda to pass and be executed in the STD IO Method.
+    std::function<bool(std::string &, std::string &)> lambda_function = [this]
+        (std::string &input, std::string &key) { 
 
-        // Pull in and test aginst new user password.
+        // Debug Logging
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+
         if(key.compare(m_config->password_newuser) == 0)
         {
             log->xrmLog<Logging::CONSOLE_LOG>("NewUserPassword Accepted", __LINE__, __FILE__);
@@ -586,64 +593,11 @@ bool ModSignup::newUserPassword(const std::string &input)
             displayPromptAndNewLine(PROMPT_PASS_INVALID);
             redisplayModulePrompt();
         }
+
+        return true;
     };
 
-    return fieldInputAndProcess(input, Config::sPassword_length, useHiddenOutput, lambda_function);
-}
-
-/**
- * @brief Check for New User Password
- * @return
- */
-bool ModSignup::newUserPassword_orig(const std::string &input)
-{
-    Logging *log = Logging::instance();
-
-    std::string key = "";
-    bool useHiddenOutput = true;
-    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length, "", useHiddenOutput);
-
-    // ESC was hit
-    if(result == "aborted")
-    {
-        m_is_active = false;
-        return false;
-    }
-    else if(result[0] == '\n')
-    {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            return false;
-        }
-
-        baseProcessDeliverNewLine();
-
-        // Pull in and test aginst new user password.
-        if(key.compare(m_config->password_newuser) == 0)
-        {
-            log->xrmLog<Logging::CONSOLE_LOG>("NewUserPassword Accepted", __LINE__, __FILE__);
-            changeNextModule();
-        }
-        else
-        {
-            log->xrmLog<Logging::CONSOLE_LOG>("Error, Incorrect NewUserPassword!", __LINE__, __FILE__);
-            ++m_newuser_password_attempts;
-            displayPromptAndNewLine(PROMPT_PASS_INVALID);
-            redisplayModulePrompt();
-        }
-    }
-    else
-    {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if(result != "empty")
-        {
-            baseProcessDeliverInput(result);
-        }
-    }
-
-    return true;
+    return fieldInputAndProcess(input, Config::sPassword_length, USE_HIDDEN_OUTPUT_TRUE, lambda_function);
 }
 
 /**
@@ -651,26 +605,14 @@ bool ModSignup::newUserPassword_orig(const std::string &input)
  * @return
  */
 bool ModSignup::disclaimer(const std::string &input)
-{
-    // handle input for using ansi color, hot key or ENTER after..  hmm
-    std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+{    
+    // Create a STD Function Lambda to pass and be executed in the STD IO Method.
+    std::function<bool(std::string &, std::string &)> lambda_function = [this]
+        (std::string &input, std::string &key) {
 
-    // ESC was hit
-    if(result == "aborted")
-    {
-        m_is_active = false;
-        return false;
-    }
-    else if(result[0] == '\n')
-    {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            return false;
-        }
-
-        baseProcessDeliverNewLine();
+        // Debug Logging
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // If ENTER Default to Yes, or Single Y is hit
         if(toupper(key[0]) == 'Y' && key.size() == 1)
@@ -688,20 +630,12 @@ bool ModSignup::disclaimer(const std::string &input)
             displayPromptAndNewLine(PROMPT_TEXT_INVALID);
             redisplayModulePrompt();
         }
-    }
-    else
-    {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if(result != "empty")
-        {
-            baseProcessDeliverInput(result);
-        }
-    }
 
-    return true;
+        return true;
+    };
+
+    return fieldInputAndProcess(input, Config::sSingle_key_length, USE_HIDDEN_OUTPUT_FALSE, lambda_function);
 }
-
 
 /**
  * @brief Get Handle from User
@@ -709,28 +643,17 @@ bool ModSignup::disclaimer(const std::string &input)
  */
 bool ModSignup::handle(const std::string &input)
 {
-    std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
+    // Create a STD Function Lambda to pass and be executed in the STD IO Method.
+    std::function<bool(std::string &, std::string &)> lambda_function = [this]
+        (std::string &input, std::string &key) {
 
-    // ESC was hit
-    if(result == "aborted")
-    {
-        m_is_active = false;
-        return false;
-    }
-    else if(result[0] == '\n')
-    {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            return false;
-        }
+        // Debug Logging
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Check for user name and if is already exists!
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
         user_ptr search = user_data->getUserByHandle(key);
-
-        baseProcessDeliverNewLine();
 
         if(!search || search->iId == -1)
         {
@@ -742,18 +665,11 @@ bool ModSignup::handle(const std::string &input)
             displayPromptAndNewLine(PROMPT_HANDLE_INVALID);
             redisplayModulePrompt();
         }
-    }
-    else
-    {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if(result != "empty")
-        {
-            baseProcessDeliverInput(result);
-        }
-    }
 
-    return true;
+        return true;
+    };
+
+    return fieldInputAndProcess(input, Config::sName_length, USE_HIDDEN_OUTPUT_FALSE, lambda_function);
 }
 
 /**
@@ -762,27 +678,17 @@ bool ModSignup::handle(const std::string &input)
  */
 bool ModSignup::realName(const std::string &input)
 {
-    std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
+    // Create a STD Function Lambda to pass and be executed in the STD IO Method.
+    std::function<bool(std::string &, std::string &)> lambda_function = [this]
+        (std::string &input, std::string &key) {
 
-    // ESC was hit
-    if(result == "aborted")
-    {
-        m_is_active = false;
-        return false;
-    }
-    else if(result[0] == '\n')
-    {
-        if(key.size() == 0)
-        {
-            return false;
-        }
+        // Debug Logging
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Check for real name and if is already exists!
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
         user_ptr search = user_data->getUserByRealName(key);
-
-        baseProcessDeliverNewLine();
 
         if(!search || search->iId == -1)
         {
@@ -794,18 +700,11 @@ bool ModSignup::realName(const std::string &input)
             displayPromptAndNewLine(PROMPT_NAME_INVALID);
             redisplayModulePrompt();
         }
-    }
-    else
-    {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if(result != "empty")
-        {
-            baseProcessDeliverInput(result);
-        }
-    }
 
-    return true;
+        return true;
+    };
+
+    return fieldInputAndProcess(input, Config::sName_length, USE_HIDDEN_OUTPUT_FALSE, lambda_function);
 }
 
 /**
@@ -814,38 +713,20 @@ bool ModSignup::realName(const std::string &input)
  */
 bool ModSignup::address(const std::string &input)
 {
-    std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
+    // Create a STD Function Lambda to pass and be executed in the STD IO Method.
+    std::function<bool(std::string &, std::string &)> lambda_function = [this]
+        (std::string &input, std::string &key) {
 
-    // ESC was hit
-    if(result == "aborted")
-    {
-        m_is_active = false;
-        return false;
-    }
-    else if(result[0] == '\n')
-    {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            return false;
-        }
+        // Debug Logging
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
-        baseProcessDeliverNewLine();
         m_user_record->sAddress = key;
         changeNextModule();
-    }
-    else
-    {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if(result != "empty")
-        {
-            baseProcessDeliverInput(result);
-        }
-    }
+        return true;
+    };
 
-    return true;
+    return fieldInputAndProcess(input, Config::sDefault_question_length, USE_HIDDEN_OUTPUT_FALSE, lambda_function);
 }
 
 /**
@@ -854,38 +735,20 @@ bool ModSignup::address(const std::string &input)
  */
 bool ModSignup::location(const std::string &input)
 {
-    std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
+    // Create a STD Function Lambda to pass and be executed in the STD IO Method.
+    std::function<bool(std::string &, std::string &)> lambda_function = [this]
+        (std::string &input, std::string &key) {
 
-    // ESC was hit
-    if(result == "aborted")
-    {
-        m_is_active = false;
-        return false;
-    }
-    else if(result[0] == '\n')
-    {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            return false;
-        }
+        // Debug Logging
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
-        baseProcessDeliverNewLine();
         m_user_record->sLocation = key;
         changeNextModule();
-    }
-    else
-    {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if(result != "empty")
-        {
-            baseProcessDeliverInput(result);
-        }
-    }
+        return true;
+    };
 
-    return true;
+    return fieldInputAndProcess(input, Config::sDefault_question_length, USE_HIDDEN_OUTPUT_FALSE, lambda_function);
 }
 
 /**
@@ -894,38 +757,20 @@ bool ModSignup::location(const std::string &input)
  */
 bool ModSignup::country(const std::string &input)
 {
-    std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
+    // Create a STD Function Lambda to pass and be executed in the STD IO Method.
+    std::function<bool(std::string &, std::string &)> lambda_function = [this]
+        (std::string &input, std::string &key) {
 
-    // ESC was hit
-    if(result == "aborted")
-    {
-        m_is_active = false;
-        return false;
-    }
-    else if(result[0] == '\n')
-    {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            return false;
-        }
+        // Debug Logging
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
-        baseProcessDeliverNewLine();
         m_user_record->sCountry = key;
         changeNextModule();
-    }
-    else
-    {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if(result != "empty")
-        {
-            baseProcessDeliverInput(result);
-        }
-    }
+        return true;
+    };
 
-    return true;
+    return fieldInputAndProcess(input, Config::sDefault_question_length, USE_HIDDEN_OUTPUT_FALSE, lambda_function);
 }
 
 /**
@@ -934,24 +779,13 @@ bool ModSignup::country(const std::string &input)
  */
 bool ModSignup::email(const std::string &input)
 {
-    std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
+    // Create a STD Function Lambda to pass and be executed in the STD IO Method.
+    std::function<bool(std::string &, std::string &)> lambda_function = [this]
+        (std::string &input, std::string &key) {
 
-    // ESC was hit
-    if(result == "aborted")
-    {
-        m_is_active = false;
-        return false;
-    }
-    else if(result[0] == '\n')
-    {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            return false;
-        }
-
-        baseProcessDeliverNewLine();
+        // Debug Logging
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Test if email already exists.
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
@@ -967,18 +801,11 @@ bool ModSignup::email(const std::string &input)
             displayPromptAndNewLine(PROMPT_EMAIL_INVALID);
             redisplayModulePrompt();
         }
-    }
-    else
-    {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if(result != "empty")
-        {
-            baseProcessDeliverInput(result);
-        }
-    }
 
-    return true;
+        return true;
+    };
+
+    return fieldInputAndProcess(input, Config::sDefault_question_length, USE_HIDDEN_OUTPUT_FALSE, lambda_function);
 }
 
 /**
@@ -987,38 +814,20 @@ bool ModSignup::email(const std::string &input)
  */
 bool ModSignup::userNote(const std::string &input)
 {
-    std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sDefault_question_length);
+    // Create a STD Function Lambda to pass and be executed in the STD IO Method.
+    std::function<bool(std::string &, std::string &)> lambda_function = [this]
+        (std::string &input, std::string &key) {
 
-    // ESC was hit
-    if(result == "aborted")
-    {
-        m_is_active = false;
-        return false;
-    }
-    else if(result[0] == '\n')
-    {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            return false;
-        }
+        // Debug Logging
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
-        baseProcessDeliverNewLine();
         m_user_record->sUserNote = key;
         changeNextModule();
-    }
-    else
-    {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if(result != "empty")
-        {
-            baseProcessDeliverInput(result);
-        }
-    }
+        return true;
+    };
 
-    return true;
+    return fieldInputAndProcess(input, Config::sDefault_question_length, USE_HIDDEN_OUTPUT_FALSE, lambda_function);
 }
 
 /**
@@ -1027,24 +836,13 @@ bool ModSignup::userNote(const std::string &input)
  */
 bool ModSignup::birthday(const std::string &input)
 {
-    std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sDate_length);
+    // Create a STD Function Lambda to pass and be executed in the STD IO Method.
+    std::function<bool(std::string &, std::string &)> lambda_function = [this]
+        (std::string &input, std::string &key) {
 
-    // ESC was hit
-    if(result == "aborted")
-    {
-        m_is_active = false;
-        return false;
-    }
-    else if(result[0] == '\n')
-    {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            return false;
-        }
-
-        baseProcessDeliverNewLine();
+        // Debug Logging
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         try
         {
@@ -1084,21 +882,13 @@ bool ModSignup::birthday(const std::string &input)
         }
         catch(std::regex_error &ex)
         {
-            Logging *log = Logging::instance();
             log->xrmLog<Logging::ERROR_LOG>("Error, regex date error=", ex.what(), ex.code(), __LINE__, __FILE__);
         }
-    }
-    else
-    {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if(result != "empty")
-        {
-            baseProcessDeliverInput(result);
-        }
-    }
 
-    return true;
+        return true;
+    };
+
+    return fieldInputAndProcess(input, Config::sDate_length, USE_HIDDEN_OUTPUT_FALSE, lambda_function);
 }
 
 /**
@@ -1107,24 +897,13 @@ bool ModSignup::birthday(const std::string &input)
  */
 bool ModSignup::gender(const std::string &input)
 {
-    std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+    // Create a STD Function Lambda to pass and be executed in the STD IO Method.
+    std::function<bool(std::string &, std::string &)> lambda_function = [this]
+        (std::string &input, std::string &key) {
 
-    // ESC was hit
-    if(result == "aborted")
-    {
-        m_is_active = false;
-        return false;
-    }
-    else if(result[0] == '\n')
-    {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            return false;
-        }
-
-        baseProcessDeliverNewLine();
+        // Debug Logging
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // If ENTER Default to Yes, or Single Y is hit
         if((toupper(key[0]) == 'M' && key.size() == 1))
@@ -1144,18 +923,10 @@ bool ModSignup::gender(const std::string &input)
         }
 
         changeNextModule();
-    }
-    else
-    {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if(result != "empty")
-        {
-            baseProcessDeliverInput(result);
-        }
-    }
+        return true;
+    };
 
-    return true;
+    return fieldInputAndProcess(input, Config::sSingle_key_length, USE_HIDDEN_OUTPUT_FALSE, lambda_function);
 }
 
 /**
@@ -1164,45 +935,20 @@ bool ModSignup::gender(const std::string &input)
  */
 bool ModSignup::password(const std::string &input)
 {
-    std::string key = "";
-    bool useHiddenOutput = true;
-    std::string result = m_session_io.getInputField(
-                             input,
-                             key,
-                             Config::sPassword_length,
-                             "",
-                             useHiddenOutput
-                         );
+    // Create a STD Function Lambda to pass and be executed in the STD IO Method.
+    std::function<bool(std::string &, std::string &)> lambda_function = [this]
+        (std::string &input, std::string &key) {
 
-    // ESC was hit
-    if(result == "aborted")
-    {
-        m_is_active = false;
-        return false;
-    }
-    else if(result[0] == '\n')
-    {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            return false;
-        }
+        // Debug Logging
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
-        baseProcessDeliverNewLine();
         m_security_record->sPasswordHash = key;
         changeNextModule();
-    }
-    else
-    {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if(result != "empty")
-        {
-            baseProcessDeliverInput(result);
-        }
-    }
+        return true;
+    };
 
-    return true;
+    return fieldInputAndProcess(input, Config::sPassword_length, USE_HIDDEN_OUTPUT_TRUE, lambda_function);
 }
 
 /**
@@ -1211,32 +957,13 @@ bool ModSignup::password(const std::string &input)
  */
 bool ModSignup::verifyPassword(const std::string &input)
 {
-    Logging *log = Logging::instance();
-    std::string key = "";
-    bool useHiddenOutput = true;
-    std::string result = m_session_io.getInputField(
-                             input,
-                             key,
-                             Config::sPassword_length,
-                             "",
-                             useHiddenOutput
-                         );
+    // Create a STD Function Lambda to pass and be executed in the STD IO Method.
+    std::function<bool(std::string &, std::string &)> lambda_function = [this]
+        (std::string &input, std::string &key) {
 
-    // ESC was hit
-    if(result == "aborted")
-    {
-        m_is_active = false;
-        return false;
-    }
-    else if(result[0] == '\n')
-    {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            return false;
-        }
-
-        baseProcessDeliverNewLine();
+        // Debug Logging
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // compare password to previous, then encrypt if they match
         // otherwise fail back if they don't and ask again.
@@ -1269,23 +996,16 @@ bool ModSignup::verifyPassword(const std::string &input)
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>("Error, Password Verify Failed.", __LINE__, __FILE__);
+            log->xrmLog<Logging::INFO_LOG>("Password Verify Failed.", __LINE__, __FILE__);
             m_security_record->sPasswordHash = "";
             displayPromptAndNewLine(PROMPT_PASS_INVALID);
             changePreviousModule();
         }
-    }
-    else
-    {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if(result != "empty")
-        {
-            baseProcessDeliverInput(result);
-        }
-    }
 
-    return true;
+        return true;
+    };
+
+    return fieldInputAndProcess(input, Config::sPassword_length, USE_HIDDEN_OUTPUT_TRUE, lambda_function);
 }
 
 /**
@@ -1294,40 +1014,21 @@ bool ModSignup::verifyPassword(const std::string &input)
  */
 bool ModSignup::challengeQuestion(const std::string &input)
 {
-    std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length);
+    // Create a STD Function Lambda to pass and be executed in the STD IO Method.
+    std::function<bool(std::string &, std::string &)> lambda_function = [this]
+        (std::string &input, std::string &key) {
 
-    // ESC was hit
-    if(result == "aborted")
-    {
-        m_is_active = false;
-        return false;
-    }
-    else if(result[0] == '\n')
-    {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            return false;
-        }
-
-        baseProcessDeliverNewLine();
+        // Debug Logging
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Set the Password and verify it matches on next module.
         m_security_record->sChallengeQuestion = key;
         changeNextModule();
-    }
-    else
-    {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if(result != "empty")
-        {
-            baseProcessDeliverInput(result);
-        }
-    }
+        return true;
+    };
 
-    return true;
+    return fieldInputAndProcess(input, Config::sPassword_length, USE_HIDDEN_OUTPUT_FALSE, lambda_function);
 }
 
 /**
@@ -1336,46 +1037,20 @@ bool ModSignup::challengeQuestion(const std::string &input)
  */
 bool ModSignup::challengeAnswer(const std::string &input)
 {
-    std::string key = "";
-    bool useHiddenOutput = true;
-    std::string result = m_session_io.getInputField(
-                             input,
-                             key,
-                             Config::sPassword_length,
-                             "",
-                             useHiddenOutput
-                         );
+    // Create a STD Function Lambda to pass and be executed in the STD IO Method.
+    std::function<bool(std::string &, std::string &)> lambda_function = [this]
+        (std::string &input, std::string &key) {
 
-    // ESC was hit
-    if(result == "aborted")
-    {
-        m_is_active = false;
-        return false;
-    }
-    else if(result[0] == '\n')
-    {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            return false;
-        }
-
-        baseProcessDeliverNewLine();
+        // Debug Logging
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         m_security_record->sChallengeAnswerHash = key;
         changeNextModule();
-    }
-    else
-    {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if(result != "empty")
-        {
-            baseProcessDeliverInput(result);
-        }
-    }
+        return true;
+    };
 
-    return true;
+    return fieldInputAndProcess(input, Config::sPassword_length, USE_HIDDEN_OUTPUT_TRUE, lambda_function);
 }
 
 /**
@@ -1384,32 +1059,13 @@ bool ModSignup::challengeAnswer(const std::string &input)
  */
 bool ModSignup::verifyChallengeAnswer(const std::string &input)
 {
-    Logging *log = Logging::instance();
-    std::string key = "";
-    bool useHiddenOutput = true;
-    std::string result = m_session_io.getInputField(
-                             input,
-                             key,
-                             Config::sPassword_length,
-                             "",
-                             useHiddenOutput
-                         );
+    // Create a STD Function Lambda to pass and be executed in the STD IO Method.
+    std::function<bool(std::string &, std::string &)> lambda_function = [this]
+        (std::string &input, std::string &key) {
 
-    // ESC was hit
-    if(result == "aborted")
-    {
-        m_is_active = false;
-        return false;
-    }
-    else if(result[0] == '\n')
-    {
-        // Key == 0 on [ENTER] pressed alone. then invalid!
-        if(key.size() == 0)
-        {
-            return false;
-        }
-
-        baseProcessDeliverNewLine();
+        // Debug Logging
+        Logging *log = Logging::instance();
+        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // compare password to previous, then encrypt if they match
         // otherwise fail back if they don't and ask again.
@@ -1434,9 +1090,9 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
 
             if(password.size() == 0)
             {
-                // Shouldn't have any empty fields.
+                // Error from envryption method.
                 log->xrmLog<Logging::ERROR_LOG>("Error, ChallengeAnswer was empty", __LINE__, __FILE__);
-                return(false);
+                return false;
             }
 
             m_security_record->sChallengeAnswerHash = password;
@@ -1449,22 +1105,15 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
             displayPromptAndNewLine(PROMPT_PASS_INVALID);
             changePreviousModule();
         }
-    }
-    else
-    {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if(result != "empty")
-        {
-            baseProcessDeliverInput(result);
-        }
-    }
 
-    return true;
+        return true;
+    };
+
+    return fieldInputAndProcess(input, Config::sPassword_length, USE_HIDDEN_OUTPUT_TRUE, lambda_function);
 }
 
 /**
- * @brief Get Yes / No Bar Preference
+ * @brief Get Yes / No Bar Preference (w/ Default ENTER Choice)
  * @return
  */
 bool ModSignup::yesNoBars(const std::string &input)
@@ -1523,7 +1172,7 @@ bool ModSignup::yesNoBars(const std::string &input)
 }
 
 /**
- * @brief Get Pause Preference
+ * @brief Get Pause Preference (w/ Default ENTER Choice)
  * @return
  */
 bool ModSignup::doPause(const std::string &input)
@@ -1582,7 +1231,7 @@ bool ModSignup::doPause(const std::string &input)
 }
 
 /**
- * @brief Get Clear or Scroll preference
+ * @brief Get Clear or Scroll preference (w/ Default ENTER Choice)
  * @return
  */
 bool ModSignup::clearOrScroll(const std::string &input)
@@ -1641,7 +1290,7 @@ bool ModSignup::clearOrScroll(const std::string &input)
 }
 
 /**
- * @brief Get ANSI Color preference
+ * @brief Get ANSI Color preference (w/ Default ENTER Choice)
  * @return
  */
 bool ModSignup::ansiColor(const std::string &input)
@@ -1700,7 +1349,7 @@ bool ModSignup::ansiColor(const std::string &input)
 }
 
 /**
- * @brief Get Backspace Preference WINDOWS/LINUX (Terminal)
+ * @brief Get Backspace Preference WINDOWS/LINUX (Terminal) (w/ Default ENTER Choice)
  * @return
  */
 bool ModSignup::backSpace(const std::string &input)
@@ -1763,7 +1412,6 @@ bool ModSignup::backSpace(const std::string &input)
 
     return true;
 }
-
 
 /**
  * @brief Save New User Record
@@ -1857,7 +1505,7 @@ void ModSignup::saveNewUserRecord()
 
 
 /**
- * @brief Confirm and save user record.
+ * @brief Confirm and save user record. (w/ Default ENTER Choice)
  * @return
  */
 bool ModSignup::verifyAndSave(const std::string &input)
