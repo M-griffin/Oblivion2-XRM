@@ -51,4 +51,10 @@ pipeline {
 			}
 		}
 	}
+	post {
+		always {
+			discordSend description: "Jenkins: **Oblivion/2 XRM** build #**${BUILD_NUMBER}**, Build Status: **${currentBuild.currentResult}**", footer: '', link: env.BUILD_URL, result: currentBuild.currentResult, 
+				title: JOB_NAME, webhookURL: "${DISCORD_URL}"
+		}
+	}
 }
