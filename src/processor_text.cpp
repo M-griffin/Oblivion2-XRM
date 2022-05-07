@@ -494,6 +494,22 @@ void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
     m_screen_pixel.foreground = m_foreground_color;
     m_screen_pixel.background = m_background_color;
 
+    // Setup Mapping for Max Line X Position per Line for END keys.
+    try
+    {
+        int line_num = m_line_ending_map.at(m_line_number);
+
+        if(line_num < m_x_position)
+        {
+            m_line_ending_map[m_line_number] = m_x_position;
+        }
+
+    }
+    catch(const std::out_of_range&)
+    {
+        m_line_ending_map.insert(std::pair<int, int>(m_line_number, m_x_position));
+    }
+
     /*
     // Setup current position in the screen buffer. 1 based for 0 based.
     m_position = ((m_y_position-1) * m_characters_per_line) + (m_x_position-1);
@@ -609,6 +625,24 @@ void ProcessorText::clearScreen()
     m_y_position = 1;
     m_max_y_position = 1;
     m_line_number = 1;
+    std::map<int, int>().swap(m_line_ending_map);
+}
+
+/**
+ * @brief Move to Start of the current line
+ */
+void ProcessorText::moveHomePosition()
+{
+    m_x_position = 1;
+}
+
+/**
+ * @brief Move End of the current line
+ */
+void ProcessorText::moveEndPosition()
+{
+    m_x_position = m_line_ending_map[m_line_number];
+    m_x_position += 1;
 }
 
 /**
@@ -645,6 +679,8 @@ void ProcessorText::movePreviousYPosition()
 {
     if(m_y_position > 1)
         --m_y_position;
+    else
+        return;
 }
 
 /**

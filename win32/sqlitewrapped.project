@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="SqliteWrapped" InternalType="Library" Version="10.0.0">
+<CodeLite_Project Name="SqliteWrapped" InternalType="Library" Version="11000">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -72,7 +72,6 @@
         <Command Enabled="no"># Linux /OSX / BSD</Command>
         <Command Enabled="no">#rm lib$(ProjectName).h</Command>
         <Command Enabled="no">#cat IError.h StderrLog.h SysLogs.h Database.h Query.h &gt; lib$(ProjectName).h</Command>
-        <Command Enabled="yes"/>
         <Command Enabled="no"># Windows</Command>
         <Command Enabled="yes">type ..\sqlitewrap\IError.h ..\sqlitewrap\StderrLog.h ..\sqlitewrap\SysLogs.h ..\sqlitewrap\Database.h ..\sqlitewrap\Query.h &gt; $(IntermediateDirectory)\lib$(ProjectName).h</Command>
       </PostBuild>

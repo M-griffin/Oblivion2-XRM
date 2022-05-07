@@ -51,7 +51,14 @@ public:
     virtual void clearScreen() override;
     virtual void parseTextToBuffer(char *buff) override;
 
+    int getCurrentLine() const
+    {
+        return m_line_number;
+    }
+
     // Processor Text Specific
+    void moveHomePosition();
+    void moveEndPosition();
     void moveNextXPosition();
     void moveNextYPosition();
     void movePreviousXPosition();

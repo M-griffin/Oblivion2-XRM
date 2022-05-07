@@ -545,14 +545,14 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
     // Wrap Around and Move Down at end of line
     else if(x_position == m_text_box_width && y_position != m_text_box_height)
     {
-        output += moveCursorToPosition();
+        //output += moveCursorToPosition();
     }
     // Bottom of box, scroll up a line up, and move to begininng.
     else if(y_position == m_text_box_height && x_position == m_text_box_width)
     {
         //output += moveCursorToPosition();
         m_text_process->parseTextToBuffer((char *)"\n");
-        output += moveCursorToPosition();
+        //output += moveCursorToPosition();
         // Scroll Box Up!
 
     }
@@ -565,8 +565,17 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
     std::cout << "y_pos: " << m_text_process->getYPosition() << std::endl;
     */
 
+    output += moveCursorToPosition();
+
+    int line_num = m_text_process->getCurrentLine();
+    std::string row_col_stamp = "\x1b[25;1H Pos# L/X/Y ( " +
+                                std::to_string(line_num) + " / "+
+                                std::to_string(m_text_process->getXPosition()) + " / "  +
+                                std::to_string(m_text_process->getYPosition()) + " )    ";
+    row_col_stamp += output;
+
     // Write output to Client Screen
-    baseProcessDeliverInput(output);
+    baseProcessDeliverInput(row_col_stamp);
 }
 
 /**
@@ -590,37 +599,57 @@ void ModMessageEditor::processEscapedInput(std::string result, std::string input
     {
         if(x_position < m_text_box_width)
         {
-            output = "\x1b[C";
-            m_text_process->parseTextToBuffer((char *)output.c_str());
+            m_text_process->moveNextXPosition();
+            //output = "\x1b[C";
         }
     }
     else if(result == "lt_arrow")
     {
         if(x_position > 1)
         {
-            output = "\x1b[D";
-            m_text_process->parseTextToBuffer((char *)output.c_str());
+            m_text_process->movePreviousXPosition();
+            //output = "\x1b[D";
         }
     }
     else if(result == "up_arrow")
     {
         if(y_position > 1)
         {
-            output = "\x1b[A";
-            m_text_process->parseTextToBuffer((char *)output.c_str());
+            m_text_process->movePreviousYPosition();
+            //output = "\x1b[A";
         }
     }
     else if(result == "dn_arrow")
     {
         if(y_position < m_text_box_height)
         {
-            output = "\x1b[B";
-            m_text_process->parseTextToBuffer((char *)output.c_str());
+            m_text_process->moveNextYPosition();
+            //output = "\x1b[B";
         }
+    }
+    else if(result == "home")
+    {
+        m_text_process->moveHomePosition();
+        //output = moveCursorToPosition();
+    }
+    else if(result == "end")
+    {
+        m_text_process->moveEndPosition();
+        //output = moveCursorToPosition();
     }
 
     std::cout << "output: " << output << std::endl;
 
+    output += moveCursorToPosition();
+
+    int line_num = m_text_process->getCurrentLine();
+    std::string row_col_stamp = "\x1b[25;1H Pos# L/X/Y ( " +
+                                std::to_string(line_num) + " / "+
+                                std::to_string(m_text_process->getXPosition()) + " / "  +
+                                std::to_string(m_text_process->getYPosition()) + " )    ";
+
+    row_col_stamp += output;
+
     // Write output to Client Screen
-    baseProcessDeliverInput(output);
+    baseProcessDeliverInput(row_col_stamp);
 }

@@ -57,7 +57,7 @@ public:
 
         Logging *log = Logging::instance();
 
-        // Startup SDL NET.
+        // Startup SDL NET. Custom version Tweaked for KEEP Alive's
         if(SDLNet_Init() == -1)
         {
             log->xrmLog<Logging::ERROR_LOG>("SDLNet_Init", SDLNet_GetError());
@@ -127,10 +127,9 @@ private:
             connection_ptr async_conn(new AsyncConnection(m_io_service, socket_handler));
 
             // Create DeadlineTimer and attach to new session
-            deadline_timer_ptr deadline_timer(new DeadlineTimer(
-                                                  //m_io_service,
-                                                  //socket_handler
-                                              ));
+            // This timer is specific for waiting .25 seconds on
+            // ESC sequences check for single esc, vs key sequences
+            deadline_timer_ptr deadline_timer(new DeadlineTimer());
 
             // Create the new Session
             session_ptr new_session = Session::create(m_io_service,

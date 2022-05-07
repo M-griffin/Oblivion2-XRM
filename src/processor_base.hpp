@@ -98,7 +98,6 @@ public:
     {
         return m_x_position;
     }
-
     int getMaxLines() const
     {
         return m_number_lines;
@@ -161,6 +160,7 @@ public:
     ScreenPixel                m_screen_pixel;
     std::vector <ScreenPixel>  m_screen_buffer;
     std::map<int, ScreenPixel> m_pull_down_options;
+    std::map<int, int>         m_line_ending_map;
 
     // ANSI escape sequences
     enum
