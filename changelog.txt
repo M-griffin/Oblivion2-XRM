@@ -1,12 +1,19 @@
+Change Log Update (00.00.148)
+* 2022-05-06
++ Setup first user created on a new system will be updated to SysOp access
+  This makes configuring and system setup a lot easier than trying to manually update the SQLite database
++ Also Did some refactoring on the mod_signup module re-using code and passing in functions
+  instead of code duplication.  Some more work can be done here later on.
+
 Change Log Update (00.00.147)
 * 2022-05-05
 + Created Dockerfile (Dockerfile.linux-image.build) and docker-compose for generating
-  a local docker image with build enviroment from the pulled branch.
-  Initial testing and and recompiles can be made, but it not setup for git pushes.
-  WIP - Addon to this would be to setup git commits and changes for active development.
+  a local Docker image with build environment from the pulled branch.
+  Initial testing and recompiles can be made, but it not setup for GIT pushes.
+  WIP - Addon to this would be to setup GIT commits and changes for active development.
 + Fixed Yaml (xml_config.yaml) Load issues. 
   config.hpp hidden_input_field_char was an unsigned char which seems to be an 
-  issue in the latest yaml-cpp v7.0.  Converted the variable to an std::string.
+  issue in the latest yaml-cpp v7.0.  Converted the variable to a std::string.
 + Added a missed "use_address" configuration option.
 
 Change Log Update (00.00.146)

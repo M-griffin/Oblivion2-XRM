@@ -1462,8 +1462,9 @@ void ModSignup::saveNewUserRecord()
 
         // Also Add Default File points,, missing from user rec.
     }
-
+    
     long userIndex = user_dao->insertRecord(m_user_record);
+    log->xrmLog<Logging::INFO_LOG>("New User Index saved", userIndex);
 
     if(userIndex < 0)
     {
@@ -1479,6 +1480,20 @@ void ModSignup::saveNewUserRecord()
         displayPromptAndNewLine(PROMPT_NOT_SAVED);
         m_is_active = false;
         return;
+    }
+    // If First User Created, Then Update Security Level to Sysop.
+    else if (userIndex == 1) 
+    {
+        log->xrmLog<Logging::INFO_LOG>("Updating First Created User to SysOp/Admin");
+
+        // Re-Read the Record Clean
+        m_user_record = user_dao->getRecordById(userIndex);
+        m_user_record->iLevel = 255;
+        m_user_record->iFileLevel = 255;
+        m_user_record->iMessageLevel = 255;
+
+        // Save Updates for Admin Access
+        user_dao->updateRecord(m_user_record);
     }
 
     // Completed Successfully
