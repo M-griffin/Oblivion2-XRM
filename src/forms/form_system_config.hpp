@@ -91,6 +91,7 @@ struct convert<config_ptr>
         node["use_matrix_login"] = rhs->use_matrix_login;
         node["use_newuser_password"] = rhs->use_newuser_password;
         node["use_disclaimer"] = rhs->use_disclaimer;
+        node["use_address"] = rhs->use_address;
         node["use_handle"] = rhs->use_handle;
         node["use_real_name"] = rhs->use_real_name;
         node["use_location"] = rhs->use_location;
@@ -215,6 +216,7 @@ struct convert<config_ptr>
         rhs->use_matrix_login                = node["use_matrix_login"].as<bool>();
         rhs->use_newuser_password            = node["use_newuser_password"].as<bool>();
         rhs->use_disclaimer                  = node["use_disclaimer"].as<bool>();
+        rhs->use_address                     = node["use_address"].as<bool>();
         rhs->use_handle                      = node["use_handle"].as<bool>();
         rhs->use_real_name                   = node["use_real_name"].as<bool>();
         rhs->use_location                    = node["use_location"].as<bool>();

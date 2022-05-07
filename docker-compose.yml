@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+  oblivion2xrm:
+    image: oblivion2xrm:latest
+    container_name: xrm-server
+    mem_limit: 500m
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+    - 6023:6023

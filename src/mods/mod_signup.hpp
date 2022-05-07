@@ -148,6 +148,9 @@ public:
         MOD_VERIFY_SAVE
     };
 
+    const bool USE_HIDDEN_OUTPUT_TRUE = true;
+    const bool USE_HIDDEN_OUTPUT_FALSE = false;
+
     // Create Prompt Constants, these are the keys for key/value lookup
     const std::string PROMPT_NUP = "newuser_password";
     const std::string PROMPT_DISCLAIMER = "disclaimer";
@@ -359,6 +362,19 @@ public:
     void setupVerifyAndSave();
 
 private:
+
+    /**
+     * @brief Base Class for shared input (receives function pointer for custom execution)
+     * 
+     * @param input 
+     * @param field_length 
+     * @param useHiddenOutput 
+     * @param func_pointer 
+     * @return true 
+     * @return false 
+     */
+    bool fieldInputAndProcess(std::string input, int field_length, bool use_hidden_output, 
+        std::function<bool(std::string &, std::string &)> function_pointer);
 
     /**
      * @brief New User Password

@@ -47,3 +47,4 @@ sqlitewrap/libSqliteWrapped.h
 build-new/
 build/DATA/
 win32/Debug/
+.vscode/settings.json

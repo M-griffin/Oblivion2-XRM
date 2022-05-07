@@ -1,6 +1,6 @@
 
-.. image:: http://htc.zapto.org:1024/jenkins/job/Oblivion2-XRM%20-%20Pipeline/job/master/badge/icon
-   :target: https://htc.zapto.org/jenkins/job/Oblivion2-XRM%20-%20Pipeline/job/master/
+.. image:: http://htc.zapto.org:8090/job/Oblivion-2%20XRM/job/master/badge/icon
+   :target: http://htc.zapto.org:8090/job/Oblivion-2%20XRM/job/master
 
 
 
@@ -82,7 +82,7 @@ Support
 * IRC: **#oblivion2** on **chat.freenode.net**
 * Email: **mrmisticismo - at - hotmail.com**
 * Facebook: **Oblivion/2 XRM** group
-
+* Discord: `Oblivion/2 XRM Channel <https://discord.com/channels/441769144149475328/490661497190481951>`_
 
 Acknowledgments and Thanks
 ==========================

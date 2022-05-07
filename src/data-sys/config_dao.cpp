@@ -368,7 +368,7 @@ bool ConfigDao::loadConfig()
     }
     catch(YAML::Exception &ex)
     {
-        std::cout << "YAML::LoadFile(xrm-config.yaml) " << ex.what() << "Missing required field maybe." << std::endl;
+        std::cout << "YAML::LoadFile(xrm-config.yaml) " << ex.what() << " Missing required field maybe." << std::endl;
         return(false);
     }
     catch(std::exception &ex)

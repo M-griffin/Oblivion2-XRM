@@ -726,6 +726,7 @@ std::string CommonIO::maskString(const std::string &str)
 
     for(std::string::size_type i = 0; i < string_size; i++)
     {
+		// TODO Note, pull hidden input char from xrm_config.yaml here!
         new_string.append("*");
     }
 
