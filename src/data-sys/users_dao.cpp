@@ -415,7 +415,7 @@ user_ptr UsersDao::getUserByHandle(std::string name)
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>("Error, getUserByHandle Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
+            log->xrmLog<Logging::INFO_LOG>("NotFound, getUserByHandle Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
@@ -467,7 +467,7 @@ user_ptr UsersDao::getUserByRealName(std::string name)
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>("Error, getUserByRealName Returned Rows", rows, m_strTableName, __LINE__, __FILE__);
+            log->xrmLog<Logging::INFO_LOG>("Notfound, getUserByRealName Returned Rows", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
@@ -519,7 +519,7 @@ user_ptr UsersDao::getUserByEmail(std::string email)
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>("Error, getUserByEmail Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
+            log->xrmLog<Logging::INFO_LOG>("Notfound, getUserByEmail Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
@@ -579,7 +579,7 @@ std::vector<user_ptr> UsersDao::getUsersByWildcard(std::string filter)
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>("Error, getUsersByWildcard Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
+            log->xrmLog<Logging::INFO_LOG>("Notfound, getUsersByWildcard Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
