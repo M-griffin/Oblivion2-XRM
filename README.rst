@@ -82,7 +82,7 @@ Support
 * IRC: **#oblivion2** on **chat.freenode.net**
 * Email: **mrmisticismo - at - hotmail.com**
 * Facebook: **Oblivion/2 XRM** group
-
+* Discord: `Oblivion/2 XRM Channel <https://discord.com/channels/441769144149475328/490661497190481951>`_
 
 Acknowledgments and Thanks
 ==========================
