@@ -1,3 +1,7 @@
+Change Log Update (00.00.149)
+* 2022-05-08
++ Corrections to OSX Project, Makefile(s) and dependencies in the Install Doc.
+
 Change Log Update (00.00.148)
 * 2022-05-06
 + Setup first user created on a new system will be updated to SysOp access
