@@ -5,33 +5,35 @@
 ## Debug
 ProjectName            :=SqliteWrapped
 ConfigurationName      :=Debug
-WorkspacePath          :=/Users/admin/code/Oblivion2-XRM/osx
-ProjectPath            :=/Users/admin/code/Oblivion2-XRM/osx
+WorkspaceConfiguration :=Debug
+WorkspacePath          :=../osx
+ProjectPath            :=../osx
 IntermediateDirectory  :=./Debug
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
-User                   :=Admin
-Date                   :=27/07/2019
-CodeLitePath           :="/Users/admin/Library/Application Support/codelite"
-LinkerName             :=clang++
-SharedObjectLinkerName :=clang++ -shared -fPIC
+User                   :=Mercyful
+Date                   :=08/05/2022
+CodeLitePath           :="/Users/mercyful/Library/Application Support/CodeLite"
+LinkerName             :=/usr/bin/clang++
+SharedObjectLinkerName :=/usr/bin/clang++ -dynamiclib -fPIC
 ObjectSuffix           :=.o
-DependSuffix           :=
-PreprocessSuffix       :=.o.i
-DebugSwitch            :=-gstab
+DependSuffix           :=.o.d
+PreprocessSuffix       :=.i
+DebugSwitch            :=-g 
 IncludeSwitch          :=-I
 LibrarySwitch          :=-l
 OutputSwitch           :=-o 
 LibraryPathSwitch      :=-L
 PreprocessorSwitch     :=-D
 SourceSwitch           :=-c 
+OutputDirectory        :=$(IntermediateDirectory)
 OutputFile             :=$(IntermediateDirectory)/lib$(ProjectName).a
 Preprocessors          :=
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
-PreprocessOnlySwitch   :=-E 
+PreprocessOnlySwitch   :=-E
 ObjectsFileList        :="SqliteWrapped.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
@@ -45,22 +47,22 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch).. $(Library
 
 ##
 ## Common variables
-## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overriden using an environment variables
+## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overridden using an environment variable
 ##
-AR       := ar rcus
-CXX      := clang++
-CC       := clang
-CXXFLAGS :=  -Wfatal-errors -g -O0 -std=c++11 $(Preprocessors)
+AR       := /usr/bin/ar rcu
+CXX      := /usr/bin/clang++
+CC       := /usr/bin/clang
+CXXFLAGS :=  -Wfatal-errors -g -O0 -std=c++11 -Wno-uninitialized $(Preprocessors)
 CFLAGS   :=  -Wfatal-errors -g -O0 -std=c++11 $(Preprocessors)
 ASFLAGS  := 
-AS       := llvm-as
+AS       := /usr/bin/as
 
 
 ##
 ## User defined environment variables
 ##
 CodeLiteDir:=/Applications/codelite.app/Contents/SharedSupport/
-Objects0=$(IntermediateDirectory)/up_sqlitewrap_Database.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_sqlitewrap_Query.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_sqlitewrap_SysLogs.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_sqlitewrap_StderrLog.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/up_sqlitewrap_Database.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_sqlitewrap_Query.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_sqlitewrap_StderrLog.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_sqlitewrap_SysLogs.cpp$(ObjectSuffix) 
 
 
 
@@ -77,8 +79,8 @@ $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 	@echo "" > $(IntermediateDirectory)/.d
 	@echo $(Objects0)  > $(ObjectsFileList)
 	$(SharedObjectLinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
-	@$(MakeDirCommand) "/Users/admin/code/Oblivion2-XRM/osx/.build-debug"
-	@echo rebuilt > "/Users/admin/code/Oblivion2-XRM/osx/.build-debug/SqliteWrapped"
+	@$(MakeDirCommand) "../osx/.build-debug"
+	@echo rebuilt > "../osx/.build-debug/SqliteWrapped"
 
 PostBuild:
 	@echo Executing Post Build commands ...
@@ -94,33 +96,39 @@ $(IntermediateDirectory)/.d:
 
 PreBuild:
 	@echo Executing Pre Build commands ...
-	sed -i '' 's+/Users/admin/code/Oblivion2-XRM/+../+' SqliteWrapped.mk
+	sed -i '' 's+../+../+' SqliteWrapped.mk
 	@echo Done
 
 
 ##
 ## Objects
 ##
-$(IntermediateDirectory)/up_sqlitewrap_Database.cpp$(ObjectSuffix): ../sqlitewrap/Database.cpp 
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/Oblivion2-XRM/sqlitewrap/Database.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_sqlitewrap_Database.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_sqlitewrap_Database.cpp$(ObjectSuffix): ../sqlitewrap/Database.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_sqlitewrap_Database.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_sqlitewrap_Database.cpp$(DependSuffix) -MM ../sqlitewrap/Database.cpp
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../sqlitewrap/Database.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_sqlitewrap_Database.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/up_sqlitewrap_Database.cpp$(PreprocessSuffix): ../sqlitewrap/Database.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_sqlitewrap_Database.cpp$(PreprocessSuffix) ../sqlitewrap/Database.cpp
 
-$(IntermediateDirectory)/up_sqlitewrap_Query.cpp$(ObjectSuffix): ../sqlitewrap/Query.cpp 
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/Oblivion2-XRM/sqlitewrap/Query.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_sqlitewrap_Query.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_sqlitewrap_Query.cpp$(ObjectSuffix): ../sqlitewrap/Query.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_sqlitewrap_Query.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_sqlitewrap_Query.cpp$(DependSuffix) -MM ../sqlitewrap/Query.cpp
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../sqlitewrap/Query.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_sqlitewrap_Query.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/up_sqlitewrap_Query.cpp$(PreprocessSuffix): ../sqlitewrap/Query.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_sqlitewrap_Query.cpp$(PreprocessSuffix) ../sqlitewrap/Query.cpp
 
-$(IntermediateDirectory)/up_sqlitewrap_SysLogs.cpp$(ObjectSuffix): ../sqlitewrap/SysLogs.cpp 
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/Oblivion2-XRM/sqlitewrap/SysLogs.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_sqlitewrap_SysLogs.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_sqlitewrap_SysLogs.cpp$(PreprocessSuffix): ../sqlitewrap/SysLogs.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_sqlitewrap_SysLogs.cpp$(PreprocessSuffix) ../sqlitewrap/SysLogs.cpp
-
-$(IntermediateDirectory)/up_sqlitewrap_StderrLog.cpp$(ObjectSuffix): ../sqlitewrap/StderrLog.cpp 
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/Oblivion2-XRM/sqlitewrap/StderrLog.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_sqlitewrap_StderrLog.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_sqlitewrap_StderrLog.cpp$(ObjectSuffix): ../sqlitewrap/StderrLog.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_sqlitewrap_StderrLog.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_sqlitewrap_StderrLog.cpp$(DependSuffix) -MM ../sqlitewrap/StderrLog.cpp
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../sqlitewrap/StderrLog.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_sqlitewrap_StderrLog.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/up_sqlitewrap_StderrLog.cpp$(PreprocessSuffix): ../sqlitewrap/StderrLog.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_sqlitewrap_StderrLog.cpp$(PreprocessSuffix) ../sqlitewrap/StderrLog.cpp
 
+$(IntermediateDirectory)/up_sqlitewrap_SysLogs.cpp$(ObjectSuffix): ../sqlitewrap/SysLogs.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_sqlitewrap_SysLogs.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_sqlitewrap_SysLogs.cpp$(DependSuffix) -MM ../sqlitewrap/SysLogs.cpp
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../sqlitewrap/SysLogs.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_sqlitewrap_SysLogs.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_sqlitewrap_SysLogs.cpp$(PreprocessSuffix): ../sqlitewrap/SysLogs.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_sqlitewrap_SysLogs.cpp$(PreprocessSuffix) ../sqlitewrap/SysLogs.cpp
+
+
+-include $(IntermediateDirectory)/*$(DependSuffix)
 ##
 ## Clean
 ##
