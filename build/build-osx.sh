@@ -11,10 +11,10 @@
 cwd=$(pwd)
 
 echo ''
-echo -e "\033[1;31m"Build Oblivion2-XRM Demo System and Utils
-echo -e "\033[1;31m"Clean build folder and starting compilation
-echo -e "\033[0;31m"===========================================
-echo -e "\033[0;m"
+echo  "\033[1;31m"Build Oblivion2-XRM Demo System and Utils
+echo  "\033[1;31m"Clean build folder and starting compilation
+echo  "\033[0;31m"===========================================
+echo  "\033[0;m"
 echo ''
 
 if [ $# -lt 1 ]; then
@@ -33,9 +33,9 @@ cd ../osx
 make -f Makefile clean
 
 echo ''
-echo -e "\033[1;31m"Build SqliteWrapped
-echo -e "\033[0;31m"===================
-echo -e "\033[0;m"
+echo  "\033[1;31m"Build SqliteWrapped
+echo  "\033[0;31m"===================
+echo  "\033[0;m"
 echo ''
 
 make -f SqliteWrapped.mk $1
@@ -46,9 +46,9 @@ cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../
 cd $cwd
 
 echo ''
-echo -e "\033[1;31m"Build Legacy Menu Conversion Tool
-echo -e "\033[0;31m"=================================
-echo -e "\033[0;m"
+echo  "\033[1;31m"Build Legacy Menu Conversion Tool
+echo  "\033[0;31m"=================================
+echo  "\033[0;m"
 
 # *** 3. Build the Legacy Menu Conversion Tool
 cd ../osx
@@ -56,9 +56,9 @@ make -f xrm-menu-convert.mk $1
 cd $cwd
 
 echo ''
-echo -e "\033[1;31m"Build Legacy Menu Prompt Conversion Tool
-echo -e "\033[0;31m"========================================
-echo -e "\033[0;m"
+echo  "\033[1;31m"Build Legacy Menu Prompt Conversion Tool
+echo  "\033[0;31m"========================================
+echo  "\033[0;m"
 
 # *** 4. Build the Legacy Menu Prompt Conversion Tool
 cd ../osx
@@ -66,9 +66,9 @@ make -f xrm-menu-prompt-convert.mk $1
 cd $cwd
 
 echo ''
-echo -e "\033[1;31m"Build XRM-Server Unit Tests
-echo -e "\033[0;31m"===========================
-echo -e "\033[0;m"
+echo  "\033[1;31m"Build XRM-Server Unit Tests
+echo  "\033[0;31m"===========================
+echo  "\033[0;m"
 
 # *** 5. Build the Unit Tests
 cd ../osx
@@ -77,9 +77,9 @@ cd $cwd
 
 
 echo ''
-echo -e "\033[1;31m"Build XRM-Server [Main Program]
-echo -e "\033[0;31m"===============================
-echo -e "\033[0;m"
+echo  "\033[1;31m"Build XRM-Server [Main Program]
+echo  "\033[0;31m"===============================
+echo  "\033[0;m"
 
 # *** 6. Build the Program
 cd ../osx
@@ -118,14 +118,15 @@ fi
 cd $cwd
 
 echo ''
-echo -e "\033[1;31m"Running Unit Tests
-echo -e "\033[0;31m"==================
-echo -e "\033[0;m"
+echo  "\033[1;31m"Running Unit Tests
+echo  "\033[0;31m"==================
+echo  "\033[0;m"
 ./xrm-unittest
  
 echo ''
-echo -e "\033[1;31m"Build Completed - Check for errors!
-echo -e "\033[1;31m"run ./xrm-server to start the program
-echo -e "\033[0;31m"======================================
-echo -e "\033[0m"
+echo  "\033[1;31m"Build Completed - Check for errors, 
+echo  "\033[1;31m"- ignore Unit Tests errors when all tests pass!
+echo  "\033[1;32m"run ./xrm-server to start the program
+echo  "\033[0;31m"======================================
+echo  "\033[0m"
 

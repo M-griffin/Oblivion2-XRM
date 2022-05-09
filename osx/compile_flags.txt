@@ -1,4 +1,13 @@
--I/Users/admin/code/Oblivion2-XRM/osx
--I/Users/admin/code/Oblivion2-XRM
--I/Users/admin/code/Oblivion2-XRM/osx/Debug
+-I/Users/mercyful/code/Oblivion2-XRM/osx
+-I/Users/mercyful/code/Oblivion2-XRM
+-I/Users/mercyful/code/Oblivion2-XRM/osx/Debug
 -I/usr/local/opt/sqlite/include
+-I/usr/local/include
+-I/Library/Developer/CommandLineTools/usr/include/c++/v1
+-I/Library/Developer/CommandLineTools/usr/lib/clang/12.0.0/include
+-I/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include
+-I/Library/Developer/CommandLineTools/usr/include
+-I/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/System/Library/Frameworks
+-std=c++11
+-target
+x86_64-apple-darwin19.6.0
