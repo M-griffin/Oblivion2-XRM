@@ -113,7 +113,8 @@ echo -e "\033[0;m"
 
 echo ''
 echo -e "\033[1;31m"Build Completed - Check for errors!
-echo -e "\033[1;31m"run ./xrm-server to start the program
+echo -e "\033[1;31m"- Ignore Unit Test errors when all builds pass!
+echo -e "\033[1;32m"run ./xrm-server to start the program
 echo -e "\033[0;31m"======================================
 echo -e "\033[0m"
 
