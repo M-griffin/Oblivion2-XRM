@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="SqliteWrapped" Version="10.0.0" InternalType="Library">
+<CodeLite_Project Name="SqliteWrapped" Version="11000" InternalType="Library">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -30,7 +30,7 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="clang++" DebuggerType="GNU gdb debugger" Type="Dynamic Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-Wfatal-errors;-g;-O0;-std=c++11" C_Options="-Wfatal-errors;-g;-O0;-std=c++11" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-Wfatal-errors;-g;-O0;-std=c++11;-Wno-uninitialized" C_Options="-Wfatal-errors;-g;-O0;-std=c++11" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value=".."/>
         <IncludePath Value="./Debug"/>
         <IncludePath Value="/usr/local/opt/sqlite/include"/>
@@ -57,7 +57,7 @@
         <StartupCommands/>
       </Debugger>
       <PreBuild>
-        <Command Enabled="yes">sed -i '' 's+/Users/admin/code/Oblivion2-XRM/+../+' SqliteWrapped.mk</Command>
+        <Command Enabled="yes">sed -i '' 's+/Users/mercyful/code/Oblivion2-XRM/+../+' SqliteWrapped.mk</Command>
       </PreBuild>
       <PostBuild>
         <Command Enabled="no"># Linux /OSX / BSD</Command>
