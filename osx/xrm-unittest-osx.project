@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="xrm-unittest" InternalType="UnitTest++" Version="10.0.0">
+<CodeLite_Project Name="xrm-unittest" InternalType="UnitTest++" Version="11000">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -146,8 +146,8 @@
       </Linker>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
-    <Configuration Name="Debug" CompilerType="clang++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O0;-std=c++11;-stdlib=libc++" C_Options="-O0;-std=c++11;-stdlib=libc++" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+    <Configuration Name="Debug" CompilerType="CLANG" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O0;-std=c++11;-stdlib=libc++;-Wno-deprecated-declarations" C_Options="-O0;-std=c++11;-stdlib=libc++;-Wno-deprecated-declarations" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
         <IncludePath Value="./Debug"/>
@@ -200,8 +200,7 @@
         <StartupCommands/>
       </Debugger>
       <PreBuild>
-        <Command Enabled="yes"/>
-        <Command Enabled="yes">sed -i '' 's+/Users/admin/code/Oblivion2-XRM/+../+' xrm-unittest.mk</Command>
+        <Command Enabled="yes">sed -i '' 's+/Users/mercyful/code/Oblivion2-XRM/+../+' xrm-unittest.mk</Command>
       </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">

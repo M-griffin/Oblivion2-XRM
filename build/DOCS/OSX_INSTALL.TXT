@@ -3,15 +3,16 @@ Main List of Dependencies for Oblivion/2 XRM for OSX
 Compilation in OSX - Tested on Latest High Sierra distribution.
 09/16/2018 - Initial Write up
 07/26/2019 - Updated dependency paths and build scripts with documentation.
+05/08/2022 - Updated dependencies that were missed also fixed Makefiles.
 
 Requirements:
-	/usr/local/opt/sqlite
-	/usr/local/opt/yaml-cpp
-	/usr/local/opt/openssl
-	/usr/local/opt/libssh
-	/usr/local/opt/ossp-uuid
-	/usr/local/opt/boost
-    /usr/local/opt/unittest-cpp
+  /usr/local/opt/sqlite
+  /usr/local/opt/yaml-cpp
+  /usr/local/opt/openssl
+  /usr/local/opt/libssh
+  /usr/local/opt/ossp-uuid
+  /usr/local/opt/boost
+  /usr/local/opt/unittest-cpp
 
 Note, Boost is only used for the menu and prompt conversion utilities
 
@@ -21,33 +22,43 @@ However, I needed to setup specific Include file locations in the .mk Makefiles
 And so if you do NOT use Homebrew, then these paths would need to be updated manually.
 #---------------------------------------------------------------------------------------
 
+
+NOTE: Requirements, you should have XCode w/ Commandline Tools installed.
+If not, you can usually install this from the APP Store.
+
 Install Homebrew:
-	ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
-Update Homebrew:
-	brew doctor
-	brew update
+Update Homebrew - And Possibly your OS to the latest version:
+  brew doctor
+  brew update
 
-Install Dependencies:
-	brew install sqlite3
-	brew install labs
-	brew install yaml-cpp
-	brew install ossp-uuid
-    brew install unittest-cpp
-    brew install boost
+Install Dependencies via Brew:
+- We use brew as this is a good package manager and easily installs 
+  All required libs to /usr/local/opt where the make files can find them.
 
+  brew install sqlite3
+  brew install yaml-cpp
+  brew install ossp-uuid
+  brew install libssh
+  brew install openssl@3
+  brew install unittest-cpp
+  brew install boost
+
+Optional Dependencies depending on your Development Envrionment
 Install GIT to pull down project:
-	brew install git
+  brew install git
 
-Install latest compiler with c++11 compatibility is NEEDED!
-	I have the following version installed or later..
+Install latest compiler with c++11 compatibility as NEEDED!
+  I have the following version installed or later..
 
-	Apple LLVM version 9.0.0 (clang-900.0.39.2)
-	Target: x86_64-apple-darwin17.4.0
-	Thread model: Posix
-	InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+  Apple LLVM version 9.0.0 (clang-900.0.39.2)
+  Target: x86_64-apple-darwin17.4.0
+  Thread model: Posix
+  InstalledDir: /Library/Developer/CommandLineTools/usr/bin
 
-	brew install clang
+  $ Only Need to install or upgrade if your version is lower then this!
+  brew install clang
 
 You can check check /usr/local/Cellar for program versions installed
 All Lib and Include files are linked to /usr/local/opt
@@ -55,18 +66,20 @@ All Lib and Include files are linked to /usr/local/opt
 
 Clone the project - This will checkout and create project in current folder.
 
-        git clone https://github.com/M-griffin/Oblivion2-XRM.git .
+  git clone https://github.com/M-griffin/Oblivion2-XRM.git .
 
-        cd build
-        ./build-osx.sh -j2  (Notes, -j# is number of cpu cores for faster compiling)
+  cd build
+  ./build-osx.sh -j2  (Notes, -j# is number of cpu cores for faster compiling)
 
 This will build all project files and copy the executables back to the build folder
 once completed.
 
-        ./xrm-server              - to start the bbs
-        ./xrm-unittest            - to run the unit tests
-        ./xrm-menu-convert        - convert Legacy Obv/2 menus to yaml format for XRM.
-        ./xrm-menu-prompt-comvert - convert Legacy Obv/2 prompt to yaml format for XRM.
+  ./xrm-server              - to start the bbs
+  ./xrm-unittest            - to run the unit tests
+
+# Helper Applications, Only used if you are converting legacy items or mods.
+  ./xrm-menu-convert        - convert Legacy Obv/2 menus to yaml format for XRM.
+  ./xrm-menu-prompt-comvert - convert Legacy Obv/2 prompt to yaml format for XRM.
 
 The default port will be 6023 and can be updated in the xrm-server.yaml configuration that gets auto-generated after you run the system the first time.
 
