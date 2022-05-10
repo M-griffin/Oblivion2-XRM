@@ -1,0 +1,8 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "Oblivion2-XRM"
+authors = [{name = "Michael Griffin", email = "mrmisticismo@hotmail.com"}]
+dynamic = ["version", "description"]
