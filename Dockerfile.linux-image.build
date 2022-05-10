@@ -15,36 +15,33 @@
 FROM ubuntu:latest
 
 # Update apps on the base image
-RUN apt-get -y update && apt-get install -y
-
+RUN apt-get -y update && apt-get install -y \
 # ----------------------
 # Install Dependencies
 # ----------------------
-
 # Debugging, good to have a local editor, and git for changes
-RUN apt-get install nano --yes
-RUN apt-get install git --yes
-
+    nano \
+    git \
 # Build Essentials for the Compiler
-RUN apt install -y software-properties-common ca-certificates wget curl ssh
-RUN apt install -y build-essential
-
+    software-properties-common ca-certificates wget curl ssh \
+    build-essential \
 # Build Application Dependencies
-RUN apt-get install libyaml-cpp-dev --yes
-RUN apt-get install libssh-dev --yes
-RUN apt-get install libboost-all-dev --yes
-RUN apt-get install libsqlite3-dev --yes
-RUN apt-get install uuid-dev --yes
-RUN apt-get install libunittest++-dev --yes
-
+    libyaml-cpp-dev \
+    libssh-dev \
+    libboost-all-dev \
+    libsqlite3-dev \
+    uuid-dev \
+    libunittest++-dev \
 # Terminal Setup - Encodings and Locales needed
-RUN apt-get install -y locales-all
+    locales-all \
+    && apt-get -y autoclean
+
 
 # Setup Enviroment Variables for locales
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 
-# Copy the current folder base projust to the Docker Container.
+# Copy the current folder base project to the Docker Container.
 COPY . /usr/src/Oblivion2-XRM
 
 # Specify the working directory on the Container

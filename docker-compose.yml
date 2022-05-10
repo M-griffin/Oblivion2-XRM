@@ -7,6 +7,6 @@ services:
     mem_limit: 500m
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile.linux-image.build
     ports:
     - 6023:6023
