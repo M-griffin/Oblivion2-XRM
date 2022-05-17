@@ -1,7 +1,20 @@
 
-.. image:: http://htc.zapto.org:8090/job/Oblivion-2%20XRM/job/master/badge/icon
+.. image:: https://img.shields.io/badge/C%2B%2B-00599C?style=flat&compact=true&logo=c%2B%2B&logoColor=white
+   :target: http://htc.zapto.org:8090/job/Oblivion-2%20XRM/job/master
+   
+.. image:: https://img.shields.io/badge/SQLite-07405E?style=flat&compact=true&logo=sqlite&logoColor=white
    :target: http://htc.zapto.org:8090/job/Oblivion-2%20XRM/job/master
 
+.. image:: http://htc.zapto.org:8090/job/Oblivion-2%20XRM/job/master/badge/icon
+   :target: http://htc.zapto.org:8090/job/Oblivion-2%20XRM/job/master
+   
+.. image:: https://readthedocs.org/projects/oblivion2-xrm/badge/?version=latest
+   :target: https://oblivion2-xrm.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
+
+.. image:: https://img.shields.io/badge/Discord-7289DA?style=flat&compact=true&logo=discord&logoColor=white
+   :target: https://discord.com/channels/441769144149475328/490661497190481951
+   :alt: Discord Channel
 
 
 .. contents:: Table of Contents
