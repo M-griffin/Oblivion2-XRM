@@ -1,5 +1,6 @@
 
-.. include GLobal RST File for Includes
+..
+   Comment: include Global RST File for Includes
 .. include:: global.rst
 
 .. image:: http://i.imgur.com/AWyEuN3.jpg

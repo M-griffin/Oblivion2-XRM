@@ -1,5 +1,6 @@
 
-.. include GLobal RST File for Includes
+..
+   Comment: include Global RST File for Includes
 .. include:: global.rst
 
 .. image:: http://i.imgur.com/AWyEuN3.jpg
@@ -11,9 +12,6 @@
    :target: http://htc.zapto.org:8090/job/Oblivion-2%20XRM/job/master
 
 .. image:: https://img.shields.io/badge/SQLite-07405E?style=flat&compact=true&logo=sqlite&logoColor=white
-   :target: http://htc.zapto.org:8090/job/Oblivion-2%20XRM/job/master
-
-.. image:: http://htc.zapto.org:8090/job/Oblivion-2%20XRM/job/master/badge/icon
    :target: http://htc.zapto.org:8090/job/Oblivion-2%20XRM/job/master
 
 .. image:: https://readthedocs.org/projects/oblivion2-xrm/badge/?version=latest
@@ -52,6 +50,9 @@ Project details
 
 Project and Build Documentation (WIP)
 ======================================
+--------------
+Install Guides
+--------------
 .. toctree::
    :maxdepth: 1
 
