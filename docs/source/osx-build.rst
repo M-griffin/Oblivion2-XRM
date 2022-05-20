@@ -6,8 +6,8 @@
 .. image:: http://i.imgur.com/AWyEuN3.jpg
    :alt: Screenshot
 
-Oblivion/2 XRM - OS/X Setup and Build Guide
-===========================================
+OS/X Setup and Build Guide
+===========================
 
 .. list-table:: Latest Content Changes
    :widths: 25 75
