@@ -23,7 +23,7 @@ And so if you do NOT use Homebrew, then these paths would need to be updated man
 #---------------------------------------------------------------------------------------
 
 
-NOTE: Requirements, you should have XCode w/ Commandline Tools installed.
+NOTE: Requirements, you should have XCode w/ Command line Tools installed.
 If not, you can usually install this from the APP Store.
 
 Install Homebrew:
@@ -45,7 +45,7 @@ Install Dependencies via Brew:
   brew install unittest-cpp
   brew install boost
 
-Optional Dependencies depending on your Development Envrionment
+Optional Dependencies depending on your Development Environment
 Install GIT to pull down project:
   brew install git
 
@@ -64,10 +64,11 @@ You can check check /usr/local/Cellar for program versions installed
 All Lib and Include files are linked to /usr/local/opt
 
 
-Clone the project - This will checkout and create project in current folder.
+Clone the project - This will checkout and create project in an ``Oblivion2-XRM`` folder.
 
-  git clone https://github.com/M-griffin/Oblivion2-XRM.git .
+  git clone https://github.com/M-griffin/Oblivion2-XRM.git
 
+  cd Oblivion2-XRM
   cd build
   ./build-osx.sh -j2  (Notes, -j# is number of cpu cores for faster compiling)
 
@@ -79,7 +80,7 @@ once completed.
 
 # Helper Applications, Only used if you are converting legacy items or mods.
   ./xrm-menu-convert        - convert Legacy Obv/2 menus to yaml format for XRM.
-  ./xrm-menu-prompt-comvert - convert Legacy Obv/2 prompt to yaml format for XRM.
+  ./xrm-menu-prompt-convert - convert Legacy Obv/2 prompt to yaml format for XRM.
 
 The default port will be 6023 and can be updated in the xrm-server.yaml configuration that gets auto-generated after you run the system the first time.
 

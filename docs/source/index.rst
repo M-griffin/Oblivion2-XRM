@@ -57,6 +57,7 @@ Install Guides
    :maxdepth: 1
 
    osx-build.rst
+   linux-build.rst
 
 
 Development Goals

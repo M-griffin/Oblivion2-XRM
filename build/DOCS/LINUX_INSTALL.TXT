@@ -3,7 +3,7 @@ Main List of Dependencies for Oblivion/2 XRM for Linux
 Initial Information is for Debian / Ubuntu / Mint builds.
 
 Compilation in Linux Mint
-07/26/2019 - Initial Write up with new project folders and commandline build script.
+07/26/2019 - Initial Write up with new project folders and command line build script.
 
 Requirements:
 	sqlite
@@ -27,12 +27,13 @@ Linux using apt-get:
         sudo apt-get install uuid-dev
         sudo apt-get install libunittest++-dev
 
-Clone the project - This will checkout and create project in current folder.
+Clone the project - This will checkout and create project in an ``Oblivion2-XRM`` folder.
 
-        git clone https://github.com/M-griffin/Oblivion2-XRM.git .
+        git clone https://github.com/M-griffin/Oblivion2-XRM.git
 
+        Oblivion2-XRM
         cd build
-	   ./build-linux.sh -j2  (Notes, -j# is number of cpu cores for faster compiling, use a high number if you have more cores)
+	./build-linux.sh -j2  (Notes, -j# is number of cpu cores for faster compiling, use a high number if you have more cores)
 
 This will build all project files and copy the executables back to the build folder
 once completed.
@@ -40,7 +41,7 @@ once completed.
         ./xrm-server              - to start the bbs
         ./xrm-unittest            - to run the unit tests
         ./xrm-menu-convert        - convert Legacy Obv/2 menus to yaml format for XRM.
-        ./xrm-menu-prompt-comvert - convert Legacy Obv/2 prompt to yaml format for XRM.
+        ./xrm-menu-prompt-convert - convert Legacy Obv/2 prompt to yaml format for XRM.
 
 The default port will be 6023 and can be updated in the xrm-server.yaml configuration that gets auto-generated after you run the system the first time.
 
