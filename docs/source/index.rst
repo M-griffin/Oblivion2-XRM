@@ -58,6 +58,7 @@ Install Guides
 
    osx-build.rst
    linux-build.rst
+   docker-build.rst
 
 
 Development Goals
@@ -72,6 +73,10 @@ Screen shot showing some of the latest work on the menu system.
 The default theme template and menu prompt in action while switching menus.
 The menu system is still pretty raw and a lot of logic still needs to be completed.
 
+.. Important:: This is a preview of the development work, It's not a fully functional system
+  You can browse Menu's, and some initial sysop functions such as the User, Menu, Message and Level editors.
+  With the Full Screen Message editor in the works.
+  
 .. image:: http://i.imgur.com/GxcX1gl.png
    :alt: Screenshot
 

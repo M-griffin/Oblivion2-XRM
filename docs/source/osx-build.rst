@@ -100,14 +100,17 @@ Optional Dependencies depending on your Development Environment
 | All Lib and Include files are linked to ``/usr/local/opt``
 
 
-**Clone the project - This will checkout and create project in an ``Oblivion2-XRM`` folder.**
+-----------------
+Clone the project
+-----------------
+This will checkout and create project in an ``Oblivion2-XRM`` folder where you run the command.
 
 ::
 
   git clone https://github.com/M-griffin/Oblivion2-XRM.git
 
 ::
-
+  
   cd Oblivion2-XRM
   cd build
   ./build-osx.sh -j2
@@ -128,7 +131,7 @@ Optional Dependencies depending on your Development Environment
   ./xrm-menu-convert        - convert Legacy Obv/2 menus to yaml
   ./xrm-menu-prompt-convert - convert Legacy Obv/2 prompts to yaml
 
-.. note:: Only Tested on default Menu's and prompt files. Should work for menu and prompt mods too.
+.. note:: Converters only tested on default Menu's and prompt files. Should work for menu and prompt mods too.
 
 **Running the BBS**
 
@@ -148,3 +151,6 @@ Than re-start the program and the files regenerate to defaults.
   ./xrm-server  -  the main configuration file generates in the root bbs folder.
 
 I'm playing around with a yaml logging format, any feedback is welcome. =)
+
+| New User Password: ``newuser`` The first created user becomes a SysOp set to level 255
+| All other users are normal access levels and can be adjusted in the | Sysop Menu | User Editor
