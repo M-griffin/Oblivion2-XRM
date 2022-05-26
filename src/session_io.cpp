@@ -71,7 +71,7 @@ std::string SessionIO::getKeyInput(const std::string &character_buffer)
 
 /**
  * @brief Generates an input field with ANSI color background
- * @param field_name {Is the Field Name, preceeds the field like 'Mail From: '}
+ * @param field_name {Is the Field label, precedes the field like 'Mail From: '}
  * @param len
  */
 void SessionIO::createInputField(std::string &field_name, int &len)
@@ -107,7 +107,7 @@ void SessionIO::createInputField(std::string &field_name, int &len)
         return;
     }
 
-    // Overide Field Input Length for Input Field.
+    // Override Field Input Length for Input Field.
     position = field_name.find("|FL", 0);
 
     if(position != std::string::npos)
@@ -142,7 +142,7 @@ void SessionIO::createInputField(std::string &field_name, int &len)
         }
     }
 
-    // Overide Foreground/Background Input Field Colors
+    // Override Foreground/Background Input Field Colors
     // This is now for OBV/2 .. Not in Legacy.
     position = field_name.find("|FB",0);
     log->xrmLog<Logging::DEBUG_LOG>("createInputField() |FB position=", position, "compare=", position+4, stringSize);
@@ -277,7 +277,7 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
  * @param data
  * @param foreground
  */
-std::string SessionIO::pipeReplaceForground(int foreground)
+std::string SessionIO::pipeReplaceForeground(int foreground)
 {
     std::string escape_sequence = "";
 
@@ -433,7 +433,7 @@ std::string SessionIO::pipeColors(const std::string &color_string)
     // Foreground Colors
     if(color_index >= 0 && color_index < 16)
     {
-        esc_sequence = pipeReplaceForground(color_index);
+        esc_sequence = pipeReplaceForeground(color_index);
         return esc_sequence;
     }
     // Background Colors
@@ -569,11 +569,11 @@ std::string SessionIO::parsePipeWithCharsDigits(const std::string &code, int val
 }
 
 /**
- * @brief Seperate Pipe Codes with 1 or 2 Digits
+ * @brief Separate Pipe Codes with 1 or 2 Digits
  * @param pipe_code
  * @return
  */
-std::string SessionIO::seperatePipeWithCharsDigits(const std::string &pipe_code)
+std::string SessionIO::separatePipeWithCharsDigits(const std::string &pipe_code)
 {
     // Strip PIPE and grab the Sequences
     std::string str = pipe_code.substr(1);
@@ -590,7 +590,7 @@ std::string SessionIO::seperatePipeWithCharsDigits(const std::string &pipe_code)
         alpha_chars = 2;
     }
 
-    // Split Alpha from Numberic so we can process it!
+    // Split Alpha from Numeric so we can process it!
     std::string str_alpha = str.substr(0, alpha_chars);
     str.erase(0, alpha_chars);
 
@@ -708,12 +708,12 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
     // Break out parsing on which pattern was matched.
     while(code_map.size() > 0)
     {
-        // Loop Backwards to perserve string offsets on replacement.
+        // Loop Backwards to preserve string offsets on replacement.
         my_matches = code_map.back();
         code_map.pop_back();
 
         // Check for Custom Screen Translation Mappings
-        // If these exist, they take presidence over standard codes
+        // If these exist, they take presidency over standard codes
         if(m_mapped_codes.size() > 0)
         {
             std::map<std::string, std::string>::iterator it;
@@ -730,9 +730,9 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
         // Handle parsing on expression match.
         switch(my_matches.m_match)
         {
-            case 1: // Pipe w/ 2 DIDIT Colors
+            case 1: // Pipe w/ 2 DIGIT Colors
             {
-                log->xrmLog<Logging::DEBUG_LOG>("Pipe w/ 2 DIDIT Colors |00");
+                log->xrmLog<Logging::DEBUG_LOG>("Pipe w/ 2 DIGIT Colors |00");
                 std::string result = pipeColors(my_matches.m_code);
 
                 if(result.size() != 0)
@@ -765,7 +765,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
             case 3: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
             {
                 log->xrmLog<Logging::DEBUG_LOG>("Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33");
-                std::string result = seperatePipeWithCharsDigits(my_matches.m_code);
+                std::string result = separatePipeWithCharsDigits(my_matches.m_code);
 
                 if(result.size() != 0)
                 {
@@ -777,7 +777,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 4: // Pipe w/ 2 CHARS
                 // This one will need replacement in the string parsing
-                // Pass the original string becasue of |DE for delay!
+                // Pass the original string because of |DE for delay!
             {
                 log->xrmLog<Logging::DEBUG_LOG>("Pipe w/ 2 CHARS // |AA");
                 std::string result = parsePipeWithChars(my_matches.m_code);
@@ -821,7 +821,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 7: // Percent with 2 digits, custom codes
             {
-                // Were just removing them becasue they are processed.
+                // Were just removing them because they are processed.
                 // Now that first part of sequence |01 etc.. are processed!
                 log->xrmLog<Logging::DEBUG_LOG>("replacing %## codes");
                 // Remove for now, haven't gotten this far!
@@ -834,7 +834,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
         }
     }
 
-    // Clear Codemap.
+    // Clear Code map.
     std::vector<MapType>().swap(code_map);
 
     // Clear Custom MCI Screen Translation Mappings
@@ -865,12 +865,12 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
     // Break out parsing on which pattern was matched.
     while(code_mapping.size() > 0)
     {
-        // Loop Backwards to perserve string offsets on replacement.
+        // Loop Backwards to preserve string offsets on replacement.
         my_matches = code_mapping.back();
         code_mapping.pop_back();
 
         // Check for Custom Screen Translation Mappings
-        // If these exist, they take presidence over standard codes
+        // If these exist, they take presidency over standard codes
         if(m_mapped_codes.size() > 0)
         {
             std::map<std::string, std::string>::iterator it;
@@ -904,7 +904,7 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
  */
 std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, const std::string &expression)
 {
-    // Contains all matches found so we can iterate and reaplace
+    // Contains all matches found so we can iterate and replace
     // Without Multiple loops through the string.
     MapType my_matches;
     std::vector<MapType> code_map;
@@ -940,7 +940,7 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
             /*
             std::cout << "Matched Sub '" << matches.str()
             		  << "' following ' " << matches.prefix().str()
-            		  << "' preceeding ' " << matches.suffix().str()
+            		  << "' preceding ' " << matches.suffix().str()
             		  << std::endl;*/
 
             // Avoid Infinite loop and make sure the existing
@@ -952,7 +952,7 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
                 break;
             }
 
-            // Since were replacing on the fly, we need to rescan the
+            // Since were replacing on the fly, we need to re-scan the
             // string for next code
             start = matches[0].second;
 
@@ -1076,7 +1076,7 @@ std::string SessionIO::parseFormatColorsColon(const std::string &sequence, confi
 }
 
 /**
- * @brief Parses unformatted prompt text and adds colors to brackets and colans.
+ * @brief Parses unformatted prompt text and adds colors to brackets and colon's.
  * @param sequence
  * @return
  */

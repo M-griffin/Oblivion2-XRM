@@ -12,8 +12,8 @@
  * Base Dao Calls for generic Object Data Calls
  * (Below This Point)
  */
- 
- 
+
+
 /**
  * @brief Check If Database Table Exists.
  * @return
@@ -82,8 +82,8 @@ bool SecurityDao::deleteRecord(long id)
 /**
  * @brief Retrieve Record By Id.
  * @param id
- * @return 
- */ 
+ * @return
+ */
 security_ptr SecurityDao::getRecordById(long id)
 {
     return baseGetRecordById(id);
@@ -112,7 +112,7 @@ long SecurityDao::getRecordsCount()
  * Base Dao Call Back for Object Specific Data Mappings
  * (Below This Point)
  */
- 
+
 
 /**
  * @brief Pulls results by FieldNames into their Class Variables.
@@ -144,7 +144,7 @@ void SecurityDao::fillSecurityColumnValues(query_ptr qry, security_ptr obj, std:
  * @brief Create Security Record Insert Statement, returns query string
  */
 std::string SecurityDao::insertSecurityQryString(std::string qry, security_ptr obj)
-{    
+{
     // Mprint statement to avoid injections.
     std::string result = sqlite3_mprintf(qry.c_str(),
         obj->sPasswordHash.c_str(),

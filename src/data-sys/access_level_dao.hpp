@@ -8,7 +8,7 @@
 #include <vector>
 #include <functional>
 
-// Forward Declerations
+// Forward Decelerations
 namespace SQLW
 {
 class Database;

@@ -49,7 +49,7 @@ public:
     template <typename StringSequence, typename Callback>
     void asyncWrite(StringSequence string_seq, const Callback &callback)
     {
-        // Place Holder is used for template parmeters, string_seq is used in writes
+        // Place Holder is used for template parameters, string_seq is used in writes
         // Where the Buffer Place Holder in the above method is used for reads.
         // nullptr can't be passed as reference for vector
         std::vector<unsigned char> place_holder;
@@ -64,7 +64,7 @@ public:
     template <typename StringSequence, typename Protocol, typename Callback>
     void asyncConnect(StringSequence string_seq, Protocol protocol, const Callback &callback)
     {
-        // Place Holder is used for template parmeters, string_seq is used in writes
+        // Place Holder is used for template parameters, string_seq is used in writes
         // Where the Buffer Place Holder in the above method is used for reads.
         // nullptr can't be passed as reference for vector
         std::vector<unsigned char> place_holder;
@@ -94,7 +94,7 @@ public:
     template <typename StringSequence, typename Protocol, typename Callback>
     void asyncHandshake(StringSequence string_seq, Protocol protocol, const Callback &callback)
     {
-        // Place Holder is used for template parmeters, string_seq is used in writes
+        // Place Holder is used for template parameters, string_seq is used in writes
         // Where the Buffer Place Holder in the above method is used for reads.
         // nullptr can't be passed as reference for vector
         std::vector<unsigned char> place_holder;

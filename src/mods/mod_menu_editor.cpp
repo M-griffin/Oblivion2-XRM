@@ -16,7 +16,7 @@
  */
 bool ModMenuEditor::update(const std::string &character_buffer, const bool &)
 {
-    // Make sure system is active, when system is done, success or failes
+    // Make sure system is active, when system is done, success or fails
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
@@ -29,7 +29,7 @@ bool ModMenuEditor::update(const std::string &character_buffer, const bool &)
         return true;
     }
 
-    // Process all incoming data stright to the input functions.
+    // Process all incoming data straight to the input functions.
     m_mod_functions[m_mod_function_index](character_buffer);
 
     return true;
@@ -91,7 +91,7 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_MENU_FIELD_INPUT_TEXT]   = std::make_pair("Menu Field Edit Prompt", "|CR|15Menu Editor C|07om|08mand |15: |07");
 
     // NOTE, added |PD will display the prompt description as HELP text to the user
-    // Usefull when editing fields - Specific to XRM.
+    // Useful when editing fields - Specific to XRM.
     value[PROMPT_MENU_FIELD_TITLE]        = std::make_pair("Menu Title (Shown in ANSI screens with 'MT' MCI code)", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Menu Title         : ");
     value[PROMPT_MENU_FIELD_PASSWORD]     = std::make_pair("Menu Password (Clear Text right now, will be encrypted lateron)", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15Password           : ");
     value[PROMPT_MENU_FIELD_FALLBACK]     = std::make_pair("Fallback Menu (Example 'MAIN')", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15Fallback Menu      : ");
@@ -114,14 +114,14 @@ void ModMenuEditor::createTextPrompts()
     value[PROMPT_MENU_OPTION_FIELD_INPUT_TEXT]  = std::make_pair("Menu Option Field Edit Prompt", "|CR|15Option Editor C|07om|08mand |15: |07");
 
     // NOTE, added |PD will display the prompt description as HELP text to the user
-    // Usefull when editing fields - Specific to XRM.
+    // Useful when editing fields - Specific to XRM.
     value[PROMPT_MENU_OPTION_FIELD_NAME]         = std::make_pair("Name Displayed in an ANSI screen", "|CR|03%   |15|PD|CR|11!   |03(|11A|03) |15Option Name        : ");
     value[PROMPT_MENU_OPTION_FIELD_ACS]          = std::make_pair("Access Control String - Setting security and flags", "|CR|03%   |15|PD|CR|11!   |03(|11B|03) |15ACS                : ");
     value[PROMPT_MENU_OPTION_FIELD_HIDDEN]       = std::make_pair("Hidden Option, Exclude from ANSI screen", "|CR|03%   |15|PD|CR|11!   |03(|11C|03) |15Hidden       |07(|15T|07/|15F|07)|15 : ");
     value[PROMPT_MENU_OPTION_FIELD_CMD_KEY]      = std::make_pair("Executes a specific menu function (Example '-/' to change menu)", "|CR|03%   |15|PD|CR|11!   |03(|11D|03) |15Command Keys       : ");
     value[PROMPT_MENU_OPTION_FIELD_MENU_KEY]     = std::make_pair("Input keys user enters to execute menu option", "|CR|03%   |15|PD|CR|11!   |03(|11E|03) |15Keys               : ");
     value[PROMPT_MENU_OPTION_FIELD_CMD_STRING]   = std::make_pair("Parameters required by Command Key (Example 'MAIN' for switching menus)", "|CR|03%   |15|PD|CR|11!   |03(|11F|03) |15Command String     : ");
-    value[PROMPT_MENU_OPTION_FIELD_PULLDOWN]     = std::make_pair("Pulldown ID - the order lightbars move from the begining to the end", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15Pulldown ID        : ");
+    value[PROMPT_MENU_OPTION_FIELD_PULLDOWN]     = std::make_pair("Pulldown ID - the order light bars move from the beginning to the end", "|CR|03%   |15|PD|CR|11!   |03(|11G|03) |15Pulldown ID        : ");
 
     // Menu commands, some header info for the view toggle.
     value[PROMPT_OPTION_TOGGLE]                  = std::make_pair("Command View Toggle using 'T' cycles though different displays", "|CR|03%   |15|PD|CR|11!   |15Current View : |11|OT |CR");
@@ -140,7 +140,7 @@ void ModMenuEditor::createTextPrompts()
     value[DISPLAY_MENU_FIELDS_QUIT_SAVE]         = std::make_pair("Quit and Save", " |03(|11Q|03) |15Quit & Save          ");
     value[DISPLAY_MENU_FIELDS_QUIT_ABORT]        = std::make_pair("Quit without Save", " |03(|11X|03) |15Exit without Saving  ");
 
-    // Dsiplay Page for Option Fields.
+    // Display Page for Option Fields.
     value[DISPLAY_OPT_FIELDS_OPTION_ID]           = std::make_pair("Option ID", "     |15Option ID          : ");
     value[DISPLAY_OPT_FIELDS_BORDER_ROW_COLOR]    = std::make_pair("Border Row Color", " |07");
     value[DISPLAY_OPT_FIELDS_OPTION_NAME]         = std::make_pair("Option Name", " |03(|11A|03) |15Option Name        : ");
@@ -263,7 +263,7 @@ void ModMenuEditor::setupMenuEditor()
     displayPrompt(PROMPT_HEADER);
 
     // Build a list of screen lines for the menu display
-    // So we know when to pause in large listing, or use pagenation.
+    // So we know when to pause in large listing, or use pagination.
     std::string menu_display_output = displayMenuList();
 
     if(m_menu_display_list.size() > 0)
@@ -316,7 +316,7 @@ void ModMenuEditor::setupMenuOptionEditor()
     displayPromptMCI(PROMPT_OPTION_TOGGLE, view_name);
 
     // Build a list of screen lines for the menu display
-    // So we know when to pause in large listing, or use pagenation.
+    // So we know when to pause in large listing, or use pagination.
     std::string menu_display_output = displayMenuOptionList();
 
     if(m_menu_display_list.size() > 0)
@@ -342,7 +342,7 @@ void ModMenuEditor::setupMenuEditFields()
     displayPromptMCI(PROMPT_MENU_EDIT_HEADER, display_name);
 
     // Build a list of screen lines for the menu display
-    // So we know when to pause in large listing, or use pagenation.
+    // So we know when to pause in large listing, or use pagination.
     std::string menu_display_output = displayMenuEditScreen();
 
     if(m_menu_display_list.size() > 0)
@@ -367,7 +367,7 @@ void ModMenuEditor::setupMenuOptionEditFields()
     displayPromptMCI(PROMPT_MENU_OPTION_EDIT_HEADER, display_name);
 
     // Build a list of screen lines for the menu display
-    // So we know when to pause in large listing, or use pagenation.
+    // So we know when to pause in large listing, or use pagination.
     std::string menu_display_output = displayMenuOptionEditScreen();
 
     if(m_menu_display_list.size() > 0)
@@ -406,7 +406,7 @@ void ModMenuEditor::displayCurrentPage(const std::string &input_state)
 
         if(i >= (m_page*m_rows_per_page) + m_rows_per_page)
         {
-            // We've displayed the max amount of rows per the currnet
+            // We've displayed the max amount of rows per the current
             // screen break out and wait for prompt or next page.
             displayed_all_rows = false;
             break;
@@ -432,8 +432,8 @@ void ModMenuEditor::displayCurrentPage(const std::string &input_state)
             return;
     }
 
-    // If we displayed all rows, then display propmpt, otherwise
-    // Ask to hit anykey for next page.
+    // If we displayed all rows, then display prompt, otherwise
+    // Ask to hit any key for next page.
     if(displayed_all_rows)
     {
         // Reset Page back to Zero for next display.
@@ -1031,7 +1031,7 @@ void ModMenuEditor::menuEditorMenuOptionFieldHandler(const std::string &input)
                     // use default false;
                 { }
                 else
-                    // Leave orginial value
+                    // Leave original value
                     break;
 
                 m_loaded_menu.back()->menu_options[m_current_option].hidden = result;
@@ -1450,7 +1450,7 @@ void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int optio
  */
 void ModMenuEditor::createNewMenu(const std::string &menu_name)
 {
-    // Pre-Load Menu, check access, if not valud, then fall back to previous.
+    // Pre-Load Menu, check access, if not valued, then fall back to previous.
     menu_ptr new_menu(new Menu());
 
     // Add a default menu option command to the menu
@@ -1571,7 +1571,7 @@ void ModMenuEditor::reorderMenuIndexesDeletion(unsigned int option_index)
  */
 void ModMenuEditor::deleteExistingMenu(const std::string &menu_name)
 {
-    // Pre-Load Menu, check access, if not valud, then fall back to previous.
+    // Pre-Load Menu, check access, if not valued, then fall back to previous.
     menu_ptr new_menu(new Menu());
 
     // Call MenuDao to save .yaml menu file
@@ -1590,7 +1590,7 @@ void ModMenuEditor::deleteExistingMenu(const std::string &menu_name)
 void ModMenuEditor::copyExistingMenu(const std::string &menu_name)
 {
     Logging *log = Logging::instance();
-    // Pre-Load Menu, check access, if not valud, then fall back to previous.
+    // Pre-Load Menu, check access, if not valued, then fall back to previous.
     menu_ptr new_menu(new Menu());
 
     // First load the Source Menu [m_current_menu] file name
@@ -1740,7 +1740,7 @@ std::string ModMenuEditor::displayMenuList()
         return "No Menu Files found!";
     }
 
-    // Sort Menu's in accending order
+    // Sort Menu's in ascending order
     std::sort(result_set.begin(), result_set.end());
 
     // iterate through and print out

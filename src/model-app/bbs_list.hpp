@@ -11,7 +11,7 @@ typedef std::shared_ptr<BBSList> bbs_list_ptr;
  * @author Michael Griffin
  * @date 03/05/2017
  * @file bbs_list.hpp
- * @brief Bullentin Board Listing
+ * @brief Bulletin Board Listing
  */
 class BBSList
 {
@@ -22,8 +22,8 @@ public:
     std::string sType;
     std::string sAddress;
     std::string sSysop;
-    
-    
+
+
     explicit BBSList()
         : iId(-1)
         , sName("")
@@ -31,7 +31,7 @@ public:
         , sAddress("")
         , sSysop("")
     { }
-    
+
     ~BBSList()
     { }
 

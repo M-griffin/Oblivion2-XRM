@@ -65,7 +65,7 @@ public:
             new_session->m_session_data->waitingForData();
         }
 
-        // Send out Telnet Negoiation Options
+        // Send out Telnet Negotiation Options
         if(connection->isActive())
         {
             // On initial Session Connection,  setup and send TELNET Options to
@@ -117,11 +117,11 @@ public:
     }
 
     /**
-     * @brief Telopt Sequences timer
+     * @brief Telnet option Sequence Timer
      */
     void startDetectionTimer()
     {
-        // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences reponses
+        // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences responses
         m_deadline_timer->setWaitInMilliseconds(1500);
         m_deadline_timer->asyncWait(
             std::bind(&Session::handleDetectionTimer, shared_from_this())
@@ -129,7 +129,7 @@ public:
     }
 
     /**
-     * @brief Deadline Detection Timer for Negoiation
+     * @brief Deadline Detection Timer for Negotiation
      * @param timer
      */
     void handleDetectionTimer()
@@ -194,7 +194,7 @@ public:
         {
             m_session_data->m_is_leaving = true;
 
-            // Disconenct the session.
+            // Disconnect the session.
             session_manager->leave(m_session_data->m_node_number);
 
             if(m_connection->isActive())

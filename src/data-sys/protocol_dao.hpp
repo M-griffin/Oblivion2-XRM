@@ -46,7 +46,7 @@ public:
      * @return
      */
     bool loadConfig();
-    
+
     /**
      * @brief Moves the Loaded config to the shared pointer.
      * @param rhs
@@ -64,10 +64,10 @@ public:
         {
             return m_protocols;
         }
-		
+
 		return nullptr;
     }
-   
+
     protocols_ptr     m_protocols;
     std::string       m_path;
     std::string       m_filename;

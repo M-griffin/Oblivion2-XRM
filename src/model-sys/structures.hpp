@@ -32,7 +32,7 @@ enum
 };
 
 /**
- * @brief Saves All MCI and PIPE Matches with Offsets for replacment.
+ * @brief Saves All MCI and PIPE Matches with Offsets for replacement.
  */
 typedef struct MapType
 {

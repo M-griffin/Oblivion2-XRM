@@ -31,7 +31,7 @@
 
 
 /**
- * @brief Unit Testing for Initial Form Configuration Implimentation
+ * @brief Unit Testing for Initial Form Configuration Implementation
  * @return
  */
 SUITE(XRMFormSystemConfig)

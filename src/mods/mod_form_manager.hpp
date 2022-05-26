@@ -1,5 +1,5 @@
-#ifndef MOD_SYS_CONFIG_HPP
-#define MOD_SYS_CONFIG_HPP
+#ifndef MOD_FORM_MANAGER_HPP
+#define MOD_FORM_MANAGER_HPP
 
 #include "mod_base.hpp"
 
@@ -38,14 +38,14 @@ class ModFormManager
 public:
 
     ModFormManager(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process);
-        
+
     virtual ~ModFormManager() override
     { }
 
     virtual bool update(const std::string &character_buffer, const bool &) override;
     virtual bool onEnter() override;
     virtual bool onExit() override;
-    
+
     /**
      * @brief Process Command Keys passed from menu selection (Callback)
      * @param option
@@ -56,12 +56,12 @@ public:
      * @brief Starts up Form Manager Module.
      */
     void startupFormManager();
-    
+
     int                m_current_page;
     menu_base_ptr      m_menu;
-    form_manager_ptr   m_form_manager;    
+    form_manager_ptr   m_form_manager;
     SessionIO          m_session_io;
-        
+
 };
 
-#endif // MOD_SYS_CONFIG_HPP
+#endif // MOD_FORM_MANAGER_HPP

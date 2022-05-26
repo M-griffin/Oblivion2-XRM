@@ -266,7 +266,7 @@ bool Query::fetchRow()
 }
 
 /*
- * Get the last Inerted Row ID for Primary Key Tables.
+ * Get the last Inserted Row ID for Primary Key Tables.
  */
 sqlite_int64 Query::getInsertId()
 {
@@ -566,7 +566,7 @@ void Query::queryError(const std::string& msg)
 }
 
 /**
- * Create a new Executate Transaction
+ * Create a new Transaction
  */
 bool Query::executeTransaction(const std::vector<std::string> &statements)
 {

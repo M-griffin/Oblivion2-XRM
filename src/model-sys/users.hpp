@@ -3,7 +3,7 @@
 
 #include <string>
 #include <ctime>
-#include <cstdint> 
+#include <cstdint>
 #include <memory>
 
 class Users;

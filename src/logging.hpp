@@ -74,10 +74,10 @@ public:
     const std::string CONSOLE_LEVEL = "Console Output";
     const std::string ALL_LEVELS = "All Level Information";
 
-    SafeQueue<log_entry_ptr> m_log_enteries;
+    SafeQueue<log_entry_ptr> m_log_entries;
 
     /**
-     * @brief Creates Singleton Instatce of Class
+     * @brief Creates Singleton Instance of Class
      * @return
      */
     static Logging* instance()
@@ -124,7 +124,7 @@ public:
      */
     int getNumberOfLogEntries()
     {
-        return m_log_enteries.size();
+        return m_log_entries.size();
     }
 
     /**
@@ -133,8 +133,8 @@ public:
      */
     log_entry_ptr getLogQueueEntry()
     {
-        if(!m_log_enteries.isEmpty())
-            return m_log_enteries.dequeue();
+        if(!m_log_entries.isEmpty())
+            return m_log_entries.dequeue();
 
         return nullptr;
     }
@@ -151,7 +151,7 @@ public:
     }
 
     /**
-     * @brief Configration String to Int Log Level
+     * @brief Configuration String to Int Log Level
      * @param log_level
      * @return
      */
@@ -260,13 +260,13 @@ public:
 // Don't Queue Logging during unit tests.
 #ifndef UNIT_TEST
             log_entry_ptr entry(new LogEntry(date_time, details));
-            m_log_enteries.enqueue(entry);
+            m_log_entries.enqueue(entry);
 #endif
         }
     }
 
     /**
-     * @brief Write out Log to console in YAML formated output.
+     * @brief Write out Log to console in YAML formatted output.
      * @param date_time
      * @param details
      */
@@ -348,5 +348,6 @@ private:
     Logging& operator=(const Logging&);
 
 };
+
 
 #endif // LOGGING_H

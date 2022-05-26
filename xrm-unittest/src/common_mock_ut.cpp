@@ -35,7 +35,7 @@ SUITE(XRM_MockUTTestClass)
 
     TEST(numberOfCharsWithHighAsciiAndUtf8BeforeAndAfter)
     {
-        // 21 Bytes, should be 9 seperate characters
+        // 21 Bytes, should be 9 separate characters
         CommonIO common;
         std::string temp = "あにま"; // 3 + 3 + 3 = 9 bytes
         temp += std::string(1, static_cast<unsigned char>(148)); // 1 byte

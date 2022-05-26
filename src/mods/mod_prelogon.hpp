@@ -124,7 +124,7 @@ public:
     void createTextPrompts();
 
     /**
-     * @brief Sets an indivdual module index.
+     * @brief Sets an individual module index.
      * @param mod_function_index
      */
     void changeModule(int mod_function_index);
@@ -185,7 +185,7 @@ public:
      */
     void startDetectionTimer()
     {
-        // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences reponses
+        // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences responses
         m_deadline_timer->setWaitInMilliseconds(1500);
         m_deadline_timer->asyncWait(
             std::bind(&ModPreLogon::handleDetectionTimer, shared_from_this())

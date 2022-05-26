@@ -18,7 +18,7 @@
  */
 bool ModLogon::update(const std::string &character_buffer, const bool &)
 {
-    // Make sure system is active, when system is done, success or failes
+    // Make sure system is active, when system is done, success or fails
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
@@ -31,7 +31,7 @@ bool ModLogon::update(const std::string &character_buffer, const bool &)
         return true;
     }
 
-    // Process all incoming data stright to the input functions.
+    // Process all incoming data straight to the input functions.
     m_mod_functions[m_mod_function_index](character_buffer);
 
     return true;
@@ -78,13 +78,13 @@ void ModLogon::createTextPrompts()
     value[PROMPT_PASSWORD]            = std::make_pair("Password Prompt", "password: ");
     value[PROMPT_USE_INVALID]         = std::make_pair("Invalid Entry", "|04Invalid Response! Try again.|CR");
     value[PROMPT_INVALID_USERNAME]    = std::make_pair("Invalid Username", "|04Invalid Username! Try again.|CR");
-    value[PROMPT_INVALID_PASSWORD]    = std::make_pair("Invalid Passowrd", "|04Invalid Passowrd! Try again.|CR");
+    value[PROMPT_INVALID_PASSWORD]    = std::make_pair("Invalid Password", "|04Invalid Password! Try again.|CR");
 
     m_text_prompts_dao->writeValue(value);
 }
 
 /**
- * @brief Sets an indivdual module index.
+ * @brief Sets an individual module index.
  * @param mod_function_index
  */
 void ModLogon::changeModule(int mod_function_index)
@@ -346,11 +346,11 @@ bool ModLogon::validate_password(const std::string &input)
 
     Logging *log = Logging::instance();
 
-    // First load the secure record for the exsting user.
+    // First load the secure record for the existing user.
     // Link to security dao for data access object
     security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
 
-    // Lookup the secutiry table for existing hash.
+    // Lookup the security table for existing hash.
     security_ptr security = security_dao->getRecordById(m_logon_user->iSecurityIndex);
 
     if(!security || security->iId == -1)
@@ -475,7 +475,7 @@ bool ModLogon::passwordAnswer(const std::string &input)
 }
 
 /**
- * @brief Chanes user logon password
+ * @brief Changes user logon password
  * @return
  */
 bool ModLogon::passwordChange(const std::string &input)

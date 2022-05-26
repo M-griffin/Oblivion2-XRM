@@ -11,7 +11,7 @@
 /**
  * Development Notes:
  *   Generate Menu and Commands for
- *   Custom Listbar Configuration Interfaces
+ *   Custom light bar Configuration Interfaces
  *   We will hard code for initial dev and testing
  *   Create form folder with form codes for pulling each interface.
  *   and later customize
@@ -19,14 +19,14 @@
  *   A Custom Form Menu Load method will be needed in the menu base
  *   To use the data created here instead of trying to load a menu yaml.
  *
- *   Special "new" menu commands will be added to handle lightbar selections
+ *   Special "new" menu commands will be added to handle light bar selections
  *   And input fields processing when the option is selected..
  *   Fe.. Bools    YES/NO Bars
  *        String   Input Fields         (Covers single and multi-char / digit input)
  *        String   Hidden Input Fields
  *
- *   Special Option, color selector like legacy obv/2  with right/left arror key movement.
- *   This will need some deep thought on best implimentation.
+ *   Special Option, color selector like legacy obv/2  with right/left arrow key movement.
+ *   This will need some deep thought on best implementation.
  */
 
 class FormBase;
@@ -68,7 +68,7 @@ public:
     void clearAllForms();
 
     /**
-     * @brief Exists and Shutsdown the current form
+     * @brief Exists and Shuts down the current form
      */
     void shutdownForm();
 
@@ -94,13 +94,13 @@ public:
      * @param list
      */
     void buildPageOptions(std::vector<MenuOption> &page_options, int current_page);
-    
+
     /**
      * @brief Pulls Generate Menu Options from Form
      * @param option
      */
     menu_ptr retrieveFormOptions(int current_page);
-        
+
     /**
      * @brief Processes a TOP Template Screen
      * @param screen
@@ -134,7 +134,7 @@ public:
     std::string      m_ansi_bot;
     int              m_box_top;
     int              m_box_bottom;
-        
+
     std::vector<MenuOption> m_loaded_options;
     CommonIO         m_common_io;
     SessionIO        m_session_io;

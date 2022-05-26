@@ -11,7 +11,7 @@
  */
 bool ModMessageEditor::update(const std::string &character_buffer, const bool &)
 {
-    // Make sure system is active, when system is done, success or failes
+    // Make sure system is active, when system is done, success or fails
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
@@ -24,7 +24,7 @@ bool ModMessageEditor::update(const std::string &character_buffer, const bool &)
         return true;
     }
 
-    // Process all incoming data stright to the input functions.
+    // Process all incoming data straight to the input functions.
     m_mod_functions[m_mod_function_index](character_buffer);
 
     return true;
@@ -180,7 +180,7 @@ std::string ModMessageEditor::processTopTemplate(ansi_process_ptr ansi_process, 
         if(index != std::string::npos)
         {
             new_screen.replace(index, 4, "\x1b[1;1H\x1b[2J");
-            // Incriment past previous replacement.
+            // Increment past previous replacement.
             index += 9;
         }
     }
@@ -300,7 +300,7 @@ std::string ModMessageEditor::processMidTemplate(ansi_process_ptr ansi_process, 
  */
 void ModMessageEditor::setupEditor()
 {
-    // NOTE Possiable make these class instances, so we don't have to keep reloading.
+    // NOTE Possible make these class instances, so we don't have to keep reloading.
     std::string top_template = m_common_io.readinAnsi("FSESRT.ANS");
     std::string mid_template = m_common_io.readinAnsi("FSEMID.ANS");
     std::string bot_template = m_common_io.readinAnsi("FSEEND.ANS");
@@ -318,8 +318,8 @@ void ModMessageEditor::setupEditor()
     std::string bot_screen = processBottomTemplate(ansi_process, bot_template);
 
     // Parse The Mid to get Left / Right Margins |RT and |LT specify Right and Left.
-    // Only after Top and Bottom are calucated, this will geenrate the apporiate
-    // Rows uses inbetween top / bot templates on current screen size.
+    // Only after Top and Bottom are calculated, this will generate the appropriate
+    // Rows uses between top / bot templates on current screen size.
     std::string mid_screen = processMidTemplate(ansi_process, mid_template);
 
     Logging *log = Logging::instance();

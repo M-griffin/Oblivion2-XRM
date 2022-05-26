@@ -21,7 +21,7 @@
  */
 bool ModSignup::update(const std::string &character_buffer, const bool &)
 {
-    // Make sure system is active, when system is done, success or failes
+    // Make sure system is active, when system is done, success or fails
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
@@ -34,7 +34,7 @@ bool ModSignup::update(const std::string &character_buffer, const bool &)
         return true;
     }
 
-    // Process all incoming data stright to the input functions.
+    // Process all incoming data straight to the input functions.
     m_mod_functions[m_mod_function_index](character_buffer);
 
     return true;
@@ -106,7 +106,7 @@ void ModSignup::createTextPrompts()
     value[PROMPT_PASS_INVALID]       = std::make_pair("Invalid/Non Matching Password", "|04Invalid, password does not match!|CR");
     value[PROMPT_HANDLE_INVALID]     = std::make_pair("User Name Already Exists", "|04Invalid UserName, Already Exists!|CR");
     value[PROMPT_NAME_INVALID]       = std::make_pair("Real Name Already Exists", "|04Name, Already Exists, Try Adding a middle initial.|CR");
-    value[PROMPT_EMAIL_INVALID]      = std::make_pair("Email Already Exists", "|04Email, Already Exists, Try another adress or check if your have an account.|CR");
+    value[PROMPT_EMAIL_INVALID]      = std::make_pair("Email Already Exists", "|04Email, Already Exists, Try another address or check if your have an account.|CR");
 
     // Confirmation of Save
     value[PROMPT_SAVED]              = std::make_pair("User Record Saved", "|CR|03User Record Saved Successfully.");
@@ -521,16 +521,16 @@ void ModSignup::setupVerifyAndSave()
 
 /**
  * @brief Base Class for shared input (receives function pointer for custom execution)
- * 
- * @param input 
- * @param field_length 
- * @param useHiddenOutput 
- * @param func_pointer 
- * @return true 
- * @return false 
+ *
+ * @param input
+ * @param field_length
+ * @param useHiddenOutput
+ * @param func_pointer
+ * @return true
+ * @return false
  */
-bool ModSignup::fieldInputAndProcess(std::string input, int field_length, bool use_hidden_output, 
-    std::function<bool(std::string &, std::string &)> function_pointer) 
+bool ModSignup::fieldInputAndProcess(std::string input, int field_length, bool use_hidden_output,
+    std::function<bool(std::string &, std::string &)> function_pointer)
 {
     std::string key = "";
     std::string result = m_session_io.getInputField(input, key, field_length, "", use_hidden_output);
@@ -575,7 +575,7 @@ bool ModSignup::newUserPassword(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) { 
+        (std::string &input, std::string &key) {
 
         // Debug Logging
         Logging *log = Logging::instance();
@@ -605,7 +605,7 @@ bool ModSignup::newUserPassword(const std::string &input)
  * @return
  */
 bool ModSignup::disclaimer(const std::string &input)
-{    
+{
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
         (std::string &input, std::string &key) {
@@ -1090,7 +1090,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
 
             if(password.size() == 0)
             {
-                // Error from envryption method.
+                // Error from encryption method.
                 log->xrmLog<Logging::ERROR_LOG>("Error, ChallengeAnswer was empty", __LINE__, __FILE__);
                 return false;
             }
@@ -1373,7 +1373,7 @@ bool ModSignup::backSpace(const std::string &input)
             std::string detection_prompt = "- Detection WIP, Select W or T.";
             baseProcessAndDeliverNewLine(detection_prompt);
 
-            // Not Implimented YET
+            // Not Implemented YET
             // Start Backspace Detection here!
             redisplayModulePrompt();
             return true;
@@ -1462,7 +1462,7 @@ void ModSignup::saveNewUserRecord()
 
         // Also Add Default File points,, missing from user rec.
     }
-    
+
     long userIndex = user_dao->insertRecord(m_user_record);
     log->xrmLog<Logging::INFO_LOG>("New User Index saved", userIndex);
 
@@ -1470,7 +1470,7 @@ void ModSignup::saveNewUserRecord()
     {
         log->xrmLog<Logging::ERROR_LOG>("Error, unable to insert new user record", __LINE__, __FILE__);
 
-        // Remove Secutiry Record if unable to create user record.
+        // Remove Security Record if unable to create user record.
         if(!security_dao->deleteRecord(securityIndex))
         {
             log->xrmLog<Logging::ERROR_LOG>("Error, unable to remove security record.", __LINE__, __FILE__);
@@ -1482,7 +1482,7 @@ void ModSignup::saveNewUserRecord()
         return;
     }
     // If First User Created, Then Update Security Level to Sysop.
-    else if (userIndex == 1) 
+    else if (userIndex == 1)
     {
         log->xrmLog<Logging::INFO_LOG>("Updating First Created User to SysOp/Admin");
 

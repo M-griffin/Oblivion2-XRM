@@ -42,7 +42,7 @@ public:
 };
 
 
-// YAML Overide namespace for encoding/decoding Menu Class.
+// YAML Override namespace for encoding/decoding Menu Class.
 namespace YAML
 {
 /**
@@ -56,7 +56,7 @@ template<>
 struct convert<MenuPrompt>
 {
     /**
-     * @brief Overide for encoding the Menu Class
+     * @brief Override for encoding the Menu Class
      *        This is not used as it makes the map on a single line!
      *        Instead Key/Value is done in the ConfigDao on save.
      * @param rhs
@@ -75,7 +75,7 @@ struct convert<MenuPrompt>
     }
 
     /**
-     * @brief Overide for the Load from File, this read and piluaes the Menu Object.
+     * @brief Override for the Load from File, this read and populate the Menu Object.
      * @param node
      * @param rhs
      * @return

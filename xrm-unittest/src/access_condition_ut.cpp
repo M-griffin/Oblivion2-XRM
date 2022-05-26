@@ -431,7 +431,7 @@ SUITE(XRMAccessCondition)
     }
 
     /**
-     * Need to Impliment better way to split OR statements.
+     * Need to Implement better way to split OR statements.
      * Most likely need a state to keep track and reset.
      * This would have to be in the Parse CodeMap.
      *

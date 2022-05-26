@@ -28,7 +28,7 @@ FormSystemConfig::~FormSystemConfig()
  */
 bool FormSystemConfig::onEnter()
 {
-    // Setup the YAML Noide with base data and type.
+    // Setup the YAML Node with base data and type.
     setNodeMappingType(m_config);
 
     setupBuildOptions("bbs_name_sysop", m_config->bbs_name_sysop);

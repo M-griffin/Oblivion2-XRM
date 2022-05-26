@@ -18,7 +18,7 @@ public:
     MyFixtureMessageArea()
         : m_database("xrm_itMessageAreaTest.sqlite3")
     {
-        // Can't remove database on closure, becasue the
+        // Can't remove database on closure, because the
         // Object is not cleared till Destructor is finished.
         // Before Each Test, we need to remove existing database.
         remove("xrm_itMessageAreaTest.sqlite3");
@@ -47,7 +47,7 @@ SUITE(XRMMessageAreaDao)
         // DataBase Table Should not exist.
         CHECK(!objdb->doesTableExist());
 
-        // Setup database Param, cache sies etc..
+        // Setup database Param, cache sizes etc..
         CHECK(objdb->firstTimeSetupParams());
 
         // Check Create Table and Index

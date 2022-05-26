@@ -14,7 +14,7 @@
 #include <string>
 #include <stdexcept>
 
-// Helper Macro For comparsion errors.
+// Helper Macro For comparison errors.
 #define UINT unsigned int
 
 
@@ -363,7 +363,7 @@ SUITE(XRMSessionIO)
         CHECK((character_buffer.compare("Testing |00|19          \x1b[11D") == 0));
     }
 
-    TEST(createInputField_10_Length_Retuns_Default_Becasue_FL17_Larger_Than_length10)
+    TEST(createInputField_10_Length_Retuns_Default_Because_FL17_Larger_Than_length10)
     {
         // Mock SessionData Class
         connection_ptr          connection;
@@ -380,7 +380,7 @@ SUITE(XRMSessionIO)
         CHECK((character_buffer.compare("Testing |00|19          \x1b[11D") == 0));
     }
 
-    TEST(createInputField_10_Length_Retuns_Default_Becasue_FL10_Smaller_Than_length20)
+    TEST(createInputField_10_Length_Retuns_Default_Because_FL10_Smaller_Than_length20)
     {
         // Mock SessionData Class
         connection_ptr          connection;
@@ -397,7 +397,7 @@ SUITE(XRMSessionIO)
         CHECK((character_buffer.compare("Testing |00|19          \x1b[11D") == 0));
     }
 
-    TEST(createInputField_10_Length_Retuns_Default_Becasue_FL10_Larger_Than_length9_Failure)
+    TEST(createInputField_10_Length_Retuns_Default_Because_FL10_Larger_Than_length9_Failure)
     {
         // Mock SessionData Class
         connection_ptr          connection;
@@ -412,7 +412,7 @@ SUITE(XRMSessionIO)
         int length = 9;
         sess.createInputField(character_buffer, length);
 
-        // Doesn't Equal 10, casue it's over the max!
+        // Doesn't Equal 10, cause it's over the max!
         CHECK((character_buffer.compare("Testing |00|19          \x1b[12D") != 0));
 
         // Equals 9 the max
@@ -607,7 +607,7 @@ SUITE(XRMSessionIO)
         CHECK_EQUAL(result, "");       // Result Blank on Aborts only returns data after ENTER
     }
 
-    TEST(getInputField_Test_Field_Returns_Empty_On_ESC_Squences_Returns_Following_Character)
+    TEST(getInputField_Test_Field_Returns_Empty_On_ESC_Sequences_Returns_Following_Character)
     {
         // We want to make sure ESC sequences, arrow keys etc..
         // will not be mistaken for ESC and abort the field.
@@ -890,7 +890,7 @@ SUITE(XRMSessionIO)
         session_data_ptr session_data;
         SessionIO sess(session_data);
 
-        // Test all groups are picked up when combinded
+        // Test all groups are picked up when combined
         std::string sequence = "e|013e|02AA||03FEers|XY0101e3%||XY101000weXa..W" \
                                "||A1%|B22XY1010weR-|AI3XY1010342|CC223eq0..W||AE%|Be22XY1010weR-|A" \
                                "I|3XY1010342|CCe2%%C|ERE23eq0..W||1AE%|Be22%%obv.ascecXY1010%%%obv" \

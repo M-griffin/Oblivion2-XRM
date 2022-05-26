@@ -63,7 +63,7 @@ unsigned char TelnetDecoder::telnetOptionDeny(unsigned char cmd)
 void TelnetDecoder::decodeBuffer()
 {
     Logging *log = Logging::instance();
-    log->xrmLog<Logging::DEBUG_LOG>("decodeByffer 240 - SE received");
+    log->xrmLog<Logging::DEBUG_LOG>("decodeBuffer 240 - SE received");
 
     // Check if this was a sequence we were waiting for.
     if(checkReply(m_subnegoOption))
