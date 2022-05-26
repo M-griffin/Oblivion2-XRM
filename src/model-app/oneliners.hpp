@@ -19,7 +19,7 @@ typedef std::shared_ptr<Oneliners> oneliner_ptr;
 class Oneliners
 {
 public:
-    explicit Oneliners() 
+    explicit Oneliners()
         : iId(-1)
         , iUserId(-1)
         , sText("")
@@ -27,12 +27,12 @@ public:
         , sUserInitials("")
         , dtDatePosted(0)
     {}
-    
+
     ~Oneliners()
     {}
 
     long iId;
-    long iUserId;        
+    long iUserId;
     std::string sText;
     std::string sUserName;
     std::string sUserInitials;

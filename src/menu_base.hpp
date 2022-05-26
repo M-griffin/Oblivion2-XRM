@@ -73,12 +73,12 @@ public:
     menu_prompt_ptr  m_menu_prompt;        // Menu Prompt
 
     ansi_process_ptr m_ansi_process;       // Instance for AnsiProcess Methods
-    unsigned int     m_active_pulldownID;  // Active Lightbar Position.
+    unsigned int     m_active_pulldownID;  // Active Light bar Position.
 
     // Flags
     bool             m_fail_flag;                   // If menu or Option fails, kick off the fail flag.
     bool             m_pulldown_reentrace_flag;     // If menu or Option fails, kick off the fail flag.
-    bool             m_is_active_pulldown_menu;     // If menu has active lightbars to display.
+    bool             m_is_active_pulldown_menu;     // If menu has active light bars to display.
     bool             m_use_first_command_execution; // If menu executes firstcmd on entrance.
     bool             m_logoff;                      // If logoff, stop loop execution on commands and exit.
 
@@ -214,7 +214,7 @@ public:
     void importMenu(menu_ptr menu_info);
 
     /**
-     * @brief Build string of lightbar matrices
+     * @brief Build string of light bar matrices
      */
     std::string buildLightBars();
 
@@ -253,7 +253,7 @@ public:
     void loadAndStartupMenu();
 
     /**
-     * @brief Updates current and next lightbar positions.
+     * @brief Updates current and next light bar positions.
      */
     void lightbarUpdate(unsigned int previous_pulldown_id);
 
@@ -272,7 +272,7 @@ public:
     bool handleStandardMenuInput(const std::string &input, const std::string &key);
 
     /**
-     * @brief Handle updating lightbar selections and redraw
+     * @brief Handle updating light bar selections and redraw
      * @param input
      * @return
      */
@@ -321,13 +321,13 @@ public:
 
     /**
      * @brief Default Menu Input Processing.
-     *        Handles Processing for Loaded Menus Hotkey and Lightbars
+     *        Handles Processing for Loaded Menus Hotkey and Light bars
      */
     void menuInput(const std::string &character_buffer, const bool &is_utf8);
 
     /**
      * @brief Yes/No Menu Bar Input Processing.
-     *        Handles Processing for Loaded Menus Hotkey and Lightbars
+     *        Handles Processing for Loaded Menus Hotkey and Light bars
      */
     void menuYesNoBarInput(const std::string &character_buffer, const bool &is_utf8);
 

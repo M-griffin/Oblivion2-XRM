@@ -60,12 +60,12 @@ bool DbStartup::initDatabaseTables()
         SecurityDao security_dao(user_database);
 
         // Verify if the security table exists.
-        // Security must be present before user becasue of foreign key.
+        // Security must be present before user because of foreign key.
         if(!security_dao.doesTableExist())
         {
             log->xrmLog<Logging::CONSOLE_LOG>("doesn't exist (security table).");
 
-            // Setup database Param, cache sies etc..
+            // Setup database Param, cache sizes etc..
             if(!security_dao.firstTimeSetupParams())
             {
                 log->xrmLog<Logging::ERROR_LOG>("unable to execute firstTimeSetupParams (security table).");
@@ -87,7 +87,7 @@ bool DbStartup::initDatabaseTables()
         {
             log->xrmLog<Logging::CONSOLE_LOG>("doesn't exist (user table).");
 
-            // Setup database Param, cache sies etc..
+            // Setup database Param, cache sizes etc..
             if(!user_dao.firstTimeSetupParams())
             {
                 log->xrmLog<Logging::ERROR_LOG>("unable to execute firstTimeSetupParams (user table).");
@@ -110,23 +110,23 @@ bool DbStartup::initDatabaseTables()
         // Verify if the user table exists.
         if(!session_stat_dao.doesTableExist())
         {
-            log->xrmLog<Logging::CONSOLE_LOG>("doesn't exist (sessionstats table).");
+            log->xrmLog<Logging::CONSOLE_LOG>("doesn't exist (session stats table).");
 
             // Setup database Param, cache sies etc..
             if(!session_stat_dao.firstTimeSetupParams())
             {
-                log->xrmLog<Logging::ERROR_LOG>("unable to execute firstTimeSetupParams (sessionstats table).");
+                log->xrmLog<Logging::ERROR_LOG>("unable to execute firstTimeSetupParams (session stats table).");
                 return(false);
             }
 
             // Setup create users table and indexes.
             if(!session_stat_dao.createTable())
             {
-                log->xrmLog<Logging::ERROR_LOG>("unable to create (sessionstats table).");
+                log->xrmLog<Logging::ERROR_LOG>("unable to create (session stats table).");
                 return(false);
             }
 
-            log->xrmLog<Logging::CONSOLE_LOG>("sessionstats table created successfully.");
+            log->xrmLog<Logging::CONSOLE_LOG>("session stats table created successfully.");
         }
 
         // Link to Access Level dao for data access object
@@ -137,7 +137,7 @@ bool DbStartup::initDatabaseTables()
         {
             log->xrmLog<Logging::CONSOLE_LOG>("doesn't exist (access_level table).");
 
-            // Setup database Param, cache sies etc..
+            // Setup database Param, cache sizes etc..
             if(!access_dao.firstTimeSetupParams())
             {
                 log->xrmLog<Logging::ERROR_LOG>("unable to execute firstTimeSetupParams (access_level table).");
@@ -176,7 +176,7 @@ bool DbStartup::initDatabaseTables()
 
             access_dao.insertRecord(level);
 
-            // Admininstrator (time Limit false by default)
+            // Administrator (time Limit false by default)
             level.reset(new AccessLevel());
             level->sName = "Sysop";
             level->sStartMenu ="top";
@@ -210,7 +210,7 @@ bool DbStartup::initDatabaseTables()
         {
             log->xrmLog<Logging::CONSOLE_LOG>("doesn't exist (oneliner table).");
 
-            // Setup database Param, cache sies etc..
+            // Setup database Param, cache sizes etc..
             if(!oneLineDao.firstTimeSetupParams())
             {
                 log->xrmLog<Logging::ERROR_LOG>("unable to execute firstTimeSetupParams (oneliner table).");

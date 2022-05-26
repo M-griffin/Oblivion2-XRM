@@ -37,7 +37,7 @@ std::string USERS_DATABASE          = "";
 Logging* Logging::m_global_logging_instance = nullptr;
 
 /**
- * @brief Unit Testing for Initial Form Configuration Implimentation
+ * @brief Unit Testing for Initial Form Configuration Implementation
  * @return
  *
 SUITE(XRMEncoding)
@@ -67,7 +67,7 @@ SUITE(XRMEncoding)
 /*
 * These Unit Tests are To test the core logic of classes and methods.
 * Any method that hit IO, Database, File, Network, is considered an Integration Test
-* and will be setup in seperate Tests Suite or done manaully through the interface.
+* and will be setup in separate Tests Suite or done manually through the interface.
 */
 
 
@@ -111,7 +111,7 @@ int main()
 
         // Handle to Data Access Object,  at the moment were not using directories
         // Setup in the config, everything is branched from the main path.
-        // Later on we'll check config for overides only.
+        // Later on we'll check config for overrides only.
         ConfigDao cfg(config, GLOBAL_BBS_PATH);
 
         if(!cfg.fileExists())

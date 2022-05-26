@@ -8,7 +8,7 @@
 #include <vector>
 #include <functional>
 
-// Forward Declerations
+// Forward Decelerations
 namespace SQLW
 {
 class Database;
@@ -26,7 +26,7 @@ typedef BaseDao<Security> baseSecurityClass;
  * @author Michael Griffin
  * @date 8/21/2016
  * @file security_dao.hpp
- * @brief Handles Reading and Writting Security Class from Database
+ * @brief Handles Reading and Writing Security Class from Database
  *        Database Objects are Instantiated in the Session then passed to the DAO for work.
  */
 class SecurityDao
@@ -54,7 +54,7 @@ public:
         m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' "
                            "AND name='" + m_strTableName + "' COLLATE NOCASE;";
 
-        // Crate Seciroty Table Query (SQLite Only for the moment)
+        // Crate Security Table Query (SQLite Only for the moment)
         m_cmdCreateTable =
             "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
             "iId                   INTEGER PRIMARY KEY, "

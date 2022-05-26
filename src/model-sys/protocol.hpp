@@ -12,13 +12,13 @@
  * @author Michael Griffin
  * @date 05/05/2017
  * @file protocols.hpp
- * @brief Individual Protocol Enteries
- */ 
+ * @brief Individual Protocol Entries
+ */
 class Protocol
 {
 public:
 
-    explicit Protocol()    
+    explicit Protocol()
         : protocol_name("")
         , protocol_type("") // up/down.
         , protocol_key("")
@@ -28,7 +28,7 @@ public:
         , protocol_hasDSZLog(false)
     {
     }
-    
+
     Protocol(std::string name, std::string type, std::string key,
         std::string path, std::string argu, bool batch, bool dszlog)
         : protocol_name(name)
@@ -41,9 +41,9 @@ public:
     {
     }
     ~Protocol()
-    {        
+    {
     }
-    
+
     std::string protocol_name;
     std::string protocol_type;
     std::string protocol_key;
@@ -65,28 +65,28 @@ class Protocols
 public:
 
     const static std::string FILE_VERSION;
-        
+
     Protocols()
         : file_version(FILE_VERSION)
-    {        
+    {
     }
-    
+
     ~Protocols()
-    {        
+    {
     }
-    
+
     std::string file_version;
-    std::vector<Protocol> protocols;            
+    std::vector<Protocol> protocols;
 };
 
-// YAML Overide namespace for encoding/decoding Class.
+// YAML Override namespace for encoding/decoding Class.
 namespace YAML
 {
     template<>
     struct convert<Protocol>
     {
         /**
-         * @brief Overide for encoding the Class
+         * @brief Override for encoding the Class
          *        This is not used as it makes the map on a single line!
          *        Instead Key/Value is done on save.
          * @param rhs
@@ -94,7 +94,7 @@ namespace YAML
          */
         static Node encode(const Protocol &rhs)
         {
-            Node node;          
+            Node node;
             node["protocol_name"] = rhs.protocol_name;
             node["protocol_type"] = rhs.protocol_type;
             node["protocol_key"] = rhs.protocol_key;
@@ -102,12 +102,12 @@ namespace YAML
             node["protocol_argument"] = rhs.protocol_argument;
             node["protocol_isBatch"] = rhs.protocol_isBatch;
             node["protocol_hasDSZLog"] = rhs.protocol_hasDSZLog;
-        
+
             return node;
         }
 
         /**
-         * @brief Overide for the Load from File, this read Object.
+         * @brief Override for the Load from File, this read Object.
          * @param node
          * @param rhs
          * @return
@@ -121,17 +121,17 @@ namespace YAML
             rhs.protocol_argument  = node["protocol_argument"].as<std::string>();
             rhs.protocol_isBatch   = node["protocol_isBatch"].as<bool>();
             rhs.protocol_hasDSZLog = node["protocol_hasDSZLog"].as<bool>();
- 
+
             return true;
         }
     };
-    
-    
+
+
     template<>
     struct convert<Protocols>
     {
         /**
-         * @brief Overide for encoding the Menu Class
+         * @brief Override for encoding the Menu Class
          *        This is not used as it makes the map on a single line!
          *        Instead Key/Value is done on save.
          * @param rhs
@@ -140,13 +140,13 @@ namespace YAML
         static Node encode(const Protocols &rhs)
         {
             Node node;
-            node["file_version"]           = rhs.file_version;     
+            node["file_version"]           = rhs.file_version;
 
             // Child Nodes for storying menu options.
-            Node prot;                               
-                        
+            Node prot;
+
             // Loop and encode each menu option
-            for (auto &p : rhs.protocols) 
+            for (auto &p : rhs.protocols)
             {
                 prot["protocol_name"]      = p.protocol_name;
                 prot["protocol_type"]      = p.protocol_type;
@@ -155,15 +155,15 @@ namespace YAML
                 prot["protocol_argument"]  = p.protocol_argument;
                 prot["protocol_isBatch"]   = p.protocol_isBatch;
                 prot["protocol_hasDSZLog"] = p.protocol_hasDSZLog;
-                                
+
                 node["protocols"].push_back(prot);
             }
-            
+
             return node;
         }
 
         /**
-         * @brief Overide for the Load from File, this read and piluaes the Menu Object.
+         * @brief Override for the Load from File, this read and populate the Menu Object.
          * @param node
          * @param rhs
          * @return
@@ -174,17 +174,17 @@ namespace YAML
 
             // Iterate through so we can get MAPS with the same key "access_levels".
             std::string key = "";
-            for (YAML::const_iterator it = node.begin(); it != node.end(); ++it) 
+            for (YAML::const_iterator it = node.begin(); it != node.end(); ++it)
             {
-                key.clear();                
+                key.clear();
                 key = it->first.as<std::string>();
-                
+
                 if (key == "protocols")
                 {
                     rhs.protocols.push_back(it->second.as<Protocol>());
-                }   
+                }
             }
-                                
+
             return true;
         }
     };

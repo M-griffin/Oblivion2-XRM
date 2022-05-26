@@ -14,7 +14,7 @@
  */
 bool ModPreLogon::update(const std::string &character_buffer, const bool &)
 {
-    // Make sure system is active, when system is done, success or failes
+    // Make sure system is active, when system is done, success or fails
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
@@ -27,7 +27,7 @@ bool ModPreLogon::update(const std::string &character_buffer, const bool &)
         return true;
     }
 
-    // Process all incoming data stright to the input functions.
+    // Process all incoming data straight to the input functions.
     m_mod_functions[m_mod_function_index](character_buffer);
 
     return true;
@@ -92,7 +92,7 @@ void ModPreLogon::createTextPrompts()
 }
 
 /**
- * @brief Sets an indivdual module index.
+ * @brief Sets an individual module index.
  * @param mod_function_index
  */
 void ModPreLogon::changeModule(int mod_function_index)
@@ -144,7 +144,7 @@ void ModPreLogon::setupEmulationDetection()
     baseProcessAndDeliver(detection);
     baseProcessAndDeliver(restore_position);
 
-    // Display Detecting Emulation, not using display prompt casue we need to append.
+    // Display Detecting Emulation, not using display prompt cause we need to append.
     std::string result = m_session_io.parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_DETECT_EMULATION)
                          );
@@ -188,7 +188,7 @@ void ModPreLogon::displayTerminalDetection()
     M_StringPair prompt_size = m_text_prompts_dao->getPrompt(PROMPT_DETECTED_SIZE);
 
     // Send out the results of the prompts after parsing MCI and Color codes.
-    // These prompts have spcial |OT place holders for variables.
+    // These prompts have special |OT place holders for variables.
     std::string mci_code = "|OT";
 
     // Handle Term, only display if prompt is not empty!
@@ -220,7 +220,7 @@ void ModPreLogon::displayTerminalDetection()
         baseProcessAndDeliver(result);
     }
 
-    // jump stright to asking code page after terminal detection
+    // jump straight to asking code page after terminal detection
     changeModule(MOD_ASK_CODEPAGE);
 }
 
@@ -283,7 +283,7 @@ bool ModPreLogon::emulationDetection(const std::string &input)
         }
 
         /* -- Get Secondary screen size detection for emulation response.
-         * -- Modem or virtual modem will not have Telnet Options negoiation
+         * -- Modem or virtual modem will not have Telnet Options negotiation
          * -- So then we have to detect old fashion way with ESC response!
         // Were inside sequence.
         if (m_esc_detected)

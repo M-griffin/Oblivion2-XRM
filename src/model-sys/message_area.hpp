@@ -74,13 +74,13 @@ public:
                                 messages in this base. Use this flag if
                                 the network you're in supports private
                                 echomailing.
-*/        
+*/
     long        iId;
     std::string sName;
     std::string sAcsAccess;
     std::string sAcsPost;
     bool        bAnonymous;
-    std::string sSponsor;    
+    std::string sSponsor;
     std::string sOriginLine;
     std::string sFidoPath;
     long        iNetworkId;
@@ -92,7 +92,7 @@ public:
     bool        bPrivate;
     bool        bNetmail;
     long        iSortOrder;
-    
+
     explicit MessageArea()
         : iId(-1)
         , sName("")
@@ -112,7 +112,7 @@ public:
         , bNetmail(false)
         , iSortOrder(-1)
     { }
-    
+
     ~MessageArea()
     { }
 

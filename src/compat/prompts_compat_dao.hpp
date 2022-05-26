@@ -12,7 +12,7 @@
  * @author Michael Griffin
  * @date 3/18/2016
  * @file prompt_dao.hpp
- * @brief Holds Binary funcations for reading MENUPROMPTS.DAT Original OBV/2
+ * @brief Holds Binary functions for reading MENUPROMPTS.DAT Original OBV/2
  */
 class PromptDao
 {
@@ -25,7 +25,7 @@ public:
     { }
 
     /**
-     * @brief Appending forward or backspash to path
+     * @brief Appending forward or backslash to path
      * @param path
      */
     void pathSeperator(std::string &path)

@@ -145,7 +145,7 @@ void ProcessWin::executeProcessLoop()
         }
 
 
-        // Handle Naped Pipes for STDIO Output of protocols.
+        // Handle Named Pipes for STDIO Output of protocols.
         PeekNamedPipe(m_read_stdout, buf, RCVBUFSIZE, &bread, &avail, NULL);
 
         if(bread > 0)
@@ -196,7 +196,7 @@ bool ProcessWin::createProcess()
         security_attrib.lpSecurityDescriptor = NULL;
     }
 
-    // Secutiry Attributes
+    // Security Attributes
     security_attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
     security_attrib.bInheritHandle = true;
 
@@ -217,7 +217,7 @@ bool ProcessWin::createProcess()
         return false;
     }
 
-    // Startupinfo for the process
+    // Startup info for the process
     GetStartupInfo(&startup_info);
 
     //The dwFlags member tells CreateProcess how to make the process.

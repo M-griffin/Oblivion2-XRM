@@ -12,8 +12,8 @@
  /**
  * Note: Null terminated strings are 1 longer then pascal
  * Basic Pascal to C++ Type Translations.
- * These are setup for specfic 8, 16 and 32 bit widths
- * to make cross platform and cpu compitable.
+ * These are setup for specific 8, 16 and 32 bit widths
+ * to make cross platform and cpu compatible.
  */
 typedef int8_t LStr[81];    // 80
 typedef int8_t MStr[36];    // 35
@@ -132,12 +132,12 @@ typedef struct InfoformData  // :  Array[1..5] Of Record
  * @class ConfigRec
  * @author Michael Griffin
  * @date 18/08/2015
- * @brief BBS Configuarion Record
+ * @brief BBS Configuration Record
  */
 #pragma pack(push, 1)
 typedef struct ConfigRec
 {
-    // {Communicatioin Info}
+    // {Communication Info}
     Word    Unused;
 
     // {Directory Info}

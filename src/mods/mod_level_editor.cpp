@@ -16,7 +16,7 @@
  */
 bool ModLevelEditor::update(const std::string& character_buffer, const bool&)
 {
-    // Make sure system is active, when system is done, success or failes
+    // Make sure system is active, when system is done, success or fails
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
@@ -29,7 +29,7 @@ bool ModLevelEditor::update(const std::string& character_buffer, const bool&)
         return true;
     }
 
-    // Process all incoming data stright to the input functions.
+    // Process all incoming data straight to the input functions.
     m_mod_functions[m_mod_function_index](character_buffer);
 
     return true;
@@ -234,7 +234,7 @@ void ModLevelEditor::setupLevelEditor()
     displayPrompt(PROMPT_HEADER);
 
     // Build a list of screen lines for the menu display
-    // So we know when to pause in large listing, or use pagenation.
+    // So we know when to pause in large listing, or use pagination.
     std::string level_display_output = displayLevelList();
 
     if(m_level_display_list.size() > 0)
@@ -259,7 +259,7 @@ void ModLevelEditor::setupLevelEditFields()
     displayPromptMCI(PROMPT_LEVEL_EDIT_HEADER, display_name);
 
     // Build a list of screen lines for the menu display
-    // So we know when to pause in large listing, or use pagenation.
+    // So we know when to pause in large listing, or use pagination.
     std::string level_display_output = displayLevelEditScreen();
 
     if(m_level_display_list.size() > 0)
@@ -298,7 +298,7 @@ void ModLevelEditor::displayCurrentPage(const std::string& input_state)
 
         if(i >= (m_page * m_rows_per_page) + m_rows_per_page)
         {
-            // We've displayed the max amount of rows per the currnet
+            // We've displayed the max amount of rows per the current
             // screen break out and wait for prompt or next page.
             displayed_all_rows = false;
             break;
@@ -320,8 +320,8 @@ void ModLevelEditor::displayCurrentPage(const std::string& input_state)
             return;
     }
 
-    // If we displayed all rows, then display propmpt, otherwise
-    // Ask to hit anykey for next page.
+    // If we displayed all rows, then display prompt, otherwise
+    // Ask to hit any key for next page.
     if(displayed_all_rows)
     {
         // Reset Page back to Zero for next display.
@@ -912,7 +912,7 @@ void ModLevelEditor::handleLevelInputState(bool does_level_exist, int level_code
             if(does_level_exist)
             {
                 // Move to new Default setup for Options vs Menus.
-                // Also set the curent menu for the system to load
+                // Also set the curent level for the system to load
                 // to pull the commands from.
                 m_current_level = level_code;
                 changeInputModule(MOD_LEVEL_FIELD_INPUT);
@@ -920,7 +920,7 @@ void ModLevelEditor::handleLevelInputState(bool does_level_exist, int level_code
             }
             else
             {
-                // Error, can't remove a menu that doesn't exist!
+                // Error, can't remove a level that doesn't exist!
                 displayPrompt(PROMPT_INVALID_LEVEL_NOT_EXISTS);
                 displayPrompt(PROMPT_INPUT_TEXT);
                 changeInputModule(MOD_LEVEL_INPUT);
@@ -937,7 +937,7 @@ void ModLevelEditor::handleLevelInputState(bool does_level_exist, int level_code
             }
             else
             {
-                // Error, can't remove a menu that doesn't exist!
+                // Error, can't remove a level that doesn't exist!
                 displayPrompt(PROMPT_INVALID_LEVEL_NOT_EXISTS);
                 displayPrompt(PROMPT_INPUT_TEXT);
                 changeInputModule(MOD_LEVEL_INPUT);

@@ -66,7 +66,7 @@ public:
         {
             return m_menu_prompt;
         }
-		
+
 		return nullptr;
     }
 

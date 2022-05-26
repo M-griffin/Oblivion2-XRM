@@ -19,7 +19,7 @@ typedef std::shared_ptr<Config> config_ptr;
  * @author Michael Griffin
  * @date 9/21/2015
  * @file session_io.hpp
- * @brief Higher Level I/O sepecific to Menu Interfaces
+ * @brief Higher Level I/O specific to Menu Interfaces
  */
 class SessionIO
 {
@@ -35,7 +35,7 @@ public:
     /**
      * @brief Single Key Input or Esc Sequence parser.
      *        Only Accepts single characters at a time then passes through.
-     *        Bascially all input passes through till there is something to display
+     *        Basically all input passes through till there is something to display
      *        Nothing loop on input in these functions to keep async.
      * @param character_buffer
      * @return
@@ -68,7 +68,7 @@ public:
      * @brief Parses for ANSI Foreground Colors
      * @param foreground
      */
-    std::string pipeReplaceForground(int foreground);
+    std::string pipeReplaceForeground(int foreground);
 
     /**
      * @brief Parses for ANSI Background Colors
@@ -129,11 +129,11 @@ public:
     std::string parsePipeWithCharsDigits(const std::string &code, int value);
 
     /**
-    * @brief Seperate Pipe Codes with 1 or 2 Digits
+    * @brief Separate Pipe Codes with 1 or 2 Digits
     * @param pipe_code
     * @return
     */
-    std::string seperatePipeWithCharsDigits(const std::string &pipe_code);
+    std::string separatePipeWithCharsDigits(const std::string &pipe_code);
 
     /**
      * @brief Parse Files %%Filename.ext
@@ -215,7 +215,7 @@ public:
     std::string parseFormatColorsColon(const std::string &sequence, config_ptr config);
 
     /**
-     * @brief Parses unformatted prompt text and adds colors to brackets and colans.
+     * @brief Parses unformatted prompt text and adds colors to brackets and colon's.
      * @param sequence
      * @return
      */

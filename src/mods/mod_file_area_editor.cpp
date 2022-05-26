@@ -15,7 +15,7 @@
  */
 bool ModFileAreaEditor::update(const std::string &character_buffer, const bool &)
 {
-    // Make sure system is active, when system is done, success or failes
+    // Make sure system is active, when system is done, success or fails
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
@@ -28,7 +28,7 @@ bool ModFileAreaEditor::update(const std::string &character_buffer, const bool &
         return true;
     }
 
-    // Process all incoming data stright to the input functions.
+    // Process all incoming data straight to the input functions.
     m_mod_functions[m_mod_function_index](character_buffer);
 
     return true;
@@ -210,7 +210,7 @@ void ModFileAreaEditor::setupMenuEditor()
     displayPrompt(PROMPT_HEADER);
 
     // Build a list of screen lines for the menu display
-    // So we know when to pause in large listing, or use pagenation.
+    // So we know when to pause in large listing, or use pagination.
     std::string menu_display_output = displayMenuList();
 
     if(m_menu_display_list.size() == 0)
@@ -235,7 +235,7 @@ void ModFileAreaEditor::setupMenuEditFields()
     displayPromptMCI(PROMPT_LEVEL_EDIT_HEADER, display_name);
 
     // Build a list of screen lines for the menu display
-    // So we know when to pause in large listing, or use pagenation.
+    // So we know when to pause in large listing, or use pagination.
     std::string menu_display_output = displayMenuEditScreen();
 
     if(m_menu_display_list.size() == 0)
@@ -274,7 +274,7 @@ void ModFileAreaEditor::displayCurrentPage(const std::string &input_state)
 
         if(i >= (m_page*m_rows_per_page) + m_rows_per_page)
         {
-            // We've displayed the max amount of rows per the currnet
+            // We've displayed the max amount of rows per the current
             // screen break out and wait for prompt or next page.
             displayed_all_rows = false;
             break;
@@ -296,8 +296,8 @@ void ModFileAreaEditor::displayCurrentPage(const std::string &input_state)
             return;
     }
 
-    // If we displayed all rows, then display propmpt, otherwise
-    // Ask to hit anykey for next page.
+    // If we displayed all rows, then display prompt, otherwise
+    // Ask to hit any key for next page.
     if(displayed_all_rows)
     {
         // Reset Page back to Zero for next display.
@@ -587,31 +587,31 @@ void ModFileAreaEditor::menuEditorMenuFieldHandler(const std::string &input)
         // Handle the assigned input received for field
         switch(m_current_field)
         {
-                /*
-                            case 'A': // Menu Title
-                                m_loaded_level.back()->menu_title = key;
-                                break;
+/*
+            case 'A': // Menu Title
+                m_loaded_level.back()->menu_title = key;
+                break;
 
-                            case 'B': // Menu Password
-                                m_loaded_level.back()->menu_password = key;
-                                break;
+            case 'B': // Menu Password
+                m_loaded_level.back()->menu_password = key;
+                break;
 
-                            case 'C': // Menu Fallback
-                                m_loaded_level.back()->menu_fall_back = key;
-                                break;
+            case 'C': // Menu Fallback
+                m_loaded_level.back()->menu_fall_back = key;
+                break;
 
-                            case 'D': // Menu Help ID
-                                m_loaded_level.back()->menu_help_file = key;
-                                break;
+            case 'D': // Menu Help ID
+                m_loaded_level.back()->menu_help_file = key;
+                break;
 
-                            case 'E': // Menu Name
-                                m_loaded_level.back()->menu_name = key;
-                                break;
+            case 'E': // Menu Name
+                m_loaded_level.back()->menu_name = key;
+                break;
 
-                            case 'F': // Menu Pulldown
-                                m_loaded_level.back()->menu_pulldown_file = key;
-                                break;
-                */
+            case 'F': // Menu Pulldown
+                m_loaded_level.back()->menu_pulldown_file = key;
+                break;
+*/
         }
 
         changeInputModule(MOD_MENU_FIELD_INPUT);
@@ -748,7 +748,7 @@ void ModFileAreaEditor::handleMenuInputState(bool does_menu_exist, const std::st
 void ModFileAreaEditor::createNewMenu(const std::string &)//menu_name)
 {
     /*
-        // Pre-Load Menu, check access, if not valud, then fall back to previous.
+        // Pre-Load Menu, check access, if not valid, then fall back to previous.
         menu_ptr new_menu(new Menu());
 
         // Add a default menu option command to the menu
@@ -875,7 +875,7 @@ void ModFileAreaEditor::reorderMenuIndexesDeletion(unsigned int) //option_index)
 void ModFileAreaEditor::deleteExistingMenu(const std::string &)//menu_name)
 {
     /*
-        // Pre-Load Menu, check access, if not valud, then fall back to previous.
+        // Pre-Load Menu, check access, if not valid, then fall back to previous.
         menu_ptr new_menu(new Menu());
 
         // Call MenuDao to save .yaml menu file
@@ -894,7 +894,7 @@ void ModFileAreaEditor::deleteExistingMenu(const std::string &)//menu_name)
 void ModFileAreaEditor::copyExistingMenu(const std::string &) //menu_name)
 {
     /*
-        // Pre-Load Menu, check access, if not valud, then fall back to previous.
+        // Pre-Load Menu, check access, if not valid, then fall back to previous.
         menu_ptr new_menu(new Menu());
 
         // First load the Source Menu [m_current_menu] file name
@@ -1045,7 +1045,7 @@ std::string ModFileAreaEditor::displayMenuList()
             return "No Menu Files found!";
         }
 
-        // Sort Menu's in accending order
+        // Sort Menu's in ascending order
         std::sort(result_set.begin(), result_set.end());
 
         // iterate through and print out

@@ -24,8 +24,8 @@ void StateManager::clean()
 }
 
 /**
- * @brief Parses Incoming Strings, Sepeates into single character
- * strings of single ASCII charactrs or UTF-8 multi-byte sequence
+ * @brief Parses Incoming Strings, Separates into single character
+ * strings of single ASCII characters or UTF-8 multi-byte sequence
  *
  * Each Code point is a individual UTF8 Character
  * which is copied from code_point to char[5] array.
@@ -57,7 +57,7 @@ void StateManager::update()
                     *it++;
 
                     // Only if ESC and next char is empty
-                    // Then we want to pass both to registed single ESC hit
+                    // Then we want to pass both to register single ESC hit
                     if(byte_value == '\x1b' && *it == '\0')
                     {
                         new_string_builder += '\x1b';
@@ -128,7 +128,7 @@ void StateManager::popState()
 }
 
 /**
- * @brief Main Entertrance for Adding, Switching to new States.
+ * @brief Main Entrance for Adding, Switching to new States.
  */
 void StateManager::changeState(state_ptr &the_state)
 {

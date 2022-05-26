@@ -21,14 +21,14 @@ IOService::~IOService()
 }
 
 /**
- * @brief Async Listener, check for incomming connections
+ * @brief Async Listener, check for incoming connections
  */
 void IOService::checkAsyncListenersForConnections()
 {
     Logging *log = Logging::instance();
 
     // Timers are not removed each iteration
-    // Async stay active until exprired or canceled
+    // Async stay active until expired or canceled
     // And wait, will block socket polling for (x) amount of time
     for(unsigned int i = 0; i < m_listener_list.size(); i++)
     {
@@ -51,7 +51,7 @@ void IOService::checkAsyncListenersForConnections()
             try
             {
                 // Check for max nodes here, if we like can limit, send a message and drop
-                // connection on hander by not passing it through the callback.
+                // connection on handler by not passing it through the callback.
                 listener_work->executeCallback(success_code, handler);
             }
             catch(std::exception &ex)
@@ -75,7 +75,7 @@ void IOService::run()
 
     while(m_is_active)
     {
-        // Check for incomming connections
+        // Check for incoming connections
         checkAsyncListenersForConnections();
 
         // This will wait for another job to be inserted on next call
@@ -162,146 +162,9 @@ void IOService::run()
                     --i; // Compensate for item removed.
                 }
             }
-
-            /*
-            else if (job_work->getServiceType() == SERVICE_TYPE_CONNECT_TELNET)
-            {
-                // Get host and port from string.
-                // This would better as a vector<std::string> for the sequqnce,
-                // More versitile.!
-                std::vector<std::string> ip_address = split(job_work->getStringSequence(), ':');
-                bool is_success = false;
-                if (ip_address.size() > 1)
-                {
-                    is_success = job_work->getSocketHandle()->connectTelnetSocket(
-                                     ip_address.at(0),
-                                     std::atoi(ip_address.at(1).c_str())
-                                 );
-                }
-                else
-                {
-                    is_success = job_work->getSocketHandle()->connectTelnetSocket(
-                                     ip_address.at(0),
-                                     23
-                                 );
-                }
-
-                if (is_success)
-                {
-                    std::error_code success_code (0, std::generic_category());
-                    job_work->executeCallback(success_code, nullptr);
-                    m_service_list.remove(i);
-                }
-                else
-                {
-                    // Error - Unable to connect
-                    std::cout << "async_connection - unable to connect" << std::endl;
-                    job_work->getSocketHandle()->setInactive();
-                    std::error_code not_connected_error_code (1, std::system_category());
-                    job_work->executeCallback(not_connected_error_code, nullptr);
-                    m_service_list.remove(i);
-                }
-            }
-
-            else if (job_work->getServiceType() == SERVICE_TYPE_CONNECT_SSH)
-            {
-                // Get host and port from string.
-                // This would better as a vector<std::string> for the sequqnce,
-                // More versitile.!
-                std::vector<std::string> ip_address = split(job_work->getStringSequence(), ':');
-                std::cout << "ip_address: " << ip_address.size();
-                bool is_success = false;
-                if (ip_address.size() >= 4)
-                {
-                    std::cout << "1. " << ip_address.at(0) << std::endl;
-                    std::cout << "2. " << ip_address.at(1) << std::endl;
-                    std::cout << "3. " << ip_address.at(2) << std::endl;
-                    std::cout << "4. " << ip_address.at(3) << std::endl;
-
-                    is_success = job_work->getSocketHandle()->connectSshSocket(
-                                     ip_address.at(0),
-                                     std::atoi(ip_address.at(1).c_str()),
-                                     ip_address.at(2),
-                                     ip_address.at(3)
-                                 );
-                }
-
-                if (is_success)
-                {
-                    std::error_code success_code (0, std::generic_category());
-                    job_work->executeCallback(success_code, nullptr);
-                    m_service_list.remove(i);
-                }
-                else
-                {
-                    // Error - Unable to connect
-                    std::cout << "async_connection - unable to connect" << std::endl;
-                    job_work->getSocketHandle()->setInactive();
-                    std::error_code not_connected_error_code (1, std::system_category());
-                    job_work->executeCallback(not_connected_error_code, nullptr);
-                    m_service_list.remove(i);
-                }
-            }*/
-
-            // SERVICE_TYPE_CONNECT_IRC
-            /*
-            else if (job_work->getServiceType() == SERVICE_TYPE_CONNECT_IRC)
-            {
-                // Get host and port from string.
-                // This would better as a vector<std::string> for the sequqnce,
-                // More versitile.!
-                std::vector<std::string> ip_address = split(job_work->getStringSequence(), ':');
-                bool is_success = false;
-                if (ip_address.size() > 1)
-                {
-                    is_success = job_work->getSocketHandle()->connectIrcSocket(
-                                     ip_address.at(0),
-                                     std::atoi(ip_address.at(1).c_str())
-                                 );
-                }
-                else
-                {
-                    is_success = job_work->getSocketHandle()->connectIrcSocket(
-                                     ip_address.at(0),
-                                     6667
-                                 );
-                }
-
-                if (is_success)
-                {
-                    // Send Initial Connection Information
-                    std::string nick = "mercyful1";
-                    std::string ident = "mercyful1";
-                    std::string read_name = "michael";
-                    std::string host = "localhost";
-
-                    std::stringstream ss;
-                    ss  << "NICK " << nick << "\r\n"
-                        << "USER " << ident << " " << host << " bla : " << read_name << "\r\n";
-
-                    std::string output = ss.str();
-                    job_work->getSocketHandle()->sendSocket((unsigned char *)output.c_str(), output.size());
-
-                    callback_function_handler run_callback(job_work->getCallback());
-                    std::error_code success_code (0, std::generic_category());
-                    run_callback(success_code);
-                    m_service_list.remove(i);
-                }
-                else
-                {
-                    // Error - Unable to connect
-                    std::cout << "async_connection - unable to connect" << std::endl;
-                    job_work->getSocketHandle()->setInactive();
-                    callback_function_handler run_callback(job_work->getCallback());
-                    std::error_code not_connected_error_code (1, std::system_category());
-                    run_callback(not_connected_error_code);
-                    m_service_list.remove(i);
-                }
-            }*/
-
         }
 
-        // Temp timer, change to 10/20 miliseconds for cpu useage
+        // Temp timer, change to 10/20 miliseconds for cpu usage
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
 

@@ -47,3 +47,6 @@ sqlitewrap/libSqliteWrapped.h
 .vscode/settings.json
 .idea/
 .vscode/
+.vs/
+win32-vs/
+*.bkp

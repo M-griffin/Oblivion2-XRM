@@ -79,7 +79,7 @@ SUITE(XRMCommonIO)
 
     TEST(numberOfCharsWithHighAsciiAndUtf8BeforeAndAfter)
     {
-        // 21 Bytes, should be 9 seperate characters
+        // 21 Bytes, should be 9 separate characters
         CommonIO common;
         std::string temp = "あにま"; // 3 + 3 + 3 = 9 bytes
         temp += std::string(1, static_cast<unsigned char>(148)); // 1 byte
@@ -227,75 +227,75 @@ SUITE(XRMCommonIO)
     }*/
 
     /**
-     * @brief Pad Sapces on the right of the string, also truncates for absolute field lengths.
+     * @brief Pad Spaces on the right of the string, also truncates for absolute field lengths.
      * @return
      */
     TEST(RightPadding)
     {
         CommonIO common;
         std::string temp = "---";
-        std::string padd_temp = common.rightPadding(temp, 6);
-        CHECK_EQUAL(padd_temp,"---   ");
+        std::string pad_temp = common.rightPadding(temp, 6);
+        CHECK_EQUAL(pad_temp,"---   ");
     }
 
     TEST(RightPadding_Truncate)
     {
         CommonIO common;
         std::string temp = "------";
-        std::string padd_temp = common.rightPadding(temp, 3);
-        CHECK_EQUAL(padd_temp,"---");
+        std::string pad_temp = common.rightPadding(temp, 3);
+        CHECK_EQUAL(pad_temp,"---");
     }
 
     TEST(RightPadding_Empty)
     {
         CommonIO common;
         std::string temp = "";
-        std::string padd_temp = common.rightPadding(temp, 3);
-        CHECK_EQUAL(padd_temp,"   ");
+        std::string pad_temp = common.rightPadding(temp, 3);
+        CHECK_EQUAL(pad_temp,"   ");
     }
 
     TEST(RightPadding0)
     {
         CommonIO common;
         std::string temp = "---";
-        std::string padd_temp = common.rightPadding(temp, 0);
-        CHECK_EQUAL(padd_temp,"---");
+        std::string pad_temp = common.rightPadding(temp, 0);
+        CHECK_EQUAL(pad_temp,"---");
     }
 
     /**
-     * @brief Pad Sapces on the Left of the string, also truncates for absolute field lengths.
+     * @brief Pad Spaces on the Left of the string, also truncates for absolute field lengths.
      * @return
      */
     TEST(LeftPadding)
     {
         CommonIO common;
         std::string temp = "---";
-        std::string padd_temp = common.leftPadding(temp, 6);
-        CHECK_EQUAL(padd_temp,"   ---");
+        std::string pad_temp = common.leftPadding(temp, 6);
+        CHECK_EQUAL(pad_temp,"   ---");
     }
 
     TEST(LeftPadding_Truncate)
     {
         CommonIO common;
         std::string temp = "------ ";
-        std::string padd_temp = common.leftPadding(temp, 3);
-        CHECK_EQUAL(padd_temp,"-- ");
+        std::string pad_temp = common.leftPadding(temp, 3);
+        CHECK_EQUAL(pad_temp,"-- ");
     }
 
     TEST(LeftPadding_Empty)
     {
         CommonIO common;
         std::string temp = "";
-        std::string padd_temp = common.leftPadding(temp, 3);
-        CHECK_EQUAL(padd_temp,"   ");
+        std::string pad_temp = common.leftPadding(temp, 3);
+        CHECK_EQUAL(pad_temp,"   ");
     }
 
     TEST(LeftPadding0)
     {
         CommonIO common;
         std::string temp = "---";
-        std::string padd_temp = common.leftPadding(temp, 0);
-        CHECK_EQUAL(padd_temp,"---");
+        std::string pad_temp = common.leftPadding(temp, 0);
+        CHECK_EQUAL(pad_temp,"---");
     }
 
     /**
@@ -322,7 +322,7 @@ SUITE(XRMCommonIO)
      * @brief Tests if string is a digit or number value.
      * @return
      */
-    TEST(IsDigit_Bad_Preceeding)
+    TEST(IsDigit_Bad_Preceding)
     {
         CommonIO common;
         std::string temp = "a1";
@@ -364,7 +364,7 @@ SUITE(XRMCommonIO)
 
     /**
      * @brief At this time, unicode digits are no longer
-     *        Funcational after removing boost locale,
+     *        Functional after removing boost locale,
      *        Alternatives will be worked on later.
      * @return
      *
@@ -376,7 +376,7 @@ SUITE(XRMCommonIO)
         CHECK_EQUAL(result, true);
     }*/
 
-    TEST(isDigit_Unicode_Bad_Preceeding)
+    TEST(isDigit_Unicode_Bad_Preceding)
     {
         CommonIO common;
         std::string temp = "a६ ೬";

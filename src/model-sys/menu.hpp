@@ -25,24 +25,24 @@ public:
     explicit MenuOption()
         : index(0)
         , name("New Option")
-        , acs_string("")  
+        , acs_string("")
         , hidden(false)
         , menu_key("")
         , command_key("")
-        , command_string("")        
+        , command_string("")
         , pulldown_id(0)
         , form_value("")
     { }
-    
+
     ~MenuOption() { }
-    
+
     unsigned int   index;
     std::string    name;
-    std::string    acs_string;    
+    std::string    acs_string;
     bool           hidden;
     std::string    menu_key;
     std::string    command_key;
-    std::string    command_string;        
+    std::string    command_string;
     unsigned       pulldown_id;
     std::string    form_value;
 
@@ -73,7 +73,7 @@ public:
     std::string menu_title;
     std::string menu_pulldown_file;
     bool        menu_form_menu;
-    
+
     std::vector<MenuOption> menu_options;
 
     Menu()
@@ -94,9 +94,9 @@ public:
 };
 
 
-// YAML Overide namespace for encoding/decoding Menu Class.
+// YAML Override namespace for encoding/decoding Menu Class.
 namespace YAML
-{    
+{
     /**
      * @class convert
      * @author Michael Griffin
@@ -108,7 +108,7 @@ namespace YAML
     struct convert<MenuOption>
     {
         /**
-         * @brief Overide for encoding the Menu Class
+         * @brief Override for encoding the Menu Class
          *        This is not used as it makes the map on a single line!
          *        Instead Key/Value is done in the ConfigDao on save.
          * @param rhs
@@ -117,27 +117,27 @@ namespace YAML
         static Node encode(const MenuOption &rhs)
         {
             Node node;
-            
+
             node["index"]            = rhs.index;
             node["name"]             = rhs.name;
-            node["acs_string"]       = rhs.acs_string;  
+            node["acs_string"]       = rhs.acs_string;
             node["hidden"]           = rhs.hidden;
             node["menu_key"]         = rhs.menu_key;
             node["command_key"]      = rhs.command_key;
             node["command_string"]   = rhs.command_string;
             node["pulldown_id"]      = rhs.pulldown_id;
-                           
+
             return node;
         }
 
         /**
-         * @brief Overide for the Load from File, this read and piluaes the Menu Object.
+         * @brief Override for the Load from File, this read and populate the Menu Object.
          * @param node
          * @param rhs
          * @return
          */
         static bool decode(const Node& node, MenuOption& rhs)
-        {            
+        {
             rhs.index           = node["index"].as<int>();
             rhs.name            = node["name"].as<std::string>();
             rhs.acs_string      = node["acs_string"].as<std::string>();
@@ -146,12 +146,12 @@ namespace YAML
             rhs.command_key     = node["command_key"].as<std::string>();
             rhs.command_string  = node["command_string"].as<std::string>();
             rhs.pulldown_id     = node["pulldown_id"].as<int>();
-                
+
             return true;
         }
     };
-    
-    
+
+
     /**
      * @class convert
      * @author Michael Griffin
@@ -163,7 +163,7 @@ namespace YAML
     struct convert<Menu>
     {
         /**
-         * @brief Overide for encoding the Menu Class
+         * @brief Override for encoding the Menu Class
          *        This is not used as it makes the map on a single line!
          *        Instead Key/Value is done in the ConfigDao on save.
          * @param rhs
@@ -173,38 +173,38 @@ namespace YAML
         {
             Node node;
             node["file_version"]       = rhs.file_version;
-            node["menu_name"]          = rhs.menu_name;            
+            node["menu_name"]          = rhs.menu_name;
             node["menu_password"]      = rhs.menu_password;
             node["menu_fall_back"]     = rhs.menu_fall_back;
             node["menu_help_file"]     = rhs.menu_help_file;
             node["menu_acs_string"]    = rhs.menu_acs_string;
             node["menu_prompt"]        = rhs.menu_prompt;
             node["menu_title"]         = rhs.menu_title;
-            node["menu_pulldown_file"] = rhs.menu_pulldown_file;          
+            node["menu_pulldown_file"] = rhs.menu_pulldown_file;
 
             // Child Nodes for storying menu options.
-            Node option;                               
-                        
+            Node option;
+
             // Loop and encode each menu option
-            for (auto &opt : rhs.menu_options) 
+            for (auto &opt : rhs.menu_options)
             {
                 option["index"]            = opt.index;
                 option["name"]             = opt.name;
-                option["acs_string"]       = opt.acs_string;  
+                option["acs_string"]       = opt.acs_string;
                 option["hidden"]           = opt.hidden;
                 option["menu_key"]         = opt.menu_key;
                 option["command_key"]      = opt.command_key;
                 option["command_string"]   = opt.command_string;
                 option["pulldown_id"]      = opt.pulldown_id;
-                                
+
                 node["menu_option"].push_back(option);
             }
-            
+
             return node;
         }
 
         /**
-         * @brief Overide for the Load from File, this read and piluaes the Menu Object.
+         * @brief Override for the Load from File, this read and populate the Menu Object.
          * @param node
          * @param rhs
          * @return
@@ -223,17 +223,17 @@ namespace YAML
 
             // Iterate through so we can get MAPS with the same key "menu_option".
             std::string key = "";
-            for (YAML::const_iterator it = node.begin(); it != node.end(); ++it) 
+            for (YAML::const_iterator it = node.begin(); it != node.end(); ++it)
             {
-                key.clear();                
+                key.clear();
                 key = it->first.as<std::string>();
-                
+
                 if (key == "menu_option")
                 {
                     rhs.menu_options.push_back(it->second.as<MenuOption>());
-                }   
+                }
             }
-                                
+
             return true;
         }
     };

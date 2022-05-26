@@ -28,14 +28,14 @@ public:
 };
 
 
-// YAML Overide namespace for encoding/decoding Config Class.
+// YAML Override namespace for encoding/decoding Config Class.
 namespace YAML
 {
 template<>
 struct convert<config_ptr>
 {
     /**
-     * @brief Overide for encoding the Config Class
+     * @brief Override for encoding the Config Class
      *        This is not used as it makes the map on a single line!
      *        Instead Key/Value is done in the ConfigDao on save.
      * @param rhs
@@ -160,7 +160,7 @@ struct convert<config_ptr>
     }
 
     /**
-     * @brief Overide for the Load from File, this read and piluaes the Config Object.
+     * @brief Override for the Load from File, this read and populate the Config Object.
      * @param node
      * @param rhs
      * @return

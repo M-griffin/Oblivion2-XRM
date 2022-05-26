@@ -322,7 +322,7 @@ void ConfigDao::encode(const Config &rhs)
 }
 
 /**
- * @brief Loads a Configuation file into the m_config stub for access.
+ * @brief Loads a Configuration file into the m_config stub for access.
  * @return
  */
 bool ConfigDao::loadConfig()
@@ -380,7 +380,7 @@ bool ConfigDao::loadConfig()
 }
 
 /**
- * @brief Validates settings for possiable conflicts
+ * @brief Validates settings for possible conflicts
  * @return
  */
 bool ConfigDao::validation()

@@ -62,11 +62,11 @@ public:
         std::lock_guard<std::mutex> lock(m);
 
         // Check if were pulling by specific or all files with extensions.
-        bool isAllExtenasions = false;
+        bool isAllExtensions = false;
 
         if(extension.size() > 0)
         {
-            isAllExtenasions = true;
+            isAllExtensions = true;
         }
 
         std::vector<std::string> file_list;
@@ -94,12 +94,12 @@ public:
                 // If File Extension matches then add to the list.
                 std::string file_ext = getFileExtension(file_name);
 
-                if(isAllExtenasions && file_ext == extension)
+                if(isAllExtensions && file_ext == extension)
                 {
                     // By Specific Extension
                     file_list.push_back(file_name);
                 }
-                else if(!isAllExtenasions && file_ext != "")
+                else if(!isAllExtensions && file_ext != "")
                 {
                     // By All Extensions (Skip folders and executables)
                     file_list.push_back(file_name);

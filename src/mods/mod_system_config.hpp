@@ -83,7 +83,7 @@ public:
     void createTextPrompts();
 
     /**
-     * @brief Sets an indivdual module index.
+     * @brief Sets an individual module index.
      * @param mod_function_index
      */
     void changeModule(int mod_function_index);

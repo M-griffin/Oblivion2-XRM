@@ -45,7 +45,7 @@ public:
                                 area are marked as free and no credit
                                 is deducted for their download.
 */
-        
+
     long        iId;
     std::string sName;
     std::string sAcsAccess;
@@ -59,7 +59,7 @@ public:
     int         iMultiplier;
     bool        bFreeArea;
     long        iSortOrder;
-    
+
     explicit FileArea()
         : iId(-1)
         , sName("")
@@ -75,7 +75,7 @@ public:
         , bFreeArea(true)
         , iSortOrder(-1)
     { }
-    
+
     ~FileArea()
     { }
 

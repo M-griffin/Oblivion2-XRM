@@ -9,7 +9,7 @@
 #include <cstring>
 
 /**
- * @brief  Global Singleton Instance, needed to initalize the class.
+ * @brief  Global Singleton Instance, needed to initialize the class.
  */
 Communicator* Communicator::m_global_instance = nullptr;
 

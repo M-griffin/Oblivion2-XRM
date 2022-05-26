@@ -51,13 +51,13 @@ CommonIO::CommonIO()
     , m_is_new_getline(true)
     , m_is_new_leadoff(true)
 {
-    // Arror Keys, Hardware OA are translated to [A on the fly
+    // Arrow Keys, Hardware OA are translated to [A on the fly
     m_sequence_map.insert(std::make_pair("[A",    "up_arrow"));
     m_sequence_map.insert(std::make_pair("[B",    "dn_arrow"));
     m_sequence_map.insert(std::make_pair("[C",    "rt_arrow"));
     m_sequence_map.insert(std::make_pair("[D",    "lt_arrow"));
 
-    // Hardware Keys, or Numpad.
+    // Hardware Keys, or Num pad.
     m_sequence_map.insert(std::make_pair("OA",    "up_arrow"));
     m_sequence_map.insert(std::make_pair("OB",    "dn_arrow"));
     m_sequence_map.insert(std::make_pair("OC",    "rt_arrow"));
@@ -183,7 +183,7 @@ CommonIO::~CommonIO()
  */
 std::string CommonIO::getProgramPath(const std::string &program_name)
 {
-    // NOTE This methid can not use logging, called prior to configuration load.
+    // NOTE This method can not use logging, called prior to configuration load.
     std::string program_path;
     std::string program = "/" + program_name;
 
@@ -193,7 +193,7 @@ std::string CommonIO::getProgramPath(const std::string &program_name)
 
     if(pPath != nullptr)
     {
-        std::cout << "Found OBV2 Enviroment Variable=" << pPath << std::endl;
+        std::cout << "Found OBV2 Environment Variable=" << pPath << std::endl;
         program_path = pPath;
 
 #ifdef _WIN32
@@ -417,7 +417,7 @@ std::string CommonIO::leftTrim(const std::string &str)
 }
 
 /**
- * @brief Right Trim Whitepsaces (Back)
+ * @brief Right Trim White spaces (Back)
  * @param str
  * @return
  */
@@ -522,7 +522,7 @@ std::string CommonIO::eraseString(const std::string &str,
                 if(char_count < start_position || char_count > end_position)
                 {
                     // This convert the uint32_t code point to char array
-                    // So each sequence can be writen as seperate byte.
+                    // So each sequence can be written as separate byte.
                     unsigned char character[5] = {0,0,0,0,0};
                     utf8::append(code_point, character);
 
@@ -576,7 +576,7 @@ std::string CommonIO::rightPadding(const std::string &str, std::string::size_typ
 
     std::string::size_type s = numberOfChars(new_string);
 
-    // if Line > Sapce, Erase to match length
+    // if Line > Space, Erase to match length
     if(s > space)
     {
         std::string erased = eraseString(new_string, space);
@@ -622,7 +622,7 @@ std::string CommonIO::leftPadding(const std::string &str, std::string::size_type
 
     std::string::size_type s = numberOfChars(new_string);
 
-    // if Line > Sapce, Erase to match length
+    // if Line > Space, Erase to match length
     if(s >= space)
     {
         std::string erased = eraseString(new_string, 0, s-space);
@@ -675,7 +675,7 @@ std::string CommonIO::centerPadding(const std::string &str, int term_width)
         padded_line += ' ';
     }
 
-    // Appending currnet data after Padding.
+    // Appending current data after Padding.
     new_string.insert(0,padded_line);
     return new_string;
 }
@@ -774,7 +774,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
         return "";
     }
 
-    // Don't process concurent multiple esc sequences.
+    // Don't process concurrent multiple esc sequences.
     // if we get a second, return the first and check if we
     // are getting a single second ESC or start of Sequence.
     if(character_buffer[0] == 27 && character_buffer.size() == 1)
@@ -870,8 +870,8 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                     return "";
 
                 // Only SCO F3 ends with [[O, otherwise it
-                // preceeds in other sequences.
-                case 'O': // Precursor to Fucntion Keys [OA etc..
+                // precedes in other sequences.
+                case 'O': // Precursor to Function Keys [OA etc..
                     if(m_string_buffer == "[[")
                     {
                         // End of SCO Sequence
@@ -946,7 +946,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
         }
     }
 
-    // If ESC key received wtih no trailing sequence,
+    // If ESC key received with no trailing sequence,
     // clear sequence buffer and just return ESC.
     if(m_string_buffer.size() == 1 && m_string_buffer[0] == 27)
     {
@@ -1060,7 +1060,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
                 }
                 else
                 {
-                    // Nothing to delete at begining Skip.
+                    // Nothing to delete at beginning Skip.
                     log->xrmLog<Logging::DEBUG_LOG>("Received DEL ESC Sequence beginning of line=", character_buffer, __LINE__, __FILE__);
                     return "empty";
                 }
@@ -1091,7 +1091,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         }
         else
         {
-            // At beginign of line, nothing to delete!
+            // At beginning of line, nothing to delete!
             log->xrmLog<Logging::DEBUG_LOG>("Received CTRL+Y Sequence beginning of line=", character_buffer, __LINE__, __FILE__);
             return "empty";
         }
@@ -1110,8 +1110,8 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         }
         else
         {
-            // At begining of Line, nothing to delete.
-            log->xrmLog<Logging::DEBUG_LOG>("Received backspace Sequence begining of line=", character_buffer, __LINE__, __FILE__);
+            // At beginning of Line, nothing to delete.
+            log->xrmLog<Logging::DEBUG_LOG>("Received backspace Sequence beginning of line=", character_buffer, __LINE__, __FILE__);
             return "empty";
         }
     }
@@ -1355,7 +1355,7 @@ std::string CommonIO::standardDateTimeToString(std::time_t std_time)
 */
 std::time_t CommonIO::stringToStandardDate(std::string date)
 {
-    // Append Time For Dates, need formattings
+    // Append Time For Dates, need formatting's
     std::string key = date;
     key += " 00:00:00";
     struct std::tm tm;

@@ -24,7 +24,7 @@
  */
 bool ModUserEditor::update(const std::string &character_buffer, const bool &)
 {
-    // Make sure system is active, when system is done, success or failes
+    // Make sure system is active, when system is done, success or fails
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
     {
@@ -37,7 +37,7 @@ bool ModUserEditor::update(const std::string &character_buffer, const bool &)
         return true;
     }
 
-    // Process all incoming data stright to the input functions.
+    // Process all incoming data straight to the input functions.
     m_mod_functions[m_mod_function_index](character_buffer);
 
     return true;
@@ -131,7 +131,7 @@ void ModUserEditor::createTextPrompts()
     value[DISPLAY_USER_FIELDS_LEVEL]              = std::make_pair("Level", " |03(|11M|03) |15User Level     : ");
     value[DISPLAY_USER_FIELDS_REALNAME]           = std::make_pair("Real Name"," |03(|11B|03) |15Real Name   : ");
     value[DISPLAY_USER_FIELDS_FILELEVEL]          = std::make_pair("File Level", " |03(|11N|03) |15File Level     : ");
-    value[DISPLAY_USER_FIELDS_EMAIL]              = std::make_pair("Email Address", " |03(|11C|03) |15Eamil       : ");
+    value[DISPLAY_USER_FIELDS_EMAIL]              = std::make_pair("Email Address", " |03(|11C|03) |15Email       : ");
     value[DISPLAY_USER_FIELDS_MESGLEVEL]          = std::make_pair("Message Level", " |03(|11O|03) |15Mesg Level     : ");
     value[DISPLAY_USER_FIELDS_ADDRESS]            = std::make_pair("Address", " |03(|11D|03) |15Address     : ");
     value[DISPLAY_USER_FIELDS_HACK_ATTEMPT]       = std::make_pair("Number of Invalid Logons", " |03(|11P|03) |15Hack Attempts  : ");
@@ -303,7 +303,7 @@ void ModUserEditor::setupUserList()
     displayPromptMCI(PROMPT_HEADER, string_filter);
 
     // Build a list of screen lines for the menu display
-    // So we know when to pause in large listing, or use pagenation.
+    // So we know when to pause in large listing, or use pagination.
     std::string user_display_output = displayUserList();
 
     if(m_user_display_list.size() > 0)
@@ -324,7 +324,7 @@ void ModUserEditor::setupUserList()
 void ModUserEditor::setupUserEditFields()
 {
     // Build a list of screen lines for the menu display
-    // So we know when to pause in large listing, or use pagenation.
+    // So we know when to pause in large listing, or use pagination.
     std::string user_display_output = displayUserEditScreen();
 
     if(user_display_output.size() == 0)
@@ -353,7 +353,7 @@ void ModUserEditor::setupUserEditFields()
 void ModUserEditor::setupUserEditExtendedFields()
 {
     // Build a list of screen lines for the menu display
-    // So we know when to pause in large listing, or use pagenation.
+    // So we know when to pause in large listing, or use pagination.
     std::string user_display_output = displayUserExtendedEditScreen();
 
     if(user_display_output.size() == 0)
@@ -648,7 +648,7 @@ void ModUserEditor::copyExistingUser(long user_id)
 
             if(userIndex < 0)
             {
-                // If user Index is not created, then remove the secutiry record.
+                // If user Index is not created, then remove the security record.
                 security_dao->deleteRecord(securityIndex);
             }
         }
@@ -806,7 +806,7 @@ void ModUserEditor::displayCurrentPage(const std::string &input_state)
 
         if(i >= (m_page*m_rows_per_page) + m_rows_per_page)
         {
-            // We've displayed the max amount of rows per the currnet
+            // We've displayed the max amount of rows per the current
             // screen break out and wait for prompt or next page.
             displayed_all_rows = false;
             break;
@@ -828,8 +828,8 @@ void ModUserEditor::displayCurrentPage(const std::string &input_state)
             return;
     }
 
-    // If we displayed all rows, then display propmpt, otherwise
-    // Ask to hit anykey for next page.
+    // If we displayed all rows, then display prompt, otherwise
+    // Ask to hit any key for next page.
     if(displayed_all_rows)
     {
         // Reset Page back to Zero for next display.
@@ -1072,7 +1072,7 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                 m_session_io.getInputField("", key, Config::sName_length, m_loaded_user.back()->sAddress);
                 break;
 
-            case 'P': // Numkber Hack Attempts
+            case 'P': // Number Hack Attempts
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_HACKATTEMPT);
                 m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iHackAttempts));
@@ -1285,7 +1285,7 @@ void ModUserEditor::userEditorExtendedInput(const std::string &input)
                 m_session_io.getInputField("", key, Config::sName_length, std::to_string(m_loaded_user.back()->iFilePoints));
                 break;
 
-            case 'D': // Expiratrion Date
+            case 'D': // Expiration Date
                 changeInputModule(MOD_USER_EXTENDED_FIELD);
                 displayPrompt(PROMPT_USER_EXT_FIELDS_EXPIRE_DATE);
                 m_session_io.getInputField("", key, Config::sName_length, m_common_io.standardDateToString(m_loaded_user.back()->dtExpirationDate));
@@ -1440,7 +1440,7 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                 m_loaded_user.back()->sAddress = key;
                 break;
 
-            case 'P': // Numkber Hack Attempts
+            case 'P': // Number Hack Attempts
                 m_loaded_user.back()->iHackAttempts = m_common_io.stringToInt(key);
                 break;
 
@@ -1710,7 +1710,7 @@ void ModUserEditor::userEditorExtendedFieldHandler(const std::string &input)
                 m_loaded_user.back()->iFilePoints = m_common_io.stringToInt(key);
                 break;
 
-            case 'D': // Expiratrion Date
+            case 'D': // Expiration Date
                 {
                     // Make sure Date Format is valid
                     std::regex date_regex { m_config->regexp_date_validation };

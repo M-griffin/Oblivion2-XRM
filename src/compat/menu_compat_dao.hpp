@@ -9,7 +9,7 @@
  * @author Michael Griffin
  * @date 10/6/2015
  * @file menu_data.hpp
- * @brief Holds Binary funcations for reading .MNU Data Files. Original OBV/2
+ * @brief Holds Binary functions for reading .MNU Data Files. Original OBV/2
  */
 class MenuCompatDao
 {
@@ -22,7 +22,7 @@ public:
     { }
 
     /**
-     * @brief Appending forward or backspash to path
+     * @brief Appending forward or backslash to path
      * @param path
      */
     void pathSeperator(std::string &path)

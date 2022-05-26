@@ -12,12 +12,12 @@ typedef std::shared_ptr<Security> security_ptr;
  * @author Michael Griffin
  * @date 8/20/2016
  * @file security.hpp
- * @brief Structure for holding users Password and Salt hashs
+ * @brief Structure for holding users Password and Salt hashes
  */
 class Security
 {
 public:
-   
+
     long iId;
     std::string sPasswordHash;
     std::string sSaltHash;

@@ -128,7 +128,7 @@ void ProtocolDao::encode(const Protocols &rhs)
     m_protocols->protocols       = rhs.protocols;
 
     // Now Sort All Protocols once they have been loaded.
-    // Unforunatally YAML does not keep ordering in arrays properly.
+    // Unfortunately YAML does not keep ordering in arrays properly.
     sort(
         m_protocols->protocols.begin(), m_protocols->protocols.end(),
         [ ](const Protocol& lhs, const Protocol& rhs)

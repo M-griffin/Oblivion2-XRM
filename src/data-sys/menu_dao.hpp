@@ -9,7 +9,7 @@
 class Menu;
 typedef std::shared_ptr<Menu> menu_ptr;
 
- 
+
  /**
   * @class MenuDao
   * @author Michael Griffin
@@ -42,7 +42,7 @@ public:
      * @return
      */
     bool saveMenu(menu_ptr menu);
-    
+
     /**
      * @brief Removes and Existing Menu from the directory.
      * @param menu
@@ -55,7 +55,7 @@ public:
      * @return
      */
     bool loadMenu();
-    
+
     /**
      * @brief Moves the Loaded Menu to the shared pointer.
      * @param rhs
@@ -73,26 +73,26 @@ public:
         {
             return m_menu;
         }
-		
+
 		return nullptr;
     }
-    
+
     /**
-     * @brief Overide the Filename
+     * @brief Override the Filename
      * @param menu_name
      */
-    void setFileName(std::string menu_name) 
+    void setFileName(std::string menu_name)
     {
-        m_filename = menu_name; 
+        m_filename = menu_name;
     }
-    
+
     /**
      * @brief Retrieve the existing Filename
-     * @return 
+     * @return
      */
     std::string getFileName() const { return m_filename; }
-    
-   
+
+
     menu_ptr    m_menu;
     std::string m_path;
     std::string m_filename;

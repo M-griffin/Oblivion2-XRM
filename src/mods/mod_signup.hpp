@@ -136,7 +136,7 @@ public:
         MOD_BIRTHDATE,
         MOD_GENDER,
         MOD_PASSWORD,
-        MOD_PASSOWRD_VERIFY,
+        MOD_PASSWORD_VERIFY,
         MOD_CHALLENGE_QUEST,
         MOD_CHALLENGE_ANSWER,
         MOD_CHALLENGE_VERIFY,
@@ -365,15 +365,15 @@ private:
 
     /**
      * @brief Base Class for shared input (receives function pointer for custom execution)
-     * 
-     * @param input 
-     * @param field_length 
-     * @param useHiddenOutput 
-     * @param func_pointer 
-     * @return true 
-     * @return false 
+     *
+     * @param input
+     * @param field_length
+     * @param useHiddenOutput
+     * @param func_pointer
+     * @return true
+     * @return false
      */
-    bool fieldInputAndProcess(std::string input, int field_length, bool use_hidden_output, 
+    bool fieldInputAndProcess(std::string input, int field_length, bool use_hidden_output,
         std::function<bool(std::string &, std::string &)> function_pointer);
 
     /**

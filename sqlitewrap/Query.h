@@ -57,7 +57,7 @@ public:
     /** Fetch next result row.
     	\return false if there was no row to fetch (end of rows) */
 
-    // Fill the Resource with the current row, also incriments to next row.
+    // Fill the Resource with the current row, also increments to next row.
     bool fetchRow();
 
     /** Get id of last insert. */
@@ -379,7 +379,7 @@ public:
     }
 
     /**
-     * Create a new Executate Transaction
+     * Create a new Transaction
      */
     bool executeTransaction(const std::vector<std::string> &statements);
 

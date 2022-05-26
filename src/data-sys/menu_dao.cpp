@@ -170,7 +170,7 @@ void MenuDao::encode(const Menu &rhs)
     m_menu->menu_options        = rhs.menu_options;
 
     // Now Sort All Menu Options once they have been loaded.
-    // Unforunatally YAML does not keep ordering properly.
+    // Unfortunately YAML does not keep ordering properly.
     sort(
         m_menu->menu_options.begin(), m_menu->menu_options.end(),
         [ ](const MenuOption& lhs, const MenuOption& rhs)

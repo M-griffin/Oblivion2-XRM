@@ -208,12 +208,12 @@ public:
     void clearAllModules();
 
     /**
-     * @brief Exists and Shutsdown the current module
+     * @brief Exists and Shuts down the current module
      */
     void shutdownModule();
 
     /**
-     * @brief Exists and Shutsdown the current module
+     * @brief Exists and Shuts down the current module
      */
     void startupModule(module_ptr module);
 

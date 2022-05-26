@@ -8,7 +8,7 @@
 #include <vector>
 #include <functional>
 
-// Forward Declerations
+// Forward Decelerations
 namespace SQLW
 {
 class Database;
@@ -48,7 +48,7 @@ public:
             "PRAGMA foreign_keys=ON; "
             "PRAGMA default_cache_size=10000; "
             "PRAGMA cache_size=10000; ";
-        
+
         // Check if Database Exists.
         m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
 
@@ -68,23 +68,23 @@ public:
             "iMultiplier       INTEGER NOT NULL, "
             "bFreeArea         BOOLEAN NOT NULL, "
             "iSortOrder        INTEGER NOT NULL, "
-            "FOREIGN KEY(iSecurityIndex) REFERENCES Secutiry(iId) ON DELETE CASCADE "
+            "FOREIGN KEY(iSecurityIndex) REFERENCES Security(iId) ON DELETE CASCADE "
             "); ";
 
         // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
         m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
-        
+
         // Setup the CallBack for Result Field Mapping
-        m_result_callback = std::bind(&FileAreaDao::pullFileAreaResult, this, 
+        m_result_callback = std::bind(&FileAreaDao::pullFileAreaResult, this,
             std::placeholders::_1, std::placeholders::_2);
-            
-        m_columns_callback = std::bind(&FileAreaDao::fillFileAreaColumnValues, this, 
+
+        m_columns_callback = std::bind(&FileAreaDao::fillFileAreaColumnValues, this,
             std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-            
-        m_insert_callback = std::bind(&FileAreaDao::insertFileAreaQryString, this, 
+
+        m_insert_callback = std::bind(&FileAreaDao::insertFileAreaQryString, this,
             std::placeholders::_1, std::placeholders::_2);
-        
-        m_update_callback = std::bind(&FileAreaDao::updateFileAreaQryString, this, 
+
+        m_update_callback = std::bind(&FileAreaDao::updateFileAreaQryString, this,
             std::placeholders::_1, std::placeholders::_2);
     }
 
@@ -97,14 +97,14 @@ public:
      * Base Dao Calls for generic Object Data Calls
      * (Below This Point)
      */
- 
- 
+
+
     /**
      * @brief Check If Database Table Exists.
      * @return
      */
     bool doesTableExist();
-    
+
     /**
      * @brief Run Setup Params for SQL Database Table.
      */
@@ -121,7 +121,7 @@ public:
      * @return
      */
     bool dropTable();
-    
+
     /**
      * @brief Updates a Record in the database!
      * @param obj
@@ -135,27 +135,27 @@ public:
      * @return
      */
     long insertRecord(file_area_ptr obj);
-        
+
     /**
      * @brief Deletes a MessageArea Record
      * @param areaId
      * @return
      */
     bool deleteRecord(long id);
-    
+
     /**
      * @brief Retrieve Record By Id.
      * @param id
-     * @return 
-     */ 
+     * @return
+     */
     file_area_ptr getRecordById(long id);
-    
+
     /**
      * @brief Retrieve All Records in a Table
      * @return
      */
     std::vector<file_area_ptr> getAllRecords();
-    
+
     /**
      * @brief Retrieve Count of All Records in a Table
      * @return
@@ -167,26 +167,26 @@ public:
      * Base Dao Call Back for Object Specific Data Mappings
      * (Below This Point)
      */
-     
-     
+
+
     /**
-     * @brief (Callback) Create Record Insert Statement, returns query string 
+     * @brief (Callback) Create Record Insert Statement, returns query string
      * @param qry
      * @param obj
-     * @return 
+     * @return
      */
     std::string insertFileAreaQryString(std::string qry, file_area_ptr obj);
 
     /**
-     * @brief (CallBack) Update Existing Record. 
+     * @brief (CallBack) Update Existing Record.
      * @param qry
      * @param obj
-     * @return 
+     * @return
      */
     std::string updateFileAreaQryString(std::string qry, file_area_ptr obj);
-    
+
     /**
-     * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+     * @brief (CallBack) Pulls results by FieldNames into their Class Variables.
      * @param qry
      * @param obj
      */
@@ -197,23 +197,23 @@ public:
      * @param qry
      * @param obj
      * @param values
-     */ 
-    void fillFileAreaColumnValues(query_ptr qry, file_area_ptr obj, 
+     */
+    void fillFileAreaColumnValues(query_ptr qry, file_area_ptr obj,
         std::vector< std::pair<std::string, std::string> > &values);
-    
-    
+
+
     /**
      * One Off Methods SQL Queries not included in the BaseDao
      * (Below This Point)
      */
- 
- 
+
+
     /**
      * @brief Return List of All FileArea by ConferenceId
      * @param areas
      * @return
-     */ 
-    std::vector<file_area_ptr> getAllFileAreasByConference(long id);       
+     */
+    std::vector<file_area_ptr> getAllFileAreasByConference(long id);
 };
 
 // Handle to Database Queries

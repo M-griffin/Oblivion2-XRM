@@ -14,7 +14,7 @@
  * @author Michael Griffin
  * @date 4/05/2016
  * @file config.hpp
- * @brief Config Model - To output serilized data to and from .yaml files.
+ * @brief Config Model - To output serialized data to and from .yaml files.
  */
 class Config
 {
@@ -314,7 +314,7 @@ public:
         , directory_bad_files("")
         , use_greater_then_for_quotes(false)
         , regexp_generic_validation("^[^\\s]+[\\w\\s,.!@#$%^&*\\(\\)]+")  // testing no starting spaces!
-        , regexp_generic_validation_msg("At least one AlphaNumeric Word characters required space seperators.")
+        , regexp_generic_validation_msg("At least one AlphaNumeric Word characters required space seperator.")
         , regexp_handle_validation("(?=.*[a-zA-Z])(?!.*\\d).{2,}")
         , regexp_handle_validation_msg("At least two characters case insensitive no spaces.")
         , regexp_password_validation("(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}")
@@ -338,14 +338,14 @@ public:
 };
 
 
-// YAML Overide namespace for encoding/decoding Config Class.
+// YAML Override namespace for encoding/decoding Config Class.
 namespace YAML
 {
 template<>
 struct convert<Config>
 {
     /**
-     * @brief Overide for encoding the Config Class
+     * @brief Override for encoding the Config Class
      *        This is not used as it makes the map on a single line!
      *        Instead Key/Value is done in the ConfigDao on save.
      * @param rhs
@@ -470,7 +470,7 @@ struct convert<Config>
     }
 
     /**
-     * @brief Overide for the Load from File, this read and piluaes the Config Object.
+     * @brief Override for the Load from File, this read and populate the Config Object.
      * @param node
      * @param rhs
      * @return

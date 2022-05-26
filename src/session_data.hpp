@@ -231,7 +231,7 @@ public:
     }
 
     /*
-     * @brief Start Secutiry handshake.
+     * @brief Start Security handshake.
      */
     void handshake();
 
@@ -247,7 +247,7 @@ public:
     void startEscapeTimer()
     {
         // Add Deadline Timer for .400 milliseconds for complete ESC Sequences.
-        // Is no other input or part of ESC Sequecnes ie.. [A following the ESC
+        // Is no other input or part of ESC Sequences ie.. [A following the ESC
         // Then it's an ESC key, otherwise capture the rest of the sequence.
         m_esc_input_timer->setWaitInMilliseconds(400);
         m_esc_input_timer->asyncWait(
