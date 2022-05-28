@@ -4,7 +4,7 @@
 #include "session_io.hpp"
 #include "common_io.hpp"
 #include "session_data.hpp"
-#include "ansi_processor.hpp"
+#include "processor_ansi.hpp"
 #include "communicator.hpp"
 
 #include "model-sys/struct_compat.hpp"
@@ -72,8 +72,8 @@ public:
     menu_ptr         m_menu_info;          // Menu Info
     menu_prompt_ptr  m_menu_prompt;        // Menu Prompt
 
-    ansi_process_ptr m_ansi_process;       // Instance for AnsiProcess Methods
-    unsigned int     m_active_pulldownID;  // Active Light bar Position.
+    processor_ansi_ptr m_ansi_process;     // Instance for AnsiProcess Methods
+    unsigned int     m_active_pulldownID;  // Active Lightbar Position.
 
     // Flags
     bool             m_fail_flag;                   // If menu or Option fails, kick off the fail flag.
@@ -113,7 +113,7 @@ public:
      */
     void baseProcessAndDeliver(std::string data)
     {
-        m_ansi_process->parseAnsiScreen((char *)data.c_str());
+        m_ansi_process->parseTextToBuffer((char *)data.c_str());
         m_menu_session_data->deliver(data);
     }
 

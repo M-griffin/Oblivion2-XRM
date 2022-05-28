@@ -31,7 +31,7 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_input_index(MENU_INPUT)
     , m_menu_info(new Menu())
     , m_menu_prompt()
-    , m_ansi_process(new AnsiProcessor(
+    , m_ansi_process(new ProcessorAnsi(
                          session_data->m_telnet_state->getTermRows(),
                          session_data->m_telnet_state->getTermCols()))
     , m_active_pulldownID(0)
@@ -270,8 +270,8 @@ std::string MenuBase::processTopGenericTemplate(const std::string &screen)
  */
 std::string MenuBase::processMidGenericTemplate(const std::string &screen)
 {
-    // Use a Local Ansi Parser for Parsing Menu Template with Mid.
-    ansi_process_ptr ansi_process(new AnsiProcessor(
+    // Use a Local Ansi Parser for Pasrsing Menu Template with Mid.
+    processor_ansi_ptr ansi_process(new ProcessorAnsi(
                                       m_menu_session_data->m_telnet_state->getTermRows(),
                                       m_menu_session_data->m_telnet_state->getTermCols())
                                  );
@@ -392,7 +392,7 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
 
     // Clear Code map.
     std::vector<MapType>().swap(code_map);
-    ansi_process->parseAnsiScreen((char *)output_screen.c_str());
+    ansi_process->parseTextToBuffer((char *)output_screen.c_str());
 
     // Return with no clear screen, since this is a mid ansi.
     return ansi_process->getScreenFromBuffer(false);
@@ -465,7 +465,7 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
     yesNoBars.insert(0, display_prompt);
 
     // Parse the Screen to the Screen Buffer.
-    m_ansi_process->parseAnsiScreen((char *)yesNoBars.c_str());
+    m_ansi_process->parseTextToBuffer((char *)yesNoBars.c_str());
 
     // Screen to String so it can be processed.
     m_ansi_process->screenBufferToString();
@@ -757,7 +757,7 @@ void MenuBase::redisplayMenuScreen()
     if(m_is_active_pulldown_menu)
     {
         // Parse the Screen to the Screen Buffer.
-        m_ansi_process->parseAnsiScreen((char *)buffer.c_str());
+        m_ansi_process->parseTextToBuffer((char *)buffer.c_str());
 
         // Screen to String so it can be processed.
         m_ansi_process->screenBufferToString();
@@ -1061,7 +1061,7 @@ void MenuBase::loadAndStartupMenu()
             m_is_active_pulldown_menu = true;
 
             // Parse the Screen to the Screen Buffer.
-            m_ansi_process->parseAnsiScreen((char *)buffer.c_str());
+            m_ansi_process->parseTextToBuffer((char *)buffer.c_str());
 
             // Screen to String so it can be processed.
             m_ansi_process->screenBufferToString();

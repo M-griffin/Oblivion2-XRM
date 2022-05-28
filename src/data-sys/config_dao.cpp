@@ -341,7 +341,8 @@ bool ConfigDao::loadConfig()
         // Testing Is on nodes always throws exceptions.
         if(node.size() == 0)
         {
-            return false; //File Not Found?
+            std::cout << std::endl << "ConfigDao Node size == 0" << std::endl;
+            return false;
         }
 
         std::string file_version = node["file_version"].as<std::string>();

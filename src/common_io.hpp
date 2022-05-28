@@ -38,6 +38,11 @@ public:
     explicit CommonIO();
     ~CommonIO();
 
+    /**
+     * @brief Retrieve Key Sequence by Value
+     * @param value
+     */
+    std::string getSequenceFromMap(std::string value);
 
     /* This function will read the OS specific functions
      * To Determine where the executable is located.
@@ -111,6 +116,12 @@ public:
      * This is for mixed ASCII And UTF-8 Strings.
      */
     bool isDigit(const std::string &str);
+
+    /**
+     * @brief Return the Input Full Screen Editor Escape Sequence Parsed.
+     * @return
+     */
+    std::string getFSEEscapeSequence();
 
     /**
     * @brief Return the Escape Sequence

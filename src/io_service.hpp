@@ -50,7 +50,7 @@ public:
     /**
      * Handles Call Back Functions, execute at the end of Asyn Job.
      */
-    typedef std::function<void(const std::error_code&, socket_handler_ptr)> callback_function_handler;
+    typedef std::function<void(const std::error_code&, socket_handler_ptr)> StdFunctionCallbackHandler;
 
     static const int MAX_BUFFER_SIZE = 16384;
 
@@ -109,7 +109,7 @@ public:
 
         virtual void executeCallback(const std::error_code &err, socket_handler_ptr handle)
         {
-            callback_function_handler callback(m_callback);
+            StdFunctionCallbackHandler callback(m_callback);
             callback(err, handle);
         }
 
@@ -150,12 +150,12 @@ public:
             = new ServiceJob <MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
         (buffer, string_sequence, socket_handle, callback, service_type);
 
-        if (SERVICE_TIMER(service_type))
+        if(SERVICE_TIMER(service_type))
         {
             // Timer (Priority List Job)
             m_timer_list.push_back(std::shared_ptr<ServiceBase>(job));
         }
-        else if (SERVICE_LISTENER(service_type))
+        else if(SERVICE_LISTENER(service_type))
         {
             // Server Connection Listener Job (1) for each Service.
             m_listener_list.push_back(std::shared_ptr<ServiceBase>(job));
@@ -165,7 +165,7 @@ public:
             // Standard Async Job
             m_service_list.push_back(std::shared_ptr<ServiceBase>(job));
         }
-    }    
+    }
 
     /**
      * @Brief Always check all timers (Priority each iteration)

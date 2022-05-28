@@ -29,6 +29,11 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="../src/processor_text.hpp"/>
+    <File Name="../src/processor_text.cpp"/>
+    <File Name="../src/processor_base.hpp"/>
+    <File Name="../src/processor_ansi.hpp"/>
+    <File Name="../src/processor_ansi.cpp"/>
     <File Name="../xrm-unittest/src/users_dao_ut.cpp"/>
     <File Name="../xrm-unittest/src/session_io_ut.cpp"/>
     <File Name="../xrm-unittest/src/oneliners_dao_it.cpp"/>
@@ -42,8 +47,6 @@
     <File Name="../xrm-unittest/src/access_condition_ut.hpp"/>
     <File Name="../xrm-unittest/src/access_condition_ut.cpp"/>
     <File Name="../xrm-unittest/src/xrm_test.cpp"/>
-    <File Name="../src/ansi_processor.cpp"/>
-    <File Name="../src/ansi_processor.hpp"/>
     <File Name="../src/session_manager.cpp"/>
     <File Name="../src/session_manager.hpp"/>
     <File Name="../src/common_io.cpp"/>

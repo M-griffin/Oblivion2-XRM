@@ -106,6 +106,15 @@ public:
     }
 
     /**
+     * @brief Check if Singletop is active
+     * @return
+     */
+    static bool isActive()
+    {
+        return m_global_logging_instance != nullptr;
+    }
+
+    /**
      * @brief Helper, appends forward/backward slash to path
      * @param value
      */

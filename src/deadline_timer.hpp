@@ -32,7 +32,7 @@ public:
         std::vector<std::future<void>>().swap(m_future_list);
     }
 
-    typedef std::function<void(int)> function_callback;
+    typedef std::function<void(int)> StdFuncationCallBack;
 
     int m_expires_from_now;
     std::atomic_bool m_cancellation_token;
@@ -64,14 +64,14 @@ public:
             std::async(std::launch::async, [i, callback, this]()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(i));
-            function_callback fncCallBack = callback;
+            StdFuncationCallBack fun_callback(callback);
 
             // If not Canceled, Execute CallBack with a default status, update lateron
             // Cancel seems to still execute, but i'm thinking we still need to execute
             // On Double ESC's HITS.
             if(!m_cancellation_token)
             {
-                fncCallBack(0);
+                fun_callback(0);
             }
         })
         );

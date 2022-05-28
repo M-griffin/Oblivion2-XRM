@@ -30,6 +30,48 @@ SessionIO::~SessionIO()
 }
 
 /**
+ * @brief Single Key Input For Full Screen Editor or Esc Sequences
+ * @param character_buffer
+ * @return
+ */
+std::string SessionIO::getFSEKeyInput(const std::string &character_buffer)
+{
+    Logging *log = Logging::instance();
+    std::string input = m_common_io.parseInput(character_buffer);
+
+    if(input.size() == 0)
+    {
+        // No Data received, could be in mid ESC sequence
+        // Return for next key.
+        log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Mid Escape");
+        return "";
+    }
+
+    std::string escape_sequence = "";
+
+    if(input[0] == '\x1b')
+    {
+        escape_sequence = m_common_io.getFSEEscapeSequence();
+
+        std::cout << "FSE escape_sequence: " << escape_sequence << std::endl;
+
+        if(escape_sequence.size() == 0)
+        {
+            log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Single Escape");
+            return "\x1b";
+        }
+        else
+        {
+            log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Translated Escape Sequence=", escape_sequence);
+            return (escape_sequence.insert(0, "\x1b"));
+        }
+    }
+
+    log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Normal Input=", input);
+    return input;
+}
+
+/**
  * @brief Single Key Input or Esc Sequence
  * @param character_buffer
  * @return

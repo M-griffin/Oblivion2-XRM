@@ -177,6 +177,27 @@ CommonIO::~CommonIO()
 }
 
 /**
+ * @brief Retrieve Key Sequence by Value
+ * @param value
+ */
+std::string CommonIO::getSequenceFromMap(std::string value)
+{
+    std::string key = "";
+
+    for(auto &i : m_sequence_map)
+    {
+        if(i.second == value)
+        {
+            key = "\x1b";
+            key += i.first;
+            break;
+        }
+    }
+
+    return key;
+}
+
+/**
  * @brief Determine where the executable is located.
  * This has only been tested in Windows, Linux, OSX.
  * @return
@@ -734,7 +755,22 @@ bool CommonIO::isDigit(const std::string &str)
 }
 
 /**
- * @brief Return the Escape Sequence Parsed.
+ * @brief Return the Input Full Screen Editor Escape Sequence Parsed.
+ * @return
+ */
+std::string CommonIO::getFSEEscapeSequence()
+{
+    // Check if Sequences Exists, otherwise return blank.
+    if(m_sequence_map.find(m_escape_sequence) != m_sequence_map.end())
+    {
+        return m_sequence_map[m_escape_sequence];
+    }
+
+    return m_escape_sequence;
+}
+
+/**
+ * @brief Return the Input Escape Sequence Parsed.
  * @return
  */
 std::string CommonIO::getEscapeSequence()
@@ -766,6 +802,14 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
         m_escape_sequence.erase();
         m_string_buffer.erase();
         return "\x1b";
+    }
+    // Handle Single Char BS and DEL from Terminals
+    // Depending on User Setting to handle Windows or Terminal - these get flipped.
+    else if(num == 1 && (character_buffer[0] == '\x7f' || character_buffer[0] == '\x08'))
+    {
+        m_is_escape_sequence = false;
+        m_escape_sequence.erase();
+        return character_buffer;
     }
     else if(num != 1)
     {
@@ -866,6 +910,8 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                 case '9': // Function Keys.
                 case '0': // Function Keys.
                 case ';': // Seperator for Shift ARROW Keys! ie [1;2A
+                    std::cout << "common io: " << character_buffer << std::endl;
+
                     m_string_buffer += character_buffer;
                     return "";
 
@@ -921,6 +967,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                     return "\x1b";
 
                 // End of Number Sequence.
+                case '@': // Insert
                 case '~': // Function
                 case '$': // Shift Function RXVT
                 case '^': // CTRL Function RXVT

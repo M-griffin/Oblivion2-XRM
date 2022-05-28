@@ -3,7 +3,7 @@
   <Environment>
     <![CDATA[]]>
   </Environment>
-  <Project Name="xrm-server" Path="xrm-server-lnx.project" Active="Yes"/>
+  <Project Name="xrm-server" Path="xrm-server-lnx.project" Active="No"/>
   <Project Name="sqlitewrapped-lnx" Path="sqlitewrapped-lnx.project" Active="No"/>
   <Project Name="xrm-menu-convert-lnx" Path="xrm-menu-convert-lnx.project" Active="No"/>
   <Project Name="xrm-menu-convert-prompt-lnx" Path="xrm-menu-convert-prompt-lnx.project" Active="No"/>

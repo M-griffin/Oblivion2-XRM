@@ -11,9 +11,11 @@
 class SessionData;
 typedef std::shared_ptr<SessionData> session_data_ptr;
 
-class AnsiProcessor;
-typedef std::shared_ptr<AnsiProcessor> ansi_process_ptr;
+class ProcessorAnsi;
+typedef std::shared_ptr<ProcessorAnsi> processor_ansi_ptr;
 
+class ProcessorText;
+typedef std::shared_ptr<ProcessorText> processor_text_ptr;
 
 /**
  * @class ModMessageEditor
@@ -26,11 +28,12 @@ class ModMessageEditor
     : public ModBase
 {
 public:
-    ModMessageEditor(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
+    ModMessageEditor(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
         : ModBase(session_data, config, ansi_process)
         , m_session_io(session_data)
         , m_filename("mod_message_editor.yaml")
         , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
+        , m_text_process(nullptr)
         , m_mod_function_index(MOD_PROMPT)
         , m_mod_setup_index(MOD_DISPLAY_EDITOR)
         , m_mod_user_state_index(MOD_FSE_INPUT)
@@ -42,13 +45,13 @@ public:
         , m_text_box_bottom(24)
         , m_text_box_left(0)
         , m_text_box_right(80)
+        , m_text_box_height(0)
+        , m_text_box_width(0)
+
     {
         // Push function pointers to the stack.
-
         m_setup_functions.push_back(std::bind(&ModMessageEditor::setupEditor, this));
-
         m_mod_functions.push_back(std::bind(&ModMessageEditor::editorInput, this, std::placeholders::_1));
-
 
         // Check of the Text Prompts exist.
         m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
@@ -77,7 +80,6 @@ public:
     {
         // Most likely add extra here for asking TOPIC, TAGS, TO etc..
         MOD_DISPLAY_EDITOR      = 0
-
     };
 
     // Input Menu State Index
@@ -180,7 +182,7 @@ public:
      * @param screen
      * @return
      */
-    std::string processTopTemplate(ansi_process_ptr ansi_process, const std::string &screen);
+    std::string processTopTemplate(processor_ansi_ptr ansi_process, const std::string &screen);
 
     /**
      * @brief Processes a MID Template Screen
@@ -188,7 +190,7 @@ public:
      * @param screen
      * @return
      */
-    std::string processMidTemplate(ansi_process_ptr ansi_process, const std::string &screen);
+    std::string processMidTemplate(processor_ansi_ptr ansi_process, const std::string &screen);
 
     /**
      * @brief Processes a Bottom Template Screen
@@ -196,7 +198,7 @@ public:
      * @param screen
      * @return
      */
-    std::string processBottomTemplate(ansi_process_ptr ansi_process, const std::string &screen);
+    std::string processBottomTemplate(processor_ansi_ptr ansi_process, const std::string &screen);
 
     /**
      * @brief Setup for the Message Editor
@@ -210,6 +212,51 @@ public:
      */
     void editorInput(const std::string &input);
 
+    /**
+     * @brief Move to the Cursor to the Buffer Position
+     */
+    std::string moveCursorToPosition();
+
+    /**
+     * @brief Scroll Screen the Text Up
+     */
+    std::string scrollTextBoxUp(std::string &output);
+
+    /**
+     * @brief Scroll Screen the Text Down
+     */
+    std::string scrollTextBoxDown(std::string &output);
+
+    /**
+     * @brief Handle Backspaces
+     * @param output
+     */
+    void handleBackSpace(std::string &output);
+
+    /**
+     * @brief Handle Deletes Inline
+     * @param output
+     */
+    void handleDelete(std::string &output);
+
+    /**
+     * @brief Handle New Lines
+     * @param output
+     */
+    void handleNewLines(std::string &output);
+
+    /**
+     * @brief Process Text Input for Editor
+     * @return
+     */
+    void processTextInput(std::string result, std::string input);
+
+    /**
+     * @brief Process Escaped and Control Input Keys for Editor
+     * @return
+     */
+    void processEscapedInput(std::string result, std::string input);
+
 
 private:
 
@@ -221,6 +268,7 @@ private:
     SessionIO              m_session_io;
     std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
+    processor_text_ptr     m_text_process;
 
     int                    m_mod_function_index;
     int                    m_mod_setup_index;
@@ -231,6 +279,8 @@ private:
     int                    m_text_box_bottom;
     int                    m_text_box_left;
     int                    m_text_box_right;
+    int                    m_text_box_height;
+    int                    m_text_box_width;
 
     CommonIO               m_common_io;
 

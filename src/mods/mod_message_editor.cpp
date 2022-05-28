@@ -1,5 +1,7 @@
 #include "mod_message_editor.hpp"
-#include "../ansi_processor.hpp"
+
+#include "../processor_ansi.hpp"
+#include "../processor_text.hpp"
 #include "../logging.hpp"
 
 #include <string>
@@ -164,7 +166,7 @@ void ModMessageEditor::displayPromptAndNewLine(const std::string &prompt)
  * @param screen
  * @return
  */
-std::string ModMessageEditor::processTopTemplate(ansi_process_ptr ansi_process, const std::string &screen)
+std::string ModMessageEditor::processTopTemplate(processor_ansi_ptr ansi_process, const std::string &screen)
 {
     /**
      * When we get 2J alone, it clears but leaves cursor.
@@ -186,7 +188,7 @@ std::string ModMessageEditor::processTopTemplate(ansi_process_ptr ansi_process, 
     }
 
     ansi_process->clearScreen();
-    ansi_process->parseAnsiScreen((char *)new_screen.c_str());
+    ansi_process->parseTextToBuffer((char *)new_screen.c_str());
     m_text_box_top = ansi_process->getMaxRowsUsedOnScreen() + 1;
 
     return ansi_process->getScreenFromBuffer(true);
@@ -198,11 +200,11 @@ std::string ModMessageEditor::processTopTemplate(ansi_process_ptr ansi_process, 
  * @param screen
  * @return
  */
-std::string ModMessageEditor::processBottomTemplate(ansi_process_ptr ansi_process, const std::string &screen)
+std::string ModMessageEditor::processBottomTemplate(processor_ansi_ptr ansi_process, const std::string &screen)
 {
     std::string new_screen = screen;
     ansi_process->clearScreen();
-    ansi_process->parseAnsiScreen((char *)new_screen.c_str());
+    ansi_process->parseTextToBuffer((char *)new_screen.c_str());
     int rows_used = ansi_process->getMaxRowsUsedOnScreen();
 
     // We have size of footer, now subtract from screen height to get bottom margin.
@@ -250,7 +252,7 @@ void ModMessageEditor::scrubNewLinesChars(std::string &screen)
  * @param screen
  * @return
  */
-std::string ModMessageEditor::processMidTemplate(ansi_process_ptr ansi_process, const std::string &screen)
+std::string ModMessageEditor::processMidTemplate(processor_ansi_ptr ansi_process, const std::string &screen)
 {
     std::string new_screen = screen;
     scrubNewLinesChars(new_screen);
@@ -266,7 +268,7 @@ std::string ModMessageEditor::processMidTemplate(ansi_process_ptr ansi_process, 
 
     // Load, then pull MCI off-sets on the screen for margins.
     ansi_process->clearScreen();
-    ansi_process->parseAnsiScreen((char *)new_screen.c_str());
+    ansi_process->parseTextToBuffer((char *)new_screen.c_str());
     m_text_box_left  = ansi_process->getMCIOffSet("|LT");
     m_text_box_right = ansi_process->getMCIOffSet("|RT");
 
@@ -280,7 +282,7 @@ std::string ModMessageEditor::processMidTemplate(ansi_process_ptr ansi_process, 
     ansi_process->clearScreen();
     std::string output_screen = m_session_io.parseCodeMapGenerics(new_screen, code_map);
 
-    ansi_process->parseAnsiScreen((char *)output_screen.c_str());
+    ansi_process->parseTextToBuffer((char *)output_screen.c_str());
 
     std::string mid_screen_line = ansi_process->getScreenFromBuffer(false);
     new_screen.erase();
@@ -305,11 +307,11 @@ void ModMessageEditor::setupEditor()
     std::string mid_template = m_common_io.readinAnsi("FSEMID.ANS");
     std::string bot_template = m_common_io.readinAnsi("FSEEND.ANS");
 
-    // Use a Local Ansi Parser for Pasrsing Menu Templates and determine boundaries.
-    ansi_process_ptr ansi_process(new AnsiProcessor(
-                                      m_session_data->m_telnet_state->getTermRows(),
-                                      m_session_data->m_telnet_state->getTermCols())
-                                 );
+    // Use a Local Ansi Parser for Parsing Menu Templates and determine boundaries.
+    processor_ansi_ptr ansi_process(new ProcessorAnsi(
+                                        m_session_data->m_telnet_state->getTermRows(),
+                                        m_session_data->m_telnet_state->getTermCols())
+                                   );
 
     // Parse the TOP Screen to get Top Text Margin
     std::string top_screen = processTopTemplate(ansi_process, top_template);
@@ -326,6 +328,17 @@ void ModMessageEditor::setupEditor()
     log->xrmLog<Logging::DEBUG_LOG>("m_text_box_top=", m_text_box_top, "m_text_box_bottom=", m_text_box_bottom,
                                     "m_text_box_left=", m_text_box_left, "m_text_box_right=", m_text_box_right);
 
+    // Setup the Text Parser Init the Parser with template data.
+    m_text_box_height = m_text_box_bottom - m_text_box_top;
+    m_text_box_width = m_text_box_right - m_text_box_left;
+
+    // Adjust to minus 1 from bottom.
+    m_text_box_height += 1;
+
+
+    log->xrmLog<Logging::DEBUG_LOG>("m_text_process - height=", m_text_box_height, "width=", m_text_box_width);
+    m_text_process.reset(new ProcessorText(m_text_box_height, m_text_box_width));
+
     // Next combine and output.. Move cursor to top left in box.
     std::string screen_output = top_screen + mid_screen + bot_screen;
     screen_output += "\x1b[" + std::to_string(m_text_box_top) + ";" + std::to_string(m_text_box_left) + "H";
@@ -340,49 +353,303 @@ void ModMessageEditor::setupEditor()
 void ModMessageEditor::editorInput(const std::string &input)
 {
     Logging *log = Logging::instance();
-    std::string result = m_session_io.getKeyInput(input);
+    std::string result = m_session_io.getFSEKeyInput(input);
 
     if(result.size() == 0)
     {
-        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [result.size() == 0] input result=", result);
         return;
     }
-    else if(result[0] == 13 || result[0] == 10)
+
+    std::cout << "result: " << result << ", input: " << input << std::endl;
+
+    if(result[0] == 13 || result[0] == 10)
     {
         // Translations for ENTER next line
         //input = "ENTER";
-        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ENTER HIT] input result=", result);
-        std::string output = "\r\n\x1b[" + std::to_string(m_text_box_left - 1) + "C";
-        baseProcessDeliverInput(output);
+        log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [ENTER HIT] input result=", result);
+        //std::string output = "\r\n\x1b[" + std::to_string(m_text_box_left - 1) + "C";
+
+        processTextInput(result, input);
     }
     else if(result[0] == '\x1b' && result.size() > 2)
     {
         // ESC SEQUENCE - check movement / arrow keys.
-        //input = result;
-        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ESC Sequence] input result=", result);
+        std::string escape_sequence = m_common_io.getEscapeSequence();
+        std::cout << "ESC= " << escape_sequence << std::endl;
+        log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 1] input result=", result);
+        processEscapedInput(result.substr(1), input);
     }
-    else if(result[0] == '\x1b' && result.size() == 1)
+    else if(result[0] == '\x1b' && result.size() == 2 && result[1] == '\x1b')
     {
         // Check Single ESC KEY - command options
         //input = "ESC";  - quit for now
-        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ESC HIT!] input result=", result);
-
+        log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [ESC HIT!] input result=", result);
         m_is_active = false;
     }
     else
     {
         // Handle Input Characters here and control chars.
-        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [STDIO] input result=", result);
+        log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [STDIO] input result=", result);
+
+        if(result[0] == '\x1b')
+        {
+            std::string escape_sequence = m_common_io.getEscapeSequence();
+            std::cout << "ESC= " << escape_sequence << std::endl;
+            log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 2] input result=", static_cast<int>(escape_sequence[0]));
+
+            // Hot Key Input, cutoff leading escape for control key.
+            processEscapedInput(result.substr(1), input);
+            return;
+        }
 
         for(char c : result)
-            log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [c HIT] input result=", static_cast<int>(c));
+            log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [c HIT] input result=", static_cast<int>(c));
 
-        std::string escape_sequence = m_common_io.getEscapeSequence();
-        log->xrmLog<Logging::DEBUG_LOG>("[editorInput] [ESC Sequence] input result=", static_cast<int>(escape_sequence[0]));
-
-        // Hot Key Input.
-        baseProcessDeliverInput(result);
+        processTextInput(result, input);
     }
 
     return;
+}
+
+/**
+ * @brief Move to the Cursor to the Buffer Position
+ */
+std::string ModMessageEditor::moveCursorToPosition()
+{
+    std::string output = "";
+    output += "\x1b[";
+    output += std::to_string((m_text_process->getYPosition()-1) + m_text_box_top) + ";";
+    output += std::to_string((m_text_process->getXPosition()-1) + m_text_box_left) + "H";
+    return output;
+}
+
+/**
+ * @brief Scroll Screen the Text Up
+ */
+std::string ModMessageEditor::scrollTextBoxUp(std::string &output)
+{
+    // Placeholder
+    return output;
+}
+
+/**
+ * @brief Scroll Screen the Text Down
+ */
+std::string ModMessageEditor::scrollTextBoxDown(std::string &output)
+{
+    // Placeholder
+    return output;
+}
+
+/**
+ * @brief Handle Backspaces
+ * @param output
+ */
+void ModMessageEditor::handleBackSpace(std::string &output)
+{
+    int x_position = m_text_process->getXPosition();
+
+    // destructive backspace
+    if(x_position > 1)
+    {
+        m_text_process->parseTextToBuffer((char *)"\b");
+        output += "\x1b[D \x1b[D";
+    }
+    // detsructive backspace move up and end of line
+    else if(x_position == 1)
+    {
+        m_text_process->parseTextToBuffer((char *)"\b");
+        output += moveCursorToPosition();
+
+        // Also need to bring text up with it!
+    }
+}
+
+/**
+ * @brief Handle Deletes Inline
+ * @param output
+ */
+void ModMessageEditor::handleDelete(std::string &output)
+{
+    /** Need to Write code to delete char or space and move everything left **/
+
+    int x_position = m_text_process->getXPosition();
+
+    // destructive backspace
+    if(x_position > 1)
+    {
+        m_text_process->parseTextToBuffer((char *)"\b");
+        output += "\x1b[D \x1b[D";
+    }
+    // detsructive backspace move up and end of line
+    else if(x_position == 1)
+    {
+        m_text_process->parseTextToBuffer((char *)"\b");
+        output += moveCursorToPosition();
+
+        // Also need to bring text up with it!
+    }
+}
+
+/**
+ * @brief Handle New Lines
+ * @param output
+ */
+void ModMessageEditor::handleNewLines(std::string &output)
+{
+    m_text_process->parseTextToBuffer((char *)"\n");
+    output += moveCursorToPosition();
+}
+
+/**
+ * @brief Process Input Text for Editor
+ * @return
+ */
+void ModMessageEditor::processTextInput(std::string result, std::string input)
+{
+
+    // Just some testing figuring out the best design.
+
+    std::string output = "";
+    int x_position = m_text_process->getXPosition();
+    int y_position = m_text_process->getYPosition();
+    std::cout << "x_pos: " << x_position << std::endl;
+    std::cout << "y_pos: " << y_position << std::endl;
+
+    if(result[0] != '\x7f' && result[0] != '\x08' && result[0] != '\r' && result[0] != '\n') // && result[0] != '\x1b')
+    {
+        m_text_process->parseTextToBuffer((char *)input.c_str());
+        output = input;
+    }
+
+    // Handle Backspaces or Delete depending on User Switch
+    if(result[0] == '\x7f')
+    {
+        if(m_session_data->m_user_record->bBackSpaceVt100)
+            handleBackSpace(output);
+        else
+            handleDelete(output);
+    }
+    else if(result[0] == '\x08')
+    {
+        if(!m_session_data->m_user_record->bBackSpaceVt100)
+            handleBackSpace(output);
+        else
+            handleDelete(output);
+    }
+    // CRLF New Line
+    else if(result[0] == '\r' || result[0] == '\n')
+    {
+        handleNewLines(output);
+    }
+    // Wrap Around and Move Down at end of line
+    else if(x_position == m_text_box_width && y_position != m_text_box_height)
+    {
+        //output += moveCursorToPosition();
+    }
+    // Bottom of box, scroll up a line up, and move to begininng.
+    else if(y_position == m_text_box_height && x_position == m_text_box_width)
+    {
+        //output += moveCursorToPosition();
+        m_text_process->parseTextToBuffer((char *)"\n");
+        //output += moveCursorToPosition();
+        // Scroll Box Up!
+
+    }
+
+    /*
+    std::cout << "=========w max " << m_text_box_width << " " << m_text_box_left << std::endl;
+    std::cout << "=========h max " << m_text_box_height << " " << m_text_box_top << std::endl;
+
+    std::cout << "x_pos: " << m_text_process->getXPosition() << std::endl;
+    std::cout << "y_pos: " << m_text_process->getYPosition() << std::endl;
+    */
+
+    output += moveCursorToPosition();
+
+    int line_num = m_text_process->getCurrentLine();
+    std::string row_col_stamp = "\x1b[25;1H Pos# L/X/Y ( " +
+                                std::to_string(line_num) + " / "+
+                                std::to_string(m_text_process->getXPosition()) + " / "  +
+                                std::to_string(m_text_process->getYPosition()) + " )    ";
+    row_col_stamp += output;
+
+    // Write output to Client Screen
+    baseProcessDeliverInput(row_col_stamp);
+}
+
+/**
+ * @brief Process Escaped and Control Input Keys for Editor
+ * @return
+ */
+void ModMessageEditor::processEscapedInput(std::string result, std::string input)
+{
+
+    // Just some testing figuring out the best design.
+
+    std::string output = "";
+    int x_position = m_text_process->getXPosition();
+    int y_position = m_text_process->getYPosition();
+    std::cout << "x_pos: " << x_position << std::endl;
+    std::cout << "y_pos: " << y_position << std::endl;
+
+    std::cout << "processedEscapedInput result= " << result << ", input= " << input << std::endl;
+
+    if(result == "rt_arrow")
+    {
+        if(x_position < m_text_box_width)
+        {
+            m_text_process->moveNextXPosition();
+            //output = "\x1b[C";
+        }
+    }
+    else if(result == "lt_arrow")
+    {
+        if(x_position > 1)
+        {
+            m_text_process->movePreviousXPosition();
+            //output = "\x1b[D";
+        }
+    }
+    else if(result == "up_arrow")
+    {
+        if(y_position > 1)
+        {
+            m_text_process->movePreviousYPosition();
+            //output = "\x1b[A";
+        }
+    }
+    else if(result == "dn_arrow")
+    {
+        if(y_position < m_text_box_height)
+        {
+            m_text_process->moveNextYPosition();
+            //output = "\x1b[B";
+        }
+    }
+    else if(result == "home")
+    {
+        m_text_process->moveHomePosition();
+        //output = moveCursorToPosition();
+    }
+    else if(result == "end")
+    {
+        m_text_process->moveEndPosition();
+        //output = moveCursorToPosition();
+    }
+
+    std::cout << "output: " << output << std::endl;
+
+    output += moveCursorToPosition();
+
+    int line_num = m_text_process->getCurrentLine();
+    std::string row_col_stamp = "\x1b[25;1H Pos# L/X/Y ( " +
+                                std::to_string(line_num) + " / "+
+                                std::to_string(m_text_process->getXPosition()) + " / "  +
+                                std::to_string(m_text_process->getYPosition()) + " )    ";
+
+    row_col_stamp += output;
+
+    // Write output to Client Screen
+    baseProcessDeliverInput(row_col_stamp);
 }

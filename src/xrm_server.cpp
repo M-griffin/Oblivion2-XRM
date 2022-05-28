@@ -55,14 +55,45 @@ std::string USERS_DATABASE = "";
 
 Logging* Logging::m_global_logging_instance = nullptr;
 
+
+/**
+ * @brief Gracefull Shutdown Method.
+ */
+void atExitFunction()
+{
+    // Check for any remaining LOG Writes, then exit gracefully.
+    if(Logging::isActive())
+    {
+        int log_entries = Logging::instance()->getNumberOfLogEntries();
+
+        for(int i = 0; i < log_entries; i++)
+        {
+            log_entry_ptr entry = Logging::instance()->getLogQueueEntry();
+
+            if(entry != nullptr)
+            {
+                Logging::instance()->writeOutYamlFile(entry);
+            }
+        }
+    }
+
+    TheCommunicator::releaseInstance();
+    Encoding::releaseInstance();
+    Logging::releaseInstance();
+    std::cout << std::endl << "XRM SHUTDOWN COMPLETED!" << std::endl;
+}
+
 /**
  * @brief Main Program Entrance.
  *        Not using Parameters at this time.  Enable lateron.
  * @return
  */
-// auto main(int argc, char* argv[]) -> int
 auto main() -> int
 {
+
+    // Setup Cleanup method when program exits.
+    std::atexit(atExitFunction);
+
     std::cout << "Oblivion/2 XRM-Server (c) 2015-2019 Michael Griffin."
               << std::endl
               << std::endl;
@@ -109,7 +140,6 @@ auto main() -> int
         if(!config)
         {
             std::cout << "Unable to allocate config structure" << std::endl;
-            Encoding::releaseInstance();
             exit(1);
         }
 
@@ -128,42 +158,16 @@ auto main() -> int
 
         if(!cfg.validation())
         {
-            Encoding::releaseInstance();
+            std::cout << "Unable to validate config structure" << std::endl;
             exit(1);
         }
+
 
         // All Good, Attached to Global Communicator Instance.
+        // This also controls logging, need to start this prior to any
+        // any logging objects being used.
         TheCommunicator::instance()->attachConfiguration(config);
         Logging::instance()->xrmLog<Logging::CONSOLE_LOG>("Starting up Oblivion/2 XRM-Server");
-    }
-
-    // Initial Config File Read, and Start ASIO Server.
-    {
-        // Default Config Instance
-        config_ptr config(new Config());
-
-        if(!config)
-        {
-            std::cout << "Unable to allocate config structure" << std::endl;
-            Encoding::releaseInstance();
-            Logging::releaseInstance();
-            Communicator::releaseInstance();
-            exit(1);
-        }
-
-        // Setup the Data Access Object
-        //config_dao_ptr cfg(config, GLOBAL_BBS_PATH);
-        ConfigDao cfg(config, GLOBAL_BBS_PATH);
-
-        if(!cfg.loadConfig())
-        {
-            // TODO Throws exception right now, need to work in
-            // better shutdown on from this point! just assert for now.
-            Encoding::releaseInstance();
-            Logging::releaseInstance();
-            Communicator::releaseInstance();
-            exit(1);
-        }
     }
 
     // Database Startup in it's own context.
@@ -174,6 +178,8 @@ auto main() -> int
         // Write all error logs and exit.
         if(!db_startup)
         {
+            // DataBase Startup Failed
+            std::cout << "Database Startup failed, writting system logs" << std::endl;
             int log_entries = Logging::instance()->getNumberOfLogEntries();
 
             for(int i = 0; i < log_entries; i++)
@@ -185,12 +191,6 @@ auto main() -> int
                     Logging::instance()->writeOutYamlFile(entry);
                 }
             }
-
-            Encoding::releaseInstance();
-            Logging::releaseInstance();
-            TheCommunicator::releaseInstance();
-
-            exit(1);
         }
     }
 
@@ -201,7 +201,6 @@ auto main() -> int
 
         IOService io_service;
         interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", config->port_telnet));
-
 
         while(TheCommunicator::instance()->isActive())
         {
@@ -223,12 +222,6 @@ auto main() -> int
             std::this_thread::sleep_for(std::chrono::milliseconds(40));
         }
     }
-
-
-    // Release singleton instances Instance
-    Encoding::releaseInstance();
-    Logging::releaseInstance();
-    TheCommunicator::releaseInstance();
 
     return 0;
 }
