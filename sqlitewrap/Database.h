@@ -25,7 +25,7 @@
 
 namespace SQLW
 {
-// handle unused paramters for template funcations.
+// handle unused parameters for template functions.
 #define UNUSED(x) [&x]{}()
 
 // Forward Declarations

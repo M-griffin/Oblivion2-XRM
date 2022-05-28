@@ -83,7 +83,7 @@ public:
     void createTextPrompts();
 
     /**
-     * @brief Sets an indivdual module index.
+     * @brief Sets an individual module index.
      * @param mod_function_index
      */
     void changeModule(int mod_function_index);
@@ -106,7 +106,7 @@ private:
     CommonIO               m_common_io;
     directory_ptr          m_directory;
 
-    // Hold instatnce of user trying to login to the system.
+    // Hold instance of user trying to login to the system.
     //user_ptr             m_logon_user;
 };
 

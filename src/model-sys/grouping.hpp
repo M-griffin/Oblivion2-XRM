@@ -17,17 +17,17 @@ typedef std::shared_ptr<Grouping> group_ptr;
 class Grouping
 {
 public:
-        
+
     long        iId;
     long        iConferenceId;
     long        iAreaId;
-    
+
     explicit Grouping()
         : iId(-1)
         , iConferenceId(-1)
         , iAreaId(-1)
     { }
-    
+
     ~Grouping()
     { }
 

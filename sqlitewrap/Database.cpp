@@ -102,7 +102,7 @@ Database::DatabasePool *Database::addDatabasePool()
             return nullptr;
         }
 
-        // Look into shared chache more!
+        // Look into shared cache more!
         // int sqlite3_enable_shared_cache(int);
         // SQLITE_OPEN_SHAREDCACHE.
         int rc = sqlite3_open_v2(m_database.c_str(), &odb->db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE, NULL);

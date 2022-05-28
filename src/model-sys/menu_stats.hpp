@@ -17,14 +17,14 @@ class MenuStats
 {
 public:
 
-    explicit MenuStats()    
+    explicit MenuStats()
         : iId(-1)
         , sMenuName("")
         , sCmdKey("")
         , dtDateTime(0)
     {
     }
-    
+
     long iId;
     std::string sMenuName;
     std::string sCmdKey;

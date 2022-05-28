@@ -101,7 +101,7 @@ void SessionData::handleRead(const std::error_code& error, socket_handler_ptr)
 
                     // Only on Single ESC Sequence,  Start Deadline timer
                     // To Catch remaining broken up ESC Sequences or
-                    // Determine if this is a lone ESC secuence
+                    // Determine if this is a lone ESC sequence
                     if (m_parsed_data[m_parsed_data.size()-1] == '\x1b')
                     {
                         start_esc_timer();
@@ -147,7 +147,7 @@ void SessionData::handleRead(const std::error_code& error, socket_handler_ptr)
             {
                 m_is_leaving = true;
 
-                // Disconenct the session.
+                // Disconnect the session.
                 session_manager->leave(m_node_number);
                 // m_session_state = SESSION_STATE::STATE_DONE;
 
@@ -166,7 +166,7 @@ void SessionData::handleRead(const std::error_code& error, socket_handler_ptr)
  */
 void SessionData::handleEscTimer()
 {
-    // Move text to State Machine, Timer has passed, or remainer of Sequence caught up!
+    // Move text to State Machine, Timer has passed, or remainder of Sequence caught up!
     m_state_manager->update();
     m_is_esc_timer = false;
 }

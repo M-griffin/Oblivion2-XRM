@@ -48,3 +48,8 @@ build-new/
 build/DATA/
 win32/Debug/
 .vscode/settings.json
+.idea/
+.vscode/
+.vs/
+win32-vs/
+*.bkp

@@ -13,8 +13,8 @@
  * Base Dao Calls for generic Object Data Calls
  * (Below This Point)
  */
- 
- 
+
+
 /**
  * @brief Check If Database Table Exists.
  * @return
@@ -83,8 +83,8 @@ bool NetworkDao::deleteRecord(long id)
 /**
  * @brief Retrieve Record By Id.
  * @param id
- * @return 
- */ 
+ * @return
+ */
 network_ptr NetworkDao::getRecordById(long id)
 {
     return baseGetRecordById(id);
@@ -116,16 +116,16 @@ long NetworkDao::getRecordsCount()
 
 
 /**
- * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+ * @brief (CallBack) Pulls results by FieldNames into their Class Variables.
  * @param qry
  * @param obj
  */
 void NetworkDao::pullNetworkResult(query_ptr qry, network_ptr obj)
 {
     qry->getFieldByName("iId", obj->iId);
-    qry->getFieldByName("sName", obj->sName);    
+    qry->getFieldByName("sName", obj->sName);
     qry->getFieldByName("sType", obj->sType);
-    qry->getFieldByName("sAddress", obj->sAddress);    
+    qry->getFieldByName("sAddress", obj->sAddress);
 }
 
 /**
@@ -133,21 +133,21 @@ void NetworkDao::pullNetworkResult(query_ptr qry, network_ptr obj)
  * @param qry
  * @param obj
  * @param values
- */ 
-void NetworkDao::fillNetworkColumnValues(query_ptr qry, network_ptr obj, 
+ */
+void NetworkDao::fillNetworkColumnValues(query_ptr qry, network_ptr obj,
     std::vector< std::pair<std::string, std::string> > &values)
 {
     // values.push_back(qry->translateFieldName("iId", conf->iId));
     values.push_back(qry->translateFieldName("sName", obj->sName));
     values.push_back(qry->translateFieldName("sType", obj->sType));
-    values.push_back(qry->translateFieldName("sAddress", obj->sAddress));    
+    values.push_back(qry->translateFieldName("sAddress", obj->sAddress));
 }
 
 /**
- * @brief (Callback) Create Record Insert Statement, returns query string 
+ * @brief (Callback) Create Record Insert Statement, returns query string
  * @param qry
  * @param obj
- * @return 
+ * @return
  */
 std::string NetworkDao::insertNetworkQryString(std::string qry, network_ptr obj)
 {
@@ -162,15 +162,15 @@ std::string NetworkDao::insertNetworkQryString(std::string qry, network_ptr obj)
 }
 
 /**
- * @brief (CallBack) Update Existing Record. 
+ * @brief (CallBack) Update Existing Record.
  * @param qry
  * @param obj
- * @return 
+ * @return
  */
 std::string NetworkDao::updateNetworkQryString(std::string qry, network_ptr obj)
-{    
+{
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),        
+    std::string result = sqlite3_mprintf(qry.c_str(),
         obj->sName.c_str(),
         obj->sType.c_str(),
         obj->sAddress.c_str(),

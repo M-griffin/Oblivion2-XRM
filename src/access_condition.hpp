@@ -72,7 +72,7 @@ public:
     bool checkAccessConditionFlag(unsigned char flag, bool first_set, user_ptr user);
 
     /**
-     * @brief Sets a Default String of Bitflags On
+     * @brief Sets a Default String of Bit flags On
      * @param bitString
      * @param first_set
      * @param user
@@ -80,7 +80,7 @@ public:
     void setAccessConditionsFlagsOn(std::string bitString, bool first_set, user_ptr user);
 
     /**
-     * @brief Sets a Default String of Bitflags Off
+     * @brief Sets a Default String of Bit flags Off
      * @param bitString
      * @param first_set
      * @param user
@@ -103,7 +103,7 @@ public:
     std::vector<MapType> parseAcsString(const std::string &acs_string);
 
     /**
-     * @brief Parses and Validates codemap
+     * @brief Parses and Validates code map
      * @param acs_string
      * @param user
      * @return
@@ -120,10 +120,10 @@ public:
     // Using Session IO for Code Mapping
     SessionIO  m_session_io;
 
-    // note update to secutiry expressions
+    // note update to security expressions
     // start with NOT s255 then test for s255
     // start with all not, but all normal will get caught and never pass through.
-    // seperate expressons with | or. and ( )
+    // separate expressions with | or. and ( )
     const std::string ACS_EXPRESSION =
     {
         "([~]{1}[sS]{1}\\d{1,3})|([sS]{1}\\d{1,3})|"

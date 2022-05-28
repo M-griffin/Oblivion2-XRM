@@ -110,7 +110,7 @@ bool TextPromptsDao::readPrompts()
     // Load the file into the class.
     try
     {
-        // Clear and Existing Nodes first beload loading.
+        // Clear and Existing Nodes first before loading.
         if(m_node.size() > 0)
         {
             m_node.reset();

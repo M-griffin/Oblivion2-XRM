@@ -17,19 +17,19 @@ typedef std::shared_ptr<Network> network_ptr;
 class Network
 {
 public:
-  
+
     long        iId;
     std::string sName;
     std::string sType;
     std::string sAddress;
-    
+
     explicit Network()
         : iId(-1)
         , sName("")
         , sType("")
         , sAddress("")
     { }
-    
+
     ~Network()
     { }
 

@@ -145,7 +145,7 @@ auto main() -> int
 
         // Handle to Data Access Object,  at the moment were not using directories
         // Setup in the config, everything is branched from the main path.
-        // Later on we'll check config for overides only.
+        // Later on we'll check config for overrides only.
         ConfigDao cfg(config, GLOBAL_BBS_PATH);
 
         if(!cfg.fileExists())
@@ -218,7 +218,7 @@ auto main() -> int
                 }
             }
 
-            // Timer, for cpu useage
+            // Timer, for cpu usage
             std::this_thread::sleep_for(std::chrono::milliseconds(40));
         }
     }

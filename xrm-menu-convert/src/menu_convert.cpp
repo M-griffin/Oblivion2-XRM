@@ -277,8 +277,8 @@ bool MenuConvert::backup_menu()
     }
     catch(std::exception& e)
     {
-        std::cout << "erorr, unable to backup: " << m_current_menu << std::endl;
-        std::cout << "Excepton: " << e.what() << std::endl;
+        std::cout << "error, unable to backup: " << m_current_menu << std::endl;
+        std::cout << "Exception: " << e.what() << std::endl;
         result = false;
     }
 
@@ -321,7 +321,7 @@ void MenuConvert::process_menu()
         return;
     }
 
-    // Sort Menu's in accending order
+    // Sort Menu's in ascending order
     std::sort(result_set.begin(), result_set.end());
 
     // Setup and Create Backup Directory
@@ -397,7 +397,7 @@ auto main() -> int
 
         // Handle to Data Access Object,  at the moment were not using directories
         // Setup in the config, everything is branched from the main path.
-        // Later on we'll check config for overides only.
+        // Later on we'll check config for overrides only.
         ConfigDao cfg(config, GLOBAL_BBS_PATH);
 
         if(!cfg.fileExists())

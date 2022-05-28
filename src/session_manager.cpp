@@ -56,7 +56,7 @@ void SessionManager::deliver(std::string msg)
 
 /**
  * @brief Retrieve Number of users connected
- * Also helpful for determinging next node number.
+ * Also helpful for determining next node number.
  * @return
  */
 int SessionManager::connections()
@@ -72,7 +72,7 @@ int SessionManager::connections()
 }
 
 /**
- * @brief Broacaster Anchors the Sessions, we loop to shutdown all connections.
+ * @brief Broadcaster Anchors the Sessions, we loop to shutdown all connections.
  * @return
  */
 void SessionManager::shutdown()

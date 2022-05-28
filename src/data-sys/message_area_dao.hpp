@@ -9,7 +9,7 @@
 #include <functional>
 
 
-// Forward Declerations
+// Forward Decelerations
 namespace SQLW
 {
 class Database;
@@ -33,7 +33,7 @@ class MessageAreaDao
     : public baseMessageAreaClass
 {
 public:
-    
+
     explicit MessageAreaDao(SQLW::Database &database)
         : baseMessageAreaClass(database)
     {
@@ -49,7 +49,7 @@ public:
             "PRAGMA foreign_keys=ON; "
             "PRAGMA default_cache_size=10000; "
             "PRAGMA cache_size=10000; ";
-        
+
         // Check if Database Exists.
         m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
 
@@ -77,18 +77,18 @@ public:
 
         // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
         m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
-        
+
         // Setup the CallBack for Result Field Mapping
-        m_result_callback = std::bind(&MessageAreaDao::pullMessageAreaResult, this, 
+        m_result_callback = std::bind(&MessageAreaDao::pullMessageAreaResult, this,
             std::placeholders::_1, std::placeholders::_2);
-            
-        m_columns_callback = std::bind(&MessageAreaDao::fillMessageAreaColumnValues, this, 
+
+        m_columns_callback = std::bind(&MessageAreaDao::fillMessageAreaColumnValues, this,
             std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-            
-        m_insert_callback = std::bind(&MessageAreaDao::insertMessageAreaQryString, this, 
+
+        m_insert_callback = std::bind(&MessageAreaDao::insertMessageAreaQryString, this,
             std::placeholders::_1, std::placeholders::_2);
-        
-        m_update_callback = std::bind(&MessageAreaDao::updateMessageAreaQryString, this, 
+
+        m_update_callback = std::bind(&MessageAreaDao::updateMessageAreaQryString, this,
             std::placeholders::_1, std::placeholders::_2);
     }
 
@@ -101,14 +101,14 @@ public:
      * Base Dao Calls for generic Object Data Calls
      * (Below This Point)
      */
- 
- 
+
+
     /**
      * @brief Check If Database Table Exists.
      * @return
      */
     bool doesTableExist();
-    
+
     /**
      * @brief Run Setup Params for SQL Database Table.
      */
@@ -125,7 +125,7 @@ public:
      * @return
      */
     bool dropTable();
-    
+
     /**
      * @brief Updates a Record in the database!
      * @param obj
@@ -139,27 +139,27 @@ public:
      * @return
      */
     long insertRecord(message_area_ptr obj);
-        
+
     /**
      * @brief Deletes a MessageArea Record
      * @param areaId
      * @return
      */
     bool deleteRecord(long id);
-    
+
     /**
      * @brief Retrieve Record By Id.
      * @param id
-     * @return 
-     */ 
+     * @return
+     */
     message_area_ptr getRecordById(long id);
-    
+
     /**
      * @brief Retrieve All Records in a Table
      * @return
      */
     std::vector<message_area_ptr> getAllRecords();
-    
+
     /**
      * @brief Retrieve Count of All Records in a Table
      * @return
@@ -174,23 +174,23 @@ public:
 
 
     /**
-     * @brief (Callback) Create Record Insert Statement, returns query string 
+     * @brief (Callback) Create Record Insert Statement, returns query string
      * @param qry
      * @param obj
-     * @return 
+     * @return
      */
     std::string insertMessageAreaQryString(std::string qry, message_area_ptr obj);
 
     /**
-     * @brief (CallBack) Update Existing Record. 
+     * @brief (CallBack) Update Existing Record.
      * @param qry
      * @param obj
-     * @return 
+     * @return
      */
     std::string updateMessageAreaQryString(std::string qry, message_area_ptr obj);
-    
+
     /**
-     * @brief (CallBack) Pulls results by FieldNames into their Class Variables. 
+     * @brief (CallBack) Pulls results by FieldNames into their Class Variables.
      * @param qry
      * @param obj
      */
@@ -201,24 +201,24 @@ public:
      * @param qry
      * @param obj
      * @param values
-     */ 
-    void fillMessageAreaColumnValues(query_ptr qry, message_area_ptr obj, 
+     */
+    void fillMessageAreaColumnValues(query_ptr qry, message_area_ptr obj,
         std::vector< std::pair<std::string, std::string> > &values);
 
-    
+
     /**
      * One Off Methods SQL Queries not included in the BaseDao
      * (Below This Point)
      */
-        
-    
+
+
     /**
      * @brief Return List of All MessageArea by ConferenceId
      * @param areas
      * @return
-     */ 
+     */
     std::vector<message_area_ptr> getAllMessageAreasByConference(long confId);
-    
+
 };
 
 // Handle to Database Queries

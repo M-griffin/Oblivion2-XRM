@@ -53,7 +53,7 @@ public:
     /**
      * @brief Startup a Windows Specific External Process
      */
-    virtual bool createProcess() override; 
+    virtual bool createProcess() override;
 
     /**
      * @brief Checks if the process is still running

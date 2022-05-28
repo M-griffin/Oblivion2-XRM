@@ -45,7 +45,7 @@ SUITE(XRMProcessorAnsi)
     }
 
     // Test the Program Path is being read correctly.
-    TEST(parseAnsi_Test_Line_Wraping)
+    TEST(parseAnsi_Test_Line_Wrapping)
     {
         ProcessorAnsi ansi(25,80);
         ansi.parseTextToBuffer((char *)"\x1b[?7h");

@@ -1,3 +1,9 @@
+Change Log Update (00.00.150)
+* 2022-05-26
++ Updates for ReadTheDocs
+  Created Build Guilds for Linux, OS/X, Docker.
++ Mass Cleanup of source files typo cleanups.
+
 Change Log Update (00.00.149)
 * 2022-05-08
 + Corrections to OSX Project, Makefile(s) and dependencies in the Install Doc.

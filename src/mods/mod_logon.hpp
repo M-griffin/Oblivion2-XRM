@@ -101,7 +101,7 @@ public:
     void createTextPrompts();
 
     /**
-     * @brief Sets an indivdual module index.
+     * @brief Sets an individual module index.
      * @param mod_function_index
      */
     void changeModule(int mod_function_index);
@@ -252,7 +252,7 @@ private:
     int                    m_failure_attempts;
     bool                   m_is_text_prompt_exist;
 
-    // Hold instatnce of user trying to login to the system.
+    // Hold instance of user trying to login to the system.
     user_ptr               m_logon_user;
 };
 

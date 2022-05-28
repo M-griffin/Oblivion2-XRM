@@ -18,7 +18,7 @@
  */
 
 /**
- * @brief  Global Singleton Instance, needed to initalize the class.
+ * @brief  Global Singleton Instance, needed to initialize the class.
  */
 Encoding* Encoding::m_global_encoding_instance = nullptr;
 
@@ -31,7 +31,8 @@ const std::string Encoding::ENCODING_TEXT_CP437 = "CP437";
 
 static std::map<wchar_t, uint8_t> map_wide_to_cp437;
 
-// UCS2 Table Taranslations.
+// UCS2 Table Translations,
+// Note for future, do we need amiga translations too?
 wchar_t CP437_TABLE[] =
 {
     L'\u0000', L'\u263A', L'\u263B', L'\u2665', L'\u2666', L'\u2663',
@@ -93,8 +94,8 @@ Encoding::~Encoding()
 }
 
 /**
- * Windows apperently needs to use it's own WINAPI methods for Wide to Multi-bytes translations
- * Where as Linux can do it with default c++ libs and settin the locale.
+ * Windows apparently needs to use it's own WINAPI methods for Wide to Multi-bytes translations
+ * Where as Linux can do it with default c++ libs and setting the locale.
  *
  */
 #ifdef _WIN32
@@ -226,7 +227,7 @@ std::string Encoding::wide_to_multibyte(const std::wstring &wide_string)
             break;
         }
 
-        // Skip any Trailing / Embedded null from Wide -> multibtye
+        // Skip any Trailing / Embedded null from Wide -> multibyte
         // Conversion, don't send NULL's to the screen.
         for(char ch: mb)
         {

@@ -3,7 +3,7 @@
 
 #include <string>
 #include <ctime>
-#include <cstdint> 
+#include <cstdint>
 #include <memory>
 
 class SessionStats;
@@ -15,12 +15,12 @@ typedef std::weak_ptr<SessionStats> session_stats_weak_ptr;
  * @author Michael Griffin
  * @date 15/04/2017
  * @file session_stats.hpp
- * @brief Logs Stats Usage Per Session Connection 
+ * @brief Logs Stats Usage Per Session Connection
  */
 class SessionStats
 {
 public:
-        
+
     long iId;
     long iUserId;
     std::string sSessionType;
@@ -28,9 +28,9 @@ public:
     std::string sTerminal;
     std::string sIPAddress;
     int  iTermWidth;
-    int  iTermHeight;  
+    int  iTermHeight;
     long dtStartDate;
-    long dtEndDate;    
+    long dtEndDate;
     int  iInvalidAttempts;
     bool bLogonSuccess;
     bool bNewUser;
@@ -50,7 +50,7 @@ public:
         , sTerminal("ansi")
         , sIPAddress("localhost")
         , iTermWidth(0)
-        , iTermHeight(0)        
+        , iTermHeight(0)
         , dtStartDate(0)
         , dtEndDate(0)
         , iInvalidAttempts(0)
@@ -64,10 +64,10 @@ public:
         , iFilesUlMb(0)
         , iFilesDlMb(0)
     { }
-        
+
     ~SessionStats()
     { }
-    
+
 };
 
 #endif // SESSION_STATS_HPP

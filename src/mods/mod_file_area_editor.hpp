@@ -150,7 +150,7 @@ public:
     const std::string DISPLAY_LEVEL_FIELDS_VERSION_ID = "display_menu_field_version_id";
     const std::string DISPLAY_LEVEL_FIELDS_BORDER_ROW_COLOR = "display_menu_field_row_color";
     const std::string DISPLAY_LEVEL_FIELDS_TITLE = "display_menu_field_title";
-    const std::string DISPLAY_LEVEL_FIELDS_PASSWORD = "display_menu_field_passoword";
+    const std::string DISPLAY_LEVEL_FIELDS_PASSWORD = "display_menu_field_password";
     const std::string DISPLAY_LEVEL_FIELDS_FALLBACK = "display_menu_field_fallback";
     const std::string DISPLAY_LEVEL_FIELDS_HELP_ID = "display_menu_field_help_id";
     const std::string DISPLAY_LEVEL_FIELDS_NAME = "display_menu_field_name";

@@ -241,7 +241,7 @@ private:
 
     /**
      * @class FindFirst
-     * @brief Comparatior for options in vectors.
+     * @brief Comparator for options in vectors.
      */
     struct FindFirst
     {

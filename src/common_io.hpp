@@ -308,7 +308,7 @@ private:
     bool m_is_new_getline;         // GetLine
     bool m_is_new_leadoff;         // GetLine
 
-    // Parameterized ESC Sequcnes Translations.
+    // Parameterized ESC Sequences Translations.
     std::map<std::string, std::string> m_sequence_map;
 
 };

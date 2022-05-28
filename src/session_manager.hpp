@@ -26,7 +26,7 @@ public:
     ~SessionManager();
 
     /**
-     * @brief OverRides for Conencting TCP and SSL Sessions
+     * @brief OverRides for Connecting TCP and SSL Sessions
      * @param Session
      */
     void join(session_ptr session);

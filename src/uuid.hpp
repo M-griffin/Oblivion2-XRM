@@ -6,7 +6,7 @@
 extern "C"
 {
 #ifdef _WIN32
-// Winsock needed becasue Rpc includes windows.h.
+// Winsock needed because Rpc includes windows.h.
 #include <winsock2.h>
 #include <Rpc.h>
 #else

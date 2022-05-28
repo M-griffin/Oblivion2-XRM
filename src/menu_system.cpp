@@ -70,7 +70,7 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
         return;
     }
 
-    // This simplily passed through the input to the current system fuction were at.
+    // This simply passed through the input to the current system fuction were at.
     m_menu_functions[m_input_index](character_buffer, is_utf8);
 }
 
@@ -151,7 +151,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
         case 'F':
             return false;
 
-        // Goto Speicific X/Y Position on screen
+        // Goto Specific X/Y Position on screen
         case 'G':
             return false;
 
@@ -207,7 +207,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
         case 'T':
             return false;
 
-        // Sets Menu Libraray to # in cstring
+        // Sets Menu Library to # in cstring
         case 'V':
             return false;
 
@@ -229,7 +229,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
         case 'Y':
             return false;
 
-        // Pauses other commands untill output buffer is completed
+        // Pauses other commands until output buffer is completed
         // Might need to research this one more.
         case 'Z':
             return false;
@@ -431,7 +431,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
     switch(option.command_key[1])
     {
         // Logon
-        // {Not Implimented yet!}
+        // {Not Implemented yet!}
         //: When a CString is specified, PRELOGON.X, an
         //: USERLOG.X, and SYSPASS.X will be displayed.
         // { Note: add 0 for random! }
@@ -920,7 +920,7 @@ void MenuSystem::clearAllModules()
 }
 
 /**
- * @brief Exists and Shutsdown the current module
+ * @brief Exists and Shuts down the current module
  */
 void MenuSystem::shutdownModule()
 {
@@ -931,7 +931,7 @@ void MenuSystem::shutdownModule()
 }
 
 /**
- * @brief Exists and Shutsdown the current module
+ * @brief Exists and Shuts down the current module
  */
 void MenuSystem::startupModule(module_ptr module)
 {

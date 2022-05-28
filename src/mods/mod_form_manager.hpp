@@ -1,5 +1,5 @@
-#ifndef MOD_SYS_CONFIG_HPP
-#define MOD_SYS_CONFIG_HPP
+#ifndef MOD_FORM_MANAGER_HPP
+#define MOD_FORM_MANAGER_HPP
 
 #include "mod_base.hpp"
 
@@ -36,7 +36,6 @@ class ModFormManager
     : public ModBase
 {
 public:
-
     ModFormManager(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process);
 
     virtual ~ModFormManager() override
@@ -64,4 +63,4 @@ public:
 
 };
 
-#endif // MOD_SYS_CONFIG_HPP
+#endif // MOD_FORM_MANAGER_HPP

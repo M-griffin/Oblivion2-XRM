@@ -151,7 +151,7 @@ bool AccessCondition::checkAccessConditionFlag(unsigned char flag, bool first_se
 }
 
 /**
- * @brief Sets a Default String of Bitflags On
+ * @brief Sets a Default String of Bit flags On
  * @param bitString
  * @param first_set
  * @param user
@@ -165,7 +165,7 @@ void AccessCondition::setAccessConditionsFlagsOn(std::string bitString, bool fir
 }
 
 /**
- * @brief Sets a Default String of Bitflags Off
+ * @brief Sets a Default String of Bit flags Off
  * @param bitString
  * @param first_set
  * @param user
@@ -198,7 +198,7 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
     // Break out parsing on which pattern was matched.
     while(code_mapping.size() > 0)
     {
-        // Loop Backwards to perserve string offsets on replacement.
+        // Loop Backwards to preserve string offsets on replacement.
         my_matches = code_mapping.back();
         code_mapping.pop_back();
 
@@ -382,7 +382,7 @@ std::vector<MapType> AccessCondition::parseAcsString(const std::string &acs_stri
 }
 
 /**
- * @brief Parses and Validates codemap
+ * @brief Parses and Validates code map
  * @param acs_string
  * @param user
  * @return

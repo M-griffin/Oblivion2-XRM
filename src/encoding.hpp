@@ -24,7 +24,7 @@ public:
     static constexpr int ENCODE_UTF8  = 1;
 
     /**
-    * @brief Creates Singleton Instatce of Class
+    * @brief Creates Singleton Instance of Class
     * @return
     */
     static Encoding* instance()

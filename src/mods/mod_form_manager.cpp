@@ -12,7 +12,7 @@ ModFormManager::ModFormManager(session_data_ptr session_data, config_ptr config,
     , m_menu(new MenuBase(session_data))
     , m_form_manager(new FormManager(config, session_data))
 {
-    // Setup the Callback to Menu Option Exection to this base class.
+    // Setup the Callback to Menu Option Execution to this base class.
     m_menu->m_execute_callback.push_back(std::bind(&ModFormManager::menuOptionsCallback, this, std::placeholders::_1));
 }
 

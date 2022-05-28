@@ -36,13 +36,13 @@ public:
     bool saveConfig(config_ptr cfg);
 
     /**
-     * @brief Loads a Configuation file into the m_config stub for access.
+     * @brief Loads a Configuration file into the m_config stub for access.
      * @return
      */
     bool loadConfig();
-    
+
     /**
-     * @brief Validates settings for possiable conflicts
+     * @brief Validates settings for possible conflicts
      * @return
      */
     bool validation();
@@ -64,10 +64,10 @@ public:
         {
             return m_config;
         }
-		
+
 		return nullptr;
     }
-   
+
     config_ptr  m_config;
     std::string m_path;
     std::string m_filename;

@@ -25,7 +25,7 @@ class Communicator
 {
 public:
     /**
-     * @brief Creates Singleton Instatce of Class
+     * @brief Creates Singleton Instance of Class
      * @return
      */
     static Communicator* instance()
@@ -81,7 +81,7 @@ public:
     }
 
     /**
-     * @brief Links the Communicator with all active seesions
+     * @brief Links the Communicator with all active sessions
      * in the System so we can send notifications or chat
      * from anywhere in the system.
      * @param session_manager
@@ -93,7 +93,7 @@ public:
     }
 
     /**
-     * @brief Searchs and picks first free node number not in use.
+     * @brief Searches and picks first free node number not in use.
      * @return
      */
     int getNodeNumber()
@@ -191,7 +191,7 @@ public:
     }
 
     /**
-     * @brief Pull Global Prompts with muxtex for threads.
+     * @brief Pull Global Prompts with mutex for threads.
      * @param lookup
      * @return
      */

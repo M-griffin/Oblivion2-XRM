@@ -17,13 +17,13 @@ typedef std::shared_ptr<Conference> conference_ptr;
 class Conference
 {
 public:
-        
+
     long        iId;
     std::string sName;
     std::string sType;
     std::string sACS;
     long        iSortOrder;
-    
+
     explicit Conference()
         : iId(-1)
         , sName("")
@@ -31,7 +31,7 @@ public:
         , sACS("")
         , iSortOrder(-1)
     { }
-    
+
     ~Conference()
     { }
 

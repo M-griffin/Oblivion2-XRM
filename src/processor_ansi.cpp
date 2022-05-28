@@ -126,7 +126,7 @@ int ProcessorAnsi::getMCIOffSet(std::string mci_code)
     for(unsigned int i = 0; i < m_screen_buffer.size(); i++)
     {
 
-        // If buffer parse move past current cursor positon
+        // If buffer parse move past current cursor position
         if((i + 1) >= max)
         {
             break;
@@ -158,9 +158,9 @@ std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen)
     int fore = 0;
     int back = 0;
 
-    // We want to cound \0 characters in a row.
-    // These are unplotted so we use home cursor drawing
-    // and ESC[C to push the cursor forward without overwritting
+    // We want to count \0 characters in a row.
+    // These are not plotted so we use home cursor drawing
+    // and ESC[C to push the cursor forward without overwriting
     int padding = 0;
 
     std::string ansi_output = "";
@@ -176,7 +176,7 @@ std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen)
     {
         auto &buff = m_screen_buffer[i];
 
-        // If buffer parse move past current cursor positon
+        // If buffer parse move past current cursor position
         if(count >= (m_x_position + (m_y_position * m_characters_per_line)))
         {
             break;
@@ -249,7 +249,7 @@ std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen)
 
 
 /**
- * @brief Build the string for Lightbar coors and colors.
+ * @brief Build the string for Light bar coors and colors.
  * @param pulldown_id
  * @return
  */
@@ -323,11 +323,11 @@ int ProcessorAnsi::getMaxRowsUsedOnScreen()
 
 
 /**
- * @brief Parses through MCI Codes for Lightbars and Char Parameters.
+ * @brief Parses through MCI Codes for Light bars and Char Parameters.
  */
 std::string ProcessorAnsi::screenBufferParse()
 {
-    // Contains all matches found so we can iterate and reaplace
+    // Contains all matches found so we can iterate and replace
     // Without Multiple loops through the string.
     MapType my_matches;
     std::vector<MapType> code_map;
@@ -360,7 +360,7 @@ std::string ProcessorAnsi::screenBufferParse()
             /*
             std::cout << "Matched Sub '" << matches.str()
                       << "' following ' " << matches.prefix().str()
-                      << "' preceeding ' " << matches.suffix().str()
+                      << "' preceding ' " << matches.suffix().str()
                       << std::endl;*/
 
             // Avoid Infinite loop and make sure the existing
@@ -372,7 +372,7 @@ std::string ProcessorAnsi::screenBufferParse()
                 break;
             }
 
-            // Since were replacing on the fly, we need to rescan the screen for next code
+            // Since were replacing on the fly, we need to re-scan the screen for next code
             start = matches[0].second;
 
             // Loop each match, and grab the starting position and length to replace.
@@ -434,7 +434,7 @@ std::string ProcessorAnsi::screenBufferParse()
 
     while(code_map.size() > 0)
     {
-        // Loop Backwards to perserve string offsets on replacement.
+        // Loop Backwards to preserve string offsets on replacement.
         // Fastest to pop from back.
         my_matches = code_map.back();
         code_map.pop_back();
@@ -443,7 +443,7 @@ std::string ProcessorAnsi::screenBufferParse()
         switch(my_matches.m_match)
         {
             case 1:
-                // Then process and display the lightbars.
+            // Then process and display the light bars.
             {
                 int pull_id = 0;
                 std::stringstream ss;
@@ -480,7 +480,7 @@ std::string ProcessorAnsi::screenBufferParse()
         }
     }
 
-    // Clear Codemap.
+    // Clear Code map.
     std::vector<MapType>().swap(code_map);
     return ansi_string;
 }
@@ -493,7 +493,7 @@ void ProcessorAnsi::screenBufferSetGlyph(std::string char_sequence)
 {
     Logging *log = Logging::instance();
 
-    // Keep track of the lonest line in buffer for Centering screen.
+    // Keep track of the longest line in buffer for Centering screen.
     if(m_x_position > m_max_x_position)
     {
         m_max_x_position = m_x_position;
@@ -942,10 +942,10 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
                     break;
 
                 case SET_GRAPHICS_MODE:
-                    // Rebuild ESC Sequqnces and Attach Character Position
+                    // Rebuild ESC Sequences and Attach Character Position
                     // So when we draw out the ansi we can keep track
                     // Of what color everything is.
-                    esc_sequence.erase(); // Ignore ESC in color, we get that sepeartely.
+                    esc_sequence.erase(); // Ignore ESC in color, we get that separately.
 
                     //position = ((y_position-1) * characters_per_line) + (x_position-1);
 
@@ -1124,7 +1124,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
 
                 case SET_KEYBOARD_STRINGS:
                     esc_sequence.clear();
-                    // Ingored!
+                    // Ignored!
                     break;
 
                 default:
@@ -1148,7 +1148,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
             if(buffer.length == 1 && nextBuffer.length == 1 &&
                     buffer.character[0] == '\r' && nextBuffer.character[0] == '\n')
             {
-                *it++; // Incriment to \n (2) char combo.
+                *it++; // Increment to \n (2) char combo.
                 m_x_position = 1;
                 ++m_y_position;
 
