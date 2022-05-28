@@ -19,7 +19,7 @@
    :alt: Documentation Status
 
 .. image:: https://img.shields.io/badge/Discord-7289DA?style=flat&compact=true&logo=discord&logoColor=white
-   :target: https://discord.com/channels/441769144149475328/490661497190481951
+   :target: https://discord.gg/XwyVcmJtsU
    :alt: Discord Channel
 
 :raw-html:`<br />`
