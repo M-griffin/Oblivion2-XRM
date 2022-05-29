@@ -86,7 +86,7 @@ public:
      * from anywhere in the system.
      * @param session_manager
      */
-    void setupServer(session_manager_ptr &session_manager)
+    void setupServer(const session_manager_ptr &session_manager)
     {
         std::lock_guard<std::mutex> lock(m_data_mutex);
         m_session_manager = session_manager;

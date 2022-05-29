@@ -29,8 +29,8 @@ public:
     {
     }
 
-    Protocol(std::string name, std::string type, std::string key,
-        std::string path, std::string argu, bool batch, bool dszlog)
+    Protocol(const std::string &name, const std::string &type, const std::string &key,
+        const std::string &path, const std::string &argu, const bool &batch, const bool &dszlog)
         : protocol_name(name)
         , protocol_type(type) // Up/Download.
         , protocol_key(key)
@@ -66,7 +66,7 @@ public:
 
     const static std::string FILE_VERSION;
 
-    Protocols()
+    explicit Protocols()
         : file_version(FILE_VERSION)
     {
     }

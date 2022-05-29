@@ -180,7 +180,7 @@ CommonIO::~CommonIO()
  * @brief Retrieve Key Sequence by Value
  * @param value
  */
-std::string CommonIO::getSequenceFromMap(std::string value)
+std::string CommonIO::getSequenceFromMap(const std::string &value)
 {
     std::string key = "";
 
@@ -1292,7 +1292,7 @@ void CommonIO::parseLocalMCI(std::string &AnsiString, const std::string &mcicode
  * @brief Check if the file exists
  * @return
  */
-bool CommonIO::fileExists(std::string file_name)
+bool CommonIO::fileExists(const std::string &file_name)
 {
     std::string path = GLOBAL_TEXTFILE_PATH;
     pathAppend(path);
@@ -1312,7 +1312,7 @@ bool CommonIO::fileExists(std::string file_name)
 /**
  * Reads in ANSI file into Buffer Only
  */
-std::string CommonIO::readinAnsi(std::string file_name)
+std::string CommonIO::readinAnsi(const std::string &file_name)
 {
     std::string path = GLOBAL_TEXTFILE_PATH;
     pathAppend(path);
@@ -1400,7 +1400,7 @@ std::string CommonIO::standardDateTimeToString(std::time_t std_time)
 * @param date
 * @return
 */
-std::time_t CommonIO::stringToStandardDate(std::string date)
+std::time_t CommonIO::stringToStandardDate(const std::string &date)
 {
     // Append Time For Dates, need formatting's
     std::string key = date;
@@ -1425,7 +1425,7 @@ std::time_t CommonIO::stringToStandardDate(std::string date)
 * @param date_time
 * @return
 */
-std::time_t CommonIO::stringToStandardDateTime(std::string date_time)
+std::time_t CommonIO::stringToStandardDateTime(const std::string &date_time)
 {
     struct std::tm tm;
     std::istringstream ss(date_time);
@@ -1446,7 +1446,7 @@ std::time_t CommonIO::stringToStandardDateTime(std::string date_time)
 * @param value
 * @return
 */
-long CommonIO::stringToLong(std::string value)
+long CommonIO::stringToLong(const std::string &value)
 {
     long result_id = -1;
     std::stringstream ss(value);
@@ -1468,7 +1468,7 @@ long CommonIO::stringToLong(std::string value)
 * @param value
 * @return
 */
-int CommonIO::stringToInt(std::string value)
+int CommonIO::stringToInt(const std::string &value)
 {
     int result_id = -1;
     std::stringstream ss(value);
@@ -1490,7 +1490,7 @@ int CommonIO::stringToInt(std::string value)
 * @param value
 * @return
 */
-int CommonIO::stringToBool(std::string value)
+int CommonIO::stringToBool(const std::string &value)
 {
     // Test if string starts with T or F instead of typing True/False
     if(toupper(value[0]) == 'T')
@@ -1505,8 +1505,9 @@ int CommonIO::stringToBool(std::string value)
 * @brief Parses screen data into the Screen Buffer.
 * @return
 */
-void CommonIO::getNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
-                            std::string::iterator &line_end)
+void CommonIO::getNextGlyph(LocalizedBuffer &buffer, 
+                            std::string::iterator &it,
+                            const std::string::iterator &line_end)
 {
     buffer.clear();
 
@@ -1554,8 +1555,9 @@ void CommonIO::getNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
 * @brief Parses screen data into the Screen Buffer.
 * @return
 */
-void CommonIO::peekNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
-                             std::string::iterator &line_end)
+void CommonIO::peekNextGlyph(LocalizedBuffer &buffer, 
+                             std::string::iterator &it,
+                             const std::string::iterator &line_end)
 {
     buffer.clear();
 

@@ -35,7 +35,7 @@ public:
         std::vector<std::string>().swap(m_details);
     }
 
-    LogEntry(std::string date_time, std::vector<std::string> details)
+    LogEntry(const std::string &date_time, std::vector<std::string> details)
         : m_date_time(date_time)
         , m_details(details)
     { }
@@ -164,7 +164,7 @@ public:
      * @param log_level
      * @return
      */
-    int getConfigurationLogState(std::string log_level)
+    int getConfigurationLogState(const std::string &log_level)
     {
         if(log_level == "INFO")
             return 0;
@@ -214,13 +214,13 @@ public:
         {
             // Incoming Logging Level
             case INFO_LOG:
-                if(config_level != INFO_LOG && INFO_LOG != ALL_LOGS)
+                if(config_level != INFO_LOG && config_level != ALL_LOGS)
                     return;
 
                 break;
 
             case DEBUG_LOG:
-                if(config_level != DEBUG_LOG && INFO_LOG != ALL_LOGS)
+                if(config_level != DEBUG_LOG && config_level != ALL_LOGS)
                     return;
 
                 break;
@@ -279,7 +279,7 @@ public:
      * @param date_time
      * @param details
      */
-    void writeOutYamlConsole(std::string date_time, std::vector<std::string> details)
+    void writeOutYamlConsole(const std::string &date_time, std::vector<std::string> details)
     {
         YAML::Emitter out;
 

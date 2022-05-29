@@ -12,7 +12,7 @@
 // Setup the file version for the config file.
 const std::string Menu::FILE_VERSION = "1.0.1";
 
-MenuDao::MenuDao(menu_ptr menu, std::string menu_name, std::string path)
+MenuDao::MenuDao(menu_ptr menu, const std::string &menu_name, const std::string &path)
     : m_menu(menu)
     , m_path(path)
     , m_filename(menu_name)

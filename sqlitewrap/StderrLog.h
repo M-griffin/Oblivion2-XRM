@@ -22,8 +22,8 @@ class Database;
 class StderrLog : public IError
 {
 public:
-    void databaseError(Database&, const std::string&);
-    void databaseError(Database&, Query&, const std::string&);
+    void databaseError(Database&, const std::string&) override;
+    void databaseError(Database&, Query&, const std::string&) override;
 };
 
 } // namespace SQLW {

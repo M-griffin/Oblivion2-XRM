@@ -11,7 +11,7 @@
 const std::string TextPromptsDao::FILE_VERSION = "1.0.1";
 static bool is_version_displayed = false;
 
-TextPromptsDao::TextPromptsDao(std::string path, std::string filename)
+TextPromptsDao::TextPromptsDao(std::string path, const std::string &filename)
     : m_path(path)
     , m_filename(filename)
     , m_is_loaded(false)

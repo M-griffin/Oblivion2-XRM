@@ -12,7 +12,9 @@
 // Setup the file version for the config file.
 const std::string MenuPrompt::FILE_VERSION = "1.0.0";
 
-MenuPromptDao::MenuPromptDao(menu_prompt_ptr menu_prompt, std::string menu_prompt_name, std::string path)
+MenuPromptDao::MenuPromptDao(menu_prompt_ptr menu_prompt, 
+                             const std::string &menu_prompt_name, 
+                             const std::string &path)
     : m_menu_prompt(menu_prompt)
     , m_path(path)
     , m_filename(menu_prompt_name)

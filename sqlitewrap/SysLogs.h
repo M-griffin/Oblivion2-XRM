@@ -23,8 +23,8 @@ public:
     SysLog(const std::string& = "database", int = LOG_PID, int = LOG_USER);
     virtual ~SysLog();
 
-    void databaseError(Database&, const std::string&);
-    void databaseError(Database&, Query&, const std::string&);
+    void databaseError(Database&, const std::string&) override;
+    void databaseError(Database&, Query&, const std::string&) override;
 
 };
 

@@ -23,7 +23,7 @@ public:
     virtual void update() = 0;
     virtual void terminate() = 0;
 
-    ProcessBase(session_data_ptr session, std::string cmdline)
+    ProcessBase(session_data_ptr session, const std::string &cmdline)
         : m_session(session)
         , m_command_line(cmdline)
     { }

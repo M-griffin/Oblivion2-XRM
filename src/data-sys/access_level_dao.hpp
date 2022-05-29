@@ -32,7 +32,7 @@ class AccessLevelDao
     : public baseAccessLevelClass
 {
 public:
-    AccessLevelDao(SQLW::Database &database)
+    explicit AccessLevelDao(SQLW::Database &database)
         : baseAccessLevelClass(database)
     {
         // Setup Table name

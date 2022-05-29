@@ -245,7 +245,7 @@ private:
      */
     struct FindFirst
     {
-        FindFirst(unsigned char i) : to_find(i) { }
+        explicit FindFirst(unsigned char i) : to_find(i) { }
         unsigned char to_find;
         bool operator()
         (const unsigned char &p)

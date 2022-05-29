@@ -27,7 +27,7 @@ public:
 
     static const std::string FILE_VERSION;
 
-    TextPromptsDao(std::string path, std::string filename);
+    TextPromptsDao(std::string path, const std::string &filename);
     ~TextPromptsDao();
 
     /**
