@@ -202,7 +202,7 @@ public:
     }
 
     template<int level, typename ... Types>
-    void xrmLog(Types ... rest)
+    void write(Types ... rest)
     {
         config_ptr config = Communicator::instance()->getConfiguration();
         std::string config_log_text = config->logging_level;

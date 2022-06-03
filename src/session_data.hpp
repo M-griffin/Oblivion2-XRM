@@ -125,7 +125,7 @@ public:
             catch(std::exception& e)
             {
                 Logging *log = Logging::instance();
-                log->xrmLog<Logging::ERROR_LOG>("Exception telnet_process_char", e.what(), __LINE__, __FILE__);
+                log->write<Logging::ERROR_LOG>("Exception telnet_process_char", e.what(), __LINE__, __FILE__);
             }
 
             // Skip any incoming nulls, nulls are also return on Telnet options received
@@ -205,7 +205,7 @@ public:
 
         if(error)
         {
-            log->xrmLog<Logging::ERROR_LOG>("async_write error - session closed()", error.message(), __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("async_write error - session closed()", error.message(), __LINE__, __FILE__);
         }
 
         session_manager_ptr session_manager = m_session_manager.lock();
@@ -224,7 +224,7 @@ public:
                 catch(std::exception &e)
                 {
                     // Sometime this doesn't close when it's already existed, just extra checking here.
-                    log->xrmLog<Logging::DEBUG_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
+                    log->write<Logging::DEBUG_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
                 }
             }
         }
@@ -278,7 +278,7 @@ public:
             {
                 // Sometime this doesn't close when it's already existed, just extra checking here.
                 Logging *log = Logging::instance();
-                log->xrmLog<Logging::DEBUG_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
+                log->write<Logging::DEBUG_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
             }
         }
     }

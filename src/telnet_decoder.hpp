@@ -159,7 +159,7 @@ private:
         if(error)
         {
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("async_write error=", error.message(), __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("async_write error=", error.message(), __LINE__, __FILE__);
         }
     }
 

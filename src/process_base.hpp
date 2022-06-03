@@ -7,6 +7,13 @@
 class SessionData;
 typedef std::shared_ptr<SessionData> session_data_ptr;
 
+/**
+ * @class ProcessBase
+ * @author merc
+ * @date 31/05/22
+ * @file process_base.hpp
+ * @brief External Processes Base Class, Handles calling doors, scripts
+ */
 class ProcessBase
 {
 public:
@@ -22,7 +29,8 @@ public:
     virtual bool isRunning() = 0;
     virtual void update() = 0;
     virtual void terminate() = 0;
-
+    
+                               
     ProcessBase(session_data_ptr session, const std::string &cmdline)
         : m_session(session)
         , m_command_line(cmdline)

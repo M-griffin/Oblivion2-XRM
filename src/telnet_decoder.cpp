@@ -63,7 +63,7 @@ unsigned char TelnetDecoder::telnetOptionDeny(unsigned char cmd)
 void TelnetDecoder::decodeBuffer()
 {
     Logging *log = Logging::instance();
-    log->xrmLog<Logging::DEBUG_LOG>("decodeBuffer 240 - SE received");
+    log->write<Logging::DEBUG_LOG>("decodeBuffer 240 - SE received");
 
     // Check if this was a sequence we were waiting for.
     if(checkReply(m_subnegoOption))
@@ -79,27 +79,27 @@ void TelnetDecoder::decodeBuffer()
             m_naws_col = (256 * (unsigned char)data_sequence[0]) + (unsigned char)data_sequence[1];
             m_naws_row = (256 * (unsigned char)data_sequence[2]) + (unsigned char)data_sequence[3];
 
-            log->xrmLog<Logging::DEBUG_LOG>("TELOPT_NAWS option", m_naws_col, "x", m_naws_row);
+            log->write<Logging::DEBUG_LOG>("TELOPT_NAWS option", m_naws_col, "x", m_naws_row);
             break;
 
         case TELOPT_TTYPE:
             m_term_type = data_sequence;
-            log->xrmLog<Logging::DEBUG_LOG>("TELOPT_TTYPE option", m_term_type);
+            log->write<Logging::DEBUG_LOG>("TELOPT_TTYPE option", m_term_type);
             break;
 
         case TELOPT_NEW_ENVIRON:
             // Add Variable Or Tokenize here!!
-            log->xrmLog<Logging::DEBUG_LOG>("TELOPT_NEW_ENVIRON data", data_sequence);
+            log->write<Logging::DEBUG_LOG>("TELOPT_NEW_ENVIRON data", data_sequence);
             break;
 
         // Not used at this time.
         case TELOPT_LINEMODE:
             // Add Variable Or Tokenize here!!
-            log->xrmLog<Logging::DEBUG_LOG>("TELOPT_LINEMODE data", data_sequence);
+            log->write<Logging::DEBUG_LOG>("TELOPT_LINEMODE data", data_sequence);
             break;
 
         default:
-            log->xrmLog<Logging::DEBUG_LOG>("Invalid option:", (int) m_subnegoOption, m_subnegoOption);
+            log->write<Logging::DEBUG_LOG>("Invalid option:", (int) m_subnegoOption, m_subnegoOption);
             break;
     }
 
@@ -142,7 +142,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
             if(c == IAC && m_is_binary)
             {
                 // If were in Binary Mode, Than IAC IAC = IAC.
-                log->xrmLog<Logging::DEBUG_LOG>("Got double IAC BINARY");
+                log->write<Logging::DEBUG_LOG>("Got double IAC BINARY");
                 m_teloptStage = 0;
                 return IAC;
             }
@@ -150,7 +150,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
             {
                 // If were NOT in binary mode, (WINDOWS TELNET CONSOLE)
                 // Then IAC is sent as double IAC for single command starter!
-                log->xrmLog<Logging::DEBUG_LOG>("Got double IAC");
+                log->write<Logging::DEBUG_LOG>("Got double IAC");
                 //m_teloptStage = 0;
                 break;
             }
@@ -173,20 +173,20 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                 case SUSP:  //     237        /* Suspend process */
                 case xEOF:  //     236        /* End of file: EOF is already used... */
                     // Pass Through commands that don't need Response.
-                    log->xrmLog<Logging::DEBUG_LOG>("[IAC]", (int)c, "PASS-THROUGH");
+                    log->write<Logging::DEBUG_LOG>("[IAC]", (int)c, "PASS-THROUGH");
                     m_teloptStage = 0;
                     break;
 
                 // Handle Data Received from Client.
                 case SE:    //     240        /* end sub negotiation */
-                    log->xrmLog<Logging::DEBUG_LOG>("[IAC]", (int)c, "SE");
+                    log->write<Logging::DEBUG_LOG>("[IAC]", (int)c, "SE");
                     decodeBuffer();
                     data_sequence.clear();
                     m_teloptStage = 0;
                     break;
 
                 default:
-                    log->xrmLog<Logging::DEBUG_LOG>("[IAC]", (int)c, "MOVE to 3 BYTE");
+                    log->write<Logging::DEBUG_LOG>("[IAC]", (int)c, "MOVE to 3 BYTE");
                     // Move to 3 Byte Commands
                     m_teloptCommand = c;
                     m_teloptStage++;
@@ -198,17 +198,17 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
         // Stage 2: Parse Commands that need a Reply (3 Byte Sequences)
         case 2:
 
-            log->xrmLog<Logging::DEBUG_LOG>("[IAC]", (int)c, "STAGE 2");
+            log->write<Logging::DEBUG_LOG>("[IAC]", (int)c, "STAGE 2");
 
             // Catch if were getting Invalid Option!.
             if(TELCMD_OK(m_teloptCommand))
             {
-                log->xrmLog<Logging::DEBUG_LOG>("[IAC]", (int)m_teloptCommand, (int)c);
+                log->write<Logging::DEBUG_LOG>("[IAC]", (int)m_teloptCommand, (int)c);
             }
             else
             {
                 // Hopefully won't get here!
-                log->xrmLog<Logging::DEBUG_LOG>("INVALID [IAC]", (int)m_teloptCommand, (int)c);
+                log->write<Logging::DEBUG_LOG>("INVALID [IAC]", (int)m_teloptCommand, (int)c);
                 m_teloptStage = 0;
                 break;
             }
@@ -241,16 +241,16 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                             break;
                     }
 
-                    log->xrmLog<Logging::DEBUG_LOG>("[IAC] RECEIVED DONT", (int)m_teloptCommand, (int)c);
+                    log->write<Logging::DEBUG_LOG>("[IAC] RECEIVED DONT", (int)m_teloptCommand, (int)c);
 
                     if(!checkReply(c))
                     {
-                        log->xrmLog<Logging::DEBUG_LOG>("[IAC] RECEIVED DONT -> WONT", (int)m_teloptCommand, (int)c);
+                        log->write<Logging::DEBUG_LOG>("[IAC] RECEIVED DONT -> WONT", (int)m_teloptCommand, (int)c);
                         sendIACSequences(telnetOptionAcknowledge(m_teloptCommand),c);
                     }
                     else
                     {
-                        log->xrmLog<Logging::DEBUG_LOG>("[IAC] RECEIVED DONT -> REPLY", (int)m_teloptCommand, (int)c);
+                        log->write<Logging::DEBUG_LOG>("[IAC] RECEIVED DONT -> REPLY", (int)m_teloptCommand, (int)c);
                         deleteReply(c);
                     }
 
@@ -258,19 +258,19 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                     break;
 
                 case DO: // Replies WILL / WON'T
-                    log->xrmLog<Logging::DEBUG_LOG>("[IAC] RECEIVED DO", (int)m_teloptCommand, (int)c);
+                    log->write<Logging::DEBUG_LOG>("[IAC] RECEIVED DO", (int)m_teloptCommand, (int)c);
 
                     switch(c)
                     {
                         case TELOPT_ECHO:
                             if(!checkReply(c))
                             {
-                                log->xrmLog<Logging::DEBUG_LOG>("[IAC] DO TELOPT_ECHO", (int)m_teloptCommand, (int)c);
+                                log->write<Logging::DEBUG_LOG>("[IAC] DO TELOPT_ECHO", (int)m_teloptCommand, (int)c);
                                 sendIACSequences(telnetOptionDeny(m_teloptCommand),c);
                             }
                             else
                             {
-                                log->xrmLog<Logging::DEBUG_LOG>("[IAC] DO TELOPT_ECHO REPLY", (int)m_teloptCommand, (int)c);
+                                log->write<Logging::DEBUG_LOG>("[IAC] DO TELOPT_ECHO REPLY", (int)m_teloptCommand, (int)c);
                                 m_is_echo = true;
                                 deleteReply(c);
                             }
@@ -280,12 +280,12 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                         case TELOPT_BINARY:
                             if(!checkReply(c))
                             {
-                                log->xrmLog<Logging::DEBUG_LOG>("[IAC] DO TELOPT_BINARY", (int)m_teloptCommand, (int)c);
+                                log->write<Logging::DEBUG_LOG>("[IAC] DO TELOPT_BINARY", (int)m_teloptCommand, (int)c);
                                 sendIACSequences(telnetOptionAcknowledge(m_teloptCommand),c);
                             }
                             else
                             {
-                                log->xrmLog<Logging::DEBUG_LOG>("[IAC] DO TELOPT_BINARY REPLY", (int)m_teloptCommand, (int)c);
+                                log->write<Logging::DEBUG_LOG>("[IAC] DO TELOPT_BINARY REPLY", (int)m_teloptCommand, (int)c);
                                 m_is_binary = true;
                                 deleteReply(c);
                             }
@@ -295,12 +295,12 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                         case TELOPT_SGA:
                             if(!checkReply(c))
                             {
-                                log->xrmLog<Logging::DEBUG_LOG>("[IAC] DO TELOPT_SGA", (int)m_teloptCommand, (int)c);
+                                log->write<Logging::DEBUG_LOG>("[IAC] DO TELOPT_SGA", (int)m_teloptCommand, (int)c);
                                 sendIACSequences(telnetOptionAcknowledge(m_teloptCommand),c);
                             }
                             else
                             {
-                                log->xrmLog<Logging::DEBUG_LOG>("[IAC] DO TELOPT_SGA REPLY", (int)m_teloptCommand, (int)c);
+                                log->write<Logging::DEBUG_LOG>("[IAC] DO TELOPT_SGA REPLY", (int)m_teloptCommand, (int)c);
                                 m_is_sga = true;
                                 deleteReply(c);
                             }
@@ -315,12 +315,12 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                         case TELOPT_LINEMODE:
                             if(!checkReply(c))
                             {
-                                log->xrmLog<Logging::DEBUG_LOG>("[IAC] DO LINEMODE", (int)m_teloptCommand, (int)c);
+                                log->write<Logging::DEBUG_LOG>("[IAC] DO LINEMODE", (int)m_teloptCommand, (int)c);
                                 sendIACSequences(telnetOptionAcknowledge(m_teloptCommand),c);
                             }
                             else
                             {
-                                log->xrmLog<Logging::DEBUG_LOG>("[IAC] DO LINEMODE REPLY", (int)m_teloptCommand, (int)c);
+                                log->write<Logging::DEBUG_LOG>("[IAC] DO LINEMODE REPLY", (int)m_teloptCommand, (int)c);
                                 m_is_linemode = true;
                                 deleteReply(c);
                             }
@@ -328,7 +328,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                             break;
 
                         default:
-                            log->xrmLog<Logging::DEBUG_LOG>("[IAC] DO -> WONT", (int)m_teloptCommand, (int)c);
+                            log->write<Logging::DEBUG_LOG>("[IAC] DO -> WONT", (int)m_teloptCommand, (int)c);
                             sendIACSequences(telnetOptionDeny(m_teloptCommand),c);
                             break;
                     }
@@ -339,7 +339,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                 // WILL means the Server Will DO IT!
                 // We reply Fine, do it!
                 case WILL: // Replies DO And DONT
-                    log->xrmLog<Logging::DEBUG_LOG>("[IAC] RECEIVED WILL", (int)m_teloptCommand, (int)c);
+                    log->write<Logging::DEBUG_LOG>("[IAC] RECEIVED WILL", (int)m_teloptCommand, (int)c);
 
                     // Don't response to WILL Requests.
                     switch(c)
@@ -347,12 +347,12 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                         case TELOPT_ECHO:
                             if(!checkReply(c))
                             {
-                                log->xrmLog<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_ECHO", (int)m_teloptCommand, (int)c);
+                                log->write<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_ECHO", (int)m_teloptCommand, (int)c);
                                 sendIACSequences(telnetOptionAcknowledge(m_teloptCommand),c);
                             }
                             else
                             {
-                                log->xrmLog<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_ECHO REPLY", (int)m_teloptCommand, (int)c);
+                                log->write<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_ECHO REPLY", (int)m_teloptCommand, (int)c);
                                 m_is_echo = true;
                                 deleteReply(c);
                             }
@@ -362,12 +362,12 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                         case TELOPT_BINARY:
                             if(!checkReply(c))
                             {
-                                log->xrmLog<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_BINARY", (int)m_teloptCommand, (int)c);
+                                log->write<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_BINARY", (int)m_teloptCommand, (int)c);
                                 sendIACSequences(telnetOptionAcknowledge(m_teloptCommand),c);
                             }
                             else
                             {
-                                log->xrmLog<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_BINARY REPLY", (int)m_teloptCommand, (int)c);
+                                log->write<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_BINARY REPLY", (int)m_teloptCommand, (int)c);
                                 m_is_binary = true;
                                 deleteReply(c);
                             }
@@ -377,12 +377,12 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                         case TELOPT_SGA:
                             if(!checkReply(c))
                             {
-                                log->xrmLog<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_SGA", (int)m_teloptCommand, (int)c);
+                                log->write<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_SGA", (int)m_teloptCommand, (int)c);
                                 sendIACSequences(telnetOptionAcknowledge(m_teloptCommand),c);
                             }
                             else
                             {
-                                log->xrmLog<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_SGA REPLY", (int)m_teloptCommand, (int)c);
+                                log->write<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_SGA REPLY", (int)m_teloptCommand, (int)c);
                                 m_is_sga = true;
                                 deleteReply(c);
                             }
@@ -391,7 +391,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
 
                         case TELOPT_TTYPE:
                             // Ask for Terminal Type from Client!
-                            log->xrmLog<Logging::DEBUG_LOG>("Ask for TTYPE", (int)m_teloptCommand, (int)c);
+                            log->write<Logging::DEBUG_LOG>("Ask for TTYPE", (int)m_teloptCommand, (int)c);
                             sendTTYPERequest();
                             break;
 
@@ -408,12 +408,12 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                         case TELOPT_LINEMODE:
                             if(!checkReply(c))
                             {
-                                log->xrmLog<Logging::DEBUG_LOG>("[IAC] WILL LINEMODE", (int)m_teloptCommand, (int)c);
+                                log->write<Logging::DEBUG_LOG>("[IAC] WILL LINEMODE", (int)m_teloptCommand, (int)c);
                                 sendIACSequences(telnetOptionAcknowledge(m_teloptCommand),c);
                             }
                             else
                             {
-                                log->xrmLog<Logging::DEBUG_LOG>("[IAC] WILL LINEMODE REPLY", (int)m_teloptCommand, (int)c);
+                                log->write<Logging::DEBUG_LOG>("[IAC] WILL LINEMODE REPLY", (int)m_teloptCommand, (int)c);
                                 m_is_linemode = true;
                                 deleteReply(c);
                             }
@@ -421,7 +421,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                             break;
 
                         default :
-                            log->xrmLog<Logging::DEBUG_LOG>("[IAC] WILL -> DONT", (int)m_teloptCommand, (int)c);
+                            log->write<Logging::DEBUG_LOG>("[IAC] WILL -> DONT", (int)m_teloptCommand, (int)c);
                             sendIACSequences(telnetOptionDeny(m_teloptCommand),c);
                             break;
                     }
@@ -457,12 +457,12 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
 
                     if(!checkReply(c))
                     {
-                        log->xrmLog<Logging::DEBUG_LOG>("[IAC] RECEIVED WONT", (int)m_teloptCommand, (int)c);
+                        log->write<Logging::DEBUG_LOG>("[IAC] RECEIVED WONT", (int)m_teloptCommand, (int)c);
                         sendIACSequences(telnetOptionAcknowledge(m_teloptCommand), c);
                     }
                     else
                     {
-                        log->xrmLog<Logging::DEBUG_LOG>("[IAC] RECEIVED WONT REPLY", (int)m_teloptCommand, (int)c);
+                        log->write<Logging::DEBUG_LOG>("[IAC] RECEIVED WONT REPLY", (int)m_teloptCommand, (int)c);
                         deleteReply(c);
                     }
 
@@ -471,7 +471,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
 
                 // Start of Sub Negotiations and Stages 3 - 4
                 case SB: // 250
-                    log->xrmLog<Logging::DEBUG_LOG>("[IAC] TELNET_STATE_SB", (int)m_teloptCommand, (int)c);
+                    log->write<Logging::DEBUG_LOG>("[IAC] TELNET_STATE_SB", (int)m_teloptCommand, (int)c);
 
                     // Setup the Option when we get SE
                     // So we know how to process the buffer when it ends.
@@ -499,7 +499,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                     }
                     else
                     {
-                        log->xrmLog<Logging::DEBUG_LOG>("[IAC] TELNET_STATE_SB UNSUPPORTED", (int)m_teloptCommand, (int)c);
+                        log->write<Logging::DEBUG_LOG>("[IAC] TELNET_STATE_SB UNSUPPORTED", (int)m_teloptCommand, (int)c);
                         // Invalid, reset back.
                         m_teloptStage = 0;
                     }
@@ -508,7 +508,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
 
                 default:
                     // Options or Commands Not Parsed, RESET.
-                    log->xrmLog<Logging::DEBUG_LOG>("[IAC] INVALID 3 Options", (int)m_teloptCommand, (int)c);
+                    log->write<Logging::DEBUG_LOG>("[IAC] INVALID 3 Options", (int)m_teloptCommand, (int)c);
                     m_teloptStage = 0;
                     break;
             }
@@ -516,7 +516,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
             break;
 
         case 3:
-            log->xrmLog<Logging::DEBUG_LOG>("--> STAGE 3", (int)c);
+            log->write<Logging::DEBUG_LOG>("--> STAGE 3", (int)c);
 
             //Options will be 1 After SB
             switch(m_currentOption)
@@ -525,7 +525,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                 case TELOPT_TTYPE:
                     if(c == TELQUAL_IS)
                     {
-                        log->xrmLog<Logging::DEBUG_LOG>("[IAC] TELQUAL_IS", (int)m_currentOption, (int)c);
+                        log->write<Logging::DEBUG_LOG>("[IAC] TELQUAL_IS", (int)m_currentOption, (int)c);
                         m_teloptStage = 4;
                     }
                     else
@@ -536,7 +536,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                 case TELOPT_NEW_ENVIRON:
                     if(c == TELQUAL_IS)
                     {
-                        log->xrmLog<Logging::DEBUG_LOG>("[IAC] TELQUAL_IS", (int)m_currentOption, (int)c);
+                        log->write<Logging::DEBUG_LOG>("[IAC] TELQUAL_IS", (int)m_currentOption, (int)c);
                         m_teloptStage = 6;
                     }
                     else
@@ -549,7 +549,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
                     //printf("\r\n [Stage 3 - unregistered stuff it] - %i, %i \r\n",opt, c);
                     if(c == SE)
                     {
-                        log->xrmLog<Logging::DEBUG_LOG>("[IAC] SB END", (int)m_currentOption, (int)c);
+                        log->write<Logging::DEBUG_LOG>("[IAC] SB END", (int)m_currentOption, (int)c);
                         m_teloptStage = 0;
                     }
                     else
@@ -565,7 +565,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
 
         // Only Gets here on TTYPE Sub-Negotiation.
         case 4:
-            log->xrmLog<Logging::DEBUG_LOG>("--> STAGE 4 TTYPE", (int)c);
+            log->write<Logging::DEBUG_LOG>("--> STAGE 4 TTYPE", (int)c);
 
             if(c != IAC && c != SE)
             {
@@ -597,7 +597,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
             break;
 
         case 5:
-            log->xrmLog<Logging::DEBUG_LOG>("--> STAGE 5 NAWS", (int)c);
+            log->write<Logging::DEBUG_LOG>("--> STAGE 5 NAWS", (int)c);
 
             if(c != IAC && c != SE)
             {
@@ -629,7 +629,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
             break;
 
         case 6:
-            log->xrmLog<Logging::DEBUG_LOG>("--> STAGE 5 TELOPT_NEW_ENVIRON", (int)c);
+            log->write<Logging::DEBUG_LOG>("--> STAGE 5 TELOPT_NEW_ENVIRON", (int)c);
 
             if(c != IAC && c != SE)
             {
@@ -671,7 +671,7 @@ unsigned char TelnetDecoder::telnetOptionParse(unsigned char c)
             * and ignore double IAC!  they are Unicode chars.
             * then only look for IAC / 240 for SE to exit.
             */
-            log->xrmLog<Logging::DEBUG_LOG>("--> STAGE 5 TELOPT_LINEMODE", (int)c);
+            log->write<Logging::DEBUG_LOG>("--> STAGE 5 TELOPT_LINEMODE", (int)c);
 
             if(c != IAC && c != SE)
             {

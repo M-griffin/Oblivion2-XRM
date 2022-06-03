@@ -198,7 +198,7 @@ void ModPreLogon::displayTerminalDetection()
         std::string term = m_session_data->m_telnet_state->getTermType();
 
 
-        log->xrmLog<Logging::CONSOLE_LOG>("Term Type=", term);
+        log->write<Logging::CONSOLE_LOG>("Term Type=", term);
 
         m_session_io.m_common_io.parseLocalMCI(result, mci_code, term);
         result = m_session_io.pipe2ansi(result);
@@ -213,7 +213,7 @@ void ModPreLogon::displayTerminalDetection()
         term_size.append("x");
         term_size.append(std::to_string(m_session_data->m_telnet_state->getTermRows()));
 
-        log->xrmLog<Logging::CONSOLE_LOG>("Term Size=", term_size);
+        log->write<Logging::CONSOLE_LOG>("Term Size=", term_size);
 
         m_session_io.m_common_io.parseLocalMCI(result, mci_code, term_size);
         result = m_session_io.pipe2ansi(result);
@@ -362,7 +362,7 @@ bool ModPreLogon::askANSIColor(const std::string &input)
                 baseProcessAndDeliverNewLine(yes_prompt);
             }
 
-            log->xrmLog<Logging::CONSOLE_LOG>("Ansi Selected");
+            log->write<Logging::CONSOLE_LOG>("Ansi Selected");
 
             m_session_data->m_is_use_ansi = true;
             displayPrompt(PROMPT_ANSI_SELECTED);
@@ -371,7 +371,7 @@ bool ModPreLogon::askANSIColor(const std::string &input)
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
-            log->xrmLog<Logging::CONSOLE_LOG>("Ascii Selected");
+            log->write<Logging::CONSOLE_LOG>("Ascii Selected");
 
             baseProcessDeliverNewLine();
             displayPrompt(PROMPT_ASCII_SELECTED);
@@ -380,7 +380,7 @@ bool ModPreLogon::askANSIColor(const std::string &input)
         }
         else
         {
-            log->xrmLog<Logging::CONSOLE_LOG>("Invalid Color selection ANSI/ASCII");
+            log->write<Logging::CONSOLE_LOG>("Invalid Color selection ANSI/ASCII");
             baseProcessDeliverNewLine();
             displayPrompt(PROMPT_USE_INVALID);
             redisplayModulePrompt();
@@ -444,7 +444,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
                           );
 
                 // Even though it's default, lets set it anyways/
-                log->xrmLog<Logging::CONSOLE_LOG>("Encoding set to CP437");
+                log->write<Logging::CONSOLE_LOG>("Encoding set to CP437");
                 m_session_data->m_encoding_text = Encoding::ENCODING_TEXT_CP437;
                 m_session_data->m_encoding = Encoding::ENCODE_CP437;
             }
@@ -460,7 +460,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
                           );
 
                 // Even though it's default, lets set it anyways/
-                log->xrmLog<Logging::CONSOLE_LOG>("Encoding set to UTF-8");
+                log->write<Logging::CONSOLE_LOG>("Encoding set to UTF-8");
                 m_session_data->m_encoding_text = Encoding::ENCODING_TEXT_UTF8;
                 m_session_data->m_encoding = Encoding::ENCODE_UTF8;
             }
@@ -487,7 +487,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
                           );
 
                 // Even though it's default, lets set it anyways/
-                log->xrmLog<Logging::CONSOLE_LOG>("Encoding set to UTF-8");
+                log->write<Logging::CONSOLE_LOG>("Encoding set to UTF-8");
                 m_session_data->m_encoding_text = Encoding::ENCODING_TEXT_UTF8;
                 m_session_data->m_encoding = Encoding::ENCODE_UTF8;
             }
@@ -503,7 +503,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
                           );
 
                 // Even though it's default, lets set it anyways/
-                log->xrmLog<Logging::CONSOLE_LOG>("Encoding set to CP437");
+                log->write<Logging::CONSOLE_LOG>("Encoding set to CP437");
                 m_session_data->m_encoding_text = Encoding::ENCODING_TEXT_CP437;
                 m_session_data->m_encoding = Encoding::ENCODE_CP437;
             }

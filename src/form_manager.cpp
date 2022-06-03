@@ -112,7 +112,7 @@ void FormManager::startupFormSystemConfiguration()
     if(!form)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("FormSystemConfig Allocation Error!", __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("FormSystemConfig Allocation Error!", __FILE__, __LINE__);
         return;
     }
 

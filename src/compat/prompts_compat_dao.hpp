@@ -68,7 +68,7 @@ public:
             if(stream == nullptr)
             {
                 Logging *log = Logging::instance();
-                log->xrmLog<Logging::ERROR_LOG>("Error writing file=", filename, __FILE__, __LINE__);
+                log->write<Logging::ERROR_LOG>("Error writing file=", filename, __FILE__, __LINE__);
                 return x;
             }
         }
@@ -102,12 +102,12 @@ public:
         {
             // Create File if it doesn't exist.
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("Error Reading/creating file=", filename, __FILE__, __LINE__);
+            log->write<Logging::ERROR_LOG>("Error Reading/creating file=", filename, __FILE__, __LINE__);
             stream = fopen(path.c_str(), "wb");
 
             if(stream == nullptr)
             {
-                log->xrmLog<Logging::ERROR_LOG>("Error Reading file=", filename, __FILE__, __LINE__);
+                log->write<Logging::ERROR_LOG>("Error Reading file=", filename, __FILE__, __LINE__);
                 return x;
             }
         }

@@ -79,7 +79,7 @@ public:
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -88,7 +88,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -99,18 +99,18 @@ public:
 
             if(rows > 0)
             {
-                log->xrmLog<Logging::DEBUG_LOG>(m_strTableName, "Table Exists!", __LINE__, __FILE__);
+                log->write<Logging::DEBUG_LOG>(m_strTableName, "Table Exists!", __LINE__, __FILE__);
                 result = true;
             }
             else
             {
                 // No rows means the table doesn't exist!
-                log->xrmLog<Logging::DEBUG_LOG>(m_strTableName, "table doesn't exist returned rows", rows, __LINE__, __FILE__);
+                log->write<Logging::DEBUG_LOG>(m_strTableName, "table doesn't exist returned rows", rows, __LINE__, __FILE__);
             }
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "baseDoesTableExist getResult()", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "baseDoesTableExist getResult()", __LINE__, __FILE__);
         }
 
         return result;
@@ -127,7 +127,7 @@ public:
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -136,7 +136,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -156,7 +156,7 @@ public:
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -165,7 +165,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -194,7 +194,7 @@ public:
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -203,7 +203,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -350,7 +350,7 @@ public:
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -359,7 +359,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -388,7 +388,7 @@ public:
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -397,7 +397,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -431,7 +431,7 @@ public:
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -440,7 +440,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -468,7 +468,7 @@ public:
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return obj;
         }
 
@@ -477,7 +477,7 @@ public:
 
         if(!qry->isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return obj;
         }
 
@@ -496,12 +496,12 @@ public:
             }
             else
             {
-                log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, getRecordById Returned Rows", rows, __LINE__, __FILE__);
+                log->write<Logging::ERROR_LOG>(m_strTableName, "Error, getRecordById Returned Rows", rows, __LINE__, __FILE__);
             }
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, getRecordById getResult()", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, getRecordById getResult()", __LINE__, __FILE__);
         }
 
         return obj;
@@ -520,7 +520,7 @@ public:
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return list;
         }
 
@@ -529,7 +529,7 @@ public:
 
         if(!qry->isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return list;
         }
 
@@ -552,12 +552,12 @@ public:
             }
             else
             {
-                log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetAllRecords Returned Rows", rows, __LINE__, __FILE__);
+                log->write<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetAllRecords Returned Rows", rows, __LINE__, __FILE__);
             }
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetAllRecords getResult()", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetAllRecords getResult()", __LINE__, __FILE__);
         }
 
         return list;
@@ -576,7 +576,7 @@ public:
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return list.size();
         }
 
@@ -585,7 +585,7 @@ public:
 
         if(!qry->isConnected())
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return list.size();
         }
 
@@ -608,12 +608,12 @@ public:
             }
             else
             {
-                log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetRecordsCount Returned Rows", rows, __LINE__, __FILE__);
+                log->write<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetRecordsCount Returned Rows", rows, __LINE__, __FILE__);
             }
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetRecordsCount getResult()", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetRecordsCount getResult()", __LINE__, __FILE__);
         }
 
         return list.size();

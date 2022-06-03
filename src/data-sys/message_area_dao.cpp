@@ -251,7 +251,7 @@ std::vector<message_area_ptr> MessageAreaDao::getAllMessageAreasByConference(lon
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
         return list;
     }
 
@@ -260,7 +260,7 @@ std::vector<message_area_ptr> MessageAreaDao::getAllMessageAreasByConference(lon
 
     if(!qry->isConnected())
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__, __LINE__);
         return list;
     }
 
@@ -283,12 +283,12 @@ std::vector<message_area_ptr> MessageAreaDao::getAllMessageAreasByConference(lon
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>("Error, getAllMessageAreasByConference Returned Rows", rows, m_strTableName, __FILE__, __LINE__);
+            log->write<Logging::ERROR_LOG>("Error, getAllMessageAreasByConference Returned Rows", rows, m_strTableName, __FILE__, __LINE__);
         }
     }
     else
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __FILE__, __LINE__);
     }
 
     return list;

@@ -167,7 +167,7 @@ auto main() -> int
         // This also controls logging, need to start this prior to any
         // any logging objects being used.
         TheCommunicator::instance()->attachConfiguration(config);
-        Logging::instance()->xrmLog<Logging::CONSOLE_LOG>("Starting up Oblivion/2 XRM-Server");
+        Logging::instance()->write<Logging::CONSOLE_LOG>("Starting up Oblivion/2 XRM-Server");
     }
 
     // Database Startup in it's own context.

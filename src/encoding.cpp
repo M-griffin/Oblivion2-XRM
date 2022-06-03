@@ -151,7 +151,7 @@ std::wstring Encoding::multibyte_to_wide(const char* mbstr)
     catch(const std::range_error& e)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("UCS multibyte_to_wide", e.what(), __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("UCS multibyte_to_wide", e.what(), __LINE__, __FILE__);
     }
 
     return ucs;
@@ -174,7 +174,7 @@ std::string Encoding::wide_to_multibyte(const std::wstring& wstr)
     catch(const std::range_error& e)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("UCS wide_to_multibyte", e.what(), __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("UCS wide_to_multibyte", e.what(), __LINE__, __FILE__);
     }
 
     return utf8;
@@ -265,7 +265,7 @@ std::string Encoding::utf8Encode(const std::string &standard_string)
         else
         {
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("Error, utf8Encode ascii_value=", ascii_value, __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Error, utf8Encode ascii_value=", ascii_value, __LINE__, __FILE__);
         }
     }
 
@@ -299,7 +299,7 @@ std::string Encoding::utf8Decode(const std::string &standard_string)
             std::string utf8_data = wide_to_multibyte(usc_string);
 
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::DEBUG_LOG>("Warning, Invalid CP437 Conversion, convert glyph back to utf8=",  utf8_data, __LINE__, __FILE__);
+            log->write<Logging::DEBUG_LOG>("Warning, Invalid CP437 Conversion, convert glyph back to utf8=",  utf8_data, __LINE__, __FILE__);
             output += utf8_data;
         }
         else

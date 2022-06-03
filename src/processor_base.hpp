@@ -102,6 +102,10 @@ public:
     {
         return m_number_lines;
     }
+    std::map<int, int> getLineEndingMap() const
+    {
+        return m_line_ending_map;
+    }
 
     /**
      * @brief ProcessorBase Constructor

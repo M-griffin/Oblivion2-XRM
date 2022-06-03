@@ -278,14 +278,6 @@ public:
                       std::string::iterator &it,
                       const std::string::iterator &line_end);
 
-    /**  TEMP EXTRA LOGGING!
-     * @brief Parses screen data into the Screen Buffer.
-     * @return
-     */
-    void getNextGlyph2(LocalizedBuffer &buffer, 
-                       std::string::iterator &it,
-                       const std::string::iterator &line_end);
-
     /**
      * @brief Parses screen data into the Screen Buffer.
      * @return

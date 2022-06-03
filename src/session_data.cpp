@@ -41,7 +41,7 @@ void SessionData::handleRead(const std::error_code& error, socket_handler_ptr)
     if(!session_manager)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("Unable to load session_manager", __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Unable to load session_manager", __FILE__, __LINE__);
         return;
     }
 
@@ -139,7 +139,7 @@ void SessionData::handleRead(const std::error_code& error, socket_handler_ptr)
         if(!m_is_leaving)
         {
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("Leaving SessionData Error=", error.message(), __FILE__, __LINE__);
+            log->write<Logging::ERROR_LOG>("Leaving SessionData Error=", error.message(), __FILE__, __LINE__);
 
             session_manager_ptr session_manager = m_session_manager.lock();
 
@@ -193,7 +193,7 @@ void SessionData::startUpSessionStats(std::string sessionType)
         if(id < 0)
         {
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("SessionStats, error on insert=", m_session_stats->iId, __FILE__, __LINE__);
+            log->write<Logging::ERROR_LOG>("SessionStats, error on insert=", m_session_stats->iId, __FILE__, __LINE__);
             return;
         }
 

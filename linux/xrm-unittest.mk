@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=merc
-Date                   :=09/05/22
+Date                   :=03/06/22
 CodeLitePath           :=/home/merc/.codelite
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -60,11 +60,11 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/up_src_sdl2_net_SDLnetUDP.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sdl2_net_SDLnetTCP.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sdl2_net_SDLnetselect.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sdl2_net_SDLnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-app_oneliners_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_text_prompts_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_users_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_ansi_processor_ut.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_conference_dao.cpp$(ObjectSuffix) \
+Objects0=$(IntermediateDirectory)/up_xrm-unittest_src_processor_text_ut.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sdl2_net_SDLnetUDP.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sdl2_net_SDLnetTCP.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sdl2_net_SDLnetselect.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sdl2_net_SDLnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-app_oneliners_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_text_prompts_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_users_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_conference_dao.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_common_mock_ut.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_access_condition_ut.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_conference_dao_it.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_message_area_dao_it.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_xrm_test.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_processor_text.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_form_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_io_service.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/up_src_access_condition.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_communicator.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_common_io_ut.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_form_system_config_ut.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_security_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_oneliners_dao_it.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_processor_ansi.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_forms_form_system_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_config_dao.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/up_src_data-sys_access_level_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_file_area_dao_it.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_menu_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_encoding.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_file_area_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_message_area_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_session_io_ut.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_protocol_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/up_src_data-sys_session_stats_dao.cpp$(ObjectSuffix) 
+	$(IntermediateDirectory)/up_src_access_condition.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_communicator.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_common_io_ut.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_form_system_config_ut.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_processor_ansi_ut.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_security_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_oneliners_dao_it.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_processor_ansi.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_forms_form_system_config.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/up_src_data-sys_config_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_access_level_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_file_area_dao_it.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_menu_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_encoding.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_file_area_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_message_area_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_xrm-unittest_src_session_io_ut.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_protocol_dao.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_data-sys_session_stats_dao.cpp$(ObjectSuffix) 
 
 
 
@@ -98,6 +98,14 @@ PreBuild:
 ##
 ## Objects
 ##
+$(IntermediateDirectory)/up_xrm-unittest_src_processor_text_ut.cpp$(ObjectSuffix): ../xrm-unittest/src/processor_text_ut.cpp $(IntermediateDirectory)/up_xrm-unittest_src_processor_text_ut.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../xrm-unittest/src/processor_text_ut.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_xrm-unittest_src_processor_text_ut.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_xrm-unittest_src_processor_text_ut.cpp$(DependSuffix): ../xrm-unittest/src/processor_text_ut.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_xrm-unittest_src_processor_text_ut.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_xrm-unittest_src_processor_text_ut.cpp$(DependSuffix) -MM ../xrm-unittest/src/processor_text_ut.cpp
+
+$(IntermediateDirectory)/up_xrm-unittest_src_processor_text_ut.cpp$(PreprocessSuffix): ../xrm-unittest/src/processor_text_ut.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_xrm-unittest_src_processor_text_ut.cpp$(PreprocessSuffix) ../xrm-unittest/src/processor_text_ut.cpp
+
 $(IntermediateDirectory)/up_src_sdl2_net_SDLnetUDP.cpp$(ObjectSuffix): ../src/sdl2_net/SDLnetUDP.cpp $(IntermediateDirectory)/up_src_sdl2_net_SDLnetUDP.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/sdl2_net/SDLnetUDP.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_sdl2_net_SDLnetUDP.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/up_src_sdl2_net_SDLnetUDP.cpp$(DependSuffix): ../src/sdl2_net/SDLnetUDP.cpp
@@ -161,14 +169,6 @@ $(IntermediateDirectory)/up_src_common_io.cpp$(DependSuffix): ../src/common_io.c
 
 $(IntermediateDirectory)/up_src_common_io.cpp$(PreprocessSuffix): ../src/common_io.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_common_io.cpp$(PreprocessSuffix) ../src/common_io.cpp
-
-$(IntermediateDirectory)/up_xrm-unittest_src_ansi_processor_ut.cpp$(ObjectSuffix): ../xrm-unittest/src/ansi_processor_ut.cpp $(IntermediateDirectory)/up_xrm-unittest_src_ansi_processor_ut.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../xrm-unittest/src/ansi_processor_ut.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_xrm-unittest_src_ansi_processor_ut.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_xrm-unittest_src_ansi_processor_ut.cpp$(DependSuffix): ../xrm-unittest/src/ansi_processor_ut.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_xrm-unittest_src_ansi_processor_ut.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_xrm-unittest_src_ansi_processor_ut.cpp$(DependSuffix) -MM ../xrm-unittest/src/ansi_processor_ut.cpp
-
-$(IntermediateDirectory)/up_xrm-unittest_src_ansi_processor_ut.cpp$(PreprocessSuffix): ../xrm-unittest/src/ansi_processor_ut.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_xrm-unittest_src_ansi_processor_ut.cpp$(PreprocessSuffix) ../xrm-unittest/src/ansi_processor_ut.cpp
 
 $(IntermediateDirectory)/up_src_data-sys_conference_dao.cpp$(ObjectSuffix): ../src/data-sys/conference_dao.cpp $(IntermediateDirectory)/up_src_data-sys_conference_dao.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/data-sys/conference_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_data-sys_conference_dao.cpp$(ObjectSuffix) $(IncludePath)
@@ -297,6 +297,14 @@ $(IntermediateDirectory)/up_xrm-unittest_src_form_system_config_ut.cpp$(DependSu
 
 $(IntermediateDirectory)/up_xrm-unittest_src_form_system_config_ut.cpp$(PreprocessSuffix): ../xrm-unittest/src/form_system_config_ut.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_xrm-unittest_src_form_system_config_ut.cpp$(PreprocessSuffix) ../xrm-unittest/src/form_system_config_ut.cpp
+
+$(IntermediateDirectory)/up_xrm-unittest_src_processor_ansi_ut.cpp$(ObjectSuffix): ../xrm-unittest/src/processor_ansi_ut.cpp $(IntermediateDirectory)/up_xrm-unittest_src_processor_ansi_ut.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../xrm-unittest/src/processor_ansi_ut.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_xrm-unittest_src_processor_ansi_ut.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_xrm-unittest_src_processor_ansi_ut.cpp$(DependSuffix): ../xrm-unittest/src/processor_ansi_ut.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_xrm-unittest_src_processor_ansi_ut.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_xrm-unittest_src_processor_ansi_ut.cpp$(DependSuffix) -MM ../xrm-unittest/src/processor_ansi_ut.cpp
+
+$(IntermediateDirectory)/up_xrm-unittest_src_processor_ansi_ut.cpp$(PreprocessSuffix): ../xrm-unittest/src/processor_ansi_ut.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_xrm-unittest_src_processor_ansi_ut.cpp$(PreprocessSuffix) ../xrm-unittest/src/processor_ansi_ut.cpp
 
 $(IntermediateDirectory)/up_src_data-sys_security_dao.cpp$(ObjectSuffix): ../src/data-sys/security_dao.cpp $(IntermediateDirectory)/up_src_data-sys_security_dao.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/data-sys/security_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_data-sys_security_dao.cpp$(ObjectSuffix) $(IncludePath)

@@ -236,7 +236,7 @@ std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(long id)
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -245,7 +245,7 @@ std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(long id)
 
     if(!qry->isConnected())
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -268,12 +268,12 @@ std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(long id)
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>("Error, getAllFileAreasByConference Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Error, getAllFileAreasByConference Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return list;

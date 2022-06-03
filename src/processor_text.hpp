@@ -24,10 +24,12 @@ public:
         : ProcessorBase(term_height, term_width)
         , m_tab_width(4)
         , m_line_number(1)
+        , m_is_double_backspace(false)
     { }
 
     int m_tab_width;
     int m_line_number;
+    bool m_is_double_backspace;
 
     virtual ~ProcessorText() {}
 
@@ -54,6 +56,15 @@ public:
     int getCurrentLine() const
     {
         return m_line_number;
+    }
+    
+    bool isDoubleBackSpace() const
+    {
+        return m_is_double_backspace;
+    }
+    
+    void setDoubleBackSpace(bool is_double_backspace) {
+        m_is_double_backspace = is_double_backspace;
     }
 
     // Processor Text Specific

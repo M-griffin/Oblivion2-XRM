@@ -325,7 +325,7 @@ void ModMessageEditor::setupEditor()
     std::string mid_screen = processMidTemplate(ansi_process, mid_template);
 
     Logging *log = Logging::instance();
-    log->xrmLog<Logging::DEBUG_LOG>("m_text_box_top=", m_text_box_top, "m_text_box_bottom=", m_text_box_bottom,
+    log->write<Logging::DEBUG_LOG>("m_text_box_top=", m_text_box_top, "m_text_box_bottom=", m_text_box_bottom,
                                     "m_text_box_left=", m_text_box_left, "m_text_box_right=", m_text_box_right);
 
     // Setup the Text Parser Init the Parser with template data.
@@ -336,7 +336,7 @@ void ModMessageEditor::setupEditor()
     m_text_box_height += 1;
 
 
-    log->xrmLog<Logging::DEBUG_LOG>("m_text_process - height=", m_text_box_height, "width=", m_text_box_width);
+    log->write<Logging::DEBUG_LOG>("m_text_process - height=", m_text_box_height, "width=", m_text_box_width);
     m_text_process.reset(new ProcessorText(m_text_box_height, m_text_box_width));
 
     // Next combine and output.. Move cursor to top left in box.
@@ -366,7 +366,7 @@ void ModMessageEditor::editorInput(const std::string &input)
     {
         // Translations for ENTER next line
         //input = "ENTER";
-        log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [ENTER HIT] input result=", result);
+        log->write<Logging::CONSOLE_LOG>("[editorInput] [ENTER HIT] input result=", result);
         //std::string output = "\r\n\x1b[" + std::to_string(m_text_box_left - 1) + "C";
 
         processTextInput(result, input);
@@ -376,26 +376,26 @@ void ModMessageEditor::editorInput(const std::string &input)
         // ESC SEQUENCE - check movement / arrow keys.
         std::string escape_sequence = m_common_io.getEscapeSequence();
         std::cout << "ESC= " << escape_sequence << std::endl;
-        log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 1] input result=", result);
+        log->write<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 1] input result=", result);
         processEscapedInput(result.substr(1), input);
     }
     else if(result[0] == '\x1b' && result.size() == 2 && result[1] == '\x1b')
     {
         // Check Single ESC KEY - command options
         //input = "ESC";  - quit for now
-        log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [ESC HIT!] input result=", result);
+        log->write<Logging::CONSOLE_LOG>("[editorInput] [ESC HIT!] input result=", result);
         m_is_active = false;
     }
     else
     {
         // Handle Input Characters here and control chars.
-        log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [STDIO] input result=", result);
+        log->write<Logging::CONSOLE_LOG>("[editorInput] [STDIO] input result=", result);
 
         if(result[0] == '\x1b')
         {
             std::string escape_sequence = m_common_io.getEscapeSequence();
             std::cout << "ESC= " << escape_sequence << std::endl;
-            log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 2] input result=", static_cast<int>(escape_sequence[0]));
+            log->write<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 2] input result=", static_cast<int>(escape_sequence[0]));
 
             // Hot Key Input, cutoff leading escape for control key.
             processEscapedInput(result.substr(1), input);
@@ -403,7 +403,7 @@ void ModMessageEditor::editorInput(const std::string &input)
         }
 
         for(char c : result)
-            log->xrmLog<Logging::CONSOLE_LOG>("[editorInput] [c HIT] input result=", static_cast<int>(c));
+            log->write<Logging::CONSOLE_LOG>("[editorInput] [c HIT] input result=", static_cast<int>(c));
 
         processTextInput(result, input);
     }
@@ -557,25 +557,25 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
 
     }
 
-    /*
+    
     std::cout << "=========w max " << m_text_box_width << " " << m_text_box_left << std::endl;
     std::cout << "=========h max " << m_text_box_height << " " << m_text_box_top << std::endl;
 
     std::cout << "x_pos: " << m_text_process->getXPosition() << std::endl;
     std::cout << "y_pos: " << m_text_process->getYPosition() << std::endl;
-    */
+    
 
     output += moveCursorToPosition();
-
-    int line_num = m_text_process->getCurrentLine();
-    std::string row_col_stamp = "\x1b[25;1H Pos# L/X/Y ( " +
-                                std::to_string(line_num) + " / "+
-                                std::to_string(m_text_process->getXPosition()) + " / "  +
-                                std::to_string(m_text_process->getYPosition()) + " )    ";
-    row_col_stamp += output;
-
-    // Write output to Client Screen
-    baseProcessDeliverInput(row_col_stamp);
+    
+    // Add a second backspace only when flag is set
+    // Flag is set when we move up and end of previous line
+    // We then remove the last char so we're off the screen border.
+    if (m_text_process->isDoubleBackSpace()) {
+        handleBackSpace(output);
+        m_text_process->setDoubleBackSpace(false);
+    }
+    
+    baseProcessDeliverInput(output);
 }
 
 /**
@@ -587,9 +587,13 @@ void ModMessageEditor::processEscapedInput(std::string result, std::string input
 
     // Just some testing figuring out the best design.
 
-    std::string output = "";
+    std::string output = "";    
     int x_position = m_text_process->getXPosition();
     int y_position = m_text_process->getYPosition();
+    
+    std::cout << "=========w max " << m_text_box_width << " " << m_text_box_left << std::endl;
+    std::cout << "=========h max " << m_text_box_height << " " << m_text_box_top << std::endl;
+    
     std::cout << "x_pos: " << x_position << std::endl;
     std::cout << "y_pos: " << y_position << std::endl;
 
@@ -638,18 +642,9 @@ void ModMessageEditor::processEscapedInput(std::string result, std::string input
         //output = moveCursorToPosition();
     }
 
+
     std::cout << "output: " << output << std::endl;
 
     output += moveCursorToPosition();
-
-    int line_num = m_text_process->getCurrentLine();
-    std::string row_col_stamp = "\x1b[25;1H Pos# L/X/Y ( " +
-                                std::to_string(line_num) + " / "+
-                                std::to_string(m_text_process->getXPosition()) + " / "  +
-                                std::to_string(m_text_process->getYPosition()) + " )    ";
-
-    row_col_stamp += output;
-
-    // Write output to Client Screen
-    baseProcessDeliverInput(row_col_stamp);
+    baseProcessDeliverInput(output);
 }

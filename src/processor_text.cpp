@@ -354,7 +354,7 @@ std::string ProcessorText::screenBufferParse()
             if(start == matches[0].second)
             {
                 Logging *log = Logging::instance();
-                log->xrmLog<Logging::DEBUG_LOG>("[screenBufferParse] no matches!",
+                log->write<Logging::DEBUG_LOG>("[screenBufferParse] no matches!",
                                                 __LINE__, __FILE__);
                 break;
             }
@@ -389,7 +389,7 @@ std::string ProcessorText::screenBufferParse()
     catch(std::regex_error &ex)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("[screenBufferParse] regex=",
+        log->write<Logging::ERROR_LOG>("[screenBufferParse] regex=",
                                         ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
@@ -481,10 +481,11 @@ void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
 
     // catch screen screen scrolling here one shot.
     if(m_y_position > m_number_lines)
-    {
+    {        
+        // Not Yet Setup 
         screenBufferScrollUp();
         m_y_position = m_number_lines;
-        m_max_y_position = m_y_position;
+        m_max_y_position = m_y_position;        
     }
 
     m_screen_pixel.char_sequence = char_sequence;
@@ -497,9 +498,9 @@ void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
     // Setup Mapping for Max Line X Position per Line for END keys.
     try
     {
-        int line_num = m_line_ending_map.at(m_line_number);
+        int line_x_pos = m_line_ending_map.at(m_line_number);
 
-        if(line_num < m_x_position)
+        if(line_x_pos < m_x_position)
         {
             m_line_ending_map[m_line_number] = m_x_position;
         }
@@ -509,6 +510,11 @@ void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
     {
         m_line_ending_map.insert(std::pair<int, int>(m_line_number, m_x_position));
     }
+    
+    // FIXME So we need a Text buffer to store the pixel (character) info per each line
+    // can we use the screen buffer, or do we want something else?
+    // YES, use screen bummer, fast vector of <pixel> 
+    
 
     /*
     // Setup current position in the screen buffer. 1 based for 0 based.
@@ -524,14 +530,14 @@ void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
         else
         {
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("[screenBufferSetGlyph] out of bounds pos=",
+            log->write<Logging::ERROR_LOG>("[screenBufferSetGlyph] out of bounds pos=",
                                             m_x_position-1, __LINE__, __FILE__);
         }
     }
     catch(std::exception &e)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("[screenBufferSetGlyph] exceeds screen dimensions Exception=",
+        log->write<Logging::ERROR_LOG>("[screenBufferSetGlyph] exceeds screen dimensions Exception=",
                                         e.what(), __LINE__, __FILE__);
     }*/
 
@@ -549,6 +555,7 @@ void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
         // Move to next line
         m_x_position = 1;
         ++m_y_position;
+        ++m_line_number;
     }
     else
     {
@@ -598,7 +605,7 @@ void ProcessorText::screenBufferClearRange(int start, int end)
         catch(std::exception &e)
         {
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("[screenBufferClearRange] Exception=", e.what(),
+            log->write<Logging::ERROR_LOG>("[screenBufferClearRange] Exception=", e.what(),
                                             "start=", start, "end=", end, __LINE__, __FILE__);
         }
     }
@@ -619,6 +626,8 @@ void ProcessorText::screenBufferClear()
  */
 void ProcessorText::clearScreen()
 {
+    std::cout << "ProcessorT clearScreen" << std::endl;
+    
     m_is_screen_cleared = true;
     screenBufferClear();
     m_x_position = 1;
@@ -633,14 +642,18 @@ void ProcessorText::clearScreen()
  */
 void ProcessorText::moveHomePosition()
 {
+    std::cout << "ProcessorT moveHomePosition" << std::endl;
+    
     m_x_position = 1;
 }
 
 /**
- * @brief Move End of the current line
+ * @brief Move End of the current line (Not 100%) WIP.
  */
 void ProcessorText::moveEndPosition()
 {
+    std::cout << "ProcessorT moveEndPosition" << std::endl;
+    
     m_x_position = m_line_ending_map[m_line_number];
     m_x_position += 1;
 }
@@ -650,6 +663,8 @@ void ProcessorText::moveEndPosition()
  */
 void ProcessorText::moveNextXPosition()
 {
+    std::cout << "ProcessorT moveNextXPosition" << std::endl;
+    
     if(m_x_position < m_characters_per_line)
         ++m_x_position;
 }
@@ -659,6 +674,8 @@ void ProcessorText::moveNextXPosition()
  */
 void ProcessorText::moveNextYPosition()
 {
+    std::cout << "ProcessorT moveNextYPosition" << std::endl;
+    
     if(m_y_position < m_number_lines)
         ++m_y_position;
 }
@@ -668,6 +685,8 @@ void ProcessorText::moveNextYPosition()
  */
 void ProcessorText::movePreviousXPosition()
 {
+    std::cout << "ProcessorT movePreviousXPosition" << std::endl;
+
     if(m_x_position > 1)
         --m_x_position;
 }
@@ -677,6 +696,8 @@ void ProcessorText::movePreviousXPosition()
  */
 void ProcessorText::movePreviousYPosition()
 {
+    std::cout << "ProcessorT movePreviousYPosition" << std::endl;
+
     if(m_y_position > 1)
         --m_y_position;
     else
@@ -714,6 +735,11 @@ void ProcessorText::moveNewLine()
 void ProcessorText::moveBackSpace()
 {
     std::cout << "ProcessorT moveBackSpace" << std::endl;
+    
+    // Backspace or Delete, the entire lines loses a char.
+    if (m_line_ending_map[m_line_number] > 0) {
+        m_line_ending_map[m_line_number]--;
+    }
 
     if(m_x_position > 1)
     {
@@ -722,18 +748,21 @@ void ProcessorText::moveBackSpace()
     }
 
 
+    // Else, Were as first positiong moving up to previous line
     if(m_y_position > 1)
     {
         --m_y_position;
     }
 
     if(m_line_number > 1)
-    {
+    {        
         --m_line_number;
+        // We moved up a line, now we need to
+        // move to end of current line, as long as were not at top left of box.
+        moveEndPosition();
+        setDoubleBackSpace(true);
+        //--m_x_position;
     }
-
-    // We moved up a line, now we need to
-    // move to end of current line
 
 }
 
@@ -1304,7 +1333,7 @@ void ProcessorText::parseTextToBuffer(char *buff)
 
         // Append Character to Screen Buffer.
         if(buffer.character[0] != '\0' && buffer.length >= 1)
-        {
+        {            
             screenBufferSetGlyph(buffer.character);
         }
     }

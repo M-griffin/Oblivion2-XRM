@@ -43,7 +43,7 @@ std::string SessionIO::getFSEKeyInput(const std::string &character_buffer)
     {
         // No Data received, could be in mid ESC sequence
         // Return for next key.
-        log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Mid Escape");
+        log->write<Logging::DEBUG_LOG>("getKeyInput Mid Escape");
         return "";
     }
 
@@ -57,17 +57,17 @@ std::string SessionIO::getFSEKeyInput(const std::string &character_buffer)
 
         if(escape_sequence.size() == 0)
         {
-            log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Single Escape");
+            log->write<Logging::DEBUG_LOG>("getKeyInput Single Escape");
             return "\x1b";
         }
         else
         {
-            log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Translated Escape Sequence=", escape_sequence);
+            log->write<Logging::DEBUG_LOG>("getKeyInput Translated Escape Sequence=", escape_sequence);
             return (escape_sequence.insert(0, "\x1b"));
         }
     }
 
-    log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Normal Input=", input);
+    log->write<Logging::DEBUG_LOG>("getKeyInput Normal Input=", input);
     return input;
 }
 
@@ -85,7 +85,7 @@ std::string SessionIO::getKeyInput(const std::string &character_buffer)
     {
         // No Data received, could be in mid ESC sequence
         // Return for next key.
-        log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Mid Escape");
+        log->write<Logging::DEBUG_LOG>("getKeyInput Mid Escape");
         return "";
     }
 
@@ -97,17 +97,17 @@ std::string SessionIO::getKeyInput(const std::string &character_buffer)
 
         if(escape_sequence.size() == 0)
         {
-            log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Single Escape");
+            log->write<Logging::DEBUG_LOG>("getKeyInput Single Escape");
             return "\x1b";
         }
         else
         {
-            log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Translated Escape Sequence=", escape_sequence);
+            log->write<Logging::DEBUG_LOG>("getKeyInput Translated Escape Sequence=", escape_sequence);
             return (escape_sequence.insert(0, "\x1b"));
         }
     }
 
-    log->xrmLog<Logging::DEBUG_LOG>("getKeyInput Normal Input=", input);
+    log->write<Logging::DEBUG_LOG>("getKeyInput Normal Input=", input);
     return input;
 }
 
@@ -174,7 +174,7 @@ void SessionIO::createInputField(std::string &field_name, int &len)
                 }
                 else
                 {
-                    log->xrmLog<Logging::ERROR_LOG>("createInputField() Incorrect |FL field length=", tempLength, "cannot exceed max size=", len);
+                    log->write<Logging::ERROR_LOG>("createInputField() Incorrect |FL field length=", tempLength, "cannot exceed max size=", len);
                 }
             }
             else
@@ -187,7 +187,7 @@ void SessionIO::createInputField(std::string &field_name, int &len)
     // Override Foreground/Background Input Field Colors
     // This is now for OBV/2 .. Not in Legacy.
     position = field_name.find("|FB",0);
-    log->xrmLog<Logging::DEBUG_LOG>("createInputField() |FB position=", position, "compare=", position+4, stringSize);
+    log->write<Logging::DEBUG_LOG>("createInputField() |FB position=", position, "compare=", position+4, stringSize);
 
     if(position != std::string::npos)
     {
@@ -304,12 +304,12 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
         // Updates on Keypresses.
         else
         {
-            log->xrmLog<Logging::DEBUG_LOG>("getInputField() result=", result, "string_data=", string_data);
+            log->write<Logging::DEBUG_LOG>("getInputField() result=", result, "string_data=", string_data);
             return string_data;
         }
     }
 
-    log->xrmLog<Logging::DEBUG_LOG>("getInputField() result empty");
+    log->write<Logging::DEBUG_LOG>("getInputField() result empty");
     return "";
 }
 
@@ -740,7 +740,7 @@ std::string SessionIO::parsePipeWithChars(const std::string &pipe_code)
 std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapType> &code_map)
 {
     Logging *log = Logging::instance();
-    log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMap]", __LINE__, __FILE__);
+    log->write<Logging::DEBUG_LOG>("[parseCodeMap]", __LINE__, __FILE__);
 
     std::string ansi_string = screen;
     MapType my_matches;
@@ -774,7 +774,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
         {
             case 1: // Pipe w/ 2 DIGIT Colors
             {
-                log->xrmLog<Logging::DEBUG_LOG>("Pipe w/ 2 DIGIT Colors |00");
+                log->write<Logging::DEBUG_LOG>("Pipe w/ 2 DIGIT Colors |00");
                 std::string result = pipeColors(my_matches.m_code);
 
                 if(result.size() != 0)
@@ -798,7 +798,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 2: // Pipe w/ 2 Chars and 4 Digits // |XY0101
             {
-                log->xrmLog<Logging::DEBUG_LOG>("Pipe w/ 2 Chars and 4 Digits // |XY0101");
+                log->write<Logging::DEBUG_LOG>("Pipe w/ 2 Chars and 4 Digits // |XY0101");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "       ");
             }
@@ -806,7 +806,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 3: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
             {
-                log->xrmLog<Logging::DEBUG_LOG>("Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33");
+                log->write<Logging::DEBUG_LOG>("Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33");
                 std::string result = separatePipeWithCharsDigits(my_matches.m_code);
 
                 if(result.size() != 0)
@@ -821,7 +821,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
                 // This one will need replacement in the string parsing
                 // Pass the original string because of |DE for delay!
             {
-                log->xrmLog<Logging::DEBUG_LOG>("Pipe w/ 2 CHARS // |AA");
+                log->write<Logging::DEBUG_LOG>("Pipe w/ 2 CHARS // |AA");
                 std::string result = parsePipeWithChars(my_matches.m_code);
 
                 if(result.size() != 0)
@@ -838,7 +838,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 5: // %%FILENAME.EXT  get filenames for loading from string prompts
             {
-                log->xrmLog<Logging::DEBUG_LOG>("Replacing %%FILENAME.EXT codes");
+                log->write<Logging::DEBUG_LOG>("Replacing %%FILENAME.EXT codes");
                 std::string result = parseFilename(my_matches.m_code);
 
                 if(result.size() != 0)
@@ -855,7 +855,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 6: // Percent w/ 2 CHARS
             {
-                log->xrmLog<Logging::DEBUG_LOG>("Percent w/ 2 CHARS");
+                log->write<Logging::DEBUG_LOG>("Percent w/ 2 CHARS");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
             }
@@ -865,7 +865,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
             {
                 // Were just removing them because they are processed.
                 // Now that first part of sequence |01 etc.. are processed!
-                log->xrmLog<Logging::DEBUG_LOG>("replacing %## codes");
+                log->write<Logging::DEBUG_LOG>("replacing %## codes");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
             }
@@ -893,7 +893,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std::vector<MapType> &code_map)
 {
     Logging *log = Logging::instance();
-    log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMapGenerics]", __LINE__, __FILE__);
+    log->write<Logging::DEBUG_LOG>("[parseCodeMapGenerics]", __LINE__, __FILE__);
 
     std::string ansi_string = screen;
     MapType my_matches;
@@ -920,13 +920,13 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
 
             if(it != m_mapped_codes.end())
             {
-                log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen found=", my_matches.m_code, it->second, __LINE__, __FILE__);
+                log->write<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen found=", my_matches.m_code, it->second, __LINE__, __FILE__);
                 // If found, replace mci sequence with text
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, it->second);
             }
             else
             {
-                log->xrmLog<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen not found=", __LINE__, __FILE__);
+                log->write<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen not found=", __LINE__, __FILE__);
                 std::string remove_code = "";
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, remove_code);
             }
@@ -990,7 +990,7 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
             if(start == matches[0].second)
             {
                 Logging *log = Logging::instance();
-                log->xrmLog<Logging::DEBUG_LOG>("[parseToCodeMap] no Code Maps Found", __LINE__, __FILE__);
+                log->write<Logging::DEBUG_LOG>("[parseToCodeMap] no Code Maps Found", __LINE__, __FILE__);
                 break;
             }
 
@@ -1039,7 +1039,7 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
     catch(std::regex_error &ex)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("[parseToCodeMap] Exception=", ex.what(), ex.code(), __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("[parseToCodeMap] Exception=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
     return code_map;
@@ -1135,7 +1135,7 @@ std::string SessionIO::pipe2promptFormat(const std::string &sequence, config_ptr
         auto &map = code_map[i];
 
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("[pipe2promptFormat] Menu Format Code=", map.m_code, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("[pipe2promptFormat] Menu Format Code=", map.m_code, __LINE__, __FILE__);
 
         // Control Codes are in Group 2
         switch(map.m_match)
@@ -1188,7 +1188,7 @@ bool SessionIO::checkRegex(const std::string &sequence, const std::string &expre
     catch(std::regex_error &ex)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("[checkRegex] Expression=", expression, "Exception=", ex.what(), ex.code(), __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("[checkRegex] Expression=", expression, "Exception=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
     return result;

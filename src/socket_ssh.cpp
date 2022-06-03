@@ -29,7 +29,7 @@ int SSH_Socket::sendSocket(unsigned char *buffer, Uint32 len)
         if(result < strlen((char *)buffer))
         {
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("Error: ssh_channel_write_nonblocking", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Error: ssh_channel_write_nonblocking", __LINE__, __FILE__);
             m_is_socket_active = false;
             return SSH_ERROR; // or Zero.
         }
@@ -50,7 +50,7 @@ int SSH_Socket::recvSocket(char *message)
         if(result < 0)
         {
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("Error: ssh_channel_read_nonblocking", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Error: ssh_channel_read_nonblocking", __LINE__, __FILE__);
             m_is_socket_active = false;
             return SSH_ERROR;
         }
@@ -119,7 +119,7 @@ bool SSH_Socket::onConnect()
     }
 
     Logging *log = Logging::instance();
-    log->xrmLog<Logging::DEBUG_LOG>("Connecting=", m_host, "User=", m_user_id,
+    log->write<Logging::DEBUG_LOG>("Connecting=", m_host, "User=", m_user_id,
                                     "Password=********");
 
     //SSH Set Connection Options
@@ -139,14 +139,14 @@ bool SSH_Socket::onConnect()
     ssh_options_set(m_ssh_session, SSH_OPTIONS_PORT, &m_port);
     ssh_options_set(m_ssh_session, SSH_OPTIONS_USER, m_user_id.c_str());
 
-    log->xrmLog<Logging::DEBUG_LOG>("Starting up SSH Connection");
+    log->write<Logging::DEBUG_LOG>("Starting up SSH Connection");
 
     // SSH Connect
     rc = ssh_connect(m_ssh_session);
 
     if(rc != SSH_OK)
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, ssh_connect=", m_host,
+        log->write<Logging::ERROR_LOG>("Error, ssh_connect=", m_host,
                                         ssh_get_error(m_ssh_session), __LINE__, __FILE__);
         m_is_socket_active = false;
         return false;
@@ -157,7 +157,7 @@ bool SSH_Socket::onConnect()
 
     if(rc < 0)
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, verify_knownhost=", m_host,
+        log->write<Logging::ERROR_LOG>("Error, verify_knownhost=", m_host,
                                         ssh_get_error(m_ssh_session), __LINE__, __FILE__);
         m_is_socket_active = false;
         return false;
@@ -168,7 +168,7 @@ bool SSH_Socket::onConnect()
 
     if(rc != SSH_AUTH_SUCCESS)
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, authenticate=", m_host,
+        log->write<Logging::ERROR_LOG>("Error, authenticate=", m_host,
                                         ssh_get_error(m_ssh_session), __LINE__, __FILE__);
         m_is_socket_active = false;
         return false;
@@ -179,7 +179,7 @@ bool SSH_Socket::onConnect()
 
     if(m_ssh_channel == nullptr)
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, ssh_channel_new=", m_host,
+        log->write<Logging::ERROR_LOG>("Error, ssh_channel_new=", m_host,
                                         ssh_get_error(m_ssh_session), __LINE__, __FILE__);
         m_is_socket_active = false;
         return false;
@@ -190,7 +190,7 @@ bool SSH_Socket::onConnect()
 
     if(rc != SSH_OK)
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, ssh_channel_open_session=", m_host,
+        log->write<Logging::ERROR_LOG>("Error, ssh_channel_open_session=", m_host,
                                         ssh_get_error(m_ssh_session), __LINE__, __FILE__);
         m_is_socket_active = false;
         return false;
@@ -200,7 +200,7 @@ bool SSH_Socket::onConnect()
     // Only After the Shell has been initialized.
     if(ssh_channel_request_pty_size(m_ssh_channel, "ansi", 80, 25))
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, ssh_channel_request_pty_size=", m_host,
+        log->write<Logging::ERROR_LOG>("Error, ssh_channel_request_pty_size=", m_host,
                                         ssh_get_error(m_ssh_session), __LINE__, __FILE__);
         // Not an error to exit the connection on.
         //return 0;
@@ -209,7 +209,7 @@ bool SSH_Socket::onConnect()
     // Now request a shell with the pty to get read/write
     if(ssh_channel_request_shell(m_ssh_channel))
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, ssh_channel_request_shell=", m_host,
+        log->write<Logging::ERROR_LOG>("Error, ssh_channel_request_shell=", m_host,
                                         ssh_get_error(m_ssh_session), __LINE__, __FILE__);
         m_is_socket_active = false;
         return false;
@@ -281,25 +281,25 @@ int SSH_Socket::verify_knownhost()
     switch(state)
     {
         case SSH_SERVER_KNOWN_OK:
-            log->xrmLog<Logging::CONSOLE_LOG>("SSH_SERVER_KNOWN_OK", __LINE__, __FILE__);
+            log->write<Logging::CONSOLE_LOG>("SSH_SERVER_KNOWN_OK", __LINE__, __FILE__);
             break; /* ok */
 
         case SSH_SERVER_KNOWN_CHANGED:
 
             ssh_print_hexa("Public key hash", hash, hlen);
-            log->xrmLog<Logging::ERROR_LOG>("Host key for server changed: it is now=", hash);
-            log->xrmLog<Logging::ERROR_LOG>("For security reasons, connection will be stopped", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Host key for server changed: it is now=", hash);
+            log->write<Logging::ERROR_LOG>("For security reasons, connection will be stopped", __LINE__, __FILE__);
             free(hash);
             return -1;
 
         case SSH_SERVER_FOUND_OTHER:
-            log->xrmLog<Logging::ERROR_LOG>("The host key for this server was not found but an other",
+            log->write<Logging::ERROR_LOG>("The host key for this server was not found but an other",
                                             "type of key exists.", __LINE__, __FILE__);
             free(hash);
             return -1;
 
         case SSH_SERVER_FILE_NOT_FOUND:
-            log->xrmLog<Logging::CONSOLE_LOG>("SSH_SERVER_FILE_NOT_FOUND.",
+            log->write<Logging::CONSOLE_LOG>("SSH_SERVER_FILE_NOT_FOUND.",
                                               "If you accept, host key is automatically created.", __LINE__, __FILE__);
 #if __GNUC__ >= 6
             [[gnu::fallthrough]]; // c++11 and c++14
@@ -309,7 +309,7 @@ int SSH_Socket::verify_knownhost()
         case SSH_SERVER_NOT_KNOWN:
             hexa = ssh_get_hexa(hash, hlen);
             //Do you trust the host key?\n");
-            log->xrmLog<Logging::CONSOLE_LOG>("SSH_SERVER_NOT_KNOWN. Adding Key.",
+            log->write<Logging::CONSOLE_LOG>("SSH_SERVER_NOT_KNOWN. Adding Key.",
                                               "Public key hash=", hexa, __LINE__, __FILE__);
             free(hexa);
 
@@ -327,7 +327,7 @@ int SSH_Socket::verify_knownhost()
             */
             if(ssh_write_knownhost(m_ssh_session) < 0)
             {
-                log->xrmLog<Logging::ERROR_LOG>("Error, ssh_write_knownhost=", strerror(errno), __LINE__, __FILE__);
+                log->write<Logging::ERROR_LOG>("Error, ssh_write_knownhost=", strerror(errno), __LINE__, __FILE__);
                 free(hash);
                 return -1;
             }
@@ -335,7 +335,7 @@ int SSH_Socket::verify_knownhost()
             break;
 
         case SSH_SERVER_ERROR:
-            log->xrmLog<Logging::ERROR_LOG>("Error, SSH_SERVER_ERROR=", ssh_get_error(m_ssh_session), __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Error, SSH_SERVER_ERROR=", ssh_get_error(m_ssh_session), __LINE__, __FILE__);
             free(hash);
             return -1;
     }
@@ -417,21 +417,21 @@ int SSH_Socket::authenticate_console()
     switch(rc)
     {
         case SSH_AUTH_ERROR:   //some error happened during authentication
-            log->xrmLog<Logging::ERROR_LOG>("ssh_userauth_none SSH_AUTH_ERROR=", ssh_get_error(m_ssh_session), __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("ssh_userauth_none SSH_AUTH_ERROR=", ssh_get_error(m_ssh_session), __LINE__, __FILE__);
             return rc;
 
         case SSH_AUTH_DENIED:  //no key matched
-            log->xrmLog<Logging::ERROR_LOG>("ssh_userauth_none SSH_AUTH_DENIED", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("ssh_userauth_none SSH_AUTH_DENIED", __LINE__, __FILE__);
             break;
 
         case SSH_AUTH_SUCCESS: //you are now authenticated
-            log->xrmLog<Logging::CONSOLE_LOG>("ssh_userauth_none SSH_AUTH_SUCCESS", __LINE__, __FILE__);
+            log->write<Logging::CONSOLE_LOG>("ssh_userauth_none SSH_AUTH_SUCCESS", __LINE__, __FILE__);
             break;
 
         case SSH_AUTH_PARTIAL:
             //some key matched but you still have
             //to provide an other mean of authentication (like a password).
-            log->xrmLog<Logging::CONSOLE_LOG>("ssh_userauth_none SSH_AUTH_PARTIAL", __LINE__, __FILE__);
+            log->write<Logging::CONSOLE_LOG>("ssh_userauth_none SSH_AUTH_PARTIAL", __LINE__, __FILE__);
             break;
     }
 
@@ -463,22 +463,22 @@ int SSH_Socket::authenticate_console()
             switch(rc)
             {
                 case SSH_AUTH_ERROR:   //some serious error happened during authentication
-                    log->xrmLog<Logging::ERROR_LOG>("SSH_AUTH_METHOD_PUBLICKEY SSH_AUTH_ERROR=", ssh_get_error(m_ssh_session), __LINE__, __FILE__);
+                    log->write<Logging::ERROR_LOG>("SSH_AUTH_METHOD_PUBLICKEY SSH_AUTH_ERROR=", ssh_get_error(m_ssh_session), __LINE__, __FILE__);
                     return rc;
 
                 case SSH_AUTH_DENIED:  //no key matched
-                    log->xrmLog<Logging::ERROR_LOG>("SSH_AUTH_METHOD_PUBLICKEY SSH_AUTH_DENIED", __LINE__, __FILE__);
+                    log->write<Logging::ERROR_LOG>("SSH_AUTH_METHOD_PUBLICKEY SSH_AUTH_DENIED", __LINE__, __FILE__);
                     ++failureCounter;
                     break;
 
                 case SSH_AUTH_SUCCESS: //you are now authenticated
-                    log->xrmLog<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_PUBLICKEY SSH_AUTH_SUCCESS", __LINE__, __FILE__);
+                    log->write<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_PUBLICKEY SSH_AUTH_SUCCESS", __LINE__, __FILE__);
                     break;
 
                 case SSH_AUTH_PARTIAL:
                     // some key matched but you still have
                     // to provide an other mean of authentication (like a password).
-                    log->xrmLog<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_PUBLICKEY SSH_AUTH_PARTIAL", __LINE__, __FILE__);
+                    log->write<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_PUBLICKEY SSH_AUTH_PARTIAL", __LINE__, __FILE__);
                     ++failureCounter;
                     break;
 
@@ -518,21 +518,21 @@ int SSH_Socket::authenticate_console()
             switch(rc)
             {
                 case SSH_AUTH_ERROR:   //some serious error happened during authentication
-                    log->xrmLog<Logging::ERROR_LOG>("SSH_AUTH_METHOD_INTERACTIVE SSH_AUTH_ERROR=", ssh_get_error(m_ssh_session), __LINE__, __FILE__);
+                    log->write<Logging::ERROR_LOG>("SSH_AUTH_METHOD_INTERACTIVE SSH_AUTH_ERROR=", ssh_get_error(m_ssh_session), __LINE__, __FILE__);
                     return rc;
 
                 case SSH_AUTH_DENIED:  //no key matched
-                    log->xrmLog<Logging::ERROR_LOG>("SSH_AUTH_METHOD_INTERACTIVE SSH_AUTH_DENIED", __LINE__, __FILE__);
+                    log->write<Logging::ERROR_LOG>("SSH_AUTH_METHOD_INTERACTIVE SSH_AUTH_DENIED", __LINE__, __FILE__);
                     ++failureCounter;
                     break;
 
                 case SSH_AUTH_SUCCESS: //you are now authenticated
-                    log->xrmLog<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_INTERACTIVE SSH_AUTH_SUCCESS", __LINE__, __FILE__);
+                    log->write<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_INTERACTIVE SSH_AUTH_SUCCESS", __LINE__, __FILE__);
                     break;
 
                 case SSH_AUTH_PARTIAL: //some key matched but you still have to
                     //provide an other mean of authentication (like a password).
-                    log->xrmLog<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_INTERACTIVE SSH_AUTH_PARTIAL", __LINE__, __FILE__);
+                    log->write<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_INTERACTIVE SSH_AUTH_PARTIAL", __LINE__, __FILE__);
                     ++failureCounter;
                     break;
 
@@ -552,27 +552,27 @@ int SSH_Socket::authenticate_console()
         {
             if(m_password != "")
             {
-                log->xrmLog<Logging::CONSOLE_LOG>("Manual Login=", m_user_id, __LINE__, __FILE__);
+                log->write<Logging::CONSOLE_LOG>("Manual Login=", m_user_id, __LINE__, __FILE__);
                 rc = ssh_userauth_password(m_ssh_session, m_user_id.c_str(), m_password.c_str());
 
                 switch(rc)
                 {
                     case SSH_AUTH_ERROR:   //some serious error happened during authentication
-                        log->xrmLog<Logging::ERROR_LOG>("SSH_AUTH_METHOD_PASSWORD SSH_AUTH_ERROR=", ssh_get_error(m_ssh_session), __LINE__, __FILE__);
+                        log->write<Logging::ERROR_LOG>("SSH_AUTH_METHOD_PASSWORD SSH_AUTH_ERROR=", ssh_get_error(m_ssh_session), __LINE__, __FILE__);
                         return rc;
 
                     case SSH_AUTH_DENIED:  //no key matched
-                        log->xrmLog<Logging::ERROR_LOG>("SSH_AUTH_METHOD_PASSWORD SSH_AUTH_DENIED", __LINE__, __FILE__);
+                        log->write<Logging::ERROR_LOG>("SSH_AUTH_METHOD_PASSWORD SSH_AUTH_DENIED", __LINE__, __FILE__);
                         ++failureCounter;
                         break;
 
                     case SSH_AUTH_SUCCESS: //you are now authenticated
-                        log->xrmLog<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_PASSWORD SSH_AUTH_SUCCESS", __LINE__, __FILE__);
+                        log->write<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_PASSWORD SSH_AUTH_SUCCESS", __LINE__, __FILE__);
                         break;
 
                     case SSH_AUTH_PARTIAL: //some key matched but you still have to
                         // provide an other mean of authentication (like a password).
-                        log->xrmLog<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_PASSWORD SSH_AUTH_PARTIAL", __LINE__, __FILE__);
+                        log->write<Logging::CONSOLE_LOG>("SSH_AUTH_METHOD_PASSWORD SSH_AUTH_PARTIAL", __LINE__, __FILE__);
                         ++failureCounter;
                         break;
 
@@ -587,11 +587,11 @@ int SSH_Socket::authenticate_console()
 
     if(banner)
     {
-        log->xrmLog<Logging::CONSOLE_LOG>("SSH Banner=", banner, __LINE__, __FILE__);
+        log->write<Logging::CONSOLE_LOG>("SSH Banner=", banner, __LINE__, __FILE__);
         ssh_string_free_char(banner);
     }
 
-    log->xrmLog<Logging::CONSOLE_LOG>("SSH Authenticate Completed", __LINE__, __FILE__);
+    log->write<Logging::CONSOLE_LOG>("SSH Authenticate Completed", __LINE__, __FILE__);
 
     return rc;
 }

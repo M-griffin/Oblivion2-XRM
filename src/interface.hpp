@@ -60,13 +60,13 @@ public:
         // Startup SDL NET. Custom version Tweaked for KEEP Alive's
         if(SDLNet_Init() == -1)
         {
-            log->xrmLog<Logging::ERROR_LOG>("SDLNet_Init", SDLNet_GetError());
+            log->write<Logging::ERROR_LOG>("SDLNet_Init", SDLNet_GetError());
             TheCommunicator::instance()->shutdown();
             return;
         }
 
         unsigned int num_threads = std::thread::hardware_concurrency();
-        log->xrmLog<Logging::INFO_LOG>("concurrent threads supported", num_threads);
+        log->write<Logging::INFO_LOG>("concurrent threads supported", num_threads);
 
         // Start up worker thread of ASIO. We want socket communications in a separate thread.
         // We only spawn a single thread for IO_Service on start up
@@ -75,7 +75,7 @@ public:
         // Setup Telnet Server Connection Listener.
         if(!m_socket_acceptor->createTelnetAcceptor("127.0.0.1", port))
         {
-            log->xrmLog<Logging::ERROR_LOG>("Unable to start Telnet Acceptor");
+            log->write<Logging::ERROR_LOG>("Unable to start Telnet Acceptor");
             TheCommunicator::instance()->shutdown();
             return;
         }
@@ -84,7 +84,7 @@ public:
         // And send messages to other nodes.
         TheCommunicator::instance()->setupServer(m_session_manager);
 
-        log->xrmLog<Logging::CONSOLE_LOG>("Telnet Server Waiting for Connection.");
+        log->write<Logging::CONSOLE_LOG>("Telnet Server Waiting for Connection.");
         waitingForConnection();
     }
 
@@ -101,7 +101,7 @@ public:
     void waitingForConnection()
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Waiting For Connection, Adding Async Job to Listener");
+        log->write<Logging::DEBUG_LOG>("Waiting For Connection, Adding Async Job to Listener");
         m_async_listener->asyncAccept(
             m_protocol,
             std::bind(&Interface::handle_accept,
@@ -122,7 +122,7 @@ private:
         if(!error)
         {
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::DEBUG_LOG>("TCP Connection accepted");
+            log->write<Logging::DEBUG_LOG>("TCP Connection accepted");
 
             connection_ptr async_conn(new AsyncConnection(m_io_service, socket_handler));
 
@@ -143,7 +143,7 @@ private:
         else
         {
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("Connection refused", error.message());
+            log->write<Logging::ERROR_LOG>("Connection refused", error.message());
         }
     }
 

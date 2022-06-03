@@ -185,7 +185,7 @@ public:
 
         if(error)
         {
-            log->xrmLog<Logging::ERROR_LOG>("Async_Write Session Closed() error=", error.message(), __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Async_Write Session Closed() error=", error.message(), __LINE__, __FILE__);
         }
 
         session_manager_ptr session_manager = m_session_data->m_session_manager.lock();
@@ -201,12 +201,12 @@ public:
             {
                 try
                 {
-                    log->xrmLog<Logging::DEBUG_LOG>("Leaving (NORMAL SESSION)", __LINE__, __FILE__);
+                    log->write<Logging::DEBUG_LOG>("Leaving (NORMAL SESSION)", __LINE__, __FILE__);
                     m_connection->shutdown();
                 }
                 catch(std::exception &ex)
                 {
-                    log->xrmLog<Logging::ERROR_LOG>("Exception closing socket()", ex.what(), __LINE__, __FILE__);
+                    log->write<Logging::ERROR_LOG>("Exception closing socket()", ex.what(), __LINE__, __FILE__);
                 }
             }
         }
@@ -231,17 +231,17 @@ public:
         {
             try
             {
-                log->xrmLog<Logging::DEBUG_LOG>("New Session Accepted", __LINE__, __FILE__);
+                log->write<Logging::DEBUG_LOG>("New Session Accepted", __LINE__, __FILE__);
             }
             catch(std::exception &ex)
             {
-                log->xrmLog<Logging::ERROR_LOG>("Exception remote_endpoint()=", ex.what(), __LINE__, __FILE__);
+                log->write<Logging::ERROR_LOG>("Exception remote_endpoint()=", ex.what(), __LINE__, __FILE__);
             }
         }
 
         // Get The First available node number.
         m_session_data->m_node_number = TheCommunicator::instance()->getNodeNumber();
-        log->xrmLog<Logging::CONSOLE_LOG>("New Session ConnectionNode Number=", m_session_data->m_node_number);
+        log->write<Logging::CONSOLE_LOG>("New Session ConnectionNode Number=", m_session_data->m_node_number);
     }
 
     connection_ptr	    m_connection;

@@ -25,7 +25,7 @@ void AccessCondition::setFlagToggle(unsigned char flag, bool first_set, user_ptr
     if(bit < 0 || bit > 25)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
@@ -53,7 +53,7 @@ void AccessCondition::setFlagLevelToggle(unsigned char flag, bool first_set, acc
     if(bit < 0 || bit > 25)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
@@ -81,7 +81,7 @@ void AccessCondition::setFlagOn(unsigned char flag, bool first_set, user_ptr use
     if(bit < 0 || bit > 25)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
@@ -109,7 +109,7 @@ void AccessCondition::setFlagOff(unsigned char flag, bool first_set, user_ptr us
     if(bit < 0 || bit > 25)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
@@ -138,7 +138,7 @@ bool AccessCondition::checkAccessConditionFlag(unsigned char flag, bool first_se
     if(bit < 0 || bit > 25)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return false;
     }
 

@@ -264,7 +264,7 @@ std::vector<session_stats_ptr> SessionStatsDao::getAllStatsPerUser(long userId)
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -273,7 +273,7 @@ std::vector<session_stats_ptr> SessionStatsDao::getAllStatsPerUser(long userId)
 
     if(!qry->isConnected())
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -296,12 +296,12 @@ std::vector<session_stats_ptr> SessionStatsDao::getAllStatsPerUser(long userId)
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>("Error, getAllStatsPerUser Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Error, getAllStatsPerUser Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return list;
@@ -320,7 +320,7 @@ std::vector<session_stats_ptr> SessionStatsDao::getLast10CallerStats()
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, Database is not connected", m_strTableName, __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, Database is not connected", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -329,7 +329,7 @@ std::vector<session_stats_ptr> SessionStatsDao::getLast10CallerStats()
 
     if(!qry->isConnected())
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -353,12 +353,12 @@ std::vector<session_stats_ptr> SessionStatsDao::getLast10CallerStats()
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>("Error, getLast10CallerStats Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Error, getLast10CallerStats Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return list;
@@ -377,7 +377,7 @@ std::vector<session_stats_ptr> SessionStatsDao::getTodaysCallerStats()
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -386,7 +386,7 @@ std::vector<session_stats_ptr> SessionStatsDao::getTodaysCallerStats()
 
     if(!qry->isConnected())
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -412,12 +412,12 @@ std::vector<session_stats_ptr> SessionStatsDao::getTodaysCallerStats()
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>("Error, getTodaysCallerStats Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Error, getTodaysCallerStats Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return list;
