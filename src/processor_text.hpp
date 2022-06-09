@@ -45,7 +45,7 @@ public:
 
 
     // Screen Buffer Modifiers
-    virtual void screenBufferSetGlyph(std::string char_sequence) override;
+    virtual void screenBufferSetGlyph(const std::string &char_sequence) override;
     virtual void screenBufferScrollUp() override;
     virtual void screenBufferClearRange(int start, int end) override;
     virtual void screenBufferClear() override;
@@ -66,8 +66,14 @@ public:
     void setDoubleBackSpace(bool is_double_backspace) {
         m_is_double_backspace = is_double_backspace;
     }
+    
+    int getMaxCharactersPerLine() const {
+        return m_characters_per_line;
+    }
 
-    // Processor Text Specific
+    // Processor Text Specific    
+    void handleTextInput(const std::string &char_sequence);
+
     void moveHomePosition();
     void moveEndPosition();
     void moveNextXPosition();

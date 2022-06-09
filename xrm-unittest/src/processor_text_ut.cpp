@@ -62,9 +62,9 @@ SUITE(XRMProcessorText)
      
         // Line Number Array is 1 Based! for actual lines.
         std::map<int, int> line_ending_map = text.getLineEndingMap();
-        
+                
         // m_line_ending_map stores on last positions, not actual data.
-        CHECK(line_ending_map[LINE_NUMBER] == 7);
+        CHECK(line_ending_map[LINE_NUMBER] == 8);
     }
     
     TEST(parseText_LineEnding_InitialText_Entry_With_Backspace)
@@ -76,9 +76,9 @@ SUITE(XRMProcessorText)
         text.parseTextToBuffer((char *)"ABC1234\b");
      
         // Line Number Array is 1 Based! for actual lines.
-        std::map<int, int> line_ending_map = text.getLineEndingMap();
+        std::map<int, int> line_ending_map = text.getLineEndingMap();       
         
-        CHECK(line_ending_map[LINE_NUMBER] == 6);
+        CHECK(line_ending_map[LINE_NUMBER] == 7);
     }
     
     TEST(parseText_LineEnding_InitialText_Entry_Multiple_Lines_With_Backspace)
@@ -93,9 +93,9 @@ SUITE(XRMProcessorText)
      
         // Line Number Array is 1 Based! for actual lines.
         std::map<int, int> line_ending_map = text.getLineEndingMap();
-                
-        CHECK(line_ending_map[LINE_NUMBER] == 7);
-        CHECK(line_ending_map[NEXT_LINE_NUMBER] == 7);
+        
+        CHECK(line_ending_map[LINE_NUMBER] == 8);
+        CHECK(line_ending_map[NEXT_LINE_NUMBER] == 8);
     }
     
     TEST(parseText_LineEnding_InitialText_Entry_Multiple_Lines_With_Backspace_MoveUp)
@@ -111,7 +111,7 @@ SUITE(XRMProcessorText)
         // Line Number Array is 1 Based! for actual lines.
         std::map<int, int> line_ending_map = text.getLineEndingMap();
         
-        CHECK(line_ending_map[LINE_NUMBER] == 7);
+        CHECK(line_ending_map[LINE_NUMBER] == 8);
         CHECK(line_ending_map[NEXT_LINE_NUMBER] == 0);
         CHECK(text.getCurrentLine() == LINE_NUMBER);
     }
@@ -132,7 +132,7 @@ SUITE(XRMProcessorText)
         
         std::cout << "lem[LINE_NUMBER]: " << line_ending_map[LINE_NUMBER] << ", ln: " << text.m_line_number << std::endl;
         
-        CHECK(line_ending_map[LINE_NUMBER] == 6);
+        CHECK(line_ending_map[LINE_NUMBER] == 7);
         
         std::cout << "lem[NEXT_LINE_NUMBER]: " << line_ending_map[NEXT_LINE_NUMBER] << std::endl;
         std::cout << "lem[NEXT_LINE_NUMBER+1]: " << line_ending_map[NEXT_LINE_NUMBER+1] << std::endl;
@@ -140,6 +140,9 @@ SUITE(XRMProcessorText)
         std::cout << "m_characters_per_line: " << text.m_characters_per_line << std::endl;
         std::cout << "getMaxLines(): " << text.getMaxLines() << std::endl;
         std::cout << "getMaxRowsUsedOnScreen(): " << text.getMaxRowsUsedOnScreen() << std::endl;
+        
+        std::cout << "m_x_position: " << text.m_x_position << std::endl;
+        std::cout << "m_y_position: " << text.m_y_position << std::endl;        
         
         CHECK(line_ending_map[NEXT_LINE_NUMBER] == 0);
         CHECK(line_ending_map[NEXT_LINE_NUMBER+1] == 0);
@@ -149,6 +152,56 @@ SUITE(XRMProcessorText)
         CHECK(text.m_y_position = LINE_NUMBER);
         CHECK(text.m_line_number = LINE_NUMBER);
     }
+    
+    // Extra Testing.. make sure if we're properly tracking X_position and line_ending_map[LINE_NUMBER]
+    // Which should be tracking the last or greatest X_Position per line
+    TEST(parseText_LineEnding_And_XPoisiton_1)
+    {        
+        const int LINE_NUMBER = 1;
+        
+        // Make a small box easier to test wrapping
+        ProcessorText text(10,10);
+        text.parseTextToBuffer((char *)"A");
+     
+        // Line Number Array is 1 Based! for actual lines.
+        std::map<int, int> line_ending_map = text.getLineEndingMap();
+        
+        std::cout << "lem[LINE_NUMBER]: " << line_ending_map[LINE_NUMBER] << ", ln: " << text.m_line_number << std::endl;
+        
+        CHECK(line_ending_map[LINE_NUMBER] == 2);
+        
+        std::cout << "m_x_position: " << text.m_x_position << std::endl;
+        std::cout << "m_y_position: " << text.m_y_position << std::endl;        
+        
+        CHECK(text.getCurrentLine() == LINE_NUMBER);        
+        CHECK(text.m_x_position = line_ending_map[LINE_NUMBER]);
+    }
+    
+    // Extra Testing.. make sure if we're properly tracking X_position and line_ending_map[LINE_NUMBER]
+    // Which should be tracking the last or greatest X_Position per line
+    TEST(parseText_LineEnding_And_XPoisiton_2)
+    {        
+        const int LINE_NUMBER = 1;
+        
+        // Make a small box easier to test wrapping
+        ProcessorText text(10,10);
+        text.parseTextToBuffer((char *)"AB");
+     
+        // Line Number Array is 1 Based! for actual lines.
+        std::map<int, int> line_ending_map = text.getLineEndingMap();
+        
+        std::cout << "lem[LINE_NUMBER]: " << line_ending_map[LINE_NUMBER] << ", ln: " << text.m_line_number << std::endl;
+        
+        CHECK(line_ending_map[LINE_NUMBER] == 3);
+        
+        std::cout << "m_x_position: " << text.m_x_position << std::endl;
+        std::cout << "m_y_position: " << text.m_y_position << std::endl;        
+        
+        CHECK(text.getCurrentLine() == LINE_NUMBER);        
+        CHECK(text.m_x_position = line_ending_map[LINE_NUMBER]);
+    }
+    
+    
     
     // WIP Not wrapping to next line when just entering chars!
     /*

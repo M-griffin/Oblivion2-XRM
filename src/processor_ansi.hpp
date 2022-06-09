@@ -38,7 +38,7 @@ public:
 
 
     // Screen Buffer Modifiers
-    virtual void screenBufferSetGlyph(std::string char_sequence) override;
+    virtual void screenBufferSetGlyph(const std::string &char_sequence) override;
     virtual void screenBufferScrollUp() override;
     virtual void screenBufferClearRange(int start, int end) override;
     virtual void screenBufferClear() override;

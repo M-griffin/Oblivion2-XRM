@@ -76,7 +76,7 @@ public:
 
 
     // Screen Buffer Modifiers
-    virtual void screenBufferSetGlyph(std::string char_sequence) = 0;
+    virtual void screenBufferSetGlyph(const std::string &char_sequence) = 0;
     virtual void screenBufferScrollUp() = 0;
     virtual void screenBufferClearRange(int start, int end) = 0;
     virtual void screenBufferClear() = 0;

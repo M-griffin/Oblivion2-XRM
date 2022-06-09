@@ -462,11 +462,12 @@ std::string ProcessorText::screenBufferParse()
 }
 
 /**
- * @brief Plots Characters on the Screen into the Buffer.
- * @param c
+ * @brief Text Handler pre-positioning prior to storing character
+ * @param char_sequence
  */
-void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
+void ProcessorText::handleTextInput(const std::string &char_sequence)
 {
+    
     // Set the Current Max Row Position.
     if(m_max_y_position < m_y_position)
     {
@@ -474,9 +475,9 @@ void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
     }
 
     // Keep track of the lonest line in buffer for Centering screen.
-    if(m_x_position > m_max_x_position)
+    if(m_x_position > m_line_ending_map[m_line_number])
     {
-        m_max_x_position = m_x_position;
+        m_line_ending_map[m_line_number] = m_x_position;
     }
 
     // catch screen screen scrolling here one shot.
@@ -487,15 +488,33 @@ void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
         m_y_position = m_number_lines;
         m_max_y_position = m_y_position;        
     }
+    
+    
+    // Writes the Char Sequence to the Text Screen Buffer    
+    screenBufferSetGlyph(char_sequence);
+    
+    
+    // Move Cursor to next position after character insert.
+    if(m_x_position >= m_characters_per_line)
+    {
+        // Move to next line
+        m_x_position = 1;
+        ++m_y_position;
+        ++m_line_number;
+    }
+    else
+    {
+        ++m_x_position;
 
-    m_screen_pixel.char_sequence = char_sequence;
-    m_screen_pixel.x_position = m_x_position;
-    m_screen_pixel.y_position = m_y_position;
-    m_screen_pixel.attribute  = m_attribute;
-    m_screen_pixel.foreground = m_foreground_color;
-    m_screen_pixel.background = m_background_color;
-
+        // Make sure the x/y position does go over num lines
+        if(m_y_position > m_number_lines)
+        {
+            m_y_position = m_number_lines;
+        }
+    }
+    
     // Setup Mapping for Max Line X Position per Line for END keys.
+    // And special Funcations like move up and end of line.
     try
     {
         int line_x_pos = m_line_ending_map.at(m_line_number);
@@ -510,11 +529,25 @@ void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
     {
         m_line_ending_map.insert(std::pair<int, int>(m_line_number, m_x_position));
     }
+}
+
+/**
+ * @brief Plots Characters on the Screen into the Buffer.
+ * @param char_sequence
+ */
+void ProcessorText::screenBufferSetGlyph(const std::string &char_sequence)
+{
+    m_screen_pixel.char_sequence = char_sequence;
+    m_screen_pixel.x_position = m_x_position;
+    m_screen_pixel.y_position = m_y_position;
+    m_screen_pixel.attribute  = m_attribute;
+    m_screen_pixel.foreground = m_foreground_color;
+    m_screen_pixel.background = m_background_color;
+    
     
     // FIXME So we need a Text buffer to store the pixel (character) info per each line
     // can we use the screen buffer, or do we want something else?
     // YES, use screen bummer, fast vector of <pixel> 
-    
 
     /*
     // Setup current position in the screen buffer. 1 based for 0 based.
@@ -549,24 +582,6 @@ void ProcessorText::screenBufferSetGlyph(std::string char_sequence)
     m_screen_pixel.foreground = FG_WHITE;
     m_screen_pixel.background = BG_BLACK;
 
-    // Move Cursor to next position after character insert.
-    if(m_x_position >= m_characters_per_line)
-    {
-        // Move to next line
-        m_x_position = 1;
-        ++m_y_position;
-        ++m_line_number;
-    }
-    else
-    {
-        ++m_x_position;
-
-        // Make sure the x/y position does go over num lines
-        if(m_y_position > m_number_lines)
-        {
-            m_y_position = m_number_lines;
-        }
-    }
 }
 
 /**
@@ -655,7 +670,7 @@ void ProcessorText::moveEndPosition()
     std::cout << "ProcessorT moveEndPosition" << std::endl;
     
     m_x_position = m_line_ending_map[m_line_number];
-    m_x_position += 1;
+    //m_x_position += 1;
 }
 
 /**
@@ -742,26 +757,54 @@ void ProcessorText::moveBackSpace()
     }
 
     if(m_x_position > 1)
-    {
+    {        
         --m_x_position;
         return;
     }
 
-
     // Else, Were as first positiong moving up to previous line
+    // If it's not the very top of the text area.
     if(m_y_position > 1)
     {
         --m_y_position;
     }
 
+    // Each line represents a line of text that can run off the screen
+    // so the actual lines in the message buffer, storing line we are on.
     if(m_line_number > 1)
-    {        
+    {                
+        // Reset the current line, we're at the fist spot moving up on Backspace.
+        m_line_ending_map[m_line_number] = 0;
+        if (m_line_ending_map[m_line_number] > 0) {
+            m_line_ending_map[m_line_number]--;
+        }
+        
+        // Setup for Previous Line, if we move up, move back 1 automatically.
         --m_line_number;
+        
+        std::cout << "ProcessorT moveBackSpace (Move Line Up)" << "m_line_ending_map[m_line_number]="<< m_line_ending_map[m_line_number] << std::endl;        
+        
         // We moved up a line, now we need to
         // move to end of current line, as long as were not at top left of box.
         moveEndPosition();
+        
+        std::cout << "ProcessorT moveBackSpace (Move Line Up)" << "moveEndPosition="<< m_x_position << std::endl;
+        
+        // Double Escape is when you're Backspace up and move to the end of the line
+        // There is 1 chat at the right edge, when we backspace in this instance
+        // we do a second one to remove that character then move left 1 spot to take
+        // it's position and not overwrite the templates.
+        
         setDoubleBackSpace(true);
-        //--m_x_position;
+    }
+    // Were on Top Line Now, just moved there.
+    else 
+    {
+        std::cout << "ProcessorT moveBackSpace (Move Line Up ! ELSE)" << std::endl;
+        
+        if (m_line_ending_map[m_line_number] > 0) {
+            m_line_ending_map[m_line_number]--;
+        }
     }
 
 }
@@ -795,6 +838,9 @@ void ProcessorText::escapeSequenceParsing(LocalizedBuffer &buffer,
         std::string::iterator &it,
         std::string::iterator &line_end)
 {
+    
+    std::cout << "escapeSequenceParsing !! " << std::endl;
+                
     CommonIO common_io;
     std::string esc_sequence = "";
 
@@ -1304,37 +1350,34 @@ void ProcessorText::parseTextToBuffer(char *buff)
 
         std::cout << "loop char <int>: " << static_cast<int>(buffer.character[0]) << std::endl;
 
+        // ESC Sequences
         if(buffer.length == 1 && buffer.character[0] == '\x1b')
         {
-            std::cout << "escapeSequenceParsing !! " << std::endl;
             escapeSequenceParsing(buffer, it, line_end);
-            continue;
         }
-
-        // Catch Backspace
-        if(buffer.character[0] == '\b')
+        // Back Space
+        else if(buffer.character[0] == '\b')
         {
             moveBackSpace();
-            continue;
         }
-
         // Catch Tabs
-        if(buffer.character[0] == '\t')
+        else if(buffer.character[0] == '\t')
         {
             moveTabWidth();
-            continue;
         }
-
         else if(buffer.length == 1 && buffer.character[0] == '\n')
         {
             moveNewLine();
-            continue;
         }
-
         // Append Character to Screen Buffer.
-        if(buffer.character[0] != '\0' && buffer.length >= 1)
+        else if(buffer.character[0] != '\0' && buffer.length >= 1)
         {            
-            screenBufferSetGlyph(buffer.character);
+            handleTextInput(buffer.character);
         }
+        else {
+            std::cout << "not handled charater sequence: " << static_cast<int>(buffer.character[0]) << std::endl;
+        }
+        
+        // End of Position Updates for movement.
     }
 }

@@ -489,7 +489,7 @@ std::string ProcessorAnsi::screenBufferParse()
  * @brief Plots Characters on the Screen into the Buffer.
  * @param c
  */
-void ProcessorAnsi::screenBufferSetGlyph(std::string char_sequence)
+void ProcessorAnsi::screenBufferSetGlyph(const std::string &char_sequence)
 {
     Logging *log = Logging::instance();
 

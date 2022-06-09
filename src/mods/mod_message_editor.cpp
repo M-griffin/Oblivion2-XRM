@@ -447,9 +447,12 @@ std::string ModMessageEditor::scrollTextBoxDown(std::string &output)
  */
 void ModMessageEditor::handleBackSpace(std::string &output)
 {
+    /** Need to Write code to delete char or space and move everything left **/    
     int x_position = m_text_process->getXPosition();
+    
+    std::cout << "handleBackSpace max_chars=" << m_text_process->getMaxCharactersPerLine() << ", x_pos=" << x_position << std::endl;
 
-    // destructive backspace
+    // destructive backspace OR Move Up a Line Backspace.
     if(x_position > 1)
     {
         m_text_process->parseTextToBuffer((char *)"\b");
@@ -457,11 +460,15 @@ void ModMessageEditor::handleBackSpace(std::string &output)
     }
     // detsructive backspace move up and end of line
     else if(x_position == 1)
-    {
+    {        
+        // Check Updated Position after parse - If we move from 1, up and to end of line, then 
+        // remove last character for cursor space.
         m_text_process->parseTextToBuffer((char *)"\b");
-        output += moveCursorToPosition();
-
-        // Also need to bring text up with it!
+        
+        std::cout << "handleBackSpaceAfter x_position=" << m_text_process->getXPosition() << std::endl;
+        if(m_text_process->getXPosition() == m_text_process->getMaxCharactersPerLine()) {
+            output += " \x1b[D";
+        }    
     }
 }
 
@@ -471,9 +478,10 @@ void ModMessageEditor::handleBackSpace(std::string &output)
  */
 void ModMessageEditor::handleDelete(std::string &output)
 {
-    /** Need to Write code to delete char or space and move everything left **/
-
+    /** Need to Write code to delete char or space and move everything left **/    
     int x_position = m_text_process->getXPosition();
+    
+    std::cout << "handleDelete max_chars=" << m_text_process->getMaxCharactersPerLine() << ", x_pos=" << x_position << std::endl;
 
     // destructive backspace
     if(x_position > 1)
@@ -484,11 +492,15 @@ void ModMessageEditor::handleDelete(std::string &output)
     // detsructive backspace move up and end of line
     else if(x_position == 1)
     {
+        // Check Updated Position after parse - If we move from 1, up and to end of line, then 
+        // remove last character for cursor space.
         m_text_process->parseTextToBuffer((char *)"\b");
-        output += moveCursorToPosition();
-
-        // Also need to bring text up with it!
+        std::cout << "handleDeleteAfter x_position=" << m_text_process->getXPosition() << std::endl;
+        if(m_text_process->getXPosition() == m_text_process->getMaxCharactersPerLine()) {
+            output += " \x1b[D";
+        }
     }
+
 }
 
 /**
@@ -558,20 +570,28 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
     }
 
     
-    std::cout << "=========w max " << m_text_box_width << " " << m_text_box_left << std::endl;
-    std::cout << "=========h max " << m_text_box_height << " " << m_text_box_top << std::endl;
+    std::cout << "=========w max " << m_text_box_width << ", lft " << m_text_box_left << std::endl;
+    std::cout << "=========h max " << m_text_box_height << ", top " << m_text_box_top << std::endl;
 
     std::cout << "x_pos: " << m_text_process->getXPosition() << std::endl;
     std::cout << "y_pos: " << m_text_process->getYPosition() << std::endl;
     
-
-    output += moveCursorToPosition();
-    
+    // Important Feature, resets to correct position when lines change etc.. 
     // Add a second backspace only when flag is set
     // Flag is set when we move up and end of previous line
-    // We then remove the last char so we're off the screen border.
+    // We then remove the last char so we're off the screen border.        
+    output += moveCursorToPosition();
+    
+    // This is required to move up to the previous line
+    // Then clear the char in the spot we just occipied.
     if (m_text_process->isDoubleBackSpace()) {
-        handleBackSpace(output);
+        std::cout << "Double Space RUN!" << std::endl;
+        std::cout << "isDoubleBackSpace max_chars=" << m_text_process->getMaxCharactersPerLine() << std::endl;        
+        if (m_text_process->getMaxCharactersPerLine() == m_text_process->getXPosition()) 
+        {
+            output += " \x1b[D"; // clear the current position
+            // TODO Probably need to clear buffer at this spot to for current position.
+        }        
         m_text_process->setDoubleBackSpace(false);
     }
     

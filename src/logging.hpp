@@ -249,9 +249,14 @@ public:
                 break;
 
             case ERROR_LOG:
+// Unit Tests, we don't need to see error for test functions
+// It's good to hit error scenario's and make sure they work
+// without the noise
+#ifndef UNIT_TEST
                 details.push_back(ERROR_LEVEL);
                 details.push_back(log_string);
                 writeOutYamlConsole(date_time, details);
+#endif                
                 break;
 
             case CONSOLE_LOG:
