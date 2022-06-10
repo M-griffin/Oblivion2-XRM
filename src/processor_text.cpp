@@ -670,7 +670,11 @@ void ProcessorText::moveEndPosition()
     std::cout << "ProcessorT moveEndPosition" << std::endl;
     
     m_x_position = m_line_ending_map[m_line_number];
-    //m_x_position += 1;
+    if (m_x_position == 0) 
+    {
+        // When no line ending, we'll move to last position on the screen
+        m_x_position = m_characters_per_line;
+    }
 }
 
 /**
@@ -693,6 +697,9 @@ void ProcessorText::moveNextYPosition()
     
     if(m_y_position < m_number_lines)
         ++m_y_position;
+        
+    // Update for max lines for scroll up/dn lateron
+    ++m_line_number;
 }
 
 /**
@@ -715,8 +722,9 @@ void ProcessorText::movePreviousYPosition()
 
     if(m_y_position > 1)
         --m_y_position;
-    else
-        return;
+        
+    // Update for max lines for scroll up/dn lateron
+    --m_line_number;
 }
 
 /**
@@ -1001,6 +1009,8 @@ void ProcessorText::escapeSequenceParsing(LocalizedBuffer &buffer,
                         }
                     }
                 }
+                // TODO This will need updating on scroll up and down!
+                m_line_number = m_y_position;
 
                 esc_sequence.clear();
                 break;
@@ -1026,6 +1036,9 @@ void ProcessorText::escapeSequenceParsing(LocalizedBuffer &buffer,
                         if(m_y_position > m_number_lines) m_y_position = m_number_lines;
                     }
                 }
+                
+                // TODO This will need updating on scroll up and down!
+                m_line_number = m_y_position;
 
                 esc_sequence.clear();
                 break;
@@ -1353,6 +1366,8 @@ void ProcessorText::parseTextToBuffer(char *buff)
         // ESC Sequences
         if(buffer.length == 1 && buffer.character[0] == '\x1b')
         {
+            // We need to update positions when this changes them
+            // like arrow keys.  if we change line number .. need to adjust m_line_number
             escapeSequenceParsing(buffer, it, line_end);
         }
         // Back Space

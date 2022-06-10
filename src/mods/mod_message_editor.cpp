@@ -575,6 +575,13 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
 
     std::cout << "x_pos: " << m_text_process->getXPosition() << std::endl;
     std::cout << "y_pos: " << m_text_process->getYPosition() << std::endl;
+     
+    std::cout << "getCurrentLine: " << m_text_process->getCurrentLine() << std::endl;
+    
+    std::map<int, int> line_ending_map = m_text_process->getLineEndingMap();
+    int lineEndPosition = line_ending_map[m_text_process->getCurrentLine()];
+    std::cout << "lineEndPosition: " << lineEndPosition << std::endl;
+    
     
     // Important Feature, resets to correct position when lines change etc.. 
     // Add a second backspace only when flag is set
@@ -585,7 +592,6 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
     // This is required to move up to the previous line
     // Then clear the char in the spot we just occipied.
     if (m_text_process->isDoubleBackSpace()) {
-        std::cout << "Double Space RUN!" << std::endl;
         std::cout << "isDoubleBackSpace max_chars=" << m_text_process->getMaxCharactersPerLine() << std::endl;        
         if (m_text_process->getMaxCharactersPerLine() == m_text_process->getXPosition()) 
         {
