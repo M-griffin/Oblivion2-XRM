@@ -23,13 +23,13 @@
  * use a line map that traces each line written to in an editor
  * 
  * Full Screen editor processes in (3) Stages.
- * 1. mod_message_editor - handles input and display ESC sequences back to the user
- * 2. processor_text - handles processing all input and update all position internally
- * 3. processor_text - read/write/erase to the screen / text buffer at the confirmed x/y position
+ * 1. mod_message_editor - handles input and displays ESC sequences back to the user
+ * 2. processor_text - handles processing all input and updates all positions internally
+ * 3. processor_text - read/write/erase to the text buffer at the confirmed x/y positions
  * 
- * Stages 1 and 2 are in progress to make sure everything is solid, once all movement and updates
- * are handled, then the actual buffer handling will be added for storing character / glyph data
- * at the specific positions, for editing and saving messages.
+ * Stages 1 and 2 are in progress to make sure everything is solid, once all movements 
+ * are handled properly, then the actual buffer handling will be added for storing 
+ * character glyph data at these specific positions, for editing and saving messages.
  * 
  * @return
  */
