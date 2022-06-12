@@ -649,6 +649,7 @@ void ProcessorText::clearScreen()
     m_y_position = 1;
     m_max_y_position = 1;
     m_line_number = 1;
+    m_number_lines = 1;
     std::map<int, int>().swap(m_line_ending_map);
 }
 
@@ -1009,8 +1010,6 @@ void ProcessorText::escapeSequenceParsing(LocalizedBuffer &buffer,
                         }
                     }
                 }
-                // TODO This will need updating on scroll up and down!
-                m_line_number = m_y_position;
 
                 esc_sequence.clear();
                 break;
@@ -1036,9 +1035,6 @@ void ProcessorText::escapeSequenceParsing(LocalizedBuffer &buffer,
                         if(m_y_position > m_number_lines) m_y_position = m_number_lines;
                     }
                 }
-                
-                // TODO This will need updating on scroll up and down!
-                m_line_number = m_y_position;
 
                 esc_sequence.clear();
                 break;
@@ -1366,8 +1362,9 @@ void ProcessorText::parseTextToBuffer(char *buff)
         // ESC Sequences
         if(buffer.length == 1 && buffer.character[0] == '\x1b')
         {
-            // We need to update positions when this changes them
-            // like arrow keys.  if we change line number .. need to adjust m_line_number
+            // Most likely won't get ESC sequences here,
+            // They are translated to key inputs prior to reaching here.
+            std::cout << "escapeSequenceParsing: " << buffer.character << std::endl;
             escapeSequenceParsing(buffer, it, line_end);
         }
         // Back Space
