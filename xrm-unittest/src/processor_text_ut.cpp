@@ -327,6 +327,39 @@ SUITE(XRMProcessorText)
         CHECK(text.getMaxCharactersPerLine() == 10);
     }
     
+    TEST(base_moveEndPoisiton_AfterBackSpace) 
+    {
+        // Make a small box easier to test wrapping
+        // A-7 Should be Line 1, where 89 are wrapped to line 2
+        ProcessorText text(10,10);
+        
+        // Move 5 Positions forward with real data.
+        text.parseTextToBuffer((char *)"12345");
+        
+        // Move down, keep same X Position
+        text.moveNextYPosition();
+        
+        // Backspace would move back one x position
+        text.parseTextToBuffer((char *)"\b");
+        
+        // Move to end of Line, with no real text data on current line
+        // We should move to last position in box. - NOT where BS was hit.
+        text.moveEndPosition();
+        
+        // Here we want to use arror key movements, then move to end of Box
+        // Make Sure Backspace when no real chars are entered cause it to move short of the end of the screen.
+        //const int LINE_NUMBER = 2;
+        //CHECK(text.getCurrentLine() == LINE_NUMBER);
+        CHECK(text.getYPosition() == 2);
+        
+        // Main check is EndPosition should match end of Screen
+        CHECK(text.getXPosition() == text.getMaxCharactersPerLine());
+        
+        // Line Ending Map should be 0, without any real test data entered yet.
+        CHECK(text.getLineEndingMap().at(2) == 0);
+        CHECK(text.getMaxCharactersPerLine() == 10);
+    }
+    
     TEST(base_movePreviousXPosition) 
     {
         // Make a small box easier to test wrapping
