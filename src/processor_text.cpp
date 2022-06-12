@@ -834,10 +834,13 @@ void ProcessorText::moveTabWidth()
 {
     std::cout << "ProcessorT moveTabWidth" << std::endl;
 
-    if(m_tab_width < m_characters_per_line - m_x_position)
+        
+    // Move forward m_tab_width amount of spaces, not moving past end of box.
+    for (int i = 0; i < m_tab_width; i++) 
     {
-        screenBufferSetGlyph(std::string(m_tab_width, ' '));
+        moveNextXPosition();  
     }
+
 }
 
 /**

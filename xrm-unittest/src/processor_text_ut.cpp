@@ -233,7 +233,8 @@ SUITE(XRMProcessorText)
         
         std::string new_string("ABC123456789");
         
-        for (int c : new_string) {
+        for (int c : new_string) 
+        {
             // Method Call to Test
             text.parseTextToBuffer((char *)&c);            
         }
@@ -262,7 +263,8 @@ SUITE(XRMProcessorText)
         
         std::string new_string("ABC123456789");
         
-        for (int c : new_string) {
+        for (int c : new_string) 
+        {
             // Method Call to Test
             text.parseTextToBuffer((char *)&c);            
         }
@@ -483,6 +485,40 @@ SUITE(XRMProcessorText)
         CHECK(text.m_max_y_position == 5);
     }
     
+    TEST(base_moveTabWidth) 
+    {
+        // Make a small box easier to test wrapping
+        // A-7 Should be Line 1, where 89 are wrapped to line 2
+        ProcessorText text(10,10);
+        
+        // Method Call to Test
+        text.moveTabWidth();
+        
+        CHECK(text.getYPosition() == 1);
+        
+        // Moves (4) Space, cursor should be as 5 position.
+        CHECK(text.getXPosition() == 5);
+        CHECK(text.getMaxCharactersPerLine() == 10);
+        
+        // Method Call to Test Again, should be at 10 position.
+        text.moveTabWidth();
+        
+        CHECK(text.getXPosition() == 9);
+        CHECK(text.getMaxCharactersPerLine() == 10);
+        
+        // Method Call to Test Again, should be at 10 position when called again an not move past the line
+        text.moveTabWidth();
+        
+        CHECK(text.getXPosition() == 10);
+        CHECK(text.getMaxCharactersPerLine() == 10);
+        
+        // Verify Another Call again is still at end position                
+        text.moveTabWidth();
+        
+        CHECK(text.getXPosition() == 10);
+        CHECK(text.getMaxCharactersPerLine() == 10);
+        
+    }
     
     // m_line_ending_map stores on last positions, not actual data.
     //std::cout << "LEM BS: " << line_ending_map[LINE_NUMBER] << ", LineNum: " << text.getCurrentLine() << std::endl;
