@@ -75,14 +75,14 @@ public:
     {
     }
 
-    virtual int sendSocket(unsigned char *message, Uint32 len);
-    virtual int recvSocket(char *message);
-    virtual socket_handler_ptr pollSocketAccepts();
-    virtual void spawnSocket(TCPsocket socket);
-    virtual int pollSocket();
-    virtual bool onConnect();
-    virtual bool onListen();
-    virtual bool onExit();
+    virtual int sendSocket(unsigned char *message, Uint32 len) override;
+    virtual int recvSocket(char *message) override;
+    virtual socket_handler_ptr pollSocketAccepts() override; 
+    virtual void spawnSocket(TCPsocket socket) override;
+    virtual int pollSocket() override;
+    virtual bool onConnect() override;
+    virtual bool onListen() override;
+    virtual bool onExit() override;
 
 private:
 
@@ -199,14 +199,14 @@ public:
     {
     }
 
-    virtual int sendSocket(unsigned char *message, Uint32 len);
-    virtual int recvSocket(char *message);
-    virtual socket_handler_ptr pollSocketAccepts();
-    virtual void spawnSocket(TCPsocket socket);
-    virtual int pollSocket();
-    virtual bool onConnect();
-    virtual bool onListen();
-    virtual bool onExit();
+    virtual int sendSocket(unsigned char *message, Uint32 len) override;
+    virtual int recvSocket(char *message) override;
+    virtual socket_handler_ptr pollSocketAccepts() override;
+    virtual void spawnSocket(TCPsocket socket) override;
+    virtual int pollSocket() override;
+    virtual bool onConnect() override;
+    virtual bool onListen() override;
+    virtual bool onExit() override;
 
     // Specific Functions for SSH
     int verify_knownhost();

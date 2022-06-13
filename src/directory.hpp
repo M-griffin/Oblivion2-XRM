@@ -78,7 +78,7 @@ public:
         if(!local_directory_ptr)
         {
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("Error opening directory=", errno, dir, __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Error opening directory=", errno, dir, __LINE__, __FILE__);
             return file_list;
         }
 

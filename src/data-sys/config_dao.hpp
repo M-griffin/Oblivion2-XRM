@@ -19,7 +19,7 @@ class ConfigDao
 {
 public:
 
-    ConfigDao(config_ptr config, std::string path);
+    ConfigDao(config_ptr config, const std::string &path);
     ~ConfigDao();
 
     /**

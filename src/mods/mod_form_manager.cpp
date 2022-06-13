@@ -6,7 +6,7 @@
 #include "../menu_base.hpp"
 
 
-ModFormManager::ModFormManager(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
+ModFormManager::ModFormManager(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
     : ModBase(session_data, config, ansi_process)
     , m_current_page(0)
     , m_menu(new MenuBase(session_data))

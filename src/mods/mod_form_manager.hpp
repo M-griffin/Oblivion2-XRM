@@ -21,8 +21,8 @@ typedef std::shared_ptr<FormManager> form_manager_ptr;
 class Config;
 typedef std::shared_ptr<Config> config_ptr;
 
-class AnsiProcessor;
-typedef std::shared_ptr<AnsiProcessor> ansi_process_ptr;
+class ProcessorAnsi;
+typedef std::shared_ptr<ProcessorAnsi> processor_ansi_ptr;
 
 
 /**
@@ -36,8 +36,7 @@ class ModFormManager
     : public ModBase
 {
 public:
-
-    ModFormManager(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process);
+    ModFormManager(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process);
 
     virtual ~ModFormManager() override
     { }

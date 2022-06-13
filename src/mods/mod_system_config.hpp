@@ -25,7 +25,7 @@ class ModSystemConfig
     : public ModBase
 {
 public:
-    ModSystemConfig(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
+    ModSystemConfig(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
         : ModBase(session_data, config, ansi_process)
         , m_session_io(session_data)
         , m_filename("mod_system_config.yaml")

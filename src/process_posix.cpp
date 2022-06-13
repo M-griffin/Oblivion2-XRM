@@ -97,40 +97,40 @@ extern "C" void *executeProcessLoop(void *args)
     fd_set rdfdset;
 
     // Setup Thread Arguments Passed.
-    args_ptr threadArgs = * reinterpret_cast<std::shared_ptr<ThreadArguments>*>(args);
+    args_ptr thread_args = * reinterpret_cast<std::shared_ptr<ThreadArguments>*>(args);
 
     char character_buffer[2014] = {'\0'};
 
     do
     {
         FD_ZERO(&rdfdset);
-        FD_SET(threadArgs->m_pty_file_desc, &rdfdset);
+        FD_SET(thread_args->m_pty_file_desc, &rdfdset);
 
-        selret = select(threadArgs->m_pty_file_desc + 1, &rdfdset, NULL, NULL, NULL);
+        selret = select(thread_args->m_pty_file_desc + 1, &rdfdset, NULL, NULL, NULL);
 
         // Error / Lost Connection on
         if (selret <= 0)
         {
-            threadArgs->m_session->m_is_process_running = false;
+            thread_args->m_session->m_is_process_running = false;
             break;
         }
 
 
-        if (FD_ISSET(threadArgs->m_pty_file_desc, &rdfdset))
+        if (FD_ISSET(thread_args->m_pty_file_desc, &rdfdset))
         {
             memset(&character_buffer, 0, 1024);
-            selret = read(threadArgs->m_pty_file_desc, character_buffer, 1023);
+            selret = read(thread_args->m_pty_file_desc, character_buffer, 1023);
 
             if (selret <= 0)
             {
-                threadArgs->m_session->m_is_process_running = false;
+                thread_args->m_session->m_is_process_running = false;
                 break;
             }
 
-            if (threadArgs->m_session)
+            if (thread_args->m_session)
             {
                 std::string buffer(reinterpret_cast<char*>(character_buffer));
-                threadArgs->m_session->deliver(buffer);
+                thread_args->m_session->deliver(buffer);
             }
         }
 
@@ -139,9 +139,9 @@ extern "C" void *executeProcessLoop(void *args)
         usleep(20);
 
     }
-    while (threadArgs->m_session->m_is_process_running);
+    while (thread_args->m_session->m_is_process_running);
 
-    threadArgs->m_session->m_is_process_running = false;
+    thread_args->m_session->m_is_process_running = false;
     pthread_exit(nullptr);
 
     return nullptr;

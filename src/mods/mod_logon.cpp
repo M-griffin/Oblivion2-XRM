@@ -297,12 +297,12 @@ bool ModLogon::logon(const std::string &input)
         // Check if users enter valid identifier.
         if(checkUserLogon(key))
         {
-            log->xrmLog<Logging::CONSOLE_LOG>("PROMPT_USERNAME=", m_logon_user->sHandle);
+            log->write<Logging::CONSOLE_LOG>("PROMPT_USERNAME=", m_logon_user->sHandle);
             changeNextModule();
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>("PROMPT_INVALID_USERNAME=", key);
+            log->write<Logging::ERROR_LOG>("PROMPT_INVALID_USERNAME=", key);
 
             displayPromptAndNewLine(PROMPT_INVALID_USERNAME);
             ++m_failure_attempts;
@@ -355,7 +355,7 @@ bool ModLogon::validate_password(const std::string &input)
 
     if(!security || security->iId == -1)
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, Security Index on user record not available=", m_logon_user->sHandle, __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Error, Security Index on user record not available=", m_logon_user->sHandle, __FILE__, __LINE__);
         return false;
     }
 
@@ -364,7 +364,7 @@ bool ModLogon::validate_password(const std::string &input)
 
     if(!encryption)
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, unable to allocate encryption (Password)=", m_logon_user->sHandle, __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Error, unable to allocate encryption (Password)=", m_logon_user->sHandle, __FILE__, __LINE__);
         return false;
     }
 
@@ -373,11 +373,11 @@ bool ModLogon::validate_password(const std::string &input)
 
     if(security->sPasswordHash.compare(password) == 0)
     {
-        log->xrmLog<Logging::CONSOLE_LOG>("Password Successful=", m_logon_user->sHandle);
+        log->write<Logging::CONSOLE_LOG>("Password Successful=", m_logon_user->sHandle);
         return true;
     }
 
-    log->xrmLog<Logging::ERROR_LOG>("Password Failure=", m_logon_user->sHandle);
+    log->write<Logging::ERROR_LOG>("Password Failure=", m_logon_user->sHandle);
     return false;
 }
 

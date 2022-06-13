@@ -35,7 +35,7 @@ public:
         std::vector<std::string>().swap(m_details);
     }
 
-    LogEntry(std::string date_time, std::vector<std::string> details)
+    LogEntry(const std::string &date_time, std::vector<std::string> details)
         : m_date_time(date_time)
         , m_details(details)
     { }
@@ -106,6 +106,15 @@ public:
     }
 
     /**
+     * @brief Check if Singletop is active
+     * @return
+     */
+    static bool isActive()
+    {
+        return m_global_logging_instance != nullptr;
+    }
+
+    /**
      * @brief Helper, appends forward/backward slash to path
      * @param value
      */
@@ -155,7 +164,7 @@ public:
      * @param log_level
      * @return
      */
-    int getConfigurationLogState(std::string log_level)
+    int getConfigurationLogState(const std::string &log_level)
     {
         if(log_level == "INFO")
             return 0;
@@ -193,7 +202,7 @@ public:
     }
 
     template<int level, typename ... Types>
-    void xrmLog(Types ... rest)
+    void write(Types ... rest)
     {
         config_ptr config = Communicator::instance()->getConfiguration();
         std::string config_log_text = config->logging_level;
@@ -205,13 +214,13 @@ public:
         {
             // Incoming Logging Level
             case INFO_LOG:
-                if(config_level != INFO_LOG && INFO_LOG != ALL_LOGS)
+                if(config_level != INFO_LOG && config_level != ALL_LOGS)
                     return;
 
                 break;
 
             case DEBUG_LOG:
-                if(config_level != DEBUG_LOG && INFO_LOG != ALL_LOGS)
+                if(config_level != DEBUG_LOG && config_level != ALL_LOGS)
                     return;
 
                 break;
@@ -240,9 +249,14 @@ public:
                 break;
 
             case ERROR_LOG:
+// Unit Tests, we don't need to see error for test functions
+// It's good to hit error scenario's and make sure they work
+// without the noise
+#ifndef UNIT_TEST
                 details.push_back(ERROR_LEVEL);
                 details.push_back(log_string);
                 writeOutYamlConsole(date_time, details);
+#endif                
                 break;
 
             case CONSOLE_LOG:
@@ -270,7 +284,7 @@ public:
      * @param date_time
      * @param details
      */
-    void writeOutYamlConsole(std::string date_time, std::vector<std::string> details)
+    void writeOutYamlConsole(const std::string &date_time, std::vector<std::string> details)
     {
         YAML::Emitter out;
 

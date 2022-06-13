@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Blue
-Date                   :=27/07/2019
+Date                   :=21/08/2019
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/MinGW-5.1.0/mingw32/bin/g++.exe
 SharedObjectLinkerName :=C:/MinGW-5.1.0/mingw32/bin/g++.exe -shared -fPIC
@@ -41,8 +41,8 @@ LinkOptions            :=
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)../src $(IncludeSwitch)C:/boost64 $(IncludeSwitch)C:/boost64/include $(IncludeSwitch)C:/Users/Blue/Documents/GitHub/yaml-cpp/include 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)boost_system-mgw51-mt-1_64 $(LibrarySwitch)boost_thread-mgw51-mt-1_64 $(LibrarySwitch)boost_locale-mgw51-mt-1_64 $(LibrarySwitch)boost_filesystem-mgw51-mt-1_64 $(LibrarySwitch)boost_timer-mgw51-mt-1_64 $(LibrarySwitch)boost_regex-mgw51-mt-1_64 $(LibrarySwitch)iconv $(LibrarySwitch)icuuc.dll $(LibrarySwitch)icuin.dll $(LibrarySwitch)yaml-cpp $(LibrarySwitch)Rpcrt4 
-ArLibs                 :=  "libboost_system-mgw51-mt-1_64" "libboost_thread-mgw51-mt-1_64" "libboost_locale-mgw51-mt-1_64" "libboost_filesystem-mgw51-mt-1_64" "libboost_timer-mgw51-mt-1_64" "libboost_regex-mgw51-mt-1_64" "libiconv.a" "libicuuc.dll.a" "libicuin.dll.a" "yaml-cpp.dll" "Rpcrt4" 
+Libs                   := $(LibrarySwitch)boost_system-mgw51-mt-1_64 $(LibrarySwitch)boost_filesystem-mgw51-mt-1_64 $(LibrarySwitch)yaml-cpp $(LibrarySwitch)Rpcrt4 
+ArLibs                 :=  "libboost_system-mgw51-mt-1_64" "libboost_filesystem-mgw51-mt-1_64" "yaml-cpp.dll" "Rpcrt4" 
 LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryPathSwitch)C:/boost64/lib $(LibraryPathSwitch)C:/msys/1.0/icu/dist/lib $(LibraryPathSwitch)C:/Users/Blue/Documents/GitHub/yaml-cpp/build 
 
 ##
@@ -52,8 +52,8 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryP
 AR       := C:/MinGW-5.1.0/mingw32/bin/ar.exe rcu
 CXX      := C:/MinGW-5.1.0/mingw32/bin/g++.exe
 CC       := C:/MinGW-5.1.0/mingw32/bin/gcc.exe
-CXXFLAGS :=  -Wfatal-errors -g -O0 -pedantic -W -std=c++14 -Wall -Wno-deprecated -Wno-unused-local-typedefs $(Preprocessors)
-CFLAGS   :=  -Wfatal-errors -g -O0 -pedantic -W -std=c++14 -Wall -Wno-deprecated -Wno-unused-local-typedefs $(Preprocessors)
+CXXFLAGS :=  -Wfatal-errors -g -O0 -pedantic -W -std=c++11 -Wall -Wno-deprecated -Wno-unused-local-typedefs $(Preprocessors)
+CFLAGS   :=  -Wfatal-errors -g -O0 -pedantic -W -std=c++11 -Wall -Wno-deprecated -Wno-unused-local-typedefs $(Preprocessors)
 ASFLAGS  := 
 AS       := C:/MinGW-5.1.0/mingw32/bin/as.exe
 

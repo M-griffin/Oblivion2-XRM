@@ -57,7 +57,7 @@ public:
         catch(std::exception &ex)
         {
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("AsyncBase shutdown() - Caught exception=", ex.what());
+            log->write<Logging::ERROR_LOG>("AsyncBase shutdown() - Caught exception=", ex.what());
         }
     }
 

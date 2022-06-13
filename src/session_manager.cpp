@@ -26,14 +26,14 @@ void SessionManager::join(session_ptr session)
 void SessionManager::leave(int node_number)
 {
     Logging *log = Logging::instance();
-    log->xrmLog<Logging::CONSOLE_LOG>("disconnecting Node Session=", node_number);
+    log->write<Logging::CONSOLE_LOG>("disconnecting Node Session=", node_number);
 
     for(auto it = m_sessions.begin(); it != m_sessions.end(); it++)
     {
         if((*it)->m_session_data->m_node_number == node_number)
         {
             m_sessions.erase(it);
-            log->xrmLog<Logging::CONSOLE_LOG>("disconnecting Node Session completed=", node_number);
+            log->write<Logging::CONSOLE_LOG>("disconnecting Node Session completed=", node_number);
             break;
         }
     }
@@ -49,7 +49,7 @@ void SessionManager::deliver(std::string msg)
         return;
 
     Logging *log = Logging::instance();
-    log->xrmLog<Logging::DEBUG_LOG>("deliver SessionManager notices=", msg);
+    log->write<Logging::DEBUG_LOG>("deliver SessionManager notices=", msg);
     std::for_each(m_sessions.begin(), m_sessions.end(),
                   std::bind(&Session::deliver, std::placeholders::_1, std::ref(msg)));
 }

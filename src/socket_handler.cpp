@@ -43,7 +43,7 @@ int SocketHandler::poll()
 
         if(ret == -1)
         {
-            log->xrmLog<Logging::ERROR_LOG>("Socket Closed by host, disconnecting.", __FILE__, __LINE__);
+            log->write<Logging::ERROR_LOG>("Socket Closed by host, disconnecting.", __FILE__, __LINE__);
 
             // Shutdown Socket.
             m_socket.back()->onExit();
@@ -60,7 +60,7 @@ int SocketHandler::poll()
     else
     {
         // Inactive Connection
-        log->xrmLog<Logging::ERROR_LOG>("Showdown received, Socket Closed.", __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Showdown received, Socket Closed.", __FILE__, __LINE__);
         ret = -1;
     }
 
@@ -91,21 +91,21 @@ bool SocketHandler::connectTelnetSocket(std::string host, int port)
             }
             else
             {
-                log->xrmLog<Logging::ERROR_LOG>("Unable to initialize Telnet Socket.", __FILE__, __LINE__);
+                log->write<Logging::ERROR_LOG>("Unable to initialize Telnet Socket.", __FILE__, __LINE__);
                 close();
                 return false;
             }
         }
         catch(std::exception& e)
         {
-            log->xrmLog<Logging::ERROR_LOG>("Exception creating new SDL_Socket.", e.what(), __FILE__, __LINE__);
+            log->write<Logging::ERROR_LOG>("Exception creating new SDL_Socket.", e.what(), __FILE__, __LINE__);
             close();
             return false;
         }
     }
     else
     {
-        log->xrmLog<Logging::ERROR_LOG>("Telnet Socket already Active in Use!", __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Telnet Socket already Active in Use!", __FILE__, __LINE__);
         return false;
     }
 
@@ -139,14 +139,14 @@ bool SocketHandler::connectSshSocket(std::string host, int port,
             }
             else
             {
-                log->xrmLog<Logging::ERROR_LOG>("Unable to initialize SSH Socket.", __FILE__, __LINE__);
+                log->write<Logging::ERROR_LOG>("Unable to initialize SSH Socket.", __FILE__, __LINE__);
                 close();
                 return false;
             }
         }
         catch(std::exception& e)
         {
-            log->xrmLog<Logging::ERROR_LOG>("Exception creating SSH_Socket=", e.what(), __FILE__, __LINE__);
+            log->write<Logging::ERROR_LOG>("Exception creating SSH_Socket=", e.what(), __FILE__, __LINE__);
             m_is_active = false;
             close();
             return false;
@@ -154,7 +154,7 @@ bool SocketHandler::connectSshSocket(std::string host, int port,
     }
     else
     {
-        log->xrmLog<Logging::ERROR_LOG>("SSH Socket already Active!", __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("SSH Socket already Active!", __FILE__, __LINE__);
         return false;
     }
 
@@ -185,7 +185,7 @@ bool SocketHandler::createTelnetAcceptor(std::string host, int port)
             }
             else
             {
-                log->xrmLog<Logging::ERROR_LOG>("Unable to initialize Telnet Socket.", __FILE__, __LINE__);
+                log->write<Logging::ERROR_LOG>("Unable to initialize Telnet Socket.", __FILE__, __LINE__);
                 close();
                 return false;
             }
@@ -193,13 +193,13 @@ bool SocketHandler::createTelnetAcceptor(std::string host, int port)
         catch(std::exception& e)
         {
             close();
-            log->xrmLog<Logging::ERROR_LOG>("Exception creating new SDL_Socket", e.what(), __FILE__, __LINE__);
+            log->write<Logging::ERROR_LOG>("Exception creating new SDL_Socket", e.what(), __FILE__, __LINE__);
             return false;
         }
     }
     else
     {
-        log->xrmLog<Logging::ERROR_LOG>("Telnet Socket already Active", __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Telnet Socket already Active", __FILE__, __LINE__);
         return false;
     }
 
@@ -262,7 +262,7 @@ void SocketHandler::close()
     catch(std::exception& e)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("Exception=", e.what(), __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Exception=", e.what(), __FILE__, __LINE__);
     }
 }
 

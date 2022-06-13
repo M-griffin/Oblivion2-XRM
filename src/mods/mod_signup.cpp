@@ -579,16 +579,16 @@ bool ModSignup::newUserPassword(const std::string &input)
 
         // Debug Logging
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         if(key.compare(m_config->password_newuser) == 0)
         {
-            log->xrmLog<Logging::CONSOLE_LOG>("NewUserPassword Accepted", __LINE__, __FILE__);
+            log->write<Logging::CONSOLE_LOG>("NewUserPassword Accepted", __LINE__, __FILE__);
             changeNextModule();
         }
         else
         {
-            log->xrmLog<Logging::CONSOLE_LOG>("Error, Incorrect NewUserPassword!", __LINE__, __FILE__);
+            log->write<Logging::CONSOLE_LOG>("Error, Incorrect NewUserPassword!", __LINE__, __FILE__);
             ++m_newuser_password_attempts;
             displayPromptAndNewLine(PROMPT_PASS_INVALID);
             redisplayModulePrompt();
@@ -612,7 +612,7 @@ bool ModSignup::disclaimer(const std::string &input)
 
         // Debug Logging
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // If ENTER Default to Yes, or Single Y is hit
         if(toupper(key[0]) == 'Y' && key.size() == 1)
@@ -649,7 +649,7 @@ bool ModSignup::handle(const std::string &input)
 
         // Debug Logging
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Check for user name and if is already exists!
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
@@ -684,7 +684,7 @@ bool ModSignup::realName(const std::string &input)
 
         // Debug Logging
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Check for real name and if is already exists!
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
@@ -719,7 +719,7 @@ bool ModSignup::address(const std::string &input)
 
         // Debug Logging
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         m_user_record->sAddress = key;
         changeNextModule();
@@ -741,7 +741,7 @@ bool ModSignup::location(const std::string &input)
 
         // Debug Logging
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         m_user_record->sLocation = key;
         changeNextModule();
@@ -763,7 +763,7 @@ bool ModSignup::country(const std::string &input)
 
         // Debug Logging
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         m_user_record->sCountry = key;
         changeNextModule();
@@ -785,7 +785,7 @@ bool ModSignup::email(const std::string &input)
 
         // Debug Logging
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Test if email already exists.
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
@@ -820,7 +820,7 @@ bool ModSignup::userNote(const std::string &input)
 
         // Debug Logging
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         m_user_record->sUserNote = key;
         changeNextModule();
@@ -842,7 +842,7 @@ bool ModSignup::birthday(const std::string &input)
 
         // Debug Logging
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         try
         {
@@ -882,7 +882,7 @@ bool ModSignup::birthday(const std::string &input)
         }
         catch(std::regex_error &ex)
         {
-            log->xrmLog<Logging::ERROR_LOG>("Error, regex date error=", ex.what(), ex.code(), __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Error, regex date error=", ex.what(), ex.code(), __LINE__, __FILE__);
         }
 
         return true;
@@ -903,7 +903,7 @@ bool ModSignup::gender(const std::string &input)
 
         // Debug Logging
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // If ENTER Default to Yes, or Single Y is hit
         if((toupper(key[0]) == 'M' && key.size() == 1))
@@ -941,7 +941,7 @@ bool ModSignup::password(const std::string &input)
 
         // Debug Logging
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         m_security_record->sPasswordHash = key;
         changeNextModule();
@@ -963,7 +963,7 @@ bool ModSignup::verifyPassword(const std::string &input)
 
         // Debug Logging
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // compare password to previous, then encrypt if they match
         // otherwise fail back if they don't and ask again.
@@ -974,7 +974,7 @@ bool ModSignup::verifyPassword(const std::string &input)
 
             if(!encryption)
             {
-                log->xrmLog<Logging::ERROR_LOG>("Error, unable to allocate encryption", __LINE__, __FILE__);
+                log->write<Logging::ERROR_LOG>("Error, unable to allocate encryption", __LINE__, __FILE__);
                 displayPromptAndNewLine(PROMPT_PASS_INVALID);
                 changePreviousModule();
                 return false;
@@ -985,7 +985,7 @@ bool ModSignup::verifyPassword(const std::string &input)
 
             if(salt.size() == 0 || password.size() == 0)
             {
-                log->xrmLog<Logging::ERROR_LOG>("Error, Salt or Password were empty", __LINE__, __FILE__);
+                log->write<Logging::ERROR_LOG>("Error, Salt or Password were empty", __LINE__, __FILE__);
                 assert(false);
             }
 
@@ -996,7 +996,7 @@ bool ModSignup::verifyPassword(const std::string &input)
         }
         else
         {
-            log->xrmLog<Logging::INFO_LOG>("Password Verify Failed.", __LINE__, __FILE__);
+            log->write<Logging::INFO_LOG>("Password Verify Failed.", __LINE__, __FILE__);
             m_security_record->sPasswordHash = "";
             displayPromptAndNewLine(PROMPT_PASS_INVALID);
             changePreviousModule();
@@ -1020,7 +1020,7 @@ bool ModSignup::challengeQuestion(const std::string &input)
 
         // Debug Logging
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Set the Password and verify it matches on next module.
         m_security_record->sChallengeQuestion = key;
@@ -1043,7 +1043,7 @@ bool ModSignup::challengeAnswer(const std::string &input)
 
         // Debug Logging
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         m_security_record->sChallengeAnswerHash = key;
         changeNextModule();
@@ -1065,7 +1065,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
 
         // Debug Logging
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // compare password to previous, then encrypt if they match
         // otherwise fail back if they don't and ask again.
@@ -1075,7 +1075,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
 
             if(!encryption)
             {
-                log->xrmLog<Logging::ERROR_LOG>("Error, unable to allocate encryption.", __LINE__, __FILE__);
+                log->write<Logging::ERROR_LOG>("Error, unable to allocate encryption.", __LINE__, __FILE__);
                 m_security_record->sChallengeAnswerHash = "";
                 displayPromptAndNewLine(PROMPT_PASS_INVALID);
                 changePreviousModule();
@@ -1091,7 +1091,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
             if(password.size() == 0)
             {
                 // Error from encryption method.
-                log->xrmLog<Logging::ERROR_LOG>("Error, ChallengeAnswer was empty", __LINE__, __FILE__);
+                log->write<Logging::ERROR_LOG>("Error, ChallengeAnswer was empty", __LINE__, __FILE__);
                 return false;
             }
 
@@ -1100,7 +1100,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
         }
         else
         {
-            log->xrmLog<Logging::ERROR_LOG>("Error, ChallengeAnswer verify failed.", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Error, ChallengeAnswer verify failed.", __LINE__, __FILE__);
             m_security_record->sChallengeAnswerHash = "";
             displayPromptAndNewLine(PROMPT_PASS_INVALID);
             changePreviousModule();
@@ -1428,7 +1428,7 @@ void ModSignup::saveNewUserRecord()
 
     if(securityIndex < 0)
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, unable to insert new user record", __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, unable to insert new user record", __LINE__, __FILE__);
         displayPrompt(PROMPT_NOT_SAVED);
         m_is_active = false;
         return;
@@ -1464,16 +1464,16 @@ void ModSignup::saveNewUserRecord()
     }
 
     long userIndex = user_dao->insertRecord(m_user_record);
-    log->xrmLog<Logging::INFO_LOG>("New User Index saved", userIndex);
+    log->write<Logging::INFO_LOG>("New User Index saved", userIndex);
 
     if(userIndex < 0)
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, unable to insert new user record", __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, unable to insert new user record", __LINE__, __FILE__);
 
         // Remove Security Record if unable to create user record.
         if(!security_dao->deleteRecord(securityIndex))
         {
-            log->xrmLog<Logging::ERROR_LOG>("Error, unable to remove security record.", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Error, unable to remove security record.", __LINE__, __FILE__);
         }
 
         baseProcessDeliverNewLine();
@@ -1484,7 +1484,7 @@ void ModSignup::saveNewUserRecord()
     // If First User Created, Then Update Security Level to Sysop.
     else if (userIndex == 1)
     {
-        log->xrmLog<Logging::INFO_LOG>("Updating First Created User to SysOp/Admin");
+        log->write<Logging::INFO_LOG>("Updating First Created User to SysOp/Admin");
 
         // Re-Read the Record Clean
         m_user_record = user_dao->getRecordById(userIndex);

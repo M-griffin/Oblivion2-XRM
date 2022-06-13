@@ -428,7 +428,7 @@ Change Log Update (00.00.109)
 * 2018-07-18
 + Menu Editor, Fixed ordering of input Methods, Also added getLineInput for parsing
   keys. Ready to start building out method and pipe sequence parsing.
-  Initial MenuEditor Option/Command display completed. Next is to add m�  �   
+  Initial MenuEditor Option/Command display completed.
 + Updated Padding (Left/Right) when the string it empty, it will now padd properly.
 + Cleanup on some socket output for debugging Async processing.   
 + Completed Copy Menu Source/Destination  

@@ -38,6 +38,11 @@ public:
     explicit CommonIO();
     ~CommonIO();
 
+    /**
+     * @brief Retrieve Key Sequence by Value
+     * @param value
+     */
+    std::string getSequenceFromMap(const std::string &value);
 
     /* This function will read the OS specific functions
      * To Determine where the executable is located.
@@ -113,6 +118,12 @@ public:
     bool isDigit(const std::string &str);
 
     /**
+     * @brief Return the Input Full Screen Editor Escape Sequence Parsed.
+     * @return
+     */
+    std::string getFSEEscapeSequence();
+
+    /**
     * @brief Return the Escape Sequence
     * @return
     */
@@ -174,14 +185,14 @@ public:
      * @brief Check if the file exists
      * @return
      */
-    bool fileExists(std::string file_name);
+    bool fileExists(const std::string &file_name);
 
     /**
      * @brief Reads in Ansi file into Buffer Only
      * @param FileName
      * @return
      */
-    std::string readinAnsi(std::string file_name);
+    std::string readinAnsi(const std::string &file_name);
 
     /**
      * @brief Split Strings by delimiter into Vector of Strings.
@@ -210,35 +221,35 @@ public:
      * @param date
      * @return
      */
-    std::time_t stringToStandardDate(std::string date);
+    std::time_t stringToStandardDate(const std::string &date);
 
     /**
      * @brief String to Date/Time Format
      * @param date_time
      * @return
      */
-    std::time_t stringToStandardDateTime(std::string date_time);
+    std::time_t stringToStandardDateTime(const std::string &date_time);
 
     /**
      * @brief Converts std::strings to Long values
      * @param value
      * @return
      */
-    long stringToLong(std::string value);
+    long stringToLong(const std::string &value);
 
     /**
      * @brief Converts std::strings to Int values
      * @param value
      * @return
      */
-    int stringToInt(std::string value);
+    int stringToInt(const std::string &value);
 
     /**
      * @brief Tests first char of string for starting T/F returns int with -1 for invalid
      * @param value
      * @return
      */
-    int stringToBool(std::string value);
+    int stringToBool(const std::string &value);
 
     /**
      * @brief Template search quick find
@@ -263,24 +274,19 @@ public:
      * @brief Parses screen data into the Screen Buffer.
      * @return
      */
-    void getNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
-                      std::string::iterator &line_end);
-
-    /**  TEMP EXTRA LOGGING!
-     * @brief Parses screen data into the Screen Buffer.
-     * @return
-     */
-    void getNextGlyph2(LocalizedBuffer &buffer, std::string::iterator &it,
-                       std::string::iterator &line_end);
+    void getNextGlyph(LocalizedBuffer &buffer, 
+                      std::string::iterator &it,
+                      const std::string::iterator &line_end);
 
     /**
      * @brief Parses screen data into the Screen Buffer.
      * @return
      */
-    void peekNextGlyph(LocalizedBuffer &buffer, std::string::iterator &it,
-                       std::string::iterator &line_end);
+    void peekNextGlyph(LocalizedBuffer &buffer, 
+                       std::string::iterator &it,
+                       const std::string::iterator &line_end);
 
-    void testUnicode(std::string incoming_data);
+    void testUnicode(const std::string &incoming_data);
 
 private:
 

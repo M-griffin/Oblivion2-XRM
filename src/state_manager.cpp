@@ -93,7 +93,7 @@ void StateManager::update()
                     catch(utf8::exception &ex)
                     {
                         Logging *log = Logging::instance();
-                        log->xrmLog<Logging::ERROR_LOG>("Utf8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
+                        log->write<Logging::ERROR_LOG>("Utf8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
                     }
                 }
 

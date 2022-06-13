@@ -106,7 +106,7 @@ bool ProtocolDao::saveConfig(protocols_ptr prot)
 
     if(!ofs.is_open())
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, unable to write to=", path, __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, unable to write to=", path, __LINE__, __FILE__);
         return false;
     }
 
@@ -166,11 +166,11 @@ bool ProtocolDao::loadConfig()
         std::string file_version = node["file_version"].as<std::string>();
 
         // Validate File Version
-        log->xrmLog<Logging::CONSOLE_LOG>("Protocols File Version=", file_version);
+        log->write<Logging::CONSOLE_LOG>("Protocols File Version=", file_version);
 
         if(file_version != Protocols::FILE_VERSION)
         {
-            log->xrmLog<Logging::ERROR_LOG>("Protocols File Version=", file_version, "Expected=", Protocols::FILE_VERSION, __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Protocols File Version=", file_version, "Expected=", Protocols::FILE_VERSION, __LINE__, __FILE__);
             return false;
         }
 
@@ -182,12 +182,12 @@ bool ProtocolDao::loadConfig()
     }
     catch(YAML::Exception &ex)
     {
-        log->xrmLog<Logging::ERROR_LOG>("YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
         return(false);
     }
     catch(std::exception &ex)
     {
-        log->xrmLog<Logging::ERROR_LOG>("Unexpected YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Unexpected YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
         return(false);
     }
 

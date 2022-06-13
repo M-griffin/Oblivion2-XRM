@@ -21,7 +21,9 @@ class MenuPromptDao
 {
 public:
 
-    MenuPromptDao(menu_prompt_ptr menu_prompt, std::string menu_prompt_name, std::string path);
+    MenuPromptDao(menu_prompt_ptr menu_prompt, 
+                  const std::string &menu_prompt_name, 
+                  const std::string &path);
     ~MenuPromptDao();
 
     /**

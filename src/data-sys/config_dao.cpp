@@ -13,7 +13,7 @@
 const std::string Config::FILE_VERSION = "1.0.4";
 static bool is_version_displayed = false;
 
-ConfigDao::ConfigDao(config_ptr config, std::string path)
+ConfigDao::ConfigDao(config_ptr config, const std::string &path)
     : m_config(config)
     , m_path(path)
     , m_filename("xrm_config.yaml")
@@ -341,7 +341,8 @@ bool ConfigDao::loadConfig()
         // Testing Is on nodes always throws exceptions.
         if(node.size() == 0)
         {
-            return false; //File Not Found?
+            std::cout << std::endl << "ConfigDao Node size == 0" << std::endl;
+            return false;
         }
 
         std::string file_version = node["file_version"].as<std::string>();

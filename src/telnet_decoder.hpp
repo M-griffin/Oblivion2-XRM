@@ -159,7 +159,7 @@ private:
         if(error)
         {
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("async_write error=", error.message(), __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("async_write error=", error.message(), __LINE__, __FILE__);
         }
     }
 
@@ -245,7 +245,7 @@ private:
      */
     struct FindFirst
     {
-        FindFirst(unsigned char i) : to_find(i) { }
+        explicit FindFirst(unsigned char i) : to_find(i) { }
         unsigned char to_find;
         bool operator()
         (const unsigned char &p)

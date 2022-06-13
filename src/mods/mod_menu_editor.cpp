@@ -309,7 +309,7 @@ void ModMenuEditor::setupMenuOptionEditor()
             break;
 
         default:
-            log->xrmLog<Logging::ERROR_LOG>("Error, Didn't add the view display to setupMenuOptionEditor", __FILE__, __LINE__);
+            log->write<Logging::ERROR_LOG>("Error, Didn't add the view display to setupMenuOptionEditor", __FILE__, __LINE__);
             break;
     }
 
@@ -428,7 +428,7 @@ void ModMenuEditor::displayCurrentPage(const std::string &input_state)
 
         default:
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentPage!!", __FILE__, __LINE__);
+            log->write<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentPage!!", __FILE__, __LINE__);
             return;
     }
 
@@ -476,7 +476,7 @@ void ModMenuEditor::displayCurrentEditPage(const std::string &input_state)
 
         default:
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentEditPage!!", __FILE__, __LINE__);
+            log->write<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentEditPage!!", __FILE__, __LINE__);
             return;
     }
 
@@ -1602,7 +1602,7 @@ void ModMenuEditor::copyExistingMenu(const std::string &menu_name)
     }
     else
     {
-        log->xrmLog<Logging::ERROR_LOG>("Source menu file doesn't exist=", m_current_menu, __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Source menu file doesn't exist=", m_current_menu, __FILE__, __LINE__);
         return;
     }
 
@@ -1615,7 +1615,7 @@ void ModMenuEditor::copyExistingMenu(const std::string &menu_name)
     }
     else
     {
-        log->xrmLog<Logging::ERROR_LOG>("Destination menu file already exist=", new_menu, __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Destination menu file already exist=", new_menu, __FILE__, __LINE__);
     }
 }
 
@@ -1663,11 +1663,11 @@ void ModMenuEditor::saveMenuChanges()
 
     if(mnu_source.saveMenu(m_loaded_menu.back()))
     {
-        log->xrmLog<Logging::DEBUG_LOG>("Menu Saved Successful=", m_current_menu, __FILE__, __LINE__);
+        log->write<Logging::DEBUG_LOG>("Menu Saved Successful=", m_current_menu, __FILE__, __LINE__);
     }
     else
     {
-        log->xrmLog<Logging::ERROR_LOG>("Menu Save Failed=", m_current_menu, __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Menu Save Failed=", m_current_menu, __FILE__, __LINE__);
     }
 }
 
@@ -1736,7 +1736,7 @@ std::string ModMenuEditor::displayMenuList()
     if(result_set.size() == 0)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::CONSOLE_LOG>("No Menus .yaml files found", __FILE__, __LINE__);
+        log->write<Logging::CONSOLE_LOG>("No Menus .yaml files found", __FILE__, __LINE__);
         return "No Menu Files found!";
     }
 

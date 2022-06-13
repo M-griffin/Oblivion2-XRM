@@ -21,7 +21,7 @@ class MenuDao
 {
 public:
 
-    MenuDao(menu_ptr menu, std::string menu_name, std::string path);
+    MenuDao(menu_ptr menu, const std::string &menu_name, const std::string &path);
     ~MenuDao();
 
     /**

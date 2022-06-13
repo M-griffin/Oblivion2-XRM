@@ -3,7 +3,7 @@
  * @return
  */
 
-#include "ansi_processor.hpp"
+#include "processor_ansi.hpp"
 
 #include <UnitTest++.h>
 
@@ -16,17 +16,17 @@
  * @brief Test Suit for CommonIO Class.
  * @return
  */
-SUITE(XRMAnsiProcessor)
+SUITE(XRMProcessorAnsi)
 {
     // Test the Program Path is being read correctly.
     TEST(parseAnsi_Empty_Verify_Startup_Defaults)
     {
-        AnsiProcessor ansi(25,80);
-        ansi.parseAnsiScreen((char *)"");
+        ProcessorAnsi ansi(25,80);
+        ansi.parseTextToBuffer((char *)"");
         // check screen size!
         CHECK(ansi.m_attribute == 0);
-        CHECK(ansi.m_foreground_color == AnsiProcessor::FG_WHITE);
-        CHECK(ansi.m_background_color == AnsiProcessor::BG_BLACK);
+        CHECK(ansi.m_foreground_color == ProcessorAnsi::FG_WHITE);
+        CHECK(ansi.m_background_color == ProcessorAnsi::BG_BLACK);
         CHECK(ansi.m_is_screen_cleared == false);
         CHECK(ansi.m_number_lines == 25);
         CHECK(ansi.m_characters_per_line == 80);
@@ -37,8 +37,8 @@ SUITE(XRMAnsiProcessor)
     // Test the Program Path is being read correctly.
     TEST(parseAnsi_Normal_Text)
     {
-        AnsiProcessor ansi(25,80);
-        ansi.parseAnsiScreen((char *)"ABC1234");
+        ProcessorAnsi ansi(25,80);
+        ansi.parseTextToBuffer((char *)"ABC1234");
         CHECK(ansi.m_screen_buffer[0].char_sequence == "A");
         CHECK(ansi.m_screen_buffer[6].char_sequence == "4");
 
@@ -47,8 +47,8 @@ SUITE(XRMAnsiProcessor)
     // Test the Program Path is being read correctly.
     TEST(parseAnsi_Test_Line_Wrapping)
     {
-        AnsiProcessor ansi(25,80);
-        ansi.parseAnsiScreen((char *)"\x1b[?7h");
+        ProcessorAnsi ansi(25,80);
+        ansi.parseTextToBuffer((char *)"\x1b[?7h");
         CHECK(ansi.m_is_line_wrapping);
     }
 }

@@ -12,7 +12,7 @@
 // Setup the file version for the config file.
 const std::string Menu::FILE_VERSION = "1.0.1";
 
-MenuDao::MenuDao(menu_ptr menu, std::string menu_name, std::string path)
+MenuDao::MenuDao(menu_ptr menu, const std::string &menu_name, const std::string &path)
     : m_menu(menu)
     , m_path(path)
     , m_filename(menu_name)
@@ -118,7 +118,7 @@ bool MenuDao::saveMenu(menu_ptr menu)
     if(!ofs.is_open())
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("Error, unable to write to", path);
+        log->write<Logging::ERROR_LOG>("Error, unable to write to", path);
         return false;
     }
 
@@ -143,7 +143,7 @@ bool MenuDao::deleteMenu()
     if(std::remove(path.c_str()) != 0)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("Error, removing menu file", path);
+        log->write<Logging::ERROR_LOG>("Error, removing menu file", path);
         return false;
     }
 
@@ -209,11 +209,11 @@ bool MenuDao::loadMenu()
         std::string file_version = node["file_version"].as<std::string>();
 
         // Validate File Version
-        log->xrmLog<Logging::DEBUG_LOG>("Menu File Version", file_version);
+        log->write<Logging::DEBUG_LOG>("Menu File Version", file_version);
 
         if(file_version != Menu::FILE_VERSION)
         {
-            log->xrmLog<Logging::ERROR_LOG>("Menu File Version=", file_version, "Expected Version=", Menu::FILE_VERSION);
+            log->write<Logging::ERROR_LOG>("Menu File Version=", file_version, "Expected Version=", Menu::FILE_VERSION);
             return false;
         }
 
@@ -224,12 +224,12 @@ bool MenuDao::loadMenu()
     }
     catch(YAML::Exception &ex)
     {
-        log->xrmLog<Logging::ERROR_LOG>("YAML::LoadFile", m_filename + ".yaml", ex.what(), "Missing required field maybe.");
+        log->write<Logging::ERROR_LOG>("YAML::LoadFile", m_filename + ".yaml", ex.what(), "Missing required field maybe.");
         return(false);
     }
     catch(std::exception &ex)
     {
-        log->xrmLog<Logging::ERROR_LOG>("Unexpected YAML::LoadFile", m_filename + ".yaml", ex.what());
+        log->write<Logging::ERROR_LOG>("Unexpected YAML::LoadFile", m_filename + ".yaml", ex.what());
         return(false);
     }
 

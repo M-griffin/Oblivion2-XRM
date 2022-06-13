@@ -32,7 +32,7 @@ int SDL_Socket::sendSocket(unsigned char *buffer, Uint32 length)
             if(SDLNet_GetError() && strlen(SDLNet_GetError()))
             {
                 Logging *log = Logging::instance();
-                log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_Send=", SDLNet_GetError(), __FILE__, __LINE__);
+                log->write<Logging::ERROR_LOG>("SDLNet_TCP_Send=", SDLNet_GetError(), __FILE__, __LINE__);
                 return(0);
             }
         }
@@ -110,7 +110,7 @@ socket_handler_ptr SDL_Socket::pollSocketAccepts()
 
     if(numActiveSockets != 0)
     {
-        log->xrmLog<Logging::DEBUG_LOG>("pollSocketAccepts=", numActiveSockets, "with data to be processed");
+        log->write<Logging::DEBUG_LOG>("pollSocketAccepts=", numActiveSockets, "with data to be processed");
     }
 
     if(numActiveSockets > 0 && m_is_socket_active)
@@ -130,7 +130,7 @@ socket_handler_ptr SDL_Socket::pollSocketAccepts()
             handler->setSocketType("TELNET");
             handler->setSocketState(state);
 
-            log->xrmLog<Logging::DEBUG_LOG>("Return new SocketHandler TELNET");
+            log->write<Logging::DEBUG_LOG>("Return new SocketHandler TELNET");
             return handler;
         }
     }
@@ -150,7 +150,7 @@ void SDL_Socket::spawnSocket(TCPsocket socket)
 
     if(!m_socket_set)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_AllocSocketSet=", SDLNet_GetError(), __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("SDLNet_AllocSocketSet=", SDLNet_GetError(), __FILE__, __LINE__);
         onExit();
         return;
     }
@@ -158,14 +158,14 @@ void SDL_Socket::spawnSocket(TCPsocket socket)
     // Attached New Socket from Accept to it's own session instance.
     if(SDLNet_TCP_AddSocket(m_socket_set, m_tcp_socket) == -1)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_AddSocket=", SDLNet_GetError(), __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("SDLNet_TCP_AddSocket=", SDLNet_GetError(), __FILE__, __LINE__);
         onExit();
         return;
     }
 
     // Successful Startup
     m_is_socket_active = true;
-    log->xrmLog<Logging::DEBUG_LOG>("Connection Spawn Successful");
+    log->write<Logging::DEBUG_LOG>("Connection Spawn Successful");
 }
 
 /**
@@ -180,17 +180,17 @@ bool SDL_Socket::onConnect()
 
     if(!m_socket_set)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_AllocSocketSet=", SDLNet_GetError(), __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("SDLNet_AllocSocketSet=", SDLNet_GetError(), __FILE__, __LINE__);
         onExit();
         return false;
     }
 
     /* Resolve the argument into an IP address type */
-    log->xrmLog<Logging::CONSOLE_LOG>("Client Connecting=", m_host, "port=", m_port);
+    log->write<Logging::CONSOLE_LOG>("Client Connecting=", m_host, "port=", m_port);
 
     if(SDLNet_ResolveHost(&ip, m_host.c_str(), m_port) == -1)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_ResolveHost=", SDLNet_GetError(), __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("SDLNet_ResolveHost=", SDLNet_GetError(), __FILE__, __LINE__);
         m_tcp_socket = nullptr;
         onExit();
         return false;
@@ -200,21 +200,21 @@ bool SDL_Socket::onConnect()
 
     if(!m_tcp_socket)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_Open=", SDLNet_GetError(), __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("SDLNet_TCP_Open=", SDLNet_GetError(), __FILE__, __LINE__);
         onExit();
         return false;
     }
 
     if(SDLNet_TCP_AddSocket(m_socket_set, m_tcp_socket) == -1)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_AddSocket=", SDLNet_GetError(), __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("SDLNet_TCP_AddSocket=", SDLNet_GetError(), __FILE__, __LINE__);
         onExit();
         return false;
     }
 
     // Successful Startup
     m_is_socket_active = true;
-    log->xrmLog<Logging::DEBUG_LOG>("Connection Successful");
+    log->write<Logging::DEBUG_LOG>("Connection Successful");
 
     return true;
 }
@@ -231,17 +231,17 @@ bool SDL_Socket::onListen()
 
     if(!m_socket_set)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_AllocSocketSet=", SDLNet_GetError(), __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("SDLNet_AllocSocketSet=", SDLNet_GetError(), __FILE__, __LINE__);
         onExit();
         return false;
     }
 
     /* Resolve the argument into an IP address type */
-    log->xrmLog<Logging::CONSOLE_LOG>("Listening for Telnet on port=", m_port);
+    log->write<Logging::CONSOLE_LOG>("Listening for Telnet on port=", m_port);
 
     if(SDLNet_ResolveHost(&ip, NULL, m_port) == -1)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_ResolveHost=", SDLNet_GetError(), __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("SDLNet_ResolveHost=", SDLNet_GetError(), __FILE__, __LINE__);
         m_tcp_socket = nullptr;
         onExit();
         return false;
@@ -251,14 +251,14 @@ bool SDL_Socket::onListen()
 
     if(!m_tcp_socket)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_Open=", SDLNet_GetError(), __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("SDLNet_TCP_Open=", SDLNet_GetError(), __FILE__, __LINE__);
         onExit();
         return false;
     }
 
     if(SDLNet_TCP_AddSocket(m_socket_set, m_tcp_socket) == -1)
     {
-        log->xrmLog<Logging::ERROR_LOG>("SDLNet_TCP_AddSocket=", SDLNet_GetError(), __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("SDLNet_TCP_AddSocket=", SDLNet_GetError(), __FILE__, __LINE__);
         onExit();
         return false;
     }

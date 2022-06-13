@@ -1,1 +1,1 @@
-Oblivion2-XRM Data File(s) are auto-generate the first time the program is executed.
+Oblivion2-XRM Data File(s) are auto-generated the first time the program is executed.

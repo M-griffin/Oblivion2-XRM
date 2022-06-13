@@ -23,7 +23,7 @@
 
 // Definitions for XRMFormSystemConfig Unit Tests.
 // NOTE These are position in the config index of the methods,
-// If we add new otpions, then these must be incremented!
+// If we add new otpions, then these should be incremented, or could be missed
 #define MAX_OPTIONS 108
 #define BBS_NAME_SYSOP 0
 #define USE_SSL_SERVICE 10
@@ -198,7 +198,7 @@ SUITE(XRMFormSystemConfig)
         std::string newValue = "2323";
         form->updateNodeMapping(opts[PORT_TELNET], newValue);
 
-        // Move from Node back to Config and Translations String to String
+        // Move from Node back to Config and Translations String to Integer
         config_ptr c = form->retrieveNodeMapping<Config>();
 
         // Now test new value is populated in config class.

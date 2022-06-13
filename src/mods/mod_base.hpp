@@ -6,7 +6,7 @@
 
 #include "../session_data.hpp"
 #include "../session_io.hpp"
-#include "../ansi_processor.hpp"
+#include "../processor_ansi.hpp"
 #include "../encoding.hpp"
 
 #include <algorithm>
@@ -34,7 +34,7 @@ public:
     virtual bool onEnter() = 0;
     virtual bool onExit()  = 0;
 
-    ModBase(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
+    ModBase(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
         : m_session_data(session_data)
         , m_config(config)
         , m_session_io(session_data)
@@ -248,7 +248,7 @@ public:
         // Clear out attributes on new strings no bleeding of colors.
         std::string output = "\x1b[0m" + baseGetDefaultColor();
         output += std::move(data);
-        m_ansi_process->parseAnsiScreen((char *)output.c_str());
+        m_ansi_process->parseTextToBuffer((char *)output.c_str());
         output += baseGetDefaultInputColor();
         m_session_data->deliver(output);
     }
@@ -277,7 +277,7 @@ public:
      */
     void baseProcessDeliverInput(std::string &data)
     {
-        m_ansi_process->parseAnsiScreen((char *)data.c_str());
+        m_ansi_process->parseTextToBuffer((char *)data.c_str());
         m_session_data->deliver(data);
     }
 
@@ -437,7 +437,7 @@ public:
     session_data_ptr  m_session_data;
     config_ptr        m_config;
     SessionIO         m_session_io;
-    ansi_process_ptr  m_ansi_process;
+    processor_ansi_ptr  m_ansi_process;
     bool              m_is_active;
 
 

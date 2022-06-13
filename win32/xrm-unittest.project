@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="xrm-unittest" InternalType="UnitTest++" Version="10.0.0">
+<CodeLite_Project Name="xrm-unittest" InternalType="UnitTest++" Version="11000">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -29,6 +29,11 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="../src/processor_text.hpp"/>
+    <File Name="../src/processor_text.cpp"/>
+    <File Name="../src/processor_base.hpp"/>
+    <File Name="../src/processor_ansi.hpp"/>
+    <File Name="../src/processor_ansi.cpp"/>
     <File Name="../xrm-unittest/src/xrm_test.cpp"/>
     <File Name="../xrm-unittest/src/users_dao_ut.cpp"/>
     <File Name="../xrm-unittest/src/session_io_ut.cpp"/>
@@ -77,8 +82,6 @@
     <File Name="../src/common_io.cpp"/>
     <File Name="../src/session_io.cpp"/>
     <File Name="../src/session_io.hpp"/>
-    <File Name="../src/ansi_processor.cpp"/>
-    <File Name="../src/ansi_processor.hpp"/>
     <File Name="../src/session_manager.cpp"/>
     <File Name="../src/session_manager.hpp"/>
     <File Name="../src/access_condition.cpp"/>

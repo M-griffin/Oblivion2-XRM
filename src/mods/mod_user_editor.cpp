@@ -607,7 +607,7 @@ void ModUserEditor::copyExistingUser(long user_id)
 
     if(salt.size() == 0 || password.size() == 0)
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, Salt or Password were empty", __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, Salt or Password were empty", __LINE__, __FILE__);
         return;
     }
 
@@ -620,7 +620,7 @@ void ModUserEditor::copyExistingUser(long user_id)
 
     if(securityIndex < 0)
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, unable to insert new user record", __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, unable to insert new user record", __LINE__, __FILE__);
         return;
     }
 
@@ -694,7 +694,7 @@ bool ModUserEditor::loadUserById(long user_id)
     if(m_loaded_user.size() > 0)
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::DEBUG_LOG>("Error, user already loaded", __LINE__, __FILE__);
+        log->write<Logging::DEBUG_LOG>("Error, user already loaded", __LINE__, __FILE__);
         return true;
     }
 
@@ -824,7 +824,7 @@ void ModUserEditor::displayCurrentPage(const std::string &input_state)
 
         default:
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentPage", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentPage", __LINE__, __FILE__);
             return;
     }
 
@@ -1573,7 +1573,7 @@ void ModUserEditor::updateExistingPassword(std::string key_value)
 
     if(password.size() == 0)
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, Password Hash empty", __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, Password Hash empty", __LINE__, __FILE__);
         assert(false);
     }
 
@@ -1581,7 +1581,7 @@ void ModUserEditor::updateExistingPassword(std::string key_value)
 
     if(!security_dao->updateRecord(security_record))
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, unable to update password hash", __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, unable to update password hash", __LINE__, __FILE__);
         return;
     }
 }
@@ -1605,7 +1605,7 @@ void ModUserEditor::updateExistingChallengeAnswer(std::string key_value)
 
     if(password.size() == 0)
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, Challenge Answer Hash empty", __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, Challenge Answer Hash empty", __LINE__, __FILE__);
         assert(false);
     }
 
@@ -1613,7 +1613,7 @@ void ModUserEditor::updateExistingChallengeAnswer(std::string key_value)
 
     if(!security_dao->updateRecord(security_record))
     {
-        log->xrmLog<Logging::ERROR_LOG>("Error, unable to update Challenge Answer", __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, unable to update Challenge Answer", __LINE__, __FILE__);
         return;
     }
 }
@@ -1635,7 +1635,7 @@ void ModUserEditor::updateExistingChallengeQuestion(std::string key_value)
     if(!security_dao->updateRecord(security_record))
     {
         Logging *log = Logging::instance();
-        log->xrmLog<Logging::ERROR_LOG>("Error, unable to update Challenge Question", __LINE__, __FILE__);
+        log->write<Logging::ERROR_LOG>("Error, unable to update Challenge Question", __LINE__, __FILE__);
         return;
     }
 }
@@ -1973,7 +1973,7 @@ void ModUserEditor::displayCurrentEditPage(const std::string &input_state)
 
         default:
             Logging *log = Logging::instance();
-            log->xrmLog<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentEditPage", __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentEditPage", __LINE__, __FILE__);
             return;
     }
 

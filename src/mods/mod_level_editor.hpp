@@ -24,7 +24,7 @@ typedef std::shared_ptr<SessionData> session_data_ptr;
 class ModLevelEditor : public ModBase
 {
 public:
-    ModLevelEditor(session_data_ptr session_data, config_ptr config, ansi_process_ptr ansi_process)
+    ModLevelEditor(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
         : ModBase(session_data, config, ansi_process)
         , m_session_io(session_data)
         , m_filename("mod_level_editor.yaml")
