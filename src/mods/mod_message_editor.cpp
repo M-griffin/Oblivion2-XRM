@@ -67,6 +67,12 @@ void ModMessageEditor::createTextPrompts()
 {
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
+    
+    //value[DEFAULT_TEXT_COLORS]                = std::make_pair("Default Text Color when typing", "|03|16");
+    value[DEFAULT_TEXT_COLORS]                = std::make_pair("Selected Text when CTRL+B is keyed for selection", "|02|20");
+    value[BACKSPACE_TEXT_COLORS]              = std::make_pair("Match your template background color", "|04|17");
+    
+    value[SELECTED_TEXT_COLORS]               = std::make_pair("Selected Text when CTRL+B is keyed for selection", "|02|20");
     /*
         value[PROMPT_HEADER]                  = std::make_pair("User Editor Header", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11User Editor|15] |03--- |11Filtering View : |15|OT |CR");
         value[PROMPT_INPUT_TEXT]              = std::make_pair("User Editor Prompt", "|CR|03E|15/dit User |03D|15/elete User |03C|15/opy User |03F|15/ilter Users |03Q|15/uit : ");
@@ -343,6 +349,7 @@ void ModMessageEditor::setupEditor()
     std::string screen_output = top_screen + mid_screen + bot_screen;
     screen_output += "\x1b[" + std::to_string(m_text_box_top) + ";" + std::to_string(m_text_box_left) + "H";
 
+    screen_output += getDisplayPromptRaw(DEFAULT_TEXT_COLORS);
     baseProcessDeliverInput(screen_output);
 }
 
@@ -452,11 +459,14 @@ void ModMessageEditor::handleBackSpace(std::string &output)
     
     std::cout << "handleBackSpace max_chars=" << m_text_process->getMaxCharactersPerLine() << ", x_pos=" << x_position << std::endl;
 
+    std::string default_text_color = getDisplayPromptRaw(DEFAULT_TEXT_COLORS);
+    std::string backspace_color = getDisplayPromptRaw(BACKSPACE_TEXT_COLORS);
+
     // destructive backspace OR Move Up a Line Backspace.
     if(x_position > 1)
     {
         m_text_process->parseTextToBuffer((char *)"\b");
-        output += "\x1b[D \x1b[D";
+        output += backspace_color + "\x1b[D \x1b[D" + default_text_color;
     }
     // detsructive backspace move up and end of line
     else if(x_position == 1)
@@ -467,7 +477,7 @@ void ModMessageEditor::handleBackSpace(std::string &output)
         
         std::cout << "handleBackSpaceAfter x_position=" << m_text_process->getXPosition() << std::endl;
         if(m_text_process->getXPosition() == m_text_process->getMaxCharactersPerLine()) {
-            output += " \x1b[D";
+            output += backspace_color + " \x1b[D" + default_text_color;
         }    
     }
 }
@@ -483,22 +493,26 @@ void ModMessageEditor::handleDelete(std::string &output)
     
     std::cout << "handleDelete max_chars=" << m_text_process->getMaxCharactersPerLine() << ", x_pos=" << x_position << std::endl;
 
-    // destructive backspace
+    std::string default_text_color = getDisplayPromptRaw(DEFAULT_TEXT_COLORS);
+    std::string backspace_color = getDisplayPromptRaw(BACKSPACE_TEXT_COLORS);
+
+    // destructive backspace OR Move Up a Line Backspace.
     if(x_position > 1)
     {
         m_text_process->parseTextToBuffer((char *)"\b");
-        output += "\x1b[D \x1b[D";
+        output += backspace_color + "\x1b[D \x1b[D" + default_text_color;
     }
     // detsructive backspace move up and end of line
     else if(x_position == 1)
-    {
+    {        
         // Check Updated Position after parse - If we move from 1, up and to end of line, then 
         // remove last character for cursor space.
         m_text_process->parseTextToBuffer((char *)"\b");
-        std::cout << "handleDeleteAfter x_position=" << m_text_process->getXPosition() << std::endl;
+        
+        std::cout << "handleBackSpaceAfter x_position=" << m_text_process->getXPosition() << std::endl;
         if(m_text_process->getXPosition() == m_text_process->getMaxCharactersPerLine()) {
-            output += " \x1b[D";
-        }
+            output += backspace_color + " \x1b[D" + default_text_color;
+        }    
     }
 
 }
@@ -592,10 +606,14 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
     // This is required to move up to the previous line
     // Then clear the char in the spot we just occipied.
     if (m_text_process->isDoubleBackSpace()) {
+        
+        std::string default_text_color = getDisplayPromptRaw(DEFAULT_TEXT_COLORS);
+        std::string backspace_color = getDisplayPromptRaw(BACKSPACE_TEXT_COLORS);
+    
         std::cout << "isDoubleBackSpace max_chars=" << m_text_process->getMaxCharactersPerLine() << std::endl;        
         if (m_text_process->getMaxCharactersPerLine() == m_text_process->getXPosition()) 
         {
-            output += " \x1b[D"; // clear the current position
+            output += backspace_color + " \x1b[D" + default_text_color; // clear the current position
             // TODO Probably need to clear buffer at this spot to for current position.
         }        
         m_text_process->setDoubleBackSpace(false);

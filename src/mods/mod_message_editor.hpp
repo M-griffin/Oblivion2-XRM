@@ -100,7 +100,11 @@ public:
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
-    const std::string PROMPT_HEADER = "header";
+    const std::string DEFAULT_TEXT_COLORS = "default_text_colors";
+    const std::string BACKSPACE_TEXT_COLORS = "backspace_text_colors";
+    const std::string SELECTED_TEXT_COLORS = "selected_text_colors";
+
+    // Not Used yet.
     const std::string PROMPT_INPUT_TEXT = "input_text";
     const std::string PROMPT_INVALID = "invalid_input";
 
