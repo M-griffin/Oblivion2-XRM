@@ -29,6 +29,8 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="../xrm-unittest/src/processor_ansi_ut.cpp"/>
+    <File Name="../xrm-unittest/src/processor_text_ut.cpp"/>
     <File Name="../src/processor_text.hpp"/>
     <File Name="../src/processor_text.cpp"/>
     <File Name="../src/processor_base.hpp"/>
@@ -43,7 +45,6 @@
     <File Name="../xrm-unittest/src/conference_dao_it.cpp"/>
     <File Name="../xrm-unittest/src/common_mock_ut.cpp"/>
     <File Name="../xrm-unittest/src/common_io_ut.cpp"/>
-    <File Name="../xrm-unittest/src/ansi_processor_ut.cpp"/>
     <File Name="../xrm-unittest/src/access_condition_ut.hpp"/>
     <File Name="../xrm-unittest/src/access_condition_ut.cpp"/>
     <File Name="../xrm-unittest/src/xrm_test.cpp"/>
