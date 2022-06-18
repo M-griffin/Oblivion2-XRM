@@ -43,11 +43,11 @@ public:
 
     virtual std::string getStateID() const override
     {
-        return m_menuID;
+        return m_stateID;
     }
 
     //int m_next_state;
-    static const std::string m_menuID;
+    static const std::string m_stateID;
     std::vector<std::string> m_system_fallback;
 
     // handle to form interface.

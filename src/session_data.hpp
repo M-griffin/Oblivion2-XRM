@@ -10,7 +10,7 @@
 #include "encoding.hpp"
 
 #include "io_service.hpp"
-#include "async_connection.hpp"
+#include "async_io.hpp"
 #include "telnet_decoder.hpp"
 #include "session_manager.hpp"
 #include "common_io.hpp"

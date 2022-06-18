@@ -15,7 +15,7 @@
 #include <functional>
 #include <cassert>
 
-const std::string MenuSystem::m_menuID = "MENU_SYSTEM";
+const std::string MenuSystem::m_stateID = "MENU_SYSTEM";
 
 MenuSystem::MenuSystem(session_data_ptr session_data)
     : StateBase(session_data)

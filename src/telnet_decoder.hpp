@@ -1,7 +1,7 @@
 #ifndef __TELNET_DECODER_H_
 #define __TELNET_DECODER_H_
 
-#include "async_connection.hpp"
+#include "async_io.hpp"
 #include "communicator.hpp"
 #include "telnet.hpp"
 #include "logging.hpp"

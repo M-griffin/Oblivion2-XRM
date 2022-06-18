@@ -2,7 +2,7 @@
 #define SESSION_HPP
 
 #include "state_manager.hpp"
-#include "async_connection.hpp"
+#include "async_io.hpp"
 #include "deadline_timer.hpp"
 #include "socket_handler.hpp"
 #include "session_manager.hpp"
@@ -11,6 +11,7 @@
 #include "session_data.hpp"
 #include "session_io.hpp"
 #include "menu_system.hpp"
+#include "python_system.hpp"
 #include "logging.hpp"
 
 #include <memory>
@@ -136,6 +137,17 @@ public:
     {
         // Detection Completed, start ip the Pre-Logon Sequence State.
         state_ptr new_state(new MenuSystem(m_session_data));
+        m_state_manager->changeState(new_state);
+    }
+    
+    /**
+     * @brief Deadline Detection Timer for Negotiation
+     * @param timer
+     */
+    void handlePyBind11State()
+    {
+        // Detection Completed, start ip the Pre-Logon Sequence State.
+        state_ptr new_state(new PythonSystem(m_session_data));
         m_state_manager->changeState(new_state);
     }
 

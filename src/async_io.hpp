@@ -10,23 +10,23 @@
 #include <memory>
 
 /**
- * @class AsyncConnection
+ * @class AsyncIO
  * @author Michael Griffin
  * @date 12/09/2017
  * @file async_connection.hpp
  * @brief Handles Shared Sockets Async Request Jobs to IOService.
  */
-class AsyncConnection
+class AsyncIO
     : public AsyncBase
 {
 public:
 
-    AsyncConnection(IOService& io_service, socket_handler_ptr socket_handler)
+    AsyncIO(IOService& io_service, socket_handler_ptr socket_handler)
         : AsyncBase(io_service, socket_handler)
     {
     }
 
-    ~AsyncConnection()
+    ~AsyncIO()
     {
     }
 
@@ -118,6 +118,6 @@ public:
 
 };
 
-typedef std::shared_ptr<AsyncConnection> connection_ptr;
+typedef std::shared_ptr<AsyncIO> connection_ptr;
 
 #endif // ASYNC_CONNECTION_HPP

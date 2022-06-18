@@ -124,7 +124,7 @@ private:
             Logging *log = Logging::instance();
             log->write<Logging::DEBUG_LOG>("TCP Connection accepted");
 
-            connection_ptr async_conn(new AsyncConnection(m_io_service, socket_handler));
+            connection_ptr async_conn(new AsyncIO(m_io_service, socket_handler));
 
             // Create DeadlineTimer and attach to new session
             // This timer is specific for waiting .25 seconds on
