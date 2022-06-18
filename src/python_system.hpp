@@ -1,6 +1,7 @@
 #ifndef PYTHON_SYSTEM_HPP
 #define PYTHON_SYSTEM_HPP
 
+#ifdef HAVE_PYTHON
 #include "state_base.hpp"
 #include "menu_base.hpp"
 
@@ -47,4 +48,5 @@ public:
     void pyRunScript(const std::string &script);
 };
 
+#endif // HAVE_PYTHON
 #endif // PYTHON_SYSTEM_HPP

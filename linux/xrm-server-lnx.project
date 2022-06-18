@@ -219,8 +219,6 @@
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
         <IncludePath Value="../linux/Debug"/>
-        <IncludePath Value="/usr/include/python3.8"/>
-        <IncludePath Value="/usr/local/include/pybind11"/>
         <Preprocessor Value="WITHOUT_SDL"/>
       </Compiler>
       <Linker Options="" Required="yes">
@@ -228,8 +226,6 @@
         <LibraryPath Value="./Debug"/>
         <LibraryPath Value="../sqlitewrap"/>
         <LibraryPath Value="../linux/Debug"/>
-        <LibraryPath Value="/usr/lib/python3.8"/>
-        <LibraryPath Value="/usr/lib/pybind11"/>
         <Library Value="libSqliteWrapped.a"/>
         <Library Value="sqlite3"/>
         <Library Value="pthread"/>
@@ -239,7 +235,6 @@
         <Library Value="util"/>
         <Library Value="libssh"/>
         <Library Value="uuid"/>
-        <Library Value="python3.8"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>

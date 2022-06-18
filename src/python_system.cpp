@@ -1,3 +1,5 @@
+
+#ifdef HAVE_PYTHON
 #include "model-sys/structures.hpp"
 #include "python_system.hpp"
 #include "directory.hpp"
@@ -124,3 +126,5 @@ void PythonSystem::pyRunScript(const std::string &script)
 
     return;
 }
+
+#endif // HAVE_PYTHON

@@ -146,9 +146,12 @@ public:
      */
     void handlePyBind11State()
     {
+// Work in Progress, not yet in use for main develop branch
+#ifdef HAVE_PYHON
         // Detection Completed, start ip the Pre-Logon Sequence State.
         state_ptr new_state(new PythonSystem(m_session_data));
         m_state_manager->changeState(new_state);
+#endif // HAVE_PYTHON
     }
 
     /**
