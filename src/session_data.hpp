@@ -112,11 +112,6 @@ public:
      */
     void handleTeloptCodes()
     {
-        if (m_is_leaving) 
-        {
-            return;
-        }
-        
         unsigned char ch = 0;
         std::string incoming_data = "";
 
@@ -170,7 +165,7 @@ public:
      */
     void deliver(const std::string &msg)
     {
-        if(msg.size() == 0 || msg[0] == '\0' || m_is_leaving)
+        if(msg.size() == 0 || msg[0] == '\0')
         {
             return;
         }
@@ -265,7 +260,6 @@ public:
      */
     void logoff()
     {
-        m_is_leaving = true;
         session_manager_ptr session_manager = m_session_manager.lock();
 
         if(session_manager)

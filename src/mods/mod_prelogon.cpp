@@ -198,11 +198,13 @@ void ModPreLogon::displayTerminalDetection()
         std::string term = m_session_data->m_telnet_state->getTermType();
         
         // Avoid Scripts, Could block Legacy Model Terminals, Maybe make an option lateron!
+        /* Test this later on forcing a logoff is resulting in segfaults!  We have some issues with deallocation.
+         * When the system is being hammered..  Look more into this.
         if(term == "undetected") {
             log->write<Logging::CONSOLE_LOG>("Term Type= undetected, disconnecting!");
             m_session_data->logoff();
             return;
-        }
+        }*/
 
 
         log->write<Logging::CONSOLE_LOG>("Term Type=", term);
