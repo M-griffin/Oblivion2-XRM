@@ -64,6 +64,11 @@ public:
         stm << static_cast<char>(option);
         buf = stm.str();
         deliver(buf);
+        
+        // Mark Sequence as Purshed then exclude senting it again.
+        if(!checkReply(option)) {
+            addReply(option);
+        }
     }
 
     /**

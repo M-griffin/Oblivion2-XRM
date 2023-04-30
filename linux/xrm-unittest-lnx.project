@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="xrm-unittest" InternalType="UnitTest++" Version="10.0.0">
-  <VirtualDirectory Name="mods">
-    <File Name="../src/mods/mod_message_editor.hpp"/>
-    <File Name="../src/mods/mod_message_editor.cpp"/>
-  </VirtualDirectory>
+<CodeLite_Project Name="xrm-unittest" InternalType="UnitTest++" Version="11000">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -30,6 +26,10 @@
  }]]]>
     </Plugin>
   </Plugins>
+  <VirtualDirectory Name="mods">
+    <File Name="../src/mods/mod_message_editor.hpp"/>
+    <File Name="../src/mods/mod_message_editor.cpp"/>
+  </VirtualDirectory>
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
