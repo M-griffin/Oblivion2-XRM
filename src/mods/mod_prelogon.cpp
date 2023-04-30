@@ -196,6 +196,13 @@ void ModPreLogon::displayTerminalDetection()
     {
         std::string result = prompt_term.second;
         std::string term = m_session_data->m_telnet_state->getTermType();
+        
+        // Avoid Scripts, Could block Legacy Model Terminals, Maybe make an option lateron!
+        if(term == "undetected") {
+            log->write<Logging::CONSOLE_LOG>("Term Type= undetected, disconnecting!");
+            m_session_data->logoff();
+            return;
+        }
 
 
         log->write<Logging::CONSOLE_LOG>("Term Type=", term);

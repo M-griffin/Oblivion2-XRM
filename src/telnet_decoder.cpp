@@ -80,8 +80,8 @@ void TelnetDecoder::decodeBuffer()
             m_naws_row = (256 * (unsigned char)data_sequence[2]) + (unsigned char)data_sequence[3];
             
             // Setup Some defaults if we get bad responses from Terminals.
-            if (m_naws_col > 100) m_naws_col = 100;
-            if (m_naws_row > 100) m_naws_row = 100;
+            if (m_naws_col > 100) m_naws_col = 80;
+            if (m_naws_row > 100) m_naws_row = 25;
             if (m_naws_col == 0) m_naws_col = 80;
             if (m_naws_row == 0) m_naws_row = 24;
 
