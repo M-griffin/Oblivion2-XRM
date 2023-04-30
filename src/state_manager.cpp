@@ -92,8 +92,9 @@ void StateManager::update()
                     }
                     catch(utf8::exception &ex)
                     {
+                        // This is filling up the log on Invalid Characters, have to find out what is pushing in here.
                         Logging *log = Logging::instance();
-                        log->write<Logging::ERROR_LOG>("Utf8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
+                        log->write<Logging::ERROR_LOG>("Utf8 Parsing Exception=", *it, ex.what(), __LINE__, __FILE__);
                     }
                 }
 

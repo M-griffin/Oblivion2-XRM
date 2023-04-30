@@ -236,7 +236,9 @@ void ModPreLogon::setupAskCodePage()
 
     // If ANSI terminal detected, or 'undetected', then default ENTER to set for CP437
     // Otherwise default to UTF-8 for Xterm etc.. and all other terminals.
-    if(m_term_type == "undetected" || m_term_type == "ansi")
+    if(m_term_type == "undetected" || 
+       m_term_type.find("ansi",0) != std::string::npos || 
+       m_term_type.find("ANSI",0) != std::string::npos)
     {
         displayPrompt(PROMPT_ASK_CP437);
     }
@@ -432,7 +434,9 @@ bool ModPreLogon::askCodePage(const std::string &input)
 
             std::string message = "";
 
-            if(m_term_type == "undetected" || m_term_type == "ansi")
+            if(m_term_type == "undetected" || 
+               m_term_type.find("ansi",0) != std::string::npos || 
+               m_term_type.find("ANSI",0) != std::string::npos)
             {
                 // Switch to ISO, then CP437 Character Set.
                 message = "\x1b[0m" + m_session_io.pipeColors(blackColor);
@@ -475,7 +479,9 @@ bool ModPreLogon::askCodePage(const std::string &input)
 
             std::string message = "";
 
-            if(m_term_type == "undetected" || m_term_type == "ansi")
+            if(m_term_type == "undetected" || 
+               m_term_type.find("ansi",0) != std::string::npos || 
+               m_term_type.find("ANSI",0) != std::string::npos)
             {
                 // Switch to Unicode Character Set.
                 message = "\x1b[0m" + m_session_io.pipeColors(blackColor);
