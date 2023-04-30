@@ -693,7 +693,7 @@ std::string SessionIO::parsePipeWithChars(const std::string &pipe_code)
             switch(pipe_code[2])
             {
                 case 'S': // Clear Screen / Home Cursor
-                    esc_sequence = "\x1b[2J\x1b[1;1H";
+                    esc_sequence = "\x1b[2J\x1b[255B\x1b[1;1H";
                     break;
 
                 case 'R': // Carriage Return / NewLine

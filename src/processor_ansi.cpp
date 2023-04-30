@@ -62,7 +62,7 @@ void ProcessorAnsi::screenBufferDisplayTest()
 
     if(m_is_screen_cleared)
     {
-        m_ansi_output.append("\x1b[1;1H\x1b[2J");
+        m_ansi_output.append("\x1b[1;1H\x1b[255B\x1b[2J");
     }
 
     for(unsigned int i = 0; i < m_screen_buffer.size(); i++)
@@ -167,7 +167,7 @@ std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen)
 
     if(clearScreen)
     {
-        ansi_output.append("\x1b[1;1H\x1b[2J");
+        ansi_output.append("\x1b[1;1H\x1b[255B\x1b[2J");
     }
 
     int count = 1;
