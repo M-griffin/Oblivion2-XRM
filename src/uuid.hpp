@@ -38,11 +38,13 @@ public:
 #else
         uuid_t uuid;
         uuid_generate_random(uuid);
-        char uuid_string[50];
-        memset(&uuid_string, 0, strlen(uuid_string));
-        uuid_unparse (uuid, uuid_string);
+        char uuid_string[37]={0};
+        //memset(&uuid_string, 0, strlen(uuid_string));
+        //uuid_unparse (uuid, uuid_string);
+        uuid_unparse_lower(uuid, uuid_string);
+        uuid_clear(uuid);
 #endif
-        return Encoding::instance()->utf8Encode(uuid_string);
+        return std::string((char*)uuid_string);
     }
 };
 

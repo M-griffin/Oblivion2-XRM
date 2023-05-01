@@ -32,6 +32,11 @@ void SessionManager::leave(int node_number)
     {
         if((*it)->m_session_data->m_node_number == node_number)
         {
+            // shutdown the Node in a locked manger.
+            if((*it)->m_connection && (*it)->m_connection->isActive())
+            {
+                (*it)->m_connection->shutdown();                
+            }
             m_sessions.erase(it);
             log->write<Logging::CONSOLE_LOG>("disconnecting Node Session completed=", node_number);
             break;

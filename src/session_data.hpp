@@ -268,6 +268,8 @@ public:
             session_manager->leave(m_node_number);
         }
 
+        // This might be doing double the deallocation
+        /*
         if(m_connection && m_connection->isActive())
         {
             try
@@ -280,7 +282,7 @@ public:
                 Logging *log = Logging::instance();
                 log->write<Logging::DEBUG_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
             }
-        }
+        }*/
     }
 
     /**

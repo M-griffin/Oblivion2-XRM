@@ -199,13 +199,13 @@ void ModPreLogon::displayTerminalDetection()
         
         // Avoid Scripts, Could block Legacy Model Terminals, Maybe make an option lateron!
         /* Test this later on forcing a logoff is resulting in segfaults!  We have some issues with deallocation.
-         * When the system is being hammered..  Look more into this.
+         * When the system is being hammered..  Look more into this. - New Testing is no loger throwing faults, Keep Watch!
         if(term == "undetected") {
             log->write<Logging::CONSOLE_LOG>("Term Type= undetected, disconnecting!");
             m_session_data->logoff();
+            m_is_active = false;
             return;
         }*/
-
 
         log->write<Logging::CONSOLE_LOG>("Term Type=", term);
 

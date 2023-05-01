@@ -204,6 +204,7 @@ auto main() -> int
 
         while(TheCommunicator::instance()->isActive())
         {
+            
             // Main Thread - While system is active loop,  This will be external event processor
             // Or notifications, etc.. lets see what else we want to do here.
             int log_entries = Logging::instance()->getNumberOfLogEntries();
@@ -214,6 +215,7 @@ auto main() -> int
 
                 if(entry != nullptr)
                 {
+                    // Temp Clear Log but don't write it out during testing.
                     Logging::instance()->writeOutYamlFile(entry);
                 }
             }

@@ -14,6 +14,12 @@ typedef struct localized_buffer
 {
     std::string character;
     uint8_t     length;
+    
+    localized_buffer()
+    {
+        character = "";
+        length = 0;
+    }
 
     void clear()
     {

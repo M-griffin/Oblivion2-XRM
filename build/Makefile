@@ -17,7 +17,7 @@ test:
 	cp -f ./Debug/xrm-unittest ../build/xrm-unittest
 run:
 	./xrm-server
-
+mem:
+	valgrind --tool=memcheck --leak-check=yes ./xrm-server
 run-test:
 	./xrm-unittest
-
