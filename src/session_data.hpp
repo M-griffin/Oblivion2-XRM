@@ -94,7 +94,7 @@ public:
         //memset(&m_raw_data, 0, max_length);
         std::vector<unsigned char>().swap(m_in_data_vector);
 
-        if(m_connection->isActive() && TheCommunicator::instance()->isActive())
+        if(m_connection->isActive()) // && TheCommunicator::instance()->isActive())
         {
             m_connection->asyncRead(m_in_data_vector,
                                     std::bind(
@@ -183,7 +183,7 @@ public:
             outputBuffer = msg;
         }
 
-        if(m_connection->isActive() && TheCommunicator::instance()->isActive())
+        if(m_connection->isActive()) // && TheCommunicator::instance()->isActive())
         {
             m_connection->asyncWrite(outputBuffer,
                                      std::bind(

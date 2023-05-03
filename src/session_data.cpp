@@ -154,6 +154,7 @@ void SessionData::handleRead(const std::error_code& error, socket_handler_ptr)
                 if(m_connection->isActive())
                 {
                     m_connection->shutdown();
+                    m_connection.reset();
                 }
             }
         }

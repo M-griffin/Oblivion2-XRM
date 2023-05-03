@@ -4,7 +4,7 @@
 //#include "model-sys/config.hpp"
 #include "session_manager.hpp"
 #include "session.hpp"
-#include "communicator.hpp"
+//#include "communicator.hpp"
 
 // New Rework for SDL2_net and Asyc io.
 #include "io_service.hpp"
@@ -61,7 +61,7 @@ public:
         if(SDLNet_Init() == -1)
         {
             log->write<Logging::ERROR_LOG>("SDLNet_Init", SDLNet_GetError());
-            TheCommunicator::instance()->shutdown();
+            //TheCommunicator::instance()->shutdown();
             return;
         }
 
@@ -76,13 +76,13 @@ public:
         if(!m_socket_acceptor->createTelnetAcceptor("127.0.0.1", port))
         {
             log->write<Logging::ERROR_LOG>("Unable to start Telnet Acceptor");
-            TheCommunicator::instance()->shutdown();
+            //TheCommunicator::instance()->shutdown();
             return;
         }
 
         // Setup the communicator to allow rest of program to talk with
         // And send messages to other nodes.
-        TheCommunicator::instance()->setupServer(m_session_manager);
+        //TheCommunicator::instance()->setupServer(m_session_manager);
 
         log->write<Logging::CONSOLE_LOG>("Telnet Server Waiting for Connection.");
         waitingForConnection();
@@ -90,6 +90,7 @@ public:
 
     ~Interface()
     {
+        std::cout << "~Interface()" << std::endl;
         m_io_service.stop();
         m_thread.join();
         SDLNet_Quit();
@@ -145,6 +146,9 @@ private:
             Logging *log = Logging::instance();
             log->write<Logging::ERROR_LOG>("Connection refused", error.message());
         }
+        
+        // Restart Listener for next connection.
+        waitingForConnection();
     }
 
     IOService&          m_io_service;

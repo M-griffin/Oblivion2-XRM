@@ -41,7 +41,9 @@ MenuBase::MenuBase(session_data_ptr session_data)
     , m_use_first_command_execution(true)
     , m_logoff(false)
 {
-    m_config = TheCommunicator::instance()->getConfiguration();
+    
+    // REset this to load the config maybe?!?  Not sure if YAML is leaking. 
+    // m_config = TheCommunicator::instance()->getConfiguration();
 }
 
 MenuBase::~MenuBase()

@@ -35,6 +35,7 @@ public:
 
     virtual ~SocketState()
     {
+        std::cout << "~SocketState()" << std::endl;
     }
 
     virtual int sendSocket(unsigned char *message, Uint32 len) = 0;
@@ -42,8 +43,9 @@ public:
     virtual socket_handler_ptr pollSocketAccepts() = 0;
     virtual void spawnSocket(TCPsocket socket) = 0;
     virtual int pollSocket() = 0;
-    virtual bool onConnect() = 0;
+    //virtual bool onConnect() = 0;
     virtual bool onListen() = 0;
+    //virtual void closeSocket() =0;
     virtual bool onExit() = 0;
 
     std::string m_host;
@@ -73,6 +75,7 @@ public:
 
     virtual ~SDL_Socket()
     {
+        std::cout << "~SDL_Socket()" << std::endl;
     }
 
     virtual int sendSocket(unsigned char *message, Uint32 len) override;
@@ -80,8 +83,9 @@ public:
     virtual socket_handler_ptr pollSocketAccepts() override; 
     virtual void spawnSocket(TCPsocket socket) override;
     virtual int pollSocket() override;
-    virtual bool onConnect() override;
+    //virtual bool onConnect() override;
     virtual bool onListen() override;
+    //virtual void closeSocket() override;
     virtual bool onExit() override;
 
 private:
@@ -90,90 +94,6 @@ private:
     SDLNet_SocketSet m_socket_set;
 
 };
-
-
-/**
- * @class IRC_Socket
- * @author Blue
- * @date 12/24/2017
- * @file socket_state.hpp
- * @brief SDL / TCP IRC Socket Template
- *
-class IRC_Socket : public SocketState
-{
-public:
-
-    IRC_Socket(const std::string &host, const int &port)
-        : SocketState(host, port)
-        , m_tcp_socket(nullptr)
-        , m_socket_set(nullptr)
-    { }
-
-    virtual ~IRC_Socket()
-    {
-        std::cout << "Shutting Down SDL_SocketState" << std::endl;
-    }
-
-    virtual int sendSocket(unsigned char *message, Uint32 len);
-    virtual int recvSocket(char *message);
-    virtual int pollSocket();
-    virtual bool onConnect();
-    virtual bool onListen();
-    virtual bool onExit();
-
-private:
-
-    TCPsocket        m_tcp_socket;
-    SDLNet_SocketSet m_socket_set;
-
-};
-*/
-
-/**
- * @class FTP_Socket
- * @author Michael Griffin
- * @date 11/12/2017
- * @file socket_state.hpp
- * @brief FTP Socket Template
- *
-class FTP_Socket : public SocketState
-{
-public:
-
-    FTP_Socket(const std::string &host, const int &port,
-               const std::string &user, const std::string &pass)
-        : SocketState(host, port)
-        , m_user_id(user)
-        , m_password(pass)
-        , m_control_socket(nullptr)
-        , m_listen_socket(nullptr)
-        , m_data_socket(nullptr)
-        , m_socket_set(nullptr)
-    { }
-
-    virtual ~FTP_Socket()
-    {
-        std::cout << "Shutting Down FTP SDL_SocketState" << std::endl;
-    }
-
-    virtual int sendSocket(unsigned char *message, Uint32 len);
-    virtual int recvSocket(char *message);
-    virtual int pollSocket();
-    virtual bool onConnect();
-    virtual bool onListen();
-    virtual bool onExit();
-
-private:
-
-    std::string      m_user_id;
-    std::string      m_password;
-
-    TCPsocket        m_control_socket;
-    TCPsocket        m_listen_socket;
-    TCPsocket        m_data_socket;
-    SDLNet_SocketSet m_socket_set;
-};
-*/
 
 /**
  * @class SSH_Socket
@@ -197,6 +117,7 @@ public:
 
     virtual  ~SSH_Socket()
     {
+        std::cout << "~SSH_Socket()" << std::endl;
     }
 
     virtual int sendSocket(unsigned char *message, Uint32 len) override;
@@ -204,8 +125,9 @@ public:
     virtual socket_handler_ptr pollSocketAccepts() override;
     virtual void spawnSocket(TCPsocket socket) override;
     virtual int pollSocket() override;
-    virtual bool onConnect() override;
+    //virtual bool onConnect() override;
     virtual bool onListen() override;
+    //virtual void closeSocket() override;
     virtual bool onExit() override;
 
     // Specific Functions for SSH

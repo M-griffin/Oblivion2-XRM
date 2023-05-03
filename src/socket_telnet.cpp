@@ -1,6 +1,6 @@
 #include "socket_state.hpp"
 #include "socket_handler.hpp"
-#include "communicator.hpp"
+//#include "communicator.hpp"
 #include "logging.hpp"
 
 #include <sdl2_net/SDL_net.hpp>
@@ -120,8 +120,10 @@ socket_handler_ptr SDL_Socket::pollSocketAccepts()
             socket = SDLNet_TCP_Accept(m_tcp_socket);
 
             // Setup the State, SDL_Socket
-            config_ptr config = TheCommunicator::instance()->getConfiguration();
-            socket_state_ptr state(new SDL_Socket("127.0.0.1", config->port_telnet));
+            //config_ptr config = TheCommunicator::instance()->getConfiguration();
+            //socket_state_ptr state(new SDL_Socket("127.0.0.1", config->port_telnet));
+            
+            socket_state_ptr state(new SDL_Socket("127.0.0.1", 6023));
             state->spawnSocket(socket);
 
             // Setup a Handle, which will link back to Async_Connection
@@ -171,7 +173,7 @@ void SDL_Socket::spawnSocket(TCPsocket socket)
 /**
  * @brief (Client) Connects out to Servers
  * @return
- */
+ *
 bool SDL_Socket::onConnect()
 {
     Logging *log = Logging::instance();
@@ -185,7 +187,7 @@ bool SDL_Socket::onConnect()
         return false;
     }
 
-    /* Resolve the argument into an IP address type */
+    // Resolve the argument into an IP address type 
     log->write<Logging::CONSOLE_LOG>("Client Connecting=", m_host, "port=", m_port);
 
     if(SDLNet_ResolveHost(&ip, m_host.c_str(), m_port) == -1)
@@ -217,7 +219,7 @@ bool SDL_Socket::onConnect()
     log->write<Logging::DEBUG_LOG>("Connection Successful");
 
     return true;
-}
+}*/
 
 /**
  * @brief (Server) Sets up the Listening Socket for New Conenction Polling.
@@ -274,9 +276,28 @@ bool SDL_Socket::onListen()
  */
 bool SDL_Socket::onExit()
 {
+    std::cout << "SDL_Socket onExit()" << std::endl;
+    Logging *log = Logging::instance();
+    m_is_socket_active = false;
+    
     if(m_tcp_socket)
     {
+        m_is_socket_active = false;
+    
+        if(m_tcp_socket == NULL) 
+        {
+            log->write<Logging::ERROR_LOG>("SDLNet_TCP_DelSocket is NULL", __FILE__, __LINE__);
+            return false;
+        }
+     
+        if(SDLNet_TCP_DelSocket(m_socket_set, m_tcp_socket) == -1) 
+        {
+            log->write<Logging::ERROR_LOG>("SDLNet_TCP_DelSocket=", SDLNet_GetError(), __FILE__, __LINE__);
+            return false;
+        }
+        
         SDLNet_TCP_Close(m_tcp_socket);
+        std::cout << "SDL_Socket closed!" << std::endl;
     }
 
     m_tcp_socket = nullptr;

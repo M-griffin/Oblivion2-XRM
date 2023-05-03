@@ -37,7 +37,7 @@ public:
             {
                 v = other.v;
                 m = other.m;
-                v = other.v;
+                c = other.c;
             }
         }
 

@@ -10,14 +10,16 @@
 #include <system_error>
 
 IOService::IOService()
-    : m_is_active(false)
+    : m_is_active(true)
 {
 }
 
 IOService::~IOService()
 {
+    std::cout << "~IOService()" << std::endl;
     m_service_list.clear();
     m_listener_list.clear();
+    m_timer_list.clear();
 }
 
 /**
@@ -36,6 +38,7 @@ void IOService::checkAsyncListenersForConnections()
 
         if(!listener_work || !listener_work->getSocketHandle()->isActive())
         {
+            listener_work.reset();
             m_listener_list.remove(i);
             --i; // Compensate for item removed.
             continue;
@@ -49,10 +52,15 @@ void IOService::checkAsyncListenersForConnections()
             std::error_code success_code(0, std::generic_category());
 
             try
-            {
+            {        
                 // Check for max nodes here, if we like can limit, send a message and drop
                 // connection on handler by not passing it through the callback.
                 listener_work->executeCallback(success_code, handler);
+                
+                handler.reset();
+                listener_work.reset();
+                m_listener_list.remove(i);
+                --i; // Compensate for item removed.
             }
             catch(std::exception &ex)
             {
@@ -71,7 +79,6 @@ void IOService::run()
     Logging *log = Logging::instance();
 
     char msg_buffer[MAX_BUFFER_SIZE];
-    m_is_active = true;
 
     while(m_is_active)
     {
@@ -87,6 +94,7 @@ void IOService::run()
 
             if(!job_work || !job_work->getSocketHandle()->isActive())
             {
+                job_work.reset();
                 m_service_list.remove(i);
                 --i; // Compensate for item removed.
                 continue;
@@ -113,30 +121,35 @@ void IOService::run()
                         job_work->getSocketHandle()->setInactive();
                         std::error_code lost_connect_error_code(1, std::system_category());
                         job_work->executeCallback(lost_connect_error_code, nullptr);
-                        m_service_list.remove(i);
-                        --i; // Compensate for item removed.
                     }
                     else
                     {
                         job_work->setBuffer((unsigned char *)msg_buffer);
                         std::error_code success_code(0, std::generic_category());
                         job_work->executeCallback(success_code, nullptr);
-                        m_service_list.remove(i);
-                        --i; // Compensate for item removed.
                     }
+                    
+                    // Clear Job, then Pop it off the list.
+                    job_work.reset();
+                    m_service_list.remove(i);
+                    --i; // Compensate for item removed.
                 }
                 else if(result == -1)
                 {
                     log->write<Logging::ERROR_LOG>("async_poll - lost connection!");
                     std::error_code lost_connect_error_code(1, std::system_category());
                     job_work->executeCallback(lost_connect_error_code, nullptr);
+                    
+                    // Clear Job, then Pop it off the list.
+                    job_work.reset();
                     m_service_list.remove(i);
                     --i; // Compensate for item removed.
-                }
+                }                
             }
 
             /**
              * Handle Write Service if Data is Available.
+             * Usuall on a Write it's only setup when data is available.
              */
             else if(job_work->getServiceType() == SERVICE_TYPE_WRITE)
             {
@@ -151,16 +164,23 @@ void IOService::run()
                     job_work->getSocketHandle()->setInactive();
                     std::error_code lost_connect_error_code(1, std::system_category());
                     job_work->executeCallback(lost_connect_error_code, nullptr);
+                    
+                    // Clear Job then Pop it off the list.
+                    job_work.reset();
                     m_service_list.remove(i);
                     --i; // Compensate for item removed.
+                    
                 }
-                else
+                else if (result > 0) // This was else, for 
                 {
                     std::error_code success_code(0, std::generic_category());
                     job_work->executeCallback(success_code, nullptr);
+                    
+                    // Clear Job then Pop it off the list.
+                    job_work.reset();
                     m_service_list.remove(i);
                     --i; // Compensate for item removed.
-                }
+                } 
             }
         }
 
@@ -176,8 +196,15 @@ void IOService::run()
 void IOService::stop()
 {
     m_is_active = false;
+    
+    std::cout << "shutting down IOService" << std::endl;
     // Clear All Lists and attached handles.
     m_service_list.clear();
     m_timer_list.clear();
     m_listener_list.clear();
+}
+
+bool IOService::isActive()
+{
+    return m_is_active;
 }

@@ -186,6 +186,11 @@ public:
      * @brief Shutdown Async Polling Service
      */
     void stop();
+    
+    /**
+     * @brief Check if the IO Service Is Active
+     */
+    bool isActive();
 
     SafeVector<service_base_ptr>  m_service_list;
     SafeVector<service_base_ptr>  m_timer_list;

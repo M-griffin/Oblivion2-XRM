@@ -95,8 +95,6 @@
     <File Name="../src/processor_text.cpp"/>
     <File Name="../src/processor_text.hpp"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
   <VirtualDirectory Name="data-sys">
     <File Name="../src/data-sys/config_dao.cpp"/>
     <File Name="../src/data-sys/config_dao.hpp"/>
@@ -261,4 +259,6 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>

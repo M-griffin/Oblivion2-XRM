@@ -102,6 +102,7 @@ int SSH_Socket::pollSocket()
     return num_ready;
 }
 
+/*
 bool SSH_Socket::onConnect()
 {
     // For testing and getting debugging output
@@ -217,7 +218,7 @@ bool SSH_Socket::onConnect()
 
     m_is_socket_active = true;
     return true;
-}
+}*/
 
 bool SSH_Socket::onListen()
 {

@@ -1,7 +1,6 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
-#include "communicator.hpp"
 #include "model-sys/config.hpp"
 #include "safe_queue.hpp"
 #include "common_io.hpp"
@@ -204,9 +203,13 @@ public:
     template<int level, typename ... Types>
     void write(Types ... rest)
     {
+        /*
         config_ptr config = Communicator::instance()->getConfiguration();
         std::string config_log_text = config->logging_level;
         int config_level = getConfigurationLogState(config_log_text);
+        */
+        
+        int config_level = DEBUG_LOG;
 
         // Quick Case Statement, in Logging level, if were not logging anything
         // then return right away to save processing.
@@ -273,8 +276,9 @@ public:
         {
 // Don't Queue Logging during unit tests.
 #ifndef UNIT_TEST
-            log_entry_ptr entry(new LogEntry(date_time, details));
-            m_log_entries.enqueue(entry);
+            // Temp Commment Out
+            // log_entry_ptr entry(new LogEntry(date_time, details));
+            // m_log_entries.enqueue(entry);
 #endif
         }
     }
@@ -304,6 +308,7 @@ public:
         out << YAML::EndMap;
 
         std::cout << std::endl << out.c_str() << std::endl;
+
         return;
     }
 
@@ -313,7 +318,7 @@ public:
      */
     void writeOutYamlFile(log_entry_ptr entry)
     {
-        std::string path = GLOBAL_LOG_PATH;
+        std::string path = ""; //GLOBAL_LOG_PATH;
         pathSeperator(path);
         path.append("systemLog.txt");
 

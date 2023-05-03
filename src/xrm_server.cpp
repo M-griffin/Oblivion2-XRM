@@ -27,7 +27,7 @@
 #include "data-sys/db_startup.hpp"
 
 #include "interface.hpp"
-#include "communicator.hpp"
+//#include "communicator.hpp"
 #include "common_io.hpp"
 #include "encoding.hpp"
 #include "logging.hpp"
@@ -62,6 +62,7 @@ Logging* Logging::m_global_logging_instance = nullptr;
 void atExitFunction()
 {
     // Check for any remaining LOG Writes, then exit gracefully.
+    /*
     if(Logging::isActive())
     {
         int log_entries = Logging::instance()->getNumberOfLogEntries();
@@ -75,9 +76,9 @@ void atExitFunction()
                 Logging::instance()->writeOutYamlFile(entry);
             }
         }
-    }
+    }*/
 
-    TheCommunicator::releaseInstance();
+    //TheCommunicator::releaseInstance();
     Encoding::releaseInstance();
     Logging::releaseInstance();
     std::cout << std::endl << "XRM SHUTDOWN COMPLETED!" << std::endl;
@@ -133,6 +134,10 @@ auto main() -> int
         Encoding::instance();
     }
 
+    
+    // Setup Configuration
+    config_ptr config(new Config());
+
     // Loading and saving default Configuration file to XML
     {
         config_ptr config(new Config());
@@ -162,11 +167,10 @@ auto main() -> int
             exit(1);
         }
 
-
         // All Good, Attached to Global Communicator Instance.
         // This also controls logging, need to start this prior to any
         // any logging objects being used.
-        TheCommunicator::instance()->attachConfiguration(config);
+        //TheCommunicator::instance()->attachConfiguration(config);
         Logging::instance()->write<Logging::CONSOLE_LOG>("Starting up Oblivion/2 XRM-Server");
     }
 
@@ -178,6 +182,8 @@ auto main() -> int
         // Write all error logs and exit.
         if(!db_startup)
         {
+            std::cout << "Database Startup failed" << std::endl;
+            /*
             // DataBase Startup Failed
             std::cout << "Database Startup failed, writting system logs" << std::endl;
             int log_entries = Logging::instance()->getNumberOfLogEntries();
@@ -191,17 +197,34 @@ auto main() -> int
                     Logging::instance()->writeOutYamlFile(entry);
                 }
             }
+            */
         }
     }
 
     // Isolate to code block for smart pointer deallocation.
     {
         // Create Handles to Services, and starts up connection listener and ASIO Thread Worker
-        config_ptr config = TheCommunicator::instance()->getConfiguration();
+        //config_ptr config = TheCommunicator::instance()->getConfiguration();
 
         IOService io_service;
         interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", config->port_telnet));
 
+        while(io_service.isActive()) 
+        {            
+            std::string line;
+            std::getline(std::cin, line);
+            std::cout << "line read: [" << line << "]" << std::endl;
+            if (line == "quit") {
+                std::cout << "Shutting down service" << std::endl;
+                io_service.stop();
+            }
+          
+            // Timer, for cpu usage
+            std::this_thread::sleep_for(std::chrono::milliseconds(40));            
+        }
+
+
+        /*
         while(TheCommunicator::instance()->isActive())
         {
             
@@ -222,7 +245,7 @@ auto main() -> int
 
             // Timer, for cpu usage
             std::this_thread::sleep_for(std::chrono::milliseconds(40));
-        }
+        }*/
     }
 
     return 0;

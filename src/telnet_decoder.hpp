@@ -2,7 +2,6 @@
 #define __TELNET_DECODER_H_
 
 #include "async_io.hpp"
-#include "communicator.hpp"
 #include "telnet.hpp"
 #include "logging.hpp"
 
@@ -179,7 +178,7 @@ private:
             return;
         }
 
-        if(m_connection->getSocketHandle()->isActive() && TheCommunicator::instance()->isActive())
+        if(m_connection->getSocketHandle()->isActive()) // && TheCommunicator::instance()->isActive())
         {
             m_connection->asyncWrite(string_msg,
                                      std::bind(

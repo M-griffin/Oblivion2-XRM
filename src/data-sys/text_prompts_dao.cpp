@@ -20,6 +20,8 @@ TextPromptsDao::TextPromptsDao(std::string path, const std::string &filename)
 
 TextPromptsDao::~TextPromptsDao()
 {
+    m_is_loaded = false;
+    m_node.reset();    
 }
 
 /**

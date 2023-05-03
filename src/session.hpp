@@ -7,7 +7,7 @@
 #include "socket_handler.hpp"
 #include "session_manager.hpp"
 #include "telnet_decoder.hpp"
-#include "communicator.hpp"
+//#include "communicator.hpp"
 #include "session_data.hpp"
 #include "session_io.hpp"
 #include "menu_system.hpp"
@@ -42,7 +42,7 @@ public:
     ~Session()
     {
         // Free the Node Number from this session.
-        TheCommunicator::instance()->freeNodeNumber(m_session_data->m_node_number);
+        //TheCommunicator::instance()->freeNodeNumber(m_session_data->m_node_number);
 
         // Free the menu system state and modules when session closes.
         m_state_manager->clean();
@@ -178,7 +178,7 @@ public:
             outputBuffer = msg;
         }
 
-        if(m_connection->isActive() && TheCommunicator::instance()->isActive())
+        if(m_connection->isActive()) // && TheCommunicator::instance()->isActive())
         {
             m_connection->asyncWrite(outputBuffer,
                                      std::bind(
@@ -255,7 +255,7 @@ public:
         }
 
         // Get The First available node number.
-        m_session_data->m_node_number = TheCommunicator::instance()->getNodeNumber();
+        m_session_data->m_node_number = 0; // TheCommunicator::instance()->getNodeNumber();
         log->write<Logging::CONSOLE_LOG>("New Session ConnectionNode Number=", m_session_data->m_node_number);
     }
 

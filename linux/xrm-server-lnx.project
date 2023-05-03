@@ -20,16 +20,13 @@
   </Plugins>
   <Description/>
   <Dependencies/>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
   <VirtualDirectory Name="..\src">
+    <File Name="../src/safe_vector.hpp"/>
     <File Name="../src/async_io.hpp"/>
     <File Name="../src/python_system.hpp"/>
     <File Name="../src/python_system.cpp"/>
     <File Name="../src/common_io.cpp"/>
     <File Name="../src/common_io.hpp"/>
-    <File Name="../src/communicator.cpp"/>
-    <File Name="../src/communicator.hpp"/>
     <File Name="../src/encryption.cpp"/>
     <File Name="../src/encryption.hpp"/>
     <File Name="../src/menu_system.cpp"/>
@@ -313,4 +310,6 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>

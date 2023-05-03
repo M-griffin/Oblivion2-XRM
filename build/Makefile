@@ -18,6 +18,6 @@ test:
 run:
 	./xrm-server
 mem:
-	valgrind --tool=memcheck --leak-check=yes ./xrm-server
+	valgrind -s --tool=memcheck --leak-check=full --show-leak-kinds=all ./xrm-server
 run-test:
 	./xrm-unittest

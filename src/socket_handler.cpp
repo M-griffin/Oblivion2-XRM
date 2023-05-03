@@ -49,18 +49,11 @@ int SocketHandler::poll()
             m_socket.back()->onExit();
             m_is_active = false;
         }
-        else if(ret == 0)  // No Data!
-        {
-
-        }
-        else
-        {
-        }
     }
     else
     {
         // Inactive Connection
-        log->write<Logging::ERROR_LOG>("Showdown received, Socket Closed.", __FILE__, __LINE__);
+        log->write<Logging::ERROR_LOG>("Shutdown received, Socket Closed.", __FILE__, __LINE__);
         ret = -1;
     }
 
@@ -72,7 +65,7 @@ int SocketHandler::poll()
  * @param host
  * @param port
  * @return
- */
+ *
 bool SocketHandler::connectTelnetSocket(std::string host, int port)
 {
     Logging *log = Logging::instance();
@@ -110,7 +103,7 @@ bool SocketHandler::connectTelnetSocket(std::string host, int port)
     }
 
     return true;
-}
+}*/
 
 /**
  * @brief Create SSH Socket
@@ -119,7 +112,7 @@ bool SocketHandler::connectTelnetSocket(std::string host, int port)
  * @param username
  * @param password
  * @return
- */
+ *
 bool SocketHandler::connectSshSocket(std::string host, int port,
                                      std::string username, std::string password)
 {
@@ -159,7 +152,7 @@ bool SocketHandler::connectSshSocket(std::string host, int port,
     }
 
     return true;
-}
+}*/
 
 /**
  * @brief Telnet Socket Listener
@@ -212,7 +205,11 @@ bool SocketHandler::createTelnetAcceptor(std::string host, int port)
  */
 socket_handler_ptr SocketHandler::acceptTelnetConnection()
 {
-    return m_socket.back()->pollSocketAccepts();
+    if (m_socket.size() > 0 && m_socket.back()->m_is_socket_active) {
+        return m_socket.back()->pollSocketAccepts();
+    }
+    
+    return nullptr;
 }
 
 /**
@@ -246,6 +243,7 @@ void SocketHandler::setInactive()
  */
 void SocketHandler::close()
 {
+    std::cout << "SocketHandler close()" << std::endl;
     try
     {
         // Deactivate Socket, then Clean it.

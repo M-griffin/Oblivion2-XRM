@@ -5,7 +5,6 @@
 #include "common_io.hpp"
 #include "session_data.hpp"
 #include "processor_ansi.hpp"
-#include "communicator.hpp"
 
 #include "model-sys/struct_compat.hpp"
 #include "model-sys/menu.hpp"

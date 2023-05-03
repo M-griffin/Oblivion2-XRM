@@ -1,7 +1,6 @@
 #ifndef DEADLINE_TIMER_HPP
 #define DEADLINE_TIMER_HPP
 
-#include "communicator.hpp"
 
 #include <iostream>
 #include <future>

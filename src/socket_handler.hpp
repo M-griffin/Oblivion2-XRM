@@ -28,6 +28,11 @@ public:
 
     ~SocketHandler()
     {
+        std::cout << "~SocketHandler()" << std::endl;
+        // Clean up the socket left overs.
+        if (m_socket.size() > 0 && m_socket.back() != NULL) {
+            m_socket.back()->onExit();
+        }
         std::vector<socket_state_ptr>().swap(m_socket);
     }
 
