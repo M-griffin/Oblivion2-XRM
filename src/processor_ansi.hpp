@@ -24,7 +24,9 @@ public:
         : ProcessorBase(term_height, term_width)
     { }
 
-    virtual ~ProcessorAnsi() {}
+    virtual ~ProcessorAnsi() {
+        std::cout << "~ProcessorAnsi()" << std::endl;
+    }
 
     virtual std::string buildPullDownBars(int pulldown_id, bool active) override;
     virtual void clearPullDownBars() override;

@@ -31,7 +31,10 @@ public:
     int m_line_number;
     bool m_is_double_backspace;
 
-    virtual ~ProcessorText() {}
+    virtual ~ProcessorText() 
+    {
+        std::cout << "~ProcessorText()" << std::endl;
+    }
 
     virtual std::string buildPullDownBars(int pulldown_id, bool active) override;
     virtual void clearPullDownBars() override;

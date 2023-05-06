@@ -8,6 +8,7 @@
 
 SessionManager::~SessionManager()
 {
+    std::cout << "~SessionManager()" << std::endl;
 }
 
 /**

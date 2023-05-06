@@ -28,6 +28,7 @@ public:
 
     ~DeadlineTimer()
     {
+        std::cout << "~DeadlineTimer()" << std::endl;
         std::vector<std::future<void>>().swap(m_future_list);
     }
 

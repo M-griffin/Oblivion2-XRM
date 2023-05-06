@@ -136,28 +136,27 @@ void SessionData::handleRead(const std::error_code& error, socket_handler_ptr)
     else
     {
         // Socket Read Error we mark leaving for the session.
-        if(!m_is_leaving)
+        Logging *log = Logging::instance();
+        log->write<Logging::INFO_LOG>("Clearing SessionData on Lost Connection Msg=", error.message(), __FILE__, __LINE__);
+
+        session_manager_ptr session_manager = m_session_manager.lock();
+
+        if(session_manager && error)
         {
-            Logging *log = Logging::instance();
-            log->write<Logging::INFO_LOG>("Clearing SessionData on Lost Connection Msg=", error.message(), __FILE__, __LINE__);
+            m_is_leaving = true;
 
-            session_manager_ptr session_manager = m_session_manager.lock();
-
-            if(session_manager && error)
+            // Disconnect the session.
+            session_manager->leave(m_node_number);
+            // m_session_state = SESSION_STATE::STATE_DONE;
+            
+            /*
+            if(m_connection->isActive())
             {
-                m_is_leaving = true;
-
-                // Disconnect the session.
-                session_manager->leave(m_node_number);
-                // m_session_state = SESSION_STATE::STATE_DONE;
-
-                if(m_connection->isActive())
-                {
-                    m_connection->shutdown();
-                    m_connection.reset();
-                }
-            }
-        }
+                m_connection->shutdown();
+                m_connection.reset();
+            }*/
+            m_session_manager.reset();
+        }        
     }
 }
 

@@ -6,8 +6,7 @@
 #include <winsock2.h>
 #endif
 
-#include <sdl2_net/SDL_net.hpp>
-#include <libssh/libssh.h>
+#include "sdl2_net/SDL_net.hpp"
 
 #include <iostream>
 #include <memory>
@@ -30,10 +29,10 @@ public:
     SocketState(const std::string &host, const int &port)
         : m_host(host)
         , m_port(port)
-        , m_is_socket_active(false)
+        , m_is_socket_active(true)
     { }
 
-    virtual ~SocketState()
+    ~SocketState()
     {
         std::cout << "~SocketState()" << std::endl;
     }
@@ -43,9 +42,7 @@ public:
     virtual socket_handler_ptr pollSocketAccepts() = 0;
     virtual void spawnSocket(TCPsocket socket) = 0;
     virtual int pollSocket() = 0;
-    //virtual bool onConnect() = 0;
     virtual bool onListen() = 0;
-    //virtual void closeSocket() =0;
     virtual bool onExit() = 0;
 
     std::string m_host;
@@ -73,7 +70,7 @@ public:
         , m_socket_set(nullptr)
     { }
 
-    virtual ~SDL_Socket()
+    ~SDL_Socket()
     {
         std::cout << "~SDL_Socket()" << std::endl;
     }
@@ -83,9 +80,7 @@ public:
     virtual socket_handler_ptr pollSocketAccepts() override; 
     virtual void spawnSocket(TCPsocket socket) override;
     virtual int pollSocket() override;
-    //virtual bool onConnect() override;
     virtual bool onListen() override;
-    //virtual void closeSocket() override;
     virtual bool onExit() override;
 
 private:
@@ -95,55 +90,6 @@ private:
 
 };
 
-/**
- * @class SSH_Socket
- * @author Michael Griffin
- * @date 11/12/2017
- * @file socket_state.hpp
- * @brief SSH Socket Template
- */
-class SSH_Socket : public SocketState
-{
-public:
-
-    SSH_Socket(const std::string &host, const int &port,
-               const std::string &user, const std::string &pass)
-        : SocketState(host, port)
-        , m_user_id(user)
-        , m_password(pass)
-        , m_ssh_channel(nullptr)
-        , m_ssh_session(nullptr)
-    { }
-
-    virtual  ~SSH_Socket()
-    {
-        std::cout << "~SSH_Socket()" << std::endl;
-    }
-
-    virtual int sendSocket(unsigned char *message, Uint32 len) override;
-    virtual int recvSocket(char *message) override;
-    virtual socket_handler_ptr pollSocketAccepts() override;
-    virtual void spawnSocket(TCPsocket socket) override;
-    virtual int pollSocket() override;
-    //virtual bool onConnect() override;
-    virtual bool onListen() override;
-    //virtual void closeSocket() override;
-    virtual bool onExit() override;
-
-    // Specific Functions for SSH
-    int verify_knownhost();
-    int authenticate_console();
-    int authenticate_kbdint();
-
-private:
-
-    std::string m_user_id;
-    std::string m_password;
-
-    ssh_channel m_ssh_channel;
-    ssh_session m_ssh_session;
-
-};
 
 
 #endif

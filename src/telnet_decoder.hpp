@@ -44,6 +44,7 @@ public:
 
     ~TelnetDecoder()
     {
+        std::cout << "~TelnetDecoder()" << std::endl;
         std::vector<unsigned char>().swap(reply_sequence);
         std::vector<unsigned char>().swap(active_sequence);
     }

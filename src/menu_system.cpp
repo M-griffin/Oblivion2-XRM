@@ -56,6 +56,7 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
 
 MenuSystem::~MenuSystem()
 {
+    std::cout << "~MenuSystem()" << std::endl;
     // Clear All Menu Command Functions.
     MappedCommandFunctions().swap(m_menu_command_functions);
 }

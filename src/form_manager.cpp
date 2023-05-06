@@ -30,6 +30,7 @@ FormManager::FormManager(config_ptr config, session_data_ptr session)
 
 FormManager::~FormManager()
 {
+    std::cout << "~FormManager()" << std::endl;
 }
 
 /**

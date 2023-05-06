@@ -1,6 +1,7 @@
 #ifndef PROCESSOR_BASE_HPP
 #define PROCESSOR_BASE_HPP
 
+#include <iostream>
 #include <memory>
 #include <stdint.h>
 #include <string>
@@ -40,7 +41,10 @@ class ProcessorBase
 {
 public:
 
-    virtual ~ProcessorBase() { };
+    virtual ~ProcessorBase() 
+    { 
+        std::cout << "~ProcessorBase()" << std::endl;
+    }
 
     // Process Build strings from pull_down array.
     virtual std::string buildPullDownBars(int pulldown_id, bool active) = 0;

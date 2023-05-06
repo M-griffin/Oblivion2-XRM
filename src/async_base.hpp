@@ -22,7 +22,9 @@ public:
         , m_socket_handler(socket_handler)
     { }
     ~AsyncBase()
-    { }
+    { 
+        std::cout << "~AsyncBase()" << std::endl;
+    }
 
     /**
      * @brief Is the Socket Created and Open

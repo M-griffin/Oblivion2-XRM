@@ -48,6 +48,8 @@ MenuBase::MenuBase(session_data_ptr session_data)
 
 MenuBase::~MenuBase()
 {
+    std::cout << "~MenuBase()" << std::endl;
+    
     // Pop Functions off the stack.
     std::vector<std::function< void(const std::string &, const bool &is_utf8)> >().swap(m_menu_functions);
     std::vector<std::function< bool(const MenuOption &)> >().swap(m_execute_callback);

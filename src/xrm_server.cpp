@@ -1,5 +1,5 @@
 /**
- * Oblivion/2 XRM (c) 2015-2019 Michael Griffin
+ * Oblivion/2 XRM rev.2 (c) 2015-2023 Michael Griffin
  * A Telnet Server and BBS system modeled after Oblivion/2 bbs software.
  *
  * XRM = Extreme Remake!
@@ -27,7 +27,6 @@
 #include "data-sys/db_startup.hpp"
 
 #include "interface.hpp"
-//#include "communicator.hpp"
 #include "common_io.hpp"
 #include "encoding.hpp"
 #include "logging.hpp"
@@ -60,27 +59,9 @@ Logging* Logging::m_global_logging_instance = nullptr;
  * @brief Gracefull Shutdown Method.
  */
 void atExitFunction()
-{
-    // Check for any remaining LOG Writes, then exit gracefully.
-    /*
-    if(Logging::isActive())
-    {
-        int log_entries = Logging::instance()->getNumberOfLogEntries();
-
-        for(int i = 0; i < log_entries; i++)
-        {
-            log_entry_ptr entry = Logging::instance()->getLogQueueEntry();
-
-            if(entry != nullptr)
-            {
-                Logging::instance()->writeOutYamlFile(entry);
-            }
-        }
-    }*/
-
-    //TheCommunicator::releaseInstance();
+{    
+    // Note Make Encoding just an extension of Common IO, 
     Encoding::releaseInstance();
-    Logging::releaseInstance();
     std::cout << std::endl << "XRM SHUTDOWN COMPLETED!" << std::endl;
 }
 
@@ -91,11 +72,10 @@ void atExitFunction()
  */
 auto main() -> int
 {
-
     // Setup Cleanup method when program exits.
     std::atexit(atExitFunction);
 
-    std::cout << "Oblivion/2 XRM-Server (c) 2015-2019 Michael Griffin."
+    std::cout << "Oblivion/2 XRM-Server rev.2(c) 2015-2023 Michael Griffin."
               << std::endl
               << std::endl;
 
@@ -136,6 +116,7 @@ auto main() -> int
 
     
     // Setup Configuration
+    /*
     config_ptr config(new Config());
 
     // Loading and saving default Configuration file to XML
@@ -171,10 +152,11 @@ auto main() -> int
         // This also controls logging, need to start this prior to any
         // any logging objects being used.
         //TheCommunicator::instance()->attachConfiguration(config);
-        Logging::instance()->write<Logging::CONSOLE_LOG>("Starting up Oblivion/2 XRM-Server");
-    }
+        std::cout << "Starting up Oblivion/2 XRM-Server" << std::endl;
+    }*/
 
     // Database Startup in it's own context.
+    /*
     {
         db_startup_ptr db(new DbStartup());
         bool db_startup = db->initDatabaseTables();
@@ -182,24 +164,9 @@ auto main() -> int
         // Write all error logs and exit.
         if(!db_startup)
         {
-            std::cout << "Database Startup failed" << std::endl;
-            /*
-            // DataBase Startup Failed
-            std::cout << "Database Startup failed, writting system logs" << std::endl;
-            int log_entries = Logging::instance()->getNumberOfLogEntries();
-
-            for(int i = 0; i < log_entries; i++)
-            {
-                log_entry_ptr entry = Logging::instance()->getLogQueueEntry();
-
-                if(entry != nullptr)
-                {
-                    Logging::instance()->writeOutYamlFile(entry);
-                }
-            }
-            */
+            std::cout << "Database Startup failed" << std::endl;            
         }
-    }
+    }*/
 
     // Isolate to code block for smart pointer deallocation.
     {

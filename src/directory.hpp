@@ -32,7 +32,10 @@ public:
     explicit Directory(void)
         : m() // Mutex
     { }
-    ~Directory() {}
+    ~Directory() 
+    {
+        std::cout << "~Directory()" << std::endl;
+    }
 
     /**
      * @brief Returns the Extension of the current file name

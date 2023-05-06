@@ -77,6 +77,19 @@ public:
 
     ~SessionData()
     {
+        
+        std::cout << "~SessionData()" << std::endl;
+        
+        // Clear Out Session Data
+        std::vector<unsigned char>().swap(m_in_data_vector);
+        m_connection.reset();
+        m_session_manager.reset();
+        m_telnet_state.reset();
+        m_esc_input_timer.reset();
+        m_state_manager.reset();
+        m_user_record.reset();
+        m_session_stats.reset();
+                        
         for(unsigned int i = 0; i < m_processes.size(); i++)
         {
             m_processes[i]->terminate();
@@ -210,11 +223,15 @@ public:
 
         session_manager_ptr session_manager = m_session_manager.lock();
 
-        if(session_manager && error && (!m_is_leaving))
+        if(session_manager && error) //  && (!m_is_leaving))
         {
+            std::cout << "Logoff Session Manager" << std::endl;
             m_is_leaving = true;
             session_manager->leave(m_node_number);
+            
+            session_manager.reset();
 
+            /*
             if(m_connection && m_connection->isActive())
             {
                 try
@@ -226,7 +243,7 @@ public:
                     // Sometime this doesn't close when it's already existed, just extra checking here.
                     log->write<Logging::DEBUG_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
                 }
-            }
+            }*/
         }
     }
 
@@ -264,8 +281,12 @@ public:
 
         if(session_manager)
         {
+            m_is_leaving = true;
+            std::cout << "Logoff Session Manager" << std::endl;
             // Room is the session.
             session_manager->leave(m_node_number);
+            
+            session_manager.reset();
         }
 
         // This might be doing double the deallocation

@@ -20,6 +20,7 @@ PythonSystem::PythonSystem(session_data_ptr session_data)
 
 PythonSystem::~PythonSystem()
 {
+    std::cout << "~PythonSystem()" << std::endl;
 }
 
 

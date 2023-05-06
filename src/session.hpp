@@ -41,6 +41,7 @@ public:
 
     ~Session()
     {
+        std::cout << "~Session()" << std::endl;
         // Free the Node Number from this session.
         //TheCommunicator::instance()->freeNodeNumber(m_session_data->m_node_number);
 
@@ -205,7 +206,7 @@ public:
 
         session_manager_ptr session_manager = m_session_data->m_session_manager.lock();
 
-        if(session_manager && error && (!m_session_data->m_is_leaving))
+        if(session_manager && error) //&& (!m_session_data->m_is_leaving))
         {
             m_session_data->m_is_leaving = true;
 

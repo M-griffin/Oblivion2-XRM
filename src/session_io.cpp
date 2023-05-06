@@ -26,6 +26,7 @@ SessionIO::SessionIO(session_data_ptr session_data)
 
 SessionIO::~SessionIO()
 {
+    std::cout << "~SessionIO()" << std::endl;
     clearAllMCIMapping();
 }
 

@@ -24,6 +24,8 @@ public:
 
     ~StateManager()
     {
+        std::cout << "~StateManager()" << std::endl;
+        
         if(!m_the_state.empty())
         {
             m_the_state.back()->onExit();

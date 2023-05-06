@@ -28,7 +28,10 @@ class AccessCondition
 {
 public:
     explicit AccessCondition()  { };
-    ~AccessCondition() { };
+    ~AccessCondition() 
+    { 
+        std::cout << "~AccessCondition()" << std::endl;
+    };
 
     /**
      * @brief Toggle Bit Flag

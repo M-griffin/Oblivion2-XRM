@@ -27,6 +27,7 @@ public:
 
     ~AsyncAcceptor()
     {
+        std::cout << "~AsyncAcceptor()" << std::endl;
     }
 
 

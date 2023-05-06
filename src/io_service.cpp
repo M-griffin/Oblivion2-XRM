@@ -38,6 +38,7 @@ void IOService::checkAsyncListenersForConnections()
 
         if(!listener_work || !listener_work->getSocketHandle()->isActive())
         {
+            std::cout << "Removing Async Listener Job" << std::endl;
             listener_work.reset();
             m_listener_list.remove(i);
             --i; // Compensate for item removed.
@@ -92,8 +93,10 @@ void IOService::run()
         {
             service_base_ptr job_work = m_service_list.get(i);
 
-            if(!job_work || !job_work->getSocketHandle()->isActive())
+            // Remove Any jobs when the socket has been disconnected.
+            if(!job_work || !job_work->getSocketHandle() || !job_work->getSocketHandle()->isActive())
             {
+                std::cout << "Removing Async Job - Socket Inactive" << std::endl;
                 job_work.reset();
                 m_service_list.remove(i);
                 --i; // Compensate for item removed.

@@ -91,6 +91,7 @@ Encoding::Encoding()
 
 Encoding::~Encoding()
 {
+    std::cout << "~Encoding()" << std::endl;
 }
 
 /**

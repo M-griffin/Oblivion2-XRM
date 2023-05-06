@@ -31,6 +31,7 @@ public:
     LogEntry() {}
     ~LogEntry()
     {
+        std::cout << "~LogEntry()" << std::endl;
         std::vector<std::string>().swap(m_details);
     }
 
@@ -97,6 +98,7 @@ public:
     {
         if(m_global_logging_instance)
         {
+            std::cout << "~LoggingInstance()" << std::endl;
             delete m_global_logging_instance;
             m_global_logging_instance = nullptr;
         }

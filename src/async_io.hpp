@@ -28,6 +28,7 @@ public:
 
     ~AsyncIO()
     {
+        std::cout << "~AsyncIO()" << std::endl;
     }
 
     /**
