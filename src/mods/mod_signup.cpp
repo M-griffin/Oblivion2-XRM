@@ -652,7 +652,7 @@ bool ModSignup::handle(const std::string &input)
         log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Check for user name and if is already exists!
-        users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+        users_dao_ptr user_data; //(new UsersDao(m_session_data->m_user_database));
         user_ptr search = user_data->getUserByHandle(key);
 
         if(!search || search->iId == -1)
@@ -687,7 +687,7 @@ bool ModSignup::realName(const std::string &input)
         log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Check for real name and if is already exists!
-        users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+        users_dao_ptr user_data; //(new UsersDao(m_session_data->m_user_database));
         user_ptr search = user_data->getUserByRealName(key);
 
         if(!search || search->iId == -1)
@@ -788,7 +788,7 @@ bool ModSignup::email(const std::string &input)
         log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Test if email already exists.
-        users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+        users_dao_ptr user_data; //(new UsersDao(m_session_data->m_user_database));
         user_ptr search = user_data->getUserByEmail(key);
 
         if(!search || search->iId == -1)
@@ -1420,8 +1420,8 @@ void ModSignup::saveNewUserRecord()
 {
     // StartUp Data Access Objects for SQL
     Logging *log = Logging::instance();
-    users_dao_ptr user_dao(new UsersDao(m_session_data->m_user_database));
-    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
+    users_dao_ptr user_dao; //(new UsersDao(m_session_data->m_user_database));
+    security_dao_ptr security_dao; //(new SecurityDao(m_session_data->m_user_database));
 
     // Save New Security Record, index is then inserted into user record
     long securityIndex = security_dao->insertRecord(m_security_record);

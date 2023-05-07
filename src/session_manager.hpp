@@ -31,7 +31,7 @@ public:
      */
     void join(session_ptr session);
 
-    void leave(int node_number);
+    void leave(session_ptr session);
     void deliver(std::string msg);
 
     int connections();

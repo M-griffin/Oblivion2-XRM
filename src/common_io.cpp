@@ -172,7 +172,8 @@ CommonIO::CommonIO()
 
 CommonIO::~CommonIO()
 {
-    std::cout << "~CommonIO()" << std::endl;
+    // std::cout << "~CommonIO()" << std::endl;   Lots of noise!
+    // Look at making this a single instance per session insetad of alocate on fly.
     m_sequence_map.clear();
     m_escape_sequence.erase();
 }
@@ -441,7 +442,7 @@ std::string CommonIO::rightTrim(const std::string &str)
                          new_string.rend(),
                          std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
                      new_string.end()
-                    );
+    );
 
     return new_string;
 }

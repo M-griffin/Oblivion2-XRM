@@ -21,10 +21,10 @@
  */
 
 #include "model-sys/structures.hpp"
-#include "model-sys/config.hpp"
-#include "data-sys/text_prompts_dao.hpp"
-#include "data-sys/config_dao.hpp"
-#include "data-sys/db_startup.hpp"
+//#include "model-sys/config.hpp"
+//#include "data-sys/text_prompts_dao.hpp"
+//#include "data-sys/config_dao.hpp"
+//#include "data-sys/db_startup.hpp"
 
 #include "interface.hpp"
 #include "common_io.hpp"
@@ -113,60 +113,7 @@ auto main() -> int
     {
         Encoding::instance();
     }
-
-    
-    // Setup Configuration
-    /*
-    config_ptr config(new Config());
-
-    // Loading and saving default Configuration file to XML
-    {
-        config_ptr config(new Config());
-
-        if(!config)
-        {
-            std::cout << "Unable to allocate config structure" << std::endl;
-            exit(1);
-        }
-
-        // Handle to Data Access Object,  at the moment were not using directories
-        // Setup in the config, everything is branched from the main path.
-        // Later on we'll check config for overrides only.
-        ConfigDao cfg(config, GLOBAL_BBS_PATH);
-
-        if(!cfg.fileExists())
-        {
-            cfg.saveConfig(config);
-        }
-
-        // Load Config and lets do some validation
-        cfg.loadConfig();
-
-        if(!cfg.validation())
-        {
-            std::cout << "Unable to validate config structure" << std::endl;
-            exit(1);
-        }
-
-        // All Good, Attached to Global Communicator Instance.
-        // This also controls logging, need to start this prior to any
-        // any logging objects being used.
-        //TheCommunicator::instance()->attachConfiguration(config);
-        std::cout << "Starting up Oblivion/2 XRM-Server" << std::endl;
-    }*/
-
-    // Database Startup in it's own context.
-    /*
-    {
-        db_startup_ptr db(new DbStartup());
-        bool db_startup = db->initDatabaseTables();
-
-        // Write all error logs and exit.
-        if(!db_startup)
-        {
-            std::cout << "Database Startup failed" << std::endl;            
-        }
-    }*/
+  
 
     // Isolate to code block for smart pointer deallocation.
     {
@@ -174,7 +121,7 @@ auto main() -> int
         //config_ptr config = TheCommunicator::instance()->getConfiguration();
 
         IOService io_service;
-        interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", config->port_telnet));
+        interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", 6023));
 
         while(io_service.isActive()) 
         {            
@@ -190,29 +137,6 @@ auto main() -> int
             std::this_thread::sleep_for(std::chrono::milliseconds(40));            
         }
 
-
-        /*
-        while(TheCommunicator::instance()->isActive())
-        {
-            
-            // Main Thread - While system is active loop,  This will be external event processor
-            // Or notifications, etc.. lets see what else we want to do here.
-            int log_entries = Logging::instance()->getNumberOfLogEntries();
-
-            for(int i = 0; i < log_entries; i++)
-            {
-                log_entry_ptr entry = Logging::instance()->getLogQueueEntry();
-
-                if(entry != nullptr)
-                {
-                    // Temp Clear Log but don't write it out during testing.
-                    Logging::instance()->writeOutYamlFile(entry);
-                }
-            }
-
-            // Timer, for cpu usage
-            std::this_thread::sleep_for(std::chrono::milliseconds(40));
-        }*/
     }
 
     return 0;

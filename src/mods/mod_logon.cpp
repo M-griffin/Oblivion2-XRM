@@ -210,7 +210,7 @@ void ModLogon::setupPasswordChange()
 bool ModLogon::checkUserLogon(const std::string &input)
 {
     // Check for user name and if is already exists!
-    users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+    users_dao_ptr user_data; //(new UsersDao(m_session_data->m_user_database));
 
     // Check if a Digit, if so, lookup by userId.
     if(m_session_data->m_common_io.isDigit(input))
@@ -348,7 +348,7 @@ bool ModLogon::validate_password(const std::string &input)
 
     // First load the secure record for the existing user.
     // Link to security dao for data access object
-    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
+    security_dao_ptr security_dao; //(new SecurityDao(m_session_data->m_user_database));
 
     // Lookup the security table for existing hash.
     security_ptr security = security_dao->getRecordById(m_logon_user->iSecurityIndex);

@@ -7,7 +7,6 @@
 #include "socket_handler.hpp"
 #include "session_manager.hpp"
 #include "telnet_decoder.hpp"
-//#include "communicator.hpp"
 #include "session_data.hpp"
 #include "session_io.hpp"
 #include "menu_system.hpp"
@@ -56,19 +55,19 @@ public:
      * @param session_manager
      * @return
      */
-    static session_ptr create(IOService& io_service, connection_ptr connection, deadline_timer_ptr deadline_timer,
+    static session_ptr create(IOService& io_service, async_io_ptr async_io, deadline_timer_ptr deadline_timer,
                               session_manager_ptr session_manager)
     {
-        session_ptr new_session(new Session(io_service, connection, deadline_timer, session_manager));
+        session_ptr new_session(new Session(io_service, async_io, deadline_timer, session_manager));
 
-        if(connection->isActive())
+        if(async_io->isActive())
         {
-            new_session->m_session_data->startUpSessionStats("Telnet");
+            /* new_session->m_session_data->startUpSessionStats("Telnet"); - Disable Database for now! */
             new_session->m_session_data->waitingForData();
         }
 
         // Send out Telnet Negotiation Options
-        if(connection->isActive())
+        if(async_io->isActive())
         {
             // On initial Session Connection,  setup and send TELNET Options to
             // start the negotiation of client features.
@@ -76,13 +75,6 @@ public:
             // On initial connection, clear and home cursor
             std::string clear_screen = "\x1b[1;1H\x1b[2J";
             new_session->deliver(clear_screen);
-
-            // Need to negotiate this first, then turn off for Linux/osx to switch
-            // Otherwise they both ignore the DONT and do not turn it off.
-            //new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_LINEMODE);
-            //new_session->m_session_data->m_telnet_state->addReply(TELOPT_LINEMODE);
-
-            //new_session->m_session_data->m_telnet_state->sendIACSequences(DONT, TELOPT_LINEMODE);
 
             new_session->m_session_data->m_telnet_state->sendIACSequences(DONT, TELOPT_OLD_ENVIRON);
 
@@ -106,10 +98,6 @@ public:
 
             new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_NAWS);
             new_session->m_session_data->m_telnet_state->addReply(TELOPT_NAWS);
-
-            // No replies, this can really not be used, only informational.
-            //new_session->m_session_data->m_telnet_state->sendIACSequences(DO, TELOPT_NEW_ENVIRON);
-            //new_session->m_session_data->m_telnet_state->addReply(TELOPT_NEW_ENVIRON);
 
             // Wait 1.5 Seconds for respones.
             new_session->startDetectionTimer();
@@ -179,9 +167,9 @@ public:
             outputBuffer = msg;
         }
 
-        if(m_connection->isActive()) // && TheCommunicator::instance()->isActive())
+        if(m_async_io->isActive()) // && TheCommunicator::instance()->isActive())
         {
-            m_connection->asyncWrite(outputBuffer,
+            m_async_io->asyncWrite(outputBuffer,
                                      std::bind(
                                          &Session::handleWrite,
                                          shared_from_this(),
@@ -201,7 +189,7 @@ public:
 
         if(error)
         {
-            log->write<Logging::ERROR_LOG>("Async_Write Session Closed() error=", error.message(), __LINE__, __FILE__);
+            log->write<Logging::ERROR_LOG>("Async_HandleWrite Session Closed() error=", error.message(), __LINE__, __FILE__);
         }
 
         session_manager_ptr session_manager = m_session_data->m_session_manager.lock();
@@ -210,40 +198,50 @@ public:
         {
             m_session_data->m_is_leaving = true;
 
+            log->write<Logging::DEBUG_LOG>("Async_HandleWrite Removing Sesison from Manager", __LINE__, __FILE__);
             // Disconnect the session.
-            session_manager->leave(m_session_data->m_node_number);
+            session_manager->leave(shared_from_this());
 
-            if(m_connection->isActive())
+            if(m_async_io->isActive())
             {
                 try
                 {
-                    log->write<Logging::DEBUG_LOG>("Leaving (NORMAL SESSION)", __LINE__, __FILE__);
-                    m_connection->shutdown();
+                    log->write<Logging::DEBUG_LOG>("Async_HandleWrite Leaving (NORMAL SESSION)", __LINE__, __FILE__);
+                    m_async_io->shutdown();
                 }
                 catch(std::exception &ex)
                 {
-                    log->write<Logging::ERROR_LOG>("Exception closing socket()", ex.what(), __LINE__, __FILE__);
+                    log->write<Logging::ERROR_LOG>("Async_HandleWrite Exception closing socket()", ex.what(), __LINE__, __FILE__);
                 }
             }
         }
     }
 
     /**
-     * @brief Session Constructor Initiate the Connection, State, Room.
+     * @brief Session Constructor
      * @param tcp_connection
      * @param session_manager
      * @return
      */
-    Session(IOService& io_service, connection_ptr connection, deadline_timer_ptr deadline_timer,
+    Session(IOService& io_service, async_io_ptr async_io, deadline_timer_ptr deadline_timer,
             session_manager_ptr session_manager)
-        : m_connection(connection)
-        , m_state_manager(new StateManager())
-        , m_session_data(new SessionData(connection, session_manager, io_service, m_state_manager))
+        : m_async_io(async_io)
+        , m_state_manager(new StateManager())        
         , m_deadline_timer(deadline_timer)
     {
+        
         Logging *log = Logging::instance();
+        
+        log->write<Logging::DEBUG_LOG>("New Session Create Session Data Instance", __LINE__, __FILE__);
+        
+        // Need to Instiant After Class has started up for shared_from_this().
+        m_session_data.reset(new SessionData(shared_from_this(), async_io, session_manager, io_service, m_state_manager));
+        
+        log->write<Logging::DEBUG_LOG>("AFTER: Create Session Data Instance", __LINE__, __FILE__);
+        
+        
 
-        if(m_connection->isActive())
+        if(m_async_io->isActive())
         {
             try
             {
@@ -260,7 +258,7 @@ public:
         log->write<Logging::CONSOLE_LOG>("New Session ConnectionNode Number=", m_session_data->m_node_number);
     }
 
-    connection_ptr	    m_connection;
+    async_io_ptr	    m_async_io;
     state_manager_ptr   m_state_manager;
     session_data_ptr    m_session_data;
     socket_handler_ptr  m_socket_handler;

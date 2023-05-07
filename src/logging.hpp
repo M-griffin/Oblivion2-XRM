@@ -291,7 +291,8 @@ public:
      * @param details
      */
     void writeOutYamlConsole(const std::string &date_time, std::vector<std::string> details)
-    {
+    {        
+        /*  Overkill on logging yaml formated logs.
         YAML::Emitter out;
 
         out << YAML::BeginMap;
@@ -308,9 +309,14 @@ public:
 
         out << YAML::EndSeq;
         out << YAML::EndMap;
-
-        std::cout << std::endl << out.c_str() << std::endl;
-
+        */
+        
+        std::cout << date_time << " : ";
+        for(std::string &d : details)
+        {
+            std::cout << d << " | ";
+        }
+        std::cout << std::endl;
         return;
     }
 

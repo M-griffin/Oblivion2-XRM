@@ -54,9 +54,14 @@ void IOService::checkAsyncListenersForConnections()
 
             try
             {        
+                
+                log->write<Logging::DEBUG_LOG>("Async-Accept - Execute CallBack", __FILE__, __LINE__);
+                
                 // Check for max nodes here, if we like can limit, send a message and drop
                 // connection on handler by not passing it through the callback.
                 listener_work->executeCallback(success_code, handler);
+                                
+                log->write<Logging::DEBUG_LOG>("Async-Accept - Returned CallBack", __FILE__, __LINE__);
                 
                 handler.reset();
                 listener_work.reset();

@@ -591,8 +591,8 @@ void ModUserEditor::handleUserInputState(bool does_user_exist, long user_id)
 void ModUserEditor::copyExistingUser(long user_id)
 {
     Logging *log = Logging::instance();
-    users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
-    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
+    users_dao_ptr user_data; //(new UsersDao(m_session_data->m_user_database));
+    security_dao_ptr security_dao; //(new SecurityDao(m_session_data->m_user_database));
 
     user_ptr lookup_user = user_data->getRecordById(user_id);
 
@@ -664,7 +664,7 @@ void ModUserEditor::copyExistingUser(long user_id)
 void ModUserEditor::deleteExistingUser(long user_id)
 {
     // Should Cascade and remove Security Record also.
-    users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+    users_dao_ptr user_data; //(new UsersDao(m_session_data->m_user_database));
     user_data->deleteRecord(user_id);
 }
 
@@ -674,7 +674,7 @@ void ModUserEditor::deleteExistingUser(long user_id)
  */
 bool ModUserEditor::checkUserExistsById(long user_id)
 {
-    users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+    users_dao_ptr user_data; //(new UsersDao(m_session_data->m_user_database));
     user_ptr lookup_user = user_data->getRecordById(user_id);
 
     // Default Id when not found is -1
@@ -850,7 +850,7 @@ void ModUserEditor::displayCurrentPage(const std::string &input_state)
  */
 std::string ModUserEditor::displayUserList()
 {
-    users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+    users_dao_ptr user_data; //(new UsersDao(m_session_data->m_user_database));
 
     // Clear All Users
     if(m_users_listing.size() > 0)
@@ -1550,7 +1550,7 @@ void ModUserEditor::updateExistingUser()
     if(m_loaded_user.back()->iId == -1)
         return;
 
-    users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+    users_dao_ptr user_data; //(new UsersDao(m_session_data->m_user_database));
     user_data->updateRecord(m_loaded_user.back());
 }
 
@@ -1561,7 +1561,7 @@ void ModUserEditor::updateExistingUser()
 void ModUserEditor::updateExistingPassword(std::string key_value)
 {
     Logging *log = Logging::instance();
-    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
+    security_dao_ptr security_dao; //(new SecurityDao(m_session_data->m_user_database));
     security_ptr security_record(new Security());
 
     // Pull Existing Security Record and re-use existing salt.
@@ -1593,7 +1593,7 @@ void ModUserEditor::updateExistingPassword(std::string key_value)
 void ModUserEditor::updateExistingChallengeAnswer(std::string key_value)
 {
     Logging *log = Logging::instance();
-    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
+    security_dao_ptr security_dao; //(new SecurityDao(m_session_data->m_user_database));
     security_ptr security_record(new Security());
 
     // Pull Existing Security Record and re-use existing salt.
@@ -1624,7 +1624,7 @@ void ModUserEditor::updateExistingChallengeAnswer(std::string key_value)
  */
 void ModUserEditor::updateExistingChallengeQuestion(std::string key_value)
 {
-    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
+    security_dao_ptr security_dao; //(new SecurityDao(m_session_data->m_user_database));
     security_ptr security_record(new Security());
 
     // Pull Existing Security Record and re-use existing salt.

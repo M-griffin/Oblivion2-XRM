@@ -90,45 +90,13 @@ void SessionData::handleRead(const std::error_code& error, socket_handler_ptr)
                 }
 
                 updateState();
-            }
-
-            /*
-            // Telnet Options are parsed out.
-            // Only send messages if there is parsed data!
-            switch(m_session_state)
-            {
-                case SESSION_STATE::STATE_CMD:
-
-                    // Only on Single ESC Sequence,  Start Deadline timer
-                    // To Catch remaining broken up ESC Sequences or
-                    // Determine if this is a lone ESC sequence
-                    if (m_parsed_data[m_parsed_data.size()-1] == '\x1b')
-                    {
-                        start_esc_timer();
-                        m_is_esc_timer = true;
-                    }
-                    else if (!m_is_esc_timer)
-                    {
-                        m_state_machine->update(std::move(m_parsed_data));
-                    }
-                    break;
-
-                case SESSION_STATE::STATE_CHAT:
-                    room->deliver(std::move(m_parsed_data));
-                    break;
-
-                case SESSION_STATE::STATE_DONE:
-                    break;
-
-                default:
-                    break;
-            }*/
+            }           
         }
 
         // Restart Callback to wait for more data.
         // If this step is skipped, then the node will exit
         // since io_service will have no more work!
-        if(m_connection->isActive())
+        if(m_async_io->isActive())
         {
             waitingForData();
         }
@@ -146,15 +114,7 @@ void SessionData::handleRead(const std::error_code& error, socket_handler_ptr)
             m_is_leaving = true;
 
             // Disconnect the session.
-            session_manager->leave(m_node_number);
-            // m_session_state = SESSION_STATE::STATE_DONE;
-            
-            /*
-            if(m_connection->isActive())
-            {
-                m_connection->shutdown();
-                m_connection.reset();
-            }*/
+            session_manager->leave(m_session);
             m_session_manager.reset();
         }        
     }
@@ -177,7 +137,7 @@ void SessionData::handleEscTimer()
 void SessionData::startUpSessionStats(std::string sessionType)
 {
     // Check Table setup for Session Stats
-    session_stats_dao_ptr session_stat_dao(new SessionStatsDao(m_user_database));
+    session_stats_dao_ptr session_stat_dao; // (new SessionStatsDao(m_user_database));
 
     // Verify if the user table exists.
     if(session_stat_dao)

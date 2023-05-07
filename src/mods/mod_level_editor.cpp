@@ -994,7 +994,7 @@ void ModLevelEditor::handleLevelInputState(bool does_level_exist, int level_code
 void ModLevelEditor::createNewLevel(int level_code)
 {
     Logging *log = Logging::instance();
-    access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
+    access_level_dao_ptr level_dao; // (new AccessLevelDao(m_session_data->m_user_database));
     access_level_ptr new_level(new AccessLevel());
 
     // Check if Level Already Exists.
@@ -1021,7 +1021,7 @@ void ModLevelEditor::createNewLevel(int level_code)
  */
 void ModLevelEditor::deleteExistingLevel(int level_code)
 {
-    access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
+    access_level_dao_ptr level_dao; // (new AccessLevelDao(m_session_data->m_user_database));
     access_level_ptr existing_level = level_dao->getAccessLevelByLevel(level_code);
 
     if(existing_level->iId == -1 || !level_dao->deleteRecord(existing_level->iId))
@@ -1041,7 +1041,7 @@ void ModLevelEditor::copyExistingLevel(int level_code)
 {
     Logging *log = Logging::instance();
 
-    access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
+    access_level_dao_ptr level_dao; // (new AccessLevelDao(m_session_data->m_user_database));
     access_level_ptr existing_level = level_dao->getAccessLevelByLevel(m_current_level);
 
     if(checkLevelExistsByLevel(level_code))
@@ -1066,7 +1066,7 @@ void ModLevelEditor::copyExistingLevel(int level_code)
  */
 void ModLevelEditor::saveLevelChanges()
 {
-    access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
+    access_level_dao_ptr level_dao; //(new AccessLevelDao(m_session_data->m_user_database));
     access_level_ptr existing_level = nullptr;
 
     for(unsigned int i = 0; i < m_loaded_levels.size(); i++)
@@ -1123,7 +1123,7 @@ access_level_ptr ModLevelEditor::getCurrentLevel()
  */
 std::string ModLevelEditor::displayLevelList()
 {
-    access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
+    access_level_dao_ptr level_dao; //(new AccessLevelDao(m_session_data->m_user_database));
 
     // Clear All Levels
     if(m_loaded_levels.size() > 0)

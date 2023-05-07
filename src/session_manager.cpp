@@ -24,25 +24,21 @@ void SessionManager::join(session_ptr session)
  * @brief Notifies that a user has left the room
  * @param participant
  */
-void SessionManager::leave(int node_number)
+void SessionManager::leave(session_ptr session)
 {
     Logging *log = Logging::instance();
+    int node_number = session->m_session_data->m_node_number;
     log->write<Logging::CONSOLE_LOG>("disconnecting Node Session=", node_number);
+    
 
-    for(auto it = m_sessions.begin(); it != m_sessions.end(); it++)
+    if (session->m_async_io && session->m_async_io->isActive())
     {
-        if((*it)->m_session_data->m_node_number == node_number)
-        {
-            // shutdown the Node in a locked manger.
-            if((*it)->m_connection && (*it)->m_connection->isActive())
-            {
-                (*it)->m_connection->shutdown();                
-            }
-            m_sessions.erase(it);
-            log->write<Logging::CONSOLE_LOG>("disconnecting Node Session completed=", node_number);
-            break;
-        }
+        log->write<Logging::CONSOLE_LOG>("Shutdown ASIO=", node_number);
+        session->m_async_io->shutdown();                             
     }
+    
+    m_sessions.erase(session);
+    log->write<Logging::CONSOLE_LOG>("disconnecting Node Session completed=", node_number);
 }
 
 /**
@@ -83,9 +79,11 @@ int SessionManager::connections()
  */
 void SessionManager::shutdown()
 {
+    Logging *log = Logging::instance();
     for(auto it = begin(m_sessions); it != end(m_sessions); ++it)
     {
-        (*it)->m_connection->shutdown();
+        log->write<Logging::DEBUG_LOG>("shutting Down Nodes=", (*it)->m_session_data->m_node_number );
+        (*it)->m_async_io->shutdown();
         m_sessions.erase(it);
     }
 }

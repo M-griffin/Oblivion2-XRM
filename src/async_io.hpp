@@ -119,6 +119,6 @@ public:
 
 };
 
-typedef std::shared_ptr<AsyncIO> connection_ptr;
+typedef std::shared_ptr<AsyncIO> async_io_ptr;
 
 #endif // ASYNC_CONNECTION_HPP

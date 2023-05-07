@@ -49,20 +49,22 @@ class SessionData
 {
 public:
 
-    SessionData(connection_ptr           connection,
+    SessionData(session_ptr              session,
+                async_io_ptr             async_io,
                 session_manager_ptr      room,
                 IOService&               io_service,
                 state_manager_ptr        state_manager)
-        : m_connection(connection)
+        : m_session(session)
+        , m_async_io(async_io)
         , m_session_manager(room)
-        , m_telnet_state(new TelnetDecoder(connection))
+        , m_telnet_state(new TelnetDecoder(async_io))
         , m_esc_input_timer(new DeadlineTimer())
         , m_state_manager(state_manager)
         , m_io_service(io_service)
         , m_common_io()
-        , m_user_database(USERS_DATABASE, &m_database_log)
+        //, m_user_database(USERS_DATABASE, &m_database_log)
         , m_user_record(new Users())
-        , m_session_stats(new SessionStats())
+        //, m_session_stats(new SessionStats())
         , m_node_number(0)
         , m_is_use_ansi(true)
         , m_encoding_text(Encoding::ENCODING_TEXT_UTF8)
@@ -82,13 +84,14 @@ public:
         
         // Clear Out Session Data
         std::vector<unsigned char>().swap(m_in_data_vector);
-        m_connection.reset();
+        m_async_io.reset();
         m_session_manager.reset();
         m_telnet_state.reset();
         m_esc_input_timer.reset();
         m_state_manager.reset();
         m_user_record.reset();
         m_session_stats.reset();
+        m_session.reset();
                         
         for(unsigned int i = 0; i < m_processes.size(); i++)
         {
@@ -107,9 +110,9 @@ public:
         //memset(&m_raw_data, 0, max_length);
         std::vector<unsigned char>().swap(m_in_data_vector);
 
-        if(m_connection->isActive()) // && TheCommunicator::instance()->isActive())
+        if(m_async_io->isActive()) // && TheCommunicator::instance()->isActive())
         {
-            m_connection->asyncRead(m_in_data_vector,
+            m_async_io->asyncRead(m_in_data_vector,
                                     std::bind(
                                         &SessionData::handleRead,
                                         shared_from_this(),
@@ -196,9 +199,9 @@ public:
             outputBuffer = msg;
         }
 
-        if(m_connection->isActive()) // && TheCommunicator::instance()->isActive())
+        if(m_async_io->isActive()) // && TheCommunicator::instance()->isActive())
         {
-            m_connection->asyncWrite(outputBuffer,
+            m_async_io->asyncWrite(outputBuffer,
                                      std::bind(
                                          &SessionData::handleWrite,
                                          shared_from_this(),
@@ -225,10 +228,9 @@ public:
 
         if(session_manager && error) //  && (!m_is_leaving))
         {
-            std::cout << "Logoff Session Manager" << std::endl;
+            std::cout << "Logoff Session Manager - Write Error" << std::endl;
             m_is_leaving = true;
-            session_manager->leave(m_node_number);
-            
+            session_manager->leave(m_session);            
             session_manager.reset();
 
             /*
@@ -282,10 +284,9 @@ public:
         if(session_manager)
         {
             m_is_leaving = true;
-            std::cout << "Logoff Session Manager" << std::endl;
+            std::cout << "Logoff Session Data -> Manager" << std::endl;
             // Room is the session.
-            session_manager->leave(m_node_number);
-            
+            session_manager->leave(m_session);
             session_manager.reset();
         }
 
@@ -374,7 +375,8 @@ private:
 
 public:
 
-    connection_ptr        m_connection;
+    session_ptr           m_session;
+    async_io_ptr          m_async_io;
     session_manager_wptr  m_session_manager;
     telnet_ptr            m_telnet_state;
     deadline_timer_ptr    m_esc_input_timer;
@@ -384,8 +386,8 @@ public:
     CommonIO              m_common_io;
 
     // Temp while testing.
-    SQLW::Database        m_user_database;
-    SQLW::StderrLog       m_database_log;
+    //SQLW::Database        m_user_database;
+    //SQLW::StderrLog       m_database_log;
 
     user_ptr              m_user_record;
     session_stats_ptr     m_session_stats;

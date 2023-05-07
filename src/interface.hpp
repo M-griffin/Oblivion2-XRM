@@ -123,14 +123,16 @@ private:
         if(!error)
         {
             Logging *log = Logging::instance();
-            log->write<Logging::DEBUG_LOG>("TCP Connection accepted");
+            log->write<Logging::DEBUG_LOG>("Handle-Accept TCP Connection accepted");
 
-            connection_ptr async_conn(new AsyncIO(m_io_service, socket_handler));
+            async_io_ptr async_conn(new AsyncIO(m_io_service, socket_handler));
 
             // Create DeadlineTimer and attach to new session
             // This timer is specific for waiting .25 seconds on
             // ESC sequences check for single esc, vs key sequences
             deadline_timer_ptr deadline_timer(new DeadlineTimer());
+            
+            log->write<Logging::DEBUG_LOG>("Handle-Accept Create New Session");
 
             // Create the new Session
             session_ptr new_session = Session::create(m_io_service,
@@ -138,13 +140,15 @@ private:
                                       deadline_timer,
                                       m_session_manager);
 
+            log->write<Logging::DEBUG_LOG>("Handle-Accept Attached Session to Manager");
+
             // Attach Session to Session Manager.
             m_session_manager->join(new_session);
         }
         else
         {
             Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("Connection refused", error.message());
+            log->write<Logging::ERROR_LOG>("Handle-Accept Connection refused", error.message());
         }
         
         // Restart Listener for next connection.

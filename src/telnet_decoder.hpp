@@ -26,8 +26,8 @@ class TelnetDecoder
 {
 public:
 
-    explicit TelnetDecoder(connection_ptr connection)
-        : m_connection(connection)
+    explicit TelnetDecoder(async_io_ptr async_io)
+        : m_async_io(async_io)
         , m_naws_row(24)
         , m_naws_col(80)
         , m_term_type("undetected")
@@ -45,6 +45,7 @@ public:
     ~TelnetDecoder()
     {
         std::cout << "~TelnetDecoder()" << std::endl;
+        m_async_io.reset();
         std::vector<unsigned char>().swap(reply_sequence);
         std::vector<unsigned char>().swap(active_sequence);
     }
@@ -126,20 +127,20 @@ public:
 
 private:
 
-    connection_ptr m_connection;
+    async_io_ptr  m_async_io;
 
-    int         m_naws_row;
-    int         m_naws_col;
-    std::string m_term_type;
+    int           m_naws_row;
+    int           m_naws_col;
+    std::string   m_term_type;
 
-    bool        m_is_binary;
-    bool        m_is_echo;
-    bool        m_is_sga;
-    bool        m_is_linemode;
+    bool          m_is_binary;
+    bool          m_is_echo;
+    bool          m_is_sga;
+    bool          m_is_linemode;
 
     // Global Option State for Telnet Options Parsing.
-    int m_teloptStage;
-    int m_teloptCommand;
+    int           m_teloptStage;
+    int           m_teloptCommand;
     unsigned char m_currentOption;
     unsigned char m_subnegoOption;
 
@@ -179,9 +180,9 @@ private:
             return;
         }
 
-        if(m_connection->getSocketHandle()->isActive()) // && TheCommunicator::instance()->isActive())
+        if(m_async_io->getSocketHandle()->isActive()) // && TheCommunicator::instance()->isActive())
         {
-            m_connection->asyncWrite(string_msg,
+            m_async_io->asyncWrite(string_msg,
                                      std::bind(
                                          &TelnetDecoder::handleWrite,
                                          shared_from_this(),

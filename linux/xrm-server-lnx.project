@@ -21,6 +21,7 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="..\src">
+    <File Name="../src/logging.hpp"/>
     <File Name="../src/safe_vector.hpp"/>
     <File Name="../src/async_io.hpp"/>
     <File Name="../src/python_system.hpp"/>
@@ -190,7 +191,6 @@
     <File Name="../src/uuid.hpp"/>
     <File Name="../src/encoding.cpp"/>
     <File Name="../src/encoding.hpp"/>
-    <File Name="../src/logging.hpp"/>
     <File Name="../src/xrm_server.cpp"/>
     <File Name="../src/processor_ansi.cpp"/>
     <File Name="../src/processor_ansi.hpp"/>
@@ -198,8 +198,6 @@
     <File Name="../src/processor_text.cpp"/>
     <File Name="../src/processor_text.hpp"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="" C_Options="" Assembler="">
@@ -311,4 +309,6 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>
