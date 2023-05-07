@@ -1,8 +1,6 @@
 #ifndef THE_STATE_HPP
 #define THE_STATE_HPP
 
-#include "session_data.hpp"
-
 #include <memory>
 #include <iostream>
 #include <string>
@@ -27,14 +25,12 @@ public:
     virtual void resume() {}
     virtual std::string getStateID() const = 0;
 
-    explicit StateBase(session_data_ptr session_data)
-        : m_session_data(session_data)
-        , m_is_active(false)
+    explicit StateBase()
+        : m_is_active(false)
     { }
 
     // This holds session data passed to each session.
-    session_data_ptr m_session_data;
-    bool             m_is_active;
+    bool m_is_active;
 
 };
 

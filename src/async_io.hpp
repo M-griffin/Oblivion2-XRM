@@ -120,5 +120,6 @@ public:
 };
 
 typedef std::shared_ptr<AsyncIO> async_io_ptr;
+typedef std::weak_ptr<AsyncIO> async_io_wptr;
 
 #endif // ASYNC_CONNECTION_HPP

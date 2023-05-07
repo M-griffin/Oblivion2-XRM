@@ -80,10 +80,6 @@ public:
             return;
         }
 
-        // Setup the communicator to allow rest of program to talk with
-        // And send messages to other nodes.
-        //TheCommunicator::instance()->setupServer(m_session_manager);
-
         log->write<Logging::CONSOLE_LOG>("Telnet Server Waiting for Connection.");
         waitingForConnection();
     }
@@ -126,19 +122,11 @@ private:
             log->write<Logging::DEBUG_LOG>("Handle-Accept TCP Connection accepted");
 
             async_io_ptr async_conn(new AsyncIO(m_io_service, socket_handler));
-
-            // Create DeadlineTimer and attach to new session
-            // This timer is specific for waiting .25 seconds on
-            // ESC sequences check for single esc, vs key sequences
-            deadline_timer_ptr deadline_timer(new DeadlineTimer());
             
             log->write<Logging::DEBUG_LOG>("Handle-Accept Create New Session");
 
             // Create the new Session
-            session_ptr new_session = Session::create(m_io_service,
-                                      async_conn,
-                                      deadline_timer,
-                                      m_session_manager);
+            session_ptr new_session = Session::create(async_conn, m_session_manager);
 
             log->write<Logging::DEBUG_LOG>("Handle-Accept Attached Session to Manager");
 

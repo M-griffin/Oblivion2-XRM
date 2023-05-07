@@ -37,7 +37,9 @@ void StateManager::update()
 
     if(!m_the_state.empty())
     {
-        std::string incoming_data = std::move(m_the_state.back()->m_session_data->m_parsed_data);
+        // TODO
+        // FIX ME Once Moved to SESSIN
+        std::string incoming_data; //  = std::move(m_the_state.back()->m_session_data->m_parsed_data);
 
         if(incoming_data.size() > 0)
         {

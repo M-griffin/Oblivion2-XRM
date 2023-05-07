@@ -21,10 +21,6 @@
  */
 
 #include "model-sys/structures.hpp"
-//#include "model-sys/config.hpp"
-//#include "data-sys/text_prompts_dao.hpp"
-//#include "data-sys/config_dao.hpp"
-//#include "data-sys/db_startup.hpp"
 
 #include "interface.hpp"
 #include "common_io.hpp"

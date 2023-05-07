@@ -1,11 +1,8 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
-#include "model-sys/config.hpp"
 #include "safe_queue.hpp"
 #include "common_io.hpp"
-
-#include <yaml-cpp/yaml.h>
 
 #include <memory>
 #include <iostream>
@@ -318,50 +315,7 @@ public:
         }
         std::cout << std::endl;
         return;
-    }
-
-    /**
-     * @brief Write out Log Entries to File.
-     * @param entry
-     */
-    void writeOutYamlFile(log_entry_ptr entry)
-    {
-        std::string path = ""; //GLOBAL_LOG_PATH;
-        pathSeperator(path);
-        path.append("systemLog.txt");
-
-        YAML::Emitter out;
-
-        out << YAML::BeginMap;
-        out << YAML::Flow;
-
-        out << YAML::Key << "LogDateTime" << YAML::Value << entry->m_date_time;
-        out << YAML::Key << "Details";
-        out << YAML::Value << YAML::BeginSeq;
-
-        for(std::string &d : entry->m_details)
-        {
-            out << d;
-        }
-
-        out << YAML::EndSeq;
-        out << YAML::EndMap;
-
-
-        // Setup file to Write out File.
-        std::ofstream ofs(path, std::ios_base::app);
-
-        if(!ofs.is_open())
-        {
-            std::cout << "Error, unable to open log file: " << path << std::endl;
-            return;
-        }
-
-        ofs << out.c_str() << std::endl;
-        ofs.close();
-
-        return;
-    }
+    }    
 
 
 private:

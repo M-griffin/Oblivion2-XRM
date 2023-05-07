@@ -43,6 +43,6 @@ private:
 };
 
 typedef std::shared_ptr<SessionManager> session_manager_ptr;
-typedef std::weak_ptr<SessionManager>	session_manager_wptr;
+typedef std::weak_ptr<SessionManager> session_manager_wptr;
 
 #endif // CHAT_ROOM_HPP

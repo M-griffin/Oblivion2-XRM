@@ -21,14 +21,12 @@ typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
  * @file telnet_decoder.hpp
  * @brief Handles Telnet Options and Feature Negotiation
  */
-class TelnetDecoder
-    : public std::enable_shared_from_this<TelnetDecoder>
+class TelnetDecoder    
 {
 public:
 
-    explicit TelnetDecoder(async_io_ptr async_io)
-        : m_async_io(async_io)
-        , m_naws_row(24)
+    explicit TelnetDecoder()
+        : m_naws_row(24)
         , m_naws_col(80)
         , m_term_type("undetected")
         , m_is_binary(false)
@@ -44,8 +42,7 @@ public:
 
     ~TelnetDecoder()
     {
-        std::cout << "~TelnetDecoder()" << std::endl;
-        m_async_io.reset();
+        std::cout << "~TelnetDecoder()" << std::endl;        
         std::vector<unsigned char>().swap(reply_sequence);
         std::vector<unsigned char>().swap(active_sequence);
     }
@@ -127,7 +124,7 @@ public:
 
 private:
 
-    async_io_ptr  m_async_io;
+    //async_io_ptr  m_async_io;
 
     int           m_naws_row;
     int           m_naws_col;
@@ -173,8 +170,13 @@ private:
      * @brief delivers text data to client
      * @param msg
      */
-    void deliver(const std::string &string_msg)
+    void deliver(const std::string &) //string_msg)
     {
+        
+        // TODO: NOTE change this to queue up respones, then the session will call to retieve
+        // once it returns from parsing, then we don't have to pass sessions/async_io, less references.
+        
+        /*
         if(string_msg.size() == 0)
         {
             return;
@@ -188,7 +190,7 @@ private:
                                          shared_from_this(),
                                          std::placeholders::_1,
                                          std::placeholders::_2));
-        }
+        }*/
 
     }
 
@@ -321,6 +323,7 @@ private:
     }
 };
 
-typedef std::shared_ptr<TelnetDecoder> telnet_ptr;
+typedef std::shared_ptr<TelnetDecoder> telnet_decoder_ptr;
+typedef std::unique_ptr<TelnetDecoder> telnet_decoder_uptr;
 
 #endif

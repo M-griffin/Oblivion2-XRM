@@ -63,6 +63,7 @@ private:
 
 };
 
-typedef std::shared_ptr<StateManager>	state_manager_ptr;
+typedef std::shared_ptr<StateManager> state_manager_ptr;
+typedef std::unique_ptr<StateManager> state_manager_uptr;
 
 #endif
