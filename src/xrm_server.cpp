@@ -57,6 +57,7 @@ Logging* Logging::m_global_logging_instance = nullptr;
 void atExitFunction()
 {    
     // Note Make Encoding just an extension of Common IO, 
+    Logging::releaseInstance();
     Encoding::releaseInstance();
     std::cout << std::endl << "XRM SHUTDOWN COMPLETED!" << std::endl;
 }
@@ -75,8 +76,10 @@ auto main() -> int
               << std::endl
               << std::endl;
 
-    CommonIO common;
-    GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
+    {
+        CommonIO common;
+        GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
+    }
     std::cout << "BBS HOME Directory Registered: " << std::endl;
     std::cout << GLOBAL_BBS_PATH << std::endl;
 

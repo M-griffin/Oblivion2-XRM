@@ -24,6 +24,7 @@ public:
     ~AsyncBase()
     { 
         std::cout << "~AsyncBase()" << std::endl;
+        m_socket_handler.reset();
     }
 
     /**

@@ -15,7 +15,7 @@ SessionManager::~SessionManager()
  * @brief Notifies that a user has joined the room
  * @param participant
  */
-void SessionManager::join(session_ptr session)
+void SessionManager::join(const session_ptr &session)
 {
     m_sessions.insert(session);
 }
@@ -24,7 +24,7 @@ void SessionManager::join(session_ptr session)
  * @brief Notifies that a user has left the room
  * @param participant
  */
-void SessionManager::leave(session_ptr session)
+void SessionManager::leave(const session_ptr &session)
 {
     Logging *log = Logging::instance();
     int node_number = session->m_node_number;
@@ -46,10 +46,12 @@ void SessionManager::leave(session_ptr session)
  * @brief Sends message to all users in the current room.
  * @param participant
  */
-void SessionManager::deliver(std::string msg)
+void SessionManager::deliver(const std::string &msg)
 {
     if(msg.size() == 0)
-        return;
+    {
+        return;        
+    }
 
     Logging *log = Logging::instance();
     log->write<Logging::DEBUG_LOG>("deliver SessionManager notices=", msg);

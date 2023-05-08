@@ -20,7 +20,7 @@ class AsyncAcceptor
 {
 public:
 
-    AsyncAcceptor(IOService& io_service, socket_handler_ptr socket_handler)
+    AsyncAcceptor(IOService& io_service, const socket_handler_ptr &socket_handler)
         : AsyncBase(io_service, socket_handler)
     {
     }
@@ -28,6 +28,7 @@ public:
     ~AsyncAcceptor()
     {
         std::cout << "~AsyncAcceptor()" << std::endl;
+        m_socket_handler.reset();
     }
 
 
@@ -37,7 +38,7 @@ public:
      * @param Callback - return error code and handles to new session
      */
     template <typename Protocol, typename Callback>
-    void asyncAccept(Protocol protocol, const Callback &callback)
+    void asyncAccept(const Protocol &protocol, const Callback &callback)
     {
         // Place Holder is used for template parameters, string_seq is used in writes
         // Where the Buffer Place Holder in the above method is used for reads.

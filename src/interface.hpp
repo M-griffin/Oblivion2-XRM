@@ -47,7 +47,7 @@ public:
      * @param port
      * @return
      */
-    Interface(IOService& io_service, std::string protocol, int port)
+    Interface(IOService& io_service, const std::string &protocol, const int &port)
         : m_io_service(io_service)
         , m_session_manager(new SessionManager())
         , m_socket_acceptor(new SocketHandler())
@@ -61,7 +61,6 @@ public:
         if(SDLNet_Init() == -1)
         {
             log->write<Logging::ERROR_LOG>("SDLNet_Init", SDLNet_GetError());
-            //TheCommunicator::instance()->shutdown();
             return;
         }
 
@@ -114,7 +113,7 @@ private:
      * @param new_connection
      * @param error
      */
-    void handle_accept(const std::error_code& error, socket_handler_ptr socket_handler)
+    void handle_accept(const std::error_code& error, const socket_handler_ptr &socket_handler)
     {
         if(!error)
         {

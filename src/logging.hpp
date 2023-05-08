@@ -1,7 +1,7 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
-#include "safe_queue.hpp"
+//#include "safe_queue.hpp"
 #include "common_io.hpp"
 
 #include <memory>
@@ -12,7 +12,7 @@
 #include <chrono>
 #include <ctime>
 #include <mutex>
-#include <map>
+//#include <map>
 
 
 /**
@@ -71,7 +71,7 @@ public:
     const std::string CONSOLE_LEVEL = "Console Output";
     const std::string ALL_LEVELS = "All Level Information";
 
-    SafeQueue<log_entry_ptr> m_log_entries;
+    //SafeQueue<log_entry_ptr> m_log_entries;
 
     /**
      * @brief Creates Singleton Instance of Class
@@ -131,7 +131,7 @@ public:
      */
     int getNumberOfLogEntries()
     {
-        return m_log_entries.size();
+        return 0; //m_log_entries.size();
     }
 
     /**
@@ -140,8 +140,8 @@ public:
      */
     log_entry_ptr getLogQueueEntry()
     {
-        if(!m_log_entries.isEmpty())
-            return m_log_entries.dequeue();
+        //if(!m_log_entries.isEmpty())
+        //    return m_log_entries.dequeue();
 
         return nullptr;
     }
