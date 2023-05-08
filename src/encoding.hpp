@@ -45,6 +45,7 @@ public:
     {
         if(m_global_encoding_instance)
         {
+            std::cout << "~Encoding Release()" << std::endl;
             delete m_global_encoding_instance;
             m_global_encoding_instance = nullptr;
         }

@@ -95,7 +95,7 @@ public:
     {
         if(m_global_logging_instance)
         {
-            std::cout << "~LoggingInstance()" << std::endl;
+            std::cout << "~LoggingInstance() Release" << std::endl;
             delete m_global_logging_instance;
             m_global_logging_instance = nullptr;
         }

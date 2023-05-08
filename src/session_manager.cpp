@@ -30,12 +30,10 @@ void SessionManager::leave(const session_ptr &session)
     int node_number = session->m_node_number;
     log->write<Logging::CONSOLE_LOG>("disconnecting Node Session=", node_number);
     
-    async_io_ptr async_io = session->m_async_io.lock();
-
-    if (async_io && async_io->isActive())
+    if (session->m_async_io && session->m_async_io->isActive())
     {
         log->write<Logging::CONSOLE_LOG>("Shutdown ASIO=", node_number);
-        async_io->shutdown();                             
+        session->m_async_io->shutdown();                             
     }
     
     m_sessions.erase(session);
@@ -87,8 +85,7 @@ void SessionManager::shutdown()
     {
         log->write<Logging::DEBUG_LOG>("shutting Down Nodes=", (*it)->m_node_number );
         {
-            async_io_ptr async_io = (*it)->m_async_io.lock();
-            async_io->shutdown();            
+            (*it)->m_async_io->shutdown();            
         }
         m_sessions.erase(it);
     }

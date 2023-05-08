@@ -109,8 +109,8 @@ public:
 
         virtual void executeCallback(const std::error_code &err, socket_handler_ptr handle)
         {
-            StdFunctionCallbackHandler callback(m_callback);
-            callback(err, handle);
+            StdFunctionCallbackHandler callback_method(m_callback);
+            callback_method(err, handle);
         }
 
         virtual int getServiceType()
@@ -118,8 +118,8 @@ public:
             return m_service_type;
         }
 
-        ServiceJob(MutableBufferSequence &buffer, const StringSequence &string_sequence, const SocketHandle &socket_handle, 
-                const Callback &callback, const ServiceType &service_type)
+        ServiceJob(MutableBufferSequence &buffer, StringSequence string_sequence, SocketHandle socket_handle, 
+                Callback &callback, ServiceType service_type)
             : m_buffer(buffer)
             , m_string_sequence(string_sequence)
             , m_socket_handle(socket_handle)
@@ -130,7 +130,7 @@ public:
         ~ServiceJob() 
         {
             std::cout << "~ServiceJob()" << std::endl;
-            m_socket_handle.reset();
+            //m_socket_handle.reset();
         }
 
         MutableBufferSequence &m_buffer;
@@ -149,8 +149,8 @@ public:
      * @param service_type
      */
     template <typename MutableBufferSequence, typename StringSequence, typename SocketHandle, typename Callback, typename ServiceType>
-    void addAsyncJob(MutableBufferSequence &buffer, const StringSequence &string_sequence, const SocketHandle &socket_handle,
-                     const Callback &callback, const ServiceType &service_type)
+    void addAsyncJob(MutableBufferSequence &buffer, StringSequence string_sequence, SocketHandle socket_handle,
+                     Callback &callback, ServiceType service_type)
     {
         ServiceJob<MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType> *job
             = new ServiceJob <MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>

@@ -24,7 +24,7 @@ public:
     ~AsyncBase()
     { 
         std::cout << "~AsyncBase()" << std::endl;
-        m_socket_handler.reset();
+        //m_socket_handler.reset();
     }
 
     /**
@@ -33,7 +33,7 @@ public:
      */
     bool isActive()
     {
-        return m_socket_handler->isActive();
+        return (m_socket_handler) ? m_socket_handler->isActive() : false;
     }
 
     /**

@@ -47,12 +47,11 @@ public:
         , m_deadline_timer(new DeadlineTimer())
         , m_telnet_decoder(new TelnetDecoder())
         , m_node_number(0)
+        , m_is_leaving(false)
     {
         Logging *log = Logging::instance();
-
-        async_io_ptr async_io = m_async_io.lock();
-        
-        if(async_io->isActive())
+       
+        if(m_async_io->isActive())
         {
             try
             {
@@ -78,6 +77,7 @@ public:
 
         // Free the menu system state and modules when session closes.
         m_state_manager->clean();
+        m_async_io.reset();
     }
 
     /**
@@ -108,6 +108,7 @@ public:
             std::string clear_screen = "\x1b[1;1H\x1b[2J";
             new_session->deliver(clear_screen);
 
+            /*
             new_session->m_telnet_decoder->sendIACSequences(DONT, TELOPT_OLD_ENVIRON);
 
             new_session->m_telnet_decoder->sendIACSequences(DO, TELOPT_SGA);
@@ -133,6 +134,7 @@ public:
 
             // Wait 1.5 Seconds for respones.
             new_session->startDetectionTimer();
+            */
         }
 
         return new_session;
@@ -207,11 +209,11 @@ public:
             outputBuffer = msg;
         }*/
 
-        async_io_ptr async_io = m_async_io.lock();
+        
 
-        if(async_io->isActive()) // && TheCommunicator::instance()->isActive())
+        if(m_async_io->isActive()) // && TheCommunicator::instance()->isActive())
         {
-            async_io->asyncWrite(outputBuffer,
+            m_async_io->asyncWrite(outputBuffer,
                                      std::bind(
                                          &Session::handleWrite,
                                          shared_from_this(),
@@ -242,23 +244,21 @@ public:
 
             log->write<Logging::DEBUG_LOG>("Async_HandleWrite Removing Sesison from Manager", __LINE__, __FILE__);
             
-            // Disconnect the session.
-            session_mgr->leave(shared_from_this());
-            
-            async_io_ptr async_io = m_async_io.lock();
-
-            if(async_io->isActive())
+            if(m_async_io->isActive())
             {
                 try
                 {
                     log->write<Logging::DEBUG_LOG>("Async_HandleWrite Leaving (NORMAL SESSION)", __LINE__, __FILE__);
-                    async_io->shutdown();
+                    m_async_io->shutdown();
                 }
                 catch(std::exception &ex)
                 {
                     log->write<Logging::ERROR_LOG>("Async_HandleWrite Exception closing socket()", ex.what(), __LINE__, __FILE__);
                 }
             }
+            
+            // Disconnect the session.
+            session_mgr->leave(shared_from_this());
         }
     }
     
@@ -272,11 +272,9 @@ public:
         // Important, clear out buffer before each read.
         std::vector<unsigned char>().swap(m_in_data_vector);
         
-        async_io_ptr async_io = m_async_io.lock();
-
-        if(async_io->isActive()) // && TheCommunicator::instance()->isActive())
+        if(m_async_io->isActive()) // && TheCommunicator::instance()->isActive())
         {
-            async_io->asyncRead(m_in_data_vector,
+            m_async_io->asyncRead(m_in_data_vector,
                                     std::bind(
                                         &Session::handleRead,
                                         shared_from_this(),
@@ -291,11 +289,37 @@ public:
      * @param error
      * @param bytes_transferred
      */
-    void handleRead(const std::error_code&, socket_handler_ptr)
+    void handleRead(const std::error_code& error, socket_handler_ptr)
     {
         
         Logging *log = Logging::instance();
         log->write<Logging::DEBUG_LOG>("handleRead - After Incoming Data.", __FILE__, __LINE__);
+
+        if (error) 
+        {
+            session_manager_ptr session_manager = m_session_manager.lock();
+
+            if(session_manager && error)
+            {
+                m_is_leaving = true;
+
+                // Disconnect the session.
+                std::cout << "handleRead - Leaving Session on Error" << std::endl;
+                session_manager->leave(shared_from_this());
+            }
+            
+            return;
+        }
+        
+
+        std::cout << "handleRead - waitingForData" << std::endl;
+
+        // Testing ASIO Call Back after reading data. 
+        //async_io_ptr async_io = m_async_io.lock();
+        //if(async_io->isActive())
+        {
+            waitingForData();
+        }
             
         /*
         if(!error)
@@ -389,7 +413,7 @@ public:
     }
     
     // Local Member Definitions Weak Pointers
-    async_io_wptr              m_async_io;
+    async_io_ptr               m_async_io;
     session_manager_wptr       m_session_manager;
     
     // Local Member Definitions Unique Pointers
@@ -399,6 +423,7 @@ public:
     
     // Local Member Variables
     int                        m_node_number;
+    bool                       m_is_leaving;
     std::vector<unsigned char> m_in_data_vector;
 
 
