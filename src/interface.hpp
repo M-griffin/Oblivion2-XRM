@@ -75,7 +75,6 @@ public:
         if(!m_socket_acceptor->createTelnetAcceptor("127.0.0.1", port))
         {
             log->write<Logging::ERROR_LOG>("Unable to start Telnet Acceptor");
-            //TheCommunicator::instance()->shutdown();
             return;
         }
 
@@ -88,6 +87,12 @@ public:
         std::cout << "~Interface()" << std::endl;
         m_io_service.stop();
         m_thread.join();
+        
+        // Clear Smart Pointers, We Should be good here but cleaner is better.
+        m_session_manager.reset();
+        m_socket_acceptor.reset();
+        m_async_listener.reset();
+        
         SDLNet_Quit();
     }
 
@@ -152,4 +157,4 @@ private:
 };
 
 
-#endif // CHAT_SERVER_HPP
+#endif

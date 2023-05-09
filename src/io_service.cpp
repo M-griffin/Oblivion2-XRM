@@ -53,8 +53,7 @@ void IOService::checkAsyncListenersForConnections()
             std::error_code success_code(0, std::generic_category());
 
             try
-            {        
-                
+            {                
                 log->write<Logging::DEBUG_LOG>("Async-Accept - Execute CallBack", __FILE__, __LINE__);
                 
                 // Check for max nodes here, if we like can limit, send a message and drop

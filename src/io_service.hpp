@@ -12,9 +12,6 @@
 class SocketHandler;
 typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
 
-class Session;
-typedef std::shared_ptr<Session> session_ptr;
-
 const int SERVICE_TYPE_NONE              = 0;
 const int SERVICE_TYPE_READ              = 1;
 const int SERVICE_TYPE_WRITE             = 2;
@@ -130,7 +127,7 @@ public:
         ~ServiceJob() 
         {
             std::cout << "~ServiceJob()" << std::endl;
-            //m_socket_handle.reset();
+            m_socket_handle.reset();
         }
 
         MutableBufferSequence &m_buffer;

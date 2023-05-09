@@ -28,7 +28,6 @@ public:
     ~AsyncAcceptor()
     {
         std::cout << "~AsyncAcceptor()" << std::endl;
-        //m_socket_handler.reset();
     }
 
 

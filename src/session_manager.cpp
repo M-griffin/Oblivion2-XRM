@@ -6,11 +6,6 @@
 #include <algorithm>
 
 
-SessionManager::~SessionManager()
-{
-    std::cout << "~SessionManager()" << std::endl;
-}
-
 /**
  * @brief Notifies that a user has joined the room
  * @param participant

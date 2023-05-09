@@ -78,6 +78,9 @@ public:
         // Free the menu system state and modules when session closes.
         m_state_manager->clean();
         m_async_io.reset();
+        m_session_manager.reset();
+        m_deadline_timer.reset();
+        m_telnet_decoder.reset();    
     }
 
     /**
