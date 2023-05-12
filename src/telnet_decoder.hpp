@@ -21,12 +21,14 @@ typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
  * @file telnet_decoder.hpp
  * @brief Handles Telnet Options and Feature Negotiation
  */
-class TelnetDecoder    
+class TelnetDecoder
+    : public std::enable_shared_from_this<TelnetDecoder>
 {
 public:
 
-    explicit TelnetDecoder()
-        : m_naws_row(24)
+    explicit TelnetDecoder(async_io_ptr async_io)
+        : m_async_io(async_io)
+        , m_naws_row(24)
         , m_naws_col(80)
         , m_term_type("undetected")
         , m_is_binary(false)
@@ -42,7 +44,8 @@ public:
 
     ~TelnetDecoder()
     {
-        std::cout << "~TelnetDecoder()" << std::endl;        
+        std::cout << "~TelnetDecoder()" << std::endl;
+        m_async_io.reset();
         std::vector<unsigned char>().swap(reply_sequence);
         std::vector<unsigned char>().swap(active_sequence);
     }
@@ -124,7 +127,7 @@ public:
 
 private:
 
-    //async_io_ptr  m_async_io;
+    async_io_wptr m_async_io;
 
     int           m_naws_row;
     int           m_naws_col;
@@ -161,8 +164,8 @@ private:
         // Just log errors for now.
         if(error)
         {
-            Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("async_write error=", error.message(), __LINE__, __FILE__);
+            Logging &log = Logging::getInstance();
+            log.write<Logging::ERROR_LOG>("telnet async_write error=", error.message(), __LINE__, __FILE__);
         }
     }
 
@@ -170,27 +173,29 @@ private:
      * @brief delivers text data to client
      * @param msg
      */
-    void deliver(const std::string &) //string_msg)
+    void deliver(const std::string &string_msg)
     {
         
         // TODO: NOTE change this to queue up respones, then the session will call to retieve
         // once it returns from parsing, then we don't have to pass sessions/async_io, less references.
-        
-        /*
         if(string_msg.size() == 0)
         {
             return;
         }
 
-        if(m_async_io->getSocketHandle()->isActive()) // && TheCommunicator::instance()->isActive())
+        std::cout << "telnetdecoder - prior to asyncio deliver telnet: " << string_msg << std::endl;
+        async_io_ptr async_io = m_async_io.lock();
+        if(async_io->getSocketHandle()->isActive()) // && TheCommunicator::instance()->isActive())
         {
-            m_async_io->asyncWrite(string_msg,
+            std::cout << "telnetdecoder - after deliver telnet: " << string_msg << std::endl;
+            async_io->asyncWrite(string_msg,
                                      std::bind(
                                          &TelnetDecoder::handleWrite,
                                          shared_from_this(),
                                          std::placeholders::_1,
                                          std::placeholders::_2));
-        }*/
+           std::cout << "telnetdecoder - after write deliver telnet: " << string_msg << std::endl;
+        }
 
     }
 
@@ -286,11 +291,6 @@ private:
     template <typename T>
     void addSequence(T &t, unsigned char option)
     {
-        //typename T::iterator it =
-        //find_if(t.begin(), t.end(), FindFirst(option));
-
-        // Sequence Not Found, add new sequence.
-        //if(it == t.end())
         t.push_back(option);
     }
 

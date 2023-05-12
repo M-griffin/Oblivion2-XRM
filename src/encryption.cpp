@@ -106,8 +106,8 @@ std::string Encrypt::SHA1(std::string key, std::string salt)
     }
     else
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("Error, SHA1 failed", __FILE__, __LINE__);
+        Logging &log = Logging::getInstance();
+        log.write<Logging::ERROR_LOG>("Error, SHA1 failed", __FILE__, __LINE__);
     }
 
     EVP_cleanup();
@@ -149,8 +149,8 @@ std::string Encrypt::PKCS5_PBKDF2(std::string key, std::string salt)
     }
     else
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("Error, PKCS5_PBKDF2_HMAC failed", __FILE__, __LINE__);
+        Logging &log = Logging::getInstance();
+        log.write<Logging::ERROR_LOG>("Error, PKCS5_PBKDF2_HMAC failed", __FILE__, __LINE__);
     }
 
     free(out);

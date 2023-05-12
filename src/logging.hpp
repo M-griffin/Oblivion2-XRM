@@ -12,7 +12,6 @@
 #include <chrono>
 #include <ctime>
 #include <mutex>
-//#include <map>
 
 
 /**
@@ -77,40 +76,11 @@ public:
      * @brief Creates Singleton Instance of Class
      * @return
      */
-    static Logging* instance()
-    {
-        if(!m_global_logging_instance)
-        {
-            m_global_logging_instance = new Logging();
-            return m_global_logging_instance;
-        }
-
-        return m_global_logging_instance;
-    }
-
-    /**
-     * @brief Releases the Instance from Memory
-     */
-    static void releaseInstance()
-    {
-        if(m_global_logging_instance)
-        {
-            std::cout << "~LoggingInstance() Release" << std::endl;
-            delete m_global_logging_instance;
-            m_global_logging_instance = nullptr;
-        }
-
-        return;
-    }
-
-    /**
-     * @brief Check if Singletop is active
-     * @return
-     */
-    static bool isActive()
-    {
-        return m_global_logging_instance != nullptr;
-    }
+    static Logging &getInstance()
+    {      
+        static Logging instance;
+        return instance;
+    }        
 
     /**
      * @brief Helper, appends forward/backward slash to path
@@ -279,6 +249,7 @@ public:
             // log_entry_ptr entry(new LogEntry(date_time, details));
             // m_log_entries.enqueue(entry);
 #endif
+            details.clear();
         }
     }
 
@@ -321,12 +292,21 @@ public:
 private:
 
     mutable std::mutex     m_encoding_mutex;
-    static Logging*        m_global_logging_instance;
-
-    explicit Logging() { };
-    ~Logging() { };
-    Logging(const Logging&);
-    Logging& operator=(const Logging&);
+    
+    /**
+     * @brief Constructor for the Singleton.
+     * @return 
+     */
+    
+    Logging() 
+    {
+        std::cout << "Logging()" << std::endl;
+    }
+    
+    Logging(const Logging&) = delete;             // Copy ctor
+    Logging(Logging&&) = delete;                  // Move ctor
+    Logging& operator=(const Logging&) = delete;  // Copy assignment
+    Logging& operator=(Logging&&) = delete;       // Move assignment
 
 };
 

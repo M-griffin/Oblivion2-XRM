@@ -80,8 +80,8 @@ public:
 
         if(!local_directory_ptr)
         {
-            Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("Error opening directory=", errno, dir, __LINE__, __FILE__);
+            Logging &log = Logging::getInstance();
+            log.write<Logging::ERROR_LOG>("Error opening directory=", errno, dir, __LINE__, __FILE__);
             return file_list;
         }
 

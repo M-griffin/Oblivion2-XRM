@@ -55,17 +55,17 @@ public:
         , m_protocol(protocol)
     {
 
-        Logging *log = Logging::instance();
+        Logging &log = Logging::getInstance();
 
         // Startup SDL NET. Custom version Tweaked for KEEP Alive's
         if(SDLNet_Init() == -1)
         {
-            log->write<Logging::ERROR_LOG>("SDLNet_Init", SDLNet_GetError());
+            log.write<Logging::ERROR_LOG>("SDLNet_Init", SDLNet_GetError());
             return;
         }
 
         unsigned int num_threads = std::thread::hardware_concurrency();
-        log->write<Logging::INFO_LOG>("concurrent threads supported", num_threads);
+        log.write<Logging::INFO_LOG>("concurrent threads supported", num_threads);
 
         // Start up worker thread of ASIO. We want socket communications in a separate thread.
         // We only spawn a single thread for IO_Service on start up
@@ -74,11 +74,11 @@ public:
         // Setup Telnet Server Connection Listener.
         if(!m_socket_acceptor->createTelnetAcceptor("127.0.0.1", port))
         {
-            log->write<Logging::ERROR_LOG>("Unable to start Telnet Acceptor");
+            log.write<Logging::ERROR_LOG>("Unable to start Telnet Acceptor");
             return;
         }
 
-        log->write<Logging::CONSOLE_LOG>("Telnet Server Waiting for Connection.");
+        log.write<Logging::CONSOLE_LOG>("Telnet Server Waiting for Connection.");
         waitingForConnection();
     }
 
@@ -101,8 +101,8 @@ public:
      */
     void waitingForConnection()
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Waiting For Connection, Adding Async Job to Listener");
+        Logging &log = Logging::getInstance();
+        log.write<Logging::DEBUG_LOG>("Waiting For Connection, Adding Async Job to Listener");
         m_async_listener->asyncAccept(
             m_protocol,
             std::bind(&Interface::handle_accept,
@@ -122,25 +122,25 @@ private:
     {
         if(!error)
         {
-            Logging *log = Logging::instance();
-            log->write<Logging::DEBUG_LOG>("Handle-Accept TCP Connection accepted");
+            Logging &log = Logging::getInstance();
+            log.write<Logging::DEBUG_LOG>("Handle-Accept TCP Connection accepted");
 
             async_io_ptr async_conn(new AsyncIO(m_io_service, socket_handler));
             
-            log->write<Logging::DEBUG_LOG>("Handle-Accept Create New Session");
+            log.write<Logging::DEBUG_LOG>("Handle-Accept Create New Session");
 
             // Create the new Session
             session_ptr new_session = Session::create(async_conn, m_session_manager);
 
-            log->write<Logging::DEBUG_LOG>("Handle-Accept Attached Session to Manager");
+            log.write<Logging::DEBUG_LOG>("Handle-Accept Attached Session to Manager");
 
             // Attach Session to Session Manager.
             m_session_manager->join(new_session);
         }
         else
         {
-            Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("Handle-Accept Connection refused", error.message());
+            Logging &log = Logging::getInstance();
+            log.write<Logging::ERROR_LOG>("Handle-Accept Connection refused", error.message());
         }
         
         // Restart Listener for next connection.

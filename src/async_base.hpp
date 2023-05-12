@@ -59,8 +59,8 @@ public:
         }
         catch(std::exception &ex)
         {
-            Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("AsyncBase shutdown() - Caught exception=", ex.what());
+            Logging &log = Logging::getInstance();
+            log.write<Logging::ERROR_LOG>("AsyncBase shutdown() - Caught exception=", ex.what());
         }
     }
 

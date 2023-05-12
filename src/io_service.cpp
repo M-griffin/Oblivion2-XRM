@@ -27,7 +27,7 @@ IOService::~IOService()
  */
 void IOService::checkAsyncListenersForConnections()
 {
-    Logging *log = Logging::instance();
+    Logging &log = Logging::getInstance();
 
     // Timers are not removed each iteration
     // Async stay active until expired or canceled
@@ -38,7 +38,7 @@ void IOService::checkAsyncListenersForConnections()
 
         if(!listener_work || !listener_work->getSocketHandle()->isActive())
         {
-            std::cout << "Removing Async Listener Job" << std::endl;
+            std::cout << "ioservice Removing Async Listener Job" << std::endl;
             listener_work.reset();
             m_listener_list.remove(i);
             --i; // Compensate for item removed.
@@ -49,18 +49,18 @@ void IOService::checkAsyncListenersForConnections()
 
         if(handler != nullptr)
         {
-            log->write<Logging::DEBUG_LOG>("async accept - connection created.");
+            log.write<Logging::DEBUG_LOG>("ioservice async accept - connection created.");
             std::error_code success_code(0, std::generic_category());
 
             try
             {                
-                log->write<Logging::DEBUG_LOG>("Async-Accept - Execute CallBack", __FILE__, __LINE__);
+                log.write<Logging::DEBUG_LOG>("ioservice Async-Accept - Execute CallBack", __FILE__, __LINE__);
                 
                 // Check for max nodes here, if we like can limit, send a message and drop
                 // connection on handler by not passing it through the callback.
                 listener_work->executeCallback(success_code, handler);
                                 
-                log->write<Logging::DEBUG_LOG>("Async-Accept - Returned CallBack", __FILE__, __LINE__);
+                log.write<Logging::DEBUG_LOG>("ioservice Async-Accept - Returned CallBack", __FILE__, __LINE__);
                 
                 handler.reset();
                 listener_work.reset();
@@ -69,7 +69,7 @@ void IOService::checkAsyncListenersForConnections()
             }
             catch(std::exception &ex)
             {
-                log->write<Logging::ERROR_LOG>("Exception Async-Accept", ex.what(), __FILE__, __LINE__);
+                log.write<Logging::ERROR_LOG>("ioservice Exception Async-Accept", ex.what(), __FILE__, __LINE__);
             }
         }
     }
@@ -81,7 +81,7 @@ void IOService::checkAsyncListenersForConnections()
  */
 void IOService::run()
 {
-    Logging *log = Logging::instance();
+    Logging &log = Logging::getInstance();
 
     char msg_buffer[MAX_BUFFER_SIZE];
 
@@ -100,7 +100,7 @@ void IOService::run()
             // Remove Any jobs when the socket has been disconnected.
             if(!job_work || !job_work->getSocketHandle() || !job_work->getSocketHandle()->isActive())
             {
-                std::cout << "Removing Async Job - Socket Inactive" << std::endl;
+                std::cout << "ioservice Removing Async Job - Socket Inactive" << std::endl;
                 job_work.reset();
                 m_service_list.remove(i);
                 --i; // Compensate for item removed.
@@ -124,7 +124,7 @@ void IOService::run()
                     if(length < 0)
                     {
                         // Error - Lost Connection
-                        log->write<Logging::ERROR_LOG>("async_read - lost connection!: ", length);
+                        log.write<Logging::ERROR_LOG>("ioservice async_read - lost connection!: ", length);
                         job_work->getSocketHandle()->setInactive();
                         std::error_code lost_connect_error_code(1, std::system_category());
                         job_work->executeCallback(lost_connect_error_code, nullptr);
@@ -143,7 +143,7 @@ void IOService::run()
                 }
                 else if(result == -1)
                 {
-                    log->write<Logging::ERROR_LOG>("async_poll - lost connection!");
+                    log.write<Logging::ERROR_LOG>("ioservice async_poll - lost connection!");
                     std::error_code lost_connect_error_code(1, std::system_category());
                     job_work->executeCallback(lost_connect_error_code, nullptr);
                     
@@ -167,7 +167,7 @@ void IOService::run()
                 if(result <= 0)
                 {
                     // Error - Lost Connection
-                    log->write<Logging::ERROR_LOG>("async_write - lost connection!");
+                    log.write<Logging::ERROR_LOG>("ioservice async_write - lost connection!");
                     job_work->getSocketHandle()->setInactive();
                     std::error_code lost_connect_error_code(1, std::system_category());
                     job_work->executeCallback(lost_connect_error_code, nullptr);

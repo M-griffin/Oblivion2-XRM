@@ -24,8 +24,8 @@
 
 #include "interface.hpp"
 #include "common_io.hpp"
-#include "encoding.hpp"
-#include "logging.hpp"
+//#include "encoding.hpp"
+//#include "logging.hpp"
 
 #include <memory>
 #include <cstdlib>
@@ -48,7 +48,8 @@ std::string GLOBAL_SCRIPT_PATH = "";
 std::string GLOBAL_LOG_PATH = "";
 std::string USERS_DATABASE = "";
 
-Logging* Logging::m_global_logging_instance = nullptr;
+// Remove pointer, using reference.
+//Logging* Logging::m_global_logging_instance = nullptr;
 
 
 /**
@@ -57,8 +58,8 @@ Logging* Logging::m_global_logging_instance = nullptr;
 void atExitFunction()
 {    
     // Note Make Encoding just an extension of Common IO, 
-    Logging::releaseInstance();
-    Encoding::releaseInstance();
+    //Logging::releaseInstance();
+    //Encoding::releaseInstance();
     std::cout << std::endl << "XRM SHUTDOWN COMPLETED!" << std::endl;
 }
 
@@ -110,7 +111,7 @@ auto main() -> int
 #endif
     // Startup the Encoding Instance and Char Mappings.
     {
-        Encoding::instance();
+        //Encoding::instance();
     }
   
 

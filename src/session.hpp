@@ -45,35 +45,33 @@ public:
         , m_session_manager(my_session_manager)
         , m_state_manager(new StateManager())
         , m_deadline_timer(new DeadlineTimer())
-        , m_telnet_decoder(new TelnetDecoder())
+        , m_telnet_decoder(new TelnetDecoder(my_async_io))
         , m_node_number(0)
         , m_is_leaving(false)
     {
-        Logging *log = Logging::instance();
+        Logging &log = Logging::getInstance();
        
         if(m_async_io->isActive())
         {
             try
             {
-                log->write<Logging::DEBUG_LOG>("New Session Accepted", __LINE__, __FILE__);
+                log.write<Logging::DEBUG_LOG>("New Session Accepted", __LINE__, __FILE__);
             }
             catch(std::exception &ex)
             {
-                log->write<Logging::ERROR_LOG>("Exception remote_endpoint()=", ex.what(), __LINE__, __FILE__);
+                log.write<Logging::ERROR_LOG>("New Session Exception=", ex.what(), __LINE__, __FILE__);
             }
         }
 
         // Get The First available node number. Needs Rework from session manager!
         m_node_number = 0;
         
-        log->write<Logging::CONSOLE_LOG>("New Session ConnectionNode Number=", m_node_number);
+        log.write<Logging::CONSOLE_LOG>("New Session ConnectionNode Number=", m_node_number);
     }
     
     ~Session()
     {
         std::cout << "~Session()" << std::endl;
-        // Free the Node Number from this session.
-        //TheCommunicator::instance()->freeNodeNumber(m_session_data->m_node_number);
 
         // Free the menu system state and modules when session closes.
         m_state_manager->clean();
@@ -81,6 +79,7 @@ public:
         m_session_manager.reset();
         m_deadline_timer.reset();
         m_telnet_decoder.reset();    
+        std::vector<unsigned char>().swap(m_in_data_vector);
     }
 
     /**
@@ -109,9 +108,9 @@ public:
 
             // On initial connection, clear and home cursor
             std::string clear_screen = "\x1b[1;1H\x1b[2J";
-            new_session->deliver(clear_screen);
+            new_session->deliver(clear_screen + " testing!");
 
-            /*
+            std::cout << "Push Telnet Sequences to Client" << std::endl;
             new_session->m_telnet_decoder->sendIACSequences(DONT, TELOPT_OLD_ENVIRON);
 
             new_session->m_telnet_decoder->sendIACSequences(DO, TELOPT_SGA);
@@ -136,8 +135,8 @@ public:
             new_session->m_telnet_decoder->addReply(TELOPT_NAWS);
 
             // Wait 1.5 Seconds for respones.
-            new_session->startDetectionTimer();
-            */
+            //new_session->startDetectionTimer();
+
         }
 
         return new_session;
@@ -150,6 +149,8 @@ public:
     {
         // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences responses
         m_deadline_timer->setWaitInMilliseconds(1500);
+        
+        // Deprecated bind, look at replacing with lambda and std::function
         m_deadline_timer->asyncWait(
             std::bind(&Session::handleDetectionTimer, shared_from_this())
         );
@@ -163,12 +164,12 @@ public:
     void handleDetectionTimer()
     {
         // Detection Completed, start ip the Pre-Logon Sequence State.
-        // Comment out for Now.
+        // Remove Timer, it's a since use case
+        m_deadline_timer.reset();
         
-        /*
-        state_ptr new_state(new MenuSystem(m_session_data));
-        m_state_manager->changeState(new_state);
-        */
+        //state_ptr new_state(new MenuSystem(m_session_data));
+        //m_state_manager->changeState(new_state);
+        
     }
     
     /**
@@ -216,6 +217,7 @@ public:
 
         if(m_async_io->isActive()) // && TheCommunicator::instance()->isActive())
         {
+            // Deprecated bind, look at replacing with lambda and std::function
             m_async_io->asyncWrite(outputBuffer,
                                      std::bind(
                                          &Session::handleWrite,
@@ -232,11 +234,11 @@ public:
      */
     void handleWrite(const std::error_code& error, socket_handler_ptr)
     {
-        Logging *log = Logging::instance();
+        Logging &log = Logging::getInstance();
 
         if(error)
         {
-            log->write<Logging::ERROR_LOG>("Async_HandleWrite Session Closed() error=", error.message(), __LINE__, __FILE__);
+            log.write<Logging::ERROR_LOG>("Async_HandleWrite Session Closed() error=", error.message(), __LINE__, __FILE__);
         }
 
         session_manager_ptr session_mgr = m_session_manager.lock();
@@ -245,18 +247,18 @@ public:
         {
             //m_is_leaving = true;
 
-            log->write<Logging::DEBUG_LOG>("Async_HandleWrite Removing Sesison from Manager", __LINE__, __FILE__);
+            log.write<Logging::DEBUG_LOG>("Async_HandleWrite Removing Sesison from Manager", __LINE__, __FILE__);
             
             if(m_async_io->isActive())
             {
                 try
                 {
-                    log->write<Logging::DEBUG_LOG>("Async_HandleWrite Leaving (NORMAL SESSION)", __LINE__, __FILE__);
+                    log.write<Logging::DEBUG_LOG>("Async_HandleWrite Leaving (NORMAL SESSION)", __LINE__, __FILE__);
                     m_async_io->shutdown();
                 }
                 catch(std::exception &ex)
                 {
-                    log->write<Logging::ERROR_LOG>("Async_HandleWrite Exception closing socket()", ex.what(), __LINE__, __FILE__);
+                    log.write<Logging::ERROR_LOG>("Async_HandleWrite Exception closing socket()", ex.what(), __LINE__, __FILE__);
                 }
             }
             
@@ -277,6 +279,7 @@ public:
         
         if(m_async_io->isActive()) // && TheCommunicator::instance()->isActive())
         {
+            // Deprecated bind, look at replacing with lambda and std::function
             m_async_io->asyncRead(m_in_data_vector,
                                     std::bind(
                                         &Session::handleRead,
@@ -295,8 +298,8 @@ public:
     void handleRead(const std::error_code& error, socket_handler_ptr)
     {
         
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("handleRead - After Incoming Data.", __FILE__, __LINE__);
+        Logging &log = Logging::getInstance();
+        log.write<Logging::DEBUG_LOG>("handleRead - After Incoming Data.", __FILE__, __LINE__);
 
         if (error) 
         {
@@ -335,8 +338,8 @@ public:
 
         if(!session_manager)
         {
-            Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("Unable to load session_manager", __FILE__, __LINE__);
+            Logging &log = Logging::getInstance();
+            log.write<Logging::ERROR_LOG>("Unable to load session_manager", __FILE__, __LINE__);
             return;
         }
 
@@ -399,8 +402,8 @@ public:
         else
         {
             // Socket Read Error we mark leaving for the session.
-            Logging *log = Logging::instance();
-            log->write<Logging::INFO_LOG>("Clearing SessionData on Lost Connection Msg=", error.message(), __FILE__, __LINE__);
+            Logging &log = Logging::getInstance();
+            log.write<Logging::INFO_LOG>("Clearing SessionData on Lost Connection Msg=", error.message(), __FILE__, __LINE__);
 
             session_manager_ptr session_manager = m_session_manager.lock();
 
@@ -422,7 +425,7 @@ public:
     // Local Member Definitions Unique Pointers
     state_manager_uptr         m_state_manager;
     deadline_timer_uptr        m_deadline_timer;    
-    telnet_decoder_uptr        m_telnet_decoder;
+    telnet_decoder_ptr         m_telnet_decoder;
     
     // Local Member Variables
     int                        m_node_number;

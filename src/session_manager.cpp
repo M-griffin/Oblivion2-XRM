@@ -21,18 +21,18 @@ void SessionManager::join(const session_ptr &session)
  */
 void SessionManager::leave(const session_ptr &session)
 {
-    Logging *log = Logging::instance();
+    Logging &log = Logging::getInstance();
     int node_number = session->m_node_number;
-    log->write<Logging::CONSOLE_LOG>("disconnecting Node Session=", node_number);
+    log.write<Logging::CONSOLE_LOG>("disconnecting Node Session=", node_number);
     
     if (session->m_async_io && session->m_async_io->isActive())
     {
-        log->write<Logging::CONSOLE_LOG>("Shutdown ASIO=", node_number);
+        log.write<Logging::CONSOLE_LOG>("Shutdown ASIO=", node_number);
         session->m_async_io->shutdown();                             
     }
     
     m_sessions.erase(session);
-    log->write<Logging::CONSOLE_LOG>("disconnecting Node Session completed=", node_number);
+    log.write<Logging::CONSOLE_LOG>("disconnecting Node Session completed=", node_number);
 }
 
 /**
@@ -46,8 +46,8 @@ void SessionManager::deliver(const std::string &msg)
         return;        
     }
 
-    Logging *log = Logging::instance();
-    log->write<Logging::DEBUG_LOG>("deliver SessionManager notices=", msg);
+    Logging &log = Logging::getInstance();
+    log.write<Logging::DEBUG_LOG>("deliver SessionManager notices=", msg);
     std::for_each(m_sessions.begin(), m_sessions.end(),
                   std::bind(&Session::deliver, std::placeholders::_1, std::ref(msg)));
 }
@@ -75,10 +75,10 @@ int SessionManager::connections()
  */
 void SessionManager::shutdown()
 {
-    Logging *log = Logging::instance();
+    Logging &log = Logging::getInstance();
     for(auto it = begin(m_sessions); it != end(m_sessions); ++it)
     {
-        log->write<Logging::DEBUG_LOG>("shutting Down Nodes=", (*it)->m_node_number );
+        log.write<Logging::DEBUG_LOG>("shutting Down Nodes=", (*it)->m_node_number );
         {
             (*it)->m_async_io->shutdown();            
         }

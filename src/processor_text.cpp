@@ -353,8 +353,8 @@ std::string ProcessorText::screenBufferParse()
             // is not the same as the next!
             if(start == matches[0].second)
             {
-                Logging *log = Logging::instance();
-                log->write<Logging::DEBUG_LOG>("[screenBufferParse] no matches!",
+                Logging &log = Logging::getInstance();
+                log.write<Logging::DEBUG_LOG>("[screenBufferParse] no matches!",
                                                 __LINE__, __FILE__);
                 break;
             }
@@ -388,8 +388,8 @@ std::string ProcessorText::screenBufferParse()
     }
     catch(std::regex_error &ex)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("[screenBufferParse] regex=",
+        Logging &log = Logging::getInstance();
+        log.write<Logging::ERROR_LOG>("[screenBufferParse] regex=",
                                         ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
@@ -562,15 +562,15 @@ void ProcessorText::screenBufferSetGlyph(const std::string &char_sequence)
         }
         else
         {
-            Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("[screenBufferSetGlyph] out of bounds pos=",
+            Logging &log = Logging::getInstance();
+            log.write<Logging::ERROR_LOG>("[screenBufferSetGlyph] out of bounds pos=",
                                             m_x_position-1, __LINE__, __FILE__);
         }
     }
     catch(std::exception &e)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("[screenBufferSetGlyph] exceeds screen dimensions Exception=",
+        Logging &log = Logging::getInstance();
+        log.write<Logging::ERROR_LOG>("[screenBufferSetGlyph] exceeds screen dimensions Exception=",
                                         e.what(), __LINE__, __FILE__);
     }*/
 
@@ -619,8 +619,8 @@ void ProcessorText::screenBufferClearRange(int start, int end)
         }
         catch(std::exception &e)
         {
-            Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("[screenBufferClearRange] Exception=", e.what(),
+            Logging &log = Logging::getInstance();
+            log.write<Logging::ERROR_LOG>("[screenBufferClearRange] Exception=", e.what(),
                                             "start=", start, "end=", end, __LINE__, __FILE__);
         }
     }
