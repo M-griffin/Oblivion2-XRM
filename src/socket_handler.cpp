@@ -66,7 +66,7 @@ int SocketHandler::poll()
  * @param port
  * @return
  */
-bool SocketHandler::createTelnetAcceptor(std::string host, int port)
+bool SocketHandler::createTelnetAcceptor(const std::string &host, const int &port)
 {
     Logging &log = Logging::getInstance();
 

@@ -15,33 +15,6 @@
 
 
 /**
- * @class LogEntry
- * @author Michael Griffin
- * @date 24/12/2018
- * @file logging.hpp
- * @brief LogEntry used to Queue up Messages for file writes.
- */
-class LogEntry
-{
-public:
-    LogEntry() {}
-    ~LogEntry()
-    {
-        std::cout << "~LogEntry()" << std::endl;
-        std::vector<std::string>().swap(m_details);
-    }
-
-    LogEntry(const std::string &date_time, std::vector<std::string> details)
-        : m_date_time(date_time)
-        , m_details(details)
-    { }
-    std::string m_date_time;
-    std::vector<std::string> m_details;
-};
-
-typedef std::shared_ptr<LogEntry> log_entry_ptr;
-
-/**
  * @class Logging
  * @author Michael Griffin
  * @date 24/12/2018
@@ -64,11 +37,11 @@ public:
     } LOGGING_LEVELS;
 
     // Descriptions
-    const std::string INFO_LEVEL = "Information";
-    const std::string DEBUG_LEVEL = "Debugging";
-    const std::string ERROR_LEVEL = "Critical Error";
-    const std::string CONSOLE_LEVEL = "Console Output";
-    const std::string ALL_LEVELS = "All Level Information";
+    const std::string INFO_LEVEL = "Info";
+    const std::string DEBUG_LEVEL = "Debug";
+    const std::string ERROR_LEVEL = "Error";
+    const std::string CONSOLE_LEVEL = "Console";
+    const std::string ALL_LEVELS = "All";
 
     //SafeQueue<log_entry_ptr> m_log_entries;
 
@@ -104,17 +77,6 @@ public:
         return 0; //m_log_entries.size();
     }
 
-    /**
-     * @brief Pull Queued log entries.
-     * @return
-     */
-    log_entry_ptr getLogQueueEntry()
-    {
-        //if(!m_log_entries.isEmpty())
-        //    return m_log_entries.dequeue();
-
-        return nullptr;
-    }
 
     /**
      * @brief Current Time Stamp (LOCAL TIME)
@@ -178,13 +140,14 @@ public:
         int config_level = getConfigurationLogState(config_log_text);
         */
         
+        // Temp Set untill we add configuration back!
         int config_level = DEBUG_LOG;
 
         // Quick Case Statement, in Logging level, if were not logging anything
         // then return right away to save processing.
         switch(level)
         {
-            // Incoming Logging Level
+            // Incoming Logging Level Filtering by Configuration
             case INFO_LOG:
                 if(config_level != INFO_LOG && config_level != ALL_LOGS)
                     return;
@@ -221,14 +184,10 @@ public:
                 break;
 
             case ERROR_LOG:
-// Unit Tests, we don't need to see error for test functions
-// It's good to hit error scenario's and make sure they work
-// without the noise
-#ifndef UNIT_TEST
+
                 details.push_back(ERROR_LEVEL);
                 details.push_back(log_string);
-                writeOutYamlConsole(date_time, details);
-#endif                
+                writeOutYamlConsole(date_time, details);             
                 break;
 
             case CONSOLE_LOG:
@@ -243,12 +202,6 @@ public:
 
         if(details.size() > 0)
         {
-// Don't Queue Logging during unit tests.
-#ifndef UNIT_TEST
-            // Temp Commment Out
-            // log_entry_ptr entry(new LogEntry(date_time, details));
-            // m_log_entries.enqueue(entry);
-#endif
             details.clear();
         }
     }
@@ -298,7 +251,7 @@ private:
      * @return 
      */
     
-    Logging() 
+    explicit Logging() 
     {
         std::cout << "Logging()" << std::endl;
     }

@@ -178,7 +178,7 @@ void IOService::run()
                     --i; // Compensate for item removed.
                     
                 }
-                else if (result > 0) // This was else, for 
+                else
                 {
                     std::error_code success_code(0, std::generic_category());
                     job_work->executeCallback(success_code, nullptr);

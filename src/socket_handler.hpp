@@ -37,8 +37,6 @@ public:
     }
 
     std::string const SOCKET_TYPE_TELNET = "TELNET";
-    std::string const SOCKET_TYPE_SSH = "SSH";
-    std::string const SOCKET_TYPE_FTP = "FTP";
 
     // Socket Events, True if Data Available.
     int sendSocket(unsigned char *buf, Uint32 len);
@@ -46,15 +44,8 @@ public:
     int poll();
 
     // Telnet
-    bool connectTelnetSocket(std::string host, int port);
-    bool createTelnetAcceptor(std::string host, int port);
+    bool createTelnetAcceptor(const std::string &host, const int &port);
     socket_handler_ptr acceptTelnetConnection();
-
-    // SSH
-    bool connectSshSocket(std::string host, int port, std::string username, std::string password);
-
-    // IRC
-    bool connectIrcSocket(std::string host, int port);
 
     std::string getSocketType() const;
     bool isActive() const;

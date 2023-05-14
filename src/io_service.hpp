@@ -81,7 +81,7 @@ public:
     class ServiceJob : public ServiceBase
     {
     public:
-        virtual void setBuffer(unsigned char *buffer)
+        virtual void setBuffer(unsigned char *buffer) override
         {
             for(int i = 0; i < MAX_BUFFER_SIZE; i++)
             {
@@ -89,28 +89,28 @@ public:
             }
         }
 
-        virtual std::vector<unsigned char> &getBuffer()
+        virtual std::vector<unsigned char> &getBuffer() override
         {
             return m_buffer;
         }
 
-        virtual std::string getStringSequence()
+        virtual std::string getStringSequence() override
         {
             return m_string_sequence;
         }
 
-        virtual socket_handler_ptr getSocketHandle()
+        virtual socket_handler_ptr getSocketHandle() override
         {
             return m_socket_handle;
         }
 
-        virtual void executeCallback(const std::error_code &err, socket_handler_ptr handle)
+        virtual void executeCallback(const std::error_code &err, socket_handler_ptr handle) override
         {
             StdFunctionCallbackHandler callback_method(m_callback);
             callback_method(err, handle);
         }
 
-        virtual int getServiceType()
+        virtual int getServiceType() override
         {
             return m_service_type;
         }

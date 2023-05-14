@@ -27,32 +27,12 @@ public:
     * @brief Creates Singleton Instance of Class
     * @return
     */
-    static Encoding* instance()
+    static Encoding& getInstance()
     {
-        if(!m_global_encoding_instance)
-        {
-            m_global_encoding_instance = new Encoding();
-            return m_global_encoding_instance;
-        }
-
-        return m_global_encoding_instance;
+        static Encoding instance;
+        return instance;
     }
-
-    /**
-     * @brief Releases the Instance from Memory
-     */
-    static void releaseInstance()
-    {
-        if(m_global_encoding_instance)
-        {
-            std::cout << "~Encoding Release()" << std::endl;
-            delete m_global_encoding_instance;
-            m_global_encoding_instance = nullptr;
-        }
-
-        return;
-    }
-
+    
     // Multi-Byte to WIDE (UTF-8 to UTF-16)
     std::wstring multibyte_to_wide(const char* mbstr);
 
@@ -77,12 +57,13 @@ public:
 private:
 
     mutable std::mutex     m_encoding_mutex;
-    static Encoding*       m_global_encoding_instance;
 
     explicit Encoding();
-    ~Encoding();
-    Encoding(const Encoding&);
-    Encoding& operator=(const Encoding&);
+    
+    Encoding(const Encoding&) = delete;             // Copy ctor
+    Encoding(Encoding&&) = delete;                  // Move ctor
+    Encoding& operator=(const Encoding&) = delete;  // Copy assignment
+    Encoding& operator=(Encoding&&) = delete;       // Move assignment
 
 };
 

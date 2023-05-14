@@ -17,10 +17,6 @@
  * CP437 -> UTF-8 Character Translation Table
  */
 
-/**
- * @brief  Global Singleton Instance, needed to initialize the class.
- */
-Encoding* Encoding::m_global_encoding_instance = nullptr;
 
 #ifdef TARGET_OS_MAC
 const std::string Encoding::ENCODING_TEXT_UTF8  = "en_US.UTF-8";
@@ -82,6 +78,7 @@ wchar_t CP437_TABLE[] =
 
 Encoding::Encoding()
 {
+    std::cout << "Encoding()" << std::endl;
     // Populate UCS to CP437 Translation Back Mapping.
     for(unsigned int char_value = 0; char_value < 256; char_value++)
     {
@@ -89,10 +86,6 @@ Encoding::Encoding()
     }
 }
 
-Encoding::~Encoding()
-{
-    std::cout << "~Encoding()" << std::endl;
-}
 
 /**
  * Windows apparently needs to use it's own WINAPI methods for Wide to Multi-bytes translations
@@ -252,12 +245,11 @@ std::string Encoding::utf8Encode(const std::string &standard_string)
 {
     std::string output = "";
     std::wstring wide_string = L"";
-    int ascii_value = 0;
 
     // Loop and write out after translation to Unicode
     for(std::string::size_type i = 0; i < standard_string.size(); i++)
     {
-        ascii_value = std::char_traits<char>().to_int_type(standard_string[i]);
+        int ascii_value = std::char_traits<char>().to_int_type(standard_string[i]);
 
         if(ascii_value < 256)
         {

@@ -48,18 +48,12 @@ std::string GLOBAL_SCRIPT_PATH = "";
 std::string GLOBAL_LOG_PATH = "";
 std::string USERS_DATABASE = "";
 
-// Remove pointer, using reference.
-//Logging* Logging::m_global_logging_instance = nullptr;
-
 
 /**
  * @brief Gracefull Shutdown Method.
  */
 void atExitFunction()
 {    
-    // Note Make Encoding just an extension of Common IO, 
-    //Logging::releaseInstance();
-    //Encoding::releaseInstance();
     std::cout << std::endl << "XRM SHUTDOWN COMPLETED!" << std::endl;
 }
 
@@ -108,12 +102,7 @@ auto main() -> int
         std::cout << "Unable to create LOG folder: " << GLOBAL_LOG_PATH << std::endl;
     }
 
-#endif
-    // Startup the Encoding Instance and Char Mappings.
-    {
-        //Encoding::instance();
-    }
-  
+#endif  
 
     // Isolate to code block for smart pointer deallocation.
     {

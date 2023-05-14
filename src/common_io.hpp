@@ -16,9 +16,9 @@ typedef struct localized_buffer
     uint8_t     length;
     
     localized_buffer()
+        : character("")
+        , length(0)
     {
-        character = "";
-        length = 0;
     }
 
     void clear()

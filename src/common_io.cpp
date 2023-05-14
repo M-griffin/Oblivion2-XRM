@@ -1067,12 +1067,10 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         return "\n";
     }
 
-    // Escape in this case, ignore, later add movement in string
-    std::string sequence = "";
 
     if(character_buffer[0] == 27)
     {
-        sequence = getEscapeSequence();
+        std::string sequence = getEscapeSequence();
 
         if(sequence.size() == 0)
         {
@@ -1332,7 +1330,7 @@ std::string CommonIO::readinAnsi(const std::string &file_name)
     // Normalize Line Ending for consistent display to users.
     std::regex exp("(\\r\\n|\\r|\\n)+");
     std::string fixed_newlines = std::regex_replace(buff, exp, "\r\n");
-    return Encoding::instance()->utf8Encode(fixed_newlines);
+    return Encoding::getInstance().utf8Encode(fixed_newlines);
 }
 
 /**

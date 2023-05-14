@@ -13,13 +13,11 @@
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Environment/>
-      <Project Name="SqliteWrapped" ConfigName="Debug"/>
       <Project Name="xrm-server" ConfigName="Debug"/>
       <Project Name="SqliteWrapped" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
-      <Project Name="SqliteWrapped" ConfigName="Release"/>
       <Project Name="xrm-server" ConfigName="Release"/>
       <Project Name="SqliteWrapped" ConfigName="Release"/>
     </WorkspaceConfiguration>
