@@ -39,8 +39,6 @@ public:
         uuid_t uuid;
         uuid_generate_random(uuid);
         char uuid_string[37]={0};
-        //memset(&uuid_string, 0, strlen(uuid_string));
-        //uuid_unparse (uuid, uuid_string);
         uuid_unparse_lower(uuid, uuid_string);
         uuid_clear(uuid);
 #endif

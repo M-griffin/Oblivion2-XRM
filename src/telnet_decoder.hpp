@@ -4,12 +4,11 @@
 #include "async_io.hpp"
 #include "telnet.hpp"
 #include "logging.hpp"
+#include "safe_vector.hpp"
 
 #include <memory>
 #include <iostream>
 #include <string>
-#include <vector>
-
 
 class SocketHandler;
 typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
@@ -27,7 +26,8 @@ class TelnetDecoder
 public:
 
     explicit TelnetDecoder(async_io_ptr async_io)
-        : m_async_io(async_io)
+        : m_log(Logging::getInstance())
+        , m_async_io(async_io)
         , m_naws_row(24)
         , m_naws_col(80)
         , m_term_type("undetected")
@@ -35,6 +35,7 @@ public:
         , m_is_echo(false)
         , m_is_sga(false)
         , m_is_linemode(false)
+        , m_is_naws_detected(false)
         , m_teloptStage(0)
         , m_teloptCommand(0)
         , m_currentOption(0)
@@ -46,8 +47,6 @@ public:
     {
         std::cout << "~TelnetDecoder()" << std::endl;
         m_async_io.reset();
-        std::vector<unsigned char>().swap(reply_sequence);
-        std::vector<unsigned char>().swap(active_sequence);
     }
 
     /**
@@ -77,39 +76,19 @@ public:
      * @param option
      * @return
      */
-    bool checkReply(unsigned char option)
+    bool checkReply(const unsigned char &option)
     {
-        return checkSequence(reply_sequence, option);
+        return m_reply_sequence.exists(option);
     }
-    void deleteReply(unsigned char option)
+       
+    void addReply(const unsigned char &option)
     {
-        deleteSequence(reply_sequence, option);
+        m_reply_sequence.push_back(option);
     }
-    void addReply(unsigned char option)
-    {
-        addSequence(reply_sequence, option);
-    }
-
-    /**
-     * @brief handles active sequences negotiated.
-     * @param option
-     * @return
-     */
-    bool checkActive(unsigned char option)
-    {
-        return checkSequence(active_sequence, option);
-    }
-    void deleteActive(unsigned char option)
-    {
-        deleteSequence(active_sequence, option);
-    }
-    void addActive(unsigned char option)
-    {
-        addSequence(active_sequence, option);
-    }
+    
 
     void decodeBuffer();
-    unsigned char telnetOptionParse(unsigned char c);
+    unsigned char telnetOptionParse(const unsigned char &c);
 
     int getTermRows() const
     {
@@ -127,6 +106,7 @@ public:
 
 private:
 
+    Logging      &m_log;
     async_io_wptr m_async_io;
 
     int           m_naws_row;
@@ -137,6 +117,7 @@ private:
     bool          m_is_echo;
     bool          m_is_sga;
     bool          m_is_linemode;
+    bool          m_is_naws_detected;
 
     // Global Option State for Telnet Options Parsing.
     int           m_teloptStage;
@@ -145,15 +126,14 @@ private:
     unsigned char m_subnegoOption;
 
     // Holds Sequences Waiting for Reply and Active.
-    std::vector<unsigned char> reply_sequence;
-    std::vector<unsigned char> active_sequence;
+    SafeVector<int> m_reply_sequence;
 
     // Holds Incoming SB Data Sequences to parse.
     std::string data_sequence;
 
     // Telnet Protocol Functions.
-    unsigned char telnetOptionAcknowledge(unsigned char m_teloptCommand);
-    unsigned char telnetOptionDeny(unsigned char m_teloptCommand);
+    unsigned char telnetOptionAcknowledge(const unsigned char &m_teloptCommand);
+    unsigned char telnetOptionDeny(const unsigned char &m_teloptCommand);
 
     /**
      * @brief handles callback after write() for errors checking.
@@ -167,6 +147,8 @@ private:
             Logging &log = Logging::getInstance();
             log.write<Logging::ERROR_LOG>("telnet async_write error=", error.message(), __LINE__, __FILE__);
         }
+        
+        // Session Manager Should disconnect here or send error back to main session.
     }
 
     /**
@@ -185,15 +167,17 @@ private:
 
         std::cout << "telnetdecoder - prior to asyncio deliver telnet: " << string_msg << std::endl;
         async_io_ptr async_io = m_async_io.lock();
-        if(async_io->getSocketHandle()->isActive()) // && TheCommunicator::instance()->isActive())
+        if(async_io->getSocketHandle()->isActive())
         {
             std::cout << "telnetdecoder - after deliver telnet: " << string_msg << std::endl;
+            
             async_io->asyncWrite(string_msg,
                                      std::bind(
                                          &TelnetDecoder::handleWrite,
                                          shared_from_this(),
                                          std::placeholders::_1,
                                          std::placeholders::_2));
+                                         
            std::cout << "telnetdecoder - after write deliver telnet: " << string_msg << std::endl;
         }
 
@@ -250,80 +234,9 @@ private:
         stm << static_cast<char>(SE);
         buf = stm.str();
         deliver(buf);
-    }
-
-    /**
-     * @class FindFirst
-     * @brief Comparator for options in vectors.
-     */
-    struct FindFirst
-    {
-        explicit FindFirst(unsigned char i) : to_find(i) { }
-        unsigned char to_find;
-        bool operator()
-        (const unsigned char &p)
-        {
-            return p == to_find;
-        }
-    };
-
-
-    /**
-     * @brief Templates for Handling Sequence Vector Operations
-     * @param t
-     * @param option
-     * @return
-     */
-    template <typename T>
-    bool checkSequence(T &t, unsigned char option)
-    {
-        typename T::iterator it =
-            find_if(t.begin(), t.end(), FindFirst(option));
-
-        if(it == t.end())
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    template <typename T>
-    void addSequence(T &t, unsigned char option)
-    {
-        t.push_back(option);
-    }
-
-    template <typename T>
-    void deleteSequence(T &t, unsigned char option)
-    {
-        typename T::iterator it =
-            find_if(t.begin(), t.end(), FindFirst(option));
-
-        typename T::iterator it_back = t.end();
-
-        if(t.size() == 0)
-        {
-            return;
-        }
-        else if(t.size() > 1)
-        {
-            // If Sequence Found, Swap to Back and Remove Back.
-            if(it != t.end())
-            {
-                iter_swap(it, it_back);
-                t.pop_back();
-            }
-            else
-            {
-                // Clear all.
-                std::vector<unsigned char>().swap(t);
-            }
-        }
-    }
+    }    
 };
 
 typedef std::shared_ptr<TelnetDecoder> telnet_decoder_ptr;
-typedef std::unique_ptr<TelnetDecoder> telnet_decoder_uptr;
 
 #endif

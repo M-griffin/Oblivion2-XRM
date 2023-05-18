@@ -5,6 +5,7 @@
 #include <vector>
 #include <mutex>
 #include <condition_variable>
+#include <algorithm>
 
 /**
  * @class SafeVector
@@ -62,6 +63,7 @@ public:
 
     ~SafeVector(void)
     {
+        std::cout << "~SafeVector()" << std::endl;
         std::vector<T>().swap(v);
     }
 
@@ -121,6 +123,22 @@ public:
             v.swap(temp);
             std::vector<T>().swap(temp);
         }
+    }
+    
+    bool exists(T t)
+    {
+        if (is_empty()) 
+        {
+            return false;
+            
+        }
+        
+        std::unique_lock<std::mutex> lock(m);
+        if (std::find(v.begin(), v.end(), t) != v.end())
+        {
+            return true;
+        }
+        return false;
     }
 
     T get(int index)

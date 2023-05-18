@@ -3,7 +3,6 @@
 
 #include "io_service.hpp"
 #include "socket_handler.hpp"
-#include "logging.hpp"
 
 #include <iostream>
 
@@ -59,8 +58,7 @@ public:
         }
         catch(std::exception &ex)
         {
-            Logging &log = Logging::getInstance();
-            log.write<Logging::ERROR_LOG>("AsyncBase shutdown() - Caught exception=", ex.what());
+            std::cout << "AsyncBase shutdown() - Caught exception=" << ex.what() << std::endl;
         }
     }
 

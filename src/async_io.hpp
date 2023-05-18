@@ -48,7 +48,7 @@ public:
      * @param Callback - returns error code
      */
     template <typename StringSequence, typename Callback>
-    void asyncWrite(StringSequence string_seq, const Callback &callback)
+    void asyncWrite(StringSequence &string_seq, const Callback &callback)
     {
         // Place Holder is used for template parameters, string_seq is used in writes
         // Where the Buffer Place Holder in the above method is used for reads.
@@ -74,15 +74,7 @@ public:
         if(protocol == "TELNET")
         {
             service_type = SERVICE_TYPE_CONNECT_TELNET;
-        }
-        else if(protocol == "SSH")
-        {
-            service_type = SERVICE_TYPE_CONNECT_SSH;
-        }
-        else if(protocol == "IRC")
-        {
-            service_type = SERVICE_TYPE_CONNECT_IRC;
-        }
+        }        
 
         m_io_service.addAsyncJob(place_holder, string_seq, m_socket_handler, callback, service_type);
     }
@@ -104,14 +96,6 @@ public:
         if(protocol == "TELNET")
         {
             service_type = SERVICE_TYPE_LISTENER_TELNET;
-        }
-        else if(protocol == "SSH")
-        {
-            service_type = SERVICE_TYPE_LISTENER_SSH;
-        }
-        else if(protocol == "IRC")
-        {
-            service_type = SERVICE_TYPE_LISTENER_IRC;
         }
 
         m_io_service.addAsyncJob(place_holder, string_seq, m_socket_handler, callback, service_type);

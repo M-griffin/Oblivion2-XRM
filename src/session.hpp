@@ -8,6 +8,7 @@
 #include "session_manager.hpp"
 #include "telnet_decoder.hpp"
 #include "logging.hpp"
+#include "encoding.hpp"
 
 #include <memory>
 #include <list>
@@ -41,32 +42,34 @@ public:
      * @return
      */
     Session(async_io_ptr const &my_async_io, session_manager_ptr const &my_session_manager)
-        : m_async_io(my_async_io)        
+        : m_log(Logging::getInstance())
+        , m_async_io(my_async_io)        
         , m_session_manager(my_session_manager)
         , m_state_manager(new StateManager())
         , m_deadline_timer(new DeadlineTimer())
         , m_telnet_decoder(new TelnetDecoder(my_async_io))
         , m_node_number(0)
         , m_is_leaving(false)
+        , m_parsed_data("")
+        , m_encoding_text(Encoding::ENCODING_TEXT_UTF8)
+        , m_encoding(Encoding::ENCODE_UTF8)
     {
-        Logging &log = Logging::getInstance();
-       
         if(m_async_io->isActive())
         {
             try
             {
-                log.write<Logging::DEBUG_LOG>("New Session Accepted", __LINE__, __FILE__);
+                m_log.write<Logging::DEBUG_LOG>("New Session Accepted", __LINE__, __FILE__);
             }
             catch(std::exception &ex)
             {
-                log.write<Logging::ERROR_LOG>("New Session Exception=", ex.what(), __LINE__, __FILE__);
+                m_log.write<Logging::ERROR_LOG>("New Session Exception=", ex.what(), __LINE__, __FILE__);
             }
         }
 
         // Get The First available node number. Needs Rework from session manager!
         m_node_number = 0;
         
-        log.write<Logging::CONSOLE_LOG>("New Session ConnectionNode Number=", m_node_number);
+        m_log.write<Logging::CONSOLE_LOG>("New Session ConnectionNode Number=", m_node_number);
     }
     
     ~Session()
@@ -234,11 +237,9 @@ public:
      */
     void handleWrite(const std::error_code& error, socket_handler_ptr)
     {
-        Logging &log = Logging::getInstance();
-
         if(error)
         {
-            log.write<Logging::ERROR_LOG>("Async_HandleWrite Session Closed() error=", error.message(), __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>("Async_HandleWrite Session Closed() error=", error.message(), __LINE__, __FILE__);
         }
 
         session_manager_ptr session_mgr = m_session_manager.lock();
@@ -247,18 +248,18 @@ public:
         {
             //m_is_leaving = true;
 
-            log.write<Logging::DEBUG_LOG>("Async_HandleWrite Removing Sesison from Manager", __LINE__, __FILE__);
+            m_log.write<Logging::DEBUG_LOG>("Async_HandleWrite Removing Sesison from Manager", __LINE__, __FILE__);
             
             if(m_async_io->isActive())
             {
                 try
                 {
-                    log.write<Logging::DEBUG_LOG>("Async_HandleWrite Leaving (NORMAL SESSION)", __LINE__, __FILE__);
+                    m_log.write<Logging::DEBUG_LOG>("Async_HandleWrite Leaving (NORMAL SESSION)", __LINE__, __FILE__);
                     m_async_io->shutdown();
                 }
                 catch(std::exception &ex)
                 {
-                    log.write<Logging::ERROR_LOG>("Async_HandleWrite Exception closing socket()", ex.what(), __LINE__, __FILE__);
+                    m_log.write<Logging::ERROR_LOG>("Async_HandleWrite Exception closing socket()", ex.what(), __LINE__, __FILE__);
                 }
             }
             
@@ -297,128 +298,137 @@ public:
      */
     void handleRead(const std::error_code& error, socket_handler_ptr)
     {
-        
-        Logging &log = Logging::getInstance();
-        log.write<Logging::DEBUG_LOG>("handleRead - After Incoming Data.", __FILE__, __LINE__);
-
-        if (error) 
-        {
-            session_manager_ptr session_manager = m_session_manager.lock();
-
-            if(session_manager && error)
-            {
-                m_is_leaving = true;
-
-                // Disconnect the session.
-                std::cout << "handleRead - Leaving Session on Error" << std::endl;
-                session_manager->leave(shared_from_this());
-            }
-            
-            return;
-        }
-        
-
-        std::cout << "handleRead - waitingForData" << std::endl;
-
-        // Testing ASIO Call Back after reading data. 
-        //async_io_ptr async_io = m_async_io.lock();
-        //if(async_io->isActive())
-        {
-            waitingForData();
-        }
-            
-        /*
-        if(!error)
-        {
-            // Part I: Parse Out Telnet Options and handle responses back to client.
-            handleTeloptCodes();
-        }
+        m_log.write<Logging::DEBUG_LOG>("handleRead - After Incoming Data.", __FILE__, __LINE__);
 
         session_manager_ptr session_manager = m_session_manager.lock();
-
         if(!session_manager)
         {
-            Logging &log = Logging::getInstance();
-            log.write<Logging::ERROR_LOG>("Unable to load session_manager", __FILE__, __LINE__);
+            m_log.write<Logging::ERROR_LOG>("Unable to load session_manager", __FILE__, __LINE__);
             return;
         }
 
-        if(!error)
+        if (error) 
+        {        
+            m_is_leaving = true;
+
+                // Disconnect the session.
+            std::cout << "handleRead - Leaving Session on Error" << std::endl;
+            session_manager->leave(shared_from_this());            
+            return;
+        }
+                  
+        // Part I: Parse Out Telnet Options and handle responses back to client.
+        handleTeloptCodes();
+
+        if(m_parsed_data.size() > 0)
         {
-            if(m_parsed_data.size() > 0)
+            // Windows Console Telnet sends [CR\LF] for ENTER!
+            // search and replace input buffer we only need one!
+            std::string::size_type id1 = 0;
+
+            do
             {
-                // Windows Console Telnet sends [CR\LF] for ENTER!
-                // search and replace input buffer we only need one!
-                std::string::size_type id1 = 0;
+                // Convert CR\LF to LF!
+                id1 = m_parsed_data.find("\r\n", 0);
 
-                do
+                if(id1 != std::string::npos)
                 {
-                    // Convert CR\LF to LF!
+                    m_parsed_data.erase(id1, 1);
                     id1 = m_parsed_data.find("\r\n", 0);
-
-                    if(id1 != std::string::npos)
-                    {
-                        m_parsed_data.erase(id1, 1);
-                        id1 = m_parsed_data.find("\r\n", 0);
-                    }
                 }
-                while(id1 != std::string::npos);
+            }
+            while(id1 != std::string::npos);
 
 
-                // If were in a process, skip stat and ESC timer.
-                if(m_is_process_running)
+            // If were in a process, skip stat and ESC timer.
+            /*
+            if(m_is_process_running)
+            {
+                if(m_processes.size() > 0)
                 {
-                    if(m_processes.size() > 0)
-                    {
-                        m_processes.back()->update();
-                    }
-                    else
-                    {
-                        // If no processes then reset.
-                        m_is_process_running = false;
-                        updateState();
-                    }
+                    m_processes.back()->update();
                 }
                 else
                 {
-                    // Check for state cleanup
-                    if(m_processes.size() > 0)
-                    {
-                        clearProcess();
-                    }
-
+                    // If no processes then reset.
+                    m_is_process_running = false;
                     updateState();
-                }           
+                }
             }
-
-            // Restart Callback to wait for more data.
-            // If this step is skipped, then the node will exit
-            // since io_service will have no more work!
-            if(m_async_io->isActive())
+            else
             {
-                waitingForData();
+                // Check for state cleanup
+                if(m_processes.size() > 0)
+                {
+                    clearProcess();
+                }
+
+                updateState();
+            }*/     
+        }
+
+        // Restart Callback to wait for more data.
+        // If this step is skipped, then the node will exit
+        // since io_service will have no more work!
+        if(m_async_io->isActive())
+        {
+            waitingForData();
+        }
+
+    }
+    
+    /**
+     * @brief Handle Telnet Options in incoming data
+     * raw data is read in from socket
+     * m_parsed_data is filled with parsed out options.
+     */
+    void handleTeloptCodes()
+    {
+        std::string incoming_data = "";
+        
+        if (m_in_data_vector.size() == 0) 
+        {
+            return;
+        }
+
+        for(auto c : m_in_data_vector)
+        {
+            try
+            {
+                // Enter the Telnet_State and handle parsing options.
+                unsigned char ch = m_telnet_decoder->telnetOptionParse(c);
+                
+                // Skip any incoming nulls, nulls are also return on Telnet options received
+                // So we know that there is no valid text data to send to the client.
+                if(ch == '\0')
+                {
+                    continue;
+                }
+
+                // Incoming Buffer is filled and Telnet options are parsed out.
+                incoming_data += ch;
+                
+            }    
+            catch(std::exception& e)
+            {
+                m_log.write<Logging::ERROR_LOG>("Exception telnet_process_char", e.what(), __LINE__, __FILE__);
             }
+        }
+
+        // Encode all incoming data as UTF8 unless we are not utf8
+        if(m_encoding != Encoding::ENCODE_UTF8)
+        {
+            m_parsed_data = Encoding::getInstance().utf8Encode(incoming_data);        
         }
         else
         {
-            // Socket Read Error we mark leaving for the session.
-            Logging &log = Logging::getInstance();
-            log.write<Logging::INFO_LOG>("Clearing SessionData on Lost Connection Msg=", error.message(), __FILE__, __LINE__);
-
-            session_manager_ptr session_manager = m_session_manager.lock();
-
-            if(session_manager && error)
-            {
-                m_is_leaving = true;
-
-                // Disconnect the session.
-                session_manager->leave(m_session);
-            }        
+            m_parsed_data = incoming_data;
+        
         }
-        */
     }
     
     // Local Member Definitions Weak Pointers
+    Logging                   &m_log;
     async_io_ptr               m_async_io;
     session_manager_wptr       m_session_manager;
     
@@ -431,6 +441,9 @@ public:
     int                        m_node_number;
     bool                       m_is_leaving;
     std::vector<unsigned char> m_in_data_vector;
+    std::string                m_parsed_data;
+    std::string                m_encoding_text;
+    int                        m_encoding;
 
 
 };

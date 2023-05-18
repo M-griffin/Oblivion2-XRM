@@ -1,7 +1,6 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
-//#include "safe_queue.hpp"
 #include "common_io.hpp"
 
 #include <memory>
@@ -42,8 +41,6 @@ public:
     const std::string ERROR_LEVEL = "Error";
     const std::string CONSOLE_LEVEL = "Console";
     const std::string ALL_LEVELS = "All";
-
-    //SafeQueue<log_entry_ptr> m_log_entries;
 
     /**
      * @brief Creates Singleton Instance of Class
@@ -151,13 +148,11 @@ public:
             case INFO_LOG:
                 if(config_level != INFO_LOG && config_level != ALL_LOGS)
                     return;
-
                 break;
 
             case DEBUG_LOG:
                 if(config_level != DEBUG_LOG && config_level != ALL_LOGS)
                     return;
-
                 break;
 
             default:
