@@ -64,27 +64,24 @@ void TelnetDecoder::decodeBuffer()
 {    
     m_log.write<Logging::DEBUG_LOG>("decodeBuffer 240 - SE received");
 
-    // Check if this was a sequence we were waiting for.
-    if(checkReply(m_subnegoOption))
-    {
-        // Remove it
-        //del_reply(m_subnegoOption);
-    }
-
     // Now process the buffer per the options
     switch(m_subnegoOption)
     {
         case TELOPT_NAWS:
-            m_naws_col = (256 * (unsigned char)data_sequence[0]) + (unsigned char)data_sequence[1];
-            m_naws_row = (256 * (unsigned char)data_sequence[2]) + (unsigned char)data_sequence[3];
-            
-            // Setup Some defaults if we get bad responses from Terminals.
-            // Temp and Dirty Fix,  Query Last Line, and cross Detect the Screen Size and comapre 
-            // This is a result of a Nutrunner not returning an apporiate response!
-            if (m_naws_col > 100) m_naws_col = 80;
-            if (m_naws_row > 100) m_naws_row = 25;
-            if (m_naws_col == 0) m_naws_col = 80;
-            if (m_naws_row == 0) m_naws_row = 24;
+        
+            for (std::string::size_type i = 0; i < data_sequence.size(); i++ )
+            {
+                // Validate First Set of Digits, then the Second Set so it's never cut off.
+                if (i == 1) 
+                {
+                    m_naws_col = (256 * (unsigned char)data_sequence[0]) + (unsigned char)data_sequence[1];
+                    
+                }
+                else if (i == 3)
+                {
+                    m_naws_row = (256 * (unsigned char)data_sequence[2]) + (unsigned char)data_sequence[3];                        
+                }
+            }
 
             m_log.write<Logging::DEBUG_LOG>("TELOPT_NAWS option", m_naws_col, "x", m_naws_row);
             m_is_naws_detected = true;

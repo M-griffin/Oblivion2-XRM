@@ -14,6 +14,7 @@
 #include <list>
 #include <string>
 #include <cassert>
+#include <thread>
 
 /*
  * NOTES TODO: Sessions should also have incoming notification buffer
@@ -138,7 +139,7 @@ public:
             new_session->m_telnet_decoder->addReply(TELOPT_NAWS);
 
             // Wait 1.5 Seconds for respones.
-            //new_session->startDetectionTimer();
+            new_session->startTelnetOptionNegoiation();
 
         }
 
@@ -146,31 +147,30 @@ public:
     }
 
     /**
-     * @brief Telnet option Sequence Timer
+     * @brief Telnet Option Negoiation Timer
      */
-    void startDetectionTimer()
+    void startTelnetOptionNegoiation()
     {
-        // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences responses
-        m_deadline_timer->setWaitInMilliseconds(1500);
+        std::cout << "startTelnetOptionNegoiation Called()" << std::endl;
+        m_deadline_timer->setWaitInMilliseconds(2000);
         
         // Deprecated bind, look at replacing with lambda and std::function
         m_deadline_timer->asyncWait(
-            std::bind(&Session::handleDetectionTimer, shared_from_this())
-        );
+            std::bind(&Session::handleTelnetOptionNegoiation, shared_from_this())
+        );        
     }
 
     /**
-     * @brief Detection Timer Handler, once Completed Starts up the Menu System
+     * @brief Timer Handler, When Called Starts up the Login State
      *        
      * @param timer
      */
-    void handleDetectionTimer()
-    {
-        // Detection Completed, start ip the Pre-Logon Sequence State.
-        // Remove Timer, it's a since use case
-        m_deadline_timer.reset();
+    void handleTelnetOptionNegoiation()
+    {        
+        std::cout << "handleTelnetOptionNegoiation Called()" << std::endl;
         
-        //state_ptr new_state(new MenuSystem(m_session_data));
+        // Starts Up the Menu System Then Loads up the PreLogin Sequence.
+        //state_ptr new_state(new MenuSystem(shared_from_this()));
         //m_state_manager->changeState(new_state);
         
     }
