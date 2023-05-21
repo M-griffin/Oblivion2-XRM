@@ -9,6 +9,7 @@
 #include "telnet_decoder.hpp"
 #include "logging.hpp"
 #include "encoding.hpp"
+#include "model-sys/users.hpp"
 
 #include <memory>
 #include <list>
@@ -49,11 +50,13 @@ public:
         , m_state_manager(new StateManager())
         , m_deadline_timer(new DeadlineTimer())
         , m_telnet_decoder(new TelnetDecoder(my_async_io))
+        , m_user_record(new Users())
         , m_node_number(0)
         , m_is_leaving(false)
         , m_parsed_data("")
         , m_encoding_text(Encoding::ENCODING_TEXT_UTF8)
         , m_encoding(Encoding::ENCODE_UTF8)
+        , m_is_use_ansi(true)
     {
         if(m_async_io->isActive())
         {
@@ -83,6 +86,7 @@ public:
         m_session_manager.reset();
         m_deadline_timer.reset();
         m_telnet_decoder.reset();    
+        m_user_record.reset();
         std::vector<unsigned char>().swap(m_in_data_vector);
     }
 
@@ -436,6 +440,7 @@ public:
     state_manager_uptr         m_state_manager;
     deadline_timer_uptr        m_deadline_timer;    
     telnet_decoder_ptr         m_telnet_decoder;
+    user_ptr                   m_user_record;
     
     // Local Member Variables
     int                        m_node_number;
@@ -444,7 +449,7 @@ public:
     std::string                m_parsed_data;
     std::string                m_encoding_text;
     int                        m_encoding;
-
+    bool                       m_is_use_ansi;
 
 };
 

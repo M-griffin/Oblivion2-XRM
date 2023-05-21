@@ -21,6 +21,12 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="..\src">
+    <File Name="../src/session_io.hpp"/>
+    <File Name="../src/session_io.cpp"/>
+    <File Name="../src/menu_system.hpp"/>
+    <File Name="../src/menu_system.cpp"/>
+    <File Name="../src/menu_base.hpp"/>
+    <File Name="../src/menu_base.cpp"/>
     <File Name="../src/logging.hpp"/>
     <File Name="../src/safe_vector.hpp"/>
     <File Name="../src/async_io.hpp"/>
@@ -40,12 +46,32 @@
     <File Name="../src/telnet_decoder.cpp"/>
     <File Name="../src/telnet_decoder.hpp"/>
     <VirtualDirectory Name="compat"/>
-    <VirtualDirectory Name="data-sys"/>
+    <VirtualDirectory Name="data-sys">
+      <File Name="../src/data-sys/config_dao.hpp"/>
+      <File Name="../src/data-sys/config_dao.cpp"/>
+      <File Name="../src/data-sys/text_prompts_dao.hpp"/>
+      <File Name="../src/data-sys/text_prompts_dao.cpp"/>
+      <File Name="../src/data-sys/menu_stats_dao.hpp"/>
+      <File Name="../src/data-sys/menu_stats_dao.cpp"/>
+      <File Name="../src/data-sys/menu_prompt_dao.hpp"/>
+      <File Name="../src/data-sys/menu_prompt_dao.cpp"/>
+      <File Name="../src/data-sys/menu_dao.hpp"/>
+      <File Name="../src/data-sys/menu_dao.cpp"/>
+    </VirtualDirectory>
     <VirtualDirectory Name="model-sys">
+      <File Name="../src/model-sys/menu_prompt.hpp"/>
+      <File Name="../src/model-sys/menu.hpp"/>
+      <File Name="../src/model-sys/config.hpp"/>
       <File Name="../src/model-sys/struct_compat.hpp"/>
       <File Name="../src/model-sys/structures.hpp"/>
     </VirtualDirectory>
-    <VirtualDirectory Name="mods"/>
+    <VirtualDirectory Name="mods">
+      <File Name="../src/mods/mod_prelogon.hpp"/>
+      <File Name="../src/mods/mod_prelogon.cpp"/>
+      <File Name="../src/mods/mod_logon.hpp"/>
+      <File Name="../src/mods/mod_logon.cpp"/>
+      <File Name="../src/mods/mod_base.hpp"/>
+    </VirtualDirectory>
     <VirtualDirectory Name="forms"/>
     <VirtualDirectory Name="data-app"/>
     <VirtualDirectory Name="model-app"/>

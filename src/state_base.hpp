@@ -5,6 +5,9 @@
 #include <iostream>
 #include <string>
 
+class Session;
+typedef std::shared_ptr<Session> session_ptr;
+
 /**
  * @class StateBase
  * @author Michael Griffin
@@ -25,12 +28,14 @@ public:
     virtual void resume() {}
     virtual std::string getStateID() const = 0;
 
-    explicit StateBase()
-        : m_is_active(false)
+    explicit StateBase(session_ptr session_data)
+        : m_session_data(session_data)
+        , m_is_active(false)
     { }
 
     // This holds session data passed to each session.
-    bool m_is_active;
+    session_ptr  m_session_data;
+    bool         m_is_active;
 
 };
 
