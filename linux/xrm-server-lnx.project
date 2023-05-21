@@ -59,6 +59,7 @@
       <File Name="../src/data-sys/menu_dao.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="model-sys">
+      <File Name="../src/model-sys/users.hpp"/>
       <File Name="../src/model-sys/menu_prompt.hpp"/>
       <File Name="../src/model-sys/menu.hpp"/>
       <File Name="../src/model-sys/config.hpp"/>
