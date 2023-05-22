@@ -6,13 +6,15 @@
 #include "../model-sys/structures.hpp"
 #include "../data-sys/text_prompts_dao.hpp"
 
-#include "../session.hpp"
 #include "../session_io.hpp"
 #include "../deadline_timer.hpp"
 
 #include <memory>
 #include <vector>
 #include <functional>
+
+class Session;
+typedef std::shared_ptr<Session> session_ptr;
 
 class Config;
 typedef std::shared_ptr<Config> config_ptr;
@@ -64,18 +66,7 @@ public:
         }
 
         // Loads all Text Prompts for current module
-        m_text_prompts_dao->readPrompts();
-
-        // On Initial Startup, setup user record with system colors for menu system
-        // this is overwritten once the user logs in, otherwise the menu system
-        // will use these defaults for theming.
-        
-        session_data->m_user_record->sRegColor = m_config->default_color_regular;
-        session_data->m_user_record->sPromptColor = m_config->default_color_prompt;
-        session_data->m_user_record->sInputColor = m_config->default_color_input;
-        session_data->m_user_record->sInverseColor = m_config->default_color_inverse;
-        session_data->m_user_record->sStatColor = m_config->default_color_stat;
-        session_data->m_user_record->sBoxColor = m_config->default_color_box;
+        m_text_prompts_dao->readPrompts();        
     }
 
     virtual ~ModPreLogon() override

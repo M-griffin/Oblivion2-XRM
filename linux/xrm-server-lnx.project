@@ -67,6 +67,7 @@
       <File Name="../src/model-sys/structures.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
+      <File Name="../src/mods/mod_base.cpp"/>
       <File Name="../src/mods/mod_prelogon.hpp"/>
       <File Name="../src/mods/mod_prelogon.cpp"/>
       <File Name="../src/mods/mod_logon.hpp"/>

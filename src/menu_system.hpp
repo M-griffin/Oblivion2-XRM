@@ -23,6 +23,9 @@ typedef std::shared_ptr<ModBase> module_ptr;
 class FormManager;
 typedef std::shared_ptr<FormManager> form_manager_ptr;
 
+class Session;
+typedef std::shared_ptr<Session> session_ptr;
+
 
 /**
  * @class MenuSystem

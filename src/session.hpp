@@ -7,6 +7,7 @@
 #include "socket_handler.hpp"
 #include "session_manager.hpp"
 #include "telnet_decoder.hpp"
+#include "menu_system.hpp"
 #include "logging.hpp"
 #include "encoding.hpp"
 #include "model-sys/users.hpp"
@@ -23,7 +24,6 @@
  * when not in chat.
  */
 class Session;
-typedef std::shared_ptr<Session> session_ptr;
 
 /**
  * @class Session
@@ -173,9 +173,9 @@ public:
     {        
         std::cout << "handleTelnetOptionNegoiation Called()" << std::endl;
         
-        // Starts Up the Menu System Then Loads up the PreLogin Sequence.
-        //state_ptr new_state(new MenuSystem(shared_from_this()));
-        //m_state_manager->changeState(new_state);
+        // Starts Up the Menu System Then Loads up the PreLogin Sequence.   
+       // state_ptr new_state(new MenuSystem(shared_from_this()));
+       // m_state_manager->changeState(new_state);
         
     }
     
@@ -269,6 +269,7 @@ public:
             
             // Disconnect the session.
             session_mgr->leave(shared_from_this());
+            session_mgr.reset();
         }
     }
     
@@ -431,6 +432,39 @@ public:
         }
     }
     
+    /**
+     * @brief User Logoff
+     */
+    void logoff()
+    {
+        session_manager_ptr session_manager = m_session_manager.lock();
+
+        if(session_manager)
+        {
+            m_is_leaving = true;
+            std::cout << "Logoff Session Manager" << std::endl;
+            // Room is the session.
+            session_manager->leave(shared_from_this());            
+            session_manager.reset();
+        }
+
+        // This might be doing double the deallocation
+        /*
+        if(m_connection && m_connection->isActive())
+        {
+            try
+            {
+                m_connection->shutdown();
+            }
+            catch(std::exception &e)
+            {
+                // Sometime this doesn't close when it's already existed, just extra checking here.
+                Logging *log = Logging::instance();
+                log->write<Logging::DEBUG_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
+            }
+        }*/
+    }
+    
     // Local Member Definitions Weak Pointers
     Logging                   &m_log;
     async_io_ptr               m_async_io;
@@ -453,5 +487,7 @@ public:
 
 };
 
+typedef std::shared_ptr<Session> session_ptr;
+typedef std::weak_ptr<Session> session_wptr;
 
 #endif // SESSION_HPP

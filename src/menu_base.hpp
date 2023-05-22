@@ -1,12 +1,10 @@
 #ifndef MENUBASE_HPP
 #define MENUBASE_HPP
 
-#include "session_io.hpp"
 #include "common_io.hpp"
-#include "session.hpp"
-#include "processor_ansi.hpp"
 
 #include "model-sys/struct_compat.hpp"
+#include "model-sys/structures.hpp"
 #include "model-sys/menu.hpp"
 #include "model-sys/menu_prompt.hpp"
 
@@ -25,6 +23,9 @@ typedef std::shared_ptr<Config> config_ptr;
 
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
+
+class SessionIO;
+typedef std::shared_ptr<SessionIO> session_io_ptr;
 
 class Directory;
 typedef std::shared_ptr<Directory> directory_ptr;
@@ -59,7 +60,7 @@ public:
     // This hold non-hotkey text passed through.
     // If Hotkeys are turn off, we append and loop this until we hit a CRLF. or ENTER
     //session_data_ptr m_session_data;     // Handles to the session for i/o. {in TheState Base Class!}
-    SessionIO        m_session_io;         // SessionIO for Output parsing and MCI Codes etc.
+    session_io_ptr   m_session_io;         // SessionIO for Output parsing and MCI Codes etc.
     CommonIO         m_common_io;          // CommonIO
     config_ptr       m_config;             // Config
     directory_ptr    m_directory;          // Directory File Lists.
@@ -113,12 +114,8 @@ public:
      *        Then delivering the data to the client
      * @param data
      */
-    void baseProcessAndDeliver(std::string data)
-    {
-        m_ansi_process->parseTextToBuffer((char *)data.c_str());
-        m_menu_session_data->deliver(data);
-    }
-
+    void baseProcessAndDeliver(std::string data);
+    
     /**
      * @brief Clears out Loaded Pulldown options { Called From readInMenuData() }
      */
