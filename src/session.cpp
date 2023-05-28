@@ -9,7 +9,9 @@
 #include "socket_handler.hpp"
 #include "session_manager.hpp"
 #include "telnet_decoder.hpp"
-#include "menu_system.hpp"
+
+//#include "menu_system.hpp"
+#include "menu_shell.hpp" // Stripped Down Rebuild for Dependency Issues
 
 #include "logging.hpp"
 #include "encoding.hpp"
@@ -35,6 +37,7 @@ Session::Session(async_io_ptr const &my_async_io, session_manager_ptr const &my_
     , m_session_manager(my_session_manager)
     , m_state_manager(new StateManager())
     , m_deadline_timer(new DeadlineTimer())
+    , m_esc_input_timer(new DeadlineTimer())
     , m_telnet_decoder(new TelnetDecoder(my_async_io))
     , m_user_record(new Users())
     , m_node_number(0)
@@ -43,6 +46,7 @@ Session::Session(async_io_ptr const &my_async_io, session_manager_ptr const &my_
     , m_encoding_text(Encoding::ENCODING_TEXT_UTF8)
     , m_encoding(Encoding::ENCODE_UTF8)
     , m_is_use_ansi(true)
+    , m_is_esc_timer(false)
 {
     if(m_async_io->isActive())
     {
@@ -101,8 +105,10 @@ void Session::handleTelnetOptionNegoiation()
     std::cout << "handleTelnetOptionNegoiation Called()" << std::endl;
     
     // Starts Up the Menu System Then Loads up the PreLogin Sequence.   
-    state_ptr new_state(new MenuSystem(shared_from_this()));
-    //m_state_manager->changeState(new_state);
+    //state_ptr new_state(new MenuSystem(shared_from_this()));
+    
+    state_ptr new_state(new MenuShell(shared_from_this()));    
+    m_state_manager->changeState(new_state);
     
 }
 
@@ -195,8 +201,11 @@ void Session::handleWrite(const std::error_code& error, socket_handler_ptr)
         }
         
         // Disconnect the session.
-        session_mgr->leave(shared_from_this());
-        session_mgr.reset();
+        if (m_async_io->isActive())
+        {
+            session_mgr->leave(shared_from_this());
+            session_mgr.reset();
+        }
     }
 }
 
@@ -223,6 +232,52 @@ void Session::waitingForData()
 }
 
 /**
+ * @brief Passed data Though the State, and Checks ESC Timer
+ */
+void Session::updateState()
+{
+    // Last Character Received is ESC, then Check for
+    // ESC Sequence, or Lone ESC Key.
+    std::cout << " Session::updateState()" << std::endl;
+    if(m_parsed_data[m_parsed_data.size()-1] == '\x1b')
+    {
+        std::cout << " Session::updateState() - startEscapeTimer" << std::endl;
+        startEscapeTimer();
+        m_is_esc_timer = true;
+    }
+    else if(!m_is_esc_timer)
+    {
+        std::cout << " Session::updateState() - update!" << std::endl;
+        m_state_manager->update();
+    }
+}
+
+/**
+ * @brief ESC Sequence Timer for Determining Single Key vs. ESC Sequence
+ */
+void Session::startEscapeTimer()
+{
+    // Add Deadline Timer for .400 milliseconds for complete ESC Sequences.
+    // Is no other input or part of ESC Sequences ie.. [A following the ESC
+    // Then it's an ESC key, otherwise capture the rest of the sequence.
+    m_esc_input_timer->setWaitInMilliseconds(400);
+    m_esc_input_timer->asyncWait(
+        std::bind(&Session::handleEscTimer, shared_from_this())
+    );
+}
+    
+/**
+ * @brief Deadline Input Timer for ESC vs ESC Sequence.
+ * @param timer
+ */
+void Session::handleEscTimer()
+{
+    // Move text to State Machine, Timer has passed, or remainder of Sequence caught up!
+    m_state_manager->update();
+    m_is_esc_timer = false;
+}
+
+/**
  * @brief Callback after data received. handles telnet options
  * Then parses out normal text data from client to server.
  * @param error
@@ -235,7 +290,7 @@ void Session::handleRead(const std::error_code& error, socket_handler_ptr)
     session_manager_ptr session_manager = m_session_manager.lock();
     if(!session_manager)
     {
-        m_log.write<Logging::ERROR_LOG>("Unable to load session_manager", __FILE__, __LINE__);
+        m_log.write<Logging::ERROR_LOG>("handleRead - Unable to load session_manager", __FILE__, __LINE__);
         return;
     }
 
@@ -296,7 +351,11 @@ void Session::handleRead(const std::error_code& error, socket_handler_ptr)
             }
 
             updateState();
-        }*/     
+        }*/
+        
+        // PART II: Standalone For Now, Pushes Input to the State or Menu System.
+        std::cout << "handleRead - updateState" << std::endl;
+        updateState();
     }
 
     // Restart Callback to wait for more data.

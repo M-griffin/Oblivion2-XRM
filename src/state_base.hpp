@@ -31,9 +31,7 @@ public:
     explicit StateBase(session_ptr session_data)
         : m_session_data(session_data)
         , m_is_active(false)
-    { 
-        m_session_data.reset();
-    }
+    {}
 
     // This holds session data passed to each session.
     session_ptr  m_session_data;

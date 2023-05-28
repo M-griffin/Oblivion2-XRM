@@ -20,6 +20,7 @@ class StateManager
 public:
     explicit StateManager()
     {
+        std::cout << "StateManager() Startup" << std::endl;
     }
 
     ~StateManager()

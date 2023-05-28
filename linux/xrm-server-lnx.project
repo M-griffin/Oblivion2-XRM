@@ -21,6 +21,8 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="..\src">
+    <File Name="../src/menu_shell.hpp"/>
+    <File Name="../src/menu_shell.cpp"/>
     <File Name="../src/session.cpp"/>
     <File Name="../src/communicator.hpp"/>
     <File Name="../src/communicator.cpp"/>

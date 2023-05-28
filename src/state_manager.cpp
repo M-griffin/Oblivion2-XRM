@@ -1,4 +1,6 @@
 #include "state_manager.hpp"
+
+#include "session.hpp"
 #include "logging.hpp"
 #include "utf-cpp/utf8.h"
 
@@ -32,17 +34,27 @@ void StateManager::clean()
  */
 void StateManager::update()
 {
+    std::cout << "StateManager() update()" << std::endl;
+    
     std::string new_string_builder = "";
     bool utf_found = false;
 
     if(!m_the_state.empty())
     {
-        // TODO
-        // FIX ME Once Moved to SESSIN
-        std::string incoming_data; //  = std::move(m_the_state.back()->m_session_data->m_parsed_data);
+        std::string incoming_data = "";
+        try
+        {
+            std::cout << "StateManager() Pull Incoming Data" << std::endl;
+            incoming_data = std::move(m_the_state.back()->m_session_data->m_parsed_data);            
+        }
+        catch(std::exception &ex)
+        {
+            std::cout << "StateManager() Exception=" << ex.what() << std::endl;
+        }
 
         if(incoming_data.size() > 0)
         {
+            std::cout << "StateManager() Parse Incoming Data" << std::endl;
             std::string::iterator it = incoming_data.begin();
             std::string::iterator line_end = incoming_data.end();
 
@@ -100,6 +112,7 @@ void StateManager::update()
                     }
                 }
 
+                std::cout << "StateManager() Update State with data=" << new_string_builder << std::endl;
                 m_the_state.back()->update(new_string_builder, utf_found);
                 new_string_builder.erase();
             }

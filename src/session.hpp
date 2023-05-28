@@ -163,6 +163,22 @@ public:
     void waitingForData();
     
     /**
+     * @brief Passed data Though the State, and Checks ESC Timer
+     */
+    void updateState();
+
+    /**
+     * @brief ESC Sequence Timer for Determining Single Key vs. ESC Sequence
+     */
+    void startEscapeTimer();
+
+    /**
+     * @brief Deadline Input Timer for ESC vs ESC Sequence.
+     * @param timer
+     */
+    void handleEscTimer();
+
+    /**
      * @brief Callback after data received. handles telnet options
      * Then parses out normal text data from client to server.
      * @param error
@@ -190,7 +206,9 @@ public:
     
     // Local Member Definitions Unique Pointers
     state_manager_uptr         m_state_manager;
-    deadline_timer_uptr        m_deadline_timer;    
+    deadline_timer_uptr        m_deadline_timer;
+    deadline_timer_uptr        m_esc_input_timer;
+ 
     telnet_decoder_ptr         m_telnet_decoder;
     user_ptr                   m_user_record;
     
@@ -202,6 +220,7 @@ public:
     std::string                m_encoding_text;
     int                        m_encoding;
     bool                       m_is_use_ansi;
+    bool                       m_is_esc_timer;
 
 };
 
