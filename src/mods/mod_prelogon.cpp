@@ -2,6 +2,7 @@
 
 #include "mod_base.hpp"
 #include "../model-sys/config.hpp"
+#include "../telnet_decoder.hpp"
 #include "../encoding.hpp"
 #include "../logging.hpp"
 
@@ -43,13 +44,15 @@ bool ModPreLogon::onEnter()
 {
     // On Initial Startup, setup user record with system colors for menu system
     // this is overwritten once the user logs in, otherwise the menu system
-    // will use these defaults for theming.    
+    // will use these defaults for theming.   
+    /*
     m_session_data->m_user_record->sRegColor = m_config->default_color_regular;
     m_session_data->m_user_record->sPromptColor = m_config->default_color_prompt;
     m_session_data->m_user_record->sInputColor = m_config->default_color_input;
     m_session_data->m_user_record->sInverseColor = m_config->default_color_inverse;
     m_session_data->m_user_record->sStatColor = m_config->default_color_stat;
     m_session_data->m_user_record->sBoxColor = m_config->default_color_box;    
+    */
     
     m_is_active = true;
 

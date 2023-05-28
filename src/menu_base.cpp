@@ -3,11 +3,13 @@
 #include "data-sys/menu_dao.hpp"
 #include "data-sys/menu_prompt_dao.hpp"
 #include "model-sys/config.hpp"
+#include "model-sys/users.hpp"
 #include "processor_ansi.hpp"
 #include "directory.hpp"
 #include "logging.hpp"
 #include "session.hpp"
 #include "session_io.hpp"
+#include "telnet_decoder.hpp"
 
 #include <locale>
 #include <cstring>

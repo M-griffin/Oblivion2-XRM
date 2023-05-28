@@ -4,6 +4,7 @@
 //#include "model-sys/config.hpp"
 #include "session_manager.hpp"
 #include "session.hpp"
+#include "async_io.hpp"
 //#include "communicator.hpp"
 
 // New Rework for SDL2_net and Asyc io.

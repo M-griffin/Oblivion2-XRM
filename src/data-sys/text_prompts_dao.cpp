@@ -16,6 +16,7 @@ TextPromptsDao::TextPromptsDao(std::string path, const std::string &filename)
     , m_filename(filename)
     , m_is_loaded(false)
 {
+    std::cout << "TextPromptsDao path=" << m_path << " filename=" << m_filename << std::endl;
 }
 
 TextPromptsDao::~TextPromptsDao()

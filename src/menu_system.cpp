@@ -86,8 +86,12 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
 bool MenuSystem::onEnter()
 {
     // Startup the Prelogon sequence
+    /* TODO  bombing Here!
     startupModulePreLogon();
     m_is_active = true;
+    return true;
+    */
+    
     return true;
 }
 

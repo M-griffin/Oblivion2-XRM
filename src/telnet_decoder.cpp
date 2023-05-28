@@ -1,11 +1,90 @@
 #include "telnet_decoder.hpp"
+
 #include "telnet.hpp"
 #include "logging.hpp"
+#include "async_io.hpp"
 
 #include <cstdio>
 #include <string>
 #include <fstream>
 
+
+TelnetDecoder::TelnetDecoder(async_io_ptr async_io)
+    : m_log(Logging::getInstance())
+    , m_async_io(async_io)
+    , m_naws_row(0)
+    , m_naws_col(0)
+    , m_term_type("undetected")
+    , m_is_binary(false)
+    , m_is_echo(false)
+    , m_is_sga(false)
+    , m_is_linemode(false)
+    , m_is_naws_detected(false)
+    , m_teloptStage(0)
+    , m_teloptCommand(0)
+    , m_currentOption(0)
+    , m_subnegoOption(0)
+{
+}
+
+TelnetDecoder::~TelnetDecoder()
+{
+    std::cout << "~TelnetDecoder()" << std::endl;
+    m_async_io.reset();
+}
+
+
+/**
+ * @brief Sends IAC Sequence back to Users Client for Terminal Negotiation.
+ * @param command
+ * @param option
+ */
+void TelnetDecoder::sendIACSequences(unsigned char command, int option)
+{
+    std::stringstream stm;
+    std::string       buf;
+
+    stm << static_cast<char>(IAC);
+    stm << command;
+    stm << static_cast<char>(option);
+    buf = stm.str();
+    deliver(buf);
+    
+    // Mark Sequence as Purshed then exclude senting it again.
+    if(!checkReply(option)) {
+        addReply(option);
+    }
+}
+
+/**
+ * @brief handles pending sequences waiting for reply responses
+ * @param option
+ * @return
+ */
+bool TelnetDecoder::checkReply(const unsigned char &option)
+{
+    return m_reply_sequence.exists(option);
+}
+   
+void TelnetDecoder::addReply(const unsigned char &option)
+{
+    m_reply_sequence.push_back(option);
+}
+
+int TelnetDecoder::TelnetDecoder::getTermRows() const
+{
+    return (m_naws_row > 0 ? m_naws_row : 24);
+}
+
+int TelnetDecoder::getTermCols() const
+{
+    return (m_naws_col > 0 ? m_naws_col : 80);
+}
+
+std::string TelnetDecoder::getTermType() const
+{
+    return m_term_type;
+}
 
 /**
  * @brief Telnet Option Acknowledgment Reply
@@ -696,3 +775,112 @@ unsigned char TelnetDecoder::telnetOptionParse(const unsigned char &c)
     // No no valid Data, Return null character which are ignored.
     return '\0';
 }
+
+
+/**
+ * @brief handles callback after write() for errors checking.
+ * @param error
+ */
+void TelnetDecoder::handleWrite(const std::error_code& error, socket_handler_ptr)
+{
+    // Just log errors for now.
+    if(error)
+    {
+        Logging &log = Logging::getInstance();
+        log.write<Logging::ERROR_LOG>("telnet async_write error=", error.message(), __LINE__, __FILE__);
+    }
+    
+    // Session Manager Should disconnect here or send error back to main session.
+}
+
+/**
+ * @brief delivers text data to client
+ * @param msg
+ */
+void TelnetDecoder::deliver(const std::string &string_msg)
+{
+    
+    // TODO: NOTE change this to queue up respones, then the session will call to retieve
+    // once it returns from parsing, then we don't have to pass sessions/async_io, less references.
+    if(string_msg.size() == 0)
+    {
+        return;
+    }
+
+    std::cout << "telnetdecoder - prior to asyncio deliver telnet: " << string_msg << std::endl;
+    
+    try
+    {
+        async_io_ptr async_io = m_async_io.lock();
+        if(async_io->getSocketHandle()->isActive())
+        {
+            std::cout << "telnetdecoder - after deliver telnet: " << string_msg << std::endl;
+            
+            async_io->asyncWrite(string_msg,
+                                     std::bind(
+                                         &TelnetDecoder::handleWrite,
+                                         shared_from_this(),
+                                         std::placeholders::_1,
+                                         std::placeholders::_2));
+                                         
+           std::cout << "telnetdecoder - after write deliver telnet: " << string_msg << std::endl;
+        }
+    }
+    catch (std::exception &ex) 
+    {
+        m_log.write<Logging::ERROR_LOG>("TelnetDecoder::deliver Exception=", ex.what(), __LINE__, __FILE__);
+    }
+}
+
+/**
+ * @brief Send Specific IAC TTYPE Message
+ */
+void TelnetDecoder::sendTTYPERequest()
+{
+    std::stringstream stm;
+    std::string       buf;
+
+    //IAC SB TTYPE SEND IAC SE
+    stm << static_cast<char>(IAC);
+    stm << static_cast<char>(SB);
+    stm << static_cast<char>(TELOPT_TTYPE);
+    stm << static_cast<char>(TELQUAL_SEND);
+    stm << static_cast<char>(IAC);
+    stm << static_cast<char>(SE);
+    buf = stm.str();
+    deliver(buf);
+}
+
+/**
+ * @brief Handles TELOPT_NEW_ENVIRON Requests
+ */
+void TelnetDecoder::sendENVRequest()
+{
+    std::stringstream stm;
+    std::string       buf;
+
+    // Loop through variables of possible responses.
+    // Not getting any Responses, copied from x/84.
+    std::vector<std::string> vars = { "USER", "TERM", "SHELL", "COLUMNS", "LINES",
+                                      "C_CTYPE", "XTERM_LOCALE", "DISPLAY", "SSH_CLIENT",
+                                      "SSH_CONNECTION", "SSH_TTY", "HOME", "HOSTNAME",
+                                      "PWD", "MAIL","LANG", "PWD", "UID", "USER_ID",
+                                      "EDITOR", "LOGNAME", "SYSTEMTYPE"
+                                    };
+    //IAC SB TTYPE SEND IAC SE
+    stm << static_cast<char>(IAC);
+    stm << static_cast<char>(SB);
+    stm << static_cast<char>(TELOPT_NEW_ENVIRON);
+    stm << static_cast<char>(TELQUAL_SEND);
+
+    for(auto &v : vars)
+    {
+        stm << static_cast<char>(NEW_ENV_VAR);
+        stm << v.data();
+    }
+
+    stm << static_cast<char>(IAC);
+    stm << static_cast<char>(SE);
+    buf = stm.str();
+    deliver(buf);
+} 

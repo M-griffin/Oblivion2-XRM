@@ -1,9 +1,12 @@
 #include "session_manager.hpp"
+
 #include "session.hpp"
 #include "logging.hpp"
 
 #include <functional>
 #include <algorithm>
+#include <string>
+#include <vector>
 
 
 /**
@@ -25,11 +28,11 @@ void SessionManager::leave(const session_ptr &session)
     int node_number = session->m_node_number;
     log.write<Logging::CONSOLE_LOG>("disconnecting Node Session=", node_number);
     
-    if (session->m_async_io && session->m_async_io->isActive())
-    {
+    //if (session->m_async_io && session->m_async_io->isActive())
+    //{
         log.write<Logging::CONSOLE_LOG>("Shutdown ASIO=", node_number);
-        session->m_async_io->shutdown();                             
-    }
+        session->logoff();                             
+    //}
     
     m_sessions.erase(session);
     log.write<Logging::CONSOLE_LOG>("disconnecting Node Session completed=", node_number);
@@ -80,7 +83,7 @@ void SessionManager::shutdown()
     {
         log.write<Logging::DEBUG_LOG>("shutting Down Nodes=", (*it)->m_node_number );
         {
-            (*it)->m_async_io->shutdown();            
+            (*it)->logoff();
         }
         m_sessions.erase(it);
     }

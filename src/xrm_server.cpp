@@ -21,11 +21,12 @@
  */
 
 #include "model-sys/structures.hpp"
+#include "model-sys/config.hpp"
+#include "data-sys/config_dao.hpp"
 
+#include "communicator.hpp"
 #include "interface.hpp"
 #include "common_io.hpp"
-//#include "encoding.hpp"
-//#include "logging.hpp"
 
 #include <memory>
 #include <cstdlib>
@@ -104,13 +105,48 @@ auto main() -> int
 
 #endif  
 
+    // Loading and saving default Configuration file to XML
+    {
+        config_ptr config(new Config());
+
+        if(!config)
+        {
+            std::cout << "Unable to allocate config structure" << std::endl;
+            exit(1);
+        }
+
+        // Handle to Data Access Object,  at the moment were not using directories
+        // Setup in the config, everything is branched from the main path.
+        // Later on we'll check config for overrides only.
+        ConfigDao cfg(config, GLOBAL_BBS_PATH);
+
+        if(!cfg.fileExists())
+        {
+            cfg.saveConfig(config);
+        }
+
+        // Load Config and lets do some validation
+        cfg.loadConfig();
+
+        if(!cfg.validation())
+        {
+            std::cout << "Unable to validate config structure" << std::endl;
+            exit(1);
+        }
+
+        // All Good, Attached to Global Communicator Instance.
+        Communicator::getInstance().attachConfiguration(config);
+        std::cout << "Starting up Oblivion/2 XRM-Server" << std::endl;
+    }
+
     // Isolate to code block for smart pointer deallocation.
     {
         // Create Handles to Services, and starts up connection listener and ASIO Thread Worker
-        //config_ptr config = TheCommunicator::instance()->getConfiguration();
+        config_ptr config = Communicator::getInstance().getConfiguration();
+        std::cout << "Reading Configuration Telnet Port=" << config->port_telnet << std::endl;
 
         IOService io_service;
-        interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", 6023));
+        interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", config->port_telnet));
 
         while(io_service.isActive()) 
         {            

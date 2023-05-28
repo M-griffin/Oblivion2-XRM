@@ -21,6 +21,9 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="..\src">
+    <File Name="../src/session.cpp"/>
+    <File Name="../src/communicator.hpp"/>
+    <File Name="../src/communicator.cpp"/>
     <File Name="../src/session_io.hpp"/>
     <File Name="../src/session_io.cpp"/>
     <File Name="../src/menu_system.hpp"/>
@@ -47,6 +50,9 @@
     <File Name="../src/telnet_decoder.hpp"/>
     <VirtualDirectory Name="compat"/>
     <VirtualDirectory Name="data-sys">
+      <File Name="../src/data-sys/base_dao.hpp"/>
+      <File Name="../src/data-sys/users_dao.hpp"/>
+      <File Name="../src/data-sys/users_dao.cpp"/>
       <File Name="../src/data-sys/config_dao.hpp"/>
       <File Name="../src/data-sys/config_dao.cpp"/>
       <File Name="../src/data-sys/text_prompts_dao.hpp"/>
