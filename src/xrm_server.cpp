@@ -23,6 +23,7 @@
 #include "model-sys/structures.hpp"
 #include "model-sys/config.hpp"
 #include "data-sys/config_dao.hpp"
+#include "data-sys/db_startup.hpp"
 
 #include "communicator.hpp"
 #include "interface.hpp"
@@ -138,6 +139,19 @@ auto main() -> int
         Communicator::getInstance().attachConfiguration(config);
         std::cout << "Starting up Oblivion/2 XRM-Server" << std::endl;
     }
+    
+    // Database Startup in it's own context.
+    {
+        db_startup_ptr db(new DbStartup());
+        bool db_startup = db->initDatabaseTables();
+
+        // Write all error logs and exit.
+        if(!db_startup)
+        {
+            std::cout << "Database Startup failed, exiting..." << std::endl;
+            return 0;
+        }
+    }
 
     // Isolate to code block for smart pointer deallocation.
     {
@@ -154,7 +168,7 @@ auto main() -> int
             std::getline(std::cin, line);
             std::cout << "line read: [" << line << "]" << std::endl;
             if (line == "quit") {
-                std::cout << "Shutting down service" << std::endl;
+                std::cout << "Shutting down service, exiting..." << std::endl;
                 io_service.stop();
             }
           

@@ -1,15 +1,54 @@
 #include "mod_prelogon.hpp"
 
-#include "mod_base.hpp"
+#include "../data-sys/text_prompts_dao.hpp"
 #include "../model-sys/config.hpp"
+
+#include "../deadline_timer.hpp"
 #include "../telnet_decoder.hpp"
 #include "../encoding.hpp"
 #include "../logging.hpp"
+#include "../session_io.hpp"
+#include "../session.hpp"
 
 #include <algorithm>
 #include <iostream>
 #include <string>
+#include <vector>
 
+ModPreLogon::ModPreLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
+    : ModBase(session_data, config, ansi_process)
+    , m_session_io(new SessionIO(session_data))
+    , m_filename("mod_prelogon.yaml")
+    , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
+    , m_deadline_timer(new DeadlineTimer())
+    , m_mod_function_index(MOD_DETECT_EMULATION)
+    , m_is_text_prompt_exist(false)
+    , m_is_esc_detected(false)
+    , m_input_buffer("")
+    , m_x_position(0)
+    , m_y_position(0)
+    , m_term_type("undetected")
+{
+    // Push function pointers to the stack.
+    m_setup_functions.push_back(std::bind(&ModPreLogon::setupEmulationDetection, this));
+    m_setup_functions.push_back(std::bind(&ModPreLogon::setupAskANSIColor, this));
+    m_setup_functions.push_back(std::bind(&ModPreLogon::setupAskCodePage, this));
+
+    m_mod_functions.push_back(std::bind(&ModPreLogon::emulationDetection, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModPreLogon::askANSIColor, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModPreLogon::askCodePage, this, std::placeholders::_1));
+
+    // Check of the Text Prompts exist.
+    m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
+
+    if(!m_is_text_prompt_exist)
+    {
+        createTextPrompts();
+    }
+
+    // Loads all Text Prompts for current module
+    m_text_prompts_dao->readPrompts();        
+}
 
 /**
  * @brief Handles Updates or Data Input from Client
@@ -45,14 +84,12 @@ bool ModPreLogon::onEnter()
     // On Initial Startup, setup user record with system colors for menu system
     // this is overwritten once the user logs in, otherwise the menu system
     // will use these defaults for theming.   
-    /*
     m_session_data->m_user_record->sRegColor = m_config->default_color_regular;
     m_session_data->m_user_record->sPromptColor = m_config->default_color_prompt;
     m_session_data->m_user_record->sInputColor = m_config->default_color_input;
     m_session_data->m_user_record->sInverseColor = m_config->default_color_inverse;
     m_session_data->m_user_record->sStatColor = m_config->default_color_stat;
     m_session_data->m_user_record->sBoxColor = m_config->default_color_box;    
-    */
     
     m_is_active = true;
 
@@ -153,20 +190,20 @@ void ModPreLogon::setupEmulationDetection()
     // Deliver ANSI Location Sequence to Detect Emulation Response
     // Only detects if terminal handles ESC responses.
     // Windows Console Telnet will response it's at 259 y!
-    std::string detection = m_session_io.pipe2ansi("|00\x1b[255B\x1b[6n");
+    std::string detection = m_session_io->pipe2ansi("|00\x1b[255B\x1b[6n");
     std::string restore_position = "\x1b[1;1H\x1b[2J";
 
     baseProcessAndDeliver(detection);
     baseProcessAndDeliver(restore_position);
 
     // Display Detecting Emulation, not using display prompt cause we need to append.
-    std::string result = m_session_io.parseTextPrompt(
+    std::string result = m_session_io->parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_DETECT_EMULATION)
                          );
 
     // If response is echoed back, make it black on black.
     result.append("|00");
-    std::string output = m_session_io.pipe2ansi(result);
+    std::string output = m_session_io->pipe2ansi(result);
 
     baseProcessAndDeliver(output);
 
@@ -222,8 +259,8 @@ void ModPreLogon::displayTerminalDetection()
 
         m_log.write<Logging::CONSOLE_LOG>("Term Type=", term);
 
-        m_session_io.m_common_io.parseLocalMCI(result, mci_code, term);
-        result = m_session_io.pipe2ansi(result);
+        m_session_io->m_common_io.parseLocalMCI(result, mci_code, term);
+        result = m_session_io->pipe2ansi(result);
         baseProcessAndDeliver(result);
     }
 
@@ -237,8 +274,8 @@ void ModPreLogon::displayTerminalDetection()
 
         m_log.write<Logging::CONSOLE_LOG>("Term Size=", term_size);
 
-        m_session_io.m_common_io.parseLocalMCI(result, mci_code, term_size);
-        result = m_session_io.pipe2ansi(result);
+        m_session_io->m_common_io.parseLocalMCI(result, mci_code, term_size);
+        result = m_session_io->pipe2ansi(result);
         baseProcessAndDeliver(result);
     }
 
@@ -342,31 +379,13 @@ bool ModPreLogon::emulationDetection(const std::string &input)
 }
 
 /**
- * @brief Detection Completed, display results.
- * @return
- */
-void ModPreLogon::emulationCompleted()
-{
-    if(m_session_data->m_is_use_ansi)
-    {
-        displayPrompt(PROMPT_DETECTED_ANSI);
-        displayTerminalDetection();
-    }
-    else
-    {
-        displayPrompt(PROMPT_DETECTED_NONE);
-        changeModule(MOD_ASK_ANSI_COLOR);
-    }
-}
-
-/**
  * @brief ASK ANSI Color {Only ask for color if emulation detection fails!}
  * @return
  */
 bool ModPreLogon::askANSIColor(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -430,7 +449,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
 {
     std::string blackColor = "|00";
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -459,11 +478,11 @@ bool ModPreLogon::askCodePage(const std::string &input)
                m_term_type.find("ANSI",0) != std::string::npos)
             {
                 // Switch to ISO, then CP437 Character Set.
-                message = "\x1b[0m" + m_session_io.pipeColors(blackColor);
+                message = "\x1b[0m" + m_session_io->pipeColors(blackColor);
                 message += "\x1b%@\x1b(U \r\n\x1b[A";
                 m_session_data->deliver(message);
 
-                message = m_session_io.parseTextPrompt(
+                message = m_session_io->parseTextPrompt(
                               m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
                           );
 
@@ -475,11 +494,11 @@ bool ModPreLogon::askCodePage(const std::string &input)
             else
             {
                 // Switch to Unicode Character Set.
-                message = "\x1b[0m" + m_session_io.pipeColors(blackColor);
+                message = "\x1b[0m" + m_session_io->pipeColors(blackColor);
                 message += "\x1b%@\x1b%G \r\n\x1b[A";
                 m_session_data->deliver(message);
 
-                message = m_session_io.parseTextPrompt(
+                message = m_session_io->parseTextPrompt(
                               m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
                           );
 
@@ -504,11 +523,11 @@ bool ModPreLogon::askCodePage(const std::string &input)
                m_term_type.find("ANSI",0) != std::string::npos)
             {
                 // Switch to Unicode Character Set.
-                message = "\x1b[0m" + m_session_io.pipeColors(blackColor);
+                message = "\x1b[0m" + m_session_io->pipeColors(blackColor);
                 message += "\x1b%@\x1b%G \r\n\x1b[A";
                 m_session_data->deliver(message);
 
-                message = m_session_io.parseTextPrompt(
+                message = m_session_io->parseTextPrompt(
                               m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
                           );
 
@@ -520,11 +539,11 @@ bool ModPreLogon::askCodePage(const std::string &input)
             else
             {
                 // Switch to ISO, then CP437 Character Set.
-                message = "\x1b[0m" + m_session_io.pipeColors(blackColor);
+                message = "\x1b[0m" + m_session_io->pipeColors(blackColor);
                 message += "\x1b%@\x1b(U \r\n\x1b[A";
                 m_session_data->deliver(message);
 
-                message = m_session_io.parseTextPrompt(
+                message = m_session_io->parseTextPrompt(
                               m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
                           );
 
@@ -555,4 +574,44 @@ bool ModPreLogon::askCodePage(const std::string &input)
     }
 
     return true;
+}
+
+/**
+ * @brief Start ANSI Detection timer
+ */
+void ModPreLogon::startDetectionTimer()
+{
+    // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences responses
+    m_deadline_timer->setWaitInMilliseconds(1500);
+    m_deadline_timer->asyncWait(
+        std::bind(&ModPreLogon::handleDetectionTimer, shared_from_this())
+    );
+}
+
+/**
+ * @brief Deadline Detection Timer for ANSI Detection
+ * @param timer
+ */
+void ModPreLogon::handleDetectionTimer()
+{
+    // Jump to Emulation completed.
+    emulationCompleted();
+}
+
+/**
+ * @brief Detection Completed, display results.
+ * @return
+ */
+void ModPreLogon::emulationCompleted()
+{
+    if(m_session_data->m_is_use_ansi)
+    {
+        displayPrompt(PROMPT_DETECTED_ANSI);
+        displayTerminalDetection();
+    }
+    else
+    {
+        displayPrompt(PROMPT_DETECTED_NONE);
+        changeModule(MOD_ASK_ANSI_COLOR);
+    }
 }

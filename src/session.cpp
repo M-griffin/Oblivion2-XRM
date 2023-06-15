@@ -10,8 +10,10 @@
 #include "session_manager.hpp"
 #include "telnet_decoder.hpp"
 
-//#include "menu_system.hpp"
-#include "menu_shell.hpp" // Stripped Down Rebuild for Dependency Issues
+#include "menu_system.hpp"
+
+// Stripped Down Rebuild for Dependency Issues
+//#include "menu_shell.hpp" 
 
 #include "logging.hpp"
 #include "encoding.hpp"
@@ -47,6 +49,8 @@ Session::Session(async_io_ptr const &my_async_io, session_manager_ptr const &my_
     , m_encoding(Encoding::ENCODE_UTF8)
     , m_is_use_ansi(true)
     , m_is_esc_timer(false)
+    , m_is_session_authorized(false)
+    , m_user_database(USERS_DATABASE, &m_database_log)
 {
     if(m_async_io->isActive())
     {
@@ -105,9 +109,9 @@ void Session::handleTelnetOptionNegoiation()
     std::cout << "handleTelnetOptionNegoiation Called()" << std::endl;
     
     // Starts Up the Menu System Then Loads up the PreLogin Sequence.   
-    //state_ptr new_state(new MenuSystem(shared_from_this()));
+    state_ptr new_state(new MenuSystem(shared_from_this()));
     
-    state_ptr new_state(new MenuShell(shared_from_this()));    
+    //state_ptr new_state(new MenuShell(shared_from_this()));    
     m_state_manager->changeState(new_state);
     
 }
@@ -428,7 +432,7 @@ void Session::logoff()
     if(session_manager)
     {
         m_is_leaving = true;
-        std::cout << "Logoff Session Manager" << std::endl;
+        m_log.write<Logging::DEBUG_LOG>("Logoff Session Manager", __LINE__, __FILE__);
         // Room is the session.
         session_manager->leave(shared_from_this());            
         session_manager.reset();
@@ -445,7 +449,7 @@ void Session::logoff()
         catch(std::exception &e)
         {
             // Sometime this doesn't close when it's already existed, just extra checking here.
-            Logging *log = Logging::instance();
+            Logging &log = Logging::getInstance();
             log->write<Logging::DEBUG_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
         }
     }*/

@@ -1,16 +1,61 @@
 #include "mod_logon.hpp"
-#include "../model-sys/config.hpp"
-#include "../encryption.hpp"
 
-//#include "../model-sys/security.hpp"
-//#include "../model-sys/users.hpp"
-//#include "../data-sys/security_dao.hpp"
-//#include "../data-sys/users_dao.hpp"
+
+#include "../model-sys/structures.hpp"
+#include "../model-sys/config.hpp"
+#include "../model-sys/security.hpp"
+#include "../model-sys/users.hpp"
+
+#include "../data-sys/text_prompts_dao.hpp"
+#include "../data-sys/security_dao.hpp"
+#include "../data-sys/users_dao.hpp"
+
+#include "../processor_ansi.hpp"
+#include "../session.hpp"
+#include "../session_io.hpp"
+#include "../encryption.hpp"
 #include "../logging.hpp"
 
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <memory>
+#include <vector>
+#include <functional>
+
+ModLogon::ModLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
+    : ModBase(session_data, config, ansi_process)
+    , m_session_io(new SessionIO(session_data))
+    , m_filename("mod_logon.yaml")
+    , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
+    , m_mod_function_index(MOD_LOGON)
+    , m_failure_attempts(0)
+    , m_is_text_prompt_exist(false)
+{
+    // Push function pointers to the stack.
+    m_setup_functions.push_back(std::bind(&ModLogon::setupLogon, this));
+    m_setup_functions.push_back(std::bind(&ModLogon::setupPassword, this));
+    m_setup_functions.push_back(std::bind(&ModLogon::setupPasswordQuestion, this));
+    m_setup_functions.push_back(std::bind(&ModLogon::setupPasswordAnswer, this));
+    m_setup_functions.push_back(std::bind(&ModLogon::setupPasswordChange, this));
+
+    m_mod_functions.push_back(std::bind(&ModLogon::logon, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModLogon::password, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModLogon::passwordQuestion, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModLogon::passwordAnswer, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModLogon::passwordChange, this, std::placeholders::_1));
+
+    // Check of the Text Prompts exist.
+    m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
+
+    if(!m_is_text_prompt_exist)
+    {
+        createTextPrompts();
+    }
+
+    // Loads all Text Prompts for current module
+    m_text_prompts_dao->readPrompts();
+}
 
 /**
  * @brief Handles Updates or Data Input from Client
@@ -159,10 +204,10 @@ void ModLogon::displayUserNumber()
 
     std::string mci_code = "|OT";
     std::string result = prompt_set.second;
-    std::string user_number = "" ; // TODO std::to_string(m_logon_user->iId);
+    std::string user_number = std::to_string(m_logon_user->iId);
 
-    m_session_io.m_common_io.parseLocalMCI(result, mci_code, user_number);
-    result = m_session_io.pipe2ansi(result);
+    m_session_io->m_common_io.parseLocalMCI(result, mci_code, user_number);
+    result = m_session_io->pipe2ansi(result);
     result += "\r\n";
     baseProcessAndDeliver(result);
 }
@@ -209,13 +254,11 @@ void ModLogon::setupPasswordChange()
  */
 bool ModLogon::checkUserLogon(const std::string &input)
 {
-    // TODO 
-    /*
     // Check for user name and if is already exists!
     users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
 
     // Check if a Digit, if so, lookup by userId.
-    if(m_session_data->m_common_io.isDigit(input))
+    if(m_common_io.isDigit(input))
     {
         long userId = 0;
         std::stringstream ss(input);
@@ -265,7 +308,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
             displayUserNumber();
             return true;
         }
-    }*/
+    }
 
     return false;
 }
@@ -277,7 +320,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
 bool ModLogon::logon(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
+    std::string result = m_session_io->getInputField(input, key, Config::sName_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -390,10 +433,9 @@ bool ModLogon::validate_password(const std::string &input)
  */
 bool ModLogon::password(const std::string &input)
 {
-    /* TODO 
     std::string key = "";
     bool useHiddenOutput = true;
-    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length, "", useHiddenOutput);
+    std::string result = m_session_io->getInputField(input, key, Config::sPassword_length, "", useHiddenOutput);
 
     // ESC was hit
     if(result == "aborted")
@@ -440,7 +482,7 @@ bool ModLogon::password(const std::string &input)
         {
             baseProcessDeliverInput(result);
         }
-    }*/
+    }
 
     return false;
 }

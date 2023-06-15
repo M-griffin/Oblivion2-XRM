@@ -2,6 +2,7 @@
 #define MENU_SHELL_HPP
 
 #include "state_base.hpp"
+#include "menu_base.hpp"
 
 #include "model-sys/struct_compat.hpp"
 
@@ -25,6 +26,7 @@ typedef std::shared_ptr<Session> session_ptr;
  */
 class MenuShell
     : public StateBase
+    , public MenuBase
 {
 public:
     explicit MenuShell(session_ptr session_data);

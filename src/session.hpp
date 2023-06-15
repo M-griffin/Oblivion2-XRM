@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+#include "libSqliteWrapped.h"
 
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
@@ -221,6 +222,10 @@ public:
     int                        m_encoding;
     bool                       m_is_use_ansi;
     bool                       m_is_esc_timer;
+    bool                       m_is_session_authorized;
+    
+    SQLW::Database             m_user_database;
+    SQLW::StderrLog            m_database_log;
 
 };
 

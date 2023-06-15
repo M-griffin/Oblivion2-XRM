@@ -1,21 +1,26 @@
 #include "menu_system.hpp"
 
+#include "model-sys/config.hpp"
+
 #include "mods/mod_prelogon.hpp"
-/*
 #include "mods/mod_logon.hpp"
 #include "mods/mod_signup.hpp"
 #include "mods/mod_menu_editor.hpp"
 #include "mods/mod_user_editor.hpp"
 #include "mods/mod_level_editor.hpp"
 #include "mods/mod_message_editor.hpp"
-*/
+
+#include "session.hpp"
 #include "logging.hpp"
 
 #include <locale>
+#include <cassert>
+#include <memory>
+#include <stdint.h>
 #include <string>
 #include <vector>
+#include <map>
 #include <functional>
-#include <cassert>
 
 const std::string MenuSystem::m_stateID = "MENU_SYSTEM";
 
@@ -86,12 +91,8 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
 bool MenuSystem::onEnter()
 {
     // Startup the Prelogon sequence
-    /* TODO  bombing Here!
     startupModulePreLogon();
     m_is_active = true;
-    return true;
-    */
-    
     return true;
 }
 
@@ -492,7 +493,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
             m_log.write<Logging::CONSOLE_LOG>("User Logoff()");
             // Base Class
             m_logoff = true;
-            // TODO FIX ME m_session_data->logoff();
+            m_session_data->logoff();
             break;
 
         // Drops into the BBS
@@ -551,7 +552,7 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
             // Add Logoff ANSI Display here.
             // Base Class
             m_logoff = true;
-            //m_session_data->logoff();
+            m_session_data->logoff();
             break;
 
         // logoff without ansi
@@ -559,7 +560,7 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
             m_log.write<Logging::DEBUG_LOG>("Logoff() Without ANSI");
             // Base Class
             m_logoff = true;
-            //m_session_data->logoff();
+            m_session_data->logoff();
             break;
 
         // Fill out info form
@@ -903,10 +904,8 @@ void MenuSystem::resetMenuInputIndex(int index)
  */
 void MenuSystem::startupExternalProcess(const std::string &cmdline)
 {
-    /** TODO 
     m_log.write<Logging::CONSOLE_LOG>("Executing startExternalProcess()=", cmdline);
-    m_menu_session_data->startExternalProcess(cmdline);
-    */
+    //m_menu_session_data->startExternalProcess(cmdline);
 }
 
 /**
@@ -927,6 +926,7 @@ void MenuSystem::shutdownModule()
 {
     // Do module shutdown, only single modules are loaded
     // This makes it easy to allocate and kill on demand.
+    m_log.write<Logging::DEBUG_LOG>("shutdownModule MenuSystem()");
     m_module_stack.back()->onExit();
     m_module_stack.pop_back();
 }
@@ -970,8 +970,7 @@ void MenuSystem::startupModulePreLogon()
  * @brief Start up the Normal Login Process.
  */
 void MenuSystem::startupModuleLogon()
-{
-    /* TODO
+{    
     // Setup the input processor
     resetMenuInputIndex(MODULE_LOGON_INPUT);
 
@@ -985,7 +984,6 @@ void MenuSystem::startupModuleLogon()
     }
 
     startupModule(module);
-    */
 }
 
 /**
@@ -993,7 +991,6 @@ void MenuSystem::startupModuleLogon()
  */
 void MenuSystem::startupModuleSignup()
 {
-    /* TODO
     // Setup the input processor
     resetMenuInputIndex(MODULE_INPUT);
 
@@ -1002,13 +999,11 @@ void MenuSystem::startupModuleSignup()
 
     if(!module)
     {
-        Logging *log = Logging::instance();
         m_log.write<Logging::ERROR_LOG>("startupModuleSignup Allocation Error");
         return;
     }
 
     startupModule(module);
-    */
 }
 
 /**
@@ -1016,7 +1011,6 @@ void MenuSystem::startupModuleSignup()
  */
 void MenuSystem::startupModuleMenuEditor()
 {
-    /* TODO
     // Setup the input processor
     resetMenuInputIndex(MODULE_INPUT);
 
@@ -1025,13 +1019,11 @@ void MenuSystem::startupModuleMenuEditor()
 
     if(!module)
     {
-        Logging *log = Logging::instance();
         m_log.write<Logging::ERROR_LOG>("startupModuleMenuEditor Allocation Error");
         return;
     }
 
     startupModule(module);
-    */
 }
 
 /**
@@ -1039,7 +1031,6 @@ void MenuSystem::startupModuleMenuEditor()
  */
 void MenuSystem::startupModuleUserEditor()
 {
-    /*
     // Setup the input processor
     resetMenuInputIndex(MODULE_INPUT);
 
@@ -1048,13 +1039,11 @@ void MenuSystem::startupModuleUserEditor()
 
     if(!module)
     {
-        Logging *log = Logging::instance();
         m_log.write<Logging::ERROR_LOG>("startupModuleUserEditor Allocation Error");
         return;
     }
 
     startupModule(module);
-    */
 }
 
 /**
@@ -1062,7 +1051,6 @@ void MenuSystem::startupModuleUserEditor()
  */
 void MenuSystem::startupModuleLevelEditor()
 {
-    /*
     // Setup the input processor
     resetMenuInputIndex(MODULE_INPUT);
 
@@ -1071,13 +1059,11 @@ void MenuSystem::startupModuleLevelEditor()
 
     if(!module)
     {
-        Logging *log = Logging::instance();
         m_log.write<Logging::ERROR_LOG>("startupModuleLevelEditor Allocation Error");
         return;
     }
 
     startupModule(module);
-    */
 }
 
 /**
@@ -1085,7 +1071,6 @@ void MenuSystem::startupModuleLevelEditor()
  */
 void MenuSystem::startupModuleMessageEditor()
 {
-    /*
     // Setup the input processor
     resetMenuInputIndex(MODULE_INPUT);
 
@@ -1094,13 +1079,11 @@ void MenuSystem::startupModuleMessageEditor()
 
     if(!module)
     {
-        Logging *log = Logging::instance();
         m_log.write<Logging::ERROR_LOG>("startupModuleMessageEditor Allocation Error");
         return;
     }
 
     startupModule(module);
-    */
 }
 
 
@@ -1126,9 +1109,7 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
     if(!m_module_stack.back()->m_is_active)
     {
         shutdownModule();
-
-        // TODO
-        /*
+        
         // Check if the current user has been logged in yet.
         if(!m_session_data->m_is_session_authorized)
         {
@@ -1153,7 +1134,7 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
                 m_current_menu = "main";
                 m_starting_menu = "main";
             }
-        }*/
+        }
 
         m_log.write<Logging::DEBUG_LOG>("loadAndStartupMenu on initial login");
 

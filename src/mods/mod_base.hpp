@@ -1,6 +1,8 @@
 #ifndef MOD_BASE_HPP
 #define MOD_BASE_HPP
 
+#include "common_io.hpp"
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -193,6 +195,7 @@ public:
     // This holds session data passed to each session.
     // In modules we'll use the weak pointer so more clarity.
     Logging            &m_log;
+    CommonIO            m_common_io;
     session_ptr         m_session_data;
     config_ptr          m_config;
     session_io_ptr      m_session_io;

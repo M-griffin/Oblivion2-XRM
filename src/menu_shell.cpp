@@ -1,4 +1,5 @@
 #include "menu_shell.hpp"
+#include "menu_base.hpp"
 
 #include "logging.hpp"
 
@@ -11,6 +12,7 @@
 
 MenuShell::MenuShell(session_ptr session_data)
     : StateBase(session_data)
+    , MenuBase(session_data)
     , m_log(Logging::getInstance())
 {
     std::cout << "MenuShell Startup()" << std::endl;
@@ -24,7 +26,7 @@ MenuShell::~MenuShell()
 /**
  * @brief Handles Updates or Data Input from Client
  */
-void MenuShell::update(const std::string &character_buffer, const bool &is_utf8)
+void MenuShell::update(const std::string &character_buffer, const bool &)//is_utf8)
 {
     if(!m_is_active)
     {

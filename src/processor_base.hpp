@@ -41,6 +41,7 @@ class ProcessorBase
 {
 public:
 
+    ProcessorBase(int term_height, int term_width);
     virtual ~ProcessorBase() 
     { 
         std::cout << "~ProcessorBase()" << std::endl;
@@ -92,57 +93,7 @@ public:
 
     // Process ANSI screen inserts into the Screen Buffer
     virtual void parseTextToBuffer(char *buff) = 0;
-
-    // Helpers
-    int getYPosition() const
-    {
-        return m_y_position;
-    }
-    int getXPosition() const
-    {
-        return m_x_position;
-    }
-    int getMaxLines() const
-    {
-        return m_number_lines;
-    }
-    std::map<int, int> getLineEndingMap() const
-    {
-        return m_line_ending_map;
-    }
-
-    /**
-     * @brief ProcessorBase Constructor
-     * @param term_height
-     * @param term_width
-     * @return
-     */
-    ProcessorBase(int term_height, int term_width)
-        : m_ansi_output("")
-        , m_is_screen_cleared(false)
-        , m_is_line_wrapping(false)
-        , m_position(0)
-        , m_y_position(1)
-        , m_number_lines(term_height)
-        , m_characters_per_line(term_width)
-        , m_x_position(1)
-        , m_max_x_position(1)
-        , m_max_y_position(1)
-        , m_center_ansi_output(false)
-        , m_saved_cursor_x(1)
-        , m_saved_cursor_y(1)
-        , m_attribute(0)
-        , m_saved_attribute(0)
-        , m_saved_foreground(FG_WHITE)
-        , m_saved_background(BG_BLACK)
-        , m_foreground_color(FG_WHITE)
-        , m_background_color(BG_BLACK)
-        , m_screen_pixel()
-    {
-        m_screen_buffer.reserve(m_number_lines * m_characters_per_line);
-        m_screen_buffer.resize(m_number_lines * m_characters_per_line);
-    }
-
+    
     std::string m_ansi_output;
 
     bool m_is_screen_cleared;
@@ -221,6 +172,12 @@ public:
         BG_CYAN            = 46,
         BG_WHITE           = 47
     };
+    
+    // Helpers
+    int getYPosition() const;
+    int getXPosition() const;
+    int getMaxLines() const;
+    std::map<int, int> getLineEndingMap() const;
 
 };
 

@@ -1,15 +1,17 @@
 #include "menu_base.hpp"
 
+#include "access_condition.hpp"
+#include "communicator.hpp"
 #include "data-sys/menu_dao.hpp"
 #include "data-sys/menu_prompt_dao.hpp"
 #include "model-sys/config.hpp"
 #include "model-sys/users.hpp"
 #include "processor_ansi.hpp"
 #include "directory.hpp"
-#include "logging.hpp"
 #include "session.hpp"
 #include "session_io.hpp"
 #include "telnet_decoder.hpp"
+#include "logging.hpp"
 
 #include <locale>
 #include <cstring>
@@ -26,7 +28,7 @@ MenuBase::MenuBase(session_ptr session_data)
     : m_log(Logging::getInstance())
     , m_menu_session_data(session_data)
     , m_session_io(new SessionIO(session_data))
-    , m_config(new Config())
+    , m_config(Communicator::getInstance().getConfiguration())
     , m_directory(new Directory())
     , m_line_buffer("")
     , m_use_hotkey(false)
@@ -47,9 +49,8 @@ MenuBase::MenuBase(session_ptr session_data)
     , m_use_first_command_execution(true)
     , m_logoff(false)
 {
-    
-    // REset this to load the config maybe?!?  Not sure if YAML is leaking. 
-    // m_config = TheCommunicator::instance()->getConfiguration();
+    // Pull in the Loaded Configuration.
+    m_config = Communicator::getInstance().getConfiguration();
 }
 
 MenuBase::~MenuBase()
@@ -132,14 +133,11 @@ void MenuBase::clearMenuPullDownOptions()
  */
 bool MenuBase::checkMenuAcsAccess(menu_ptr menu)
 {
-    // TODO 
-    /*
     AccessCondition acs;
     return acs.validateAcsString(
                menu->menu_acs_string,
                m_menu_session_data->m_user_record
            );
-    */
 }
 
 /**
@@ -151,18 +149,16 @@ void MenuBase::checkMenuOptionsAcsAccess()
     std::vector<MenuOption>::iterator it = m_menu_info->menu_options.begin();
     std::vector<MenuOption>::iterator end = m_menu_info->menu_options.end();
     std::vector<MenuOption> new_options;
-    // TODO AccessCondition acs;
+    AccessCondition acs;
 
     for(; it != end; it++)
     {
-        /*
         if(acs.validateAcsString(
                     (*it).acs_string,
                     m_menu_session_data->m_user_record))
         {
             new_options.push_back(*it);
-        }*/
-        // TODO FIXME
+        }
         new_options.push_back(*it);
     }
 
