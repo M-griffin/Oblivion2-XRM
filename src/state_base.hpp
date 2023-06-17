@@ -21,6 +21,8 @@ public:
 
     virtual ~StateBase()
     {
+        std::cout << "~StateBase()" << std::endl;
+        m_session_data.reset();        
     }
     virtual void update(const std::string &character_buffer, const bool &is_utf8)  = 0;
     virtual bool onEnter() = 0;

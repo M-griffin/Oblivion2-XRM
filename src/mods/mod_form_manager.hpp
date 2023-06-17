@@ -13,8 +13,8 @@ class MenuOption;
 class MenuBase;
 typedef std::shared_ptr<MenuBase> menu_base_ptr;
 
-class FormManager;
-typedef std::shared_ptr<FormManager> form_manager_ptr;
+//class FormManager;
+//typedef std::shared_ptr<FormManager> form_manager_ptr;
 
 
 /**
@@ -52,7 +52,7 @@ public:
 
     int                m_current_page;
     menu_base_ptr      m_menu;
-    form_manager_ptr   m_form_manager;
+    //form_manager_ptr   m_form_manager;
 
 };
 

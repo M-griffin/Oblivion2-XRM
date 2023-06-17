@@ -38,7 +38,7 @@ MenuBase::MenuBase(session_ptr session_data)
     , m_starting_menu("")
     , m_input_index(MENU_INPUT)
     , m_menu_info(new Menu())
-    , m_menu_prompt()
+    , m_menu_prompt(new MenuPrompt())
     , m_ansi_process(new ProcessorAnsi(
                          m_menu_session_data->m_telnet_decoder->getTermRows(),
                          m_menu_session_data->m_telnet_decoder->getTermCols()))
@@ -63,13 +63,16 @@ MenuBase::~MenuBase()
 
     // Pop off the stack to deallocate any active modules.
     std::vector<module_ptr>().swap(m_module_stack);
+    std::vector<MenuOption>().swap(m_loaded_pulldown_options);
     
-    m_menu_session_data.reset();
-    m_session_io.reset();
+    m_menu_session_data.reset();    
     m_config.reset();
     m_directory.reset();
     m_menu_info.reset();
     m_ansi_process.reset();
+    m_menu_info.reset();
+    m_menu_prompt.reset();
+    m_session_io.reset();
     
 }
 

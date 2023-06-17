@@ -7,6 +7,7 @@
 #include "model-sys/struct_compat.hpp"
 #include "model-sys/menu.hpp"
 
+#include <iostream>
 #include <memory>
 #include <stdint.h>
 #include <string>
@@ -16,12 +17,6 @@
 
 
 class Logging;
-
-class ModBase;
-typedef std::shared_ptr<ModBase> module_ptr;
-
-class FormManager;
-typedef std::shared_ptr<FormManager> form_manager_ptr;
 
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
@@ -40,7 +35,7 @@ class MenuSystem
 {
 public:
     explicit MenuSystem(session_ptr session_data);
-    ~MenuSystem();
+    virtual ~MenuSystem();
 
     virtual void update(const std::string &character_buffer, const bool &is_utf8) override;
     virtual bool onEnter() override;
@@ -56,7 +51,7 @@ public:
     std::vector<std::string>  m_system_fallback;
 
     // handle to form interface.
-    form_manager_ptr          m_form_manager;
+    //form_manager_ptr          m_form_manager;
 
 
     // Dynamic Map of all Menu Option Command functions

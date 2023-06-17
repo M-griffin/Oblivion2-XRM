@@ -4,7 +4,7 @@
 #include "model-sys/menu.hpp"
 
 #include "../forms/form_system_config.hpp"
-#include "../form_manager.hpp"
+//#include "../form_manager.hpp"
 
 #include "../processor_ansi.hpp"
 #include "../session.hpp"
@@ -16,7 +16,7 @@ ModFormManager::ModFormManager(session_ptr session_data, config_ptr config, proc
     : ModBase(session_data, config, ansi_process)
     , m_current_page(0)
     , m_menu(new MenuBase(session_data))
-    , m_form_manager(new FormManager(config, session_data))
+//    , m_form_manager(new FormManager(config, session_data))
 {
     // Setup the Callback to Menu Option Execution to this base class.
     m_menu->m_execute_callback.push_back(std::bind(&ModFormManager::menuOptionsCallback, this, std::placeholders::_1));
@@ -80,6 +80,7 @@ bool ModFormManager::menuOptionsCallback(const MenuOption &option)
  */
 void ModFormManager::startupFormManager()
 {
+    /* TODO FIXME
     // Startup a new Form manager instance.
     m_form_manager.reset(new FormManager(m_config, m_session_data));
 
@@ -91,4 +92,5 @@ void ModFormManager::startupFormManager()
         // Load the Form Menu Options into the Menu System.
         m_menu->importMenu(menu);
     }
+    */
 }
