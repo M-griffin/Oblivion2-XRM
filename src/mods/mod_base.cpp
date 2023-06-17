@@ -26,6 +26,7 @@ ModBase::ModBase(session_ptr session_data, config_ptr config, processor_ansi_ptr
 
 ModBase::~ModBase()
 {
+    std::cout << "~ModBase()" << std::endl;
     m_session_data.reset();
     m_config.reset();
     m_session_io.reset();

@@ -3,6 +3,7 @@
 
 #include "mod_base.hpp"
 
+#include <iostream>
 #include <string>
 #include <memory>
 #include <vector>
@@ -32,6 +33,7 @@ public:
 
     virtual ~ModSignup() override
     {
+        std::cout << "~ModSignup()" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
     }
@@ -436,7 +438,6 @@ private:
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
-    session_io_ptr         m_session_io;
     menu_base_ptr          m_menu_base;
     std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;

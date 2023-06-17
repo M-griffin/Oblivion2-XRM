@@ -31,7 +31,9 @@ public:
     ModFormManager(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process);
 
     virtual ~ModFormManager() override
-    { }
+    { 
+        std::cout << "~ModFormManager()" << std::endl;
+    }
 
     virtual bool update(const std::string &character_buffer, const bool &) override;
     virtual bool onEnter() override;
@@ -51,7 +53,6 @@ public:
     int                m_current_page;
     menu_base_ptr      m_menu;
     form_manager_ptr   m_form_manager;
-    session_io_ptr     m_session_io;
 
 };
 

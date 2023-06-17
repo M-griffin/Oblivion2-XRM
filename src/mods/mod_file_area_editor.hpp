@@ -29,6 +29,7 @@ public:
 
     virtual ~ModFileAreaEditor() override
     {
+        std::cout << "~ModFileAreaEditor()" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
         std::vector<access_level_ptr>().swap(m_loaded_level);
@@ -334,9 +335,9 @@ private:
     std::vector<std::string>                                m_menu_display_list;
     std::vector<access_level_ptr>                           m_loaded_level;
 
-    session_io_ptr         m_session_io;
     std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
+    directory_ptr          m_directory;
 
     unsigned int           m_mod_setup_index;
     unsigned int           m_mod_function_index;
@@ -351,7 +352,7 @@ private:
     unsigned int           m_current_option;
     unsigned int           m_current_field;
 
-    directory_ptr          m_directory;
+    
 
 };
 

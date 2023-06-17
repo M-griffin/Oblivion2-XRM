@@ -19,7 +19,6 @@
 
 ModLevelEditor::ModLevelEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
     : ModBase(session_data, config, ansi_process)
-    , m_session_io(new SessionIO(session_data))
     , m_filename("mod_level_editor.yaml")
     , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
     , m_mod_setup_index(MOD_DISPLAY_LEVEL)

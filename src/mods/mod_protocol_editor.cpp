@@ -9,12 +9,13 @@
 #include "../processor_ansi.hpp"
 #include "../encoding.hpp"
 #include "../logging.hpp"
+#include "../directory.hpp"
 
 ModProtocolEditor::ModProtocolEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
     : ModBase(session_data, config, ansi_process)
-    , m_session_io(new SessionIO(session_data))
     , m_filename("mod_menu_editor.yaml")
     , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
+    , m_directory(new Directory())
     , m_mod_function_index(MOD_PROMPT)
     , m_failure_attempts(0)
     , m_is_text_prompt_exist(false)

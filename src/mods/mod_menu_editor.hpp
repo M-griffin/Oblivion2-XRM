@@ -3,13 +3,11 @@
 
 #include "mod_base.hpp"
 
+#include <iostream>
 #include <string>
 #include <memory>
 #include <functional>
 #include <vector>
-
-class SessionIO;
-typedef std::shared_ptr<SessionIO> session_io_ptr;
 
 class Menu;
 typedef std::shared_ptr<Menu> menu_ptr;
@@ -32,6 +30,7 @@ public:
 
     virtual ~ModMenuEditor() override
     {
+        std::cout << "~ModMenuEditor()" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
         std::vector<menu_ptr>().swap(m_loaded_menu);
@@ -452,9 +451,9 @@ private:
     std::vector<std::string>                                m_menu_display_list;
     std::vector<menu_ptr>                                   m_loaded_menu;
 
-    session_io_ptr         m_session_io;
     std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
+    directory_ptr          m_directory;
 
     unsigned int           m_mod_setup_index;
     unsigned int           m_mod_function_index;
@@ -467,10 +466,7 @@ private:
     unsigned int           m_rows_per_page;
     std::string            m_current_menu;
     unsigned int           m_current_option;
-    unsigned int           m_current_field;
-
-    CommonIO               m_common_io;
-    directory_ptr          m_directory;
+    unsigned int           m_current_field;   
 
 };
 

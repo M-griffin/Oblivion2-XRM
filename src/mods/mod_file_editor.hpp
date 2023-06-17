@@ -3,6 +3,7 @@
 
 #include "mod_base.hpp"
 
+#include <iostream>
 #include <string>
 #include <memory>
 #include <vector>
@@ -26,6 +27,7 @@ public:
 
     virtual ~ModFileEditor() override
     {
+        std::cout << "~ModFileEditor()" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
     }
@@ -64,18 +66,16 @@ private:
     // Function Input Vector.
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
-
-
-    session_io_ptr         m_session_io;
+    
     std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
+    directory_ptr          m_directory;
 
     int                    m_mod_function_index;
     int                    m_failure_attempts;
     bool                   m_is_text_prompt_exist;
 
-    CommonIO               m_common_io;
-    directory_ptr          m_directory;
+    
 
     // Hold instance of user trying to login to the system.
     //user_ptr             m_logon_user;

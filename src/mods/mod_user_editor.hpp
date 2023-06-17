@@ -3,13 +3,11 @@
 
 #include "mod_base.hpp"
 
+#include <iostream>
 #include <string>
 #include <memory>
 #include <functional>
 #include <vector>
-
-class SessionIO;
-typedef std::shared_ptr<SessionIO> session_io_ptr;
 
 class Directory;
 typedef std::shared_ptr<Directory> directory_ptr;
@@ -32,6 +30,7 @@ public:
 
     virtual ~ModUserEditor() override
     {
+        std::cout << "~ModUserEditor()" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
         std::vector<user_ptr>().swap(m_users_listing);
@@ -423,9 +422,9 @@ private:
     std::vector<std::string>                                m_user_display_list;
     std::vector<user_ptr>                                   m_loaded_user;
 
-    session_io_ptr         m_session_io;
     std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
+    directory_ptr          m_directory;
 
     unsigned int           m_mod_setup_index;
     unsigned int           m_mod_function_index;
@@ -438,10 +437,7 @@ private:
     unsigned long          m_current_user_id;
     unsigned int           m_current_field;
     std::string            m_wildcard_filter;
-    unsigned long          m_user_array_position;
-
-    CommonIO               m_common_io;
-    directory_ptr          m_directory;
+    unsigned long          m_user_array_position;    
 
 };
 

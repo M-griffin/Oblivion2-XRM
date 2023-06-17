@@ -3,6 +3,7 @@
 
 #include "mod_base.hpp"
 
+#include <iostream>
 #include <string>
 #include <memory>
 #include <functional>
@@ -26,6 +27,7 @@ public:
 
     virtual ~ModSystemConfig() override
     {
+        std::cout << "~ModSystemConfig()" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
     }
@@ -66,11 +68,10 @@ private:
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
-
-    session_io_ptr         m_session_io;
     std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
     directory_ptr          m_directory;
+
     int                    m_mod_function_index;
     int                    m_failure_attempts;
     bool                   m_is_text_prompt_exist;

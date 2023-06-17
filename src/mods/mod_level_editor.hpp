@@ -3,6 +3,7 @@
 
 #include "mod_base.hpp"
 
+#include <iostream>
 #include <functional>
 #include <memory>
 #include <string>
@@ -25,6 +26,7 @@ public:
 
     virtual ~ModLevelEditor() override
     {
+        std::cout << "~ModLevelEditor()" << std::endl;
         std::vector<std::function<void()>>().swap(m_setup_functions);
         std::vector<std::function<void(const std::string&)>>().swap(m_mod_functions);
         std::vector<access_level_ptr>().swap(m_loaded_levels);
@@ -310,7 +312,6 @@ private:
     std::vector<std::string>                             m_level_display_list;
     std::vector<access_level_ptr>                        m_loaded_levels;
 
-    session_io_ptr       m_session_io;
     std::string          m_filename;
     text_prompts_dao_ptr m_text_prompts_dao;
 
@@ -323,8 +324,6 @@ private:
     unsigned int         m_rows_per_page;
     int                  m_current_level;
     unsigned int         m_current_field;
-
-    CommonIO             m_common_io;
 };
 
 #endif // MOD_LEVEL_EDITOR_HPP

@@ -3,6 +3,7 @@
 
 #include "mod_base.hpp"
 
+#include <iostream>
 #include <string>
 #include <memory>
 #include <vector>
@@ -28,6 +29,7 @@ public:
 
     virtual ~ModPreLogon() override
     {
+        std::cout << "~ModPreLogon()" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
     }
@@ -167,8 +169,6 @@ private:
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
-
-    session_io_ptr         m_session_io;
     std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
     deadline_timer_ptr     m_deadline_timer;

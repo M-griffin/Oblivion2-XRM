@@ -11,6 +11,7 @@
 #include "../session.hpp"
 #include "../common_io.hpp"
 #include "../logging.hpp"
+#include "../directory.hpp"
 
 #include <stdint.h>
 #include <string>
@@ -20,9 +21,9 @@
 
 ModMessageBaseEditor::ModMessageBaseEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
     : ModBase(session_data, config, ansi_process)
-    , m_session_io(new SessionIO(session_data))
     , m_filename("mod_message_base_editor.yaml")
     , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
+    , m_directory(new Directory())
     , m_mod_setup_index(MOD_DISPLAY_MENU)
     , m_mod_function_index(MOD_MENU_INPUT)
     , m_mod_menu_state_index(MENU_ADD)

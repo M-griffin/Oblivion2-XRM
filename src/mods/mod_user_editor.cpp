@@ -13,6 +13,7 @@
 #include "../encryption.hpp"
 #include "../access_condition.hpp"
 #include "../logging.hpp"
+#include "../directory.hpp"
 
 #include <string>
 #include <vector>
@@ -26,9 +27,9 @@
  
 ModUserEditor::ModUserEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
     : ModBase(session_data, config, ansi_process)
-    , m_session_io(new SessionIO(session_data))
     , m_filename("mod_user_editor.yaml")
     , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
+    , m_directory(new Directory())
     , m_mod_setup_index(MOD_DISPLAY_USER_LIST)
     , m_mod_function_index(MOD_USER_INPUT)
     , m_mod_user_state_index(USER_CHANGE)
