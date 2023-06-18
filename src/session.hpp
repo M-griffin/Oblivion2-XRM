@@ -118,7 +118,7 @@ public:
         {
             Logging &log = Logging::getInstance();
             log.write<Logging::ERROR_LOG>("TelnetOptionNegoiation Exception=", ex.what(), __LINE__, __FILE__);
-            new_session->logoff();
+            //new_session->logoff();
         }
         
         return new_session;
@@ -199,6 +199,10 @@ public:
      */
     void logoff();
     
+    /**
+     * @brief Shutdown Socket Connections
+     */
+    void disconnectUser();
     
     // Local Member Definitions Weak Pointers
     Logging                   &m_log;

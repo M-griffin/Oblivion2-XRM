@@ -283,13 +283,46 @@ bool SDL_Socket::onExit()
     if(m_tcp_socket)
     {
         m_is_socket_active = false;
-    
-        if(m_tcp_socket == NULL) 
+     
+        if(SDLNet_TCP_DelSocket(m_socket_set, m_tcp_socket) == -1) 
         {
-            log.write<Logging::ERROR_LOG>("SDLNet_TCP_DelSocket is NULL", __FILE__, __LINE__);
+            log.write<Logging::ERROR_LOG>("SDLNet_TCP_DelSocket=", SDLNet_GetError(), __FILE__, __LINE__);
             return false;
         }
-     
+        
+        SDLNet_TCP_Close(m_tcp_socket);
+        std::cout << "SDL_Socket closed!" << std::endl;
+    }
+
+    m_tcp_socket = nullptr;
+
+    if(m_socket_set)
+    {
+        SDLNet_FreeSocketSet(m_socket_set);
+    }
+
+    m_socket_set = nullptr;
+    return true;
+}
+
+/**
+ * @brief Shutdown Socket.
+ * @return
+ */
+bool SDL_Socket::disconnectUser()
+{
+    std::cout << "SDL_Socket disconnectUser()" << std::endl;
+    Logging &log = Logging::getInstance();
+    m_is_socket_active = false;
+    
+    if(m_tcp_socket == NULL) 
+    {
+        log.write<Logging::ERROR_LOG>("SDLNet_TCP_DelSocket is NULL", __FILE__, __LINE__);
+        return false;
+    }
+
+    if(m_tcp_socket)
+    {    
         if(SDLNet_TCP_DelSocket(m_socket_set, m_tcp_socket) == -1) 
         {
             log.write<Logging::ERROR_LOG>("SDLNet_TCP_DelSocket=", SDLNet_GetError(), __FILE__, __LINE__);

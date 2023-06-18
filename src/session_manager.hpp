@@ -35,7 +35,7 @@ public:
      */
     void join(const session_ptr &session);
 
-    void leave(const session_ptr &session);
+    void leave(session_ptr session);
     void deliver(const std::string &msg);
 
     int connections();

@@ -251,7 +251,7 @@ void ModPreLogon::displayTerminalDetection()
          * When the system is being hammered..  Look more into this. - New Testing is no loger throwing faults, Keep Watch!
         if(term == "undetected") {
             m_log.write<Logging::CONSOLE_LOG>("Term Type= undetected, disconnecting!");
-            m_session_data->logoff();
+            m_session_data->disconnectUser();
             m_is_active = false;
             return;
         }*/

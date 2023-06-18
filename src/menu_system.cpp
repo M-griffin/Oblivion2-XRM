@@ -493,7 +493,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
             m_log.write<Logging::CONSOLE_LOG>("User Logoff()");
             // Base Class
             m_logoff = true;
-            m_session_data->logoff();
+            m_session_data->disconnectUser();
             break;
 
         // Drops into the BBS
@@ -552,7 +552,7 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
             // Add Logoff ANSI Display here.
             // Base Class
             m_logoff = true;
-            m_session_data->logoff();
+            m_session_data->disconnectUser();
             break;
 
         // logoff without ansi
@@ -560,7 +560,7 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
             m_log.write<Logging::DEBUG_LOG>("Logoff() Without ANSI");
             // Base Class
             m_logoff = true;
-            m_session_data->logoff();
+            m_session_data->disconnectUser();
             break;
 
         // Fill out info form

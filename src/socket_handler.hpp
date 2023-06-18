@@ -8,6 +8,8 @@
 #include <vector>
 #include <memory>
 
+class Logging;
+
 /**
  * @class SocketHandler
  * @author Michael Griffin
@@ -19,12 +21,7 @@ class SocketHandler
 {
 public:
 
-    SocketHandler()
-        : m_socket()
-        , m_socket_type("")
-        , m_is_active(false)
-    {
-    }
+    SocketHandler();
 
     ~SocketHandler()
     {
@@ -55,8 +52,12 @@ public:
 
     void setSocketType(std::string type);
     void setSocketState(socket_state_ptr state);
+    
+    void disconnectUser();
 
 private:
+
+    Logging                        &m_log;
 
     std::vector<socket_state_ptr>   m_socket;
     std::string                     m_socket_type;

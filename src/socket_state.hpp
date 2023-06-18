@@ -44,6 +44,7 @@ public:
     virtual int pollSocket() = 0;
     virtual bool onListen() = 0;
     virtual bool onExit() = 0;
+    virtual bool disconnectUser() = 0;
 
     std::string m_host;
     int         m_port;
@@ -68,7 +69,8 @@ public:
         : SocketState(host, port)
         , m_tcp_socket(nullptr)
         , m_socket_set(nullptr)
-    { }
+    { 
+    }
 
     ~SDL_Socket()
     {
@@ -82,6 +84,7 @@ public:
     virtual int pollSocket() override;
     virtual bool onListen() override;
     virtual bool onExit() override;
+    virtual bool disconnectUser() override;
 
 private:
 

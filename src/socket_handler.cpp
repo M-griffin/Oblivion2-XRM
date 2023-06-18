@@ -1,10 +1,20 @@
 
 #include "socket_handler.hpp"
+
 #include "socket_state.hpp"
 #include "logging.hpp"
 
 #include <iostream>
 #include <exception>
+
+
+SocketHandler::SocketHandler()
+    : m_log(Logging::getInstance())
+    , m_socket()
+    , m_socket_type("")
+    , m_is_active(false)
+{
+}
 
 /**
  * @brief Send Socket Data
@@ -31,10 +41,8 @@ int SocketHandler::recvSocket(char *message)
  * @brief Poll if Socket has any data to retrieve
  * @return
  */
-int SocketHandler::poll()
+int SocketHandler::SocketHandler::poll()
 {
-    Logging &log = Logging::getInstance();
-
     int ret = 0;
 
     if(m_is_active)
@@ -43,7 +51,7 @@ int SocketHandler::poll()
 
         if(ret == -1)
         {
-            log.write<Logging::ERROR_LOG>("Socket Closed by host, disconnecting.", __FILE__, __LINE__);
+            m_log.write<Logging::ERROR_LOG>("Socket Closed by host, disconnecting.", __FILE__, __LINE__);
 
             // Shutdown Socket.
             m_socket.back()->onExit();
@@ -53,7 +61,7 @@ int SocketHandler::poll()
     else
     {
         // Inactive Connection
-        log.write<Logging::ERROR_LOG>("Shutdown received, Socket Closed.", __FILE__, __LINE__);
+        m_log.write<Logging::ERROR_LOG>("Shutdown received, Socket Closed.", __FILE__, __LINE__);
         ret = -1;
     }
 
@@ -68,8 +76,6 @@ int SocketHandler::poll()
  */
 bool SocketHandler::createTelnetAcceptor(const std::string &host, const int &port)
 {
-    Logging &log = Logging::getInstance();
-
     if(!m_is_active)
     {
         try
@@ -84,7 +90,7 @@ bool SocketHandler::createTelnetAcceptor(const std::string &host, const int &por
             }
             else
             {
-                log.write<Logging::ERROR_LOG>("Unable to initialize Telnet Socket.", __FILE__, __LINE__);
+                m_log.write<Logging::ERROR_LOG>("Unable to initialize Telnet Socket.", __FILE__, __LINE__);
                 close();
                 return false;
             }
@@ -92,13 +98,13 @@ bool SocketHandler::createTelnetAcceptor(const std::string &host, const int &por
         catch(std::exception& e)
         {
             close();
-            log.write<Logging::ERROR_LOG>("Exception creating new SDL_Socket", e.what(), __FILE__, __LINE__);
+            m_log.write<Logging::ERROR_LOG>("Exception creating new SDL_Socket", e.what(), __FILE__, __LINE__);
             return false;
         }
     }
     else
     {
-        log.write<Logging::ERROR_LOG>("Telnet Socket already Active", __FILE__, __LINE__);
+        m_log.write<Logging::ERROR_LOG>("Telnet Socket already Active", __FILE__, __LINE__);
         return false;
     }
 
@@ -165,8 +171,7 @@ void SocketHandler::close()
     }
     catch(std::exception& e)
     {
-        Logging &log = Logging::getInstance();
-        log.write<Logging::ERROR_LOG>("Exception=", e.what(), __FILE__, __LINE__);
+        m_log.write<Logging::ERROR_LOG>("Exception=", e.what(), __FILE__, __LINE__);
     }
 }
 
@@ -188,3 +193,13 @@ void SocketHandler::setSocketState(socket_state_ptr state)
     m_socket.push_back(state);
     m_is_active = true;
 }
+
+/**
+ * @brief Set Socket State, For creating unique standalone socket sessions
+ * @param state
+ */
+void SocketHandler::disconnectUser()
+{
+    m_socket.back()->disconnectUser();
+}
+

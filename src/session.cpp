@@ -9,11 +9,7 @@
 #include "socket_handler.hpp"
 #include "session_manager.hpp"
 #include "telnet_decoder.hpp"
-
 #include "menu_system.hpp"
-
-// Stripped Down Rebuild for Dependency Issues
-//#include "menu_shell.hpp" 
 
 #include "logging.hpp"
 #include "encoding.hpp"
@@ -76,11 +72,12 @@ Session::~Session()
 
     // Free the menu system state and modules when session closes.
     m_state_manager->clean();
-    m_async_io.reset();
-    m_session_manager.reset();
+    m_async_io.reset();    
     m_deadline_timer.reset();
+    m_esc_input_timer.reset();
     m_telnet_decoder.reset();    
     m_user_record.reset();
+    m_session_manager.reset();
     std::vector<unsigned char>().swap(m_in_data_vector);
 }
 
@@ -427,30 +424,40 @@ void Session::handleTeloptCodes()
  */
 void Session::logoff()
 {
+    
+    // This might be doing double the deallocation    
+    if(m_async_io && m_async_io->getSocketHandle()->isActive())
+    {
+        try
+        {
+            m_log.write<Logging::DEBUG_LOG>("m_async_io->getSocketHandle() is ACTIVE!", __LINE__, __FILE__);
+            m_async_io->getSocketHandle()->setInactive();
+            
+        }
+        catch(std::exception &e)
+        {
+            // Sometime this doesn't close when it's already existed, just extra checking here.            
+            m_log.write<Logging::DEBUG_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
+        }
+    }
+    
     session_manager_ptr session_manager = m_session_manager.lock();
 
     if(session_manager)
     {
         m_is_leaving = true;
         m_log.write<Logging::DEBUG_LOG>("Logoff Session Manager", __LINE__, __FILE__);
-        // Room is the session.
+                
         session_manager->leave(shared_from_this());            
-        session_manager.reset();
+        session_manager.reset();        
     }
+    
+}
 
-    // This might be doing double the deallocation
-    /*
-    if(m_connection && m_connection->isActive())
-    {
-        try
-        {
-            m_connection->shutdown();
-        }
-        catch(std::exception &e)
-        {
-            // Sometime this doesn't close when it's already existed, just extra checking here.
-            Logging &log = Logging::getInstance();
-            log->write<Logging::DEBUG_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
-        }
-    }*/
+/**
+ * @brief Shutdown Socket Connections by User Rquests / Logoff.
+ */
+void Session::disconnectUser() 
+{
+    m_async_io->getSocketHandle()->disconnectUser();
 }

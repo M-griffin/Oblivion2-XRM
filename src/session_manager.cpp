@@ -23,7 +23,7 @@ void SessionManager::join(const session_ptr &session)
  * @brief Notifies that a user has left the room
  * @param participant
  */
-void SessionManager::leave(const session_ptr &session)
+void SessionManager::leave(session_ptr session)
 {
     Logging &log = Logging::getInstance();
     int node_number = session->m_node_number;
@@ -31,9 +31,11 @@ void SessionManager::leave(const session_ptr &session)
     
     try 
     {
-        // Clean Update The State Manager Prior to Removing the session!
-        session->m_state_manager->clean();
+        // Clean Update The State Manager Prior to Removing the session!        
+        //session->shutdownAsoi();
+        session->m_state_manager->clean();        
         m_sessions.erase(session);
+        
         log.write<Logging::CONSOLE_LOG>("SessionManager - disconnecting Node Session completed=", node_number);
     }
     catch (std::exception &ex)

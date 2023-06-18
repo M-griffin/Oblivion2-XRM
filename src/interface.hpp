@@ -48,25 +48,23 @@ public:
      * @param port
      * @return
      */
-    Interface(IOService& io_service, const std::string &protocol, const int &port)
-        : m_io_service(io_service)
+    Interface(IOService &io_service, const std::string &protocol, const int &port)
+        : m_log(Logging::getInstance())
+        , m_io_service(io_service)
         , m_session_manager(new SessionManager())
         , m_socket_acceptor(new SocketHandler())
         , m_async_listener(new AsyncAcceptor(io_service, m_socket_acceptor))
         , m_protocol(protocol)
     {
-
-        Logging &log = Logging::getInstance();
-
         // Startup SDL NET. Custom version Tweaked for KEEP Alive's
         if(SDLNet_Init() == -1)
         {
-            log.write<Logging::ERROR_LOG>("SDLNet_Init", SDLNet_GetError());
+            m_log.write<Logging::ERROR_LOG>("SDLNet_Init", SDLNet_GetError());
             return;
         }
 
         unsigned int num_threads = std::thread::hardware_concurrency();
-        log.write<Logging::INFO_LOG>("concurrent threads supported", num_threads);
+        m_log.write<Logging::INFO_LOG>("concurrent threads supported", num_threads);
 
         // Start up worker thread of ASIO. We want socket communications in a separate thread.
         // We only spawn a single thread for IO_Service on start up
@@ -75,11 +73,11 @@ public:
         // Setup Telnet Server Connection Listener.
         if(!m_socket_acceptor->createTelnetAcceptor("127.0.0.1", port))
         {
-            log.write<Logging::ERROR_LOG>("Unable to start Telnet Acceptor");
+            m_log.write<Logging::ERROR_LOG>("Unable to start Telnet Acceptor");
             return;
         }
 
-        log.write<Logging::CONSOLE_LOG>("Telnet Server Waiting for Connection.");
+        m_log.write<Logging::CONSOLE_LOG>("Telnet Server Waiting for Connection.");
         waitingForConnection();
     }
 
@@ -101,9 +99,8 @@ public:
      * @brief Handles incoming connections.
      */
     void waitingForConnection()
-    {
-        Logging &log = Logging::getInstance();
-        log.write<Logging::DEBUG_LOG>("Waiting For Connection, Adding Async Job to Listener");
+    {        
+        m_log.write<Logging::DEBUG_LOG>("Waiting For Connection, Adding Async Job to Listener");
         m_async_listener->asyncAccept(
             m_protocol,
             std::bind(&Interface::handle_accept,
@@ -122,38 +119,37 @@ private:
     void handle_accept(const std::error_code& error, const socket_handler_ptr &socket_handler)
     {
         if(!error)
-        {
-            Logging &log = Logging::getInstance();
-            log.write<Logging::DEBUG_LOG>("Handle-Accept TCP Connection accepted");
+        {            
+            m_log.write<Logging::DEBUG_LOG>("Handle-Accept TCP Connection accepted");
 
             async_io_ptr async_conn(new AsyncIO(m_io_service, socket_handler));
             
-            log.write<Logging::DEBUG_LOG>("Handle-Accept Create New Session");
+            m_log.write<Logging::DEBUG_LOG>("Handle-Accept Create New Session");
 
             // Create the new Session
             session_ptr new_session = Session::create(async_conn, m_session_manager);
 
-            log.write<Logging::DEBUG_LOG>("Handle-Accept Attached Session to Manager");
+            m_log.write<Logging::DEBUG_LOG>("Handle-Accept Attached Session to Manager");
 
             // Attach Session to Session Manager.
             m_session_manager->join(new_session);
         }
         else
         {
-            Logging &log = Logging::getInstance();
-            log.write<Logging::ERROR_LOG>("Handle-Accept Connection refused", error.message());
+            m_log.write<Logging::ERROR_LOG>("Handle-Accept Connection refused", error.message());
         }
         
         // Restart Listener for next connection.
         waitingForConnection();
     }
 
-    IOService&          m_io_service;
-    session_manager_ptr m_session_manager;
-    socket_handler_ptr  m_socket_acceptor;
-    acceptor_ptr        m_async_listener;
-    std::string         m_protocol;
-    std::thread         m_thread;
+    Logging             &m_log;
+    IOService           &m_io_service;
+    session_manager_ptr  m_session_manager;
+    socket_handler_ptr   m_socket_acceptor;
+    acceptor_ptr         m_async_listener;
+    std::string          m_protocol;
+    std::thread          m_thread;
 
 };
 

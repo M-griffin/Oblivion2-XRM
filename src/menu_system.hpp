@@ -35,7 +35,7 @@ class MenuSystem
 {
 public:
     explicit MenuSystem(session_ptr session_data);
-    virtual ~MenuSystem();
+    virtual ~MenuSystem() override;
 
     virtual void update(const std::string &character_buffer, const bool &is_utf8) override;
     virtual bool onEnter() override;
