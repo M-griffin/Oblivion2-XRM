@@ -1,16 +1,20 @@
 #ifndef SESSION_IO_HPP
 #define SESSION_IO_HPP
 
-#include "session.hpp"
-#include "common_io.hpp"
-
 #include "model-sys/structures.hpp"
 
+#include <vector>
 #include <memory>
 #include <string>
 #include <map>
 
 class Logging;
+
+class Session;
+typedef std::shared_ptr<Session> session_ptr;
+
+class CommonIO;
+typedef std::shared_ptr<CommonIO> common_io_ptr;
 
 class Config;
 typedef std::shared_ptr<Config> config_ptr;
@@ -31,7 +35,8 @@ public:
     typedef std::pair<std::string, std::string> M_StringPair;
 
     explicit SessionIO();
-    explicit SessionIO(session_ptr session_data);
+    SessionIO(session_ptr session_data);
+    SessionIO(session_ptr session_data, common_io_ptr common_io);
     ~SessionIO();
 
     /**
@@ -269,7 +274,7 @@ public:
     // Internal Methods
     Logging                           &m_log;
     session_ptr                        m_session_data; // SessionData
-    CommonIO                           m_common_io;    // CommonIO
+    common_io_ptr                      m_common_io;    // CommonIO
     std::map<std::string, std::string> m_mapped_codes; // MCI Code Translation for specific screens.
 
     const std::string STD_EXPRESSION = {"([|]{1}[0-9]{2})|([|]{1}[X][Y][0-9]{4})|"

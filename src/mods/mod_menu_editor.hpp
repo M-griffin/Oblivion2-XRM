@@ -26,7 +26,8 @@ class ModMenuEditor
     : public ModBase
 {
 public:
-    ModMenuEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process);
+    ModMenuEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModMenuEditor() override
     {
@@ -451,7 +452,6 @@ private:
     std::vector<std::string>                                m_menu_display_list;
     std::vector<menu_ptr>                                   m_loaded_menu;
 
-    std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
     directory_ptr          m_directory;
 

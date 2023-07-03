@@ -13,9 +13,9 @@
 #include <string>
 #include <vector>
 
-ModMessageEditor::ModMessageEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-    : ModBase(session_data, config, ansi_process)
-    , m_filename("mod_message_editor.yaml")
+ModMessageEditor::ModMessageEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io)
+    : ModBase(session_data, config, ansi_process,"mod_message_editor.yaml", common_io, session_io)
     , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
     , m_text_process(nullptr)
     , m_mod_function_index(MOD_PROMPT)
@@ -351,9 +351,9 @@ std::string ModMessageEditor::processMidTemplate(processor_ansi_ptr ansi_process
 void ModMessageEditor::setupEditor()
 {
     // NOTE Possible make these class instances, so we don't have to keep reloading.
-    std::string top_template = m_common_io.readinAnsi("FSESRT.ANS");
-    std::string mid_template = m_common_io.readinAnsi("FSEMID.ANS");
-    std::string bot_template = m_common_io.readinAnsi("FSEEND.ANS");
+    std::string top_template = m_common_io->readinAnsi("FSESRT.ANS");
+    std::string mid_template = m_common_io->readinAnsi("FSEMID.ANS");
+    std::string bot_template = m_common_io->readinAnsi("FSEEND.ANS");
 
     // Use a Local Ansi Parser for Parsing Menu Templates and determine boundaries.
     processor_ansi_ptr ansi_process(new ProcessorAnsi(
@@ -421,7 +421,7 @@ void ModMessageEditor::editorInput(const std::string &input)
     else if(result[0] == '\x1b' && result.size() > 2)
     {
         // ESC SEQUENCE - check movement / arrow keys.
-        std::string escape_sequence = m_common_io.getEscapeSequence();
+        std::string escape_sequence = m_common_io->getEscapeSequence();
         std::cout << "ESC= " << escape_sequence << std::endl;
         m_log.write<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 1] input result=", result);
         processEscapedInput(result.substr(1), input);
@@ -440,7 +440,7 @@ void ModMessageEditor::editorInput(const std::string &input)
 
         if(result[0] == '\x1b')
         {
-            std::string escape_sequence = m_common_io.getEscapeSequence();
+            std::string escape_sequence = m_common_io->getEscapeSequence();
             std::cout << "ESC= " << escape_sequence << std::endl;
             m_log.write<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 2] input result=", static_cast<int>(escape_sequence[0]));
 

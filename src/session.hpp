@@ -118,7 +118,7 @@ public:
         {
             Logging &log = Logging::getInstance();
             log.write<Logging::ERROR_LOG>("TelnetOptionNegoiation Exception=", ex.what(), __LINE__, __FILE__);
-            //new_session->logoff();
+            return nullptr;
         }
         
         return new_session;

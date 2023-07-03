@@ -22,7 +22,8 @@ typedef std::shared_ptr<AccessLevel> access_level_ptr;
 class ModLevelEditor : public ModBase
 {
 public:
-    ModLevelEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process);
+    ModLevelEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, 
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModLevelEditor() override
     {
@@ -312,7 +313,6 @@ private:
     std::vector<std::string>                             m_level_display_list;
     std::vector<access_level_ptr>                        m_loaded_levels;
 
-    std::string          m_filename;
     text_prompts_dao_ptr m_text_prompts_dao;
 
     unsigned int         m_mod_setup_index;

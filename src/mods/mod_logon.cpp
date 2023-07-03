@@ -1,6 +1,5 @@
 #include "mod_logon.hpp"
 
-
 #include "../model-sys/structures.hpp"
 #include "../model-sys/config.hpp"
 #include "../model-sys/security.hpp"
@@ -15,6 +14,7 @@
 #include "../session_io.hpp"
 #include "../encryption.hpp"
 #include "../logging.hpp"
+#include "../common_io.hpp"
 
 #include <iostream>
 #include <string>
@@ -23,9 +23,9 @@
 #include <vector>
 #include <functional>
 
-ModLogon::ModLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-    : ModBase(session_data, config, ansi_process)
-    , m_filename("mod_logon.yaml")
+ModLogon::ModLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, 
+        common_io_ptr common_io, session_io_ptr session_io)
+    : ModBase(session_data, config, ansi_process, "mod_logon.yaml", common_io, session_io)
     , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
     , m_mod_function_index(MOD_LOGON)
     , m_failure_attempts(0)
@@ -54,6 +54,8 @@ ModLogon::ModLogon(session_ptr session_data, config_ptr config, processor_ansi_p
 
     // Loads all Text Prompts for current module
     m_text_prompts_dao->readPrompts();
+    
+    std::cout << "ModLogon() - Creation" << std::endl;
 }
 
 /**
@@ -62,6 +64,8 @@ ModLogon::ModLogon(session_ptr session_data, config_ptr config, processor_ansi_p
  */
 bool ModLogon::update(const std::string &character_buffer, const bool &)
 {
+    std::cout << "ModLogon::update : m_is_active=" << m_is_active << ", char: " << character_buffer << std::endl;
+    
     // Make sure system is active, when system is done, success or fails
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
@@ -87,6 +91,8 @@ bool ModLogon::update(const std::string &character_buffer, const bool &)
  */
 bool ModLogon::onEnter()
 {
+    std::cout << "ModLogon() - onEnter" << std::endl;
+    
     m_is_active = true;
 
     // Grab ANSI Screen, display, if desired.. logon.ans maybe?
@@ -96,6 +102,7 @@ bool ModLogon::onEnter()
     // Execute the initial setup index.
     m_setup_functions[m_mod_function_index]();
 
+    std::cout << "ModLogon() - onEnter END;" << std::endl;
     return true;
 }
 
@@ -105,7 +112,10 @@ bool ModLogon::onEnter()
  */
 bool ModLogon::onExit()
 {
+    std::cout << "ModLogon() - onExit" << std::endl;
     m_is_active = false;
+    
+    std::cout << "ModLogon() - onExit END;" << std::endl;
     return true;
 }
 
@@ -173,6 +183,7 @@ void ModLogon::redisplayModulePrompt()
  */
 void ModLogon::displayPrompt(const std::string &prompt)
 {
+    std::cout << "ModLogon() - displayPrompt" << std::endl;
     baseDisplayPrompt(prompt, m_text_prompts_dao);
 }
 
@@ -182,6 +193,7 @@ void ModLogon::displayPrompt(const std::string &prompt)
  */
 void ModLogon::displayPromptAndNewLine(const std::string &prompt)
 {
+    std::cout << "ModLogon() - displayPromptAndNewLine" << std::endl;
     baseDisplayPromptAndNewLine(prompt, m_text_prompts_dao);
 }
 
@@ -191,6 +203,7 @@ void ModLogon::displayPromptAndNewLine(const std::string &prompt)
  */
 void ModLogon::setupLogon()
 {
+    std::cout << "setupLogon() - displays prompt" << std::endl;
     displayPrompt(PROMPT_LOGON);
 }
 
@@ -205,7 +218,7 @@ void ModLogon::displayUserNumber()
     std::string result = prompt_set.second;
     std::string user_number = std::to_string(m_logon_user->iId);
 
-    m_session_io->m_common_io.parseLocalMCI(result, mci_code, user_number);
+    m_common_io->parseLocalMCI(result, mci_code, user_number);
     result = m_session_io->pipe2ansi(result);
     result += "\r\n";
     baseProcessAndDeliver(result);
@@ -217,6 +230,7 @@ void ModLogon::displayUserNumber()
  */
 void ModLogon::setupPassword()
 {
+    std::cout << "setupPassword()" << std::endl;
     displayPrompt(PROMPT_PASSWORD);
 }
 
@@ -257,7 +271,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
     users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
 
     // Check if a Digit, if so, lookup by userId.
-    if(m_common_io.isDigit(input))
+    if(m_common_io->isDigit(input))
     {
         long userId = 0;
         std::stringstream ss(input);
@@ -318,6 +332,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
  */
 bool ModLogon::logon(const std::string &input)
 {
+    std::cout << "logon() checking input: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io->getInputField(input, key, Config::sName_length);
 
@@ -389,8 +404,6 @@ bool ModLogon::validate_password(const std::string &input)
 
     // First load the secure record for the existing user.
     // Link to security dao for data access object
-    
-    /* TODO 
     security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
 
     // Lookup the security table for existing hash.
@@ -421,7 +434,6 @@ bool ModLogon::validate_password(const std::string &input)
     }
 
     m_log.write<Logging::ERROR_LOG>("Password Failure=", m_logon_user->sHandle);
-    */
     return false;
 }
 

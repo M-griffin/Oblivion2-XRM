@@ -14,6 +14,7 @@
 #include "../access_condition.hpp"
 #include "../logging.hpp"
 #include "../directory.hpp"
+#include "../common_io.hpp"
 
 #include <string>
 #include <vector>
@@ -25,9 +26,9 @@
  * And are not rolled back on exit without saving.  Might update this later on.
  */
  
-ModUserEditor::ModUserEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-    : ModBase(session_data, config, ansi_process)
-    , m_filename("mod_user_editor.yaml")
+ModUserEditor::ModUserEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io)
+    : ModBase(session_data, config, ansi_process, "mod_user_editor.yaml", common_io, session_io)
     , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
     , m_directory(new Directory())
     , m_mod_setup_index(MOD_DISPLAY_USER_LIST)
@@ -364,7 +365,7 @@ void ModUserEditor::setupUserList()
         std::vector<std::string>().swap(m_user_display_list);
     }
 
-    m_user_display_list = m_common_io.splitString(user_display_output, '\n');
+    m_user_display_list = m_common_io->splitString(user_display_output, '\n');
     m_page = 0;
     displayCurrentPage(PROMPT_INPUT_TEXT);
 }
@@ -393,7 +394,7 @@ void ModUserEditor::setupUserEditFields()
         std::vector<std::string>().swap(m_user_display_list);
     }
 
-    m_user_display_list = m_common_io.splitString(user_display_output, '\n');
+    m_user_display_list = m_common_io->splitString(user_display_output, '\n');
     m_page = 0;
     displayCurrentEditPage(PROMPT_USER_FIELD_INPUT_TEXT);
 }
@@ -422,7 +423,7 @@ void ModUserEditor::setupUserEditExtendedFields()
         std::vector<std::string>().swap(m_user_display_list);
     }
 
-    m_user_display_list = m_common_io.splitString(user_display_output, '\n');
+    m_user_display_list = m_common_io->splitString(user_display_output, '\n');
     m_page = 0;
     displayCurrentEditPage(PROMPT_USER_EXTENDED_FIELD_INPUT_TEXT);
 }
@@ -919,18 +920,18 @@ std::string ModUserEditor::displayUserList()
 
     if(m_users_listing.size() == 0)
     {
-        result_set.push_back(baseGetDefaultStatColor() + m_common_io.rightPadding("No Records Found!", 24));
+        result_set.push_back(baseGetDefaultStatColor() + m_common_io->rightPadding("No Records Found!", 24));
     }
 
     // Build a string list of individual menu options, then loop to fit as many per screen!
     for(unsigned int i = 0; i < m_users_listing.size(); i++)
     {
-        std::string option_string = m_common_io.rightPadding(std::to_string(m_users_listing[i]->iId), 5);
+        std::string option_string = m_common_io->rightPadding(std::to_string(m_users_listing[i]->iId), 5);
 
         if(m_users_listing[i]->sHandle.size() == 0)
-            option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(m_users_listing[i]->sRealName, 19));
+            option_string.append(baseGetDefaultStatColor() + m_common_io->rightPadding(m_users_listing[i]->sRealName, 19));
         else
-            option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(m_users_listing[i]->sHandle, 19));
+            option_string.append(baseGetDefaultStatColor() + m_common_io->rightPadding(m_users_listing[i]->sHandle, 19));
 
         result_set.push_back(option_string);
     }
@@ -1139,7 +1140,7 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                     displayPrompt(PROMPT_USER_FIELD_NOTIMELIMIT);
                     // Setup pre-population to display only T or F instead of True / False
                     std::string bool_value = "";
-                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bIgnoreTimeLimit).at(0);
+                    bool_value += m_common_io->boolAlpha(m_loaded_user.back()->bIgnoreTimeLimit).at(0);
                     m_session_io->getInputField("", key, Config::sName_length, bool_value);
                     break;
                 }
@@ -1156,7 +1157,7 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                     displayPrompt(PROMPT_USER_FIELD_USEANSI);
                     // Setup pre-population to display only T or F instead of True / False
                     std::string bool_value = "";
-                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bAnsi).at(0);
+                    bool_value += m_common_io->boolAlpha(m_loaded_user.back()->bAnsi).at(0);
                     m_session_io->getInputField("", key, Config::sName_length, bool_value);
                     break;
                 }
@@ -1173,7 +1174,7 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                     displayPrompt(PROMPT_USER_FIELD_BACKSPACE);
                     // Setup pre-population to display only T or F instead of True / False
                     std::string bool_value = "";
-                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bBackSpaceVt100).at(0);
+                    bool_value += m_common_io->boolAlpha(m_loaded_user.back()->bBackSpaceVt100).at(0);
                     m_session_io->getInputField("", key, Config::sName_length, bool_value);
                     break;
                 }
@@ -1181,7 +1182,7 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
             case 'H': // User Birth Date
                 changeInputModule(MOD_USER_FIELD);
                 displayPrompt(PROMPT_USER_FIELD_BIRTHDATE);
-                m_session_io->getInputField("", key, Config::sName_length, m_common_io.standardDateToString(m_loaded_user.back()->dtBirthday));
+                m_session_io->getInputField("", key, Config::sName_length, m_common_io->standardDateToString(m_loaded_user.back()->dtBirthday));
                 break;
 
             case 'U': // User Wanted
@@ -1190,7 +1191,7 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                     displayPrompt(PROMPT_USER_FIELD_WANTED);
                     // Setup pre-population to display only T or F instead of True / False
                     std::string bool_value = "";
-                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bWanted).at(0);
+                    bool_value += m_common_io->boolAlpha(m_loaded_user.back()->bWanted).at(0);
                     m_session_io->getInputField("", key, Config::sName_length, bool_value);
                     break;
                 }
@@ -1208,7 +1209,7 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                     displayPrompt(PROMPT_USER_FIELD_CLEARSCREEN);
                     // Setup pre-population to display only T or F instead of True / False
                     std::string bool_value = "";
-                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bClearOrScroll).at(0);
+                    bool_value += m_common_io->boolAlpha(m_loaded_user.back()->bClearOrScroll).at(0);
                     m_session_io->getInputField("", key, Config::sName_length, bool_value);
                     break;
                 }
@@ -1226,7 +1227,7 @@ void ModUserEditor::userEditorFieldInput(const std::string &input)
                     displayPrompt(PROMPT_USER_FIELD_SCREENPAUSE);
                     // Setup pre-population to display only T or F instead of True / False
                     std::string bool_value = "";
-                    bool_value += m_common_io.boolAlpha(m_loaded_user.back()->bDoPause).at(0);
+                    bool_value += m_common_io->boolAlpha(m_loaded_user.back()->bDoPause).at(0);
                     m_session_io->getInputField("", key, Config::sName_length, bool_value);
                     break;
                 }
@@ -1313,7 +1314,7 @@ void ModUserEditor::userEditorExtendedInput(const std::string &input)
             case 'B': // Password Last change date
                 changeInputModule(MOD_USER_EXTENDED_FIELD);
                 displayPrompt(PROMPT_USER_EXT_FIELDS_PASSCHANGE_DATE);
-                m_session_io->getInputField("", key, Config::sName_length, m_common_io.standardDateToString(m_loaded_user.back()->dtFirstOn));
+                m_session_io->getInputField("", key, Config::sName_length, m_common_io->standardDateToString(m_loaded_user.back()->dtFirstOn));
                 break;
 
             case 'N': // Days to Force Password change
@@ -1325,7 +1326,7 @@ void ModUserEditor::userEditorExtendedInput(const std::string &input)
             case 'C': // Signup Date / First On
                 changeInputModule(MOD_USER_EXTENDED_FIELD);
                 displayPrompt(PROMPT_USER_EXT_FIELDS_FIRSTON_DATE);
-                m_session_io->getInputField("", key, Config::sName_length, m_common_io.standardDateToString(m_loaded_user.back()->dtPassChangeDate));
+                m_session_io->getInputField("", key, Config::sName_length, m_common_io->standardDateToString(m_loaded_user.back()->dtPassChangeDate));
                 break;
 
             case 'O': // File Points
@@ -1337,7 +1338,7 @@ void ModUserEditor::userEditorExtendedInput(const std::string &input)
             case 'D': // Expiration Date
                 changeInputModule(MOD_USER_EXTENDED_FIELD);
                 displayPrompt(PROMPT_USER_EXT_FIELDS_EXPIRE_DATE);
-                m_session_io->getInputField("", key, Config::sName_length, m_common_io.standardDateToString(m_loaded_user.back()->dtExpirationDate));
+                m_session_io->getInputField("", key, Config::sName_length, m_common_io->standardDateToString(m_loaded_user.back()->dtExpirationDate));
                 break;
 
             case 'P': // Post/Call Ratio
@@ -1466,7 +1467,7 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                 break;
 
             case 'M': // User Level
-                m_loaded_user.back()->iLevel = m_common_io.stringToInt(key);
+                m_loaded_user.back()->iLevel = m_common_io->stringToInt(key);
                 break;
 
             case 'B': // User Real Name
@@ -1474,7 +1475,7 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                 break;
 
             case 'N': // User File Level
-                m_loaded_user.back()->iFileLevel = m_common_io.stringToInt(key);
+                m_loaded_user.back()->iFileLevel = m_common_io->stringToInt(key);
                 break;
 
             case 'C': // User Email
@@ -1482,7 +1483,7 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                 break;
 
             case 'O': // User Message Level
-                m_loaded_user.back()->iMessageLevel = m_common_io.stringToInt(key);
+                m_loaded_user.back()->iMessageLevel = m_common_io->stringToInt(key);
                 break;
 
             case 'D': // User Address
@@ -1490,7 +1491,7 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                 break;
 
             case 'P': // Number Hack Attempts
-                m_loaded_user.back()->iHackAttempts = m_common_io.stringToInt(key);
+                m_loaded_user.back()->iHackAttempts = m_common_io->stringToInt(key);
                 break;
 
             case 'E': // User Location
@@ -1498,8 +1499,8 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                 break;
 
             case 'R': // Ignore Time Limit
-                if(m_common_io.stringToBool(key) != -1)
-                    m_loaded_user.back()->bIgnoreTimeLimit = m_common_io.stringToBool(key);
+                if(m_common_io->stringToBool(key) != -1)
+                    m_loaded_user.back()->bIgnoreTimeLimit = m_common_io->stringToBool(key);
 
                 break;
 
@@ -1508,8 +1509,8 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                 break;
 
             case 'S': // Use ANSI Graphics
-                if(m_common_io.stringToBool(key) != -1)
-                    m_loaded_user.back()->bAnsi = m_common_io.stringToBool(key);
+                if(m_common_io->stringToBool(key) != -1)
+                    m_loaded_user.back()->bAnsi = m_common_io->stringToBool(key);
 
                 break;
 
@@ -1518,8 +1519,8 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                 break;
 
             case 'T': // Use VT100 Backspace
-                if(m_common_io.stringToBool(key) != -1)
-                    m_loaded_user.back()->bBackSpaceVt100 = m_common_io.stringToBool(key);
+                if(m_common_io->stringToBool(key) != -1)
+                    m_loaded_user.back()->bBackSpaceVt100 = m_common_io->stringToBool(key);
 
                 break;
 
@@ -1532,15 +1533,15 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                     // If invalid display message, but for now ignore changes
                     if(std::regex_match(key, str_matches, date_regex))
                     {
-                        m_loaded_user.back()->dtBirthday = m_common_io.stringToStandardDate(key);
+                        m_loaded_user.back()->dtBirthday = m_common_io->stringToStandardDate(key);
                     }
 
                     break;
                 }
 
             case 'U': // User Wanted
-                if(m_common_io.stringToBool(key) != -1)
-                    m_loaded_user.back()->bWanted = m_common_io.stringToBool(key);
+                if(m_common_io->stringToBool(key) != -1)
+                    m_loaded_user.back()->bWanted = m_common_io->stringToBool(key);
 
                 break;
 
@@ -1555,8 +1556,8 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                 }
 
             case 'V': // Clear Screen or Scroll Screen
-                if(m_common_io.stringToBool(key) != -1)
-                    m_loaded_user.back()->bClearOrScroll = m_common_io.stringToBool(key);
+                if(m_common_io->stringToBool(key) != -1)
+                    m_loaded_user.back()->bClearOrScroll = m_common_io->stringToBool(key);
 
                 break;
 
@@ -1571,8 +1572,8 @@ void ModUserEditor::userEditorFieldHandler(const std::string &input)
                 }
 
             case 'W': // Pause
-                if(m_common_io.stringToBool(key) != -1)
-                    m_loaded_user.back()->bDoPause = m_common_io.stringToBool(key);
+                if(m_common_io->stringToBool(key) != -1)
+                    m_loaded_user.back()->bDoPause = m_common_io->stringToBool(key);
 
                 break;
         }
@@ -1727,14 +1728,14 @@ void ModUserEditor::userEditorExtendedFieldHandler(const std::string &input)
                     // If invalid display message, but for now ignore changes
                     if(std::regex_match(key, str_matches, date_regex))
                     {
-                        m_loaded_user.back()->dtFirstOn = m_common_io.stringToStandardDate(key);
+                        m_loaded_user.back()->dtFirstOn = m_common_io->stringToStandardDate(key);
                     }
 
                     break;
                 }
 
             case 'N': // Days to Force Password change
-                m_loaded_user.back()->iCSPassChange = m_common_io.stringToInt(key);
+                m_loaded_user.back()->iCSPassChange = m_common_io->stringToInt(key);
                 break;
 
             case 'C': // Signup Date / First On
@@ -1746,14 +1747,14 @@ void ModUserEditor::userEditorExtendedFieldHandler(const std::string &input)
                     // If invalid display message, but for now ignore changes
                     if(std::regex_match(key, str_matches, date_regex))
                     {
-                        m_loaded_user.back()->dtPassChangeDate = m_common_io.stringToStandardDate(key);
+                        m_loaded_user.back()->dtPassChangeDate = m_common_io->stringToStandardDate(key);
                     }
 
                     break;
                 }
 
             case 'O': // File Points
-                m_loaded_user.back()->iFilePoints = m_common_io.stringToInt(key);
+                m_loaded_user.back()->iFilePoints = m_common_io->stringToInt(key);
                 break;
 
             case 'D': // Expiration Date
@@ -1765,30 +1766,30 @@ void ModUserEditor::userEditorExtendedFieldHandler(const std::string &input)
                     // If invalid display message, but for now ignore changes
                     if(std::regex_match(key, str_matches, date_regex))
                     {
-                        m_loaded_user.back()->dtExpirationDate = m_common_io.stringToStandardDate(key);
+                        m_loaded_user.back()->dtExpirationDate = m_common_io->stringToStandardDate(key);
                     }
 
                     break;
                 }
 
             case 'P': // Post/Call Ratio
-                m_loaded_user.back()->iPostCallRatio = m_common_io.stringToInt(key);
+                m_loaded_user.back()->iPostCallRatio = m_common_io->stringToInt(key);
                 break;
 
             case 'E': // Time Limit
-                m_loaded_user.back()->iTimeLimit = m_common_io.stringToInt(key);
+                m_loaded_user.back()->iTimeLimit = m_common_io->stringToInt(key);
                 break;
 
             case 'R': // Time Left Today
-                m_loaded_user.back()->iTimeLeft = m_common_io.stringToInt(key);
+                m_loaded_user.back()->iTimeLeft = m_common_io->stringToInt(key);
                 break;
 
             case 'F': // New User Voting (YES)
-                m_loaded_user.back()->iNuvVotesYes = m_common_io.stringToInt(key);
+                m_loaded_user.back()->iNuvVotesYes = m_common_io->stringToInt(key);
                 break;
 
             case 'S': // New User Voting (NO)
-                m_loaded_user.back()->iNuvVotesNo = m_common_io.stringToInt(key);
+                m_loaded_user.back()->iNuvVotesNo = m_common_io->stringToInt(key);
                 break;
 
             case 'G': // Regular Color
@@ -1860,43 +1861,43 @@ std::string ModUserEditor::displayUserEditScreen()
     AccessCondition acs;
     user_ptr usr = m_loaded_user.back();
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_USERNAME) + baseGetDefaultStatColor() + usr->sHandle, 64) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_LEVEL) + baseGetDefaultStatColor() + std::to_string(usr->iLevel), 48));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_USERNAME) + baseGetDefaultStatColor() + usr->sHandle, 64) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_LEVEL) + baseGetDefaultStatColor() + std::to_string(usr->iLevel), 48));
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_REALNAME) + baseGetDefaultStatColor() + usr->sRealName, 64) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_FILELEVEL) + baseGetDefaultStatColor() + std::to_string(usr->iFileLevel), 48));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_REALNAME) + baseGetDefaultStatColor() + usr->sRealName, 64) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_FILELEVEL) + baseGetDefaultStatColor() + std::to_string(usr->iFileLevel), 48));
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_EMAIL) + baseGetDefaultStatColor() + usr->sEmail, 64) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_MESGLEVEL) + baseGetDefaultStatColor() + std::to_string(usr->iMessageLevel), 48));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_EMAIL) + baseGetDefaultStatColor() + usr->sEmail, 64) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_MESGLEVEL) + baseGetDefaultStatColor() + std::to_string(usr->iMessageLevel), 48));
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_ADDRESS) + baseGetDefaultStatColor() + usr->sAddress, 64) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_HACK_ATTEMPT) + baseGetDefaultStatColor() + std::to_string(usr->iHackAttempts), 48));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_ADDRESS) + baseGetDefaultStatColor() + usr->sAddress, 64) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_HACK_ATTEMPT) + baseGetDefaultStatColor() + std::to_string(usr->iHackAttempts), 48));
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_LOCATION) + baseGetDefaultStatColor() + usr->sLocation, 64) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_NO_TIMELIMIT) + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bIgnoreTimeLimit), 48));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_LOCATION) + baseGetDefaultStatColor() + usr->sLocation, 64) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_NO_TIMELIMIT) + baseGetDefaultStatColor() + m_common_io->boolAlpha(usr->bIgnoreTimeLimit), 48));
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_COUNTRY) + baseGetDefaultStatColor() + usr->sCountry, 64) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_USE_ANSI) + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bAnsi), 48));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_COUNTRY) + baseGetDefaultStatColor() + usr->sCountry, 64) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_USE_ANSI) + baseGetDefaultStatColor() + m_common_io->boolAlpha(usr->bAnsi), 48));
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_USERNOTE) + baseGetDefaultStatColor() + usr->sUserNote, 64) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_USE_VTBACKSPACE) + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bBackSpaceVt100), 48));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_USERNOTE) + baseGetDefaultStatColor() + usr->sUserNote, 64) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_USE_VTBACKSPACE) + baseGetDefaultStatColor() + m_common_io->boolAlpha(usr->bBackSpaceVt100), 48));
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_BIRTHDATE) + baseGetDefaultStatColor() + m_common_io.standardDateToString(usr->dtBirthday), 64) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_WANTED) + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bWanted), 48));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_BIRTHDATE) + baseGetDefaultStatColor() + m_common_io->standardDateToString(usr->dtBirthday), 64) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_WANTED) + baseGetDefaultStatColor() + m_common_io->boolAlpha(usr->bWanted), 48));
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_FLAGS1) + baseGetDefaultStatColor() + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags1), 64) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_CLEAR_OR_SCROLL) + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bClearOrScroll), 48));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_FLAGS1) + baseGetDefaultStatColor() + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags1), 64) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_CLEAR_OR_SCROLL) + baseGetDefaultStatColor() + m_common_io->boolAlpha(usr->bClearOrScroll), 48));
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_FLAGS2) + baseGetDefaultStatColor() + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags2), 64) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_SCREEN_PAUSE) + baseGetDefaultStatColor() + m_common_io.boolAlpha(usr->bDoPause), 48));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_FLAGS2) + baseGetDefaultStatColor() + acs.getAccessConditionFlagStringFromBits(usr->iControlFlags2), 64) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_FIELDS_SCREEN_PAUSE) + baseGetDefaultStatColor() + m_common_io->boolAlpha(usr->bDoPause), 48));
 
     result_set.push_back(baseGetDefaultPromptColor() + " " + Encoding::getInstance().utf8Encode(std::string(72, M_BORDER_ROW)) + " ");
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_FIELDS_EXTENDED_DETAILS) + m_common_io.rightPadding("", 48));
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_FIELDS_PREVIOUS_USER) + m_common_io.rightPadding("", 48));
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_FIELDS_NEXT_USER) + m_common_io.rightPadding("", 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_FIELDS_EXTENDED_DETAILS) + m_common_io->rightPadding("", 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_FIELDS_PREVIOUS_USER) + m_common_io->rightPadding("", 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_FIELDS_NEXT_USER) + m_common_io->rightPadding("", 48));
     result_set.push_back(baseGetDefaultPromptColor() + " " + Encoding::getInstance().utf8Encode(std::string(72, M_BORDER_ROW)) + " ");
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_FIELDS_QUIT_SAVE) + m_common_io.rightPadding("", 48));
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_FIELDS_QUIT_ABORT) + m_common_io.rightPadding("", 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_FIELDS_QUIT_SAVE) + m_common_io->rightPadding("", 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_FIELDS_QUIT_ABORT) + m_common_io->rightPadding("", 48));
 
     // iterate through and print out
     int total_rows = result_set.size();
@@ -1936,50 +1937,50 @@ std::string ModUserEditor::displayUserExtendedEditScreen()
 
     // Initial Configuration fields, not all interfaces are implemented so some things
     // will be left off for now.
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_PASSWORD) + baseGetDefaultStatColor() + "****** Masked ", 64) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_GENDER) + baseGetDefaultStatColor() + gender_string, 48));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_PASSWORD) + baseGetDefaultStatColor() + "****** Masked ", 64) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_GENDER) + baseGetDefaultStatColor() + gender_string, 48));
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_PASSCHANGE_DATE) + baseGetDefaultStatColor() + m_common_io.standardDateToString(usr->dtPassChangeDate), 64) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_PASS_FORCE_CHANCE) + baseGetDefaultStatColor() + std::to_string(usr->iCSPassChange), 48));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_PASSCHANGE_DATE) + baseGetDefaultStatColor() + m_common_io->standardDateToString(usr->dtPassChangeDate), 64) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_PASS_FORCE_CHANCE) + baseGetDefaultStatColor() + std::to_string(usr->iCSPassChange), 48));
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_FIRSTON_DATE) + baseGetDefaultStatColor() + m_common_io.standardDateToString(usr->dtFirstOn), 64) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_FILEPOINTS) + baseGetDefaultStatColor() + std::to_string(usr->iFilePoints), 48));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_FIRSTON_DATE) + baseGetDefaultStatColor() + m_common_io->standardDateToString(usr->dtFirstOn), 64) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_FILEPOINTS) + baseGetDefaultStatColor() + std::to_string(usr->iFilePoints), 48));
 
     // If Expiration Date Set to Minimun, then set as default None
     std::string expiration_date_string = "None";
 
     // SQLite default.
-    if(m_common_io.standardDateToString(usr->dtExpirationDate) != "1969-12-31")
-        expiration_date_string = m_common_io.standardDateToString(usr->dtExpirationDate);
+    if(m_common_io->standardDateToString(usr->dtExpirationDate) != "1969-12-31")
+        expiration_date_string = m_common_io->standardDateToString(usr->dtExpirationDate);
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_EXPIRE_DATE) + baseGetDefaultStatColor() + expiration_date_string, 64) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_POSTCALL_RATIO) + baseGetDefaultStatColor() + std::to_string(usr->iPostCallRatio), 48));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_EXPIRE_DATE) + baseGetDefaultStatColor() + expiration_date_string, 64) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_POSTCALL_RATIO) + baseGetDefaultStatColor() + std::to_string(usr->iPostCallRatio), 48));
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_TIME_LIMIT) + baseGetDefaultStatColor() + std::to_string(usr->iTimeLimit), 64) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_TIME_LEFT) + baseGetDefaultStatColor() + std::to_string(usr->iTimeLeft), 48));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_TIME_LIMIT) + baseGetDefaultStatColor() + std::to_string(usr->iTimeLimit), 64) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_TIME_LEFT) + baseGetDefaultStatColor() + std::to_string(usr->iTimeLeft), 48));
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_NUV_YESVOTES) + baseGetDefaultStatColor() + std::to_string(usr->iNuvVotesYes), 64) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_NUV_NOVOTES) + baseGetDefaultStatColor() + std::to_string(usr->iNuvVotesNo), 48));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_NUV_YESVOTES) + baseGetDefaultStatColor() + std::to_string(usr->iNuvVotesYes), 64) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_NUV_NOVOTES) + baseGetDefaultStatColor() + std::to_string(usr->iNuvVotesNo), 48));
 
 
     // NOTE, might need to LEFT Justify instead here if multiple pipe color sequences are used!
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_REGULAR_COLOR) + usr->sRegColor + "***|16", 63) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_INPUT_COLOR) + usr->sInputColor + "***|16", 47));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_REGULAR_COLOR) + usr->sRegColor + "***|16", 63) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_INPUT_COLOR) + usr->sInputColor + "***|16", 47));
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_PROMPT_COLOR) + usr->sPromptColor + "***|16", 63) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_BOX_COLOR) + usr->sBoxColor + "***|16", 47));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_PROMPT_COLOR) + usr->sPromptColor + "***|16", 63) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_BOX_COLOR) + usr->sBoxColor + "***|16", 47));
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_STATUS_COLOR) + usr->sStatColor + "***|16", 63) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_INVERSE_COLOR) + usr->sInverseColor + "***|16", 47));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_STATUS_COLOR) + usr->sStatColor + "***|16", 63) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_INVERSE_COLOR) + usr->sInverseColor + "***|16", 47));
 
 
     // Challenge Question and Answer are Masked since they are in security record.
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_CHALLENGE_QUESTION) + baseGetDefaultStatColor() + "****** Masked ", 93));
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_CHALLENGE_ANSWER) + baseGetDefaultStatColor() + "****** Masked ", 93));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_CHALLENGE_QUESTION) + baseGetDefaultStatColor() + "****** Masked ", 93));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_CHALLENGE_ANSWER) + baseGetDefaultStatColor() + "****** Masked ", 93));
 
 
     result_set.push_back(baseGetDefaultPromptColor() + " " + Encoding::getInstance().utf8Encode(std::string(72, M_BORDER_ROW)) + " ");
-    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_QUIT_RETURN) + m_common_io.rightPadding("", 48));
+    result_set.push_back(getDisplayPromptRaw(DISPLAY_USER_EXT_FIELDS_QUIT_RETURN) + m_common_io->rightPadding("", 48));
 
     // iterate through and print out
     int total_rows = result_set.size();

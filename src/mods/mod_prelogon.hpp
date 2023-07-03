@@ -25,7 +25,8 @@ class ModPreLogon
     , public ModBase
 {
 public:
-    ModPreLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process);
+    ModPreLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModPreLogon() override
     {
@@ -169,7 +170,6 @@ private:
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
-    std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
     deadline_timer_ptr     m_deadline_timer;
 

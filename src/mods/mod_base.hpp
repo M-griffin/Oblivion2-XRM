@@ -1,8 +1,6 @@
 #ifndef MOD_BASE_HPP
 #define MOD_BASE_HPP
 
-#include "common_io.hpp"
-
 #include <memory>
 #include <string>
 #include <vector>
@@ -15,6 +13,9 @@ typedef std::shared_ptr<Session> session_ptr;
 
 class SessionIO;
 typedef std::shared_ptr<SessionIO> session_io_ptr;
+
+class CommonIO;
+typedef std::shared_ptr<CommonIO> common_io_ptr;
 
 class ProcessorAnsi;
 typedef std::shared_ptr<ProcessorAnsi> processor_ansi_ptr;
@@ -41,7 +42,8 @@ public:
     virtual bool onEnter() = 0;
     virtual bool onExit()  = 0;
 
-    ModBase(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process);       
+    ModBase(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, std::string filename,
+        common_io_ptr common_io, session_io_ptr session_io);       
 
     // Box drawing characters
     enum
@@ -194,13 +196,14 @@ public:
 
     // This holds session data passed to each session.
     // In modules we'll use the weak pointer so more clarity.
+    std::string         m_filename;
     Logging            &m_log;
-    CommonIO            m_common_io;
     session_ptr         m_session_data;
-    config_ptr          m_config;
-    session_io_ptr      m_session_io;
+    config_ptr          m_config;    
     processor_ansi_ptr  m_ansi_process;
-    bool                m_is_active;
+    common_io_ptr       m_common_io;
+    session_io_ptr      m_session_io;
+    bool                m_is_active;    
 
 
     // All Data is saved to this buffer, which is then

@@ -6,6 +6,8 @@
 #include <string>
 #include <set>
 
+class Logging;
+
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
 
@@ -20,9 +22,9 @@ typedef std::shared_ptr<Session> session_ptr;
 class SessionManager
 {
 public:
-    explicit SessionManager()
-    {
-    }
+    
+    explicit SessionManager();
+    
     ~SessionManager()
     {
         std::cout << "~SessionManager()" << std::endl;
@@ -35,7 +37,7 @@ public:
      */
     void join(const session_ptr &session);
 
-    void leave(session_ptr session);
+    void leave(const session_ptr &session);
     void deliver(const std::string &msg);
 
     int connections();
@@ -43,7 +45,8 @@ public:
 
 private:
 
-    std::set<session_ptr> m_sessions;
+    Logging               &m_log;
+    std::set<session_ptr>  m_sessions;
 };
 
 typedef std::shared_ptr<SessionManager> session_manager_ptr;

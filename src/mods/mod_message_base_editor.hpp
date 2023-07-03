@@ -27,7 +27,8 @@ class ModMessageBaseEditor
     : public ModBase
 {
 public:
-    ModMessageBaseEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process);
+    ModMessageBaseEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModMessageBaseEditor() override
     {
@@ -337,7 +338,6 @@ private:
     std::vector<std::string>                                m_menu_display_list;
     std::vector<access_level_ptr>                           m_loaded_level;
 
-    std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
     directory_ptr          m_directory;
 

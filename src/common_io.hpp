@@ -1,7 +1,6 @@
 #ifndef COMMONIO_HPP
 #define COMMONIO_HPP
 
-
 #include <ctime>
 #include <iostream>
 #include <string>

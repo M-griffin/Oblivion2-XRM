@@ -23,7 +23,8 @@ class ModMessageEditor
     : public ModBase
 {
 public:
-    ModMessageEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process);
+    ModMessageEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModMessageEditor() override
     {
@@ -229,7 +230,6 @@ private:
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
-    std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
     processor_text_ptr     m_text_process;
 

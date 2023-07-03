@@ -913,6 +913,7 @@ void MenuSystem::startupExternalProcess(const std::string &cmdline)
  */
 void MenuSystem::clearAllModules()
 {
+    std::cout << "Menu System: clearAllModules()" << std::endl;
     if(m_module_stack.size() > 0)
     {
         std::vector<module_ptr>().swap(m_module_stack);
@@ -934,8 +935,9 @@ void MenuSystem::shutdownModule()
 /**
  * @brief Exists and Shuts down the current module
  */
-void MenuSystem::startupModule(module_ptr module)
+void MenuSystem::startupModule(const module_ptr &module)
 {
+    std::cout << "MenuSystem : startupModule" << std::endl;
     // First clear any left overs if they exist.
     clearAllModules();
 
@@ -955,7 +957,7 @@ void MenuSystem::startupModulePreLogon()
     resetMenuInputIndex(MODULE_PRELOGON_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModPreLogon(m_session_data, m_config, m_ansi_process));
+    module_ptr module(new ModPreLogon(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
 
     if(!module)
     {
@@ -975,7 +977,7 @@ void MenuSystem::startupModuleLogon()
     resetMenuInputIndex(MODULE_LOGON_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModLogon(m_session_data, m_config, m_ansi_process));
+    module_ptr module(new ModLogon(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
 
     if(!module)
     {
@@ -995,7 +997,7 @@ void MenuSystem::startupModuleSignup()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModSignup(m_session_data, m_config, m_ansi_process));
+    module_ptr module(new ModSignup(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
 
     if(!module)
     {
@@ -1015,7 +1017,7 @@ void MenuSystem::startupModuleMenuEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModMenuEditor(m_session_data, m_config, m_ansi_process));
+    module_ptr module(new ModMenuEditor(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
 
     if(!module)
     {
@@ -1035,7 +1037,7 @@ void MenuSystem::startupModuleUserEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModUserEditor(m_session_data, m_config, m_ansi_process));
+    module_ptr module(new ModUserEditor(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
 
     if(!module)
     {
@@ -1055,7 +1057,7 @@ void MenuSystem::startupModuleLevelEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModLevelEditor(m_session_data, m_config, m_ansi_process));
+    module_ptr module(new ModLevelEditor(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
 
     if(!module)
     {
@@ -1075,7 +1077,7 @@ void MenuSystem::startupModuleMessageEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModMessageEditor(m_session_data, m_config, m_ansi_process));
+    module_ptr module(new ModMessageEditor(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
 
     if(!module)
     {
@@ -1108,6 +1110,9 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
     // Finished modules processing.
     if(!m_module_stack.back()->m_is_active)
     {
+        m_log.write<Logging::DEBUG_LOG>(
+            "*** !m_module_stack.back()->m_is_active - shutting down module: " 
+            , m_module_stack.back()->m_filename);
         shutdownModule();
         
         // Check if the current user has been logged in yet.

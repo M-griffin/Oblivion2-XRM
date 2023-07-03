@@ -12,8 +12,9 @@
 #include "../menu_base.hpp"
 
 
-ModFormManager::ModFormManager(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-    : ModBase(session_data, config, ansi_process)
+ModFormManager::ModFormManager(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io)
+    : ModBase(session_data, config, ansi_process, nullptr, common_io, session_io)
     , m_current_page(0)
     , m_menu(new MenuBase(session_data))
 //    , m_form_manager(new FormManager(config, session_data))

@@ -1,6 +1,9 @@
 #include "access_condition.hpp"
+
 #include "model-sys/users.hpp"
 #include "model-sys/access_level.hpp"
+
+#include "session_io.hpp"
 #include "logging.hpp"
 
 #include <algorithm>
@@ -10,6 +13,16 @@
 #include <iostream>
 #include <sstream>
 #include <cctype>
+
+/**
+ * @brief Class Constructor And Initilization
+ * @return 
+ */
+AccessCondition::AccessCondition() 
+    : m_session_io(new SessionIO())
+{
+    
+}
 
 /**
  * @brief Toggle Bit Flag
@@ -369,13 +382,13 @@ std::vector<MapType> AccessCondition::parseAcsString(const std::string &acs_stri
         // Or would need to be handled in the code mapping
         for(std::string t : tokens)
         {
-            std::vector<MapType> tmp = m_session_io.parseToCodeMap(t, ACS_EXPRESSION);
+            std::vector<MapType> tmp = m_session_io->parseToCodeMap(t, ACS_EXPRESSION);
             code_map.insert(code_map.end(), tmp.begin(), tmp.end());
         }
     }
     else
     {
-        code_map = m_session_io.parseToCodeMap(acs_string, ACS_EXPRESSION);
+        code_map = m_session_io->parseToCodeMap(acs_string, ACS_EXPRESSION);
     }
 
     return code_map;

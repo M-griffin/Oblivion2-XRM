@@ -169,11 +169,13 @@ CommonIO::CommonIO()
     m_sequence_map.insert(std::make_pair("[6^",   "ctrl_pg_dn"));
     m_sequence_map.insert(std::make_pair("[7^",   "ctrl_home"));
     m_sequence_map.insert(std::make_pair("[8^",   "ctrl_end"));
+    
+    std::cout << "CommonIO() Init Completed!" << std::endl;
 }
 
 CommonIO::~CommonIO()
 {
-    // std::cout << "~CommonIO()" << std::endl;   Lots of noise!
+    std::cout << "~CommonIO()" << std::endl;
     // Look at making this a single instance per session insetad of alocate on fly.
     m_sequence_map.clear();
     m_escape_sequence.erase();

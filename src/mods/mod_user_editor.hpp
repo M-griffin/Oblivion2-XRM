@@ -26,7 +26,8 @@ class ModUserEditor
     : public ModBase
 {
 public:
-    ModUserEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process);
+    ModUserEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModUserEditor() override
     {
@@ -422,7 +423,6 @@ private:
     std::vector<std::string>                                m_user_display_list;
     std::vector<user_ptr>                                   m_loaded_user;
 
-    std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
     directory_ptr          m_directory;
 

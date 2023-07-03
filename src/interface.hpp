@@ -1,11 +1,9 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-//#include "model-sys/config.hpp"
 #include "session_manager.hpp"
 #include "session.hpp"
 #include "async_io.hpp"
-//#include "communicator.hpp"
 
 // New Rework for SDL2_net and Asyc io.
 #include "io_service.hpp"
@@ -33,7 +31,7 @@ class Interface
 public:
 
     /**
-     * @brief Create IO_Service Working thread for socket communications.
+     * @brief Create IO_Service Worker Thread for AsyncIO
      * @return
      */
     std::thread create_thread()
@@ -128,11 +126,13 @@ private:
 
             // Create the new Session
             session_ptr new_session = Session::create(async_conn, m_session_manager);
+            if (new_session) 
+            {
+                m_log.write<Logging::DEBUG_LOG>("Handle-Accept Attached Session to Manager");
 
-            m_log.write<Logging::DEBUG_LOG>("Handle-Accept Attached Session to Manager");
-
-            // Attach Session to Session Manager.
-            m_session_manager->join(new_session);
+                // Attach Session to Session Manager.
+                m_session_manager->join(new_session);                
+            }
         }
         else
         {

@@ -12,6 +12,7 @@
 #include "session_io.hpp"
 #include "telnet_decoder.hpp"
 #include "logging.hpp"
+#include "common_io.hpp"
 
 #include <locale>
 #include <cstring>
@@ -27,7 +28,8 @@
 MenuBase::MenuBase(session_ptr session_data)
     : m_log(Logging::getInstance())
     , m_menu_session_data(session_data)
-    , m_session_io(new SessionIO(session_data))
+    , m_common_io(new CommonIO())
+    , m_session_io(new SessionIO(session_data, m_common_io))
     , m_config(Communicator::getInstance().getConfiguration())
     , m_directory(new Directory())
     , m_line_buffer("")
@@ -49,8 +51,6 @@ MenuBase::MenuBase(session_ptr session_data)
     , m_use_first_command_execution(true)
     , m_logoff(false)
 {
-    // Pull in the Loaded Configuration.
-    m_config = Communicator::getInstance().getConfiguration();
 }
 
 MenuBase::~MenuBase()
@@ -72,7 +72,8 @@ MenuBase::~MenuBase()
     m_ansi_process.reset();
     m_menu_info.reset();
     m_menu_prompt.reset();
-    m_session_io.reset();
+    m_common_io.reset();
+    m_session_io.reset();    
     
 }
 
@@ -162,7 +163,6 @@ void MenuBase::checkMenuOptionsAcsAccess()
         {
             new_options.push_back(*it);
         }
-        new_options.push_back(*it);
     }
 
     // Swap Validated Options with Existing.
@@ -436,9 +436,9 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
  */
 std::string MenuBase::processGenericScreens()
 {
-    std::string top_screen = m_common_io.readinAnsi("GENSRT.ANS");
-    std::string mid_screen = m_common_io.readinAnsi("GENMID.ANS");
-    std::string bot_screen = m_common_io.readinAnsi("GENEND.ANS");
+    std::string top_screen = m_common_io->readinAnsi("GENSRT.ANS");
+    std::string mid_screen = m_common_io->readinAnsi("GENMID.ANS");
+    std::string bot_screen = m_common_io->readinAnsi("GENEND.ANS");
     std::string screen_output = "";
 
     // Add the Top section of the template
@@ -702,9 +702,9 @@ std::string MenuBase::loadMenuScreen()
         screen_file = upper_case(screen_file);
 
         // if file doesn't exist, then use generic template
-        if(m_common_io.fileExists(screen_file))
+        if(m_common_io->fileExists(screen_file))
         {
-            screen_data = m_common_io.readinAnsi(screen_file);
+            screen_data = m_common_io->readinAnsi(screen_file);
         }
         else
         {
@@ -723,9 +723,9 @@ std::string MenuBase::loadMenuScreen()
 
         // Otherwise use the Pulldown menu name from the menu.
         // if file doesn't exist, then use generic template
-        if(m_common_io.fileExists(screen_file))
+        if(m_common_io->fileExists(screen_file))
         {
-            screen_data = m_common_io.readinAnsi(screen_file);
+            screen_data = m_common_io->readinAnsi(screen_file);
         }
         else
         {
@@ -1239,7 +1239,7 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
     {
         // Match Strings to the same size.
         std::string key_match = key.substr(0, idx);
-        std::string input_match = input.substr(0, m_common_io.numberOfChars(key_match));
+        std::string input_match = input.substr(0, m_common_io->numberOfChars(key_match));
 
         m_log.write<Logging::DEBUG_LOG>("key_match=", key_match, "input_match=", input_match);
 
@@ -1705,7 +1705,7 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
             // Clear Menu Field input Text, redraw prompt?
             std::string clear_input = "\x1b[0m";
 
-            for(int i = m_common_io.numberOfChars(key); i > 0; i--)
+            for(int i = m_common_io->numberOfChars(key); i > 0; i--)
             {
                 clear_input += "\x1b[D \x1b[D";
             }

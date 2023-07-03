@@ -11,6 +11,7 @@
 #include "../session_io.hpp"
 #include "../logging.hpp"
 #include "../directory.hpp"
+#include "../common_io.hpp"
 
 #include <stdint.h>
 #include <string>
@@ -18,9 +19,9 @@
 #include <sstream>
 
 
-ModFileAreaEditor::ModFileAreaEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-    : ModBase(session_data, config, ansi_process)
-    , m_filename("mod_file_area_editor.yaml")
+ModFileAreaEditor::ModFileAreaEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io)
+    : ModBase(session_data, config, ansi_process, "mod_file_area_editor.yaml", common_io, session_io)
     , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
     , m_directory(new Directory())
     , m_mod_setup_index(MOD_DISPLAY_MENU)
@@ -274,7 +275,7 @@ void ModFileAreaEditor::setupMenuEditor()
         std::vector<std::string>().swap(m_menu_display_list);
     }
 
-    m_menu_display_list = m_common_io.splitString(menu_display_output, '\n');
+    m_menu_display_list = m_common_io->splitString(menu_display_output, '\n');
     m_page = 0;
     displayCurrentPage(PROMPT_INPUT_TEXT);
 }
@@ -299,7 +300,7 @@ void ModFileAreaEditor::setupMenuEditFields()
         std::vector<std::string>().swap(m_menu_display_list);
     }
 
-    m_menu_display_list = m_common_io.splitString(menu_display_output, '\n');
+    m_menu_display_list = m_common_io->splitString(menu_display_output, '\n');
     m_page = 0;
     displayCurrentEditPage(PROMPT_LEVEL_FIELD_INPUT_TEXT);
 }
@@ -1179,7 +1180,7 @@ std::string ModFileAreaEditor::displayMenuList()
                         {
                             // Strip Extension, then pad 8 characters.
                             menu_name = i->substr(0, i->size()-5);
-                            menu_name = m_common_io.rightPadding(menu_name, 8);
+                            menu_name = m_common_io->rightPadding(menu_name, 8);
 
                             baseTransformToUpper(menu_name);
 
@@ -1221,38 +1222,38 @@ std::string ModLevelEditor::displayMenuOptionList()
     {
         auto &m = current_menu->menu_options[i];
 
-        std::string option_string = m_common_io.rightPadding(std::to_string(m.index), 3);
+        std::string option_string = m_common_io->rightPadding(std::to_string(m.index), 3);
 
         // Toggled View will show commands strings, while default shows command key info.
         switch (m_mod_toggle_view_index)
         {
             case VIEW_DEFAULT:
-                option_string.append(baseGetDefaultColor() + m_common_io.rightPadding(m.menu_key, 9));
-                option_string.append(baseGetDefaultInputColor() + m_common_io.rightPadding(m.command_key, 4));
-                option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(m.acs_string, 8));
+                option_string.append(baseGetDefaultColor() + m_common_io->rightPadding(m.menu_key, 9));
+                option_string.append(baseGetDefaultInputColor() + m_common_io->rightPadding(m.command_key, 4));
+                option_string.append(baseGetDefaultStatColor() + m_common_io->rightPadding(m.acs_string, 8));
                 break;
 
             case VIEW_NAMES:
-                option_string.append(baseGetDefaultColor() + m_common_io.rightPadding(m.name, 21));
+                option_string.append(baseGetDefaultColor() + m_common_io->rightPadding(m.name, 21));
                 break;
 
             case VIEW_STRINGS:
-                option_string.append(baseGetDefaultColor() + m_common_io.rightPadding(m.command_string, 15));
-                option_string.append(baseGetDefaultInputColor() + m_common_io.rightPadding("", 1));
-                option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(m_common_io.boolAlpha(m.hidden), 5));
+                option_string.append(baseGetDefaultColor() + m_common_io->rightPadding(m.command_string, 15));
+                option_string.append(baseGetDefaultInputColor() + m_common_io->rightPadding("", 1));
+                option_string.append(baseGetDefaultStatColor() + m_common_io->rightPadding(m_common_io->boolAlpha(m.hidden), 5));
                 break;
 
             case VIEW_PULLDOWN:
-                option_string.append(baseGetDefaultColor() + m_common_io.rightPadding(m.menu_key, 9));
-                option_string.append(baseGetDefaultInputColor() + m_common_io.rightPadding(m.command_key, 4));
+                option_string.append(baseGetDefaultColor() + m_common_io->rightPadding(m.menu_key, 9));
+                option_string.append(baseGetDefaultInputColor() + m_common_io->rightPadding(m.command_key, 4));
 
                 if (m.pulldown_id > 0)
                 {
-                    option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(std::to_string(m.pulldown_id), 8));
+                    option_string.append(baseGetDefaultStatColor() + m_common_io->rightPadding(std::to_string(m.pulldown_id), 8));
                 }
                 else
                 {
-                    option_string.append(m_common_io.rightPadding("", 8));
+                    option_string.append(m_common_io->rightPadding("", 8));
                 }
         }
 
@@ -1394,23 +1395,23 @@ std::string ModFileAreaEditor::displayMenuEditScreen()
         // Build a string list of individual menu options, then loop to fit as many per screen!
         std::vector<std::string> result_set;
 
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_VERSION_ID) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->file_version, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_VERSION_ID) + baseGetDefaultStatColor() + m_common_io->rightPadding(current_menu->file_version, 48));
         result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_TITLE) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_title, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_PASSWORD) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_password, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_FALLBACK) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_HELP_ID) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_help_file, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_NAME) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_name, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_PULLDOWN_FILE) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_VIEW_GENERIC) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_EDIT_OPTIONS) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_TITLE) + baseGetDefaultStatColor() + m_common_io->rightPadding(current_menu->menu_title, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_PASSWORD) + baseGetDefaultStatColor() + m_common_io->rightPadding(current_menu->menu_password, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_FALLBACK) + baseGetDefaultStatColor() + m_common_io->rightPadding(current_menu->menu_fall_back, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_HELP_ID) + baseGetDefaultStatColor() + m_common_io->rightPadding(current_menu->menu_help_file, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_NAME) + baseGetDefaultStatColor() + m_common_io->rightPadding(current_menu->menu_name, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_PULLDOWN_FILE) + baseGetDefaultStatColor() + m_common_io->rightPadding(current_menu->menu_pulldown_file, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_VIEW_GENERIC) + baseGetDefaultStatColor() + m_common_io->rightPadding("", 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_EDIT_OPTIONS) + baseGetDefaultStatColor() + m_common_io->rightPadding("", 48));
         result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_QUIT_SAVE) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_QUIT_ABORT) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_QUIT_SAVE) + baseGetDefaultStatColor() + m_common_io->rightPadding("", 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_QUIT_ABORT) + baseGetDefaultStatColor() + m_common_io->rightPadding("", 48));
 
         // Not in use Yet, seems legacy only does ACS in option commands.
-        // option_string.append("Menu ACS           : " + m_common_io.rightPadding(current_menu->menu_acs_string, 35);
-        // option_string.append("Menu FormMenu      : " + m_common_io.rightPadding(current_menu->menu_form_menu, 8);
+        // option_string.append("Menu ACS           : " + m_common_io->rightPadding(current_menu->menu_acs_string, 35);
+        // option_string.append("Menu FormMenu      : " + m_common_io->rightPadding(current_menu->menu_form_menu, 8);
 
         // iterate through and print out
         int total_rows = result_set.size();

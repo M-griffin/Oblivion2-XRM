@@ -11,9 +11,9 @@
 #include "../logging.hpp"
 #include "../directory.hpp"
 
-ModFileLister::ModFileLister(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-    : ModBase(session_data, config, ansi_process)
-    , m_filename("mod_file_lister.yaml")
+ModFileLister::ModFileLister(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io)
+    : ModBase(session_data, config, ansi_process, "mod_file_lister.yaml", common_io, session_io)
     , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
     , m_directory(new Directory())
     , m_mod_function_index(MOD_PROMPT)

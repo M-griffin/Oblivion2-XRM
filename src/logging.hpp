@@ -1,8 +1,6 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
-#include "common_io.hpp"
-
 #include <memory>
 #include <iostream>
 #include <sstream>
@@ -10,8 +8,8 @@
 #include <vector>
 #include <chrono>
 #include <ctime>
+#include <iomanip>
 #include <mutex>
-
 
 /**
  * @class Logging
@@ -74,6 +72,19 @@ public:
         return 0; //m_log_entries.size();
     }
 
+    /**
+    * @brief Standard Time to Date/Time String
+    * @param std_time
+    * @return
+    */
+    std::string standardDateTimeToString(std::time_t std_time)
+    {
+        std::ostringstream oss;
+        oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d %H:%M:%S %z");
+        std::string datetime_string = oss.str();
+        return datetime_string;
+    }
+
 
     /**
      * @brief Current Time Stamp (LOCAL TIME)
@@ -81,9 +92,8 @@ public:
      */
     std::string getCurrentDateTime()
     {
-        CommonIO common;
         std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        return common.standardDateTimeToString(now);
+        return standardDateTimeToString(now);
     }
 
     /**

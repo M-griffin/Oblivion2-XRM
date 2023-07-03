@@ -3,6 +3,8 @@
 
 #include "mod_base.hpp"
 
+#include <iostream>
+#include <string>
 #include <memory>
 #include <vector>
 #include <functional>
@@ -28,7 +30,8 @@ class ModFormManager
     : public ModBase
 {
 public:
-    ModFormManager(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process);
+    ModFormManager(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModFormManager() override
     { 

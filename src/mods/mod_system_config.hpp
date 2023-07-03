@@ -23,7 +23,8 @@ class ModSystemConfig
     : public ModBase
 {
 public:
-    ModSystemConfig(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process);
+    ModSystemConfig(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModSystemConfig() override
     {
@@ -68,7 +69,6 @@ private:
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
-    std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
     directory_ptr          m_directory;
 

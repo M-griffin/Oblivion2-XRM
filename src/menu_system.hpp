@@ -215,7 +215,7 @@ public:
     /**
      * @brief Exists and Shuts down the current module
      */
-    void startupModule(module_ptr module);
+    void startupModule(const module_ptr &module);
 
     /**
      * @brief Starts up Logon Module

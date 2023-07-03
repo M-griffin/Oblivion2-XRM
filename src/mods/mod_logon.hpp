@@ -24,11 +24,12 @@ class ModLogon
     : public ModBase
 {
 public:
-    ModLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process);
+    ModLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModLogon() override
     {
-        std::cout << "~ModLogon()" << std::endl;
+        std::cout << "~ModLogon() destruction!" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
     }
@@ -206,9 +207,6 @@ private:
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
-
-    session_io_ptr         m_session_io;
-    std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
 
     int                    m_mod_function_index;

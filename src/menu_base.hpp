@@ -1,8 +1,6 @@
 #ifndef MENUBASE_HPP
 #define MENUBASE_HPP
 
-#include "common_io.hpp"
-
 #include "model-sys/struct_compat.hpp"
 #include "model-sys/structures.hpp"
 #include "model-sys/menu.hpp"
@@ -26,6 +24,9 @@ typedef std::shared_ptr<Session> session_ptr;
 
 class SessionIO;
 typedef std::shared_ptr<SessionIO> session_io_ptr;
+
+class CommonIO;
+typedef std::shared_ptr<CommonIO> common_io_ptr;
 
 class Directory;
 typedef std::shared_ptr<Directory> directory_ptr;
@@ -59,9 +60,8 @@ public:
 
     // This hold non-hotkey text passed through.
     // If Hotkeys are turn off, we append and loop this until we hit a CRLF. or ENTER
-    //session_data_ptr m_session_data;     // Handles to the session for i/o. {in TheState Base Class!}
-    session_io_ptr   m_session_io;         // SessionIO for Output parsing and MCI Codes etc.
-    CommonIO         m_common_io;          // CommonIO
+    common_io_ptr    m_common_io;          // CommonIO
+    session_io_ptr   m_session_io;         // SessionIO for Output parsing and MCI Codes etc.    
     config_ptr       m_config;             // Config
     directory_ptr    m_directory;          // Directory File Lists.
     std::string      m_line_buffer;        // Buffer used for menu system and reading field data.

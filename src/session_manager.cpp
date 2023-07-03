@@ -9,6 +9,10 @@
 #include <string>
 #include <vector>
 
+SessionManager::SessionManager()
+    : m_log(Logging::getInstance())
+{
+}
 
 /**
  * @brief Notifies that a user has joined the room
@@ -23,11 +27,10 @@ void SessionManager::join(const session_ptr &session)
  * @brief Notifies that a user has left the room
  * @param participant
  */
-void SessionManager::leave(session_ptr session)
+void SessionManager::leave(const session_ptr &session)
 {
-    Logging &log = Logging::getInstance();
     int node_number = session->m_node_number;
-    log.write<Logging::CONSOLE_LOG>("SessionManager - disconnecting Node Session=", node_number);
+    m_log.write<Logging::CONSOLE_LOG>("SessionManager - disconnecting Node Session=", node_number);
     
     try 
     {
@@ -36,11 +39,11 @@ void SessionManager::leave(session_ptr session)
         session->m_state_manager->clean();        
         m_sessions.erase(session);
         
-        log.write<Logging::CONSOLE_LOG>("SessionManager - disconnecting Node Session completed=", node_number);
+        m_log.write<Logging::CONSOLE_LOG>("SessionManager - disconnecting Node Session completed=", node_number);
     }
     catch (std::exception &ex)
     {
-        log.write<Logging::ERROR_LOG>("SessionManager - disconnecting Exception=", ex.what(), node_number);
+        m_log.write<Logging::ERROR_LOG>("SessionManager - disconnecting Exception=", ex.what(), node_number);
     }    
 }
 
@@ -55,8 +58,7 @@ void SessionManager::deliver(const std::string &msg)
         return;        
     }
 
-    Logging &log = Logging::getInstance();
-    log.write<Logging::DEBUG_LOG>("SessionManager - deliver SessionManager notices=", msg);
+    m_log.write<Logging::DEBUG_LOG>("SessionManager - deliver SessionManager notices=", msg);
     std::for_each(m_sessions.begin(), m_sessions.end(),
                   std::bind(&Session::deliver, std::placeholders::_1, std::ref(msg)));
 }
@@ -84,10 +86,9 @@ int SessionManager::connections()
  */
 void SessionManager::shutdown()
 {
-    Logging &log = Logging::getInstance();
     for(auto it = begin(m_sessions); it != end(m_sessions); ++it)
     {
-        log.write<Logging::DEBUG_LOG>("shutting Down Nodes=", (*it)->m_node_number );
+        m_log.write<Logging::DEBUG_LOG>("shutting Down Nodes=", (*it)->m_node_number );
         {
             (*it)->logoff();
         }

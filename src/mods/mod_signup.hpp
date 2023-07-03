@@ -29,7 +29,8 @@ class ModSignup
     : public ModBase
 {
 public:
-    ModSignup(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process);
+    ModSignup(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModSignup() override
     {
@@ -439,7 +440,6 @@ private:
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
     menu_base_ptr          m_menu_base;
-    std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
     user_ptr               m_user_record;
     security_ptr           m_security_record;

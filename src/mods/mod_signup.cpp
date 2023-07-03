@@ -27,10 +27,10 @@
 #include <functional>
 
 
-ModSignup::ModSignup(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-    : ModBase(session_data, config, ansi_process)
+ModSignup::ModSignup(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, 
+        common_io_ptr common_io, session_io_ptr session_io)
+    : ModBase(session_data, config, ansi_process, "mod_signup.yaml", common_io, session_io)
     , m_menu_base(new MenuBase(session_data))
-    , m_filename("mod_signup.yaml")
     , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
     , m_user_record(new Users())
     , m_security_record(new Security())

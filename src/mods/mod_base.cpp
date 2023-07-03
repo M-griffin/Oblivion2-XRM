@@ -8,6 +8,7 @@
 #include "../processor_ansi.hpp"
 #include "../encoding.hpp"
 #include "../logging.hpp"
+#include "../common_io.hpp"
 
 #include <algorithm>
 #include <memory>
@@ -15,14 +16,19 @@
 #include <string>
 #include <vector>
 
-ModBase::ModBase(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-        : m_log(Logging::getInstance())
-        , m_session_data(session_data)
-        , m_config(config)
-        , m_session_io(new SessionIO(session_data))
-        , m_ansi_process(ansi_process)
-        , m_is_active(false)
-{ }
+ModBase::ModBase(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, std::string filename,
+        common_io_ptr common_io, session_io_ptr session_io)
+    : m_filename(filename)
+    , m_log(Logging::getInstance())
+    , m_session_data(session_data)
+    , m_config(config)    
+    , m_ansi_process(ansi_process)
+    , m_common_io(common_io)
+    , m_session_io(session_io)
+    , m_is_active(false)
+{ 
+    std::cout << "ModBase Loaded" << std::endl;
+}
 
 ModBase::~ModBase()
 {
@@ -31,7 +37,8 @@ ModBase::~ModBase()
     m_config.reset();
     m_session_io.reset();
     m_ansi_process.reset();
-    m_is_active = false;    
+    m_is_active = false;
+    m_filename.clear();
 }
 
 /**
@@ -338,7 +345,7 @@ void ModBase::baseDisplayPromptMCI(const std::string &prompt, text_prompts_dao_p
 
     // Parse and replace the MCI Code with the field value
     std::string mci_code = "|OT";
-    m_session_io->m_common_io.parseLocalMCI(prompt_set.second, mci_code, mci_field);
+    m_common_io->parseLocalMCI(prompt_set.second, mci_code, mci_field);
 
     // Does pipe2ansi for colors etc..
     result += std::move(m_session_io->parseTextPrompt(prompt_set));

@@ -9,15 +9,16 @@
 #include "../logging.hpp"
 #include "../session_io.hpp"
 #include "../session.hpp"
+#include "../common_io.hpp"
 
 #include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
 
-ModPreLogon::ModPreLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-    : ModBase(session_data, config, ansi_process)
-    , m_filename("mod_prelogon.yaml")
+ModPreLogon::ModPreLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io)
+    : ModBase(session_data, config, ansi_process, "mod_prelogon.yaml", common_io, session_io)
     , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
     , m_deadline_timer(new DeadlineTimer())
     , m_mod_function_index(MOD_DETECT_EMULATION)
@@ -258,7 +259,7 @@ void ModPreLogon::displayTerminalDetection()
 
         m_log.write<Logging::CONSOLE_LOG>("Term Type=", term);
 
-        m_session_io->m_common_io.parseLocalMCI(result, mci_code, term);
+        m_common_io->parseLocalMCI(result, mci_code, term);
         result = m_session_io->pipe2ansi(result);
         baseProcessAndDeliver(result);
     }
@@ -273,7 +274,7 @@ void ModPreLogon::displayTerminalDetection()
 
         m_log.write<Logging::CONSOLE_LOG>("Term Size=", term_size);
 
-        m_session_io->m_common_io.parseLocalMCI(result, mci_code, term_size);
+        m_common_io->parseLocalMCI(result, mci_code, term_size);
         result = m_session_io->pipe2ansi(result);
         baseProcessAndDeliver(result);
     }
