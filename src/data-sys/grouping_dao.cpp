@@ -150,12 +150,14 @@ void GroupingDao::fillGroupingColumnValues(query_ptr qry, group_ptr obj,
 std::string GroupingDao::insertGroupingQryString(std::string qry, group_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->iConferenceId,
                                          obj->iAreaId
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -167,13 +169,15 @@ std::string GroupingDao::insertGroupingQryString(std::string qry, group_ptr obj)
 std::string GroupingDao::updateGroupingQryString(std::string qry, group_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->iConferenceId,
                                          obj->iAreaId,
                                          obj->iId
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -210,7 +214,9 @@ std::vector<group_ptr> GroupingDao::getAllGroupingsByConferenceId(long id)
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iConferenceId = %ld;", m_strTableName.c_str(), id);
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE iConferenceId = %ld;", m_strTableName.c_str(), id);
+    std::string queryString(result);
+    sqlite3_free(result);
 
     // Execute Query.
     if(qry->getResult(queryString))

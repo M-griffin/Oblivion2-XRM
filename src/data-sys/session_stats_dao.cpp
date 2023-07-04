@@ -184,7 +184,7 @@ void SessionStatsDao::fillSessionStatsColumnValues(query_ptr qry, session_stats_
 std::string SessionStatsDao::insertSessionStatsQryString(std::string qry, session_stats_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->iUserId,
                                          obj->sSessionType.c_str(),
                                          obj->sCodePage.c_str(),
@@ -206,7 +206,9 @@ std::string SessionStatsDao::insertSessionStatsQryString(std::string qry, sessio
                                          obj->iFilesDlMb
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -218,7 +220,7 @@ std::string SessionStatsDao::insertSessionStatsQryString(std::string qry, sessio
 std::string SessionStatsDao::updateSessionStatsQryString(std::string qry, session_stats_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->iUserId,
                                          obj->sSessionType.c_str(),
                                          obj->sCodePage.c_str(),
@@ -241,7 +243,9 @@ std::string SessionStatsDao::updateSessionStatsQryString(std::string qry, sessio
                                          obj->iId
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 
@@ -278,7 +282,9 @@ std::vector<session_stats_ptr> SessionStatsDao::getAllStatsPerUser(long userId)
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iUserId = %ld;", m_strTableName.c_str(), userId);
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE iUserId = %ld;", m_strTableName.c_str(), userId);
+    std::string queryString(result);
+    sqlite3_free(result);
 
     // Execute Query.
     if(qry->getResult(queryString))
@@ -334,9 +340,12 @@ std::vector<session_stats_ptr> SessionStatsDao::getLast10CallerStats()
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE bLogonSuccess = '1' "
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE bLogonSuccess = '1' "
                               "ORDER BY iID DESC;", m_strTableName.c_str());
 
+    std::string queryString(result);
+    sqlite3_free(result);
+    
     // Execute Query.
     if(qry->getResult(queryString))
     {
@@ -391,10 +400,13 @@ std::vector<session_stats_ptr> SessionStatsDao::getTodaysCallerStats()
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf(
+    char *result = sqlite3_mprintf(
                                   "SELECT * FROM %Q "
                                   "WHERE datetime(dtStartDate, 'unixepoch', 'localtime') >= datetime('now','start of day') "
                                   "ORDER BY iID DESC;", m_strTableName.c_str());
+                                  
+    std::string queryString(result);
+    sqlite3_free(result);
 
     // Execute Query.
     if(qry->getResult(queryString))

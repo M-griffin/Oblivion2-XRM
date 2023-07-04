@@ -10,6 +10,7 @@
 #include "libSqliteWrapped.h"
 #include <sqlite3.h>
 
+#include <iostream>
 #include <memory>
 #include <functional>
 #include <vector>
@@ -44,7 +45,9 @@ public:
     { }
 
     ~BaseDao()
-    { }
+    { 
+        std::cout << "~BaseDao()" << std::endl;
+    }
 
     Logging        &m_log;
 
@@ -421,13 +424,13 @@ public:
      */
     bool baseDeleteRecord(long id)
     {
-        bool result = false;
+        bool results = false;
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
             m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
-            return result;
+            return results;
         }
 
         // Create Pointer and Connect Query Object to Database.
@@ -436,18 +439,20 @@ public:
         if(!qry || !qry->isConnected())
         {
             m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
-            return result;
+            return results;
         }
 
         // Build string
-        std::string queryString = sqlite3_mprintf("DELETE FROM %Q WHERE iId = %ld;", m_strTableName.c_str(), id);
+        char *result = sqlite3_mprintf("DELETE FROM %Q WHERE iId = %ld;", m_strTableName.c_str(), id);
+        std::string queryString(result);
+        sqlite3_free(result);
 
         // Execute Update in a Transaction, rollback if fails.
         std::vector<std::string> statements;
         statements.push_back(queryString);
-        result = qry->executeTransaction(statements);
+        results = qry->executeTransaction(statements);
 
-        return result;
+        return results;
     }
 
     /**
@@ -476,7 +481,9 @@ public:
         }
 
         // Build Query String
-        std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iID = %ld;", m_strTableName.c_str(), id);
+        char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE iID = %ld;", m_strTableName.c_str(), id);
+        std::string queryString(result);
+        sqlite3_free(result);
 
         // Execute Query.
         if(qry->getResult(queryString))
@@ -527,7 +534,9 @@ public:
         }
 
         // Build Query String
-        std::string queryString = sqlite3_mprintf("SELECT * FROM %Q;", m_strTableName.c_str());
+        char *result = sqlite3_mprintf("SELECT * FROM %Q;", m_strTableName.c_str());
+        std::string queryString(result);
+        sqlite3_free(result);
 
         // Execute Query.
         if(qry->getResult(queryString))
@@ -582,7 +591,9 @@ public:
         }
 
         // Build Query String
-        std::string queryString = sqlite3_mprintf("SELECT * FROM %Q;", m_strTableName.c_str());
+        char *result = sqlite3_mprintf("SELECT * FROM %Q;", m_strTableName.c_str());
+        std::string queryString(result);
+        sqlite3_free(result);
 
         // Execute Query.
         if(qry->getResult(queryString))

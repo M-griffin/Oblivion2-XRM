@@ -176,7 +176,7 @@ void MessageAreaDao::fillMessageAreaColumnValues(query_ptr qry, message_area_ptr
 std::string MessageAreaDao::insertMessageAreaQryString(std::string qry, message_area_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->sName.c_str(),
                                          obj->sAcsAccess.c_str(),
                                          obj->sAcsPost.c_str(),
@@ -195,7 +195,9 @@ std::string MessageAreaDao::insertMessageAreaQryString(std::string qry, message_
                                          obj->iSortOrder
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -207,7 +209,7 @@ std::string MessageAreaDao::insertMessageAreaQryString(std::string qry, message_
 std::string MessageAreaDao::updateMessageAreaQryString(std::string qry, message_area_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->sName.c_str(),
                                          obj->sAcsAccess.c_str(),
                                          obj->sAcsPost.c_str(),
@@ -227,7 +229,9 @@ std::string MessageAreaDao::updateMessageAreaQryString(std::string qry, message_
                                          obj->iId
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 
@@ -265,7 +269,9 @@ std::vector<message_area_ptr> MessageAreaDao::getAllMessageAreasByConference(lon
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT a.* FROM %Q a, Grouping g WHERE g.iConferenceId = %ld AND a.iID = g.iMsgAreaId;", m_strTableName.c_str(), id);
+    char *result = sqlite3_mprintf("SELECT a.* FROM %Q a, Grouping g WHERE g.iConferenceId = %ld AND a.iID = g.iMsgAreaId;", m_strTableName.c_str(), id);
+    std::string queryString(result);
+    sqlite3_free(result);
 
     // Execute Query.
     if(qry->getResult(queryString))

@@ -183,7 +183,7 @@ void AccessLevelDao::fillAccessLevelColumnValues(query_ptr qry, access_level_ptr
 std::string AccessLevelDao::insertAccessLevelQryString(std::string qry, access_level_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->sName.c_str(),
                                          obj->sStartMenu.c_str(),
                                          obj->iLevel,
@@ -205,7 +205,9 @@ std::string AccessLevelDao::insertAccessLevelQryString(std::string qry, access_l
                                          obj->bDownloadMB
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -217,7 +219,7 @@ std::string AccessLevelDao::insertAccessLevelQryString(std::string qry, access_l
 std::string AccessLevelDao::updateAccessLevelQryString(std::string qry, access_level_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->sName.c_str(),
                                          obj->sStartMenu.c_str(),
                                          obj->iLevel,
@@ -240,7 +242,9 @@ std::string AccessLevelDao::updateAccessLevelQryString(std::string qry, access_l
                                          obj->iId
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 
@@ -275,8 +279,10 @@ access_level_ptr AccessLevelDao::getAccessLevelByLevel(long access_level)
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iLevel = %d;",
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE iLevel = %d;",
                               m_strTableName.c_str(), access_level);
+    std::string queryString(result);
+    sqlite3_free(result);
 
     // create a test3 table
     if(qry->getResult(queryString))

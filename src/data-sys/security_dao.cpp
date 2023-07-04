@@ -146,14 +146,16 @@ void SecurityDao::fillSecurityColumnValues(query_ptr qry, security_ptr obj, std:
 std::string SecurityDao::insertSecurityQryString(std::string qry, security_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
         obj->sPasswordHash.c_str(),
         obj->sSaltHash.c_str(),
         obj->sChallengeQuestion.c_str(),
         obj->sChallengeAnswerHash.c_str()
     );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -162,7 +164,7 @@ std::string SecurityDao::insertSecurityQryString(std::string qry, security_ptr o
 std::string SecurityDao::updateSecurityQryString(std::string qry, security_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
         obj->sPasswordHash.c_str(),
         obj->sSaltHash.c_str(),
         obj->sChallengeQuestion.c_str(),
@@ -170,6 +172,8 @@ std::string SecurityDao::updateSecurityQryString(std::string qry, security_ptr o
         obj->iId
     );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 

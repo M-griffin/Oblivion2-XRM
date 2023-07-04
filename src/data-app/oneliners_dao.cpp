@@ -153,7 +153,7 @@ void OnelinerDao::fillOnelinerColumnValues(query_ptr qry, oneliner_ptr obj,
 std::string OnelinerDao::insertOnelinerQryString(std::string qry, oneliner_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->iUserId,
                                          obj->sText.c_str(),
                                          obj->sUserName.c_str(),
@@ -161,7 +161,9 @@ std::string OnelinerDao::insertOnelinerQryString(std::string qry, oneliner_ptr o
                                          obj->dtDatePosted
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -173,7 +175,7 @@ std::string OnelinerDao::insertOnelinerQryString(std::string qry, oneliner_ptr o
 std::string OnelinerDao::updateOnelinerQryString(std::string qry, oneliner_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->iUserId,
                                          obj->sText.c_str(),
                                          obj->sUserName.c_str(),
@@ -182,7 +184,9 @@ std::string OnelinerDao::updateOnelinerQryString(std::string qry, oneliner_ptr o
                                          obj->iId
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 
@@ -219,7 +223,9 @@ std::vector<oneliner_ptr> OnelinerDao::getAllOnelinersByUserId(long userId)
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iUserId = %ld;", m_strTableName.c_str(), userId);
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE iUserId = %ld;", m_strTableName.c_str(), userId);
+    std::string queryString(result);
+    sqlite3_free(result);
 
     // Execute Query.
     if(qry->getResult(queryString))

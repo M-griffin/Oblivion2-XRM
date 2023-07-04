@@ -4,6 +4,7 @@
 #include "../data-sys/base_dao.hpp"
 #include "../model-sys/users.hpp"
 
+#include <iostream>
 #include <memory>
 #include <vector>
 #include <functional>
@@ -138,6 +139,7 @@ public:
 
     ~UsersDao()
     {
+        std::cout << "~UsersDao()" << std::endl;
     }
 
 

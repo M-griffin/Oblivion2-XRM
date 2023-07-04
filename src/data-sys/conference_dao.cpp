@@ -154,14 +154,16 @@ void ConferenceDao::fillConferenceColumnValues(query_ptr qry, conference_ptr obj
 std::string ConferenceDao::insertConferenceQryString(std::string qry, conference_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->sName.c_str(),
                                          obj->sType.c_str(),
                                          obj->sACS.c_str(),
                                          obj->iSortOrder
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -173,7 +175,7 @@ std::string ConferenceDao::insertConferenceQryString(std::string qry, conference
 std::string ConferenceDao::updateConferenceQryString(std::string qry, conference_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->sName.c_str(),
                                          obj->sType.c_str(),
                                          obj->sACS.c_str(),
@@ -181,7 +183,9 @@ std::string ConferenceDao::updateConferenceQryString(std::string qry, conference
                                          obj->iId
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 
@@ -219,8 +223,11 @@ std::vector<conference_ptr> ConferenceDao::getAllConferencesByType(std::string t
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sType like %Q;", m_strTableName.c_str(), type.c_str());
-
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE sType like %Q;", m_strTableName.c_str(), type.c_str());
+    std::string queryString(result);
+    sqlite3_free(result);
+    
+    
     // Execute Query.
     if(qry->getResult(queryString))
     {
@@ -276,7 +283,9 @@ long ConferenceDao::getConferencesCountByType(std::string type)
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sType like %Q;", m_strTableName.c_str(), type.c_str());
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE sType like %Q;", m_strTableName.c_str(), type.c_str());
+    std::string queryString(result);
+    sqlite3_free(result);
 
     // Execute Query.
     if(qry->getResult(queryString))
