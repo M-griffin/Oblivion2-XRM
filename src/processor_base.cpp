@@ -31,10 +31,8 @@ ProcessorBase::ProcessorBase(int term_height, int term_width)
     , m_saved_background(BG_BLACK)
     , m_foreground_color(FG_WHITE)
     , m_background_color(BG_BLACK)
-    , m_screen_pixel()
 {
-    m_screen_buffer.reserve(m_number_lines * m_characters_per_line);
-    m_screen_buffer.resize(m_number_lines * m_characters_per_line);
+
 }
 
 
@@ -54,7 +52,3 @@ int ProcessorBase::getMaxLines() const
     return m_number_lines;
 }
 
-std::map<int, int> ProcessorBase::getLineEndingMap() const
-{
-    return m_line_ending_map;
-}

@@ -93,6 +93,7 @@
       <File Name="../src/data-sys/menu_dao.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="model-sys">
+      <File Name="../src/model-sys/screen_pixel.hpp"/>
       <File Name="../src/model-sys/session_stats.hpp"/>
       <File Name="../src/model-sys/security.hpp"/>
       <File Name="../src/model-sys/protocol.hpp"/>

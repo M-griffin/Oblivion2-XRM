@@ -84,6 +84,12 @@ public:
      * @param config
      */
     void attachConfiguration(config_ptr config);
+    
+    /**
+     * @brief Release the system configuration.
+     * @param config
+     */
+    void releaseConfiguration();
 
     /**
      * @brief Return a Read Only Instance of the Configuration.

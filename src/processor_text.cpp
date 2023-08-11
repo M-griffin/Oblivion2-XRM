@@ -1,5 +1,8 @@
 #include "processor_text.hpp"
+
 #include "model-sys/structures.hpp"
+#include "model-sys/screen_pixel.hpp"
+
 #include "common_io.hpp"
 #include "logging.hpp"
 
@@ -22,6 +25,14 @@
 #include <vector>
 #include <sstream>
 
+ProcessorText::ProcessorText(int term_height, int term_width)
+    : ProcessorBase(term_height, term_width)
+    , m_tab_width(4)
+    , m_line_number(1)
+    , m_is_double_backspace(false)
+{ 
+    
+}
 
 /**
  * @brief Buffer to String for Parsing
@@ -537,12 +548,13 @@ void ProcessorText::handleTextInput(const std::string &char_sequence)
  */
 void ProcessorText::screenBufferSetGlyph(const std::string &char_sequence)
 {
-    m_screen_pixel.char_sequence = char_sequence;
-    m_screen_pixel.x_position = m_x_position;
-    m_screen_pixel.y_position = m_y_position;
-    m_screen_pixel.attribute  = m_attribute;
-    m_screen_pixel.foreground = m_foreground_color;
-    m_screen_pixel.background = m_background_color;
+    ScreenPixel screen_pixel;
+    screen_pixel.char_sequence = char_sequence;
+    screen_pixel.x_position = m_x_position;
+    screen_pixel.y_position = m_y_position;
+    screen_pixel.attribute  = m_attribute;
+    screen_pixel.foreground = m_foreground_color;
+    screen_pixel.background = m_background_color;
     
     
     // FIXME So we need a Text buffer to store the pixel (character) info per each line
@@ -575,12 +587,13 @@ void ProcessorText::screenBufferSetGlyph(const std::string &char_sequence)
     }*/
 
     // Clear for next sequences.
+    /*
     m_screen_pixel.char_sequence = '\0';
     m_screen_pixel.x_position = 1;
     m_screen_pixel.y_position = 1;
     m_screen_pixel.attribute  = 0;
     m_screen_pixel.foreground = FG_WHITE;
-    m_screen_pixel.background = BG_BLACK;
+    m_screen_pixel.background = BG_BLACK;*/
 
 }
 
@@ -1395,4 +1408,9 @@ void ProcessorText::parseTextToBuffer(char *buff)
         
         // End of Position Updates for movement.
     }
+}
+
+std::map<int, int> ProcessorText::getLineEndingMap() const
+{
+    return m_line_ending_map;
 }

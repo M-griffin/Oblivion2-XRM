@@ -143,6 +143,15 @@ void Communicator::attachConfiguration(config_ptr config)
 }
 
 /**
+ * @brief Release the system configuration.
+ * @param config
+ */
+void Communicator::releaseConfiguration() {
+    
+    m_active = false;
+}
+
+/**
  * @brief Return a Read Only Instance of the Configuration.
  * @param config
  */

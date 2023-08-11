@@ -29,6 +29,7 @@
 #include "interface.hpp"
 #include "common_io.hpp"
 
+#include <string>
 #include <memory>
 #include <cstdlib>
 #include <iostream>
@@ -56,6 +57,7 @@ std::string USERS_DATABASE = "";
  */
 void atExitFunction()
 {    
+    Communicator::getInstance().releaseConfiguration();
     std::cout << std::endl << "XRM SHUTDOWN COMPLETED!" << std::endl;
 }
 
@@ -156,12 +158,12 @@ auto main() -> int
     // Isolate to code block for smart pointer deallocation.
     {
         // Create Handles to Services, and starts up connection listener and ASIO Thread Worker
-        config_ptr config = Communicator::getInstance().getConfiguration();
-        std::cout << "Reading Configuration Telnet Port=" << config->port_telnet << std::endl;
-
-        IOService io_service;
-        interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", config->port_telnet));
-
+        IOService io_service;        
+        int port = Communicator::getInstance().getConfiguration()->port_telnet;
+        std::cout << "Reading Configuration Telnet Port=" << port << std::endl;            
+        interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", port));
+        
+        
         while(io_service.isActive()) 
         {            
             std::string line;

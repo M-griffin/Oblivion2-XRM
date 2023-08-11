@@ -5,30 +5,10 @@
 #include <memory>
 #include <stdint.h>
 #include <string>
-#include <vector>
 #include <map>
 
-/**
- * @class ScreenPixel
- * @author Michael Griffin
- * @date 10/8/2015
- * @file ansi_processor.hpp
- * @brief Managers Characters and their attributes
- */
-typedef struct ScreenPixel
-{
-    std::string char_sequence;
-    int x_position;
-    int y_position;
-    int attribute;
-    int foreground;
-    int background;
-    int selected_attribute;
-    int selected_foreground;
-    int selected_background;
 
-} ScreenPixel;
-
+class ScreenPixel;
 
 /**
  * @class ProcessorBase
@@ -114,12 +94,7 @@ public:
     int m_saved_foreground;
     int m_saved_background;
     int m_foreground_color;
-    int m_background_color;
-
-    ScreenPixel                m_screen_pixel;
-    std::vector <ScreenPixel>  m_screen_buffer;
-    std::map<int, ScreenPixel> m_pull_down_options;
-    std::map<int, int>         m_line_ending_map;
+    int m_background_color;    
 
     // ANSI escape sequences
     enum
@@ -177,7 +152,6 @@ public:
     int getYPosition() const;
     int getXPosition() const;
     int getMaxLines() const;
-    std::map<int, int> getLineEndingMap() const;
 
 };
 

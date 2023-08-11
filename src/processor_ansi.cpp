@@ -1,6 +1,9 @@
 #include "processor_ansi.hpp"
 
 #include "model-sys/structures.hpp"
+#include "model-sys/screen_pixel.hpp"
+
+
 #include "common_io.hpp"
 #include "logging.hpp"
 
@@ -22,6 +25,23 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <map>
+
+
+ProcessorAnsi::ProcessorAnsi(int term_height, int term_width)
+    : ProcessorBase(term_height, term_width)
+{ 
+    m_screen_buffer.reserve((m_number_lines * m_characters_per_line)+1);
+    m_screen_buffer.resize((m_number_lines * m_characters_per_line)+1);
+}
+
+ProcessorAnsi::~ProcessorAnsi()
+{ 
+    std::cout << "~ProcessorAnsi()" << std::endl;
+    std::vector <ScreenPixel>().swap(m_screen_buffer);
+    std::map<int, ScreenPixel>().swap(m_pull_down_options);
+    std::map<int, int>().swap(m_line_ending_map);
+}
 
 
 /**
@@ -512,12 +532,13 @@ void ProcessorAnsi::screenBufferSetGlyph(const std::string &char_sequence)
         m_max_y_position = m_y_position;
     }
 
-    m_screen_pixel.char_sequence = char_sequence;
-    m_screen_pixel.x_position = m_x_position;
-    m_screen_pixel.y_position = m_y_position;
-    m_screen_pixel.attribute  = m_attribute;
-    m_screen_pixel.foreground = m_foreground_color;
-    m_screen_pixel.background = m_background_color;
+    ScreenPixel screen_pixel;
+    screen_pixel.char_sequence = char_sequence;
+    screen_pixel.x_position = m_x_position;
+    screen_pixel.y_position = m_y_position;
+    screen_pixel.attribute  = m_attribute;
+    screen_pixel.foreground = m_foreground_color;
+    screen_pixel.background = m_background_color;
 
     // Setup current position in the screen buffer. 1 based for 0 based.
     m_position = ((m_y_position-1) * m_characters_per_line) + (m_x_position-1);
@@ -527,7 +548,7 @@ void ProcessorAnsi::screenBufferSetGlyph(const std::string &char_sequence)
     {
         if(m_position < (signed)m_screen_buffer.size())
         {
-            m_screen_buffer.at(m_position) = m_screen_pixel;
+            m_screen_buffer.at(m_position) = screen_pixel;
         }
         else
         {
@@ -540,12 +561,14 @@ void ProcessorAnsi::screenBufferSetGlyph(const std::string &char_sequence)
     }
 
     // Clear for next sequences.
+    /*
     m_screen_pixel.char_sequence = '\0';
     m_screen_pixel.x_position = 1;
     m_screen_pixel.y_position = 1;
     m_screen_pixel.attribute  = 0;
     m_screen_pixel.foreground = FG_WHITE;
     m_screen_pixel.background = BG_BLACK;
+    */
 
     // Move Cursor to next position after character insert.
     if(m_x_position >= m_characters_per_line)
@@ -1237,4 +1260,10 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
             esc_sequence.erase();
         }
     }   // end while !feof
+}
+
+
+std::map<int, int> ProcessorAnsi::getLineEndingMap() const
+{
+    return m_line_ending_map;
 }

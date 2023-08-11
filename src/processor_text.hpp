@@ -2,6 +2,9 @@
 #define PROCESSOR_TEXT_HPP
 
 #include "processor_base.hpp"
+
+#include "model-sys/screen_pixel.hpp"
+
 #include "common_io.hpp"
 
 #include <memory>
@@ -20,13 +23,8 @@ class ProcessorText
 {
 public:
 
-    ProcessorText(int term_height, int term_width)
-        : ProcessorBase(term_height, term_width)
-        , m_tab_width(4)
-        , m_line_number(1)
-        , m_is_double_backspace(false)
-    { }
-
+    ProcessorText(int term_height, int term_width);
+    
     int m_tab_width;
     int m_line_number;
     bool m_is_double_backspace;
@@ -94,6 +92,12 @@ public:
     void escapeSequenceParsing(LocalizedBuffer &buffer,
                                std::string::iterator &it,
                                std::string::iterator &line_end);
+                               
+    std::vector <ScreenPixel>  m_screen_buffer;
+    std::map<int, ScreenPixel> m_pull_down_options;
+    std::map<int, int>         m_line_ending_map;
+    
+    std::map<int, int> getLineEndingMap() const;
 
 };
 
