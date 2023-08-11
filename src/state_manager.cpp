@@ -81,7 +81,7 @@ void StateManager::update()
                         m_the_state.back()->update(new_string_builder, utf_found);
                         new_string_builder.erase();
                         continue;
-                    }
+                    }                    
 
                     new_string_builder += std::string(1, byte_value);
                 }

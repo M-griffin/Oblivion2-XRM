@@ -72,6 +72,9 @@ void IOService::checkAsyncListenersForConnections()
                 log.write<Logging::ERROR_LOG>("ioservice Exception Async-Accept", ex.what(), __FILE__, __LINE__);
             }
         }
+        
+        // Temp timer, change to 10/20 miliseconds for cpu usage
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
 }
 

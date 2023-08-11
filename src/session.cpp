@@ -396,6 +396,9 @@ void Session::handleTeloptCodes()
             {
                 continue;
             }
+            
+            // we see (2) 27 Keys here in double ESC!! 
+            std::cout << "SESSION INPUT: " << int(ch) << std::endl;
 
             // Incoming Buffer is filled and Telnet options are parsed out.
             incoming_data += ch;
@@ -408,13 +411,15 @@ void Session::handleTeloptCodes()
     }
 
     // Encode all incoming data as UTF8 unless we are not utf8
+    // Updated, append Incoming to Parsed Data so we don't miss double ESC Sequences.
+    // This catches items still in Buffer where sequences happen quickly. like Double ESC's.
     if(m_encoding != Encoding::ENCODE_UTF8)
     {
-        m_parsed_data = Encoding::getInstance().utf8Encode(incoming_data);        
+        m_parsed_data += Encoding::getInstance().utf8Encode(incoming_data);        
     }
     else
     {
-        m_parsed_data = incoming_data;
+        m_parsed_data += incoming_data;
     
     }
 }

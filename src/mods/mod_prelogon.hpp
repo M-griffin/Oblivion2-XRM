@@ -42,12 +42,17 @@ public:
     // This matches the index for and key for setup -> mod_functions.push_back
     enum
     {
+        MOD_HUMAN_SHIELD,
         MOD_DETECT_EMULATION,
         MOD_ASK_ANSI_COLOR,
         MOD_ASK_CODEPAGE
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
+    const std::string PROMPT_HUMAN_SHIELD = "human_shield";
+    const std::string PROMPT_HUMAN_SHIELD_SUCCESS = "human_shield_success";
+    const std::string PROMPT_HUMAN_SHIELD_FAIL = "human_shield_fail";
+    
     const std::string PROMPT_DETECT_EMULATION = "detect_emu";
     const std::string PROMPT_DETECTED_ANSI = "detected_ansi";
     const std::string PROMPT_DETECTED_NONE = "detected_none";
@@ -97,6 +102,12 @@ public:
     void displayPromptAndNewLine(const std::string &prompt);
 
     /**
+     * @brief Startup Human Shield, ESC Twice detection.
+     * @return
+     */
+    void setupHumanShield();
+
+    /**
      * @brief Start ANSI ESC[6n ANSI Detection
      * @return
      */
@@ -130,6 +141,23 @@ public:
      */
 
     /**
+     * @brief Start ESC Twice Timer
+     */
+    void startHumanShieldTimer();
+
+    /**
+     * @brief Deadline Detection Timer ESC Twice
+     * @param timer
+     */
+    void handleHumanShieldTimer();
+    
+    /**
+     * @brief ESC Twice Completed
+     * @return
+     */
+    void humanShieldCompleted();
+
+    /**
      * @brief Start ANSI Detection timer
      */
     void startDetectionTimer();
@@ -147,7 +175,13 @@ public:
     void emulationCompleted();
 
 private:
-
+    
+    /**
+     * @brief Were Detecting ESC Twice Here.
+     * @return
+     */
+    bool humanShieldDetection(const std::string &input);
+    
     /**
      * @brief Detect ANSI Emulation
      * @return
@@ -176,6 +210,7 @@ private:
     int                    m_mod_function_index;
     bool                   m_is_text_prompt_exist;
     bool                   m_is_esc_detected;
+    bool                   m_is_human_shield;
     std::string            m_input_buffer;
     int                    m_x_position;
     int                    m_y_position;

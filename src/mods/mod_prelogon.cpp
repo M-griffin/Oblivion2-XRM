@@ -21,19 +21,22 @@ ModPreLogon::ModPreLogon(session_ptr session_data, config_ptr config, processor_
     : ModBase(session_data, config, ansi_process, "mod_prelogon.yaml", common_io, session_io)
     , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
     , m_deadline_timer(new DeadlineTimer())
-    , m_mod_function_index(MOD_DETECT_EMULATION)
+    , m_mod_function_index(MOD_HUMAN_SHIELD)
     , m_is_text_prompt_exist(false)
     , m_is_esc_detected(false)
+    , m_is_human_shield(false)
     , m_input_buffer("")
     , m_x_position(0)
     , m_y_position(0)
     , m_term_type("undetected")
 {
     // Push function pointers to the stack.
+    m_setup_functions.push_back(std::bind(&ModPreLogon::setupHumanShield, this));
     m_setup_functions.push_back(std::bind(&ModPreLogon::setupEmulationDetection, this));
     m_setup_functions.push_back(std::bind(&ModPreLogon::setupAskANSIColor, this));
     m_setup_functions.push_back(std::bind(&ModPreLogon::setupAskCodePage, this));
 
+    m_mod_functions.push_back(std::bind(&ModPreLogon::humanShieldDetection, this, std::placeholders::_1));
     m_mod_functions.push_back(std::bind(&ModPreLogon::emulationDetection, this, std::placeholders::_1));
     m_mod_functions.push_back(std::bind(&ModPreLogon::askANSIColor, this, std::placeholders::_1));
     m_mod_functions.push_back(std::bind(&ModPreLogon::askCodePage, this, std::placeholders::_1));
@@ -120,25 +123,29 @@ void ModPreLogon::createTextPrompts()
 {
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
+    
+    value[PROMPT_HUMAN_SHIELD]         = std::make_pair("Hit [ESC] twice to continue", "|CRHuman Shield: Hit [ESC] twice within 8 seconds to continue!");
+    value[PROMPT_HUMAN_SHIELD_SUCCESS] = std::make_pair("ESC Detection Successful", "|CRHuman Detected, 1 Moment");
+    value[PROMPT_HUMAN_SHIELD_FAIL]    = std::make_pair("No Human Detected", "No Human Detected, Disconnecting...");
 
-    value[PROMPT_DETECT_EMULATION] = std::make_pair("Detecting Emulation", "Detecting Emulation");
-    value[PROMPT_DETECTED_ANSI]    = std::make_pair("Emulation Detected: Ansi ESC Supported", "|CREmulation Detected: |03ANSI ESC Supported.");
-    value[PROMPT_DETECTED_NONE]    = std::make_pair("Emulation Detected: None", "|CREmulation Detect: |03none");
+    value[PROMPT_DETECT_EMULATION]     = std::make_pair("Detecting Emulation", "Detecting Emulation");
+    value[PROMPT_DETECTED_ANSI]        = std::make_pair("Emulation Detected: Ansi ESC Supported", "|CREmulation Detected: |03ANSI ESC Supported.");
+    value[PROMPT_DETECTED_NONE]        = std::make_pair("Emulation Detected: None", "|CREmulation Detect: |03none");
 
-    value[PROMPT_USE_ANSI]         = std::make_pair("Use ANSI Colors (Y/n) ", "|CRPress [y/ENTER or n] to use ANSI Colors or to Select ASCII No Colors: ");
-    value[PROMPT_USE_INVALID]      = std::make_pair("Invalid Response to Y/N/ENTER", "|04Invalid Response! Try again.");
-    value[PROMPT_ANSI_SELECTED]    = std::make_pair("ANSI Color Selected", "Selected: |03Ansi.");
-    value[PROMPT_ASCII_SELECTED]   = std::make_pair("ASCII No Colors Selected", "Selected: None.");
+    value[PROMPT_USE_ANSI]             = std::make_pair("Use ANSI Colors (Y/n) ", "|CRPress [y/ENTER or n] to use ANSI Colors or to Select ASCII No Colors: ");
+    value[PROMPT_USE_INVALID]          = std::make_pair("Invalid Response to Y/N/ENTER", "|04Invalid Response! Try again.");
+    value[PROMPT_ANSI_SELECTED]        = std::make_pair("ANSI Color Selected", "Selected: |03Ansi.");
+    value[PROMPT_ASCII_SELECTED]       = std::make_pair("ASCII No Colors Selected", "Selected: None.");
 
-    value[PROMPT_DETECT_TERMOPTS]  = std::make_pair("Detecting Terminal Options", "|CR|CRDetecting Terminal Options");
-    value[PROMPT_DETECTED_TERM]    = std::make_pair("Detecting Terminal: |OT ", "|CRDetected Terminal Type: |03|OT");
-    value[PROMPT_DETECTED_SIZE]    = std::make_pair("Detecting Terminal Size: |OT ", "|CRDetected Screen Size: |03|OT");
+    value[PROMPT_DETECT_TERMOPTS]      = std::make_pair("Detecting Terminal Options", "|CR|CRDetecting Terminal Options");
+    value[PROMPT_DETECTED_TERM]        = std::make_pair("Detecting Terminal: |OT ", "|CRDetected Terminal Type: |03|OT");
+    value[PROMPT_DETECTED_SIZE]        = std::make_pair("Detecting Terminal Size: |OT ", "|CRDetected Screen Size: |03|OT");
 
-    value[PROMPT_ASK_CP437]        = std::make_pair("Use CP437 Output Encoding", "|CR|CR[y/ENTER or n] Select Output Encoding CP-437: ");
-    value[PROMPT_ASK_UTF8]         = std::make_pair("Use UTF-8 Output Encoding", "|CR|CR[y/ENTER or n] Select Output Encoding UTF-8: ");
+    value[PROMPT_ASK_CP437]            = std::make_pair("Use CP437 Output Encoding", "|CR|CR[y/ENTER or n] Select Output Encoding CP-437: ");
+    value[PROMPT_ASK_UTF8]             = std::make_pair("Use UTF-8 Output Encoding", "|CR|CR[y/ENTER or n] Select Output Encoding UTF-8: ");
 
-    value[PROMPT_CP437_SELECTED]   = std::make_pair("Selected CP437 Output Encoding", "Selected: |03CP-437 Codepage.");
-    value[PROMPT_UTF8_SELECTED]    = std::make_pair("Selected UTF-8 Output Encoding", "Selected: |03UTF-8 Codepage.");
+    value[PROMPT_CP437_SELECTED]       = std::make_pair("Selected CP437 Output Encoding", "Selected: |03CP-437 Codepage.");
+    value[PROMPT_UTF8_SELECTED]        = std::make_pair("Selected UTF-8 Output Encoding", "Selected: |03UTF-8 Codepage.");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -179,6 +186,26 @@ void ModPreLogon::displayPrompt(const std::string &prompt)
 void ModPreLogon::displayPromptAndNewLine(const std::string &prompt)
 {
     baseDisplayPromptAndNewLine(prompt, m_text_prompts_dao);
+}
+
+/**
+ * @brief Startup Human Shield, ESC Twice detection.
+ * @return
+ */
+void ModPreLogon::setupHumanShield()
+{
+    // Display Detecting Emulation, not using display prompt cause we need to append.
+    std::string result = m_session_io->parseTextPrompt(
+                             m_text_prompts_dao->getPrompt(PROMPT_HUMAN_SHIELD)
+                         );
+
+    // If response is echoed back, make it black on black.
+    result.append("|00");
+    std::string output = m_session_io->pipe2ansi(result);
+
+    baseProcessAndDeliver(output);
+    
+    startHumanShieldTimer();
 }
 
 /**
@@ -305,6 +332,43 @@ void ModPreLogon::setupAskCodePage()
     {
         displayPrompt(PROMPT_ASK_UTF8);
     }
+}
+
+/**
+ * @brief Were Detecting ESC Twice Here.
+ * @return
+ */
+bool ModPreLogon::humanShieldDetection(const std::string &input)
+{   
+    bool result = false;
+
+    if(input.size() != 0)
+    {
+        unsigned int ch = 0;
+        ch = input[0];
+        
+        std::cout << "Input shield -> " << (int)ch << " : " << input.size() << std::endl;
+
+        // Read in buffer once ESC sequence is hit to
+        // Parse the ESC[6n Response
+        if(ch == 27 && !m_is_esc_detected)
+        {
+            // First ESC Only, Mark True
+            m_is_esc_detected = true;
+        }
+        else if ((ch == 27) && m_is_esc_detected)
+        {
+            // Second ESC Detected, Completed
+            m_is_human_shield = true;
+            m_is_esc_detected = false;
+            
+            displayPrompt(PROMPT_HUMAN_SHIELD_SUCCESS);
+            return true;
+        }
+
+    }
+
+    return result;
 }
 
 /**
@@ -577,6 +641,18 @@ bool ModPreLogon::askCodePage(const std::string &input)
 }
 
 /**
+ * @brief Start ESC Twice Timer
+ */
+void ModPreLogon::startHumanShieldTimer()
+{
+    // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences responses
+    m_deadline_timer->setWaitInMilliseconds(8000);
+    m_deadline_timer->asyncWait(
+        std::bind(&ModPreLogon::handleHumanShieldTimer, shared_from_this())
+    );
+}
+
+/**
  * @brief Start ANSI Detection timer
  */
 void ModPreLogon::startDetectionTimer()
@@ -587,6 +663,42 @@ void ModPreLogon::startDetectionTimer()
         std::bind(&ModPreLogon::handleDetectionTimer, shared_from_this())
     );
 }
+
+/**
+ * @brief Deadline Detection Timer ESC Twice
+ * @param timer
+ */
+void ModPreLogon::handleHumanShieldTimer()
+{
+    std::cout << "HUMAN_SHIELD_TIMER!" << std::endl;
+    // Jump to Emulation completed.
+    humanShieldCompleted();
+}
+
+/**
+ * @brief ESC Twice Completed
+ * @return
+ */
+void ModPreLogon::humanShieldCompleted()
+{
+    std::cout << "HUMAN_SHIELD_COMPLETED!" << std::endl;
+    if(m_is_human_shield)
+    {
+        // Move to Next Detection
+        changeModule(MOD_DETECT_EMULATION);
+    }
+    else
+    {
+        // Logoff is too fast, Prompt is never displayed.. hmm
+        displayPrompt(PROMPT_HUMAN_SHIELD_FAIL);
+        
+        // Disconnect User        
+        m_is_active = false;
+        m_log.write<Logging::CONSOLE_LOG>("Human Shield Failed, disconnecting!");
+        m_session_data->disconnectUser();
+    }
+}
+
 
 /**
  * @brief Deadline Detection Timer for ANSI Detection
