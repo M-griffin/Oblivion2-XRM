@@ -128,28 +128,28 @@ void ModPreLogon::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
     
-    value[PROMPT_HUMAN_SHIELD]         = std::make_pair("Hit [ESC] twice to continue", "|CRHuman Shield: Hit [ESC] twice within 8 seconds to continue!");
-    value[PROMPT_HUMAN_SHIELD_SUCCESS] = std::make_pair("ESC Detection Successful", "|CRHuman Detected, 1 Moment");
-    value[PROMPT_HUMAN_SHIELD_FAIL]    = std::make_pair("No Human Detected", "No Human Detected, Disconnecting...");
+    value[PROMPT_HUMAN_SHIELD]         = std::make_pair("Hit [ESC] twice to continue", "|CR<Human Shield>: Hit [ESC] twice within 8 seconds to continue!");
+    value[PROMPT_HUMAN_SHIELD_SUCCESS] = std::make_pair("ESC Detection Successful", "|CR<Human Shield>: Input Detected, Loading - 1 Moment");
+    value[PROMPT_HUMAN_SHIELD_FAIL]    = std::make_pair("No Human Detected", "|CR<Human Shield>: No Input Detected, Disconnecting...");
 
-    value[PROMPT_DETECT_EMULATION]     = std::make_pair("Detecting Emulation", "Detecting Emulation");
-    value[PROMPT_DETECTED_ANSI]        = std::make_pair("Emulation Detected: Ansi ESC Supported", "|CREmulation Detected: |03ANSI ESC Supported.");
-    value[PROMPT_DETECTED_NONE]        = std::make_pair("Emulation Detected: None", "|CREmulation Detect: |03none");
+    value[PROMPT_DETECT_EMULATION]     = std::make_pair("Detecting Emulation", "|09Detecting Emulation");
+    value[PROMPT_DETECTED_ANSI]        = std::make_pair("Emulation Detected: Ansi ESC Supported", "|CR|15Emulation Detected: |03ANSI ESC Supported.");
+    value[PROMPT_DETECTED_NONE]        = std::make_pair("Emulation Detected: None", "|CR|15Emulation Detect: |03none");
 
     value[PROMPT_USE_ANSI]             = std::make_pair("Use ANSI Colors (Y/n) ", "|CRPress [y/ENTER or n] to use ANSI Colors or to Select ASCII No Colors: ");
     value[PROMPT_USE_INVALID]          = std::make_pair("Invalid Response to Y/N/ENTER", "|04Invalid Response! Try again.");
     value[PROMPT_ANSI_SELECTED]        = std::make_pair("ANSI Color Selected", "Selected: |03Ansi.");
     value[PROMPT_ASCII_SELECTED]       = std::make_pair("ASCII No Colors Selected", "Selected: None.");
 
-    value[PROMPT_DETECT_TERMOPTS]      = std::make_pair("Detecting Terminal Options", "|CR|CRDetecting Terminal Options");
-    value[PROMPT_DETECTED_TERM]        = std::make_pair("Detecting Terminal: |OT ", "|CRDetected Terminal Type: |03|OT");
-    value[PROMPT_DETECTED_SIZE]        = std::make_pair("Detecting Terminal Size: |OT ", "|CRDetected Screen Size: |03|OT");
+    value[PROMPT_DETECT_TERMOPTS]      = std::make_pair("Detecting Terminal Options", "|CR|CR|09Detecting Terminal Options");
+    value[PROMPT_DETECTED_TERM]        = std::make_pair("Detecting Terminal: |OT ", "|CR|15Detected Terminal Type: |03|OT");
+    value[PROMPT_DETECTED_SIZE]        = std::make_pair("Detecting Terminal Size: |OT ", "|CR|15Detected Screen Size: |03|OT");
 
-    value[PROMPT_ASK_CP437]            = std::make_pair("Use CP437 Output Encoding", "|CR|CR[y/ENTER or n] Select Output Encoding CP-437: ");
-    value[PROMPT_ASK_UTF8]             = std::make_pair("Use UTF-8 Output Encoding", "|CR|CR[y/ENTER or n] Select Output Encoding UTF-8: ");
+    value[PROMPT_ASK_CP437]            = std::make_pair("Use CP437 Output Encoding", "|CR|CR|15[y/ENTER or n] Select Output Encoding CP-437: ");
+    value[PROMPT_ASK_UTF8]             = std::make_pair("Use UTF-8 Output Encoding", "|CR|CR|15[y/ENTER or n] Select Output Encoding UTF-8: ");
 
-    value[PROMPT_CP437_SELECTED]       = std::make_pair("Selected CP437 Output Encoding", "Selected: |03CP-437 Codepage.");
-    value[PROMPT_UTF8_SELECTED]        = std::make_pair("Selected UTF-8 Output Encoding", "Selected: |03UTF-8 Codepage.");
+    value[PROMPT_CP437_SELECTED]       = std::make_pair("Selected CP437 Output Encoding", "|09Selected: |03CP-437 Codepage.");
+    value[PROMPT_UTF8_SELECTED]        = std::make_pair("Selected UTF-8 Output Encoding", "|09Selected: |03UTF-8 Codepage.");
 
     m_text_prompts_dao->writeValue(value);
 }
@@ -181,6 +181,15 @@ void ModPreLogon::redisplayModulePrompt()
 void ModPreLogon::displayPrompt(const std::string &prompt)
 {
     baseDisplayPrompt(prompt, m_text_prompts_dao);
+}
+
+/**
+ * @brief Pull and Display Prompts, Then Disconnect
+ * @param prompt
+ */
+void ModPreLogon::displayPromptThenDisconnect(const std::string &prompt)
+{
+    baseDisplayPrompt(prompt, m_text_prompts_dao, DISCONNECT_USER);
 }
 
 /**
@@ -700,12 +709,11 @@ void ModPreLogon::humanShieldCompleted()
     else
     {
         // Logoff is too fast, Prompt is never displayed.. hmm
-        displayPrompt(PROMPT_HUMAN_SHIELD_FAIL);
+        displayPromptThenDisconnect(PROMPT_HUMAN_SHIELD_FAIL);
         
         // Disconnect User        
         m_is_active = false;
         m_log.write<Logging::CONSOLE_LOG>("Human Shield Failed, disconnecting!");
-        m_session_data->disconnectUser();
     }
 }
 

@@ -94,6 +94,12 @@ public:
      * @param prompt
      */
     void displayPrompt(const std::string &prompt);
+    
+    /**
+     * @brief Pull and Display Prompts, Then Disconnect
+     * @param prompt
+     */
+    void displayPromptThenDisconnect(const std::string &prompt);
 
     /**
      * @brief Pull and Display Prompts with following newline

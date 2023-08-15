@@ -208,6 +208,7 @@ void IOService::stop()
     m_is_active = false;
     
     std::cout << "shutting down IOService" << std::endl;
+    
     // Clear All Lists and attached handles.
     m_service_list.clear();
     m_timer_list.clear();

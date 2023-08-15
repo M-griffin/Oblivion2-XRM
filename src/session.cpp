@@ -131,7 +131,7 @@ void Session::handlePyBind11State()
  * @brief Callback from The Broadcaster to write data to the active sessions.
  * @param msg
  */
-void Session::deliver(const std::string &msg)
+void Session::deliver(const std::string &msg, bool is_disconnection)
 {
     if(msg.size() == 0 || msg[0] == '\0')
     {
@@ -153,12 +153,24 @@ void Session::deliver(const std::string &msg)
     if(m_async_io->isActive()) // && TheCommunicator::instance()->isActive())
     {
         // Deprecated bind, look at replacing with lambda and std::function
-        m_async_io->asyncWrite(outputBuffer,
-                                 std::bind(
-                                     &Session::handleWrite,
-                                     shared_from_this(),
-                                     std::placeholders::_1,
-                                     std::placeholders::_2));
+        if (!is_disconnection)
+        {
+            m_async_io->asyncWrite(outputBuffer,
+                                     std::bind(
+                                         &Session::handleWrite,
+                                         shared_from_this(),
+                                         std::placeholders::_1,
+                                         std::placeholders::_2));
+        }
+        else
+        {
+            m_async_io->asyncWrite(outputBuffer,
+                                     std::bind(
+                                         &Session::handleWriteThenDisconnect,
+                                         shared_from_this(),
+                                         std::placeholders::_1,
+                                         std::placeholders::_2));
+        }
     }
 }
 
@@ -203,6 +215,18 @@ void Session::handleWrite(const std::error_code& error, socket_handler_ptr)
         }
     }
 }
+
+/**
+ * @brief Callback after Writing Data, If error/hangup notifies
+ *        Everyone this person has left.
+ * @param error
+ */
+void Session::handleWriteThenDisconnect(const std::error_code& error, socket_handler_ptr ptr)
+{
+    handleWrite(error, ptr);
+    disconnectUser();    
+}
+
 
 // Previous SessionData Methods
 

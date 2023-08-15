@@ -106,6 +106,14 @@ public:
                       std::placeholders::_1,
                       std::placeholders::_2));
     }
+    
+    /**
+     * @brief Shutdown Sessions by Session Manager.
+     */
+    void shutdown() 
+    {
+        m_session_manager->shutdown();        
+    }
 
 private:
 

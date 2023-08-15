@@ -169,8 +169,25 @@ auto main() -> int
             std::string line;
             std::getline(std::cin, line);
             std::cout << "line read: [" << line << "]" << std::endl;
+            
+            /**
+             * Clean Shutdown, (2) Steps at this time from Console Commands.
+             * 
+             * 1. Kill - All Connections, so all sessions cleanly shutown, should wait at least 10 seconds.
+             * 2. Quit - Stops IO Worker Service and All Async Jobs and listeners
+             * 
+             * If we try to do both of these Kill isn't finished then we get leaks on quit.
+             * Which has to be looked into more in a single smpoother process.
+             * 
+             * Works for Now.
+             */
+            if (line == "kill") {
+                std::cout << "Killing All Connections before exiting..." << std::endl;
+                setupAndRunAsioServer->shutdown();
+            }
+            
             if (line == "quit") {
-                std::cout << "Shutting down service, exiting..." << std::endl;
+                std::cout << "Shutting down IOservice, exiting..." << std::endl;
                 io_service.stop();
             }
           

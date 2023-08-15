@@ -1,6 +1,7 @@
 #include "session_manager.hpp"
 
 #include "state_manager.hpp"
+#include "async_io.hpp"
 #include "session.hpp"
 #include "logging.hpp"
 
@@ -8,12 +9,19 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <memory>
 
 SessionManager::SessionManager()
     : m_log(Logging::getInstance())
 {
 }
 
+SessionManager::~SessionManager()
+{
+    std::cout << "~SessionManager()" << std::endl;
+    std::set<session_ptr>().swap(m_sessions);
+}
+    
 /**
  * @brief Notifies that a user has joined the room
  * @param participant
@@ -60,7 +68,7 @@ void SessionManager::deliver(const std::string &msg)
 
     m_log.write<Logging::DEBUG_LOG>("SessionManager - deliver SessionManager notices=", msg);
     std::for_each(m_sessions.begin(), m_sessions.end(),
-                  std::bind(&Session::deliver, std::placeholders::_1, std::ref(msg)));
+                  std::bind(&Session::deliver, std::placeholders::_1, std::ref(msg), false));
 }
 
 /**
@@ -85,13 +93,15 @@ int SessionManager::connections()
  * @return
  */
 void SessionManager::shutdown()
-{
-    for(auto it = begin(m_sessions); it != end(m_sessions); ++it)
-    {
-        m_log.write<Logging::DEBUG_LOG>("shutting Down Nodes=", (*it)->m_node_number );
-        {
-            (*it)->logoff();
-        }
-        m_sessions.erase(it);
-    }
+{    
+    std::cout << "SessionManage Shutdown! NumSessions=" << m_sessions.size() << std::endl;   
+    
+    // Loop and Disconnects Each Active Session
+    std::for_each(m_sessions.begin(), m_sessions.end(), 
+        [] (session_ptr p) 
+        { 
+            std::string msg = "\r\nService is shutting down, please try again later. \r\n";
+            p->m_async_io->getSocketHandle()->sendSocket((unsigned char*)msg.c_str(), msg.size());
+            p->disconnectUser();
+        });
 }

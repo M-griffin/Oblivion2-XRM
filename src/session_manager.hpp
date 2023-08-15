@@ -25,11 +25,7 @@ public:
     
     explicit SessionManager();
     
-    ~SessionManager()
-    {
-        std::cout << "~SessionManager()" << std::endl;
-        std::set<session_ptr>().swap(m_sessions);
-    }
+    ~SessionManager();    
 
     /**
      * @brief OverRides for Connecting TCP and SSL Sessions

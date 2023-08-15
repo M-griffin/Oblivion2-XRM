@@ -43,7 +43,9 @@ public:
     virtual bool onExit()  = 0;
 
     ModBase(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, std::string filename,
-        common_io_ptr common_io, session_io_ptr session_io);       
+        common_io_ptr common_io, session_io_ptr session_io);
+        
+    const bool DISCONNECT_USER = true;
 
     // Box drawing characters
     enum
@@ -134,6 +136,13 @@ public:
      * @param data
      */
     void baseProcessAndDeliver(std::string &data);
+    
+    /**
+     * @brief Method for Adding outgoing text data to ANSI processor
+     *        Then delivering the data to the client, Then Disconnect
+     * @param data
+     */
+    void baseProcessAndDeliverThenDisconnect(std::string &data);
 
     /**
      * @brief Deliver Output followed with New Line.
@@ -150,12 +159,17 @@ public:
      * @brief Deliver Input for prompts (No Coloring Extras)
      */
     void baseProcessDeliverInput(std::string &data);
+    
+    /**
+    * @brief Deliver Input for prompts Then Disconnect (No Coloring Extras)
+    */
+    void baseProcessDeliverInputAndDisconnect(std::string &data);
 
     /**
      * @brief Pull and Display Prompts
      * @param prompt
      */
-    void baseDisplayPrompt(const std::string &prompt, text_prompts_dao_ptr m_text_dao);
+    void baseDisplayPrompt(const std::string &prompt, text_prompts_dao_ptr m_text_dao, bool is_disconnect=false);
 
     /**
      * @brief Pull and Return Display Prompt

@@ -146,7 +146,7 @@ public:
      * @brief Callback from The Broadcaster to write data to the active sessions.
      * @param msg
      */
-    void deliver(const std::string &msg);
+    void deliver(const std::string &msg, bool is_disconnection=false);
 
     /**
      * @brief Callback after Writing Data, If error/hangup notifies
@@ -154,6 +154,13 @@ public:
      * @param error
      */
     void handleWrite(const std::error_code& error, socket_handler_ptr);
+    
+    /**
+     * @brief Callback after Writing Data, Disconnects After Making Sure output is sent to User
+     *        Everyone this person has left.
+     * @param error
+     */
+    void handleWriteThenDisconnect(const std::error_code& error, socket_handler_ptr);
     
     
     // Previous SessionData Methods

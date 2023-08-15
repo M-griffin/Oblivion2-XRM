@@ -240,6 +240,21 @@ void ModBase::baseProcessAndDeliver(std::string &data)
 }
 
 /**
+ * @brief Method for Adding outgoing text data to ANSI processor
+ *        Then delivering the data to the client, Then Disconnect
+ * @param data
+ */
+void ModBase::baseProcessAndDeliverThenDisconnect(std::string &data)
+{
+    // Clear out attributes on new strings no bleeding of colors.
+    std::string output = "\x1b[0m" + baseGetDefaultColor();
+    output += std::move(data);
+    m_ansi_process->parseTextToBuffer((char *)output.c_str());
+    output += baseGetDefaultInputColor();    
+    m_session_data->deliver(output, DISCONNECT_USER);
+}
+
+/**
  * @brief Deliver Output followed with New Line.
  * @param data
  */
@@ -268,10 +283,19 @@ void ModBase::baseProcessDeliverInput(std::string &data)
 }
 
 /**
+ * @brief Deliver Input for prompts Then Disconnect (No Coloring Extras)
+ */
+void ModBase::baseProcessDeliverInputAndDisconnect(std::string &data)
+{
+    m_ansi_process->parseTextToBuffer((char *)data.c_str());
+    m_session_data->deliver(data, DISCONNECT_USER);
+}
+
+/**
  * @brief Pull and Display Prompts
  * @param prompt
  */
-void ModBase::baseDisplayPrompt(const std::string &prompt, text_prompts_dao_ptr m_text_dao)
+void ModBase::baseDisplayPrompt(const std::string &prompt, text_prompts_dao_ptr m_text_dao, bool is_disconnect)
 {
     // Set Default String Color, Can be overridden with pipe colors in text prompt.
     std::string result = baseGetDefaultColor();
@@ -289,7 +313,14 @@ void ModBase::baseDisplayPrompt(const std::string &prompt, text_prompts_dao_ptr 
         result += baseGetDefaultInputColor();
     }
 
-    baseProcessAndDeliver(result);
+    if (is_disconnect)
+    {
+        baseProcessAndDeliverThenDisconnect(result);
+    }
+    else
+    {
+        baseProcessAndDeliver(result);        
+    }
 }
 
 /**
