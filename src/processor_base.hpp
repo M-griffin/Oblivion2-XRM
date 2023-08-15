@@ -127,7 +127,7 @@ public:
         REVERSE_VIDEO_ON   = 7,
         CONCEALED_ON       = 8,
 
-        // Foreground Colors
+        // Standard Foreground Colors
         FG_BLACK           = 30,
         FG_RED             = 31,
         FG_GREEN           = 32,
@@ -136,6 +136,17 @@ public:
         FG_MAGENTA         = 35,
         FG_CYAN            = 36,
         FG_WHITE           = 37,
+        FG_DEFAULT         = 38,
+        
+        // high intensity colors
+        FGH_BLACK          = 90,
+        FGH_RED            = 91,
+        FGH_GREEN          = 92,
+        FGH_YELLOW         = 93,
+        FGH_BLUE           = 94,
+        FGH_MAGENTA        = 95,
+        FGH_CYAN           = 96,
+        FGH_WHITE          = 97,
 
         // Background Colors
         BG_BLACK           = 40,

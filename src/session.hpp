@@ -79,7 +79,7 @@ public:
 
             // On initial connection, clear and home cursor
             std::string clear_screen = "\x1b[1;1H\x1b[2J";
-            new_session->deliver(clear_screen + " testing!"); /// Can be removed, testing output!
+            new_session->deliver(clear_screen);
 
             std::cout << "Push Telnet Sequences to Client" << std::endl;
             new_session->m_telnet_decoder->sendIACSequences(DONT, TELOPT_OLD_ENVIRON);

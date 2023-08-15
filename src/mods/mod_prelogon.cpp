@@ -15,6 +15,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <memory>
+#include <functional>
+
 
 ModPreLogon::ModPreLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
         common_io_ptr common_io, session_io_ptr session_io)
@@ -29,6 +32,7 @@ ModPreLogon::ModPreLogon(session_ptr session_data, config_ptr config, processor_
     , m_x_position(0)
     , m_y_position(0)
     , m_term_type("undetected")
+    , m_esc_sequence("")
 {
     // Push function pointers to the stack.
     m_setup_functions.push_back(std::bind(&ModPreLogon::setupHumanShield, this));
@@ -50,7 +54,7 @@ ModPreLogon::ModPreLogon(session_ptr session_data, config_ptr config, processor_
     }
 
     // Loads all Text Prompts for current module
-    m_text_prompts_dao->readPrompts();        
+    m_text_prompts_dao->readPrompts();
 }
 
 /**
@@ -217,11 +221,11 @@ void ModPreLogon::setupEmulationDetection()
     // Deliver ANSI Location Sequence to Detect Emulation Response
     // Only detects if terminal handles ESC responses.
     // Windows Console Telnet will response it's at 259 y!
-    std::string detection = m_session_io->pipe2ansi("|00\x1b[255B\x1b[6n");
-    std::string restore_position = "\x1b[1;1H\x1b[2J";
+    std::string detection = m_session_io->pipe2ansi("|00\x1b[255B\x1b[255C\x1b[6n");
+    std::string reset_position = "\x1b[1;1H\x1b[2J";
 
     baseProcessAndDeliver(detection);
-    baseProcessAndDeliver(restore_position);
+    baseProcessAndDeliver(reset_position);
 
     // Display Detecting Emulation, not using display prompt cause we need to append.
     std::string result = m_session_io->parseTextPrompt(
@@ -295,9 +299,24 @@ void ModPreLogon::displayTerminalDetection()
     if(prompt_size.second.size() > 0)
     {
         std::string result = prompt_size.second;
-        std::string term_size = std::to_string(m_session_data->m_telnet_decoder->getTermCols());
-        term_size.append("x");
-        term_size.append(std::to_string(m_session_data->m_telnet_decoder->getTermRows()));
+        std::string term_size = "";
+        if (m_x_position == 0 || m_y_position == 0)
+        {
+            std::cout << "*** NAWS Detection!" << std::endl;
+            term_size = std::to_string(m_session_data->m_telnet_decoder->getTermCols());
+            term_size.append("x");
+            term_size.append(std::to_string(m_session_data->m_telnet_decoder->getTermRows()));            
+        }
+        else
+        {
+            std::cout << "*** ESC Detection!" << std::endl;
+            term_size = std::to_string(m_x_position);
+            term_size.append("x");
+            term_size.append(std::to_string(m_y_position));
+            
+            m_session_data->m_telnet_decoder->setTermCols(m_x_position);
+            m_session_data->m_telnet_decoder->setTermRows(m_y_position);
+        }
 
         m_log.write<Logging::CONSOLE_LOG>("Term Size=", term_size);
 
@@ -356,7 +375,7 @@ bool ModPreLogon::humanShieldDetection(const std::string &input)
             // First ESC Only, Mark True
             m_is_esc_detected = true;
         }
-        else if ((ch == 27) && m_is_esc_detected)
+        else if ((ch == 27) && m_is_esc_detected && !m_is_human_shield)
         {
             // Second ESC Detected, Completed
             m_is_human_shield = true;
@@ -365,6 +384,15 @@ bool ModPreLogon::humanShieldDetection(const std::string &input)
             displayPrompt(PROMPT_HUMAN_SHIELD_SUCCESS);
             return true;
         }
+        else 
+        {
+            // If get other keys then ESC Excluding Null's, then reset Flags.
+            if (ch != 0 && !m_is_human_shield)
+            {
+                m_is_esc_detected = false;
+                m_is_human_shield = false;
+            }
+        }
 
     }
 
@@ -372,7 +400,7 @@ bool ModPreLogon::humanShieldDetection(const std::string &input)
 }
 
 /**
- * @brief Were Detecting Emulation here, we should get response.
+ * @brief Were Detecting Emulation here, we should get response from ESC[6n for Screen Position
  * @return
  */
 bool ModPreLogon::emulationDetection(const std::string &input)
@@ -394,49 +422,31 @@ bool ModPreLogon::emulationDetection(const std::string &input)
         // Check for sequence terminator.
         if(m_is_esc_detected)
         {
+            if (ch != 27 && ch!= '\0' && ch != '[' && ch != 'R')
+            {
+                m_esc_sequence += (char)ch;
+            }            
+            
             if(toupper(ch) == 'R')
             {
                 m_session_data->m_is_use_ansi = true;
-                // Make sure anything piggy backing doesn't reset
-                // Once were detected.
                 m_is_esc_detected = false;
+                
+                // Parse out x/y position coordinates for Screen Size returned.
+                // Splunk String on : for X/Y Positions from Response
+                std::vector<std::string> positions = m_common_io->splitString(m_esc_sequence, ';');
+                if (positions.size() > 1)
+                {
+                    std::cout << "X=" << positions[1] << ", Y=" << positions[0] << std::endl;
+                    m_x_position = m_common_io->stringToInt(positions[1]);
+                    m_y_position = m_common_io->stringToInt(positions[0]);
+                }
             }
             else
             {
                 m_session_data->m_is_use_ansi = false;
             }
         }
-
-        /* -- Get Secondary screen size detection for emulation response.
-         * -- Modem or virtual modem will not have Telnet Options negotiation
-         * -- So then we have to detect old fashion way with ESC response!
-        // Were inside sequence.
-        if (m_esc_detected)
-        {
-            // Get x[##;xx
-            if(isdigit(ch))
-            {
-                xy[i] = ch;
-                ++i;
-            }
-
-            //now get x[xx;##
-            if(ch==';')
-            {
-                i = 0;
-                m_x_position = atoi(xy);
-            }
-
-            //now get end of sequence.
-            if (toupper(ch) == 'R')
-            {
-                m_y_position = atoi(xy);
-
-                // Register we received a completed sequence.
-                m_is_emulation_detected = true;
-                break;
-            }
-        }*/
     }
 
     return result;

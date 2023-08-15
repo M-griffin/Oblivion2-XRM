@@ -12,8 +12,8 @@
 TelnetDecoder::TelnetDecoder(async_io_ptr async_io)
     : m_log(Logging::getInstance())
     , m_async_io(async_io)
-    , m_naws_row(0)
-    , m_naws_col(0)
+    , m_naws_row(24)
+    , m_naws_col(80)
     , m_term_type("undetected")
     , m_is_binary(false)
     , m_is_echo(false)
@@ -71,14 +71,26 @@ void TelnetDecoder::addReply(const unsigned char &option)
     m_reply_sequence.push_back(option);
 }
 
-int TelnetDecoder::TelnetDecoder::getTermRows() const
+int TelnetDecoder::getTermRows() const
 {
-    return (m_naws_row > 0 ? m_naws_row : 24);
+    std::cout << "NAWS ROWS=" << m_naws_row << std::endl;
+    return m_naws_row;
 }
 
 int TelnetDecoder::getTermCols() const
 {
-    return (m_naws_col > 0 ? m_naws_col : 80);
+    std::cout << "NAWS COLS=" << m_naws_col << std::endl;
+    return m_naws_col;
+}
+
+void TelnetDecoder::setTermRows(int value)
+{
+    m_naws_row = value;
+}
+
+void TelnetDecoder::setTermCols(int value)
+{
+    m_naws_col = value;
 }
 
 std::string TelnetDecoder::getTermType() const

@@ -31,6 +31,7 @@
 ProcessorAnsi::ProcessorAnsi(int term_height, int term_width)
     : ProcessorBase(term_height, term_width)
 { 
+    std::cout << "PROCESSOR_ANSI rows=" << term_height << ", cols=" << term_width << std::endl;
     m_screen_buffer.reserve((m_number_lines * m_characters_per_line)+1);
     m_screen_buffer.resize((m_number_lines * m_characters_per_line)+1);
 }

@@ -1000,6 +1000,14 @@ void MenuBase::loadAndStartupMenu()
 {
     // Check Configuration here,  if use SpecialLogin (Matrix Menu)
     // Then load it, otherwise jump to Entering UserID / P
+    
+    if (m_current_menu == "matrix")
+    {
+        std::cout << "MATRIX MENU DETECTED - RESET ANSI TERM SIZE to Detection" << std::endl;
+        m_ansi_process.reset(new ProcessorAnsi(
+            m_menu_session_data->m_telnet_decoder->getTermRows(),
+            m_menu_session_data->m_telnet_decoder->getTermCols()));
+    }
 
     // 1. Make sure the Input is set to the
     m_input_index = 0; // MENU_INPUT;

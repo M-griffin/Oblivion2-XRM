@@ -200,10 +200,6 @@ private:
      */
     bool askCodePage(const std::string &input);
 
-    // Function Input Vector.
-    std::vector<std::function< void()> >                    m_setup_functions;
-    std::vector<std::function< void(const std::string &)> > m_mod_functions;
-
     text_prompts_dao_ptr   m_text_prompts_dao;
     deadline_timer_ptr     m_deadline_timer;
 
@@ -215,6 +211,11 @@ private:
     int                    m_x_position;
     int                    m_y_position;
     std::string            m_term_type;
+    std::string            m_esc_sequence;
+    
+    // Function Input Vector.
+    std::vector<std::function< void()> >                    m_setup_functions;
+    std::vector<std::function< void(const std::string &)> > m_mod_functions;
 };
 
 #endif // MOD_PRELOGON_HPP

@@ -1,82 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Session Name="/home/merc/code/Oblivion2-XRM/linux/obv2-xrm.workspace">
-  <int Value="10" Name="m_selectedTab"/>
+  <int Value="0" Name="m_selectedTab"/>
   <wxString Value="/home/merc/code/Oblivion2-XRM/linux/obv2-xrm.workspace" Name="m_workspaceName"/>
   <TabInfoArray Name="TabInfoArray">
     <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/processor_ansi.hpp" Name="FileName"/>
-      <int Value="12" Name="FirstVisibleLine"/>
-      <int Value="28" Name="CurrentLine"/>
+      <wxString Value="/home/merc/code/Oblivion2-XRM/src/mods/mod_prelogon.cpp" Name="FileName"/>
+      <int Value="388" Name="FirstVisibleLine"/>
+      <int Value="401" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/processor_ansi.cpp" Name="FileName"/>
-      <int Value="1256" Name="FirstVisibleLine"/>
-      <int Value="1265" Name="CurrentLine"/>
+      <wxString Value="/home/merc/code/Oblivion2-XRM/src/mods/mod_prelogon.hpp" Name="FileName"/>
+      <int Value="186" Name="FirstVisibleLine"/>
+      <int Value="217" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/processor_base.cpp" Name="FileName"/>
-      <int Value="39" Name="FirstVisibleLine"/>
-      <int Value="53" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/processor_base.hpp" Name="FileName"/>
-      <int Value="9" Name="FirstVisibleLine"/>
-      <int Value="24" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/xrm_server.cpp" Name="FileName"/>
-      <int Value="150" Name="FirstVisibleLine"/>
-      <int Value="162" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/processor_text.cpp" Name="FileName"/>
-      <int Value="1399" Name="FirstVisibleLine"/>
-      <int Value="1415" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/processor_text.hpp" Name="FileName"/>
-      <int Value="87" Name="FirstVisibleLine"/>
-      <int Value="106" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/mods/mod_message_editor.cpp" Name="FileName"/>
-      <int Value="622" Name="FirstVisibleLine"/>
-      <int Value="634" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/communicator.hpp" Name="FileName"/>
-      <int Value="42" Name="FirstVisibleLine"/>
-      <int Value="12" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/communicator.cpp" Name="FileName"/>
-      <int Value="174" Name="FirstVisibleLine"/>
-      <int Value="194" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/io_service.cpp" Name="FileName"/>
-      <int Value="54" Name="FirstVisibleLine"/>
-      <int Value="76" Name="CurrentLine"/>
+      <wxString Value="/home/merc/code/Oblivion2-XRM/src/common_io.cpp" Name="FileName"/>
+      <int Value="1330" Name="FirstVisibleLine"/>
+      <int Value="1336" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>

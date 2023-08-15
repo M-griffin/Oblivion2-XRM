@@ -137,24 +137,18 @@ void Session::deliver(const std::string &msg)
     {
         return;
     }
-
-    // handle output encoding, if utf-8 translate data accordingly.
-    // Temp Disabled, in general any done is translated prior to this
-    // But lets double check this!
-    std::string outputBuffer = std::string(msg);
-
-    /*
+    
+    std::string outputBuffer = "";
+    
     // On Output, We have internal UTF8 now, translate to CP437
     if(m_encoding == Encoding::ENCODE_CP437)
     {
-        outputBuffer = msg; //Encoding::instance()->utf8Decode(msg);
+        outputBuffer = Encoding::getInstance().utf8Decode(msg);
     }
     else
     {
         outputBuffer = msg;
-    }*/
-
-    
+    }    
 
     if(m_async_io->isActive()) // && TheCommunicator::instance()->isActive())
     {

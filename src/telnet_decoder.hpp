@@ -55,6 +55,9 @@ public:
 
     int getTermRows() const;
     int getTermCols() const;
+    
+    void setTermRows(int value);
+    void setTermCols(int value);
 
     std::string getTermType() const;
 
