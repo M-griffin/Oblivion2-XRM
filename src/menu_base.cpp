@@ -798,8 +798,9 @@ void MenuBase::redisplayMenuScreen()
         // only if we want result, ignore.., result just for testing at this time!
         std::string result = m_ansi_process->screenBufferParse();
 
-        // Now Build the Light bars
-        std::string light_bars = buildLightBars();
+        // Now Build the Light bars with Hidden Cursor.
+        std::string light_bars = "\x1b[?25l";
+        light_bars += buildLightBars();
 
         // add and write out.
         output.append(light_bars);
@@ -1178,7 +1179,7 @@ void MenuBase::lightbarUpdate(unsigned int previous_pulldown_id)
             break;
         }
     }
-
+    
     // Clear Attributes, then move back to menu prompt position.
     light_bars.append("\x1b[0m\x1b[u");
     std::string output = m_session_io->pipe2ansi(light_bars);
@@ -1628,7 +1629,7 @@ bool MenuBase::processMenuOptions(const std::string &input)
         // Menu Changed, exit and leave startup to next menu.
         return true;
     }
-
+    
     // Track Executed Commands, If we didn't execute anything
     // By user input_text, then clear the menu prompt input field
     if(executed > 0)

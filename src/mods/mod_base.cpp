@@ -9,6 +9,7 @@
 #include "../encoding.hpp"
 #include "../logging.hpp"
 #include "../common_io.hpp"
+#include "../async_io.hpp"
 
 #include <algorithm>
 #include <memory>
@@ -28,6 +29,12 @@ ModBase::ModBase(session_ptr session_data, config_ptr config, processor_ansi_ptr
     , m_is_active(false)
 { 
     std::cout << "ModBase Loaded" << std::endl;
+    
+    // Default on Mod Startup, Enable Cursor.
+    std::string enableCursor = "\x1b[?25h";
+    session_data->m_async_io->getSocketHandle()->sendSocket(
+        (unsigned char*)enableCursor.c_str(), enableCursor.size()
+    );
 }
 
 ModBase::~ModBase()

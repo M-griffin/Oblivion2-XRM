@@ -17,6 +17,7 @@
 #include <vector>
 #include <memory>
 #include <functional>
+#include <chrono>
 
 
 ModPreLogon::ModPreLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
@@ -145,9 +146,11 @@ void ModPreLogon::createTextPrompts()
     value[PROMPT_DETECTED_TERM]        = std::make_pair("Detecting Terminal: |OT ", "|CR|15Detected Terminal Type: |03|OT");
     value[PROMPT_DETECTED_SIZE]        = std::make_pair("Detecting Terminal Size: |OT ", "|CR|15Detected Screen Size: |03|OT");
 
-    value[PROMPT_ASK_CP437]            = std::make_pair("Use CP437 Output Encoding", "|CR|CR|15[y/ENTER or n] Select Output Encoding CP-437: ");
-    value[PROMPT_ASK_UTF8]             = std::make_pair("Use UTF-8 Output Encoding", "|CR|CR|15[y/ENTER or n] Select Output Encoding UTF-8: ");
+    value[PROMPT_ASK_CP437]            = std::make_pair("Use CP437 Output Encoding", "|CR|CR|15Detected Default Encoding |03CP-437|15 |CR[ENTER] to Continue, or [N] for |11UTF-8|15: ");
+    value[PROMPT_ASK_UTF8]             = std::make_pair("Use UTF-8 Output Encoding", "|CR|CR|15Detected Default Encoding |03UTF-8|15 |CR[ENTER] to Continue, or [N] for |11CP437|15: ");
 
+    // These are not displayed properly need to add adjustments 
+    // prior to matrix menu display, or DE delay action once it's displayed.
     value[PROMPT_CP437_SELECTED]       = std::make_pair("Selected CP437 Output Encoding", "|09Selected: |03CP-437 Codepage.");
     value[PROMPT_UTF8_SELECTED]        = std::make_pair("Selected UTF-8 Output Encoding", "|09Selected: |03UTF-8 Codepage.");
 
