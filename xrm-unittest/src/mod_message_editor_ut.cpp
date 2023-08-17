@@ -1,28 +1,39 @@
 
 #include "mods/mod_message_editor.hpp"
 
-#include "processor_ansi.hpp"
-#include "model-sys/config.hpp"
+#include "../model-sys/config.hpp"
+
+#include "../processor_ansi.hpp"
+#include "../common_io.hpp"
+#include "../session_io.hpp"
 
 #include <UnitTest++.h>
 
+#include <iostream>
+#include <string>
 #include <memory>
 
 /**
  * Handle Setup and Tear Down of Integration Test for SQLite
+ * - Incomplete, needs work, Fixture is throwing Unhandled Excetpion, rework this!
  */
-session_data_ptr session_data;
+session_ptr session_data;
+common_io_ptr common_io;
+session_io_ptr session_io;
  
 class MyFixtureMessageEditor 
-    : public ModMessageEditor
+    //: public ModMessageEditor
 {
 public:
 
-    
+    //ModMessageEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+    //    common_io_ptr common_io, session_io_ptr session_io);
 
     MyFixtureMessageEditor()
-        : ModMessageEditor(session_data, config_ptr(new Config()), processor_ansi_ptr(new ProcessorAnsi(10, 10)))
+      //  : ModMessageEditor(session_data, config_ptr(new Config()), processor_ansi_ptr(new ProcessorAnsi(10, 10)),
+      //      common_io, session_io)
     { 
+        std::cout << "MyFixtureMessageEditor" << std::endl;
     }
 
     ~MyFixtureMessageEditor()

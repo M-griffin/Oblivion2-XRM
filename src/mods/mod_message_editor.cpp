@@ -9,9 +9,11 @@
 #include "../processor_ansi.hpp"
 #include "../processor_text.hpp"
 #include "../logging.hpp"
+#include "../common_io.hpp"
 
 #include <string>
 #include <vector>
+#include <memory>
 
 ModMessageEditor::ModMessageEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
         common_io_ptr common_io, session_io_ptr session_io)

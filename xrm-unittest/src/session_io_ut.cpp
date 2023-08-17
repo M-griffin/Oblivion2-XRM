@@ -3,13 +3,20 @@
  * @return
  */
 
-#include "io_service.hpp"
+#include "session.hpp"
 #include "session_io.hpp"
+#include "async_io.hpp"
+#include "io_service.hpp"
+#include "socket_handler.hpp"
+#include "session_manager.hpp"
+#include "state_manager.hpp"
+
 #include "model-sys/config.hpp"
 
 #include <UnitTest++.h>
 
 // C++ Standard
+#include <memory>
 #include <iostream>
 #include <string>
 #include <stdexcept>
@@ -36,7 +43,7 @@ SUITE(XRMSessionIO)
     TEST(InputKey_Empty)
     {
         // Normal Characters and sequences should pass through
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "";
@@ -47,7 +54,7 @@ SUITE(XRMSessionIO)
     TEST(InputKey_Normal_Character)
     {
         // Normal Characters and sequences should pass through
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "A";
@@ -57,7 +64,7 @@ SUITE(XRMSessionIO)
 
     TEST(InputKey_Double_Character_Expect_Empty)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "AA";
@@ -68,7 +75,7 @@ SUITE(XRMSessionIO)
     TEST(InputKey_UniCode_Character)
     {
         // Normal Unicode Characters and sequences should pass through
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "あ";
@@ -78,7 +85,7 @@ SUITE(XRMSessionIO)
 
     TEST(InputKey_Two_UniCode_Character_Expect_Empty)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "ああ";
@@ -88,7 +95,7 @@ SUITE(XRMSessionIO)
 
     TEST(InputKey_Mix_Normal_And_UniCode_Character_Expect_Empty)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "あAあ";
@@ -98,7 +105,7 @@ SUITE(XRMSessionIO)
 
     TEST(InputKey_Mix_Normal_And_UniCode_Characters2_Expect_Empty)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "Aあ";
@@ -108,7 +115,7 @@ SUITE(XRMSessionIO)
 
     TEST(InputKey_Mix_Normal_And_UniCode_Character3_Expect_Empty)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "あA";
@@ -119,7 +126,7 @@ SUITE(XRMSessionIO)
     TEST(InputKey_Escape_Expect_Empty_Then_Esc)
     {
         // First ESC waits for \0 to signal it's single ESC key
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "\x1b";
@@ -134,7 +141,7 @@ SUITE(XRMSessionIO)
 
     TEST(InputKey_Escape_Sequence_Up_Arrow_Failure)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "\x1b[A";
@@ -144,7 +151,7 @@ SUITE(XRMSessionIO)
 
     TEST(InputKey_Escape_Sequence_Up_Arrow_Sequence)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "\x1b";
@@ -162,7 +169,7 @@ SUITE(XRMSessionIO)
 
     TEST(InputKey_Escape_Sequence_Dn_Arrow_Sequence)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "\x1b";
@@ -180,7 +187,7 @@ SUITE(XRMSessionIO)
 
     TEST(InputKey_Escape_Sequence_Lt_Arrow_Sequence)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "\x1b";
@@ -198,7 +205,7 @@ SUITE(XRMSessionIO)
 
     TEST(InputKey_Escape_Sequence_Rt_Arrow_Sequence)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "\x1b";
@@ -216,7 +223,7 @@ SUITE(XRMSessionIO)
 
     TEST(InputKey_Escape_Sequence_Hardware_Up_Arrow_Sequence)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "\x1b";
@@ -236,7 +243,7 @@ SUITE(XRMSessionIO)
 
     TEST(InputKey_Escape_Sequence_Hardware_Dn_Arrow_Sequence)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "\x1b";
@@ -254,7 +261,7 @@ SUITE(XRMSessionIO)
 
     TEST(InputKey_Escape_Sequence_Hardware_Lt_Arrow_Sequence)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "\x1b";
@@ -272,7 +279,7 @@ SUITE(XRMSessionIO)
 
     TEST(InputKey_Escape_Sequence_Hardware_Rt_Arrow_Sequence)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "\x1b";
@@ -290,7 +297,7 @@ SUITE(XRMSessionIO)
 
     TEST(InputKey_Escape_Sequence_Esc_Twice_Returns_Esc)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "\x1b";
@@ -309,7 +316,7 @@ SUITE(XRMSessionIO)
      */
     TEST(createInputField_Empty_Returns_Empty)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "";
@@ -320,7 +327,7 @@ SUITE(XRMSessionIO)
 
     TEST(createInputField_0_Length_Retuns_Field_Name)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing";
@@ -332,12 +339,12 @@ SUITE(XRMSessionIO)
     TEST(createInputField_1_Length_Retuns_Field_Name_1_Length_ANSI_Field)
     {
         // Mock SessionData Class
-        connection_ptr          connection;
-        session_manager_ptr     room;
-        IOService               io_service;
-        state_manager_ptr       state_manager;
+        IOService               ioservice;
+        socket_handler_ptr      handler(new SocketHandler());
+        async_io_ptr            connection(new AsyncIO(ioservice, handler));
+        session_manager_ptr     room(new SessionManager());
 
-        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
+        session_ptr session_data(new Session(connection, room));            
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing ";
@@ -345,16 +352,17 @@ SUITE(XRMSessionIO)
         sess.createInputField(character_buffer, length);
         CHECK((character_buffer.compare("Testing |00|19 \x1b[2D") == 0));
     }
+    
 
     TEST(createInputField_10_Length_Retuns_Field_Name_10_Length_ANSI_Field)
     {
         // Mock SessionData Class
-        connection_ptr          connection;
-        session_manager_ptr     room;
-        IOService               io_service;
-        state_manager_ptr       state_manager;
+        IOService               ioservice;
+        socket_handler_ptr      handler(new SocketHandler());
+        async_io_ptr            connection(new AsyncIO(ioservice, handler));
+        session_manager_ptr     room(new SessionManager());
 
-        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
+        session_ptr session_data(new Session(connection, room));
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing ";
@@ -366,12 +374,12 @@ SUITE(XRMSessionIO)
     TEST(createInputField_10_Length_Retuns_Default_Because_FL17_Larger_Than_length10)
     {
         // Mock SessionData Class
-        connection_ptr          connection;
-        session_manager_ptr     room;
-        IOService               io_service;
-        state_manager_ptr       state_manager;
+        IOService               ioservice;
+        socket_handler_ptr      handler(new SocketHandler());
+        async_io_ptr            connection(new AsyncIO(ioservice, handler));
+        session_manager_ptr     room(new SessionManager());
 
-        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
+        session_ptr session_data(new Session(connection, room));
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing |FL17";
@@ -383,12 +391,12 @@ SUITE(XRMSessionIO)
     TEST(createInputField_10_Length_Retuns_Default_Because_FL10_Smaller_Than_length20)
     {
         // Mock SessionData Class
-        connection_ptr          connection;
-        session_manager_ptr     room;
-        IOService               io_service;
-        state_manager_ptr       state_manager;
+        IOService               ioservice;
+        socket_handler_ptr      handler(new SocketHandler());
+        async_io_ptr            connection(new AsyncIO(ioservice, handler));
+        session_manager_ptr     room(new SessionManager());
 
-        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
+        session_ptr session_data(new Session(connection, room));
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing |FL10";
@@ -400,12 +408,12 @@ SUITE(XRMSessionIO)
     TEST(createInputField_10_Length_Retuns_Default_Because_FL10_Larger_Than_length9_Failure)
     {
         // Mock SessionData Class
-        connection_ptr          connection;
-        session_manager_ptr     room;
-        IOService               io_service;
-        state_manager_ptr       state_manager;
+        IOService               ioservice;
+        socket_handler_ptr      handler(new SocketHandler());
+        async_io_ptr            connection(new AsyncIO(ioservice, handler));
+        session_manager_ptr     room(new SessionManager());
 
-        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
+        session_ptr session_data(new Session(connection, room));
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing |FL10";
@@ -422,12 +430,12 @@ SUITE(XRMSessionIO)
     TEST(createInputField_20_Length_Retuns_Field_Name_Override_Input_Length)
     {
         // Mock SessionData Class
-        connection_ptr          connection;
-        session_manager_ptr     room;
-        IOService               io_service;
-        state_manager_ptr       state_manager;
+        IOService               ioservice;
+        socket_handler_ptr      handler(new SocketHandler());
+        async_io_ptr            connection(new AsyncIO(ioservice, handler));
+        session_manager_ptr     room(new SessionManager());
 
-        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
+        session_ptr session_data(new Session(connection, room));
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing |FL17";
@@ -439,12 +447,12 @@ SUITE(XRMSessionIO)
     TEST(createInputField_20_Length_Retuns_Field_Name_Override_Input_Length_And_Color)
     {
         // Mock SessionData Class
-        connection_ptr          connection;
-        session_manager_ptr     room;
-        IOService               io_service;
-        state_manager_ptr       state_manager;
-
-        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
+        IOService               ioservice;
+        socket_handler_ptr      handler(new SocketHandler());
+        async_io_ptr            connection(new AsyncIO(ioservice, handler));
+        session_manager_ptr     room(new SessionManager());
+        
+        session_ptr session_data(new Session(connection, room));
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing |FL17|FB0116";
@@ -456,12 +464,12 @@ SUITE(XRMSessionIO)
     TEST(createInputField_10_Length_Retuns_Field_Name_Override_Color_Only)
     {
         // Mock SessionData Class
-        connection_ptr          connection;
-        session_manager_ptr     room;
-        IOService               io_service;
-        state_manager_ptr       state_manager;
+        IOService               ioservice;
+        socket_handler_ptr      handler(new SocketHandler());
+        async_io_ptr            connection(new AsyncIO(ioservice, handler));
+        session_manager_ptr     room(new SessionManager());
 
-        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
+        session_ptr session_data(new Session(connection, room));
         SessionIO sess(session_data);
 
         std::string character_buffer = "Testing: |FB0116";
@@ -478,12 +486,12 @@ SUITE(XRMSessionIO)
     TEST(getInputField_Test_Field_Return_No_LF)
     {
         // Mock SessionData Class
-        connection_ptr          connection;
-        session_manager_ptr     room;
-        IOService               io_service;
-        state_manager_ptr       state_manager;
+        IOService               ioservice;
+        socket_handler_ptr      handler(new SocketHandler());
+        async_io_ptr            connection(new AsyncIO(ioservice, handler));
+        session_manager_ptr     room(new SessionManager());
 
-        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
+        session_ptr session_data(new Session(connection, room));
         SessionIO sess(session_data);
 
         std::string character_buffer;
@@ -513,12 +521,12 @@ SUITE(XRMSessionIO)
     TEST(getInputField_Test_Field_Return_No_LF_Received_Return_Empty)
     {
         // Mock SessionData Class
-        connection_ptr          connection;
-        session_manager_ptr     room;
-        IOService               io_service;
-        state_manager_ptr       state_manager;
+        IOService               ioservice;
+        socket_handler_ptr      handler(new SocketHandler());
+        async_io_ptr            connection(new AsyncIO(ioservice, handler));
+        session_manager_ptr     room(new SessionManager());
 
-        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
+        session_ptr session_data(new Session(connection, room));
         SessionIO sess(session_data);
 
         std::string character_buffer;
@@ -542,12 +550,12 @@ SUITE(XRMSessionIO)
     TEST(getInputField_Test_Field_Return_Aborted_On_ESC)
     {
         // Mock SessionData Class
-        connection_ptr          connection;
-        session_manager_ptr     room;
-        IOService               io_service;
-        state_manager_ptr       state_manager;
-
-        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
+        IOService               ioservice;
+        socket_handler_ptr      handler(new SocketHandler());
+        async_io_ptr            connection(new AsyncIO(ioservice, handler));
+        session_manager_ptr     room(new SessionManager());
+        
+        session_ptr session_data(new Session(connection, room));
         SessionIO sess(session_data);
 
         std::string character_buffer;
@@ -569,12 +577,12 @@ SUITE(XRMSessionIO)
     TEST(getInputField_Test_Field_Return_Aborted_On_ESC_Mid_Field)
     {
         // Mock SessionData Class
-        connection_ptr          connection;
-        session_manager_ptr     room;
-        IOService               io_service;
-        state_manager_ptr       state_manager;
+        IOService               ioservice;
+        socket_handler_ptr      handler(new SocketHandler());
+        async_io_ptr            connection(new AsyncIO(ioservice, handler));
+        session_manager_ptr     room(new SessionManager());
 
-        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
+        session_ptr session_data(new Session(connection, room));
         SessionIO sess(session_data);
 
         std::string character_buffer;
@@ -613,12 +621,12 @@ SUITE(XRMSessionIO)
         // will not be mistaken for ESC and abort the field.
 
         // Mock SessionData Class
-        connection_ptr          connection;
-        session_manager_ptr     room;
-        IOService               io_service;
-        state_manager_ptr       state_manager;
+        IOService               ioservice;
+        socket_handler_ptr      handler(new SocketHandler());
+        async_io_ptr            connection(new AsyncIO(ioservice, handler));
+        session_manager_ptr     room(new SessionManager());
 
-        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
+        session_ptr session_data(new Session(connection, room));
         SessionIO sess(session_data);
 
         std::string character_buffer;
@@ -670,12 +678,12 @@ SUITE(XRMSessionIO)
         // will not be mistaken for ESC and abort the field.
 
         // Mock SessionData Class
-        connection_ptr          connection;
-        session_manager_ptr     room;
-        IOService               io_service;
-        state_manager_ptr       state_manager;
+        IOService               ioservice;
+        socket_handler_ptr      handler(new SocketHandler());
+        async_io_ptr            connection(new AsyncIO(ioservice, handler));
+        session_manager_ptr     room(new SessionManager());
 
-        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
+        session_ptr session_data(new Session(connection, room));
         SessionIO sess(session_data);
 
         std::string character_buffer;
@@ -707,12 +715,12 @@ SUITE(XRMSessionIO)
         // will not be mistaken for ESC and abort the field.
 
         // Mock SessionData Class
-        connection_ptr          connection;
-        session_manager_ptr     room;
-        IOService               io_service;
-        state_manager_ptr       state_manager;
+        IOService               ioservice;
+        socket_handler_ptr      handler(new SocketHandler());
+        async_io_ptr            connection(new AsyncIO(ioservice, handler));
+        session_manager_ptr     room(new SessionManager());
 
-        session_data_ptr session_data(new SessionData(connection, room, io_service, state_manager));
+        session_ptr session_data(new Session(connection, room));
         SessionIO sess(session_data);
 
         std::string character_buffer;
@@ -737,7 +745,7 @@ SUITE(XRMSessionIO)
 
     TEST(pipe2codeMap_Test_MapCode_Group1)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         // Test Group 1 ([|]{1}[0-9]{2})                // |00
@@ -759,7 +767,7 @@ SUITE(XRMSessionIO)
 
     TEST(pipe2codeMap_Test_MapCode_Group2)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         // Test Group 2 ([|]{1}[X][Y][0-9]{4}           // |XY0101
@@ -779,7 +787,7 @@ SUITE(XRMSessionIO)
 
     TEST(pipe2codeMap_Test_MapCode_Group3)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         // Test Group 3 ([|]{1}[A-Z]{1,2}[0-9]{1,2})    // |A1 A22  AA2  AA33
@@ -803,7 +811,7 @@ SUITE(XRMSessionIO)
 
     TEST(pipe2codeMap_Test_MapCode_Group4)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         // Test Group 4 ([|]{1}[A-Z]{2})                // |AA
@@ -827,7 +835,7 @@ SUITE(XRMSessionIO)
 
     TEST(pipe2codeMap_Test_MapCode_Group5)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         // Test Group 5 ([%]{2}[\w]+[.]{1}[\w]{3})      // %%filename.ans
@@ -847,7 +855,7 @@ SUITE(XRMSessionIO)
 
     TEST(pipe2codeMap_Test_MapCode_Group6)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         // Test Group 6 ([%]{1}[A-Z]{2})                // %AA
@@ -867,7 +875,7 @@ SUITE(XRMSessionIO)
 
     TEST(pipe2codeMap_Test_MapCode_Group7)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         // Test Group 7 ([%]{1}[0-9]{2})                // %11
@@ -887,7 +895,7 @@ SUITE(XRMSessionIO)
 
     TEST(pipe2codeMap_Test_MapCode_AllGroups)
     {
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         // Test all groups are picked up when combined
@@ -947,7 +955,7 @@ SUITE(XRMSessionIO)
     TEST(checkRegex_config_regexp_generic_validation_pass)
     {
         config_ptr config(new Config());
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         // [^\\s][\\w\\s,.!@#$%^&*()]+
@@ -961,7 +969,7 @@ SUITE(XRMSessionIO)
     TEST(checkRegex_config_regexp_generic_validation_no_leading_spaces)
     {
         config_ptr config(new Config());
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         // [^\\s][\\w\\s,.!@#$%^&*()]+
@@ -975,7 +983,7 @@ SUITE(XRMSessionIO)
     TEST(checkRegex_config_regexp_generic_validation_space_seperator)
     {
         config_ptr config(new Config());
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         // [^\\s][\\w\\s,.!@#$%^&*()]+
@@ -989,7 +997,7 @@ SUITE(XRMSessionIO)
     TEST(checkRegex_config_regexp_generic_validation_no_leading_space2)
     {
         config_ptr config(new Config());
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         // [^\\s][\\w\\s,.!@#$%^&*()]+
@@ -1006,7 +1014,7 @@ SUITE(XRMSessionIO)
     TEST(checkRegex_config_regexp_generic_validation_test_unicode)
     {
         config_ptr config(new Config());
-        session_data_ptr session_data;
+        session_ptr session_data;
         SessionIO sess(session_data);
 
         // [^\\s][\\w\\s,.!@#$%^&*()]+

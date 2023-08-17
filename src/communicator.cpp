@@ -8,6 +8,7 @@
 #include "session_manager.hpp"
 #include "common_io.hpp"
 
+#include <memory>
 #include <algorithm>
 #include <iostream>
 #include <string>
@@ -57,7 +58,7 @@ void Communicator::sendGlobalMessage()
 
     std::string message;
 
-    while(!m_queue.isEmpty())
+    while(!m_queue.isEmpty() && m_session_manager)
     {
         message.erase();
         message = m_queue.dequeue();
