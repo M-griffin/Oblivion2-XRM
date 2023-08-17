@@ -50,35 +50,35 @@ make -f SqliteWrapped.mk $1
 cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h > ./Debug/libSqliteWrapped.h
 cd $cwd
 
-#echo ''
-#echo -e "\033[1;31m"Build Legacy Menu Conversion Tool
-#echo -e "\033[0;31m"=================================
-#echo -e "\033[0;m"
+echo ''
+echo -e "\033[1;31m"Build Legacy Menu Conversion Tool
+echo -e "\033[0;31m"=================================
+echo -e "\033[0;m"
 
 # *** 3. Build the Legacy Menu Conversion Tool
-#cd ../linux
-#make -f xrm-menu-convert.mk $1
-#cd $cwd
+cd ../linux
+make -f xrm-menu-convert.mk $1
+cd $cwd
 
-#echo ''
-#echo -e "\033[1;31m"Build Legacy Menu Prompt Conversion Tool
-#echo -e "\033[0;31m"========================================
-#echo -e "\033[0;m"
+echo ''
+echo -e "\033[1;31m"Build Legacy Menu Prompt Conversion Tool
+echo -e "\033[0;31m"========================================
+echo -e "\033[0;m"
 
 # *** 4. Build the Legacy Menu Prompt Conversion Tool
-#cd ../linux
-#make -f xrm-menu-prompt-convert.mk $1
-#cd $cwd
+cd ../linux
+make -f xrm-menu-prompt-convert.mk $1
+cd $cwd
 
-#echo ''
-#echo -e "\033[1;31m"Build XRM-Server Unit Tests
-#echo -e "\033[0;31m"===========================
-#echo -e "\033[0;m"
+echo ''
+echo -e "\033[1;31m"Build XRM-Server Unit Tests
+echo -e "\033[0;31m"===========================
+echo -e "\033[0;m"
 
 # *** 5. Build the Unit Tests
-#cd ../linux
-#make -f xrm-unittest.mk $1
-#cd $cwd
+cd ../linux
+make -f xrm-unittest.mk $1
+cd $cwd
 
 echo ''
 echo -e "\033[1;31m"Build XRM-Server [Main Program]
@@ -97,24 +97,24 @@ echo -e "\033[0;m"
 
 # *** 7. Copy the Built Executable (Right now it's a Debug Executable to Build Folder)
 rm -f xrm-server
-#rm -f xrm-menu-convert
-#rm -f xrm-menu-prompt-convert
-#rm -f xrm-unittest
+rm -f xrm-menu-convert
+rm -f xrm-menu-prompt-convert
+rm -f xrm-unittest
 
 cp ../linux/Debug/xrm-server .
-#cp ../linux/Debug/xrm-menu-convert .
-#cp ../linux/Debug/xrm-menu-prompt-convert .
-#cp ../linux/Debug/xrm-unittest .
+cp ../linux/Debug/xrm-menu-convert .
+cp ../linux/Debug/xrm-menu-prompt-convert .
+cp ../linux/Debug/xrm-unittest .
 
 #echo ''
-#echo -e "\033[1;31m"Running Unit Tests
-#echo -e "\033[0;31m"==================
-#echo -e "\033[0;m"
-#./xrm-unittest
+echo -e "\033[1;31m"Running Unit Tests
+echo -e "\033[0;31m"==================
+echo -e "\033[0;m"
+./xrm-unittest
 
 echo ''
 echo -e "\033[1;31m"Build Completed - Check for errors!
-#echo -e "\033[1;31m"- Ignore Unit Test errors when all builds pass!
+echo -e "\033[1;31m"- Ignore Unit Test errors when all builds pass!
 echo -e "\033[1;32m"run ./xrm-server to start the program
 echo -e "\033[0;31m"======================================
 echo -e "\033[0m"

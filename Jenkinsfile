@@ -12,7 +12,6 @@ pipeline {
 				}
 			}
 		}
-		/*
 		stage('\u2777 Build MenuConvert') {
 			steps {
 				dir ('linux') {
@@ -43,7 +42,7 @@ pipeline {
 					}
 				}
 			}
-		}*/
+		}
 		stage('\u277B Build Appplication') {
 			 steps {
 				dir ('linux') {

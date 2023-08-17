@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=merc
-Date                   :=16/08/23
+Date                   :=17/08/23
 CodeLitePath           :=/home/merc/.codelite
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -50,8 +50,8 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryP
 AR       := /usr/bin/ar rcu
 CXX      := /usr/bin/g++
 CC       := /usr/bin/gcc
-CXXFLAGS :=  -Wfatal-errors -g -O0 -pedantic -W -std=c++17 -Wall -Wno-psabi -Wno-deprecated-declarations $(Preprocessors)
-CFLAGS   :=  -Wfatal-errors -g -O0 -pedantic -W -std=c++17 -Wall -Wno-psabi -Wno-deprecated-declarations $(Preprocessors)
+CXXFLAGS :=  -Wfatal-errors -g -O0 -pedantic -W -std=c++11 -Wall -Wno-psabi -Wno-deprecated-declarations $(Preprocessors)
+CFLAGS   :=  -Wfatal-errors -g -O0 -pedantic -W -std=c++11 -Wall -Wno-psabi -Wno-deprecated-declarations $(Preprocessors)
 ASFLAGS  := 
 AS       := /usr/bin/as
 

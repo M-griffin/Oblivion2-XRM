@@ -21,6 +21,7 @@ mem:
 	valgrind -s --track-origins=yes --tool=memcheck --leak-check=full --show-leak-kinds=all ./xrm-server
 mem2:
 	valgrind -s --track-origins=yes --tool=memcheck --leak-check=full --show-leak-kinds=all ../linux/Debug/xrm-server
-
+detach:
+	nohup ./xrm-server &
 run-test:
 	./xrm-unittest
