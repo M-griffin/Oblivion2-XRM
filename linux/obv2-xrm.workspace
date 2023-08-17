@@ -13,13 +13,19 @@
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Environment/>
-      <Project Name="xrm-server" ConfigName="Debug"/>
       <Project Name="SqliteWrapped" ConfigName="Debug"/>
+      <Project Name="xrm-menu-convert" ConfigName=""/>
+      <Project Name="xrm-menu-prompt-convert" ConfigName=""/>
+      <Project Name="xrm-server" ConfigName="Debug"/>
+      <Project Name="xrm-unittest" ConfigName=""/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release" Selected="yes">
+    <WorkspaceConfiguration Name="Release" Selected="no">
       <Environment/>
-      <Project Name="xrm-server" ConfigName="Release"/>
       <Project Name="SqliteWrapped" ConfigName="Release"/>
+      <Project Name="xrm-menu-convert" ConfigName=""/>
+      <Project Name="xrm-menu-prompt-convert" ConfigName=""/>
+      <Project Name="xrm-server" ConfigName="Release"/>
+      <Project Name="xrm-unittest" ConfigName=""/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

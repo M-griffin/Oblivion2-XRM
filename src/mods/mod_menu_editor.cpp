@@ -553,8 +553,8 @@ void ModMenuEditor::displayCurrentEditPage(const std::string &input_state)
  */
 void ModMenuEditor::menuEditorPausedInput(const std::string &input)
 {
-    std::string current_state_input;
-    unsigned int current_module_input;
+    std::string current_state_input = "";
+    unsigned int current_module_input = 0;
 
     switch(m_mod_setup_index)
     {
