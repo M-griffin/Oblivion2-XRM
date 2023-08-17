@@ -72,8 +72,6 @@
     <File Name="../src/session_io.hpp"/>
     <File Name="../src/access_condition.cpp"/>
     <File Name="../src/access_condition.hpp"/>
-    <File Name="../src/form_manager.cpp"/>
-    <File Name="../src/form_manager.hpp"/>
     <File Name="../src/io_service.cpp"/>
     <File Name="../src/io_service.hpp"/>
     <File Name="../src/communicator.cpp"/>
