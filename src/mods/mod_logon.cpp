@@ -54,8 +54,13 @@ ModLogon::ModLogon(session_ptr session_data, config_ptr config, processor_ansi_p
 
     // Loads all Text Prompts for current module
     m_text_prompts_dao->readPrompts();
-    
-    std::cout << "ModLogon() - Creation" << std::endl;
+}
+
+ModLogon::~ModLogon()
+{
+    m_log.write<Logging::DEBUG_LOG>("~ModLogon");
+    std::vector<std::function< void()> >().swap(m_setup_functions);
+    std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
 }
 
 /**
@@ -63,9 +68,7 @@ ModLogon::ModLogon(session_ptr session_data, config_ptr config, processor_ansi_p
  * @return bool, not used anymore?!?
  */
 bool ModLogon::update(const std::string &character_buffer, const bool &)
-{
-    std::cout << "ModLogon::update : m_is_active=" << m_is_active << ", char: " << character_buffer << std::endl;
-    
+{   
     // Make sure system is active, when system is done, success or fails
     // We change this is inactive to single the login process is completed.
     if(!m_is_active)
@@ -90,9 +93,7 @@ bool ModLogon::update(const std::string &character_buffer, const bool &)
  * @return
  */
 bool ModLogon::onEnter()
-{
-    std::cout << "ModLogon() - onEnter" << std::endl;
-    
+{   
     m_is_active = true;
 
     // Grab ANSI Screen, display, if desired.. logon.ans maybe?
@@ -102,7 +103,6 @@ bool ModLogon::onEnter()
     // Execute the initial setup index.
     m_setup_functions[m_mod_function_index]();
 
-    std::cout << "ModLogon() - onEnter END;" << std::endl;
     return true;
 }
 
@@ -112,10 +112,7 @@ bool ModLogon::onEnter()
  */
 bool ModLogon::onExit()
 {
-    std::cout << "ModLogon() - onExit" << std::endl;
     m_is_active = false;
-    
-    std::cout << "ModLogon() - onExit END;" << std::endl;
     return true;
 }
 
@@ -183,7 +180,6 @@ void ModLogon::redisplayModulePrompt()
  */
 void ModLogon::displayPrompt(const std::string &prompt)
 {
-    std::cout << "ModLogon() - displayPrompt" << std::endl;
     baseDisplayPrompt(prompt, m_text_prompts_dao);
 }
 
@@ -193,7 +189,6 @@ void ModLogon::displayPrompt(const std::string &prompt)
  */
 void ModLogon::displayPromptAndNewLine(const std::string &prompt)
 {
-    std::cout << "ModLogon() - displayPromptAndNewLine" << std::endl;
     baseDisplayPromptAndNewLine(prompt, m_text_prompts_dao);
 }
 
@@ -203,7 +198,6 @@ void ModLogon::displayPromptAndNewLine(const std::string &prompt)
  */
 void ModLogon::setupLogon()
 {
-    std::cout << "setupLogon() - displays prompt" << std::endl;
     displayPrompt(PROMPT_LOGON);
 }
 
@@ -230,7 +224,6 @@ void ModLogon::displayUserNumber()
  */
 void ModLogon::setupPassword()
 {
-    std::cout << "setupPassword()" << std::endl;
     displayPrompt(PROMPT_PASSWORD);
 }
 
@@ -332,7 +325,6 @@ bool ModLogon::checkUserLogon(const std::string &input)
  */
 bool ModLogon::logon(const std::string &input)
 {
-    std::cout << "logon() checking input: " << input << std::endl;
     std::string key = "";
     std::string result = m_session_io->getInputField(input, key, Config::sName_length);
 

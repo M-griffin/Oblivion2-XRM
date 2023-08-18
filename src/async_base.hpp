@@ -3,6 +3,7 @@
 
 #include "io_service.hpp"
 #include "socket_handler.hpp"
+#include "logging.hpp"
 
 #include <iostream>
 
@@ -17,12 +18,14 @@ class AsyncBase
 {
 public:
     AsyncBase(IOService& io_service, socket_handler_ptr socket_handler)
-        : m_io_service(io_service)
+        : m_log(Logging::getInstance())
+        , m_io_service(io_service)
         , m_socket_handler(socket_handler)
     { }
+    
     ~AsyncBase()
     { 
-        std::cout << "~AsyncBase()" << std::endl;
+        m_log.write<Logging::DEBUG_LOG>("~AsyncBase()");
         m_socket_handler.reset();
     }
 
@@ -62,6 +65,7 @@ public:
         }
     }
 
+    Logging            &m_log;
     IOService          &m_io_service;
     socket_handler_ptr  m_socket_handler;
 };

@@ -1,8 +1,9 @@
 #include "communicator.hpp"
 
-#include "data-sys/text_prompts_dao.hpp"
 #include "model-sys/structures.hpp"
 #include "model-sys/config.hpp"
+
+#include "data-sys/text_prompts_dao.hpp"
 
 #include "safe_queue.hpp"
 #include "session_manager.hpp"

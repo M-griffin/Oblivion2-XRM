@@ -4,6 +4,7 @@
 #include "async_base.hpp"
 #include "io_service.hpp"
 #include "socket_handler.hpp"
+#include "logging.hpp"
 
 #include <iostream>
 #include <memory>
@@ -27,10 +28,9 @@ public:
 
     ~AsyncAcceptor()
     {
-        std::cout << "~AsyncAcceptor()" << std::endl;
+        m_log.write<Logging::DEBUG_LOG>("~AsyncAcceptor()");
     }
-
-
+    
     /**
      * @brief Async Listener Callback for IOService Work
      * @param StringSequence - Host:Port
@@ -51,7 +51,8 @@ public:
         {
             service_type = SERVICE_TYPE_LISTENER_TELNET;
         }
-
+        
+        m_log.write<Logging::DEBUG_LOG>("Async Listener Job Added to the Queue for", protocol);
         m_io_service.addAsyncJob(place_holder, string_place_holder, m_socket_handler, callback, service_type);
     }
 

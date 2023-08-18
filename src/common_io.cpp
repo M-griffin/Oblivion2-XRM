@@ -169,13 +169,11 @@ CommonIO::CommonIO()
     m_sequence_map.insert(std::make_pair("[6^",   "ctrl_pg_dn"));
     m_sequence_map.insert(std::make_pair("[7^",   "ctrl_home"));
     m_sequence_map.insert(std::make_pair("[8^",   "ctrl_end"));
-    
-    std::cout << "CommonIO() Init Completed!" << std::endl;
 }
 
 CommonIO::~CommonIO()
 {
-    std::cout << "~CommonIO()" << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("~CommonIO()");
     // Look at making this a single instance per session insetad of alocate on fly.
     m_sequence_map.clear();
     m_escape_sequence.erase();
@@ -219,14 +217,10 @@ std::string CommonIO::getProgramPath(const std::string &program_name)
 
     if(pPath != nullptr)
     {
-        std::cout << "Found OBV2 Environment Variable=" << pPath << std::endl;
+        m_log.write<Logging::CONSOLE_LOG>("Found OBV2 Environment Variable", pPath);
         program_path = pPath;
         pathAppend(program_path);
         return program_path;
-    }
-    else
-    {
-        std::cout << "looking up program path" << std::endl;
     }
 
     // Get the Folder the Executable runs in.
@@ -236,7 +230,7 @@ std::string CommonIO::getProgramPath(const std::string &program_name)
 
     if(_NSGetExecutablePath(current_path, &size) != 0)
     {
-        std::cout << "Error, getProgramPath: OSX Path empty!" << std::endl;
+        m_log.write<Logging::ERROR_LOG>("getProgramPath: OSX Path empty!");
         throw std::runtime_error("getProgramPath: OSX Path");
     }
 
@@ -265,7 +259,7 @@ std::string CommonIO::getProgramPath(const std::string &program_name)
 
     if(result == 0)
     {
-        std::cout << "Error, getProgramPath: Win32 Path empty!" << std::endl;
+        m_log.write<Logging::ERROR_LOG>("getProgramPath: Win32 Path empty!");
         throw std::runtime_error("GetProgramPath: Win32 Path");
     }
 
@@ -283,14 +277,14 @@ std::string CommonIO::getProgramPath(const std::string &program_name)
 
     if(result < 0)
     {
-        std::cout << "Error, getProgramPath: Linux Path empty!" << std::endl;
+        m_log.write<Logging::ERROR_LOG>("getProgramPath: Linux Path empty!");
         throw std::runtime_error("getProgramPath: Linux Path");
     }
 
     const char* t = " \t\n\r\f\v";
     program_path = exe_path;
 
-    std::cout << "Original Path=" << program_path << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("Original Path", program_path);
     program_path = program_path.erase(program_path.find_last_not_of(t) + 1);
     program_path += "/";
 
@@ -325,8 +319,7 @@ std::string CommonIO::getSystemHomeDirectory()
 
         if(!homedir)
         {
-            std::cout << "!WIN32, Unable to locate home directory" << std::endl;
-
+            m_log.write<Logging::DEBUG_LOG>("!WIN32, Unable to locate home directory");
             home_directory = "";
             return home_directory;
         }

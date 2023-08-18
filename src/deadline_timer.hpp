@@ -1,6 +1,7 @@
 #ifndef DEADLINE_TIMER_HPP
 #define DEADLINE_TIMER_HPP
 
+#include "logging.hpp"
 
 #include <iostream>
 #include <thread>
@@ -20,18 +21,20 @@ class DeadlineTimer
 {
 public:
     explicit DeadlineTimer()
-        : m_expires_from_now(0)
+        : m_log(Logging::getInstance())
+        , m_expires_from_now(0)
         , m_num_instances (0)
     {
     }
 
     ~DeadlineTimer()
     {
-        std::cout << "~DeadlineTimer()" << std::endl;
+        m_log.write<Logging::DEBUG_LOG>("~DeadlineTimer()");
     }
 
     typedef std::function<void(int)> StdFuncationCallBack;
 
+    Logging         &m_log;
     int              m_expires_from_now;
     std::atomic_int  m_num_instances;
 
@@ -66,13 +69,15 @@ public:
             // If Current Instance is the 
             // If overwrritten we'll have (2) instances, ignore the first.
             if(m_num_instances == 1)
-            {
-                std::cout << "DeadlineTimer() Executing CallBack, NumInstances=" << m_num_instances << " CurrInstance=" << c << std::endl;
+            {                
+                m_log.write<Logging::DEBUG_LOG>("DeadlineTimer() Executing CallBack", 
+                    "NumInstances=", (int)m_num_instances, "CurrInstance=", (int)c);
                 fun_callback(0);
             }
             else
             {
-                std::cout << "DeadlineTimer() Cancled, Num Instances=" << m_num_instances << " CurrInstance=" << c << std::endl;
+                m_log.write<Logging::DEBUG_LOG>("DeadlineTimer() Cancled CallBack", 
+                    "NumInstances=", (int)m_num_instances, "CurrInstance=", (int)c);
             }
             
             m_num_instances -= 1;

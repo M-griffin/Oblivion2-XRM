@@ -918,11 +918,30 @@ std::string MenuBase::loadMenuPrompt()
     // Don't display prompts on Pulldown menu's.
     if(!m_is_active_pulldown_menu && is_loaded)
     {
-        //fmt.Print("\033[?25l")
-        //fmt.Print("\033[?25h")
-
-        // Default Display Cursor prompt starting point, make this configurable lateron
-        prompt_display = "\x1b[?25h\x1b[22;1H";
+        // Used Screen Rows is not reliable across menu's, need to look into this more!
+        //int screen_rows = m_ansi_process->getMaxRowsUsedOnScreen();
+        
+        // For Now use defaults when Term height is 24 (Default) or 25 and greater
+        // Usually menu's themselves are not going to be higher 25
+        // Properly can also overwrite and have MCU position Codes in them.
+        int term_rows = m_menu_session_data->m_telnet_decoder->getTermRows();
+        if (term_rows == 24)
+        {
+            prompt_display = "\x1b[?25h\x1b[21;1H";
+        }
+        else if (term_rows > 24) 
+        {
+            prompt_display = "\x1b[?25h\x1b[22;1H";
+        }
+        
+       
+        //prompt_display = "\x1b[?25h\x1b[" + std::to_string(screen_rows) + ";1H\r\n";
+        prompt_display += getDefaultColor();
+        
+        
+        // Insert Rumor Test here 1 line abovem enu propmpt!
+        prompt_display += "\"Mock: Oblivion/2 will live once again!\r\n"; 
+        // Start of Menu prompt
         prompt_display += m_menu_prompt->data_line1 + "\r\n";
         prompt_display += m_menu_prompt->data_line2 + "\r\n";
         prompt_display += m_menu_prompt->data_line3;
@@ -965,7 +984,7 @@ std::string MenuBase::loadMenuPrompt()
 }
 
 /**
- * @brief Move to End of Display then output
+ * @brief Move to End of Display then output (Not Used?)
  * @param output
  */
 void MenuBase::moveToBottomAndDisplay(const std::string &prompt)
@@ -973,7 +992,7 @@ void MenuBase::moveToBottomAndDisplay(const std::string &prompt)
     std::string output = "";
     int screen_row = m_ansi_process->getMaxRowsUsedOnScreen();
 
-    output += getDefaultColor();
+    output += getDefaultColor();        
     output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
     output += std::move(prompt);
     baseProcessAndDeliver(output);

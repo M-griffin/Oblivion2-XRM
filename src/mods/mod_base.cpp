@@ -27,19 +27,12 @@ ModBase::ModBase(session_ptr session_data, config_ptr config, processor_ansi_ptr
     , m_common_io(common_io)
     , m_session_io(session_io)
     , m_is_active(false)
-{ 
-    std::cout << "ModBase Loaded" << std::endl;
-    
-    // Default on Mod Startup, Enable Cursor.
-    std::string enableCursor = "\x1b[?25h";
-    session_data->m_async_io->getSocketHandle()->sendSocket(
-        (unsigned char*)enableCursor.c_str(), enableCursor.size()
-    );
+{    
 }
 
 ModBase::~ModBase()
 {
-    std::cout << "~ModBase()" << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("~ModBase()");
     m_session_data.reset();
     m_config.reset();
     m_session_io.reset();

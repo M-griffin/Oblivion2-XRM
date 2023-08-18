@@ -1,6 +1,10 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
+#include "model-sys/config.hpp"
+
+#include "communicator.hpp"
+
 #include <memory>
 #include <iostream>
 #include <sstream>
@@ -140,15 +144,14 @@ public:
 
     template<int level, typename ... Types>
     void write(Types ... rest)
-    {
-        /*
-        config_ptr config = Communicator::instance()->getConfiguration();
-        std::string config_log_text = config->logging_level;
-        int config_level = getConfigurationLogState(config_log_text);
-        */
+    {        
+        int config_level = INFO_LOG;
+        config_ptr config = Communicator::getInstance().getConfiguration();
         
-        // Temp Set untill we add configuration back!
-        int config_level = DEBUG_LOG;
+        if (config)
+        {
+            config_level = getConfigurationLogState(config->logging_level);
+        }
 
         // Quick Case Statement, in Logging level, if were not logging anything
         // then return right away to save processing.

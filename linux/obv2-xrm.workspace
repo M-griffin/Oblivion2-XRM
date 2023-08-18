@@ -5,7 +5,7 @@
   <Environment>
     <![CDATA[]]>
   </Environment>
-  <Project Name="xrm-server" Path="xrm-server-lnx.project" Active="No"/>
+  <Project Name="xrm-server" Path="xrm-server-lnx.project" Active="Yes"/>
   <Project Name="sqlitewrapped-lnx" Path="sqlitewrapped-lnx.project" Active="No"/>
   <Project Name="xrm-menu-convert-lnx" Path="xrm-menu-convert-lnx.project" Active="No"/>
   <Project Name="xrm-menu-convert-prompt-lnx" Path="xrm-menu-convert-prompt-lnx.project" Active="No"/>
@@ -14,18 +14,12 @@
     <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Environment/>
       <Project Name="SqliteWrapped" ConfigName="Debug"/>
-      <Project Name="xrm-menu-convert" ConfigName=""/>
-      <Project Name="xrm-menu-prompt-convert" ConfigName=""/>
       <Project Name="xrm-server" ConfigName="Debug"/>
-      <Project Name="xrm-unittest" ConfigName=""/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release" Selected="no">
+    <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
       <Project Name="SqliteWrapped" ConfigName="Release"/>
-      <Project Name="xrm-menu-convert" ConfigName=""/>
-      <Project Name="xrm-menu-prompt-convert" ConfigName=""/>
       <Project Name="xrm-server" ConfigName="Release"/>
-      <Project Name="xrm-unittest" ConfigName=""/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

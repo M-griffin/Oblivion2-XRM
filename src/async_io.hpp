@@ -28,7 +28,7 @@ public:
 
     ~AsyncIO()
     {
-        std::cout << "~AsyncIO()" << std::endl;
+        m_log.write<Logging::DEBUG_LOG>("~AsyncIO()");
     }
 
     /**
@@ -39,6 +39,7 @@ public:
     template <typename BufferSequence, typename Callback>
     void asyncRead(BufferSequence &buffer, const Callback &callback)
     {
+        m_log.write<Logging::DEBUG_LOG>("Async Read Job Added To Queue");
         m_io_service.addAsyncJob(buffer, nullptr, m_socket_handler, callback, SERVICE_TYPE_READ);
     }
 
@@ -50,6 +51,7 @@ public:
     template <typename StringSequence, typename Callback>
     void asyncWrite(StringSequence &string_seq, const Callback &callback)
     {
+        m_log.write<Logging::DEBUG_LOG>("Async Write Job Added To Queue");
         // Place Holder is used for template parameters, string_seq is used in writes
         // Where the Buffer Place Holder in the above method is used for reads.
         // nullptr can't be passed as reference for vector
@@ -76,6 +78,7 @@ public:
             service_type = SERVICE_TYPE_CONNECT_TELNET;
         }        
 
+        m_log.write<Logging::DEBUG_LOG>("Async Connect Job Added To Queue");
         m_io_service.addAsyncJob(place_holder, string_seq, m_socket_handler, callback, service_type);
     }
 
@@ -98,6 +101,7 @@ public:
             service_type = SERVICE_TYPE_LISTENER_TELNET;
         }
 
+        m_log.write<Logging::DEBUG_LOG>("Async Listener Job Added To Queue");
         m_io_service.addAsyncJob(place_holder, string_seq, m_socket_handler, callback, service_type);
     }
 

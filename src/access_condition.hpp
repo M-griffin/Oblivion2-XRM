@@ -19,6 +19,8 @@ typedef std::shared_ptr<Users> user_ptr;
 class AccessLevel;
 typedef std::shared_ptr<AccessLevel> access_level_ptr;
 
+class Logging;
+
 /**
  * @class AccessCondition
  * @author Michael Griffin
@@ -30,10 +32,7 @@ class AccessCondition
 {
 public:
     explicit AccessCondition();
-    ~AccessCondition() 
-    { 
-        std::cout << "~AccessCondition()" << std::endl;
-    };
+    ~AccessCondition();            
 
     /**
      * @brief Toggle Bit Flag
@@ -123,7 +122,8 @@ public:
     std::string getAccessConditionFlagStringFromBits(int bits);
 
     // Using Session IO for Code Mapping
-    session_io_ptr  m_session_io;
+    Logging        &m_log;
+    session_io_ptr  m_session_io;    
 
     // note update to security expressions
     // start with NOT s255 then test for s255
