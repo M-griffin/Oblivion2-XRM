@@ -146,12 +146,16 @@ public:
     void write(Types ... rest)
     {        
         int config_level = INFO_LOG;
+// For Conversion Utils, we share some common files, but don't need to allication Session Objcets
+// And waste compile time, resources, and all of the required include files.
+#ifndef CONVERSION        
         config_ptr config = Communicator::getInstance().getConfiguration();
         
         if (config)
         {
             config_level = getConfigurationLogState(config->logging_level);
         }
+#endif        
 
         // Quick Case Statement, in Logging level, if were not logging anything
         // then return right away to save processing.

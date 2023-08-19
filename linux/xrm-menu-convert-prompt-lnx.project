@@ -63,6 +63,8 @@
     <File Name="../src/logging.hpp"/>
     <File Name="../xrm-menu-prompt-convert/src/prompt_convert.cpp"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="" C_Options="" Assembler="">
@@ -78,6 +80,7 @@
         <IncludePath Value="."/>
         <IncludePath Value="../src"/>
         <IncludePath Value="../linux/Debug"/>
+        <Preprocessor Value="CONVERSION"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
@@ -165,6 +168,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
 </CodeLite_Project>
