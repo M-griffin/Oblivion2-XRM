@@ -49,11 +49,8 @@ Database::Database(Mutex& m, const std::string& database, IError *error)
 
 
 Database::~Database()
-{
-    std::cout << "~Database()" << std::endl;
-    
-    // Check Open Databases and pop off stack!
-    
+{   
+    // Check Open Databases and pop off stack!    
     for (m_database_pool::iterator it = m_opendbs.begin(); it != m_opendbs.end(); it++)
     {
         DatabasePool *p = *it;
@@ -66,13 +63,8 @@ Database::~Database()
         int rc = sqlite3_close(p -> db);
         if (rc != SQLITE_OK) 
         {
-            std::cout << "Database Not closed properly!" << std::endl;
+            databaseError("Database Not closed properly!");
         }
-        else 
-        {
-            std::cout << "Database Closed properly." << std::endl;
-        }
-        
         
         delete p;
     }
@@ -127,11 +119,7 @@ Database::DatabasePool *Database::addDatabasePool()
             int rc = sqlite3_close(odb->db);
             if (rc != SQLITE_OK)
             {
-                std::cout << "Can't close database properly on Open" << std::endl;
-            }
-            else 
-            {
-                std::cout << "Closed database properly on Error Opening" << std::endl;
+                databaseError("Can't close database properly on Open");
             }
             
             delete odb;

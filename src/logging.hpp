@@ -121,6 +121,15 @@ public:
             // Default is Error
             return 2;
     }
+    
+    /**
+     * @brief Set Logging Level From Configurations by String and Convert to Int Level.
+     * @param log_level
+     */
+    void setLoggingLevel(std::string log_level) 
+    {
+        m_log_level = getConfigurationLogState(log_level);
+    }
 
     template<int level>
     std::string log()
@@ -144,31 +153,19 @@ public:
 
     template<int level, typename ... Types>
     void write(Types ... rest)
-    {        
-        int config_level = INFO_LOG;
-// For Conversion Utils, we share some common files, but don't need to allication Session Objcets
-// And waste compile time, resources, and all of the required include files.
-#ifndef CONVERSION        
-        config_ptr config = Communicator::getInstance().getConfiguration();
-        
-        if (config)
-        {
-            config_level = getConfigurationLogState(config->logging_level);
-        }
-#endif        
-
+    {
         // Quick Case Statement, in Logging level, if were not logging anything
         // then return right away to save processing.
         switch(level)
         {
             // Incoming Logging Level Filtering by Configuration
             case INFO_LOG:
-                if(config_level != INFO_LOG && config_level != ALL_LOGS)
+                if(m_log_level != INFO_LOG && m_log_level != ALL_LOGS)
                     return;
                 break;
 
             case DEBUG_LOG:
-                if(config_level != DEBUG_LOG && config_level != ALL_LOGS)
+                if(m_log_level != DEBUG_LOG && m_log_level != ALL_LOGS)
                     return;
                 break;
 
@@ -256,6 +253,7 @@ public:
 
 private:
 
+    int                    m_log_level;
     mutable std::mutex     m_encoding_mutex;
     
     /**
@@ -264,8 +262,9 @@ private:
      */
     
     explicit Logging() 
+        : m_log_level(INFO_LOG)
+        , m_encoding_mutex()
     {
-        std::cout << "Logging()" << std::endl;
     }
     
     Logging(const Logging&) = delete;             // Copy ctor

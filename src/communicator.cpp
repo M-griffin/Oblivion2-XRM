@@ -150,6 +150,7 @@ void Communicator::attachConfiguration(config_ptr config)
  */
 void Communicator::releaseConfiguration() {
     
+    m_config.reset();
     m_active = false;
 }
 

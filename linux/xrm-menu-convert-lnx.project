@@ -84,7 +84,6 @@
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
         <IncludePath Value="../linux/Debug"/>
-        <Preprocessor Value="CONVERSION"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>

@@ -160,6 +160,9 @@ auto main() -> int
         // Create Handles to Services, and starts up connection listener and ASIO Thread Worker
         IOService io_service;        
         int port = Communicator::getInstance().getConfiguration()->port_telnet;
+        std::string logging_level = Communicator::getInstance().getConfiguration()->logging_level;
+        Logging::getInstance().setLoggingLevel(logging_level);        
+        
         std::cout << "Reading Configuration Telnet Port=" << port << std::endl;            
         interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", port));
         
@@ -168,7 +171,6 @@ auto main() -> int
         {            
             std::string line;
             std::getline(std::cin, line);
-            std::cout << "line read: [" << line << "]" << std::endl;
             
             /**
              * Clean Shutdown, (2) Steps at this time from Console Commands.
