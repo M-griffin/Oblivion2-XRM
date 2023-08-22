@@ -414,8 +414,7 @@ void ModBase::baseDisplayPromptAndNewLine(const std::string &prompt, text_prompt
 
     // Add New Line.
     result += "\r\n";
-
-    //std::cout << "prompt: " << result << std::endl;
+    
     baseProcessAndDeliver(result);
 }
 

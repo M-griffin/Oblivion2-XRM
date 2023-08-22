@@ -9,6 +9,8 @@
 #include <memory>
 #include <typeinfo>
 
+class Logging;
+
 class SocketHandler;
 typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
 
@@ -126,7 +128,6 @@ public:
         
         ~ServiceJob() 
         {
-            std::cout << "~ServiceJob()" << std::endl;
             m_socket_handle.reset();
         }
 
@@ -194,10 +195,12 @@ public:
      * @brief Check if the IO Service Is Active
      */
     bool isActive();
-
+    
     SafeVector<service_base_ptr>  m_service_list;
     SafeVector<service_base_ptr>  m_timer_list;
     SafeVector<service_base_ptr>  m_listener_list;
+    
+    Logging                      &m_log;
     bool                          m_is_active;
 
 };

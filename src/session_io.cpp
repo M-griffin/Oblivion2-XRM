@@ -35,13 +35,12 @@ SessionIO::SessionIO(session_ptr session_data, common_io_ptr common_io)
     , m_session_data(session_data)
     , m_common_io(common_io)
 {
-    std::cout << "SessionIO() w/ SessionData, CommonIO for Modules" << std::endl;
 }
 
 
 SessionIO::~SessionIO()
 {
-    std::cout << "~SessionIO()" << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("~SessionIO()");
     clearAllMCIMapping();
 }
 
@@ -68,7 +67,7 @@ std::string SessionIO::getFSEKeyInput(const std::string &character_buffer)
     {
         escape_sequence = m_common_io->getFSEEscapeSequence();
 
-        std::cout << "FSE escape_sequence: " << escape_sequence << std::endl;
+        m_log.write<Logging::DEBUG_LOG>("FSE escape_sequence=", escape_sequence);
 
         if(escape_sequence.size() == 0)
         {

@@ -1,6 +1,9 @@
 #include "socket_state.hpp"
+
+#include "model-sys/config.hpp"
+
+#include "communicator.hpp"
 #include "socket_handler.hpp"
-//#include "communicator.hpp"
 #include "logging.hpp"
 
 #include <sdl2_net/SDL_net.hpp>
@@ -120,10 +123,8 @@ socket_handler_ptr SDL_Socket::pollSocketAccepts()
             socket = SDLNet_TCP_Accept(m_tcp_socket);
 
             // Setup the State, SDL_Socket
-            //config_ptr config = TheCommunicator::instance()->getConfiguration();
-            //socket_state_ptr state(new SDL_Socket("127.0.0.1", config->port_telnet));
-            
-            socket_state_ptr state(new SDL_Socket("127.0.0.1", 6023));
+            config_ptr config = Communicator::getInstance().getConfiguration();
+            socket_state_ptr state(new SDL_Socket("127.0.0.1", config->port_telnet));
             state->spawnSocket(socket);
 
             // Setup a Handle, which will link back to Async_Connection
@@ -276,7 +277,6 @@ bool SDL_Socket::onListen()
  */
 bool SDL_Socket::onExit()
 {
-    std::cout << "SDL_Socket onExit()" << std::endl;
     Logging &log = Logging::getInstance();
     m_is_socket_active = false;
     
@@ -291,7 +291,6 @@ bool SDL_Socket::onExit()
         }
         
         SDLNet_TCP_Close(m_tcp_socket);
-        std::cout << "SDL_Socket closed!" << std::endl;
     }
 
     m_tcp_socket = nullptr;
@@ -311,7 +310,6 @@ bool SDL_Socket::onExit()
  */
 bool SDL_Socket::disconnectUser()
 {
-    std::cout << "SDL_Socket disconnectUser()" << std::endl;
     Logging &log = Logging::getInstance();
     m_is_socket_active = false;
     
@@ -330,7 +328,6 @@ bool SDL_Socket::disconnectUser()
         }
         
         SDLNet_TCP_Close(m_tcp_socket);
-        std::cout << "SDL_Socket closed!" << std::endl;
     }
 
     m_tcp_socket = nullptr;

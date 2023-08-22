@@ -31,7 +31,6 @@ public:
 
     virtual ~ProcessorText() 
     {
-        std::cout << "~ProcessorText()" << std::endl;
     }
 
     virtual std::string buildPullDownBars(int pulldown_id, bool active) override;

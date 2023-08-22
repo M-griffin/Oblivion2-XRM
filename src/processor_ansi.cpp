@@ -3,7 +3,6 @@
 #include "model-sys/structures.hpp"
 #include "model-sys/screen_pixel.hpp"
 
-
 #include "common_io.hpp"
 #include "logging.hpp"
 
@@ -31,14 +30,14 @@
 ProcessorAnsi::ProcessorAnsi(int term_height, int term_width)
     : ProcessorBase(term_height, term_width)
 { 
-    std::cout << "PROCESSOR_ANSI rows=" << term_height << ", cols=" << term_width << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("PROCESSOR_ANSI rows=", term_height, "cols=", term_width);
     m_screen_buffer.reserve((m_number_lines * m_characters_per_line)+1);
     m_screen_buffer.resize((m_number_lines * m_characters_per_line)+1);
 }
 
 ProcessorAnsi::~ProcessorAnsi()
 { 
-    std::cout << "~ProcessorAnsi()" << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("~ProcessorAnsi()");
     std::vector <ScreenPixel>().swap(m_screen_buffer);
     std::map<int, ScreenPixel>().swap(m_pull_down_options);
     std::map<int, int>().swap(m_line_ending_map);
@@ -389,8 +388,7 @@ std::string ProcessorAnsi::screenBufferParse()
             // is not the same as the next!
             if(start == matches[0].second)
             {
-                Logging &log = Logging::getInstance();
-                log.write<Logging::DEBUG_LOG>("[screenBufferParse] no matches!", __LINE__, __FILE__);
+                m_log.write<Logging::DEBUG_LOG>("[screenBufferParse] no matches!", __LINE__, __FILE__);
                 break;
             }
 
@@ -435,8 +433,7 @@ std::string ProcessorAnsi::screenBufferParse()
     }
     catch(std::regex_error &ex)
     {
-        Logging &log = Logging::getInstance();
-        log.write<Logging::ERROR_LOG>("[screenBufferParse] regex=", ex.what(), ex.code(), __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("[screenBufferParse] regex=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
     // All Global MCI Codes likes standard screens and colors will
@@ -513,8 +510,6 @@ std::string ProcessorAnsi::screenBufferParse()
  */
 void ProcessorAnsi::screenBufferSetGlyph(const std::string &char_sequence)
 {
-    Logging &log = Logging::getInstance();
-
     // Keep track of the longest line in buffer for Centering screen.
     if(m_x_position > m_max_x_position)
     {
@@ -553,12 +548,12 @@ void ProcessorAnsi::screenBufferSetGlyph(const std::string &char_sequence)
         }
         else
         {
-            log.write<Logging::ERROR_LOG>("[screenBufferSetGlyph] out of bounds pos=", m_x_position-1, __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>("[screenBufferSetGlyph] out of bounds pos=", m_x_position-1, __LINE__, __FILE__);
         }
     }
     catch(std::exception &e)
     {
-        log.write<Logging::ERROR_LOG>("[screenBufferSetGlyph] exceeds screen dimensions Exception=", e.what(), __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("[screenBufferSetGlyph] exceeds screen dimensions Exception=", e.what(), __LINE__, __FILE__);
     }
 
     // Clear for next sequences.
@@ -606,8 +601,7 @@ void ProcessorAnsi::screenBufferScrollUp()
     }
     catch(std::exception &e)
     {
-        Logging &log = Logging::getInstance();
-        log.write<Logging::ERROR_LOG>("[screenBufferScrollUp] Exception=", e.what(), __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("[screenBufferScrollUp] Exception=", e.what(), __LINE__, __FILE__);
     }
 
     // Readd The last Line back to the buffer.
@@ -636,8 +630,7 @@ void ProcessorAnsi::screenBufferClearRange(int start, int end)
         }
         catch(std::exception &e)
         {
-            Logging &log = Logging::getInstance();
-            log.write<Logging::ERROR_LOG>("[screenBufferClearRange] Exception=", e.what(),
+            m_log.write<Logging::ERROR_LOG>("[screenBufferClearRange] Exception=", e.what(),
                                             "start=", start, "end=", end, __LINE__, __FILE__);
         }
     }

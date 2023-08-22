@@ -289,16 +289,6 @@ void ModPreLogon::displayTerminalDetection()
     {
         std::string result = prompt_term.second;
         std::string term = m_session_data->m_telnet_decoder->getTermType();
-        
-        // Avoid Scripts, Could block Legacy Model Terminals, Maybe make an option lateron!
-        /* Test this later on forcing a logoff is resulting in segfaults!  We have some issues with deallocation.
-         * When the system is being hammered..  Look more into this. - New Testing is no loger throwing faults, Keep Watch!
-        if(term == "undetected") {
-            m_log.write<Logging::CONSOLE_LOG>("Term Type= undetected, disconnecting!");
-            m_session_data->disconnectUser();
-            m_is_active = false;
-            return;
-        }*/
 
         m_log.write<Logging::CONSOLE_LOG>("Term Type=", term);
 
@@ -314,14 +304,16 @@ void ModPreLogon::displayTerminalDetection()
         std::string term_size = "";
         if (m_x_position == 0 || m_y_position == 0)
         {
-            std::cout << "*** NAWS Detection!" << std::endl;
+            m_log.write<Logging::CONSOLE_LOG>("*** NAWS TermSize Detection!");
+            // Make this Propmpts for Customization!            
             term_size = std::to_string(m_session_data->m_telnet_decoder->getTermCols());
             term_size.append("x");
             term_size.append(std::to_string(m_session_data->m_telnet_decoder->getTermRows()));            
         }
         else
         {
-            std::cout << "*** ESC Detection!" << std::endl;
+            m_log.write<Logging::CONSOLE_LOG>("*** ESC TermSize Detection!");
+            // Make this Propmpts for Customization!            
             term_size = std::to_string(m_x_position);
             term_size.append("x");
             term_size.append(std::to_string(m_y_position));
@@ -377,8 +369,6 @@ bool ModPreLogon::humanShieldDetection(const std::string &input)
     {
         unsigned int ch = 0;
         ch = input[0];
-        
-        std::cout << "Input shield -> " << (int)ch << " : " << input.size() << std::endl;
 
         // Read in buffer once ESC sequence is hit to
         // Parse the ESC[6n Response
@@ -449,7 +439,7 @@ bool ModPreLogon::emulationDetection(const std::string &input)
                 std::vector<std::string> positions = m_common_io->splitString(m_esc_sequence, ';');
                 if (positions.size() > 1)
                 {
-                    std::cout << "X=" << positions[1] << ", Y=" << positions[0] << std::endl;
+                    m_log.write<Logging::DEBUG_LOG>("X=", positions[1], "Y=", positions[0]);
                     m_x_position = m_common_io->stringToInt(positions[1]);
                     m_y_position = m_common_io->stringToInt(positions[0]);
                 }
@@ -692,8 +682,6 @@ void ModPreLogon::startDetectionTimer()
  */
 void ModPreLogon::handleHumanShieldTimer()
 {
-    std::cout << "HUMAN_SHIELD_TIMER!" << std::endl;
-    // Jump to Emulation completed.
     humanShieldCompleted();
 }
 
@@ -703,7 +691,6 @@ void ModPreLogon::handleHumanShieldTimer()
  */
 void ModPreLogon::humanShieldCompleted()
 {
-    std::cout << "HUMAN_SHIELD_COMPLETED!" << std::endl;
     if(m_is_human_shield)
     {
         // Move to Next Detection

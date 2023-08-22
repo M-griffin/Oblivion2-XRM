@@ -1,5 +1,7 @@
 #include "text_prompts_dao.hpp"
 
+#include "logging.hpp"
+
 #include <yaml-cpp/yaml.h>
 
 #include <iostream>
@@ -12,11 +14,12 @@ const std::string TextPromptsDao::FILE_VERSION = "1.0.1";
 static bool is_version_displayed = false;
 
 TextPromptsDao::TextPromptsDao(std::string path, const std::string &filename)
-    : m_path(path)
+    : m_log(Logging::getInstance())
+    , m_path(path)
     , m_filename(filename)
     , m_is_loaded(false)
 {
-    std::cout << "TextPromptsDao path=" << m_path << " filename=" << m_filename << std::endl;
+    m_log.write<Logging::CONSOLE_LOG>("TextPromptsDao path=", m_path, "filename=", m_filename);
 }
 
 TextPromptsDao::~TextPromptsDao()
@@ -73,7 +76,7 @@ void TextPromptsDao::writeValue(M_TextPrompt &value)
 
     if(!ofs.is_open())
     {
-        std::cout << "Error, unable to write to: " << path << std::endl;
+        m_log.write<Logging::ERROR_LOG>("Error, unable to write to=", path);
         return;
     }
 
@@ -124,7 +127,7 @@ bool TextPromptsDao::readPrompts()
 
         if(m_node.size() == 0)
         {
-            std::cout << std::endl << "TextPromptsDao Node size == 0" << std::endl;
+            m_log.write<Logging::ERROR_LOG>("TextPromptsDao Node size == 0", path);
             return false;
         }
 
@@ -133,13 +136,13 @@ bool TextPromptsDao::readPrompts()
         // Validate File Version
         if(!is_version_displayed)
         {
-            std::cout << "Text Prompt File Version: " << file_version << std::endl;
+            m_log.write<Logging::CONSOLE_LOG>("Text Prompt File Version=", file_version);
             is_version_displayed = true;
         }
 
         if(file_version != TextPromptsDao::FILE_VERSION)
         {
-            std::cout << "Invalid file_version, expected: " << TextPromptsDao::FILE_VERSION << std::endl;
+            m_log.write<Logging::ERROR_LOG>("Text Prompt Invalid File Version=", file_version, "Expected=", TextPromptsDao::FILE_VERSION);
             return(false);
         }
 
@@ -147,7 +150,7 @@ bool TextPromptsDao::readPrompts()
     }
     catch(std::exception &ex)
     {
-        std::cout << "Exception YAML::readPrompts(" << m_filename << ") " << ex.what() << std::endl;
+        m_log.write<Logging::ERROR_LOG>("Exception YAML::readPrompts=", m_filename, ex.what());
         return(false);
     }
 

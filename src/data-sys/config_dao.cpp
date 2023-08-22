@@ -1,8 +1,7 @@
 #include "config_dao.hpp"
 #include "../model-sys/config.hpp"
 
-// NOTE can't use logging here, circular dependency on communicator.
-//#include "logging.hpp"
+#include "logging.hpp"
 
 #include <fstream>
 #include <string>
@@ -14,7 +13,8 @@ const std::string Config::FILE_VERSION = "1.0.4";
 static bool is_version_displayed = false;
 
 ConfigDao::ConfigDao(config_ptr config, const std::string &path)
-    : m_config(config)
+    : m_log(Logging::getInstance())
+    , m_config(config)
     , m_path(path)
     , m_filename("xrm_config.yaml")
 {
@@ -183,7 +183,7 @@ bool ConfigDao::saveConfig(config_ptr cfg)
 
     if(!ofs.is_open())
     {
-        std::cout << "Error, unable to write to" << path << std::endl;
+        m_log.write<Logging::ERROR_LOG>("Error, unable to write to path=", path);
         return false;
     }
 
@@ -341,7 +341,7 @@ bool ConfigDao::loadConfig()
         // Testing Is on nodes always throws exceptions.
         if(node.size() == 0)
         {
-            std::cout << std::endl << "ConfigDao Node size == 0" << std::endl;
+            m_log.write<Logging::ERROR_LOG>("Error, ConfigDao Node size == 0");
             return false;
         }
 
@@ -350,13 +350,13 @@ bool ConfigDao::loadConfig()
         // Validate File Version
         if(!is_version_displayed)
         {
-            std::cout << std::endl << "Config File Version: " << file_version << std::endl;
+            m_log.write<Logging::CONSOLE_LOG>("Config File Version=", file_version);
             is_version_displayed = true;
         }
 
         if(file_version != Config::FILE_VERSION)
         {
-            std::cout << "Config File Version=" << file_version << " Expected Version=" << Config::FILE_VERSION << std::endl;
+            m_log.write<Logging::ERROR_LOG>("Config File Version=", file_version, "Expected Version=", Config::FILE_VERSION);
             return false;
         }
 
@@ -368,12 +368,12 @@ bool ConfigDao::loadConfig()
     }
     catch(YAML::Exception &ex)
     {
-        std::cout << "YAML::LoadFile(xrm-config.yaml) " << ex.what() << " Missing required field maybe." << std::endl;
+        m_log.write<Logging::ERROR_LOG>("YAML::LoadFile(xrm-config.yaml)", ex.what(), "Missing required field maybe.");
         return(false);
     }
     catch(std::exception &ex)
     {
-        std::cout << "UnexpectedYAML::LoadFile(xrm-config.yaml) " << ex.what() << std::endl;
+        m_log.write<Logging::ERROR_LOG>("YAML::LoadFile(xrm-config.yaml)", ex.what());
         return(false);
     }
 
@@ -389,7 +389,7 @@ bool ConfigDao::validation()
     // Check if Handle and Real Name are configured.
     if(!m_config->use_handle && !m_config->use_real_name)
     {
-        std::cout << "Config Validation - use_handle and use_real_name can't both be false." << std::endl;
+        m_log.write<Logging::ERROR_LOG>("Config Validation - use_handle and use_real_name can't both be false.");
         return false;
     }
 

@@ -885,9 +885,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                 case '8': // Function Keys.
                 case '9': // Function Keys.
                 case '0': // Function Keys.
-                case ';': // Seperator for Shift ARROW Keys! ie [1;2A
-                    std::cout << "common io: " << character_buffer << std::endl;
-
+                case ';': // Seperator for Shift ARROW Keys! ie [1;2A                    
                     m_string_buffer += character_buffer;
                     return "";
 

@@ -35,7 +35,7 @@ public:
 
     virtual ~ModFormManager() override
     { 
-        std::cout << "~ModFormManager()" << std::endl;
+        // std::cout << "~ModFormManager()" << std::endl;
     }
 
     virtual bool update(const std::string &character_buffer, const bool &) override;

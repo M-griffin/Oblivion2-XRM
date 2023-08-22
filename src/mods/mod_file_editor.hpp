@@ -28,7 +28,6 @@ public:
 
     virtual ~ModFileEditor() override
     {
-        std::cout << "~ModFileEditor()" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
     }

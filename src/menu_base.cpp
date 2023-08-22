@@ -55,7 +55,7 @@ MenuBase::MenuBase(session_ptr session_data)
 
 MenuBase::~MenuBase()
 {
-    std::cout << "~MenuBase()" << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("~MenuBase()");
     
     // Pop Functions off the stack.
     std::vector<std::function< void(const std::string &, const bool &is_utf8)> >().swap(m_menu_functions);
@@ -1023,7 +1023,10 @@ void MenuBase::loadAndStartupMenu()
     
     if (m_current_menu == "matrix")
     {
-        std::cout << "MATRIX MENU DETECTED - RESET ANSI TERM SIZE to Detection" << std::endl;
+        m_log.write<Logging::DEBUG_LOG>("MATRIX MENU DETECTED - RESET ANSI TERM SIZE to Detection", 
+            m_menu_session_data->m_telnet_decoder->getTermRows(),
+            m_menu_session_data->m_telnet_decoder->getTermCols());
+            
         m_ansi_process.reset(new ProcessorAnsi(
             m_menu_session_data->m_telnet_decoder->getTermRows(),
             m_menu_session_data->m_telnet_decoder->getTermCols()));

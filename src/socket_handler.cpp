@@ -16,6 +16,17 @@ SocketHandler::SocketHandler()
 {
 }
 
+SocketHandler::~SocketHandler()
+{
+    m_log.write<Logging::DEBUG_LOG>("~SocketHandler()");
+    
+    // Clean up the socket left overs.
+    if (m_socket.size() > 0 && m_socket.back() != NULL) {
+        m_socket.back()->onExit();
+    }
+    std::vector<socket_state_ptr>().swap(m_socket);
+}
+
 /**
  * @brief Send Socket Data
  * @param buffer
@@ -155,7 +166,7 @@ void SocketHandler::setInactive()
  */
 void SocketHandler::close()
 {
-    std::cout << "SocketHandler close()" << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("SocketHandler closed()");
     try
     {
         // Deactivate Socket, then Clean it.

@@ -81,7 +81,6 @@ public:
             std::string clear_screen = "\x1b[1;1H\x1b[2J";
             new_session->deliver(clear_screen);
 
-            std::cout << "Push Telnet Sequences to Client" << std::endl;
             new_session->m_telnet_decoder->sendIACSequences(DONT, TELOPT_OLD_ENVIRON);
 
             new_session->m_telnet_decoder->sendIACSequences(DO, TELOPT_SGA);
@@ -106,19 +105,16 @@ public:
             new_session->m_telnet_decoder->addReply(TELOPT_NAWS);
 
             // Wait 1.5 Seconds for respones.
-            std::cout << "startTelnetOptionNegoiation" << std::endl;
             new_session->startTelnetOptionNegoiation();
 
             // Setup Async Input on Session for User Input
-            std::cout << "waitingForData" << std::endl;
             new_session->waitingForData();
             
         }
         catch(std::exception &ex)
         {
             Logging &log = Logging::getInstance();
-            log.write<Logging::ERROR_LOG>("TelnetOptionNegoiation Exception=", ex.what(), __LINE__, __FILE__);
-            return nullptr;
+            log.write<Logging::ERROR_LOG>("TelnetOptionNegoiation Exception=", ex.what(), __LINE__, __FILE__);            
         }
         
         return new_session;

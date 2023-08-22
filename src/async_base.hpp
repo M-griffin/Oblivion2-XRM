@@ -5,8 +5,6 @@
 #include "socket_handler.hpp"
 #include "logging.hpp"
 
-#include <iostream>
-
 /**
  * @class AsyncBase
  * @author Michael Griffin
@@ -61,7 +59,7 @@ public:
         }
         catch(std::exception &ex)
         {
-            std::cout << "AsyncBase shutdown() - Caught exception=" << ex.what() << std::endl;
+            m_log.write<Logging::ERROR_LOG>("AsyncBase shutdown() - Caught exception=", ex.what());
         }
     }
 

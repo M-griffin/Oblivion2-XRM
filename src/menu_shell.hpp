@@ -38,7 +38,7 @@ public:
 
     virtual std::string getStateID() const override
     {
-        return "Test";
+        return "Menu Test (Not Used at This Time)";
     }
 
     Logging                  &m_log;

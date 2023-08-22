@@ -31,7 +31,6 @@ public:
 
     virtual ~ModMenuEditor() override
     {
-        std::cout << "~ModMenuEditor()" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
         std::vector<menu_ptr>().swap(m_loaded_menu);

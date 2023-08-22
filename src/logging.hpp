@@ -31,16 +31,18 @@ public:
     {
         INFO_LOG = 0,
         DEBUG_LOG = 1,
-        ERROR_LOG = 2,
-        CONSOLE_LOG = 3,
-        ALL_LOGS = 4
+        WARN_LOG = 2,
+        ERROR_LOG = 3,
+        CONSOLE_LOG = 4,
+        ALL_LOGS = 5
 
     } LOGGING_LEVELS;
 
     // Descriptions
     const std::string INFO_LEVEL = "Info";
     const std::string DEBUG_LEVEL = "Debug";
-    const std::string ERROR_LEVEL = "Error";
+    const std::string WARN_LEVEL = "Warn";
+    const std::string ERROR_LEVEL = "Error";    
     const std::string CONSOLE_LEVEL = "Console";
     const std::string ALL_LEVELS = "All";
 
@@ -111,15 +113,17 @@ public:
             return 0;
         else if(log_level == "DEBUG")
             return 1;
+        else if(log_level == "WARN")
+            return 2;
         else if(log_level == "ERROR")
-            return 2;
-        else if(log_level == "CONSOLE")
             return 3;
-        else if(log_level == "ALL")
+        else if(log_level == "CONSOLE")
             return 4;
+        else if(log_level == "ALL")
+            return 5;
         else
-            // Default is Error
-            return 2;
+            // Default is Info
+            return 0;
     }
     
     /**
@@ -154,6 +158,9 @@ public:
     template<int level, typename ... Types>
     void write(Types ... rest)
     {
+        // Thread Safety, since we have main look and worker thread.
+        std::unique_lock<std::mutex> lock(m_mutex);
+        
         // Quick Case Statement, in Logging level, if were not logging anything
         // then return right away to save processing.
         switch(level)
@@ -168,7 +175,12 @@ public:
                 if(m_log_level != DEBUG_LOG && m_log_level != ALL_LOGS)
                     return;
                 break;
-
+                
+            case WARN_LOG:
+                if(m_log_level != WARN_LOG && m_log_level != ALL_LOGS)
+                    return;
+                break;
+                
             default:
                 break;
         }
@@ -192,8 +204,13 @@ public:
                 writeOutYamlConsole(date_time, details);
                 break;
 
+            case WARN_LOG:
+                details.push_back(WARN_LEVEL);
+                details.push_back(log_string);
+                writeOutYamlConsole(date_time, details);             
+                break;
+                
             case ERROR_LOG:
-
                 details.push_back(ERROR_LEVEL);
                 details.push_back(log_string);
                 writeOutYamlConsole(date_time, details);             
@@ -254,7 +271,7 @@ public:
 private:
 
     int                    m_log_level;
-    mutable std::mutex     m_encoding_mutex;
+    mutable std::mutex     m_mutex;
     
     /**
      * @brief Constructor for the Singleton.
@@ -263,7 +280,7 @@ private:
     
     explicit Logging() 
         : m_log_level(INFO_LOG)
-        , m_encoding_mutex()
+        , m_mutex()
     {
     }
     

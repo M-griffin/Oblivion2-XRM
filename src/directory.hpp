@@ -30,11 +30,12 @@ class Directory
 {
 public:
     explicit Directory(void)
-        : m() // Mutex
+        : m_log(Logging::getInstance())
+        , m() // Mutex
     { }
     ~Directory() 
     {
-        std::cout << "~Directory()" << std::endl;
+        m_log.write<Logging::DEBUG_LOG>("~Directory()");
     }
 
     /**
@@ -80,8 +81,7 @@ public:
 
         if(!local_directory_ptr)
         {
-            Logging &log = Logging::getInstance();
-            log.write<Logging::ERROR_LOG>("Error opening directory=", errno, dir, __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>("Error opening directory=", errno, dir, __LINE__, __FILE__);
             return file_list;
         }
 
@@ -127,7 +127,8 @@ public:
     }
 
 private:
-    mutable std::mutex m;
+    Logging            &m_log;
+    mutable std::mutex  m;
 
 };
 

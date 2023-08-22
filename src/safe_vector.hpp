@@ -63,7 +63,6 @@ public:
 
     ~SafeVector(void)
     {
-        std::cout << "~SafeVector()" << std::endl;
         std::vector<T>().swap(v);
     }
 

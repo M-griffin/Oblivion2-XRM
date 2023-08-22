@@ -29,7 +29,7 @@ TelnetDecoder::TelnetDecoder(async_io_ptr async_io)
 
 TelnetDecoder::~TelnetDecoder()
 {
-    std::cout << "~TelnetDecoder()" << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("~TelnetDecoder()");
     m_async_io.reset();
 }
 
@@ -73,13 +73,11 @@ void TelnetDecoder::addReply(const unsigned char &option)
 
 int TelnetDecoder::getTermRows() const
 {
-    std::cout << "NAWS ROWS=" << m_naws_row << std::endl;
     return m_naws_row;
 }
 
 int TelnetDecoder::getTermCols() const
 {
-    std::cout << "NAWS COLS=" << m_naws_col << std::endl;
     return m_naws_col;
 }
 
@@ -818,24 +816,18 @@ void TelnetDecoder::deliver(const std::string &string_msg)
     {
         return;
     }
-
-    std::cout << "telnetdecoder - prior to asyncio deliver telnet: " << string_msg << std::endl;
     
     try
     {
         async_io_ptr async_io = m_async_io.lock();
         if(async_io->getSocketHandle()->isActive())
-        {
-            std::cout << "telnetdecoder - after deliver telnet: " << string_msg << std::endl;
-            
+        {            
             async_io->asyncWrite(string_msg,
                                      std::bind(
                                          &TelnetDecoder::handleWrite,
                                          shared_from_this(),
                                          std::placeholders::_1,
                                          std::placeholders::_2));
-                                         
-           std::cout << "telnetdecoder - after write deliver telnet: " << string_msg << std::endl;
         }
     }
     catch (std::exception &ex) 

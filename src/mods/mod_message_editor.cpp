@@ -408,8 +408,8 @@ void ModMessageEditor::editorInput(const std::string &input)
     {
         return;
     }
-
-    std::cout << "result: " << result << ", input: " << input << std::endl;
+    
+    m_log.write<Logging::DEBUG_LOG>("result=", result, "input=", input);
 
     if(result[0] == 13 || result[0] == 10)
     {
@@ -423,8 +423,9 @@ void ModMessageEditor::editorInput(const std::string &input)
     else if(result[0] == '\x1b' && result.size() > 2)
     {
         // ESC SEQUENCE - check movement / arrow keys.
-        std::string escape_sequence = m_common_io->getEscapeSequence();
-        std::cout << "ESC= " << escape_sequence << std::endl;
+        std::string escape_sequence = m_common_io->getEscapeSequence();        
+        m_log.write<Logging::DEBUG_LOG>("ESC=", escape_sequence);
+                
         m_log.write<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 1] input result=", result);
         processEscapedInput(result.substr(1), input);
     }
@@ -497,9 +498,8 @@ std::string ModMessageEditor::scrollTextBoxDown(std::string &output)
 void ModMessageEditor::handleBackSpace(std::string &output)
 {
     /** Need to Write code to delete char or space and move everything left **/    
-    int x_position = m_text_process->getXPosition();
-    
-    std::cout << "handleBackSpace max_chars=" << m_text_process->getMaxCharactersPerLine() << ", x_pos=" << x_position << std::endl;
+    int x_position = m_text_process->getXPosition();    
+    m_log.write<Logging::DEBUG_LOG>("handleBackSpace max_chars=", m_text_process->getMaxCharactersPerLine(), "x_pos=", x_position);
 
     std::string default_text_color = getDisplayPromptRaw(DEFAULT_TEXT_COLORS);
     std::string backspace_color = getDisplayPromptRaw(BACKSPACE_TEXT_COLORS);
@@ -517,7 +517,9 @@ void ModMessageEditor::handleBackSpace(std::string &output)
         // remove last character for cursor space.
         m_text_process->parseTextToBuffer((char *)"\b");
         
-        std::cout << "handleBackSpaceAfter x_position=" << m_text_process->getXPosition() << std::endl;
+        m_log.write<Logging::DEBUG_LOG>("handleBackSpaceAfter m_text_process->x_position=", 
+            m_text_process->getXPosition(), "x_pos=", x_position);
+        
         if(m_text_process->getXPosition() == m_text_process->getMaxCharactersPerLine()) {
             output += backspace_color + " \x1b[D" + default_text_color;
         }    
@@ -533,7 +535,7 @@ void ModMessageEditor::handleDelete(std::string &output)
     /** Need to Write code to delete char or space and move everything left **/    
     int x_position = m_text_process->getXPosition();
     
-    std::cout << "handleDelete max_chars=" << m_text_process->getMaxCharactersPerLine() << ", x_pos=" << x_position << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("handleDelete max_chars=", m_text_process->getMaxCharactersPerLine(), "x_pos=", x_position);
 
     std::string default_text_color = getDisplayPromptRaw(DEFAULT_TEXT_COLORS);
     std::string backspace_color = getDisplayPromptRaw(BACKSPACE_TEXT_COLORS);
@@ -551,7 +553,9 @@ void ModMessageEditor::handleDelete(std::string &output)
         // remove last character for cursor space.
         m_text_process->parseTextToBuffer((char *)"\b");
         
-        std::cout << "handleBackSpaceAfter x_position=" << m_text_process->getXPosition() << std::endl;
+        m_log.write<Logging::DEBUG_LOG>("handleBackSpaceAfter m_text_process->x_position=", 
+            m_text_process->getXPosition(), "x_pos=", x_position);
+            
         if(m_text_process->getXPosition() == m_text_process->getMaxCharactersPerLine()) {
             output += backspace_color + " \x1b[D" + default_text_color;
         }    
@@ -624,7 +628,6 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
         // Scroll Box Up!
 
     }
-
     
     std::cout << "=========w max " << m_text_box_width << ", lft " << m_text_box_left << std::endl;
     std::cout << "=========h max " << m_text_box_height << ", top " << m_text_box_top << std::endl;
@@ -652,7 +655,8 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
         std::string default_text_color = getDisplayPromptRaw(DEFAULT_TEXT_COLORS);
         std::string backspace_color = getDisplayPromptRaw(BACKSPACE_TEXT_COLORS);
     
-        std::cout << "isDoubleBackSpace max_chars=" << m_text_process->getMaxCharactersPerLine() << std::endl;        
+        m_log.write<Logging::DEBUG_LOG>("isDoubleBackSpace max_chars=", m_text_process->getMaxCharactersPerLine());
+        
         if (m_text_process->getMaxCharactersPerLine() == m_text_process->getXPosition()) 
         {
             output += backspace_color + " \x1b[D" + default_text_color; // clear the current position

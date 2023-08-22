@@ -70,17 +70,15 @@ auto main() -> int
 {
     // Setup Cleanup method when program exits.
     std::atexit(atExitFunction);
-
-    std::cout << "Oblivion/2 XRM-Server rev.2(c) 2015-2023 Michael Griffin."
-              << std::endl
-              << std::endl;
+    
+    Logging &m_log = Logging::getInstance();
+    m_log.write<Logging::CONSOLE_LOG>("Oblivion/2 XRM-Server rev.2(c) 2015-2023 Michael Griffin.");
 
     {
         CommonIO common;
         GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
     }
-    std::cout << "BBS HOME Directory Registered: " << std::endl;
-    std::cout << GLOBAL_BBS_PATH << std::endl;
+    m_log.write<Logging::CONSOLE_LOG>("BBS HOME Directory Registered=", GLOBAL_BBS_PATH);
 
     // Setup System Folder Paths off main BBS Path.
     GLOBAL_DATA_PATH = GLOBAL_BBS_PATH + "DATA";
@@ -95,7 +93,7 @@ auto main() -> int
     // Create LOG Directory if it doesn't exist.
     if(_mkdir(GLOBAL_LOG_PATH.c_str()) != 0 && errno != EEXIST)
     {
-        std::cout << "Unable to create LOG folder: " << GLOBAL_LOG_PATH << std::endl;
+        m_log.write<Logging::WARN_LOG>("Unable to create LOG folder=", GLOBAL_LOG_PATH);
     }
 
 #else
@@ -103,7 +101,7 @@ auto main() -> int
     // Create LOG Directory if it doesn't exist.
     if(mkdir(GLOBAL_LOG_PATH.c_str(), 0770) == -1 && errno != EEXIST)
     {
-        std::cout << "Unable to create LOG folder: " << GLOBAL_LOG_PATH << std::endl;
+        m_log.write<Logging::WARN_LOG>("Unable to create LOG folder=", GLOBAL_LOG_PATH);
     }
 
 #endif  
@@ -114,7 +112,7 @@ auto main() -> int
 
         if(!config)
         {
-            std::cout << "Unable to allocate config structure" << std::endl;
+            m_log.write<Logging::ERROR_LOG>("Unable to allocate config object");
             exit(1);
         }
 
@@ -133,13 +131,13 @@ auto main() -> int
 
         if(!cfg.validation())
         {
-            std::cout << "Unable to validate config structure" << std::endl;
+            m_log.write<Logging::ERROR_LOG>("Config Object validation failed!");
             exit(1);
         }
 
         // All Good, Attached to Global Communicator Instance.
         Communicator::getInstance().attachConfiguration(config);
-        std::cout << "Starting up Oblivion/2 XRM-Server" << std::endl;
+        m_log.write<Logging::CONSOLE_LOG>("Starting up Oblivion/2 XRM-Server");
     }
     
     // Database Startup in it's own context.
@@ -150,7 +148,7 @@ auto main() -> int
         // Write all error logs and exit.
         if(!db_startup)
         {
-            std::cout << "Database Startup failed, exiting..." << std::endl;
+            m_log.write<Logging::ERROR_LOG>("Database Startup failed, exiting...");
             return 0;
         }
     }
@@ -162,10 +160,7 @@ auto main() -> int
         int port = Communicator::getInstance().getConfiguration()->port_telnet;
         std::string logging_level = Communicator::getInstance().getConfiguration()->logging_level;
         Logging::getInstance().setLoggingLevel(logging_level);        
-        
-        std::cout << "Reading Configuration Telnet Port=" << port << std::endl;            
-        interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", port));
-        
+        interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", port));        
         
         while(io_service.isActive()) 
         {            
@@ -184,12 +179,12 @@ auto main() -> int
              * Works for Now.
              */
             if (line == "kill") {
-                std::cout << "Killing All Connections before exiting..." << std::endl;
+                m_log.write<Logging::INFO_LOG>("Killing All Connections before exiting...");
                 setupAndRunAsioServer->shutdown();
             }
             
             if (line == "quit") {
-                std::cout << "Shutting down IOservice, exiting..." << std::endl;
+                m_log.write<Logging::INFO_LOG>("hutting down IOservice, exiting...");
                 io_service.stop();
             }
           

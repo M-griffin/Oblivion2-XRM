@@ -31,7 +31,6 @@ public:
 
     virtual ~ModUserEditor() override
     {
-        std::cout << "~ModUserEditor()" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
         std::vector<user_ptr>().swap(m_users_listing);

@@ -64,7 +64,7 @@ MenuSystem::MenuSystem(session_ptr session_data)
 
 MenuSystem::~MenuSystem()
 {
-    std::cout << "~MenuSystem()" << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("~MenuSystem()");
     // Clear All Menu Command Functions.
     MappedCommandFunctions().swap(m_menu_command_functions);
 }
@@ -913,7 +913,7 @@ void MenuSystem::startupExternalProcess(const std::string &cmdline)
  */
 void MenuSystem::clearAllModules()
 {
-    std::cout << "Menu System: clearAllModules()" << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("Menu System: clearAllModules()");
     if(m_module_stack.size() > 0)
     {
         std::vector<module_ptr>().swap(m_module_stack);
@@ -937,7 +937,7 @@ void MenuSystem::shutdownModule()
  */
 void MenuSystem::startupModule(const module_ptr &module)
 {
-    std::cout << "MenuSystem : startupModule" << std::endl;
+    m_log.write<Logging::CONSOLE_LOG>("Menu System: Startup Module=", module->m_filename);
     // First clear any left overs if they exist.
     clearAllModules();
 

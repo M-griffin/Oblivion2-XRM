@@ -31,7 +31,6 @@ public:
 
     virtual ~ModProtocolEditor() override
     {
-        std::cout << "~ModProtocolEditor()" << std::endl;
         std::vector<std::function< void()> >().swap(m_setup_functions);
         std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
     }

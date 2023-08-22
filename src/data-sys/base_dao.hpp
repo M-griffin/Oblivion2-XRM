@@ -46,7 +46,7 @@ public:
 
     ~BaseDao()
     { 
-        std::cout << "~BaseDao()" << std::endl;
+        m_log.write<Logging::DEBUG_LOG>("~BaseDao()");
     }
 
     Logging        &m_log;

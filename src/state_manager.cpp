@@ -1,5 +1,6 @@
 #include "state_manager.hpp"
 
+#include "state_base.hpp"
 #include "session.hpp"
 #include "logging.hpp"
 #include "utf-cpp/utf8.h"
@@ -7,6 +8,27 @@
 #include <cstring>
 #include <string>
 
+StateManager::StateManager()
+    : m_log(Logging::getInstance())
+{ }
+    
+StateManager::~StateManager()
+{
+    m_log.write<Logging::DEBUG_LOG>("~StateManager()");
+    
+    if(!m_the_state.empty())
+    {
+        m_the_state.back()->onExit();
+
+        while(m_the_state.size() > 0)
+        {
+            m_the_state.pop_back();
+        }
+
+        m_the_state.clear();
+    }
+}
+    
 /**
  * @brief Removed the Current State from the session
  */
@@ -33,9 +55,7 @@ void StateManager::clean()
  * which is copied from code_point to char[5] array.
  */
 void StateManager::update()
-{
-    std::cout << "StateManager() update()" << std::endl;
-    
+{   
     std::string new_string_builder = "";
     bool utf_found = false;
 
@@ -44,17 +64,15 @@ void StateManager::update()
         std::string incoming_data = "";
         try
         {
-            std::cout << "StateManager() Pull Incoming Data" << std::endl;
             incoming_data = std::move(m_the_state.back()->m_session_data->m_parsed_data);            
         }
         catch(std::exception &ex)
         {
-            std::cout << "StateManager() Exception=" << ex.what() << std::endl;
+            m_log.write<Logging::ERROR_LOG>("StateManager() Exception=", ex.what(), __LINE__, __FILE__);
         }
 
         if(incoming_data.size() > 0)
         {
-            std::cout << "StateManager() Parse Incoming Data" << std::endl;
             std::string::iterator it = incoming_data.begin();
             std::string::iterator line_end = incoming_data.end();
 
@@ -107,12 +125,10 @@ void StateManager::update()
                     catch(utf8::exception &ex)
                     {
                         // This is filling up the log on Invalid Characters, have to find out what is pushing in here.
-                        Logging &log = Logging::getInstance();
-                        log.write<Logging::ERROR_LOG>("Utf8 Parsing Exception=", *it, ex.what(), __LINE__, __FILE__);
+                        m_log.write<Logging::ERROR_LOG>("Utf8 Parsing Exception=", *it, ex.what(), __LINE__, __FILE__);
                     }
                 }
 
-                std::cout << "StateManager() Update State with data=" << new_string_builder << std::endl;
                 m_the_state.back()->update(new_string_builder, utf_found);
                 new_string_builder.erase();
             }

@@ -15,12 +15,11 @@ MenuShell::MenuShell(session_ptr session_data)
     , MenuBase(session_data)
     , m_log(Logging::getInstance())
 {
-    std::cout << "MenuShell Startup()" << std::endl;
 }
 
 MenuShell::~MenuShell()
 {
-    std::cout << "~MenuShell()" << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("~MenuShell()");
 }
 
 /**
@@ -30,11 +29,10 @@ void MenuShell::update(const std::string &character_buffer, const bool &)//is_ut
 {
     if(!m_is_active)
     {
-        std::cout << "MenuShell: m_is_active: " << m_is_active << std::endl;
         return;
     }
-
-    std::cout << "MenuShell: Data Received: " << character_buffer << std::endl;
+    
+    m_log.write<Logging::DEBUG_LOG>("character_buffer", character_buffer);
 }
 
 /**

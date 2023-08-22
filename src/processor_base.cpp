@@ -1,5 +1,7 @@
 #include "processor_base.hpp"
 
+#include "logging.hpp"
+
 #include <string>
 #include <vector>
 #include <map>
@@ -12,7 +14,8 @@
  * @return
  */
 ProcessorBase::ProcessorBase(int term_height, int term_width)
-    : m_ansi_output("")
+    : m_log(Logging::getInstance())
+    , m_ansi_output("")
     , m_is_screen_cleared(false)
     , m_is_line_wrapping(false)
     , m_position(0)

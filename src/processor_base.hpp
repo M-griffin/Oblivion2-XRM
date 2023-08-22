@@ -9,6 +9,7 @@
 
 
 class ScreenPixel;
+class Logging;
 
 /**
  * @class ProcessorBase
@@ -24,7 +25,6 @@ public:
     ProcessorBase(int term_height, int term_width);
     virtual ~ProcessorBase() 
     { 
-        std::cout << "~ProcessorBase()" << std::endl;
     }
 
     // Process Build strings from pull_down array.
@@ -74,27 +74,28 @@ public:
     // Process ANSI screen inserts into the Screen Buffer
     virtual void parseTextToBuffer(char *buff) = 0;
     
-    std::string m_ansi_output;
+    Logging     &m_log; 
+    std::string  m_ansi_output;
 
-    bool m_is_screen_cleared;
-    bool m_is_line_wrapping;
+    bool         m_is_screen_cleared;
+    bool         m_is_line_wrapping;
 
-    int m_position;
-    int m_y_position;
-    int m_number_lines;             // TERM Height
-    int m_characters_per_line;      // TERM Width
-    int m_x_position;
-    int m_max_x_position;
-    int m_max_y_position;
-    int m_center_ansi_output;
-    int m_saved_cursor_x;
-    int m_saved_cursor_y;
-    int m_attribute;
-    int m_saved_attribute;
-    int m_saved_foreground;
-    int m_saved_background;
-    int m_foreground_color;
-    int m_background_color;    
+    int          m_position;
+    int          m_y_position;
+    int          m_number_lines;             // TERM Height
+    int          m_characters_per_line;      // TERM Width
+    int          m_x_position;
+    int          m_max_x_position;
+    int          m_max_y_position;
+    int          m_center_ansi_output;
+    int          m_saved_cursor_x;
+    int          m_saved_cursor_y;
+    int          m_attribute;
+    int          m_saved_attribute;
+    int          m_saved_foreground;
+    int          m_saved_background;
+    int          m_foreground_color;
+    int          m_background_color;    
 
     // ANSI escape sequences
     enum

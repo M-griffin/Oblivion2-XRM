@@ -27,7 +27,6 @@ public:
 
     virtual ~ModLevelEditor() override
     {
-        std::cout << "~ModLevelEditor()" << std::endl;
         std::vector<std::function<void()>>().swap(m_setup_functions);
         std::vector<std::function<void(const std::string&)>>().swap(m_mod_functions);
         std::vector<access_level_ptr>().swap(m_loaded_levels);

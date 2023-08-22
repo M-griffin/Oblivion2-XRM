@@ -6,6 +6,8 @@
 #include <mutex>
 #include <map>
 
+class Logging;
+
 /**
  * @class Encoding
  * @author Michael Griffin
@@ -56,6 +58,7 @@ public:
 
 private:
 
+    Logging               &m_log;
     mutable std::mutex     m_encoding_mutex;
 
     explicit Encoding();

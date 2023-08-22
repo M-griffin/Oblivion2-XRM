@@ -34,7 +34,6 @@ public:
 
     ~SocketState()
     {
-        std::cout << "~SocketState()" << std::endl;
     }
 
     virtual int sendSocket(unsigned char *message, Uint32 len) = 0;
@@ -74,7 +73,6 @@ public:
 
     ~SDL_Socket()
     {
-        std::cout << "~SDL_Socket()" << std::endl;
     }
 
     virtual int sendSocket(unsigned char *message, Uint32 len) override;

@@ -18,7 +18,7 @@ SessionManager::SessionManager()
 
 SessionManager::~SessionManager()
 {
-    std::cout << "~SessionManager()" << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("~SessionManager()");
     std::set<session_ptr>().swap(m_sessions);
 }
     
@@ -94,7 +94,7 @@ int SessionManager::connections()
  */
 void SessionManager::shutdown()
 {    
-    std::cout << "SessionManage Shutdown! NumSessions=" << m_sessions.size() << std::endl;   
+    m_log.write<Logging::CONSOLE_LOG>("SessionManager Shutdown! NumSessions=", m_sessions.size());
     
     // Loop and Disconnects Each Active Session
     std::for_each(m_sessions.begin(), m_sessions.end(), 

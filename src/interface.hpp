@@ -62,7 +62,7 @@ public:
         }
 
         unsigned int num_threads = std::thread::hardware_concurrency();
-        m_log.write<Logging::INFO_LOG>("concurrent threads supported", num_threads);
+        m_log.write<Logging::CONSOLE_LOG>("Concurrent CPU Core(s) Supported", num_threads);
 
         // Start up worker thread of ASIO. We want socket communications in a separate thread.
         // We only spawn a single thread for IO_Service on start up
@@ -81,7 +81,7 @@ public:
 
     ~Interface()
     {
-        std::cout << "~Interface()" << std::endl;
+        m_log.write<Logging::DEBUG_LOG>("~Interface()");
         m_io_service.stop();
         m_thread.join();
         

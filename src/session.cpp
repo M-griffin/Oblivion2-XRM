@@ -68,7 +68,7 @@ Session::Session(async_io_ptr const &my_async_io, session_manager_ptr const &my_
 
 Session::~Session()
 {
-    std::cout << "~Session()" << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("~Session()");
 
     // Free the menu system state and modules when session closes.
     m_state_manager->clean();
@@ -87,7 +87,6 @@ Session::~Session()
  */
 void Session::startTelnetOptionNegoiation()
 {
-    std::cout << "startTelnetOptionNegoiation Called()" << std::endl;
     m_deadline_timer->setWaitInMilliseconds(2000);
     
     // Deprecated bind, look at replacing with lambda and std::function
@@ -103,14 +102,11 @@ void Session::startTelnetOptionNegoiation()
  */
 void Session::handleTelnetOptionNegoiation()
 {        
-    std::cout << "handleTelnetOptionNegoiation Called()" << std::endl;
-    
     // Starts Up the Menu System Then Loads up the PreLogin Sequence.   
     state_ptr new_state(new MenuSystem(shared_from_this()));
     
     //state_ptr new_state(new MenuShell(shared_from_this()));    
-    m_state_manager->changeState(new_state);
-    
+    m_state_manager->changeState(new_state);    
 }
 
 /**
@@ -257,16 +253,13 @@ void Session::updateState()
 {
     // Last Character Received is ESC, then Check for
     // ESC Sequence, or Lone ESC Key.
-    std::cout << " Session::updateState()" << std::endl;
     if(m_parsed_data[m_parsed_data.size()-1] == '\x1b')
     {
-        std::cout << " Session::updateState() - startEscapeTimer" << std::endl;
         startEscapeTimer();
         m_is_esc_timer = true;
     }
     else if(!m_is_esc_timer)
     {
-        std::cout << " Session::updateState() - update!" << std::endl;
         m_state_manager->update();
     }
 }
@@ -315,10 +308,8 @@ void Session::handleRead(const std::error_code& error, socket_handler_ptr)
 
     if (error) 
     {        
-        m_is_leaving = true;
-
-            // Disconnect the session.
-        std::cout << "handleRead - Leaving Session on Error" << std::endl;
+        // Disconnect the session.
+        m_is_leaving = true;        
         session_manager->leave(shared_from_this());            
         return;
     }
@@ -372,8 +363,6 @@ void Session::handleRead(const std::error_code& error, socket_handler_ptr)
             updateState();
         }*/
         
-        // PART II: Standalone For Now, Pushes Input to the State or Menu System.
-        std::cout << "handleRead - updateState" << std::endl;
         updateState();
     }
 
@@ -414,9 +403,6 @@ void Session::handleTeloptCodes()
             {
                 continue;
             }
-            
-            // we see (2) 27 Keys here in double ESC!! 
-            std::cout << "SESSION INPUT: " << int(ch) << std::endl;
 
             // Incoming Buffer is filled and Telnet options are parsed out.
             incoming_data += ch;
