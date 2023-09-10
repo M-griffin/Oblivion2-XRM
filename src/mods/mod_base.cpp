@@ -28,6 +28,8 @@ ModBase::ModBase(session_ptr session_data, config_ptr config, processor_ansi_ptr
     , m_session_io(session_io)
     , m_is_active(false)
 {    
+    // Setup All Mods for Proper Node Logging by Session.
+    m_log.setUserInfo(session_data->m_node_number);
 }
 
 ModBase::~ModBase()

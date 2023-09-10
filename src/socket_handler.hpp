@@ -30,6 +30,7 @@ public:
     int sendSocket(unsigned char *buf, Uint32 len);
     int recvSocket(char *message);
     int poll();
+    std::string getIpAddress();
 
     // Telnet
     bool createTelnetAcceptor(const std::string &host, const int &port);

@@ -62,7 +62,7 @@ int SocketHandler::SocketHandler::poll()
 
         if(ret == -1)
         {
-            m_log.write<Logging::ERROR_LOG>("Socket Closed by host, disconnecting.", __FILE__, __LINE__);
+            m_log.write<Logging::WARN_LOG>("Socket Closed by host, disconnecting.", __FILE__, __LINE__);
 
             // Shutdown Socket.
             m_socket.back()->onExit();
@@ -72,11 +72,20 @@ int SocketHandler::SocketHandler::poll()
     else
     {
         // Inactive Connection
-        m_log.write<Logging::ERROR_LOG>("Shutdown received, Socket Closed.", __FILE__, __LINE__);
+        m_log.write<Logging::WARN_LOG>("Shutdown received, Socket Closed.", __FILE__, __LINE__);
         ret = -1;
     }
 
     return ret;
+}
+
+/**
+ * @brief Retrieve Ip Address of Remote Socket.
+ * @return 
+ */
+std::string SocketHandler::getIpAddress()
+{
+    return m_socket.back()->getIPAddress();
 }
 
 /**

@@ -268,6 +268,9 @@ void ModPreLogon::setupAskANSIColor()
  */
 void ModPreLogon::displayTerminalDetection()
 {
+    
+    m_log.setUserInfo(m_session_data->m_node_number);
+    
     // Grab Detected Terminal, ANSI, XTERM, etc..
     displayPrompt(PROMPT_DETECT_TERMOPTS);
 

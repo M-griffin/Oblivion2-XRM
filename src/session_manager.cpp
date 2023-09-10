@@ -4,12 +4,14 @@
 #include "async_io.hpp"
 #include "session.hpp"
 #include "logging.hpp"
+#include "common_io.hpp"
 
 #include <functional>
 #include <algorithm>
 #include <string>
 #include <vector>
 #include <memory>
+#include <mutex>
 
 SessionManager::SessionManager()
     : m_log(Logging::getInstance())
@@ -28,6 +30,52 @@ SessionManager::~SessionManager()
  */
 void SessionManager::join(const session_ptr &session)
 {
+    // Find First Node Number not in use, then set it.
+    // Also Manage Thread Safety, although should be single sessions at a time.
+    std::lock_guard<std::mutex> lock(m_mutex);
+    int node_check = 1;
+    
+    if (m_sessions.size() > 0)
+    {
+        // Coy out Node Number to it's own Array for Sorting.
+        std::vector<int> node_array;
+    
+        for (session_ptr ptr : m_sessions)
+        {
+            node_array.push_back(ptr->m_node_number);
+        }    
+    
+        std::sort(
+            node_array.begin(), node_array.end(),
+            [ ](const int &lhs, const int &rhs) -> 
+        bool
+        {
+            return lhs > rhs;
+        });
+        
+        // Find First Unused Node Number
+        bool foundfree = false;
+        for(int node_number : node_array) {
+            if (node_check != node_number)
+            {
+                session->m_node_number = node_check;
+                foundfree = true;
+            }
+            node_check++;
+        }
+        
+        // Loop Exists cause only node was checked, use incremented number.
+        if (!foundfree)
+        {
+            session->m_node_number = node_check;
+        }
+    }
+    else 
+    {
+        // Starting Node Number.
+        session->m_node_number = 1;
+    }
+    
     m_sessions.insert(session);
 }
 
@@ -37,8 +85,8 @@ void SessionManager::join(const session_ptr &session)
  */
 void SessionManager::leave(const session_ptr &session)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     int node_number = session->m_node_number;
-    m_log.write<Logging::CONSOLE_LOG>("SessionManager - disconnecting Node Session=", node_number);
     
     try 
     {
@@ -94,6 +142,7 @@ int SessionManager::connections()
  */
 void SessionManager::shutdown()
 {    
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_log.write<Logging::CONSOLE_LOG>("SessionManager Shutdown! NumSessions=", m_sessions.size());
     
     // Loop and Disconnects Each Active Session

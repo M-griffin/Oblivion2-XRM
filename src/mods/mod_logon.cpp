@@ -361,6 +361,7 @@ bool ModLogon::logon(const std::string &input)
             // NOTE Separate login/password attempts or change to login?
             if(m_failure_attempts >= m_config->invalid_password_attempts)
             {
+                //m_session_data->disconnectUser();
                 m_is_active = false;
                 return false;
             }
@@ -470,6 +471,7 @@ bool ModLogon::password(const std::string &input)
             // If max, then exit back to matrix.
             if(m_failure_attempts >= m_config->invalid_password_attempts)
             {
+                m_session_data->disconnectUser();
                 m_is_active = false;
                 return false;
             }

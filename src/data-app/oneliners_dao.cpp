@@ -1,5 +1,7 @@
 #include "oneliners_dao.hpp"
+
 #include "../model-app/oneliners.hpp"
+
 #include "../logging.hpp"
 
 #include "libSqliteWrapped.h"
@@ -202,14 +204,13 @@ std::string OnelinerDao::updateOnelinerQryString(std::string qry, oneliner_ptr o
  */
 std::vector<oneliner_ptr> OnelinerDao::getAllOnelinersByUserId(long userId)
 {
-    Logging &log = Logging::getInstance();
     oneliner_ptr obj(new Oneliners);
     std::vector<oneliner_ptr> list;
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log.write<Logging::ERROR_LOG>("Error, Database is not connected!", __FILE__, __LINE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Database is not connected!", __FILE__, __LINE__);
         return list;
     }
 
@@ -218,7 +219,7 @@ std::vector<oneliner_ptr> OnelinerDao::getAllOnelinersByUserId(long userId)
 
     if(!qry->isConnected())
     {
-        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", __FILE__, __LINE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", __FILE__, __LINE__);
         return list;
     }
 
@@ -243,12 +244,12 @@ std::vector<oneliner_ptr> OnelinerDao::getAllOnelinersByUserId(long userId)
         }
         else
         {
-            log.write<Logging::ERROR_LOG>("Error, getAllOneliners Returned Rows=", rows, __FILE__, __LINE__);
+            m_log.write<Logging::ERROR_LOG>("Error, getAllOneliners Returned Rows=", rows, __FILE__, __LINE__);
         }
     }
     else
     {
-        log.write<Logging::ERROR_LOG>("Error, getResult()", __FILE__, __LINE__);
+        m_log.write<Logging::ERROR_LOG>("Error, getResult()", __FILE__, __LINE__);
     }
 
     return list;

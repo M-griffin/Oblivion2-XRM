@@ -313,7 +313,7 @@ bool SDL_Socket::disconnectUser()
     Logging &log = Logging::getInstance();
     m_is_socket_active = false;
     
-    if(m_tcp_socket == NULL) 
+    if(!m_tcp_socket) 
     {
         log.write<Logging::ERROR_LOG>("SDLNet_TCP_DelSocket is NULL", __FILE__, __LINE__);
         return false;
@@ -339,4 +339,24 @@ bool SDL_Socket::disconnectUser()
 
     m_socket_set = nullptr;
     return true;
+}
+
+/**
+ * @brief Get Remote Users IP Address for Logging
+ * @return 
+ */
+std::string SDL_Socket::getIPAddress()
+{
+    std::string result = "N/A";
+    if (m_tcp_socket)
+    {        
+        IPaddress *client_ip = SDLNet_TCP_GetPeerAddress(m_tcp_socket);
+        
+        if (client_ip) 
+        { 
+            // Resolve UP address
+            result = SDLNet_ResolveIP(client_ip);
+        }        
+    }
+    return result;
 }

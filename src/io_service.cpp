@@ -70,7 +70,7 @@ void IOService::checkAsyncListenersForConnections()
             }
             catch(std::exception &ex)
             {
-                m_log.write<Logging::ERROR_LOG>("ioservice Exception Async-Accept", ex.what(), __FILE__, __LINE__);
+                m_log.write<Logging::WARN_LOG>("ioservice Exception Async-Accept", ex.what(), __FILE__, __LINE__);
             }
         }
         
@@ -126,7 +126,7 @@ void IOService::run()
                     if(length < 0)
                     {
                         // Error - Lost Connection
-                        m_log.write<Logging::ERROR_LOG>("ioservice async_read - lost connection!: ", length);
+                        m_log.write<Logging::WARN_LOG>("ioservice async_read - lost connection!: ", length);
                         job_work->getSocketHandle()->setInactive();
                         std::error_code lost_connect_error_code(1, std::system_category());
                         job_work->executeCallback(lost_connect_error_code, nullptr);
@@ -145,7 +145,7 @@ void IOService::run()
                 }
                 else if(result == -1)
                 {
-                    m_log.write<Logging::ERROR_LOG>("ioservice async_poll - lost connection!");
+                    m_log.write<Logging::WARN_LOG>("ioservice async_poll - lost connection!");
                     std::error_code lost_connect_error_code(1, std::system_category());
                     job_work->executeCallback(lost_connect_error_code, nullptr);
                     
@@ -169,7 +169,7 @@ void IOService::run()
                 if(result <= 0)
                 {
                     // Error - Lost Connection
-                    m_log.write<Logging::ERROR_LOG>("ioservice async_write - lost connection!");
+                    m_log.write<Logging::WARN_LOG>("ioservice async_write - lost connection!");
                     job_work->getSocketHandle()->setInactive();
                     std::error_code lost_connect_error_code(1, std::system_category());
                     job_work->executeCallback(lost_connect_error_code, nullptr);
@@ -205,7 +205,7 @@ void IOService::run()
 void IOService::stop()
 {
     m_is_active = false;    
-    m_log.write<Logging::CONSOLE_LOG>("Shutting down IOService - Stop");
+    m_log.write<Logging::DEBUG_LOG>("Shutting down IOService - Stop");
     
     // Clear All Lists and attached handles.
     m_service_list.clear();

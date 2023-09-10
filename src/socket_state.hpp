@@ -44,7 +44,8 @@ public:
     virtual bool onListen() = 0;
     virtual bool onExit() = 0;
     virtual bool disconnectUser() = 0;
-
+    virtual std::string getIPAddress() =0;
+    
     std::string m_host;
     int         m_port;
     bool        m_is_socket_active;
@@ -83,6 +84,7 @@ public:
     virtual bool onListen() override;
     virtual bool onExit() override;
     virtual bool disconnectUser() override;
+    virtual std::string getIPAddress() override;
 
 private:
 

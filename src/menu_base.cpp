@@ -215,7 +215,7 @@ void MenuBase::readInMenuData()
         else
         {
             // Fallck is if user doesn't have access.  update this lateron.
-            m_log.write<Logging::DEBUG_LOG>("Menu doesn't exist, loading fallback if exists.", __LINE__, __FILE__);
+            m_log.write<Logging::WARN_LOG>("Menu doesn't exist=", m_current_menu, "loading Fallback=", m_fallback_menu);
 
             if(m_fallback_menu.size() > 0)
             {
@@ -236,6 +236,8 @@ void MenuBase::readInMenuData()
  */
 void MenuBase::loadInMenu(std::string menu_name)
 {
+    m_log.write<Logging::INFO_LOG>("Loading Menu=", menu_name);
+    
     // Assign current to previous menu, then assign new menu.
     m_previous_menu = m_current_menu;
     m_current_menu = menu_name;

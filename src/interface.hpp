@@ -125,21 +125,24 @@ private:
     void handle_accept(const std::error_code& error, const socket_handler_ptr &socket_handler)
     {
         if(!error)
-        {            
-            m_log.write<Logging::DEBUG_LOG>("Handle-Accept TCP Connection accepted");
-
+        {
             async_io_ptr async_conn(new AsyncIO(m_io_service, socket_handler));
+            m_log.write<Logging::INFO_LOG>("Handle-Accept TCP Connection accepted from=", 
+                async_conn->getSocketHandle()->getIpAddress()); 
             
             m_log.write<Logging::DEBUG_LOG>("Handle-Accept Create New Session");
 
             // Create the new Session
             session_ptr new_session = Session::create(async_conn, m_session_manager);
             if (new_session) 
-            {
+            {                
                 m_log.write<Logging::DEBUG_LOG>("Handle-Accept Attached Session to Manager");
 
                 // Attach Session to Session Manager.
-                m_session_manager->join(new_session);                
+                m_session_manager->join(new_session);
+
+                m_log.setUserInfo(new_session->m_node_number);
+                m_log.write<Logging::INFO_LOG>("New Session Created, Node=", new_session->m_node_number);
             }
         }
         else

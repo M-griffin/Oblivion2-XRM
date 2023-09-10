@@ -59,11 +59,6 @@ Session::Session(async_io_ptr const &my_async_io, session_manager_ptr const &my_
             m_log.write<Logging::ERROR_LOG>("New Session Exception=", ex.what(), __LINE__, __FILE__);
         }
     }
-
-    // Get The First available node number. Needs Rework from session manager!
-    m_node_number = 0;            
-    m_log.write<Logging::CONSOLE_LOG>("New Session ConnectionNode Number=", m_node_number);
-        
 }
 
 Session::~Session()
@@ -101,7 +96,10 @@ void Session::startTelnetOptionNegoiation()
  * @param timer
  */
 void Session::handleTelnetOptionNegoiation()
-{        
+{   
+    // Setup Node Number for Separate Thread.
+    m_log.setUserInfo(m_node_number);
+    
     // Starts Up the Menu System Then Loads up the PreLogin Sequence.   
     state_ptr new_state(new MenuSystem(shared_from_this()));
     
@@ -177,6 +175,9 @@ void Session::deliver(const std::string &msg, bool is_disconnection)
  */
 void Session::handleWrite(const std::error_code& error, socket_handler_ptr)
 {
+    // Setup All Mods for Proper Node Logging by Session.
+    m_log.setUserInfo(m_node_number);
+    
     if(error)
     {
         m_log.write<Logging::ERROR_LOG>("Async_HandleWrite Session Closed() error=", error.message(), __LINE__, __FILE__);
@@ -219,6 +220,7 @@ void Session::handleWrite(const std::error_code& error, socket_handler_ptr)
  */
 void Session::handleWriteThenDisconnect(const std::error_code& error, socket_handler_ptr ptr)
 {
+    m_log.setUserInfo(m_node_number);
     handleWrite(error, ptr);
     disconnectUser();    
 }
@@ -251,6 +253,9 @@ void Session::waitingForData()
  */
 void Session::updateState()
 {
+    // Setup Logging per Current Node.
+    m_log.setUserInfo(m_node_number);
+    
     // Last Character Received is ESC, then Check for
     // ESC Sequence, or Lone ESC Key.
     if(m_parsed_data[m_parsed_data.size()-1] == '\x1b')
@@ -284,6 +289,8 @@ void Session::startEscapeTimer()
  */
 void Session::handleEscTimer()
 {
+    m_log.setUserInfo(m_node_number);
+    
     // Move text to State Machine, Timer has passed, or remainder of Sequence caught up!
     m_state_manager->update();
     m_is_esc_timer = false;
@@ -297,6 +304,7 @@ void Session::handleEscTimer()
  */
 void Session::handleRead(const std::error_code& error, socket_handler_ptr)
 {
+    m_log.setUserInfo(m_node_number);
     m_log.write<Logging::DEBUG_LOG>("handleRead - After Incoming Data.", __FILE__, __LINE__);
 
     session_manager_ptr session_manager = m_session_manager.lock();
@@ -383,6 +391,8 @@ void Session::handleRead(const std::error_code& error, socket_handler_ptr)
  */
 void Session::handleTeloptCodes()
 {
+    m_log.setUserInfo(m_node_number);
+    
     std::string incoming_data = "";
     
     if (m_in_data_vector.size() == 0) 
@@ -433,6 +443,7 @@ void Session::handleTeloptCodes()
  */
 void Session::logoff()
 {
+    m_log.setUserInfo(m_node_number);
     
     // This might be doing double the deallocation    
     if(m_async_io && m_async_io->getSocketHandle()->isActive())
@@ -468,5 +479,6 @@ void Session::logoff()
  */
 void Session::disconnectUser() 
 {
+    m_log.setUserInfo(m_node_number);
     m_async_io->getSocketHandle()->disconnectUser();
 }

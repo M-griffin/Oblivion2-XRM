@@ -34,11 +34,6 @@ typedef std::shared_ptr<StateManager> state_manager_ptr;
 class DeadlineTimer;
 typedef std::unique_ptr<DeadlineTimer> deadline_timer_uptr;
 
-/*
-class TelnetDecoder;
-typedef std::shared_ptr<TelnetDecoder> telnet_decoder_ptr;
-*/
-
 /**
  * @class Session
  * @author Michael Griffin

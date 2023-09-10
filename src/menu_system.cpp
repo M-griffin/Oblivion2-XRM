@@ -938,13 +938,10 @@ void MenuSystem::shutdownModule()
 void MenuSystem::startupModule(const module_ptr &module)
 {
     m_log.write<Logging::CONSOLE_LOG>("Menu System: Startup Module=", module->m_filename);
+    
     // First clear any left overs if they exist.
     clearAllModules();
-
-    // Run the startup for the module
     module->onEnter();
-
-    // Push to stack now the new module.
     m_module_stack.push_back(module);
 }
 
@@ -1091,6 +1088,7 @@ void MenuSystem::startupModuleMessageEditor()
 
 /**
  * @brief Handles Input for Login and PreLogin Sequences.
+ *        On Login Falures kicks back out to the Matrix.
  * @param character_buffer
  * @param is_utf8
  */

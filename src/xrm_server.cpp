@@ -57,7 +57,6 @@ std::string USERS_DATABASE = "";
  */
 void atExitFunction()
 {    
-    Communicator::getInstance().releaseConfiguration();
     std::cout << std::endl << "XRM SHUTDOWN COMPLETED!" << std::endl;
 }
 
@@ -184,7 +183,7 @@ auto main() -> int
             }
             
             if (line == "quit") {
-                m_log.write<Logging::INFO_LOG>("hutting down IOservice, exiting...");
+                m_log.write<Logging::INFO_LOG>("Shutting down IOservice, exiting...");
                 io_service.stop();
             }
           

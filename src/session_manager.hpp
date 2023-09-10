@@ -5,8 +5,12 @@
 #include <iostream>
 #include <string>
 #include <set>
+#include <mutex>
 
 class Logging;
+
+class CommonIO;
+typedef std::shared_ptr<CommonIO> common_io_ptr;
 
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
@@ -43,6 +47,8 @@ private:
 
     Logging               &m_log;
     std::set<session_ptr>  m_sessions;
+    std::mutex             m_mutex;
+    
 };
 
 typedef std::shared_ptr<SessionManager> session_manager_ptr;
