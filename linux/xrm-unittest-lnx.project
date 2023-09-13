@@ -47,6 +47,7 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="../src/logging.cpp"/>
     <File Name="../src/encryption.hpp"/>
     <File Name="../src/encryption.cpp"/>
     <File Name="../src/menu_system.hpp"/>
