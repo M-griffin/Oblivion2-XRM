@@ -126,6 +126,12 @@ void StateManager::update()
                     {
                         // This is filling up the log on Invalid Characters, have to find out what is pushing in here.
                         m_log.write<Logging::ERROR_LOG>("Utf8 Parsing Exception=", *it, ex.what(), __LINE__, __FILE__);
+                        
+                        // On Failure, use the exiting char, which could be extended ascii
+                        new_string_builder += std::string(1, byte_value);
+                        
+                        // Also on failures it rollback back the iterator, so increment so we get past this current char failure
+                        *it++;
                     }
                 }
 
