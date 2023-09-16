@@ -199,6 +199,8 @@
     <File Name="../src/processor_text.cpp"/>
     <File Name="../src/processor_text.hpp"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="" C_Options="" Assembler="">
@@ -270,12 +272,12 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-Wfatal-errors;-Os;-O3;-pedantic;-W;-std=c++11;-Wall;-Wno-psabi;-Wno-deprecated-declarations" C_Options="-Wfatal-errors;-g;-O0;-pedantic;-W;-std=c++11;-Wall;-Wno-psabi;-Wno-deprecated-declarations" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-Wfatal-errors;-Os;-O2;-pedantic;-W;-std=c++11;-Wall;-Wno-psabi;-Wno-deprecated-declarations" C_Options="-Wfatal-errors;-Os;-O2;-pedantic;-W;-std=c++11;-Wall;-Wno-psabi;-Wno-deprecated-declarations" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="./Release"/>
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
-        <IncludePath Value="../linux/Debug"/>
+        <IncludePath Value="../linux/Release"/>
         <Preprocessor Value="WITHOUT_SDL"/>
       </Compiler>
       <Linker Options="" Required="yes">
@@ -330,6 +332,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
 </CodeLite_Project>

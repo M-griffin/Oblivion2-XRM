@@ -11,7 +11,6 @@
 #                   - Added Conversion and Unit Tests to Cmdline build
 # Updated 7/26/2019 - Added Command line Parameter for CPU cores to speed up compiling
 # Updated 4/30/2023 - Minimual Build - Needed for Rebuilding App / Testing
-# Updated 9/16/2023 - Setup this file to Do Release Folder Builds optimized for Size/Speed.
 
 # Save Current Working Directory
 cwd=$(pwd)
@@ -48,7 +47,7 @@ echo ''
 # *** 2. Build SqliteWrapped Dependency first.
 cd ../linux
 make -f SqliteWrapped.mk $1
-cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h > ./Release/libSqliteWrapped.h
+cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h > ./Debug/libSqliteWrapped.h
 cd $cwd
 
 echo ''
@@ -102,10 +101,10 @@ rm -f xrm-menu-convert
 rm -f xrm-menu-prompt-convert
 rm -f xrm-unittest
 
-cp ../linux/Release/xrm-server .
-cp ../linux/Release/xrm-menu-convert .
-cp ../linux/Release/xrm-menu-prompt-convert .
-cp ../linux/Release/xrm-unittest .
+cp ../linux/Debug/xrm-server .
+cp ../linux/Debug/xrm-menu-convert .
+cp ../linux/Debug/xrm-menu-prompt-convert .
+cp ../linux/Debug/xrm-unittest .
 
 #echo ''
 echo -e "\033[1;31m"Running Unit Tests

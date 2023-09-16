@@ -694,6 +694,7 @@ void ModPreLogon::handleHumanShieldTimer()
  */
 void ModPreLogon::humanShieldCompleted()
 {
+    m_log.setUserInfo(m_session_data->m_node_number);
     if(m_is_human_shield)
     {
         // Move to Next Detection

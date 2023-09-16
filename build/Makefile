@@ -8,7 +8,7 @@ clean:
 	make -f ../linux/SqliteWrapped.mk clean
 sql:
 	make -f ../linux/SqliteWrapped.mk -j3
-	cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h> ./Debug/libSqliteWrapped.h
+	cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h> ./Release/libSqliteWrapped.h
 
 sqlr:
 	make -f ../linux/SqliteWrapped.mk -j3
@@ -16,7 +16,7 @@ sqlr:
 
 xrm:
 	make -f ../linux/xrm-server.mk -j3
-	cp -f ./Debug/xrm-server ../build/xrm-server
+	cp -f ./Release/xrm-server ../build/xrm-server
 
 xrmr:
 	make -f ../linux/xrm-server.mk -j3
@@ -24,13 +24,13 @@ xrmr:
 
 test:
 	make -f ../linux/xrm-unittest.mk -j3
-	cp -f ./Debug/xrm-unittest ../build/xrm-unittest
+	cp -f ./Release/xrm-unittest ../build/xrm-unittest
 run:
 	./xrm-server
 mem:
 	valgrind -s --track-origins=yes --tool=memcheck --leak-check=full --show-leak-kinds=all ./xrm-server
 mem2:
-	valgrind -s --track-origins=yes --tool=memcheck --leak-check=full --show-leak-kinds=all ../linux/Debug/xrm-server
+	valgrind -s --track-origins=yes --tool=memcheck --leak-check=full --show-leak-kinds=all ../linux/Release/xrm-server
 detach:
 	nohup ./xrm-server &
 run-test:

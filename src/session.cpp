@@ -201,6 +201,8 @@ void Session::handleWrite(const std::error_code& error, socket_handler_ptr)
             catch(std::exception &ex)
             {
                 m_log.write<Logging::ERROR_LOG>("Async_HandleWrite Exception closing socket()", ex.what(), __LINE__, __FILE__);
+                logoff();
+                return;
             }
         }
         
@@ -466,7 +468,7 @@ void Session::logoff()
     if(session_manager)
     {
         m_is_leaving = true;
-        m_log.write<Logging::DEBUG_LOG>("Logoff Session Manager", __LINE__, __FILE__);
+        m_log.write<Logging::INFO_LOG>("Logoff Session Manager", __LINE__, __FILE__);
                 
         session_manager->leave(shared_from_this());            
         session_manager.reset();        
