@@ -46,7 +46,7 @@ COPY . /usr/src/Oblivion2-XRM
 
 # Specify the working directory on the Container
 WORKDIR /usr/src/Oblivion2-XRM/linux
-RUN mkdir -p ./Debug
+RUN mkdir -p ./Release
 
 # ----------------------
 # Build The System
@@ -56,7 +56,7 @@ RUN mkdir -p ./Debug
 RUN make -f SqliteWrapped.mk
 
 # SQLITE Wrapped - Setup Compiled Header File for other Modules to use.
-RUN cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h > ./Debug/libSqliteWrapped.h
+RUN cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h > ./Release/libSqliteWrapped.h
 
 # Build the Main XRM Server And Helper Apps Along with Unit Tests
 RUN make -f xrm-menu-convert.mk
@@ -65,7 +65,7 @@ RUN make -f xrm-unittest.mk
 RUN make -f xrm-server.mk
 
 # Switch to the Debug Directory, and copy executables to the Build folder.
-WORKDIR /usr/src/Oblivion2-XRM/linux/Debug
+WORKDIR /usr/src/Oblivion2-XRM/linux/Release
 RUN cp ./xrm-menu-convert ../../build
 RUN cp ./xrm-menu-prompt-convert ../../build
 RUN cp ./xrm-unittest ../../build
