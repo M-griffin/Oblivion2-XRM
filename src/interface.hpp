@@ -126,10 +126,7 @@ private:
     {
         if(!error)
         {
-            async_io_ptr async_conn(new AsyncIO(m_io_service, socket_handler));
-            m_log.write<Logging::INFO_LOG>("Handle-Accept TCP Connection accepted from=", 
-                async_conn->getSocketHandle()->getIpAddress()); 
-            
+            async_io_ptr async_conn(new AsyncIO(m_io_service, socket_handler));                        
             m_log.write<Logging::DEBUG_LOG>("Handle-Accept Create New Session");
 
             // Create the new Session
@@ -142,16 +139,14 @@ private:
                 m_session_manager->join(new_session);
 
                 m_log.setUserInfo(new_session->m_node_number);
-                m_log.write<Logging::INFO_LOG>("New Session Created, Node=", new_session->m_node_number);
+                m_log.write<Logging::INFO_LOG>("Handle-Accept TCP Connection accepted from=", 
+                    async_conn->getSocketHandle()->getIpAddress(), "Node=", new_session->m_node_number); 
             }
         }
         else
         {
             m_log.write<Logging::ERROR_LOG>("Handle-Accept Connection refused", error.message());
-        }
-        
-        // Restart Listener for next connection.
-        waitingForConnection();
+        }        
     }
 
     Logging             &m_log;

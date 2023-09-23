@@ -71,9 +71,8 @@ public:
         {
             // On initial Session Connection,  setup and send TELNET Options to
             // start the negotiation of client features.
-
             // On initial connection, clear and home cursor
-            std::string clear_screen = "\x1b[1;1H\x1b[2J";
+            std::string clear_screen = "\x1b[1;1H\x1b[2J\x1b[0m";
             new_session->deliver(clear_screen);
 
             new_session->m_telnet_decoder->sendIACSequences(DONT, TELOPT_OLD_ENVIRON);

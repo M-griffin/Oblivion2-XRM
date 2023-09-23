@@ -27,6 +27,7 @@
     </Plugin>
   </Plugins>
   <VirtualDirectory Name="mods">
+    <File Name="../src/mods/mod_prelogon.cpp"/>
     <File Name="../src/mods/mod_level_editor.hpp"/>
     <File Name="../src/mods/mod_level_editor.cpp"/>
     <File Name="../src/mods/mod_user_editor.hpp"/>
@@ -38,7 +39,6 @@
     <File Name="../src/mods/mod_logon.hpp"/>
     <File Name="../src/mods/mod_logon.cpp"/>
     <File Name="../src/mods/mod_prelogon.hpp"/>
-    <File Name="../src/mods/mod_prelogon.cpp"/>
     <File Name="../src/mods/mod_base.hpp"/>
     <File Name="../src/mods/mod_base.cpp"/>
     <File Name="../src/mods/mod_message_editor.hpp"/>

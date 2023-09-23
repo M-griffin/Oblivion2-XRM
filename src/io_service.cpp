@@ -39,10 +39,10 @@ void IOService::checkAsyncListenersForConnections()
 
         if(!listener_work || !listener_work->getSocketHandle()->isActive())
         {
-            m_log.write<Logging::DEBUG_LOG>("ioservice Removing Async Listener Job");
-            listener_work.reset();
-            m_listener_list.remove(i);
-            --i; // Compensate for item removed.
+            //m_log.write<Logging::DEBUG_LOG>("ioservice Removing Async Listener Job");
+            //listener_work.reset();
+            //m_listener_list.remove(i);
+            //--i; // Compensate for item removed.
             continue;
         }
 
@@ -63,10 +63,10 @@ void IOService::checkAsyncListenersForConnections()
                                 
                 m_log.write<Logging::DEBUG_LOG>("ioservice Async-Accept - Returned CallBack", __FILE__, __LINE__);
                 
-                handler.reset();
-                listener_work.reset();
-                m_listener_list.remove(i);
-                --i; // Compensate for item removed.
+                //handler.reset();
+                //listener_work.reset();
+                //m_listener_list.remove(i);
+                //--i; // Compensate for item removed.
             }
             catch(std::exception &ex)
             {

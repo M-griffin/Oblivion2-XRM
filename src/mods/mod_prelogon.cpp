@@ -233,10 +233,12 @@ void ModPreLogon::setupEmulationDetection()
     // Deliver ANSI Location Sequence to Detect Emulation Response
     // Only detects if terminal handles ESC responses.
     // Windows Console Telnet will response it's at 259 y!
-    std::string detection = m_session_io->pipe2ansi("|00\x1b[255B\x1b[255C\x1b[6n");
+    // Also use Session Deliver, we don't need to use internal screen buffer on detection.
+    std::string detection = "\x1b[40;30m\x1b[255B\x1b[255C\x1b[6n";
+    m_session_data->deliver(detection);
+            
     std::string reset_position = "\x1b[1;1H\x1b[2J";
-
-    baseProcessAndDeliver(detection);
+    
     baseProcessAndDeliver(reset_position);
 
     // Display Detecting Emulation, not using display prompt cause we need to append.
