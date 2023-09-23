@@ -72,16 +72,6 @@ make -f xrm-menu-prompt-convert.mk $1
 cd $cwd
 
 echo ''
-echo -e "\033[1;31m"Build XRM-Server Unit Tests
-echo -e "\033[0;31m"===========================
-echo -e "\033[0;m"
-
-# *** 5. Build the Unit Tests
-cd ../linux
-make -f xrm-unittest.mk $1
-cd $cwd
-
-echo ''
 echo -e "\033[1;31m"Build XRM-Server [Main Program]
 echo -e "\033[0;31m"===============================
 echo -e "\033[0;m"
@@ -89,6 +79,16 @@ echo -e "\033[0;m"
 # *** 6. Build the Program
 cd ../linux
 make -f xrm-server.mk $1
+cd $cwd
+
+echo ''
+echo -e "\033[1;31m"Build XRM-Server Unit Tests
+echo -e "\033[0;31m"===========================
+echo -e "\033[0;m"
+
+# *** 5. Build the Unit Tests
+cd ../linux
+make -f xrm-unittest.mk $1
 cd $cwd
 
 echo ''
