@@ -181,21 +181,21 @@ void Session::handleWrite(const std::error_code& error, socket_handler_ptr)
     if(error)
     {
         m_log.write<Logging::ERROR_LOG>("Async_HandleWrite Session Closed() error=", error.message(), __LINE__, __FILE__);
+        logoff();
     }
 
+    /*
     session_manager_ptr session_mgr = m_session_manager.lock();
 
     if(session_mgr && error) //&& (!m_session_data->m_is_leaving))
     {
         //m_is_leaving = true;
-
-        m_log.write<Logging::DEBUG_LOG>("Async_HandleWrite Removing Sesison from Manager", __LINE__, __FILE__);
         
         if(m_async_io->isActive())
         {
             try
             {
-                m_log.write<Logging::DEBUG_LOG>("Async_HandleWrite Leaving (NORMAL SESSION)", __LINE__, __FILE__);
+                m_log.write<Logging::CONSOLE_LOG>("Async_HandleWrite Leaving (NORMAL SESSION)", __LINE__, __FILE__);
                 m_async_io->shutdown();
             }
             catch(std::exception &ex)
@@ -209,10 +209,11 @@ void Session::handleWrite(const std::error_code& error, socket_handler_ptr)
         // Disconnect the session.
         if (m_async_io->isActive())
         {
+            m_log.write<Logging::CONSOLE_LOG>("Async_HandleWrite Removing Sesison from Manager", __LINE__, __FILE__);
             session_mgr->leave(shared_from_this());
             session_mgr.reset();
         }
-    }
+    }*/
 }
 
 /**
@@ -452,14 +453,14 @@ void Session::logoff()
     {
         try
         {
-            m_log.write<Logging::DEBUG_LOG>("m_async_io->getSocketHandle() is ACTIVE!", __LINE__, __FILE__);
+            m_log.write<Logging::INFO_LOG>("m_async_io->getSocketHandle() is ACTIVE! -> INACTIVE", __LINE__, __FILE__);
             m_async_io->getSocketHandle()->setInactive();
             
         }
         catch(std::exception &e)
         {
             // Sometime this doesn't close when it's already existed, just extra checking here.            
-            m_log.write<Logging::DEBUG_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
         }
     }
     
