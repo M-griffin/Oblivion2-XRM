@@ -17,10 +17,6 @@
  * CP437 -> UTF-8 Character Translation Table
  */
 
-/**
- * @brief  Global Singleton Instance, needed to initialize the class.
- */
-Encoding* Encoding::m_global_encoding_instance = nullptr;
 
 #ifdef TARGET_OS_MAC
 const std::string Encoding::ENCODING_TEXT_UTF8  = "en_US.UTF-8";
@@ -81,6 +77,8 @@ wchar_t CP437_TABLE[] =
 };
 
 Encoding::Encoding()
+    : m_log(Logging::getInstance())
+    , m_encoding_mutex()
 {
     // Populate UCS to CP437 Translation Back Mapping.
     for(unsigned int char_value = 0; char_value < 256; char_value++)
@@ -89,9 +87,6 @@ Encoding::Encoding()
     }
 }
 
-Encoding::~Encoding()
-{
-}
 
 /**
  * Windows apparently needs to use it's own WINAPI methods for Wide to Multi-bytes translations
@@ -150,8 +145,7 @@ std::wstring Encoding::multibyte_to_wide(const char* mbstr)
     }
     catch(const std::range_error& e)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("UCS multibyte_to_wide", e.what(), __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("UCS multibyte_to_wide", e.what(), __LINE__, __FILE__);
     }
 
     return ucs;
@@ -173,8 +167,7 @@ std::string Encoding::wide_to_multibyte(const std::wstring& wstr)
     }
     catch(const std::range_error& e)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("UCS wide_to_multibyte", e.what(), __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("UCS wide_to_multibyte", e.what(), __LINE__, __FILE__);
     }
 
     return utf8;
@@ -251,12 +244,11 @@ std::string Encoding::utf8Encode(const std::string &standard_string)
 {
     std::string output = "";
     std::wstring wide_string = L"";
-    int ascii_value = 0;
 
     // Loop and write out after translation to Unicode
     for(std::string::size_type i = 0; i < standard_string.size(); i++)
     {
-        ascii_value = std::char_traits<char>().to_int_type(standard_string[i]);
+        int ascii_value = std::char_traits<char>().to_int_type(standard_string[i]);
 
         if(ascii_value < 256)
         {
@@ -264,8 +256,7 @@ std::string Encoding::utf8Encode(const std::string &standard_string)
         }
         else
         {
-            Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("Error, utf8Encode ascii_value=", ascii_value, __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>("Error, utf8Encode ascii_value=", ascii_value, __LINE__, __FILE__);
         }
     }
 
@@ -298,12 +289,13 @@ std::string Encoding::utf8Decode(const std::string &standard_string)
             usc_string += usc_char;
             std::string utf8_data = wide_to_multibyte(usc_string);
 
-            Logging *log = Logging::instance();
-            log->write<Logging::DEBUG_LOG>("Warning, Invalid CP437 Conversion, convert glyph back to utf8=",  utf8_data, __LINE__, __FILE__);
+            m_log.write<Logging::DEBUG_LOG>("Warning, Invalid CP437 Conversion, convert glyph back to utf8=",  utf8_data, __LINE__, __FILE__);
             output += utf8_data;
         }
         else
-            c = map_wide_to_cp437.find(usc_char)->second;
+        {
+            c = map_wide_to_cp437.find(usc_char)->second;            
+        }
 
         output += std::string(1, c);
     }

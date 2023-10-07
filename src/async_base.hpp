@@ -5,8 +5,6 @@
 #include "socket_handler.hpp"
 #include "logging.hpp"
 
-#include <iostream>
-
 /**
  * @class AsyncBase
  * @author Michael Griffin
@@ -18,11 +16,16 @@ class AsyncBase
 {
 public:
     AsyncBase(IOService& io_service, socket_handler_ptr socket_handler)
-        : m_io_service(io_service)
+        : m_log(Logging::getInstance())
+        , m_io_service(io_service)
         , m_socket_handler(socket_handler)
     { }
+    
     ~AsyncBase()
-    { }
+    { 
+        m_log.write<Logging::DEBUG_LOG>("~AsyncBase()");
+        m_socket_handler.reset();
+    }
 
     /**
      * @brief Is the Socket Created and Open
@@ -30,7 +33,7 @@ public:
      */
     bool isActive()
     {
-        return m_socket_handler->isActive();
+        return (m_socket_handler) ? m_socket_handler->isActive() : false;
     }
 
     /**
@@ -56,11 +59,11 @@ public:
         }
         catch(std::exception &ex)
         {
-            Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("AsyncBase shutdown() - Caught exception=", ex.what());
+            m_log.write<Logging::ERROR_LOG>("AsyncBase shutdown() - Caught exception=", ex.what());
         }
     }
 
+    Logging            &m_log;
     IOService          &m_io_service;
     socket_handler_ptr  m_socket_handler;
 };

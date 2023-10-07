@@ -4,6 +4,7 @@
 #include "async_base.hpp"
 #include "io_service.hpp"
 #include "socket_handler.hpp"
+#include "logging.hpp"
 
 #include <iostream>
 #include <memory>
@@ -20,23 +21,23 @@ class AsyncAcceptor
 {
 public:
 
-    AsyncAcceptor(IOService& io_service, socket_handler_ptr socket_handler)
+    AsyncAcceptor(IOService& io_service, const socket_handler_ptr &socket_handler)
         : AsyncBase(io_service, socket_handler)
     {
     }
 
     ~AsyncAcceptor()
     {
+        m_log.write<Logging::DEBUG_LOG>("~AsyncAcceptor()");
     }
-
-
+    
     /**
      * @brief Async Listener Callback for IOService Work
      * @param StringSequence - Host:Port
      * @param Callback - return error code and handles to new session
      */
     template <typename Protocol, typename Callback>
-    void asyncAccept(Protocol protocol, const Callback &callback)
+    void asyncAccept(const Protocol &protocol, const Callback &callback)
     {
         // Place Holder is used for template parameters, string_seq is used in writes
         // Where the Buffer Place Holder in the above method is used for reads.
@@ -50,15 +51,8 @@ public:
         {
             service_type = SERVICE_TYPE_LISTENER_TELNET;
         }
-        else if(protocol == "SSH")
-        {
-            service_type = SERVICE_TYPE_LISTENER_SSH;
-        }
-        else if(protocol == "IRC")
-        {
-            service_type = SERVICE_TYPE_LISTENER_IRC;
-        }
-
+        
+        m_log.write<Logging::DEBUG_LOG>("Async Listener Job Added to the Queue for", protocol);
         m_io_service.addAsyncJob(place_holder, string_place_holder, m_socket_handler, callback, service_type);
     }
 

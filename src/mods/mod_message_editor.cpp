@@ -1,11 +1,55 @@
 #include "mod_message_editor.hpp"
 
+#include "../data-sys/text_prompts_dao.hpp"
+#include "../model-sys/config.hpp"
+
+#include "../session.hpp"
+#include "../session_io.hpp"
+
 #include "../processor_ansi.hpp"
 #include "../processor_text.hpp"
 #include "../logging.hpp"
+#include "../common_io.hpp"
 
 #include <string>
 #include <vector>
+#include <memory>
+
+ModMessageEditor::ModMessageEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io)
+    : ModBase(session_data, config, ansi_process,"mod_message_editor.yaml", common_io, session_io)
+    , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
+    , m_text_process(nullptr)
+    , m_mod_function_index(MOD_PROMPT)
+    , m_mod_setup_index(MOD_DISPLAY_EDITOR)
+    , m_mod_user_state_index(MOD_FSE_INPUT)
+    , m_failure_attempts(0)
+    , m_is_text_prompt_exist(false)
+
+      // Later on default to 1, and screen width!!!
+    , m_text_box_top(0)
+    , m_text_box_bottom(24)
+    , m_text_box_left(0)
+    , m_text_box_right(80)
+    , m_text_box_height(0)
+    , m_text_box_width(0)
+
+{
+    // Push function pointers to the stack.
+    m_setup_functions.push_back(std::bind(&ModMessageEditor::setupEditor, this));
+    m_mod_functions.push_back(std::bind(&ModMessageEditor::editorInput, this, std::placeholders::_1));
+
+    // Check of the Text Prompts exist.
+    m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
+
+    if(!m_is_text_prompt_exist)
+    {
+        createTextPrompts();
+    }
+
+    // Loads all Text Prompts for current module
+    m_text_prompts_dao->readPrompts();
+}
 
 /**
  * @brief Handles Updates or Data Input from Client
@@ -67,6 +111,12 @@ void ModMessageEditor::createTextPrompts()
 {
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
+    
+    //value[DEFAULT_TEXT_COLORS]                = std::make_pair("Default Text Color when typing", "|03|16");
+    value[DEFAULT_TEXT_COLORS]                = std::make_pair("Selected Text when CTRL+B is keyed for selection", "|02|20");
+    value[BACKSPACE_TEXT_COLORS]              = std::make_pair("Match your template background color", "|04|17");
+    
+    value[SELECTED_TEXT_COLORS]               = std::make_pair("Selected Text when CTRL+B is keyed for selection", "|02|20");
     /*
         value[PROMPT_HEADER]                  = std::make_pair("User Editor Header", "|CS|CR|03--- |15[|03Oblivion/2 XRM |07// |11User Editor|15] |03--- |11Filtering View : |15|OT |CR");
         value[PROMPT_INPUT_TEXT]              = std::make_pair("User Editor Prompt", "|CR|03E|15/dit User |03D|15/elete User |03C|15/opy User |03F|15/ilter Users |03Q|15/uit : ");
@@ -258,12 +308,12 @@ std::string ModMessageEditor::processMidTemplate(processor_ansi_ptr ansi_process
     scrubNewLinesChars(new_screen);
 
     // Clear All Mappings
-    m_session_io.clearAllMCIMapping();
-    m_session_io.addMCIMapping("|LT", "");
-    m_session_io.addMCIMapping("|RT", "");
+    m_session_io->clearAllMCIMapping();
+    m_session_io->addMCIMapping("|LT", "");
+    m_session_io->addMCIMapping("|RT", "");
 
     // Build a single code map that can be reused.
-    std::vector<MapType> code_map = m_session_io.pipe2genericCodeMap(new_screen);
+    std::vector<MapType> code_map = m_session_io->pipe2genericCodeMap(new_screen);
 
 
     // Load, then pull MCI off-sets on the screen for margins.
@@ -280,7 +330,7 @@ std::string ModMessageEditor::processMidTemplate(processor_ansi_ptr ansi_process
 
     // Remove Code Mappings from screen the sets up ansi screen
     ansi_process->clearScreen();
-    std::string output_screen = m_session_io.parseCodeMapGenerics(new_screen, code_map);
+    std::string output_screen = m_session_io->parseCodeMapGenerics(new_screen, code_map);
 
     ansi_process->parseTextToBuffer((char *)output_screen.c_str());
 
@@ -303,14 +353,14 @@ std::string ModMessageEditor::processMidTemplate(processor_ansi_ptr ansi_process
 void ModMessageEditor::setupEditor()
 {
     // NOTE Possible make these class instances, so we don't have to keep reloading.
-    std::string top_template = m_common_io.readinAnsi("FSESRT.ANS");
-    std::string mid_template = m_common_io.readinAnsi("FSEMID.ANS");
-    std::string bot_template = m_common_io.readinAnsi("FSEEND.ANS");
+    std::string top_template = m_common_io->readinAnsi("FSESRT.ANS");
+    std::string mid_template = m_common_io->readinAnsi("FSEMID.ANS");
+    std::string bot_template = m_common_io->readinAnsi("FSEEND.ANS");
 
     // Use a Local Ansi Parser for Parsing Menu Templates and determine boundaries.
     processor_ansi_ptr ansi_process(new ProcessorAnsi(
-                                        m_session_data->m_telnet_state->getTermRows(),
-                                        m_session_data->m_telnet_state->getTermCols())
+                                        m_session_data->m_telnet_decoder->getTermRows(),
+                                        m_session_data->m_telnet_decoder->getTermCols())
                                    );
 
     // Parse the TOP Screen to get Top Text Margin
@@ -324,8 +374,7 @@ void ModMessageEditor::setupEditor()
     // Rows uses between top / bot templates on current screen size.
     std::string mid_screen = processMidTemplate(ansi_process, mid_template);
 
-    Logging *log = Logging::instance();
-    log->write<Logging::DEBUG_LOG>("m_text_box_top=", m_text_box_top, "m_text_box_bottom=", m_text_box_bottom,
+    m_log.write<Logging::DEBUG_LOG>("m_text_box_top=", m_text_box_top, "m_text_box_bottom=", m_text_box_bottom,
                                     "m_text_box_left=", m_text_box_left, "m_text_box_right=", m_text_box_right);
 
     // Setup the Text Parser Init the Parser with template data.
@@ -336,13 +385,14 @@ void ModMessageEditor::setupEditor()
     m_text_box_height += 1;
 
 
-    log->write<Logging::DEBUG_LOG>("m_text_process - height=", m_text_box_height, "width=", m_text_box_width);
+    m_log.write<Logging::DEBUG_LOG>("m_text_process - height=", m_text_box_height, "width=", m_text_box_width);
     m_text_process.reset(new ProcessorText(m_text_box_height, m_text_box_width));
 
     // Next combine and output.. Move cursor to top left in box.
     std::string screen_output = top_screen + mid_screen + bot_screen;
     screen_output += "\x1b[" + std::to_string(m_text_box_top) + ";" + std::to_string(m_text_box_left) + "H";
 
+    screen_output += getDisplayPromptRaw(DEFAULT_TEXT_COLORS);
     baseProcessDeliverInput(screen_output);
 }
 
@@ -352,21 +402,20 @@ void ModMessageEditor::setupEditor()
  */
 void ModMessageEditor::editorInput(const std::string &input)
 {
-    Logging *log = Logging::instance();
-    std::string result = m_session_io.getFSEKeyInput(input);
+    std::string result = m_session_io->getFSEKeyInput(input);
 
     if(result.size() == 0)
     {
         return;
     }
-
-    std::cout << "result: " << result << ", input: " << input << std::endl;
+    
+    m_log.write<Logging::DEBUG_LOG>("result=", result, "input=", input);
 
     if(result[0] == 13 || result[0] == 10)
     {
         // Translations for ENTER next line
         //input = "ENTER";
-        log->write<Logging::CONSOLE_LOG>("[editorInput] [ENTER HIT] input result=", result);
+        m_log.write<Logging::CONSOLE_LOG>("[editorInput] [ENTER HIT] input result=", result);
         //std::string output = "\r\n\x1b[" + std::to_string(m_text_box_left - 1) + "C";
 
         processTextInput(result, input);
@@ -374,28 +423,29 @@ void ModMessageEditor::editorInput(const std::string &input)
     else if(result[0] == '\x1b' && result.size() > 2)
     {
         // ESC SEQUENCE - check movement / arrow keys.
-        std::string escape_sequence = m_common_io.getEscapeSequence();
-        std::cout << "ESC= " << escape_sequence << std::endl;
-        log->write<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 1] input result=", result);
+        std::string escape_sequence = m_common_io->getEscapeSequence();        
+        m_log.write<Logging::DEBUG_LOG>("ESC=", escape_sequence);
+                
+        m_log.write<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 1] input result=", result);
         processEscapedInput(result.substr(1), input);
     }
     else if(result[0] == '\x1b' && result.size() == 2 && result[1] == '\x1b')
     {
         // Check Single ESC KEY - command options
         //input = "ESC";  - quit for now
-        log->write<Logging::CONSOLE_LOG>("[editorInput] [ESC HIT!] input result=", result);
+        m_log.write<Logging::CONSOLE_LOG>("[editorInput] [ESC HIT!] input result=", result);
         m_is_active = false;
     }
     else
     {
         // Handle Input Characters here and control chars.
-        log->write<Logging::CONSOLE_LOG>("[editorInput] [STDIO] input result=", result);
+        m_log.write<Logging::CONSOLE_LOG>("[editorInput] [STDIO] input result=", result);
 
         if(result[0] == '\x1b')
         {
-            std::string escape_sequence = m_common_io.getEscapeSequence();
+            std::string escape_sequence = m_common_io->getEscapeSequence();
             std::cout << "ESC= " << escape_sequence << std::endl;
-            log->write<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 2] input result=", static_cast<int>(escape_sequence[0]));
+            m_log.write<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 2] input result=", static_cast<int>(escape_sequence[0]));
 
             // Hot Key Input, cutoff leading escape for control key.
             processEscapedInput(result.substr(1), input);
@@ -403,7 +453,7 @@ void ModMessageEditor::editorInput(const std::string &input)
         }
 
         for(char c : result)
-            log->write<Logging::CONSOLE_LOG>("[editorInput] [c HIT] input result=", static_cast<int>(c));
+            m_log.write<Logging::CONSOLE_LOG>("[editorInput] [c HIT] input result=", static_cast<int>(c));
 
         processTextInput(result, input);
     }
@@ -448,15 +498,17 @@ std::string ModMessageEditor::scrollTextBoxDown(std::string &output)
 void ModMessageEditor::handleBackSpace(std::string &output)
 {
     /** Need to Write code to delete char or space and move everything left **/    
-    int x_position = m_text_process->getXPosition();
-    
-    std::cout << "handleBackSpace max_chars=" << m_text_process->getMaxCharactersPerLine() << ", x_pos=" << x_position << std::endl;
+    int x_position = m_text_process->getXPosition();    
+    m_log.write<Logging::DEBUG_LOG>("handleBackSpace max_chars=", m_text_process->getMaxCharactersPerLine(), "x_pos=", x_position);
+
+    std::string default_text_color = getDisplayPromptRaw(DEFAULT_TEXT_COLORS);
+    std::string backspace_color = getDisplayPromptRaw(BACKSPACE_TEXT_COLORS);
 
     // destructive backspace OR Move Up a Line Backspace.
     if(x_position > 1)
     {
         m_text_process->parseTextToBuffer((char *)"\b");
-        output += "\x1b[D \x1b[D";
+        output += backspace_color + "\x1b[D \x1b[D" + default_text_color;
     }
     // detsructive backspace move up and end of line
     else if(x_position == 1)
@@ -465,9 +517,11 @@ void ModMessageEditor::handleBackSpace(std::string &output)
         // remove last character for cursor space.
         m_text_process->parseTextToBuffer((char *)"\b");
         
-        std::cout << "handleBackSpaceAfter x_position=" << m_text_process->getXPosition() << std::endl;
+        m_log.write<Logging::DEBUG_LOG>("handleBackSpaceAfter m_text_process->x_position=", 
+            m_text_process->getXPosition(), "x_pos=", x_position);
+        
         if(m_text_process->getXPosition() == m_text_process->getMaxCharactersPerLine()) {
-            output += " \x1b[D";
+            output += backspace_color + " \x1b[D" + default_text_color;
         }    
     }
 }
@@ -481,24 +535,30 @@ void ModMessageEditor::handleDelete(std::string &output)
     /** Need to Write code to delete char or space and move everything left **/    
     int x_position = m_text_process->getXPosition();
     
-    std::cout << "handleDelete max_chars=" << m_text_process->getMaxCharactersPerLine() << ", x_pos=" << x_position << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("handleDelete max_chars=", m_text_process->getMaxCharactersPerLine(), "x_pos=", x_position);
 
-    // destructive backspace
+    std::string default_text_color = getDisplayPromptRaw(DEFAULT_TEXT_COLORS);
+    std::string backspace_color = getDisplayPromptRaw(BACKSPACE_TEXT_COLORS);
+
+    // destructive backspace OR Move Up a Line Backspace.
     if(x_position > 1)
     {
         m_text_process->parseTextToBuffer((char *)"\b");
-        output += "\x1b[D \x1b[D";
+        output += backspace_color + "\x1b[D \x1b[D" + default_text_color;
     }
     // detsructive backspace move up and end of line
     else if(x_position == 1)
-    {
+    {        
         // Check Updated Position after parse - If we move from 1, up and to end of line, then 
         // remove last character for cursor space.
         m_text_process->parseTextToBuffer((char *)"\b");
-        std::cout << "handleDeleteAfter x_position=" << m_text_process->getXPosition() << std::endl;
+        
+        m_log.write<Logging::DEBUG_LOG>("handleBackSpaceAfter m_text_process->x_position=", 
+            m_text_process->getXPosition(), "x_pos=", x_position);
+            
         if(m_text_process->getXPosition() == m_text_process->getMaxCharactersPerLine()) {
-            output += " \x1b[D";
-        }
+            output += backspace_color + " \x1b[D" + default_text_color;
+        }    
     }
 
 }
@@ -568,7 +628,6 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
         // Scroll Box Up!
 
     }
-
     
     std::cout << "=========w max " << m_text_box_width << ", lft " << m_text_box_left << std::endl;
     std::cout << "=========h max " << m_text_box_height << ", top " << m_text_box_top << std::endl;
@@ -592,10 +651,15 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
     // This is required to move up to the previous line
     // Then clear the char in the spot we just occipied.
     if (m_text_process->isDoubleBackSpace()) {
-        std::cout << "isDoubleBackSpace max_chars=" << m_text_process->getMaxCharactersPerLine() << std::endl;        
+        
+        std::string default_text_color = getDisplayPromptRaw(DEFAULT_TEXT_COLORS);
+        std::string backspace_color = getDisplayPromptRaw(BACKSPACE_TEXT_COLORS);
+    
+        m_log.write<Logging::DEBUG_LOG>("isDoubleBackSpace max_chars=", m_text_process->getMaxCharactersPerLine());
+        
         if (m_text_process->getMaxCharactersPerLine() == m_text_process->getXPosition()) 
         {
-            output += " \x1b[D"; // clear the current position
+            output += backspace_color + " \x1b[D" + default_text_color; // clear the current position
             // TODO Probably need to clear buffer at this spot to for current position.
         }        
         m_text_process->setDoubleBackSpace(false);

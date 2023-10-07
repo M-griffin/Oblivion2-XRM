@@ -176,7 +176,7 @@ void MessageAreaDao::fillMessageAreaColumnValues(query_ptr qry, message_area_ptr
 std::string MessageAreaDao::insertMessageAreaQryString(std::string qry, message_area_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->sName.c_str(),
                                          obj->sAcsAccess.c_str(),
                                          obj->sAcsPost.c_str(),
@@ -195,7 +195,9 @@ std::string MessageAreaDao::insertMessageAreaQryString(std::string qry, message_
                                          obj->iSortOrder
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -207,7 +209,7 @@ std::string MessageAreaDao::insertMessageAreaQryString(std::string qry, message_
 std::string MessageAreaDao::updateMessageAreaQryString(std::string qry, message_area_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->sName.c_str(),
                                          obj->sAcsAccess.c_str(),
                                          obj->sAcsPost.c_str(),
@@ -227,7 +229,9 @@ std::string MessageAreaDao::updateMessageAreaQryString(std::string qry, message_
                                          obj->iId
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 
@@ -244,14 +248,14 @@ std::string MessageAreaDao::updateMessageAreaQryString(std::string qry, message_
  */
 std::vector<message_area_ptr> MessageAreaDao::getAllMessageAreasByConference(long id)
 {
-    Logging *log = Logging::instance();
+    Logging &log = Logging::getInstance();
     message_area_ptr area(new MessageArea);
     std::vector<message_area_ptr> list;
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
+        log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
         return list;
     }
 
@@ -260,12 +264,14 @@ std::vector<message_area_ptr> MessageAreaDao::getAllMessageAreasByConference(lon
 
     if(!qry->isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__, __LINE__);
+        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__, __LINE__);
         return list;
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT a.* FROM %Q a, Grouping g WHERE g.iConferenceId = %ld AND a.iID = g.iMsgAreaId;", m_strTableName.c_str(), id);
+    char *result = sqlite3_mprintf("SELECT a.* FROM %Q a, Grouping g WHERE g.iConferenceId = %ld AND a.iID = g.iMsgAreaId;", m_strTableName.c_str(), id);
+    std::string queryString(result);
+    sqlite3_free(result);
 
     // Execute Query.
     if(qry->getResult(queryString))
@@ -283,12 +289,12 @@ std::vector<message_area_ptr> MessageAreaDao::getAllMessageAreasByConference(lon
         }
         else
         {
-            log->write<Logging::ERROR_LOG>("Error, getAllMessageAreasByConference Returned Rows", rows, m_strTableName, __FILE__, __LINE__);
+            log.write<Logging::ERROR_LOG>("Error, getAllMessageAreasByConference Returned Rows", rows, m_strTableName, __FILE__, __LINE__);
         }
     }
     else
     {
-        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __FILE__, __LINE__);
+        log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __FILE__, __LINE__);
     }
 
     return list;

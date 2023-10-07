@@ -17,6 +17,9 @@ Docker Image Creation and Run Guide
      - Update Notes
    * - 05/21/2022
      - Initial Guide in .RST format
+   * - 10/07/2023
+     - Optimized Image Size and built time, removed menu prompt and menu conversion builds, along with unit tests
+     - Since this is a high level development preview no need for all of the extras right now.
 
 .. important:: Latest Tested in Windows 10 64 bit Docker with Linux Containers.
 
@@ -102,13 +105,13 @@ You'll find the main ``xrm-server.yaml`` configuration file with other data file
 ::
 
   ./xrm-server              - to start the bbs
-  ./xrm-unittest            - to run the unit tests
+  ./xrm-unittest            - to run the unit tests (Temp Disabled or Excluded from the Build Process)
 
 **Helper Applications** Only used if you are converting legacy items or mods.
 ::
 
-  ./xrm-menu-convert        - convert Legacy Obv/2 menus to yaml
-  ./xrm-menu-prompt-convert - convert Legacy Obv/2 prompts to yaml
+  ./xrm-menu-convert        - convert Legacy Obv/2 menus to yaml   (Temp Disabled or Excluded from the Build Process)
+  ./xrm-menu-prompt-convert - convert Legacy Obv/2 prompts to yaml (Temp Disabled or Excluded from the Build Process)
 
 .. note:: Converters only tested on default Menu's and prompt files. Should work for menu and prompt mods too.
 

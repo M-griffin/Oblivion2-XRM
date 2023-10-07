@@ -245,7 +245,7 @@ void UsersDao::fillUsersColumnValues(query_ptr qry, user_ptr obj, std::vector< s
 std::string UsersDao::insertUsersQryString(std::string qry, user_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->sHandle.c_str(),
                                          obj->sRealName.c_str(),
                                          obj->sAddress.c_str(),
@@ -298,7 +298,9 @@ std::string UsersDao::insertUsersQryString(std::string qry, user_ptr obj)
                                          obj->iSecurityIndex
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -310,7 +312,7 @@ std::string UsersDao::insertUsersQryString(std::string qry, user_ptr obj)
 std::string UsersDao::updateUsersQryString(std::string qry, user_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->sHandle.c_str(),
                                          obj->sRealName.c_str(),
                                          obj->sAddress.c_str(),
@@ -364,7 +366,9 @@ std::string UsersDao::updateUsersQryString(std::string qry, user_ptr obj)
                                          obj->iId
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 
@@ -380,13 +384,12 @@ std::string UsersDao::updateUsersQryString(std::string qry, user_ptr obj)
  */
 user_ptr UsersDao::getUserByHandle(std::string name)
 {
-    Logging *log = Logging::instance();
     user_ptr user(new Users);
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return user;
     }
 
@@ -395,13 +398,16 @@ user_ptr UsersDao::getUserByHandle(std::string name)
 
     if(!qry->isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return user;
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sHandle = %Q; COLLATE NOCASE;",
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE sHandle = %Q; COLLATE NOCASE;",
                               m_strTableName.c_str(), name.c_str());
+                              
+    std::string queryString(result);
+    sqlite3_free(result);
 
     // Execute Query.
     if(qry->getResult(queryString))
@@ -415,12 +421,12 @@ user_ptr UsersDao::getUserByHandle(std::string name)
         }
         else
         {
-            log->write<Logging::INFO_LOG>("NotFound, getUserByHandle Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
+            m_log.write<Logging::INFO_LOG>("NotFound, getUserByHandle Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return user;
@@ -432,13 +438,12 @@ user_ptr UsersDao::getUserByHandle(std::string name)
  */
 user_ptr UsersDao::getUserByRealName(std::string name)
 {
-    Logging *log = Logging::instance();
     user_ptr user(new Users);
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return user;
     }
 
@@ -447,14 +452,17 @@ user_ptr UsersDao::getUserByRealName(std::string name)
 
     if(!qry->isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return user;
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sRealName = %Q COLLATE NOCASE;",
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE sRealName = %Q COLLATE NOCASE;",
                               m_strTableName.c_str(), name.c_str());
 
+    std::string queryString(result);
+    sqlite3_free(result);
+    
     // Execute Query.
     if(qry->getResult(queryString))
     {
@@ -467,12 +475,12 @@ user_ptr UsersDao::getUserByRealName(std::string name)
         }
         else
         {
-            log->write<Logging::INFO_LOG>("Notfound, getUserByRealName Returned Rows", rows, m_strTableName, __LINE__, __FILE__);
+            m_log.write<Logging::INFO_LOG>("Notfound, getUserByRealName Returned Rows", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return user;
@@ -484,13 +492,12 @@ user_ptr UsersDao::getUserByRealName(std::string name)
  */
 user_ptr UsersDao::getUserByEmail(std::string email)
 {
-    Logging *log = Logging::instance();
     user_ptr user(new Users);
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return user;
     }
 
@@ -499,14 +506,17 @@ user_ptr UsersDao::getUserByEmail(std::string email)
 
     if(!qry->isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return user;
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sEmail = %Q COLLATE NOCASE;",
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE sEmail = %Q COLLATE NOCASE;",
                               m_strTableName.c_str(), email.c_str());
 
+    std::string queryString(result);
+    sqlite3_free(result);
+    
     // create a test3 table
     if(qry->getResult(queryString))
     {
@@ -519,12 +529,12 @@ user_ptr UsersDao::getUserByEmail(std::string email)
         }
         else
         {
-            log->write<Logging::INFO_LOG>("Notfound, getUserByEmail Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
+            m_log.write<Logging::INFO_LOG>("Notfound, getUserByEmail Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return user;
@@ -536,14 +546,13 @@ user_ptr UsersDao::getUserByEmail(std::string email)
  */
 std::vector<user_ptr> UsersDao::getUsersByWildcard(std::string filter)
 {
-    Logging *log = Logging::instance();
     user_ptr obj(new Users());
     std::vector<user_ptr> list;
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -552,7 +561,7 @@ std::vector<user_ptr> UsersDao::getUsersByWildcard(std::string filter)
 
     if(!qry->isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -560,9 +569,12 @@ std::vector<user_ptr> UsersDao::getUsersByWildcard(std::string filter)
     std::replace(filter.begin(), filter.end(), '*', '%');
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sHandle like %Q ORDER BY sHandle COLLATE NOCASE asc;",
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE sHandle like %Q ORDER BY sHandle COLLATE NOCASE asc;",
                               m_strTableName.c_str(), filter.c_str());
 
+    std::string queryString(result);
+    sqlite3_free(result);
+    
     // Execute Query.
     if(qry->getResult(queryString))
     {
@@ -579,12 +591,12 @@ std::vector<user_ptr> UsersDao::getUsersByWildcard(std::string filter)
         }
         else
         {
-            log->write<Logging::INFO_LOG>("Notfound, getUsersByWildcard Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
+            m_log.write<Logging::INFO_LOG>("Notfound, getUsersByWildcard Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return list;

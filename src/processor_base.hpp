@@ -1,33 +1,15 @@
 #ifndef PROCESSOR_BASE_HPP
 #define PROCESSOR_BASE_HPP
 
+#include <iostream>
 #include <memory>
 #include <stdint.h>
 #include <string>
-#include <vector>
 #include <map>
 
-/**
- * @class ScreenPixel
- * @author Michael Griffin
- * @date 10/8/2015
- * @file ansi_processor.hpp
- * @brief Managers Characters and their attributes
- */
-typedef struct ScreenPixel
-{
-    std::string char_sequence;
-    int x_position;
-    int y_position;
-    int attribute;
-    int foreground;
-    int background;
-    int selected_attribute;
-    int selected_foreground;
-    int selected_background;
 
-} ScreenPixel;
-
+class ScreenPixel;
+class Logging;
 
 /**
  * @class ProcessorBase
@@ -40,7 +22,10 @@ class ProcessorBase
 {
 public:
 
-    virtual ~ProcessorBase() { };
+    ProcessorBase(int term_height, int term_width);
+    virtual ~ProcessorBase() 
+    { 
+    }
 
     // Process Build strings from pull_down array.
     virtual std::string buildPullDownBars(int pulldown_id, bool active) = 0;
@@ -88,83 +73,29 @@ public:
 
     // Process ANSI screen inserts into the Screen Buffer
     virtual void parseTextToBuffer(char *buff) = 0;
+    
+    Logging     &m_log; 
+    std::string  m_ansi_output;
 
-    // Helpers
-    int getYPosition() const
-    {
-        return m_y_position;
-    }
-    int getXPosition() const
-    {
-        return m_x_position;
-    }
-    int getMaxLines() const
-    {
-        return m_number_lines;
-    }
-    std::map<int, int> getLineEndingMap() const
-    {
-        return m_line_ending_map;
-    }
+    bool         m_is_screen_cleared;
+    bool         m_is_line_wrapping;
 
-    /**
-     * @brief ProcessorBase Constructor
-     * @param term_height
-     * @param term_width
-     * @return
-     */
-    ProcessorBase(int term_height, int term_width)
-        : m_ansi_output("")
-        , m_is_screen_cleared(false)
-        , m_is_line_wrapping(false)
-        , m_position(0)
-        , m_y_position(1)
-        , m_number_lines(term_height)
-        , m_characters_per_line(term_width)
-        , m_x_position(1)
-        , m_max_x_position(1)
-        , m_max_y_position(1)
-        , m_center_ansi_output(false)
-        , m_saved_cursor_x(1)
-        , m_saved_cursor_y(1)
-        , m_attribute(0)
-        , m_saved_attribute(0)
-        , m_saved_foreground(FG_WHITE)
-        , m_saved_background(BG_BLACK)
-        , m_foreground_color(FG_WHITE)
-        , m_background_color(BG_BLACK)
-        , m_screen_pixel()
-    {
-        m_screen_buffer.reserve(m_number_lines * m_characters_per_line);
-        m_screen_buffer.resize(m_number_lines * m_characters_per_line);
-    }
-
-    std::string m_ansi_output;
-
-    bool m_is_screen_cleared;
-    bool m_is_line_wrapping;
-
-    int m_position;
-    int m_y_position;
-    int m_number_lines;             // TERM Height
-    int m_characters_per_line;      // TERM Width
-    int m_x_position;
-    int m_max_x_position;
-    int m_max_y_position;
-    int m_center_ansi_output;
-    int m_saved_cursor_x;
-    int m_saved_cursor_y;
-    int m_attribute;
-    int m_saved_attribute;
-    int m_saved_foreground;
-    int m_saved_background;
-    int m_foreground_color;
-    int m_background_color;
-
-    ScreenPixel                m_screen_pixel;
-    std::vector <ScreenPixel>  m_screen_buffer;
-    std::map<int, ScreenPixel> m_pull_down_options;
-    std::map<int, int>         m_line_ending_map;
+    int          m_position;
+    int          m_y_position;
+    int          m_number_lines;             // TERM Height
+    int          m_characters_per_line;      // TERM Width
+    int          m_x_position;
+    int          m_max_x_position;
+    int          m_max_y_position;
+    int          m_center_ansi_output;
+    int          m_saved_cursor_x;
+    int          m_saved_cursor_y;
+    int          m_attribute;
+    int          m_saved_attribute;
+    int          m_saved_foreground;
+    int          m_saved_background;
+    int          m_foreground_color;
+    int          m_background_color;    
 
     // ANSI escape sequences
     enum
@@ -197,7 +128,7 @@ public:
         REVERSE_VIDEO_ON   = 7,
         CONCEALED_ON       = 8,
 
-        // Foreground Colors
+        // Standard Foreground Colors
         FG_BLACK           = 30,
         FG_RED             = 31,
         FG_GREEN           = 32,
@@ -206,6 +137,17 @@ public:
         FG_MAGENTA         = 35,
         FG_CYAN            = 36,
         FG_WHITE           = 37,
+        FG_DEFAULT         = 38,
+        
+        // high intensity colors
+        FGH_BLACK          = 90,
+        FGH_RED            = 91,
+        FGH_GREEN          = 92,
+        FGH_YELLOW         = 93,
+        FGH_BLUE           = 94,
+        FGH_MAGENTA        = 95,
+        FGH_CYAN           = 96,
+        FGH_WHITE          = 97,
 
         // Background Colors
         BG_BLACK           = 40,
@@ -217,6 +159,11 @@ public:
         BG_CYAN            = 46,
         BG_WHITE           = 47
     };
+    
+    // Helpers
+    int getYPosition() const;
+    int getXPosition() const;
+    int getMaxLines() const;
 
 };
 

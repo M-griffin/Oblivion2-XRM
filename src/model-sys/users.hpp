@@ -6,8 +6,6 @@
 #include <cstdint>
 #include <memory>
 
-class Users;
-typedef std::shared_ptr<Users> user_ptr;
 
 /**
  * @class Users
@@ -130,5 +128,7 @@ public:
 
 };
 
+
+typedef std::shared_ptr<Users> user_ptr;
 
 #endif // USERS_HPP

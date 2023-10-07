@@ -3,16 +3,11 @@
 
 #include "mod_base.hpp"
 
+#include <iostream>
 #include <string>
 #include <memory>
 #include <functional>
 #include <vector>
-
-class SessionData;
-typedef std::shared_ptr<SessionData> session_data_ptr;
-
-class ProcessorAnsi;
-typedef std::shared_ptr<ProcessorAnsi> processor_ansi_ptr;
 
 class ProcessorText;
 typedef std::shared_ptr<ProcessorText> processor_text_ptr;
@@ -28,42 +23,8 @@ class ModMessageEditor
     : public ModBase
 {
 public:
-    ModMessageEditor(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-        : ModBase(session_data, config, ansi_process)
-        , m_session_io(session_data)
-        , m_filename("mod_message_editor.yaml")
-        , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
-        , m_text_process(nullptr)
-        , m_mod_function_index(MOD_PROMPT)
-        , m_mod_setup_index(MOD_DISPLAY_EDITOR)
-        , m_mod_user_state_index(MOD_FSE_INPUT)
-        , m_failure_attempts(0)
-        , m_is_text_prompt_exist(false)
-
-          // Later on default to 1, and screen width!!!
-        , m_text_box_top(0)
-        , m_text_box_bottom(24)
-        , m_text_box_left(0)
-        , m_text_box_right(80)
-        , m_text_box_height(0)
-        , m_text_box_width(0)
-
-    {
-        // Push function pointers to the stack.
-        m_setup_functions.push_back(std::bind(&ModMessageEditor::setupEditor, this));
-        m_mod_functions.push_back(std::bind(&ModMessageEditor::editorInput, this, std::placeholders::_1));
-
-        // Check of the Text Prompts exist.
-        m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
-
-        if(!m_is_text_prompt_exist)
-        {
-            createTextPrompts();
-        }
-
-        // Loads all Text Prompts for current module
-        m_text_prompts_dao->readPrompts();
-    }
+    ModMessageEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModMessageEditor() override
     {
@@ -100,7 +61,11 @@ public:
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
-    const std::string PROMPT_HEADER = "header";
+    const std::string DEFAULT_TEXT_COLORS = "default_text_colors";
+    const std::string BACKSPACE_TEXT_COLORS = "backspace_text_colors";
+    const std::string SELECTED_TEXT_COLORS = "selected_text_colors";
+
+    // Not Used yet.
     const std::string PROMPT_INPUT_TEXT = "input_text";
     const std::string PROMPT_INVALID = "invalid_input";
 
@@ -264,9 +229,6 @@ private:
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
-
-    SessionIO              m_session_io;
-    std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
     processor_text_ptr     m_text_process;
 
@@ -281,8 +243,6 @@ private:
     int                    m_text_box_right;
     int                    m_text_box_height;
     int                    m_text_box_width;
-
-    CommonIO               m_common_io;
 
 };
 

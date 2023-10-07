@@ -3,25 +3,15 @@
 
 #include "mod_base.hpp"
 
-
-#include "../model-sys/structures.hpp"
-#include "../data-sys/text_prompts_dao.hpp"
-
-#include "../session_data.hpp"
-#include "../session_io.hpp"
-#include "../deadline_timer.hpp"
-
+#include <iostream>
+#include <string>
 #include <memory>
 #include <vector>
 #include <functional>
 
-class Config;
-typedef std::shared_ptr<Config> config_ptr;
+class DeadlineTimer;
+typedef std::shared_ptr<DeadlineTimer> deadline_timer_ptr;
 
-class ProcessorAnsi;
-typedef std::shared_ptr<ProcessorAnsi> processor_ansi_ptr;
-
-//using std::asio::deadline_timer;
 
 /**
  * @class ModPreLogin
@@ -35,50 +25,8 @@ class ModPreLogon
     , public ModBase
 {
 public:
-    ModPreLogon(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-        : ModBase(session_data, config, ansi_process)
-        , m_session_io(session_data)
-        , m_filename("mod_prelogon.yaml")
-        , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
-        , m_deadline_timer(new DeadlineTimer())
-        , m_mod_function_index(MOD_DETECT_EMULATION)
-        , m_is_text_prompt_exist(false)
-        , m_is_esc_detected(false)
-        , m_input_buffer("")
-        , m_x_position(0)
-        , m_y_position(0)
-        , m_term_type("undetected")
-    {
-        // Push function pointers to the stack.
-        m_setup_functions.push_back(std::bind(&ModPreLogon::setupEmulationDetection, this));
-        m_setup_functions.push_back(std::bind(&ModPreLogon::setupAskANSIColor, this));
-        m_setup_functions.push_back(std::bind(&ModPreLogon::setupAskCodePage, this));
-
-        m_mod_functions.push_back(std::bind(&ModPreLogon::emulationDetection, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModPreLogon::askANSIColor, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModPreLogon::askCodePage, this, std::placeholders::_1));
-
-        // Check of the Text Prompts exist.
-        m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
-
-        if(!m_is_text_prompt_exist)
-        {
-            createTextPrompts();
-        }
-
-        // Loads all Text Prompts for current module
-        m_text_prompts_dao->readPrompts();
-
-        // On Initial Startup, setup user record with system colors for menu system
-        // this is overwritten once the user logs in, otherwise the menu system
-        // will use these defaults for theming.
-        session_data->m_user_record->sRegColor = m_config->default_color_regular;
-        session_data->m_user_record->sPromptColor = m_config->default_color_prompt;
-        session_data->m_user_record->sInputColor = m_config->default_color_input;
-        session_data->m_user_record->sInverseColor = m_config->default_color_inverse;
-        session_data->m_user_record->sStatColor = m_config->default_color_stat;
-        session_data->m_user_record->sBoxColor = m_config->default_color_box;
-    }
+    ModPreLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModPreLogon() override
     {
@@ -93,12 +41,17 @@ public:
     // This matches the index for and key for setup -> mod_functions.push_back
     enum
     {
+        MOD_HUMAN_SHIELD,
         MOD_DETECT_EMULATION,
         MOD_ASK_ANSI_COLOR,
         MOD_ASK_CODEPAGE
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
+    const std::string PROMPT_HUMAN_SHIELD = "human_shield";
+    const std::string PROMPT_HUMAN_SHIELD_SUCCESS = "human_shield_success";
+    const std::string PROMPT_HUMAN_SHIELD_FAIL = "human_shield_fail";
+    
     const std::string PROMPT_DETECT_EMULATION = "detect_emu";
     const std::string PROMPT_DETECTED_ANSI = "detected_ansi";
     const std::string PROMPT_DETECTED_NONE = "detected_none";
@@ -140,12 +93,24 @@ public:
      * @param prompt
      */
     void displayPrompt(const std::string &prompt);
+    
+    /**
+     * @brief Pull and Display Prompts, Then Disconnect
+     * @param prompt
+     */
+    void displayPromptThenDisconnect(const std::string &prompt);
 
     /**
      * @brief Pull and Display Prompts with following newline
      * @param prompt
      */
     void displayPromptAndNewLine(const std::string &prompt);
+
+    /**
+     * @brief Startup Human Shield, ESC Twice detection.
+     * @return
+     */
+    void setupHumanShield();
 
     /**
      * @brief Start ANSI ESC[6n ANSI Detection
@@ -181,26 +146,32 @@ public:
      */
 
     /**
+     * @brief Start ESC Twice Timer
+     */
+    void startHumanShieldTimer();
+
+    /**
+     * @brief Deadline Detection Timer ESC Twice
+     * @param timer
+     */
+    void handleHumanShieldTimer();
+    
+    /**
+     * @brief ESC Twice Completed
+     * @return
+     */
+    void humanShieldCompleted();
+
+    /**
      * @brief Start ANSI Detection timer
      */
-    void startDetectionTimer()
-    {
-        // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences responses
-        m_deadline_timer->setWaitInMilliseconds(1500);
-        m_deadline_timer->asyncWait(
-            std::bind(&ModPreLogon::handleDetectionTimer, shared_from_this())
-        );
-    }
+    void startDetectionTimer();
 
     /**
      * @brief Deadline Detection Timer for ANSI Detection
      * @param timer
      */
-    void handleDetectionTimer()
-    {
-        // Jump to Emulation completed.
-        emulationCompleted();
-    }
+    void handleDetectionTimer();
 
     /**
      * @brief After Emulation Detection is completed
@@ -209,7 +180,13 @@ public:
     void emulationCompleted();
 
 private:
-
+    
+    /**
+     * @brief Were Detecting ESC Twice Here.
+     * @return
+     */
+    bool humanShieldDetection(const std::string &input);
+    
     /**
      * @brief Detect ANSI Emulation
      * @return
@@ -228,23 +205,22 @@ private:
      */
     bool askCodePage(const std::string &input);
 
-    // Function Input Vector.
-    std::vector<std::function< void()> >                    m_setup_functions;
-    std::vector<std::function< void(const std::string &)> > m_mod_functions;
-
-
-    SessionIO              m_session_io;
-    std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
     deadline_timer_ptr     m_deadline_timer;
 
     int                    m_mod_function_index;
     bool                   m_is_text_prompt_exist;
     bool                   m_is_esc_detected;
+    bool                   m_is_human_shield;
     std::string            m_input_buffer;
     int                    m_x_position;
     int                    m_y_position;
     std::string            m_term_type;
+    std::string            m_esc_sequence;
+    
+    // Function Input Vector.
+    std::vector<std::function< void()> >                    m_setup_functions;
+    std::vector<std::function< void(const std::string &)> > m_mod_functions;
 };
 
 #endif // MOD_PRELOGON_HPP

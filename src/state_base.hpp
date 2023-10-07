@@ -1,11 +1,12 @@
 #ifndef THE_STATE_HPP
 #define THE_STATE_HPP
 
-#include "session_data.hpp"
-
 #include <memory>
 #include <iostream>
 #include <string>
+
+class Session;
+typedef std::shared_ptr<Session> session_ptr;
 
 /**
  * @class StateBase
@@ -20,6 +21,7 @@ public:
 
     virtual ~StateBase()
     {
+        m_session_data.reset();        
     }
     virtual void update(const std::string &character_buffer, const bool &is_utf8)  = 0;
     virtual bool onEnter() = 0;
@@ -27,14 +29,14 @@ public:
     virtual void resume() {}
     virtual std::string getStateID() const = 0;
 
-    explicit StateBase(session_data_ptr session_data)
+    explicit StateBase(session_ptr session_data)
         : m_session_data(session_data)
         , m_is_active(false)
-    { }
+    {}
 
     // This holds session data passed to each session.
-    session_data_ptr m_session_data;
-    bool             m_is_active;
+    session_ptr  m_session_data;
+    bool         m_is_active;
 
 };
 

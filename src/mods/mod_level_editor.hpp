@@ -3,6 +3,7 @@
 
 #include "mod_base.hpp"
 
+#include <iostream>
 #include <functional>
 #include <memory>
 #include <string>
@@ -10,9 +11,6 @@
 
 class AccessLevel;
 typedef std::shared_ptr<AccessLevel> access_level_ptr;
-
-class SessionData;
-typedef std::shared_ptr<SessionData> session_data_ptr;
 
 /**
  * @class ModLevelEditor
@@ -24,44 +22,8 @@ typedef std::shared_ptr<SessionData> session_data_ptr;
 class ModLevelEditor : public ModBase
 {
 public:
-    ModLevelEditor(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-        : ModBase(session_data, config, ansi_process)
-        , m_session_io(session_data)
-        , m_filename("mod_level_editor.yaml")
-        , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
-        , m_mod_setup_index(MOD_DISPLAY_LEVEL)
-        , m_mod_function_index(MOD_LEVEL_INPUT)
-        , m_mod_level_state_index(LEVEL_ADD)
-        , m_is_text_prompt_exist(false)
-        , m_page(0)
-        , m_rows_per_page(0)
-        , m_current_level(0)
-        , m_current_field(0)
-    {
-        // Setup Modules
-        m_setup_functions.push_back(std::bind(&ModLevelEditor::setupLevelEditor, this));
-        m_setup_functions.push_back(std::bind(&ModLevelEditor::setupLevelEditFields, this));
-
-        // Input or Method Modules that handle incoming input per state.
-        m_mod_functions.push_back(std::bind(&ModLevelEditor::levelEditorInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModLevelEditor::levelEditorPausedInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModLevelEditor::levelEditorLevelInput, this, std::placeholders::_1));
-
-        // Menu Field Input Commands
-        m_mod_functions.push_back(std::bind(&ModLevelEditor::levelEditorLevelFieldInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModLevelEditor::levelEditorLevelFieldHandler, this, std::placeholders::_1));
-
-        // Check of the Text Prompts exist.
-        m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
-
-        if(!m_is_text_prompt_exist)
-        {
-            createTextPrompts();
-        }
-
-        // Loads all Text Prompts for current module
-        m_text_prompts_dao->readPrompts();
-    }
+    ModLevelEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, 
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModLevelEditor() override
     {
@@ -350,8 +312,6 @@ private:
     std::vector<std::string>                             m_level_display_list;
     std::vector<access_level_ptr>                        m_loaded_levels;
 
-    SessionIO            m_session_io;
-    std::string          m_filename;
     text_prompts_dao_ptr m_text_prompts_dao;
 
     unsigned int         m_mod_setup_index;
@@ -363,8 +323,6 @@ private:
     unsigned int         m_rows_per_page;
     int                  m_current_level;
     unsigned int         m_current_field;
-
-    CommonIO             m_common_io;
 };
 
 #endif // MOD_LEVEL_EDITOR_HPP

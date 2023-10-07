@@ -1,15 +1,14 @@
 #ifndef DEADLINE_TIMER_HPP
 #define DEADLINE_TIMER_HPP
 
-#include "communicator.hpp"
+#include "logging.hpp"
 
 #include <iostream>
-#include <future>
 #include <thread>
 #include <chrono>
 #include <memory>
 #include <functional>
-
+#include <atomic>
 
 /**
  * @class DeadlineTimer
@@ -22,21 +21,22 @@ class DeadlineTimer
 {
 public:
     explicit DeadlineTimer()
-        : m_expires_from_now(0)
-        , m_cancellation_token(false)
+        : m_log(Logging::getInstance())
+        , m_expires_from_now(0)
+        , m_num_instances (0)
     {
     }
 
     ~DeadlineTimer()
     {
-        std::vector<std::future<void>>().swap(m_future_list);
+        m_log.write<Logging::DEBUG_LOG>("~DeadlineTimer()");
     }
 
     typedef std::function<void(int)> StdFuncationCallBack;
 
-    int m_expires_from_now;
-    std::atomic_bool m_cancellation_token;
-    std::vector<std::future<void>> m_future_list;
+    Logging         &m_log;
+    int              m_expires_from_now;
+    std::atomic_int  m_num_instances;
 
     /**
      * @brief Sets the waiting period for the timer.
@@ -49,49 +49,42 @@ public:
 
     /**
      * @brief Async Non-Block Wait (MilliSeconds) with Callback
-     * @param callback
+     * @param callback_method
      */
     template <typename Callback>
-    void asyncWait(const Callback &callback)
+    void asyncWait(const Callback &callback_method)
     {
-        int i = m_expires_from_now;
-        //std::atomic_bool cancel = &m_cancellation_token;
-        // If one exist, remove and re-create it.
-        checkAsyncClean();
+        // Values Passed to the Thread that don't change.
+        int i = m_expires_from_now;      
+        int c = m_num_instances +1;
 
-        // Add to container to keep in an active scope
-        m_future_list.emplace_back(
-            std::async(std::launch::async, [i, callback, this]()
+        // Add to container to keep in an active scope        
+        std::thread time_thread([i, c, callback_method, this]()
         {
+            m_num_instances += 1;
+            
             std::this_thread::sleep_for(std::chrono::milliseconds(i));
-            StdFuncationCallBack fun_callback(callback);
+            StdFuncationCallBack fun_callback(callback_method);
 
-            // If not Canceled, Execute CallBack with a default status, update lateron
-            // Cancel seems to still execute, but i'm thinking we still need to execute
-            // On Double ESC's HITS.
-            if(!m_cancellation_token)
-            {
+            // If Current Instance is the 
+            // If overwrritten we'll have (2) instances, ignore the first.
+            if(m_num_instances == 1)
+            {                
+                m_log.write<Logging::DEBUG_LOG>("DeadlineTimer() Executing CallBack", 
+                    "NumInstances=", (int)m_num_instances, "CurrInstance=", (int)c);
                 fun_callback(0);
             }
-        })
-        );
-    }
-
-    /**
-     * @brief Clean any unfinished, or cancels on overwrites with new.
-     */
-    void checkAsyncClean()
-    {
-        if(m_future_list.size() > 0)
-        {
-            m_cancellation_token = true;
-            m_future_list.pop_back();
-            m_cancellation_token = false;
-        }
-        else
-        {
-            m_cancellation_token = false;
-        }
+            else
+            {
+                m_log.write<Logging::DEBUG_LOG>("DeadlineTimer() Cancled CallBack", 
+                    "NumInstances=", (int)m_num_instances, "CurrInstance=", (int)c);
+            }
+            
+            m_num_instances -= 1;
+        });
+        
+        // Detach so there is no hold on the thread.
+        time_thread.detach();
     }
 
     /**
@@ -105,5 +98,6 @@ public:
 };
 
 typedef std::shared_ptr<DeadlineTimer> deadline_timer_ptr;
+typedef std::unique_ptr<DeadlineTimer> deadline_timer_uptr;
 
 #endif // DEADLINE_TIMER_HPP

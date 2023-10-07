@@ -44,8 +44,6 @@ std::string GLOBAL_MENU_PROMPT_PATH = "";
 std::string GLOBAL_TEXTFILE_PATH = "";
 std::string GLOBAL_LOG_PATH = "";
 
-Logging* Logging::m_global_logging_instance = nullptr;
-
 
 /**
  * @class MenuConvert
@@ -204,7 +202,7 @@ void MenuPromptConvert::readMenuAllPrompts()
 auto main() -> int
 {
     std::cout << "Oblivion/2 XRM Server - Legacy to XRM Menu Prompt Converter" << std::endl;
-    std::cout << "(c) 2015-2019 Michael Griffin." << std::endl << std::endl;
+    std::cout << "(c) 2015-2023 Michael Griffin." << std::endl << std::endl;
     std::cout << "Important, you must run this from the root directory," << std::endl;
     std::cout << "Otherwise you can set the OBV2 environment variable." << std::endl << std::endl;
 
@@ -236,20 +234,12 @@ auto main() -> int
         if(!cfg.fileExists())
         {
             std::cout << "Unable to locate xrm-config.yaml, you must run this from root bbs directory." << std::endl;
-            Logging::releaseInstance();
-            //Encoding::releaseInstance();
-            TheCommunicator::releaseInstance();
-
             exit(1);
         }
     }
     catch(std::exception& e)
     {
         std::cout << "Unable to load configuration in bbs root." << std::endl;
-
-        Logging::releaseInstance();
-        //Encoding::releaseInstance();
-        TheCommunicator::releaseInstance();
         exit(2);
     }
 
@@ -267,15 +257,8 @@ auto main() -> int
     {
         std::cout << "Exception: Unable to process menus." << std::endl;
         std::cout << e.what() << std::endl;
-        Logging::releaseInstance();
-        //Encoding::releaseInstance();
-        TheCommunicator::releaseInstance();
         exit(3);
     }
-
-    Logging::releaseInstance();
-    //Encoding::releaseInstance();
-    TheCommunicator::releaseInstance();
 
     return 0;
 }

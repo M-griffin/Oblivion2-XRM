@@ -169,7 +169,7 @@ void FileAreaDao::fillFileAreaColumnValues(query_ptr qry, file_area_ptr obj,
 std::string FileAreaDao::insertFileAreaQryString(std::string qry, file_area_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->sName.c_str(),
                                          obj->sAcsAccess.c_str(),
                                          obj->sAcsUpload.c_str(),
@@ -184,7 +184,9 @@ std::string FileAreaDao::insertFileAreaQryString(std::string qry, file_area_ptr 
                                          obj->iSortOrder
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -196,7 +198,7 @@ std::string FileAreaDao::insertFileAreaQryString(std::string qry, file_area_ptr 
 std::string FileAreaDao::updateFileAreaQryString(std::string qry, file_area_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->sName.c_str(),
                                          obj->sAcsAccess.c_str(),
                                          obj->sAcsUpload.c_str(),
@@ -212,7 +214,9 @@ std::string FileAreaDao::updateFileAreaQryString(std::string qry, file_area_ptr 
                                          obj->iId
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 
@@ -229,14 +233,14 @@ std::string FileAreaDao::updateFileAreaQryString(std::string qry, file_area_ptr 
  */
 std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(long id)
 {
-    Logging *log = Logging::instance();
+    Logging &log = Logging::getInstance();
     file_area_ptr area(new FileArea);
     std::vector<file_area_ptr> list;
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -245,12 +249,14 @@ std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(long id)
 
     if(!qry->isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT a.* FROM %Q a, Grouping g WHERE g.iConferenceId = %ld AND a.iID = g.iFileAreaId;", m_strTableName.c_str(), id);
+    char *result = sqlite3_mprintf("SELECT a.* FROM %Q a, Grouping g WHERE g.iConferenceId = %ld AND a.iID = g.iFileAreaId;", m_strTableName.c_str(), id);
+    std::string queryString(result);
+    sqlite3_free(result);
 
     // Execute Query.
     if(qry->getResult(queryString))
@@ -268,12 +274,12 @@ std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(long id)
         }
         else
         {
-            log->write<Logging::ERROR_LOG>("Error, getAllFileAreasByConference Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
+            log.write<Logging::ERROR_LOG>("Error, getAllFileAreasByConference Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return list;

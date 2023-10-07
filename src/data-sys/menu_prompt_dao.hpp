@@ -5,6 +5,7 @@
 #include <string>
 #include <mutex>
 
+class Logging;
 
 class MenuPrompt;
 typedef std::shared_ptr<MenuPrompt> menu_prompt_ptr;
@@ -72,10 +73,11 @@ public:
 		return nullptr;
     }
 
-    menu_prompt_ptr m_menu_prompt;
-    std::string m_path;
-    std::string m_filename;
-    std::mutex  m;
+    Logging         &m_log;
+    menu_prompt_ptr  m_menu_prompt;
+    std::string      m_path;
+    std::string      m_filename;
+    std::mutex       m;
 
 };
 

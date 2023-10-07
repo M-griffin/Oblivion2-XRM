@@ -1,13 +1,8 @@
 #ifndef MENUBASE_HPP
 #define MENUBASE_HPP
 
-#include "session_io.hpp"
-#include "common_io.hpp"
-#include "session_data.hpp"
-#include "processor_ansi.hpp"
-#include "communicator.hpp"
-
 #include "model-sys/struct_compat.hpp"
+#include "model-sys/structures.hpp"
 #include "model-sys/menu.hpp"
 #include "model-sys/menu_prompt.hpp"
 
@@ -19,11 +14,19 @@
 #include <functional>
 #include <vector>
 
+class Logging;
+
 class Config;
 typedef std::shared_ptr<Config> config_ptr;
 
-class SessionData;
-typedef std::shared_ptr<SessionData> session_data_ptr;
+class Session;
+typedef std::shared_ptr<Session> session_ptr;
+
+class SessionIO;
+typedef std::shared_ptr<SessionIO> session_io_ptr;
+
+class CommonIO;
+typedef std::shared_ptr<CommonIO> common_io_ptr;
 
 class Directory;
 typedef std::shared_ptr<Directory> directory_ptr;
@@ -38,7 +41,7 @@ typedef std::shared_ptr<Directory> directory_ptr;
 class MenuBase
 {
 public:
-    explicit MenuBase(session_data_ptr session_data);
+    explicit MenuBase(session_ptr session_data);
     ~MenuBase();
 
     // This matches the index for menu_functions.push_back
@@ -52,13 +55,13 @@ public:
         FORM_INPUT
     };
 
-    session_data_ptr m_menu_session_data;
+    Logging         &m_log;
+    session_ptr      m_menu_session_data;
 
     // This hold non-hotkey text passed through.
     // If Hotkeys are turn off, we append and loop this until we hit a CRLF. or ENTER
-    //session_data_ptr m_session_data;     // Handles to the session for i/o. {in TheState Base Class!}
-    SessionIO        m_session_io;         // SessionIO for Output parsing and MCI Codes etc.
-    CommonIO         m_common_io;          // CommonIO
+    common_io_ptr    m_common_io;          // CommonIO
+    session_io_ptr   m_session_io;         // SessionIO for Output parsing and MCI Codes etc.    
     config_ptr       m_config;             // Config
     directory_ptr    m_directory;          // Directory File Lists.
     std::string      m_line_buffer;        // Buffer used for menu system and reading field data.
@@ -111,12 +114,8 @@ public:
      *        Then delivering the data to the client
      * @param data
      */
-    void baseProcessAndDeliver(std::string data)
-    {
-        m_ansi_process->parseTextToBuffer((char *)data.c_str());
-        m_menu_session_data->deliver(data);
-    }
-
+    void baseProcessAndDeliver(std::string data);
+    
     /**
      * @brief Clears out Loaded Pulldown options { Called From readInMenuData() }
      */

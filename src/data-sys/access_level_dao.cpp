@@ -183,7 +183,7 @@ void AccessLevelDao::fillAccessLevelColumnValues(query_ptr qry, access_level_ptr
 std::string AccessLevelDao::insertAccessLevelQryString(std::string qry, access_level_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->sName.c_str(),
                                          obj->sStartMenu.c_str(),
                                          obj->iLevel,
@@ -205,7 +205,9 @@ std::string AccessLevelDao::insertAccessLevelQryString(std::string qry, access_l
                                          obj->bDownloadMB
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -217,7 +219,7 @@ std::string AccessLevelDao::insertAccessLevelQryString(std::string qry, access_l
 std::string AccessLevelDao::updateAccessLevelQryString(std::string qry, access_level_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->sName.c_str(),
                                          obj->sStartMenu.c_str(),
                                          obj->iLevel,
@@ -240,7 +242,9 @@ std::string AccessLevelDao::updateAccessLevelQryString(std::string qry, access_l
                                          obj->iId
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 
@@ -255,13 +259,13 @@ std::string AccessLevelDao::updateAccessLevelQryString(std::string qry, access_l
  */
 access_level_ptr AccessLevelDao::getAccessLevelByLevel(long access_level)
 {
-    Logging *log = Logging::instance();
+    Logging &log = Logging::getInstance();
     access_level_ptr level(new AccessLevel);
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return level;
     }
 
@@ -270,13 +274,15 @@ access_level_ptr AccessLevelDao::getAccessLevelByLevel(long access_level)
 
     if(!qry->isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return level;
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iLevel = %d;",
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE iLevel = %d;",
                               m_strTableName.c_str(), access_level);
+    std::string queryString(result);
+    sqlite3_free(result);
 
     // create a test3 table
     if(qry->getResult(queryString))
@@ -290,12 +296,12 @@ access_level_ptr AccessLevelDao::getAccessLevelByLevel(long access_level)
         }
         else
         {
-            log->write<Logging::ERROR_LOG>("Error, getAccessLevelByLevel Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
+            log.write<Logging::ERROR_LOG>("Error, getAccessLevelByLevel Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return level;

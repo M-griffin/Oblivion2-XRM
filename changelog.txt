@@ -1,3 +1,25 @@
+Change Log Update (00.00.151)
+* 3023-06-15 -> 2023-10-07
++ Revision 2 Rework consists of a break down and rewrite of the core system to resolve system and deallocation issues.
++ Updated Telnet Responses to only reply one to avoid loops
++ Fix for ANSI detections, if it contains, then default to CP437, Set max rows/cols to 100, and undetected
+  defaults to 80x24, add some logging on bad utf8 sequences causing lots of logging
++ Added ESC[6n Cursor Position Detection for Screen size for Terminals and Telnet Clients that don't support NAWS
++ Cleaner Separation of Source and Header Files, lots of Core Refactoring for Cleaner Session deallocation.
++ Update Node Number handling and logging to properly capture which logging per active session.
++ Added IP Addresses on connection statements to review where connection are coming from
++ Fixed Matrix menu redraws on lightbars that will turn the cursor back off when it's a lightbar menu on redisplays.
++ Fixed SQLiteWrapped De allocation issues.
++ Added Human Shield or ESC Twice at login that will disconnects after 8 seconds for Bot hammering.
++ Added new WARN logging level, for items that are not errors but can be considered invalid.
++ Fixed circular dependencies from the logging and configuration files.
++ Changed both Logging and Encoding from Allocated Singletons to Reference Singletons for smarter allocation handling and usage.
++ Updated Project files for Release builds that will create smaller and more optimized executables.
+- Removed incomplete FormManager for now, needs to be rewritten and wasn't in use yet.
+- Removed Window, OSX project builds, right now only working with Linux and Docker to keep things simple for early development.
+  Trying to maintain too many platforms and manual build system wastes too much time in the early stages.
+- Files logging is temporally removed. Along with yaml formatting of output, wastes too much screen real estate
+
 Change Log Update (00.00.150)
 * 2022-05-26
 + Updates for ReadTheDocs
@@ -21,40 +43,40 @@ Change Log Update (00.00.147)
   a local Docker image with build environment from the pulled branch.
   Initial testing and recompiles can be made, but it not setup for GIT pushes.
   WIP - Addon to this would be to setup GIT commits and changes for active development.
-+ Fixed Yaml (xml_config.yaml) Load issues. 
-  config.hpp hidden_input_field_char was an unsigned char which seems to be an 
++ Fixed Yaml (xml_config.yaml) Load issues.
+  config.hpp hidden_input_field_char was an unsigned char which seems to be an
   issue in the latest yaml-cpp v7.0.  Converted the variable to a std::string.
 + Added a missed "use_address" configuration option.
 
 Change Log Update (00.00.146)
 * 2019-07-27
-+ Entire Project update and rework so each environment strictly uses it's own 
++ Entire Project update and rework so each environment strictly uses it's own
   folder for storing it's projects make files. This avoid one app overwrite another
   and one environment overwritten another.
 + Makefiles, each project has a .mk Makefile now.  Developer paths are also removed
-  and each make file per environment is now easier to compile from the commandline.
+  and each make file per environment is now easier to compile from the command line.
   (Exception is windows) since it needs hard coded library paths, (Code Lite recommended here)
-+ Linux (build-linux.sh) and OSX (build-osx.sh) script file are now updated and reworked to 
++ Linux (build-linux.sh) and OSX (build-osx.sh) script file are now updated and reworked to
   build the complete project from the command line easier then ever before.
-  These scripts will now build all dependencies, tools, unit tests and the full projects 
-  from the script located in the Build folder.  All compiled executables are copied back to the 
+  These scripts will now build all dependencies, tools, unit tests and the full projects
+  from the script located in the Build folder.  All compiled executables are copied back to the
   build folder once completed so you can run you system right away.
   The build script now has an added command line parameter -j# (# being the number of CPU Core)
   using a number greater then 1 on multi-core machines will increate the command line compile time
   (Example I have 4 CPU's each with 2 Cores - I use -j8 and it compiles pretty quick on my Desktop)
   And in my VMware's I allocate 2 CPU's usually and it's a bit slower to compile.
 + Moved OSX-INSTALL.TXT to the Build/Docs folder, and also created an initial LINUX-INSTALL.TXT
-  this is mainly for installing libraries and dependencies prior to building the project and 
+  this is mainly for installing libraries and dependencies prior to building the project and
   should make things a lot easier.
 + Added Socket HOT Fixes for some issues with SDL_Net.  Also small updates on creating the new
   LOG Folder when it doesn't exist on startup of the program the first time.
 + Project dependency cleanup, removed libs and paths no longer needed.
-+ NOTE- the MenuConvert and PromptConvert tools still used boost, eventually I'll remove it and 
++ NOTE- the MenuConvert and PromptConvert tools still used boost, eventually I'll remove it and
   use the new internal directory methods I've re-written.
 
 Change Log Update (00.00.145)
 * 2019-01-03
-+ Fixed some logging level issues, missed logging on encoding so wasn't 
++ Fixed some logging level issues, missed logging on encoding so wasn't
   reading the pre-set level from the config file properly.
 + Also made all selected logging levels output to console as well as file.
 + Updated ANSI FSE Templates to 1 extra column to the right.
@@ -63,120 +85,120 @@ Change Log Update (00.00.144)
 * 2019-01-01 - 2019-01-02
 + Fixed Typo on Critical Logging text.
 + Fixed missing () parenthesis on SDL Socket Error Method passed to logging.
-+ Corrections to Ansi Parser, CR should only move to beginning of Line, LF should 
-  only move down a line. This can different from a telnet client that gets a 
-  variety. Then need to be pre-normalized for consistence display with CRLF on 
++ Corrections to Ansi Parser, CR should only move to beginning of Line, LF should
+  only move down a line. This can different from a telnet client that gets a
+  variety. Then need to be pre-normalized for consistence display with CRLF on
   all screens. This fixes cross platform ANSI Templates.
-+ Some more code cleanup, removed debugging for final testing, Putty, EtherTerm 
++ Some more code cleanup, removed debugging for final testing, Putty, EtherTerm
   and Linux terminal on both platform are now all matching output and display properly.
   Next, final OSX testing.
-+ OSX Project tested and synced. All Good. 
++ OSX Project tested and synced. All Good.
 
 Change Log Update (00.00.143)
 * 2018-12-24 - 2018-12-31
-+ Starting roughing out new logging class for different logging levels. Added new 
-  default INFO logging level to CONFIG and incremented file version. Config can be 
++ Starting roughing out new logging class for different logging levels. Added new
+  default INFO logging level to CONFIG and incremented file version. Config can be
   deleted and auto re-created for latest version. Also making this a header only class.
   Testing example:  Logging::instance()->xrmLog<Logging::INFO_LOG>("Test1", 2, 4.5);
   Logging with export to YAML and or Console Text for logging level set in config.
 + More work on the logging system using variadic templates for parameter packs.
-+ Add missed type.. next to setup filtering on log levels, add buffer queue for 
++ Add missed type.. next to setup filtering on log levels, add buffer queue for
   async log writes.
-+ A little more on testing logging yaml console output. File output i think will be 
++ A little more on testing logging yaml console output. File output i think will be
   queued and handled by main thread leaving the i/o thread free for all session / socket work.
-+ WIP - Large Refactoring for new logging and output noise reduction. Startup has been 
-  reworked a little, and next is to go through remaining systems to move output to 
++ WIP - Large Refactoring for new logging and output noise reduction. Startup has been
+  reworked a little, and next is to go through remaining systems to move output to
   console, info, debug logging levels
 + Cont. Logging and Cleanup. Ready for Multi-Platform Testing on Encoding and Logging next.
-+ Initial Linux Testing Completed, Next check OSX 
-+ Updated OSX projects to sync with Linux and Windows. Notice some templates are off, 
++ Initial Linux Testing Completed, Next check OSX
++ Updated OSX projects to sync with Linux and Windows. Notice some templates are off,
   think adjustments are needed for new lines
 
 Change Log Update (00.00.142)
 * 2018-10-31 - 2018-01-23
 + Started initial work on the Full Screen message editor
 + Initial Templates are now displaying and expanded depending on users screen size.
-+ Fixed issue with ESC detection on SingleHotKey input vs GetLine Input Had to 
-  updated to push tailing '\0' on Individual ESC so it would detect it wasn't 
++ Fixed issue with ESC detection on SingleHotKey input vs GetLine Input Had to
+  updated to push tailing '\0' on Individual ESC so it would detect it wasn't
   a sequence such as arrow key(s).
 + Rolled back some test changes on Ansi Parser
-  First Step in Ansi Parser Update, Screen Buffer character sequence store to 
-  std::string from unsigned char.  Next work through the ansi parser calls one 
+  First Step in Ansi Parser Update, Screen Buffer character sequence store to
+  std::string from unsigned char.  Next work through the ansi parser calls one
   by one to see where things break.
 + Added Initial code for checking utf-8 sequence for rework
-+ Small fixes to the Level editor for boolean output 
++ Small fixes to the Level editor for boolean output
 + Unit Test corrections.
-+ Found some issues with High-Ascii and UTF-8 parsing of string. Started unit test 
-  for drilling down. Now need to update the rest of the methods to properly handle 
++ Found some issues with High-Ascii and UTF-8 parsing of string. Started unit test
+  for drilling down. Now need to update the rest of the methods to properly handle
   high ASCII mix-ins
-+ Rewrote numberOfCharacters, now properly handles mix of HighAscii and Utf-8 when 
++ Rewrote numberOfCharacters, now properly handles mix of HighAscii and Utf-8 when
   counting glyphs vs. bytes.
-+ Updated Erase String to handle High ASCII with Unicode mix. 
-+ Added using Tests for updated methods covering extras (HighAscii Tests). 
-+ Cleaned up some message warning for stub classes not yet reworked. 
-+ Updated the State_Manager - which handles incoming data from the client to parse 
++ Updated Erase String to handle High ASCII with Unicode mix.
++ Added using Tests for updated methods covering extras (HighAscii Tests).
++ Cleaned up some message warning for stub classes not yet reworked.
++ Updated the State_Manager - which handles incoming data from the client to parse
   and handle High ASCII input with Multi-bytes sequence parsing.
-+ Worked on the Ansi Sequence parser to now handle glyphs instead of single characters. 
-  Some more work need to be done to pass the current encoding used or selected at login 
-  since chars > 127 - 255 in UTF-8 are considered partially 2 Bytes glyphs and there is 
-  no real working detection to differentiate them from high ASCII. Right now it's hard 
++ Worked on the Ansi Sequence parser to now handle glyphs instead of single characters.
+  Some more work need to be done to pass the current encoding used or selected at login
+  since chars > 127 - 255 in UTF-8 are considered partially 2 Bytes glyphs and there is
+  no real working detection to differentiate them from high ASCII. Right now it's hard
   coded for High ASCII until encoding is passed through. (Temp Fix).
-+ Started a Map cache of the translation table. This will store the UTF-16 WIDE CP437 
++ Started a Map cache of the translation table. This will store the UTF-16 WIDE CP437
   translations with their 8 bit CP437 characters for quick translations back from UTF-8.
-+ Initial setup for tracking encoding selection on connection, then deciding on internal 
++ Initial setup for tracking encoding selection on connection, then deciding on internal
   translations to single encoding for internal usage.
-+ Creating new Encoding class singleton to separate encoding methods from CommonIO methods. 
-  The singleton will keep pre-loaded mappings for object sharing vs each instance having a 
++ Creating new Encoding class singleton to separate encoding methods from CommonIO methods.
+  The singleton will keep pre-loaded mappings for object sharing vs each instance having a
   separate copy. Creating Encoding-tests branch to further test internal UTF-8 internal processing.
-+ Also created a Multi-Byte to Wide for using the new Mappings, and updated the existing 
++ Also created a Multi-Byte to Wide for using the new Mappings, and updated the existing
   Wide to Milti-Byte. Left is to write and test the translation from UTF-8 back to CP437.
-+ Added new Encoding class Files. 
-+ Corrected some Initialization on the Encoding Class. 
-+ ANSI screens and Menu prompts are now default Encoded UTF-8 on load, Parsers are testing 
++ Added new Encoding class Files.
++ Corrected some Initialization on the Encoding Class.
++ ANSI screens and Menu prompts are now default Encoded UTF-8 on load, Parsers are testing
   well, next to Decode back to CP437 on output.
-+ Initial Tests from Linux Terminal To Windows Machine is good now, had to add Win API specific 
++ Initial Tests from Linux Terminal To Windows Machine is good now, had to add Win API specific
   translations for Wide and MultiByte Characters.
-  Initial Tests from Windows CP437 on CP437 -> UTF8 -> CP437 is working much better now.  
+  Initial Tests from Windows CP437 on CP437 -> UTF8 -> CP437 is working much better now.
   More internal systems now need to be converted to UTF-8.
 + Sync Linux Project, Also handle UTF-8 -> UCS2 / UTF-16 conversion and exclude extra null bytes.
-+ Updated OSX Project and Encoding to Convert Cp437 -> UCS2 -> UTF8 and back, long struggle. 
++ Updated OSX Project and Encoding to Convert Cp437 -> UCS2 -> UTF8 and back, long struggle.
   Found some issues with .yaml file reading errors which need to be debugged on OSX now.
-+ Debugged issues with YAML and loading the CONFIG Dao multiple times per sessions. Don't 
-  appears to have issues with other instances for Text Prompts, Menu's Etc.. CONFIG should 
-  anyway's be moved to a single shared instance and removed for loading in the Menu Base Constructor. 
-  So far commented out and using default constructor no longer crashes in OSX. Other Platforms 
++ Debugged issues with YAML and loading the CONFIG Dao multiple times per sessions. Don't
+  appears to have issues with other instances for Text Prompts, Menu's Etc.. CONFIG should
+  anyway's be moved to a single shared instance and removed for loading in the Menu Base Constructor.
+  So far commented out and using default constructor no longer crashes in OSX. Other Platforms
   not an issue but lets make this smarted for all.
-  NOTE: out.SetStringFormat(YAML::DoubleQuoted);  could be a nice option but ass double quotes 
+  NOTE: out.SetStringFormat(YAML::DoubleQuoted);  could be a nice option but ass double quotes
   around all keys as well as string values.
-+ Re sync Linux Project with latest changes. Notes, xrm convert project need encoding and should 
++ Re sync Linux Project with latest changes. Notes, xrm convert project need encoding and should
   be updated lateron to encoding data to UTF-8 for yaml files.
-+ Re-enabled older idea that was already in place to use Gobal Node Manager "Communicator" 
-  to store the configuration. Updated code to pull this for session instances and then pass this 
++ Re-enabled older idea that was already in place to use Gobal Node Manager "Communicator"
+  to store the configuration. Updated code to pull this for session instances and then pass this
   around as needed. - Next Back to Encoding..
 + Adding Encoding for On Text Generated Internal Methods Also some Internal cleanup.
 + Initial Encoding Completed for Internal UTF-8, Continue Testing and debugging on Windows now.
   Reworked some of the editors as well.
-+ Fixed several issues with encoding and display output of screens. Especially the Full Screen editor 
++ Fixed several issues with encoding and display output of screens. Especially the Full Screen editor
   templating which found most of the issues. code is full of debugging,  cleanup will follow!!
 + Removed Debugging out. Next add some logging levels and get rid of a lot of STDOUT debugging.
 
 Change Log Update (00.00.141)
 * 2018-10-31
-+ Completed Level Editor. 
++ Completed Level Editor.
 
 Change Log Update (00.00.140)
 * 2018-10-31
-+ Level Editors display screen set, next is to plug in all fields for 
++ Level Editors display screen set, next is to plug in all fields for
   making edits for saving changes.
 
 Change Log Update (00.00.139)
 * 2018-10-30
-+ Setup the Prompt and Display Text Files for the Level Editor Screen Next is 
++ Setup the Prompt and Display Text Files for the Level Editor Screen Next is
   to plug in the for screen display.
 
 Change Log Update (00.00.138)
 * 2018-10-30
-+ Added Copy Levels for the Level Editor. Next is work on Editing the Individual 
++ Added Copy Levels for the Level Editor. Next is work on Editing the Individual
   level field options.
 
 Change Log Update (00.00.137)
@@ -186,11 +208,11 @@ Change Log Update (00.00.137)
 
 Change Log Update (00.00.136)
 * 2018-10-27
-+ Fixed checking on Populated list before clearing in Editors. 
++ Fixed checking on Populated list before clearing in Editors.
 
 Change Log Update (00.00.135)
 * 2018-10-20
-+ Fixed Issue with Foreign Key on for Security Table on User Table. 
++ Fixed Issue with Foreign Key on for Security Table on User Table.
 
 Change Log Update (00.00.134)
 * 2018-10-14
@@ -199,7 +221,7 @@ Change Log Update (00.00.134)
 
 Change Log Update (00.00.133)
 * 2018-10-04
-+ Wip on Level Editor, Started work on Level Display screen. 
++ Wip on Level Editor, Started work on Level Display screen.
 
 Change Log Update (00.00.132)
 * 2018-10-03
@@ -221,7 +243,7 @@ Change Log Update (00.00.129)
 * 2018-08-19
 + Added in the Level Access Mod to the menu system. Now slowly reworking
   the initial display to pull and display all levels and add new ones.
-+ Sync OSX Project with Latest Module Additions 
++ Sync OSX Project with Latest Module Additions
 + Sync Linux project for latest module file additions
 + Also updates new message and file area modules with their own definitions.
 
@@ -243,13 +265,13 @@ Change Log Update (00.00.126)
 
 Change Log Update (00.00.125)
 * 2018-08-15
-+ Initial Stub for Level Editor. Started from rework of Menu editor. 
++ Initial Stub for Level Editor. Started from rework of Menu editor.
 
 Change Log Update (00.00.124)
 * 2018-08-12
 + Created default Build folder for Runtime execution with default menus,
   prompts, and ANSI screen files.
-+ Added some build scripts for Linux and OSX to update Makefiles and 
++ Added some build scripts for Linux and OSX to update Makefiles and
   build the executable without Codelite IDE.  Package dependences still
   need to be installed and available.
 - Starting on Level Editor next.
@@ -258,94 +280,94 @@ Change Log Update (00.00.123)
 * 2018-08-05
 + Sync OSX Project.
 + Caught and fixed some issues with CppCheck.
-+ Sync Linux Project with latest changes, also small correction on 
++ Sync Linux Project with latest changes, also small correction on
   SqliteWrapped for error output.
 + Added Challenge Question and Answer to User Extended Field Editor.
-+ Updated User Editor, when updating an existing password or challenge 
-  answer, use the existing salt because it's used by both, so if one 
++ Updated User Editor, when updating an existing password or challenge
+  answer, use the existing salt because it's used by both, so if one
   changes it, the other would have issues.
- 
+
 Change Log Update (00.00.122)
 * 2018-08-04
-+ Tested User Editor, fixes small display issues and some field 
++ Tested User Editor, fixes small display issues and some field
   key displays
- 
+
 Change Log Update (00.00.121)
 * 2018-08-03
-+ Added password update for user editor.  
++ Added password update for user editor.
   NOTE: need to add challenge question/answer updates too.
-+ Finished Most of the Field Inputs, need to ass one for setting password 
++ Finished Most of the Field Inputs, need to ass one for setting password
   w/ encryption then saving final user record changes.
 + Completed about half of the asking input on prompts for extended users.
-+ Added new Extended Prompts for User Fields. Next is to code up their 
++ Added new Extended Prompts for User Fields. Next is to code up their
   input and updating the user record.
- 
+
 Change Log Update (00.00.120)
 * 2018-08-02
 + Updated SQLiteWrapped Code Base. Fixed Casing issues and updated some
   methods with more descriptive naming.
- 
+
 Change Log Update (00.00.119)
 * 2018-07-31
 + Updates to the extended display of colors.
-+ Added Screen display prompts for user Extended Display. Next is to 
++ Added Screen display prompts for user Extended Display. Next is to
   code setting all fields on changes.
 + A bit more work on normalizing theme colors in the editors. Added new
-  getDefaultPromptRaw which will not try to parse to ESC sequences and 
-  added extra leading and input colors, this is for displaying and 
+  getDefaultPromptRaw which will not try to parse to ESC sequences and
+  added extra leading and input colors, this is for displaying and
   building screen with screen display prompts vs input prompts.
- 
+
 Change Log Update (00.00.118)
 * 2018-07-29
 + Completed Display of User Extended Fields for Editing. Also worked in
-  theme colors, next is to update the fields on input, write a password 
+  theme colors, next is to update the fields on input, write a password
   update method, then a final user save method.
-+ Menu editor is now using more theme colors for borders and title information 
++ Menu editor is now using more theme colors for borders and title information
   and hard coded screen elements. User Editor will follow suite.
 + Added Mod_Base default box, prompt, and stat colors, for more use of
   theme colors in modules.
-+ Added MenuEditor the menu field text display to the prompts file along 
-  with menu option display, and the new getDisplayPrompt to pull instead 
-  of displaying on the fly so the screen can be build first before pushing to 
++ Added MenuEditor the menu field text display to the prompts file along
+  with menu option display, and the new getDisplayPrompt to pull instead
+  of displaying on the fly so the screen can be build first before pushing to
   the user.
 + Also Added to the User Editor to follow the same normalization once it's ready.
-+ Some Cleanup on, next Update the other displays. Also lateron add MCI Codes 
++ Some Cleanup on, next Update the other displays. Also lateron add MCI Codes
   and option to just use ANSI Screen.
-+ Update Menu Options, address configurable prompts so the screen layout or 
++ Update Menu Options, address configurable prompts so the screen layout or
   colors can be customized.
 + Added Extended Header Field const.
 + Laying out fields for Extended User Edit Display.
-+ Completed initial User Display View. When making changes need to update the 
-  new m_users_list with changes, and also when changing to next or previous 
++ Completed initial User Display View. When making changes need to update the
+  new m_users_list with changes, and also when changing to next or previous
   user until quit and save or exit without saving is selected.
-+ Some User Editor Corrections, updated next/previous user to keep track of 
-  array index, this is shared with normal ALL view and filtered view, and gets 
-  re-populated on filtering. The next and previous with now move properly along the   
-  available users searched. Also incorrect selections will not redisplay the user 
++ Some User Editor Corrections, updated next/previous user to keep track of
+  array index, this is shared with normal ALL view and filtered view, and gets
+  re-populated on filtering. The next and previous with now move properly along the
+  available users searched. Also incorrect selections will not redisplay the user
   listing again until a valid selection is made.
-+ Updated Boolean prompts to just ask for T/F versus typing out True and also 
-  added header count showing current our of total records when switch between next 
-  and previous users in the list.  Next it assigning updated value to record, 
++ Updated Boolean prompts to just ask for T/F versus typing out True and also
+  added header count showing current our of total records when switch between next
+  and previous users in the list.  Next it assigning updated value to record,
   then saving or ignoring changes.
- 
+
 Change Log Update (00.00.117)
 * 2018-07-27
-+ Added move to next / previous user in field editor. Changed record load 
-  to use pre-loaded list of users order by handle, that will keep the search 
++ Added move to next / previous user in field editor. Changed record load
+  to use pre-loaded list of users order by handle, that will keep the search
   results and then Iterator through that when changing users.
 + Coding up the prompt displays on field commands.
-+ Completed initial prompts for User Field editing on main view to .yaml file. 
-  Next is to create the prompts for the Extended Information View and finish 
-  coding up the field assignments. 
++ Completed initial prompts for User Field editing on main view to .yaml file.
+  Next is to create the prompts for the Extended Information View and finish
+  coding up the field assignments.
 + Some minor Spell checking on files currently being worked on.
- 
+
 Change Log Update (00.00.116)
 * 2018-07-26
-+ Adding User List filtering for quick searches. 
++ Adding User List filtering for quick searches.
 + Added new user access flags to sting method to display all user flags as letters.
 + Added more User Fields, will probably add a second screen for extended options
-  and keep it smaller and more optimized. 
-+ Fixed UnitTests for forms that rely on config class. Added new options 
+  and keep it smaller and more optimized.
++ Fixed UnitTests for forms that rely on config class. Added new options
   and some indexes needed to be incremented.
 + Moved Output of std::time_t with printable date to a methods in common_io.
 + Some cleanup, started on User Extended Display.
@@ -353,19 +375,19 @@ Change Log Update (00.00.116)
 
 Change Log Update (00.00.115)
 * 2018-07-26
-+ Started on User Field Editor and displaying available options to edit. Also 
-  added new field to config file password_default_user, config file version has 
-  been incremented, the file must be updated manually, or the file removed and 
-  will auto re-  generate on startup of the program otherwise it will result in 
++ Started on User Field Editor and displaying available options to edit. Also
+  added new field to config file password_default_user, config file version has
+  been incremented, the file must be updated manually, or the file removed and
+  will auto re-  generate on startup of the program otherwise it will result in
   version mismatch and not startup.
-+ Completed USER_ADD, USER_DELETE, USER_COPY with default renaming of user_name, 
++ Completed USER_ADD, USER_DELETE, USER_COPY with default renaming of user_name,
   handle and emails.
- 
+
 Change Log Update (00.00.114)
 * 2018-07-25
 + Building Initial User Editor Prompts and Input State Methods
 + Setup to use RealName when Handle is not used or empty.
-+ User List setup with (3) Rows with ID and Handles. If handle is blank, 
++ User List setup with (3) Rows with ID and Handles. If handle is blank,
   then use real name.
 
 Change Log Update (00.00.113)
@@ -375,30 +397,30 @@ Change Log Update (00.00.113)
 
 Change Log Update (00.00.112)
 * 2018-07-21
-+ Added Command View Display info Header, which gives information on toggling 
++ Added Command View Display info Header, which gives information on toggling
   the views
 + Updated OSX project with latest changes.
-+ Updated and Tested Linux Project. All good. 
-+ Added Generic Menu View in Menu Editor, users can now make changes and 
++ Updated and Tested Linux Project. All good.
++ Added Generic Menu View in Menu Editor, users can now make changes and
   previews the screen before saving.
 + Added Change Options Prompt, was missing and using the menu change prompt
-+ Tweaked the default prompt descriptions and some cleanup.  
++ Tweaked the default prompt descriptions and some cleanup.
   Everything is testing good.
 + Completed command field assignments.
-  also make next/previous command jumping hot keys, [ ] and ENTER is too annoying 
+  also make next/previous command jumping hot keys, [ ] and ENTER is too annoying
   when cycling options and most likely legacy obv/2 did the same.
-+ Added Option ID current / total in the display for when moving from/to next 
++ Added Option ID current / total in the display for when moving from/to next
   or previous option.
 + Added Option Fields and Prompts for Each field
-+ Some slight refactoring for box drawing characters, Completed more state setup 
++ Some slight refactoring for box drawing characters, Completed more state setup
   for Option Field editing.
 + Create Menu Option Editor for editing individual fields, Screen layout.
 
 Change Log Update (00.00.111)
 * 2018-07-20
-+ Completed Option Move. 
-+ Completed Option Copy, and a little extra cleanup. 
-+ Completed Menu Option Delete. 
++ Completed Option Move.
++ Completed Option Copy, and a little extra cleanup.
++ Completed Menu Option Delete.
 + Added Menu Option Create initial.
 + Some cleanup and also update black fields for Add/Change/Edit/Delete
   will return on empty input and also abort on ESC.
@@ -408,10 +430,10 @@ Change Log Update (00.00.111)
   which display the prompt description as help text when editing fields.
 + Updated Input to allow blacks and clearing fields out.
 + Various Prompt updates
-+ Added checking when editing a menu to only reload if menu is not 
++ Added checking when editing a menu to only reload if menu is not
   already loaded. Then on exit we now need to add save/abort question.
 + Some small tweaks and got initial input field formatted properly with
-  leadoff data if Entry already exists it will populate it to edit or 
+  leadoff data if Entry already exists it will populate it to edit or
   modify the existing.
 + Added Menu Parsing for Prompts in the modules, mainly with |OT pipes
   for general placeholders for in Editor headers for Menu Name and other data.
@@ -430,20 +452,20 @@ Change Log Update (00.00.109)
   keys. Ready to start building out method and pipe sequence parsing.
   Initial MenuEditor Option/Command display completed.
 + Updated Padding (Left/Right) when the string it empty, it will now padd properly.
-+ Cleanup on some socket output for debugging Async processing.   
-+ Completed Copy Menu Source/Destination  
-+ MenuEditor, delete function is completed and tested.  
-+ Completed Menu Add Command, Creates a new default menu with a default 
-  menu command for starting out.     
-+ Updated Menu editor, added Copy, and changed "change" to "edit" for input keys.   
++ Cleanup on some socket output for debugging Async processing.
++ Completed Copy Menu Source/Destination
++ MenuEditor, delete function is completed and tested.
++ Completed Menu Add Command, Creates a new default menu with a default
+  menu command for starting out.
++ Updated Menu editor, added Copy, and changed "change" to "edit" for input keys.
 + Added initial input method for Add/Change/Delete and checking if the
-  menu exists or not in the folder.  
+  menu exists or not in the folder.
 + Added colors to menu list, need to add more baseColors for the mods for
   Theme default colors lateron.
 
 Change Log Update (00.00.108)
 * 2018-07-03
-+ Corrected some login issues with rework, removed Enum no longer being used 
++ Corrected some login issues with rework, removed Enum no longer being used
   corrected the issue with the state.
 
 Change Log Update (00.00.107)
@@ -466,11 +488,11 @@ Change Log Update (00.00.105)
 + Ripped out Boost ASIO for Async Socket Communication, Timers, File System
   and Locale support.  This was a large rewrite to get things working on OSX better.
 + Replace ASIO with SDL2_Net library used in EtherTerm, This removes SSL socket support
-  which wasn't used at the time, but also adding libssh in the process for SSH 
-  server connections to be hooked up at a later date.  
+  which wasn't used at the time, but also adding libssh in the process for SSH
+  server connections to be hooked up at a later date.
 + Created an IO_Service to mimic ASIO to use SDL2_Net Sockets and connections in
   an asynchronous way to use the existing code base.
-+ Created Deadline Timers for asynchronous waits with callbacks to mimic Boost's 
++ Created Deadline Timers for asynchronous waits with callbacks to mimic Boost's
   deadline timers to keep existing functionality.
 + Wrote some new directory methods that are cross-platform to replace the use
   of Boost File system.
@@ -481,7 +503,7 @@ Change Log Update (00.00.105)
 + Switched from Boost Regex to std Regex in c++11.
 + Fixed some issues with Regex expressions used when tested in clang vs gcc
   also added Regex Expression Exception catching.
-  
+
 Change Log Update (00.00.104)
 * 2018-02-05
 + SqliteWrapped, update making file lib naming so if users run this manually
@@ -491,7 +513,7 @@ Change Log Update (00.00.104)
 Change Log Update (00.00.103)
 * 2018-02-05
 + Corrected issues with Linux (ARM) Builder and G++7 Compiler in Arch Linux.
-+ Hooked in Jenkins build processing, on-demand builds are setup now, next will 
++ Hooked in Jenkins build processing, on-demand builds are setup now, next will
   hooking up commits and pull-requests.
 
 Change Log Update (00.00.102)
@@ -514,24 +536,24 @@ Change Log Update (00.00.100)
   to detect and handle newer and older API Calls for SHA1
   Which can probably be removed later on also.. Was testing a fix
   for Enthral as well.
-- Other issues with Arch for ARM is GCC version 7, lots of new 
+- Other issues with Arch for ARM is GCC version 7, lots of new
   and crazy warnings, needs to look into this.
 - Note, the previous ARM setup was more for any Linux using GCC (Debian) Jessie
   with version 4.9 and lower.  the ARM folder will be renamed lateron for
   Compatibility of older distro's for now at least.
 - Note, Codelite will build and compile on Arch ARM which has the latest
-  libs and features.. One plus, other is that doc's suck and you have to 
+  libs and features.. One plus, other is that doc's suck and you have to
   keep recompiling and adding missing libs as you go for just about everything
   in Arch.. haha.
 
 Change Log Update (00.00.99)
 * 2017-05-28
 + Several Updates to compile and run on ARM platform - testing (Raspberry Pi2).
-+ Updated Threads, downgraded std::thread to use pthread for Posix for gcc 4.9.1 
-  compatibility ARM.  GCC < 5.1 doesn't appear to work correctly, known issue.  
-+ Also changed from std::time methods for std::get_date and std::put_date, also 
++ Updated Threads, downgraded std::thread to use pthread for Posix for gcc 4.9.1
+  compatibility ARM.  GCC < 5.1 doesn't appear to work correctly, known issue.
++ Also changed from std::time methods for std::get_date and std::put_date, also
   not compatible with GCC < 5.1 for ARM compatibility.  Switched to Boost::Date_Time
-+ Corrected Shutdown issues with menu logoff command trying to execute or cycle 
++ Corrected Shutdown issues with menu logoff command trying to execute or cycle
   stacked commands once the sessions has closed. The system will not exit the menu
   command look when a logoff command is executed.
 + Fix for UTF-8 output encoding, optimized byte parsing, only noticeable on ARM.
@@ -561,7 +583,7 @@ Change Log Update (00.00.97)
 Change Log Update (00.00.96)
 * 2017-05-12
 + Completed Refactoring of All Dao object to now use the BaseDao for concurrency.
-+ Created Dao Integration Tests for Initial DAO Refactors with mock databases 
++ Created Dao Integration Tests for Initial DAO Refactors with mock databases
   and clean up.
 + Synced all Linux Project Files
 - Eventually complete all Integration Tests.
@@ -571,7 +593,7 @@ Change Log Update (00.00.95)
 + Create new BaseDao Object for Standard SQL Database base calls.
 + Updated ConferenceDao to inherit BaseDao
 + Updated OnelinerDao to inherit BaseDao
-+ Created Integration UnitTests for Calling ConferenceDao testing all BaseDao 
++ Created Integration UnitTests for Calling ConferenceDao testing all BaseDao
   Methods to make sure everything is solid.
 + Added new getAllRecordsCount() to baseDao
 - Working on refactoring the remaining DAO objects to inherit from BaseDao
@@ -592,12 +614,12 @@ Change Log Update (00.00.93)
 Change Log Update (00.00.92)
 * 2017-05-04
 + Completed Grouping DAO (Groups Conferences and Message/File Areas)
-+ Completed Message Area DAO 
++ Completed Message Area DAO
 - Network DAO for Fido / IP Address for Message Areas and Networks
 
 Change Log Update (00.00.91)
 * 2017-05-04
-+ Completed FileArea DAO 
++ Completed FileArea DAO
 + Added new model files for Conference Grouping
 - Create more Dao objects for reading/writing the Models to database.
 
@@ -609,7 +631,7 @@ Change Log Update (00.00.90)
 
 Change Log Update (00.00.89)
 * 2017-05-03
-+ More work on the FormManager and System Configuration Form along with 
++ More work on the FormManager and System Configuration Form along with
   Implementation.  Still working on the best way to implement so playing
   with different ideas right now.
 + Create Conference Model, and DAO for database read/writes.
@@ -620,7 +642,7 @@ Change Log Update (00.00.88)
 + Updates to Process, Added Separate UpdateState for Process Handling
   If were inside a process, skip ESC sequence testing, just pass through
   all data as is to the process.
-+ Cleanup processes on next look, make sure if a process is not running to 
++ Cleanup processes on next look, make sure if a process is not running to
   pop it off the stack for cleanup.
 
 Change Log Update (00.00.87)
@@ -647,7 +669,7 @@ Change Log Update (00.00.85)
 * 2017-04-17
 + Completed Initial work on SessionStats objects and Database DAO calls.
 + Added Startup creation of stats on connection.
-+ Fixed minor compiler warnings left over on signed vs unsigned comparisons and 
++ Fixed minor compiler warnings left over on signed vs unsigned comparisons and
   Unused Database variables.
 + Synced Linux projects and Database checks on both platforms Windows and Linux.
 + Updated Users Records, removed fields not needed for individual users,
@@ -658,7 +680,7 @@ Change Log Update (00.00.84)
 + Completed more work on Unit Tests and Configuration Form
 + Remodeled some of the folder structure, split data and model into (2) sets app and sys
   Sys for Core System Data and Models, and App for Application Data and Models ie..
-  LastCallers, OneLiners, etc.. 
+  LastCallers, OneLiners, etc..
 + Sync Linux workspaces and project with the new structure.  All Unit Tests are passing.
 - Moving from Form Work right now to getting some applications data doing and logon sequence.
   Going to work on getting more Tables setup and Data Access Objects going now.
@@ -666,7 +688,7 @@ Change Log Update (00.00.84)
 Change Log Update (00.00.83)
 * 2017-04-08
 + Some slight refactoring to ACS String Validations, Call a single method instead of doing it manually
-+ Started Unit Test for FormSystemConfiguration.  Unit Tests help test and map out the best way to 
++ Started Unit Test for FormSystemConfiguration.  Unit Tests help test and map out the best way to
   write the dynamic menu form options.  Using YAML for serialization and mapping class fields.
 
 Change Log Update (00.00.82)
@@ -683,9 +705,9 @@ Change Log Update (00.00.81)
 + Incremented config version also.
 + Re sync Linux Project with Latest Updates. Tested good.
 + Added pull from config file for starting menu once the user has been authorized.
-+ Added check for User AutoValidation on Signup,  If so, the system will upgrade 
-  from unauthorized level 10 (new user), to 20 default level set in config file.  
-  Otherwise it should sit at level 10 until the sysop validates the user.  
++ Added check for User AutoValidation on Signup,  If so, the system will upgrade
+  from unauthorized level 10 (new user), to 20 default level set in config file.
+  Otherwise it should sit at level 10 until the sysop validates the user.
 + Added new AccessLevels Models and DAO for storing security levels with descriptions
   NOTE: Add Defaults for each level, instead of single set from config, each level
   can have it's own customized defaults.
@@ -711,14 +733,14 @@ Change Log Update (00.00.79)
 + Fixed issue with Sysop menu and the pre gosysop menu that is suppose to ask
   for sysop password.  The prompt is not yet setup for input, bit the menu
   will no longer get stuck when trying to return to the starting menu
-+ Fixed issue with menu prompts, when the menu was changing the system was 
++ Fixed issue with menu prompts, when the menu was changing the system was
   executing the clean input (used for when menu command return without execution
   the system will clear the input text on the screen.  Added a check if the menu
   changes to no longer attempt to clear input text since everything is re-drawn
   this will no longer overwrite the menu prompt.
 + Tested Changes in Linux, Updated Linux project and refreshed build folder.
 + Fixed and updates were done for Theme Colors and Users Colors for Yes/No Bars
-  Make sure to remove the xrm-config.yaml and users.sqlite3 database and let the 
+  Make sure to remove the xrm-config.yaml and users.sqlite3 database and let the
   system recreate and re-apply as a new user for correct colors on lightbars.
 
 Change Log Update (00.00.78)
@@ -730,57 +752,57 @@ Change Log Update (00.00.78)
 + Newuser signup now properly assigns the logged in user to the session.
 + Corrected Theme color being pull from config instead of signed on users record.
 + Newuser creation now sets user defaults pulling from default configuration colors.
-+ Default colors are now pulled from configuration, and set to the initial instantiation 
-  of the user record using default system theme colors until the user logs in and the 
++ Default colors are now pulled from configuration, and set to the initial instantiation
+  of the user record using default system theme colors until the user logs in and the
   system takes over using the user's default theme colors.
-+ Corrected final issue with stacked commands and menu changes.  If the menu changes 
-  while processing stacked commands, we need to then exist the loop gracefully and 
++ Corrected final issue with stacked commands and menu changes.  If the menu changes
+  while processing stacked commands, we need to then exist the loop gracefully and
   no longer attempt to execute or loop commands that no longer exist.
 
 Change Log Update (00.00.77)
 * 2017-03-12
 + Finished Initial Update for Single Lightbar Menu prompts.
 + Corrected some issues with Stacked Commands on these special case menus.
-+ Removed CRLF after ENTER on lightbars menus is used, commands not executed 
++ Removed CRLF after ENTER on lightbars menus is used, commands not executed
   should not push the screen and keep the same display.
-+ Updated Login prompts, this mean the build folder will be updated and/or 
++ Updated Login prompts, this mean the build folder will be updated and/or
   the login.yaml should be removed and regenerated with new defaults.
 + Corrected issues in AnsiProcessor with last line calculations.
   Updates last line used detection methods so the single line prompts
   will now display properly under the menu prompt.
-- WIP have to look at the quit menu option or fallback in the sysop menu, 
+- WIP have to look at the quit menu option or fallback in the sysop menu,
   Quit is not returning to the menu that called it.
 
 Change Log Update (00.00.76)
 * 2017-03-06 / 2017-03-09
-+ Fixed Several Linux display issues due to lapse in testing in this environment 
++ Fixed Several Linux display issues due to lapse in testing in this environment
   once functionally was added.
-+ Fixed Issues with Generic Menu Template Display, Top and Mid.  Some old DOS 
-  system save clear screens with just ESC2J so had to add a ESC[1;1H to move 
++ Fixed Issues with Generic Menu Template Display, Top and Mid.  Some old DOS
+  system save clear screens with just ESC2J so had to add a ESC[1;1H to move
   to cursor to the top of the screen.
-+ Also Fix MID ansi issues where some telnet clients will wrap ESC[C right 
-  cursor pushes. However, the Linux terminal will wait at the end of the line 
-  until a displayable character is found.  This is not fixed to check in between 
++ Also Fix MID ansi issues where some telnet clients will wrap ESC[C right
+  cursor pushes. However, the Linux terminal will wait at the end of the line
+  until a displayable character is found.  This is not fixed to check in between
   spacing sequences for ANSI optimizations.
-+ Also refactored and some code cleanup.  Some generic some was added and might 
++ Also refactored and some code cleanup.  Some generic some was added and might
   be moved to the common libraries lateron if it's needed by future systems.
-+ Tested and corrected issues with yaml message prompts.  Instead of letting 
-  YAML write the output which force converts to UTF-8. We now write out the 
-  yaml format manually when it comes to menu prompts.. All text prompts have %DF 
-  for displaying files and don't need too much high ASCII. However if the need arises, 
-  can work out some MCI codes where the file will write out yaml and MCI codes will 
++ Tested and corrected issues with yaml message prompts.  Instead of letting
+  YAML write the output which force converts to UTF-8. We now write out the
+  yaml format manually when it comes to menu prompts.. All text prompts have %DF
+  for displaying files and don't need too much high ASCII. However if the need arises,
+  can work out some MCI codes where the file will write out yaml and MCI codes will
   be replaces with CP437 sequences.  Add to the TODO list!
-+ Fixes For Bottom of Used Screen Detection, Thanks to Putty and 24 Lines 
-  Was able to test and fix a detection issue and now new prompts will 
++ Fixes For Bottom of Used Screen Detection, Thanks to Putty and 24 Lines
+  Was able to test and fix a detection issue and now new prompts will
   properly show under the menu prompt on any screen length.
-+ Created New MenuPromptConvert project for converting legacy Menu Prompt Data to 
++ Created New MenuPromptConvert project for converting legacy Menu Prompt Data to
   individual .yaml files
 + Create Model and DAO's for new Menu Prompt Layouts and the new code is plugged in
   and working nicely
-- Update MenuPrompt out of yaml to save as raw text to keep CP437 encoding. YAML 
+- Update MenuPrompt out of yaml to save as raw text to keep CP437 encoding. YAML
   forces UTF-8 output which will corrupt the CP437 characters saved.
 + Also added random menu prompts when no prompt is selected as an option.
-+ Updated User Record / Database table, changing menu prompt from an int index to 
++ Updated User Record / Database table, changing menu prompt from an int index to
   the name of the file for easier lookup and selection.
 
 Change Log Update (00.00.75)
@@ -813,10 +835,10 @@ Change Log Update (00.00.73)
 + Fixed lightbar drawing issues on pull down menu's.. most noticeable was the matrix menu.
 - Mocked up the yes/no light bars, still a WIP
 - Need to switch input to hotkey for N Menu functions.
-- Started working on text prompt formatting for unformatted strings, default coloring for 
+- Started working on text prompt formatting for unformatted strings, default coloring for
   strings not using pipe colors to add some configurable default feel to the system
 - Added |PD in text prompts, this will display the prompt description (XRM Special)
-  Users can add extra notes or instructions in the description of the prompt and display it along 
+  Users can add extra notes or instructions in the description of the prompt and display it along
   with the text.
   
 Change Log Update (00.00.72)
@@ -836,8 +858,8 @@ Change Log Update (00.00.72)
   ^P - Prompt Color       ^E - Input Color
   ^V - Inverse Color      ^X - Box Color
   ^M - Goes down a line
-- Main focus right now is on menu options and switching between menu and getting all 
-  custom logic going.  
+- Main focus right now is on menu options and switching between menu and getting all
+  custom logic going.
 
 Change Log Update (00.00.71)
 * 2016-12-19
@@ -851,9 +873,9 @@ Change Log Update (00.00.71)
   and check for a sequence of \0 characters, then push out ESC[C to move
   the cursor forward instead of overwriting.  ANSI menu screens with templates
   are now displaying properly.
-+ Menu Option Ordering, YAML does not guarantee that Sequences are loaded in the 
++ Menu Option Ordering, YAML does not guarantee that Sequences are loaded in the
   same order they are present in the file.  Updated the Menu DAO (Data Access Object)
-  to now sort by the index field assigned to all menu options to keep the proper 
+  to now sort by the index field assigned to all menu options to keep the proper
   ordering.
 
 Change Log Update (00.00.70)
@@ -886,9 +908,9 @@ Change Log Update (00.00.67)
 Change Log Update (00.00.66)
 * 2016-12-17
 + Added MCI Code parsing for Menu Prompt. Pulling the Menu Prompt
-  Field for Menu Name, Added Time Left, and Time Now 
+  Field for Menu Name, Added Time Left, and Time Now
   Which are not implemented since were not keeping track of time
-  limits yet.  
+  limits yet.
 + Also update previous field input length limits to match legacy
   |FL
 * 2016-12-16
@@ -902,27 +924,27 @@ Change Log Update (00.00.65)
   where the missing sequence is considered the current row
   instead of default row 1.  We draw the screen internally
   then push out the processed screen for correct drawing.
-  
+
 Change Log Update (00.00.64)
 * 2016-11-30
 + Menu Option Cleanup and split out to separate methods.
 + Split up Menu Input into Pull down and Standard Input
   Pull down Accepts Hotkey's, while Standard is line mode.
-+ Added new code to handle stacked commands when using 
++ Added new code to handle stacked commands when using
   ENTER to make lightbar selection
-+ Split Regex Expressions into constants that can be 
++ Split Regex Expressions into constants that can be
   passed in to the Code Map for different screens.
   Makes it easier to setup different screens and their
   custom MCI code replacements per interface.
 + Completed Generic Menu Template processing.  When the
-  Menu HelpId is empty, or no ansi exist the Generic 
+  Menu HelpId is empty, or no ansi exist the Generic
   Template is used for Top, Mid, and Bottom.  All
-  valid Menu options are then populated. Drawing the 
-  Menu ANSI Screen. This is also used for the Menu 
+  valid Menu options are then populated. Drawing the
+  Menu ANSI Screen. This is also used for the Menu
   Library's and Selectable Themes across the system.
 + Added some Missing Include for Boost Lexical Cast.
 + Corrected missed parsing on Pull down Menu Hotkey's.
-- Initial Menu Prompts are pulling and are displayed. 
+- Initial Menu Prompts are pulling and are displayed.
   Need to add MCI parsing for data and position.
   Also need to debug the baseProcessAndDeliver for Menu screens.
 - Also need to setup user selection for available menu prompts.
@@ -941,7 +963,7 @@ Change Log Update (00.00.63)
 
 Change Log Update (00.00.62)
 * 2016-11-21
-+ Added some initial config flag validation to catch any possible 
++ Added some initial config flag validation to catch any possible
   conflicts on manual configuration.
 + Sign_up and Login mods, move encryption out of class instance
   and just call it when used.
@@ -960,10 +982,10 @@ Change Log Update (00.00.62)
 Change Log Update (00.00.61)
 * 2016-11-20
 + MenuBase has been converted over to using the new .yaml menu files.
-  Only tested matrix.yaml at the moment, still more code need to be added 
+  Only tested matrix.yaml at the moment, still more code need to be added
   for jumping to other menus, and then implementing menu features to come.
 + Update getProgramPath to pass executable name.  So multiple utilities
-  sharing the same object will have the correct filename removed from the 
+  sharing the same object will have the correct filename removed from the
   program's path.
 + Added Corrections to #include Boost File_System for Scoped ENUM
 + Linux Project Re sync update for new virtual folder with testing.
@@ -988,23 +1010,23 @@ Change Log Update (00.00.59)
 Change Log Update (00.00.58)
 * 2016-11-16
 + Rename Legacy Menu objects with Compat
-+ Create New Data Access Object (DAO) and classes for 
++ Create New Data Access Object (DAO) and classes for
   reading/writing menu's in YAML files.
-+ Starting on Legacy to new YAML XRM Menu format then plan 
++ Starting on Legacy to new YAML XRM Menu format then plan
   to update the loading code to start using the new menu files.
 + Also added File Versions to all YAML configuration files.
 
 Change Log Update (00.00.57)
 * 2016-11-15
-+ Add new MenuDao and Menu class for YAML menu files.  Rename previous to compat to 
-  Mark data for the original obv/2 data sets.  
++ Add new MenuDao and Menu class for YAML menu files.  Rename previous to compat to
+  Mark data for the original obv/2 data sets.
 + Started Menu converter to convert legacy menus to new YAML files so we can extend
   Menus in a new format and add new features.
 
 Change Log Update (00.00.56)
 * 2016-11-10
-+ Refactored Menu System, decoupled and split core from the state 
-  into a base class. This allows other dynamic systems to use it's 
++ Refactored Menu System, decoupled and split core from the state
+  into a base class. This allows other dynamic systems to use it's
   features for lightbars with callback command execution specific
   to each interface.
 
@@ -1024,7 +1046,7 @@ Change Log Update (00.00.53)
 
 * 2016-11-04
 + Some cppcheck issues fixed
-  
+
 Change Log Update (00.00.52)
 * 2016-11-03
 + Create new unit tests for SessionIO testing main MCI Regex sequence parsing.
@@ -1049,8 +1071,8 @@ Change Log Update (00.00.50)
 
 * 2016-10-15
 + SessionIO::pipe2ansi, added new custom screen MCI translations lookup/replacements
-  On custom screen we need to ability to compile of a list of MCI codes specific 
-  to an interface, then when the ansi is parsed it quickly process these interface 
+  On custom screen we need to ability to compile of a list of MCI codes specific
+  to an interface, then when the ansi is parsed it quickly process these interface
   specific codes.
 
 Change Log Update (00.00.49)
@@ -1090,7 +1112,7 @@ Change Log Update (00.00.45)
   the local screen buffer.
 + For ansi screens in windows, replaced \n with \r\n on parsing ansi files.
   (Should also add detection if just \r or replace with \r\n also.
-+ WIP need to add screen size change detection, if the screen size changes 
++ WIP need to add screen size change detection, if the screen size changes
   we need to redraw the screen but also resize the local screen buffer to match
   so lightbar are still in the correct positions!  Important, but not vital just yet.
 
@@ -1116,12 +1138,12 @@ Change Log Update (00.00.42)
 * 2016-08-19
 + Added Enum to config for standard field lengths for limiting field input
   by the same length through the program without having to hard code in each area.
-+ Reworked AnsiProcessor to smart pointer and passes to all modules.  This keeps 
++ Reworked AnsiProcessor to smart pointer and passes to all modules.  This keeps
   track of all screen data output so we know locally where the screen's x/y position
-  is.  This is important for advanced screen redraws and MCI code parsing of positions 
+  is.  This is important for advanced screen redraws and MCI code parsing of positions
   on the fly.
 + Completed more work and refining on the new user application
-+ Added in initial user database setup on startup and setup for creating new users 
++ Added in initial user database setup on startup and setup for creating new users
   in the sign up process.
 + Signup process is still a WIP.
 + Also plugged in the ansi processor to the modules, all output should be sent through
@@ -1130,7 +1152,7 @@ Change Log Update (00.00.42)
 
 Change Log Update (00.00.41)
 * 2016-08-11
-+ Reworked inputField to handle pass through data properly.  
++ Reworked inputField to handle pass through data properly.
 + Reworked so Backspace, Del, and ESC Sequences are not echoed back
 + WIP New User Application
 
@@ -1151,8 +1173,8 @@ Change Log Update (00.00.38)
   constructor lateron, but looks good for now.
 + Added use_newuser_password and use_disclaimer to the config files for signup items.
   If they are enabled, they will be displayed and use in the signup process.
-+ Update the menu system on command execution via ENTER and Hotkey to now execute the 
-  command match the command key sequence.  The matrix menu is the test bed, and is now 
++ Update the menu system on command execution via ENTER and Hotkey to now execute the
+  command match the command key sequence.  The matrix menu is the test bed, and is now
   kicking off the new user application when hitting A or ENTER on Apply for new.
 + Still working on the input handling for all of the signup fields now.
 
@@ -1172,7 +1194,7 @@ Change Log Update (00.00.36)
 
 Change Log Update (00.00.35)
 * 2016-03-31
-+ Added more code in SessionIO to check if ANSI emulations is not enabled, then 
++ Added more code in SessionIO to check if ANSI emulations is not enabled, then
   Ignore PIPE color codes in prompts and pipe2ansi replace methods.
 + Started working on Signup Module for New User Applications
   Finished a lot of the initial method stubs and virtual functions
@@ -1211,7 +1233,7 @@ Change Log Update (00.00.31)
 * 2016-03-27
 + Working on more of the PreLogon process, When ANSI is not detected it will
   ask to use colors or ASCII no color.  Next need to work on codepage output
-  CP437 or UTF-8.  
+  CP437 or UTF-8.
 - Also look at the NEW_ENV Telnet options when I get some more time.
 
 Change Log Update (00.00.30)
@@ -1224,7 +1246,7 @@ Change Log Update (00.00.29)
 + Prompts are not working for Terminal Detection (Telnet Option Parsing)
   When completed, now displays detected terminal 'ansi' and size '80x25' etc..
 + Prelogon Emulation Detection is working, sending ESC[6n and getting a response
-  from the client,  ESC[xx;xxR for current X/Y Position showing the client 
+  from the client,  ESC[xx;xxR for current X/Y Position showing the client
   can use ESC sequence
 + Also added a new Detection Timer for 1.5 seconds to receive client response
   for ESC[6n query.
@@ -1235,7 +1257,7 @@ Change Log Update (00.00.29)
 Change Log Update (00.00.28)
 * 2016-03-25
 + Created New Mod_PreLogon to handle pre-logon sequences like Emulation and Term Detection.
-+ Reworking the Setup / Input methods per the modules right now.  
++ Reworking the Setup / Input methods per the modules right now.
 + Moved the Initial Global Text Prompts out of Communicator to the PreLogon Modules to where
   they will be used.
 + Added parseFilename to session_io to handle text prompts with %%FILENAME.EXT MCI code
@@ -1252,7 +1274,7 @@ Change Log Update (00.00.27)
 * 2016-03-24
 + Update to main, moved path setup before the communicator is called so it has valid paths for
   creating / reading global text prompts.
-+ Updated session: added a deadline detection timer for Telnet negotiations.  
++ Updated session: added a deadline detection timer for Telnet negotiations.
   on connection the session should wait at least 1.5 seconds before starting the state
   so that any terminal detection can be negotiated and detected before starting the login process.
 + Also updated the state, if were in the detection phase, and the state is not yet created
@@ -1287,7 +1309,7 @@ Change Log Update (00.00.22)
 * 2016-03-23
 + Renamed Broad_Caster to Session_Manager to better describe what it does.
 + Various cleanup and re-organization.
-+ Also removed directory_bbs from config, the main root folder will always 
++ Also removed directory_bbs from config, the main root folder will always
   be detected from where the executable is launched.
 
 Change Log Update (00.00.21)
@@ -1300,7 +1322,7 @@ Change Log Update (00.00.20)
 * 2016-03-23
 + Created new Model sub folder to separate structures from data access objects.
 + Updated all files to the new model path
-+ Added NewUserApplication stub for ModLogin 
++ Added NewUserApplication stub for ModLogin
 + Currently building out text prompt reading, Initial idea is to have single function in dao.
   Then each mod will have it's own separate file of prompts which it will pass to the dao
   to quick read module specific text prompts.
@@ -1314,14 +1336,14 @@ Change Log Update (00.00.19)
 Change Log Update (00.00.18)
 * 2016-03-18
 + Remove Initial Stub for Language File
-  Change this to Prompts_Dao, Moved to Data Folder, working on reading the OBV/2 
+  Change this to Prompts_Dao, Moved to Data Folder, working on reading the OBV/2
   Language file for prompts so I can convert this to an easier format to work
   With, later on will write an update for existing prompts.
 
 Change Log Update (00.00.17)
 * 2016-03-17
 + Added popping modules off stack when menu system is closed down!
-+ Added new shutdown state cleaning in the Session Destructor to make sure the 
++ Added new shutdown state cleaning in the Session Destructor to make sure the
   Menu System and all active modules are shutdown per RAII properly.
 + Update Module Login to pass Instantiate SessionIO class for handle key input
 
@@ -1329,11 +1351,11 @@ Change Log Update (00.00.16)
 * 2016-03-17
 + Created new Mods Sub folder to store system modules
   All modules will be containers of system functions like mod_login for login procedures
-  mod_messages for message, mod_files for files, mod_bbslist etc.. 
+  mod_messages for message, mod_files for files, mod_bbslist etc..
   Each module will contain it's own asynchronous input processing and output
   And everything will pass through from Session->MenuSystem->Modules
 + Bit of rework on the Menu System, changes passing character_buffer and bools to const references.
-+ Added new startupModuleLogon() and moduleInput() for dynamic and asynchronous processing. 
++ Added new startupModuleLogon() and moduleInput() for dynamic and asynchronous processing.
 
 Change Log Update (00.00.15)
 * 2016-03-16
@@ -1348,7 +1370,7 @@ Change Log Update (00.00.14)
 + Created executeMenuOptions() to handle processing command keys from input.
 + Setting processMenuOptions() to taken input and pass to execute
 - Working default startup to check configuration for Matrix or normal logon.
-  Then setting up the startup menu properly.  
+  Then setting up the startup menu properly.
 - Building initial login with apply as new first
 - Looking at best way to handle language file for prompts, thinking key value map
   is much better then int indexes, don't have to worry about order ever!
@@ -1375,21 +1397,21 @@ Change Log Update (00.00.11)
 * 2016-03-13 Long Break is Over
 + Started laying out Database Tables, decided to stick with custom version of SqliteWrapped.
 * SqliteWrapped:
-+ Makes lots of updates and have been rewriting SqliteWrapped to work a little 
-  easer with classes and help make some ORM related adjustments for pulling data 
++ Makes lots of updates and have been rewriting SqliteWrapped to work a little
+  easer with classes and help make some ORM related adjustments for pulling data
   in and out of classes easier.
 + Added transactional inserts, updates, and creates, failures can no be rolled back
   and makes for quicker inserts of large data sets, and also creating tables and indexes together.
-* XRM: 
+* XRM:
 + Created a new Data Sub folder and initial data classes for Config and Users.
   Also created Config_Dao, and Users_Dao which will maintain the API for reading and writing data.
 + Config file is setup as a serialization class that will read and write to an XML file.
 + Users is setup to use the custom SQLite Wrappers API and updated features and methods.
-- Work has been a little start as my time is still limited.  I have to rip out allot of the 
-  flat file stuff I did and start writing interfaces for the data, then later on write conversions 
+- Work has been a little start as my time is still limited.  I have to rip out allot of the
+  flat file stuff I did and start writing interfaces for the data, then later on write conversions
   from the flat files to the new data layouts.
-- Then i also need to decide what format the menu files will be in.  It's kind of silly to use a 
-  database for menu files. So either XML, JSON, or something that is quick and easy to edit and use. 
+- Then i also need to decide what format the menu files will be in.  It's kind of silly to use a
+  database for menu files. So either XML, JSON, or something that is quick and easy to edit and use.
 
 Change Log Update (00.00.10)
 + Note, SSL ipv6, and Telnet Options.
@@ -1402,8 +1424,8 @@ Change Log Update (00.00.10)
 
 * 2015-11-01 Obv2 Data Files
 + Breaking out functions for reading original obv/2 data files
-  to a new update2xrm sub folder.  This is will be used for 
-  upgrading legacy obv2 systems to the new xrm format once 
+  to a new update2xrm sub folder.  This is will be used for
+  upgrading legacy obv2 systems to the new xrm format once
   it's completed.  Namespaecs will be created for different
   obv/2 versions as needed.  Default is 2.30, plans for adding
   2.4 etc for Black Flag and more.
@@ -1441,7 +1463,7 @@ Change Log Update (00.00.09)
 
 * 2015-10-16 XRM-WFC and SSL Connections
 + SSL Connections are now working correctly with signed cert's.
-+ XRM-WFC client is able to send and receive messages from the 
++ XRM-WFC client is able to send and receive messages from the
   BBS server over SSL. And will have both a server and client.
   Sysop's will be able to connect up and join a global sysop
   chat, link systems, transfer mail over secure connections.
@@ -1451,9 +1473,9 @@ Change Log Update (00.00.09)
   under the boost licence as well.
 
 * 2015-10-15 Added SSL Secure System to System Connections.
-+ Started Oblivion/2 XRM Client_SSL Test will merge into the 
++ Started Oblivion/2 XRM Client_SSL Test will merge into the
   Waiting for Caller remote admin Interface.
-  - This is for local system configuration, viewing users only, 
+  - This is for local system configuration, viewing users only,
     Internal Sysop messaging network possibly a lot more.
 
 Change Log Update (00.00.08)
@@ -1464,7 +1486,7 @@ Change Log Update (00.00.08)
 
 Change Log Update (00.00.07)
 * 2015-10-11 Unit Tests & Code Refactoring.
-+ Working on next method for SessionIO, Added start of 
++ Working on next method for SessionIO, Added start of
   ScreenBuffer testing for AnsiProcessor.
 + 63 Unit Tests so far. Only had a little time tonight
 + Various updates to Session and CommonIO
@@ -1474,7 +1496,7 @@ Change Log Update (00.00.06)
 + Updates some Test Names, and Started UnitTests for AnsiProcessor.
 + Testing and working on ARM Makefiles for Pi/2 in Raspbian.
   More preliminary researching on what needs to be done.
-- Small issues with outdated packages, Sqlite3 is 3.7.13, and 
+- Small issues with outdated packages, Sqlite3 is 3.7.13, and
   we need at least 3.7.14 for sqlite3_close_v2 UTF8 version.
   This is from 2012,  a little outdated Debian, I think so!
 - gcc also needs to be at least 4.8.x for c++11 support.
@@ -1484,7 +1506,7 @@ Change Log Update (00.00.06)
   However, ARM builds will take some manual updating. :)
 
 Change Log Update (00.00.05)
-* 2015-10-09 Unit Tests 
+* 2015-10-09 Unit Tests
 + Started Units Test on SessionIO
 - Class only 10% covered so far. more to go.
 + Tested 52 passing unit tests in Win and Linux so far.
@@ -1530,22 +1552,22 @@ Change Log Update (00.00.00)
 + Marking change logs with versions to match GIT
 + Some Cleanup and code break out of the MenuSystem.  Built extension files
   to separate specific menu operations.
-- Starting on LanguageFile imports and string editor for all configurable 
+- Starting on LanguageFile imports and string editor for all configurable
   prompts.
 
 Change Log Update
 * 2015-10-07 MenuSystem WIP
 + Initial Light bar display and movement, and selection are all working
-+ Menu handling now working for FIRSTCMD and EVERY on menu  
++ Menu handling now working for FIRSTCMD and EVERY on menu
   returns.
-+ Split out Menu DataFile Templates for obv/2 data files to new 
++ Split out Menu DataFile Templates for obv/2 data files to new
   MenuData Class.  MenuSystem is growing as the core and need to keep
   everything organized.
-+ Each Menu Loaded will have a fresh AnsiProcessor instance. 
-  This instance keeps track of all pull-down / template screen for 
++ Each Menu Loaded will have a fresh AnsiProcessor instance.
+  This instance keeps track of all pull-down / template screen for
   parsing special MCI function codes by parsing and building an std::map
   to make a Key Value store of each screen pixel position, pixel in this
-  context in a single character on the screen with color, attribute and 
+  context in a single character on the screen with color, attribute and
   position data.
 
 - NOTES: Right now up and left move to previous, and down and right
@@ -1553,7 +1575,7 @@ Change Log Update
   with menu commands.. so you can have up and down, or left and right
   toggle bars.. or split out to other menu commands.  Need to add this in.
 - Need to Add menu command for override of starting pull-down ID.
-- Add Cursor Toggle to hide the cursor when displaying light bars 
+- Add Cursor Toggle to hide the cursor when displaying light bars
   And/Or move to Menu Prompt location.  Also pull in selected menu
   prompt if available.
 
@@ -1565,15 +1587,15 @@ Change Log Update
   of command options.
 + Completed methods for Menu Screen redraws without re-processing.
   Clear screen, Draw out initial light bars. Method of redrawing
-  light bar movement updates.  
+  light bar movement updates.
 + Started handling of FIRSTCMD and EACH command keys for executing
   menu commands the first time menu loads, or EACH TIME a command
-  completes and returns back to the menu. 
+  completes and returns back to the menu.
 
 * Items on the next Todo list:
 -------------------------------------
-- Still a lot more menu system work.  Handling normal menus without 
-  pull- down and field input. 
+- Still a lot more menu system work.  Handling normal menus without
+  pull- down and field input.
 - Access Control Systems with security levels and flags.
 - handling menu prompts defaults and sets.
 - handling menu themes defaults and sets.
@@ -1584,21 +1606,21 @@ Change Log Update
 
 Change Log Update
 * 2015-10-05 Internal Screen Buffer - WIP
-+ Completed screen buffer parsing.  Now have X/Y Coords and Colors of 
++ Completed screen buffer parsing.  Now have X/Y Coords and Colors of
   Special MCI sequences for Light bars in menu screen
 + System is now processing the MATRIX Menu for pull down commands
-  then parsing the ANSI for the X/Y Coords and colors of each 
-  light bar state.  on/off.. 
-- Can layout the low-light bars and active for the high-light bar.  
+  then parsing the ANSI for the X/Y Coords and colors of each
+  light bar state.  on/off.
+- Can layout the low-light bars and active for the high-light bar.
   Need to add a looping to change back and forth between commands
   then setup command execution and processing.
 - Verify OBV/2 light bar ordering.  Does is height by order in menu options
-  or does it order by pulldownID index.  My bet is on the first one. 
+  or does it order by pulldownID index.  My bet is on the first one.
 
 Change Log Update
 * 2015-10-04 Internal ANSI Parser - WIP
 + Screen buffer is processing menu ANSI now. With redraw of screen
-  from the buffer.  
+  from the buffer.
 - Working on parsing character buffer for light bar position for cycling them
   in a menu.
 
@@ -1609,7 +1631,7 @@ Change Log Update
 - Finished Color and Attribute Tracking. Implementing Clear Screen,
   (3) Ways, Entire, from cursor and above, from cursor and below.
   Then adding in Erase from Cursor to End of Line, From Cursor to begging.
-- Add in pre-search in Pipe2Ansi for MCI codes so we know when to pull 
+- Add in pre-search in Pipe2Ansi for MCI codes so we know when to pull
   color and position attributes from the screen buffer.
 
 
@@ -1617,7 +1639,7 @@ Change Log Update
 * 2015-09-28 StateSystem & Internal ANSI Parser
 + Reconfigured the Session->StateMachine->State->MenuSystem hierarchy.
   Cleaned up to Session->MenuManager->MenuSystem
-  The MenuSystem is a now a State itself which easily inherits the 
+  The MenuSystem is a now a State itself which easily inherits the
   SessionData Class when created through MenuManager.  This keeps it
   nice and clean without circular dependencies tripping up.
 + a Modified StateSystem will now be used from the MenuSystem
@@ -1625,25 +1647,25 @@ Change Log Update
   and kept alive once the system returns for the next async_input loop.
 - Started on Internal ANSI screen buffer.  This is needed to process
   all ANSI screens for special MCI position codes which tell the system
-  where and what colors to place lightbars or input boundaries for 
+  where and what colors to place lightbars or input boundaries for
   split screen chat.
 
 Change Log Update
 * 2015-09-27 Menu System
 + Completed new Dynamic function mapping for the menu system.
   Each menu function will have (2) functions to work asynchronously.
-  a startup...() method for each system will be used to switch over the 
-  input index to the selected system and also handle any initial setup 
-  and screen displays for that specific interface. While state->update() 
-  method passing input to the menu system will do a lookup and pass 
+  a startup...() method for each system will be used to switch over the
+  input index to the selected system and also handle any initial setup
+  and screen displays for that specific interface. While state->update()
+  method passing input to the menu system will do a lookup and pass
   all incoming data for processing to the specific method awaiting input.
 
-+ Tested switching back and forth between the default menu input and menu 
-  editor input without any issues.  Fast and smooth! 
-- Now that the base of the menu system is laid out. Work is starting on the 
++ Tested switching back and forth between the default menu input and menu
+  editor input without any issues.  Fast and smooth!
+- Now that the base of the menu system is laid out. Work is starting on the
   actual interfaces for both the default menu, and menu editor.
 
-Change Log Update  
+Change Log Update
 * 2015-09-25 MCI Codes
 + New Parser is up to speed with the old one parsing all menu prompt
   Codes for movement and colors along with ClearScreen and NewLines.
@@ -1657,7 +1679,7 @@ Change Log Update
 * 2015-09-23 MCI Codes Parsing and Regex
 + Completed the initial parsing of MCI Codes with new Regex Parser
   Thanks Bryan for the extra help and cool validator site!
-+ Added Enum system to the MCI Codes parser, some interfaces and 
++ Added Enum system to the MCI Codes parser, some interfaces and
   screens have different MCI Codes, for examples menu prompts,
   status screen, upload checked. This will parsed for specific codes
   per interface.
@@ -1670,12 +1692,12 @@ Change Log Update
 
 Change Log Update
 * 2015-09-22 Communicator
-+ Adding System wide configuration Structs to the singleton.  
++ Adding System wide configuration Structs to the singleton.
   This is for global configuration variable access to all sessions.
 + Moved PascalToCString, CStringToPascal, BoolToString to CommonIO.
 + Added Functions to Communicator to read the CONFIG.BBS record.
 + Started Exit Error Codes, First is if the Config file can not be loaded.
-+ Completed import for Config record with updates from Pascal to 
++ Completed import for Config record with updates from Pascal to
    C-Strings.
 + Changed MenuIO to SessionIO as it's more generalized for all interfaces.
    With Pipe2Ansi, and MCI Code Parsing and GetKey, GetInputField ...
@@ -1689,7 +1711,7 @@ Making these Objects callable from the MenuSystem itself.
 Change Log Update
 * 2015-09-21 MenuIO.
 + Created New MenuIO object with SessionData
-+ Added High Level GetKey, GetInputField, 
++ Added High Level GetKey, GetInputField,
   CreateInputField: generates ANSI background color at specified length
   for Inputting data for specific amount of characters.
   pipe2ansi for MCI and Pipes sequence parser.
@@ -1714,7 +1736,7 @@ Change Log Update
   SessionData is now working nicely being passed through the states.
   Clean shutdown of the system through the Singleton to loop each session
   and disconnect all connections properly is completed for maint shutdowns.
-+ Getline/Field Input is done.  Add a Hotkey toggle with easy to use functions 
++ Getline/Field Input is done.  Add a Hotkey toggle with easy to use functions
   for handing input.
 
 Next Initial Items to complete:
@@ -1728,29 +1750,29 @@ Next Initial Items to complete:
 Change Log Update
 * 2015-09-20 SessionData Object And Core IO - WIP.
 + Most of the core IO has been moved over from the base Session class.
-  Session data will link the StateMachine with session so that it 
+  Session data will link the StateMachine with session so that it
   can change the state from within any interface. The Base Sessions
-  keep pointers through the session alive and are kept alive itself via 
+  keep pointers through the session alive and are kept alive itself via
   the Broad_caster.
-- Lots of work to rewrite the shutdown process. Now that the core IO is 
-  In the SessionDate, this allows it to be passed and used through the entire system.  
-  However, it now keep has it own Broad_caster link to keep node communication available.  
-  Since this link is in both the Session and SessionData,  we can't just stop 
-  and let all of the destructors work down. We now have to loop through all 
-  connections and disconnect them all first to properly release the smart pointers, 
-  then we can call the final io_service shutdown. Working some difference ideas 
+- Lots of work to rewrite the shutdown process. Now that the core IO is
+  In the SessionDate, this allows it to be passed and used through the entire system.
+  However, it now keep has it own Broad_caster link to keep node communication available.
+  Since this link is in both the Session and SessionData,  we can't just stop
+  and let all of the destructors work down. We now have to loop through all
+  connections and disconnect them all first to properly release the smart pointers,
+  then we can call the final io_service shutdown. Working some difference ideas
   to handle this now after researching.
 
 Change Log Update
 * 2015-09-19 Start of new SessionData Object
 + Doing callbacks in the main Session Class loop then passing buffers
-  through each state and retrieving output back the same way with several 
-  layers is very cumbersome! The new SessionData object using smart 
-  pointers spawning per session and link the base io_session, and hold all 
-  session specific data. This new object will then be passed through to 
-  each state, then off to each menu, menu's method so that IO can be used 
-  and accessed easily within the direct methods instead of data passed 
-  through several layers.  This is how I envisioned the IO would work, just 
+  through each state and retrieving output back the same way with several
+  layers is very cumbersome! The new SessionData object using smart
+  pointers spawning per session and link the base io_session, and hold all
+  session specific data. This new object will then be passed through to
+  each state, then off to each menu, menu's method so that IO can be used
+  and accessed easily within the direct methods instead of data passed
+  through several layers.  This is how I envisioned the IO would work, just
   took quite some time to get here properly learning ASIO since all examples
   work with the base class, it took some time to learn creating, passing
   with enabled_share_this() to other areas.
@@ -1762,8 +1784,8 @@ Change Log Update
 * 2015-09-17 InputField processing III
 + Fixed InputField Issue, Not a bug in EtherTerm.  Issue was with fast key
   presses, the buffer had more then one key press.  The new system loops
-  each incoming key and waits for a return from the method to push to the 
-  screen if it's a valid key and not in the middle of ESC sequence. So 
+  each incoming key and waits for a return from the method to push to the
+  screen if it's a valid key and not in the middle of ESC sequence. So
   This now catches characters in the middle of loop.. to make sure it
   catches everything to output.
 
@@ -1771,8 +1793,8 @@ Change Log Update
 * 2015-09-17 InputField processing II
 + Found bug in EntherTerm! GetLine processing is working correctly.
 + Working on InputField Generate, which will take the prompt, add a lightbar
-  Input field after the string for the length of the field, and pre-populate 
-  with any text like when sending an email.. Email to: Mercyful Fate  will 
+  Input field after the string for the length of the field, and pre-populate
+  with any text like when sending an email.. Email to: Mercyful Fate  will
   then pre populate The input field with a foreground and back color.
 
 Change Log Update
@@ -1782,23 +1804,23 @@ Change Log Update
   Thanks to Bryan for the extra rxvt sequences.
 + Completed single Key / ESC Sequence GetKey functions.
   Input is parsed for ESC determining is ESC has follow up sequence.  If
-  a sequence is detected it continues gathering the remainder of the 
+  a sequence is detected it continues gathering the remainder of the
   sequence returning an ESC to notify either ESC key or Sequence.
-  When it's a sequence the m_escape_sequence buffer will be empty for 
+  When it's a sequence the m_escape_sequence buffer will be empty for
   a single ESC key, or populated with the string translation ie.. up_arrow.
-- WIP InputField Processing. This uses the above GetKey Translations 
-  and loops input on fields until an [ENTER] is received.  Handles ESC 
-  to Abort field, CTRL+Y Clear and start over and BS/DEL to erase 
-  characters.  Working out ASCII and UTF-8 friendly support.  
+- WIP InputField Processing. This uses the above GetKey Translations
+  and loops input on fields until an [ENTER] is received.  Handles ESC
+  to Abort field, CTRL+Y Clear and start over and BS/DEL to erase
+  characters.  Working out ASCII and UTF-8 friendly support.
   WIP BS/DEL or erasing needs a little more tweaking. Made lots of progress.
 
 Change Log Update
 * 2015-09-16 Async ESC Sequence Parsing
 - Working out issues with breaking data asynchronously into ESC sequence
-  patterns when characters are originally split first by ASCII vs UTF-8, 
-  are only sent through one at a time. A Mechanism needs to be used to 
-  notify if there is more data to determine if its an ESC vs. start of a 
-  sequence.  
+  patterns when characters are originally split first by ASCII vs UTF-8,
+  are only sent through one at a time. A Mechanism needs to be used to
+  notify if there is more data to determine if its an ESC vs. start of a
+  sequence.
   NOTE: I don't like passing flags through classes for this.
 + Worked out ESC issue, on lone ESC key, we'll follow-up with a null '\0'
   right after to ESC to signal it's a lone ESC key after deadline checking.
@@ -1812,7 +1834,7 @@ Change Log Update
 * 2015-09-15 Menu Editor
 - Working on the Menu Editor input handling.  Added toggle for line or
   Hotkey input.  Default in OBV/2 is line input in most menus with
-  Hotkey during pull down menus.  This will be a toggle for an added 
+  Hotkey during pull down menus.  This will be a toggle for an added
   feature.
 
 Change Log Update
@@ -1821,10 +1843,10 @@ Change Log Update
   received is an ESC.  We need the ability to detect single ESC vs
   an ESC sequence. Lag over the Internet can receive broken sequences
   ESC in one read(), then [A in the next read().  With the timer, any
-  time we receive an ESC by itself we wait 400 milliseconds for any follow 
+  time we receive an ESC by itself we wait 400 milliseconds for any follow
   up sequence.  Otherwise it's registered as a lone ESC key.
   Without this, function key sequence can register as an ESC and exit allot
-  of interfaces causing issues!  
+  of interfaces causing issues!
 
 Change Log Update
 * 2015-09-13 Menu Editor
@@ -1839,7 +1861,7 @@ Change Log Update
 
 Change Log Update
 * 2015-09-07 Menu Editor
-+ Complete Initial Menu Directory parsing, and formatting the screen to 
++ Complete Initial Menu Directory parsing, and formatting the screen to
   dynamically display all available menus for editing.
   Working on Edit, Save, Add, Delete options now.
 
@@ -1848,47 +1870,47 @@ Change Log Update
 + Reading of MenuInfo and MenuOption Structs in .MNU files completed.
 - Started working on Editor, will add some extra options for ? in CKeys
   to list all available with small descriptions when there is time.
-  Makes it easier to mod. 
+  Makes it easier to mod.
 
 Change Log Update
 * 2015-09-04 More State Machine and I/O
 + Worked out functionality of StateMachine will derive a menu system
   States will now involve more complete systems instead of sub modules
-  Eg.. System State (BBS), Chat State (Sysop/Teleconference, 
+  Eg.. System State (BBS), Chat State (Sysop/Teleconference,
   WFC State (Waiting for Callers, stats, node snooping).
   Each state will have a Menu system for handing commands and lightbars.
-+ The State/MenuManager will loop incoming strings of data, parse single 
++ The State/MenuManager will loop incoming strings of data, parse single
   ASCII characters vs UTF-8 multi-byte characters and feed them one
-  at a time through to each interface. Interfaces will then be able to 
+  at a time through to each interface. Interfaces will then be able to
   parse sequences ASCII, ESC, or multi-byte sequences as needed.
-+ Added some basic Node Tracking for sessions.  This way we can tell  who is 
-  on which node, and also match these numbers to sessions for notifications 
++ Added some basic Node Tracking for sessions.  This way we can tell  who is
+  on which node, and also match these numbers to sessions for notifications
   and chat and door games.
 + Started adding output for default out and translated CP347 to UTF-8 for
   terminals.  Eventually will look at encoding for other 8 bit types like
   ISO-8859-1, etc.. However, most of these do not do block and line
-  drawing for ANSI.  At this time I'm keeping CP437 and UTF-8 with 
+  drawing for ANSI.  At this time I'm keeping CP437 and UTF-8 with
   possible expansions later on. (Keep it simple for now).
 + Starting on Menu Editor that will read and edit original OBV/2 menu files
   Goal is to handle menus and data exactly as OBV/2 does, then expand later
-  on as needed and enrich it.  To also allow full working menu from OBV/2 
+  on as needed and enrich it.  To also allow full working menu from OBV/2
   systems with compatibility for all mods and custom work.
 
 Change Log Update
 * 2015-09-02 Working on Sessions and State Machine
-+ Each session now includes its own State Machine.  In this instance a state 
-  Machine contains a base class, while each module will become a derived 
-  class.  For Example, CONFIG, LOGIN, MESSAGES, FILES will each have its own 
++ Each session now includes its own State Machine.  In this instance a state
+  Machine contains a base class, while each module will become a derived
+  class.  For Example, CONFIG, LOGIN, MESSAGES, FILES will each have its own
   state and become a derived state class.
 + After lots of tinkering it's been decided (with possible future changes)
   to handle each state module in the following as we do not want to loop for
   Data or input inside any of the state modules.  The Session will pass all
   client input through the update() method.  The update() method will then
-  process the input and return all output to the state_machine 
+  process the input and return all output to the state_machine
   or ie..The Manager.  which will then send all outback to the screen for
   the user to see the interaction awaiting input.
 - Question on Changing the State from within a state.  Looking at the best
-  way to handle state switching.  If we want to keep communication with a list 
+  way to handle state switching.  If we want to keep communication with a list
   of each session, and when their state changes.  This way when in multi-node
   or who's on, we can easily list the users, and which state/module or action
   they are in.  I'm leaning more towards this, but need to test this out.
@@ -1899,23 +1921,23 @@ Change Log Update
   - Completed Loop that reads buffer after Telnet Opts are parsed out
   - Next Checks for complete single characters ASCII vs UTF-8
   - Returns char commands or ESC with buffered ESC sequence for Function Keys
-  - Tricky as original code was looking at TTY in *nix, now rewriting to 
+  - Tricky as original code was looking at TTY in *nix, now rewriting to
     read buffered socket data directly.
 + Cleaned up some File naming
 + WIP handle_character_sequencing(), this need to loop all incoming data
-  splitting out characters from sequences.  But also need to keep static 
-  track of where it left off so no sequences or multi-byte characters 
+  splitting out characters from sequences.  But also need to keep static
+  track of where it left off so no sequences or multi-byte characters
   are lost.
 + Working on State Machine, each interface will be separated into states
-  where the sessions will be passed and update() will be looped to process 
+  where the sessions will be passed and update() will be looped to process
   input when data is received.
-- NOTE: Still need to research async_wait() within a session and not main 
+- NOTE: Still need to research async_wait() within a session and not main
   thread. Need to add timeouts per session.
 
 Change Log Update
 * 2015-08-31 OBV/2 Data Structure (Initial Version 2.30) 2.35, 2.4x will follow
   For Data Conversions.
-+ Completed Data Structures for MenuInfo, MenuOption, FileArea, 
++ Completed Data Structures for MenuInfo, MenuOption, FileArea,
   FileRecord, Protocol
 + Structures Completed so far w/ read/write function template:
   Statistics
@@ -1933,16 +1955,16 @@ Change Log Update
 
 Change Log Update
 * 2015-08-30 Session State
-+ Adding Session State to tell if incoming data is for commands or 
++ Adding Session State to tell if incoming data is for commands or
   session/global chat.
 + Added session tracking for input and output character encoding
   Sessions start with CP437 default. I will try to test and add support
   for other options such as ISO-8859-1 etc.. Although they don't display ANSI
-  options are nice to have later on.  Otherwise the main defaults are CP437 
+  options are nice to have later on.  Otherwise the main defaults are CP437
   and UTF-8.
 + Output encoding will default to CP437 on ANSI term detection, UTF-8 on XTERM
-  With global toggles between the two output translations.  Input will default to 
-  UTF-8, with toggles for CP437 for pasting ANSI graphics characters.  
+  With global toggles between the two output translations.  Input will default to
+  UTF-8, with toggles for CP437 for pasting ANSI graphics characters.
 
 Change Log Update
 * 2015-08-29 Encryption support for internal and user passwords.
@@ -1956,8 +1978,8 @@ Change Log Update
 Change Log Update
 * 2015-08-27 Unicode or UTF-8 Internal support.
 + Started adding experimental methods for UTF-8. Originally tested in Linux
-  and ported to Windows for OBV/2. Custom build of Boost with ICU for Boost 
-  boundary and translations for Windows.  Allot of extra work to compile with 
+  and ported to Windows for OBV/2. Custom build of Boost with ICU for Boost
+  boundary and translations for Windows.  Allot of extra work to compile with
   MingW32.
 
 Change Log Update
@@ -1967,46 +1989,46 @@ Change Log Update
 
 Change Log Update
 * 2015-08-17 Started logging updates and changes
-+ Added Communicator Class with SafeQueue for global messaging between 
++ Added Communicator Class with SafeQueue for global messaging between
   sessions and the system operator.
 + Updated Telnet Option Parsing, Added Containers for Reply and Active.
   Waiting for reply avoid sending reply's on responses. Active will heep track
   of options agreed upon between client and server.
 + Working on adding TTYPE and NAWS parsing. Have initial stages completed.
 
-Ideas: 
-+ Global Trivial that can display random questions and let users answer from 
-  any subsystem. Also keeping ongoing totals and counts through the week 
+Ideas:
++ Global Trivial that can display random questions and let users answer from
+  any subsystem. Also keeping ongoing totals and counts through the week
   pre-determined time frame.
 
 + Global Chat / Teleconference like IRC where users can chat, ANSI draw together,
-  and transfer files.  
+  and transfer files.
 
 
 ===============================================================================
 
-MAIN GOAL 
-Need to create Configuration editors for System / Menus.  
+MAIN GOAL
+Need to create Configuration editors for System / Menus.
 Have to be able to edit menus and commands!
 
-Post of Initial Change Log, and some extra ideas.. for later reference.. :) 
+Post of Initial Change Log, and some extra ideas.. for later reference.. :)
 Short term and some Long term goals, the idea is to hit as many of the short
 term as possible to get the initial interfaces going.
 
 Completed:
 1. Initial Telnet Server
 
-2. Telnet Command/Option Parsing 
+2. Telnet Command/Option Parsing
    + Negotiations for Terminal Type, Screen Size, and Key at a Time input.
    + Individual Sessions in single thread with asynchronous i/o.
    + global communication room for sending messages to all users connected.
    + ability for sysop console to send messages to all nodes.
-   - WIP, need to separate this out to chat per sessions and sysop per 
+   - WIP, need to separate this out to chat per sessions and sysop per
      individual session.
 
 Short Term Goals:
 1. Get Full Incoming Data parsing completed.
-   + CP437 -> Utf8 
+   + CP437 -> Utf8
    + Parse ESC and Function Keys Sequences
    + Toggles for Output Encoding
    + Toggles for Key-map encoding for BS/DEL between Windows and *Nix platforms.
@@ -2023,11 +2045,11 @@ Short Term Goals:
 5. WFC (Waiting for Caller) Interface for configuration and node chat/viewing.
 
 Long Term Goals:
-1. Telnet server options for ignoring bad IP's and too many connections from the 
+1. Telnet server options for ignoring bad IP's and too many connections from the
    same IP address.
 2. Full OBV/2 Menu command and light-bar emulations.
    Support for Stacked commands along with fall back menu
-   - Extra new support added for listing descriptive commands top/down in 
+   - Extra new support added for listing descriptive commands top/down in
      scrolling interface.
 3. Full OBV/2 Data Area support for custom mods
 4. Full Message and File Area with transfer protocols.

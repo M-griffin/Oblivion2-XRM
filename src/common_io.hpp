@@ -8,12 +8,19 @@
 #include <map>
 #include <stdint.h>
 
+class Logging;
 
 // Localized Buffer.
 typedef struct localized_buffer
 {
     std::string character;
     uint8_t     length;
+    
+    localized_buffer()
+        : character("")
+        , length(0)
+    {
+    }
 
     void clear()
     {
@@ -294,11 +301,13 @@ private:
      * @brief Globals for Input Methods
      * Unique per session so don't want these static.
      */
+    Logging    &m_log;             // Logging Reference
+     
     std::string m_escape_sequence; // ParseInput
     std::string m_string_buffer;   // ParseInput
     std::string m_incoming_data;   // ParseInput
     std::string m_line_buffer;     // GetLine
-    int m_column_position;         // GetLine
+    int  m_column_position;        // GetLine
     bool m_is_escape_sequence;     // ParseInput
     bool m_is_new_getline;         // GetLine
     bool m_is_new_leadoff;         // GetLine

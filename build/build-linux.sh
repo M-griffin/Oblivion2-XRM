@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Oblivion/2 XRM [LINUX / ARM]
+# Oblivion/2 XRM [LINUX / ARM] - Minimual Build Testing
 #
 # Commandline Build Script 
 # For users that want to checkout and build the system 
@@ -10,6 +10,8 @@
 #                   - Packages to their own enviroment folder
 #                   - Added Conversion and Unit Tests to Cmdline build
 # Updated 7/26/2019 - Added Command line Parameter for CPU cores to speed up compiling
+# Updated 4/30/2023 - Minimual Build - Needed for Rebuilding App / Testing
+# Updated 9/16/2023 - Setup this file to Do Release Folder Builds optimized for Size/Speed.
 
 # Save Current Working Directory
 cwd=$(pwd)
@@ -46,7 +48,7 @@ echo ''
 # *** 2. Build SqliteWrapped Dependency first.
 cd ../linux
 make -f SqliteWrapped.mk $1
-cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h > ./Debug/libSqliteWrapped.h
+cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h > ./Release/libSqliteWrapped.h
 cd $cwd
 
 echo ''
@@ -70,16 +72,6 @@ make -f xrm-menu-prompt-convert.mk $1
 cd $cwd
 
 echo ''
-echo -e "\033[1;31m"Build XRM-Server Unit Tests
-echo -e "\033[0;31m"===========================
-echo -e "\033[0;m"
-
-# *** 5. Build the Unit Tests
-cd ../linux
-make -f xrm-unittest.mk $1
-cd $cwd
-
-echo ''
 echo -e "\033[1;31m"Build XRM-Server [Main Program]
 echo -e "\033[0;31m"===============================
 echo -e "\033[0;m"
@@ -87,6 +79,16 @@ echo -e "\033[0;m"
 # *** 6. Build the Program
 cd ../linux
 make -f xrm-server.mk $1
+cd $cwd
+
+echo ''
+echo -e "\033[1;31m"Build XRM-Server Unit Tests
+echo -e "\033[0;31m"===========================
+echo -e "\033[0;m"
+
+# *** 5. Build the Unit Tests
+cd ../linux
+make -f xrm-unittest.mk $1
 cd $cwd
 
 echo ''
@@ -100,12 +102,12 @@ rm -f xrm-menu-convert
 rm -f xrm-menu-prompt-convert
 rm -f xrm-unittest
 
-cp ../linux/Debug/xrm-server .
-cp ../linux/Debug/xrm-menu-convert .
-cp ../linux/Debug/xrm-menu-prompt-convert .
-cp ../linux/Debug/xrm-unittest .
+cp ../linux/Release/xrm-server .
+cp ../linux/Release/xrm-menu-convert .
+cp ../linux/Release/xrm-menu-prompt-convert .
+cp ../linux/Release/xrm-unittest .
 
-echo ''
+#echo ''
 echo -e "\033[1;31m"Running Unit Tests
 echo -e "\033[0;31m"==================
 echo -e "\033[0;m"

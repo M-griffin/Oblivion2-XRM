@@ -184,7 +184,7 @@ void SessionStatsDao::fillSessionStatsColumnValues(query_ptr qry, session_stats_
 std::string SessionStatsDao::insertSessionStatsQryString(std::string qry, session_stats_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->iUserId,
                                          obj->sSessionType.c_str(),
                                          obj->sCodePage.c_str(),
@@ -206,7 +206,9 @@ std::string SessionStatsDao::insertSessionStatsQryString(std::string qry, sessio
                                          obj->iFilesDlMb
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -218,7 +220,7 @@ std::string SessionStatsDao::insertSessionStatsQryString(std::string qry, sessio
 std::string SessionStatsDao::updateSessionStatsQryString(std::string qry, session_stats_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->iUserId,
                                          obj->sSessionType.c_str(),
                                          obj->sCodePage.c_str(),
@@ -241,7 +243,9 @@ std::string SessionStatsDao::updateSessionStatsQryString(std::string qry, sessio
                                          obj->iId
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 
@@ -257,14 +261,14 @@ std::string SessionStatsDao::updateSessionStatsQryString(std::string qry, sessio
  */
 std::vector<session_stats_ptr> SessionStatsDao::getAllStatsPerUser(long userId)
 {
-    Logging *log = Logging::instance();
+    Logging &log = Logging::getInstance();
     session_stats_ptr stat(new SessionStats);
     std::vector<session_stats_ptr> list;
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -273,12 +277,14 @@ std::vector<session_stats_ptr> SessionStatsDao::getAllStatsPerUser(long userId)
 
     if(!qry->isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iUserId = %ld;", m_strTableName.c_str(), userId);
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE iUserId = %ld;", m_strTableName.c_str(), userId);
+    std::string queryString(result);
+    sqlite3_free(result);
 
     // Execute Query.
     if(qry->getResult(queryString))
@@ -296,12 +302,12 @@ std::vector<session_stats_ptr> SessionStatsDao::getAllStatsPerUser(long userId)
         }
         else
         {
-            log->write<Logging::ERROR_LOG>("Error, getAllStatsPerUser Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
+            log.write<Logging::ERROR_LOG>("Error, getAllStatsPerUser Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return list;
@@ -313,14 +319,14 @@ std::vector<session_stats_ptr> SessionStatsDao::getAllStatsPerUser(long userId)
  */
 std::vector<session_stats_ptr> SessionStatsDao::getLast10CallerStats()
 {
-    Logging *log = Logging::instance();
+    Logging &log = Logging::getInstance();
     session_stats_ptr stat(new SessionStats);
     std::vector<session_stats_ptr> list;
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Database is not connected", m_strTableName, __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Error, Database is not connected", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -329,14 +335,17 @@ std::vector<session_stats_ptr> SessionStatsDao::getLast10CallerStats()
 
     if(!qry->isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE bLogonSuccess = '1' "
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE bLogonSuccess = '1' "
                               "ORDER BY iID DESC;", m_strTableName.c_str());
 
+    std::string queryString(result);
+    sqlite3_free(result);
+    
     // Execute Query.
     if(qry->getResult(queryString))
     {
@@ -353,12 +362,12 @@ std::vector<session_stats_ptr> SessionStatsDao::getLast10CallerStats()
         }
         else
         {
-            log->write<Logging::ERROR_LOG>("Error, getLast10CallerStats Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
+            log.write<Logging::ERROR_LOG>("Error, getLast10CallerStats Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return list;
@@ -370,14 +379,14 @@ std::vector<session_stats_ptr> SessionStatsDao::getLast10CallerStats()
  */
 std::vector<session_stats_ptr> SessionStatsDao::getTodaysCallerStats()
 {
-    Logging *log = Logging::instance();
+    Logging &log = Logging::getInstance();
     session_stats_ptr stat(new SessionStats);
     std::vector<session_stats_ptr> list;
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -386,15 +395,18 @@ std::vector<session_stats_ptr> SessionStatsDao::getTodaysCallerStats()
 
     if(!qry->isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf(
+    char *result = sqlite3_mprintf(
                                   "SELECT * FROM %Q "
                                   "WHERE datetime(dtStartDate, 'unixepoch', 'localtime') >= datetime('now','start of day') "
                                   "ORDER BY iID DESC;", m_strTableName.c_str());
+                                  
+    std::string queryString(result);
+    sqlite3_free(result);
 
     // Execute Query.
     if(qry->getResult(queryString))
@@ -412,12 +424,12 @@ std::vector<session_stats_ptr> SessionStatsDao::getTodaysCallerStats()
         }
         else
         {
-            log->write<Logging::ERROR_LOG>("Error, getTodaysCallerStats Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
+            log.write<Logging::ERROR_LOG>("Error, getTodaysCallerStats Returned Rows=", rows, m_strTableName, __LINE__, __FILE__);
         }
     }
     else
     {
-        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return list;

@@ -1,5 +1,5 @@
 /**
- * Oblivion/2 XRM (c) 2015-2019 Michael Griffin
+ * Oblivion/2 XRM rev.2 (c) 2015-2023 Michael Griffin
  * A Telnet Server and BBS system modeled after Oblivion/2 bbs software.
  *
  * XRM = Extreme Remake!
@@ -22,16 +22,14 @@
 
 #include "model-sys/structures.hpp"
 #include "model-sys/config.hpp"
-#include "data-sys/text_prompts_dao.hpp"
 #include "data-sys/config_dao.hpp"
 #include "data-sys/db_startup.hpp"
 
-#include "interface.hpp"
 #include "communicator.hpp"
+#include "interface.hpp"
 #include "common_io.hpp"
-#include "encoding.hpp"
-#include "logging.hpp"
 
+#include <string>
 #include <memory>
 #include <cstdlib>
 #include <iostream>
@@ -53,33 +51,12 @@ std::string GLOBAL_SCRIPT_PATH = "";
 std::string GLOBAL_LOG_PATH = "";
 std::string USERS_DATABASE = "";
 
-Logging* Logging::m_global_logging_instance = nullptr;
-
 
 /**
  * @brief Gracefull Shutdown Method.
  */
 void atExitFunction()
-{
-    // Check for any remaining LOG Writes, then exit gracefully.
-    if(Logging::isActive())
-    {
-        int log_entries = Logging::instance()->getNumberOfLogEntries();
-
-        for(int i = 0; i < log_entries; i++)
-        {
-            log_entry_ptr entry = Logging::instance()->getLogQueueEntry();
-
-            if(entry != nullptr)
-            {
-                Logging::instance()->writeOutYamlFile(entry);
-            }
-        }
-    }
-
-    TheCommunicator::releaseInstance();
-    Encoding::releaseInstance();
-    Logging::releaseInstance();
+{    
     std::cout << std::endl << "XRM SHUTDOWN COMPLETED!" << std::endl;
 }
 
@@ -90,18 +67,17 @@ void atExitFunction()
  */
 auto main() -> int
 {
-
     // Setup Cleanup method when program exits.
     std::atexit(atExitFunction);
+    
+    Logging &m_log = Logging::getInstance();
+    m_log.write<Logging::CONSOLE_LOG>("Oblivion/2 XRM-Server rev.2(c) 2015-2023 Michael Griffin.");
 
-    std::cout << "Oblivion/2 XRM-Server (c) 2015-2019 Michael Griffin."
-              << std::endl
-              << std::endl;
-
-    CommonIO common;
-    GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
-    std::cout << "BBS HOME Directory Registered: " << std::endl;
-    std::cout << GLOBAL_BBS_PATH << std::endl;
+    {
+        CommonIO common;
+        GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
+    }
+    m_log.write<Logging::CONSOLE_LOG>("BBS HOME Directory Registered=", GLOBAL_BBS_PATH);
 
     // Setup System Folder Paths off main BBS Path.
     GLOBAL_DATA_PATH = GLOBAL_BBS_PATH + "DATA";
@@ -116,7 +92,7 @@ auto main() -> int
     // Create LOG Directory if it doesn't exist.
     if(_mkdir(GLOBAL_LOG_PATH.c_str()) != 0 && errno != EEXIST)
     {
-        std::cout << "Unable to create LOG folder: " << GLOBAL_LOG_PATH << std::endl;
+        m_log.write<Logging::WARN_LOG>("Unable to create LOG folder=", GLOBAL_LOG_PATH);
     }
 
 #else
@@ -124,14 +100,10 @@ auto main() -> int
     // Create LOG Directory if it doesn't exist.
     if(mkdir(GLOBAL_LOG_PATH.c_str(), 0770) == -1 && errno != EEXIST)
     {
-        std::cout << "Unable to create LOG folder: " << GLOBAL_LOG_PATH << std::endl;
+        m_log.write<Logging::WARN_LOG>("Unable to create LOG folder=", GLOBAL_LOG_PATH);
     }
 
-#endif
-    // Startup the Encoding Instance and Char Mappings.
-    {
-        Encoding::instance();
-    }
+#endif  
 
     // Loading and saving default Configuration file to XML
     {
@@ -139,7 +111,7 @@ auto main() -> int
 
         if(!config)
         {
-            std::cout << "Unable to allocate config structure" << std::endl;
+            m_log.write<Logging::ERROR_LOG>("Unable to allocate config object");
             exit(1);
         }
 
@@ -158,18 +130,15 @@ auto main() -> int
 
         if(!cfg.validation())
         {
-            std::cout << "Unable to validate config structure" << std::endl;
+            m_log.write<Logging::ERROR_LOG>("Config Object validation failed!");
             exit(1);
         }
 
-
         // All Good, Attached to Global Communicator Instance.
-        // This also controls logging, need to start this prior to any
-        // any logging objects being used.
-        TheCommunicator::instance()->attachConfiguration(config);
-        Logging::instance()->write<Logging::CONSOLE_LOG>("Starting up Oblivion/2 XRM-Server");
+        Communicator::getInstance().attachConfiguration(config);
+        m_log.write<Logging::CONSOLE_LOG>("Starting up Oblivion/2 XRM-Server");
     }
-
+    
     // Database Startup in it's own context.
     {
         db_startup_ptr db(new DbStartup());
@@ -178,49 +147,50 @@ auto main() -> int
         // Write all error logs and exit.
         if(!db_startup)
         {
-            // DataBase Startup Failed
-            std::cout << "Database Startup failed, writting system logs" << std::endl;
-            int log_entries = Logging::instance()->getNumberOfLogEntries();
-
-            for(int i = 0; i < log_entries; i++)
-            {
-                log_entry_ptr entry = Logging::instance()->getLogQueueEntry();
-
-                if(entry != nullptr)
-                {
-                    Logging::instance()->writeOutYamlFile(entry);
-                }
-            }
+            m_log.write<Logging::ERROR_LOG>("Database Startup failed, exiting...");
+            return 0;
         }
     }
 
     // Isolate to code block for smart pointer deallocation.
     {
         // Create Handles to Services, and starts up connection listener and ASIO Thread Worker
-        config_ptr config = TheCommunicator::instance()->getConfiguration();
-
-        IOService io_service;
-        interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", config->port_telnet));
-
-        while(TheCommunicator::instance()->isActive())
-        {
-            // Main Thread - While system is active loop,  This will be external event processor
-            // Or notifications, etc.. lets see what else we want to do here.
-            int log_entries = Logging::instance()->getNumberOfLogEntries();
-
-            for(int i = 0; i < log_entries; i++)
-            {
-                log_entry_ptr entry = Logging::instance()->getLogQueueEntry();
-
-                if(entry != nullptr)
-                {
-                    Logging::instance()->writeOutYamlFile(entry);
-                }
+        IOService io_service;        
+        int port = Communicator::getInstance().getConfiguration()->port_telnet;
+        std::string logging_level = Communicator::getInstance().getConfiguration()->logging_level;
+        Logging::getInstance().setLoggingLevel(logging_level);        
+        interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", port));        
+        
+        while(io_service.isActive()) 
+        {            
+            std::string line;
+            std::getline(std::cin, line);
+            
+            /**
+             * Clean Shutdown, (2) Steps at this time from Console Commands.
+             * 
+             * 1. Kill - All Connections, so all sessions cleanly shutown, should wait at least 10 seconds.
+             * 2. Quit - Stops IO Worker Service and All Async Jobs and listeners
+             * 
+             * If we try to do both of these Kill isn't finished then we get leaks on quit.
+             * Which has to be looked into more in a single smpoother process.
+             * 
+             * Works for Now.
+             */
+            if (line == "kill") {
+                m_log.write<Logging::INFO_LOG>("Killing All Connections before exiting...");
+                setupAndRunAsioServer->shutdown();
             }
-
+            
+            if (line == "quit") {
+                m_log.write<Logging::INFO_LOG>("Shutting down IOservice, exiting...");
+                io_service.stop();
+            }
+          
             // Timer, for cpu usage
-            std::this_thread::sleep_for(std::chrono::milliseconds(40));
+            std::this_thread::sleep_for(std::chrono::milliseconds(40));            
         }
+
     }
 
     return 0;

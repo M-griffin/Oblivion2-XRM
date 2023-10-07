@@ -3,6 +3,7 @@
 
 #include "mod_base.hpp"
 
+#include <iostream>
 #include <string>
 #include <memory>
 #include <functional>
@@ -10,9 +11,6 @@
 
 class Menu;
 typedef std::shared_ptr<Menu> menu_ptr;
-
-class SessionData;
-typedef std::shared_ptr<SessionData> session_data_ptr;
 
 class Directory;
 typedef std::shared_ptr<Directory> directory_ptr;
@@ -28,62 +26,8 @@ class ModMenuEditor
     : public ModBase
 {
 public:
-    ModMenuEditor(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-        : ModBase(session_data, config, ansi_process)
-        , m_session_io(session_data)
-        , m_filename("mod_menu_editor.yaml")
-        , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
-        , m_mod_setup_index(MOD_DISPLAY_MENU)
-        , m_mod_function_index(MOD_MENU_INPUT)
-        , m_mod_menu_state_index(MENU_ADD)
-        , m_mod_toggle_view_index(VIEW_DEFAULT)
-        , m_max_toggled_view_index(VIEW_PULLDOWN)
-        , m_is_text_prompt_exist(false)
-        , m_page(0)
-        , m_rows_per_page(0)
-        , m_current_menu("")
-        , m_current_option(0)
-        , m_current_field(0)
-    {
-        // Setup Modules
-        m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuEditor, this));
-        m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuOptionEditor, this));
-        m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuEditFields, this));
-        m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuOptionEditFields, this));
-
-        // Input or Method Modules that handle incoming input per state.
-        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorPausedInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuNameInput, this, std::placeholders::_1));
-
-        // Menu Option Input Commands.
-        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorOptionInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuOptionInput, this, std::placeholders::_1));
-
-        // Menu Field Input Commands
-        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuFieldInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuFieldHandler, this, std::placeholders::_1));
-
-        // Menu Option Field Input Commands.
-        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuOptionFieldInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorMenuOptionFieldHandler, this, std::placeholders::_1));
-
-        // Display Pause, waits for a key, then returns (Used in View Generic Menu)
-        m_mod_functions.push_back(std::bind(&ModMenuEditor::menuEditorDisplayPause, this, std::placeholders::_1));
-
-
-
-        // Check of the Text Prompts exist.
-        m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
-
-        if(!m_is_text_prompt_exist)
-        {
-            createTextPrompts();
-        }
-
-        // Loads all Text Prompts for current module
-        m_text_prompts_dao->readPrompts();
-    }
+    ModMenuEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModMenuEditor() override
     {
@@ -507,9 +451,8 @@ private:
     std::vector<std::string>                                m_menu_display_list;
     std::vector<menu_ptr>                                   m_loaded_menu;
 
-    SessionIO              m_session_io;
-    std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
+    directory_ptr          m_directory;
 
     unsigned int           m_mod_setup_index;
     unsigned int           m_mod_function_index;
@@ -522,10 +465,7 @@ private:
     unsigned int           m_rows_per_page;
     std::string            m_current_menu;
     unsigned int           m_current_option;
-    unsigned int           m_current_field;
-
-    CommonIO               m_common_io;
-    directory_ptr          m_directory;
+    unsigned int           m_current_field;   
 
 };
 

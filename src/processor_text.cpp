@@ -1,5 +1,8 @@
 #include "processor_text.hpp"
+
 #include "model-sys/structures.hpp"
+#include "model-sys/screen_pixel.hpp"
+
 #include "common_io.hpp"
 #include "logging.hpp"
 
@@ -22,6 +25,14 @@
 #include <vector>
 #include <sstream>
 
+ProcessorText::ProcessorText(int term_height, int term_width)
+    : ProcessorBase(term_height, term_width)
+    , m_tab_width(4)
+    , m_line_number(1)
+    , m_is_double_backspace(false)
+{ 
+    
+}
 
 /**
  * @brief Buffer to String for Parsing
@@ -353,8 +364,8 @@ std::string ProcessorText::screenBufferParse()
             // is not the same as the next!
             if(start == matches[0].second)
             {
-                Logging *log = Logging::instance();
-                log->write<Logging::DEBUG_LOG>("[screenBufferParse] no matches!",
+                Logging &log = Logging::getInstance();
+                log.write<Logging::DEBUG_LOG>("[screenBufferParse] no matches!",
                                                 __LINE__, __FILE__);
                 break;
             }
@@ -388,8 +399,8 @@ std::string ProcessorText::screenBufferParse()
     }
     catch(std::regex_error &ex)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("[screenBufferParse] regex=",
+        Logging &log = Logging::getInstance();
+        log.write<Logging::ERROR_LOG>("[screenBufferParse] regex=",
                                         ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
@@ -537,12 +548,13 @@ void ProcessorText::handleTextInput(const std::string &char_sequence)
  */
 void ProcessorText::screenBufferSetGlyph(const std::string &char_sequence)
 {
-    m_screen_pixel.char_sequence = char_sequence;
-    m_screen_pixel.x_position = m_x_position;
-    m_screen_pixel.y_position = m_y_position;
-    m_screen_pixel.attribute  = m_attribute;
-    m_screen_pixel.foreground = m_foreground_color;
-    m_screen_pixel.background = m_background_color;
+    ScreenPixel screen_pixel;
+    screen_pixel.char_sequence = char_sequence;
+    screen_pixel.x_position = m_x_position;
+    screen_pixel.y_position = m_y_position;
+    screen_pixel.attribute  = m_attribute;
+    screen_pixel.foreground = m_foreground_color;
+    screen_pixel.background = m_background_color;
     
     
     // FIXME So we need a Text buffer to store the pixel (character) info per each line
@@ -562,25 +574,26 @@ void ProcessorText::screenBufferSetGlyph(const std::string &char_sequence)
         }
         else
         {
-            Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("[screenBufferSetGlyph] out of bounds pos=",
+            Logging &log = Logging::getInstance();
+            log.write<Logging::ERROR_LOG>("[screenBufferSetGlyph] out of bounds pos=",
                                             m_x_position-1, __LINE__, __FILE__);
         }
     }
     catch(std::exception &e)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("[screenBufferSetGlyph] exceeds screen dimensions Exception=",
+        Logging &log = Logging::getInstance();
+        log.write<Logging::ERROR_LOG>("[screenBufferSetGlyph] exceeds screen dimensions Exception=",
                                         e.what(), __LINE__, __FILE__);
     }*/
 
     // Clear for next sequences.
+    /*
     m_screen_pixel.char_sequence = '\0';
     m_screen_pixel.x_position = 1;
     m_screen_pixel.y_position = 1;
     m_screen_pixel.attribute  = 0;
     m_screen_pixel.foreground = FG_WHITE;
-    m_screen_pixel.background = BG_BLACK;
+    m_screen_pixel.background = BG_BLACK;*/
 
 }
 
@@ -619,8 +632,8 @@ void ProcessorText::screenBufferClearRange(int start, int end)
         }
         catch(std::exception &e)
         {
-            Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("[screenBufferClearRange] Exception=", e.what(),
+            Logging &log = Logging::getInstance();
+            log.write<Logging::ERROR_LOG>("[screenBufferClearRange] Exception=", e.what(),
                                             "start=", start, "end=", end, __LINE__, __FILE__);
         }
     }
@@ -1395,4 +1408,9 @@ void ProcessorText::parseTextToBuffer(char *buff)
         
         // End of Position Updates for movement.
     }
+}
+
+std::map<int, int> ProcessorText::getLineEndingMap() const
+{
+    return m_line_ending_map;
 }

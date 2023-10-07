@@ -1,9 +1,10 @@
 #ifndef USERS_DAO_HPP
 #define USERS_DAO_HPP
 
-#include "../model-sys/users.hpp"
 #include "../data-sys/base_dao.hpp"
+#include "../model-sys/users.hpp"
 
+#include <iostream>
 #include <memory>
 #include <vector>
 #include <functional>
@@ -20,6 +21,7 @@ typedef std::shared_ptr<SQLW::Query> query_ptr;
 
 // Base Dao Definition
 typedef BaseDao<Users> baseUsersClass;
+
 
 /**
  * @class UsersDao

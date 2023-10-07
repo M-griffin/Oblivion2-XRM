@@ -1,5 +1,6 @@
 #include "session_io.hpp"
-#include "session_data.hpp"
+
+#include "session.hpp"
 #include "common_io.hpp"
 #include "encoding.hpp"
 #include "logging.hpp"
@@ -12,20 +13,34 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <memory>
 
 
 SessionIO::SessionIO()
-    : m_session_data(nullptr)
+    : m_log(Logging::getInstance())
+    , m_session_data(nullptr)
+    , m_common_io(new CommonIO())
 {
 }
 
-SessionIO::SessionIO(session_data_ptr session_data)
-    : m_session_data(session_data)
+SessionIO::SessionIO(session_ptr session_data)
+    : m_log(Logging::getInstance())
+    , m_session_data(session_data)
+    , m_common_io(new CommonIO())
 {
 }
+
+SessionIO::SessionIO(session_ptr session_data, common_io_ptr common_io)
+    : m_log(Logging::getInstance())
+    , m_session_data(session_data)
+    , m_common_io(common_io)
+{
+}
+
 
 SessionIO::~SessionIO()
 {
+    m_log.write<Logging::DEBUG_LOG>("~SessionIO()");
     clearAllMCIMapping();
 }
 
@@ -35,15 +50,14 @@ SessionIO::~SessionIO()
  * @return
  */
 std::string SessionIO::getFSEKeyInput(const std::string &character_buffer)
-{
-    Logging *log = Logging::instance();
-    std::string input = m_common_io.parseInput(character_buffer);
+{    
+    std::string input = m_common_io->parseInput(character_buffer);
 
     if(input.size() == 0)
     {
         // No Data received, could be in mid ESC sequence
         // Return for next key.
-        log->write<Logging::DEBUG_LOG>("getKeyInput Mid Escape");
+        m_log.write<Logging::DEBUG_LOG>("getKeyInput Mid Escape");
         return "";
     }
 
@@ -51,23 +65,23 @@ std::string SessionIO::getFSEKeyInput(const std::string &character_buffer)
 
     if(input[0] == '\x1b')
     {
-        escape_sequence = m_common_io.getFSEEscapeSequence();
+        escape_sequence = m_common_io->getFSEEscapeSequence();
 
-        std::cout << "FSE escape_sequence: " << escape_sequence << std::endl;
+        m_log.write<Logging::DEBUG_LOG>("FSE escape_sequence=", escape_sequence);
 
         if(escape_sequence.size() == 0)
         {
-            log->write<Logging::DEBUG_LOG>("getKeyInput Single Escape");
+            m_log.write<Logging::DEBUG_LOG>("getKeyInput Single Escape");
             return "\x1b";
         }
         else
         {
-            log->write<Logging::DEBUG_LOG>("getKeyInput Translated Escape Sequence=", escape_sequence);
+            m_log.write<Logging::DEBUG_LOG>("getKeyInput Translated Escape Sequence=", escape_sequence);
             return (escape_sequence.insert(0, "\x1b"));
         }
     }
 
-    log->write<Logging::DEBUG_LOG>("getKeyInput Normal Input=", input);
+    m_log.write<Logging::DEBUG_LOG>("getKeyInput Normal Input=", input);
     return input;
 }
 
@@ -78,14 +92,13 @@ std::string SessionIO::getFSEKeyInput(const std::string &character_buffer)
  */
 std::string SessionIO::getKeyInput(const std::string &character_buffer)
 {
-    Logging *log = Logging::instance();
-    std::string input = m_common_io.parseInput(character_buffer);
+    std::string input = m_common_io->parseInput(character_buffer);
 
     if(input.size() == 0)
     {
         // No Data received, could be in mid ESC sequence
         // Return for next key.
-        log->write<Logging::DEBUG_LOG>("getKeyInput Mid Escape");
+        m_log.write<Logging::DEBUG_LOG>("getKeyInput Mid Escape");
         return "";
     }
 
@@ -93,21 +106,21 @@ std::string SessionIO::getKeyInput(const std::string &character_buffer)
 
     if(input[0] == '\x1b')
     {
-        escape_sequence = m_common_io.getEscapeSequence();
+        escape_sequence = m_common_io->getEscapeSequence();
 
         if(escape_sequence.size() == 0)
         {
-            log->write<Logging::DEBUG_LOG>("getKeyInput Single Escape");
+            m_log.write<Logging::DEBUG_LOG>("getKeyInput Single Escape");
             return "\x1b";
         }
         else
         {
-            log->write<Logging::DEBUG_LOG>("getKeyInput Translated Escape Sequence=", escape_sequence);
+            m_log.write<Logging::DEBUG_LOG>("getKeyInput Translated Escape Sequence=", escape_sequence);
             return (escape_sequence.insert(0, "\x1b"));
         }
     }
 
-    log->write<Logging::DEBUG_LOG>("getKeyInput Normal Input=", input);
+    m_log.write<Logging::DEBUG_LOG>("getKeyInput Normal Input=", input);
     return input;
 }
 
@@ -118,8 +131,6 @@ std::string SessionIO::getKeyInput(const std::string &character_buffer)
  */
 void SessionIO::createInputField(std::string &field_name, int &len)
 {
-    Logging *log = Logging::instance();
-
     std::string repeat;
     char formatted[1024]= {0};
     char sTmp[3]  = {0};
@@ -174,7 +185,7 @@ void SessionIO::createInputField(std::string &field_name, int &len)
                 }
                 else
                 {
-                    log->write<Logging::ERROR_LOG>("createInputField() Incorrect |FL field length=", tempLength, "cannot exceed max size=", len);
+                    m_log.write<Logging::ERROR_LOG>("createInputField() Incorrect |FL field length=", tempLength, "cannot exceed max size=", len);
                 }
             }
             else
@@ -187,7 +198,7 @@ void SessionIO::createInputField(std::string &field_name, int &len)
     // Override Foreground/Background Input Field Colors
     // This is now for OBV/2 .. Not in Legacy.
     position = field_name.find("|FB",0);
-    log->write<Logging::DEBUG_LOG>("createInputField() |FB position=", position, "compare=", position+4, stringSize);
+    m_log.write<Logging::DEBUG_LOG>("createInputField() |FB position=", position, "compare=", position+4, stringSize);
 
     if(position != std::string::npos)
     {
@@ -258,7 +269,6 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
                                      std::string leadoff,
                                      bool hidden)
 {
-    Logging *log = Logging::instance();
     // Setup the leadoff, if it's first time, then print it out
     // Other if empty or follow-up calls to inputfield field skip it!
     static bool is_leadoff = true;
@@ -276,14 +286,14 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
         is_leadoff = false;
     }
 
-    std::string string_data = m_common_io.getLine(character_buffer, length, leadoff, hidden);
+    std::string string_data = m_common_io->getLine(character_buffer, length, leadoff, hidden);
 
     if((signed)string_data.size() > 0)
     {
         // Check for ESC for Abort!
         if(string_data[0] == 27 && string_data.size() == 1)
         {
-            std::string esc_sequence = m_common_io.getEscapeSequence();
+            std::string esc_sequence = m_common_io->getEscapeSequence();
 
             if(esc_sequence.size() == 0 && character_buffer[0] == '\0')
             {
@@ -296,7 +306,7 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
         // Check for Completed Field Entry
         else if((string_data[0] == '\n' && string_data.size() == 1) || character_buffer[0] == '\n')
         {
-            result = m_common_io.getInputBuffer();
+            result = m_common_io->getInputBuffer();
             string_data.erase();
             is_leadoff = true;    // Reset for next run
             return "\n";
@@ -304,12 +314,12 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
         // Updates on Keypresses.
         else
         {
-            log->write<Logging::DEBUG_LOG>("getInputField() result=", result, "string_data=", string_data);
+            m_log.write<Logging::DEBUG_LOG>("getInputField() result=", result, "string_data=", string_data);
             return string_data;
         }
     }
 
-    log->write<Logging::DEBUG_LOG>("getInputField() result empty");
+    m_log.write<Logging::DEBUG_LOG>("getInputField() result empty");
     return "";
 }
 
@@ -739,8 +749,7 @@ std::string SessionIO::parsePipeWithChars(const std::string &pipe_code)
  */
 std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapType> &code_map)
 {
-    Logging *log = Logging::instance();
-    log->write<Logging::DEBUG_LOG>("[parseCodeMap]", __LINE__, __FILE__);
+    m_log.write<Logging::DEBUG_LOG>("[parseCodeMap]", __LINE__, __FILE__);
 
     std::string ansi_string = screen;
     MapType my_matches;
@@ -774,7 +783,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
         {
             case 1: // Pipe w/ 2 DIGIT Colors
             {
-                log->write<Logging::DEBUG_LOG>("Pipe w/ 2 DIGIT Colors |00");
+                m_log.write<Logging::DEBUG_LOG>("Pipe w/ 2 DIGIT Colors |00");
                 std::string result = pipeColors(my_matches.m_code);
 
                 if(result.size() != 0)
@@ -798,7 +807,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 2: // Pipe w/ 2 Chars and 4 Digits // |XY0101
             {
-                log->write<Logging::DEBUG_LOG>("Pipe w/ 2 Chars and 4 Digits // |XY0101");
+                m_log.write<Logging::DEBUG_LOG>("Pipe w/ 2 Chars and 4 Digits // |XY0101");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "       ");
             }
@@ -806,7 +815,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 3: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
             {
-                log->write<Logging::DEBUG_LOG>("Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33");
+                m_log.write<Logging::DEBUG_LOG>("Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33");
                 std::string result = separatePipeWithCharsDigits(my_matches.m_code);
 
                 if(result.size() != 0)
@@ -821,7 +830,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
                 // This one will need replacement in the string parsing
                 // Pass the original string because of |DE for delay!
             {
-                log->write<Logging::DEBUG_LOG>("Pipe w/ 2 CHARS // |AA");
+                m_log.write<Logging::DEBUG_LOG>("Pipe w/ 2 CHARS // |AA");
                 std::string result = parsePipeWithChars(my_matches.m_code);
 
                 if(result.size() != 0)
@@ -838,7 +847,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 5: // %%FILENAME.EXT  get filenames for loading from string prompts
             {
-                log->write<Logging::DEBUG_LOG>("Replacing %%FILENAME.EXT codes");
+                m_log.write<Logging::DEBUG_LOG>("Replacing %%FILENAME.EXT codes");
                 std::string result = parseFilename(my_matches.m_code);
 
                 if(result.size() != 0)
@@ -855,7 +864,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 6: // Percent w/ 2 CHARS
             {
-                log->write<Logging::DEBUG_LOG>("Percent w/ 2 CHARS");
+                m_log.write<Logging::DEBUG_LOG>("Percent w/ 2 CHARS");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
             }
@@ -865,7 +874,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
             {
                 // Were just removing them because they are processed.
                 // Now that first part of sequence |01 etc.. are processed!
-                log->write<Logging::DEBUG_LOG>("replacing %## codes");
+                m_log.write<Logging::DEBUG_LOG>("replacing %## codes");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
             }
@@ -892,8 +901,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
  */
 std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std::vector<MapType> &code_map)
 {
-    Logging *log = Logging::instance();
-    log->write<Logging::DEBUG_LOG>("[parseCodeMapGenerics]", __LINE__, __FILE__);
+    m_log.write<Logging::DEBUG_LOG>("[parseCodeMapGenerics]", __LINE__, __FILE__);
 
     std::string ansi_string = screen;
     MapType my_matches;
@@ -920,13 +928,13 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
 
             if(it != m_mapped_codes.end())
             {
-                log->write<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen found=", my_matches.m_code, it->second, __LINE__, __FILE__);
+                m_log.write<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen found=", my_matches.m_code, it->second, __LINE__, __FILE__);
                 // If found, replace mci sequence with text
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, it->second);
             }
             else
             {
-                log->write<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen not found=", __LINE__, __FILE__);
+                m_log.write<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen not found=", __LINE__, __FILE__);
                 std::string remove_code = "";
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, remove_code);
             }
@@ -989,8 +997,7 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
             // is not the same as the next!
             if(start == matches[0].second)
             {
-                Logging *log = Logging::instance();
-                log->write<Logging::DEBUG_LOG>("[parseToCodeMap] no Code Maps Found", __LINE__, __FILE__);
+                m_log.write<Logging::DEBUG_LOG>("[parseToCodeMap] no Code Maps Found", __LINE__, __FILE__);
                 break;
             }
 
@@ -1038,8 +1045,7 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
     }
     catch(std::regex_error &ex)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("[parseToCodeMap] Exception=", ex.what(), ex.code(), __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("[parseToCodeMap] Exception=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
     return code_map;
@@ -1133,9 +1139,7 @@ std::string SessionIO::pipe2promptFormat(const std::string &sequence, config_ptr
     for(unsigned int i = 0; i < code_map.size(); i++)
     {
         auto &map = code_map[i];
-
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("[pipe2promptFormat] Menu Format Code=", map.m_code, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("[pipe2promptFormat] Menu Format Code=", map.m_code, __LINE__, __FILE__);
 
         // Control Codes are in Group 2
         switch(map.m_match)
@@ -1187,8 +1191,7 @@ bool SessionIO::checkRegex(const std::string &sequence, const std::string &expre
     }
     catch(std::regex_error &ex)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("[checkRegex] Expression=", expression, "Exception=", ex.what(), ex.code(), __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("[checkRegex] Expression=", expression, "Exception=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
     return result;
@@ -1206,7 +1209,7 @@ std::string SessionIO::parseTextPrompt(const M_StringPair &prompt)
     std::string mci_code = "|PD";
 
     // If Description Flag is in Prompt, then replace code with Description
-    m_common_io.parseLocalMCI(text_prompt, mci_code, prompt.first);
+    m_common_io->parseLocalMCI(text_prompt, mci_code, prompt.first);
 
     // Return full mci code parsing on the new string.
     return pipe2ansi(text_prompt);

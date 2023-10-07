@@ -1,21 +1,25 @@
 #ifndef ACCESS_CONDITION_HPP
 #define ACCESS_CONDITION_HPP
 
-#include "session_io.hpp"
 #include "model-sys/structures.hpp"
 
+#include <iostream>
 #include <memory>
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <map>
 
+class SessionIO;
+typedef std::shared_ptr<SessionIO> session_io_ptr;
 
 class Users;
 typedef std::shared_ptr<Users> user_ptr;
 
 class AccessLevel;
 typedef std::shared_ptr<AccessLevel> access_level_ptr;
+
+class Logging;
 
 /**
  * @class AccessCondition
@@ -27,8 +31,8 @@ typedef std::shared_ptr<AccessLevel> access_level_ptr;
 class AccessCondition
 {
 public:
-    explicit AccessCondition()  { };
-    ~AccessCondition() { };
+    explicit AccessCondition();
+    ~AccessCondition();            
 
     /**
      * @brief Toggle Bit Flag
@@ -118,7 +122,8 @@ public:
     std::string getAccessConditionFlagStringFromBits(int bits);
 
     // Using Session IO for Code Mapping
-    SessionIO  m_session_io;
+    Logging        &m_log;
+    session_io_ptr  m_session_io;    
 
     // note update to security expressions
     // start with NOT s255 then test for s255

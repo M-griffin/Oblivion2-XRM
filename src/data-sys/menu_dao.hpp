@@ -5,6 +5,7 @@
 #include <string>
 #include <mutex>
 
+class Logging;
 
 class Menu;
 typedef std::shared_ptr<Menu> menu_ptr;
@@ -92,7 +93,7 @@ public:
      */
     std::string getFileName() const { return m_filename; }
 
-
+    Logging    &m_log;
     menu_ptr    m_menu;
     std::string m_path;
     std::string m_filename;

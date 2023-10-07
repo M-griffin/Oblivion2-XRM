@@ -10,6 +10,7 @@
 #include "libSqliteWrapped.h"
 #include <sqlite3.h>
 
+#include <iostream>
 #include <memory>
 #include <functional>
 #include <vector>
@@ -32,7 +33,8 @@ class BaseDao
 public:
 
     explicit BaseDao(SQLW::Database &database)
-        : m_database(database)
+        : m_log(Logging::getInstance())
+        , m_database(database)
         , m_strTableName("")
         , m_cmdFirstTimeSetup("")
         , m_cmdTableExists("")
@@ -43,8 +45,11 @@ public:
     { }
 
     ~BaseDao()
-    { }
+    { 
+        m_log.write<Logging::DEBUG_LOG>("~BaseDao()");
+    }
 
+    Logging        &m_log;
 
     // Handle to Database
     SQLW::Database &m_database;
@@ -73,13 +78,12 @@ public:
      */
     bool baseDoesTableExist()
     {
-        bool result = false;
-        Logging *log = Logging::instance();
+        bool result = false;        
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -88,7 +92,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -99,18 +103,18 @@ public:
 
             if(rows > 0)
             {
-                log->write<Logging::DEBUG_LOG>(m_strTableName, "Table Exists!", __LINE__, __FILE__);
+                m_log.write<Logging::DEBUG_LOG>(m_strTableName, "Table Exists!", __LINE__, __FILE__);
                 result = true;
             }
             else
             {
                 // No rows means the table doesn't exist!
-                log->write<Logging::DEBUG_LOG>(m_strTableName, "table doesn't exist returned rows", rows, __LINE__, __FILE__);
+                m_log.write<Logging::DEBUG_LOG>(m_strTableName, "table doesn't exist returned rows", rows, __LINE__, __FILE__);
             }
         }
         else
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "baseDoesTableExist getResult()", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "baseDoesTableExist getResult()", __LINE__, __FILE__);
         }
 
         return result;
@@ -122,12 +126,11 @@ public:
     bool baseFirstTimeSetupParams()
     {
         bool result = false;
-        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -136,7 +139,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -151,12 +154,11 @@ public:
     bool baseCreateTable()
     {
         bool result = false;
-        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -165,7 +167,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -189,12 +191,11 @@ public:
     bool baseDropTable()
     {
         bool result = false;
-        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -203,7 +204,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -345,12 +346,11 @@ public:
     bool baseUpdateRecord(std::shared_ptr<T> obj)
     {
         bool result = false;
-        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -359,7 +359,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -383,12 +383,11 @@ public:
     {
         bool result = false;
         long lastInsertId = -1;
-        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -397,7 +396,7 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return result;
         }
 
@@ -425,14 +424,13 @@ public:
      */
     bool baseDeleteRecord(long id)
     {
-        bool result = false;
-        Logging *log = Logging::instance();
+        bool results = false;
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
-            return result;
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            return results;
         }
 
         // Create Pointer and Connect Query Object to Database.
@@ -440,19 +438,21 @@ public:
 
         if(!qry || !qry->isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
-            return result;
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            return results;
         }
 
         // Build string
-        std::string queryString = sqlite3_mprintf("DELETE FROM %Q WHERE iId = %ld;", m_strTableName.c_str(), id);
+        char *result = sqlite3_mprintf("DELETE FROM %Q WHERE iId = %ld;", m_strTableName.c_str(), id);
+        std::string queryString(result);
+        sqlite3_free(result);
 
         // Execute Update in a Transaction, rollback if fails.
         std::vector<std::string> statements;
         statements.push_back(queryString);
-        result = qry->executeTransaction(statements);
+        results = qry->executeTransaction(statements);
 
-        return result;
+        return results;
     }
 
     /**
@@ -463,12 +463,11 @@ public:
     std::shared_ptr<T> baseGetRecordById(long id)
     {
         std::shared_ptr<T> obj(new T);
-        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return obj;
         }
 
@@ -477,12 +476,14 @@ public:
 
         if(!qry->isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return obj;
         }
 
         // Build Query String
-        std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iID = %ld;", m_strTableName.c_str(), id);
+        char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE iID = %ld;", m_strTableName.c_str(), id);
+        std::string queryString(result);
+        sqlite3_free(result);
 
         // Execute Query.
         if(qry->getResult(queryString))
@@ -496,12 +497,12 @@ public:
             }
             else
             {
-                log->write<Logging::ERROR_LOG>(m_strTableName, "Error, getRecordById Returned Rows", rows, __LINE__, __FILE__);
+                m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, getRecordById Returned Rows", rows, __LINE__, __FILE__);
             }
         }
         else
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, getRecordById getResult()", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, getRecordById getResult()", __LINE__, __FILE__);
         }
 
         return obj;
@@ -515,12 +516,11 @@ public:
     {
         std::shared_ptr<T> obj(new T);
         std::vector<std::shared_ptr<T>> list;
-        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return list;
         }
 
@@ -529,12 +529,14 @@ public:
 
         if(!qry->isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return list;
         }
 
         // Build Query String
-        std::string queryString = sqlite3_mprintf("SELECT * FROM %Q;", m_strTableName.c_str());
+        char *result = sqlite3_mprintf("SELECT * FROM %Q;", m_strTableName.c_str());
+        std::string queryString(result);
+        sqlite3_free(result);
 
         // Execute Query.
         if(qry->getResult(queryString))
@@ -552,12 +554,12 @@ public:
             }
             else
             {
-                log->write<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetAllRecords Returned Rows", rows, __LINE__, __FILE__);
+                m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetAllRecords Returned Rows", rows, __LINE__, __FILE__);
             }
         }
         else
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetAllRecords getResult()", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetAllRecords getResult()", __LINE__, __FILE__);
         }
 
         return list;
@@ -571,12 +573,11 @@ public:
     {
         std::shared_ptr<T> obj(new T);
         std::vector<std::shared_ptr<T>> list;
-        Logging *log = Logging::instance();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return list.size();
         }
 
@@ -585,12 +586,14 @@ public:
 
         if(!qry->isConnected())
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
             return list.size();
         }
 
         // Build Query String
-        std::string queryString = sqlite3_mprintf("SELECT * FROM %Q;", m_strTableName.c_str());
+        char *result = sqlite3_mprintf("SELECT * FROM %Q;", m_strTableName.c_str());
+        std::string queryString(result);
+        sqlite3_free(result);
 
         // Execute Query.
         if(qry->getResult(queryString))
@@ -608,12 +611,12 @@ public:
             }
             else
             {
-                log->write<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetRecordsCount Returned Rows", rows, __LINE__, __FILE__);
+                m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetRecordsCount Returned Rows", rows, __LINE__, __FILE__);
             }
         }
         else
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetRecordsCount getResult()", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>(m_strTableName, "Error, baseGetRecordsCount getResult()", __LINE__, __FILE__);
         }
 
         return list.size();

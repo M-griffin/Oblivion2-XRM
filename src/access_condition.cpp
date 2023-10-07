@@ -1,6 +1,9 @@
 #include "access_condition.hpp"
+
 #include "model-sys/users.hpp"
 #include "model-sys/access_level.hpp"
+
+#include "session_io.hpp"
 #include "logging.hpp"
 
 #include <algorithm>
@@ -10,6 +13,20 @@
 #include <iostream>
 #include <sstream>
 #include <cctype>
+
+/**
+ * @brief Class Constructor And Initilization
+ * @return 
+ */
+AccessCondition::AccessCondition() 
+    : m_log(Logging::getInstance())
+    , m_session_io(new SessionIO())    
+{ }
+
+AccessCondition::~AccessCondition()
+{ 
+    m_log.write<Logging::DEBUG_LOG>("~AccessCondition()");
+}
 
 /**
  * @brief Toggle Bit Flag
@@ -23,9 +40,8 @@ void AccessCondition::setFlagToggle(unsigned char flag, bool first_set, user_ptr
     bit -= 65; // Handles A - Z
 
     if(bit < 0 || bit > 25)
-    {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+    {        
+        m_log.write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
@@ -52,8 +68,7 @@ void AccessCondition::setFlagLevelToggle(unsigned char flag, bool first_set, acc
 
     if(bit < 0 || bit > 25)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
@@ -80,8 +95,7 @@ void AccessCondition::setFlagOn(unsigned char flag, bool first_set, user_ptr use
 
     if(bit < 0 || bit > 25)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
@@ -108,8 +122,7 @@ void AccessCondition::setFlagOff(unsigned char flag, bool first_set, user_ptr us
 
     if(bit < 0 || bit > 25)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
@@ -137,8 +150,7 @@ bool AccessCondition::checkAccessConditionFlag(unsigned char flag, bool first_se
 
     if(bit < 0 || bit > 25)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return false;
     }
 
@@ -369,13 +381,13 @@ std::vector<MapType> AccessCondition::parseAcsString(const std::string &acs_stri
         // Or would need to be handled in the code mapping
         for(std::string t : tokens)
         {
-            std::vector<MapType> tmp = m_session_io.parseToCodeMap(t, ACS_EXPRESSION);
+            std::vector<MapType> tmp = m_session_io->parseToCodeMap(t, ACS_EXPRESSION);
             code_map.insert(code_map.end(), tmp.begin(), tmp.end());
         }
     }
     else
     {
-        code_map = m_session_io.parseToCodeMap(acs_string, ACS_EXPRESSION);
+        code_map = m_session_io->parseToCodeMap(acs_string, ACS_EXPRESSION);
     }
 
     return code_map;

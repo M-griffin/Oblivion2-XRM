@@ -1,10 +1,9 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-//#include "model-sys/config.hpp"
 #include "session_manager.hpp"
 #include "session.hpp"
-#include "communicator.hpp"
+#include "async_io.hpp"
 
 // New Rework for SDL2_net and Asyc io.
 #include "io_service.hpp"
@@ -32,7 +31,7 @@ class Interface
 public:
 
     /**
-     * @brief Create IO_Service Working thread for socket communications.
+     * @brief Create IO_Service Worker Thread for AsyncIO
      * @return
      */
     std::thread create_thread()
@@ -47,26 +46,23 @@ public:
      * @param port
      * @return
      */
-    Interface(IOService& io_service, std::string protocol, int port)
-        : m_io_service(io_service)
+    Interface(IOService &io_service, const std::string &protocol, const int &port)
+        : m_log(Logging::getInstance())
+        , m_io_service(io_service)
         , m_session_manager(new SessionManager())
         , m_socket_acceptor(new SocketHandler())
         , m_async_listener(new AsyncAcceptor(io_service, m_socket_acceptor))
         , m_protocol(protocol)
     {
-
-        Logging *log = Logging::instance();
-
         // Startup SDL NET. Custom version Tweaked for KEEP Alive's
         if(SDLNet_Init() == -1)
         {
-            log->write<Logging::ERROR_LOG>("SDLNet_Init", SDLNet_GetError());
-            TheCommunicator::instance()->shutdown();
+            m_log.write<Logging::ERROR_LOG>("SDLNet_Init", SDLNet_GetError());
             return;
         }
 
         unsigned int num_threads = std::thread::hardware_concurrency();
-        log->write<Logging::INFO_LOG>("concurrent threads supported", num_threads);
+        m_log.write<Logging::CONSOLE_LOG>("Concurrent CPU Core(s) Supported", num_threads);
 
         // Start up worker thread of ASIO. We want socket communications in a separate thread.
         // We only spawn a single thread for IO_Service on start up
@@ -75,23 +71,25 @@ public:
         // Setup Telnet Server Connection Listener.
         if(!m_socket_acceptor->createTelnetAcceptor("127.0.0.1", port))
         {
-            log->write<Logging::ERROR_LOG>("Unable to start Telnet Acceptor");
-            TheCommunicator::instance()->shutdown();
+            m_log.write<Logging::ERROR_LOG>("Unable to start Telnet Acceptor");
             return;
         }
 
-        // Setup the communicator to allow rest of program to talk with
-        // And send messages to other nodes.
-        TheCommunicator::instance()->setupServer(m_session_manager);
-
-        log->write<Logging::CONSOLE_LOG>("Telnet Server Waiting for Connection.");
+        m_log.write<Logging::CONSOLE_LOG>("Telnet Server Waiting for Connection.");
         waitingForConnection();
     }
 
     ~Interface()
     {
+        m_log.write<Logging::DEBUG_LOG>("~Interface()");
         m_io_service.stop();
         m_thread.join();
+        
+        // Clear Smart Pointers, We Should be good here but cleaner is better.
+        m_session_manager.reset();
+        m_socket_acceptor.reset();
+        m_async_listener.reset();
+        
         SDLNet_Quit();
     }
 
@@ -99,15 +97,22 @@ public:
      * @brief Handles incoming connections.
      */
     void waitingForConnection()
-    {
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Waiting For Connection, Adding Async Job to Listener");
+    {        
+        m_log.write<Logging::DEBUG_LOG>("Waiting For Connection, Adding Async Job to Listener");
         m_async_listener->asyncAccept(
             m_protocol,
             std::bind(&Interface::handle_accept,
                       this,
                       std::placeholders::_1,
                       std::placeholders::_2));
+    }
+    
+    /**
+     * @brief Shutdown Sessions by Session Manager.
+     */
+    void shutdown() 
+    {
+        m_session_manager->shutdown();        
     }
 
 private:
@@ -117,44 +122,42 @@ private:
      * @param new_connection
      * @param error
      */
-    void handle_accept(const std::error_code& error, socket_handler_ptr socket_handler)
+    void handle_accept(const std::error_code& error, const socket_handler_ptr &socket_handler)
     {
         if(!error)
         {
-            Logging *log = Logging::instance();
-            log->write<Logging::DEBUG_LOG>("TCP Connection accepted");
-
-            connection_ptr async_conn(new AsyncConnection(m_io_service, socket_handler));
-
-            // Create DeadlineTimer and attach to new session
-            // This timer is specific for waiting .25 seconds on
-            // ESC sequences check for single esc, vs key sequences
-            deadline_timer_ptr deadline_timer(new DeadlineTimer());
+            async_io_ptr async_conn(new AsyncIO(m_io_service, socket_handler));                        
+            m_log.write<Logging::DEBUG_LOG>("Handle-Accept Create New Session");
 
             // Create the new Session
-            session_ptr new_session = Session::create(m_io_service,
-                                      async_conn,
-                                      deadline_timer,
-                                      m_session_manager);
+            session_ptr new_session = Session::create(async_conn, m_session_manager);
+            if (new_session) 
+            {                
+                m_log.write<Logging::DEBUG_LOG>("Handle-Accept Attached Session to Manager");
 
-            // Attach Session to Session Manager.
-            m_session_manager->join(new_session);
+                // Attach Session to Session Manager.
+                m_session_manager->join(new_session);
+
+                m_log.setUserInfo(new_session->m_node_number);
+                m_log.write<Logging::INFO_LOG>("Handle-Accept TCP Connection accepted from=", 
+                    async_conn->getSocketHandle()->getIpAddress(), "Node=", new_session->m_node_number); 
+            }
         }
         else
         {
-            Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("Connection refused", error.message());
-        }
+            m_log.write<Logging::ERROR_LOG>("Handle-Accept Connection refused", error.message());
+        }        
     }
 
-    IOService&          m_io_service;
-    session_manager_ptr m_session_manager;
-    socket_handler_ptr  m_socket_acceptor;
-    acceptor_ptr        m_async_listener;
-    std::string         m_protocol;
-    std::thread         m_thread;
+    Logging             &m_log;
+    IOService           &m_io_service;
+    session_manager_ptr  m_session_manager;
+    socket_handler_ptr   m_socket_acceptor;
+    acceptor_ptr         m_async_listener;
+    std::string          m_protocol;
+    std::thread          m_thread;
 
 };
 
 
-#endif // CHAT_SERVER_HPP
+#endif

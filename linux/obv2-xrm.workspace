@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Workspace Name="OBV2-XRM" Database="" Version="10.0.0">
+<CodeLite_Workspace Name="OBV2-XRM" Database="" Version="10.0.0" SWTLW="Yes">
+  <WorkspaceParserMacros/>
+  <WorkspaceParserPaths/>
   <Environment>
     <![CDATA[]]>
   </Environment>
@@ -9,28 +11,20 @@
   <Project Name="xrm-menu-convert-prompt-lnx" Path="xrm-menu-convert-prompt-lnx.project" Active="No"/>
   <Project Name="xrm-unittest-lnx" Path="xrm-unittest-lnx.project" Active="No"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="yes">
+    <WorkspaceConfiguration Name="Debug" Selected="no">
       <Environment/>
       <Project Name="SqliteWrapped" ConfigName="Debug"/>
+      <Project Name="xrm-menu-convert" ConfigName="Debug"/>
+      <Project Name="xrm-menu-prompt-convert" ConfigName="Debug"/>
       <Project Name="xrm-server" ConfigName="Debug"/>
-      <Project Name="xrm-unittest" ConfigName="Debug"/>
-      <Project Name="xrm-menu-convert" ConfigName="Debug"/>
-      <Project Name="xrm-menu-prompt-convert" ConfigName="Debug"/>
-      <Project Name="SqliteWrapped" ConfigName="Debug"/>
-      <Project Name="xrm-menu-convert" ConfigName="Debug"/>
-      <Project Name="xrm-menu-prompt-convert" ConfigName="Debug"/>
       <Project Name="xrm-unittest" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
       <Project Name="SqliteWrapped" ConfigName="Release"/>
+      <Project Name="xrm-menu-convert" ConfigName="Release"/>
+      <Project Name="xrm-menu-prompt-convert" ConfigName="Release"/>
       <Project Name="xrm-server" ConfigName="Release"/>
-      <Project Name="xrm-unittest" ConfigName="Release"/>
-      <Project Name="xrm-menu-convert" ConfigName="Release"/>
-      <Project Name="xrm-menu-prompt-convert" ConfigName="Release"/>
-      <Project Name="SqliteWrapped" ConfigName="Release"/>
-      <Project Name="xrm-menu-convert" ConfigName="Release"/>
-      <Project Name="xrm-menu-prompt-convert" ConfigName="Release"/>
       <Project Name="xrm-unittest" ConfigName="Release"/>
     </WorkspaceConfiguration>
   </BuildMatrix>

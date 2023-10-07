@@ -42,7 +42,8 @@
 #include <utf-cpp/utf8.h>
 
 CommonIO::CommonIO()
-    : m_escape_sequence("")
+    : m_log(Logging::getInstance())
+    , m_escape_sequence("")
     , m_string_buffer("")
     , m_incoming_data("")
     , m_line_buffer("")
@@ -172,6 +173,8 @@ CommonIO::CommonIO()
 
 CommonIO::~CommonIO()
 {
+    m_log.write<Logging::DEBUG_LOG>("~CommonIO()");
+    // Look at making this a single instance per session insetad of alocate on fly.
     m_sequence_map.clear();
     m_escape_sequence.erase();
 }
@@ -214,14 +217,10 @@ std::string CommonIO::getProgramPath(const std::string &program_name)
 
     if(pPath != nullptr)
     {
-        std::cout << "Found OBV2 Environment Variable=" << pPath << std::endl;
+        m_log.write<Logging::CONSOLE_LOG>("Found OBV2 Environment Variable", pPath);
         program_path = pPath;
         pathAppend(program_path);
         return program_path;
-    }
-    else
-    {
-        std::cout << "looking up program path" << std::endl;
     }
 
     // Get the Folder the Executable runs in.
@@ -231,7 +230,7 @@ std::string CommonIO::getProgramPath(const std::string &program_name)
 
     if(_NSGetExecutablePath(current_path, &size) != 0)
     {
-        std::cout << "Error, getProgramPath: OSX Path empty!" << std::endl;
+        m_log.write<Logging::ERROR_LOG>("getProgramPath: OSX Path empty!");
         throw std::runtime_error("getProgramPath: OSX Path");
     }
 
@@ -254,14 +253,13 @@ std::string CommonIO::getProgramPath(const std::string &program_name)
     }
 
 #elif _WIN32
-    // Get the Current Program path.
     char current_path[PATH_MAX];
 
     int result = GetModuleFileName(NULL, current_path, PATH_MAX-1);
 
     if(result == 0)
     {
-        std::cout << "Error, getProgramPath: Win32 Path empty!" << std::endl;
+        m_log.write<Logging::ERROR_LOG>("getProgramPath: Win32 Path empty!");
         throw std::runtime_error("GetProgramPath: Win32 Path");
     }
 
@@ -274,20 +272,19 @@ std::string CommonIO::getProgramPath(const std::string &program_name)
     }
 
 #else
-
     char exe_path[PATH_MAX] = {0};
     ssize_t result = readlink("/proc/self/exe", exe_path, PATH_MAX);
 
     if(result < 0)
     {
-        std::cout << "Error, getProgramPath: Linux Path empty!" << std::endl;
+        m_log.write<Logging::ERROR_LOG>("getProgramPath: Linux Path empty!");
         throw std::runtime_error("getProgramPath: Linux Path");
     }
 
     const char* t = " \t\n\r\f\v";
     program_path = exe_path;
 
-    std::cout << "Original Path=" << program_path << std::endl;
+    m_log.write<Logging::DEBUG_LOG>("Original Path", program_path);
     program_path = program_path.erase(program_path.find_last_not_of(t) + 1);
     program_path += "/";
 
@@ -322,8 +319,7 @@ std::string CommonIO::getSystemHomeDirectory()
 
         if(!homedir)
         {
-            std::cout << "!WIN32, Unable to locate home directory" << std::endl;
-
+            m_log.write<Logging::DEBUG_LOG>("!WIN32, Unable to locate home directory");
             home_directory = "";
             return home_directory;
         }
@@ -388,8 +384,7 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str)
             {
                 *it++;
                 ++number_characters;
-                Logging *log = Logging::instance();
-                log->write<Logging::ERROR_LOG>("[numberOfChars] UTF8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
+                m_log.write<Logging::ERROR_LOG>("[numberOfChars] UTF8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
             }
         }
     }
@@ -440,7 +435,7 @@ std::string CommonIO::rightTrim(const std::string &str)
                          new_string.rend(),
                          std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
                      new_string.end()
-                    );
+    );
 
     return new_string;
 }
@@ -496,8 +491,7 @@ std::string CommonIO::eraseString(const std::string &str,
 
     if(new_string.empty())
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("(Common::EraseString) string length == 0", __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("(Common::EraseString) string length == 0", __LINE__, __FILE__);
         return new_string;
     }
 
@@ -542,8 +536,7 @@ std::string CommonIO::eraseString(const std::string &str,
             }
             catch(utf8::exception &ex)
             {
-                Logging *log = Logging::instance();
-                log->write<Logging::DEBUG_LOG>("(Common::EraseString) UTF8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
+                m_log.write<Logging::DEBUG_LOG>("(Common::EraseString) UTF8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
                 *it++;
             }
         }
@@ -797,8 +790,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
     }
     else if(num != 1)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("This function expects single characters/glyphs=", character_buffer, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("This function expects single characters/glyphs=", character_buffer, __LINE__, __FILE__);
         return "";
     }
 
@@ -893,9 +885,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                 case '8': // Function Keys.
                 case '9': // Function Keys.
                 case '0': // Function Keys.
-                case ';': // Seperator for Shift ARROW Keys! ie [1;2A
-                    std::cout << "common io: " << character_buffer << std::endl;
-
+                case ';': // Seperator for Shift ARROW Keys! ie [1;2A                    
                     m_string_buffer += character_buffer;
                     return "";
 
@@ -1017,7 +1007,6 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
                               const std::string &leadoff, // Data to Display in Default Field {Optional}
                               bool  hidden)               // If input is hidden or masked     {Optional}
 {
-    Logging *log = Logging::instance();
     std::string output_buffer = "";    // Used for Data to send back
     std::string character_buffer = ""; // Used for Data being processed.
 
@@ -1065,12 +1054,10 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         return "\n";
     }
 
-    // Escape in this case, ignore, later add movement in string
-    std::string sequence = "";
 
     if(character_buffer[0] == 27)
     {
-        sequence = getEscapeSequence();
+        std::string sequence = getEscapeSequence();
 
         if(sequence.size() == 0)
         {
@@ -1083,7 +1070,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
             {
                 if(m_line_buffer.size() > 0)
                 {
-                    log->write<Logging::DEBUG_LOG>("Received DEL ESC Sequence", __LINE__, __FILE__);
+                    m_log.write<Logging::DEBUG_LOG>("Received DEL ESC Sequence", __LINE__, __FILE__);
                     std::string temp = eraseString(m_line_buffer, numberOfChars(m_line_buffer)-1, 1);
                     m_line_buffer = std::move(temp);
                     m_column_position = m_line_buffer.size();
@@ -1092,14 +1079,14 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
                 else
                 {
                     // Nothing to delete at beginning Skip.
-                    log->write<Logging::DEBUG_LOG>("Received DEL ESC Sequence beginning of line=", character_buffer, __LINE__, __FILE__);
+                    m_log.write<Logging::DEBUG_LOG>("Received DEL ESC Sequence beginning of line=", character_buffer, __LINE__, __FILE__);
                     return "empty";
                 }
             }
             else
             {
                 // Unhandled sequence! Skip and return
-                log->write<Logging::DEBUG_LOG>("Received Unhandled ESC Sequence beginning=", character_buffer, __LINE__, __FILE__);
+                m_log.write<Logging::DEBUG_LOG>("Received Unhandled ESC Sequence beginning=", character_buffer, __LINE__, __FILE__);
                 return "empty";
             }
         }
@@ -1109,7 +1096,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
     {
         if(m_line_buffer.size() > 0)
         {
-            log->write<Logging::DEBUG_LOG>("Received CTRL+Y Sequence=", character_buffer, __LINE__, __FILE__);
+            m_log.write<Logging::DEBUG_LOG>("Received CTRL+Y Sequence=", character_buffer, __LINE__, __FILE__);
 
             for(int i = numberOfChars(m_line_buffer); i > 0; i--)
             {
@@ -1123,7 +1110,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         else
         {
             // At beginning of line, nothing to delete!
-            log->write<Logging::DEBUG_LOG>("Received CTRL+Y Sequence beginning of line=", character_buffer, __LINE__, __FILE__);
+            m_log.write<Logging::DEBUG_LOG>("Received CTRL+Y Sequence beginning of line=", character_buffer, __LINE__, __FILE__);
             return "empty";
         }
     }
@@ -1133,7 +1120,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
     {
         if(m_line_buffer.size() > 0)
         {
-            log->write<Logging::DEBUG_LOG>("Received backspace Sequence=", character_buffer, __LINE__, __FILE__);
+            m_log.write<Logging::DEBUG_LOG>("Received backspace Sequence=", character_buffer, __LINE__, __FILE__);
             std::string temp = eraseString(m_line_buffer, numberOfChars(m_line_buffer)-1, 1);
             m_line_buffer = std::move(temp);
             m_column_position =  m_line_buffer.size();
@@ -1142,7 +1129,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         else
         {
             // At beginning of Line, nothing to delete.
-            log->write<Logging::DEBUG_LOG>("Received backspace Sequence beginning of line=", character_buffer, __LINE__, __FILE__);
+            m_log.write<Logging::DEBUG_LOG>("Received backspace Sequence beginning of line=", character_buffer, __LINE__, __FILE__);
             return "empty";
         }
     }
@@ -1153,21 +1140,21 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
     {
         if(hidden)
         {
-            log->write<Logging::DEBUG_LOG>("hidden field input=", character_buffer, __LINE__, __FILE__);
+            m_log.write<Logging::DEBUG_LOG>("hidden field input=", character_buffer, __LINE__, __FILE__);
             m_line_buffer += character_buffer;
             m_column_position = numberOfChars(m_line_buffer);
             return "*";
         }
         else
         {
-            log->write<Logging::DEBUG_LOG>("normal field input=", character_buffer, __LINE__, __FILE__);
+            m_log.write<Logging::DEBUG_LOG>("normal field input=", character_buffer, __LINE__, __FILE__);
             m_line_buffer += character_buffer;
             m_column_position = numberOfChars(m_line_buffer);
             return character_buffer;
         }
     }
 
-    log->write<Logging::DEBUG_LOG>("Past the max length, nothing to add!", __LINE__, __FILE__);
+    m_log.write<Logging::DEBUG_LOG>("Past the max length, nothing to add!", __LINE__, __FILE__);
     return "empty";
 }
 
@@ -1302,8 +1289,7 @@ std::string CommonIO::readinAnsi(const std::string &file_name)
     pathAppend(path);
     path += file_name;
 
-    Logging *log = Logging::instance();
-    log->write<Logging::DEBUG_LOG>("readinAnsi=", path);
+    m_log.write<Logging::DEBUG_LOG>("readinAnsi=", path);
 
     std::string buff;
     FILE *fp;
@@ -1330,7 +1316,7 @@ std::string CommonIO::readinAnsi(const std::string &file_name)
     // Normalize Line Ending for consistent display to users.
     std::regex exp("(\\r\\n|\\r|\\n)+");
     std::string fixed_newlines = std::regex_replace(buff, exp, "\r\n");
-    return Encoding::instance()->utf8Encode(fixed_newlines);
+    return Encoding::getInstance().utf8Encode(fixed_newlines);
 }
 
 /**
@@ -1528,8 +1514,7 @@ void CommonIO::getNextGlyph(LocalizedBuffer &buffer,
         }
         catch(utf8::exception &ex)
         {
-            Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("[getNextGlyph] UTF8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>("[getNextGlyph] UTF8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
             ++*it; // Bad, other iterate past it, otherwise stuck in endless loop.
         }
     }
@@ -1577,9 +1562,8 @@ void CommonIO::peekNextGlyph(LocalizedBuffer &buffer,
             *it--;
         }
         catch(utf8::exception &ex)
-        {
-            Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("[peekNextGlyph] UTF8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
+        {            
+            m_log.write<Logging::ERROR_LOG>("[peekNextGlyph] UTF8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
             ++*it; // Bad, iterate past otherwise stuck in endless loop!
         }
     }
