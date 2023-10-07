@@ -2,10 +2,18 @@
 
 #include "../model-sys/config.hpp"
 #include "../model-sys/users.hpp"
+#include "../model-sys/menu.hpp"
+
+#include "../data-sys/text_prompts_dao.hpp"
 #include "../data-sys/security_dao.hpp"
 #include "../data-sys/users_dao.hpp"
+
+#include "../processor_ansi.hpp"
+#include "../session.hpp"
+#include "../session_io.hpp"
 #include "../encryption.hpp"
 #include "../logging.hpp"
+#include "../menu_base.hpp"
 
 #include <regex>
 #include <iostream>
@@ -14,6 +22,85 @@
 #include <iomanip>
 #include <ctime>
 #include <cassert>
+#include <vector>
+#include <memory>
+#include <functional>
+
+
+ModSignup::ModSignup(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, 
+        common_io_ptr common_io, session_io_ptr session_io)
+    : ModBase(session_data, config, ansi_process, "mod_signup.yaml", common_io, session_io)
+    , m_menu_base(new MenuBase(session_data))
+    , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
+    , m_user_record(new Users())
+    , m_security_record(new Security())
+    , m_mod_function_index(MOD_NUP)
+    , m_is_text_prompt_exist(false)
+    , m_newuser_password_attempts(0)
+{
+    // Push function pointers to the stack.
+    m_setup_functions.push_back(std::bind(&ModSignup::setupNewUserPassword, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupDisclaimer, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupHandle, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupRealName, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupAddress, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupLocation, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupCountry, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupEmail, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupUserNote, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupBirthday, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupGender, this));
+
+    m_setup_functions.push_back(std::bind(&ModSignup::setupPassword, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupVerifyPassword, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupChallengeQuestion, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupChallengeAnswer, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupVerifyChallengeAnswer, this));
+
+    m_setup_functions.push_back(std::bind(&ModSignup::setupYesNoBars, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupDoPause, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupClearOrScroll, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupAnsiColor, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupBackSpace, this));
+    m_setup_functions.push_back(std::bind(&ModSignup::setupVerifyAndSave, this));
+
+    // Input Processing Functions
+    m_mod_functions.push_back(std::bind(&ModSignup::newUserPassword, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::disclaimer, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::handle, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::realName, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::address, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::location, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::country, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::email, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::userNote, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::birthday, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::gender, this, std::placeholders::_1));
+
+    m_mod_functions.push_back(std::bind(&ModSignup::password, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::verifyPassword, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::challengeQuestion, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::challengeAnswer, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::verifyChallengeAnswer, this, std::placeholders::_1));
+
+    m_mod_functions.push_back(std::bind(&ModSignup::yesNoBars, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::doPause, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::clearOrScroll, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::ansiColor, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::backSpace, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModSignup::verifyAndSave, this, std::placeholders::_1));
+
+    // Check of the Text Prompts exist.
+    m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
+
+    if(!m_is_text_prompt_exist)
+    {
+        createTextPrompts();
+    }
+
+    // Loads all Text Prompts for current module
+    m_text_prompts_dao->readPrompts();
+}
 
 /**
  * @brief Handles Updates or Data Input from Client
@@ -533,7 +620,7 @@ bool ModSignup::fieldInputAndProcess(std::string input, int field_length, bool u
     std::function<bool(std::string &, std::string &)> function_pointer)
 {
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, field_length, "", use_hidden_output);
+    std::string result = m_session_io->getInputField(input, key, field_length, "", use_hidden_output);
 
     // ESC was hit
     if(result == "aborted")
@@ -575,20 +662,20 @@ bool ModSignup::newUserPassword(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) {
+        (std::string &input, std::string &key) 
+    {
 
         // Debug Logging
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         if(key.compare(m_config->password_newuser) == 0)
         {
-            log->write<Logging::CONSOLE_LOG>("NewUserPassword Accepted", __LINE__, __FILE__);
+            m_log.write<Logging::CONSOLE_LOG>("NewUserPassword Accepted", __LINE__, __FILE__);
             changeNextModule();
         }
         else
         {
-            log->write<Logging::CONSOLE_LOG>("Error, Incorrect NewUserPassword!", __LINE__, __FILE__);
+            m_log.write<Logging::CONSOLE_LOG>("Error, Incorrect NewUserPassword!", __LINE__, __FILE__);
             ++m_newuser_password_attempts;
             displayPromptAndNewLine(PROMPT_PASS_INVALID);
             redisplayModulePrompt();
@@ -608,11 +695,11 @@ bool ModSignup::disclaimer(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) {
+        (std::string &input, std::string &key) 
+    {
 
         // Debug Logging
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // If ENTER Default to Yes, or Single Y is hit
         if(toupper(key[0]) == 'Y' && key.size() == 1)
@@ -645,11 +732,11 @@ bool ModSignup::handle(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) {
+        (std::string &input, std::string &key) 
+    {
 
         // Debug Logging
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Check for user name and if is already exists!
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
@@ -680,11 +767,11 @@ bool ModSignup::realName(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) {
+        (std::string &input, std::string &key) 
+    {
 
         // Debug Logging
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Check for real name and if is already exists!
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
@@ -715,11 +802,11 @@ bool ModSignup::address(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) {
+        (std::string &input, std::string &key) 
+    {
 
         // Debug Logging
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         m_user_record->sAddress = key;
         changeNextModule();
@@ -737,11 +824,11 @@ bool ModSignup::location(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) {
+        (std::string &input, std::string &key) 
+    {
 
         // Debug Logging
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         m_user_record->sLocation = key;
         changeNextModule();
@@ -759,11 +846,11 @@ bool ModSignup::country(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) {
+        (std::string &input, std::string &key) 
+    {
 
         // Debug Logging
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         m_user_record->sCountry = key;
         changeNextModule();
@@ -781,11 +868,11 @@ bool ModSignup::email(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) {
+        (std::string &input, std::string &key) 
+    {
 
         // Debug Logging
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Test if email already exists.
         users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
@@ -816,11 +903,11 @@ bool ModSignup::userNote(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) {
+        (std::string &input, std::string &key) 
+    {
 
         // Debug Logging
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         m_user_record->sUserNote = key;
         changeNextModule();
@@ -838,11 +925,10 @@ bool ModSignup::birthday(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) {
-
+        (std::string &input, std::string &key) 
+    {
         // Debug Logging
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         try
         {
@@ -882,7 +968,7 @@ bool ModSignup::birthday(const std::string &input)
         }
         catch(std::regex_error &ex)
         {
-            log->write<Logging::ERROR_LOG>("Error, regex date error=", ex.what(), ex.code(), __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>("Error, regex date error=", ex.what(), ex.code(), __LINE__, __FILE__);
         }
 
         return true;
@@ -899,11 +985,10 @@ bool ModSignup::gender(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) {
-
+        (std::string &input, std::string &key) 
+    {
         // Debug Logging
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // If ENTER Default to Yes, or Single Y is hit
         if((toupper(key[0]) == 'M' && key.size() == 1))
@@ -937,11 +1022,10 @@ bool ModSignup::password(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) {
-
+        (std::string &input, std::string &key) 
+    {
         // Debug Logging
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         m_security_record->sPasswordHash = key;
         changeNextModule();
@@ -959,11 +1043,10 @@ bool ModSignup::verifyPassword(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) {
-
+        (std::string &input, std::string &key) 
+    {
         // Debug Logging
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // compare password to previous, then encrypt if they match
         // otherwise fail back if they don't and ask again.
@@ -974,7 +1057,7 @@ bool ModSignup::verifyPassword(const std::string &input)
 
             if(!encryption)
             {
-                log->write<Logging::ERROR_LOG>("Error, unable to allocate encryption", __LINE__, __FILE__);
+                m_log.write<Logging::ERROR_LOG>("Error, unable to allocate encryption", __LINE__, __FILE__);
                 displayPromptAndNewLine(PROMPT_PASS_INVALID);
                 changePreviousModule();
                 return false;
@@ -985,7 +1068,7 @@ bool ModSignup::verifyPassword(const std::string &input)
 
             if(salt.size() == 0 || password.size() == 0)
             {
-                log->write<Logging::ERROR_LOG>("Error, Salt or Password were empty", __LINE__, __FILE__);
+                m_log.write<Logging::ERROR_LOG>("Error, Salt or Password were empty", __LINE__, __FILE__);
                 assert(false);
             }
 
@@ -996,7 +1079,7 @@ bool ModSignup::verifyPassword(const std::string &input)
         }
         else
         {
-            log->write<Logging::INFO_LOG>("Password Verify Failed.", __LINE__, __FILE__);
+            m_log.write<Logging::INFO_LOG>("Password Verify Failed.", __LINE__, __FILE__);
             m_security_record->sPasswordHash = "";
             displayPromptAndNewLine(PROMPT_PASS_INVALID);
             changePreviousModule();
@@ -1016,11 +1099,10 @@ bool ModSignup::challengeQuestion(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) {
-
+        (std::string &input, std::string &key) 
+    {
         // Debug Logging
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Set the Password and verify it matches on next module.
         m_security_record->sChallengeQuestion = key;
@@ -1039,11 +1121,10 @@ bool ModSignup::challengeAnswer(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) {
-
+        (std::string &input, std::string &key) 
+    {
         // Debug Logging
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         m_security_record->sChallengeAnswerHash = key;
         changeNextModule();
@@ -1061,11 +1142,10 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
 {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
-        (std::string &input, std::string &key) {
-
+        (std::string &input, std::string &key) 
+    {
         // Debug Logging
-        Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
+        m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // compare password to previous, then encrypt if they match
         // otherwise fail back if they don't and ask again.
@@ -1075,7 +1155,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
 
             if(!encryption)
             {
-                log->write<Logging::ERROR_LOG>("Error, unable to allocate encryption.", __LINE__, __FILE__);
+                m_log.write<Logging::ERROR_LOG>("Error, unable to allocate encryption.", __LINE__, __FILE__);
                 m_security_record->sChallengeAnswerHash = "";
                 displayPromptAndNewLine(PROMPT_PASS_INVALID);
                 changePreviousModule();
@@ -1091,7 +1171,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
             if(password.size() == 0)
             {
                 // Error from encryption method.
-                log->write<Logging::ERROR_LOG>("Error, ChallengeAnswer was empty", __LINE__, __FILE__);
+                m_log.write<Logging::ERROR_LOG>("Error, ChallengeAnswer was empty", __LINE__, __FILE__);
                 return false;
             }
 
@@ -1100,7 +1180,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
         }
         else
         {
-            log->write<Logging::ERROR_LOG>("Error, ChallengeAnswer verify failed.", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>("Error, ChallengeAnswer verify failed.", __LINE__, __FILE__);
             m_security_record->sChallengeAnswerHash = "";
             displayPromptAndNewLine(PROMPT_PASS_INVALID);
             changePreviousModule();
@@ -1119,7 +1199,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
 bool ModSignup::yesNoBars(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -1178,7 +1258,7 @@ bool ModSignup::yesNoBars(const std::string &input)
 bool ModSignup::doPause(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -1237,7 +1317,7 @@ bool ModSignup::doPause(const std::string &input)
 bool ModSignup::clearOrScroll(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -1296,7 +1376,7 @@ bool ModSignup::clearOrScroll(const std::string &input)
 bool ModSignup::ansiColor(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -1355,7 +1435,7 @@ bool ModSignup::ansiColor(const std::string &input)
 bool ModSignup::backSpace(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -1419,7 +1499,6 @@ bool ModSignup::backSpace(const std::string &input)
 void ModSignup::saveNewUserRecord()
 {
     // StartUp Data Access Objects for SQL
-    Logging *log = Logging::instance();
     users_dao_ptr user_dao(new UsersDao(m_session_data->m_user_database));
     security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
 
@@ -1428,7 +1507,7 @@ void ModSignup::saveNewUserRecord()
 
     if(securityIndex < 0)
     {
-        log->write<Logging::ERROR_LOG>("Error, unable to insert new user record", __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, unable to insert new user record", __LINE__, __FILE__);
         displayPrompt(PROMPT_NOT_SAVED);
         m_is_active = false;
         return;
@@ -1464,16 +1543,16 @@ void ModSignup::saveNewUserRecord()
     }
 
     long userIndex = user_dao->insertRecord(m_user_record);
-    log->write<Logging::INFO_LOG>("New User Index saved", userIndex);
+    m_log.write<Logging::INFO_LOG>("New User Index saved", userIndex);
 
     if(userIndex < 0)
     {
-        log->write<Logging::ERROR_LOG>("Error, unable to insert new user record", __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, unable to insert new user record", __LINE__, __FILE__);
 
         // Remove Security Record if unable to create user record.
         if(!security_dao->deleteRecord(securityIndex))
         {
-            log->write<Logging::ERROR_LOG>("Error, unable to remove security record.", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>("Error, unable to remove security record.", __LINE__, __FILE__);
         }
 
         baseProcessDeliverNewLine();
@@ -1484,7 +1563,7 @@ void ModSignup::saveNewUserRecord()
     // If First User Created, Then Update Security Level to Sysop.
     else if (userIndex == 1)
     {
-        log->write<Logging::INFO_LOG>("Updating First Created User to SysOp/Admin");
+        m_log.write<Logging::INFO_LOG>("Updating First Created User to SysOp/Admin");
 
         // Re-Read the Record Clean
         m_user_record = user_dao->getRecordById(userIndex);
@@ -1526,7 +1605,7 @@ void ModSignup::saveNewUserRecord()
 bool ModSignup::verifyAndSave(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")

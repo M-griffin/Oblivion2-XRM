@@ -1,20 +1,30 @@
 #ifndef MOD_BASE_HPP
 #define MOD_BASE_HPP
 
-#include "../data-sys/text_prompts_dao.hpp"
-#include "../model-sys/config.hpp"
-
-#include "../session_data.hpp"
-#include "../session_io.hpp"
-#include "../processor_ansi.hpp"
-#include "../encoding.hpp"
-
-#include <algorithm>
 #include <memory>
-#include <iostream>
 #include <string>
 #include <vector>
 
+// Header Type Definitions
+class Logging;
+
+class Session;
+typedef std::shared_ptr<Session> session_ptr;
+
+class SessionIO;
+typedef std::shared_ptr<SessionIO> session_io_ptr;
+
+class CommonIO;
+typedef std::shared_ptr<CommonIO> common_io_ptr;
+
+class ProcessorAnsi;
+typedef std::shared_ptr<ProcessorAnsi> processor_ansi_ptr;
+
+class Config;
+typedef std::shared_ptr<Config> config_ptr;
+
+class TextPromptsDao;
+typedef std::shared_ptr<TextPromptsDao> text_prompts_dao_ptr;
 
 /**
  * @class ModBase
@@ -27,20 +37,15 @@ class ModBase
 {
 public:
 
-    virtual ~ModBase()
-    {
-    }
+    virtual ~ModBase();    
     virtual bool update(const std::string &character_buffer, const bool &is_utf8) = 0;
     virtual bool onEnter() = 0;
     virtual bool onExit()  = 0;
 
-    ModBase(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-        : m_session_data(session_data)
-        , m_config(config)
-        , m_session_io(session_data)
-        , m_ansi_process(ansi_process)
-        , m_is_active(false)
-    { }
+    ModBase(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, std::string filename,
+        common_io_ptr common_io, session_io_ptr session_io);
+        
+    const bool DISCONNECT_USER = true;
 
     // Box drawing characters
     enum
@@ -59,21 +64,13 @@ public:
      * @brief Translate Box Chars to UTF-8
      * @param enum_value
      */
-    std::string baseGetEncodedBoxChar(int enum_value)
-    {
-        std::string char_value = std::string(1, static_cast<char>(enum_value));
-        return Encoding::instance()->utf8Encode(char_value);
-    }
+    std::string baseGetEncodedBoxChar(int enum_value);
 
     /**
      * @brief Translate Box Chars to UTF-8 with Default box Color
      * @param enum_value
      */
-    std::string baseGetEncodedBoxCharAndColor(int enum_value)
-    {
-        std::string char_value = std::string(1, static_cast<char>(enum_value));
-        return baseGetDefaultBoxColor() + Encoding::instance()->utf8Encode(char_value);
-    }
+    std::string baseGetEncodedBoxCharAndColor(int enum_value);
 
 
     /**
@@ -83,362 +80,144 @@ public:
      * @param max_cols
      * @return
      */
-    std::string baseCreateBorderedDisplay(std::vector<std::string> result_set, int total_rows, int max_cols)
-    {
-        // Vector or Menus, Loop through
-        std::vector<std::string>::iterator i = result_set.begin();
-        std::string buffer = "";
-
-        for(int rows = 0; rows < total_rows; rows++)
-        {
-            buffer += "  "; // 3 Leading spaces per row.
-
-            for(int cols = 0; cols < max_cols; cols++)
-            {
-                // Top Row
-                if(rows == 0 && cols == 0)
-                {
-                    buffer += baseGetEncodedBoxCharAndColor(M_BORDER_TOP_LEFT);
-                }
-                else if(rows == 0 && cols == max_cols-1)
-                {
-                    buffer += baseGetEncodedBoxCharAndColor(M_BORDER_TOP_RIGHT);
-                }
-                else if(rows == 0 && cols % (max_cols-1) == 0)
-                {
-                    buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID_TOP);
-                }
-                else if(rows == 0)
-                {
-                    buffer += baseGetEncodedBoxCharAndColor(M_BORDER_ROW);
-                }
-
-                // Bottom Row
-                else if(rows == total_rows-1 && cols == 0)
-                {
-                    buffer += baseGetEncodedBoxCharAndColor(M_BORDER_BOT_LEFT);
-                }
-                else if(rows == total_rows-1 && cols == max_cols-1)
-                {
-                    buffer += baseGetEncodedBoxCharAndColor(M_BORDER_BOT_RIGHT);
-                }
-                else if(rows == total_rows-1 && cols % (max_cols-1) == 0)
-                {
-                    buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID_BOT);
-                }
-                else if(rows == total_rows-1)
-                {
-                    buffer += baseGetEncodedBoxCharAndColor(M_BORDER_ROW);
-                }
-                else if(cols % (max_cols-1) == 0)
-                {
-                    buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID);
-                }
-                else
-                {
-                    // Here we insert the Menu name and pad through to 8 characters.
-                    if(cols == 1)
-                    {
-                        if(i != result_set.end())
-                        {
-                            buffer += *i;
-                            ++i;
-                        }
-                    }
-                }
-            }
-
-            // Were going to split on \n, which will get replaced lateron
-            // with \r\n for full carriage returns.
-            buffer += "\n";
-        }
-
-        return buffer;
-    }
+    std::string baseCreateBorderedDisplay(std::vector<std::string> result_set, int total_rows, int max_cols);
 
     /**
      * @brief Transform Strings to Uppercase with Locale
      * @param value
      */
-    void baseTransformToUpper(std::string &value)
-    {
-        auto stringToUpper = std::bind1st(
-                                 std::mem_fun(
-                                     &std::ctype<char>::toupper),
-                                 &std::use_facet<std::ctype<char> >(std::locale()));
-
-        transform(value.begin(), value.end(), value.begin(), stringToUpper);
-    }
+    void baseTransformToUpper(std::string &value);
 
     /**
      * @brief Transform Strings to Lowercase with Locale
      * @param value
      */
-    void baseTransformToLower(std::string &value)
-    {
-        auto stringToLower = std::bind1st(
-                                 std::mem_fun(
-                                     &std::ctype<char>::tolower),
-                                 &std::use_facet<std::ctype<char> >(std::locale()));
-
-        transform(value.begin(), value.end(), value.begin(), stringToLower);
-    }
+    void baseTransformToLower(std::string &value);
 
     /**
      * @brief Gets the Default Color Sequence
      * @return
      */
-    std::string baseGetDefaultColor()
-    {
-        return m_session_io.pipeColors(m_config->default_color_regular);
-    }
+    std::string baseGetDefaultColor();
 
     /**
      * @brief Gets the Default Input Color Sequence
      * @return
      */
-    std::string baseGetDefaultInputColor()
-    {
-        return m_session_io.pipeColors(m_config->default_color_input);
-    }
+    std::string baseGetDefaultInputColor();
 
     /**
      * @brief Gets the Default Input Color Sequence
      * @return
      */
-    std::string baseGetDefaultInverseColor()
-    {
-        return m_session_io.pipeColors(m_config->default_color_inverse);
-    }
+    std::string baseGetDefaultInverseColor();
 
     /**
      * @brief Gets the Default Box Color Sequence
      * @return
      */
-    std::string baseGetDefaultBoxColor()
-    {
-        return m_session_io.pipeColors(m_config->default_color_box);
-    }
+    std::string baseGetDefaultBoxColor();
 
     /**
      * @brief Gets the Default Prompt Color Sequence
      * @return
      */
-    std::string baseGetDefaultPromptColor()
-    {
-        return m_session_io.pipeColors(m_config->default_color_prompt);
-    }
+    std::string baseGetDefaultPromptColor();
 
     /**
      * @brief Gets the Default Stat Color Sequence
      * @return
      */
-    std::string baseGetDefaultStatColor()
-    {
-        return m_session_io.pipeColors(m_config->default_color_stat);
-    }
+    std::string baseGetDefaultStatColor();
 
     /**
      * @brief Method for Adding outgoing text data to ANSI processor
      *        Then delivering the data to the client
      * @param data
      */
-    void baseProcessAndDeliver(std::string &data)
-    {
-        // Clear out attributes on new strings no bleeding of colors.
-        std::string output = "\x1b[0m" + baseGetDefaultColor();
-        output += std::move(data);
-        m_ansi_process->parseTextToBuffer((char *)output.c_str());
-        output += baseGetDefaultInputColor();
-        m_session_data->deliver(output);
-    }
+    void baseProcessAndDeliver(std::string &data);
+    
+    /**
+     * @brief Method for Adding outgoing text data to ANSI processor
+     *        Then delivering the data to the client, Then Disconnect
+     * @param data
+     */
+    void baseProcessAndDeliverThenDisconnect(std::string &data);
 
     /**
      * @brief Deliver Output followed with New Line.
      * @param data
      */
-    void baseProcessAndDeliverNewLine(std::string &data)
-    {
-        data += "\r\n";
-        baseProcessAndDeliver(data);
-    }
+    void baseProcessAndDeliverNewLine(std::string &data);
 
     /**
      * @brief Deliver NewLine for [ENTER] On Prompts.
      */
-    void baseProcessDeliverNewLine()
-    {
-        std::string data = "\r\n";
-        baseProcessAndDeliver(data);
-    }
+    void baseProcessDeliverNewLine();
 
     /**
      * @brief Deliver Input for prompts (No Coloring Extras)
      */
-    void baseProcessDeliverInput(std::string &data)
-    {
-        m_ansi_process->parseTextToBuffer((char *)data.c_str());
-        m_session_data->deliver(data);
-    }
+    void baseProcessDeliverInput(std::string &data);
+    
+    /**
+    * @brief Deliver Input for prompts Then Disconnect (No Coloring Extras)
+    */
+    void baseProcessDeliverInputAndDisconnect(std::string &data);
 
     /**
      * @brief Pull and Display Prompts
      * @param prompt
      */
-    void baseDisplayPrompt(const std::string &prompt, text_prompts_dao_ptr m_text_dao)
-    {
-        // Set Default String Color, Can be overridden with pipe colors in text prompt.
-        std::string result = baseGetDefaultColor();
-
-        // Parse Prompt for Input Color And Position Override.
-        // If found, the colors of the MCI Codes should be used as the default color.
-        M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
-        std::string::size_type idx = prompt_set.second.find("%IN", 0);
-
-        result += std::move(m_session_io.parseTextPrompt(prompt_set));
-
-        // Not found, set default input color
-        if(idx == std::string::npos)
-        {
-            result += baseGetDefaultInputColor();
-        }
-
-        baseProcessAndDeliver(result);
-    }
+    void baseDisplayPrompt(const std::string &prompt, text_prompts_dao_ptr m_text_dao, bool is_disconnect=false);
 
     /**
      * @brief Pull and Return Display Prompt
      * @param prompt
      */
-    std::string baseGetDisplayPrompt(const std::string &prompt, text_prompts_dao_ptr m_text_dao)
-    {
-        // Set Default String Color, Can be overridden with pipe colors in text prompt.
-        std::string result = baseGetDefaultColor();
-
-        // Parse Prompt for Input Color And Position Override.
-        // If found, the colors of the MCI Codes should be used as the default color.
-        M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
-        std::string::size_type idx = prompt_set.second.find("%IN", 0);
-
-        result += std::move(m_session_io.parseTextPrompt(prompt_set));
-
-        // Not found, set default input color
-        if(idx == std::string::npos)
-        {
-            result += baseGetDefaultInputColor();
-        }
-
-        return result;
-    }
+    std::string baseGetDisplayPrompt(const std::string &prompt, text_prompts_dao_ptr m_text_dao);
 
     /**
      * @brief Pull and Return Raw Display Prompts
      * @param prompt
      */
-    std::string baseGetDisplayPromptRaw(const std::string &prompt, text_prompts_dao_ptr m_text_dao)
-    {
-        // Parse Prompt for Input Color And Position Override.
-        // If found, the colors of the MCI Codes should be used as the default color.
-        M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
-        return prompt_set.second;
-    }
+    std::string baseGetDisplayPromptRaw(const std::string &prompt, text_prompts_dao_ptr m_text_dao);
 
     /**
      * @brief Pull and Display Prompts, Replace MCI Code |OT
      * @param prompt
      */
-    void baseDisplayPromptMCI(const std::string &prompt, text_prompts_dao_ptr m_text_dao, std::string mci_field)
-    {
-        // Set Default String Color, Can be overridden with pipe colors in text prompt.
-        std::string result = baseGetDefaultColor();
-
-        // Parse Prompt for Input Color And Position Override.
-        // If found, the colors of the MCI Codes should be used as the default color.
-        M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
-        std::string::size_type idx  = prompt_set.second.find("%IN", 0);
-
-        // Parse and replace the MCI Code with the field value
-        std::string mci_code = "|OT";
-        m_session_io.m_common_io.parseLocalMCI(prompt_set.second, mci_code, mci_field);
-
-        // Does pipe2ansi for colors etc..
-        result += std::move(m_session_io.parseTextPrompt(prompt_set));
-
-        // Not found, set default input color
-        if(idx == std::string::npos)
-        {
-            result += baseGetDefaultInputColor();
-        }
-
-        baseProcessAndDeliver(result);
-    }
+    void baseDisplayPromptMCI(const std::string &prompt, text_prompts_dao_ptr m_text_dao, std::string mci_field);
 
     /**
      * @brief Pull and Display Prompt with a following new line for info messages.
      * @param prompt
      */
-    void baseDisplayPromptAndNewLine(const std::string &prompt, text_prompts_dao_ptr m_text_dao)
-    {
-        // Set Default String Color, Can be overridden with pipe colors in text prompt.
-        std::string result = baseGetDefaultColor();
-
-        // Parse Prompt for Input Color And Position Override.
-        // If found, the colors of the MCI Codes should be used as the default color.
-        M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
-        std::string::size_type idx = prompt_set.second.find("%IN", 0);
-
-        result += m_session_io.parseTextPrompt(prompt_set);
-
-        // Not found, set default input color
-        if(idx == std::string::npos)
-        {
-            result += baseGetDefaultInputColor();
-        }
-
-        // Add New Line.
-        result += "\r\n";
-
-        //std::cout << "prompt: " << result << std::endl;
-        baseProcessAndDeliver(result);
-    }
+    void baseDisplayPromptAndNewLine(const std::string &prompt, text_prompts_dao_ptr m_text_dao);
 
     /**
      * @brief Move to End of Display then output
      * @param output
      */
-    void moveToBottomAndDisplay(const std::string &prompt)
-    {
-        std::string output = "";
-        int screen_row = m_ansi_process->getMaxRowsUsedOnScreen();
-
-        output += baseGetDefaultColor();
-        output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
-        output += std::move(prompt);
-        baseProcessAndDeliver(output);
-    }
+    void moveToBottomAndDisplay(const std::string &prompt);
+    
 
     /**
      * @brief Move to End of Display then Setup Display for String
      * @param output
      */
-    std::string moveStringToBottom(const std::string &prompt)
-    {
-        std::string output = "";
-        int screen_row = m_ansi_process->getMaxRowsUsedOnScreen();
-
-        output += baseGetDefaultColor();
-        output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
-        output += std::move(prompt);
-        return output;
-    }
+    std::string moveStringToBottom(const std::string &prompt);
 
     // This holds session data passed to each session.
     // In modules we'll use the weak pointer so more clarity.
-    session_data_ptr  m_session_data;
-    config_ptr        m_config;
-    SessionIO         m_session_io;
+    std::string         m_filename;
+    Logging            &m_log;
+    session_ptr         m_session_data;
+    config_ptr          m_config;    
     processor_ansi_ptr  m_ansi_process;
-    bool              m_is_active;
+    common_io_ptr       m_common_io;
+    session_io_ptr      m_session_io;
+    bool                m_is_active;    
 
 
     // All Data is saved to this buffer, which is then

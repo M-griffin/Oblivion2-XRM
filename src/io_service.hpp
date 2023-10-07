@@ -9,11 +9,10 @@
 #include <memory>
 #include <typeinfo>
 
+class Logging;
+
 class SocketHandler;
 typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
-
-class Session;
-typedef std::shared_ptr<Session> session_ptr;
 
 const int SERVICE_TYPE_NONE              = 0;
 const int SERVICE_TYPE_READ              = 1;
@@ -84,7 +83,7 @@ public:
     class ServiceJob : public ServiceBase
     {
     public:
-        virtual void setBuffer(unsigned char *buffer)
+        virtual void setBuffer(unsigned char *buffer) override
         {
             for(int i = 0; i < MAX_BUFFER_SIZE; i++)
             {
@@ -92,40 +91,45 @@ public:
             }
         }
 
-        virtual std::vector<unsigned char> &getBuffer()
+        virtual std::vector<unsigned char> &getBuffer() override
         {
             return m_buffer;
         }
 
-        virtual std::string getStringSequence()
+        virtual std::string getStringSequence() override
         {
             return m_string_sequence;
         }
 
-        virtual socket_handler_ptr getSocketHandle()
+        virtual socket_handler_ptr getSocketHandle() override
         {
             return m_socket_handle;
         }
 
-        virtual void executeCallback(const std::error_code &err, socket_handler_ptr handle)
+        virtual void executeCallback(const std::error_code &err, socket_handler_ptr handle) override
         {
-            StdFunctionCallbackHandler callback(m_callback);
-            callback(err, handle);
+            StdFunctionCallbackHandler callback_method(m_callback);
+            callback_method(err, handle);
         }
 
-        virtual int getServiceType()
+        virtual int getServiceType() override
         {
             return m_service_type;
         }
 
-        ServiceJob(MutableBufferSequence &buffer, StringSequence string_sequence, SocketHandle socket_handle, Callback callback,
-                   ServiceType service_type)
+        ServiceJob(MutableBufferSequence &buffer, StringSequence string_sequence, SocketHandle socket_handle, 
+                Callback &callback, ServiceType service_type)
             : m_buffer(buffer)
             , m_string_sequence(string_sequence)
             , m_socket_handle(socket_handle)
             , m_callback(callback)
             , m_service_type(service_type)
         { }
+        
+        ~ServiceJob() 
+        {
+            m_socket_handle.reset();
+        }
 
         MutableBufferSequence &m_buffer;
         StringSequence         m_string_sequence;
@@ -186,10 +190,17 @@ public:
      * @brief Shutdown Async Polling Service
      */
     void stop();
-
+    
+    /**
+     * @brief Check if the IO Service Is Active
+     */
+    bool isActive();
+    
     SafeVector<service_base_ptr>  m_service_list;
     SafeVector<service_base_ptr>  m_timer_list;
     SafeVector<service_base_ptr>  m_listener_list;
+    
+    Logging                      &m_log;
     bool                          m_is_active;
 
 };

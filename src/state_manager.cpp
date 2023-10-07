@@ -1,10 +1,34 @@
 #include "state_manager.hpp"
+
+#include "state_base.hpp"
+#include "session.hpp"
 #include "logging.hpp"
 #include "utf-cpp/utf8.h"
 
 #include <cstring>
 #include <string>
 
+StateManager::StateManager()
+    : m_log(Logging::getInstance())
+{ }
+    
+StateManager::~StateManager()
+{
+    m_log.write<Logging::DEBUG_LOG>("~StateManager()");
+    
+    if(!m_the_state.empty())
+    {
+        m_the_state.back()->onExit();
+
+        while(m_the_state.size() > 0)
+        {
+            m_the_state.pop_back();
+        }
+
+        m_the_state.clear();
+    }
+}
+    
 /**
  * @brief Removed the Current State from the session
  */
@@ -31,13 +55,21 @@ void StateManager::clean()
  * which is copied from code_point to char[5] array.
  */
 void StateManager::update()
-{
+{   
     std::string new_string_builder = "";
     bool utf_found = false;
 
     if(!m_the_state.empty())
     {
-        std::string incoming_data = std::move(m_the_state.back()->m_session_data->m_parsed_data);
+        std::string incoming_data = "";
+        try
+        {
+            incoming_data = std::move(m_the_state.back()->m_session_data->m_parsed_data);            
+        }
+        catch(std::exception &ex)
+        {
+            m_log.write<Logging::ERROR_LOG>("StateManager() Exception=", ex.what(), __LINE__, __FILE__);
+        }
 
         if(incoming_data.size() > 0)
         {
@@ -67,7 +99,7 @@ void StateManager::update()
                         m_the_state.back()->update(new_string_builder, utf_found);
                         new_string_builder.erase();
                         continue;
-                    }
+                    }                    
 
                     new_string_builder += std::string(1, byte_value);
                 }
@@ -92,8 +124,14 @@ void StateManager::update()
                     }
                     catch(utf8::exception &ex)
                     {
-                        Logging *log = Logging::instance();
-                        log->write<Logging::ERROR_LOG>("Utf8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
+                        // This is filling up the log on Invalid Characters, have to find out what is pushing in here.
+                        m_log.write<Logging::ERROR_LOG>("Utf8 Parsing Exception=", *it, ex.what(), __LINE__, __FILE__);
+                        
+                        // On Failure, use the exiting char, which could be extended ascii
+                        new_string_builder += std::string(1, byte_value);
+                        
+                        // Also on failures it rollback back the iterator, so increment so we get past this current char failure
+                        *it++;
                     }
                 }
 

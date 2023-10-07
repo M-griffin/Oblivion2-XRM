@@ -19,6 +19,7 @@
 #include <pthread.h>
 #endif
 
+#include <iostream>
 #include <string>
 #include <list>
 #include <stdint.h>
@@ -81,10 +82,6 @@ public:
         { }
         ~DatabasePool()
         {
-            if(db)
-            {
-                sqlite3_close_v2(db);
-            }
         }
 
         sqlite3 *db;

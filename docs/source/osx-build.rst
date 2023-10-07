@@ -6,7 +6,7 @@
 .. image:: http://i.imgur.com/AWyEuN3.jpg
    :alt: Screenshot
 
-OS/X Setup and Build Guide
+OS/X Setup and Build Guide (Temp Deprecation)
 ===========================
 
 .. list-table:: Latest Content Changes
@@ -22,6 +22,9 @@ OS/X Setup and Build Guide
      - Updated dependencies that were missed also fixed Makefiles
    * - 05/17/2022
      - Updated guide to .RST format
+   * - 10/07/2023
+     - Temp deprecation, OSX Project builds have been disabled and are not updated on the current develop revision.
+     - During the initial development, it's too time consume to manually maintain and test each platform after after commits or changes.
 
 .. important:: Latest Builds Tested on OS/X Catalina
 
@@ -29,7 +32,7 @@ OS/X Setup and Build Guide
 Libraries to Install
 --------------------
 
-.. note:: Boost is only used for the menu and prompt conversion utilities. 
+.. note:: Boost is only used for the menu and prompt conversion utilities.
   Future plans are to remove this dependency.
 
 :List of Dependencies:
@@ -110,7 +113,7 @@ This will checkout and create project in an ``Oblivion2-XRM`` folder where you r
   git clone https://github.com/M-griffin/Oblivion2-XRM.git
 
 ::
-  
+
   cd Oblivion2-XRM
   cd build
   ./build-osx.sh -j2

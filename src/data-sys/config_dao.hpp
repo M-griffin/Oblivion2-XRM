@@ -5,6 +5,8 @@
 #include <string>
 #include <mutex>
 
+class Logging;
+
 class Config;
 typedef std::shared_ptr<Config> config_ptr;
 
@@ -68,6 +70,7 @@ public:
 		return nullptr;
     }
 
+    Logging    &m_log; 
     config_ptr  m_config;
     std::string m_path;
     std::string m_filename;

@@ -76,7 +76,7 @@ The menu system is still pretty raw and a lot of logic still needs to be complet
 .. Important:: This is a preview of the development work, It's not a fully functional system
   You can browse Menu's, and some initial sysop functions such as the User, Menu, Message and Level editors.
   With the Full Screen Message editor in the works.
-  
+
 .. image:: http://i.imgur.com/GxcX1gl.png
    :alt: Screenshot
 

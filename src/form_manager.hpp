@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "common_io.hpp"
-#include "session_io.hpp"
 
 /**
  * Development Notes:
@@ -38,10 +37,15 @@ typedef std::shared_ptr<Config> config_ptr;
 class Menu;
 typedef std::shared_ptr<Menu> menu_ptr;
 
-class SessionData;
-typedef std::shared_ptr<SessionData> session_data_ptr;
+class Session;
+typedef std::shared_ptr<Session> session_ptr;
+
+class SessionIO;
+typedef std::shared_ptr<SessionIO> session_io_ptr;
 
 class MenuOption;
+
+class Logging;
 
 /**
  * @class FormManager
@@ -54,7 +58,7 @@ class FormManager
 {
 public:
 
-    FormManager(config_ptr config, session_data_ptr session_data);
+    FormManager(config_ptr config, session_ptr session_data);
     ~FormManager();
 
 
@@ -121,9 +125,9 @@ public:
      */
     std::string processFormScreens();
 
-
+    Logging         &m_log;
     config_ptr       m_config;
-    session_data_ptr m_session_data;
+    session_ptr      m_session_data;
     menu_ptr         m_menu_info;
     int              max_cmds_per_page;
     int              m_current_page;
@@ -135,9 +139,9 @@ public:
     int              m_box_top;
     int              m_box_bottom;
 
-    std::vector<MenuOption> m_loaded_options;
-    CommonIO         m_common_io;
-    SessionIO        m_session_io;
+    std::vector<MenuOption> m_loaded_options;    
+    session_io_ptr   m_session_io;
+    CommonIO         m_common_io;    
 };
 
 

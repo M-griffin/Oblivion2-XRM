@@ -1,14 +1,60 @@
 #include "mod_level_editor.hpp"
 
-#include "data-sys/access_level_dao.hpp"
-#include "model-sys/access_level.hpp"
+#include "../data-sys/text_prompts_dao.hpp"
+#include "../data-sys/access_level_dao.hpp"
+
+#include "../model-sys/config.hpp"
+#include "../model-sys/access_level.hpp"
+
 #include "../access_condition.hpp"
+#include "../processor_ansi.hpp"
+#include "../session_io.hpp"
+#include "../session.hpp"
 #include "../logging.hpp"
+#include "../common_io.hpp"
 
 #include <sstream>
 #include <stdint.h>
 #include <string>
 #include <vector>
+
+ModLevelEditor::ModLevelEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io)
+    : ModBase(session_data, config, ansi_process, "mod_level_editor.yaml", common_io, session_io)
+    , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
+    , m_mod_setup_index(MOD_DISPLAY_LEVEL)
+    , m_mod_function_index(MOD_LEVEL_INPUT)
+    , m_mod_level_state_index(LEVEL_ADD)
+    , m_is_text_prompt_exist(false)
+    , m_page(0)
+    , m_rows_per_page(0)
+    , m_current_level(0)
+    , m_current_field(0)
+{
+    // Setup Modules
+    m_setup_functions.push_back(std::bind(&ModLevelEditor::setupLevelEditor, this));
+    m_setup_functions.push_back(std::bind(&ModLevelEditor::setupLevelEditFields, this));
+
+    // Input or Method Modules that handle incoming input per state.
+    m_mod_functions.push_back(std::bind(&ModLevelEditor::levelEditorInput, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModLevelEditor::levelEditorPausedInput, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModLevelEditor::levelEditorLevelInput, this, std::placeholders::_1));
+
+    // Menu Field Input Commands
+    m_mod_functions.push_back(std::bind(&ModLevelEditor::levelEditorLevelFieldInput, this, std::placeholders::_1));
+    m_mod_functions.push_back(std::bind(&ModLevelEditor::levelEditorLevelFieldHandler, this, std::placeholders::_1));
+
+    // Check of the Text Prompts exist.
+    m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
+
+    if(!m_is_text_prompt_exist)
+    {
+        createTextPrompts();
+    }
+
+    // Loads all Text Prompts for current module
+    m_text_prompts_dao->readPrompts();
+}
 
 /**
  * @brief Handles Updates or Data Input from Client
@@ -243,7 +289,7 @@ void ModLevelEditor::setupLevelEditor()
         std::vector<std::string>().swap(m_level_display_list);
     }
 
-    m_level_display_list = m_common_io.splitString(level_display_output, '\n');
+    m_level_display_list = m_common_io->splitString(level_display_output, '\n');
     m_page = 0;
     displayCurrentPage(PROMPT_INPUT_TEXT);
 }
@@ -268,7 +314,7 @@ void ModLevelEditor::setupLevelEditFields()
         std::vector<std::string>().swap(m_level_display_list);
     }
 
-    m_level_display_list = m_common_io.splitString(level_display_output, '\n');
+    m_level_display_list = m_common_io->splitString(level_display_output, '\n');
     m_page = 0;
     displayCurrentEditPage(PROMPT_LEVEL_FIELD_INPUT_TEXT);
 }
@@ -292,7 +338,7 @@ void ModLevelEditor::displayCurrentPage(const std::string& input_state)
 
     for(unsigned int i = (m_page * (m_rows_per_page - 2)); i < m_level_display_list.size(); i++)
     {
-        std::string display_line = m_session_io.pipe2ansi(m_level_display_list[i]);
+        std::string display_line = m_session_io->pipe2ansi(m_level_display_list[i]);
         display_line.append("\r\n");
         baseProcessAndDeliver(display_line);
 
@@ -315,8 +361,7 @@ void ModLevelEditor::displayCurrentPage(const std::string& input_state)
             break;
 
         default:
-            Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentPage!!", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentPage!!", __LINE__, __FILE__);
             return;
     }
 
@@ -344,7 +389,7 @@ void ModLevelEditor::displayCurrentEditPage(const std::string& input_state)
 {
     for(unsigned int i = 0; i < m_level_display_list.size(); i++)
     {
-        std::string display_line = m_session_io.pipe2ansi(m_level_display_list[i]);
+        std::string display_line = m_session_io->pipe2ansi(m_level_display_list[i]);
         display_line.append("\r\n");
         baseProcessAndDeliver(display_line);
     }
@@ -359,8 +404,7 @@ void ModLevelEditor::displayCurrentEditPage(const std::string& input_state)
             break;
 
         default:
-            Logging *log = Logging::instance();
-            log->write<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentEditPage!!", __LINE__, __FILE__);
+            m_log.write<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentEditPage!!", __LINE__, __FILE__);
             return;
     }
 
@@ -416,7 +460,7 @@ void ModLevelEditor::levelEditorDisplayPause(const std::string&)
 void ModLevelEditor::levelEditorInput(const std::string& input)
 {
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -488,7 +532,7 @@ void ModLevelEditor::levelEditorInput(const std::string& input)
 void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
 {
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -520,84 +564,84 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_FIELD_NAME);
-                m_session_io.getInputField("", key, Config::sName_length, current_level->sName);
+                m_session_io->getInputField("", key, Config::sName_length, current_level->sName);
                 break;
 
             case 'B': // Level Start Menu
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_FIELD_START_MENU);
-                m_session_io.getInputField("", key, Config::sName_length, current_level->sStartMenu);
+                m_session_io->getInputField("", key, Config::sName_length, current_level->sStartMenu);
                 break;
 
             case 'C': // Level File Level
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_FIELD_FILE_LEVEL);
-                m_session_io.getInputField("", key, Config::sName_length, std::to_string(current_level->iFileLevel));
+                m_session_io->getInputField("", key, Config::sName_length, std::to_string(current_level->iFileLevel));
                 break;
 
             case 'D': // Level Message Level
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_FIELD_MESG_LEVEL);
-                m_session_io.getInputField("", key, Config::sName_length, std::to_string(current_level->iMessageLevel));
+                m_session_io->getInputField("", key, Config::sName_length, std::to_string(current_level->iMessageLevel));
                 break;
 
             case 'E': // Level Post/Call Ratio
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_FIELD_POST_CALL_RATIO);
-                m_session_io.getInputField("", key, Config::sName_length, std::to_string(current_level->iPostCallRatio));
+                m_session_io->getInputField("", key, Config::sName_length, std::to_string(current_level->iPostCallRatio));
                 break;
 
             case 'F': // Level File Ratio
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_FIELD_FILE_RATIO);
-                m_session_io.getInputField("", key, Config::sName_length, std::to_string(current_level->iFileRatio));
+                m_session_io->getInputField("", key, Config::sName_length, std::to_string(current_level->iFileRatio));
                 break;
 
             case 'G': // Level Time Limit
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_FIELD_TIME_LIMIT);
-                m_session_io.getInputField("", key, Config::sName_length, std::to_string(current_level->iTimeLimit));
+                m_session_io->getInputField("", key, Config::sName_length, std::to_string(current_level->iTimeLimit));
                 break;
 
             case 'H': // Level Call Limit
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_FIELD_CALL_LIMIT);
-                m_session_io.getInputField("", key, Config::sName_length, std::to_string(current_level->iCallLimit));
+                m_session_io->getInputField("", key, Config::sName_length, std::to_string(current_level->iCallLimit));
                 break;
 
             case 'I': // Level Downloads
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_FIELD_DOWNLOADS);
-                m_session_io.getInputField("", key, Config::sName_length, std::to_string(current_level->iDownloads));
+                m_session_io->getInputField("", key, Config::sName_length, std::to_string(current_level->iDownloads));
                 break;
 
             case 'J': // Level Downloads MB
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_FIELD_DOWNLOAD_MB);
-                m_session_io.getInputField("", key, Config::sName_length, std::to_string(current_level->iDownloadMB));
+                m_session_io->getInputField("", key, Config::sName_length, std::to_string(current_level->iDownloadMB));
                 break;
 
             case 'K': // Level AR Flags 1
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_FIELD_ARFLAGS1);
-                m_session_io.getInputField("", key, Config::sName_length);
+                m_session_io->getInputField("", key, Config::sName_length);
                 break;
 
             case 'L': // Level AR Flags 2
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_FIELD_ARFLAGS2);
-                m_session_io.getInputField("", key, Config::sName_length);
+                m_session_io->getInputField("", key, Config::sName_length);
                 break;
 
             case 'M': // Bool PostCallRatio
@@ -606,8 +650,8 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_POST_CALL_RATIO);
                 std::string bool_value = "";
-                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                bool_value = m_common_io->boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io->getInputField("", key, Config::sName_length, bool_value);
                 break;
             }
 
@@ -617,8 +661,8 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_FILE_RATIO);
                 std::string bool_value = "";
-                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                bool_value = m_common_io->boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io->getInputField("", key, Config::sName_length, bool_value);
                 break;
             }
 
@@ -628,8 +672,8 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_TIME_LIMIT);
                 std::string bool_value = "";
-                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                bool_value = m_common_io->boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io->getInputField("", key, Config::sName_length, bool_value);
                 break;
             }
 
@@ -639,8 +683,8 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_CALL_LIMIT);
                 std::string bool_value = "";
-                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                bool_value = m_common_io->boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io->getInputField("", key, Config::sName_length, bool_value);
                 break;
             }
 
@@ -650,8 +694,8 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_DOWNLOADS);
                 std::string bool_value = "";
-                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                bool_value = m_common_io->boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io->getInputField("", key, Config::sName_length, bool_value);
                 break;
             }
 
@@ -661,8 +705,8 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
                 changeInputModule(MOD_LEVEL_FIELD);
                 displayPrompt(PROMPT_LEVEL_BOOL_DOWNLOAD_MB);
                 std::string bool_value = "";
-                bool_value = m_common_io.boolAlpha(current_level->bPostCallRatio).at(0);
-                m_session_io.getInputField("", key, Config::sName_length, bool_value);
+                bool_value = m_common_io->boolAlpha(current_level->bPostCallRatio).at(0);
+                m_session_io->getInputField("", key, Config::sName_length, bool_value);
                 break;
             }
 
@@ -706,7 +750,7 @@ void ModLevelEditor::levelEditorLevelFieldInput(const std::string& input)
 void ModLevelEditor::levelEditorLevelFieldHandler(const std::string& input)
 {
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
+    std::string result = m_session_io->getInputField(input, key, Config::sName_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -733,35 +777,35 @@ void ModLevelEditor::levelEditorLevelFieldHandler(const std::string& input)
                 break;
 
             case 'C': // Level File Level
-                current_level->iFileLevel = m_common_io.stringToInt(key);
+                current_level->iFileLevel = m_common_io->stringToInt(key);
                 break;
 
             case 'D': // Level Message Level
-                current_level->iMessageLevel = m_common_io.stringToInt(key);
+                current_level->iMessageLevel = m_common_io->stringToInt(key);
                 break;
 
             case 'E': // Level Post/Call Ratio
-                current_level->iPostCallRatio = m_common_io.stringToInt(key);
+                current_level->iPostCallRatio = m_common_io->stringToInt(key);
                 break;
 
             case 'F': // Level File Ratio
-                current_level->iFileRatio = m_common_io.stringToInt(key);
+                current_level->iFileRatio = m_common_io->stringToInt(key);
                 break;
 
             case 'G': // Level Time Limit
-                current_level->iTimeLimit = m_common_io.stringToInt(key);
+                current_level->iTimeLimit = m_common_io->stringToInt(key);
                 break;
 
             case 'H': // Level Call Limit
-                current_level->iCallLimit = m_common_io.stringToInt(key);
+                current_level->iCallLimit = m_common_io->stringToInt(key);
                 break;
 
             case 'I': // Level Downloads
-                current_level->iDownloads = m_common_io.stringToInt(key);
+                current_level->iDownloads = m_common_io->stringToInt(key);
                 break;
 
             case 'J': // Level Downloads MB
-                current_level->iDownloadMB = m_common_io.stringToInt(key);
+                current_level->iDownloadMB = m_common_io->stringToInt(key);
                 break;
 
             case 'K': // Level AR Flags 1
@@ -785,27 +829,27 @@ void ModLevelEditor::levelEditorLevelFieldHandler(const std::string& input)
             }
 
             case 'M': // Bool PostCallRatio
-                current_level->bPostCallRatio = m_common_io.stringToBool(key);
+                current_level->bPostCallRatio = m_common_io->stringToBool(key);
                 break;
 
             case 'N': // Bool File Ratio
-                current_level->bFileRatio = m_common_io.stringToBool(key);
+                current_level->bFileRatio = m_common_io->stringToBool(key);
                 break;
 
             case 'O': // Bool Time Limit
-                current_level->bTimeLimit = m_common_io.stringToBool(key);
+                current_level->bTimeLimit = m_common_io->stringToBool(key);
                 break;
 
             case 'P': // Bool Call Limit
-                current_level->bCallLimit = m_common_io.stringToBool(key);
+                current_level->bCallLimit = m_common_io->stringToBool(key);
                 break;
 
             case 'R': // Bool Download File Limit
-                current_level->bDownloads = m_common_io.stringToBool(key);
+                current_level->bDownloads = m_common_io->stringToBool(key);
                 break;
 
             case 'S': // Bool Download Limit MB
-                current_level->bDownloadMB = m_common_io.stringToBool(key);
+                current_level->bDownloadMB = m_common_io->stringToBool(key);
                 break;
         }
 
@@ -830,7 +874,7 @@ void ModLevelEditor::levelEditorLevelFieldHandler(const std::string& input)
 void ModLevelEditor::levelEditorLevelInput(const std::string& input)
 {
     std::string key = "";
-    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
+    std::string result = m_session_io->getInputField(input, key, Config::sName_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -993,7 +1037,6 @@ void ModLevelEditor::handleLevelInputState(bool does_level_exist, int level_code
  */
 void ModLevelEditor::createNewLevel(int level_code)
 {
-    Logging *log = Logging::instance();
     access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
     access_level_ptr new_level(new AccessLevel());
 
@@ -1002,7 +1045,7 @@ void ModLevelEditor::createNewLevel(int level_code)
 
     if(checkLevelExistsByLevel(level_code))
     {
-        log->write<Logging::ERROR_LOG>("Error, Destination level already exists=", level_code, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Destination level already exists=", level_code, __LINE__, __FILE__);
         return;
     }
 
@@ -1011,7 +1054,7 @@ void ModLevelEditor::createNewLevel(int level_code)
 
     if(level_dao->insertRecord(new_level) < 0)
     {
-        log->write<Logging::ERROR_LOG>("Error, unable to insert new level=", level_code, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, unable to insert new level=", level_code, __LINE__, __FILE__);
     }
 }
 
@@ -1026,8 +1069,7 @@ void ModLevelEditor::deleteExistingLevel(int level_code)
 
     if(existing_level->iId == -1 || !level_dao->deleteRecord(existing_level->iId))
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("Error, unable to delete existing level=", level_code, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, unable to delete existing level=", level_code, __LINE__, __FILE__);
     }
 
     level_dao->deleteRecord(existing_level->iId);
@@ -1039,14 +1081,12 @@ void ModLevelEditor::deleteExistingLevel(int level_code)
  */
 void ModLevelEditor::copyExistingLevel(int level_code)
 {
-    Logging *log = Logging::instance();
-
     access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
     access_level_ptr existing_level = level_dao->getAccessLevelByLevel(m_current_level);
 
     if(checkLevelExistsByLevel(level_code))
     {
-        log->write<Logging::ERROR_LOG>("Error, Destination level already exists=", level_code, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Destination level already exists=", level_code, __LINE__, __FILE__);
         return;
     }
 
@@ -1056,7 +1096,7 @@ void ModLevelEditor::copyExistingLevel(int level_code)
 
     if(level_dao->insertRecord(existing_level) < 0)
     {
-        log->write<Logging::ERROR_LOG>("Error, unable to copy existing level=", m_current_level, "to=", level_code,__LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, unable to copy existing level=", m_current_level, "to=", level_code,__LINE__, __FILE__);
     }
 }
 
@@ -1079,8 +1119,7 @@ void ModLevelEditor::saveLevelChanges()
 
     if(existing_level == nullptr || !level_dao->updateRecord(existing_level))
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("Error, unable to update existing level=", m_current_level, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, unable to update existing level=", m_current_level, __LINE__, __FILE__);
         return;
     }
 
@@ -1143,14 +1182,14 @@ std::string ModLevelEditor::displayLevelList()
 
     if(m_loaded_levels.size() == 0)
     {
-        result_set.push_back(baseGetDefaultStatColor() + m_common_io.rightPadding("No Records Found!", 24));
+        result_set.push_back(baseGetDefaultStatColor() + m_common_io->rightPadding("No Records Found!", 24));
     }
 
     // Build a string list of individual menu options, then loop to fit as many per screen!
     for(unsigned int i = 0; i < m_loaded_levels.size(); i++)
     {
-        std::string option_string = m_common_io.rightPadding(std::to_string(m_loaded_levels[i]->iLevel), 5);
-        option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(m_loaded_levels[i]->sName, 19));
+        std::string option_string = m_common_io->rightPadding(std::to_string(m_loaded_levels[i]->iLevel), 5);
+        option_string.append(baseGetDefaultStatColor() + m_common_io->rightPadding(m_loaded_levels[i]->sName, 19));
         result_set.push_back(option_string);
     }
 
@@ -1257,8 +1296,7 @@ std::string ModLevelEditor::displayLevelEditScreen()
 
     if(current_level == nullptr)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("Error, Level Not Found=", m_current_level, __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Level Not Found=", m_current_level, __LINE__, __FILE__);
         return "Level Not Found: " + std::to_string(m_current_level);
     }
 
@@ -1267,61 +1305,61 @@ std::string ModLevelEditor::displayLevelEditScreen()
     AccessCondition acs;
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_NAME) + baseGetDefaultStatColor() +
-                         m_common_io.rightPadding(current_level->sName, 48));
+                         m_common_io->rightPadding(current_level->sName, 48));
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_START_MENU) + baseGetDefaultStatColor() +
-                         m_common_io.rightPadding(current_level->sStartMenu, 48));
+                         m_common_io->rightPadding(current_level->sStartMenu, 48));
 
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_FILE_LEVEL) + baseGetDefaultStatColor() +
-                         m_common_io.rightPadding(std::to_string(current_level->iFileLevel), 48));
+                         m_common_io->rightPadding(std::to_string(current_level->iFileLevel), 48));
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_MESG_LEVEL) + baseGetDefaultStatColor() +
-                         m_common_io.rightPadding(std::to_string(current_level->iMessageLevel), 48));
+                         m_common_io->rightPadding(std::to_string(current_level->iMessageLevel), 48));
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_POST_CALL_RATIO) + baseGetDefaultStatColor() +
-                         m_common_io.rightPadding(std::to_string(current_level->iPostCallRatio), 48));
+                         m_common_io->rightPadding(std::to_string(current_level->iPostCallRatio), 48));
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_FILE_RATIO) + baseGetDefaultStatColor() +
-                         m_common_io.rightPadding(std::to_string(current_level->iFileRatio), 48));
+                         m_common_io->rightPadding(std::to_string(current_level->iFileRatio), 48));
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_TIME_LIMIT) + baseGetDefaultStatColor() +
-                         m_common_io.rightPadding(std::to_string(current_level->iTimeLimit), 48));
+                         m_common_io->rightPadding(std::to_string(current_level->iTimeLimit), 48));
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_CALL_LIMIT) + baseGetDefaultStatColor() +
-                         m_common_io.rightPadding(std::to_string(current_level->iCallLimit), 48));
+                         m_common_io->rightPadding(std::to_string(current_level->iCallLimit), 48));
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_DOWNLOADS) + baseGetDefaultStatColor() +
-                         m_common_io.rightPadding(std::to_string(current_level->iDownloads), 48));
+                         m_common_io->rightPadding(std::to_string(current_level->iDownloads), 48));
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_DOWNLOAD_MB) + baseGetDefaultStatColor() +
-                         m_common_io.rightPadding(std::to_string(current_level->iDownloadMB), 48));
+                         m_common_io->rightPadding(std::to_string(current_level->iDownloadMB), 48));
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_ARFLAGS1) + baseGetDefaultStatColor() +
-                         m_common_io.rightPadding(acs.getAccessConditionFlagStringFromBits(current_level->iARFlags1), 48));
+                         m_common_io->rightPadding(acs.getAccessConditionFlagStringFromBits(current_level->iARFlags1), 48));
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELD_ARFLAGS2) + baseGetDefaultStatColor() +
-                         m_common_io.rightPadding(acs.getAccessConditionFlagStringFromBits(current_level->iARFlags2), 48));
+                         m_common_io->rightPadding(acs.getAccessConditionFlagStringFromBits(current_level->iARFlags2), 48));
 
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_POST_CALL_RATIO) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bPostCallRatio), 56) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_CALL_LIMIT) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bCallLimit), 56));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_POST_CALL_RATIO) + baseGetDefaultStatColor() + m_common_io->boolAlpha(current_level->bPostCallRatio), 56) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_CALL_LIMIT) + baseGetDefaultStatColor() + m_common_io->boolAlpha(current_level->bCallLimit), 56));
 
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_FILE_RATIO) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bFileRatio), 56) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_DOWNLOADS) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bDownloads), 56));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_FILE_RATIO) + baseGetDefaultStatColor() + m_common_io->boolAlpha(current_level->bFileRatio), 56) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_DOWNLOADS) + baseGetDefaultStatColor() + m_common_io->boolAlpha(current_level->bDownloads), 56));
 
-    result_set.push_back(m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_TIME_LIMIT) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bTimeLimit), 56) +
-                         m_common_io.rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_DOWNLOAD_MB) + baseGetDefaultStatColor() + m_common_io.boolAlpha(current_level->bDownloadMB), 56));
+    result_set.push_back(m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_TIME_LIMIT) + baseGetDefaultStatColor() + m_common_io->boolAlpha(current_level->bTimeLimit), 56) +
+                         m_common_io->rightPadding(getDisplayPromptRaw(DISPLAY_LEVEL_BOOL_DOWNLOAD_MB) + baseGetDefaultStatColor() + m_common_io->boolAlpha(current_level->bDownloadMB), 56));
 
 
-    result_set.push_back(baseGetDefaultPromptColor() + " " + Encoding::instance()->utf8Encode(std::string(72, M_BORDER_ROW)) + " ");
+    result_set.push_back(baseGetDefaultPromptColor() + " " + Encoding::getInstance().utf8Encode(std::string(72, M_BORDER_ROW)) + " ");
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_QUIT_SAVE) + baseGetDefaultStatColor() +
-                         m_common_io.rightPadding("", 48));
+                         m_common_io->rightPadding("", 48));
 
     result_set.push_back(getDisplayPromptRaw(DISPLAY_LEVEL_FIELDS_QUIT_ABORT) + baseGetDefaultStatColor() +
-                         m_common_io.rightPadding("", 48));
+                         m_common_io->rightPadding("", 48));
 
 
     // iterate through and print out

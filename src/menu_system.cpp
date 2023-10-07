@@ -1,5 +1,7 @@
 #include "menu_system.hpp"
 
+#include "model-sys/config.hpp"
+
 #include "mods/mod_prelogon.hpp"
 #include "mods/mod_logon.hpp"
 #include "mods/mod_signup.hpp"
@@ -7,19 +9,25 @@
 #include "mods/mod_user_editor.hpp"
 #include "mods/mod_level_editor.hpp"
 #include "mods/mod_message_editor.hpp"
+
+#include "session.hpp"
 #include "logging.hpp"
 
 #include <locale>
+#include <cassert>
+#include <memory>
+#include <stdint.h>
 #include <string>
 #include <vector>
+#include <map>
 #include <functional>
-#include <cassert>
 
-const std::string MenuSystem::m_menuID = "MENU_SYSTEM";
+const std::string MenuSystem::m_stateID = "MENU_SYSTEM";
 
-MenuSystem::MenuSystem(session_data_ptr session_data)
+MenuSystem::MenuSystem(session_ptr session_data)
     : StateBase(session_data)
     , MenuBase(session_data)
+    , m_log(Logging::getInstance())
 {
     // [Vector] Setup std::function array with available options to pass input to.
     m_menu_functions.push_back(std::bind(&MenuBase::menuInput, this, std::placeholders::_1, std::placeholders::_2));
@@ -56,6 +64,7 @@ MenuSystem::MenuSystem(session_data_ptr session_data)
 
 MenuSystem::~MenuSystem()
 {
+    m_log.write<Logging::DEBUG_LOG>("~MenuSystem()");
     // Clear All Menu Command Functions.
     MappedCommandFunctions().swap(m_menu_command_functions);
 }
@@ -102,9 +111,7 @@ bool MenuSystem::onExit()
  * @param option
  */
 bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
-{
-    Logging *log = Logging::instance();
-
+{   
     // Some of these options set actual flags for behavior.
     // In this case, we will need to parse for specific Control commands
     // and set Menu System Flags!
@@ -269,13 +276,13 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             if(m_system_fallback.size() > 0)
             {
                 m_current_menu = m_system_fallback.back();
-                log->write<Logging::DEBUG_LOG>("FallBack reset to current=", m_current_menu);
+                m_log.write<Logging::DEBUG_LOG>("FallBack reset to current=", m_current_menu);
 
                 m_system_fallback.pop_back();
             }
             else
             {
-                log->write<Logging::DEBUG_LOG>("FallBack reset to menu_fall_back=", m_menu_info->menu_fall_back);
+                m_log.write<Logging::DEBUG_LOG>("FallBack reset to menu_fall_back=", m_menu_info->menu_fall_back);
                 m_current_menu = m_menu_info->menu_fall_back;
             }
 
@@ -290,7 +297,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
                 m_starting_menu = m_current_menu;
             }
 
-            log->write<Logging::DEBUG_LOG>("Set Fallback Starting Menu=", m_starting_menu);
+            m_log.write<Logging::DEBUG_LOG>("Set Fallback Starting Menu=", m_starting_menu);
             m_system_fallback.push_back(m_starting_menu);
             m_current_menu = lower_case(option.command_string);
             loadAndStartupMenu();
@@ -426,8 +433,6 @@ bool MenuSystem::menuOptionsMultiNodeCommands(const MenuOption &option)
  */
 bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
 {
-    Logging *log = Logging::instance();
-
     switch(option.command_key[1])
     {
         // Logon
@@ -436,7 +441,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
         //: USERLOG.X, and SYSPASS.X will be displayed.
         // { Note: add 0 for random! }
         case 'S':
-            log->write<Logging::DEBUG_LOG>("Executing startupModuleLogon()");
+            m_log.write<Logging::DEBUG_LOG>("Executing startupModuleLogon()");
             startupModuleLogon();
             break;
 
@@ -452,7 +457,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
 
         // Apply
         case 'A':
-            log->write<Logging::DEBUG_LOG>("Executing startupModuleSignup()");
+            m_log.write<Logging::DEBUG_LOG>("Executing startupModuleSignup()");
             startupModuleSignup();
             return true;
 
@@ -460,7 +465,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
         case 'C':
         {
             // Testing processes
-            log->write<Logging::DEBUG_LOG>("Executing startupModuleMessageEditor()");
+            m_log.write<Logging::DEBUG_LOG>("Executing startupModuleMessageEditor()");
             startupModuleMessageEditor();
             return true;
             /*
@@ -485,10 +490,10 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
 
         // Logoff
         case 'G':
-            log->write<Logging::CONSOLE_LOG>("User Logoff()");
+            m_log.write<Logging::CONSOLE_LOG>("User Logoff()");
             // Base Class
             m_logoff = true;
-            m_session_data->logoff();
+            m_session_data->disconnectUser();
             break;
 
         // Drops into the BBS
@@ -523,8 +528,6 @@ bool MenuSystem::menuOptionsGlobalNewScanCommands(const MenuOption &option)
  */
 bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
 {
-    Logging *log = Logging::instance();
-
     switch(option.command_key[1])
     {
         // autosig
@@ -545,19 +548,19 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
 
         // Logoff
         case 'G':
-            log->write<Logging::DEBUG_LOG>("Logoff()");
+            m_log.write<Logging::DEBUG_LOG>("Logoff()");
             // Add Logoff ANSI Display here.
             // Base Class
             m_logoff = true;
-            m_session_data->logoff();
+            m_session_data->disconnectUser();
             break;
 
         // logoff without ansi
         case 'H':
-            log->write<Logging::DEBUG_LOG>("Logoff() Without ANSI");
+            m_log.write<Logging::DEBUG_LOG>("Logoff() Without ANSI");
             // Base Class
             m_logoff = true;
-            m_session_data->logoff();
+            m_session_data->disconnectUser();
             break;
 
         // Fill out info form
@@ -632,22 +635,20 @@ bool MenuSystem::menuOptionsDoorCommands(const MenuOption &option)
  */
 bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option)
 {
-    Logging *log = Logging::instance();
-
     switch(option.command_key[1])
     {
         case '#':  // Menu Editor
-            log->write<Logging::DEBUG_LOG>("Executing startupModuleMenuEditor()");
+            m_log.write<Logging::DEBUG_LOG>("Executing startupModuleMenuEditor()");
             startupModuleMenuEditor();
             break;
 
         case 'U': // User Editor
-            log->write<Logging::DEBUG_LOG>("Executing startupModuleUserEditor()");
+            m_log.write<Logging::DEBUG_LOG>("Executing startupModuleUserEditor()");
             startupModuleUserEditor();
             break;
 
         case 'Y': // Level Editor
-            log->write<Logging::DEBUG_LOG>("Executing startupModuleLevelEditor()");
+            m_log.write<Logging::DEBUG_LOG>("Executing startupModuleLevelEditor()");
             startupModuleLevelEditor();
             break;
 
@@ -903,9 +904,8 @@ void MenuSystem::resetMenuInputIndex(int index)
  */
 void MenuSystem::startupExternalProcess(const std::string &cmdline)
 {
-    Logging *log = Logging::instance();
-    log->write<Logging::CONSOLE_LOG>("Executing startExternalProcess()=", cmdline);
-    m_menu_session_data->startExternalProcess(cmdline);
+    m_log.write<Logging::CONSOLE_LOG>("Executing startExternalProcess()=", cmdline);
+    //m_menu_session_data->startExternalProcess(cmdline);
 }
 
 /**
@@ -913,6 +913,7 @@ void MenuSystem::startupExternalProcess(const std::string &cmdline)
  */
 void MenuSystem::clearAllModules()
 {
+    m_log.write<Logging::DEBUG_LOG>("Menu System: clearAllModules()");
     if(m_module_stack.size() > 0)
     {
         std::vector<module_ptr>().swap(m_module_stack);
@@ -926,6 +927,7 @@ void MenuSystem::shutdownModule()
 {
     // Do module shutdown, only single modules are loaded
     // This makes it easy to allocate and kill on demand.
+    m_log.write<Logging::DEBUG_LOG>("shutdownModule MenuSystem()");
     m_module_stack.back()->onExit();
     m_module_stack.pop_back();
 }
@@ -933,15 +935,13 @@ void MenuSystem::shutdownModule()
 /**
  * @brief Exists and Shuts down the current module
  */
-void MenuSystem::startupModule(module_ptr module)
+void MenuSystem::startupModule(const module_ptr &module)
 {
+    m_log.write<Logging::CONSOLE_LOG>("Menu System: Startup Module=", module->m_filename);
+    
     // First clear any left overs if they exist.
     clearAllModules();
-
-    // Run the startup for the module
     module->onEnter();
-
-    // Push to stack now the new module.
     m_module_stack.push_back(module);
 }
 
@@ -954,12 +954,11 @@ void MenuSystem::startupModulePreLogon()
     resetMenuInputIndex(MODULE_PRELOGON_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModPreLogon(m_session_data, m_config, m_ansi_process));
+    module_ptr module(new ModPreLogon(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
 
     if(!module)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("startupModulePreLogon Allocation Error");
+        m_log.write<Logging::ERROR_LOG>("startupModulePreLogon Allocation Error");
         return;
     }
 
@@ -970,17 +969,16 @@ void MenuSystem::startupModulePreLogon()
  * @brief Start up the Normal Login Process.
  */
 void MenuSystem::startupModuleLogon()
-{
+{    
     // Setup the input processor
     resetMenuInputIndex(MODULE_LOGON_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModLogon(m_session_data, m_config, m_ansi_process));
+    module_ptr module(new ModLogon(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
 
     if(!module)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("startupModuleLogon Allocation Error");
+        m_log.write<Logging::ERROR_LOG>("startupModuleLogon Allocation Error");
         return;
     }
 
@@ -996,12 +994,11 @@ void MenuSystem::startupModuleSignup()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModSignup(m_session_data, m_config, m_ansi_process));
+    module_ptr module(new ModSignup(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
 
     if(!module)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("startupModuleSignup Allocation Error");
+        m_log.write<Logging::ERROR_LOG>("startupModuleSignup Allocation Error");
         return;
     }
 
@@ -1017,12 +1014,11 @@ void MenuSystem::startupModuleMenuEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModMenuEditor(m_session_data, m_config, m_ansi_process));
+    module_ptr module(new ModMenuEditor(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
 
     if(!module)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("startupModuleMenuEditor Allocation Error");
+        m_log.write<Logging::ERROR_LOG>("startupModuleMenuEditor Allocation Error");
         return;
     }
 
@@ -1038,12 +1034,11 @@ void MenuSystem::startupModuleUserEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModUserEditor(m_session_data, m_config, m_ansi_process));
+    module_ptr module(new ModUserEditor(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
 
     if(!module)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("startupModuleUserEditor Allocation Error");
+        m_log.write<Logging::ERROR_LOG>("startupModuleUserEditor Allocation Error");
         return;
     }
 
@@ -1059,12 +1054,11 @@ void MenuSystem::startupModuleLevelEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModLevelEditor(m_session_data, m_config, m_ansi_process));
+    module_ptr module(new ModLevelEditor(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
 
     if(!module)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("startupModuleLevelEditor Allocation Error");
+        m_log.write<Logging::ERROR_LOG>("startupModuleLevelEditor Allocation Error");
         return;
     }
 
@@ -1080,12 +1074,11 @@ void MenuSystem::startupModuleMessageEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModMessageEditor(m_session_data, m_config, m_ansi_process));
+    module_ptr module(new ModMessageEditor(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
 
     if(!module)
     {
-        Logging *log = Logging::instance();
-        log->write<Logging::ERROR_LOG>("startupModuleMessageEditor Allocation Error");
+        m_log.write<Logging::ERROR_LOG>("startupModuleMessageEditor Allocation Error");
         return;
     }
 
@@ -1095,13 +1088,12 @@ void MenuSystem::startupModuleMessageEditor()
 
 /**
  * @brief Handles Input for Login and PreLogin Sequences.
+ *        On Login Falures kicks back out to the Matrix.
  * @param character_buffer
  * @param is_utf8
  */
 void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8)
 {
-    Logging *log = Logging::instance();
-
     // Make sure we have an allocated module before processing.
     if(m_module_stack.size() == 0 || character_buffer.size() == 0)
     {
@@ -1111,24 +1103,27 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
     // Allocate and Create
     m_module_stack.back()->update(character_buffer, is_utf8);
 
-    log->write<Logging::DEBUG_LOG>("update - handleLoginInputSystem");
+    m_log.write<Logging::DEBUG_LOG>("update - handleLoginInputSystem");
 
     // Finished modules processing.
     if(!m_module_stack.back()->m_is_active)
     {
+        m_log.write<Logging::DEBUG_LOG>(
+            "*** !m_module_stack.back()->m_is_active - shutting down module: " 
+            , m_module_stack.back()->m_filename);
         shutdownModule();
-
+        
         // Check if the current user has been logged in yet.
         if(!m_session_data->m_is_session_authorized)
         {
-            log->write<Logging::DEBUG_LOG>("!m_is_session_authorized");
+            m_log.write<Logging::DEBUG_LOG>("!m_is_session_authorized");
             m_current_menu = "matrix";
         }
         else
         {
             // If Authorized, then we want to move to main! Startup menu should be TOP or
             // Specified in Config file!  TODO
-            log->write<Logging::DEBUG_LOG>("m_is_session_authorized");
+            m_log.write<Logging::DEBUG_LOG>("m_is_session_authorized");
 
             // TODO This should be individual users start menu!
             if(m_config->starting_menu_name.size() > 0)
@@ -1144,8 +1139,7 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
             }
         }
 
-        //Logging *log = Logging::instance();
-        log->write<Logging::DEBUG_LOG>("loadAndStartupMenu on initial login");
+        m_log.write<Logging::DEBUG_LOG>("loadAndStartupMenu on initial login");
 
         loadAndStartupMenu();
     }

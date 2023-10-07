@@ -8,6 +8,8 @@
 #include <vector>
 #include <memory>
 
+class Logging;
+
 /**
  * @class SocketHandler
  * @author Michael Griffin
@@ -19,37 +21,20 @@ class SocketHandler
 {
 public:
 
-    SocketHandler()
-        : m_socket()
-        , m_socket_type("")
-        , m_is_active(false)
-    {
-    }
-
-    ~SocketHandler()
-    {
-        std::vector<socket_state_ptr>().swap(m_socket);
-    }
+    explicit SocketHandler();
+    ~SocketHandler();    
 
     std::string const SOCKET_TYPE_TELNET = "TELNET";
-    std::string const SOCKET_TYPE_SSH = "SSH";
-    std::string const SOCKET_TYPE_FTP = "FTP";
 
     // Socket Events, True if Data Available.
     int sendSocket(unsigned char *buf, Uint32 len);
     int recvSocket(char *message);
     int poll();
+    std::string getIpAddress();
 
     // Telnet
-    bool connectTelnetSocket(std::string host, int port);
-    bool createTelnetAcceptor(std::string host, int port);
+    bool createTelnetAcceptor(const std::string &host, const int &port);
     socket_handler_ptr acceptTelnetConnection();
-
-    // SSH
-    bool connectSshSocket(std::string host, int port, std::string username, std::string password);
-
-    // IRC
-    bool connectIrcSocket(std::string host, int port);
 
     std::string getSocketType() const;
     bool isActive() const;
@@ -59,8 +44,12 @@ public:
 
     void setSocketType(std::string type);
     void setSocketState(socket_state_ptr state);
+    
+    void disconnectUser();
 
 private:
+
+    Logging                        &m_log;
 
     std::vector<socket_state_ptr>   m_socket;
     std::string                     m_socket_type;

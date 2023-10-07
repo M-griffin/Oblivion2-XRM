@@ -66,7 +66,7 @@ bool ProtocolDao::fileExists()
  */
 bool ProtocolDao::saveConfig(protocols_ptr prot)
 {
-    Logging *log = Logging::instance();
+    Logging &log = Logging::getInstance();
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
@@ -106,7 +106,7 @@ bool ProtocolDao::saveConfig(protocols_ptr prot)
 
     if(!ofs.is_open())
     {
-        log->write<Logging::ERROR_LOG>("Error, unable to write to=", path, __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Error, unable to write to=", path, __LINE__, __FILE__);
         return false;
     }
 
@@ -143,7 +143,7 @@ void ProtocolDao::encode(const Protocols &rhs)
  */
 bool ProtocolDao::loadConfig()
 {
-    Logging *log = Logging::instance();
+    Logging &log = Logging::getInstance();
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
@@ -166,11 +166,11 @@ bool ProtocolDao::loadConfig()
         std::string file_version = node["file_version"].as<std::string>();
 
         // Validate File Version
-        log->write<Logging::CONSOLE_LOG>("Protocols File Version=", file_version);
+        log.write<Logging::CONSOLE_LOG>("Protocols File Version=", file_version);
 
         if(file_version != Protocols::FILE_VERSION)
         {
-            log->write<Logging::ERROR_LOG>("Protocols File Version=", file_version, "Expected=", Protocols::FILE_VERSION, __LINE__, __FILE__);
+            log.write<Logging::ERROR_LOG>("Protocols File Version=", file_version, "Expected=", Protocols::FILE_VERSION, __LINE__, __FILE__);
             return false;
         }
 
@@ -182,12 +182,12 @@ bool ProtocolDao::loadConfig()
     }
     catch(YAML::Exception &ex)
     {
-        log->write<Logging::ERROR_LOG>("YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
         return(false);
     }
     catch(std::exception &ex)
     {
-        log->write<Logging::ERROR_LOG>("Unexpected YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>("Unexpected YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
         return(false);
     }
 

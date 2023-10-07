@@ -3,16 +3,17 @@
 
 #include "mod_base.hpp"
 
+#include <iostream>
 #include <string>
 #include <memory>
 #include <functional>
 #include <vector>
 
-class SessionData;
-typedef std::shared_ptr<SessionData> session_data_ptr;
-
 class Directory;
 typedef std::shared_ptr<Directory> directory_ptr;
+
+class Users;
+typedef std::shared_ptr<Users> user_ptr;
 
 /**
  * @class ModUserEditor
@@ -25,50 +26,8 @@ class ModUserEditor
     : public ModBase
 {
 public:
-    ModUserEditor(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-        : ModBase(session_data, config, ansi_process)
-        , m_session_io(session_data)
-        , m_filename("mod_user_editor.yaml")
-        , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
-        , m_mod_setup_index(MOD_DISPLAY_USER_LIST)
-        , m_mod_function_index(MOD_USER_INPUT)
-        , m_mod_user_state_index(USER_CHANGE)
-        , m_is_text_prompt_exist(false)
-        , m_page(0)
-        , m_rows_per_page(0)
-        , m_current_user_id(0)
-        , m_current_field(0)
-        , m_wildcard_filter("")
-        , m_user_array_position(0)
-    {
-        // Push function pointers to the stack.
-
-        m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserList, this));
-        m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserEditFields, this));
-        m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserEditExtendedFields, this));
-
-        m_mod_functions.push_back(std::bind(&ModUserEditor::userListInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorPausedInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorUserInput, this, std::placeholders::_1));
-
-        m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorFieldInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorFieldHandler, this, std::placeholders::_1));
-
-        m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorExtendedInput, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModUserEditor::userEditorExtendedFieldHandler, this, std::placeholders::_1));
-
-
-        // Check of the Text Prompts exist.
-        m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
-
-        if(!m_is_text_prompt_exist)
-        {
-            createTextPrompts();
-        }
-
-        // Loads all Text Prompts for current module
-        m_text_prompts_dao->readPrompts();
-    }
+    ModUserEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModUserEditor() override
     {
@@ -463,9 +422,8 @@ private:
     std::vector<std::string>                                m_user_display_list;
     std::vector<user_ptr>                                   m_loaded_user;
 
-    SessionIO              m_session_io;
-    std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
+    directory_ptr          m_directory;
 
     unsigned int           m_mod_setup_index;
     unsigned int           m_mod_function_index;
@@ -478,10 +436,7 @@ private:
     unsigned long          m_current_user_id;
     unsigned int           m_current_field;
     std::string            m_wildcard_filter;
-    unsigned long          m_user_array_position;
-
-    CommonIO               m_common_io;
-    directory_ptr          m_directory;
+    unsigned long          m_user_array_position;    
 
 };
 

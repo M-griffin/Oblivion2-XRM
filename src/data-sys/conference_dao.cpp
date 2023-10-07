@@ -154,14 +154,16 @@ void ConferenceDao::fillConferenceColumnValues(query_ptr qry, conference_ptr obj
 std::string ConferenceDao::insertConferenceQryString(std::string qry, conference_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->sName.c_str(),
                                          obj->sType.c_str(),
                                          obj->sACS.c_str(),
                                          obj->iSortOrder
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -173,7 +175,7 @@ std::string ConferenceDao::insertConferenceQryString(std::string qry, conference
 std::string ConferenceDao::updateConferenceQryString(std::string qry, conference_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->sName.c_str(),
                                          obj->sType.c_str(),
                                          obj->sACS.c_str(),
@@ -181,7 +183,9 @@ std::string ConferenceDao::updateConferenceQryString(std::string qry, conference
                                          obj->iId
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 
@@ -198,14 +202,14 @@ std::string ConferenceDao::updateConferenceQryString(std::string qry, conference
  */
 std::vector<conference_ptr> ConferenceDao::getAllConferencesByType(std::string type)
 {
-    Logging *log = Logging::instance();
+    Logging &log = Logging::getInstance();
     conference_ptr conf(new Conference);
     std::vector<conference_ptr> list;
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
+        log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
         return list;
     }
 
@@ -214,13 +218,16 @@ std::vector<conference_ptr> ConferenceDao::getAllConferencesByType(std::string t
 
     if(!qry->isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__, __LINE__);
+        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__, __LINE__);
         return list;
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sType like %Q;", m_strTableName.c_str(), type.c_str());
-
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE sType like %Q;", m_strTableName.c_str(), type.c_str());
+    std::string queryString(result);
+    sqlite3_free(result);
+    
+    
     // Execute Query.
     if(qry->getResult(queryString))
     {
@@ -237,12 +244,12 @@ std::vector<conference_ptr> ConferenceDao::getAllConferencesByType(std::string t
         }
         else
         {
-            log->write<Logging::ERROR_LOG>("Error, getAllConferencesByType Returned Rows=", rows, m_strTableName, __FILE__, __LINE__);
+            log.write<Logging::ERROR_LOG>("Error, getAllConferencesByType Returned Rows=", rows, m_strTableName, __FILE__, __LINE__);
         }
     }
     else
     {
-        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __FILE__, __LINE__);
+        log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __FILE__, __LINE__);
     }
 
     return list;
@@ -255,14 +262,14 @@ std::vector<conference_ptr> ConferenceDao::getAllConferencesByType(std::string t
  */
 long ConferenceDao::getConferencesCountByType(std::string type)
 {
-    Logging *log = Logging::instance();
+    Logging &log = Logging::getInstance();
     conference_ptr conf(new Conference);
     std::vector<conference_ptr> list;
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
+        log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
         return list.size();
     }
 
@@ -271,12 +278,14 @@ long ConferenceDao::getConferencesCountByType(std::string type)
 
     if(!qry->isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__, __LINE__);
+        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__, __LINE__);
         return list.size();
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE sType like %Q;", m_strTableName.c_str(), type.c_str());
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE sType like %Q;", m_strTableName.c_str(), type.c_str());
+    std::string queryString(result);
+    sqlite3_free(result);
 
     // Execute Query.
     if(qry->getResult(queryString))
@@ -294,12 +303,12 @@ long ConferenceDao::getConferencesCountByType(std::string type)
         }
         else
         {
-            log->write<Logging::ERROR_LOG>("Error, getConferenceCount By Type Returned Rows=", rows, m_strTableName, __FILE__, __LINE__);
+            log.write<Logging::ERROR_LOG>("Error, getConferenceCount By Type Returned Rows=", rows, m_strTableName, __FILE__, __LINE__);
         }
     }
     else
     {
-        log->write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __FILE__, __LINE__);
+        log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __FILE__, __LINE__);
     }
 
     return list.size();

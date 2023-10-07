@@ -1,12 +1,15 @@
 #ifndef STATE_MANAGER_HPP
 #define STATE_MANAGER_HPP
 
-#include "state_base.hpp"
-
 #include <memory>
 #include <iostream>
 #include <string>
 #include <vector>
+
+class Logging;
+
+class StateBase;
+typedef std::shared_ptr<StateBase> state_ptr;
 
 /**
  * @class StateManager
@@ -18,24 +21,8 @@
 class StateManager
 {
 public:
-    explicit StateManager()
-    {
-    }
-
-    ~StateManager()
-    {
-        if(!m_the_state.empty())
-        {
-            m_the_state.back()->onExit();
-
-            while(m_the_state.size() > 0)
-            {
-                m_the_state.pop_back();
-            }
-
-            m_the_state.clear();
-        }
-    }
+    explicit StateManager();
+    ~StateManager();    
 
     void update();
     void pushState(state_ptr &the_state);
@@ -57,10 +44,11 @@ public:
 
 private:
 
-    std::vector<state_ptr> m_the_state;
+    Logging                &m_log;
+    std::vector<state_ptr>  m_the_state;
 
 };
 
-typedef std::shared_ptr<StateManager>	state_manager_ptr;
+typedef std::shared_ptr<StateManager> state_manager_ptr;
 
 #endif

@@ -1,5 +1,7 @@
 #include "oneliners_dao.hpp"
+
 #include "../model-app/oneliners.hpp"
+
 #include "../logging.hpp"
 
 #include "libSqliteWrapped.h"
@@ -153,7 +155,7 @@ void OnelinerDao::fillOnelinerColumnValues(query_ptr qry, oneliner_ptr obj,
 std::string OnelinerDao::insertOnelinerQryString(std::string qry, oneliner_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->iUserId,
                                          obj->sText.c_str(),
                                          obj->sUserName.c_str(),
@@ -161,7 +163,9 @@ std::string OnelinerDao::insertOnelinerQryString(std::string qry, oneliner_ptr o
                                          obj->dtDatePosted
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -173,7 +177,7 @@ std::string OnelinerDao::insertOnelinerQryString(std::string qry, oneliner_ptr o
 std::string OnelinerDao::updateOnelinerQryString(std::string qry, oneliner_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->iUserId,
                                          obj->sText.c_str(),
                                          obj->sUserName.c_str(),
@@ -182,7 +186,9 @@ std::string OnelinerDao::updateOnelinerQryString(std::string qry, oneliner_ptr o
                                          obj->iId
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 
@@ -198,14 +204,13 @@ std::string OnelinerDao::updateOnelinerQryString(std::string qry, oneliner_ptr o
  */
 std::vector<oneliner_ptr> OnelinerDao::getAllOnelinersByUserId(long userId)
 {
-    Logging *log = Logging::instance();
     oneliner_ptr obj(new Oneliners);
     std::vector<oneliner_ptr> list;
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Database is not connected!", __FILE__, __LINE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Database is not connected!", __FILE__, __LINE__);
         return list;
     }
 
@@ -214,12 +219,14 @@ std::vector<oneliner_ptr> OnelinerDao::getAllOnelinersByUserId(long userId)
 
     if(!qry->isConnected())
     {
-        log->write<Logging::ERROR_LOG>("Error, Query has no connection to the database", __FILE__, __LINE__);
+        m_log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", __FILE__, __LINE__);
         return list;
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iUserId = %ld;", m_strTableName.c_str(), userId);
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE iUserId = %ld;", m_strTableName.c_str(), userId);
+    std::string queryString(result);
+    sqlite3_free(result);
 
     // Execute Query.
     if(qry->getResult(queryString))
@@ -237,12 +244,12 @@ std::vector<oneliner_ptr> OnelinerDao::getAllOnelinersByUserId(long userId)
         }
         else
         {
-            log->write<Logging::ERROR_LOG>("Error, getAllOneliners Returned Rows=", rows, __FILE__, __LINE__);
+            m_log.write<Logging::ERROR_LOG>("Error, getAllOneliners Returned Rows=", rows, __FILE__, __LINE__);
         }
     }
     else
     {
-        log->write<Logging::ERROR_LOG>("Error, getResult()", __FILE__, __LINE__);
+        m_log.write<Logging::ERROR_LOG>("Error, getResult()", __FILE__, __LINE__);
     }
 
     return list;

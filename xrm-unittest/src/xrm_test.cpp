@@ -1,11 +1,16 @@
 /**
  *   Oblivion/2 XRM - UNIT / INTEGRATION TESTS
- *   Copyright (C) 2015 - 2017 by Michael Griffin
+ *   Copyright (C) 2015 - 2023 by Michael Griffin
  */
 
 #include "model-sys/structures.hpp"
 #include "model-sys/config.hpp"
 #include "data-sys/config_dao.hpp"
+
+#include "communicator.hpp"
+#include "encoding.hpp"
+#include "logging.hpp"
+#include "common_io.hpp"
 
 #include <UnitTest++.h>
 #include <memory>
@@ -20,9 +25,6 @@
 #include <vector>
 #include <stdexcept>
 
-#include "encoding.hpp"
-#include "logging.hpp"
-#include "communicator.hpp"
 
 // Mocking Paths
 std::string GLOBAL_BBS_PATH         = "";
@@ -34,7 +36,6 @@ std::string GLOBAL_TEXTFILE_PATH    = "";
 std::string GLOBAL_LOG_PATH         = "";
 std::string USERS_DATABASE          = "";
 
-Logging* Logging::m_global_logging_instance = nullptr;
 
 /**
  * @brief Unit Testing for Initial Form Configuration Implementation
@@ -93,11 +94,6 @@ int main()
     GLOBAL_SCRIPT_PATH = GLOBAL_BBS_PATH;
     GLOBAL_LOG_PATH = GLOBAL_BBS_PATH;
 
-    // Startup the Encoding Instance and Char Mappings.
-    {
-        Encoding::instance();
-    }
-
     // Loading and saving default Configuration file to XML
     {
         config_ptr config(new Config());
@@ -105,7 +101,6 @@ int main()
         if(!config)
         {
             std::cout << "Unable to allocate config structure" << std::endl;
-            Encoding::releaseInstance();
             return(1);
         }
 
@@ -124,12 +119,11 @@ int main()
 
         if(!cfg.validation())
         {
-            Encoding::releaseInstance();
             return 1;
         }
 
         // All Good, Attached to Global Communicator Instance.
-        TheCommunicator::instance()->attachConfiguration(config);
+        Communicator::getInstance().attachConfiguration(config);
     }
 
 
@@ -140,10 +134,6 @@ int main()
     remove("xrm_itOnelinersTest.sqlite3");
     remove("xrm_itFileAreaTest.sqlite3");
     remove("xrm_itMessageAreaTest.sqlite3");
-
-    Logging::releaseInstance();
-    Encoding::releaseInstance();
-    TheCommunicator::releaseInstance();
 
     return result;
 }

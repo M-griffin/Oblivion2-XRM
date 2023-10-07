@@ -3,26 +3,20 @@
 
 #include "mod_base.hpp"
 
-#include "../session_data.hpp"
-#include "../session_io.hpp"
-
+#include <iostream>
+#include <string>
 #include <memory>
 #include <vector>
 #include <functional>
 
 
 class MenuOption;
+
 class MenuBase;
 typedef std::shared_ptr<MenuBase> menu_base_ptr;
 
-class FormManager;
-typedef std::shared_ptr<FormManager> form_manager_ptr;
-
-class Config;
-typedef std::shared_ptr<Config> config_ptr;
-
-class ProcessorAnsi;
-typedef std::shared_ptr<ProcessorAnsi> processor_ansi_ptr;
+//class FormManager;
+//typedef std::shared_ptr<FormManager> form_manager_ptr;
 
 
 /**
@@ -36,10 +30,13 @@ class ModFormManager
     : public ModBase
 {
 public:
-    ModFormManager(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process);
+    ModFormManager(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModFormManager() override
-    { }
+    { 
+        // std::cout << "~ModFormManager()" << std::endl;
+    }
 
     virtual bool update(const std::string &character_buffer, const bool &) override;
     virtual bool onEnter() override;
@@ -58,8 +55,7 @@ public:
 
     int                m_current_page;
     menu_base_ptr      m_menu;
-    form_manager_ptr   m_form_manager;
-    SessionIO          m_session_io;
+    //form_manager_ptr   m_form_manager;
 
 };
 

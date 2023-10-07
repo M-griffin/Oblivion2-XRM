@@ -10,24 +10,25 @@
 #include <memory>
 
 /**
- * @class AsyncConnection
+ * @class AsyncIO
  * @author Michael Griffin
  * @date 12/09/2017
  * @file async_connection.hpp
  * @brief Handles Shared Sockets Async Request Jobs to IOService.
  */
-class AsyncConnection
+class AsyncIO
     : public AsyncBase
 {
 public:
 
-    AsyncConnection(IOService& io_service, socket_handler_ptr socket_handler)
+    AsyncIO(IOService& io_service, const socket_handler_ptr &socket_handler)
         : AsyncBase(io_service, socket_handler)
     {
     }
 
-    ~AsyncConnection()
+    ~AsyncIO()
     {
+        m_log.write<Logging::DEBUG_LOG>("~AsyncIO()");
     }
 
     /**
@@ -38,6 +39,7 @@ public:
     template <typename BufferSequence, typename Callback>
     void asyncRead(BufferSequence &buffer, const Callback &callback)
     {
+        m_log.write<Logging::DEBUG_LOG>("Async Read Job Added To Queue");
         m_io_service.addAsyncJob(buffer, nullptr, m_socket_handler, callback, SERVICE_TYPE_READ);
     }
 
@@ -47,8 +49,9 @@ public:
      * @param Callback - returns error code
      */
     template <typename StringSequence, typename Callback>
-    void asyncWrite(StringSequence string_seq, const Callback &callback)
+    void asyncWrite(StringSequence &string_seq, const Callback &callback)
     {
+        m_log.write<Logging::DEBUG_LOG>("Async Write Job Added To Queue");
         // Place Holder is used for template parameters, string_seq is used in writes
         // Where the Buffer Place Holder in the above method is used for reads.
         // nullptr can't be passed as reference for vector
@@ -73,16 +76,9 @@ public:
         if(protocol == "TELNET")
         {
             service_type = SERVICE_TYPE_CONNECT_TELNET;
-        }
-        else if(protocol == "SSH")
-        {
-            service_type = SERVICE_TYPE_CONNECT_SSH;
-        }
-        else if(protocol == "IRC")
-        {
-            service_type = SERVICE_TYPE_CONNECT_IRC;
-        }
+        }        
 
+        m_log.write<Logging::DEBUG_LOG>("Async Connect Job Added To Queue");
         m_io_service.addAsyncJob(place_holder, string_seq, m_socket_handler, callback, service_type);
     }
 
@@ -104,20 +100,14 @@ public:
         {
             service_type = SERVICE_TYPE_LISTENER_TELNET;
         }
-        else if(protocol == "SSH")
-        {
-            service_type = SERVICE_TYPE_LISTENER_SSH;
-        }
-        else if(protocol == "IRC")
-        {
-            service_type = SERVICE_TYPE_LISTENER_IRC;
-        }
 
+        m_log.write<Logging::DEBUG_LOG>("Async Listener Job Added To Queue");
         m_io_service.addAsyncJob(place_holder, string_seq, m_socket_handler, callback, service_type);
     }
 
 };
 
-typedef std::shared_ptr<AsyncConnection> connection_ptr;
+typedef std::shared_ptr<AsyncIO> async_io_ptr;
+typedef std::weak_ptr<AsyncIO> async_io_wptr;
 
 #endif // ASYNC_CONNECTION_HPP

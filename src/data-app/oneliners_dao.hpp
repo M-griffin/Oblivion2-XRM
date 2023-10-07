@@ -4,6 +4,7 @@
 #include "../model-app/oneliners.hpp"
 #include "../data-sys/base_dao.hpp"
 
+#include <string>
 #include <memory>
 #include <vector>
 

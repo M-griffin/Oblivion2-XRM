@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="xrm-unittest" InternalType="UnitTest++" Version="10.0.0">
+<CodeLite_Project Name="xrm-unittest" InternalType="UnitTest++" Version="11000">
   <Plugins>
     <Plugin Name="qmake">
-      <![CDATA[00010001N0005Debug000000000000]]>
+      <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
     </Plugin>
     <Plugin Name="CMakePlugin">
       <![CDATA[[{
@@ -26,9 +26,43 @@
  }]]]>
     </Plugin>
   </Plugins>
+  <VirtualDirectory Name="mods">
+    <File Name="../src/mods/mod_prelogon.cpp"/>
+    <File Name="../src/mods/mod_level_editor.hpp"/>
+    <File Name="../src/mods/mod_level_editor.cpp"/>
+    <File Name="../src/mods/mod_user_editor.hpp"/>
+    <File Name="../src/mods/mod_user_editor.cpp"/>
+    <File Name="../src/mods/mod_menu_editor.hpp"/>
+    <File Name="../src/mods/mod_menu_editor.cpp"/>
+    <File Name="../src/mods/mod_signup.hpp"/>
+    <File Name="../src/mods/mod_signup.cpp"/>
+    <File Name="../src/mods/mod_logon.hpp"/>
+    <File Name="../src/mods/mod_logon.cpp"/>
+    <File Name="../src/mods/mod_prelogon.hpp"/>
+    <File Name="../src/mods/mod_base.hpp"/>
+    <File Name="../src/mods/mod_base.cpp"/>
+    <File Name="../src/mods/mod_message_editor.hpp"/>
+    <File Name="../src/mods/mod_message_editor.cpp"/>
+  </VirtualDirectory>
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="../src/logging.cpp"/>
+    <File Name="../src/encryption.hpp"/>
+    <File Name="../src/encryption.cpp"/>
+    <File Name="../src/menu_system.hpp"/>
+    <File Name="../src/menu_system.cpp"/>
+    <File Name="../src/menu_base.hpp"/>
+    <File Name="../src/menu_base.cpp"/>
+    <File Name="../src/state_manager.hpp"/>
+    <File Name="../src/state_manager.cpp"/>
+    <File Name="../src/state_base.hpp"/>
+    <File Name="../src/session.hpp"/>
+    <File Name="../src/session.cpp"/>
+    <File Name="../src/telnet_decoder.hpp"/>
+    <File Name="../src/telnet_decoder.cpp"/>
+    <File Name="../src/processor_base.cpp"/>
+    <File Name="../xrm-unittest/src/mod_message_editor_ut.cpp"/>
     <File Name="../xrm-unittest/src/processor_text_ut.cpp"/>
     <File Name="../xrm-unittest/src/processor_ansi_ut.cpp"/>
     <File Name="../src/session_manager.cpp"/>
@@ -39,15 +73,12 @@
     <File Name="../src/session_io.hpp"/>
     <File Name="../src/access_condition.cpp"/>
     <File Name="../src/access_condition.hpp"/>
-    <File Name="../src/form_manager.cpp"/>
-    <File Name="../src/form_manager.hpp"/>
     <File Name="../src/io_service.cpp"/>
     <File Name="../src/io_service.hpp"/>
     <File Name="../src/communicator.cpp"/>
     <File Name="../src/communicator.hpp"/>
     <File Name="../src/socket_handler.cpp"/>
     <File Name="../src/socket_handler.hpp"/>
-    <File Name="../src/socket_ssh.cpp"/>
     <File Name="../src/socket_state.hpp"/>
     <File Name="../src/socket_telnet.cpp"/>
     <VirtualDirectory Name="sdl2_net">
@@ -90,9 +121,9 @@
     <File Name="../src/processor_text.cpp"/>
     <File Name="../src/processor_text.hpp"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
   <VirtualDirectory Name="data-sys">
+    <File Name="../src/data-sys/menu_prompt_dao.hpp"/>
+    <File Name="../src/data-sys/menu_prompt_dao.cpp"/>
     <File Name="../src/data-sys/config_dao.cpp"/>
     <File Name="../src/data-sys/config_dao.hpp"/>
     <File Name="../src/data-sys/base_dao.hpp"/>
@@ -136,6 +167,8 @@
   <VirtualDirectory Name="model-app">
     <File Name="../src/model-app/oneliners.hpp"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="" C_Options="" Assembler="">
@@ -213,13 +246,34 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="" C_Options="" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-Os;-O2;-std=c++11;-Wno-psabi;-Wno-deprecated-declarations" C_Options="-Os;-O2;-std=c++11;-Wno-psabi;-Wno-deprecated-declarations" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
-        <IncludePath Value="$(UNIT_TEST_PP_SRC_DIR)/src"/>
+        <IncludePath Value="../src"/>
+        <IncludePath Value="../sqlitewrap"/>
+        <IncludePath Value="../linux/Release"/>
+        <IncludePath Value="/usr/include/unittest++"/>
+        <IncludePath Value="/usr/include/UnitTest++"/>
+        <IncludePath Value="../src/sdl2_net"/>
+        <IncludePath Value="../src/utf-cpp"/>
+        <IncludePath Value="../src/utf8"/>
+        <Preprocessor Value="WITHOUT_SDL"/>
+        <Preprocessor Value="UNIT_TEST"/>
       </Compiler>
       <Linker Options="-O2" Required="yes">
+        <LibraryPath Value="."/>
         <LibraryPath Value="$(UNIT_TEST_PP_SRC_DIR)/Release"/>
+        <LibraryPath Value="../linux/Release"/>
+        <LibraryPath Value="../sqlitewrap"/>
+        <LibraryPath Value="../src"/>
         <Library Value="libUnitTest++.a"/>
+        <Library Value="libSqliteWrapped.a"/>
+        <Library Value="sqlite3"/>
+        <Library Value="pthread"/>
+        <Library Value="ssl"/>
+        <Library Value="crypto"/>
+        <Library Value="yaml-cpp"/>
+        <Library Value="libssh"/>
+        <Library Value="uuid"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
@@ -232,7 +286,9 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild/>
+      <PreBuild>
+        <Command Enabled="yes">sed -i 's+/home/merc/code/Oblivion2-XRM/+../+' xrm-unittest.mk</Command>
+      </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">
         <RebuildCommand/>

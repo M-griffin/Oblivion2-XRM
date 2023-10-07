@@ -49,23 +49,29 @@ Database::Database(Mutex& m, const std::string& database, IError *error)
 
 
 Database::~Database()
-{
-    // Check Open Databases and pop off stack!
-    m_database_pool::iterator it;
-
-    while(m_opendbs.size())
+{   
+    // Check Open Databases and pop off stack!    
+    for (m_database_pool::iterator it = m_opendbs.begin(); it != m_opendbs.end(); it++)
     {
-        it = m_opendbs.begin();
         DatabasePool *p = *it;
-
+        
         if(p->busy)
         {
             databaseError("destroying Database object before Query object");
         }
-
+        
+        int rc = sqlite3_close(p -> db);
+        if (rc != SQLITE_OK) 
+        {
+            databaseError("Database Not closed properly!");
+        }
+        
         delete p;
-        m_opendbs.erase(it);
     }
+
+    // Clear The Entire pool.
+    std::list<DatabasePool *>().swap(m_opendbs);
+
 }
 
 void Database::errorHandler(IError *p)
@@ -105,11 +111,17 @@ Database::DatabasePool *Database::addDatabasePool()
         // Look into shared cache more!
         // int sqlite3_enable_shared_cache(int);
         // SQLITE_OPEN_SHAREDCACHE.
-        int rc = sqlite3_open_v2(m_database.c_str(), &odb->db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE, NULL);
+        int rc = sqlite3_open(m_database.c_str(), &odb->db);
 
         if(rc)
         {
             databaseError("Can't open database: %s\n", sqlite3_errmsg(odb -> db));
+            int rc = sqlite3_close(odb->db);
+            if (rc != SQLITE_OK)
+            {
+                databaseError("Can't close database properly on Open");
+            }
+            
             delete odb;
             return nullptr;
         }

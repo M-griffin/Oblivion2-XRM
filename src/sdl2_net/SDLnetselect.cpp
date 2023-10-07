@@ -44,7 +44,6 @@ struct _SDLNet_SocketSet {
 SDLNet_SocketSet SDLNet_AllocSocketSet(int maxsockets)
 {
     struct _SDLNet_SocketSet *set;
-    int i;
 
     set = (struct _SDLNet_SocketSet *)SDL_malloc(sizeof(*set));
     if ( set != NULL ) {
@@ -53,7 +52,7 @@ SDLNet_SocketSet SDLNet_AllocSocketSet(int maxsockets)
         set->sockets = (struct SDLNet_Socket **)SDL_malloc
                     (maxsockets*sizeof(*set->sockets));
         if ( set->sockets != NULL ) {
-            for ( i=0; i<maxsockets; ++i ) {
+            for (int i=0; i<maxsockets; ++i ) {
                 set->sockets[i] = NULL;
             }
         } else {

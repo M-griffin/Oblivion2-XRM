@@ -3,21 +3,15 @@
 
 #include "mod_base.hpp"
 
-#include "../model-sys/structures.hpp"
-#include "../data-sys/text_prompts_dao.hpp"
-
-#include "../session_data.hpp"
-#include "../session_io.hpp"
-
+#include <iostream>
+#include <string>
 #include <memory>
 #include <vector>
 #include <functional>
 
-class Config;
-typedef std::shared_ptr<Config> config_ptr;
+class Users;
+typedef std::shared_ptr<Users> user_ptr;
 
-class ProcessorAnsi;
-typedef std::shared_ptr<ProcessorAnsi> processor_ansi_ptr;
 
 /**
  * @class ModLogin
@@ -30,46 +24,11 @@ class ModLogon
     : public ModBase
 {
 public:
-    ModLogon(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-        : ModBase(session_data, config, ansi_process)
-        , m_session_io(session_data)
-        , m_filename("mod_logon.yaml")
-        , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
-        , m_mod_function_index(MOD_LOGON)
-        , m_failure_attempts(0)
-        , m_is_text_prompt_exist(false)
-    {
-        // Push function pointers to the stack.
-        m_setup_functions.push_back(std::bind(&ModLogon::setupLogon, this));
-        m_setup_functions.push_back(std::bind(&ModLogon::setupPassword, this));
-        m_setup_functions.push_back(std::bind(&ModLogon::setupPasswordQuestion, this));
-        m_setup_functions.push_back(std::bind(&ModLogon::setupPasswordAnswer, this));
-        m_setup_functions.push_back(std::bind(&ModLogon::setupPasswordChange, this));
+    ModLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io);
 
-        m_mod_functions.push_back(std::bind(&ModLogon::logon, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModLogon::password, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModLogon::passwordQuestion, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModLogon::passwordAnswer, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModLogon::passwordChange, this, std::placeholders::_1));
-
-        // Check of the Text Prompts exist.
-        m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
-
-        if(!m_is_text_prompt_exist)
-        {
-            createTextPrompts();
-        }
-
-        // Loads all Text Prompts for current module
-        m_text_prompts_dao->readPrompts();
-    }
-
-    virtual ~ModLogon() override
-    {
-        std::vector<std::function< void()> >().swap(m_setup_functions);
-        std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
-    }
-
+    virtual ~ModLogon() override;    
+    
     virtual bool update(const std::string &character_buffer, const bool &) override;
     virtual bool onEnter() override;
     virtual bool onExit() override;
@@ -243,9 +202,6 @@ private:
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
-
-    SessionIO              m_session_io;
-    std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
 
     int                    m_mod_function_index;

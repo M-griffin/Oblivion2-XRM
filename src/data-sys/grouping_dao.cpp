@@ -150,12 +150,14 @@ void GroupingDao::fillGroupingColumnValues(query_ptr qry, group_ptr obj,
 std::string GroupingDao::insertGroupingQryString(std::string qry, group_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->iConferenceId,
                                          obj->iAreaId
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -167,13 +169,15 @@ std::string GroupingDao::insertGroupingQryString(std::string qry, group_ptr obj)
 std::string GroupingDao::updateGroupingQryString(std::string qry, group_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
                                          obj->iConferenceId,
                                          obj->iAreaId,
                                          obj->iId
                                         );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -191,12 +195,12 @@ std::vector<group_ptr> GroupingDao::getAllGroupingsByConferenceId(long id)
 {
     group_ptr group(new Grouping);
     std::vector<group_ptr> list;
-    Logging *log = Logging::instance();
+    Logging &log = Logging::getInstance();
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
     {
-        log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
         return list;
     }
 
@@ -205,12 +209,14 @@ std::vector<group_ptr> GroupingDao::getAllGroupingsByConferenceId(long id)
 
     if(!qry->isConnected())
     {
-        log->write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
         return list;
     }
 
     // Build Query String
-    std::string queryString = sqlite3_mprintf("SELECT * FROM %Q WHERE iConferenceId = %ld;", m_strTableName.c_str(), id);
+    char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE iConferenceId = %ld;", m_strTableName.c_str(), id);
+    std::string queryString(result);
+    sqlite3_free(result);
 
     // Execute Query.
     if(qry->getResult(queryString))
@@ -228,12 +234,12 @@ std::vector<group_ptr> GroupingDao::getAllGroupingsByConferenceId(long id)
         }
         else
         {
-            log->write<Logging::ERROR_LOG>(m_strTableName, "Error, getAllGroupingsByConferenceId Returned Rows", rows, __LINE__, __FILE__);
+            log.write<Logging::ERROR_LOG>(m_strTableName, "Error, getAllGroupingsByConferenceId Returned Rows", rows, __LINE__, __FILE__);
         }
     }
     else
     {
-        log->write<Logging::ERROR_LOG>(m_strTableName, "Error, getResult()", __LINE__, __FILE__);
+        log.write<Logging::ERROR_LOG>(m_strTableName, "Error, getResult()", __LINE__, __FILE__);
     }
 
     return list;

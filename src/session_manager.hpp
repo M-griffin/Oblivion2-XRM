@@ -5,6 +5,12 @@
 #include <iostream>
 #include <string>
 #include <set>
+#include <mutex>
+
+class Logging;
+
+class CommonIO;
+typedef std::shared_ptr<CommonIO> common_io_ptr;
 
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
@@ -20,29 +26,32 @@ typedef std::shared_ptr<Session> session_ptr;
 class SessionManager
 {
 public:
-    explicit SessionManager()
-    {
-    }
-    ~SessionManager();
+    
+    explicit SessionManager();
+    
+    ~SessionManager();    
 
     /**
      * @brief OverRides for Connecting TCP and SSL Sessions
      * @param Session
      */
-    void join(session_ptr session);
+    void join(const session_ptr &session);
 
-    void leave(int node_number);
-    void deliver(std::string msg);
+    void leave(const session_ptr &session);
+    void deliver(const std::string &msg);
 
     int connections();
     void shutdown();
 
 private:
 
-    std::set<session_ptr> m_sessions;
+    Logging               &m_log;
+    std::set<session_ptr>  m_sessions;
+    std::mutex             m_mutex;
+    
 };
 
 typedef std::shared_ptr<SessionManager> session_manager_ptr;
-typedef std::weak_ptr<SessionManager>	session_manager_wptr;
+typedef std::weak_ptr<SessionManager> session_manager_wptr;
 
 #endif // CHAT_ROOM_HPP

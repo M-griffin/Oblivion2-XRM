@@ -9,6 +9,7 @@
 #include <string>
 #include <map>
 
+class Logging;
 
 // Types for Text Prompt formatting to file.
 typedef std::map<std::string, std::pair<std::string, std::string> > M_TextPrompt;
@@ -67,7 +68,7 @@ public:
      */
     void displayAll();
 
-
+    Logging    &m_log;
     std::string m_path;
     std::string m_filename;
     bool        m_is_loaded;

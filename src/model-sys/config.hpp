@@ -2,10 +2,11 @@
 #define CONFIG_HPP
 
 #include "../uuid.hpp"
+#include "yaml-cpp/yaml.h"
 
 #include <memory>
 #include <fstream>
-#include <yaml-cpp/yaml.h>
+
 
 
 

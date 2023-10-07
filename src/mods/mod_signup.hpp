@@ -2,27 +2,21 @@
 #define MOD_SIGNUP_HPP
 
 #include "mod_base.hpp"
-#include "menu_base.hpp"
 
-#include "../model-sys/structures.hpp"
-#include "../model-sys/security.hpp"
-#include "../model-sys/users.hpp"
-
-#include "../data-sys/text_prompts_dao.hpp"
-#include "../data-sys/users_dao.hpp"
-
-#include "../session_data.hpp"
-
+#include <iostream>
+#include <string>
 #include <memory>
 #include <vector>
 #include <functional>
 
-class Config;
-typedef std::shared_ptr<Config> config_ptr;
+class Security;
+typedef std::shared_ptr<Security> security_ptr;
 
-class ProcessorAnsi;
-typedef std::shared_ptr<ProcessorAnsi> processor_ansi_ptr;
+class MenuBase;
+typedef std::shared_ptr<MenuBase> menu_base_ptr;
 
+class Users;
+typedef std::shared_ptr<Users> user_ptr;
 
 /**
  * @class ModSignup
@@ -35,81 +29,8 @@ class ModSignup
     : public ModBase
 {
 public:
-    ModSignup(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-        : ModBase(session_data, config, ansi_process)
-        , m_session_io(session_data)
-        , m_menu_base(new MenuBase(session_data))
-        , m_filename("mod_signup.yaml")
-        , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
-        , m_user_record(new Users())
-        , m_security_record(new Security())
-        , m_mod_function_index(MOD_NUP)
-        , m_is_text_prompt_exist(false)
-        , m_newuser_password_attempts(0)
-    {
-        // Push function pointers to the stack.
-        m_setup_functions.push_back(std::bind(&ModSignup::setupNewUserPassword, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupDisclaimer, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupHandle, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupRealName, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupAddress, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupLocation, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupCountry, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupEmail, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupUserNote, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupBirthday, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupGender, this));
-
-        m_setup_functions.push_back(std::bind(&ModSignup::setupPassword, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupVerifyPassword, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupChallengeQuestion, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupChallengeAnswer, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupVerifyChallengeAnswer, this));
-
-        m_setup_functions.push_back(std::bind(&ModSignup::setupYesNoBars, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupDoPause, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupClearOrScroll, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupAnsiColor, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupBackSpace, this));
-        m_setup_functions.push_back(std::bind(&ModSignup::setupVerifyAndSave, this));
-
-        // Input Processing Functions
-        m_mod_functions.push_back(std::bind(&ModSignup::newUserPassword, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::disclaimer, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::handle, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::realName, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::address, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::location, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::country, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::email, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::userNote, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::birthday, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::gender, this, std::placeholders::_1));
-
-        m_mod_functions.push_back(std::bind(&ModSignup::password, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::verifyPassword, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::challengeQuestion, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::challengeAnswer, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::verifyChallengeAnswer, this, std::placeholders::_1));
-
-        m_mod_functions.push_back(std::bind(&ModSignup::yesNoBars, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::doPause, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::clearOrScroll, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::ansiColor, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::backSpace, this, std::placeholders::_1));
-        m_mod_functions.push_back(std::bind(&ModSignup::verifyAndSave, this, std::placeholders::_1));
-
-        // Check of the Text Prompts exist.
-        m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
-
-        if(!m_is_text_prompt_exist)
-        {
-            createTextPrompts();
-        }
-
-        // Loads all Text Prompts for current module
-        m_text_prompts_dao->readPrompts();
-    }
+    ModSignup(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io);
 
     virtual ~ModSignup() override
     {
@@ -513,14 +434,11 @@ private:
      */
     void saveNewUserRecord();
 
-
     // Function Input Vector.
     std::vector<std::function< void()> >                    m_setup_functions;
     std::vector<std::function< void(const std::string &)> > m_mod_functions;
 
-    SessionIO              m_session_io;
     menu_base_ptr          m_menu_base;
-    std::string            m_filename;
     text_prompts_dao_ptr   m_text_prompts_dao;
     user_ptr               m_user_record;
     security_ptr           m_security_record;

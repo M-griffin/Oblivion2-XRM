@@ -7,6 +7,7 @@
 #include "model-sys/struct_compat.hpp"
 #include "model-sys/menu.hpp"
 
+#include <iostream>
 #include <memory>
 #include <stdint.h>
 #include <string>
@@ -15,11 +16,10 @@
 #include <functional>
 
 
-class ModBase;
-typedef std::shared_ptr<ModBase> module_ptr;
+class Logging;
 
-class FormManager;
-typedef std::shared_ptr<FormManager> form_manager_ptr;
+class Session;
+typedef std::shared_ptr<Session> session_ptr;
 
 
 /**
@@ -34,8 +34,8 @@ class MenuSystem
     , public MenuBase
 {
 public:
-    explicit MenuSystem(session_data_ptr session_data);
-    ~MenuSystem();
+    explicit MenuSystem(session_ptr session_data);
+    virtual ~MenuSystem() override;
 
     virtual void update(const std::string &character_buffer, const bool &is_utf8) override;
     virtual bool onEnter() override;
@@ -43,15 +43,15 @@ public:
 
     virtual std::string getStateID() const override
     {
-        return m_menuID;
+        return m_stateID;
     }
 
-    //int m_next_state;
-    static const std::string m_menuID;
-    std::vector<std::string> m_system_fallback;
+    Logging                  &m_log;
+    static const std::string  m_stateID;
+    std::vector<std::string>  m_system_fallback;
 
     // handle to form interface.
-    form_manager_ptr         m_form_manager;
+    //form_manager_ptr          m_form_manager;
 
 
     // Dynamic Map of all Menu Option Command functions
@@ -59,7 +59,7 @@ public:
     typedef std::map<char, CommandFuncType> MappedCommandFunctions;
 
     // Holds map of Menu Option Commands for quick lookup and execution
-    MappedCommandFunctions   m_menu_command_functions;
+    MappedCommandFunctions    m_menu_command_functions;
 
     /**
      * @brief Control Commands
@@ -215,7 +215,7 @@ public:
     /**
      * @brief Exists and Shuts down the current module
      */
-    void startupModule(module_ptr module);
+    void startupModule(const module_ptr &module);
 
     /**
      * @brief Starts up Logon Module

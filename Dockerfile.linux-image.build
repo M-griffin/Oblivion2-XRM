@@ -15,7 +15,7 @@
 FROM ubuntu:latest
 
 # Update apps on the base image
-RUN apt-get -y update && apt-get install -y \
+RUN apt-get update && apt-get install --no-install-recommends --yes \
 # ----------------------
 # Install Dependencies
 # ----------------------
@@ -28,7 +28,8 @@ RUN apt-get -y update && apt-get install -y \
 # Build Application Dependencies
     libyaml-cpp-dev \
     libssh-dev \
-    libboost-all-dev \
+# Boost only needed for Propmt and Menu Converters, not needed for preview.
+#    libboost-all-dev \
     libsqlite3-dev \
     uuid-dev \
     libunittest++-dev \
@@ -46,7 +47,7 @@ COPY . /usr/src/Oblivion2-XRM
 
 # Specify the working directory on the Container
 WORKDIR /usr/src/Oblivion2-XRM/linux
-RUN mkdir -p ./Debug
+RUN mkdir -p ./Release
 
 # ----------------------
 # Build The System
@@ -56,19 +57,23 @@ RUN mkdir -p ./Debug
 RUN make -f SqliteWrapped.mk
 
 # SQLITE Wrapped - Setup Compiled Header File for other Modules to use.
-RUN cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h > ./Debug/libSqliteWrapped.h
+RUN cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h > ./Release/libSqliteWrapped.h
 
 # Build the Main XRM Server And Helper Apps Along with Unit Tests
-RUN make -f xrm-menu-convert.mk
-RUN make -f xrm-menu-prompt-convert.mk
-RUN make -f xrm-unittest.mk
+
+# Comment Out the Prompt Converters, Not really needed for a Preview, but can toggle this if desired.
+#RUN make -f xrm-menu-convert.mk
+#RUN make -f xrm-menu-prompt-convert.mk
 RUN make -f xrm-server.mk
+#RUN make -f xrm-unittest.mk
 
 # Switch to the Debug Directory, and copy executables to the Build folder.
-WORKDIR /usr/src/Oblivion2-XRM/linux/Debug
-RUN cp ./xrm-menu-convert ../../build
-RUN cp ./xrm-menu-prompt-convert ../../build
-RUN cp ./xrm-unittest ../../build
+WORKDIR /usr/src/Oblivion2-XRM/linux/Release
+
+# Comment Out the Prompt Converters, Not really needed for a Preview, but can toggle this if desired.
+#RUN cp ./xrm-menu-convert ../../build
+#RUN cp ./xrm-menu-prompt-convert ../../build
+#RUN cp ./xrm-unittest ../../build
 RUN cp ./xrm-server ../../build
 
 # Update permissions to avoid any issues, this runs as root, so should revisit this

@@ -1,16 +1,23 @@
 #include "mod_form_manager.hpp"
 
-#include "../model-sys/menu.hpp"
+#include "model-sys/config.hpp"
+#include "model-sys/menu.hpp"
+
 #include "../forms/form_system_config.hpp"
-#include "../form_manager.hpp"
+//#include "../form_manager.hpp"
+
+#include "../processor_ansi.hpp"
+#include "../session.hpp"
+#include "../logging.hpp"
 #include "../menu_base.hpp"
 
 
-ModFormManager::ModFormManager(session_data_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process)
-    : ModBase(session_data, config, ansi_process)
+ModFormManager::ModFormManager(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
+        common_io_ptr common_io, session_io_ptr session_io)
+    : ModBase(session_data, config, ansi_process, nullptr, common_io, session_io)
     , m_current_page(0)
     , m_menu(new MenuBase(session_data))
-    , m_form_manager(new FormManager(config, session_data))
+//    , m_form_manager(new FormManager(config, session_data))
 {
     // Setup the Callback to Menu Option Execution to this base class.
     m_menu->m_execute_callback.push_back(std::bind(&ModFormManager::menuOptionsCallback, this, std::placeholders::_1));
@@ -74,6 +81,7 @@ bool ModFormManager::menuOptionsCallback(const MenuOption &option)
  */
 void ModFormManager::startupFormManager()
 {
+    /* TODO FIXME
     // Startup a new Form manager instance.
     m_form_manager.reset(new FormManager(m_config, m_session_data));
 
@@ -85,4 +93,5 @@ void ModFormManager::startupFormManager()
         // Load the Form Menu Options into the Menu System.
         m_menu->importMenu(menu);
     }
+    */
 }

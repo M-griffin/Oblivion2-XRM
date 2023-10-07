@@ -152,13 +152,15 @@ void NetworkDao::fillNetworkColumnValues(query_ptr qry, network_ptr obj,
 std::string NetworkDao::insertNetworkQryString(std::string qry, network_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
         obj->sName.c_str(),
         obj->sType.c_str(),
         obj->sAddress.c_str()
     );
-
-    return result;
+    
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
 /**
@@ -170,13 +172,15 @@ std::string NetworkDao::insertNetworkQryString(std::string qry, network_ptr obj)
 std::string NetworkDao::updateNetworkQryString(std::string qry, network_ptr obj)
 {
     // Mprint statement to avoid injections.
-    std::string result = sqlite3_mprintf(qry.c_str(),
+    char *result = sqlite3_mprintf(qry.c_str(),
         obj->sName.c_str(),
         obj->sType.c_str(),
         obj->sAddress.c_str(),
         obj->iId
     );
 
-    return result;
+    std::string queryString(result);
+    sqlite3_free(result);
+    return queryString;
 }
 
