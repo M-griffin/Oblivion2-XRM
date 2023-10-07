@@ -246,7 +246,7 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-Os;-std=c++11;-Wno-psabi;-Wno-deprecated-declarations" C_Options="-Os;-std=c++11;-Wno-psabi;-Wno-deprecated-declarations" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-Os;-O2;-std=c++11;-Wno-psabi;-Wno-deprecated-declarations" C_Options="-Os;-O2;-std=c++11;-Wno-psabi;-Wno-deprecated-declarations" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>

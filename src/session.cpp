@@ -63,7 +63,7 @@ Session::Session(async_io_ptr const &my_async_io, session_manager_ptr const &my_
 
 Session::~Session()
 {
-    m_log.write<Logging::DEBUG_LOG>("~Session()");
+    m_log.write<Logging::INFO_LOG>("~Session() Closed.");
 
     // Free the menu system state and modules when session closes.
     m_state_manager->clean();
@@ -180,40 +180,9 @@ void Session::handleWrite(const std::error_code& error, socket_handler_ptr)
     
     if(error)
     {
-        m_log.write<Logging::ERROR_LOG>("Async_HandleWrite Session Closed() error=", error.message(), __LINE__, __FILE__);
+        m_log.write<Logging::ERROR_LOG>("Async_HandleWrite Error Session Closed() msg=", error.message());
         logoff();
-    }
-
-    /*
-    session_manager_ptr session_mgr = m_session_manager.lock();
-
-    if(session_mgr && error) //&& (!m_session_data->m_is_leaving))
-    {
-        //m_is_leaving = true;
-        
-        if(m_async_io->isActive())
-        {
-            try
-            {
-                m_log.write<Logging::CONSOLE_LOG>("Async_HandleWrite Leaving (NORMAL SESSION)", __LINE__, __FILE__);
-                m_async_io->shutdown();
-            }
-            catch(std::exception &ex)
-            {
-                m_log.write<Logging::ERROR_LOG>("Async_HandleWrite Exception closing socket()", ex.what(), __LINE__, __FILE__);
-                logoff();
-                return;
-            }
-        }
-        
-        // Disconnect the session.
-        if (m_async_io->isActive())
-        {
-            m_log.write<Logging::CONSOLE_LOG>("Async_HandleWrite Removing Sesison from Manager", __LINE__, __FILE__);
-            session_mgr->leave(shared_from_this());
-            session_mgr.reset();
-        }
-    }*/
+    }    
 }
 
 /**
@@ -383,6 +352,11 @@ void Session::handleRead(const std::error_code& error, socket_handler_ptr)
     if(m_async_io->isActive())
     {
         waitingForData();
+    }
+    else
+    {
+        m_log.write<Logging::WARN_LOG>("handleRead - m_async_io no longer active");
+        logoff();
     }
 
 }
