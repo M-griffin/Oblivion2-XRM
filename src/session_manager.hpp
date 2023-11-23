@@ -35,9 +35,9 @@ public:
      * @brief OverRides for Connecting TCP and SSL Sessions
      * @param Session
      */
-    void join(const session_ptr &session);
+    void join(session_ptr session);
 
-    void leave(const session_ptr &session);
+    void leave(session_ptr session);
     void deliver(const std::string &msg);
 
     int connections();

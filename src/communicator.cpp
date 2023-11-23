@@ -22,11 +22,14 @@
  */
 Communicator::Communicator()
     : m_filename("mod_global.yaml")
-    , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
+    , m_text_prompts_dao(nullptr)
     , m_is_text_prompt_exist(false)
     , m_active(true)
     , m_config(nullptr)
 {
+    // Setup Smart Poiinters
+    m_text_prompts_dao = std::make_shared<TextPromptsDao>(GLOBAL_DATA_PATH, m_filename);
+     
     // Check of the Text Prompts exist.
     m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
 
@@ -73,7 +76,7 @@ void Communicator::sendGlobalMessage()
  * from anywhere in the system.
  * @param session_manager
  */
-void Communicator::setupServer(const session_manager_ptr &session_manager)
+void Communicator::setupServer(session_manager_ptr session_manager)
 {
     std::lock_guard<std::mutex> lock(m_data_mutex);
     m_session_manager = session_manager;

@@ -29,15 +29,15 @@
  * @param session_manager
  * @return
  */
-Session::Session(async_io_ptr const &my_async_io, session_manager_ptr const &my_session_manager)
+Session::Session(async_io_ptr my_async_io, session_manager_ptr my_session_manager)
     : m_log(Logging::getInstance())
     , m_async_io(my_async_io)        
     , m_session_manager(my_session_manager)
-    , m_state_manager(new StateManager())
-    , m_deadline_timer(new DeadlineTimer())
-    , m_esc_input_timer(new DeadlineTimer())
-    , m_telnet_decoder(new TelnetDecoder(my_async_io))
-    , m_user_record(new Users())
+    , m_state_manager(nullptr)
+    , m_deadline_timer(nullptr)
+    , m_esc_input_timer(nullptr)
+    , m_telnet_decoder(nullptr)
+    , m_user_record(nullptr)
     , m_node_number(0)
     , m_is_leaving(false)
     , m_parsed_data("")
@@ -48,6 +48,13 @@ Session::Session(async_io_ptr const &my_async_io, session_manager_ptr const &my_
     , m_is_session_authorized(false)
     , m_user_database(USERS_DATABASE, &m_database_log)
 {
+    // Setup Shared Pointers
+    m_state_manager = std::make_shared<StateManager>();
+    m_deadline_timer = std::make_shared<DeadlineTimer>();
+    m_esc_input_timer = std::make_shared<DeadlineTimer>();
+    m_telnet_decoder = std::make_shared<TelnetDecoder>(my_async_io);
+    m_user_record = std::make_shared<Users>();
+    
     if(m_async_io->isActive())
     {
         try
@@ -101,9 +108,8 @@ void Session::handleTelnetOptionNegoiation()
     m_log.setUserInfo(m_node_number);
     
     // Starts Up the Menu System Then Loads up the PreLogin Sequence.   
-    state_ptr new_state(new MenuSystem(shared_from_this()));
+    state_ptr new_state = std::make_shared<MenuSystem>(shared_from_this());
     
-    //state_ptr new_state(new MenuShell(shared_from_this()));    
     m_state_manager->changeState(new_state);    
 }
 
@@ -113,11 +119,15 @@ void Session::handleTelnetOptionNegoiation()
  */
 void Session::handlePyBind11State()
 {
-// Work in Progress, not yet in use for main develop branch
+    // Work in Progress, not yet in use for main develop branch
+    // Also requries Dependencies and Extra setup on Make Files!
 #ifdef HAVE_PYHON
+
     // Detection Completed, start ip the Pre-Logon Sequence State.
-    state_ptr new_state(new PythonSystem(m_session_data));
+    state_ptr new_state = std::make_shared<PythonSystem>(m_session_data);
+    
     m_state_manager->changeState(new_state);
+    
 #endif // HAVE_PYTHON
 }
 

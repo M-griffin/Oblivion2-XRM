@@ -21,7 +21,7 @@ class AsyncIO
 {
 public:
 
-    AsyncIO(IOService& io_service, const socket_handler_ptr &socket_handler)
+    AsyncIO(IOService& io_service, socket_handler_ptr socket_handler)
         : AsyncBase(io_service, socket_handler)
     {
     }

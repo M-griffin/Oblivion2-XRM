@@ -954,7 +954,9 @@ void MenuSystem::startupModulePreLogon()
     resetMenuInputIndex(MODULE_PRELOGON_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModPreLogon(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
+    module_ptr module = std::make_shared<ModPreLogon>(
+        m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
+    );
 
     if(!module)
     {
@@ -974,7 +976,9 @@ void MenuSystem::startupModuleLogon()
     resetMenuInputIndex(MODULE_LOGON_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModLogon(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
+    module_ptr module = std::make_shared<ModLogon>(
+        m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
+    );
 
     if(!module)
     {
@@ -994,7 +998,9 @@ void MenuSystem::startupModuleSignup()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModSignup(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
+    module_ptr module = std::make_shared<ModSignup>(
+        m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
+    );
 
     if(!module)
     {
@@ -1014,7 +1020,9 @@ void MenuSystem::startupModuleMenuEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModMenuEditor(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
+    module_ptr module = std::make_shared<ModMenuEditor>(
+        m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
+    );
 
     if(!module)
     {
@@ -1034,7 +1042,9 @@ void MenuSystem::startupModuleUserEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModUserEditor(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
+    module_ptr module = std::make_shared<ModUserEditor>(
+        m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
+    );
 
     if(!module)
     {
@@ -1054,7 +1064,9 @@ void MenuSystem::startupModuleLevelEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModLevelEditor(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
+    module_ptr module = std::make_shared<ModLevelEditor>(
+        m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
+    );
 
     if(!module)
     {
@@ -1074,7 +1086,9 @@ void MenuSystem::startupModuleMessageEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    module_ptr module(new ModMessageEditor(m_session_data, m_config, m_ansi_process, m_common_io, m_session_io));
+    module_ptr module = std::make_shared<ModMessageEditor>(
+        m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
+    );
 
     if(!module)
     {

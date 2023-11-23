@@ -63,6 +63,10 @@ public:
     class ServiceBase
     {
     public:
+        virtual ~ServiceBase()
+        {
+            //std::cout << "ServiceBase Destructor called\n";
+        }
         virtual void setBuffer(unsigned char *buffer) = 0;
         virtual std::vector<unsigned char> &getBuffer() = 0;
         virtual std::string getStringSequence() = 0;
@@ -83,6 +87,13 @@ public:
     class ServiceJob : public ServiceBase
     {
     public:
+    
+        virtual ~ServiceJob()
+        {
+            //std::cout << "ServiceJob Destructor called\n";
+            m_socket_handle.reset();
+        }
+        
         virtual void setBuffer(unsigned char *buffer) override
         {
             for(int i = 0; i < MAX_BUFFER_SIZE; i++)
@@ -124,12 +135,7 @@ public:
             , m_socket_handle(socket_handle)
             , m_callback(callback)
             , m_service_type(service_type)
-        { }
-        
-        ~ServiceJob() 
-        {
-            m_socket_handle.reset();
-        }
+        { }        
 
         MutableBufferSequence &m_buffer;
         StringSequence         m_string_sequence;
@@ -150,9 +156,11 @@ public:
     void addAsyncJob(MutableBufferSequence &buffer, StringSequence string_sequence, SocketHandle socket_handle,
                      Callback &callback, ServiceType service_type)
     {
+        // We keep NEW here for Initial Pointer Creation due to Varidict Templates.
+        // Made Sure Virtual Descructors are called properly when Jobs are released. 
         ServiceJob<MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType> *job
             = new ServiceJob <MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
-        (buffer, string_sequence, socket_handle, callback, service_type);
+                (buffer, string_sequence, socket_handle, callback, service_type);
 
         if(SERVICE_TIMER(service_type))
         {

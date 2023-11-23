@@ -23,8 +23,8 @@
 ModPreLogon::ModPreLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
         common_io_ptr common_io, session_io_ptr session_io)
     : ModBase(session_data, config, ansi_process, "mod_prelogon.yaml", common_io, session_io)
-    , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
-    , m_deadline_timer(new DeadlineTimer())
+    , m_text_prompts_dao(nullptr)
+    , m_deadline_timer(nullptr)
     , m_mod_function_index(MOD_HUMAN_SHIELD)
     , m_is_text_prompt_exist(false)
     , m_is_esc_detected(false)
@@ -35,6 +35,10 @@ ModPreLogon::ModPreLogon(session_ptr session_data, config_ptr config, processor_
     , m_term_type("undetected")
     , m_esc_sequence("")
 {
+    // Setup Smart Pointers
+    m_text_prompts_dao = std::make_shared<TextPromptsDao>(GLOBAL_DATA_PATH, m_filename);
+    m_deadline_timer = std::make_shared<DeadlineTimer>();
+    
     // Push function pointers to the stack.
     m_setup_functions.push_back(std::bind(&ModPreLogon::setupHumanShield, this));
     m_setup_functions.push_back(std::bind(&ModPreLogon::setupEmulationDetection, this));

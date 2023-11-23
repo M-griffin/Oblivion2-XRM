@@ -249,7 +249,7 @@ std::string MessageAreaDao::updateMessageAreaQryString(std::string qry, message_
 std::vector<message_area_ptr> MessageAreaDao::getAllMessageAreasByConference(long id)
 {
     Logging &log = Logging::getInstance();
-    message_area_ptr area(new MessageArea);
+    message_area_ptr area = std::make_shared<MessageArea>();
     std::vector<message_area_ptr> list;
 
     // Make Sure Database Reference is Connected
@@ -260,7 +260,7 @@ std::vector<message_area_ptr> MessageAreaDao::getAllMessageAreasByConference(lon
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_database));
+    query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
     if(!qry->isConnected())
     {
@@ -282,7 +282,8 @@ std::vector<message_area_ptr> MessageAreaDao::getAllMessageAreasByConference(lon
         {
             while(qry->fetchRow())
             {
-                area.reset(new MessageArea);
+                area.reset();
+                area = std::make_shared<MessageArea>();
                 pullMessageAreaResult(qry, area);
                 list.push_back(area);
             }

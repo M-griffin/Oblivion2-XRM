@@ -167,7 +167,8 @@ struct convert<config_ptr>
      */
     static bool decode(const Node& node, config_ptr rhs)
     {
-        rhs.reset(new Config());
+        rhs.reset();
+        rhs = std::make_shared<Config>();
 
         rhs->file_version                    = node["file_version"].as<std::string>();
         rhs->bbs_name_sysop                  = node["bbs_name_sysop"].as<std::string>();

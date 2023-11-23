@@ -20,8 +20,10 @@
  */
 AccessCondition::AccessCondition() 
     : m_log(Logging::getInstance())
-    , m_session_io(new SessionIO())    
-{ }
+    , m_session_io(nullptr)
+{ 
+    m_session_io = std::make_shared<SessionIO>();
+}
 
 AccessCondition::~AccessCondition()
 { 
