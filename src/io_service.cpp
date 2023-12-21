@@ -30,19 +30,12 @@ IOService::~IOService()
  */
 void IOService::checkAsyncListenersForConnections()
 {
-    // Timers are not removed each iteration
-    // Async stay active until expired or canceled
-    // And wait, will block socket polling for (x) amount of time
     for(unsigned int i = 0; i < m_listener_list.size(); i++)
     {
         service_base_ptr listener_work = m_listener_list.get(i);
 
         if(!listener_work || !listener_work->getSocketHandle()->isActive())
         {
-            //m_log.write<Logging::DEBUG_LOG>("ioservice Removing Async Listener Job");
-            //listener_work.reset();
-            //m_listener_list.remove(i);
-            //--i; // Compensate for item removed.
             continue;
         }
 
@@ -59,23 +52,46 @@ void IOService::checkAsyncListenersForConnections()
                 
                 // Check for max nodes here, if we like can limit, send a message and drop
                 // connection on handler by not passing it through the callback.
+                // Creates a Session on New Incoming Connections
                 listener_work->executeCallback(success_code, handler);
                                 
                 m_log.write<Logging::DEBUG_LOG>("ioservice Async-Accept - Returned CallBack", __FILE__, __LINE__);
-                
-                //handler.reset();
-                //listener_work.reset();
-                //m_listener_list.remove(i);
-                //--i; // Compensate for item removed.
             }
             catch(std::exception &ex)
             {
                 m_log.write<Logging::WARN_LOG>("ioservice Exception Async-Accept", ex.what(), __FILE__, __LINE__);
             }
-        }
+        }        
+    }
+}
+
+/**
+ * @brief Checks Timers for Execution of Callbacks.
+ */
+void IOService::checkAsyncTimers()
+{
+    if (m_timer_list.size() > 0) 
+    {
+        SafeQueue<timer_base_ptr> pulled_timer_list; 
+        pulled_timer_list.copy(std::move(m_timer_list));
         
-        // Temp timer, change to 10/20 miliseconds for cpu usage
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        while(!pulled_timer_list.isEmpty())
+        {
+            timer_base_ptr timer_work = pulled_timer_list.dequeue();
+            
+            if (timer_work)
+            {
+                if (timer_work->isExpired())
+                {
+                    timer_work->executeCallback(0);
+                }
+                else
+                {
+                    // Throw it back on the Queue at the Back for next iteration
+                    m_timer_list.enqueue(timer_work);
+                }
+            }                
+        }
     }
 }
 
@@ -91,21 +107,31 @@ void IOService::run()
     {
         // Check for incoming connections
         checkAsyncListenersForConnections();
+        
+        checkAsyncTimers();
+        
+        if (m_service_list.size() == 0)
+        {
+            continue;
+        }
+        
+        // Test, forgot what this 
+        SafeQueue<service_base_ptr> pulled_list; 
+        pulled_list.copy(std::move(m_service_list));       
 
         // This will wait for another job to be inserted on next call
         // Do we want to insert the job back, if poll is empty or
         // move to vector then look polls..  i think #2.
-        for(unsigned int i = 0; i < m_service_list.size(); i++)
+        while(!pulled_list.isEmpty())
         {
-            service_base_ptr job_work = m_service_list.get(i);
+            service_base_ptr job_work = pulled_list.dequeue();
+           
 
             // Remove Any jobs when the socket has been disconnected.
             if(!job_work || !job_work->getSocketHandle() || !job_work->getSocketHandle()->isActive())
             {
                 m_log.write<Logging::DEBUG_LOG>("ioservice Removing Async Job - Socket Inactive");
                 job_work.reset();
-                m_service_list.remove(i);
-                --i; // Compensate for item removed.
                 continue;
             }
 
@@ -133,6 +159,7 @@ void IOService::run()
                     }
                     else
                     {
+                        // Success
                         job_work->setBuffer((unsigned char *)msg_buffer);
                         std::error_code success_code(0, std::generic_category());
                         job_work->executeCallback(success_code, nullptr);
@@ -140,8 +167,6 @@ void IOService::run()
                     
                     // Clear Job, then Pop it off the list.
                     job_work.reset();
-                    m_service_list.remove(i);
-                    --i; // Compensate for item removed.
                 }
                 else if(result == -1)
                 {
@@ -151,9 +176,12 @@ void IOService::run()
                     
                     // Clear Job, then Pop it off the list.
                     job_work.reset();
-                    m_service_list.remove(i);
-                    --i; // Compensate for item removed.
-                }                
+                }
+                else
+                {
+                    // No Data Retrieved, Add Read Job back to end of Queue.
+                    m_service_list.enqueue(job_work);
+                }
             }
 
             /**
@@ -175,10 +203,7 @@ void IOService::run()
                     job_work->executeCallback(lost_connect_error_code, nullptr);
                     
                     // Clear Job then Pop it off the list.
-                    job_work.reset();
-                    m_service_list.remove(i);
-                    --i; // Compensate for item removed.
-                    
+                    job_work.reset();                    
                 }
                 else
                 {
@@ -187,8 +212,6 @@ void IOService::run()
                     
                     // Clear Job then Pop it off the list.
                     job_work.reset();
-                    m_service_list.remove(i);
-                    --i; // Compensate for item removed.
                 } 
             }
         }

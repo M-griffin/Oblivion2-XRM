@@ -3,12 +3,12 @@
 #include "../data-sys/text_prompts_dao.hpp"
 #include "../model-sys/config.hpp"
 
-#include "../deadline_timer.hpp"
 #include "../telnet_decoder.hpp"
 #include "../encoding.hpp"
 #include "../logging.hpp"
 #include "../session_io.hpp"
 #include "../session.hpp"
+#include "../async_io.hpp"
 #include "../common_io.hpp"
 
 #include <algorithm>
@@ -24,7 +24,6 @@ ModPreLogon::ModPreLogon(session_ptr session_data, config_ptr config, processor_
         common_io_ptr common_io, session_io_ptr session_io)
     : ModBase(session_data, config, ansi_process, "mod_prelogon.yaml", common_io, session_io)
     , m_text_prompts_dao(nullptr)
-    , m_deadline_timer(nullptr)
     , m_mod_function_index(MOD_HUMAN_SHIELD)
     , m_is_text_prompt_exist(false)
     , m_is_esc_detected(false)
@@ -37,7 +36,6 @@ ModPreLogon::ModPreLogon(session_ptr session_data, config_ptr config, processor_
 {
     // Setup Smart Pointers
     m_text_prompts_dao = std::make_shared<TextPromptsDao>(GLOBAL_DATA_PATH, m_filename);
-    m_deadline_timer = std::make_shared<DeadlineTimer>();
     
     // Push function pointers to the stack.
     m_setup_functions.push_back(std::bind(&ModPreLogon::setupHumanShield, this));
@@ -667,10 +665,12 @@ bool ModPreLogon::askCodePage(const std::string &input)
 void ModPreLogon::startHumanShieldTimer()
 {
     // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences responses
-    m_deadline_timer->setWaitInMilliseconds(8000);
-    m_deadline_timer->asyncWait(
-        std::bind(&ModPreLogon::handleHumanShieldTimer, shared_from_this())
-    );
+    //m_deadline_timer->setWaitInMilliseconds(8000);
+    //m_deadline_timer->asyncWait(
+    //    std::bind(&ModPreLogon::handleHumanShieldTimer, shared_from_this())
+    //);
+    auto callback_function = std::bind(&ModPreLogon::handleHumanShieldTimer, shared_from_this());        
+    m_session_data->m_async_io->asyncWait(8000, callback_function);
 }
 
 /**
@@ -679,10 +679,13 @@ void ModPreLogon::startHumanShieldTimer()
 void ModPreLogon::startDetectionTimer()
 {
     // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences responses
-    m_deadline_timer->setWaitInMilliseconds(1500);
-    m_deadline_timer->asyncWait(
-        std::bind(&ModPreLogon::handleDetectionTimer, shared_from_this())
-    );
+    //m_deadline_timer->setWaitInMilliseconds(1500);
+    //m_deadline_timer->asyncWait(
+    //    std::bind(&ModPreLogon::handleDetectionTimer, shared_from_this())
+    //);
+    
+    auto callback_function = std::bind(&ModPreLogon::handleDetectionTimer, shared_from_this());        
+    m_session_data->m_async_io->asyncWait(1500, callback_function);
 }
 
 /**

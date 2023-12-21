@@ -9,9 +9,6 @@
 #include <vector>
 #include <functional>
 
-class DeadlineTimer;
-typedef std::shared_ptr<DeadlineTimer> deadline_timer_ptr;
-
 
 /**
  * @class ModPreLogin
@@ -206,7 +203,6 @@ private:
     bool askCodePage(const std::string &input);
 
     text_prompts_dao_ptr   m_text_prompts_dao;
-    deadline_timer_ptr     m_deadline_timer;
 
     int                    m_mod_function_index;
     bool                   m_is_text_prompt_exist;

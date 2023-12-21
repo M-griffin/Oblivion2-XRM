@@ -31,9 +31,6 @@ class StateManager;
 //typedef std::unique_ptr<StateManager> state_manager_uptr;
 typedef std::shared_ptr<StateManager> state_manager_ptr;
 
-class DeadlineTimer;
-//typedef std::unique_ptr<DeadlineTimer> deadline_timer_uptr;
-typedef std::shared_ptr<DeadlineTimer> deadline_timer_ptr;
 
 /**
  * @class Session
@@ -153,6 +150,12 @@ public:
      */
     void handleWriteThenDisconnect(const std::error_code& error, socket_handler_ptr);
     
+    /**
+     * @brief Async Non-Block Wait (MilliSeconds) with Callback
+     * @param callback_method
+     */
+    template <class Callback>
+    void asyncWait(int expires_on, const Callback &callback_method);
     
     // Previous SessionData Methods
     
@@ -209,8 +212,6 @@ public:
     
     // Local Member Definitions Unique Pointers
     state_manager_ptr          m_state_manager;
-    deadline_timer_ptr         m_deadline_timer;
-    deadline_timer_ptr         m_esc_input_timer;
  
     telnet_decoder_ptr         m_telnet_decoder;
     user_ptr                   m_user_record;
