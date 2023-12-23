@@ -25,7 +25,8 @@ TextPromptsDao::TextPromptsDao(std::string path, const std::string &filename)
 TextPromptsDao::~TextPromptsDao()
 {
     m_is_loaded = false;
-    m_node.reset();    
+    m_node.reset();
+    m_text_prompts.clear();
 }
 
 /**
@@ -145,8 +146,13 @@ bool TextPromptsDao::readPrompts()
             m_log.write<Logging::ERROR_LOG>("Text Prompt Invalid File Version=", file_version, "Expected=", TextPromptsDao::FILE_VERSION);
             return(false);
         }
-
+        
         m_is_loaded = true;
+        
+        // Testing pre-loading methods, expand this lateron for a glocal static cache instance.
+        // These prompts don't change, no reason to keep reloading them for each class and session instance separately.
+        // Not a priority, but groundwork is all set for this, they need a map by filename to keep separate files loaded.
+        // cacheAllTextPrompts();
     }
     catch(std::exception &ex)
     {
@@ -171,20 +177,30 @@ M_StringPair TextPromptsDao::getPrompt(const std::string &lookup)
         return temp;
     }
 
-    std::string key = "";
-
-    for(YAML::const_iterator it = m_node.begin(); it != m_node.end(); ++it)
+    // Keep Original Lookup if Cache is not populated
+    if (m_text_prompts.size() ==0)    
     {
-        key = it->first.as<std::string>();
+        //std::cout << "Return Non-Cached Text Prompt" << std::endl;
+        std::string key = "";
 
-        // Check key for selected prompt to pull
-        if(key.compare(lookup) == 0)
+        for(YAML::const_iterator it = m_node.begin(); it != m_node.end(); ++it)
         {
-            M_StringPair value = it->second.as<M_StringPair>();
-            return value;
+            key = it->first.as<std::string>();
+
+            // Check key for selected prompt to pull
+            if(key.compare(lookup) == 0)
+            {
+                M_StringPair value = it->second.as<M_StringPair>();
+                return value;
+            }
         }
     }
-
+    else 
+    {
+        //std::cout << "Return Cached Text Prompt" << std::endl;
+        return m_text_prompts[lookup];
+    }
+    
     return temp;
 }
 
@@ -201,3 +217,33 @@ void TextPromptsDao::displayAll()
         std::cout << key << " -> " << value.first << ", " << value.second << std::endl;
     }
 }
+
+/**
+ * @brief Testing, cahce all records to a map instad of reloading and searching.
+ */
+void TextPromptsDao::cacheAllTextPrompts()
+{
+    try
+    {
+        for(YAML::const_iterator it = m_node.begin(); it != m_node.end(); ++it)
+        {            
+            // The first Entry on All Text Prompts is the File Version which doesn't have a key/Value Pair, and is just a string value.
+            // Exclude This when pre-loading all propmpts.
+            if (it->first.as<std::string>() != "file_version")
+            {            
+                std::cout << "1. caching: -> " << it->first << ", " << it->second << std::endl; 
+                std::string key = it->first.as<std::string>();
+                M_StringPair value = it->second.as<M_StringPair>();
+
+                std::cout << "2. caching: " << key << " -> " << value.first << ", " << value.second << std::endl;
+                m_text_prompts[key] = value;
+            }
+        }        
+    }
+    catch(std::exception &ex)
+    {
+        m_log.write<Logging::ERROR_LOG>("Exception cacheAllTextPrompts YAML::readPrompts=", m_filename, ex.what());
+        throw ex;
+    }
+}
+
