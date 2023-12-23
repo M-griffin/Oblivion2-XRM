@@ -79,18 +79,20 @@ void IOService::checkAsyncTimers()
         {
             timer_base_ptr timer_work = pulled_timer_list.dequeue();
             
-            if (timer_work)
+            if (!timer_work)
             {
-                if (timer_work->isExpired())
-                {
-                    timer_work->executeCallback(0);
-                }
-                else
-                {
-                    // Throw it back on the Queue at the Back for next iteration
-                    m_timer_list.enqueue(timer_work);
-                }
-            }                
+                continue;
+            }
+            
+            if (timer_work->isExpired())
+            {
+                timer_work->executeCallback(0);
+            }
+            else
+            {
+                // Throw it back on the Queue at the Back for next iteration
+                m_timer_list.enqueue(timer_work);
+            }
         }
     }
 }
@@ -112,6 +114,8 @@ void IOService::run()
         
         if (m_service_list.size() == 0)
         {
+            // Temp timer, change to 10/20 miliseconds for cpu usage
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
             continue;
         }
         
@@ -132,6 +136,9 @@ void IOService::run()
             {
                 m_log.write<Logging::DEBUG_LOG>("ioservice Removing Async Job - Socket Inactive");
                 job_work.reset();
+                
+                // Temp timer, change to 10/20 miliseconds for cpu usage
+                std::this_thread::sleep_for(std::chrono::milliseconds(20));
                 continue;
             }
 
