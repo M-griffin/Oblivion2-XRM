@@ -67,13 +67,19 @@ public:
      * @brief Testing, display all nodes in a file.
      */
     void displayAll();
+    
+    /**
+     * @brief Testing, cahce all records to a map instad of reloading and searching.
+     */
+    void cacheAllTextPrompts();
 
-    Logging    &m_log;
-    std::string m_path;
-    std::string m_filename;
-    bool        m_is_loaded;
+    Logging     &m_log;
+    std::string  m_path;
+    std::string  m_filename;
+    bool         m_is_loaded;
 
-    YAML::Node  m_node;
+    YAML::Node   m_node;
+    M_TextPrompt m_text_prompts;
 
 };
 

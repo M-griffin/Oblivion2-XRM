@@ -30,14 +30,20 @@
 ModSignup::ModSignup(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, 
         common_io_ptr common_io, session_io_ptr session_io)
     : ModBase(session_data, config, ansi_process, "mod_signup.yaml", common_io, session_io)
-    , m_menu_base(new MenuBase(session_data))
-    , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
-    , m_user_record(new Users())
-    , m_security_record(new Security())
+    , m_menu_base(nullptr)
+    , m_text_prompts_dao(nullptr)
+    , m_user_record(nullptr)
+    , m_security_record(nullptr)
     , m_mod_function_index(MOD_NUP)
     , m_is_text_prompt_exist(false)
     , m_newuser_password_attempts(0)
 {
+    // Setup Smart Pointers
+    m_menu_base = std::make_shared<MenuBase>(session_data);
+    m_text_prompts_dao = std::make_shared<TextPromptsDao>(GLOBAL_DATA_PATH, m_filename);
+    m_user_record = std::make_shared<Users>();
+    m_security_record = std::make_shared<Security>();
+    
     // Push function pointers to the stack.
     m_setup_functions.push_back(std::bind(&ModSignup::setupNewUserPassword, this));
     m_setup_functions.push_back(std::bind(&ModSignup::setupDisclaimer, this));
@@ -739,7 +745,7 @@ bool ModSignup::handle(const std::string &input)
         m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Check for user name and if is already exists!
-        users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+        users_dao_ptr user_data = std::make_shared<UsersDao>(m_session_data->m_user_database);
         user_ptr search = user_data->getUserByHandle(key);
 
         if(!search || search->iId == -1)
@@ -774,7 +780,7 @@ bool ModSignup::realName(const std::string &input)
         m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Check for real name and if is already exists!
-        users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+        users_dao_ptr user_data = std::make_shared<UsersDao>(m_session_data->m_user_database);
         user_ptr search = user_data->getUserByRealName(key);
 
         if(!search || search->iId == -1)
@@ -875,7 +881,7 @@ bool ModSignup::email(const std::string &input)
         m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
         // Test if email already exists.
-        users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+        users_dao_ptr user_data = std::make_shared<UsersDao>(m_session_data->m_user_database);
         user_ptr search = user_data->getUserByEmail(key);
 
         if(!search || search->iId == -1)
@@ -1053,7 +1059,7 @@ bool ModSignup::verifyPassword(const std::string &input)
         if(m_security_record->sPasswordHash.compare(key) == 0)
         {
             // Load pointer to encrypt methods.
-            encrypt_ptr encryption(new Encrypt());
+            encrypt_ptr encryption = std::make_shared<Encrypt>();
 
             if(!encryption)
             {
@@ -1151,7 +1157,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
         // otherwise fail back if they don't and ask again.
         if(m_security_record->sChallengeAnswerHash.compare(key) == 0)
         {
-            encrypt_ptr encryption(new Encrypt());
+            encrypt_ptr encryption = std::make_shared<Encrypt>();
 
             if(!encryption)
             {
@@ -1499,8 +1505,8 @@ bool ModSignup::backSpace(const std::string &input)
 void ModSignup::saveNewUserRecord()
 {
     // StartUp Data Access Objects for SQL
-    users_dao_ptr user_dao(new UsersDao(m_session_data->m_user_database));
-    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
+    users_dao_ptr user_dao = std::make_shared<UsersDao>(m_session_data->m_user_database);
+    security_dao_ptr security_dao = std::make_shared<SecurityDao>(m_session_data->m_user_database);
 
     // Save New Security Record, index is then inserted into user record
     long securityIndex = security_dao->insertRecord(m_security_record);

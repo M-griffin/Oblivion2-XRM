@@ -384,7 +384,7 @@ std::string UsersDao::updateUsersQryString(std::string qry, user_ptr obj)
  */
 user_ptr UsersDao::getUserByHandle(std::string name)
 {
-    user_ptr user(new Users);
+    user_ptr user = std::make_shared<Users>();
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
@@ -394,7 +394,7 @@ user_ptr UsersDao::getUserByHandle(std::string name)
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_database));
+    query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
     if(!qry->isConnected())
     {
@@ -438,7 +438,7 @@ user_ptr UsersDao::getUserByHandle(std::string name)
  */
 user_ptr UsersDao::getUserByRealName(std::string name)
 {
-    user_ptr user(new Users);
+    user_ptr user = std::make_shared<Users>();
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
@@ -448,7 +448,7 @@ user_ptr UsersDao::getUserByRealName(std::string name)
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_database));
+    query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
     if(!qry->isConnected())
     {
@@ -492,7 +492,7 @@ user_ptr UsersDao::getUserByRealName(std::string name)
  */
 user_ptr UsersDao::getUserByEmail(std::string email)
 {
-    user_ptr user(new Users);
+    user_ptr user = std::make_shared<Users>();
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
@@ -502,7 +502,7 @@ user_ptr UsersDao::getUserByEmail(std::string email)
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_database));
+    query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
     if(!qry->isConnected())
     {
@@ -546,7 +546,7 @@ user_ptr UsersDao::getUserByEmail(std::string email)
  */
 std::vector<user_ptr> UsersDao::getUsersByWildcard(std::string filter)
 {
-    user_ptr obj(new Users());
+    user_ptr obj = std::make_shared<Users>();
     std::vector<user_ptr> list;
 
     // Make Sure Database Reference is Connected
@@ -557,7 +557,7 @@ std::vector<user_ptr> UsersDao::getUsersByWildcard(std::string filter)
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_database));
+    query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
     if(!qry->isConnected())
     {
@@ -584,7 +584,8 @@ std::vector<user_ptr> UsersDao::getUsersByWildcard(std::string filter)
         {
             while(qry->fetchRow())
             {
-                obj.reset(new Users());
+                obj.reset();
+                obj = std::make_shared<Users>();
                 pullUsersResult(qry, obj);
                 list.push_back(obj);
             }

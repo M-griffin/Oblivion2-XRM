@@ -98,6 +98,6 @@ public:
 };
 
 typedef std::shared_ptr<DeadlineTimer> deadline_timer_ptr;
-typedef std::unique_ptr<DeadlineTimer> deadline_timer_uptr;
+//typedef std::unique_ptr<DeadlineTimer> deadline_timer_uptr;
 
 #endif // DEADLINE_TIMER_HPP

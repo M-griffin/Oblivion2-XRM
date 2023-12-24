@@ -262,7 +262,7 @@ std::string SessionStatsDao::updateSessionStatsQryString(std::string qry, sessio
 std::vector<session_stats_ptr> SessionStatsDao::getAllStatsPerUser(long userId)
 {
     Logging &log = Logging::getInstance();
-    session_stats_ptr stat(new SessionStats);
+    session_stats_ptr stat = std::make_shared<SessionStats>();
     std::vector<session_stats_ptr> list;
 
     // Make Sure Database Reference is Connected
@@ -273,7 +273,7 @@ std::vector<session_stats_ptr> SessionStatsDao::getAllStatsPerUser(long userId)
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_database));
+    query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
     if(!qry->isConnected())
     {
@@ -295,7 +295,8 @@ std::vector<session_stats_ptr> SessionStatsDao::getAllStatsPerUser(long userId)
         {
             while(qry->fetchRow())
             {
-                stat.reset(new SessionStats);
+                stat.reset();
+                stat = std::make_shared<SessionStats>();
                 pullSessionStatsResult(qry, stat);
                 list.push_back(stat);
             }
@@ -320,7 +321,7 @@ std::vector<session_stats_ptr> SessionStatsDao::getAllStatsPerUser(long userId)
 std::vector<session_stats_ptr> SessionStatsDao::getLast10CallerStats()
 {
     Logging &log = Logging::getInstance();
-    session_stats_ptr stat(new SessionStats);
+    session_stats_ptr stat = std::make_shared<SessionStats>();
     std::vector<session_stats_ptr> list;
 
     // Make Sure Database Reference is Connected
@@ -331,7 +332,7 @@ std::vector<session_stats_ptr> SessionStatsDao::getLast10CallerStats()
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_database));
+    query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
     if(!qry->isConnected())
     {
@@ -355,7 +356,8 @@ std::vector<session_stats_ptr> SessionStatsDao::getLast10CallerStats()
         {
             while(qry->fetchRow())
             {
-                stat.reset(new SessionStats);
+                stat.reset();
+                stat = std::make_shared<SessionStats>();
                 pullSessionStatsResult(qry, stat);
                 list.push_back(stat);
             }
@@ -380,7 +382,7 @@ std::vector<session_stats_ptr> SessionStatsDao::getLast10CallerStats()
 std::vector<session_stats_ptr> SessionStatsDao::getTodaysCallerStats()
 {
     Logging &log = Logging::getInstance();
-    session_stats_ptr stat(new SessionStats);
+    session_stats_ptr stat = std::make_shared<SessionStats>();
     std::vector<session_stats_ptr> list;
 
     // Make Sure Database Reference is Connected
@@ -391,7 +393,7 @@ std::vector<session_stats_ptr> SessionStatsDao::getTodaysCallerStats()
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_database));
+    query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
     if(!qry->isConnected())
     {
@@ -417,7 +419,8 @@ std::vector<session_stats_ptr> SessionStatsDao::getTodaysCallerStats()
         {
             while(qry->fetchRow())
             {
-                stat.reset(new SessionStats);
+                stat.reset();
+                stat = std::make_shared<SessionStats>();
                 pullSessionStatsResult(qry, stat);
                 list.push_back(stat);
             }

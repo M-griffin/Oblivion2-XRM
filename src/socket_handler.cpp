@@ -100,8 +100,8 @@ bool SocketHandler::createTelnetAcceptor(const std::string &host, const int &por
     {
         try
         {
-            m_socket_type = SOCKET_TYPE_TELNET;
-            socket_state_ptr sdl_socket(new SDL_Socket(host, port));
+            m_socket_type = SOCKET_TYPE_TELNET;            
+            socket_state_ptr sdl_socket = std::make_shared<SDL_Socket>(host, port);
             m_socket.push_back(sdl_socket);
 
             if(m_socket.back()->onListen())

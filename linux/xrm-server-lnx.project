@@ -162,7 +162,6 @@
     </VirtualDirectory>
     <File Name="../src/async_acceptor.hpp"/>
     <File Name="../src/async_base.hpp"/>
-    <File Name="../src/deadline_timer.hpp"/>
     <File Name="../src/directory.hpp"/>
     <File Name="../src/interface.hpp"/>
     <File Name="../src/io_service.cpp"/>

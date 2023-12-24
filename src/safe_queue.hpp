@@ -74,12 +74,10 @@ public:
     // Get first Item in Queue. FIFO
     T dequeue(void)
     {
+        if (q.empty()) 
+            return nullptr;
+            
         std::unique_lock<std::mutex> lock(m);
-
-        while(q.empty())
-        {
-            c.wait(lock);
-        }
 
         T val = q.front();
         q.pop();
@@ -103,6 +101,21 @@ public:
     unsigned long size(void) const
     {
         return q.size();
+    }
+    
+    SafeQueue& copy(SafeQueue&& other)
+    {
+        if(this != &other)
+        {
+            std::lock_guard<std::mutex> lock(m);
+
+            if(!other.isEmpty())
+            {
+                q.swap(other.q);
+            }
+        }
+
+        return *this;
     }
 
 private:

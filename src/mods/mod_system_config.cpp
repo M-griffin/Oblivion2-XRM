@@ -13,12 +13,16 @@
 ModSystemConfig::ModSystemConfig(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, 
         common_io_ptr common_io, session_io_ptr session_io)
     : ModBase(session_data, config, ansi_process, "mod_system_config.yaml", common_io, session_io)
-    , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
-    , m_directory(new Directory())    
+    , m_text_prompts_dao(nullptr)
+    , m_directory(nullptr)    
     , m_mod_function_index(MOD_PROMPT)
     , m_failure_attempts(0)
     , m_is_text_prompt_exist(false)    
 {
+    // Setup Smart Pointers
+    m_text_prompts_dao = std::make_shared<TextPromptsDao>(GLOBAL_DATA_PATH, m_filename);
+    m_directory = std::make_shared<Directory>();
+    
     // WIP Push function pointers to the stack.
 
     //m_setup_functions.push_back(std::bind(&ModMenuEditor::setupLogon, this));

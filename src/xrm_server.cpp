@@ -107,8 +107,8 @@ auto main() -> int
 
     // Loading and saving default Configuration file to XML
     {
-        config_ptr config(new Config());
-
+        config_ptr config = std::make_shared<Config>();
+        
         if(!config)
         {
             m_log.write<Logging::ERROR_LOG>("Unable to allocate config object");
@@ -141,7 +141,7 @@ auto main() -> int
     
     // Database Startup in it's own context.
     {
-        db_startup_ptr db(new DbStartup());
+        db_startup_ptr db = std::make_shared<DbStartup>();
         bool db_startup = db->initDatabaseTables();
 
         // Write all error logs and exit.
@@ -155,18 +155,21 @@ auto main() -> int
     // Isolate to code block for smart pointer deallocation.
     {
         // Create Handles to Services, and starts up connection listener and ASIO Thread Worker
-        IOService io_service;        
+        IOService io_service;
         int port = Communicator::getInstance().getConfiguration()->port_telnet;
         std::string logging_level = Communicator::getInstance().getConfiguration()->logging_level;
-        Logging::getInstance().setLoggingLevel(logging_level);        
-        interface_ptr setupAndRunAsioServer(new Interface(io_service, "TELNET", port));        
+        Logging::getInstance().setLoggingLevel(logging_level);
         
+        // Testing Main Loop without returning.
+        auto setupAndRunAsioServer = std::make_shared<Interface>(io_service, "TELNET", port);
+
+        /*
         while(io_service.isActive()) 
         {            
             std::string line;
             std::getline(std::cin, line);
             
-            /**
+            
              * Clean Shutdown, (2) Steps at this time from Console Commands.
              * 
              * 1. Kill - All Connections, so all sessions cleanly shutown, should wait at least 10 seconds.
@@ -176,7 +179,7 @@ auto main() -> int
              * Which has to be looked into more in a single smpoother process.
              * 
              * Works for Now.
-             */
+             *
             if (line == "kill") {
                 m_log.write<Logging::INFO_LOG>("Killing All Connections before exiting...");
                 setupAndRunAsioServer->shutdown();
@@ -189,7 +192,7 @@ auto main() -> int
           
             // Timer, for cpu usage
             std::this_thread::sleep_for(std::chrono::milliseconds(40));            
-        }
+        }*/
 
     }
 
