@@ -234,7 +234,7 @@ std::string FileAreaDao::updateFileAreaQryString(std::string qry, file_area_ptr 
 std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(long id)
 {
     Logging &log = Logging::getInstance();
-    file_area_ptr area(new FileArea);
+    file_area_ptr area = std::make_shared<FileArea>();
     std::vector<file_area_ptr> list;
 
     // Make Sure Database Reference is Connected
@@ -245,7 +245,7 @@ std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(long id)
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_database));
+    query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
     if(!qry->isConnected())
     {
@@ -267,7 +267,8 @@ std::vector<file_area_ptr> FileAreaDao::getAllFileAreasByConference(long id)
         {
             while(qry->fetchRow())
             {
-                area.reset(new FileArea);
+                area.reset();
+                area = std::make_shared<FileArea>();
                 pullFileAreaResult(qry, area);
                 list.push_back(area);
             }

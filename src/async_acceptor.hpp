@@ -21,7 +21,7 @@ class AsyncAcceptor
 {
 public:
 
-    AsyncAcceptor(IOService& io_service, const socket_handler_ptr &socket_handler)
+    AsyncAcceptor(IOService& io_service, socket_handler_ptr socket_handler)
         : AsyncBase(io_service, socket_handler)
     {
     }
@@ -50,10 +50,10 @@ public:
         if(protocol == "TELNET")
         {
             service_type = SERVICE_TYPE_LISTENER_TELNET;
-        }
+            m_log.write<Logging::DEBUG_LOG>("Async Listener Job Added to the Queue for", protocol);
+            m_io_service.addAsyncJob(place_holder, string_place_holder, m_socket_handler, callback, service_type);
+        }        
         
-        m_log.write<Logging::DEBUG_LOG>("Async Listener Job Added to the Queue for", protocol);
-        m_io_service.addAsyncJob(place_holder, string_place_holder, m_socket_handler, callback, service_type);
     }
 
 };

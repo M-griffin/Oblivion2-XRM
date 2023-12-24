@@ -28,7 +28,7 @@ SessionManager::~SessionManager()
  * @brief Notifies that a user has joined the room
  * @param participant
  */
-void SessionManager::join(const session_ptr &session)
+void SessionManager::join(session_ptr session)
 {
     // Find First Node Number not in use, then set it.
     // Also Manage Thread Safety, although should be single sessions at a time.
@@ -83,7 +83,7 @@ void SessionManager::join(const session_ptr &session)
  * @brief Notifies that a user has left the room
  * @param participant
  */
-void SessionManager::leave(const session_ptr &session)
+void SessionManager::leave(session_ptr session)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     int node_number = session->m_node_number;

@@ -5,7 +5,6 @@
 
 #include "state_manager.hpp"
 #include "async_io.hpp"
-#include "deadline_timer.hpp"
 #include "socket_handler.hpp"
 #include "session_manager.hpp"
 #include "telnet_decoder.hpp"
@@ -15,6 +14,8 @@
 #include "encoding.hpp"
 
 #include "libSqliteWrapped.h"
+
+#include "mods/mod_prelogon.hpp"
 
 #include <memory>
 #include <list>
@@ -29,15 +30,13 @@
  * @param session_manager
  * @return
  */
-Session::Session(async_io_ptr const &my_async_io, session_manager_ptr const &my_session_manager)
+Session::Session(async_io_ptr my_async_io, session_manager_ptr my_session_manager)
     : m_log(Logging::getInstance())
     , m_async_io(my_async_io)        
     , m_session_manager(my_session_manager)
-    , m_state_manager(new StateManager())
-    , m_deadline_timer(new DeadlineTimer())
-    , m_esc_input_timer(new DeadlineTimer())
-    , m_telnet_decoder(new TelnetDecoder(my_async_io))
-    , m_user_record(new Users())
+    , m_state_manager(nullptr)
+    , m_telnet_decoder(nullptr)
+    , m_user_record(nullptr)
     , m_node_number(0)
     , m_is_leaving(false)
     , m_parsed_data("")
@@ -48,6 +47,11 @@ Session::Session(async_io_ptr const &my_async_io, session_manager_ptr const &my_
     , m_is_session_authorized(false)
     , m_user_database(USERS_DATABASE, &m_database_log)
 {
+    // Setup Shared Pointers
+    m_state_manager = std::make_shared<StateManager>();
+    m_telnet_decoder = std::make_shared<TelnetDecoder>(my_async_io);
+    m_user_record = std::make_shared<Users>();
+    
     if(m_async_io->isActive())
     {
         try
@@ -68,8 +72,6 @@ Session::~Session()
     // Free the menu system state and modules when session closes.
     m_state_manager->clean();
     m_async_io.reset();    
-    m_deadline_timer.reset();
-    m_esc_input_timer.reset();
     m_telnet_decoder.reset();    
     m_user_record.reset();
     m_session_manager.reset();
@@ -82,12 +84,14 @@ Session::~Session()
  */
 void Session::startTelnetOptionNegoiation()
 {
-    m_deadline_timer->setWaitInMilliseconds(2000);
+    //m_deadline_timer->setWaitInMilliseconds(2000);
     
     // Deprecated bind, look at replacing with lambda and std::function
-    m_deadline_timer->asyncWait(
-        std::bind(&Session::handleTelnetOptionNegoiation, shared_from_this())
-    );        
+    //m_deadline_timer->asyncWait(
+    //    std::bind(&Session::handleTelnetOptionNegoiation, shared_from_this())
+    //);
+    auto callback_function = std::bind(&Session::handleTelnetOptionNegoiation, shared_from_this());
+    asyncWait(2000, callback_function);
 }
 
 /**
@@ -101,9 +105,8 @@ void Session::handleTelnetOptionNegoiation()
     m_log.setUserInfo(m_node_number);
     
     // Starts Up the Menu System Then Loads up the PreLogin Sequence.   
-    state_ptr new_state(new MenuSystem(shared_from_this()));
+    state_ptr new_state = std::make_shared<MenuSystem>(shared_from_this());
     
-    //state_ptr new_state(new MenuShell(shared_from_this()));    
     m_state_manager->changeState(new_state);    
 }
 
@@ -113,11 +116,15 @@ void Session::handleTelnetOptionNegoiation()
  */
 void Session::handlePyBind11State()
 {
-// Work in Progress, not yet in use for main develop branch
+    // Work in Progress, not yet in use for main develop branch
+    // Also requries Dependencies and Extra setup on Make Files!
 #ifdef HAVE_PYHON
+
     // Detection Completed, start ip the Pre-Logon Sequence State.
-    state_ptr new_state(new PythonSystem(m_session_data));
+    state_ptr new_state = std::make_shared<PythonSystem>(m_session_data);
+    
     m_state_manager->changeState(new_state);
+    
 #endif // HAVE_PYTHON
 }
 
@@ -197,6 +204,12 @@ void Session::handleWriteThenDisconnect(const std::error_code& error, socket_han
     disconnectUser();    
 }
 
+template <class Callback>
+void Session::asyncWait(int expires_on, const Callback &callback_method)
+{    
+    m_log.setUserInfo(m_node_number);
+    m_async_io->asyncWait(expires_on, callback_method);
+}
 
 // Previous SessionData Methods
 
@@ -249,10 +262,12 @@ void Session::startEscapeTimer()
     // Add Deadline Timer for .400 milliseconds for complete ESC Sequences.
     // Is no other input or part of ESC Sequences ie.. [A following the ESC
     // Then it's an ESC key, otherwise capture the rest of the sequence.
-    m_esc_input_timer->setWaitInMilliseconds(400);
-    m_esc_input_timer->asyncWait(
-        std::bind(&Session::handleEscTimer, shared_from_this())
-    );
+    //m_esc_input_timer->setWaitInMilliseconds(400);
+    //m_esc_input_timer->asyncWait(
+    //    std::bind(&Session::handleEscTimer, shared_from_this())
+    //);
+    auto callback_function = std::bind(&Session::handleEscTimer, shared_from_this());
+    asyncWait(400, callback_function);
 }
     
 /**

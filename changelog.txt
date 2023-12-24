@@ -1,5 +1,11 @@
+Change Log Update (00.00.152)
+* 2023-11-23
++ Reworking Smart Pointers removing all New references where possible, and 
+  Also making sure all destructors are setup properly, espeically when they 
+  are virtual classes, should have virtual destructors to match.
+
 Change Log Update (00.00.151)
-* 3023-06-15 -> 2023-10-07
+* 2023-06-15 -> 2023-10-07
 + Revision 2 Rework consists of a break down and rewrite of the core system to resolve system and deallocation issues.
 + Updated Telnet Responses to only reply one to avoid loops
 + Fix for ANSI detections, if it contains, then default to CP437, Set max rows/cols to 100, and undetected

@@ -28,11 +28,9 @@ class SocketHandler;
 typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
 
 class StateManager;
-typedef std::unique_ptr<StateManager> state_manager_uptr;
+//typedef std::unique_ptr<StateManager> state_manager_uptr;
 typedef std::shared_ptr<StateManager> state_manager_ptr;
 
-class DeadlineTimer;
-typedef std::unique_ptr<DeadlineTimer> deadline_timer_uptr;
 
 /**
  * @class Session
@@ -52,7 +50,7 @@ public:
      * @param my_session_manager
      * @return
      */
-    Session(async_io_ptr const &my_async_io, session_manager_ptr const &my_session_manager);    
+    Session(async_io_ptr my_async_io, session_manager_ptr my_session_manager);    
     ~Session();
 
     /**
@@ -65,7 +63,7 @@ public:
      */
     static session_ptr create(async_io_ptr my_async_io, session_manager_ptr my_session_manager)
     {
-        session_ptr new_session(new Session(my_async_io, my_session_manager));
+        session_ptr new_session = std::make_shared<Session>(my_async_io, my_session_manager);
         
         try        
         {
@@ -152,6 +150,12 @@ public:
      */
     void handleWriteThenDisconnect(const std::error_code& error, socket_handler_ptr);
     
+    /**
+     * @brief Async Non-Block Wait (MilliSeconds) with Callback
+     * @param callback_method
+     */
+    template <class Callback>
+    void asyncWait(int expires_on, const Callback &callback_method);
     
     // Previous SessionData Methods
     
@@ -207,9 +211,7 @@ public:
     session_manager_wptr       m_session_manager;
     
     // Local Member Definitions Unique Pointers
-    state_manager_uptr         m_state_manager;
-    deadline_timer_uptr        m_deadline_timer;
-    deadline_timer_uptr        m_esc_input_timer;
+    state_manager_ptr          m_state_manager;
  
     telnet_decoder_ptr         m_telnet_decoder;
     user_ptr                   m_user_record;

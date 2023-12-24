@@ -16,9 +16,12 @@ ModFormManager::ModFormManager(session_ptr session_data, config_ptr config, proc
         common_io_ptr common_io, session_io_ptr session_io)
     : ModBase(session_data, config, ansi_process, nullptr, common_io, session_io)
     , m_current_page(0)
-    , m_menu(new MenuBase(session_data))
+    , m_menu(nullptr)
 //    , m_form_manager(new FormManager(config, session_data))
 {
+    // Setup Smart Pointers
+    m_menu = std::make_shared<MenuBase>(session_data);
+    
     // Setup the Callback to Menu Option Execution to this base class.
     m_menu->m_execute_callback.push_back(std::bind(&ModFormManager::menuOptionsCallback, this, std::placeholders::_1));
 }

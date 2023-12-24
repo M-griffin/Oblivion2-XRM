@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <memory>
+#include <chrono>
 
 /**
  * @class AsyncIO
@@ -21,7 +22,11 @@ class AsyncIO
 {
 public:
 
-    AsyncIO(IOService& io_service, const socket_handler_ptr &socket_handler)
+    using clock             = std::chrono::system_clock;
+    using time_point_type   = std::chrono::time_point<clock, std::chrono::milliseconds>;
+        
+
+    AsyncIO(IOService& io_service, socket_handler_ptr socket_handler)
         : AsyncBase(io_service, socket_handler)
     {
     }
@@ -103,6 +108,24 @@ public:
 
         m_log.write<Logging::DEBUG_LOG>("Async Listener Job Added To Queue");
         m_io_service.addAsyncJob(place_holder, string_seq, m_socket_handler, callback, service_type);
+    }
+    
+    /**
+     * @brief Async Wait Callback for IOService Work
+     * @param BufferSequence - populates will data retrieved
+     * @param Callback - returns error code
+     */
+    template <typename Callback>
+    void asyncWait(int expires_on, const Callback &callback)
+    {        
+        
+    
+        m_log.write<Logging::DEBUG_LOG>("Async Read Job Added To Queue");
+        //std::time_t start_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        
+        time_point_type start = std::chrono::time_point_cast<std::chrono::milliseconds>(clock::now());
+        
+        m_io_service.addTimerJob(start, expires_on, callback);
     }
 
 };

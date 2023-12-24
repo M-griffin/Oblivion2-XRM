@@ -193,7 +193,7 @@ std::string GroupingDao::updateGroupingQryString(std::string qry, group_ptr obj)
  */
 std::vector<group_ptr> GroupingDao::getAllGroupingsByConferenceId(long id)
 {
-    group_ptr group(new Grouping);
+    group_ptr group = std::make_shared<Grouping>();
     std::vector<group_ptr> list;
     Logging &log = Logging::getInstance();
 
@@ -205,7 +205,7 @@ std::vector<group_ptr> GroupingDao::getAllGroupingsByConferenceId(long id)
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_database));
+    query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
     if(!qry->isConnected())
     {
@@ -227,7 +227,8 @@ std::vector<group_ptr> GroupingDao::getAllGroupingsByConferenceId(long id)
         {
             while(qry->fetchRow())
             {
-                group.reset(new Grouping);
+                group.reset();
+                group = std::make_shared<Grouping>();
                 pullGroupingResult(qry, group);
                 list.push_back(group);
             }

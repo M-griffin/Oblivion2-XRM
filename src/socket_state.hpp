@@ -15,6 +15,8 @@
 class SocketHandler;
 typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
 
+class Logging;
+
 /**
  * @class SocketState
  * @author Michael Griffin
@@ -32,8 +34,9 @@ public:
         , m_is_socket_active(true)
     { }
 
-    ~SocketState()
+    virtual ~SocketState()
     {
+        //std::cout << "SocketState Destructor" << std::endl;
     }
 
     virtual int sendSocket(unsigned char *message, Uint32 len) = 0;
@@ -65,15 +68,11 @@ class SDL_Socket : public SocketState
 {
 public:
 
-    SDL_Socket(const std::string &host, const int &port)
-        : SocketState(host, port)
-        , m_tcp_socket(nullptr)
-        , m_socket_set(nullptr)
-    { 
-    }
+    SDL_Socket(const std::string &host, const int &port);
 
-    ~SDL_Socket()
+    virtual ~SDL_Socket()
     {
+        //std::cout << "SDL_Socket Destructor" << std::endl;
     }
 
     virtual int sendSocket(unsigned char *message, Uint32 len) override;
@@ -88,6 +87,7 @@ public:
 
 private:
 
+    Logging         &m_log;
     TCPsocket        m_tcp_socket;
     SDLNet_SocketSet m_socket_set;
 

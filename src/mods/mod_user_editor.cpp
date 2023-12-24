@@ -29,8 +29,8 @@
 ModUserEditor::ModUserEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
         common_io_ptr common_io, session_io_ptr session_io)
     : ModBase(session_data, config, ansi_process, "mod_user_editor.yaml", common_io, session_io)
-    , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
-    , m_directory(new Directory())
+    , m_text_prompts_dao(nullptr)
+    , m_directory(nullptr)
     , m_mod_setup_index(MOD_DISPLAY_USER_LIST)
     , m_mod_function_index(MOD_USER_INPUT)
     , m_mod_user_state_index(USER_CHANGE)
@@ -42,8 +42,11 @@ ModUserEditor::ModUserEditor(session_ptr session_data, config_ptr config, proces
     , m_wildcard_filter("")
     , m_user_array_position(0)
 {
+    // Setup Smart Pointers
+    m_text_prompts_dao = std::make_shared<TextPromptsDao>(GLOBAL_DATA_PATH, m_filename);
+    m_directory = std::make_shared<Directory>();
+    
     // Push function pointers to the stack.
-
     m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserList, this));
     m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserEditFields, this));
     m_setup_functions.push_back(std::bind(&ModUserEditor::setupUserEditExtendedFields, this));
@@ -643,8 +646,8 @@ void ModUserEditor::handleUserInputState(bool does_user_exist, long user_id)
  */
 void ModUserEditor::copyExistingUser(long user_id)
 {
-    users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
-    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
+    users_dao_ptr user_data = std::make_shared<UsersDao>(m_session_data->m_user_database);
+    security_dao_ptr security_dao = std::make_shared<SecurityDao>(m_session_data->m_user_database);
 
     user_ptr lookup_user = user_data->getRecordById(user_id);
 
@@ -653,7 +656,7 @@ void ModUserEditor::copyExistingUser(long user_id)
         return;
 
     // Setup for default password and challenge questions.
-    encrypt_ptr encryption(new Encrypt());
+    encrypt_ptr encryption = std::make_shared<Encrypt>();
     std::string salt = encryption->generate_salt(lookup_user->sHandle, m_config->bbs_uuid);
     std::string password = encryption->generate_password(m_config->password_default_user, salt);
 
@@ -663,7 +666,7 @@ void ModUserEditor::copyExistingUser(long user_id)
         return;
     }
 
-    security_ptr security_record(new Security());
+    security_ptr security_record = std::make_shared<Security>();
     security_record->sChallengeAnswerHash = password;
     security_record->sPasswordHash = password;
     security_record->sSaltHash = salt;
@@ -716,7 +719,7 @@ void ModUserEditor::copyExistingUser(long user_id)
 void ModUserEditor::deleteExistingUser(long user_id)
 {
     // Should Cascade and remove Security Record also.
-    users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+    users_dao_ptr user_data = std::make_shared<UsersDao>(m_session_data->m_user_database);
     user_data->deleteRecord(user_id);
 }
 
@@ -726,7 +729,7 @@ void ModUserEditor::deleteExistingUser(long user_id)
  */
 bool ModUserEditor::checkUserExistsById(long user_id)
 {
-    users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+    users_dao_ptr user_data = std::make_shared<UsersDao>(m_session_data->m_user_database);
     user_ptr lookup_user = user_data->getRecordById(user_id);
 
     // Default Id when not found is -1
@@ -900,7 +903,7 @@ void ModUserEditor::displayCurrentPage(const std::string &input_state)
  */
 std::string ModUserEditor::displayUserList()
 {
-    users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+    users_dao_ptr user_data = std::make_shared<UsersDao>(m_session_data->m_user_database);
 
     // Clear All Users
     if(m_users_listing.size() > 0)
@@ -1600,7 +1603,7 @@ void ModUserEditor::updateExistingUser()
     if(m_loaded_user.back()->iId == -1)
         return;
 
-    users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+    users_dao_ptr user_data = std::make_shared<UsersDao>(m_session_data->m_user_database);
     user_data->updateRecord(m_loaded_user.back());
 }
 
@@ -1610,14 +1613,14 @@ void ModUserEditor::updateExistingUser()
  */
 void ModUserEditor::updateExistingPassword(std::string key_value)
 {
-    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
-    security_ptr security_record(new Security());
+    security_dao_ptr security_dao = std::make_shared<SecurityDao>(m_session_data->m_user_database);
+    security_ptr security_record = std::make_shared<Security>();
 
     // Pull Existing Security Record and re-use existing salt.
     security_record = security_dao->getRecordById(m_loaded_user.back()->iSecurityIndex);
 
     // Setup for default password and challenge questions.
-    encrypt_ptr encryption(new Encrypt());
+    encrypt_ptr encryption = std::make_shared<Encrypt>();
     std::string password = encryption->generate_password(key_value, security_record->sSaltHash);
 
     if(password.size() == 0)
@@ -1641,14 +1644,14 @@ void ModUserEditor::updateExistingPassword(std::string key_value)
  */
 void ModUserEditor::updateExistingChallengeAnswer(std::string key_value)
 {
-    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
-    security_ptr security_record(new Security());
+    security_dao_ptr security_dao = std::make_shared<SecurityDao>(m_session_data->m_user_database);
+    security_ptr security_record = std::make_shared<Security>();
 
     // Pull Existing Security Record and re-use existing salt.
     security_record = security_dao->getRecordById(m_loaded_user.back()->iSecurityIndex);
 
     // Setup for default password and challenge questions.
-    encrypt_ptr encryption(new Encrypt());
+    encrypt_ptr encryption = std::make_shared<Encrypt>();
     std::string password = encryption->generate_password(key_value, security_record->sSaltHash);
 
     if(password.size() == 0)
@@ -1672,8 +1675,8 @@ void ModUserEditor::updateExistingChallengeAnswer(std::string key_value)
  */
 void ModUserEditor::updateExistingChallengeQuestion(std::string key_value)
 {
-    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
-    security_ptr security_record(new Security());
+    security_dao_ptr security_dao = std::make_shared<SecurityDao>(m_session_data->m_user_database);
+    security_ptr security_record = std::make_shared<Security>();
 
     // Pull Existing Security Record and re-use existing salt.
     security_record = security_dao->getRecordById(m_loaded_user.back()->iSecurityIndex);

@@ -24,6 +24,9 @@ class Uuid
 
 public:
 
+    explicit Uuid() {}
+    ~Uuid() {}
+
     std::string createUuidString()
     {
 #ifdef _WIN32

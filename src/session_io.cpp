@@ -19,15 +19,17 @@
 SessionIO::SessionIO()
     : m_log(Logging::getInstance())
     , m_session_data(nullptr)
-    , m_common_io(new CommonIO())
+    , m_common_io(nullptr)
 {
+    m_common_io = std::make_shared<CommonIO>();
 }
 
 SessionIO::SessionIO(session_ptr session_data)
     : m_log(Logging::getInstance())
     , m_session_data(session_data)
-    , m_common_io(new CommonIO())
+    , m_common_io(nullptr)
 {
+    m_common_io = std::make_shared<CommonIO>();
 }
 
 SessionIO::SessionIO(session_ptr session_data, common_io_ptr common_io)
@@ -181,7 +183,7 @@ void SessionIO::createInputField(std::string &field_name, int &len)
 
                 if((signed)tempLength > 0 && (signed)tempLength <= len)
                 {
-                    len = tempLength; // Set new Length
+                    len = tempLength;
                 }
                 else
                 {

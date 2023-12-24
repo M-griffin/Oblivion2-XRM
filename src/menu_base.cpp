@@ -28,10 +28,10 @@
 MenuBase::MenuBase(session_ptr session_data)
     : m_log(Logging::getInstance())
     , m_menu_session_data(session_data)
-    , m_common_io(new CommonIO())
-    , m_session_io(new SessionIO(session_data, m_common_io))
+    , m_common_io(nullptr)
+    , m_session_io(nullptr)
     , m_config(Communicator::getInstance().getConfiguration())
-    , m_directory(new Directory())
+    , m_directory(nullptr)
     , m_line_buffer("")
     , m_use_hotkey(false)
     , m_current_menu("")
@@ -39,11 +39,9 @@ MenuBase::MenuBase(session_ptr session_data)
     , m_fallback_menu("")
     , m_starting_menu("")
     , m_input_index(MENU_INPUT)
-    , m_menu_info(new Menu())
-    , m_menu_prompt(new MenuPrompt())
-    , m_ansi_process(new ProcessorAnsi(
-                         m_menu_session_data->m_telnet_decoder->getTermRows(),
-                         m_menu_session_data->m_telnet_decoder->getTermCols()))
+    , m_menu_info(nullptr)
+    , m_menu_prompt(nullptr)
+    , m_ansi_process(nullptr)
     , m_active_pulldownID(0)
     , m_fail_flag(false)
     , m_pulldown_reentrace_flag(false)
@@ -51,6 +49,21 @@ MenuBase::MenuBase(session_ptr session_data)
     , m_use_first_command_execution(true)
     , m_logoff(false)
 {
+    // Setup Smart Pointers
+    m_common_io = std::make_shared<CommonIO>();
+    m_session_io = std::make_shared<SessionIO>(
+        session_data, 
+        m_common_io
+    );
+    
+    m_directory = std::make_shared<Directory>();    
+    m_menu_info = std::make_shared<Menu>();
+    m_menu_prompt = std::make_shared<MenuPrompt>();
+    m_ansi_process = std::make_shared<ProcessorAnsi>(
+        m_menu_session_data->m_telnet_decoder->getTermRows(),
+        m_menu_session_data->m_telnet_decoder->getTermCols()
+    );
+    
 }
 
 MenuBase::~MenuBase()
@@ -194,7 +207,7 @@ void MenuBase::readInMenuData()
     // For PreLoading and Testing Menu ACS String
     {
         // Pre-Load Menu, check access, if not valued, then fall back to previous.
-        menu_ptr pre_load_menu(new Menu());
+        menu_ptr pre_load_menu = std::make_shared<Menu>();
 
         // Call MenuDao to read in .yaml file
         MenuDao mnu(pre_load_menu, m_current_menu, GLOBAL_MENU_PATH);
@@ -305,10 +318,11 @@ std::string MenuBase::processTopGenericTemplate(const std::string &screen)
 std::string MenuBase::processMidGenericTemplate(const std::string &screen)
 {
     // Use a Local Ansi Parser for Pasrsing Menu Template with Mid.
-    processor_ansi_ptr ansi_process(new ProcessorAnsi(
-                                      m_menu_session_data->m_telnet_decoder->getTermRows(),
-                                      m_menu_session_data->m_telnet_decoder->getTermCols())
-                                 );
+    processor_ansi_ptr ansi_process = std::make_shared<ProcessorAnsi>(
+        m_menu_session_data->m_telnet_decoder->getTermRows(),
+        m_menu_session_data->m_telnet_decoder->getTermCols()
+    );
+    
     std::string output_screen;
     std::string new_screen = screen;
 
@@ -911,7 +925,8 @@ std::string MenuBase::loadMenuPrompt()
     }
 
     // Load Menu prompt.
-    m_menu_prompt.reset(new MenuPrompt());
+    m_menu_prompt.reset();
+    m_menu_prompt = std::make_shared<MenuPrompt>();
 
     // Load YAML Menu Prompt
     MenuPromptDao mnu_prompt(m_menu_prompt, prompt, GLOBAL_MENU_PROMPT_PATH);
@@ -1027,11 +1042,14 @@ void MenuBase::loadAndStartupMenu()
     {
         m_log.write<Logging::DEBUG_LOG>("MATRIX MENU DETECTED - RESET ANSI TERM SIZE to Detection", 
             m_menu_session_data->m_telnet_decoder->getTermRows(),
-            m_menu_session_data->m_telnet_decoder->getTermCols());
+            m_menu_session_data->m_telnet_decoder->getTermCols()
+        );
             
-        m_ansi_process.reset(new ProcessorAnsi(
+        m_ansi_process.reset();
+        m_ansi_process = std::make_shared<ProcessorAnsi>(
             m_menu_session_data->m_telnet_decoder->getTermRows(),
-            m_menu_session_data->m_telnet_decoder->getTermCols()));
+            m_menu_session_data->m_telnet_decoder->getTermCols()
+        );
     }
 
     // 1. Make sure the Input is set to the

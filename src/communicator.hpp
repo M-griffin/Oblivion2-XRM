@@ -57,7 +57,7 @@ public:
      * from anywhere in the system.
      * @param session_manager
      */
-    void setupServer(const session_manager_ptr &session_manager);
+    void setupServer(session_manager_ptr session_manager);
 
     /**
      * @brief Searches and picks first free node number not in use.

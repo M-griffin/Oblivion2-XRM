@@ -21,7 +21,7 @@
 ModLevelEditor::ModLevelEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
         common_io_ptr common_io, session_io_ptr session_io)
     : ModBase(session_data, config, ansi_process, "mod_level_editor.yaml", common_io, session_io)
-    , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
+    , m_text_prompts_dao(nullptr)
     , m_mod_setup_index(MOD_DISPLAY_LEVEL)
     , m_mod_function_index(MOD_LEVEL_INPUT)
     , m_mod_level_state_index(LEVEL_ADD)
@@ -31,6 +31,9 @@ ModLevelEditor::ModLevelEditor(session_ptr session_data, config_ptr config, proc
     , m_current_level(0)
     , m_current_field(0)
 {
+    // Setup Smart Pointers
+    m_text_prompts_dao = std::make_shared<TextPromptsDao>(GLOBAL_DATA_PATH, m_filename);
+    
     // Setup Modules
     m_setup_functions.push_back(std::bind(&ModLevelEditor::setupLevelEditor, this));
     m_setup_functions.push_back(std::bind(&ModLevelEditor::setupLevelEditFields, this));
@@ -1037,8 +1040,8 @@ void ModLevelEditor::handleLevelInputState(bool does_level_exist, int level_code
  */
 void ModLevelEditor::createNewLevel(int level_code)
 {
-    access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
-    access_level_ptr new_level(new AccessLevel());
+    access_level_dao_ptr level_dao = std::make_shared<AccessLevelDao>(m_session_data->m_user_database);
+    access_level_ptr new_level = std::make_shared<AccessLevel>();
 
     // Check if Level Already Exists.
     access_level_ptr destination_level = level_dao->getAccessLevelByLevel(level_code);
@@ -1064,7 +1067,7 @@ void ModLevelEditor::createNewLevel(int level_code)
  */
 void ModLevelEditor::deleteExistingLevel(int level_code)
 {
-    access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
+    access_level_dao_ptr level_dao = std::make_shared<AccessLevelDao>(m_session_data->m_user_database);
     access_level_ptr existing_level = level_dao->getAccessLevelByLevel(level_code);
 
     if(existing_level->iId == -1 || !level_dao->deleteRecord(existing_level->iId))
@@ -1081,7 +1084,7 @@ void ModLevelEditor::deleteExistingLevel(int level_code)
  */
 void ModLevelEditor::copyExistingLevel(int level_code)
 {
-    access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
+    access_level_dao_ptr level_dao = std::make_shared<AccessLevelDao>(m_session_data->m_user_database);
     access_level_ptr existing_level = level_dao->getAccessLevelByLevel(m_current_level);
 
     if(checkLevelExistsByLevel(level_code))
@@ -1106,7 +1109,7 @@ void ModLevelEditor::copyExistingLevel(int level_code)
  */
 void ModLevelEditor::saveLevelChanges()
 {
-    access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
+    access_level_dao_ptr level_dao = std::make_shared<AccessLevelDao>(m_session_data->m_user_database);
     access_level_ptr existing_level = nullptr;
 
     for(unsigned int i = 0; i < m_loaded_levels.size(); i++)
@@ -1162,7 +1165,7 @@ access_level_ptr ModLevelEditor::getCurrentLevel()
  */
 std::string ModLevelEditor::displayLevelList()
 {
-    access_level_dao_ptr level_dao(new AccessLevelDao(m_session_data->m_user_database));
+    access_level_dao_ptr level_dao = std::make_shared<AccessLevelDao>(m_session_data->m_user_database);
 
     // Clear All Levels
     if(m_loaded_levels.size() > 0)

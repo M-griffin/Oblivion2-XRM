@@ -88,7 +88,7 @@ public:
         }
 
         // Create Pointer and Connect Query Object to Database.
-        query_ptr qry(new SQLW::Query(m_database));
+        query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
         if(!qry || !qry->isConnected())
         {
@@ -135,7 +135,7 @@ public:
         }
 
         // Create Pointer and Connect Query Object to Database.
-        query_ptr qry(new SQLW::Query(m_database));
+        query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
         if(!qry || !qry->isConnected())
         {
@@ -163,7 +163,7 @@ public:
         }
 
         // Create Pointer and Connect Query Object to Database.
-        query_ptr qry(new SQLW::Query(m_database));
+        query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
         if(!qry || !qry->isConnected())
         {
@@ -200,7 +200,7 @@ public:
         }
 
         // Create Pointer and Connect Query Object to Database.
-        query_ptr qry(new SQLW::Query(m_database));
+        query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
         if(!qry || !qry->isConnected())
         {
@@ -355,7 +355,7 @@ public:
         }
 
         // Create Pointer and Connect Query Object to Database.
-        query_ptr qry(new SQLW::Query(m_database));
+        query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
         if(!qry || !qry->isConnected())
         {
@@ -392,7 +392,7 @@ public:
         }
 
         // Create Pointer and Connect Query Object to Database.
-        query_ptr qry(new SQLW::Query(m_database));
+        query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
         if(!qry || !qry->isConnected())
         {
@@ -434,7 +434,7 @@ public:
         }
 
         // Create Pointer and Connect Query Object to Database.
-        query_ptr qry(new SQLW::Query(m_database));
+        query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
         if(!qry || !qry->isConnected())
         {
@@ -462,7 +462,7 @@ public:
      */
     std::shared_ptr<T> baseGetRecordById(long id)
     {
-        std::shared_ptr<T> obj(new T);
+        std::shared_ptr<T> obj = std::make_shared<T>();
 
         // Make Sure Database Reference is Connected
         if(!m_database.isConnected())
@@ -472,7 +472,7 @@ public:
         }
 
         // Create Pointer and Connect Query Object to Database.
-        query_ptr qry(new SQLW::Query(m_database));
+        query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
         if(!qry->isConnected())
         {
@@ -514,7 +514,7 @@ public:
      */
     std::vector< std::shared_ptr<T> > baseGetAllRecords()
     {
-        std::shared_ptr<T> obj(new T);
+        std::shared_ptr<T> obj = std::make_shared<T>();
         std::vector<std::shared_ptr<T>> list;
 
         // Make Sure Database Reference is Connected
@@ -525,7 +525,7 @@ public:
         }
 
         // Create Pointer and Connect Query Object to Database.
-        query_ptr qry(new SQLW::Query(m_database));
+       query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
         if(!qry->isConnected())
         {
@@ -547,7 +547,8 @@ public:
             {
                 while(qry->fetchRow())
                 {
-                    obj.reset(new T);
+                    obj.reset();
+                    obj = std::make_shared<T>();
                     basePullResult(qry, obj);
                     list.push_back(obj);
                 }
@@ -571,7 +572,7 @@ public:
      */
     long baseGetRecordsCount()
     {
-        std::shared_ptr<T> obj(new T);
+        std::shared_ptr<T> obj = std::make_shared<T>();
         std::vector<std::shared_ptr<T>> list;
 
         // Make Sure Database Reference is Connected
@@ -582,7 +583,7 @@ public:
         }
 
         // Create Pointer and Connect Query Object to Database.
-        query_ptr qry(new SQLW::Query(m_database));
+       query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
         if(!qry->isConnected())
         {
@@ -604,7 +605,8 @@ public:
             {
                 while(qry->fetchRow())
                 {
-                    obj.reset(new T);
+                    obj.reset();
+                    obj = std::make_shared<T>();
                     basePullResult(qry, obj);
                     list.push_back(obj);
                 }

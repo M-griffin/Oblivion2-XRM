@@ -204,7 +204,7 @@ std::string OnelinerDao::updateOnelinerQryString(std::string qry, oneliner_ptr o
  */
 std::vector<oneliner_ptr> OnelinerDao::getAllOnelinersByUserId(long userId)
 {
-    oneliner_ptr obj(new Oneliners);
+    oneliner_ptr obj = std::make_shared<Oneliners>();
     std::vector<oneliner_ptr> list;
 
     // Make Sure Database Reference is Connected
@@ -215,7 +215,7 @@ std::vector<oneliner_ptr> OnelinerDao::getAllOnelinersByUserId(long userId)
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_database));
+    query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
     if(!qry->isConnected())
     {
@@ -237,7 +237,8 @@ std::vector<oneliner_ptr> OnelinerDao::getAllOnelinersByUserId(long userId)
         {
             while(qry->fetchRow())
             {
-                obj.reset(new Oneliners);
+                obj.reset();
+                obj = std::make_shared<Oneliners>();
                 pullOnelinerResult(qry, obj);
                 list.push_back(obj);
             }
