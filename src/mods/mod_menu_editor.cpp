@@ -22,8 +22,8 @@
 ModMenuEditor::ModMenuEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
         common_io_ptr common_io, session_io_ptr session_io)
     : ModBase(session_data, config, ansi_process,"mod_menu_editor.yaml", common_io, session_io)
-    , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
-    , m_directory(new Directory())
+    , m_text_prompts_dao(nullptr)
+    , m_directory(nullptr)
     , m_mod_setup_index(MOD_DISPLAY_MENU)
     , m_mod_function_index(MOD_MENU_INPUT)
     , m_mod_menu_state_index(MENU_ADD)
@@ -36,6 +36,10 @@ ModMenuEditor::ModMenuEditor(session_ptr session_data, config_ptr config, proces
     , m_current_option(0)
     , m_current_field(0)
 {
+    // Setup Smart Pointers
+    m_text_prompts_dao = std::make_shared<TextPromptsDao>(GLOBAL_DATA_PATH, m_filename);
+    m_directory = std::make_shared<Directory>();
+    
     // Setup Modules
     m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuEditor, this));
     m_setup_functions.push_back(std::bind(&ModMenuEditor::setupMenuOptionEditor, this));
@@ -1514,7 +1518,7 @@ void ModMenuEditor::handleMenuOptionInputState(bool does_option_exist, int optio
 void ModMenuEditor::createNewMenu(const std::string &menu_name)
 {
     // Pre-Load Menu, check access, if not valued, then fall back to previous.
-    menu_ptr new_menu(new Menu());
+    menu_ptr new_menu = std::make_shared<Menu>();
 
     // Add a default menu option command to the menu
     std::vector<MenuOption> new_menu_options;
@@ -1635,7 +1639,7 @@ void ModMenuEditor::reorderMenuIndexesDeletion(unsigned int option_index)
 void ModMenuEditor::deleteExistingMenu(const std::string &menu_name)
 {
     // Pre-Load Menu, check access, if not valued, then fall back to previous.
-    menu_ptr new_menu(new Menu());
+    menu_ptr new_menu = std::make_shared<Menu>();
 
     // Call MenuDao to save .yaml menu file
     MenuDao mnu(new_menu, menu_name, GLOBAL_MENU_PATH);
@@ -1653,7 +1657,7 @@ void ModMenuEditor::deleteExistingMenu(const std::string &menu_name)
 void ModMenuEditor::copyExistingMenu(const std::string &menu_name)
 {
     // Pre-Load Menu, check access, if not valued, then fall back to previous.
-    menu_ptr new_menu(new Menu());
+    menu_ptr new_menu = std::make_shared<Menu>();
 
     // First load the Source Menu [m_current_menu] file name
     MenuDao mnu_source(new_menu, m_current_menu, GLOBAL_MENU_PATH);
@@ -1738,7 +1742,7 @@ void ModMenuEditor::saveMenuChanges()
  */
 bool ModMenuEditor::checkMenuExists(std::string menu_name)
 {
-    directory_ptr directory(new Directory());
+    directory_ptr directory = std::make_shared<Directory>();
     std::vector<std::string> result_set = directory->getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
 
     // Append the extension to match the directory files.
@@ -1790,7 +1794,7 @@ bool ModMenuEditor::checkMenuOptionExists(unsigned int option_index)
  */
 std::string ModMenuEditor::displayMenuList()
 {
-    directory_ptr directory(new Directory());
+    directory_ptr directory = std::make_shared<Directory>();
     std::vector<std::string> result_set = directory->getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
 
     // check result set, if no menu then return gracefully.
@@ -2050,7 +2054,7 @@ std::string ModMenuEditor::displayMenuOptionList()
 std::string ModMenuEditor::displayMenuEditScreen()
 {
     // Create Menu Pointer then load the menu into it.
-    menu_ptr current_menu(new Menu());
+    menu_ptr current_menu = std::make_shared<Menu>();
 
     if(m_loaded_menu.size() == 0)
     {
@@ -2156,7 +2160,7 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
  */
 void ModMenuEditor::displayGenericMenu()
 {
-    menu_base_ptr menu(new MenuBase(m_session_data));
+    menu_base_ptr menu = std::make_shared<MenuBase>(m_session_data);
     menu->importMenu(m_loaded_menu.back());
 
     std::string generic_screen = menu->processGenericScreens();

@@ -16,7 +16,7 @@
   "parentProject": ""
  }, {
   "name": "Release",
-  "enabled": false,
+  "enabled": true,
   "buildDirectory": "build",
   "sourceDirectory": "$(ProjectPath)",
   "generator": "",
@@ -185,11 +185,11 @@
         <IncludePath Value="../src"/>
         <IncludePath Value="../sqlitewrap"/>
         <IncludePath Value="../linux/Debug"/>
-        <IncludePath Value="/usr/include/unittest++"/>
-        <IncludePath Value="/usr/include/UnitTest++"/>
         <IncludePath Value="../src/sdl2_net"/>
         <IncludePath Value="../src/utf-cpp"/>
         <IncludePath Value="../src/utf8"/>
+        <IncludePath Value="/usr/include/unittest++"/>
+        <IncludePath Value="/usr/include/UnitTest++"/>
         <Preprocessor Value="WITHOUT_SDL"/>
         <Preprocessor Value="UNIT_TEST"/>
       </Compiler>
@@ -261,7 +261,6 @@
       </Compiler>
       <Linker Options="-O2" Required="yes">
         <LibraryPath Value="."/>
-        <LibraryPath Value="$(UNIT_TEST_PP_SRC_DIR)/Release"/>
         <LibraryPath Value="../linux/Release"/>
         <LibraryPath Value="../sqlitewrap"/>
         <LibraryPath Value="../src"/>

@@ -203,7 +203,7 @@ std::string ConferenceDao::updateConferenceQryString(std::string qry, conference
 std::vector<conference_ptr> ConferenceDao::getAllConferencesByType(std::string type)
 {
     Logging &log = Logging::getInstance();
-    conference_ptr conf(new Conference);
+    conference_ptr conf = std::make_shared<Conference>();
     std::vector<conference_ptr> list;
 
     // Make Sure Database Reference is Connected
@@ -214,7 +214,7 @@ std::vector<conference_ptr> ConferenceDao::getAllConferencesByType(std::string t
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_database));
+   query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
     if(!qry->isConnected())
     {
@@ -237,7 +237,8 @@ std::vector<conference_ptr> ConferenceDao::getAllConferencesByType(std::string t
         {
             while(qry->fetchRow())
             {
-                conf.reset(new Conference);
+                conf.reset();
+                conf = std::make_shared<Conference>();
                 pullConferenceResult(qry, conf);
                 list.push_back(conf);
             }
@@ -263,7 +264,7 @@ std::vector<conference_ptr> ConferenceDao::getAllConferencesByType(std::string t
 long ConferenceDao::getConferencesCountByType(std::string type)
 {
     Logging &log = Logging::getInstance();
-    conference_ptr conf(new Conference);
+    conference_ptr conf = std::make_shared<Conference>();
     std::vector<conference_ptr> list;
 
     // Make Sure Database Reference is Connected
@@ -274,7 +275,7 @@ long ConferenceDao::getConferencesCountByType(std::string type)
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_database));
+   query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
     if(!qry->isConnected())
     {
@@ -296,7 +297,8 @@ long ConferenceDao::getConferencesCountByType(std::string type)
         {
             while(qry->fetchRow())
             {
-                conf.reset(new Conference);
+                conf.reset();
+                conf = std::make_shared<Conference>();
                 pullConferenceResult(qry, conf);
                 list.push_back(conf);
             }

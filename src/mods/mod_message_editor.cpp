@@ -18,7 +18,7 @@
 ModMessageEditor::ModMessageEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
         common_io_ptr common_io, session_io_ptr session_io)
     : ModBase(session_data, config, ansi_process,"mod_message_editor.yaml", common_io, session_io)
-    , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
+    , m_text_prompts_dao(nullptr)
     , m_text_process(nullptr)
     , m_mod_function_index(MOD_PROMPT)
     , m_mod_setup_index(MOD_DISPLAY_EDITOR)
@@ -35,6 +35,9 @@ ModMessageEditor::ModMessageEditor(session_ptr session_data, config_ptr config, 
     , m_text_box_width(0)
 
 {
+    // Setup Smart Pointers
+    m_text_prompts_dao = std::make_shared<TextPromptsDao>(GLOBAL_DATA_PATH, m_filename);
+    
     // Push function pointers to the stack.
     m_setup_functions.push_back(std::bind(&ModMessageEditor::setupEditor, this));
     m_mod_functions.push_back(std::bind(&ModMessageEditor::editorInput, this, std::placeholders::_1));
@@ -84,7 +87,6 @@ bool ModMessageEditor::onEnter()
 {
     m_is_active = true;
 
-    // Grab ANSI Screen, display, if desired.. logon.ans maybe?
     std::string prompt = "\x1b[?25h"; // Turn on Cursor.
     baseProcessAndDeliver(prompt);
 
@@ -358,10 +360,9 @@ void ModMessageEditor::setupEditor()
     std::string bot_template = m_common_io->readinAnsi("FSEEND.ANS");
 
     // Use a Local Ansi Parser for Parsing Menu Templates and determine boundaries.
-    processor_ansi_ptr ansi_process(new ProcessorAnsi(
+    processor_ansi_ptr ansi_process = std::make_shared<ProcessorAnsi>(
                                         m_session_data->m_telnet_decoder->getTermRows(),
-                                        m_session_data->m_telnet_decoder->getTermCols())
-                                   );
+                                        m_session_data->m_telnet_decoder->getTermCols());
 
     // Parse the TOP Screen to get Top Text Margin
     std::string top_screen = processTopTemplate(ansi_process, top_template);
@@ -386,7 +387,7 @@ void ModMessageEditor::setupEditor()
 
 
     m_log.write<Logging::DEBUG_LOG>("m_text_process - height=", m_text_box_height, "width=", m_text_box_width);
-    m_text_process.reset(new ProcessorText(m_text_box_height, m_text_box_width));
+    m_text_process = std::make_shared<ProcessorText>(m_text_box_height, m_text_box_width);
 
     // Next combine and output.. Move cursor to top left in box.
     std::string screen_output = top_screen + mid_screen + bot_screen;

@@ -1,5 +1,17 @@
+Change Log Update (00.00.153)
+* 2023-12-24
++ Reworking more Smart Pointers, make sure everything has proper reference counting, remove constants and replace new with make_shared().
++ Rework DeadlineTimer to use the IO Service for monitoring and function callbacks.
+- Found issues with threads eating memory and not freeing properly, so removed all thread spawns for the time being, most were on timers.
+
+Change Log Update (00.00.152)
+* 2023-11-23
++ Reworking Smart Pointers removing all New references where possible, and 
+  Also making sure all destructors are setup properly, espeically when they 
+  are virtual classes, should have virtual destructors to match.
+
 Change Log Update (00.00.151)
-* 3023-06-15 -> 2023-10-07
+* 2023-06-15 -> 2023-10-07
 + Revision 2 Rework consists of a break down and rewrite of the core system to resolve system and deallocation issues.
 + Updated Telnet Responses to only reply one to avoid loops
 + Fix for ANSI detections, if it contains, then default to CP437, Set max rows/cols to 100, and undetected

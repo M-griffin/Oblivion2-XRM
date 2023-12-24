@@ -31,7 +31,7 @@ class Interface
 public:
 
     /**
-     * @brief Create IO_Service Worker Thread for AsyncIO
+     * @brief Create IO_Service Worker Thread for AsyncIO (Temp Commented Out!)
      * @return
      */
     std::thread create_thread()
@@ -49,11 +49,16 @@ public:
     Interface(IOService &io_service, const std::string &protocol, const int &port)
         : m_log(Logging::getInstance())
         , m_io_service(io_service)
-        , m_session_manager(new SessionManager())
-        , m_socket_acceptor(new SocketHandler())
-        , m_async_listener(new AsyncAcceptor(io_service, m_socket_acceptor))
+        , m_session_manager(nullptr)
+        , m_socket_acceptor(nullptr)
+        , m_async_listener(nullptr)
         , m_protocol(protocol)
     {
+        // Setup Shared Pointers
+        m_session_manager = std::make_shared<SessionManager>();
+        m_socket_acceptor = std::make_shared<SocketHandler>();
+        m_async_listener  = std::make_shared<AsyncAcceptor>(io_service, m_socket_acceptor);        
+        
         // Startup SDL NET. Custom version Tweaked for KEEP Alive's
         if(SDLNet_Init() == -1)
         {
@@ -66,7 +71,8 @@ public:
 
         // Start up worker thread of ASIO. We want socket communications in a separate thread.
         // We only spawn a single thread for IO_Service on start up
-        m_thread = create_thread();
+ //       std::thread my_thread = create_thread();
+//        my_thread.detach();
 
         // Setup Telnet Server Connection Listener.
         if(!m_socket_acceptor->createTelnetAcceptor("127.0.0.1", port))
@@ -77,13 +83,16 @@ public:
 
         m_log.write<Logging::CONSOLE_LOG>("Telnet Server Waiting for Connection.");
         waitingForConnection();
+        
+        // run the Service Loop.
+        m_io_service.run();
     }
 
     ~Interface()
     {
         m_log.write<Logging::DEBUG_LOG>("~Interface()");
         m_io_service.stop();
-        m_thread.join();
+        //m_thread.join();  // Not good pratice in destructor.
         
         // Clear Smart Pointers, We Should be good here but cleaner is better.
         m_session_manager.reset();
@@ -122,11 +131,11 @@ private:
      * @param new_connection
      * @param error
      */
-    void handle_accept(const std::error_code& error, const socket_handler_ptr &socket_handler)
+    void handle_accept(const std::error_code& error, socket_handler_ptr socket_handler)
     {
         if(!error)
         {
-            async_io_ptr async_conn(new AsyncIO(m_io_service, socket_handler));                        
+            async_io_ptr async_conn = std::make_shared<AsyncIO>(m_io_service, socket_handler);
             m_log.write<Logging::DEBUG_LOG>("Handle-Accept Create New Session");
 
             // Create the new Session
@@ -155,7 +164,7 @@ private:
     socket_handler_ptr   m_socket_acceptor;
     acceptor_ptr         m_async_listener;
     std::string          m_protocol;
-    std::thread          m_thread;
+    //std::thread          m_thread;
 
 };
 

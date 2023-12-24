@@ -260,7 +260,7 @@ std::string AccessLevelDao::updateAccessLevelQryString(std::string qry, access_l
 access_level_ptr AccessLevelDao::getAccessLevelByLevel(long access_level)
 {
     Logging &log = Logging::getInstance();
-    access_level_ptr level(new AccessLevel);
+    access_level_ptr level = std::make_shared<AccessLevel>();
 
     // Make Sure Database Reference is Connected
     if(!m_database.isConnected())
@@ -270,7 +270,7 @@ access_level_ptr AccessLevelDao::getAccessLevelByLevel(long access_level)
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry(new SQLW::Query(m_database));
+    query_ptr qry = std::make_shared<SQLW::Query>(m_database);
 
     if(!qry->isConnected())
     {

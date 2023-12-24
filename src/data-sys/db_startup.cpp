@@ -154,7 +154,7 @@ bool DbStartup::initDatabaseTables()
             log.write<Logging::CONSOLE_LOG>("access_level table created successfully.");
 
             // Check and Setup default Access Levels.
-            access_level_ptr level(new AccessLevel());
+            access_level_ptr level = std::make_shared<AccessLevel>();
 
             // Set Initial Defaults for Not Validated Level
             // the reest are populated on Class Defaults.
@@ -167,7 +167,8 @@ bool DbStartup::initDatabaseTables()
             access_dao.insertRecord(level);
 
             // Validated User
-            level.reset(new AccessLevel());
+            level.reset();
+            level = std::make_shared<AccessLevel>();
             level->sName = "Validated User";
             level->sStartMenu ="top";
             level->iLevel = 20;
@@ -177,7 +178,8 @@ bool DbStartup::initDatabaseTables()
             access_dao.insertRecord(level);
 
             // Administrator (time Limit false by default)
-            level.reset(new AccessLevel());
+            level.reset();
+            level = std::make_shared<AccessLevel>();
             level->sName = "Sysop";
             level->sStartMenu ="top";
             level->iLevel = 255;
@@ -187,7 +189,7 @@ bool DbStartup::initDatabaseTables()
         }
 
 
-        protocols_ptr prots(new Protocols());
+        protocols_ptr prots = std::make_shared<Protocols>();
         ProtocolDao protdb(prots, GLOBAL_DATA_PATH);
 
         if(!protdb.fileExists())
@@ -228,7 +230,7 @@ bool DbStartup::initDatabaseTables()
 
             // Insert a default record the first time the table
             // is created only.
-            oneliner_ptr one(new Oneliners());
+            oneliner_ptr one = std::make_shared<Oneliners>();
             one->iUserId = 1;
             one->sText = "Welcome to a new system running Oblivion/2 XRM";
             one->sUserInitials = "MF";

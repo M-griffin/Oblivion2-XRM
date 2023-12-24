@@ -26,11 +26,14 @@
 ModLogon::ModLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, 
         common_io_ptr common_io, session_io_ptr session_io)
     : ModBase(session_data, config, ansi_process, "mod_logon.yaml", common_io, session_io)
-    , m_text_prompts_dao(new TextPromptsDao(GLOBAL_DATA_PATH, m_filename))
+    , m_text_prompts_dao(nullptr)
     , m_mod_function_index(MOD_LOGON)
     , m_failure_attempts(0)
     , m_is_text_prompt_exist(false)
 {
+    // Setup Smart Pointers
+    m_text_prompts_dao = std::make_shared<TextPromptsDao>(GLOBAL_DATA_PATH, m_filename);
+    
     // Push function pointers to the stack.
     m_setup_functions.push_back(std::bind(&ModLogon::setupLogon, this));
     m_setup_functions.push_back(std::bind(&ModLogon::setupPassword, this));
@@ -261,7 +264,7 @@ void ModLogon::setupPasswordChange()
 bool ModLogon::checkUserLogon(const std::string &input)
 {
     // Check for user name and if is already exists!
-    users_dao_ptr user_data(new UsersDao(m_session_data->m_user_database));
+    users_dao_ptr user_data = std::make_shared<UsersDao>(m_session_data->m_user_database);
 
     // Check if a Digit, if so, lookup by userId.
     if(m_common_io->isDigit(input))
@@ -397,7 +400,7 @@ bool ModLogon::validate_password(const std::string &input)
 
     // First load the secure record for the existing user.
     // Link to security dao for data access object
-    security_dao_ptr security_dao(new SecurityDao(m_session_data->m_user_database));
+    security_dao_ptr security_dao = std::make_shared<SecurityDao>(m_session_data->m_user_database);
 
     // Lookup the security table for existing hash.
     security_ptr security = security_dao->getRecordById(m_logon_user->iSecurityIndex);
@@ -409,7 +412,7 @@ bool ModLogon::validate_password(const std::string &input)
     }
 
     // Generate Encrypted password from incoming string.
-    encrypt_ptr encryption(new Encrypt());
+    encrypt_ptr encryption = std::make_shared<Encrypt>();
 
     if(!encryption)
     {
