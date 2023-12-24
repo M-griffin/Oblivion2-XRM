@@ -188,6 +188,15 @@ std::string ModMessageEditor::getDisplayPrompt(const std::string &prompt)
  * @brief Pull and parse and return Display Prompts for use in interfaces
  * @param prompt
  */
+std::string ModMessageEditor::getDisplayPromptAnsi(const std::string &prompt)
+{
+    return baseGetDisplayPromptPipeToAnsi(prompt, m_text_prompts_dao);
+}
+
+/**
+ * @brief Pull and parse and return Display Prompts for use in interfaces
+ * @param prompt
+ */
 std::string ModMessageEditor::getDisplayPromptRaw(const std::string &prompt)
 {
     return baseGetDisplayPromptRaw(prompt, m_text_prompts_dao);
@@ -239,6 +248,7 @@ std::string ModMessageEditor::processTopTemplate(processor_ansi_ptr ansi_process
         }
     }
 
+    // For accuiracy should be used in this sequence
     ansi_process->clearScreen();
     ansi_process->parseTextToBuffer((char *)new_screen.c_str());
     m_text_box_top = ansi_process->getMaxRowsUsedOnScreen() + 1;
@@ -255,6 +265,8 @@ std::string ModMessageEditor::processTopTemplate(processor_ansi_ptr ansi_process
 std::string ModMessageEditor::processBottomTemplate(processor_ansi_ptr ansi_process, const std::string &screen)
 {
     std::string new_screen = screen;
+    
+     // For accuiracy should be used in this sequence
     ansi_process->clearScreen();
     ansi_process->parseTextToBuffer((char *)new_screen.c_str());
     int rows_used = ansi_process->getMaxRowsUsedOnScreen();
@@ -393,7 +405,7 @@ void ModMessageEditor::setupEditor()
     std::string screen_output = top_screen + mid_screen + bot_screen;
     screen_output += "\x1b[" + std::to_string(m_text_box_top) + ";" + std::to_string(m_text_box_left) + "H";
 
-    screen_output += getDisplayPromptRaw(DEFAULT_TEXT_COLORS);
+    screen_output += getDisplayPromptAnsi(DEFAULT_TEXT_COLORS);
     baseProcessDeliverInput(screen_output);
 }
 
@@ -502,8 +514,8 @@ void ModMessageEditor::handleBackSpace(std::string &output)
     int x_position = m_text_process->getXPosition();    
     m_log.write<Logging::DEBUG_LOG>("handleBackSpace max_chars=", m_text_process->getMaxCharactersPerLine(), "x_pos=", x_position);
 
-    std::string default_text_color = getDisplayPromptRaw(DEFAULT_TEXT_COLORS);
-    std::string backspace_color = getDisplayPromptRaw(BACKSPACE_TEXT_COLORS);
+    std::string default_text_color = getDisplayPromptAnsi(DEFAULT_TEXT_COLORS);
+    std::string backspace_color = getDisplayPromptAnsi(BACKSPACE_TEXT_COLORS);
 
     // destructive backspace OR Move Up a Line Backspace.
     if(x_position > 1)
@@ -538,8 +550,8 @@ void ModMessageEditor::handleDelete(std::string &output)
     
     m_log.write<Logging::DEBUG_LOG>("handleDelete max_chars=", m_text_process->getMaxCharactersPerLine(), "x_pos=", x_position);
 
-    std::string default_text_color = getDisplayPromptRaw(DEFAULT_TEXT_COLORS);
-    std::string backspace_color = getDisplayPromptRaw(BACKSPACE_TEXT_COLORS);
+    std::string default_text_color = getDisplayPromptAnsi(DEFAULT_TEXT_COLORS);
+    std::string backspace_color = getDisplayPromptAnsi(BACKSPACE_TEXT_COLORS);
 
     // destructive backspace OR Move Up a Line Backspace.
     if(x_position > 1)
@@ -630,12 +642,11 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
 
     }
     
+    // Debugging
     std::cout << "=========w max " << m_text_box_width << ", lft " << m_text_box_left << std::endl;
     std::cout << "=========h max " << m_text_box_height << ", top " << m_text_box_top << std::endl;
-
     std::cout << "x_pos: " << m_text_process->getXPosition() << std::endl;
-    std::cout << "y_pos: " << m_text_process->getYPosition() << std::endl;
-     
+    std::cout << "y_pos: " << m_text_process->getYPosition() << std::endl;    
     std::cout << "getCurrentLine: " << m_text_process->getCurrentLine() << std::endl;
     
     std::map<int, int> line_ending_map = m_text_process->getLineEndingMap();
@@ -653,8 +664,8 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
     // Then clear the char in the spot we just occipied.
     if (m_text_process->isDoubleBackSpace()) {
         
-        std::string default_text_color = getDisplayPromptRaw(DEFAULT_TEXT_COLORS);
-        std::string backspace_color = getDisplayPromptRaw(BACKSPACE_TEXT_COLORS);
+        std::string default_text_color = getDisplayPromptAnsi(DEFAULT_TEXT_COLORS);
+        std::string backspace_color = getDisplayPromptAnsi(BACKSPACE_TEXT_COLORS);
     
         m_log.write<Logging::DEBUG_LOG>("isDoubleBackSpace max_chars=", m_text_process->getMaxCharactersPerLine());
         
@@ -662,7 +673,9 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
         {
             output += backspace_color + " \x1b[D" + default_text_color; // clear the current position
             // TODO Probably need to clear buffer at this spot to for current position.
-        }        
+        }
+        
+        // Turn it off for next iteration.
         m_text_process->setDoubleBackSpace(false);
     }
     
@@ -682,12 +695,11 @@ void ModMessageEditor::processEscapedInput(std::string result, std::string input
     int x_position = m_text_process->getXPosition();
     int y_position = m_text_process->getYPosition();
     
+    // Debugging
     std::cout << "=========w max " << m_text_box_width << " " << m_text_box_left << std::endl;
-    std::cout << "=========h max " << m_text_box_height << " " << m_text_box_top << std::endl;
-    
+    std::cout << "=========h max " << m_text_box_height << " " << m_text_box_top << std::endl;    
     std::cout << "x_pos: " << x_position << std::endl;
     std::cout << "y_pos: " << y_position << std::endl;
-
     std::cout << "processedEscapedInput result= " << result << ", input= " << input << std::endl;
 
     if(result == "rt_arrow")

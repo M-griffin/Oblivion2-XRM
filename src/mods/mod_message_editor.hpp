@@ -121,6 +121,12 @@ public:
      * @param prompt
      */
     std::string getDisplayPromptRaw(const std::string &prompt);
+    
+    /**
+    * @brief Pull and parse and return Display Prompts for use in interfaces
+    * @param prompt
+    */
+    std::string getDisplayPromptAnsi(const std::string &prompt);
 
     /**
      * @brief Pull and Display Prompts with MCI Code

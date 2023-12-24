@@ -182,6 +182,12 @@ public:
      * @param prompt
      */
     std::string baseGetDisplayPromptRaw(const std::string &prompt, text_prompts_dao_ptr m_text_dao);
+    
+    /**
+     * @brief Pull and Return Raw Display Prompts Parse Pipe Codes to ANSI
+     * @param prompt
+     */
+    std::string baseGetDisplayPromptPipeToAnsi(const std::string &prompt, text_prompts_dao_ptr m_text_dao);
 
     /**
      * @brief Pull and Display Prompts, Replace MCI Code |OT
