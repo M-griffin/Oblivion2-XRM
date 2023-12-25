@@ -184,6 +184,11 @@ public:
     void editorInput(const std::string &input);
 
     /**
+     * @brief Method to Output the X/Y Postions after keys are hit in the Editor.
+     */
+    void displayTextBoxCoordinates();
+
+    /**
      * @brief Move to the Cursor to the Buffer Position
      */
     std::string moveCursorToPosition();

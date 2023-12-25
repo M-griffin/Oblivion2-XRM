@@ -407,7 +407,10 @@ void ModMessageEditor::setupEditor()
 
     screen_output += getDisplayPromptAnsi(DEFAULT_TEXT_COLORS);
     baseProcessDeliverInput(screen_output);
-}
+    
+    // TODO Testing
+    displayTextBoxCoordinates();
+}   
 
 /**
  * @brief General Input for Editor
@@ -462,6 +465,9 @@ void ModMessageEditor::editorInput(const std::string &input)
 
             // Hot Key Input, cutoff leading escape for control key.
             processEscapedInput(result.substr(1), input);
+            
+            // TODO Testing
+            displayTextBoxCoordinates();
             return;
         }
 
@@ -470,9 +476,32 @@ void ModMessageEditor::editorInput(const std::string &input)
 
         processTextInput(result, input);
     }
-
+    
+    // TODO Testing
+    displayTextBoxCoordinates(); 
     return;
 }
+
+/**
+ * @brief Method to Output the X/Y Postions after keys are hit in the Editor.
+ */
+void ModMessageEditor::displayTextBoxCoordinates() 
+{
+    std::string output = "";
+    // SAve, then move to Specific Footer/Header Position (Temp Hard Code for Testing, then make MCI Codes for Positions.)
+    output += "\x1b[s\x1b[";
+    output += std::to_string(24) + ";";
+    output += std::to_string(5) + "H";
+
+    // Output Coords, then restore Position.
+    output += "Y=" + std::to_string(m_text_process->getYPosition()-1) + ", X=";
+    output += std::to_string(m_text_process->getXPosition()-1) + ", L=";
+    output += std::to_string(m_text_process->getCurrentLine());
+    output += "\x1b[u";
+    
+    baseProcessDeliverInput(output);
+}
+
 
 /**
  * @brief Move to the Cursor to the Buffer Position
