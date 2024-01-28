@@ -559,7 +559,9 @@ std::string CommonIO::rightPadding(const std::string &str, std::string::size_typ
     std::string new_string = str;
 
     if(space == 0)
-        return new_string;
+    {
+        return new_string;        
+    }
 
     // If empty, return padded with spaces!
     if(new_string.empty())
@@ -703,7 +705,7 @@ std::string CommonIO::maskString(const std::string &str)
 
     for(std::string::size_type i = 0; i < string_size; i++)
     {
-		// TODO Note, pull hidden input char from xrm_config.yaml here!
+        // TODO Note, pull hidden input char from xrm_config.yaml here!
         new_string.append("*");
     }
 

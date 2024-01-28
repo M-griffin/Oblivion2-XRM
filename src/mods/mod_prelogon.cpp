@@ -131,9 +131,9 @@ void ModPreLogon::createTextPrompts()
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
     
-    value[PROMPT_HUMAN_SHIELD]         = std::make_pair("Hit [ESC] twice to continue", "|CR<Human Shield>: Hit [ESC] twice within 8 seconds to continue!");
-    value[PROMPT_HUMAN_SHIELD_SUCCESS] = std::make_pair("ESC Detection Successful", "|CR<Human Shield>: Input Detected, Loading - 1 Moment");
-    value[PROMPT_HUMAN_SHIELD_FAIL]    = std::make_pair("No Human Detected", "|CR<Human Shield>: No Input Detected, Disconnecting...");
+    value[PROMPT_HUMAN_SHIELD]         = std::make_pair("Hit [ESC] twice to continue", "|CR|12<|04Human Shield|12>|08: |15Hit |08[|12ESC|08] |15twice within |124 |15seconds to continue!");
+    value[PROMPT_HUMAN_SHIELD_SUCCESS] = std::make_pair("ESC Detection Successful", "|CR |08- |15Input Detected|08, |15Loading |08- |151 Moment \x1b[0m");
+    value[PROMPT_HUMAN_SHIELD_FAIL]    = std::make_pair("No Human Detected", "|CR |08- |15No Input Detected|08, |15Disconnecting|08...  \x1b[0m");
 
     value[PROMPT_DETECT_EMULATION]     = std::make_pair("Detecting Emulation", "|09Detecting Emulation");
     value[PROMPT_DETECTED_ANSI]        = std::make_pair("Emulation Detected: Ansi ESC Supported", "|CR|15Emulation Detected: |03ANSI ESC Supported.");
@@ -670,7 +670,7 @@ void ModPreLogon::startHumanShieldTimer()
     //    std::bind(&ModPreLogon::handleHumanShieldTimer, shared_from_this())
     //);
     auto callback_function = std::bind(&ModPreLogon::handleHumanShieldTimer, shared_from_this());        
-    m_session_data->m_async_io->asyncWait(8000, callback_function);
+    m_session_data->m_async_io->asyncWait(4000, callback_function);
 }
 
 /**

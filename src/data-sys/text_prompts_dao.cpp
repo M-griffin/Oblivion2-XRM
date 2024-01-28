@@ -24,9 +24,9 @@ TextPromptsDao::TextPromptsDao(std::string path, const std::string &filename)
 
 TextPromptsDao::~TextPromptsDao()
 {
-    m_is_loaded = false;
-    m_node.reset();
-    m_text_prompts.clear();
+    m_is_loaded = false;    
+    m_text_prompts.clear();    
+    std::map<std::string, std::pair<std::string, std::string> >().swap(m_text_prompts);
 }
 
 /**
@@ -99,9 +99,11 @@ void TextPromptsDao::writeValue(M_TextPrompt &value)
 
     out << YAML::EndMap;
 
-    // Write out and save the file.
+    // Write out and save the file directly, using yaml's write() encodes UTF-8 automatically.
+    // This can Goof up ANSI Characters and Text Prompts in CP437.
     ofs << out.c_str();
     ofs.close();
+
 }
 
 /**
@@ -116,23 +118,18 @@ bool TextPromptsDao::readPrompts()
 
     // Load the file into the class.
     try
-    {
-        // Clear and Existing Nodes first before loading.
-        if(m_node.size() > 0)
-        {
-            m_node.reset();
-        }
-
+    {        
         // Load file fresh.
-        m_node = YAML::LoadFile(path);
+        YAML::Node node = YAML::LoadFile(path);
 
-        if(m_node.size() == 0)
+        if(node.size() == 0)
         {
             m_log.write<Logging::ERROR_LOG>("TextPromptsDao Node size == 0", path);
+            node.reset();
             return false;
         }
 
-        std::string file_version = m_node["file_version"].as<std::string>();
+        std::string file_version = node["file_version"].as<std::string>();
 
         // Validate File Version
         if(!is_version_displayed)
@@ -152,7 +149,8 @@ bool TextPromptsDao::readPrompts()
         // Testing pre-loading methods, expand this lateron for a glocal static cache instance.
         // These prompts don't change, no reason to keep reloading them for each class and session instance separately.
         // Not a priority, but groundwork is all set for this, they need a map by filename to keep separate files loaded.
-        // cacheAllTextPrompts();
+        cacheAllTextPrompts(node);
+        node.reset();
     }
     catch(std::exception &ex)
     {
@@ -172,36 +170,12 @@ M_StringPair TextPromptsDao::getPrompt(const std::string &lookup)
 {
     M_StringPair temp;
 
-    if(!m_is_loaded)
+    if(!m_is_loaded || (m_text_prompts.size() == 0))
     {
         return temp;
     }
-
-    // Keep Original Lookup if Cache is not populated
-    if (m_text_prompts.size() ==0)    
-    {
-        //std::cout << "Return Non-Cached Text Prompt" << std::endl;
-        std::string key = "";
-
-        for(YAML::const_iterator it = m_node.begin(); it != m_node.end(); ++it)
-        {
-            key = it->first.as<std::string>();
-
-            // Check key for selected prompt to pull
-            if(key.compare(lookup) == 0)
-            {
-                M_StringPair value = it->second.as<M_StringPair>();
-                return value;
-            }
-        }
-    }
-    else 
-    {
-        //std::cout << "Return Cached Text Prompt" << std::endl;
-        return m_text_prompts[lookup];
-    }
     
-    return temp;
+    return m_text_prompts[lookup];
 }
 
 /**
@@ -209,33 +183,31 @@ M_StringPair TextPromptsDao::getPrompt(const std::string &lookup)
  */
 void TextPromptsDao::displayAll()
 {
-    for(YAML::const_iterator it = m_node.begin(); it != m_node.end(); ++it)
-    {
-        std::string key = it->first.as<std::string>();
-        M_StringPair value = it->second.as<M_StringPair>();
+    
+    for(M_TextPrompt::const_iterator it = m_text_prompts.begin(); it != m_text_prompts.end(); ++it)
+    {            
+        std::string key = it->first;
+        M_StringPair value = it->second;
 
-        std::cout << key << " -> " << value.first << ", " << value.second << std::endl;
+        std::cout << "Cache: " << key << " -> " << key << ", " << value.first << ", " << value.second << std::endl;
     }
 }
 
 /**
  * @brief Testing, cahce all records to a map instad of reloading and searching.
  */
-void TextPromptsDao::cacheAllTextPrompts()
+void TextPromptsDao::cacheAllTextPrompts(YAML::Node &node)
 {
     try
     {
-        for(YAML::const_iterator it = m_node.begin(); it != m_node.end(); ++it)
+        for(YAML::const_iterator it = node.begin(); it != node.end(); ++it)
         {            
             // The first Entry on All Text Prompts is the File Version which doesn't have a key/Value Pair, and is just a string value.
             // Exclude This when pre-loading all propmpts.
             if (it->first.as<std::string>() != "file_version")
             {            
-                std::cout << "1. caching: -> " << it->first << ", " << it->second << std::endl; 
                 std::string key = it->first.as<std::string>();
                 M_StringPair value = it->second.as<M_StringPair>();
-
-                std::cout << "2. caching: " << key << " -> " << value.first << ", " << value.second << std::endl;
                 m_text_prompts[key] = value;
             }
         }        

@@ -15,6 +15,13 @@
 #include <vector>
 #include <memory>
 
+/*****
+ * Notes to Work on
+ * 1. Backspace is not removing or clearing from buffer yet.
+ * 2. current line scrolling back up never reaches 0 cause y does first..  
+ * 3. when max lines in reaches and exceeded, then allocate new line to box on the fly.
+ */
+
 ModMessageEditor::ModMessageEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
         common_io_ptr common_io, session_io_ptr session_io)
     : ModBase(session_data, config, ansi_process,"mod_message_editor.yaml", common_io, session_io)
@@ -24,15 +31,8 @@ ModMessageEditor::ModMessageEditor(session_ptr session_data, config_ptr config, 
     , m_mod_setup_index(MOD_DISPLAY_EDITOR)
     , m_mod_user_state_index(MOD_FSE_INPUT)
     , m_failure_attempts(0)
-    , m_is_text_prompt_exist(false)
-
-      // Later on default to 1, and screen width!!!
-    , m_text_box_top(0)
-    , m_text_box_bottom(24)
-    , m_text_box_left(0)
-    , m_text_box_right(80)
-    , m_text_box_height(0)
-    , m_text_box_width(0)
+    , m_is_text_prompt_exist(false)    
+    , m_screen_template("")
 
 {
     // Setup Smart Pointers
@@ -88,7 +88,8 @@ bool ModMessageEditor::onEnter()
     m_is_active = true;
 
     std::string prompt = "\x1b[?25h"; // Turn on Cursor.
-    baseProcessAndDeliver(prompt);
+    m_session_data->deliver(prompt, false);
+    //baseProcessAndDeliver(prompt);
 
     // Execute the initial setup index.
     m_setup_functions[m_mod_setup_index]();
@@ -386,7 +387,7 @@ void ModMessageEditor::setupEditor()
     // Only after Top and Bottom are calculated, this will generate the appropriate
     // Rows uses between top / bot templates on current screen size.
     std::string mid_screen = processMidTemplate(ansi_process, mid_template);
-
+    
     m_log.write<Logging::DEBUG_LOG>("m_text_box_top=", m_text_box_top, "m_text_box_bottom=", m_text_box_bottom,
                                     "m_text_box_left=", m_text_box_left, "m_text_box_right=", m_text_box_right);
 
@@ -396,21 +397,33 @@ void ModMessageEditor::setupEditor()
 
     // Adjust to minus 1 from bottom.
     m_text_box_height += 1;
-
+    
 
     m_log.write<Logging::DEBUG_LOG>("m_text_process - height=", m_text_box_height, "width=", m_text_box_width);
     m_text_process = std::make_shared<ProcessorText>(m_text_box_height, m_text_box_width);
 
     // Next combine and output.. Move cursor to top left in box.
-    std::string screen_output = top_screen + mid_screen + bot_screen;
-    screen_output += "\x1b[" + std::to_string(m_text_box_top) + ";" + std::to_string(m_text_box_left) + "H";
+    m_screen_template = top_screen + mid_screen + bot_screen;
+    m_screen_template += "\x1b[" + std::to_string(m_text_box_top) + ";" + std::to_string(m_text_box_left) + "H";
 
-    screen_output += getDisplayPromptAnsi(DEFAULT_TEXT_COLORS);
-    baseProcessDeliverInput(screen_output);
+    m_screen_template += getDisplayPromptAnsi(DEFAULT_TEXT_COLORS);
+    baseProcessDeliverInput(m_screen_template);
     
     // TODO Testing
     displayTextBoxCoordinates();
-}   
+}
+
+/**
+ * @brief Debugging, Redraw Editor then display Everything currently in the buffer. (TESTING!! ) could also be used for redrawing!  but have to add wrapping!
+ */
+void ModMessageEditor::displayTextBoxBuffer()
+{
+    // Refreshes and redraws templates with no message data.    
+    // Also pre-saves, then restores original cursor position on screen redraws
+    std::string message_text = "\x1b[s" + m_screen_template + m_text_process->getScreenFromBuffer(false, m_text_box_left) + "\x1b[u";
+        
+    baseProcessDeliverInput(message_text);
+}
 
 /**
  * @brief General Input for Editor
@@ -450,6 +463,9 @@ void ModMessageEditor::editorInput(const std::string &input)
         // Check Single ESC KEY - command options
         //input = "ESC";  - quit for now
         m_log.write<Logging::CONSOLE_LOG>("[editorInput] [ESC HIT!] input result=", result);
+        
+        // DEBUG TESTING, Display Buffer on ESC, Or Exit.
+        //displayTextBoxBuffer();
         m_is_active = false;
     }
     else
@@ -488,12 +504,12 @@ void ModMessageEditor::editorInput(const std::string &input)
 void ModMessageEditor::displayTextBoxCoordinates() 
 {
     std::string output = "";
-    // SAve, then move to Specific Footer/Header Position (Temp Hard Code for Testing, then make MCI Codes for Positions.)
+    // Save, then move to Specific Footer/Header Position (Temp Hard Code for Testing, then make MCI Codes for Positions.)
     output += "\x1b[s\x1b[";
     output += std::to_string(24) + ";";
     output += std::to_string(5) + "H";
 
-    // Output Coords, then restore Position.
+    // Output Coords, then restore Position. - reminder, this also has to do and handle color shifts back to original color.
     output += "Y=" + std::to_string(m_text_process->getYPosition()-1) + ", X=";
     output += std::to_string(m_text_process->getXPosition()-1) + ", L=";
     output += std::to_string(m_text_process->getCurrentLine());
@@ -595,7 +611,7 @@ void ModMessageEditor::handleDelete(std::string &output)
         // remove last character for cursor space.
         m_text_process->parseTextToBuffer((char *)"\b");
         
-        m_log.write<Logging::DEBUG_LOG>("handleBackSpaceAfter m_text_process->x_position=", 
+        m_log.write<Logging::DEBUG_LOG>("handleDelete m_text_process->x_position=", 
             m_text_process->getXPosition(), "x_pos=", x_position);
             
         if(m_text_process->getXPosition() == m_text_process->getMaxCharactersPerLine()) {
@@ -632,6 +648,7 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
 
     if(result[0] != '\x7f' && result[0] != '\x08' && result[0] != '\r' && result[0] != '\n') // && result[0] != '\x1b')
     {
+        std::cout << "parseTextToBuffer -> textprocessor()" << std::endl;
         m_text_process->parseTextToBuffer((char *)input.c_str());
         output = input;
     }
@@ -700,7 +717,7 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
         
         if (m_text_process->getMaxCharactersPerLine() == m_text_process->getXPosition()) 
         {
-            output += backspace_color + " \x1b[D" + default_text_color; // clear the current position
+            output += backspace_color + " \x1b[D" + default_text_color; // clear the current position (NOTE Change color to what was replace maybe?)
             // TODO Probably need to clear buffer at this spot to for current position.
         }
         

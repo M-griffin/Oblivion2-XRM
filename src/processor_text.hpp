@@ -29,10 +29,8 @@ public:
     int m_line_number;
     bool m_is_double_backspace;
 
-    virtual ~ProcessorText() 
-    {
-    }
-
+    virtual ~ProcessorText() override;
+    
     virtual std::string buildPullDownBars(int pulldown_id, bool active) override;
     virtual void clearPullDownBars() override;
 
@@ -42,6 +40,9 @@ public:
     virtual void screenBufferDisplayTest() override;
     virtual int getMCIOffSet(std::string mci_code) override;
     virtual std::string getScreenFromBuffer(bool clearScreen) override;
+    
+    // Override for Testing Mesasge Box Redraw!
+    std::string getScreenFromBuffer(bool clearScreen, int left_border);
 
 
     // Screen Buffer Modifiers

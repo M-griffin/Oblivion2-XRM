@@ -178,6 +178,11 @@ public:
     void setupEditor();
 
     /**
+     * @brief Debugging, Redraw Editor then display Everything currently in the buffer.
+     */
+    void displayTextBoxBuffer();
+
+    /**
      * @brief General Input for Message Editor
      * @return
      */
@@ -254,6 +259,9 @@ private:
     int                    m_text_box_right;
     int                    m_text_box_height;
     int                    m_text_box_width;
+    
+    // Holds Loaded Templates with starting text colors.
+    std::string            m_screen_template;
 
 };
 

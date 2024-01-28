@@ -35,3 +35,7 @@ detach:
 	nohup ./xrm-server &
 run-test:
 	./xrm-unittest
+
+tail:
+	tail -f nohup.out
+

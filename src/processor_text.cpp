@@ -31,8 +31,19 @@ ProcessorText::ProcessorText(int term_height, int term_width)
     , m_line_number(1)
     , m_is_double_backspace(false)
 { 
-    
+    m_log.write<Logging::DEBUG_LOG>("PROCESSOR_TEXT rows=", term_height, "cols=", term_width);
+    m_screen_buffer.reserve((m_number_lines * m_characters_per_line)+1);
+    m_screen_buffer.resize((m_number_lines * m_characters_per_line)+1);
 }
+
+ProcessorText::~ProcessorText()
+{ 
+    m_log.write<Logging::DEBUG_LOG>("~ProcessorText()");
+    std::vector <ScreenPixel>().swap(m_screen_buffer);
+    std::map<int, ScreenPixel>().swap(m_pull_down_options);
+    std::map<int, int>().swap(m_line_ending_map);
+}
+
 
 /**
  * @brief Buffer to String for Parsing
@@ -157,26 +168,35 @@ int ProcessorText::getMCIOffSet(std::string mci_code)
     return 0;
 }
 
+// placeholder
+std::string ProcessorText::getScreenFromBuffer(bool)
+{
+    return "";
+}
+
 /**
  * @brief Takes buffer and displays parsed sequences
  * NOTE, this can add a new line at the end of screen
  * Should exclude for BOTTOM Ansi Screens.
+ * 
+ * Also Manage Template Spacing on New Lines
  */
-std::string ProcessorText::getScreenFromBuffer(bool clearScreen)
+std::string ProcessorText::getScreenFromBuffer(bool clearScreen, int left_border)
 {
     int attr = 0;
     int fore = 0;
     int back = 0;
 
-    // We want to cound \0 characters in a row.
+    // We want to count \0 characters in a row.
     // These are unplotted so we use home cursor drawing
     // and ESC[C to push the cursor forward without overwritting
-    int padding = 0;
+    int padding_forward = 0;
 
     std::string ansi_output = "";
 
     if(clearScreen)
     {
+        // Adjust This for Top of Message Headers spacing possibly. 
         ansi_output.append("\x1b[1;1H\x1b[2J");
     }
 
@@ -184,14 +204,7 @@ std::string ProcessorText::getScreenFromBuffer(bool clearScreen)
 
     for(unsigned int i = 0; i < m_screen_buffer.size(); i++)
     {
-        auto &buff = m_screen_buffer[i];
-
-        // If buffer parse move past current cursor positon
-        if(count >= (m_x_position + (m_y_position * m_characters_per_line)))
-        {
-            break;
-        }
-
+        auto &buff = m_screen_buffer[i];        
         std::stringstream ss;
 
         if(attr !=  buff.attribute ||
@@ -203,7 +216,7 @@ std::string ProcessorText::getScreenFromBuffer(bool clearScreen)
                 << buff.foreground << ";"
                 << buff.background << "m";
 
-            if(padding == 0)
+            if(padding_forward == 0)
                 ansi_output.append(ss.str());
 
             attr = buff.attribute;
@@ -216,31 +229,38 @@ std::string ProcessorText::getScreenFromBuffer(bool clearScreen)
 
         // Options and skip null non plotted characters by
         // moving the drawing position forward.
-        if(padding > 0 && buff.char_sequence[0] != '\0')
+        if(padding_forward > 0 && buff.char_sequence[0] != '\0')
         {
-            ansi_output += "\x1b[" + std::to_string(padding) + "C";
+            ansi_output += "\x1b[" + std::to_string(padding_forward) + "C";
             // Get the Color change or first character after padding.
             ansi_output.append(ss.str());
-            padding = 0;
+            padding_forward = 0;
         }
 
-        if(padding > 0 && (i > 0 && i % m_characters_per_line == 0))
+        if(padding_forward > 0 && (i > 0 && i % m_characters_per_line == 0))
         {
-            ansi_output += "\x1b[" + std::to_string(padding) + "C";
+            ansi_output += "\x1b[" + std::to_string(padding_forward) + "C";
             ansi_output.append(ss.str());
-            padding = 0;
+            padding_forward = 0;
             ansi_output.append("\x1B[1D\r\n");
+            
+            // New Line // Move Past border on wraping.        
+            ansi_output += "\x1b[" + std::to_string(left_border-1) + "C";
+            
         }
         else if((i > 0 && i % m_characters_per_line == 0))
         {
             ansi_output.append("\x1B[1D\r\n");
+            
+            // New Line // Move Past border on wraping.            
+            ansi_output += "\x1b[" + std::to_string(left_border-1) + "C";
         }
 
         if(buff.char_sequence[0] == '\r')
         { } //  character = "\x1b[40m\r\n";
         else if(buff.char_sequence[0] == '\0')
         {
-            ++padding;
+            ++padding_forward;
             ++count;
             continue;
         }
@@ -252,8 +272,11 @@ std::string ProcessorText::getScreenFromBuffer(bool clearScreen)
         ++count;
     }
 
-    // Screen should always end with reset.
-    ansi_output.append("\x1b[0m");
+    // Screen should always end with reset. (Not In Message Buffer)
+    //ansi_output.append("\x1b[0m");
+    
+    std::cout << "Buffer: " << ansi_output << std::endl;
+    
     return ansi_output;
 }
 
@@ -486,6 +509,7 @@ void ProcessorText::handleTextInput(const std::string &char_sequence)
     }
 
     // Keep track of the lonest line in buffer for Centering screen.
+    // also for quick end key usage in jumping to end of a line.
     if(m_x_position > m_line_ending_map[m_line_number])
     {
         m_line_ending_map[m_line_number] = m_x_position;
@@ -559,9 +583,9 @@ void ProcessorText::screenBufferSetGlyph(const std::string &char_sequence)
     
     // FIXME So we need a Text buffer to store the pixel (character) info per each line
     // can we use the screen buffer, or do we want something else?
-    // YES, use screen bummer, fast vector of <pixel> 
+    // YES, use screen buffer, fast vector of <pixel> 
 
-    /*
+    
     // Setup current position in the screen buffer. 1 based for 0 based.
     m_position = ((m_y_position-1) * m_characters_per_line) + (m_x_position-1);
 
@@ -570,7 +594,12 @@ void ProcessorText::screenBufferSetGlyph(const std::string &char_sequence)
     {
         if(m_position < (signed)m_screen_buffer.size())
         {
-            m_screen_buffer.at(m_position) = m_screen_pixel;
+            // TODO Note, if M_POSITION >= m_screen_buffer.size() ,  then allocate more space!
+            std::cout << "screenBufferSetGlyph() - m_screen_buffer.size(): " << m_screen_buffer.size() << ", m_position: " << m_position << ", chr: " << char_sequence << std::endl;
+            m_screen_buffer.at(m_position) = screen_pixel;
+            
+            // TODO THis proves the buffer is populated, then losing data on ESC hit!
+            std::cout << "Screen Buffer RB: " << m_screen_buffer[m_position].char_sequence << ", current screen: " << screenBufferToString() << std::endl;
         }
         else
         {
@@ -584,16 +613,7 @@ void ProcessorText::screenBufferSetGlyph(const std::string &char_sequence)
         Logging &log = Logging::getInstance();
         log.write<Logging::ERROR_LOG>("[screenBufferSetGlyph] exceeds screen dimensions Exception=",
                                         e.what(), __LINE__, __FILE__);
-    }*/
-
-    // Clear for next sequences.
-    /*
-    m_screen_pixel.char_sequence = '\0';
-    m_screen_pixel.x_position = 1;
-    m_screen_pixel.y_position = 1;
-    m_screen_pixel.attribute  = 0;
-    m_screen_pixel.foreground = FG_WHITE;
-    m_screen_pixel.background = BG_BLACK;*/
+    }
 
 }
 
@@ -781,6 +801,21 @@ void ProcessorText::moveBackSpace()
     if(m_x_position > 1)
     {        
         --m_x_position;
+        
+        // Update and Clear Entry in Screen Buffer
+        std::cout << "Backspace on: " << m_screen_buffer[m_position].char_sequence << std::endl;
+        
+        // Reset Screen Pixel as current position
+        ScreenPixel screen_pixel;
+        m_screen_buffer.at(m_position) = screen_pixel;
+        std::cout << "Backspace after: " << m_screen_buffer[m_position].char_sequence << std::endl;
+        
+        // Reset the absolute position back one.
+        if (m_position > 0)
+        {
+            m_position -=1;            
+        }
+        
         return;
     }
 
@@ -790,6 +825,9 @@ void ProcessorText::moveBackSpace()
     {
         --m_y_position;
     }
+    
+    
+    // TODO,  NEED TO RESET M_POSITION ON UP-LINE then MVOING TO THE END.
 
     // Each line represents a line of text that can run off the screen
     // so the actual lines in the message buffer, storing line we are on.
@@ -836,8 +874,84 @@ void ProcessorText::moveBackSpace()
  */
 void ProcessorText::moveDelete()
 {
+    // TODO Started on Delete, just copied Backspace for reference!!
+    
+    
     std::cout << "ProcessorT moveDelete" << std::endl;
-    // clear current, or erase on on line so next char move back
+       
+    // Backspace or Delete, the entire lines loses a char.
+    if (m_line_ending_map[m_line_number] > 0) {
+        m_line_ending_map[m_line_number]--;
+    }
+
+    if(m_x_position > 1)
+    {        
+        --m_x_position;
+        
+        // Update and Clear Entry in Screen Buffer
+        std::cout << "Delete on: " << m_screen_buffer[m_position].char_sequence << std::endl;
+        
+        // Reset Screen Pixel as current position
+        ScreenPixel screen_pixel;
+        m_screen_buffer.at(m_position) = screen_pixel;
+        std::cout << "Delete after: " << m_screen_buffer[m_position].char_sequence << std::endl;
+        
+        // Reset the absolute position back one.
+        if (m_position > 0)
+        {
+            m_position -=1;            
+        }
+        
+        return;
+    }
+
+    // Else, Were as first positiong moving up to previous line
+    // If it's not the very top of the text area.
+    if(m_y_position > 1)
+    {
+        --m_y_position;
+    }
+    
+    
+    // TODO,  NEED TO RESET M_POSITION ON UP-LINE then MVOING TO THE END.
+
+    // Each line represents a line of text that can run off the screen
+    // so the actual lines in the message buffer, storing line we are on.
+    if(m_line_number > 1)
+    {                
+        // Reset the current line, we're at the fist spot moving up on Backspace.
+        m_line_ending_map[m_line_number] = 0;
+        if (m_line_ending_map[m_line_number] > 0) {
+            m_line_ending_map[m_line_number]--;
+        }
+        
+        // Setup for Previous Line, if we move up, move back 1 automatically.
+        --m_line_number;
+        
+        std::cout << "ProcessorT Delete (Move Line Up)" << "m_line_ending_map[m_line_number]="<< m_line_ending_map[m_line_number] << std::endl;        
+        
+        // We moved up a line, now we need to
+        // move to end of current line, as long as were not at top left of box.
+        moveEndPosition();
+        
+        std::cout << "ProcessorT Delete (Move Line Up)" << "moveEndPosition="<< m_x_position << std::endl;
+        
+        // Double Escape is when you're Backspace up and move to the end of the line
+        // There is 1 chat at the right edge, when we backspace in this instance
+        // we do a second one to remove that character then move left 1 spot to take
+        // it's position and not overwrite the templates.
+        
+        setDoubleBackSpace(true);
+    }
+    // Were on Top Line Now, just moved there.
+    else 
+    {
+        std::cout << "ProcessorT moveBackSpace (Move Line Up ! ELSE)" << std::endl;
+        
+        if (m_line_ending_map[m_line_number] > 0) {
+            m_line_ending_map[m_line_number]--;
+        }
+    }
 }
 
 /**

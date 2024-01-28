@@ -71,14 +71,13 @@ public:
     /**
      * @brief Testing, cahce all records to a map instad of reloading and searching.
      */
-    void cacheAllTextPrompts();
+    void cacheAllTextPrompts(YAML::Node &node);
 
     Logging     &m_log;
     std::string  m_path;
     std::string  m_filename;
     bool         m_is_loaded;
-
-    YAML::Node   m_node;
+    
     M_TextPrompt m_text_prompts;
 
 };
