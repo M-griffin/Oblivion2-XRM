@@ -70,3 +70,12 @@ menu_option:
   command_key: "{G"
   command_string: ""
   pulldown_id: 6
+menu_option:
+  index: 7
+  name: Message Editor
+  acs_string: ""
+  hidden: true
+  menu_key: E
+  command_key: "{E"
+  command_string: ""
+  pulldown_id: 0

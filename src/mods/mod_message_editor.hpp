@@ -26,12 +26,7 @@ public:
     ModMessageEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
         common_io_ptr common_io, session_io_ptr session_io);
 
-    virtual ~ModMessageEditor() override
-    {
-        std::vector<std::function< void()> >().swap(m_setup_functions);
-        std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
-    }
-
+    virtual ~ModMessageEditor() override;
     virtual bool update(const std::string &character_buffer, const bool &) override;
     virtual bool onEnter() override;
     virtual bool onExit() override;

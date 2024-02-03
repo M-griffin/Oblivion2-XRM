@@ -54,6 +54,13 @@ ModMessageEditor::ModMessageEditor(session_ptr session_data, config_ptr config, 
     m_text_prompts_dao->readPrompts();
 }
 
+ModMessageEditor::~ModMessageEditor()
+{
+    m_log.write<Logging::CONSOLE_LOG>("~ModMessageEditor()");
+    std::vector<std::function< void()> >().swap(m_setup_functions);
+    std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
+}
+
 /**
  * @brief Handles Updates or Data Input from Client
  * @return

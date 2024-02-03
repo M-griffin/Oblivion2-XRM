@@ -1,6 +1,7 @@
 #include "mod_prelogon.hpp"
 
 #include "../data-sys/text_prompts_dao.hpp"
+#include "../model-sys/structures.hpp"
 #include "../model-sys/config.hpp"
 
 #include "../telnet_decoder.hpp"
@@ -213,7 +214,9 @@ void ModPreLogon::displayPromptAndNewLine(const std::string &prompt)
 void ModPreLogon::setupHumanShield()
 {
     // Display Detecting Emulation, not using display prompt cause we need to append.
-    std::string result = m_session_io->parseTextPrompt(
+    std::string result = "|07" + m_common_io->centerPadding(BUILD_INFO, m_session_data->m_telnet_decoder->getTermCols()) + "\r\n";
+    
+    result += m_session_io->parseTextPrompt(
                              m_text_prompts_dao->getPrompt(PROMPT_HUMAN_SHIELD)
                          );
 

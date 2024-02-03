@@ -24,6 +24,7 @@ TextPromptsDao::TextPromptsDao(std::string path, const std::string &filename)
 
 TextPromptsDao::~TextPromptsDao()
 {
+    m_log.write<Logging::CONSOLE_LOG>("~TextPromptsDao()");
     m_is_loaded = false;    
     m_text_prompts.clear();    
     std::map<std::string, std::pair<std::string, std::string> >().swap(m_text_prompts);
@@ -146,9 +147,6 @@ bool TextPromptsDao::readPrompts()
         
         m_is_loaded = true;
         
-        // Testing pre-loading methods, expand this lateron for a glocal static cache instance.
-        // These prompts don't change, no reason to keep reloading them for each class and session instance separately.
-        // Not a priority, but groundwork is all set for this, they need a map by filename to keep separate files loaded.
         cacheAllTextPrompts(node);
         node.reset();
     }

@@ -10,6 +10,7 @@
 #include <chrono>
 #include <system_error>
 #include <memory>
+#include <malloc.h>
 
 IOService::IOService()
     : m_log(Logging::getInstance())
@@ -104,18 +105,34 @@ void IOService::checkAsyncTimers()
 void IOService::run()
 {
     char msg_buffer[MAX_BUFFER_SIZE];
-
+    
+    // Timed Garbage Collection to free memory back to the OS
+    using clock             = std::chrono::system_clock;
+    using time_point_type   = std::chrono::time_point<clock, std::chrono::milliseconds>;
+    
+    time_point_type start   = std::chrono::time_point_cast<std::chrono::milliseconds>(clock::now());
+    
     while(m_is_active)
-    {
+    {        
         // Check for incoming connections
         checkAsyncListenersForConnections();
         
         checkAsyncTimers();
         
+        // When there are no Connections Or Activity we are looping here.
         if (m_service_list.size() == 0)
-        {
+        {            
             // Temp timer, change to 10/20 miliseconds for cpu usage
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
+            
+            // Time > 10 Minutes, reset time when no activity no reason to garbage collect.
+            time_point_type end = std::chrono::time_point_cast<std::chrono::milliseconds>(clock::now());
+            long time_passed = (end - start).count();
+            if (time_passed >= 600000)
+            {                                    
+                std::cout << "No Timer ACtivity, Reset() time_passed= " << time_passed << std::endl;        
+                start = std::chrono::time_point_cast<std::chrono::milliseconds>(clock::now());
+            }
             continue;
         }
         
@@ -225,7 +242,22 @@ void IOService::run()
 
         // Temp timer, change to 10/20 miliseconds for cpu usage
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        
+        time_point_type end = std::chrono::time_point_cast<std::chrono::milliseconds>(clock::now());
+        long time_passed = (end - start).count();
+        
+        // Garbage collection Memory back to the OS Every 5 Minute (Testing, update this maybe hourly)
+        if (time_passed >= 300000)            
+        {            
+            std::cout << "malloc_trim() time_passed= " << time_passed << ", bytes freeed= " << malloc_trim(0) << std::endl;        
+            
+            
+            // Reset Timer
+            start = std::chrono::time_point_cast<std::chrono::milliseconds>(clock::now());
+        }
     }
+    
+    
 
 }
 

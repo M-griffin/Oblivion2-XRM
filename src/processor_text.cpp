@@ -38,7 +38,7 @@ ProcessorText::ProcessorText(int term_height, int term_width)
 
 ProcessorText::~ProcessorText()
 { 
-    m_log.write<Logging::DEBUG_LOG>("~ProcessorText()");
+    m_log.write<Logging::CONSOLE_LOG>("~ProcessorText()");
     std::vector <ScreenPixel>().swap(m_screen_buffer);
     std::map<int, ScreenPixel>().swap(m_pull_down_options);
     std::map<int, int>().swap(m_line_ending_map);

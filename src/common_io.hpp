@@ -21,6 +21,12 @@ typedef struct localized_buffer
         , length(0)
     {
     }
+    
+    ~localized_buffer()
+    {
+        character.erase();
+        length = 0;
+    }
 
     void clear()
     {

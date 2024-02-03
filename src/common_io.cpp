@@ -176,7 +176,11 @@ CommonIO::~CommonIO()
     m_log.write<Logging::DEBUG_LOG>("~CommonIO()");
     // Look at making this a single instance per session insetad of alocate on fly.
     m_sequence_map.clear();
+    std::map<std::string, std::string>().swap(m_sequence_map);
     m_escape_sequence.erase();
+    m_string_buffer.erase();
+    m_incoming_data.erase();
+    m_line_buffer.erase();
 }
 
 /**

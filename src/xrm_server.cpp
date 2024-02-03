@@ -51,6 +51,7 @@ std::string GLOBAL_SCRIPT_PATH = "";
 std::string GLOBAL_LOG_PATH = "";
 std::string USERS_DATABASE = "";
 
+std::string BUILD_INFO = "Oblivion/2 XRM-Server rev.2 build [00.00.153] Alpha Preview";
 
 /**
  * @brief Gracefull Shutdown Method.
@@ -71,7 +72,7 @@ auto main() -> int
     std::atexit(atExitFunction);
     
     Logging &m_log = Logging::getInstance();
-    m_log.write<Logging::CONSOLE_LOG>("Oblivion/2 XRM-Server rev.2(c) 2015-2023 Michael Griffin.");
+    m_log.write<Logging::CONSOLE_LOG>(BUILD_INFO);
 
     {
         CommonIO common;

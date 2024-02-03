@@ -117,9 +117,7 @@ public:
      */
     template <typename Callback>
     void asyncWait(int expires_on, const Callback &callback)
-    {        
-        
-    
+    {    
         m_log.write<Logging::DEBUG_LOG>("Async Read Job Added To Queue");
         //std::time_t start_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         

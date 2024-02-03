@@ -65,6 +65,7 @@ MenuSystem::MenuSystem(session_ptr session_data)
 MenuSystem::~MenuSystem()
 {
     m_log.write<Logging::DEBUG_LOG>("~MenuSystem()");
+    
     // Clear All Menu Command Functions.
     MappedCommandFunctions().swap(m_menu_command_functions);
 }
@@ -463,6 +464,10 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
 
         // Check
         case 'C':
+            return false;
+        
+        // Check
+        case 'E':
         {
             // Testing processes
             m_log.write<Logging::DEBUG_LOG>("Executing startupModuleMessageEditor()");
@@ -927,7 +932,7 @@ void MenuSystem::shutdownModule()
 {
     // Do module shutdown, only single modules are loaded
     // This makes it easy to allocate and kill on demand.
-    m_log.write<Logging::DEBUG_LOG>("shutdownModule MenuSystem()");
+    m_log.write<Logging::CONSOLE_LOG>("shutdownModule in MenuSystem() Module=", m_module_stack.back()->m_filename);
     m_module_stack.back()->onExit();
     m_module_stack.pop_back();
 }
@@ -937,7 +942,7 @@ void MenuSystem::shutdownModule()
  */
 void MenuSystem::startupModule(const module_ptr &module)
 {
-    m_log.write<Logging::CONSOLE_LOG>("Menu System: Startup Module=", module->m_filename);
+    m_log.write<Logging::CONSOLE_LOG>("StartupModule in MenuSystem() Module=", module->m_filename);
     
     // First clear any left overs if they exist.
     clearAllModules();

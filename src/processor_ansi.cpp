@@ -37,7 +37,7 @@ ProcessorAnsi::ProcessorAnsi(int term_height, int term_width)
 
 ProcessorAnsi::~ProcessorAnsi()
 { 
-    m_log.write<Logging::DEBUG_LOG>("~ProcessorAnsi()");
+    m_log.write<Logging::CONSOLE_LOG>("~ProcessorAnsi()");
     std::vector <ScreenPixel>().swap(m_screen_buffer);
     std::map<int, ScreenPixel>().swap(m_pull_down_options);
     std::map<int, int>().swap(m_line_ending_map);
