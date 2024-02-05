@@ -3,6 +3,7 @@
 
 
 #include <string>
+#include <map>
 
 extern std::string GLOBAL_BBS_PATH;
 extern std::string GLOBAL_DATA_PATH;
@@ -43,6 +44,9 @@ typedef struct MapType
     bool                   m_or;
 } MapType;
 
+
+// Parameterized ESC Sequences Translations.
+extern std::map<std::string, std::string> INPUT_SEQUENCE_MAP;
 
 /*struct Area
 {

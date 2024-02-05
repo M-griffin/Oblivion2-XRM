@@ -289,7 +289,10 @@ public:
         // Setup String to build the Query.
         std::string newQueryString = ssColumn.str();
         newQueryString.append(ssType.str());
-
+        
+        ssColumn.clear();
+        ssType.clear();
+        
         // Mprint statement to avoid injections.
         std::string result = m_insert_callback(newQueryString, obj);
 
@@ -330,6 +333,8 @@ public:
 
         // Closing For Query.
         std::string newQueryString = ssColumn.str();
+        ssColumn.clear();
+        
         newQueryString.append(" WHERE iId = %ld; ");
 
         // Mprint statement to avoid injections.

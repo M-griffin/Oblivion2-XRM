@@ -130,7 +130,7 @@ void IOService::run()
             long time_passed = (end - start).count();
             if (time_passed >= 600000)
             {                                    
-                std::cout << "No Timer ACtivity, Reset() time_passed= " << time_passed << std::endl;        
+                std::cout << "No Timer Activity, Reset() time_passed= " << time_passed << std::endl;        
                 start = std::chrono::time_point_cast<std::chrono::milliseconds>(clock::now());
             }
             continue;

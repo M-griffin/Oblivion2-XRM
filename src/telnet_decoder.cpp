@@ -31,6 +31,7 @@ TelnetDecoder::~TelnetDecoder()
 {
     m_log.write<Logging::DEBUG_LOG>("~TelnetDecoder()");
     m_async_io.reset();
+    m_reply_sequence.clear();
 }
 
 
@@ -48,6 +49,7 @@ void TelnetDecoder::sendIACSequences(unsigned char command, int option)
     stm << command;
     stm << static_cast<char>(option);
     buf = stm.str();
+    stm.clear();
     deliver(buf);
     
     // Mark Sequence as Purshed then exclude senting it again.
@@ -851,7 +853,8 @@ void TelnetDecoder::sendTTYPERequest()
     stm << static_cast<char>(TELQUAL_SEND);
     stm << static_cast<char>(IAC);
     stm << static_cast<char>(SE);
-    buf = stm.str();
+    buf = stm.str();    
+    stm.clear();
     deliver(buf);
 }
 
@@ -886,5 +889,7 @@ void TelnetDecoder::sendENVRequest()
     stm << static_cast<char>(IAC);
     stm << static_cast<char>(SE);
     buf = stm.str();
+    stm.clear();
+    vars.clear();
     deliver(buf);
 } 

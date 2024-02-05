@@ -904,10 +904,11 @@ void ModLevelEditor::levelEditorLevelInput(const std::string& input)
 
         // check for Invalid Index.
         if(ss.fail() || level_code < 0)
-        {
-            ss.clear();
+        {            
             level_code = -1;
         }
+        
+        ss.clear();
 
         if(level_code != -1 && checkLevelExistsByLevel(level_code))
         {

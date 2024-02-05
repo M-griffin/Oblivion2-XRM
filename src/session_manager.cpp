@@ -21,6 +21,7 @@ SessionManager::SessionManager()
 SessionManager::~SessionManager()
 {
     m_log.write<Logging::DEBUG_LOG>("~SessionManager()");
+    m_sessions.clear();
     std::set<session_ptr>().swap(m_sessions);
 }
     
@@ -69,6 +70,10 @@ void SessionManager::join(session_ptr session)
         {
             session->m_node_number = node_check;
         }
+        
+        node_array.clear();
+        std::vector<int>().swap(node_array);
+        
     }
     else 
     {

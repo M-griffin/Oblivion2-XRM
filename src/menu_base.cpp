@@ -71,11 +71,15 @@ MenuBase::~MenuBase()
     m_log.write<Logging::DEBUG_LOG>("~MenuBase()");
     
     // Pop Functions off the stack.
+    m_menu_functions.clear();
     std::vector<std::function< void(const std::string &, const bool &is_utf8)> >().swap(m_menu_functions);
+    m_execute_callback.clear();
     std::vector<std::function< bool(const MenuOption &)> >().swap(m_execute_callback);
 
     // Pop off the stack to deallocate any active modules.
+    m_module_stack.clear();
     std::vector<module_ptr>().swap(m_module_stack);
+    m_loaded_pulldown_options.clear();
     std::vector<MenuOption>().swap(m_loaded_pulldown_options);
     
     m_menu_session_data.reset();    
@@ -179,6 +183,7 @@ void MenuBase::checkMenuOptionsAcsAccess()
     }
 
     // Swap Validated Options with Existing.
+    m_menu_info->menu_options.clear();
     m_menu_info->menu_options.swap(new_options);
 }
 

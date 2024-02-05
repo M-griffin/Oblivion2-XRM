@@ -51,132 +51,14 @@ CommonIO::CommonIO()
     , m_is_escape_sequence(false)
     , m_is_new_getline(true)
     , m_is_new_leadoff(true)
-{
-    // Arrow Keys, Hardware OA are translated to [A on the fly
-    m_sequence_map.insert(std::make_pair("[A",    "up_arrow"));
-    m_sequence_map.insert(std::make_pair("[B",    "dn_arrow"));
-    m_sequence_map.insert(std::make_pair("[C",    "rt_arrow"));
-    m_sequence_map.insert(std::make_pair("[D",    "lt_arrow"));
-
-    // Hardware Keys, or Num pad.
-    m_sequence_map.insert(std::make_pair("OA",    "up_arrow"));
-    m_sequence_map.insert(std::make_pair("OB",    "dn_arrow"));
-    m_sequence_map.insert(std::make_pair("OC",    "rt_arrow"));
-    m_sequence_map.insert(std::make_pair("OD",    "lt_arrow"));
-    m_sequence_map.insert(std::make_pair("OE",    "clear"));
-    m_sequence_map.insert(std::make_pair("OF",    "end"));
-    m_sequence_map.insert(std::make_pair("OH",    "home"));
-
-    // Shift Arrow Keys
-    m_sequence_map.insert(std::make_pair("[1;2A", "shift_up_arrow"));
-    m_sequence_map.insert(std::make_pair("[1;2B", "shift_dn_arrow"));
-    m_sequence_map.insert(std::make_pair("[1;2C", "shift_rt_arrow"));
-    m_sequence_map.insert(std::make_pair("[1;2D", "shift_lt_arrow"));
-
-    // Shift TAB
-    m_sequence_map.insert(std::make_pair("[Z",    "shift_tab"));
-
-    // Function Keys ANSI
-    m_sequence_map.insert(std::make_pair("[@",    "insert"));
-    m_sequence_map.insert(std::make_pair("[H",    "home"));
-    m_sequence_map.insert(std::make_pair("[K",    "end"));
-    m_sequence_map.insert(std::make_pair("[F",    "end")); // = 0F
-    m_sequence_map.insert(std::make_pair("[V",    "pg_up"));
-    m_sequence_map.insert(std::make_pair("[U",    "pg_dn"));
-    m_sequence_map.insert(std::make_pair("[OP",   "f1"));
-    m_sequence_map.insert(std::make_pair("[OQ",   "f2"));
-    m_sequence_map.insert(std::make_pair("[OR",   "f3"));
-    m_sequence_map.insert(std::make_pair("[OS",   "f4"));
-    m_sequence_map.insert(std::make_pair("[OT",   "f5"));
-    m_sequence_map.insert(std::make_pair("[[17~", "f6"));
-    m_sequence_map.insert(std::make_pair("[[18~", "f7"));
-    m_sequence_map.insert(std::make_pair("[[19~", "f8"));
-    m_sequence_map.insert(std::make_pair("[[20~", "f9"));
-    m_sequence_map.insert(std::make_pair("[[21~", "f10"));
-    m_sequence_map.insert(std::make_pair("[[23~", "f11"));
-    m_sequence_map.insert(std::make_pair("[[24~", "f12"));
-
-    // VT-100 Putty
-    m_sequence_map.insert(std::make_pair("[1~",   "home"));
-    m_sequence_map.insert(std::make_pair("[2~",   "insert"));
-    m_sequence_map.insert(std::make_pair("[3~",   "del"));
-    m_sequence_map.insert(std::make_pair("[4~",   "end"));
-    m_sequence_map.insert(std::make_pair("[5~",   "pg_up"));
-    m_sequence_map.insert(std::make_pair("[6~",   "pg_dn"));
-    m_sequence_map.insert(std::make_pair("[OU",   "f6"));
-    m_sequence_map.insert(std::make_pair("[OV",   "f7"));
-    m_sequence_map.insert(std::make_pair("[OW",   "f8"));
-    m_sequence_map.insert(std::make_pair("[OX",   "f9"));
-    m_sequence_map.insert(std::make_pair("[OY",   "f10"));
-    m_sequence_map.insert(std::make_pair("[OZ",   "f11"));
-    m_sequence_map.insert(std::make_pair("[O[",   "f12"));
-
-    // Linux Console
-    m_sequence_map.insert(std::make_pair("[[A",   "f1"));
-    m_sequence_map.insert(std::make_pair("[[B",   "f2"));
-    m_sequence_map.insert(std::make_pair("[[C",   "f3"));
-    m_sequence_map.insert(std::make_pair("[[D",   "f4"));
-    m_sequence_map.insert(std::make_pair("[[E",   "f5"));
-
-    // SCO
-    m_sequence_map.insert(std::make_pair("[L",    "insert"));
-    m_sequence_map.insert(std::make_pair("[I",    "pg_up"));
-    m_sequence_map.insert(std::make_pair("[G",    "pg_dn"));
-
-    m_sequence_map.insert(std::make_pair("[[M",   "f1"));
-    m_sequence_map.insert(std::make_pair("[[N",   "f2"));
-    m_sequence_map.insert(std::make_pair("[[O",   "f3"));
-    m_sequence_map.insert(std::make_pair("[[P",   "f4"));
-    m_sequence_map.insert(std::make_pair("[[Q",   "f5"));
-    m_sequence_map.insert(std::make_pair("[[R",   "f6"));
-    m_sequence_map.insert(std::make_pair("[[S",   "f7"));
-    m_sequence_map.insert(std::make_pair("[[T",   "f8"));
-    m_sequence_map.insert(std::make_pair("[[U",   "f9"));
-    m_sequence_map.insert(std::make_pair("[[V",   "f10"));
-    m_sequence_map.insert(std::make_pair("[[W",   "f11"));
-    m_sequence_map.insert(std::make_pair("[[X",   "f12"));
-
-    // rxvt
-    m_sequence_map.insert(std::make_pair("[7~",   "home"));
-    m_sequence_map.insert(std::make_pair("[8~",   "end"));
-
-    // Shift Arrow Keys
-    m_sequence_map.insert(std::make_pair("[a",    "shift_up_arrow"));
-    m_sequence_map.insert(std::make_pair("[b",    "shift_dn_arrow"));
-    m_sequence_map.insert(std::make_pair("[c",    "shift_rt_arrow"));
-    m_sequence_map.insert(std::make_pair("[d",    "shift_lt_arrow"));
-    m_sequence_map.insert(std::make_pair("[e",    "shift_clear"));
-
-    // Shift Function
-    m_sequence_map.insert(std::make_pair("[2$",   "insert"));
-    m_sequence_map.insert(std::make_pair("[3$",   "del"));
-    m_sequence_map.insert(std::make_pair("[5$",   "pg_up"));
-    m_sequence_map.insert(std::make_pair("[6$",   "pg_dn"));
-    m_sequence_map.insert(std::make_pair("[7$",   "home"));
-    m_sequence_map.insert(std::make_pair("[8$",   "end"));
-
-    // Ctrl
-    m_sequence_map.insert(std::make_pair("Oa",    "ctrl_up_arrow"));
-    m_sequence_map.insert(std::make_pair("Ob",    "ctrl_dn_arrow"));
-    m_sequence_map.insert(std::make_pair("Oc",    "ctrl_rt_arrow"));
-    m_sequence_map.insert(std::make_pair("Od",    "ctrl_lt_arrow"));
-    m_sequence_map.insert(std::make_pair("Oe",    "ctrl_clear"));
-
-    // Shift Function
-    m_sequence_map.insert(std::make_pair("[2^",   "ctrl_insert"));
-    m_sequence_map.insert(std::make_pair("[3^",   "ctrl_del"));
-    m_sequence_map.insert(std::make_pair("[5^",   "ctrl_pg_up"));
-    m_sequence_map.insert(std::make_pair("[6^",   "ctrl_pg_dn"));
-    m_sequence_map.insert(std::make_pair("[7^",   "ctrl_home"));
-    m_sequence_map.insert(std::make_pair("[8^",   "ctrl_end"));
+{ 
 }
 
 CommonIO::~CommonIO()
 {
     m_log.write<Logging::DEBUG_LOG>("~CommonIO()");
-    // Look at making this a single instance per session insetad of alocate on fly.
-    m_sequence_map.clear();
-    std::map<std::string, std::string>().swap(m_sequence_map);
+    
+    // Look at making this a single instance per session insetad of alocate on fly.    
     m_escape_sequence.erase();
     m_string_buffer.erase();
     m_incoming_data.erase();
@@ -191,7 +73,7 @@ std::string CommonIO::getSequenceFromMap(const std::string &value)
 {
     std::string key = "";
 
-    for(auto &i : m_sequence_map)
+    for(auto &i : INPUT_SEQUENCE_MAP)
     {
         if(i.second == value)
         {
@@ -744,9 +626,9 @@ bool CommonIO::isDigit(const std::string &str)
 std::string CommonIO::getFSEEscapeSequence()
 {
     // Check if Sequences Exists, otherwise return blank.
-    if(m_sequence_map.find(m_escape_sequence) != m_sequence_map.end())
+    if(INPUT_SEQUENCE_MAP.find(m_escape_sequence) != INPUT_SEQUENCE_MAP.end())
     {
-        return m_sequence_map[m_escape_sequence];
+        return INPUT_SEQUENCE_MAP[m_escape_sequence];
     }
 
     return m_escape_sequence;
@@ -759,9 +641,9 @@ std::string CommonIO::getFSEEscapeSequence()
 std::string CommonIO::getEscapeSequence()
 {
     // Check if Sequences Exists, otherwise return blank.
-    if(m_sequence_map.find(m_escape_sequence) != m_sequence_map.end())
+    if(INPUT_SEQUENCE_MAP.find(m_escape_sequence) != INPUT_SEQUENCE_MAP.end())
     {
-        return m_sequence_map[m_escape_sequence];
+        return INPUT_SEQUENCE_MAP[m_escape_sequence];
     }
 
     return "";
@@ -1430,12 +1312,12 @@ long CommonIO::stringToLong(const std::string &value)
 
     // check for Invalid Index.
     if(ss.fail() || result_id < 0)
-    {
-        ss.clear();
+    {        
         ss.ignore();
         result_id = -1;
     }
 
+    ss.clear();
     return result_id;
 }
 
@@ -1453,11 +1335,11 @@ int CommonIO::stringToInt(const std::string &value)
     // check for Invalid Index.
     if(ss.fail() || result_id < 0)
     {
-        ss.clear();
         ss.ignore();
         result_id = -1;
     }
 
+    ss.clear();
     return result_id;
 }
 

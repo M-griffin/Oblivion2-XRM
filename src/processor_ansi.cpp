@@ -38,8 +38,12 @@ ProcessorAnsi::ProcessorAnsi(int term_height, int term_width)
 ProcessorAnsi::~ProcessorAnsi()
 { 
     m_log.write<Logging::CONSOLE_LOG>("~ProcessorAnsi()");
+    
+    m_screen_buffer.clear();
     std::vector <ScreenPixel>().swap(m_screen_buffer);
+    m_pull_down_options.clear();
     std::map<int, ScreenPixel>().swap(m_pull_down_options);
+    m_line_ending_map.clear();
     std::map<int, int>().swap(m_line_ending_map);
 }
 
@@ -500,6 +504,7 @@ std::string ProcessorAnsi::screenBufferParse()
     }
 
     // Clear Code map.
+    code_map.clear();
     std::vector<MapType>().swap(code_map);
     return ansi_string;
 }

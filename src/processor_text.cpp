@@ -39,8 +39,11 @@ ProcessorText::ProcessorText(int term_height, int term_width)
 ProcessorText::~ProcessorText()
 { 
     m_log.write<Logging::CONSOLE_LOG>("~ProcessorText()");
+    m_screen_buffer.clear();
     std::vector <ScreenPixel>().swap(m_screen_buffer);
+    m_pull_down_options.clear();
     std::map<int, ScreenPixel>().swap(m_pull_down_options);
+    m_line_ending_map.clear();
     std::map<int, int>().swap(m_line_ending_map);
 }
 
@@ -491,6 +494,7 @@ std::string ProcessorText::screenBufferParse()
     }
 
     // Clear Codemap.
+    code_map.clear();
     std::vector<MapType>().swap(code_map);
     return ansi_string;
 }

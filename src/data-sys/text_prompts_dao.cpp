@@ -104,7 +104,6 @@ void TextPromptsDao::writeValue(M_TextPrompt &value)
     // This can Goof up ANSI Characters and Text Prompts in CP437.
     ofs << out.c_str();
     ofs.close();
-
 }
 
 /**
@@ -142,6 +141,7 @@ bool TextPromptsDao::readPrompts()
         if(file_version != TextPromptsDao::FILE_VERSION)
         {
             m_log.write<Logging::ERROR_LOG>("Text Prompt Invalid File Version=", file_version, "Expected=", TextPromptsDao::FILE_VERSION);
+            node.reset();
             return(false);
         }
         

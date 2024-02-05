@@ -67,6 +67,7 @@ MenuSystem::~MenuSystem()
     m_log.write<Logging::DEBUG_LOG>("~MenuSystem()");
     
     // Clear All Menu Command Functions.
+    m_menu_command_functions.clear();
     MappedCommandFunctions().swap(m_menu_command_functions);
 }
 

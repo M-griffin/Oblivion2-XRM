@@ -24,6 +24,8 @@ SocketHandler::~SocketHandler()
     if (m_socket.size() > 0 && m_socket.back() != NULL) {
         m_socket.back()->onExit();
     }
+    
+    m_socket.clear();
     std::vector<socket_state_ptr>().swap(m_socket);
 }
 

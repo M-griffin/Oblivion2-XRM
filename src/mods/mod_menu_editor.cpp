@@ -1125,12 +1125,12 @@ void ModMenuEditor::menuEditorMenuOptionFieldHandler(const std::string &input)
 
                 // check for Invalid Index.
                 if(ss.fail() || new_id < 0)
-                {
-                    ss.clear();
+                {                    
                     ss.ignore();
                     break;
                 }
-
+                
+                ss.clear();
                 m_loaded_menu.back()->menu_options[m_current_option].pulldown_id = new_id;
                 break;
             }
@@ -1237,6 +1237,8 @@ void ModMenuEditor::menuEditorMenuOptionInput(const std::string &input)
             ss.ignore();
             return;
         }
+        
+        ss.clear();
 
         if(checkMenuOptionExists(option_index))
         {

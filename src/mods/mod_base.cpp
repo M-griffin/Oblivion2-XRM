@@ -38,9 +38,10 @@ ModBase::~ModBase()
     m_session_data.reset();
     m_config.reset();
     m_session_io.reset();
-    m_ansi_process.reset();
-    m_is_active = false;
+    m_common_io.reset();
+    m_ansi_process.reset();    
     m_filename.clear();
+    m_is_active = false;    
 }
 
 /**

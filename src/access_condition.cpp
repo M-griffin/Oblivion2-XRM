@@ -236,7 +236,8 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
                 {
                     condition = false;
                 }
-
+                
+                ss.clear();
                 break;
             }
 
@@ -259,6 +260,7 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, user_pt
                     condition = false;
                 }
 
+                ss.clear();
                 break;
             }
 

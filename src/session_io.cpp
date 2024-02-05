@@ -43,7 +43,18 @@ SessionIO::SessionIO(session_ptr session_data, common_io_ptr common_io)
 SessionIO::~SessionIO()
 {
     m_log.write<Logging::DEBUG_LOG>("~SessionIO()");
-    clearAllMCIMapping();
+    m_mapped_codes.clear();
+    std::map<std::string, std::string>().swap(m_mapped_codes);
+    
+    // Conditional on Constructor. Check and Clear if used and not nullptr.
+    if (m_common_io)
+    {
+        m_common_io.reset();    
+    }
+    if (m_session_data)
+    {
+        m_session_data.reset();
+    }
 }
 
 /**
@@ -481,8 +492,12 @@ std::string SessionIO::pipeColors(const std::string &color_string)
 
     if(ss.fail())
     {
+        ss.clear();
+        ss.ignore();
         return "";
     }
+    
+    ss.clear();
 
     // Foreground Colors
     if(color_index >= 0 && color_index < 16)
@@ -888,6 +903,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
     }
 
     // Clear Code map.
+    code_map.clear();
     std::vector<MapType>().swap(code_map);
 
     // Clear Custom MCI Screen Translation Mappings
@@ -945,6 +961,7 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
 
     // Clear MCI And Code Mappings
     clearAllMCIMapping();
+    code_mapping.clear();
     std::vector<MapType>().swap(code_mapping);
     return ansi_string;
 }
@@ -1235,6 +1252,7 @@ void SessionIO::clearAllMCIMapping()
 {
     if(m_mapped_codes.size() > 0)
     {
+        m_mapped_codes.clear();
         std::map<std::string, std::string>().swap(m_mapped_codes);
     }
 }

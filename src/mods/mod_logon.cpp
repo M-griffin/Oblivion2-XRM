@@ -283,6 +283,8 @@ bool ModLogon::checkUserLogon(const std::string &input)
                 return true;
             }
         }
+        
+        ss.clear();
     }
 
     // Pass through all (3) checks if they are all enabled.
