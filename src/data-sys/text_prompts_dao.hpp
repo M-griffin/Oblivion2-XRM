@@ -12,8 +12,12 @@
 class Logging;
 
 // Types for Text Prompt formatting to file.
-typedef std::map<std::string, std::pair<std::string, std::string> > M_TextPrompt;
 typedef std::pair<std::string, std::string> M_StringPair;
+typedef std::map<std::string, M_StringPair> M_TextPrompt;
+
+// Global Cache of Loaded Text Prompts
+// extern M_TextPrompt m_text_prompts;
+extern std::map<std::string, M_TextPrompt> TEXT_PROMPTS;
 
 /**
  * @class TextPromptsDao
@@ -76,9 +80,7 @@ public:
     Logging     &m_log;
     std::string  m_path;
     std::string  m_filename;
-    bool         m_is_loaded;
-    
-    M_TextPrompt m_text_prompts;
+    bool         m_is_loaded;        
 
 };
 

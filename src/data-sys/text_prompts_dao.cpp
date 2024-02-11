@@ -13,6 +13,9 @@
 const std::string TextPromptsDao::FILE_VERSION = "1.0.1";
 static bool is_version_displayed = false;
 
+// Global Cache of Loaded Text Prompts
+std::map<std::string, M_TextPrompt> TEXT_PROMPTS;
+
 TextPromptsDao::TextPromptsDao(std::string path, const std::string &filename)
     : m_log(Logging::getInstance())
     , m_path(path)
@@ -26,8 +29,8 @@ TextPromptsDao::~TextPromptsDao()
 {
     m_log.write<Logging::CONSOLE_LOG>("~TextPromptsDao()");
     m_is_loaded = false;    
-    m_text_prompts.clear();    
-    std::map<std::string, std::pair<std::string, std::string> >().swap(m_text_prompts);
+    //m_text_prompts.clear();    
+    //std::map<std::string, std::pair<std::string, std::string> >().swap(m_text_prompts);
 }
 
 /**
@@ -111,7 +114,18 @@ void TextPromptsDao::writeValue(M_TextPrompt &value)
  * @return
  */
 bool TextPromptsDao::readPrompts()
-{
+{    
+    if (TEXT_PROMPTS[m_filename].empty())
+    {
+        std::cout << "TextPrompts Not Yet Loaded" << std::endl;
+    }
+    else
+    {
+        std::cout << "TextPrompts are Cached" << std::endl;
+        m_is_loaded = true;
+        return m_is_loaded;
+    }
+    
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
@@ -168,12 +182,13 @@ M_StringPair TextPromptsDao::getPrompt(const std::string &lookup)
 {
     M_StringPair temp;
 
-    if(!m_is_loaded || (m_text_prompts.size() == 0))
+    if(!m_is_loaded || (TEXT_PROMPTS[m_filename].size() == 0))
     {
+        std::cout << "Text Prompts Empty, returning Temp!, shouldn't get here! :)" << std::endl;
         return temp;
     }
     
-    return m_text_prompts[lookup];
+    return TEXT_PROMPTS[m_filename].at(lookup);
 }
 
 /**
@@ -181,8 +196,8 @@ M_StringPair TextPromptsDao::getPrompt(const std::string &lookup)
  */
 void TextPromptsDao::displayAll()
 {
-    
-    for(M_TextPrompt::const_iterator it = m_text_prompts.begin(); it != m_text_prompts.end(); ++it)
+    M_TextPrompt text_prompts = TEXT_PROMPTS[m_filename];
+    for(M_TextPrompt::const_iterator it = text_prompts.begin(); it != text_prompts.end(); ++it)
     {            
         std::string key = it->first;
         M_StringPair value = it->second;
@@ -198,6 +213,7 @@ void TextPromptsDao::cacheAllTextPrompts(YAML::Node &node)
 {
     try
     {
+        M_TextPrompt text_prompts;
         for(YAML::const_iterator it = node.begin(); it != node.end(); ++it)
         {            
             // The first Entry on All Text Prompts is the File Version which doesn't have a key/Value Pair, and is just a string value.
@@ -206,9 +222,12 @@ void TextPromptsDao::cacheAllTextPrompts(YAML::Node &node)
             {            
                 std::string key = it->first.as<std::string>();
                 M_StringPair value = it->second.as<M_StringPair>();
-                m_text_prompts[key] = value;
+                text_prompts[key] = value;                
             }
-        }        
+        }
+        
+        // Cache all one loaded per filename
+        TEXT_PROMPTS[m_filename] = text_prompts;
     }
     catch(std::exception &ex)
     {
