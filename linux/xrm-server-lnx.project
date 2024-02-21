@@ -182,6 +182,9 @@
     </VirtualDirectory>
     <VirtualDirectory Name="utf-cpp">
       <VirtualDirectory Name="utf8">
+        <File Name="../src/utf-cpp/utf8/cpp20.h"/>
+        <File Name="../src/utf-cpp/utf8/cpp17.h"/>
+        <File Name="../src/utf-cpp/utf8/cpp11.h"/>
         <File Name="../src/utf-cpp/utf8/checked.h"/>
         <File Name="../src/utf-cpp/utf8/core.h"/>
         <File Name="../src/utf-cpp/utf8/unchecked.h"/>
@@ -198,8 +201,6 @@
     <File Name="../src/processor_text.cpp"/>
     <File Name="../src/processor_text.hpp"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="" C_Options="" Assembler="">
@@ -291,7 +292,6 @@
         <Library Value="crypto"/>
         <Library Value="yaml-cpp"/>
         <Library Value="util"/>
-        <Library Value="libssh"/>
         <Library Value="uuid"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
@@ -331,4 +331,6 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>

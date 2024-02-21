@@ -1,15 +1,15 @@
 #ifndef SESSION_HPP
 #define SESSION_HPP
 
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "model-sys/users.hpp"
 #include "telnet_decoder.hpp"
 
 #include "logging.hpp"
 #include "encoding.hpp"
-
-#include <memory>
-#include <string>
-#include <vector>
 
 #include "libSqliteWrapped.h"
 
@@ -28,7 +28,6 @@ class SocketHandler;
 typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
 
 class StateManager;
-//typedef std::unique_ptr<StateManager> state_manager_uptr;
 typedef std::shared_ptr<StateManager> state_manager_ptr;
 
 

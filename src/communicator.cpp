@@ -1,5 +1,11 @@
 #include "communicator.hpp"
 
+#include <memory>
+#include <algorithm>
+#include <iostream>
+#include <string>
+#include <mutex>
+
 #include "model-sys/structures.hpp"
 #include "model-sys/config.hpp"
 
@@ -8,13 +14,6 @@
 #include "safe_queue.hpp"
 #include "session_manager.hpp"
 #include "common_io.hpp"
-
-#include <memory>
-#include <algorithm>
-#include <iostream>
-#include <string>
-#include <mutex>
-
 
 /**
  * @brief Default Constructors required.

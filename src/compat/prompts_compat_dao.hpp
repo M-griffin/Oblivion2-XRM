@@ -1,11 +1,11 @@
 #ifndef PROMPT_DAO_HPP
 #define PROMPT_DAO_HPP
 
+#include <string>
+
 #include "../model-sys/structures.hpp"
 #include "../model-sys/struct_compat.hpp"
 #include "../logging.hpp"
-
-#include <string>
 
 /**
  * @class PromptDao

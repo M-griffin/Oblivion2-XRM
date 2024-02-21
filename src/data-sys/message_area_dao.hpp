@@ -1,13 +1,12 @@
 #ifndef MESSAGE_AREA_DAO_HPP
 #define MESSAGE_AREA_DAO_HPP
 
-#include "../model-sys/message_area.hpp"
-#include "../data-sys/base_dao.hpp"
-
 #include <memory>
 #include <vector>
 #include <functional>
 
+#include "../model-sys/message_area.hpp"
+#include "../data-sys/base_dao.hpp"
 
 // Forward Decelerations
 namespace SQLW

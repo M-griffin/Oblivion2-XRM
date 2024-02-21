@@ -1,8 +1,6 @@
 #ifndef DIRECTORY_HPP
 #define DIRECTORY_HPP
 
-#include "logging.hpp"
-
 #include <dirent.h>
 #include <string>
 #include <iostream>
@@ -10,6 +8,7 @@
 #include <memory>
 #include <mutex>
 
+#include "logging.hpp"
 
 /**
  * There is no Standard Filesystem and directory methods for C++/11

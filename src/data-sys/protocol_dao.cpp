@@ -1,6 +1,4 @@
 #include "protocol_dao.hpp"
-#include "../model-sys/protocol.hpp"
-#include "../logging.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -8,6 +6,9 @@
 #include <algorithm>
 #include <mutex>
 #include <cassert>
+
+#include "../model-sys/protocol.hpp"
+#include "../logging.hpp"
 
 // Setup the file version for the file.
 const std::string Protocols::FILE_VERSION = "1.0.0";

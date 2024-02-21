@@ -1,13 +1,13 @@
 #ifndef TEXT_PROMPTS_DAO_HPP
 #define TEXT_PROMPTS_DAO_HPP
 
-#include <yaml-cpp/yaml.h>
-
 #include <memory>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <map>
+
+#include <yaml-cpp/yaml.h>
 
 class Logging;
 

@@ -1,5 +1,16 @@
 #include "mod_signup.hpp"
 
+#include <regex>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <iomanip>
+#include <ctime>
+#include <cassert>
+#include <vector>
+#include <memory>
+#include <functional>
+
 #include "../model-sys/config.hpp"
 #include "../model-sys/users.hpp"
 #include "../model-sys/menu.hpp"
@@ -14,18 +25,6 @@
 #include "../encryption.hpp"
 #include "../logging.hpp"
 #include "../menu_base.hpp"
-
-#include <regex>
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <iomanip>
-#include <ctime>
-#include <cassert>
-#include <vector>
-#include <memory>
-#include <functional>
-
 
 ModSignup::ModSignup(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, 
         common_io_ptr common_io, session_io_ptr session_io)

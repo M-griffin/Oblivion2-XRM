@@ -1,14 +1,11 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include "../uuid.hpp"
-#include "yaml-cpp/yaml.h"
-
 #include <memory>
 #include <fstream>
 
-
-
+#include "../uuid.hpp"
+#include "yaml-cpp/yaml.h"
 
 /**
  * @class Config Object

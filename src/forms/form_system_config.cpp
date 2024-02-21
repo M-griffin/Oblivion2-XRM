@@ -1,9 +1,10 @@
 #include "form_system_config.hpp"
 
+#include <string>
+
 #include "../model-sys/config.hpp"
 #include "../model-sys/menu.hpp"
 
-#include <string>
 
 FormSystemConfig::FormSystemConfig(config_ptr config)
     : FormBase(

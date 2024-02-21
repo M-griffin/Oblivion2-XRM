@@ -1,12 +1,12 @@
 #include "state_manager.hpp"
 
+#include <cstring>
+#include <string>
+
 #include "state_base.hpp"
 #include "session.hpp"
 #include "logging.hpp"
 #include "utf-cpp/utf8.h"
-
-#include <cstring>
-#include <string>
 
 StateManager::StateManager()
     : m_log(Logging::getInstance())
@@ -58,6 +58,7 @@ void StateManager::update()
 {   
     std::string new_string_builder = "";
     bool utf_found = false;
+    bool valid = false;
 
     if(!m_the_state.empty())
     {
@@ -73,8 +74,15 @@ void StateManager::update()
 
         if(incoming_data.size() > 0)
         {
-            std::string::iterator it = incoming_data.begin();
-            std::string::iterator line_end = incoming_data.end();
+            valid = utf8::is_valid(incoming_data.begin(), incoming_data.end());
+            if (!valid)
+            {
+                std::cout << "Incoming String UTF-8 is invalid: " <<  incoming_data << std::endl;
+            }
+            
+            std::string checked_data = utf8::replace_invalid(incoming_data, '?');            
+            std::string::iterator it = checked_data.begin();
+            std::string::iterator line_end = checked_data.end();
 
             /**
              * This loops a string, each next should be a single character code point.
@@ -106,7 +114,7 @@ void StateManager::update()
                 else
                 {
                     try
-                    {
+                    {                        
                         // Only gets here on multi-byte sequences.
                         uint32_t code_point = utf8::next(it, line_end);
                         unsigned char character[5] = {0, 0, 0, 0, 0};

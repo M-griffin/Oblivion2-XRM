@@ -1,12 +1,12 @@
 #include "config_dao.hpp"
-#include "../model-sys/config.hpp"
-
-#include "logging.hpp"
 
 #include <fstream>
 #include <string>
 #include <mutex>
 #include <cassert>
+
+#include "../model-sys/config.hpp"
+#include "logging.hpp"
 
 // Setup the file version for the config file.
 const std::string Config::FILE_VERSION = "1.0.4";

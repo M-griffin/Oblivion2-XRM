@@ -1,9 +1,5 @@
 #include "common_io.hpp"
 
-#include "model-sys/structures.hpp"
-#include "encoding.hpp"
-#include "logging.hpp"
-
 #include <unistd.h>
 #include <sys/types.h>
 
@@ -39,7 +35,11 @@
 #include <fstream>
 #include <regex>
 
-#include <utf-cpp/utf8.h>
+#include "model-sys/structures.hpp"
+#include "encoding.hpp"
+#include "logging.hpp"
+
+#include "utf-cpp/utf8.h"
 
 CommonIO::CommonIO()
     : m_log(Logging::getInstance())
@@ -658,7 +658,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
 {
     int num = numberOfChars(character_buffer);
 
-    if((num == 0  ||  character_buffer[0] == '\x1b') &&
+    if((num == 0 || character_buffer[0] == '\x1b') &&
             m_is_escape_sequence &&
             m_string_buffer.size() == 1)
     {
@@ -1224,6 +1224,7 @@ std::vector<std::string> CommonIO::splitString(const std::string& s, char delimi
         tokens.push_back(token);
     }
 
+    tokenStream.clear();
     return tokens;
 }
 
@@ -1237,6 +1238,7 @@ std::string CommonIO::standardDateToString(std::time_t std_time)
     std::ostringstream oss;
     oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d");
     std::string time_string = oss.str();
+    oss.clear();
     return time_string;
 }
 
@@ -1250,6 +1252,7 @@ std::string CommonIO::standardDateTimeToString(std::time_t std_time)
     std::ostringstream oss;
     oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d %H:%M:%S %z");
     std::string datetime_string = oss.str();
+    oss.clear();
     return datetime_string;
 }
 
@@ -1403,7 +1406,7 @@ void CommonIO::getNextGlyph(LocalizedBuffer &buffer,
         catch(utf8::exception &ex)
         {
             m_log.write<Logging::ERROR_LOG>("[getNextGlyph] UTF8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
-            ++*it; // Bad, other iterate past it, otherwise stuck in endless loop.
+            (*it)++; // Bad, other iterate past it, otherwise stuck in endless loop.
         }
     }
 }
@@ -1447,12 +1450,12 @@ void CommonIO::peekNextGlyph(LocalizedBuffer &buffer,
             }
 
             buffer.length = buffer.character.size();
-            *it--;
+            (*it)--;
         }
         catch(utf8::exception &ex)
         {            
             m_log.write<Logging::ERROR_LOG>("[peekNextGlyph] UTF8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
-            ++*it; // Bad, iterate past otherwise stuck in endless loop!
+            (*it)++; // Bad, iterate past otherwise stuck in endless loop!
         }
     }
 }

@@ -1,13 +1,14 @@
 #include "file_area_dao.hpp"
 
+#include <iostream>
+#include <string>
+
+#include <sqlite3.h>
+
 #include "../model-sys/file_area.hpp"
 #include "../logging.hpp"
 
 #include "libSqliteWrapped.h"
-#include <sqlite3.h>
-
-#include <iostream>
-#include <string>
 
 
 /**

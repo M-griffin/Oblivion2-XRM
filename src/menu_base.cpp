@@ -1,5 +1,16 @@
 #include "menu_base.hpp"
 
+#include <locale>
+#include <cstring>
+#include <string>
+#include <stdint.h>
+#include <vector>
+#include <fstream>
+#include <algorithm>
+#include <functional>
+#include <random>
+#include <cassert>
+
 #include "access_condition.hpp"
 #include "communicator.hpp"
 #include "data-sys/menu_dao.hpp"
@@ -13,17 +24,6 @@
 #include "telnet_decoder.hpp"
 #include "logging.hpp"
 #include "common_io.hpp"
-
-#include <locale>
-#include <cstring>
-#include <string>
-#include <stdint.h>
-#include <vector>
-#include <fstream>
-#include <algorithm>
-#include <functional>
-#include <random>
-#include <cassert>
 
 MenuBase::MenuBase(session_ptr session_data)
     : m_log(Logging::getInstance())

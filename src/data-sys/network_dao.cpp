@@ -1,12 +1,13 @@
 #include "network_dao.hpp"
 
+#include <iostream>
+#include <string>
+
+#include <sqlite3.h>
+
 #include "../model-sys/network.hpp"
 
 #include "libSqliteWrapped.h"
-#include <sqlite3.h>
-
-#include <iostream>
-#include <string>
 
 
 /**

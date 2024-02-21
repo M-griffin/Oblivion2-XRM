@@ -1,18 +1,18 @@
 #include "socket_state.hpp"
 
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <cerrno>
+#include <time.h>
+
 #include "model-sys/config.hpp"
 
 #include "communicator.hpp"
 #include "socket_handler.hpp"
 #include "logging.hpp"
 
-#include <sdl2_net/SDL_net.hpp>
-
-#include <iostream>
-#include <cstdio>
-#include <cstring>
-#include <cerrno>
-#include <time.h>
+#include "sdl2_net/SDL_net.hpp"
 
 #define MAX_BUFFER 16384
 

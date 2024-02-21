@@ -1,15 +1,14 @@
 #ifndef MENU_SHELL_HPP
 #define MENU_SHELL_HPP
 
-#include "state_base.hpp"
-#include "menu_base.hpp"
-
-#include "model-sys/struct_compat.hpp"
-
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "state_base.hpp"
+#include "menu_base.hpp"
+
+#include "model-sys/struct_compat.hpp"
 
 class Logging;
 

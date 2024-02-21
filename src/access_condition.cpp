@@ -1,18 +1,17 @@
 #include "access_condition.hpp"
 
-#include "model-sys/users.hpp"
-#include "model-sys/access_level.hpp"
-
-#include "session_io.hpp"
-#include "logging.hpp"
-
 #include <algorithm>
-
 #include <string>
 #include <vector>
 #include <iostream>
 #include <sstream>
 #include <cctype>
+
+#include "model-sys/users.hpp"
+#include "model-sys/access_level.hpp"
+
+#include "session_io.hpp"
+#include "logging.hpp"
 
 /**
  * @brief Class Constructor And Initilization

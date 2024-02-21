@@ -1,12 +1,12 @@
 #ifndef SECURITY_DAO_HPP
 #define SECURITY_DAO_HPP
 
-#include "../model-sys/security.hpp"
-#include "../data-sys/base_dao.hpp"
-
 #include <memory>
 #include <vector>
 #include <functional>
+
+#include "../model-sys/security.hpp"
+#include "../data-sys/base_dao.hpp"
 
 // Forward Decelerations
 namespace SQLW

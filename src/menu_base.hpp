@@ -1,6 +1,10 @@
 #ifndef MENUBASE_HPP
 #define MENUBASE_HPP
 
+#include <memory>
+#include <functional>
+#include <vector>
+
 #include "model-sys/struct_compat.hpp"
 #include "model-sys/structures.hpp"
 #include "model-sys/menu.hpp"
@@ -9,10 +13,6 @@
 #include "data-sys/menu_dao.hpp"
 #include "data-sys/menu_prompt_dao.hpp"
 #include "mods/mod_base.hpp"
-
-#include <memory>
-#include <functional>
-#include <vector>
 
 class Logging;
 

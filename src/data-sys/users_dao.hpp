@@ -1,13 +1,13 @@
 #ifndef USERS_DAO_HPP
 #define USERS_DAO_HPP
 
-#include "../data-sys/base_dao.hpp"
-#include "../model-sys/users.hpp"
-
 #include <iostream>
 #include <memory>
 #include <vector>
 #include <functional>
+
+#include "../data-sys/base_dao.hpp"
+#include "../model-sys/users.hpp"
 
 // Forward Decelerations
 namespace SQLW

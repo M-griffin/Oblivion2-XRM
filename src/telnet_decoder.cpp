@@ -1,12 +1,12 @@
 #include "telnet_decoder.hpp"
 
-#include "telnet.hpp"
-#include "logging.hpp"
-#include "async_io.hpp"
-
 #include <cstdio>
 #include <string>
 #include <fstream>
+
+#include "telnet.hpp"
+#include "logging.hpp"
+#include "async_io.hpp"
 
 
 TelnetDecoder::TelnetDecoder(async_io_ptr async_io)

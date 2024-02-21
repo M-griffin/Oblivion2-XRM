@@ -1,11 +1,10 @@
 #include "processor_base.hpp"
 
-#include "logging.hpp"
-
 #include <string>
 #include <vector>
 #include <map>
 
+#include "logging.hpp"
 
 /**
  * @brief ProcessorBase Constructor

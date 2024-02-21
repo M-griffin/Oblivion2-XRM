@@ -1,5 +1,14 @@
 #include "menu_system.hpp"
 
+#include <locale>
+#include <cassert>
+#include <memory>
+#include <stdint.h>
+#include <string>
+#include <vector>
+#include <map>
+#include <functional>
+
 #include "model-sys/config.hpp"
 
 #include "mods/mod_prelogon.hpp"
@@ -12,15 +21,6 @@
 
 #include "session.hpp"
 #include "logging.hpp"
-
-#include <locale>
-#include <cassert>
-#include <memory>
-#include <stdint.h>
-#include <string>
-#include <vector>
-#include <map>
-#include <functional>
 
 const std::string MenuSystem::m_stateID = "MENU_SYSTEM";
 

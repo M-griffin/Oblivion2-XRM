@@ -1,19 +1,19 @@
 #include "mod_message_editor.hpp"
 
+#include <string>
+#include <vector>
+#include <memory>
+
 #include "../data-sys/text_prompts_dao.hpp"
 #include "../model-sys/config.hpp"
 
 #include "../session.hpp"
 #include "../session_io.hpp"
-
 #include "../processor_ansi.hpp"
 #include "../processor_text.hpp"
-#include "../logging.hpp"
 #include "../common_io.hpp"
+#include "../logging.hpp"
 
-#include <string>
-#include <vector>
-#include <memory>
 
 /*****
  * Notes to Work on

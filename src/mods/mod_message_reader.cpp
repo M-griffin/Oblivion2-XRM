@@ -1,5 +1,8 @@
 #include "mod_message_reader.hpp"
 
+#include <string>
+#include <vector>
+
 #include "../data-sys/text_prompts_dao.hpp"
 #include "../model-sys/config.hpp"
 
@@ -9,9 +12,6 @@
 #include "../processor_ansi.hpp"
 #include "../logging.hpp"
 #include "../directory.hpp"
-
-#include <string>
-#include <vector>
 
 
 ModMessageReader::ModMessageReader(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,

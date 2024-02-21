@@ -2,10 +2,6 @@
 #define MENU_SYSTEM_HPP
 
 #include "state_base.hpp"
-#include "menu_base.hpp"
-
-#include "model-sys/struct_compat.hpp"
-#include "model-sys/menu.hpp"
 
 #include <iostream>
 #include <memory>
@@ -14,6 +10,10 @@
 #include <vector>
 #include <map>
 #include <functional>
+
+#include "model-sys/struct_compat.hpp"
+#include "model-sys/menu.hpp"
+#include "menu_base.hpp"
 
 
 class Logging;

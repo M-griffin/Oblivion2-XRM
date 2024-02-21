@@ -1,12 +1,12 @@
 #ifndef NETWORK_DAO_HPP
 #define NETWORK_DAO_HPP
 
-#include "../model-sys/network.hpp"
-#include "../data-sys/base_dao.hpp"
-
 #include <memory>
 #include <vector>
 #include <functional>
+
+#include "../model-sys/network.hpp"
+#include "../data-sys/base_dao.hpp"
 
 // Forward Decelerations
 namespace SQLW

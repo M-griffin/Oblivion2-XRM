@@ -1,5 +1,13 @@
 #include "mod_prelogon.hpp"
 
+#include <algorithm>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <memory>
+#include <functional>
+#include <chrono>
+
 #include "../data-sys/text_prompts_dao.hpp"
 #include "../model-sys/structures.hpp"
 #include "../model-sys/config.hpp"
@@ -11,15 +19,6 @@
 #include "../session.hpp"
 #include "../async_io.hpp"
 #include "../common_io.hpp"
-
-#include <algorithm>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <memory>
-#include <functional>
-#include <chrono>
-
 
 ModPreLogon::ModPreLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
         common_io_ptr common_io, session_io_ptr session_io)

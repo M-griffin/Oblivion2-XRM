@@ -1,5 +1,9 @@
 #include "mod_menu_editor.hpp"
 
+#include <stdint.h>
+#include <string>
+#include <vector>
+#include <sstream>
 
 #include "../data-sys/menu_dao.hpp"
 #include "../data-sys/text_prompts_dao.hpp"
@@ -13,11 +17,6 @@
 #include "../menu_base.hpp"
 #include "../logging.hpp"
 #include "../common_io.hpp"
-
-#include <stdint.h>
-#include <string>
-#include <vector>
-#include <sstream>
 
 ModMenuEditor::ModMenuEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
         common_io_ptr common_io, session_io_ptr session_io)

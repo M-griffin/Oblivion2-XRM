@@ -1,8 +1,9 @@
 #ifndef MENU_COMPAT_DAO_HPP
 #define MENU_COMPAT_DAO_HPP
 
-#include "../model-sys/structures.hpp"
 #include <string>
+
+#include "../model-sys/structures.hpp"
 
 /**
  * @class Compat

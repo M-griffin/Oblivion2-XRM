@@ -6,11 +6,11 @@
 #include <winsock2.h>
 #endif
 
-#include "sdl2_net/SDL_net.hpp"
-
 #include <iostream>
 #include <memory>
 #include <string>
+
+#include "sdl2_net/SDL_net.hpp"
 
 class SocketHandler;
 typedef std::shared_ptr<SocketHandler> socket_handler_ptr;

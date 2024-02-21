@@ -1,6 +1,4 @@
 #include "menu_prompt_dao.hpp"
-#include "../model-sys/menu_prompt.hpp"
-#include "../logging.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -8,6 +6,9 @@
 #include <algorithm>
 #include <mutex>
 #include <cassert>
+
+#include "../model-sys/menu_prompt.hpp"
+#include "../logging.hpp"
 
 // Setup the file version for the config file.
 const std::string MenuPrompt::FILE_VERSION = "1.0.0";

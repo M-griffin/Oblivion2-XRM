@@ -1,12 +1,12 @@
 #ifndef SESSION_IO_HPP
 #define SESSION_IO_HPP
 
-#include "model-sys/structures.hpp"
-
 #include <vector>
 #include <memory>
 #include <string>
 #include <map>
+
+#include "model-sys/structures.hpp"
 
 class Logging;
 

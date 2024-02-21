@@ -1,12 +1,12 @@
 #ifndef FILE_AREA_DAO_HPP
 #define FILE_AREA_DAO_HPP
 
-#include "../model-sys/file_area.hpp"
-#include "../data-sys/base_dao.hpp"
-
 #include <memory>
 #include <vector>
 #include <functional>
+
+#include "../model-sys/file_area.hpp"
+#include "../data-sys/base_dao.hpp"
 
 // Forward Decelerations
 namespace SQLW

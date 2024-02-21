@@ -2,7 +2,6 @@
 #define ANSI_PROCESSOR_HPP
 
 #include "processor_base.hpp"
-#include "model-sys/screen_pixel.hpp"
 
 #include <memory>
 #include <stdint.h>
@@ -10,6 +9,7 @@
 #include <vector>
 #include <map>
 
+#include "model-sys/screen_pixel.hpp"
 
 /**
  * @class AnsiProcessor

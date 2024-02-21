@@ -1,5 +1,10 @@
 #include "mod_level_editor.hpp"
 
+#include <sstream>
+#include <stdint.h>
+#include <string>
+#include <vector>
+
 #include "../data-sys/text_prompts_dao.hpp"
 #include "../data-sys/access_level_dao.hpp"
 
@@ -13,10 +18,6 @@
 #include "../logging.hpp"
 #include "../common_io.hpp"
 
-#include <sstream>
-#include <stdint.h>
-#include <string>
-#include <vector>
 
 ModLevelEditor::ModLevelEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
         common_io_ptr common_io, session_io_ptr session_io)

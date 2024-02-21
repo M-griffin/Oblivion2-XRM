@@ -1,13 +1,16 @@
 #include "users_dao.hpp"
-#include "../model-sys/users.hpp"
-#include "../logging.hpp"
-
-#include "libSqliteWrapped.h"
-#include <sqlite3.h>
 
 #include <iostream>
 #include <string>
 #include <algorithm>
+
+#include <sqlite3.h>
+
+#include "../model-sys/users.hpp"
+#include "../logging.hpp"
+
+#include "libSqliteWrapped.h"
+
 
 /**
  * Base Dao Calls for generic Object Data Calls

@@ -1,12 +1,16 @@
 #include "conference_dao.hpp"
+
+#include <iostream>
+#include <string>
+
+#include <sqlite3.h>
+
 #include "../model-sys/conference.hpp"
 #include "../logging.hpp"
 
 #include "libSqliteWrapped.h"
-#include <sqlite3.h>
 
-#include <iostream>
-#include <string>
+
 
 
 /**

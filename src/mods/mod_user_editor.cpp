@@ -1,5 +1,10 @@
 #include "mod_user_editor.hpp"
 
+#include <string>
+#include <vector>
+#include <cassert>
+#include <regex>
+
 #include "../data-sys/text_prompts_dao.hpp"
 #include "../model-sys/config.hpp"
 #include "../model-sys/security.hpp"
@@ -15,11 +20,6 @@
 #include "../logging.hpp"
 #include "../directory.hpp"
 #include "../common_io.hpp"
-
-#include <string>
-#include <vector>
-#include <cassert>
-#include <regex>
 
 /**
  * NOTE, changes to password and challenge q/a are saved right away to security record

@@ -1,12 +1,12 @@
 #ifndef GROUPING_DAO_HPP
 #define GROUPING_DAO_HPP
 
-#include "../model-sys/grouping.hpp"
-#include "../data-sys/base_dao.hpp"
-
 #include <memory>
 #include <vector>
 #include <functional>
+
+#include "../model-sys/grouping.hpp"
+#include "../data-sys/base_dao.hpp"
 
 // Forward Decelerations
 namespace SQLW

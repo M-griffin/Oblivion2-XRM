@@ -1,5 +1,10 @@
 #include "mod_message_base_editor.hpp"
 
+#include <stdint.h>
+#include <string>
+#include <vector>
+#include <sstream>
+
 #include "../data-sys/text_prompts_dao.hpp"
 #include "../data-sys/access_level_dao.hpp"
 
@@ -12,11 +17,6 @@
 #include "../common_io.hpp"
 #include "../logging.hpp"
 #include "../directory.hpp"
-
-#include <stdint.h>
-#include <string>
-#include <vector>
-#include <sstream>
 
 
 ModMessageBaseEditor::ModMessageBaseEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,

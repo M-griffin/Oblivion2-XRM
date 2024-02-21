@@ -1,11 +1,11 @@
 #ifndef COMMUNICATOR_HPP
 #define COMMUNICATOR_HPP
 
-#include "safe_queue.hpp"
-
 #include <memory>
 #include <string>
 #include <mutex>
+
+#include "safe_queue.hpp"
 
 class TextPromptsDao;
 typedef std::shared_ptr<TextPromptsDao> text_prompts_dao_ptr;

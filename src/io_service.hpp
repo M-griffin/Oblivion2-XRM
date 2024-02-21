@@ -2,15 +2,15 @@
 #ifndef IO_SERVICE_HPP
 #define IO_SERVICE_HPP
 
-#include "safe_vector.hpp"
-#include "safe_queue.hpp"
-
 #include <functional>
 #include <sstream>
 #include <vector>
 #include <memory>
 #include <typeinfo>
 #include <chrono>
+
+#include "safe_vector.hpp"
+#include "safe_queue.hpp"
 
 class Logging;
 

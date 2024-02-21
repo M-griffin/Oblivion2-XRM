@@ -1,5 +1,10 @@
 #include "mod_file_editor.hpp"
 
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <vector>
+
 #include "../model-sys/config.hpp"
 #include "../data-sys/text_prompts_dao.hpp"
 
@@ -7,11 +12,6 @@
 #include "../session_io.hpp"
 #include "../logging.hpp"
 #include "../directory.hpp"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <vector>
 
 ModFileEditor::ModFileEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
         common_io_ptr common_io, session_io_ptr session_io)

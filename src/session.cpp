@@ -1,5 +1,11 @@
 #include "session.hpp"
 
+#include <memory>
+#include <list>
+#include <string>
+#include <cassert>
+#include <thread>
+
 #include "model-sys/users.hpp"
 #include "data-sys/users_dao.hpp"
 
@@ -16,12 +22,6 @@
 #include "libSqliteWrapped.h"
 
 #include "mods/mod_prelogon.hpp"
-
-#include <memory>
-#include <list>
-#include <string>
-#include <cassert>
-#include <thread>
 
 
 /**

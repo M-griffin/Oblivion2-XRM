@@ -1,14 +1,15 @@
 #include "oneliners_dao.hpp"
 
-#include "../model-app/oneliners.hpp"
+#include <iostream>
+#include <string>
 
+#include <sqlite3.h>
+
+#include "../model-app/oneliners.hpp"
 #include "../logging.hpp"
 
 #include "libSqliteWrapped.h"
-#include <sqlite3.h>
 
-#include <iostream>
-#include <string>
 
 /**
  * Base Dao Calls for generic Object Data Calls

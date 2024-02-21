@@ -1,12 +1,14 @@
 #include "access_level_dao.hpp"
-#include "../model-sys/access_level.hpp"
-#include "../logging.hpp"
-
-#include "libSqliteWrapped.h"
-#include <sqlite3.h>
 
 #include <iostream>
 #include <string>
+
+#include <sqlite3.h>
+
+#include "../model-sys/access_level.hpp"
+
+#include "../logging.hpp"
+#include "libSqliteWrapped.h"
 
 
 /**

@@ -1,12 +1,12 @@
 #ifndef __TELNET_DECODER_H_
 #define __TELNET_DECODER_H_
 
-#include "telnet.hpp"
-#include "safe_vector.hpp"
-
 #include <memory>
 #include <iostream>
 #include <string>
+
+#include "telnet.hpp"
+#include "safe_vector.hpp"
 
 class Logging;
 

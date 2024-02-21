@@ -1,5 +1,4 @@
 #include "encoding.hpp"
-#include "logging.hpp"
 
 #include <string>
 #include <vector>
@@ -12,6 +11,8 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
+
+#include "logging.hpp"
 
 /**
  * CP437 -> UTF-8 Character Translation Table

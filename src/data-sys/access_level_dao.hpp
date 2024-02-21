@@ -2,11 +2,12 @@
 #define ACCESS_LEVEL_DAO_HPP
 
 #include "../model-sys/access_level.hpp"
-#include "../data-sys/base_dao.hpp"
 
 #include <memory>
 #include <vector>
 #include <functional>
+
+#include "../data-sys/base_dao.hpp"
 
 // Forward Decelerations
 namespace SQLW

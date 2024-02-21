@@ -1,14 +1,14 @@
 #ifndef ACCESS_CONDITION_HPP
 #define ACCESS_CONDITION_HPP
 
-#include "model-sys/structures.hpp"
-
 #include <iostream>
 #include <memory>
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <map>
+
+#include "model-sys/structures.hpp"
 
 class SessionIO;
 typedef std::shared_ptr<SessionIO> session_io_ptr;

@@ -1,12 +1,12 @@
 #ifndef __SOCKET_HANDLER__
 #define __SOCKET_HANDLER__
 
-#include "socket_state.hpp"
-#include "io_service.hpp"
-
 #include <iostream>
 #include <vector>
 #include <memory>
+
+#include "socket_state.hpp"
+#include "io_service.hpp"
 
 class Logging;
 

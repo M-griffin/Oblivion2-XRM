@@ -20,15 +20,6 @@
  * Error Exit Codes (2) Unable to use Fallback IPv4 Acceptor (Accept Connections).
  */
 
-#include "model-sys/structures.hpp"
-#include "model-sys/config.hpp"
-#include "data-sys/config_dao.hpp"
-#include "data-sys/db_startup.hpp"
-
-#include "communicator.hpp"
-#include "interface.hpp"
-#include "common_io.hpp"
-
 #include <map>
 #include <string>
 #include <memory>
@@ -42,6 +33,15 @@
 #else
 #include <direct.h>
 #endif
+
+#include "model-sys/structures.hpp"
+#include "model-sys/config.hpp"
+#include "data-sys/config_dao.hpp"
+#include "data-sys/db_startup.hpp"
+
+#include "communicator.hpp"
+#include "interface.hpp"
+#include "common_io.hpp"
 
 std::string GLOBAL_BBS_PATH = "";
 std::string GLOBAL_DATA_PATH = "";

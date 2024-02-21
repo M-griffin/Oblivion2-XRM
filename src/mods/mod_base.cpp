@@ -1,5 +1,11 @@
 #include "mod_base.hpp"
 
+#include <algorithm>
+#include <memory>
+#include <iostream>
+#include <string>
+#include <vector>
+
 #include "../data-sys/text_prompts_dao.hpp"
 #include "../model-sys/config.hpp"
 
@@ -10,12 +16,6 @@
 #include "../logging.hpp"
 #include "../common_io.hpp"
 #include "../async_io.hpp"
-
-#include <algorithm>
-#include <memory>
-#include <iostream>
-#include <string>
-#include <vector>
 
 ModBase::ModBase(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, std::string filename,
         common_io_ptr common_io, session_io_ptr session_io)

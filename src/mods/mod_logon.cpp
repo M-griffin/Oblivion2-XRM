@@ -1,5 +1,12 @@
 #include "mod_logon.hpp"
 
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <memory>
+#include <vector>
+#include <functional>
+
 #include "../model-sys/structures.hpp"
 #include "../model-sys/config.hpp"
 #include "../model-sys/security.hpp"
@@ -15,13 +22,6 @@
 #include "../encryption.hpp"
 #include "../logging.hpp"
 #include "../common_io.hpp"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <memory>
-#include <vector>
-#include <functional>
 
 ModLogon::ModLogon(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, 
         common_io_ptr common_io, session_io_ptr session_io)

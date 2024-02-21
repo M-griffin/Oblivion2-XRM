@@ -1,17 +1,17 @@
 #include "session_manager.hpp"
 
-#include "state_manager.hpp"
-#include "async_io.hpp"
-#include "session.hpp"
-#include "logging.hpp"
-#include "common_io.hpp"
-
 #include <functional>
 #include <algorithm>
 #include <string>
 #include <vector>
 #include <memory>
 #include <mutex>
+
+#include "state_manager.hpp"
+#include "async_io.hpp"
+#include "session.hpp"
+#include "logging.hpp"
+#include "common_io.hpp"
 
 SessionManager::SessionManager()
     : m_log(Logging::getInstance())

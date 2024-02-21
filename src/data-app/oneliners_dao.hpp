@@ -1,12 +1,12 @@
 #ifndef ONELINERS_DAO_HPP
 #define ONELINERS_DAO_HPP
 
-#include "../model-app/oneliners.hpp"
-#include "../data-sys/base_dao.hpp"
-
 #include <string>
 #include <memory>
 #include <vector>
+
+#include "../model-app/oneliners.hpp"
+#include "../data-sys/base_dao.hpp"
 
 // Forward Decelerations
 namespace SQLW

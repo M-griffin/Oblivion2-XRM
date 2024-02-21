@@ -3,14 +3,13 @@
 
 #include "mod_base.hpp"
 
-#include "model-sys/structures.hpp"
-
 #include <iostream>
 #include <string>
 #include <memory>
 #include <functional>
 #include <vector>
 
+#include "model-sys/structures.hpp"
 
 class Directory;
 typedef std::shared_ptr<Directory> directory_ptr;

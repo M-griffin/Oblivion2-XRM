@@ -3,13 +3,11 @@
 
 #include "processor_base.hpp"
 
-#include "model-sys/screen_pixel.hpp"
-
-#include "common_io.hpp"
-
 #include <memory>
 #include <string>
 
+#include "model-sys/screen_pixel.hpp"
+#include "common_io.hpp"
 
 /**
  * @class ProcessorText

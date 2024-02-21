@@ -1,19 +1,19 @@
 #ifndef BASE_DAO_HPP
 #define BASE_DAO_HPP
 
-#include "logging.hpp"
+#include <iostream>
+#include <memory>
+#include <functional>
+#include <vector>
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-#include "libSqliteWrapped.h"
 #include <sqlite3.h>
 
-#include <iostream>
-#include <memory>
-#include <functional>
-#include <vector>
+#include "logging.hpp"
+#include "libSqliteWrapped.h"
 
 
 // Handle to Database Queries

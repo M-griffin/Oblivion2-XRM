@@ -1,25 +1,27 @@
 #include "db_startup.hpp"
 
+#include <cassert>
+
 #include "../model-sys/structures.hpp"
 #include "../model-sys/protocol.hpp"
 #include "../model-sys/access_level.hpp"
 #include "../model-app/oneliners.hpp"
-
-#include "base_dao.hpp"
-#include "protocol_dao.hpp"
-#include "access_level_dao.hpp"
 #include "../data-app/oneliners_dao.hpp"
-#include "../logging.hpp"
 
 // Needed for Initializing and checking users data is setup
 // On startup.
 #include "session_stats_dao.hpp"
 #include "security_dao.hpp"
 #include "users_dao.hpp"
+#include "base_dao.hpp"
+#include "protocol_dao.hpp"
+#include "access_level_dao.hpp"
+
+#include "../logging.hpp"
 
 #include "libSqliteWrapped.h"
 
-#include <cassert>
+
 
 DbStartup::DbStartup()
 {

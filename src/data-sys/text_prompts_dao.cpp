@@ -1,14 +1,14 @@
 #include "text_prompts_dao.hpp"
 
-#include "logging.hpp"
-
-#include <yaml-cpp/yaml.h>
-
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <exception>
 #include <cassert>
+
+#include "logging.hpp"
+
+#include <yaml-cpp/yaml.h>
 
 const std::string TextPromptsDao::FILE_VERSION = "1.0.1";
 static bool is_version_displayed = false;

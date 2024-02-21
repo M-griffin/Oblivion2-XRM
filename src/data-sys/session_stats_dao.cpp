@@ -1,14 +1,14 @@
 #include "session_stats_dao.hpp"
 
+#include <iostream>
+#include <string>
+
+#include <sqlite3.h>
+
 #include "../model-sys/session_stats.hpp"
 #include "../logging.hpp"
 
 #include "libSqliteWrapped.h"
-#include <sqlite3.h>
-
-#include <iostream>
-#include <string>
-
 
 /**
  * Base Dao Calls for generic Object Data Calls

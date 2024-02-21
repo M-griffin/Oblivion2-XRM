@@ -1,5 +1,12 @@
 #include "session_io.hpp"
 
+#include <clocale>
+#include <regex>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <memory>
+
 #include "session.hpp"
 #include "common_io.hpp"
 #include "encoding.hpp"
@@ -7,13 +14,6 @@
 
 #include "model-sys/config.hpp"
 #include "utf-cpp/utf8.h"
-
-#include <clocale>
-#include <regex>
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <memory>
 
 
 SessionIO::SessionIO()

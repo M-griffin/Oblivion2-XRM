@@ -1,15 +1,15 @@
 #ifndef FORM_BASE_HPP
 #define FORM_BASE_HPP
 
-#include "../model-sys/config.hpp"
-#include "../model-sys/menu.hpp"
-#include "../session_io.hpp"
-
-#include <yaml-cpp/yaml.h>
-
 #include <memory>
 #include <iostream>
 #include <string>
+
+#include <yaml-cpp/yaml.h>
+
+#include "../model-sys/config.hpp"
+#include "../model-sys/menu.hpp"
+#include "../session_io.hpp"
 
 
 /**

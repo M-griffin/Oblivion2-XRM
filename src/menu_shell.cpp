@@ -1,14 +1,14 @@
 #include "menu_shell.hpp"
 #include "menu_base.hpp"
 
-#include "logging.hpp"
-
 #include <locale>
 #include <string>
 #include <vector>
 #include <functional>
 #include <cassert>
 
+
+#include "logging.hpp"
 
 MenuShell::MenuShell(session_ptr session_data)
     : StateBase(session_data)

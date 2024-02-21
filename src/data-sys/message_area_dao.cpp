@@ -1,13 +1,14 @@
 #include "message_area_dao.hpp"
 
+#include <iostream>
+#include <string>
+
+#include <sqlite3.h>
+
 #include "../model-sys/message_area.hpp"
 #include "../logging.hpp"
 
 #include "libSqliteWrapped.h"
-#include <sqlite3.h>
-
-#include <iostream>
-#include <string>
 
 /**
  * Base Dao Calls for generic Object Data Calls

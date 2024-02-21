@@ -1,9 +1,5 @@
 #include "io_service.hpp"
 
-#include "common_io.hpp"
-#include "socket_handler.hpp"
-#include "logging.hpp"
-
 #include <cstring>
 #include <string>
 #include <thread>
@@ -11,6 +7,10 @@
 #include <system_error>
 #include <memory>
 #include <malloc.h>
+
+#include "common_io.hpp"
+#include "socket_handler.hpp"
+#include "logging.hpp"
 
 IOService::IOService()
     : m_log(Logging::getInstance())

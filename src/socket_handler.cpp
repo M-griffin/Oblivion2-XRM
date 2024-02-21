@@ -1,11 +1,11 @@
 
 #include "socket_handler.hpp"
 
-#include "socket_state.hpp"
-#include "logging.hpp"
-
 #include <iostream>
 #include <exception>
+
+#include "socket_state.hpp"
+#include "logging.hpp"
 
 
 SocketHandler::SocketHandler()

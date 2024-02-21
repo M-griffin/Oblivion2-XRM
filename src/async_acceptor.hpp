@@ -1,13 +1,13 @@
 #ifndef ASYNC_ACCEPTOR_HPP
 #define ASYNC_ACCEPTOR_HPP
 
+#include <iostream>
+#include <memory>
+
 #include "async_base.hpp"
 #include "io_service.hpp"
 #include "socket_handler.hpp"
 #include "logging.hpp"
-
-#include <iostream>
-#include <memory>
 
 /**
  * @class AsyncAcceptor

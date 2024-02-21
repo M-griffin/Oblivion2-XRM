@@ -1,13 +1,14 @@
 #include "encryption.hpp"
-#include "logging.hpp"
 
 #include <openssl/engine.h>
-#include "openssl/evp.h"
+#include <openssl/evp.h>
 
 #include <iostream>
 #include <string>
 #include <sstream>
 #include <iomanip>
+
+#include "logging.hpp"
 
 Encrypt::Encrypt()
 {

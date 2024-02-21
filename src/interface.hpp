@@ -1,6 +1,10 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+// For Startup.
+#include "sdl2_net/SDL_net.hpp"
+#include <thread>
+
 #include "session_manager.hpp"
 #include "session.hpp"
 #include "async_io.hpp"
@@ -10,10 +14,6 @@
 #include "socket_handler.hpp"
 #include "async_acceptor.hpp"
 #include "logging.hpp"
-
-// For Startup.
-#include <sdl2_net/SDL_net.hpp>
-#include <thread>
 
 class Interface;
 typedef std::unique_ptr<Interface> interface_ptr;

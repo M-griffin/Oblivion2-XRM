@@ -1,14 +1,15 @@
 #ifndef ASYNC_CONNECTION_HPP
 #define ASYNC_CONNECTION_HPP
 
+#include <vector>
+#include <memory>
+#include <chrono>
+
 #include "async_base.hpp"
 #include "io_service.hpp"
 #include "socket_handler.hpp"
 #include "logging.hpp"
 
-#include <vector>
-#include <memory>
-#include <chrono>
 
 /**
  * @class AsyncIO

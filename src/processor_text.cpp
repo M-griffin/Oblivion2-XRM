@@ -1,13 +1,5 @@
 #include "processor_text.hpp"
 
-#include "model-sys/structures.hpp"
-#include "model-sys/screen_pixel.hpp"
-
-#include "common_io.hpp"
-#include "logging.hpp"
-
-#include "utf-cpp/utf8.h"
-
 #include <cstdio>
 #include <cstdlib>
 #include <cctype>
@@ -24,6 +16,14 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+
+#include "model-sys/structures.hpp"
+#include "model-sys/screen_pixel.hpp"
+
+#include "common_io.hpp"
+#include "logging.hpp"
+
+#include "utf-cpp/utf8.h"
 
 ProcessorText::ProcessorText(int term_height, int term_width)
     : ProcessorBase(term_height, term_width)

@@ -1,12 +1,12 @@
 #ifndef SESSION_STATS_DAO_HPP
 #define SESSION_STATS_DAO_HPP
 
-#include "../model-sys/session_stats.hpp"
-#include "../data-sys/base_dao.hpp"
-
 #include <memory>
 #include <vector>
 #include <functional>
+
+#include "../model-sys/session_stats.hpp"
+#include "../data-sys/base_dao.hpp"
 
 // Forward Decelerations
 namespace SQLW
