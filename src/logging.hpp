@@ -74,6 +74,12 @@ public:
      * @return
      */
     std::string getCurrentDateTime();
+    
+    /**
+     * @brief Current Time Stamp (LOCAL TIME)
+     * @return
+     */
+    std::string getCurrentDateTimeMillis();
 
     /**
      * @brief Configuration String to Int Log Level
@@ -145,8 +151,8 @@ public:
         }
 
         std::vector<std::string> details;
-        std::string date_time = getCurrentDateTime();
-        std::string log_string = log<level>(rest...);
+        std::string date_time = getCurrentDateTimeMillis();
+        std::string log_string = log<level>(rest...);        
 
         switch(level)
         {
@@ -182,13 +188,12 @@ public:
                 break;
 
             default:
+                details.clear();
                 return;
         }
 
-        if(details.size() > 0)
-        {
-            details.clear();
-        }
+        details.clear();
+
     }
 
 
@@ -197,7 +202,7 @@ public:
      * @param date_time
      * @param details
      */
-    void writeOutYamlConsole(const std::string &date_time, std::vector<std::string> details);
+    void writeOutYamlConsole(const std::string &date_time, std::vector<std::string> &details);
 
 
 private:

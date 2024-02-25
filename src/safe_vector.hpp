@@ -128,8 +128,7 @@ public:
     {
         if (is_empty()) 
         {
-            return false;
-            
+            return false;            
         }
         
         std::unique_lock<std::mutex> lock(m);

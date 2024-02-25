@@ -52,6 +52,7 @@ std::string Logging::standardDateTimeToString(std::time_t std_time)
     std::ostringstream oss;
     oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d %H:%M:%S %z");
     std::string datetime_string = oss.str();
+    oss.clear();
     return datetime_string;
 }
 
@@ -64,6 +65,26 @@ std::string Logging::getCurrentDateTime()
 {
     std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     return standardDateTimeToString(now);
+}
+
+/**
+ * @brief Current Time Stamp (LOCAL TIME) - With MilliSeconds!
+ * @return
+ */
+std::string Logging::getCurrentDateTimeMillis()
+{
+    // Millisecond are not native, we need to take (absoulte seconds - absolute millisonds) to get the left overs then append it.
+    auto now = std::chrono::system_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) -
+      std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch());
+
+    std::ostringstream oss;
+    std::time_t localnow = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    oss << std::put_time(std::localtime(&localnow), "%Y-%m-%d %H:%M:%S.");
+    oss << std::setfill('0') << std::setw(3) << ms.count();
+    std::string datetime_string = oss.str();
+    oss.clear();
+    return datetime_string;
 }
 
 /**
@@ -115,7 +136,7 @@ void Logging::setUserInfo(int node_number)
  * @param date_time
  * @param details
  */
-void Logging::writeOutYamlConsole(const std::string &date_time, std::vector<std::string> details)
+void Logging::writeOutYamlConsole(const std::string &date_time, std::vector<std::string> &details)
 {        
     /*  Overkill on logging yaml formated logs.
     YAML::Emitter out;

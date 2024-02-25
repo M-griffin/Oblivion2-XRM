@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "mod_base.hpp"
+
 #include "../data-sys/text_prompts_dao.hpp"
 #include "../data-sys/access_level_dao.hpp"
 

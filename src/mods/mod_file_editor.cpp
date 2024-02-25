@@ -5,6 +5,8 @@
 #include <sstream>
 #include <vector>
 
+#include "mod_base.hpp"
+
 #include "../model-sys/config.hpp"
 #include "../data-sys/text_prompts_dao.hpp"
 

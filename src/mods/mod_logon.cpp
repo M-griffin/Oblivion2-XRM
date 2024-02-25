@@ -7,6 +7,8 @@
 #include <vector>
 #include <functional>
 
+#include "mod_base.hpp"
+
 #include "../model-sys/structures.hpp"
 #include "../model-sys/config.hpp"
 #include "../model-sys/security.hpp"

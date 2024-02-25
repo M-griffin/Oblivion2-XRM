@@ -18,6 +18,7 @@
 
 #include "logging.hpp"
 #include "encoding.hpp"
+#include "uuid.hpp"
 
 #include "libSqliteWrapped.h"
 
@@ -40,8 +41,9 @@ Session::Session(async_io_ptr my_async_io, session_manager_ptr my_session_manage
     , m_node_number(0)
     , m_is_leaving(false)
     , m_parsed_data("")
+    , m_session_id("")
     , m_encoding_text(Encoding::ENCODING_TEXT_UTF8)
-    , m_encoding(Encoding::ENCODE_UTF8)
+    , m_encoding(Encoding::ENCODE_UTF8)    
     , m_is_use_ansi(true)
     , m_is_esc_timer(false)
     , m_is_session_authorized(false)
@@ -50,7 +52,7 @@ Session::Session(async_io_ptr my_async_io, session_manager_ptr my_session_manage
     // Setup Shared Pointers
     m_state_manager = std::make_shared<StateManager>();
     m_telnet_decoder = std::make_shared<TelnetDecoder>(my_async_io);
-    m_user_record = std::make_shared<Users>();
+    m_user_record = std::make_shared<Users>();  
     
     if(m_async_io->isActive())
     {
@@ -75,6 +77,7 @@ Session::~Session()
     m_telnet_decoder.reset();    
     m_user_record.reset();
     m_session_manager.reset();
+    m_in_data_vector.clear();
     std::vector<unsigned char>().swap(m_in_data_vector);
 }
 
@@ -219,6 +222,7 @@ void Session::asyncWait(int expires_on, const Callback &callback_method)
 void Session::waitingForData()
 {
     // Important, clear out buffer before each read.
+    m_in_data_vector.clear();
     std::vector<unsigned char>().swap(m_in_data_vector);
     
     if(m_async_io->isActive()) // && TheCommunicator::instance()->isActive())
@@ -419,6 +423,7 @@ void Session::handleTeloptCodes()
     // Encode all incoming data as UTF8 unless we are not utf8
     // Updated, append Incoming to Parsed Data so we don't miss double ESC Sequences.
     // This catches items still in Buffer where sequences happen quickly. like Double ESC's.
+    /*
     if(m_encoding != Encoding::ENCODE_UTF8)
     {
         m_parsed_data += Encoding::getInstance().utf8Encode(incoming_data);        
@@ -427,7 +432,11 @@ void Session::handleTeloptCodes()
     {
         m_parsed_data += incoming_data;
     
-    }
+    }*/
+    
+    // Encoding is isolated to Output Translations of CP437 Textfiles.
+    // For Incoming data we shouldn't translate as Parsing methods should handle.
+    m_parsed_data += incoming_data;
 }
 
 /**

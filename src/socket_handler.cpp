@@ -10,7 +10,7 @@
 
 SocketHandler::SocketHandler()
     : m_log(Logging::getInstance())
-    , m_socket()
+    , m_socket(nullptr)
     , m_socket_type("")
     , m_is_active(false)
 {
@@ -21,12 +21,11 @@ SocketHandler::~SocketHandler()
     m_log.write<Logging::DEBUG_LOG>("~SocketHandler()");
     
     // Clean up the socket left overs.
-    if (m_socket.size() > 0 && m_socket.back() != NULL) {
-        m_socket.back()->onExit();
+    if (m_socket) {
+        m_socket->onExit();
     }
     
-    m_socket.clear();
-    std::vector<socket_state_ptr>().swap(m_socket);
+    m_socket.reset();    
 }
 
 /**
@@ -37,7 +36,7 @@ SocketHandler::~SocketHandler()
  */
 int SocketHandler::sendSocket(unsigned char *buffer, Uint32 length)
 {
-    return m_socket.back()->sendSocket(buffer, length);
+    return m_socket->sendSocket(buffer, length);
 }
 
 /**
@@ -47,7 +46,7 @@ int SocketHandler::sendSocket(unsigned char *buffer, Uint32 length)
  */
 int SocketHandler::recvSocket(char *message)
 {
-    return m_socket.back()->recvSocket(message);
+    return m_socket->recvSocket(message);
 }
 
 /**
@@ -60,14 +59,14 @@ int SocketHandler::SocketHandler::poll()
 
     if(m_is_active)
     {
-        ret = m_socket.back()->pollSocket();
+        ret = m_socket->pollSocket();
 
         if(ret == -1)
         {
             m_log.write<Logging::WARN_LOG>("Socket Closed by host, disconnecting.", __FILE__, __LINE__);
 
             // Shutdown Socket.
-            m_socket.back()->onExit();
+            m_socket->onExit();
             m_is_active = false;
         }
     }
@@ -87,7 +86,7 @@ int SocketHandler::SocketHandler::poll()
  */
 std::string SocketHandler::getIpAddress()
 {
-    return m_socket.back()->getIPAddress();
+    return m_socket->getIPAddress();
 }
 
 /**
@@ -103,10 +102,9 @@ bool SocketHandler::createTelnetAcceptor(const std::string &host, const int &por
         try
         {
             m_socket_type = SOCKET_TYPE_TELNET;            
-            socket_state_ptr sdl_socket = std::make_shared<SDL_Socket>(host, port);
-            m_socket.push_back(sdl_socket);
+            m_socket = std::make_shared<SDL_Socket>(host, port);
 
-            if(m_socket.back()->onListen())
+            if(m_socket->onListen())
             {
                 m_is_active = true;
             }
@@ -139,8 +137,8 @@ bool SocketHandler::createTelnetAcceptor(const std::string &host, const int &por
  */
 socket_handler_ptr SocketHandler::acceptTelnetConnection()
 {
-    if (m_socket.size() > 0 && m_socket.back()->m_is_socket_active) {
-        return m_socket.back()->pollSocketAccepts();
+    if (m_socket->m_is_socket_active) {
+        return m_socket->pollSocketAccepts();
     }
     
     return nullptr;
@@ -181,15 +179,15 @@ void SocketHandler::close()
     try
     {
         // Deactivate Socket, then Clean it.
-        if(m_socket.size() > 0 && m_socket.back())
+        if(m_socket)
         {
-            m_socket.back()->onExit();
+            m_socket->onExit();
         }
 
         m_is_active = false;
         m_socket_type.erase();
-        m_socket.pop_back();
-        std::vector<socket_state_ptr>().swap(m_socket);
+        m_socket.reset();
+        
     }
     catch(std::exception& e)
     {
@@ -212,7 +210,8 @@ void SocketHandler::setSocketType(std::string type)
  */
 void SocketHandler::setSocketState(socket_state_ptr state)
 {
-    m_socket.push_back(state);
+    m_socket.reset();
+    m_socket = state;
     m_is_active = true;
 }
 
@@ -222,6 +221,6 @@ void SocketHandler::setSocketState(socket_state_ptr state)
  */
 void SocketHandler::disconnectUser()
 {
-    m_socket.back()->disconnectUser();
+    m_socket->disconnectUser();
 }
 

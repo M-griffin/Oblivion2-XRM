@@ -25,6 +25,7 @@ TelnetDecoder::TelnetDecoder(async_io_ptr async_io)
     , m_currentOption(0)
     , m_subnegoOption(0)
 {
+    m_reply_sequence.clear();
 }
 
 TelnetDecoder::~TelnetDecoder()

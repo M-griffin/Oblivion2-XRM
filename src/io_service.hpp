@@ -174,7 +174,8 @@ public:
         if(SERVICE_LISTENER(service_type))
         {
             // Server Connection Listener Job (1) for each Service.
-            m_listener_list.push_back(std::shared_ptr<ServiceBase>(job));
+            m_listener.reset();
+            m_listener = std::shared_ptr<ServiceBase>(job);
         }
         else
         {
@@ -323,11 +324,10 @@ public:
      */
     bool isActive();
     
-    SafeVector<service_base_ptr>  m_listener_list;
+    Logging                      &m_log;
+    service_base_ptr              m_listener;
     SafeQueue<service_base_ptr>   m_service_list;    
     SafeQueue<timer_base_ptr>     m_timer_list;
-    
-    Logging                      &m_log;
     bool                          m_is_active;
 
 };

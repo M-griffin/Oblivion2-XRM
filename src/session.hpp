@@ -12,6 +12,7 @@
 #include "encoding.hpp"
 
 #include "libSqliteWrapped.h"
+#include "uuid.hpp"
 
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
@@ -63,6 +64,11 @@ public:
     static session_ptr create(async_io_ptr my_async_io, session_manager_ptr my_session_manager)
     {
         session_ptr new_session = std::make_shared<Session>(my_async_io, my_session_manager);
+        
+        // Setup Unique Session Id's.    
+        Uuid uuid;
+        new_session->m_session_id = uuid.createUuidString();
+
         
         try        
         {
@@ -220,15 +226,15 @@ public:
     bool                       m_is_leaving;
     std::vector<unsigned char> m_in_data_vector;
     std::string                m_parsed_data;
+    std::string                m_session_id;
     std::string                m_encoding_text;
-    int                        m_encoding;
+    int                        m_encoding;    
     bool                       m_is_use_ansi;
     bool                       m_is_esc_timer;
     bool                       m_is_session_authorized;
     
     SQLW::Database             m_user_database;
-    SQLW::StderrLog            m_database_log;
-
+    SQLW::StderrLog            m_database_log;    
 };
 
 #endif // SESSION_HPP

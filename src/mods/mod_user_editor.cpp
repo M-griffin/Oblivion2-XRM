@@ -5,6 +5,8 @@
 #include <cassert>
 #include <regex>
 
+#include "mod_base.hpp"
+
 #include "../data-sys/text_prompts_dao.hpp"
 #include "../model-sys/config.hpp"
 #include "../model-sys/security.hpp"

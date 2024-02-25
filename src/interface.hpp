@@ -2,8 +2,9 @@
 #define SERVER_HPP
 
 // For Startup.
-#include "sdl2_net/SDL_net.hpp"
 #include <thread>
+
+#include "sdl2_net/SDL_net.hpp"
 
 #include "session_manager.hpp"
 #include "session.hpp"

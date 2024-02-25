@@ -50,6 +50,11 @@ public:
 
     explicit CommonIO();
     ~CommonIO();
+    
+    /**
+     * @brief Setup a Static GLobal Map for Key Input that can be resued.
+     */
+    void popuateInputSequenceMap();
 
     /**
      * @brief Retrieve Key Sequence by Value

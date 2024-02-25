@@ -6,7 +6,7 @@
 #include <chrono>
 #include <system_error>
 #include <memory>
-#include <malloc.h>
+//#include <malloc.h>
 
 #include "common_io.hpp"
 #include "socket_handler.hpp"
@@ -14,6 +14,7 @@
 
 IOService::IOService()
     : m_log(Logging::getInstance())
+    , m_listener(nullptr)
     , m_is_active(true)
 {
 }
@@ -21,8 +22,8 @@ IOService::IOService()
 IOService::~IOService()
 {
     m_log.write<Logging::DEBUG_LOG>("~IOService()");
-    m_service_list.clear();
-    m_listener_list.clear();
+    m_listener.reset();
+    m_service_list.clear();    
     m_timer_list.clear();
 }
 
@@ -30,39 +31,34 @@ IOService::~IOService()
  * @brief Async Listener, check for incoming connections
  */
 void IOService::checkAsyncListenersForConnections()
-{
-    for(unsigned int i = 0; i < m_listener_list.size(); i++)
+{        
+    if(!m_listener || !m_listener->getSocketHandle()->isActive())
     {
-        service_base_ptr listener_work = m_listener_list.get(i);
+        return;
+    }
 
-        if(!listener_work || !listener_work->getSocketHandle()->isActive())
-        {
-            continue;
+    socket_handler_ptr handler = m_listener->getSocketHandle()->acceptTelnetConnection();
+
+    if(handler != nullptr)
+    {
+        m_log.write<Logging::DEBUG_LOG>("ioservice async accept - connection created.");
+        std::error_code success_code(0, std::generic_category());
+
+        try
+        {                
+            m_log.write<Logging::DEBUG_LOG>("ioservice Async-Accept - Execute CallBack", __FILE__, __LINE__);
+            
+            // Check for max nodes here, if we like can limit, send a message and drop
+            // connection on handler by not passing it through the callback.
+            // Creates a Session on New Incoming Connections
+            m_listener->executeCallback(success_code, handler);
+                            
+            m_log.write<Logging::DEBUG_LOG>("ioservice Async-Accept - Returned CallBack", __FILE__, __LINE__);
         }
-
-        socket_handler_ptr handler = listener_work->getSocketHandle()->acceptTelnetConnection();
-
-        if(handler != nullptr)
+        catch(std::exception &ex)
         {
-            m_log.write<Logging::DEBUG_LOG>("ioservice async accept - connection created.");
-            std::error_code success_code(0, std::generic_category());
-
-            try
-            {                
-                m_log.write<Logging::DEBUG_LOG>("ioservice Async-Accept - Execute CallBack", __FILE__, __LINE__);
-                
-                // Check for max nodes here, if we like can limit, send a message and drop
-                // connection on handler by not passing it through the callback.
-                // Creates a Session on New Incoming Connections
-                listener_work->executeCallback(success_code, handler);
-                                
-                m_log.write<Logging::DEBUG_LOG>("ioservice Async-Accept - Returned CallBack", __FILE__, __LINE__);
-            }
-            catch(std::exception &ex)
-            {
-                m_log.write<Logging::WARN_LOG>("ioservice Exception Async-Accept", ex.what(), __FILE__, __LINE__);
-            }
-        }        
+            m_log.write<Logging::WARN_LOG>("ioservice Exception Async-Accept", ex.what(), __FILE__, __LINE__);
+        }
     }
 }
 
@@ -249,7 +245,7 @@ void IOService::run()
         // Garbage collection Memory back to the OS Every 5 Minute (Testing, update this maybe hourly)
         if (time_passed >= 300000)            
         {            
-            std::cout << "malloc_trim() time_passed= " << time_passed << ", bytes freeed= " << malloc_trim(0) << std::endl;        
+            //std::cout << "malloc_trim() time_passed= " << time_passed << ", bytes freeed= " << malloc_trim(0) << std::endl;        
             
             
             // Reset Timer
@@ -272,7 +268,7 @@ void IOService::stop()
     // Clear All Lists and attached handles.
     m_service_list.clear();
     m_timer_list.clear();
-    m_listener_list.clear();
+    m_listener.reset();
 }
 
 bool IOService::isActive()

@@ -11,6 +11,8 @@
 #include <memory>
 #include <functional>
 
+#include "mod_base.hpp"
+
 #include "../model-sys/config.hpp"
 #include "../model-sys/users.hpp"
 #include "../model-sys/menu.hpp"

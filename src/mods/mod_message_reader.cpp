@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include "mod_base.hpp"
+
 #include "../data-sys/text_prompts_dao.hpp"
 #include "../model-sys/config.hpp"
 

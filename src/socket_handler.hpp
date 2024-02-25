@@ -50,8 +50,7 @@ public:
 private:
 
     Logging                        &m_log;
-
-    std::vector<socket_state_ptr>   m_socket;
+    socket_state_ptr                m_socket;
     std::string                     m_socket_type;
     bool                            m_is_active;
 

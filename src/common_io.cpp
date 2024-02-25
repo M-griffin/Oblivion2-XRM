@@ -41,6 +41,8 @@
 
 #include "utf-cpp/utf8.h"
 
+std::map<std::string, std::string> INPUT_SEQUENCE_MAP;
+
 CommonIO::CommonIO()
     : m_log(Logging::getInstance())
     , m_escape_sequence("")
@@ -51,7 +53,8 @@ CommonIO::CommonIO()
     , m_is_escape_sequence(false)
     , m_is_new_getline(true)
     , m_is_new_leadoff(true)
-{ 
+{
+    popuateInputSequenceMap();
 }
 
 CommonIO::~CommonIO()
@@ -64,6 +67,136 @@ CommonIO::~CommonIO()
     m_incoming_data.erase();
     m_line_buffer.erase();
 }
+
+/**
+ * @brief Setup a Static GLobal Map for Key Input that can be resued.
+ */
+void CommonIO::popuateInputSequenceMap() 
+{
+    if (INPUT_SEQUENCE_MAP.size() > 0) 
+    {
+        return;
+    }
+    
+    // Arrow Keys, Hardware OA are translated to [A on the fly
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[A",    "up_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[B",    "dn_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[C",    "rt_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[D",    "lt_arrow"));
+
+    // Hardware Keys, or Num pad.
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("OA",    "up_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("OB",    "dn_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("OC",    "rt_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("OD",    "lt_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("OE",    "clear"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("OF",    "end"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("OH",    "home"));
+
+    // Shift Arrow Keys
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[1;2A", "shift_up_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[1;2B", "shift_dn_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[1;2C", "shift_rt_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[1;2D", "shift_lt_arrow"));
+
+    // Shift TAB
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[Z",    "shift_tab"));
+
+    // Function Keys ANSI
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[@",    "insert"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[H",    "home"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[K",    "end"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[F",    "end")); // = 0F
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[V",    "pg_up"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[U",    "pg_dn"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OP",   "f1"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OQ",   "f2"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OR",   "f3"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OS",   "f4"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OT",   "f5"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[17~", "f6"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[18~", "f7"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[19~", "f8"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[20~", "f9"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[21~", "f10"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[23~", "f11"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[24~", "f12"));
+
+    // VT-100 Putty
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[1~",   "home"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[2~",   "insert"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[3~",   "del"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[4~",   "end"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[5~",   "pg_up"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[6~",   "pg_dn"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OU",   "f6"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OV",   "f7"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OW",   "f8"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OX",   "f9"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OY",   "f10"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OZ",   "f11"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[O[",   "f12"));
+
+    // Linux Console
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[A",   "f1"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[B",   "f2"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[C",   "f3"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[D",   "f4"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[E",   "f5"));
+
+    // SCO
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[L",    "insert"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[I",    "pg_up"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[G",    "pg_dn"));
+
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[M",   "f1"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[N",   "f2"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[O",   "f3"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[P",   "f4"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[Q",   "f5"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[R",   "f6"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[S",   "f7"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[T",   "f8"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[U",   "f9"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[V",   "f10"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[W",   "f11"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[X",   "f12"));
+
+    // rxvt
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[7~",   "home"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[8~",   "end"));
+
+    // Shift Arrow Keys
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[a",    "shift_up_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[b",    "shift_dn_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[c",    "shift_rt_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[d",    "shift_lt_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[e",    "shift_clear"));
+
+    // Shift Function
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[2$",   "insert"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[3$",   "del"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[5$",   "pg_up"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[6$",   "pg_dn"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[7$",   "home"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[8$",   "end"));
+
+    // Ctrl
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("Oa",    "ctrl_up_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("Ob",    "ctrl_dn_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("Oc",    "ctrl_rt_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("Od",    "ctrl_lt_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("Oe",    "ctrl_clear"));
+
+    // Shift Function
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[2^",   "ctrl_insert"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[3^",   "ctrl_del"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[5^",   "ctrl_pg_up"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[6^",   "ctrl_pg_dn"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[7^",   "ctrl_home"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[8^",   "ctrl_end"));
+}
+
 
 /**
  * @brief Retrieve Key Sequence by Value

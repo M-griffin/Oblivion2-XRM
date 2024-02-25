@@ -5,6 +5,8 @@
 #include <vector>
 #include <sstream>
 
+#include "mod_base.hpp"
+
 #include "../model-sys/access_level.hpp"
 #include "../model-sys/config.hpp"
 

@@ -1,5 +1,7 @@
 #include "mod_protocol_editor.hpp"
 
+#include "mod_base.hpp"
+
 #include "../data-sys/text_prompts_dao.hpp"
 #include "../model-sys/config.hpp"
 
