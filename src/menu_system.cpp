@@ -11,6 +11,7 @@
 
 #include "model-sys/config.hpp"
 
+/*
 #include "mods/mod_prelogon.hpp"
 #include "mods/mod_logon.hpp"
 #include "mods/mod_signup.hpp"
@@ -18,6 +19,7 @@
 #include "mods/mod_user_editor.hpp"
 #include "mods/mod_level_editor.hpp"
 #include "mods/mod_message_editor.hpp"
+*/
 
 #include "session.hpp"
 #include "logging.hpp"
@@ -93,7 +95,17 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
 bool MenuSystem::onEnter()
 {
     // Startup the Prelogon sequence
-    startupModulePreLogon();
+    //startupModulePreLogon();
+    
+    m_current_menu = "matrix";        
+    m_log.write<Logging::CONSOLE_LOG>("loadAndStartupMenu on initial login");
+    loadAndStartupMenu();
+    
+    
+    // Reset the Input back to the Menu System
+    resetMenuInputIndex(MENU_INPUT);
+    loadAndStartupMenu();
+    
     m_is_active = true;
     return true;
 }
@@ -960,6 +972,7 @@ void MenuSystem::startupModulePreLogon()
     resetMenuInputIndex(MODULE_PRELOGON_INPUT);
 
     // Allocate and Create
+    /*
     module_ptr module = std::make_shared<ModPreLogon>(
         m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
     );
@@ -970,7 +983,7 @@ void MenuSystem::startupModulePreLogon()
         return;
     }
 
-    startupModule(module);
+    startupModule(module);*/
 }
 
 /**
@@ -982,6 +995,7 @@ void MenuSystem::startupModuleLogon()
     resetMenuInputIndex(MODULE_LOGON_INPUT);
 
     // Allocate and Create
+    /*
     module_ptr module = std::make_shared<ModLogon>(
         m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
     );
@@ -992,7 +1006,7 @@ void MenuSystem::startupModuleLogon()
         return;
     }
 
-    startupModule(module);
+    startupModule(module); */
 }
 
 /**
@@ -1004,6 +1018,7 @@ void MenuSystem::startupModuleSignup()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
+    /*
     module_ptr module = std::make_shared<ModSignup>(
         m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
     );
@@ -1014,7 +1029,7 @@ void MenuSystem::startupModuleSignup()
         return;
     }
 
-    startupModule(module);
+    startupModule(module); */
 }
 
 /**
@@ -1026,6 +1041,7 @@ void MenuSystem::startupModuleMenuEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
+    /*
     module_ptr module = std::make_shared<ModMenuEditor>(
         m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
     );
@@ -1036,7 +1052,7 @@ void MenuSystem::startupModuleMenuEditor()
         return;
     }
 
-    startupModule(module);
+    startupModule(module); */
 }
 
 /**
@@ -1048,6 +1064,7 @@ void MenuSystem::startupModuleUserEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
+    /*
     module_ptr module = std::make_shared<ModUserEditor>(
         m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
     );
@@ -1058,7 +1075,7 @@ void MenuSystem::startupModuleUserEditor()
         return;
     }
 
-    startupModule(module);
+    startupModule(module); */
 }
 
 /**
@@ -1070,6 +1087,7 @@ void MenuSystem::startupModuleLevelEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
+    /*
     module_ptr module = std::make_shared<ModLevelEditor>(
         m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
     );
@@ -1080,7 +1098,7 @@ void MenuSystem::startupModuleLevelEditor()
         return;
     }
 
-    startupModule(module);
+    startupModule(module); */
 }
 
 /**
@@ -1092,6 +1110,7 @@ void MenuSystem::startupModuleMessageEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
+    /*
     module_ptr module = std::make_shared<ModMessageEditor>(
         m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
     );
@@ -1102,7 +1121,7 @@ void MenuSystem::startupModuleMessageEditor()
         return;
     }
 
-    startupModule(module);
+    startupModule(module); */
 }
 
 

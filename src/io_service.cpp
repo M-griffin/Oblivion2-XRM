@@ -121,6 +121,7 @@ void IOService::run()
             // Temp timer, change to 10/20 miliseconds for cpu usage
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
             
+            /*
             // Time > 10 Minutes, reset time when no activity no reason to garbage collect.
             time_point_type end = std::chrono::time_point_cast<std::chrono::milliseconds>(clock::now());
             long time_passed = (end - start).count();
@@ -128,7 +129,7 @@ void IOService::run()
             {                                    
                 std::cout << "No Timer Activity, Reset() time_passed= " << time_passed << std::endl;        
                 start = std::chrono::time_point_cast<std::chrono::milliseconds>(clock::now());
-            }
+            }*/
             continue;
         }
         
