@@ -90,13 +90,13 @@ public:
     std::vector<MenuOption> m_loaded_pulldown_options;
 
     // Dynamic Async Input Function Vector.
-    std::vector<std::function< void(const std::string &, const bool &is_utf8)> > m_menu_functions;
+    //std::vector<std::function< void(const std::string &, const bool &is_utf8)> > m_menu_functions;
 
     // Handles Dynamic Menu Command Option Execution
-    std::vector<std::function< bool(const MenuOption &)> > m_execute_callback;
+    //std::vector<std::function< bool(const MenuOption &)> > m_execute_callback;
 
     // Handle Dynamic modules being executed.
-    std::vector<module_ptr> m_module_stack;
+    //std::vector<module_ptr> m_module_stack;
 
 
     /**

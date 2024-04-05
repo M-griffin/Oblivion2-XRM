@@ -71,14 +71,21 @@ MenuBase::~MenuBase()
     m_log.write<Logging::DEBUG_LOG>("~MenuBase()");
     
     // Pop Functions off the stack.
+    /*
     m_menu_functions.clear();
     std::vector<std::function< void(const std::string &, const bool &is_utf8)> >().swap(m_menu_functions);
     m_execute_callback.clear();
     std::vector<std::function< bool(const MenuOption &)> >().swap(m_execute_callback);
+    */
 
     // Pop off the stack to deallocate any active modules.
+    /*
     m_module_stack.clear();
     std::vector<module_ptr>().swap(m_module_stack);
+    m_loaded_pulldown_options.clear();
+    std::vector<MenuOption>().swap(m_loaded_pulldown_options);
+    */
+    
     m_loaded_pulldown_options.clear();
     std::vector<MenuOption>().swap(m_loaded_pulldown_options);
     
@@ -1239,6 +1246,7 @@ void MenuBase::lightbarUpdate(unsigned int previous_pulldown_id)
  */
 bool MenuBase::executeMenuOptions(const MenuOption &option)
 {
+    /*
     // If Invalid then return
     if(m_execute_callback.size() == 0 || option.command_key.size() != 2)
     {
@@ -1247,6 +1255,8 @@ bool MenuBase::executeMenuOptions(const MenuOption &option)
 
     // Execute Menu Option Commands per Callback
     return m_execute_callback.back()(option);
+    */
+    return false;
 }
 
 /**

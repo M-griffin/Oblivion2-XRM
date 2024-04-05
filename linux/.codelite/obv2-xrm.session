@@ -5,8 +5,29 @@
   <TabInfoArray Name="TabInfoArray">
     <TabInfo>
       <wxString Value="/home/merc/code/Oblivion2-XRM/src/menu_system.cpp" Name="FileName"/>
-      <int Value="84" Name="FirstVisibleLine"/>
-      <int Value="100" Name="CurrentLine"/>
+      <int Value="310" Name="FirstVisibleLine"/>
+      <int Value="324" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/home/merc/code/Oblivion2-XRM/src/menu_system.hpp" Name="FileName"/>
+      <int Value="279" Name="FirstVisibleLine"/>
+      <int Value="0" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/home/merc/code/Oblivion2-XRM/src/io_service.cpp" Name="FileName"/>
+      <int Value="234" Name="FirstVisibleLine"/>
+      <int Value="243" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/home/merc/code/Oblivion2-XRM/src/menu_base.cpp" Name="FileName"/>
+      <int Value="1220" Name="FirstVisibleLine"/>
+      <int Value="1040" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>

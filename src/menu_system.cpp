@@ -33,6 +33,7 @@ MenuSystem::MenuSystem(session_ptr session_data)
     , MenuBase(session_data)
     , m_log(Logging::getInstance())
 {
+    /*
     // [Vector] Setup std::function array with available options to pass input to.
     m_menu_functions.push_back(std::bind(&MenuBase::menuInput, this, std::placeholders::_1, std::placeholders::_2));
     m_menu_functions.push_back(std::bind(&MenuBase::menuYesNoBarInput, this, std::placeholders::_1, std::placeholders::_2));
@@ -64,6 +65,7 @@ MenuSystem::MenuSystem(session_ptr session_data)
     m_menu_command_functions['T'] = std::bind(&MenuSystem::menuOptionsFileBaseSponsorCommands, this, std::placeholders::_1);
     m_menu_command_functions['V'] = std::bind(&MenuSystem::menuOptionsVotingCommands, this, std::placeholders::_1);
     m_menu_command_functions['+'] = std::bind(&MenuSystem::menuOptionsColorSettingCommands, this, std::placeholders::_1);
+    */
 }
 
 MenuSystem::~MenuSystem()
@@ -71,8 +73,8 @@ MenuSystem::~MenuSystem()
     m_log.write<Logging::DEBUG_LOG>("~MenuSystem()");
     
     // Clear All Menu Command Functions.
-    m_menu_command_functions.clear();
-    MappedCommandFunctions().swap(m_menu_command_functions);
+    //m_menu_command_functions.clear();
+    //MappedCommandFunctions().swap(m_menu_command_functions);
 }
 
 /**
@@ -86,7 +88,16 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
     }
 
     // This simply passed through the input to the current system fuction were at.
-    m_menu_functions[m_input_index](character_buffer, is_utf8);
+    //m_menu_functions[m_input_index](character_buffer, is_utf8);
+    
+    switch(m_input_index) {
+        case 0 : menuInput(character_buffer, is_utf8); break;
+        case 1 : menuYesNoBarInput(character_buffer, is_utf8); break;
+        case 2 : modulePreLogonInput(character_buffer, is_utf8); break;
+        case 3 : moduleLogonInput(character_buffer, is_utf8); break;
+        case 4 : moduleInput(character_buffer, is_utf8); break;
+    }
+    
 }
 
 /**
@@ -906,7 +917,33 @@ bool MenuSystem::menuOptionsCallback(const MenuOption &option)
 
     if(idx != std::string::npos)
     {
-        return m_menu_command_functions[option.command_key[0]](option);
+        // Testing Without Dynamic Function Pointers
+        // return m_menu_command_functions[option.command_key[0]](option);
+        
+        switch(option.command_key[0]) {        
+            case '-': return menuOptionsControlCommands(option); break;
+            case '&': return menuOptionsMultiNodeCommands(option); break;
+            case '{': return menuOptionsMatrixCommands(option); break;
+            case '!': return menuOptionsGlobalNewScanCommands(option); break;
+            case '[': return menuOptionsMainMenuCommands(option); break;
+            case '.': return menuOptionsDoorCommands(option); break;
+            case '*': return menuOptionsSysopCommands(option); break;
+            case '^': return menuOptionsNewUserVotingCommands(option); break;
+            case 'C': return menuOptionsConferenceEditorCommands(option); break;
+            case 'D': return menuOptionsDataAreaCommands(option); break;
+            case 'E': return menuOptionsEmailCommands(option); break;
+            case 'F': return menuOptionsFileCommands(option); break;
+            case 'J': return menuOptionsJoinConference(option); break;
+            case 'M': return menuOptionsMessageCommands(option); break;
+            case 'Q': return menuOptionsQWKMailCommands(option); break;
+            case 'R': return menuOptionsTopTenListingCommands(option); break;
+            case 'S': return menuOptionsMessageBaseSponsorCommands(option); break;
+            case 'T': return menuOptionsFileBaseSponsorCommands(option); break;
+            case 'V': return menuOptionsVotingCommands(option); break;
+            case '+': return menuOptionsColorSettingCommands(option); break;
+            default : break;
+        }
+        
     }
 
     return false;
@@ -937,10 +974,11 @@ void MenuSystem::startupExternalProcess(const std::string &cmdline)
 void MenuSystem::clearAllModules()
 {
     m_log.write<Logging::DEBUG_LOG>("Menu System: clearAllModules()");
+    /*
     if(m_module_stack.size() > 0)
     {
         std::vector<module_ptr>().swap(m_module_stack);
-    }
+    }*/
 }
 
 /**
@@ -950,9 +988,11 @@ void MenuSystem::shutdownModule()
 {
     // Do module shutdown, only single modules are loaded
     // This makes it easy to allocate and kill on demand.
+    /*
     m_log.write<Logging::CONSOLE_LOG>("shutdownModule in MenuSystem() Module=", m_module_stack.back()->m_filename);
     m_module_stack.back()->onExit();
     m_module_stack.pop_back();
+    */
 }
 
 /**
@@ -965,7 +1005,7 @@ void MenuSystem::startupModule(const module_ptr &module)
     // First clear any left overs if they exist.
     clearAllModules();
     module->onEnter();
-    m_module_stack.push_back(module);
+    // m_module_stack.push_back(module);
 }
 
 /**
@@ -1139,6 +1179,7 @@ void MenuSystem::startupModuleMessageEditor()
 void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8)
 {
     // Make sure we have an allocated module before processing.
+    /*
     if(m_module_stack.size() == 0 || character_buffer.size() == 0)
     {
         return;
@@ -1187,6 +1228,8 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
 
         loadAndStartupMenu();
     }
+    */
+    return;
 }
 
 /**
@@ -1213,6 +1256,7 @@ void MenuSystem::moduleLogonInput(const std::string &character_buffer, const boo
  */
 void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is_utf8)
 {
+    /*
     // Make sure we have an allocated module before processing.
     if(m_module_stack.size() == 0 || character_buffer.size() == 0)
     {
@@ -1233,4 +1277,7 @@ void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is
         // Redisplay,  may need to startup() again, but menu data should still be active and loaded!
         redisplayMenuScreen();
     }
+    */
+    
+    return;
 }

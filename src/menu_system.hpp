@@ -55,11 +55,11 @@ public:
 
 
     // Dynamic Map of all Menu Option Command functions
-    typedef std::function< bool(const MenuOption & option)> CommandFuncType;
-    typedef std::map<char, CommandFuncType> MappedCommandFunctions;
+    //typedef std::function< bool(const MenuOption & option)> CommandFuncType;
+    //typedef std::map<char, CommandFuncType> MappedCommandFunctions;
 
     // Holds map of Menu Option Commands for quick lookup and execution
-    MappedCommandFunctions    m_menu_command_functions;
+    //MappedCommandFunctions    m_menu_command_functions;
 
     /**
      * @brief Control Commands
