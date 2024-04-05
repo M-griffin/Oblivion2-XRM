@@ -8,6 +8,8 @@
 #include <vector>
 #include <map>
 #include <functional>
+#include <chrono>
+#include <thread>
 
 #include "model-sys/config.hpp"
 
@@ -98,14 +100,17 @@ bool MenuSystem::onEnter()
     //startupModulePreLogon();
     
     m_current_menu = "matrix";        
-    m_log.write<Logging::CONSOLE_LOG>("loadAndStartupMenu on initial login");
-    loadAndStartupMenu();
-    
+    m_log.write<Logging::CONSOLE_LOG>("loadAndStartupMenu on initial login"); 
     
     // Reset the Input back to the Menu System
     resetMenuInputIndex(MENU_INPUT);
     loadAndStartupMenu();
     
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+    
+    m_logoff = true;
+    m_session_data->disconnectUser();
+            
     m_is_active = true;
     return true;
 }
