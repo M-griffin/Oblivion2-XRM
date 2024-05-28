@@ -8,6 +8,9 @@
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
 
+class Session;
+typedef std::weak_ptr<Session> session_wptr;
+
 /**
  * @class StateBase
  * @author Michael Griffin
@@ -23,7 +26,7 @@ public:
     {
         m_session_data.reset();        
     }
-    virtual void update(const std::string &character_buffer, const bool &is_utf8)  = 0;
+    virtual void update(const std::string &character_buffer)  = 0;
     virtual bool onEnter() = 0;
     virtual bool onExit()  = 0;
     virtual void resume() {}
@@ -35,8 +38,8 @@ public:
     {}
 
     // This holds session data passed to each session.
-    session_ptr  m_session_data;
-    bool         m_is_active;
+    session_wptr  m_session_data;
+    bool          m_is_active;
 
 };
 

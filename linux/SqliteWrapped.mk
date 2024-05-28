@@ -2,19 +2,19 @@
 ## Auto Generated makefile by CodeLite IDE
 ## any manual changes will be erased      
 ##
-## Release
+## Debug
 ProjectName            :=SqliteWrapped
-ConfigurationName      :=Release
-WorkspaceConfiguration :=Release
+ConfigurationName      :=Debug
+WorkspaceConfiguration :=Debug
 WorkspacePath          :=../linux
 ProjectPath            :=../linux
-IntermediateDirectory  :=./Release
+IntermediateDirectory  :=./Debug
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=merc
-Date                   :=04/04/24
+Date                   :=28/05/24
 CodeLitePath           :=/home/merc/.codelite
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -43,7 +43,7 @@ IncludePCH             :=
 RcIncludePath          := 
 Libs                   := 
 ArLibs                 :=  
-LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryPathSwitch)sqlitewrap $(LibraryPathSwitch)sqlitewrap/Release 
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryPathSwitch)sqlitewrap $(LibraryPathSwitch)sqlitewrap/Debug 
 
 ##
 ## Common variables
@@ -52,8 +52,8 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryP
 AR       := /usr/bin/ar rcu
 CXX      := /usr/bin/g++
 CC       := /usr/bin/gcc
-CXXFLAGS :=  -Wfatal-errors -Os -O2 -W -std=c++11 -Wall -static -Wno-init-self $(Preprocessors)
-CFLAGS   :=  -Wfatal-errors -Os -O2 -W -std=c++11 -Wall -static -Wno-init-self $(Preprocessors)
+CXXFLAGS :=  -Wfatal-errors -g -O0 -W -std=c++11 -Wall -static -Wno-init-self $(Preprocessors)
+CFLAGS   :=  -Wfatal-errors -g -O0 -W -std=c++11 -Wall -static -Wno-init-self $(Preprocessors)
 ASFLAGS  := 
 AS       := /usr/bin/as
 
@@ -79,20 +79,20 @@ $(OutputFile): $(Objects)
 	@echo "" > $(IntermediateDirectory)/.d
 	@echo $(Objects0)  > $(ObjectsFileList)
 	$(AR) $(ArchiveOutputSwitch)$(OutputFile) @$(ObjectsFileList)
-	@$(MakeDirCommand) "../linux/.build-release"
-	@echo rebuilt > "../linux/.build-release/SqliteWrapped"
+	@$(MakeDirCommand) "../linux/.build-debug"
+	@echo rebuilt > "../linux/.build-debug/SqliteWrapped"
 
 PostBuild:
 	@echo Executing Post Build commands ...
-	cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h > ./Release/libSqliteWrapped.h
+	cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h > ./Debug/libSqliteWrapped.h
 	@echo Done
 
 MakeIntermediateDirs:
-	@test -d ./Release || $(MakeDirCommand) ./Release
+	@test -d ./Debug || $(MakeDirCommand) ./Debug
 
 
-./Release:
-	@test -d ./Release || $(MakeDirCommand) ./Release
+./Debug:
+	@test -d ./Debug || $(MakeDirCommand) ./Debug
 
 PreBuild:
 	@echo Executing Pre Build commands ...
@@ -133,6 +133,6 @@ $(IntermediateDirectory)/up_sqlitewrap_Database.cpp$(PreprocessSuffix): ../sqlit
 ## Clean
 ##
 clean:
-	$(RM) -r ./Release/
+	$(RM) -r ./Debug/
 
 

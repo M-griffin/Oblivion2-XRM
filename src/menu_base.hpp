@@ -310,7 +310,7 @@ public:
      * @brief Handle Input Specific to Pull Down Menus
      * @param character_buffer
      */
-    void handlePulldownInput(const std::string &character_buffer, const bool &is_utf8);
+    void handlePulldownInput(const std::string &character_buffer);
 
     /**
      * @brief Handle Input Specific to Pull Down Menus
@@ -322,13 +322,13 @@ public:
      * @brief Default Menu Input Processing.
      *        Handles Processing for Loaded Menus Hotkey and Light bars
      */
-    void menuInput(const std::string &character_buffer, const bool &is_utf8);
+    void menuInput(const std::string &character_buffer);
 
     /**
      * @brief Yes/No Menu Bar Input Processing.
      *        Handles Processing for Loaded Menus Hotkey and Light bars
      */
-    void menuYesNoBarInput(const std::string &character_buffer, const bool &is_utf8);
+    void menuYesNoBarInput(const std::string &character_buffer);
 
 };
 

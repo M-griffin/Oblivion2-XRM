@@ -18,9 +18,9 @@ xrm:
 	make -f ../linux/xrm-server.mk -j3
 	cp -f ./Release/xrm-server ../build/xrm-server
 
-xrmr:
+xrmd:
 	make -f ../linux/xrm-server.mk -j3
-	cp -f ./Release/xrm-server ../build/xrm-server
+	cp -f ./Debug/xrm-server ../build/xrm-server
 
 test:
 	make -f ../linux/xrm-unittest.mk -j3

@@ -3,6 +3,7 @@
 #include <cstring>
 #include <string>
 
+#include "connection_base.hpp"
 #include "state_base.hpp"
 #include "session.hpp"
 #include "logging.hpp"
@@ -10,11 +11,13 @@
 
 StateManager::StateManager()
     : m_log(Logging::getInstance())
-{ }
+{ 
+    m_log.write<Logging::CONSOLE_LOG>("StateManager()");
+}
     
 StateManager::~StateManager()
 {
-    m_log.write<Logging::DEBUG_LOG>("~StateManager()");
+    m_log.write<Logging::CONSOLE_LOG>("~StateManager()");
     
     if(!m_the_state.empty())
     {
@@ -65,7 +68,8 @@ void StateManager::update()
         std::string incoming_data = "";
         try
         {
-            incoming_data = std::move(m_the_state.back()->m_session_data->m_parsed_data);            
+            session_ptr session = m_the_state.back()->m_session_data.lock();
+            incoming_data = std::move(session->m_parsed_data);            
         }
         catch(std::exception &ex)
         {
@@ -101,10 +105,10 @@ void StateManager::update()
                     if(byte_value == '\x1b' && *it == '\0')
                     {
                         new_string_builder += '\x1b';
-                        m_the_state.back()->update(new_string_builder, utf_found);
+                        m_the_state.back()->update(new_string_builder);
 
                         new_string_builder = '\0';
-                        m_the_state.back()->update(new_string_builder, utf_found);
+                        m_the_state.back()->update(new_string_builder);
                         new_string_builder.erase();
                         continue;
                     }                    
@@ -143,7 +147,7 @@ void StateManager::update()
                     }
                 }
 
-                m_the_state.back()->update(new_string_builder, utf_found);
+                m_the_state.back()->update(new_string_builder);
                 new_string_builder.erase();
             }
         }

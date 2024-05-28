@@ -21,6 +21,9 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="..\src">
+    <File Name="../src/server.hpp"/>
+    <File Name="../src/connection_tcp.hpp"/>
+    <File Name="../src/connection_base.hpp"/>
     <File Name="../src/logging.hpp"/>
     <File Name="../src/logging.cpp"/>
     <File Name="../src/access_condition.hpp"/>
@@ -38,7 +41,6 @@
     <File Name="../src/menu_base.hpp"/>
     <File Name="../src/menu_base.cpp"/>
     <File Name="../src/safe_vector.hpp"/>
-    <File Name="../src/async_io.hpp"/>
     <File Name="../src/common_io.cpp"/>
     <File Name="../src/common_io.hpp"/>
     <File Name="../src/encryption.cpp"/>
@@ -127,26 +129,7 @@
       <File Name="../src/model-app/oneliners.hpp"/>
       <File Name="../src/model-app/bbs_list.hpp"/>
     </VirtualDirectory>
-    <File Name="../src/async_acceptor.hpp"/>
-    <File Name="../src/async_base.hpp"/>
     <File Name="../src/directory.hpp"/>
-    <File Name="../src/interface.hpp"/>
-    <File Name="../src/io_service.cpp"/>
-    <File Name="../src/io_service.hpp"/>
-    <File Name="../src/socket_handler.cpp"/>
-    <File Name="../src/socket_handler.hpp"/>
-    <File Name="../src/socket_state.hpp"/>
-    <File Name="../src/socket_telnet.cpp"/>
-    <VirtualDirectory Name="sdl2_net">
-      <File Name="../src/sdl2_net/begin_code.h"/>
-      <File Name="../src/sdl2_net/close_code.h"/>
-      <File Name="../src/sdl2_net/SDLnet.cpp"/>
-      <File Name="../src/sdl2_net/SDL_net.hpp"/>
-      <File Name="../src/sdl2_net/SDLnetselect.cpp"/>
-      <File Name="../src/sdl2_net/SDLnetsys.hpp"/>
-      <File Name="../src/sdl2_net/SDLnetTCP.cpp"/>
-      <File Name="../src/sdl2_net/SDLnetUDP.cpp"/>
-    </VirtualDirectory>
     <VirtualDirectory Name="utf-cpp">
       <VirtualDirectory Name="utf8">
         <File Name="../src/utf-cpp/utf8/cpp20.h"/>
@@ -168,6 +151,8 @@
     <File Name="../src/processor_text.cpp"/>
     <File Name="../src/processor_text.hpp"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="" C_Options="" Assembler="">
@@ -199,8 +184,9 @@
         <Library Value="crypto"/>
         <Library Value="yaml-cpp"/>
         <Library Value="util"/>
-        <Library Value="libssh"/>
         <Library Value="uuid"/>
+        <Library Value="boost_system"/>
+        <Library Value="boost_thread"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
@@ -260,6 +246,8 @@
         <Library Value="yaml-cpp"/>
         <Library Value="util"/>
         <Library Value="uuid"/>
+        <Library Value="boost_system"/>
+        <Library Value="boost_thread"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
@@ -298,6 +286,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
 </CodeLite_Project>

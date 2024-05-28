@@ -6,12 +6,13 @@
 
 #include "telnet.hpp"
 #include "logging.hpp"
-#include "async_io.hpp"
+#include "connection_base.hpp"
+#include "connection_tcp.hpp"
 
 
-TelnetDecoder::TelnetDecoder(async_io_ptr async_io)
-    : m_log(Logging::getInstance())
-    , m_async_io(async_io)
+TelnetDecoder::TelnetDecoder(connection_ptr connection)
+    : m_log(Logging::getInstance())    
+    , m_connection(connection)
     , m_naws_row(24)
     , m_naws_col(80)
     , m_term_type("undetected")
@@ -31,7 +32,7 @@ TelnetDecoder::TelnetDecoder(async_io_ptr async_io)
 TelnetDecoder::~TelnetDecoder()
 {
     m_log.write<Logging::DEBUG_LOG>("~TelnetDecoder()");
-    m_async_io.reset();
+    m_connection.reset();
     m_reply_sequence.clear();
 }
 
@@ -794,7 +795,7 @@ unsigned char TelnetDecoder::telnetOptionParse(const unsigned char &c)
  * @brief handles callback after write() for errors checking.
  * @param error
  */
-void TelnetDecoder::handleWrite(const std::error_code& error, socket_handler_ptr)
+void TelnetDecoder::handleWrite(const std::error_code& error)
 {
     // Just log errors for now.
     if(error)
@@ -815,23 +816,20 @@ void TelnetDecoder::deliver(const std::string &string_msg)
     
     // TODO: NOTE change this to queue up respones, then the session will call to retieve
     // once it returns from parsing, then we don't have to pass sessions/async_io, less references.
-    if(string_msg.size() == 0)
+    if(string_msg.size() == 0 || m_connection->is_open())
     {
         return;
     }
     
     try
-    {
-        async_io_ptr async_io = m_async_io.lock();
-        if(async_io->getSocketHandle()->isActive())
-        {            
-            async_io->asyncWrite(string_msg,
-                                     std::bind(
-                                         &TelnetDecoder::handleWrite,
-                                         shared_from_this(),
-                                         std::placeholders::_1,
-                                         std::placeholders::_2));
-        }
+    {        
+        /*
+        auto self(shared_from_this());    
+        boost::asio::async_write(m_connection->m_normal_socket, boost::asio::buffer(string_msg, string_msg.size()),
+        [this, self](boost::system::error_code ec, std::size_t)
+        {
+            handleWrite(ec);            
+        });*/
     }
     catch (std::exception &ex) 
     {

@@ -8,7 +8,6 @@
 #include <mutex>
 
 #include "state_manager.hpp"
-#include "async_io.hpp"
 #include "session.hpp"
 #include "logging.hpp"
 #include "common_io.hpp"
@@ -31,6 +30,8 @@ SessionManager::~SessionManager()
  */
 void SessionManager::join(session_ptr session)
 {
+    std::cout << "Joining Session - Start" << std::endl;
+    
     // Find First Node Number not in use, then set it.
     // Also Manage Thread Safety, although should be single sessions at a time.
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -80,8 +81,10 @@ void SessionManager::join(session_ptr session)
         // Starting Node Number.
         session->m_node_number = 1;
     }
-    
+        
     m_sessions.insert(session);
+    
+    std::cout << "Joining Session - Finished: msession=" << m_sessions.size() << std::endl;
 }
 
 /**
@@ -119,7 +122,7 @@ void SessionManager::deliver(const std::string &msg)
         return;        
     }
 
-    m_log.write<Logging::DEBUG_LOG>("SessionManager - deliver SessionManager notices=", msg);
+    m_log.write<Logging::CONSOLE_LOG>("SessionManager - deliver SessionManager notices=", msg);
     std::for_each(m_sessions.begin(), m_sessions.end(),
                   std::bind(&Session::deliver, std::placeholders::_1, std::ref(msg), false));
 }
@@ -154,8 +157,20 @@ void SessionManager::shutdown()
     std::for_each(m_sessions.begin(), m_sessions.end(), 
         [] (session_ptr p) 
         { 
-            std::string msg = "\r\nService is shutting down, please try again later. \r\n";
-            p->m_async_io->getSocketHandle()->sendSocket((unsigned char*)msg.c_str(), msg.size());
-            p->disconnectUser();
+            try
+            {
+                /*
+                std::cout << "Leaving (NORMAL SESSION) Client IP: "
+                          << m_connection->m_normal_socket.remote_endpoint().address().to_string()
+                          << std::endl;
+
+                m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
+                m_connection->m_normal_socket.close();
+                */
+            }
+            catch(std::exception &ex)
+            {
+                std::cout << "Exception closing socket(): " << ex.what() << std::endl;
+            }
         });
 }

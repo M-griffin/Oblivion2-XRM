@@ -6,19 +6,24 @@
 #include <cassert>
 #include <thread>
 
+#include <boost/asio.hpp>
+#include <boost/asio/deadline_timer.hpp>
+
 #include "model-sys/users.hpp"
 #include "data-sys/users_dao.hpp"
 
 #include "state_manager.hpp"
-#include "async_io.hpp"
 #include "socket_handler.hpp"
 #include "session_manager.hpp"
 #include "telnet_decoder.hpp"
-#include "menu_system.hpp"
+//#include "menu_system.hpp"
+#include "menu_shell.hpp"
 
 #include "logging.hpp"
 #include "encoding.hpp"
 #include "uuid.hpp"
+#include "connection_base.hpp"
+#include "communicator.hpp"
 
 #include "libSqliteWrapped.h"
 
@@ -31,15 +36,16 @@
  * @param session_manager
  * @return
  */
-Session::Session(async_io_ptr my_async_io, session_manager_ptr my_session_manager)
-    : m_log(Logging::getInstance())
-    , m_async_io(my_async_io)        
+Session::Session(boost::asio::io_service& io_service, connection_ptr connection, session_manager_ptr my_session_manager)
+    : m_log(Logging::getInstance())   
+    , m_connection(connection)
     , m_session_manager(my_session_manager)
     , m_state_manager(nullptr)
     , m_telnet_decoder(nullptr)
     , m_user_record(nullptr)
     , m_node_number(0)
     , m_is_leaving(false)
+    , m_raw_data()
     , m_parsed_data("")
     , m_session_id("")
     , m_encoding_text(Encoding::ENCODING_TEXT_UTF8)
@@ -47,54 +53,57 @@ Session::Session(async_io_ptr my_async_io, session_manager_ptr my_session_manage
     , m_is_use_ansi(true)
     , m_is_esc_timer(false)
     , m_is_session_authorized(false)
+    , m_detection_deadline(io_service)
     , m_user_database(USERS_DATABASE, &m_database_log)
 {
+    //m_log.write<Logging::CONSOLE_LOG>("Session() Started.");
+    std::cout << "Session() Started." << std::endl;
+    
     // Setup Shared Pointers
     m_state_manager = std::make_shared<StateManager>();
-    m_telnet_decoder = std::make_shared<TelnetDecoder>(my_async_io);
+    m_telnet_decoder = std::make_shared<TelnetDecoder>(connection);
     m_user_record = std::make_shared<Users>();  
     
-    if(m_async_io->isActive())
-    {
-        try
-        {
-            m_log.write<Logging::DEBUG_LOG>("New Session Accepted", __LINE__, __FILE__);
-        }
-        catch(std::exception &ex)
-        {
-            m_log.write<Logging::ERROR_LOG>("New Session Exception=", ex.what(), __LINE__, __FILE__);
-        }
-    }
 }
 
 Session::~Session()
 {
-    m_log.write<Logging::INFO_LOG>("~Session() Closed.");
+    //m_log.write<Logging::CONSOLE_LOG>("~Session() Closed.");
+    std::cout << "~Session() Closed." << std::endl;
 
     // Free the menu system state and modules when session closes.
-    m_state_manager->clean();
-    m_async_io.reset();    
-    m_telnet_decoder.reset();    
+    m_state_manager->clean();     
+    m_connection.reset();
+    m_telnet_decoder.reset();
     m_user_record.reset();
-    m_session_manager.reset();
-    m_in_data_vector.clear();
-    std::vector<unsigned char>().swap(m_in_data_vector);
+    m_session_manager.reset();    
 }
 
 
 /**
- * @brief Telnet Option Negoiation Timer
+ * @brief Start ESC Key input timer
  */
 void Session::startTelnetOptionNegoiation()
 {
-    //m_deadline_timer->setWaitInMilliseconds(2000);
+    // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences reponses
+    m_detection_deadline.expires_from_now(boost::posix_time::milliseconds(2000));   
     
-    // Deprecated bind, look at replacing with lambda and std::function
-    //m_deadline_timer->asyncWait(
-    //    std::bind(&Session::handleTelnetOptionNegoiation, shared_from_this())
-    //);
-    auto callback_function = std::bind(&Session::handleTelnetOptionNegoiation, shared_from_this());
-    asyncWait(2000, callback_function);
+    auto self(shared_from_this());
+    m_detection_deadline.async_wait(
+    [this, self](const boost::system::error_code& ec)
+    {
+        if (!ec)
+        {
+            handleTelnetOptionNegoiation();            
+        }
+        else 
+        {
+            std::cout << "Deadline Timer Exepction: " << ec.message() << std::endl;
+            disconnectUser();
+        }
+    });
+    
+    
 }
 
 /**
@@ -104,13 +113,19 @@ void Session::startTelnetOptionNegoiation()
  */
 void Session::handleTelnetOptionNegoiation()
 {   
+    std::cout << "handleTelnetOptionNegoiation - Deadline Terminal Detection, EXPIRED!" << std::endl;
     // Setup Node Number for Separate Thread.
     m_log.setUserInfo(m_node_number);
     
     // Starts Up the Menu System Then Loads up the PreLogin Sequence.   
-    state_ptr new_state = std::make_shared<MenuSystem>(shared_from_this());
+    //state_ptr new_state = std::make_shared<MenuSystem>(shared_from_this());
     
+    // TESTING FIXME
+    state_ptr new_state = std::make_shared<MenuShell>(shared_from_this());
+    
+    std::cout << "handleTelnetOptionNegoiation - Starting Menu System State!" << std::endl;
     m_state_manager->changeState(new_state);    
+
 }
 
 /**
@@ -137,8 +152,10 @@ void Session::handlePyBind11State()
  */
 void Session::deliver(const std::string &msg, bool is_disconnection)
 {
+    std::cout << "deliver()" << std::endl;
     if(msg.size() == 0 || msg[0] == '\0')
     {
+        std::cout << "deliver() size 0 - return" << std::endl;
         return;
     }
     
@@ -154,86 +171,77 @@ void Session::deliver(const std::string &msg, bool is_disconnection)
         outputBuffer = msg;
     }    
 
-    if(m_async_io->isActive()) // && TheCommunicator::instance()->isActive())
-    {
-        // Deprecated bind, look at replacing with lambda and std::function
-        if (!is_disconnection)
+    if(m_connection->is_open())
+    {                                         
+        auto self(shared_from_this());        
+        boost::asio::async_write(m_connection->m_normal_socket, boost::asio::buffer(outputBuffer, outputBuffer.size()),
+        [this, self, is_disconnection](boost::system::error_code ec, std::size_t /*length*/)
         {
-            m_async_io->asyncWrite(outputBuffer,
-                                     std::bind(
-                                         &Session::handleWrite,
-                                         shared_from_this(),
-                                         std::placeholders::_1,
-                                         std::placeholders::_2));
-        }
-        else
-        {
-            m_async_io->asyncWrite(outputBuffer,
-                                     std::bind(
-                                         &Session::handleWriteThenDisconnect,
-                                         shared_from_this(),
-                                         std::placeholders::_1,
-                                         std::placeholders::_2));
-        }
+            if (ec)
+            {
+                std::cout << "Async Write Error: " << ec.message() << std::endl;
+                disconnectUser();
+                return;
+            }
+        });
     }
-}
-
-/**
- * @brief Callback after Writing Data, If error/hangup notifies
- *        Everyone this person has left.
- * @param error
- */
-void Session::handleWrite(const std::error_code& error, socket_handler_ptr)
-{
-    // Setup All Mods for Proper Node Logging by Session.
-    m_log.setUserInfo(m_node_number);
-    
-    if(error)
+    else
     {
-        m_log.write<Logging::ERROR_LOG>("Async_HandleWrite Error Session Closed() msg=", error.message());
-        logoff();
-    }    
+        std::cout << "deliver - Error Code (CONNECTION CLOSED!) "
+                  << " Client IP: "
+                  << m_connection->m_normal_socket.remote_endpoint().address().to_string()
+                  << std::endl;
+        disconnectUser();
+    }     
 }
-
-/**
- * @brief Callback after Writing Data, If error/hangup notifies
- *        Everyone this person has left.
- * @param error
- */
-void Session::handleWriteThenDisconnect(const std::error_code& error, socket_handler_ptr ptr)
-{
-    m_log.setUserInfo(m_node_number);
-    handleWrite(error, ptr);
-    disconnectUser();    
-}
-
-template <class Callback>
-void Session::asyncWait(int expires_on, const Callback &callback_method)
-{    
-    m_log.setUserInfo(m_node_number);
-    m_async_io->asyncWait(expires_on, callback_method);
-}
-
-// Previous SessionData Methods
 
 /**
  * @brief Data Handler for incoming Data (From Client)
  */
 void Session::waitingForData()
 {
-    // Important, clear out buffer before each read.
-    m_in_data_vector.clear();
-    std::vector<unsigned char>().swap(m_in_data_vector);
+    std::cout << "waiting For Data()" << std::endl;
+    memset(&m_raw_data, 0, max_length); // * sizeof(m_raw_data));
     
-    if(m_async_io->isActive()) // && TheCommunicator::instance()->isActive())
+    if(m_connection->is_open())
     {
-        // Deprecated bind, look at replacing with lambda and std::function
-        m_async_io->asyncRead(m_in_data_vector,
-                                std::bind(
-                                    &Session::handleRead,
-                                    shared_from_this(),
-                                    std::placeholders::_1,
-                                    std::placeholders::_2));
+        auto self(shared_from_this());        
+        m_connection->m_normal_socket.async_read_some(boost::asio::buffer(m_raw_data, max_length),
+        [this, self](boost::system::error_code ec, std::size_t length)
+        {
+            if (ec)
+            {
+                std::cout << "Async Read Error: " << ec.message() << " : " << m_is_leaving << std::endl;
+                //if (!m_is_leaving)
+                //{
+                    disconnectUser();                    
+                //}
+                return;
+            }
+            
+            handleRead(ec, length);
+        });
+    }
+}
+
+/**
+ * @brief Resolves the Hostname
+ * @param ec
+ * @param it
+ */
+void Session::resolveHandler(const boost::system::error_code &ec, tcp::resolver::iterator it)
+{
+    if(!ec)
+    {
+        tcp::resolver::iterator end;
+        for(; it != end; ++it)
+        {
+            std::cout << "hostname: " << it->host_name() << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << "Error resolving hostname: " << ec.message() << std::endl;
     }
 }
 
@@ -242,6 +250,10 @@ void Session::waitingForData()
  */
 void Session::updateState()
 {
+    
+    // FIXME 
+    std::cout << "FIX ME updateState " << std::endl;
+    
     // Setup Logging per Current Node.
     m_log.setUserInfo(m_node_number);
     
@@ -249,20 +261,26 @@ void Session::updateState()
     // ESC Sequence, or Lone ESC Key.
     if(m_parsed_data[m_parsed_data.size()-1] == '\x1b')
     {
-        startEscapeTimer();
-        m_is_esc_timer = true;
+        //startEscapeTimer();
+        //m_is_esc_timer = true;
     }
     else if(!m_is_esc_timer)
     {
-        m_state_manager->update();
+        //m_state_manager->update();
     }
+    
+    m_state_manager->update();
 }
+
+
 
 /**
  * @brief ESC Sequence Timer for Determining Single Key vs. ESC Sequence
  */
 void Session::startEscapeTimer()
 {
+    std::cout << "startEscapeTimer " << std::endl;
+    
     // Add Deadline Timer for .400 milliseconds for complete ESC Sequences.
     // Is no other input or part of ESC Sequences ie.. [A following the ESC
     // Then it's an ESC key, otherwise capture the rest of the sequence.
@@ -270,8 +288,10 @@ void Session::startEscapeTimer()
     //m_esc_input_timer->asyncWait(
     //    std::bind(&Session::handleEscTimer, shared_from_this())
     //);
-    auto callback_function = std::bind(&Session::handleEscTimer, shared_from_this());
-    asyncWait(400, callback_function);
+    
+    
+    //auto callback_function = std::bind(&Session::handleEscTimer, shared_from_this());
+    //asyncWait(400, callback_function);
 }
     
 /**
@@ -280,6 +300,7 @@ void Session::startEscapeTimer()
  */
 void Session::handleEscTimer()
 {
+    std::cout << "handleEscTimer " << std::endl;
     m_log.setUserInfo(m_node_number);
     
     // Move text to State Machine, Timer has passed, or remainder of Sequence caught up!
@@ -290,26 +311,25 @@ void Session::handleEscTimer()
 /**
  * @brief Callback after data received. handles telnet options
  * Then parses out normal text data from client to server.
- * @param error
- * @param bytes_transferred
+ * @param ec
+ * @param length
  */
-void Session::handleRead(const std::error_code& error, socket_handler_ptr)
+void Session::handleRead(const boost::system::error_code& ec, std::size_t length)
 {
     m_log.setUserInfo(m_node_number);
-    m_log.write<Logging::DEBUG_LOG>("handleRead - After Incoming Data.", __FILE__, __LINE__);
 
     session_manager_ptr session_manager = m_session_manager.lock();
     if(!session_manager)
     {
         m_log.write<Logging::ERROR_LOG>("handleRead - Unable to load session_manager", __FILE__, __LINE__);
+        disconnectUser();
         return;
     }
 
-    if (error) 
+    if (ec || !m_connection->is_open())
     {        
-        // Disconnect the session.
-        m_is_leaving = true;        
-        session_manager->leave(shared_from_this());            
+        std::cout << "handleRead (ERROR)" << ((ec) ? ec.message() : "") << " : " << m_is_leaving << std::endl;
+        disconnectUser();
         return;
     }
               
@@ -362,22 +382,22 @@ void Session::handleRead(const std::error_code& error, socket_handler_ptr)
             updateState();
         }*/
         
+        std::cout << "updateState " << std::endl;
         updateState();
     }
 
     // Restart Callback to wait for more data.
     // If this step is skipped, then the node will exit
     // since io_service will have no more work!
-    if(m_async_io->isActive())
+    if(!m_connection->is_open())
     {
-        waitingForData();
+        m_log.write<Logging::WARN_LOG>("handleRead - m_connection no longer active");
+        disconnectUser();
+        return;
     }
-    else
-    {
-        m_log.write<Logging::WARN_LOG>("handleRead - m_async_io no longer active");
-        logoff();
-    }
-
+    
+    std::cout << "look back to  waitingForData" << std::endl;
+    waitingForData();
 }
 
 /**
@@ -387,16 +407,13 @@ void Session::handleRead(const std::error_code& error, socket_handler_ptr)
  */
 void Session::handleTeloptCodes()
 {
+    std::cout << "handleTeloptCodes - inside" << std::endl;
+    
     m_log.setUserInfo(m_node_number);
     
     std::string incoming_data = "";
     
-    if (m_in_data_vector.size() == 0) 
-    {
-        return;
-    }
-
-    for(auto c : m_in_data_vector)
+    for(auto c : m_raw_data)
     {
         try
         {
@@ -419,60 +436,23 @@ void Session::handleTeloptCodes()
             m_log.write<Logging::ERROR_LOG>("Exception telnet_process_char", e.what(), __LINE__, __FILE__);
         }
     }
-
-    // Encode all incoming data as UTF8 unless we are not utf8
-    // Updated, append Incoming to Parsed Data so we don't miss double ESC Sequences.
-    // This catches items still in Buffer where sequences happen quickly. like Double ESC's.
-    /*
-    if(m_encoding != Encoding::ENCODE_UTF8)
-    {
-        m_parsed_data += Encoding::getInstance().utf8Encode(incoming_data);        
-    }
-    else
-    {
-        m_parsed_data += incoming_data;
     
-    }*/
+    // Clear the Session's Socket Buffer for next set of data.
+    memset(&m_raw_data, 0, max_length); // * sizeof(m_raw_data));
     
     // Encoding is isolated to Output Translations of CP437 Textfiles.
     // For Incoming data we shouldn't translate as Parsing methods should handle.
     m_parsed_data += incoming_data;
 }
 
-/**
- * @brief User Logoff
- */
-void Session::logoff()
+void Session::logoff() 
 {
-    m_log.setUserInfo(m_node_number);
-    
-    // This might be doing double the deallocation    
-    if(m_async_io && m_async_io->getSocketHandle()->isActive())
+    if (!m_is_leaving)
     {
-        try
-        {
-            m_log.write<Logging::INFO_LOG>("m_async_io->getSocketHandle() is ACTIVE! -> INACTIVE", __LINE__, __FILE__);
-            m_async_io->getSocketHandle()->setInactive();
-            
-        }
-        catch(std::exception &e)
-        {
-            // Sometime this doesn't close when it's already existed, just extra checking here.            
-            m_log.write<Logging::ERROR_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
-        }
+        // Test only shutting down, then let the error close the socket cleanly.
+        m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
+        return;        
     }
-    
-    session_manager_ptr session_manager = m_session_manager.lock();
-
-    if(session_manager)
-    {
-        m_is_leaving = true;
-        m_log.write<Logging::INFO_LOG>("Logoff Session Manager", __LINE__, __FILE__);
-                
-        session_manager->leave(shared_from_this());            
-        session_manager.reset();        
-    }
-    
 }
 
 /**
@@ -480,6 +460,29 @@ void Session::logoff()
  */
 void Session::disconnectUser() 
 {
-    m_log.setUserInfo(m_node_number);
-    m_async_io->getSocketHandle()->disconnectUser();
+    std::cout << "disconnectUser : " << std::endl;
+    if (m_is_leaving)
+    {
+        return;        
+    }
+    m_is_leaving = true;       
+
+    // Close Down Sockets
+    m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
+    m_connection->m_normal_socket.close();
+    
+    // Remove Session from Session Manager so it will Exit Cleanly.
+    session_manager_ptr session_manager = m_session_manager.lock();
+    if(!session_manager)
+    {
+        m_log.write<Logging::ERROR_LOG>("disconnectUser - Unable to load session_manager", __FILE__, __LINE__);
+        return;
+    }
+            
+    // Review Sessions are being freed properly.
+    std::cout << "Current Sessions cnt=" << session_manager->connections() << std::endl;    
+    //m_connection.reset();
+    session_manager->leave(shared_from_this());
+    std::cout << "Removed Session cnt=" << session_manager->connections() << std::endl;
+    
 }

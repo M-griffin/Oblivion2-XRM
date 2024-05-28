@@ -1,5 +1,4 @@
 #include "menu_shell.hpp"
-#include "menu_base.hpp"
 
 #include <locale>
 #include <string>
@@ -7,32 +6,40 @@
 #include <functional>
 #include <cassert>
 
-
+#include "menu_base.hpp"
 #include "logging.hpp"
+#include "session.hpp"
 
 MenuShell::MenuShell(session_ptr session_data)
     : StateBase(session_data)
     , MenuBase(session_data)
     , m_log(Logging::getInstance())
 {
+    m_log.write<Logging::CONSOLE_LOG>("MenuShell()");
 }
 
 MenuShell::~MenuShell()
 {
-    m_log.write<Logging::DEBUG_LOG>("~MenuShell()");
+    m_log.write<Logging::CONSOLE_LOG>("~MenuShell()");
 }
 
 /**
  * @brief Handles Updates or Data Input from Client
  */
-void MenuShell::update(const std::string &character_buffer, const bool &)//is_utf8)
+void MenuShell::update(const std::string &character_buffer)//is_utf8)
 {
     if(!m_is_active)
     {
         return;
     }
     
-    m_log.write<Logging::DEBUG_LOG>("character_buffer", character_buffer);
+    m_log.write<Logging::CONSOLE_LOG>("character_buffer", character_buffer);
+    
+    baseProcessAndDeliver(character_buffer);
+    if (character_buffer[0] == 'g' || character_buffer[0] == 'G') 
+    {
+        // Disconnect the fricking user here!@! 
+    }
 }
 
 /**
@@ -48,6 +55,11 @@ bool MenuShell::onEnter()
     m_is_active = true;
     return true;
     */
+    m_logoff = true;
+    
+    session_ptr session = m_session_data.lock();
+    session->logoff();
+            
     m_is_active = true;
     
     return true;

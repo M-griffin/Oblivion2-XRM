@@ -11,6 +11,7 @@
 #include "common_io.hpp"
 #include "encoding.hpp"
 #include "logging.hpp"
+#include "connection_base.hpp"
 
 #include "model-sys/config.hpp"
 #include "utf-cpp/utf8.h"

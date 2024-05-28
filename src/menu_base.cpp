@@ -1701,7 +1701,7 @@ bool MenuBase::processMenuOptions(const std::string &input)
  * @brief Handle Input Specific to Pull Down Menus
  * @param character_buffer
  */
-void MenuBase::handlePulldownInput(const std::string &character_buffer, const bool &is_utf8)
+void MenuBase::handlePulldownInput(const std::string &character_buffer)
 {
     // Get hotmay and lightbar input.
     std::string result = m_session_io->getKeyInput(character_buffer);
@@ -1716,7 +1716,7 @@ void MenuBase::handlePulldownInput(const std::string &character_buffer, const bo
         // Menu Translations for ENTER
         input = "ENTER";
     }
-    else if(result[0] == '\x1b' && result.size() > 2 && !is_utf8)
+    else if(result[0] == '\x1b' && result.size() > 2)
     {
         // ESC SEQUENCE
         input = result;
@@ -1796,12 +1796,12 @@ void MenuBase::handleStandardInput(const std::string &character_buffer)
  * @brief Default Menu Input Processing.
  *        Handles Processing for Loaded Menus Hotkey and Light bars
  */
-void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf8)
+void MenuBase::menuInput(const std::string &character_buffer)
 {
     // If were in lightbar mode, then we are using hotkeys.
     if(m_is_active_pulldown_menu)
     {
-        handlePulldownInput(character_buffer, is_utf8);
+        handlePulldownInput(character_buffer);
     }
     else
     {
@@ -1813,7 +1813,7 @@ void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf
  * @brief Default Menu Input Processing. (HotKey and Light bar)
  *        Handles Processing for Loaded Menus Hotkey and Light bars
  */
-void MenuBase::menuYesNoBarInput(const std::string &character_buffer, const bool &is_utf8)
+void MenuBase::menuYesNoBarInput(const std::string &character_buffer)
 {
-    handlePulldownInput(character_buffer, is_utf8);
+    handlePulldownInput(character_buffer);
 }

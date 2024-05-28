@@ -29,9 +29,9 @@ class MenuShell
 {
 public:
     explicit MenuShell(session_ptr session_data);
-    ~MenuShell();
+    virtual ~MenuShell() override;
 
-    virtual void update(const std::string &character_buffer, const bool &is_utf8) override;
+    virtual void update(const std::string &character_buffer) override;
     virtual bool onEnter() override;
     virtual bool onExit() override;
 

@@ -34,14 +34,17 @@
 #include <direct.h>
 #endif
 
+#include <boost/asio.hpp>
+
 #include "model-sys/structures.hpp"
 #include "model-sys/config.hpp"
 #include "data-sys/config_dao.hpp"
 #include "data-sys/db_startup.hpp"
 
 #include "communicator.hpp"
-#include "interface.hpp"
+#include "server.hpp"
 #include "common_io.hpp"
+#include "logging.hpp"
 
 std::string GLOBAL_BBS_PATH = "";
 std::string GLOBAL_DATA_PATH = "";
@@ -53,7 +56,9 @@ std::string GLOBAL_LOG_PATH = "";
 std::string USERS_DATABASE = "";
 
 
-std::string BUILD_INFO = "Oblivion/2 XRM-Server rev.2 build [00.00.153] Alpha Preview";
+std::string BUILD_INFO = "Oblivion/2 XRM-Server rev.3 build [00.00.154] Alpha Preview";
+
+typedef std::shared_ptr<Server> server_telnet_ptr;
 
 /**
  * @brief Gracefull Shutdown Method.
@@ -155,10 +160,48 @@ auto main() -> int
             return 0;
         }
     }
+    
+    {
+        
+        config_ptr config = std::make_shared<Config>();
+        
+        if(!config)
+        {
+            m_log.write<Logging::ERROR_LOG>("Unable to allocate config object");
+            exit(1);
+        }
+        
+        ConfigDao cfg(config, GLOBAL_BBS_PATH);
+
+        if(!cfg.fileExists())
+        {
+            m_log.write<Logging::ERROR_LOG>("Config File doesn't exist");
+        }
+
+        // Load Config and lets do some validation
+        cfg.loadConfig();
+                        
+        // Startup Telnet Server
+        server_telnet_ptr serverTelnet;
+        boost::asio::io_service io_service;
+        
+        if (cfg.m_config->use_service_telnet)
+        {
+            std::cout << "Listening for telnet connections on port "
+                      << cfg.m_config->port_telnet << std::endl;
+                      
+            server_telnet_ptr serverTelnet = std::make_shared<Server>(io_service, cfg.m_config->port_telnet);                
+            io_service.run();
+        }
+        
+        std::cout << "Exting..." << std::endl;
+        io_service.stop();
+    }
 
     // Isolate to code block for smart pointer deallocation.
     {
         // Create Handles to Services, and starts up connection listener and ASIO Thread Worker
+        /*
         IOService io_service;
         int port = Communicator::getInstance().getConfiguration()->port_telnet;
         std::string logging_level = Communicator::getInstance().getConfiguration()->logging_level;
@@ -166,6 +209,7 @@ auto main() -> int
         
         // Testing Main Loop without returning.
         Interface interface(io_service, "TELNET", port);
+        */
 
         /*
         while(io_service.isActive()) 

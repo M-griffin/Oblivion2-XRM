@@ -37,7 +37,7 @@ public:
     explicit MenuSystem(session_ptr session_data);
     virtual ~MenuSystem() override;
 
-    virtual void update(const std::string &character_buffer, const bool &is_utf8) override;
+    virtual void update(const std::string &character_buffer) override;
     virtual bool onEnter() override;
     virtual bool onExit() override;
 
@@ -257,22 +257,22 @@ public:
      * @param character_buffer
      * @param is_utf8
      */
-    void handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8);
+    void handleLoginInputSystem(const std::string &character_buffer);
 
     /**
      * @brief Handles parsing input for PreLogon current module.
      */
-    void modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8);
+    void modulePreLogonInput(const std::string &character_buffer);
 
     /**
      * @brief Handles parsing input for Logon current module.
      */
-    void moduleLogonInput(const std::string &character_buffer, const bool &is_utf8);
+    void moduleLogonInput(const std::string &character_buffer);
 
     /**
      * @brief Handles parsing input for current module.
      */
-    void moduleInput(const std::string &character_buffer, const bool &is_utf8);
+    void moduleInput(const std::string &character_buffer);
 
 };
 

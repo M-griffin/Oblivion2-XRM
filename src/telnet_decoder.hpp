@@ -10,12 +10,9 @@
 
 class Logging;
 
-class AsyncIO;
-typedef std::shared_ptr<AsyncIO> async_io_ptr;
-typedef std::weak_ptr<AsyncIO> async_io_wptr;
+class ConnectionBase;
+typedef std::shared_ptr<ConnectionBase> connection_ptr;
 
-class SocketHandler;
-typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
 
 /**
  * @class TelnetDecoder
@@ -29,7 +26,7 @@ class TelnetDecoder
 {
 public:
 
-    explicit TelnetDecoder(async_io_ptr async_io);
+    explicit TelnetDecoder(connection_ptr m_connection);
     ~TelnetDecoder();
 
     /**
@@ -64,7 +61,7 @@ public:
 private:
 
     Logging      &m_log;
-    async_io_wptr m_async_io;
+    connection_ptr m_connection;
 
     int           m_naws_row;
     int           m_naws_col;
@@ -96,7 +93,7 @@ private:
      * @brief handles callback after write() for errors checking.
      * @param error
      */
-    void handleWrite(const std::error_code& error, socket_handler_ptr);
+    void handleWrite(const std::error_code& error);
 
     /**
      * @brief delivers text data to client

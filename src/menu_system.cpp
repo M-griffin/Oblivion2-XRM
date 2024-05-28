@@ -25,6 +25,7 @@
 
 #include "session.hpp"
 #include "logging.hpp"
+#include "connection_base.hpp"
 
 const std::string MenuSystem::m_stateID = "MENU_SYSTEM";
 
@@ -80,7 +81,7 @@ MenuSystem::~MenuSystem()
 /**
  * @brief Handles Updates or Data Input from Client
  */
-void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8)
+void MenuSystem::update(const std::string &character_buffer)
 {
     if(!m_is_active)
     {
@@ -91,11 +92,11 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
     //m_menu_functions[m_input_index](character_buffer, is_utf8);
     
     switch(m_input_index) {
-        case 0 : menuInput(character_buffer, is_utf8); break;
-        case 1 : menuYesNoBarInput(character_buffer, is_utf8); break;
-        case 2 : modulePreLogonInput(character_buffer, is_utf8); break;
-        case 3 : moduleLogonInput(character_buffer, is_utf8); break;
-        case 4 : moduleInput(character_buffer, is_utf8); break;
+        case 0 : menuInput(character_buffer); break;
+        case 1 : menuYesNoBarInput(character_buffer); break;
+        case 2 : modulePreLogonInput(character_buffer); break;
+        case 3 : moduleLogonInput(character_buffer); break;
+        case 4 : moduleInput(character_buffer); break;
     }
     
 }
@@ -120,7 +121,9 @@ bool MenuSystem::onEnter()
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     
     m_logoff = true;
-    m_session_data->disconnectUser();
+    
+    session_ptr session = m_session_data.lock();
+    session->logoff();
             
     m_is_active = true;
     return true;
@@ -524,12 +527,15 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
 
         // Logoff
         case 'G':
+        {
             m_log.write<Logging::CONSOLE_LOG>("User Logoff()");
             // Base Class
             m_logoff = true;
-            m_session_data->disconnectUser();
+            
+            session_ptr session = m_session_data.lock();
+            session->logoff();
             break;
-
+        }
         // Drops into the BBS
         case 'X':
             return false;
@@ -582,21 +588,25 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
 
         // Logoff
         case 'G':
+        {
             m_log.write<Logging::DEBUG_LOG>("Logoff()");
             // Add Logoff ANSI Display here.
             // Base Class
             m_logoff = true;
-            m_session_data->disconnectUser();
+            session_ptr session = m_session_data.lock();
+            session->logoff();
             break;
-
+        }
         // logoff without ansi
         case 'H':
+        {
             m_log.write<Logging::DEBUG_LOG>("Logoff() Without ANSI");
             // Base Class
             m_logoff = true;
-            m_session_data->disconnectUser();
+            session_ptr session = m_session_data.lock();
+            session->logoff();
             break;
-
+        }   
         // Fill out info form
         case 'I':
             return false;
@@ -1176,7 +1186,7 @@ void MenuSystem::startupModuleMessageEditor()
  * @param character_buffer
  * @param is_utf8
  */
-void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8)
+void MenuSystem::handleLoginInputSystem(const std::string &character_buffer)
 {
     // Make sure we have an allocated module before processing.
     /*
@@ -1236,25 +1246,25 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
  * @brief Handles parsing input for preLogon module
  *
  */
-void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8)
+void MenuSystem::modulePreLogonInput(const std::string &character_buffer)
 {
-    handleLoginInputSystem(character_buffer, is_utf8);
+    handleLoginInputSystem(character_buffer);
 }
 
 /**
  * @brief Handles parsing input for Logon module
  *
  */
-void MenuSystem::moduleLogonInput(const std::string &character_buffer, const bool &is_utf8)
+void MenuSystem::moduleLogonInput(const std::string &character_buffer)
 {
-    handleLoginInputSystem(character_buffer, is_utf8);
+    handleLoginInputSystem(character_buffer);
 }
 
 /**
  * @brief Handles parsing input for modules
  *
  */
-void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is_utf8)
+void MenuSystem::moduleInput(const std::string &character_buffer)
 {
     /*
     // Make sure we have an allocated module before processing.

@@ -4,16 +4,10 @@
 // For Startup.
 #include <thread>
 
-#include "sdl2_net/SDL_net.hpp"
-
 #include "session_manager.hpp"
 #include "session.hpp"
-#include "async_io.hpp"
 
-// New Rework for SDL2_net and Asyc io.
-#include "io_service.hpp"
-#include "socket_handler.hpp"
-#include "async_acceptor.hpp"
+
 #include "logging.hpp"
 
 class Interface;
