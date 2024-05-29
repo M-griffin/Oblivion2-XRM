@@ -94,7 +94,10 @@ void Session::startTelnetOptionNegoiation()
     {
         if (!ec)
         {
-            handleTelnetOptionNegoiation();            
+            if(m_connection->is_open())
+            {
+                handleTelnetOptionNegoiation();
+            }            
         }
         else 
         {
@@ -121,11 +124,13 @@ void Session::handleTelnetOptionNegoiation()
     //state_ptr new_state = std::make_shared<MenuSystem>(shared_from_this());
     
     // TESTING FIXME
-    state_ptr new_state = std::make_shared<MenuShell>(shared_from_this());
+    if(m_connection->is_open())
+    {
+        state_ptr new_state = std::make_shared<MenuShell>(shared_from_this());
     
-    std::cout << "handleTelnetOptionNegoiation - Starting Menu System State!" << std::endl;
-    m_state_manager->changeState(new_state);    
-
+        std::cout << "handleTelnetOptionNegoiation - Starting Menu System State!" << std::endl;
+        m_state_manager->changeState(new_state);    
+    }
 }
 
 /**
@@ -212,14 +217,14 @@ void Session::waitingForData()
             if (ec)
             {
                 std::cout << "Async Read Error: " << ec.message() << " : " << m_is_leaving << std::endl;
-                //if (!m_is_leaving)
-                //{
-                    disconnectUser();                    
-                //}
+                disconnectUser();                
                 return;
             }
             
-            handleRead(ec, length);
+            if(m_connection->is_open())
+            {
+                handleRead(ec, length);                 
+            }
         });
     }
 }
@@ -267,9 +272,7 @@ void Session::updateState()
     else if(!m_is_esc_timer)
     {
         //m_state_manager->update();
-    }
-    
-    m_state_manager->update();
+    }        
 }
 
 
@@ -321,7 +324,7 @@ void Session::handleRead(const boost::system::error_code& ec, std::size_t length
     session_manager_ptr session_manager = m_session_manager.lock();
     if(!session_manager)
     {
-        m_log.write<Logging::ERROR_LOG>("handleRead - Unable to load session_manager", __FILE__, __LINE__);
+        m_log.write<Logging::ERROR_LOG>("handleRead - Unable to load session_manager", length, __FILE__, __LINE__);
         disconnectUser();
         return;
     }
@@ -445,33 +448,55 @@ void Session::handleTeloptCodes()
     m_parsed_data += incoming_data;
 }
 
+/**
+ * @brief Closes Socket Logging the user off, then gets routed to DisconnectUser() Below.
+ */
 void Session::logoff() 
-{
-    if (!m_is_leaving)
+{    
+    std::cout << "logoff() : is_leaving=" << m_is_leaving << " : is_open=" << m_connection->is_open() << std::endl;
+    
+    try 
     {
-        // Test only shutting down, then let the error close the socket cleanly.
         m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
-        return;        
+        m_connection->m_normal_socket.close();
     }
+    catch (std::exception &msg) 
+    {
+        std::cout << "Logoff() Exception: " << msg.what() << std::endl;
+    }
+                
+    return; 
 }
 
 /**
- * @brief Shutdown Socket Connections by User Rquests / Logoff.
+ * @brief Handles Errors and Closeing the Session
  */
 void Session::disconnectUser() 
 {
-    std::cout << "disconnectUser : " << std::endl;
+    std::cout << "disconnectUser() : is_leaving=" << m_is_leaving << " : is_open=" << m_connection->is_open() << std::endl;
     if (m_is_leaving)
     {
         return;        
     }
     m_is_leaving = true;       
 
-    // Close Down Sockets
-    m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
-    m_connection->m_normal_socket.close();
+    // Close Down Sockets If they are Open Still.
+    if (m_connection->is_open())
+    {
+        try 
+        {            
+            m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
+            m_connection->m_normal_socket.close();
+        }
+        catch (std::exception &msg) 
+        {
+            std::cout << "DisconnectUser() Exception: " << msg.what() << std::endl;
+        }
+    }
     
     // Remove Session from Session Manager so it will Exit Cleanly.
+    // Cancle The Timer incase it's running it can block proper session shutdown
+    m_detection_deadline.cancel();
     session_manager_ptr session_manager = m_session_manager.lock();
     if(!session_manager)
     {
@@ -480,8 +505,8 @@ void Session::disconnectUser()
     }
             
     // Review Sessions are being freed properly.
+    std::cout << "Shutting Down Session : is_leaving=" << m_is_leaving << " : is_open=" << m_connection->is_open() << std::endl;
     std::cout << "Current Sessions cnt=" << session_manager->connections() << std::endl;    
-    //m_connection.reset();
     session_manager->leave(shared_from_this());
     std::cout << "Removed Session cnt=" << session_manager->connections() << std::endl;
     
