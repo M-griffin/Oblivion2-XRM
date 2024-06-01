@@ -1,5 +1,5 @@
 /**
- * Oblivion/2 XRM rev.2 (c) 2015-2023 Michael Griffin
+ * Oblivion/2 XRM rev.3 (c) 2015-2024 Michael Griffin
  * A Telnet Server and BBS system modeled after Oblivion/2 bbs software.
  *
  * XRM = Extreme Remake!
@@ -190,59 +190,27 @@ auto main() -> int
             std::cout << "Listening for telnet connections on port "
                       << cfg.m_config->port_telnet << std::endl;
                       
-            server_telnet_ptr serverTelnet = std::make_shared<Server>(io_service, cfg.m_config->port_telnet);                
-            io_service.run();
+            server_telnet_ptr serverTelnet = std::make_shared<Server>(io_service, cfg.m_config->port_telnet);
+            
+            while(1)
+            {
+                try 
+                {
+                    io_service.run();
+                    // Normal Exit of Loop, only loops when an Encaught Exception Occurs from possible Async Operations.
+                    break;
+                }
+                catch(std::exception &e)
+                {
+                    m_log.write<Logging::ERROR_LOG>("Uncaught Exception - Restarting io_service.run()", e.what());
+                }                
+            }
         }
         
         std::cout << "Exting..." << std::endl;
         io_service.stop();
     }
-
-    // Isolate to code block for smart pointer deallocation.
-    {
-        // Create Handles to Services, and starts up connection listener and ASIO Thread Worker
-        /*
-        IOService io_service;
-        int port = Communicator::getInstance().getConfiguration()->port_telnet;
-        std::string logging_level = Communicator::getInstance().getConfiguration()->logging_level;
-        Logging::getInstance().setLoggingLevel(logging_level);
-        
-        // Testing Main Loop without returning.
-        Interface interface(io_service, "TELNET", port);
-        */
-
-        /*
-        while(io_service.isActive()) 
-        {            
-            std::string line;
-            std::getline(std::cin, line);
-            
-            
-             * Clean Shutdown, (2) Steps at this time from Console Commands.
-             * 
-             * 1. Kill - All Connections, so all sessions cleanly shutown, should wait at least 10 seconds.
-             * 2. Quit - Stops IO Worker Service and All Async Jobs and listeners
-             * 
-             * If we try to do both of these Kill isn't finished then we get leaks on quit.
-             * Which has to be looked into more in a single smpoother process.
-             * 
-             * Works for Now.
-             *
-            if (line == "kill") {
-                m_log.write<Logging::INFO_LOG>("Killing All Connections before exiting...");
-                setupAndRunAsioServer->shutdown();
-            }
-            
-            if (line == "quit") {
-                m_log.write<Logging::INFO_LOG>("Shutting down IOservice, exiting...");
-                io_service.stop();
-            }
-          
-            // Timer, for cpu usage
-            std::this_thread::sleep_for(std::chrono::milliseconds(40));            
-        }*/
-
-    }
+    
 
     return 0;
 }

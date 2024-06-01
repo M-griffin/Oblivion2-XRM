@@ -171,6 +171,7 @@
         <IncludePath Value="../sqlitewrap"/>
         <IncludePath Value="../linux/Debug"/>
         <Preprocessor Value="WITHOUT_SDL"/>
+        <Preprocessor Value="BOOST_ASIO_ENABLE_HANDLER_TRACKING"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
@@ -185,8 +186,6 @@
         <Library Value="yaml-cpp"/>
         <Library Value="util"/>
         <Library Value="uuid"/>
-        <Library Value="boost_system"/>
-        <Library Value="boost_thread"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>

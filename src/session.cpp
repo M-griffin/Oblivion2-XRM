@@ -177,18 +177,25 @@ void Session::deliver(const std::string &msg, bool is_disconnection)
     }    
 
     if(m_connection->is_open())
-    {                                         
-        auto self(shared_from_this());        
-        boost::asio::async_write(m_connection->m_normal_socket, boost::asio::buffer(outputBuffer, outputBuffer.size()),
-        [this, self, is_disconnection](boost::system::error_code ec, std::size_t /*length*/)
+    {           
+        try 
         {
-            if (ec)
+            auto self(shared_from_this());        
+            boost::asio::async_write(m_connection->m_normal_socket, boost::asio::buffer(outputBuffer, outputBuffer.size()),
+            [this, self, is_disconnection](boost::system::error_code ec, std::size_t /*length*/)
             {
-                std::cout << "Async Write Error: " << ec.message() << std::endl;
-                disconnectUser();
-                return;
-            }
-        });
+                if (ec)
+                {
+                    std::cout << "Async Write Error: " << ec.message() << std::endl;
+                    disconnectUser();
+                    return;
+                }
+            });            
+        }
+        catch (std::exception &e)
+        {
+            m_log.write<Logging::ERROR_LOG>("Caught Exception - Async Write Error", e.what());
+        }
     }
     else
     {
@@ -208,25 +215,32 @@ void Session::waitingForData()
     std::cout << "waiting For Data()" << std::endl;
     memset(&m_raw_data, 0, max_length); // * sizeof(m_raw_data));
     
-    if(m_connection->is_open())
+    if(m_connection && m_connection->is_open())
     {
-        auto self(shared_from_this());        
-        m_connection->m_normal_socket.async_read_some(boost::asio::buffer(m_raw_data, max_length),
-        [this, self](boost::system::error_code ec, std::size_t length)
+        try {
+            auto self(shared_from_this());        
+            m_connection->m_normal_socket.async_read_some(boost::asio::buffer(m_raw_data, max_length),
+            [this, self](boost::system::error_code ec, std::size_t length)
+            {
+                if (ec)
+                {
+                    std::cout << "Async Read Error: " << ec.message() << " : " << m_is_leaving << std::endl;
+                    disconnectUser();                
+                    return;
+                }
+                
+                if(m_connection->is_open())
+                {
+                    handleRead(ec, length);                 
+                }
+            });
+        } 
+        catch (std::exception &e)
         {
-            if (ec)
-            {
-                std::cout << "Async Read Error: " << ec.message() << " : " << m_is_leaving << std::endl;
-                disconnectUser();                
-                return;
-            }
-            
-            if(m_connection->is_open())
-            {
-                handleRead(ec, length);                 
-            }
-        });
+            m_log.write<Logging::ERROR_LOG>("Caught Exception - Async Read Error", e.what());
+        }
     }
+
 }
 
 /**
@@ -273,6 +287,8 @@ void Session::updateState()
     {
         //m_state_manager->update();
     }        
+    
+    m_state_manager->update();
 }
 
 
@@ -460,9 +476,9 @@ void Session::logoff()
         m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
         m_connection->m_normal_socket.close();
     }
-    catch (std::exception &msg) 
+    catch (std::exception &e) 
     {
-        std::cout << "Logoff() Exception: " << msg.what() << std::endl;
+        std::cout << "Logoff() Exception: " << e.what() << std::endl;
     }
                 
     return; 
@@ -473,7 +489,7 @@ void Session::logoff()
  */
 void Session::disconnectUser() 
 {
-    std::cout << "disconnectUser() : is_leaving=" << m_is_leaving << " : is_open=" << m_connection->is_open() << std::endl;
+    std::cout << "disconnectUser() : is_leaving=" << m_is_leaving << " : is_open=" << (m_connection ? m_connection->is_open() : 0) << std::endl;
     if (m_is_leaving)
     {
         return;        
@@ -481,18 +497,18 @@ void Session::disconnectUser()
     m_is_leaving = true;       
 
     // Close Down Sockets If they are Open Still.
-    if (m_connection->is_open())
-    {
-        try 
-        {            
-            m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
-            m_connection->m_normal_socket.close();
-        }
-        catch (std::exception &msg) 
+    try 
+    {     
+        if (m_connection->is_open())
         {
-            std::cout << "DisconnectUser() Exception: " << msg.what() << std::endl;
+            m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
+            m_connection->m_normal_socket.close();        
         }
     }
+    catch (std::exception &e) 
+    {
+        std::cout << "DisconnectUser() Exception: " << e.what() << std::endl;
+    }    
     
     // Remove Session from Session Manager so it will Exit Cleanly.
     // Cancle The Timer incase it's running it can block proper session shutdown
