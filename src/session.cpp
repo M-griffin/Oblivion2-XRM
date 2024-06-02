@@ -13,7 +13,6 @@
 #include "data-sys/users_dao.hpp"
 
 #include "state_manager.hpp"
-#include "socket_handler.hpp"
 #include "session_manager.hpp"
 #include "telnet_decoder.hpp"
 //#include "menu_system.hpp"
@@ -56,8 +55,7 @@ Session::Session(boost::asio::io_service& io_service, connection_ptr connection,
     , m_detection_deadline(io_service)
     , m_user_database(USERS_DATABASE, &m_database_log)
 {
-    //m_log.write<Logging::CONSOLE_LOG>("Session() Started.");
-    std::cout << "Session() Started." << std::endl;
+    m_log.write<Logging::CONSOLE_LOG>("Session() Started.");    
     
     // Setup Shared Pointers
     m_state_manager = std::make_shared<StateManager>();
@@ -68,8 +66,7 @@ Session::Session(boost::asio::io_service& io_service, connection_ptr connection,
 
 Session::~Session()
 {
-    //m_log.write<Logging::CONSOLE_LOG>("~Session() Closed.");
-    std::cout << "~Session() Closed." << std::endl;
+    m_log.write<Logging::CONSOLE_LOG>("~Session() Closed.");    
 
     // Free the menu system state and modules when session closes.
     m_state_manager->clean();     
@@ -92,18 +89,26 @@ void Session::startTelnetOptionNegoiation()
     m_detection_deadline.async_wait(
     [this, self](const boost::system::error_code& ec)
     {
-        if (!ec)
+        if (ec)
+        {            
+            m_log.write<Logging::WARN_LOG>("Deadline Timer Exepction", "msg", ec.message());
+            disconnectUser();
+            return;
+        }
+        
+        try 
         {
             if(m_connection->is_open())
             {
                 handleTelnetOptionNegoiation();
-            }            
+            }                            
         }
-        else 
+        catch (std::exception &e)
         {
-            std::cout << "Deadline Timer Exepction: " << ec.message() << std::endl;
+            m_log.write<Logging::WARN_LOG>("startTelnetOptionNegoiation Excetpion", "msg", e.what(), "is_leaving", m_is_leaving);
             disconnectUser();
-        }
+        }        
+        
     });
     
     
@@ -116,9 +121,8 @@ void Session::startTelnetOptionNegoiation()
  */
 void Session::handleTelnetOptionNegoiation()
 {   
-    std::cout << "handleTelnetOptionNegoiation - Deadline Terminal Detection, EXPIRED!" << std::endl;
-    // Setup Node Number for Separate Thread.
-    m_log.setUserInfo(m_node_number);
+    m_log.setUserInfo(m_node_number);    
+    m_log.write<Logging::INFO_LOG>("handleTelnetOptionNegoiation - Deadline Terminal Detection, EXPIRED!");
     
     // Starts Up the Menu System Then Loads up the PreLogin Sequence.   
     //state_ptr new_state = std::make_shared<MenuSystem>(shared_from_this());
@@ -128,7 +132,7 @@ void Session::handleTelnetOptionNegoiation()
     {
         state_ptr new_state = std::make_shared<MenuShell>(shared_from_this());
     
-        std::cout << "handleTelnetOptionNegoiation - Starting Menu System State!" << std::endl;
+        m_log.write<Logging::INFO_LOG>("handleTelnetOptionNegoiation - (MenuShell) Starting Menu System State!");
         m_state_manager->changeState(new_state);    
     }
 }
@@ -157,10 +161,12 @@ void Session::handlePyBind11State()
  */
 void Session::deliver(const std::string &msg, bool is_disconnection)
 {
-    std::cout << "deliver()" << std::endl;
+    m_log.setUserInfo(m_node_number);    
+    m_log.write<Logging::INFO_LOG>("ASYNC -> Deliver");
+    
     if(msg.size() == 0 || msg[0] == '\0')
     {
-        std::cout << "deliver() size 0 - return" << std::endl;
+        m_log.write<Logging::INFO_LOG>("ASYNC -> Deliver - Size - 0, Return");
         return;
     }
     
@@ -186,7 +192,7 @@ void Session::deliver(const std::string &msg, bool is_disconnection)
             {
                 if (ec)
                 {
-                    std::cout << "Async Write Error: " << ec.message() << std::endl;
+                    m_log.write<Logging::WARN_LOG>("Async Write Error", "msg", ec.message(), "is_leaving", m_is_leaving);
                     disconnectUser();
                     return;
                 }
@@ -199,10 +205,9 @@ void Session::deliver(const std::string &msg, bool is_disconnection)
     }
     else
     {
-        std::cout << "deliver - Error Code (CONNECTION CLOSED!) "
-                  << " Client IP: "
-                  << m_connection->m_normal_socket.remote_endpoint().address().to_string()
-                  << std::endl;
+        m_log.write<Logging::WARN_LOG>("deliver - Error Code (CONNECTION CLOSED!) "
+                  ," Client IP: "
+                  ,m_connection->m_normal_socket.remote_endpoint().address().to_string());                  
         disconnectUser();
     }     
 }
@@ -212,7 +217,9 @@ void Session::deliver(const std::string &msg, bool is_disconnection)
  */
 void Session::waitingForData()
 {
-    std::cout << "waiting For Data()" << std::endl;
+    m_log.setUserInfo(m_node_number);    
+    m_log.write<Logging::INFO_LOG>("ASYNC -> Waiting for Data");
+    
     memset(&m_raw_data, 0, max_length); // * sizeof(m_raw_data));
     
     if(m_connection && m_connection->is_open())
@@ -223,8 +230,9 @@ void Session::waitingForData()
             [this, self](boost::system::error_code ec, std::size_t length)
             {
                 if (ec)
-                {
-                    std::cout << "Async Read Error: " << ec.message() << " : " << m_is_leaving << std::endl;
+                {                    
+                    m_log.setUserInfo(m_node_number);    
+                    m_log.write<Logging::WARN_LOG>("Async Read Error", "msg", ec.message(), "is_leaving", m_is_leaving);
                     disconnectUser();                
                     return;
                 }
@@ -268,13 +276,9 @@ void Session::resolveHandler(const boost::system::error_code &ec, tcp::resolver:
  * @brief Passed data Though the State, and Checks ESC Timer
  */
 void Session::updateState()
-{
-    
-    // FIXME 
-    std::cout << "FIX ME updateState " << std::endl;
-    
-    // Setup Logging per Current Node.
-    m_log.setUserInfo(m_node_number);
+{    
+    m_log.setUserInfo(m_node_number);    
+    m_log.write<Logging::INFO_LOG>("FIXME - (SESSION) Update State w/ Timers");
     
     // Last Character Received is ESC, then Check for
     // ESC Sequence, or Lone ESC Key.
@@ -319,8 +323,8 @@ void Session::startEscapeTimer()
  */
 void Session::handleEscTimer()
 {
-    std::cout << "handleEscTimer " << std::endl;
-    m_log.setUserInfo(m_node_number);
+    m_log.setUserInfo(m_node_number);    
+    m_log.write<Logging::INFO_LOG>("handleEscTimer - inside");
     
     // Move text to State Machine, Timer has passed, or remainder of Sequence caught up!
     m_state_manager->update();
@@ -347,7 +351,7 @@ void Session::handleRead(const boost::system::error_code& ec, std::size_t length
 
     if (ec || !m_connection->is_open())
     {        
-        std::cout << "handleRead (ERROR)" << ((ec) ? ec.message() : "") << " : " << m_is_leaving << std::endl;
+        m_log.write<Logging::WARN_LOG>("handleRead (ERROR)", "error_code", ((ec) ? ec.message() : ""));        
         disconnectUser();
         return;
     }
@@ -401,7 +405,8 @@ void Session::handleRead(const boost::system::error_code& ec, std::size_t length
             updateState();
         }*/
         
-        std::cout << "updateState " << std::endl;
+
+        m_log.write<Logging::INFO_LOG>("updateState");
         updateState();
     }
 
@@ -415,7 +420,6 @@ void Session::handleRead(const boost::system::error_code& ec, std::size_t length
         return;
     }
     
-    std::cout << "look back to  waitingForData" << std::endl;
     waitingForData();
 }
 
@@ -426,9 +430,8 @@ void Session::handleRead(const boost::system::error_code& ec, std::size_t length
  */
 void Session::handleTeloptCodes()
 {
-    std::cout << "handleTeloptCodes - inside" << std::endl;
-    
-    m_log.setUserInfo(m_node_number);
+    m_log.setUserInfo(m_node_number);    
+    m_log.write<Logging::INFO_LOG>("handleTeloptCodes - inside");
     
     std::string incoming_data = "";
     
@@ -469,16 +472,26 @@ void Session::handleTeloptCodes()
  */
 void Session::logoff() 
 {    
-    std::cout << "logoff() : is_leaving=" << m_is_leaving << " : is_open=" << m_connection->is_open() << std::endl;
+    m_log.setUserInfo(m_node_number);
+    m_log.write<Logging::WARN_LOG>("logoff()", "is_leaving=", m_is_leaving, 
+        "is_open()=", (m_connection ? m_connection->is_open() : 0), __FILE__, __LINE__);
     
     try 
     {
-        m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
+        m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);        
+    }
+    catch (std::exception &e) 
+    {
+        m_log.write<Logging::WARN_LOG>("logoff() Exception (shutdown)", e.what(), __FILE__, __LINE__);
+    }
+    
+    try 
+    {
         m_connection->m_normal_socket.close();
     }
     catch (std::exception &e) 
     {
-        std::cout << "Logoff() Exception: " << e.what() << std::endl;
+        m_log.write<Logging::WARN_LOG>("logoff() Exception (close)", e.what(), __FILE__, __LINE__);
     }
                 
     return; 
@@ -489,7 +502,10 @@ void Session::logoff()
  */
 void Session::disconnectUser() 
 {
-    std::cout << "disconnectUser() : is_leaving=" << m_is_leaving << " : is_open=" << (m_connection ? m_connection->is_open() : 0) << std::endl;
+    m_log.setUserInfo(m_node_number);
+    m_log.write<Logging::WARN_LOG>("disconnectUser()", "is_leaving=", m_is_leaving, 
+        "is_open()=", (m_connection ? m_connection->is_open() : 0), __FILE__, __LINE__);
+    
     if (m_is_leaving)
     {
         return;        
@@ -501,14 +517,25 @@ void Session::disconnectUser()
     {     
         if (m_connection->is_open())
         {
-            m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);
+            m_connection->m_normal_socket.shutdown(tcp::socket::shutdown_both);            
+        }
+    }
+    catch (std::exception &e) 
+    {
+        m_log.write<Logging::WARN_LOG>("disconnectUser() Exception (shutdown)", e.what(), __FILE__, __LINE__);
+    }    
+    
+    try 
+    {     
+        if (m_connection->is_open())
+        {
             m_connection->m_normal_socket.close();        
         }
     }
     catch (std::exception &e) 
     {
-        std::cout << "DisconnectUser() Exception: " << e.what() << std::endl;
-    }    
+        m_log.write<Logging::WARN_LOG>("disconnectUser() Exception (close)", e.what(), __FILE__, __LINE__);
+    }
     
     // Remove Session from Session Manager so it will Exit Cleanly.
     // Cancle The Timer incase it's running it can block proper session shutdown
@@ -516,14 +543,17 @@ void Session::disconnectUser()
     session_manager_ptr session_manager = m_session_manager.lock();
     if(!session_manager)
     {
-        m_log.write<Logging::ERROR_LOG>("disconnectUser - Unable to load session_manager", __FILE__, __LINE__);
+        m_log.write<Logging::ERROR_LOG>("disconnectUser() - Unable to lock session_manager", __FILE__, __LINE__);
         return;
     }
             
-    // Review Sessions are being freed properly.
-    std::cout << "Shutting Down Session : is_leaving=" << m_is_leaving << " : is_open=" << m_connection->is_open() << std::endl;
-    std::cout << "Current Sessions cnt=" << session_manager->connections() << std::endl;    
+    // Review Sessions are being freed properly.    
+    m_log.write<Logging::WARN_LOG>("disconnectUser() - Shutting Down Session", "is_leaving=", m_is_leaving, 
+        "is_open()=", (m_connection ? m_connection->is_open() : 0), __FILE__, __LINE__);
+    
+    // Extra Debugging, Make Sure Session is removed from Manager, verify counts.
+    m_log.write<Logging::WARN_LOG>("Current Sessions cnt", session_manager->connections());
     session_manager->leave(shared_from_this());
-    std::cout << "Removed Session cnt=" << session_manager->connections() << std::endl;
+    m_log.write<Logging::WARN_LOG>("Removed Sessions cnt", session_manager->connections());
     
 }

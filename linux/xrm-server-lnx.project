@@ -171,7 +171,7 @@
         <IncludePath Value="../sqlitewrap"/>
         <IncludePath Value="../linux/Debug"/>
         <Preprocessor Value="WITHOUT_SDL"/>
-        <Preprocessor Value="BOOST_ASIO_ENABLE_HANDLER_TRACKING"/>
+        <Preprocessor Value="ZZZ_BOOST_ASIO_ENABLE_HANDLER_TRACKING"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>

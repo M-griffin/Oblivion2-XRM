@@ -10,9 +10,9 @@ sql:
 	make -f ../linux/SqliteWrapped.mk -j3
 	cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h> ./Release/libSqliteWrapped.h
 
-sqlr:
+sqld:
 	make -f ../linux/SqliteWrapped.mk -j3
-	cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h> ./Release/libSqliteWrapped.h
+	cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h> ./Debug/libSqliteWrapped.h
 
 xrm:
 	make -f ../linux/xrm-server.mk -j3

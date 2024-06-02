@@ -140,11 +140,13 @@ public:
                 if(m_log_level != DEBUG_LOG && m_log_level != ALL_LOGS)
                     return;
                 break;
-                
+            
+/*    Test, WARN AND ERROR SHould laways show..  Info vs Debug are swapable.
             case WARN_LOG:
                 if(m_log_level != WARN_LOG && m_log_level != ALL_LOGS)
                     return;
                 break;
+                 */
                 
             default:
                 break;
