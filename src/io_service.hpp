@@ -167,20 +167,19 @@ public:
     {
         // We keep NEW here for Initial Pointer Creation due to Varidict Templates.
         // Made Sure Virtual Descructors are called properly when Jobs are released. 
-        ServiceJob<MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType> *job
-            = new ServiceJob <MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
-                (buffer, string_sequence, socket_handle, callback, service_type);
 
         if(SERVICE_LISTENER(service_type))
         {
             // Server Connection Listener Job (1) for each Service.
             m_listener.reset();
-            m_listener = std::shared_ptr<ServiceBase>(job);
+            m_listener = std::shared_ptr<ServiceBase>(new ServiceJob <MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
+                (buffer, string_sequence, socket_handle, callback, service_type));                        
         }
         else
         {
             // Standard Async Job
-            m_service_list.enqueue(std::shared_ptr<ServiceBase>(job));
+            m_service_list.enqueue(std::shared_ptr<ServiceBase>(new ServiceJob <MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
+                (buffer, string_sequence, socket_handle, callback, service_type)));
         }
     }
     
@@ -287,11 +286,10 @@ public:
     {
         // We keep NEW here for Initial Pointer Creation due to Varidict Templates.
         // Made Sure Virtual Descructors are called properly when Jobs are released. 
-        TimerJob<StartTime, MilliSeconds, Callback> *job = new TimerJob <StartTime, MilliSeconds, Callback>
-                (start_time, expires_from_now, callback);
 
         // Timer (Priority List Job)
-        m_timer_list.enqueue(std::shared_ptr<TimerBase>(job));
+        m_timer_list.enqueue(std::shared_ptr<TimerBase>(new TimerJob <StartTime, MilliSeconds, Callback>
+                (start_time, expires_from_now, callback)));
     }
 
     /**

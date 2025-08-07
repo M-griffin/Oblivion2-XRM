@@ -266,7 +266,7 @@ void ModLogon::setupPasswordChange()
 bool ModLogon::checkUserLogon(const std::string &input)
 {
     // Check for user name and if is already exists!
-    users_dao_ptr user_data = std::make_shared<UsersDao>(m_session_data->m_user_database);
+    users_dao_ptr user_data = std::make_shared<UsersDao>(getUserDatabase());
 
     // Check if a Digit, if so, lookup by userId.
     if(m_common_io->isDigit(input))
@@ -404,7 +404,7 @@ bool ModLogon::validate_password(const std::string &input)
 
     // First load the secure record for the existing user.
     // Link to security dao for data access object
-    security_dao_ptr security_dao = std::make_shared<SecurityDao>(m_session_data->m_user_database);
+    security_dao_ptr security_dao = std::make_shared<SecurityDao>(getUserDatabase());
 
     // Lookup the security table for existing hash.
     security_ptr security = security_dao->getRecordById(m_logon_user->iSecurityIndex);
@@ -466,8 +466,11 @@ bool ModLogon::password(const std::string &input)
         if(validate_password(key))
         {
             // Authorize and assign user to the session.
-            m_session_data->m_is_session_authorized = true;
-            m_session_data->m_user_record = m_logon_user;
+            if (session_ptr session = getLockedSession())
+            {
+                session->m_is_session_authorized = true;
+                session->m_user_record = m_logon_user;
+            }
             m_is_active = false;
         }
         else
@@ -478,7 +481,10 @@ bool ModLogon::password(const std::string &input)
             // If max, then exit back to matrix.
             if(m_failure_attempts >= m_config->invalid_password_attempts)
             {
-                m_session_data->disconnectUser();
+                if (session_ptr session = getLockedSession())
+                {
+                    session->disconnectUser();                
+                }
                 m_is_active = false;
                 return false;
             }

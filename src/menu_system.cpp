@@ -499,7 +499,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
             m_log.write<Logging::CONSOLE_LOG>("User Logoff()");
             // Base Class
             m_logoff = true;
-            m_session_data->disconnectUser();
+            getLockedSession()->disconnectUser();
             break;
 
         // Drops into the BBS
@@ -526,6 +526,18 @@ bool MenuSystem::menuOptionsGlobalNewScanCommands(const MenuOption &option)
     }
 
     return true;
+}
+
+/**
+ * @brief Disconnect a user on the Session.
+ */
+void MenuSystem::disconnectUser()
+{
+    session_ptr session = getLockedSession();
+    if (session) 
+    {
+        session->disconnectUser();
+    }
 }
 
 /**
@@ -558,7 +570,7 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
             // Add Logoff ANSI Display here.
             // Base Class
             m_logoff = true;
-            m_session_data->disconnectUser();
+            disconnectUser();
             break;
 
         // logoff without ansi
@@ -566,7 +578,7 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
             m_log.write<Logging::DEBUG_LOG>("Logoff() Without ANSI");
             // Base Class
             m_logoff = true;
-            m_session_data->disconnectUser();
+            disconnectUser();
             break;
 
         // Fill out info form
@@ -961,7 +973,7 @@ void MenuSystem::startupModulePreLogon()
 
     // Allocate and Create
     module_ptr module = std::make_shared<ModPreLogon>(
-        m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
+        getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
 
     if(!module)
@@ -983,7 +995,7 @@ void MenuSystem::startupModuleLogon()
 
     // Allocate and Create
     module_ptr module = std::make_shared<ModLogon>(
-        m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
+        getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
 
     if(!module)
@@ -1005,7 +1017,7 @@ void MenuSystem::startupModuleSignup()
 
     // Allocate and Create
     module_ptr module = std::make_shared<ModSignup>(
-        m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
+        getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
 
     if(!module)
@@ -1027,7 +1039,7 @@ void MenuSystem::startupModuleMenuEditor()
 
     // Allocate and Create
     module_ptr module = std::make_shared<ModMenuEditor>(
-        m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
+        getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
 
     if(!module)
@@ -1049,7 +1061,7 @@ void MenuSystem::startupModuleUserEditor()
 
     // Allocate and Create
     module_ptr module = std::make_shared<ModUserEditor>(
-        m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
+        getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
 
     if(!module)
@@ -1071,7 +1083,7 @@ void MenuSystem::startupModuleLevelEditor()
 
     // Allocate and Create
     module_ptr module = std::make_shared<ModLevelEditor>(
-        m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
+        getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
 
     if(!module)
@@ -1093,7 +1105,7 @@ void MenuSystem::startupModuleMessageEditor()
 
     // Allocate and Create
     module_ptr module = std::make_shared<ModMessageEditor>(
-        m_session_data, m_config, m_ansi_process, m_common_io, m_session_io
+        getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
 
     if(!module)
@@ -1134,13 +1146,9 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
         shutdownModule();
         
         // Check if the current user has been logged in yet.
-        if(!m_session_data->m_is_session_authorized)
-        {
-            m_log.write<Logging::DEBUG_LOG>("!m_is_session_authorized");
-            m_current_menu = "matrix";
-        }
-        else
-        {
+        session_ptr session = getLockedSession();
+        if(session && session->m_is_session_authorized)
+        {            
             // If Authorized, then we want to move to main! Startup menu should be TOP or
             // Specified in Config file!  TODO
             m_log.write<Logging::DEBUG_LOG>("m_is_session_authorized");
@@ -1158,10 +1166,18 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
                 m_starting_menu = "main";
             }
         }
+        else
+        {
+            m_log.write<Logging::DEBUG_LOG>("!m_is_session_authorized");
+            m_current_menu = "matrix";            
+        }
 
         m_log.write<Logging::DEBUG_LOG>("loadAndStartupMenu on initial login");
 
-        loadAndStartupMenu();
+        if (session) 
+        {
+            loadAndStartupMenu();            
+        }
     }
 }
 

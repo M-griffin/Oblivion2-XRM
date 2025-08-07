@@ -191,6 +191,12 @@ private:
     bool emulationDetection(const std::string &input);
 
     /**
+     * @brief Sets Ansi Color Detection / User on the Session
+     * @param is_ansi
+     */
+    void setANSIColor(bool is_ansi);
+
+    /**
      * @brief ASK ANSI Color
      * @return
      */

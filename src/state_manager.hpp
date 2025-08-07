@@ -11,6 +11,9 @@ class Logging;
 class StateBase;
 typedef std::shared_ptr<StateBase> state_ptr;
 
+class Session;
+typedef std::shared_ptr<Session> session_ptr;
+
 /**
  * @class StateManager
  * @author Michael Griffin
@@ -29,6 +32,8 @@ public:
     void changeState(state_ptr &the_state);
     void popState();
     void clean();
+    
+    session_ptr getLockedSession();
 
     template<typename octet_type>
     inline uint8_t mask8(octet_type oc)
@@ -41,6 +46,7 @@ public:
     {
         return m_the_state;
     }
+
 
 private:
 

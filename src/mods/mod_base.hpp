@@ -11,6 +11,9 @@ class Logging;
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
 
+class Session;
+typedef std::weak_ptr<Session> session_wptr;
+
 class SessionIO;
 typedef std::shared_ptr<SessionIO> session_io_ptr;
 
@@ -25,6 +28,11 @@ typedef std::shared_ptr<Config> config_ptr;
 
 class TextPromptsDao;
 typedef std::shared_ptr<TextPromptsDao> text_prompts_dao_ptr;
+
+namespace SQLW {
+    class Database;
+}
+
 
 /**
  * @class ModBase
@@ -59,6 +67,16 @@ public:
         M_BORDER_MID_BOT   = (char)208,  // ╨
         M_BORDER_MID       = (char)186   // ║
     };
+
+    /**
+     * @brief Retrieve a Session Point to a Locked Session Object.
+     */
+    session_ptr getLockedSession();
+    
+    /**
+     * @brief Retrieves User Database from Session.
+     */
+    SQLW::Database &getUserDatabase();
 
     /**
      * @brief Translate Box Chars to UTF-8
@@ -218,7 +236,7 @@ public:
     // In modules we'll use the weak pointer so more clarity.
     std::string         m_filename;
     Logging            &m_log;
-    session_ptr         m_session_data;
+    session_wptr        m_session_data;
     config_ptr          m_config;    
     processor_ansi_ptr  m_ansi_process;
     common_io_ptr       m_common_io;

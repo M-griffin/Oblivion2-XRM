@@ -8,6 +8,10 @@
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
 
+class Session;
+typedef std::weak_ptr<Session> session_wptr;
+
+
 /**
  * @class StateBase
  * @author Michael Griffin
@@ -35,7 +39,7 @@ public:
     {}
 
     // This holds session data passed to each session.
-    session_ptr  m_session_data;
+    session_wptr m_session_data;
     bool         m_is_active;
 
 };

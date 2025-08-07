@@ -2163,7 +2163,7 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
  */
 void ModMenuEditor::displayGenericMenu()
 {
-    menu_base_ptr menu = std::make_shared<MenuBase>(m_session_data);
+    menu_base_ptr menu = std::make_shared<MenuBase>(getLockedSession());
     menu->importMenu(m_loaded_menu.back());
 
     std::string generic_screen = menu->processGenericScreens();

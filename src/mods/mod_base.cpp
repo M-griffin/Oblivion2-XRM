@@ -17,6 +17,8 @@
 #include "../common_io.hpp"
 #include "../async_io.hpp"
 
+#include "libSqliteWrapped.h"
+
 ModBase::ModBase(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, std::string filename,
         common_io_ptr common_io, session_io_ptr session_io)
     : m_filename(filename)
@@ -42,6 +44,31 @@ ModBase::~ModBase()
     m_ansi_process.reset();    
     m_filename.clear();
     m_is_active = false;    
+}
+
+/**
+ * @brief Retrieve a Session Point to a Locked Session Object.
+ */
+session_ptr ModBase::getLockedSession()
+{
+    if (session_ptr session = m_session_data.lock())
+    {
+        return session;
+    }
+    else
+    {
+        m_log.write<Logging::ERROR_LOG>("Session Object Not Available");
+    }
+    
+    return nullptr;
+}
+
+/**
+ * @brief Retrieves User Database from Session.
+ */
+SQLW::Database &ModBase::getUserDatabase()
+{
+    return getLockedSession()->m_user_database;
 }
 
 /**
@@ -238,8 +265,12 @@ void ModBase::baseProcessAndDeliver(std::string &data)
     std::string output = "\x1b[0m" + baseGetDefaultColor();
     output += std::move(data);
     m_ansi_process->parseTextToBuffer((char *)output.c_str());
-    output += baseGetDefaultInputColor();    
-    m_session_data->deliver(output);
+    output += baseGetDefaultInputColor();
+    
+    if(session_ptr session = getLockedSession())
+    {
+        session->deliver(output);
+    }
 }
 
 /**
@@ -254,7 +285,11 @@ void ModBase::baseProcessAndDeliverThenDisconnect(std::string &data)
     output += std::move(data);
     m_ansi_process->parseTextToBuffer((char *)output.c_str());
     output += baseGetDefaultInputColor();    
-    m_session_data->deliver(output, DISCONNECT_USER);
+    
+    if(session_ptr session = getLockedSession())
+    {
+        session->deliver(output, DISCONNECT_USER);
+    }
 }
 
 /**
@@ -282,7 +317,11 @@ void ModBase::baseProcessDeliverNewLine()
 void ModBase::baseProcessDeliverInput(std::string &data)
 {
     m_ansi_process->parseTextToBuffer((char *)data.c_str());
-    m_session_data->deliver(data);
+    
+    if(session_ptr session = getLockedSession())
+    {
+        session->deliver(data);
+    }
 }
 
 /**
@@ -291,7 +330,11 @@ void ModBase::baseProcessDeliverInput(std::string &data)
 void ModBase::baseProcessDeliverInputAndDisconnect(std::string &data)
 {
     m_ansi_process->parseTextToBuffer((char *)data.c_str());
-    m_session_data->deliver(data, DISCONNECT_USER);
+    
+    if(session_ptr session = getLockedSession())
+    {
+        session->deliver(data, DISCONNECT_USER);
+    }
 }
 
 /**

@@ -84,6 +84,11 @@ public:
      * @param option
      */
     bool menuOptionsGlobalNewScanCommands(const MenuOption &option);
+    
+    /**
+     * @brief Disconnect a user on the Session.
+     */
+    void disconnectUser();
 
     /**
      * @brief Main Menu Commands

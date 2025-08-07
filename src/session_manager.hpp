@@ -32,6 +32,11 @@ public:
     ~SessionManager();    
 
     /**
+     * @brief Retrieve next Free Node Number
+     */
+    int getNodeNumber();
+
+    /**
      * @brief OverRides for Connecting TCP and SSL Sessions
      * @param Session
      */

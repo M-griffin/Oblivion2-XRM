@@ -3,6 +3,7 @@
 
 // For Startup.
 #include <thread>
+#include <chrono>
 
 #include "sdl2_net/SDL_net.hpp"
 
@@ -15,6 +16,8 @@
 #include "socket_handler.hpp"
 #include "async_acceptor.hpp"
 #include "logging.hpp"
+
+#include "libSqliteWrapped.h"
 
 class Interface;
 typedef std::unique_ptr<Interface> interface_ptr;
@@ -54,6 +57,7 @@ public:
         , m_socket_acceptor(nullptr)
         , m_async_listener(nullptr)
         , m_protocol(protocol)
+        , m_user_database(USERS_DATABASE, &m_database_log)
     {
         // Setup Shared Pointers
         m_session_manager = std::make_shared<SessionManager>();
@@ -134,23 +138,40 @@ private:
      */
     void handle_accept(const std::error_code& error, socket_handler_ptr socket_handler)
     {
+        
+        // Avoid Incoming Hamming, or space it out a but, give 2 seconds intervals
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        
         if(!error)
         {
             async_io_ptr async_conn = std::make_shared<AsyncIO>(m_io_service, socket_handler);
-            m_log.write<Logging::DEBUG_LOG>("Handle-Accept Create New Session");
+            m_log.write<Logging::CONSOLE_LOG>("Handle-Accept NEw Incoming TCP Connection");
+            
+            int node_number = m_session_manager->getNodeNumber();
+            m_log.setUserInfo(node_number);
+            
+            // Ignore Creating a session and close connection
+            if (node_number > 10)
+            {
+                m_log.write<Logging::INFO_LOG>("Handle-Accept TCP Connection OVER MAX 10 from=",                 
+                    async_conn->getSocketHandle()->getIpAddress(), "Node=", node_number); 
+                    socket_handler->close();
+                    return;
+            }
 
             // Create the new Session
-            session_ptr new_session = Session::create(async_conn, m_session_manager);
+            session_ptr new_session = Session::create(async_conn, m_session_manager, m_user_database);
             if (new_session) 
             {                
                 m_log.write<Logging::DEBUG_LOG>("Handle-Accept Attached Session to Manager");
 
                 // Attach Session to Session Manager.
+                new_session->m_node_number = node_number;
                 m_session_manager->join(new_session);
-
-                m_log.setUserInfo(new_session->m_node_number);
+                                
+                m_log.setUserInfo(node_number);
                 m_log.write<Logging::INFO_LOG>("Handle-Accept TCP Connection accepted from=", 
-                    async_conn->getSocketHandle()->getIpAddress(), "Node=", new_session->m_node_number); 
+                    async_conn->getSocketHandle()->getIpAddress(), "Node=", node_number); 
             }
         }
         else
@@ -166,6 +187,9 @@ private:
     acceptor_ptr         m_async_listener;
     std::string          m_protocol;
     //std::thread          m_thread;
+    
+    SQLW::Database       m_user_database;
+    SQLW::StderrLog      m_database_log;  
 
 };
 

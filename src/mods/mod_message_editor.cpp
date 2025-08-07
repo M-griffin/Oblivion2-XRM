@@ -96,9 +96,11 @@ bool ModMessageEditor::onEnter()
 {
     m_is_active = true;
 
-    std::string prompt = "\x1b[?25h"; // Turn on Cursor.
-    m_session_data->deliver(prompt, false);
-    //baseProcessAndDeliver(prompt);
+    std::string prompt = "\x1b[?25h"; // Turn on Cursor.    
+    if(session_ptr session = getLockedSession())
+    {
+        session->deliver(prompt, false);
+    }
 
     // Execute the initial setup index.
     m_setup_functions[m_mod_setup_index]();
@@ -381,10 +383,18 @@ void ModMessageEditor::setupEditor()
     std::string mid_template = m_common_io->readinAnsi("FSEMID.ANS");
     std::string bot_template = m_common_io->readinAnsi("FSEEND.ANS");
 
+    int term_rows = 0;
+    int term_cols = 0;
+    if (session_ptr session = getLockedSession())
+    {
+        term_rows = session->m_telnet_decoder->getTermRows();
+        term_cols = session->m_telnet_decoder->getTermCols();
+    }
+
     // Use a Local Ansi Parser for Parsing Menu Templates and determine boundaries.
     processor_ansi_ptr ansi_process = std::make_shared<ProcessorAnsi>(
-                                        m_session_data->m_telnet_decoder->getTermRows(),
-                                        m_session_data->m_telnet_decoder->getTermCols());
+                                        term_rows,
+                                        term_cols);
 
     // Parse the TOP Screen to get Top Text Margin
     std::string top_screen = processTopTemplate(ansi_process, top_template);
@@ -648,6 +658,15 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
 {
 
     // Just some testing figuring out the best design.
+    bool is_back_space_vt100 = false;
+    if (session_ptr session = getLockedSession())
+    {
+        is_back_space_vt100 = session->m_user_record->bBackSpaceVt100;
+    }
+    else
+    {
+        return;
+    }
 
     std::string output = "";
     int x_position = m_text_process->getXPosition();
@@ -665,14 +684,14 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
     // Handle Backspaces or Delete depending on User Switch
     if(result[0] == '\x7f')
     {
-        if(m_session_data->m_user_record->bBackSpaceVt100)
+        if(is_back_space_vt100)
             handleBackSpace(output);
         else
             handleDelete(output);
     }
     else if(result[0] == '\x08')
     {
-        if(!m_session_data->m_user_record->bBackSpaceVt100)
+        if(!is_back_space_vt100)
             handleBackSpace(output);
         else
             handleDelete(output);

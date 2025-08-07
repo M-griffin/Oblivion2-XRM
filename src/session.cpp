@@ -20,8 +20,6 @@
 #include "encoding.hpp"
 #include "uuid.hpp"
 
-#include "libSqliteWrapped.h"
-
 #include "mods/mod_prelogon.hpp"
 
 
@@ -31,7 +29,7 @@
  * @param session_manager
  * @return
  */
-Session::Session(async_io_ptr my_async_io, session_manager_ptr my_session_manager)
+Session::Session(async_io_ptr my_async_io, session_manager_ptr my_session_manager, SQLW::Database &database)
     : m_log(Logging::getInstance())
     , m_async_io(my_async_io)        
     , m_session_manager(my_session_manager)
@@ -46,8 +44,9 @@ Session::Session(async_io_ptr my_async_io, session_manager_ptr my_session_manage
     , m_encoding(Encoding::ENCODE_UTF8)    
     , m_is_use_ansi(true)
     , m_is_esc_timer(false)
-    , m_is_session_authorized(false)
-    , m_user_database(USERS_DATABASE, &m_database_log)
+    , m_is_session_authorized(false) 
+    , m_user_database(database)
+
 {
     // Setup Shared Pointers
     m_state_manager = std::make_shared<StateManager>();

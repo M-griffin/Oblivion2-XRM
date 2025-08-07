@@ -21,6 +21,7 @@ typedef std::shared_ptr<Config> config_ptr;
 
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
+typedef std::weak_ptr<Session> session_wptr;
 
 class SessionIO;
 typedef std::shared_ptr<SessionIO> session_io_ptr;
@@ -56,7 +57,7 @@ public:
     };
 
     Logging         &m_log;
-    session_ptr      m_menu_session_data;
+    session_wptr     m_menu_session_data;
 
     // This hold non-hotkey text passed through.
     // If Hotkeys are turn off, we append and loop this until we hit a CRLF. or ENTER
@@ -85,6 +86,8 @@ public:
     bool             m_use_first_command_execution; // If menu executes firstcmd on entrance.
     bool             m_logoff;                      // If logoff, stop loop execution on commands and exit.
 
+    // Retrieve Weak Pointer and lock it to a Session
+    session_ptr getLockedSession();
 
     // Holds all pulldown menu options.
     std::vector<MenuOption> m_loaded_pulldown_options;

@@ -25,20 +25,24 @@ SessionManager::~SessionManager()
     std::set<session_ptr>().swap(m_sessions);
 }
     
+
 /**
- * @brief Notifies that a user has joined the room
- * @param participant
+ * @brief Retrieve next Free Node Number
  */
-void SessionManager::join(session_ptr session)
+int SessionManager::getNodeNumber()
 {
-    // Find First Node Number not in use, then set it.
-    // Also Manage Thread Safety, although should be single sessions at a time.
+    // Lock for thread safety
     std::lock_guard<std::mutex> lock(m_mutex);
+    
+    // Start with node_number 1
     int node_check = 1;
     
+    m_log.write<Logging::CONSOLE_LOG>("m_sessions.size()", m_sessions.size());
+    
+    // If there are sessions, find the first available node number
     if (m_sessions.size() > 0)
     {
-        // Coy out Node Number to it's own Array for Sorting.
+        // Copy Node Numbers to a vector for sorting
         std::vector<int> node_array;
     
         for (session_ptr ptr : m_sessions)
@@ -46,41 +50,29 @@ void SessionManager::join(session_ptr session)
             node_array.push_back(ptr->m_node_number);
         }    
     
-        std::sort(
-            node_array.begin(), node_array.end(),
-            [ ](const int &lhs, const int &rhs) -> 
-        bool
-        {
-            return lhs > rhs;
-        });
+        // Sort node numbers in ascending order
+        std::sort(node_array.begin(), node_array.end());
         
-        // Find First Unused Node Number
-        bool foundfree = false;
-        for(int node_number : node_array) {
-            if (node_check != node_number)
-            {
-                session->m_node_number = node_check;
-                foundfree = true;
+        // Find the first available node number
+        for (int node_number : node_array) {
+            if (node_check != node_number) {
+                // Return the first unused node number
+                return node_check;
             }
             node_check++;
         }
-        
-        // Loop Exists cause only node was checked, use incremented number.
-        if (!foundfree)
-        {
-            session->m_node_number = node_check;
-        }
-        
-        node_array.clear();
-        std::vector<int>().swap(node_array);
-        
-    }
-    else 
-    {
-        // Starting Node Number.
-        session->m_node_number = 1;
     }
     
+    // If no sessions or no gaps in node numbers, return the next available node (node_check)
+    return node_check;
+}
+    
+/**
+ * @brief Notifies that a user has joined the room
+ * @param participant
+ */
+void SessionManager::join(session_ptr session)
+{    
     m_sessions.insert(session);
 }
 

@@ -28,6 +28,30 @@ StateManager::~StateManager()
         m_the_state.clear();
     }
 }
+
+/**
+ * @brief Retrieve a Session Point to a Locked Session Object.
+ */
+session_ptr StateManager::getLockedSession()
+{
+    if (m_the_state.back()) 
+    {
+        if (session_ptr session = m_the_state.back()->m_session_data.lock())     
+        {
+            return session;
+        }
+        else
+        {
+            m_log.write<Logging::ERROR_LOG>("Session Object Not Available");
+        }
+    }
+    else
+    {
+        m_log.write<Logging::ERROR_LOG>("State Object Not Available");
+    }
+        
+    return nullptr;
+}
     
 /**
  * @brief Removed the Current State from the session
@@ -65,7 +89,7 @@ void StateManager::update()
         std::string incoming_data = "";
         try
         {
-            incoming_data = std::move(m_the_state.back()->m_session_data->m_parsed_data);            
+            incoming_data = std::move(getLockedSession()->m_parsed_data);            
         }
         catch(std::exception &ex)
         {

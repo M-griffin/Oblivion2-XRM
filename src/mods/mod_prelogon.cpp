@@ -93,15 +93,23 @@ bool ModPreLogon::update(const std::string &character_buffer, const bool &)
  */
 bool ModPreLogon::onEnter()
 {
-    // On Initial Startup, setup user record with system colors for menu system
-    // this is overwritten once the user logs in, otherwise the menu system
-    // will use these defaults for theming.   
-    m_session_data->m_user_record->sRegColor = m_config->default_color_regular;
-    m_session_data->m_user_record->sPromptColor = m_config->default_color_prompt;
-    m_session_data->m_user_record->sInputColor = m_config->default_color_input;
-    m_session_data->m_user_record->sInverseColor = m_config->default_color_inverse;
-    m_session_data->m_user_record->sStatColor = m_config->default_color_stat;
-    m_session_data->m_user_record->sBoxColor = m_config->default_color_box;    
+    if (session_ptr session = getLockedSession()) 
+    {
+        // On Initial Startup, setup user record with system colors for menu system
+        // this is overwritten once the user logs in, otherwise the menu system
+        // will use these defaults for theming.   
+        session->m_user_record->sRegColor = m_config->default_color_regular;
+        session->m_user_record->sPromptColor = m_config->default_color_prompt;
+        session->m_user_record->sInputColor = m_config->default_color_input;
+        session->m_user_record->sInverseColor = m_config->default_color_inverse;
+        session->m_user_record->sStatColor = m_config->default_color_stat;
+        session->m_user_record->sBoxColor = m_config->default_color_box; 
+    }
+    else 
+    {
+        return false;        
+    }
+       
     
     m_is_active = true;
 
@@ -215,19 +223,21 @@ void ModPreLogon::displayPromptAndNewLine(const std::string &prompt)
 void ModPreLogon::setupHumanShield()
 {
     // Display Detecting Emulation, not using display prompt cause we need to append.
-    std::string result = "|07" + m_common_io->centerPadding(BUILD_INFO, m_session_data->m_telnet_decoder->getTermCols()) + "\r\n";
-    
-    result += m_session_io->parseTextPrompt(
-                             m_text_prompts_dao->getPrompt(PROMPT_HUMAN_SHIELD)
-                         );
+    std::string result = "";
+    if (session_ptr session = getLockedSession()) 
+    {
+        result = "|07" + m_common_io->centerPadding(BUILD_INFO, session->m_telnet_decoder->getTermCols()) + "\r\n";        
+        result += m_session_io->parseTextPrompt(
+                                 m_text_prompts_dao->getPrompt(PROMPT_HUMAN_SHIELD)
+                             );
 
-    // If response is echoed back, make it black on black.
-    result.append("|00");
+        // If response is echoed back, make it black on black.
+        result.append("|00");        
+    }
+    
     std::string output = m_session_io->pipe2ansi(result);
-
-    baseProcessAndDeliver(output);
-    
-    startHumanShieldTimer();
+    baseProcessAndDeliver(output);    
+    startHumanShieldTimer();  
 }
 
 /**
@@ -241,7 +251,10 @@ void ModPreLogon::setupEmulationDetection()
     // Windows Console Telnet will response it's at 259 y!
     // Also use Session Deliver, we don't need to use internal screen buffer on detection.
     std::string detection = "\x1b[40;30m\x1b[255B\x1b[255C\x1b[6n";
-    m_session_data->deliver(detection);
+    if (session_ptr session = getLockedSession())
+    {
+        session->deliver(detection);
+    }
             
     std::string reset_position = "\x1b[1;1H\x1b[2J";
     
@@ -277,7 +290,20 @@ void ModPreLogon::setupAskANSIColor()
 void ModPreLogon::displayTerminalDetection()
 {
     
-    m_log.setUserInfo(m_session_data->m_node_number);
+    int node_number = 0;
+    std::string term_type = "";
+    int term_cols = 0;
+    int term_rows = 0;
+        
+    if (session_ptr session = getLockedSession())
+    {
+        node_number = session->m_node_number;
+        term_type = session->m_telnet_decoder->getTermType();
+        term_cols = session->m_telnet_decoder->getTermCols();
+        term_rows = session->m_telnet_decoder->getTermRows();
+    }
+    
+    m_log.setUserInfo(node_number);
     
     // Grab Detected Terminal, ANSI, XTERM, etc..
     displayPrompt(PROMPT_DETECT_TERMOPTS);
@@ -299,11 +325,9 @@ void ModPreLogon::displayTerminalDetection()
     if(prompt_term.second.size() > 0)
     {
         std::string result = prompt_term.second;
-        std::string term = m_session_data->m_telnet_decoder->getTermType();
+        m_log.write<Logging::CONSOLE_LOG>("Term Type=", term_type);
 
-        m_log.write<Logging::CONSOLE_LOG>("Term Type=", term);
-
-        m_common_io->parseLocalMCI(result, mci_code, term);
+        m_common_io->parseLocalMCI(result, mci_code, term_type);
         result = m_session_io->pipe2ansi(result);
         baseProcessAndDeliver(result);
     }
@@ -317,9 +341,9 @@ void ModPreLogon::displayTerminalDetection()
         {
             m_log.write<Logging::CONSOLE_LOG>("*** NAWS TermSize Detection!");
             // Make this Propmpts for Customization!            
-            term_size = std::to_string(m_session_data->m_telnet_decoder->getTermCols());
+            term_size = std::to_string(term_cols);
             term_size.append("x");
-            term_size.append(std::to_string(m_session_data->m_telnet_decoder->getTermRows()));            
+            term_size.append(std::to_string(term_rows));
         }
         else
         {
@@ -329,8 +353,11 @@ void ModPreLogon::displayTerminalDetection()
             term_size.append("x");
             term_size.append(std::to_string(m_y_position));
             
-            m_session_data->m_telnet_decoder->setTermCols(m_x_position);
-            m_session_data->m_telnet_decoder->setTermRows(m_y_position);
+            if (session_ptr session = getLockedSession())
+            {
+                session->m_telnet_decoder->setTermCols(m_x_position);
+                session->m_telnet_decoder->setTermRows(m_y_position);                
+            }
         }
 
         m_log.write<Logging::CONSOLE_LOG>("Term Size=", term_size);
@@ -352,7 +379,11 @@ void ModPreLogon::displayTerminalDetection()
 void ModPreLogon::setupAskCodePage()
 {
     // Fill the local term type to work with.
-    m_term_type = m_session_data->m_telnet_decoder->getTermType();
+    if (session_ptr session = getLockedSession())
+    {
+        m_term_type = session->m_telnet_decoder->getTermType();
+    }
+    
 
     // If ANSI terminal detected, or 'undetected', then default ENTER to set for CP437
     // Otherwise default to UTF-8 for Xterm etc.. and all other terminals.
@@ -419,6 +450,12 @@ bool ModPreLogon::humanShieldDetection(const std::string &input)
 bool ModPreLogon::emulationDetection(const std::string &input)
 {
     bool result = false;
+    
+    session_ptr session = getLockedSession();
+    if (!session)
+    {
+        return false;
+    }
 
     if(input.size() != 0)
     {
@@ -442,7 +479,7 @@ bool ModPreLogon::emulationDetection(const std::string &input)
             
             if(toupper(ch) == 'R')
             {
-                m_session_data->m_is_use_ansi = true;
+                session->m_is_use_ansi = true;
                 m_is_esc_detected = false;
                 
                 // Parse out x/y position coordinates for Screen Size returned.
@@ -457,13 +494,29 @@ bool ModPreLogon::emulationDetection(const std::string &input)
             }
             else
             {
-                m_session_data->m_is_use_ansi = false;
+                session->m_is_use_ansi = false;
             }
         }
     }
 
     return result;
 }
+
+/**
+ * @brief Sets Ansi Color Detection / User on the Session
+ * @param is_ansi
+ */
+void ModPreLogon::setANSIColor(bool is_ansi)
+{
+    session_ptr session = getLockedSession();
+    if (!session) 
+    {
+        return;
+    }
+    
+    session->m_is_use_ansi = is_ansi;
+}
+
 
 /**
  * @brief ASK ANSI Color {Only ask for color if emulation detection fails!}
@@ -493,7 +546,7 @@ bool ModPreLogon::askANSIColor(const std::string &input)
 
             m_log.write<Logging::CONSOLE_LOG>("Ansi Selected");
 
-            m_session_data->m_is_use_ansi = true;
+            setANSIColor(true);
             displayPrompt(PROMPT_ANSI_SELECTED);
             displayTerminalDetection();
         }
@@ -504,7 +557,7 @@ bool ModPreLogon::askANSIColor(const std::string &input)
 
             baseProcessDeliverNewLine();
             displayPrompt(PROMPT_ASCII_SELECTED);
-            m_session_data->m_is_use_ansi = false;
+            setANSIColor(false);
             displayTerminalDetection();
         }
         else
@@ -567,32 +620,40 @@ bool ModPreLogon::askCodePage(const std::string &input)
                 // Switch to ISO, then CP437 Character Set.
                 message = "\x1b[0m" + m_session_io->pipeColors(blackColor);
                 message += "\x1b%@\x1b(U \r\n\x1b[A";
-                m_session_data->deliver(message);
+                
+                if (session_ptr session = getLockedSession())
+                {
+                    session->deliver(message);
 
-                message = m_session_io->parseTextPrompt(
-                              m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
-                          );
+                    message = m_session_io->parseTextPrompt(
+                                  m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
+                              );
 
-                // Even though it's default, lets set it anyways/
-                m_log.write<Logging::CONSOLE_LOG>("Encoding set to CP437");
-                m_session_data->m_encoding_text = Encoding::ENCODING_TEXT_CP437;
-                m_session_data->m_encoding = Encoding::ENCODE_CP437;
+                    // Even though it's default, lets set it anyways/
+                    m_log.write<Logging::CONSOLE_LOG>("Encoding set to CP437");
+                    session->m_encoding_text = Encoding::ENCODING_TEXT_CP437;
+                    session->m_encoding = Encoding::ENCODE_CP437;                
+                }
             }
             else
             {
                 // Switch to Unicode Character Set.
                 message = "\x1b[0m" + m_session_io->pipeColors(blackColor);
                 message += "\x1b%@\x1b%G \r\n\x1b[A";
-                m_session_data->deliver(message);
+                
+                if (session_ptr session = getLockedSession())
+                {
+                    session->deliver(message);
 
-                message = m_session_io->parseTextPrompt(
-                              m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
-                          );
+                    message = m_session_io->parseTextPrompt(
+                                  m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
+                              );
 
-                // Even though it's default, lets set it anyways/
-                m_log.write<Logging::CONSOLE_LOG>("Encoding set to UTF-8");
-                m_session_data->m_encoding_text = Encoding::ENCODING_TEXT_UTF8;
-                m_session_data->m_encoding = Encoding::ENCODE_UTF8;
+                    // Even though it's default, lets set it anyways/
+                    m_log.write<Logging::CONSOLE_LOG>("Encoding set to UTF-8");
+                    session->m_encoding_text = Encoding::ENCODING_TEXT_UTF8;
+                    session->m_encoding = Encoding::ENCODE_UTF8;
+                }
             }
 
             baseProcessAndDeliverNewLine(message);
@@ -612,32 +673,40 @@ bool ModPreLogon::askCodePage(const std::string &input)
                 // Switch to Unicode Character Set.
                 message = "\x1b[0m" + m_session_io->pipeColors(blackColor);
                 message += "\x1b%@\x1b%G \r\n\x1b[A";
-                m_session_data->deliver(message);
+                
+                if(session_ptr session = getLockedSession())
+                {
+                    session->deliver(message);
 
-                message = m_session_io->parseTextPrompt(
-                              m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
-                          );
+                    message = m_session_io->parseTextPrompt(
+                                  m_text_prompts_dao->getPrompt(PROMPT_UTF8_SELECTED)
+                              );
 
-                // Even though it's default, lets set it anyways/
-                m_log.write<Logging::CONSOLE_LOG>("Encoding set to UTF-8");
-                m_session_data->m_encoding_text = Encoding::ENCODING_TEXT_UTF8;
-                m_session_data->m_encoding = Encoding::ENCODE_UTF8;
+                    // Even though it's default, lets set it anyways/
+                    m_log.write<Logging::CONSOLE_LOG>("Encoding set to UTF-8");
+                    session->m_encoding_text = Encoding::ENCODING_TEXT_UTF8;
+                    session->m_encoding = Encoding::ENCODE_UTF8;                    
+                }
             }
             else
             {
                 // Switch to ISO, then CP437 Character Set.
                 message = "\x1b[0m" + m_session_io->pipeColors(blackColor);
                 message += "\x1b%@\x1b(U \r\n\x1b[A";
-                m_session_data->deliver(message);
+                
+                if(session_ptr session = getLockedSession())
+                {
+                    session->deliver(message);
 
-                message = m_session_io->parseTextPrompt(
-                              m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
-                          );
+                    message = m_session_io->parseTextPrompt(
+                                  m_text_prompts_dao->getPrompt(PROMPT_CP437_SELECTED)
+                              );
 
-                // Even though it's default, lets set it anyways/
-                m_log.write<Logging::CONSOLE_LOG>("Encoding set to CP437");
-                m_session_data->m_encoding_text = Encoding::ENCODING_TEXT_CP437;
-                m_session_data->m_encoding = Encoding::ENCODE_CP437;
+                    // Even though it's default, lets set it anyways/
+                    m_log.write<Logging::CONSOLE_LOG>("Encoding set to CP437");
+                    session->m_encoding_text = Encoding::ENCODING_TEXT_CP437;
+                    session->m_encoding = Encoding::ENCODE_CP437;
+                }
             }
 
             baseProcessAndDeliverNewLine(message);
@@ -673,9 +742,16 @@ void ModPreLogon::startHumanShieldTimer()
     //m_deadline_timer->asyncWait(
     //    std::bind(&ModPreLogon::handleHumanShieldTimer, shared_from_this())
     //);
-    auto callback_function = std::bind(&ModPreLogon::handleHumanShieldTimer, shared_from_this());        
-    m_session_data->m_async_io->asyncWait(4000, callback_function);
+    
+    if (session_ptr session = getLockedSession())
+    {
+        auto callback_function = std::bind(&ModPreLogon::handleHumanShieldTimer, shared_from_this());
+        
+        // If session is locked but called in callback_function??? would this block forever?
+        session->m_async_io->asyncWait(4000, callback_function);
+    }
 }
+
 
 /**
  * @brief Start ANSI Detection timer
@@ -688,8 +764,14 @@ void ModPreLogon::startDetectionTimer()
     //    std::bind(&ModPreLogon::handleDetectionTimer, shared_from_this())
     //);
     
-    auto callback_function = std::bind(&ModPreLogon::handleDetectionTimer, shared_from_this());        
-    m_session_data->m_async_io->asyncWait(1500, callback_function);
+    if (session_ptr session = getLockedSession())
+    {
+        auto callback_function = std::bind(&ModPreLogon::handleDetectionTimer, shared_from_this());
+        
+        // If session is locked but called in callback_function??? would this block forever?
+         session->m_async_io->asyncWait(1500, callback_function);
+    }
+   
 }
 
 /**
@@ -707,7 +789,18 @@ void ModPreLogon::handleHumanShieldTimer()
  */
 void ModPreLogon::humanShieldCompleted()
 {
-    m_log.setUserInfo(m_session_data->m_node_number);
+    if (session_ptr session = getLockedSession())
+    {
+        m_log.setUserInfo(session->m_node_number);        
+    }
+    else 
+    {
+        // User Disconnected most likely.    
+        m_is_active = false;
+        m_log.write<Logging::CONSOLE_LOG>("Human Shield Failed, user disconnected!");
+        return;
+    }
+    
     if(m_is_human_shield)
     {
         // Move to Next Detection
@@ -741,7 +834,14 @@ void ModPreLogon::handleDetectionTimer()
  */
 void ModPreLogon::emulationCompleted()
 {
-    if(m_session_data->m_is_use_ansi)
+    session_ptr session = getLockedSession();
+    if (!session)
+    {
+        return;
+        
+    }
+    
+    if(session->m_is_use_ansi)
     {
         displayPrompt(PROMPT_DETECTED_ANSI);
         displayTerminalDetection();

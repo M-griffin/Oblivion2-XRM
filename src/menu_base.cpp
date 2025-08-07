@@ -59,10 +59,19 @@ MenuBase::MenuBase(session_ptr session_data)
     m_directory = std::make_shared<Directory>();    
     m_menu_info = std::make_shared<Menu>();
     m_menu_prompt = std::make_shared<MenuPrompt>();
-    m_ansi_process = std::make_shared<ProcessorAnsi>(
-        m_menu_session_data->m_telnet_decoder->getTermRows(),
-        m_menu_session_data->m_telnet_decoder->getTermCols()
-    );
+    
+    
+    if (auto session = m_menu_session_data.lock()) 
+    {
+        m_ansi_process = std::make_shared<ProcessorAnsi>(
+            session->m_telnet_decoder->getTermRows(),
+            session->m_telnet_decoder->getTermCols()
+        );        
+    }
+    else 
+    {
+        m_log.write<Logging::ERROR_LOG>("Unable to lock Session Object", m_fallback_menu, __LINE__, __FILE__);
+    }
     
 }
 
@@ -92,6 +101,23 @@ MenuBase::~MenuBase()
     m_common_io.reset();
     m_session_io.reset();    
     
+}
+
+/**
+ * @brief Retrieve a Session Point to a Locked Session Object.
+ */
+session_ptr MenuBase::getLockedSession()
+{
+    if (session_ptr session = m_menu_session_data.lock())
+    {
+        return session;
+    }
+    else
+    {
+        m_log.write<Logging::ERROR_LOG>("Session Object Not Available");
+    }
+    
+    return nullptr;
 }
 
 /**
@@ -132,7 +158,10 @@ std::string MenuBase::lower_case(const std::string &string_sequence)
 void MenuBase::baseProcessAndDeliver(std::string data)
 {
     m_ansi_process->parseTextToBuffer((char *)data.c_str());
-    m_menu_session_data->deliver(data);
+    if (session_ptr session = getLockedSession()) 
+    {
+        session->deliver(data);
+    }
 }
     
 /**
@@ -155,10 +184,19 @@ void MenuBase::clearMenuPullDownOptions()
 bool MenuBase::checkMenuAcsAccess(menu_ptr menu)
 {
     AccessCondition acs;
-    return acs.validateAcsString(
+    if (session_ptr session = getLockedSession()) 
+    {
+        return acs.validateAcsString(
                menu->menu_acs_string,
-               m_menu_session_data->m_user_record
-           );
+               session->m_user_record
+        );
+    }
+    else
+    { 
+        return false;        
+    }
+    
+    
 }
 
 /**
@@ -172,16 +210,20 @@ void MenuBase::checkMenuOptionsAcsAccess()
     std::vector<MenuOption> new_options;
     AccessCondition acs;
 
-    for(; it != end; it++)
+    if (session_ptr session = getLockedSession()) 
     {
-        if(acs.validateAcsString(
-                    (*it).acs_string,
-                    m_menu_session_data->m_user_record))
+        for(; it != end; it++)
         {
-            new_options.push_back(*it);
+            
+            if(acs.validateAcsString(
+                        (*it).acs_string,
+                        session->m_user_record))
+            {
+                new_options.push_back(*it);
+            }
         }
     }
-
+    
     // Swap Validated Options with Existing.
     m_menu_info->menu_options.clear();
     m_menu_info->menu_options.swap(new_options);
@@ -323,10 +365,19 @@ std::string MenuBase::processTopGenericTemplate(const std::string &screen)
 std::string MenuBase::processMidGenericTemplate(const std::string &screen)
 {
     // Use a Local Ansi Parser for Pasrsing Menu Template with Mid.
-    processor_ansi_ptr ansi_process = std::make_shared<ProcessorAnsi>(
-        m_menu_session_data->m_telnet_decoder->getTermRows(),
-        m_menu_session_data->m_telnet_decoder->getTermCols()
-    );
+    processor_ansi_ptr ansi_process = nullptr;
+    if (session_ptr session = getLockedSession()) 
+    {
+        ansi_process = std::make_shared<ProcessorAnsi>(
+            session->m_telnet_decoder->getTermRows(),
+            session->m_telnet_decoder->getTermCols()
+        );
+    }
+    else 
+    {
+        // Session Not avilable, return
+        return nullptr;
+    }
     
     std::string output_screen;
     std::string new_screen = screen;
@@ -562,7 +613,12 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
  */
 std::string MenuBase::getDefaultColor()
 {
-    return m_session_io->pipeColors(m_menu_session_data->m_user_record->sRegColor);
+    if (session_ptr session = getLockedSession()) 
+    {
+        return m_session_io->pipeColors(session->m_user_record->sRegColor);
+    }
+    
+    return nullptr;
 }
 
 /**
@@ -571,7 +627,13 @@ std::string MenuBase::getDefaultColor()
  */
 std::string MenuBase::getDefaultInputColor()
 {
-    return m_session_io->pipeColors(m_menu_session_data->m_user_record->sInputColor);
+    if (session_ptr session = getLockedSession()) 
+    {
+        return m_session_io->pipeColors(session->m_user_record->sInputColor);
+    }
+    
+    return nullptr;
+    
 }
 
 /**
@@ -580,7 +642,12 @@ std::string MenuBase::getDefaultInputColor()
  */
 std::string MenuBase::getDefaultInverseColor()
 {
-    return m_session_io->pipeColors(m_menu_session_data->m_user_record->sInverseColor);
+    if (session_ptr session = getLockedSession()) 
+    {
+        return m_session_io->pipeColors(session->m_user_record->sInverseColor);
+    }
+    
+    return nullptr;
 }
 
 /**
@@ -705,12 +772,21 @@ std::string MenuBase::loadMenuScreen()
 
     // NOTES: check for themes here!!!
     // also  if (m_menu_session_data->m_is_use_ansi), if not ansi, then maybe no pull down, or light bars!
-    if(m_menu_info->menu_pulldown_file.size() == 0 || !m_menu_session_data->m_is_use_ansi)
+    bool use_ansi = false;
+    if (session_ptr session = getLockedSession()) 
+    {
+        use_ansi = session->m_is_use_ansi;
+    }
+    else {        
+        return nullptr;
+    }
+    
+    if(m_menu_info->menu_pulldown_file.size() == 0 || !use_ansi)
     {
         std::string screen_file = m_menu_info->menu_help_file;
 
         // Load ansi by Menu Name, remove .MNU and Add .ANS, maybe .UTF for utf8 native?
-        if(m_menu_session_data->m_is_use_ansi)
+        if(use_ansi)
         {
             screen_file.append(".ANS");
         }
@@ -917,10 +993,26 @@ std::string MenuBase::loadMenuPrompt()
     // lateron add users selected.  This is just a test!
     std::string prompt = "";
     std::string prompt_display = "";
-
-    if(m_menu_session_data->m_user_record->iId != -1)
+    long record_id = 0;
+    int term_rows = 0;
+    int node_number = 0;
+    std::string prompt_name = "";
+    
+    if (session_ptr session = getLockedSession()) 
     {
-        prompt = m_menu_session_data->m_user_record->sMenuPromptName;
+         record_id = session->m_user_record->iId;
+         term_rows = session->m_telnet_decoder->getTermRows();
+         node_number = session->m_node_number;
+         prompt_name = session->m_user_record->sMenuPromptName;
+    }
+    else 
+    {
+        return nullptr;
+    }
+    
+    if(record_id != -1)
+    {
+        prompt = prompt_name;
     }
 
     // If users Menu Prompt is blank, then grab random menu prompt!
@@ -945,8 +1037,7 @@ std::string MenuBase::loadMenuPrompt()
         
         // For Now use defaults when Term height is 24 (Default) or 25 and greater
         // Usually menu's themselves are not going to be higher 25
-        // Properly can also overwrite and have MCU position Codes in them.
-        int term_rows = m_menu_session_data->m_telnet_decoder->getTermRows();
+        // Properly can also overwrite and have MCU position Codes in them.        
         if (term_rows == 24)
         {
             prompt_display = "\x1b[?25h\x1b[21;1H";
@@ -975,7 +1066,7 @@ std::string MenuBase::loadMenuPrompt()
         m_session_io->addMCIMapping("|MN", m_menu_info->menu_prompt);
         m_session_io->addMCIMapping("|TL", "1440");              // Time Left {Not Implemented Yet}
         m_session_io->addMCIMapping("|TM", "Current Date/Time"); // Time Now  {Not Implemented Yet}
-        m_session_io->addMCIMapping("|NN", std::to_string(m_menu_session_data->m_node_number));
+        m_session_io->addMCIMapping("|NN", std::to_string(node_number));
 
         // Legacy Note:
         // SysOps may place %%filename.ext anywhere in the menu prompt
@@ -1042,18 +1133,33 @@ void MenuBase::loadAndStartupMenu()
 {
     // Check Configuration here,  if use SpecialLogin (Matrix Menu)
     // Then load it, otherwise jump to Entering UserID / P
+        
+    int term_rows = 0;
+    int term_cols = 0;
+    bool use_ansi = false;
+    
+    if (session_ptr session = getLockedSession()) 
+    {
+         term_rows = session->m_telnet_decoder->getTermRows();
+         term_cols = session->m_telnet_decoder->getTermCols();
+         use_ansi = session->m_is_use_ansi;
+    }
+    else 
+    {
+        return;
+    }
     
     if (m_current_menu == "matrix")
     {
         m_log.write<Logging::DEBUG_LOG>("MATRIX MENU DETECTED - RESET ANSI TERM SIZE to Detection", 
-            m_menu_session_data->m_telnet_decoder->getTermRows(),
-            m_menu_session_data->m_telnet_decoder->getTermCols()
+            term_rows,
+            term_cols
         );
             
         m_ansi_process.reset();
         m_ansi_process = std::make_shared<ProcessorAnsi>(
-            m_menu_session_data->m_telnet_decoder->getTermRows(),
-            m_menu_session_data->m_telnet_decoder->getTermCols()
+            term_rows,
+            term_cols
         );
     }
 
@@ -1120,7 +1226,7 @@ void MenuBase::loadAndStartupMenu()
         {
             auto &m = m_menu_info->menu_options[i];
 
-            if(m.pulldown_id > 0 && m_menu_session_data->m_is_use_ansi)
+            if(m.pulldown_id > 0 && use_ansi)
             {
                 pull_down_ids.push_back(m.pulldown_id);
 
@@ -1137,7 +1243,7 @@ void MenuBase::loadAndStartupMenu()
         }
 
         // If active pull_down id's found, mark as active pulldown menu.
-        if(pull_down_ids.size() > 0 && m_menu_session_data->m_is_use_ansi)
+        if(pull_down_ids.size() > 0 && use_ansi)
         {
             // Hide Cursor on light bars
             output += "\x1b[?25l";

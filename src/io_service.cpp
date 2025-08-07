@@ -50,7 +50,7 @@ void IOService::checkAsyncListenersForConnections()
             
             // Check for max nodes here, if we like can limit, send a message and drop
             // connection on handler by not passing it through the callback.
-            // Creates a Session on New Incoming Connections
+            // New Incoming Connections
             m_listener->executeCallback(success_code, handler);
                             
             m_log.write<Logging::DEBUG_LOG>("ioservice Async-Accept - Returned CallBack", __FILE__, __LINE__);

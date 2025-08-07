@@ -11,8 +11,10 @@
 #include "logging.hpp"
 #include "encoding.hpp"
 
-#include "libSqliteWrapped.h"
 #include "uuid.hpp"
+
+#include "libSqliteWrapped.h"
+
 
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
@@ -50,7 +52,7 @@ public:
      * @param my_session_manager
      * @return
      */
-    Session(async_io_ptr my_async_io, session_manager_ptr my_session_manager);    
+    Session(async_io_ptr my_async_io, session_manager_ptr my_session_manager, SQLW::Database &database);    
     ~Session();
 
     /**
@@ -61,9 +63,9 @@ public:
      * @param my_session_manager
      * @return
      */
-    static session_ptr create(async_io_ptr my_async_io, session_manager_ptr my_session_manager)
+    static session_ptr create(async_io_ptr my_async_io, session_manager_ptr my_session_manager, SQLW::Database &database)
     {
-        session_ptr new_session = std::make_shared<Session>(my_async_io, my_session_manager);
+        session_ptr new_session = std::make_shared<Session>(my_async_io, my_session_manager, database);
         
         // Setup Unique Session Id's.    
         Uuid uuid;
@@ -233,8 +235,7 @@ public:
     bool                       m_is_esc_timer;
     bool                       m_is_session_authorized;
     
-    SQLW::Database             m_user_database;
-    SQLW::StderrLog            m_database_log;    
+    SQLW::Database             &m_user_database;
 };
 
 #endif // SESSION_HPP
