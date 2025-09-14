@@ -15,6 +15,7 @@ TelnetDecoder::TelnetDecoder(async_io_ptr async_io)
     , m_naws_row(24)
     , m_naws_col(80)
     , m_term_type("undetected")
+    , m_is_state_active(true)
     , m_is_binary(false)
     , m_is_echo(false)
     , m_is_sga(false)
@@ -35,6 +36,12 @@ TelnetDecoder::~TelnetDecoder()
     m_reply_sequence.clear();
 }
 
+/**
+ * @brief Returns State of Session, If a Socket Error Occures we will shutdown.
+ */
+bool TelnetDecoder::isCurrentStateActive() {
+    return m_is_state_active;
+}
 
 /**
  * @brief Sends IAC Sequence back to Users Client for Terminal Negotiation.
@@ -212,6 +219,12 @@ void TelnetDecoder::decodeBuffer()
  */
 unsigned char TelnetDecoder::telnetOptionParse(const unsigned char &c)
 {
+    
+    if (!m_is_state_active) 
+    {
+        return '\0';
+    }
+    
     // TEL-OPT Parser
     switch(m_teloptStage)
     {
@@ -801,9 +814,11 @@ void TelnetDecoder::handleWrite(const std::error_code& error, socket_handler_ptr
     {
         Logging &log = Logging::getInstance();
         log.write<Logging::ERROR_LOG>("telnet async_write error=", error.message(), __LINE__, __FILE__);
-    }
-    
-    // Session Manager Should disconnect here or send error back to main session.
+        
+        // Let the session know that the user has most likely disconnected 
+        // or socket is no longer in connected.
+        m_is_state_active = false;
+    }    
 }
 
 /**
@@ -815,7 +830,7 @@ void TelnetDecoder::deliver(const std::string &string_msg)
     
     // TODO: NOTE change this to queue up respones, then the session will call to retieve
     // once it returns from parsing, then we don't have to pass sessions/async_io, less references.
-    if(string_msg.size() == 0)
+    if(string_msg.size() == 0 || !m_is_state_active)
     {
         return;
     }
@@ -823,7 +838,7 @@ void TelnetDecoder::deliver(const std::string &string_msg)
     try
     {
         async_io_ptr async_io = m_async_io.lock();
-        if(async_io->getSocketHandle()->isActive())
+        if(async_io && async_io->getSocketHandle()->isActive())
         {            
             async_io->asyncWrite(string_msg,
                                      std::bind(

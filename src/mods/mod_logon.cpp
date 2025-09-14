@@ -466,11 +466,13 @@ bool ModLogon::password(const std::string &input)
         if(validate_password(key))
         {
             // Authorize and assign user to the session.
+            m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
             if (session_ptr session = getLockedSession())
             {
                 session->m_is_session_authorized = true;
                 session->m_user_record = m_logon_user;
             }
+            m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
             m_is_active = false;
         }
         else
@@ -481,10 +483,12 @@ bool ModLogon::password(const std::string &input)
             // If max, then exit back to matrix.
             if(m_failure_attempts >= m_config->invalid_password_attempts)
             {
+                m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
                 if (session_ptr session = getLockedSession())
                 {
-                    session->disconnectUser();                
+                    session->disconnectUser();
                 }
+                m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
                 m_is_active = false;
                 return false;
             }

@@ -1,4 +1,4 @@
-#include "session.hpp"
+#include "z_session.hpp"
 
 #include <memory>
 #include <list>
@@ -297,18 +297,21 @@ void Session::handleRead(const std::error_code& error, socket_handler_ptr)
     m_log.setUserInfo(m_node_number);
     m_log.write<Logging::DEBUG_LOG>("handleRead - After Incoming Data.", __FILE__, __LINE__);
 
+    m_log.write<Logging::CONSOLE_LOG>("Start SManager Lock", __LINE__, __FILE__);
     session_manager_ptr session_manager = m_session_manager.lock();
     if(!session_manager)
     {
         m_log.write<Logging::ERROR_LOG>("handleRead - Unable to load session_manager", __FILE__, __LINE__);
+        m_log.write<Logging::CONSOLE_LOG>("End SManager Lock && No Session Manager", __LINE__, __FILE__);
         return;
-    }
+    }    
 
     if (error) 
     {        
         // Disconnect the session.
         m_is_leaving = true;        
-        session_manager->leave(shared_from_this());            
+        session_manager->leave(shared_from_this());
+        m_log.write<Logging::CONSOLE_LOG>("End SManager Lock", __LINE__, __FILE__);
         return;
     }
               
@@ -376,7 +379,7 @@ void Session::handleRead(const std::error_code& error, socket_handler_ptr)
         m_log.write<Logging::WARN_LOG>("handleRead - m_async_io no longer active");
         logoff();
     }
-
+    m_log.write<Logging::CONSOLE_LOG>("END SManager Lock", __LINE__, __FILE__);
 }
 
 /**
@@ -401,6 +404,22 @@ void Session::handleTeloptCodes()
         {
             // Enter the Telnet_State and handle parsing options.
             unsigned char ch = m_telnet_decoder->telnetOptionParse(c);
+            
+            // Disconnect and clean-up the session if there are connection issues
+            // During Telnet Option Parsing and Sockets.
+            if (!m_telnet_decoder->isCurrentStateActive())
+            {
+                session_manager_ptr session_manager = m_session_manager.lock();
+                if(!session_manager)
+                {
+                    m_log.write<Logging::ERROR_LOG>("handleRead - Unable to load session_manager", __FILE__, __LINE__);
+                    return;
+                }
+                
+                m_is_leaving = true;
+                session_manager->leave(shared_from_this());            
+                return;
+            }
             
             // Skip any incoming nulls, nulls are also return on Telnet options received
             // So we know that there is no valid text data to send to the client.
@@ -461,6 +480,7 @@ void Session::logoff()
         }
     }
     
+    m_log.write<Logging::CONSOLE_LOG>("Start SManager Lock", __LINE__, __FILE__);
     session_manager_ptr session_manager = m_session_manager.lock();
 
     if(session_manager)
@@ -469,8 +489,9 @@ void Session::logoff()
         m_log.write<Logging::INFO_LOG>("Logoff Session Manager", __LINE__, __FILE__);
                 
         session_manager->leave(shared_from_this());            
-        session_manager.reset();        
+        //session_manager.reset();        
     }
+    m_log.write<Logging::CONSOLE_LOG>("End SManager Lock", __LINE__, __FILE__);
     
 }
 

@@ -93,6 +93,7 @@ bool ModPreLogon::update(const std::string &character_buffer, const bool &)
  */
 bool ModPreLogon::onEnter()
 {
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if (session_ptr session = getLockedSession()) 
     {
         // On Initial Startup, setup user record with system colors for menu system
@@ -107,8 +108,11 @@ bool ModPreLogon::onEnter()
     }
     else 
     {
-        return false;        
+        m_log.write<Logging::CONSOLE_LOG>("End Session Lock && No Session", __LINE__, __FILE__);
+        m_is_active = false;
+        return true;        
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
        
     
     m_is_active = true;
@@ -224,6 +228,8 @@ void ModPreLogon::setupHumanShield()
 {
     // Display Detecting Emulation, not using display prompt cause we need to append.
     std::string result = "";
+    
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if (session_ptr session = getLockedSession()) 
     {
         result = "|07" + m_common_io->centerPadding(BUILD_INFO, session->m_telnet_decoder->getTermCols()) + "\r\n";        
@@ -234,6 +240,7 @@ void ModPreLogon::setupHumanShield()
         // If response is echoed back, make it black on black.
         result.append("|00");        
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
     
     std::string output = m_session_io->pipe2ansi(result);
     baseProcessAndDeliver(output);    
@@ -251,10 +258,13 @@ void ModPreLogon::setupEmulationDetection()
     // Windows Console Telnet will response it's at 259 y!
     // Also use Session Deliver, we don't need to use internal screen buffer on detection.
     std::string detection = "\x1b[40;30m\x1b[255B\x1b[255C\x1b[6n";
+    
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if (session_ptr session = getLockedSession())
     {
         session->deliver(detection);
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
             
     std::string reset_position = "\x1b[1;1H\x1b[2J";
     
@@ -295,6 +305,7 @@ void ModPreLogon::displayTerminalDetection()
     int term_cols = 0;
     int term_rows = 0;
         
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if (session_ptr session = getLockedSession())
     {
         node_number = session->m_node_number;
@@ -302,6 +313,7 @@ void ModPreLogon::displayTerminalDetection()
         term_cols = session->m_telnet_decoder->getTermCols();
         term_rows = session->m_telnet_decoder->getTermRows();
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
     
     m_log.setUserInfo(node_number);
     
@@ -353,11 +365,13 @@ void ModPreLogon::displayTerminalDetection()
             term_size.append("x");
             term_size.append(std::to_string(m_y_position));
             
+            m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
             if (session_ptr session = getLockedSession())
             {
                 session->m_telnet_decoder->setTermCols(m_x_position);
                 session->m_telnet_decoder->setTermRows(m_y_position);                
             }
+            m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
         }
 
         m_log.write<Logging::CONSOLE_LOG>("Term Size=", term_size);
@@ -379,10 +393,12 @@ void ModPreLogon::displayTerminalDetection()
 void ModPreLogon::setupAskCodePage()
 {
     // Fill the local term type to work with.
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if (session_ptr session = getLockedSession())
     {
         m_term_type = session->m_telnet_decoder->getTermType();
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
     
 
     // If ANSI terminal detected, or 'undetected', then default ENTER to set for CP437
@@ -451,11 +467,14 @@ bool ModPreLogon::emulationDetection(const std::string &input)
 {
     bool result = false;
     
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     session_ptr session = getLockedSession();
     if (!session)
     {
+        m_log.write<Logging::CONSOLE_LOG>("End Session Lock && No Session", __LINE__, __FILE__);
         return false;
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 
     if(input.size() != 0)
     {
@@ -508,11 +527,14 @@ bool ModPreLogon::emulationDetection(const std::string &input)
  */
 void ModPreLogon::setANSIColor(bool is_ansi)
 {
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     session_ptr session = getLockedSession();
     if (!session) 
     {
+        m_log.write<Logging::CONSOLE_LOG>("End Session Lock && No Session", __LINE__, __FILE__);
         return;
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
     
     session->m_is_use_ansi = is_ansi;
 }
@@ -641,6 +663,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
                 message = "\x1b[0m" + m_session_io->pipeColors(blackColor);
                 message += "\x1b%@\x1b%G \r\n\x1b[A";
                 
+                m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
                 if (session_ptr session = getLockedSession())
                 {
                     session->deliver(message);
@@ -654,6 +677,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
                     session->m_encoding_text = Encoding::ENCODING_TEXT_UTF8;
                     session->m_encoding = Encoding::ENCODE_UTF8;
                 }
+                m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
             }
 
             baseProcessAndDeliverNewLine(message);
@@ -674,6 +698,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
                 message = "\x1b[0m" + m_session_io->pipeColors(blackColor);
                 message += "\x1b%@\x1b%G \r\n\x1b[A";
                 
+                m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
                 if(session_ptr session = getLockedSession())
                 {
                     session->deliver(message);
@@ -687,6 +712,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
                     session->m_encoding_text = Encoding::ENCODING_TEXT_UTF8;
                     session->m_encoding = Encoding::ENCODE_UTF8;                    
                 }
+                m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
             }
             else
             {
@@ -694,6 +720,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
                 message = "\x1b[0m" + m_session_io->pipeColors(blackColor);
                 message += "\x1b%@\x1b(U \r\n\x1b[A";
                 
+                m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
                 if(session_ptr session = getLockedSession())
                 {
                     session->deliver(message);
@@ -707,6 +734,7 @@ bool ModPreLogon::askCodePage(const std::string &input)
                     session->m_encoding_text = Encoding::ENCODING_TEXT_CP437;
                     session->m_encoding = Encoding::ENCODE_CP437;
                 }
+                m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
             }
 
             baseProcessAndDeliverNewLine(message);
@@ -743,6 +771,7 @@ void ModPreLogon::startHumanShieldTimer()
     //    std::bind(&ModPreLogon::handleHumanShieldTimer, shared_from_this())
     //);
     
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if (session_ptr session = getLockedSession())
     {
         auto callback_function = std::bind(&ModPreLogon::handleHumanShieldTimer, shared_from_this());
@@ -750,6 +779,7 @@ void ModPreLogon::startHumanShieldTimer()
         // If session is locked but called in callback_function??? would this block forever?
         session->m_async_io->asyncWait(4000, callback_function);
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 }
 
 
@@ -764,13 +794,15 @@ void ModPreLogon::startDetectionTimer()
     //    std::bind(&ModPreLogon::handleDetectionTimer, shared_from_this())
     //);
     
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if (session_ptr session = getLockedSession())
     {
         auto callback_function = std::bind(&ModPreLogon::handleDetectionTimer, shared_from_this());
         
         // If session is locked but called in callback_function??? would this block forever?
-         session->m_async_io->asyncWait(1500, callback_function);
+        session->m_async_io->asyncWait(1500, callback_function);
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
    
 }
 
@@ -789,6 +821,7 @@ void ModPreLogon::handleHumanShieldTimer()
  */
 void ModPreLogon::humanShieldCompleted()
 {
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if (session_ptr session = getLockedSession())
     {
         m_log.setUserInfo(session->m_node_number);        
@@ -798,8 +831,10 @@ void ModPreLogon::humanShieldCompleted()
         // User Disconnected most likely.    
         m_is_active = false;
         m_log.write<Logging::CONSOLE_LOG>("Human Shield Failed, user disconnected!");
+        m_log.write<Logging::CONSOLE_LOG>("End Session Lock && No Session", __LINE__, __FILE__);
         return;
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
     
     if(m_is_human_shield)
     {
@@ -834,12 +869,14 @@ void ModPreLogon::handleDetectionTimer()
  */
 void ModPreLogon::emulationCompleted()
 {
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     session_ptr session = getLockedSession();
     if (!session)
     {
-        return;
-        
+        m_log.write<Logging::CONSOLE_LOG>("End Session Lock && No Session", __LINE__, __FILE__);
+        return;        
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
     
     if(session->m_is_use_ansi)
     {

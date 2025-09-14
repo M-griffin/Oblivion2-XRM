@@ -40,8 +40,9 @@
 #include "data-sys/db_startup.hpp"
 
 #include "communicator.hpp"
-#include "interface.hpp"
 #include "common_io.hpp"
+#include "logging.hpp"
+#include "tcp_server.hpp"
 
 std::string GLOBAL_BBS_PATH = "";
 std::string GLOBAL_DATA_PATH = "";
@@ -139,7 +140,7 @@ auto main() -> int
         }
 
         // All Good, Attached to Global Communicator Instance.
-        Communicator::getInstance().attachConfiguration(config);
+        //Communicator::getInstance().attachConfiguration(config);
         m_log.write<Logging::CONSOLE_LOG>("Starting up Oblivion/2 XRM-Server");
     }
     
@@ -158,46 +159,21 @@ auto main() -> int
 
     // Isolate to code block for smart pointer deallocation.
     {
-        // Create Handles to Services, and starts up connection listener and ASIO Thread Worker
-        IOService io_service;
-        int port = Communicator::getInstance().getConfiguration()->port_telnet;
-        std::string logging_level = Communicator::getInstance().getConfiguration()->logging_level;
-        Logging::getInstance().setLoggingLevel(logging_level);
+//        int port = Communicator::getInstance().getConfiguration()->port_telnet;
+        int port = 6023;
+        int maxClients = 10;
+        //std::string logging_level = Communicator::getInstance().getConfiguration()->logging_level;
+        //Logging::getInstance().setLoggingLevel(logging_level);
+        TcpServer server(port, maxClients);
         
-        // Testing Main Loop without returning.
-        Interface interface(io_service, "TELNET", port);
-
-        /*
-        while(io_service.isActive()) 
-        {            
-            std::string line;
-            std::getline(std::cin, line);
-            
-            
-             * Clean Shutdown, (2) Steps at this time from Console Commands.
-             * 
-             * 1. Kill - All Connections, so all sessions cleanly shutown, should wait at least 10 seconds.
-             * 2. Quit - Stops IO Worker Service and All Async Jobs and listeners
-             * 
-             * If we try to do both of these Kill isn't finished then we get leaks on quit.
-             * Which has to be looked into more in a single smpoother process.
-             * 
-             * Works for Now.
-             *
-            if (line == "kill") {
-                m_log.write<Logging::INFO_LOG>("Killing All Connections before exiting...");
-                setupAndRunAsioServer->shutdown();
-            }
-            
-            if (line == "quit") {
-                m_log.write<Logging::INFO_LOG>("Shutting down IOservice, exiting...");
-                io_service.stop();
-            }
-          
-            // Timer, for cpu usage
-            std::this_thread::sleep_for(std::chrono::milliseconds(40));            
-        }*/
-
+        if (server.start())
+        {
+            server.run();
+        }
+        else
+        {
+            m_log.write<Logging::ERROR_LOG>("TCP Startup failed, exiting...");
+        }
     }
 
     return 0;

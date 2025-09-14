@@ -533,11 +533,13 @@ bool MenuSystem::menuOptionsGlobalNewScanCommands(const MenuOption &option)
  */
 void MenuSystem::disconnectUser()
 {
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     session_ptr session = getLockedSession();
     if (session) 
     {
         session->disconnectUser();
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 }
 
 /**
@@ -972,9 +974,11 @@ void MenuSystem::startupModulePreLogon()
     resetMenuInputIndex(MODULE_PRELOGON_INPUT);
 
     // Allocate and Create
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     module_ptr module = std::make_shared<ModPreLogon>(
         getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 
     if(!module)
     {
@@ -994,9 +998,11 @@ void MenuSystem::startupModuleLogon()
     resetMenuInputIndex(MODULE_LOGON_INPUT);
 
     // Allocate and Create
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     module_ptr module = std::make_shared<ModLogon>(
         getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 
     if(!module)
     {
@@ -1016,9 +1022,11 @@ void MenuSystem::startupModuleSignup()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     module_ptr module = std::make_shared<ModSignup>(
         getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 
     if(!module)
     {
@@ -1060,9 +1068,11 @@ void MenuSystem::startupModuleUserEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     module_ptr module = std::make_shared<ModUserEditor>(
         getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 
     if(!module)
     {
@@ -1082,9 +1092,11 @@ void MenuSystem::startupModuleLevelEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     module_ptr module = std::make_shared<ModLevelEditor>(
         getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 
     if(!module)
     {
@@ -1104,9 +1116,11 @@ void MenuSystem::startupModuleMessageEditor()
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     module_ptr module = std::make_shared<ModMessageEditor>(
         getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 
     if(!module)
     {
@@ -1146,6 +1160,7 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
         shutdownModule();
         
         // Check if the current user has been logged in yet.
+        m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
         session_ptr session = getLockedSession();
         if(session && session->m_is_session_authorized)
         {            
@@ -1178,6 +1193,7 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
         {
             loadAndStartupMenu();            
         }
+        m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
     }
 }
 

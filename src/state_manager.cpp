@@ -36,6 +36,7 @@ session_ptr StateManager::getLockedSession()
 {
     if (m_the_state.back()) 
     {
+        m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
         if (session_ptr session = m_the_state.back()->m_session_data.lock())     
         {
             return session;
@@ -44,6 +45,7 @@ session_ptr StateManager::getLockedSession()
         {
             m_log.write<Logging::ERROR_LOG>("Session Object Not Available");
         }
+        m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
     }
     else
     {
@@ -89,7 +91,17 @@ void StateManager::update()
         std::string incoming_data = "";
         try
         {
-            incoming_data = std::move(getLockedSession()->m_parsed_data);            
+            m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
+            if (session_ptr session = getLockedSession()) 
+            {
+                incoming_data = std::move(session->m_parsed_data);
+            }
+            else
+            {
+                m_log.write<Logging::CONSOLE_LOG>("End Session Lock && No Session", __LINE__, __FILE__);
+                return;
+            }
+            m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
         }
         catch(std::exception &ex)
         {

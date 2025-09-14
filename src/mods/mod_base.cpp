@@ -267,10 +267,12 @@ void ModBase::baseProcessAndDeliver(std::string &data)
     m_ansi_process->parseTextToBuffer((char *)output.c_str());
     output += baseGetDefaultInputColor();
     
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if(session_ptr session = getLockedSession())
     {
         session->deliver(output);
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 }
 
 /**
@@ -286,10 +288,12 @@ void ModBase::baseProcessAndDeliverThenDisconnect(std::string &data)
     m_ansi_process->parseTextToBuffer((char *)output.c_str());
     output += baseGetDefaultInputColor();    
     
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if(session_ptr session = getLockedSession())
     {
         session->deliver(output, DISCONNECT_USER);
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 }
 
 /**
@@ -331,10 +335,12 @@ void ModBase::baseProcessDeliverInputAndDisconnect(std::string &data)
 {
     m_ansi_process->parseTextToBuffer((char *)data.c_str());
     
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if(session_ptr session = getLockedSession())
     {
         session->deliver(data, DISCONNECT_USER);
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 }
 
 /**

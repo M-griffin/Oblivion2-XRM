@@ -61,6 +61,7 @@ MenuBase::MenuBase(session_ptr session_data)
     m_menu_prompt = std::make_shared<MenuPrompt>();
     
     
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if (auto session = m_menu_session_data.lock()) 
     {
         m_ansi_process = std::make_shared<ProcessorAnsi>(
@@ -72,6 +73,7 @@ MenuBase::MenuBase(session_ptr session_data)
     {
         m_log.write<Logging::ERROR_LOG>("Unable to lock Session Object", m_fallback_menu, __LINE__, __FILE__);
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
     
 }
 
@@ -158,10 +160,12 @@ std::string MenuBase::lower_case(const std::string &string_sequence)
 void MenuBase::baseProcessAndDeliver(std::string data)
 {
     m_ansi_process->parseTextToBuffer((char *)data.c_str());
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if (session_ptr session = getLockedSession()) 
     {
         session->deliver(data);
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 }
     
 /**
@@ -184,6 +188,7 @@ void MenuBase::clearMenuPullDownOptions()
 bool MenuBase::checkMenuAcsAccess(menu_ptr menu)
 {
     AccessCondition acs;
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if (session_ptr session = getLockedSession()) 
     {
         return acs.validateAcsString(
@@ -191,12 +196,9 @@ bool MenuBase::checkMenuAcsAccess(menu_ptr menu)
                session->m_user_record
         );
     }
-    else
-    { 
-        return false;        
-    }
     
-    
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
+    return false;    
 }
 
 /**
@@ -210,6 +212,7 @@ void MenuBase::checkMenuOptionsAcsAccess()
     std::vector<MenuOption> new_options;
     AccessCondition acs;
 
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if (session_ptr session = getLockedSession()) 
     {
         for(; it != end; it++)
@@ -223,6 +226,7 @@ void MenuBase::checkMenuOptionsAcsAccess()
             }
         }
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
     
     // Swap Validated Options with Existing.
     m_menu_info->menu_options.clear();
@@ -366,6 +370,8 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
 {
     // Use a Local Ansi Parser for Pasrsing Menu Template with Mid.
     processor_ansi_ptr ansi_process = nullptr;
+    
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if (session_ptr session = getLockedSession()) 
     {
         ansi_process = std::make_shared<ProcessorAnsi>(
@@ -376,8 +382,11 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen)
     else 
     {
         // Session Not avilable, return
+        m_log.write<Logging::CONSOLE_LOG>("End Session Lock & Session Not Available.", __LINE__, __FILE__);
         return nullptr;
     }
+    
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
     
     std::string output_screen;
     std::string new_screen = screen;
@@ -642,11 +651,14 @@ std::string MenuBase::getDefaultInputColor()
  */
 std::string MenuBase::getDefaultInverseColor()
 {
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if (session_ptr session = getLockedSession()) 
     {
+        m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
         return m_session_io->pipeColors(session->m_user_record->sInverseColor);
     }
     
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock && No Session", __LINE__, __FILE__);
     return nullptr;
 }
 
@@ -773,13 +785,17 @@ std::string MenuBase::loadMenuScreen()
     // NOTES: check for themes here!!!
     // also  if (m_menu_session_data->m_is_use_ansi), if not ansi, then maybe no pull down, or light bars!
     bool use_ansi = false;
+    
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if (session_ptr session = getLockedSession()) 
     {
         use_ansi = session->m_is_use_ansi;
     }
     else {        
+        m_log.write<Logging::CONSOLE_LOG>("End Session Lock && No Session", __LINE__, __FILE__);
         return nullptr;
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
     
     if(m_menu_info->menu_pulldown_file.size() == 0 || !use_ansi)
     {
@@ -1138,6 +1154,7 @@ void MenuBase::loadAndStartupMenu()
     int term_cols = 0;
     bool use_ansi = false;
     
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     if (session_ptr session = getLockedSession()) 
     {
          term_rows = session->m_telnet_decoder->getTermRows();
@@ -1146,8 +1163,10 @@ void MenuBase::loadAndStartupMenu()
     }
     else 
     {
+        m_log.write<Logging::CONSOLE_LOG>("End Session Lock && No Session", __LINE__, __FILE__);
         return;
     }
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
     
     if (m_current_menu == "matrix")
     {

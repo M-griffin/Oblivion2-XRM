@@ -21,38 +21,37 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="..\src">
+    <File Name="../src/tcp_server.hpp"/>
+    <File Name="../src/session.hpp"/>
+    <File Name="../src/z_session.hpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/z_session.cpp" ExcludeProjConfig="Debug;"/>
     <File Name="../src/logging.cpp"/>
-    <File Name="../src/access_condition.hpp"/>
-    <File Name="../src/access_condition.cpp"/>
-    <File Name="../src/processor_base.cpp"/>
-    <File Name="../src/menu_shell.hpp"/>
-    <File Name="../src/menu_shell.cpp"/>
-    <File Name="../src/session.cpp"/>
-    <File Name="../src/communicator.hpp"/>
-    <File Name="../src/communicator.cpp"/>
-    <File Name="../src/session_io.hpp"/>
-    <File Name="../src/session_io.cpp"/>
-    <File Name="../src/menu_system.hpp"/>
-    <File Name="../src/menu_system.cpp"/>
-    <File Name="../src/menu_base.hpp"/>
-    <File Name="../src/menu_base.cpp"/>
+    <File Name="../src/access_condition.hpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/access_condition.cpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/processor_base.cpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/menu_shell.hpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/menu_shell.cpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/communicator.hpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/communicator.cpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/session_io.hpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/session_io.cpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/menu_system.hpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/menu_system.cpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/menu_base.hpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/menu_base.cpp" ExcludeProjConfig="Debug;"/>
     <File Name="../src/safe_vector.hpp"/>
-    <File Name="../src/async_io.hpp"/>
     <File Name="../src/common_io.cpp"/>
     <File Name="../src/common_io.hpp"/>
     <File Name="../src/encryption.cpp"/>
     <File Name="../src/encryption.hpp"/>
     <File Name="../src/safe_queue.hpp"/>
     <File Name="../src/safe_set.hpp"/>
-    <File Name="../src/session.hpp"/>
-    <File Name="../src/session_manager.cpp"/>
-    <File Name="../src/session_manager.hpp"/>
-    <File Name="../src/state_base.hpp"/>
-    <File Name="../src/state_manager.cpp"/>
-    <File Name="../src/state_manager.hpp"/>
+    <File Name="../src/state_base.hpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/state_manager.cpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/state_manager.hpp" ExcludeProjConfig="Debug;"/>
     <File Name="../src/telnet.hpp"/>
-    <File Name="../src/telnet_decoder.cpp"/>
-    <File Name="../src/telnet_decoder.hpp"/>
+    <File Name="../src/telnet_decoder.cpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/telnet_decoder.hpp" ExcludeProjConfig="Debug;"/>
     <VirtualDirectory Name="compat">
       <File Name="../src/compat/prompts_compat_dao.hpp"/>
       <File Name="../src/compat/menu_compat_dao.hpp"/>
@@ -112,43 +111,43 @@
       <File Name="../src/model-sys/structures.hpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="mods">
-      <File Name="../src/mods/mod_user_editor.hpp"/>
-      <File Name="../src/mods/mod_user_editor.cpp"/>
-      <File Name="../src/mods/mod_system_config.hpp"/>
-      <File Name="../src/mods/mod_system_config.cpp"/>
-      <File Name="../src/mods/mod_signup.hpp"/>
-      <File Name="../src/mods/mod_signup.cpp"/>
-      <File Name="../src/mods/mod_protocol_editor.hpp"/>
-      <File Name="../src/mods/mod_protocol_editor.cpp"/>
-      <File Name="../src/mods/mod_message_reader.hpp"/>
-      <File Name="../src/mods/mod_message_reader.cpp"/>
-      <File Name="../src/mods/mod_message_editor.hpp"/>
-      <File Name="../src/mods/mod_message_editor.cpp"/>
-      <File Name="../src/mods/mod_message_base_editor.hpp"/>
-      <File Name="../src/mods/mod_message_base_editor.cpp"/>
-      <File Name="../src/mods/mod_menu_editor.hpp"/>
-      <File Name="../src/mods/mod_menu_editor.cpp"/>
-      <File Name="../src/mods/mod_level_editor.hpp"/>
-      <File Name="../src/mods/mod_level_editor.cpp"/>
-      <File Name="../src/mods/mod_form_manager.hpp"/>
-      <File Name="../src/mods/mod_form_manager.cpp"/>
-      <File Name="../src/mods/mod_file_lister.hpp"/>
-      <File Name="../src/mods/mod_file_lister.cpp"/>
-      <File Name="../src/mods/mod_file_editor.hpp"/>
-      <File Name="../src/mods/mod_file_editor.cpp"/>
-      <File Name="../src/mods/mod_file_area_editor.hpp"/>
-      <File Name="../src/mods/mod_file_area_editor.cpp"/>
-      <File Name="../src/mods/mod_base.cpp"/>
-      <File Name="../src/mods/mod_prelogon.hpp"/>
-      <File Name="../src/mods/mod_prelogon.cpp"/>
-      <File Name="../src/mods/mod_logon.hpp"/>
-      <File Name="../src/mods/mod_logon.cpp"/>
-      <File Name="../src/mods/mod_base.hpp"/>
+      <File Name="../src/mods/mod_user_editor.hpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_user_editor.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_system_config.hpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_system_config.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_signup.hpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_signup.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_protocol_editor.hpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_protocol_editor.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_message_reader.hpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_message_reader.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_message_editor.hpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_message_editor.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_message_base_editor.hpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_message_base_editor.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_menu_editor.hpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_menu_editor.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_level_editor.hpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_level_editor.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_form_manager.hpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_form_manager.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_file_lister.hpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_file_lister.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_file_editor.hpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_file_editor.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_file_area_editor.hpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_file_area_editor.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_base.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_prelogon.hpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_prelogon.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_logon.hpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_logon.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/mods/mod_base.hpp" ExcludeProjConfig="Debug;"/>
     </VirtualDirectory>
     <VirtualDirectory Name="forms">
-      <File Name="../src/forms/form_system_config.hpp"/>
-      <File Name="../src/forms/form_system_config.cpp"/>
-      <File Name="../src/forms/form_base.hpp"/>
+      <File Name="../src/forms/form_system_config.hpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/forms/form_system_config.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="../src/forms/form_base.hpp" ExcludeProjConfig="Debug;"/>
     </VirtualDirectory>
     <VirtualDirectory Name="data-app">
       <File Name="../src/data-app/oneliners_dao.hpp"/>
@@ -160,16 +159,9 @@
       <File Name="../src/model-app/oneliners.hpp"/>
       <File Name="../src/model-app/bbs_list.hpp"/>
     </VirtualDirectory>
-    <File Name="../src/async_acceptor.hpp"/>
-    <File Name="../src/async_base.hpp"/>
+    <File Name="../src/async_acceptor.hpp" ExcludeProjConfig="Debug;"/>
     <File Name="../src/directory.hpp"/>
-    <File Name="../src/interface.hpp"/>
-    <File Name="../src/io_service.cpp"/>
-    <File Name="../src/io_service.hpp"/>
-    <File Name="../src/socket_handler.cpp"/>
-    <File Name="../src/socket_handler.hpp"/>
-    <File Name="../src/socket_state.hpp"/>
-    <File Name="../src/socket_telnet.cpp"/>
+    <File Name="../src/interface.hpp" ExcludeProjConfig="Debug;"/>
     <VirtualDirectory Name="sdl2_net">
       <File Name="../src/sdl2_net/begin_code.h"/>
       <File Name="../src/sdl2_net/close_code.h"/>
@@ -195,11 +187,11 @@
     <File Name="../src/encoding.cpp"/>
     <File Name="../src/encoding.hpp"/>
     <File Name="../src/xrm_server.cpp"/>
-    <File Name="../src/processor_ansi.cpp"/>
-    <File Name="../src/processor_ansi.hpp"/>
-    <File Name="../src/processor_base.hpp"/>
-    <File Name="../src/processor_text.cpp"/>
-    <File Name="../src/processor_text.hpp"/>
+    <File Name="../src/processor_ansi.cpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/processor_ansi.hpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/processor_base.hpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/processor_text.cpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/processor_text.hpp" ExcludeProjConfig="Debug;"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

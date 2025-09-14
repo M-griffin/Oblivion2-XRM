@@ -2163,7 +2163,9 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
  */
 void ModMenuEditor::displayGenericMenu()
 {
+    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     menu_base_ptr menu = std::make_shared<MenuBase>(getLockedSession());
+    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
     menu->importMenu(m_loaded_menu.back());
 
     std::string generic_screen = menu->processGenericScreens();

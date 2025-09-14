@@ -4,46 +4,37 @@
   <wxString Value="/home/merc/code/Oblivion2-XRM/linux/obv2-xrm.workspace" Name="m_workspaceName"/>
   <TabInfoArray Name="TabInfoArray">
     <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/interface.hpp" Name="FileName"/>
-      <int Value="123" Name="FirstVisibleLine"/>
-      <int Value="150" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks">
-        <wxString Value="55:7"/>
-        <wxString Value="62:7"/>
-        <wxString Value="102:7"/>
-        <wxString Value="128:7"/>
-        <wxString Value="149:7"/>
-        <wxString Value="162:7"/>
-        <wxString Value="169:7"/>
-        <wxString Value="184:7"/>
-      </wxArrayString>
+      <wxString Value="/home/merc/code/Oblivion2-XRM/src/session.hpp" Name="FileName"/>
+      <int Value="0" Name="FirstVisibleLine"/>
+      <int Value="23" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/session_manager.hpp" Name="FileName"/>
-      <int Value="12" Name="FirstVisibleLine"/>
+      <wxString Value="/home/merc/code/Oblivion2-XRM/src/interface.hpp" Name="FileName"/>
+      <int Value="0" Name="FirstVisibleLine"/>
       <int Value="0" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/session_manager.cpp" Name="FileName"/>
-      <int Value="30" Name="FirstVisibleLine"/>
-      <int Value="35" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
       <wxString Value="/home/merc/code/Oblivion2-XRM/src/xrm_server.cpp" Name="FileName"/>
-      <int Value="12" Name="FirstVisibleLine"/>
+      <int Value="21" Name="FirstVisibleLine"/>
       <int Value="22" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="/home/merc/code/Oblivion2-XRM/src/io_service.cpp" Name="FileName"/>
+      <wxString Value="/home/merc/code/Oblivion2-XRM/src/tcp_server.hpp" Name="FileName"/>
       <int Value="0" Name="FirstVisibleLine"/>
-      <int Value="5" Name="CurrentLine"/>
+      <int Value="0" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/home/merc/code/Oblivion2-XRM/src/safe_queue.hpp" Name="FileName"/>
+      <int Value="0" Name="FirstVisibleLine"/>
+      <int Value="0" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
@@ -51,5 +42,5 @@
   <SerializedObject Name="m_breakpoints">
     <long Value="0" Name="Count"/>
   </SerializedObject>
-  <wxString Value="*.c;*.cpp;*.cxx;*.cc;*.h;*.hpp;*.inc;*.mm;*.m;*.xrc;*.xml;*.json;*.sql;*.txt;*.plist;CMakeLists.txt;*.rc;*.iss" Name="m_findInFilesMask"/>
+  <wxString Value="*.c;*.cpp;*.cxx;*.cc;*.h;*.hpp;*.inc;*.mm;*.m;*.xrc;*.plist;*.txt" Name="m_findInFilesMask"/>
 </Session>

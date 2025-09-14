@@ -33,6 +33,11 @@ public:
     ~TelnetDecoder();
 
     /**
+     * @brief Returns State of Session, If a Socket Error Occures we will shutdown.
+     */
+    bool isCurrentStateActive();
+    
+    /**
      * @brief Sends IAC Sequence back to Users Client for Terminal Negotiation.
      * @param command
      * @param option
@@ -70,6 +75,7 @@ private:
     int           m_naws_col;
     std::string   m_term_type;
 
+    bool          m_is_state_active;
     bool          m_is_binary;
     bool          m_is_echo;
     bool          m_is_sga;

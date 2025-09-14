@@ -5,7 +5,6 @@
 ## Debug
 ProjectName            :=SqliteWrapped
 ConfigurationName      :=Debug
-WorkspaceConfiguration :=Debug
 WorkspacePath          :=../linux
 ProjectPath            :=../linux
 IntermediateDirectory  :=./Debug
@@ -13,8 +12,8 @@ OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
-User                   :=merc
-Date                   :=05/08/25
+User                   :=Mercyful
+Date                   :=31/08/25
 CodeLitePath           :=/home/merc/.codelite
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -28,7 +27,6 @@ OutputSwitch           :=-o
 LibraryPathSwitch      :=-L
 PreprocessorSwitch     :=-D
 SourceSwitch           :=-c 
-OutputDirectory        :=$(IntermediateDirectory)
 OutputFile             :=$(IntermediateDirectory)/lib$(ProjectName).a
 Preprocessors          :=
 ObjectSwitch           :=-o 
@@ -47,7 +45,7 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryP
 
 ##
 ## Common variables
-## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overridden using an environment variable
+## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overriden using an environment variables
 ##
 AR       := /usr/bin/ar rcu
 CXX      := /usr/bin/g++
@@ -79,12 +77,13 @@ $(OutputFile): $(Objects)
 	@echo "" > $(IntermediateDirectory)/.d
 	@echo $(Objects0)  > $(ObjectsFileList)
 	$(AR) $(ArchiveOutputSwitch)$(OutputFile) @$(ObjectsFileList)
-	@$(MakeDirCommand) "../linux/.build-debug"
-	@echo rebuilt > "../linux/.build-debug/SqliteWrapped"
+	@$(MakeDirCommand) "../linux/.build-"
+	@echo rebuilt > "../linux/.build-/SqliteWrapped"
 
 PostBuild:
 	@echo Executing Post Build commands ...
 	cat ../sqlitewrap/IError.h ../sqlitewrap/StderrLog.h ../sqlitewrap/SysLogs.h ../sqlitewrap/Database.h ../sqlitewrap/Query.h > ./Debug/libSqliteWrapped.h
+	
 	@echo Done
 
 MakeIntermediateDirs:
