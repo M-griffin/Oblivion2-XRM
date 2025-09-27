@@ -11,6 +11,7 @@
 
 #include "model-sys/config.hpp"
 
+/*
 #include "mods/mod_prelogon.hpp"
 #include "mods/mod_logon.hpp"
 #include "mods/mod_signup.hpp"
@@ -18,15 +19,15 @@
 #include "mods/mod_user_editor.hpp"
 #include "mods/mod_level_editor.hpp"
 #include "mods/mod_message_editor.hpp"
+*/
 
 #include "session.hpp"
 #include "logging.hpp"
 
 const std::string MenuSystem::m_stateID = "MENU_SYSTEM";
 
-MenuSystem::MenuSystem(session_ptr session_data)
-    : StateBase(session_data)
-    , MenuBase(session_data)
+MenuSystem::MenuSystem(Session &session)
+    , MenuBase(session)
     , m_log(Logging::getInstance())
 {
     // [Vector] Setup std::function array with available options to pass input to.

@@ -12,7 +12,7 @@
 
 #include <sqlite3.h>
 
-#include "logging.hpp"
+#include "../logging.hpp"
 #include "libSqliteWrapped.h"
 
 

@@ -6,21 +6,30 @@
 #include <string>
 #include <thread>
 #include <chrono>
-#include <algorithm>
+
+#include "model-sys/config.hpp"
+#include "session.hpp"
+#include "logging.hpp"
 
 #include "sdl2_net/SDL_net.hpp"
-#include "logging.hpp"
-#include "session.hpp"
-
+#include "libSqliteWrapped.h"
 
 class TcpServer {
 public:
-    TcpServer(Uint16 port, int maxClients = 16)
-        : serverSocket(nullptr), socketSet(nullptr), port(port),
-          maxClients(maxClients), isRunning(false) {
-        for (int i = 1; i <= maxClients; ++i) {
+    explicit TcpServer(Uint16 port, int maxSessions = 16)
+        : serverSocket(nullptr)
+          , socketSet(nullptr)
+          , port(port)
+          , maxSessions(maxSessions)
+          , isRunning(false)
+          , userDatabase(USERS_DATABASE, &databaseLog) {
+        for (int i = 1; i <= maxSessions; ++i) {
             availableNodes.insert(i);
         }
+    }
+
+    ~TcpServer() {
+        stop();
     }
 
     bool start() {
@@ -40,7 +49,7 @@ public:
             return false;
         }
 
-        socketSet = SDLNet_AllocSocketSet(maxClients + 1);
+        socketSet = SDLNet_AllocSocketSet(maxSessions + 1);
         if (!socketSet) {
             std::cerr << "[Server] SDLNet_AllocSocketSet failed: " << SDLNet_GetError() << std::endl;
             return false;
@@ -59,31 +68,63 @@ public:
             return;
         }
 
+        // Add shutdown flag WFC or soemthing.
         while (isRunning) {
+            // Can check for Events to display to users etc... or execute.
+
+
             // Accept new clients
             TCPsocket newClient = SDLNet_TCP_Accept(serverSocket);
             if (newClient) {
-                if (clients.size() < static_cast<size_t>(maxClients) && !availableNodes.empty()) {
-                    int nodeId = *availableNodes.begin(); // Take lowest available node number
+                if (sessions.size() < static_cast<size_t>(maxSessions) && !availableNodes.empty()) {
+                    int nodeId = *availableNodes.begin();
                     availableNodes.erase(nodeId);
 
                     SDLNet_TCP_AddSocket(socketSet, newClient);
-                    clients.emplace_back(newClient, nodeId);
+                    sessions.emplace_back(newClient, nodeId, config);
                     std::cout << "[Server] New client connected! Node #" << nodeId
-                              << ", Total: " << clients.size() << "\n";
+                            << ", Total: " << sessions.size() << "\n";
                 } else {
                     std::cerr << "[Server] Max clients reached or no available node IDs. Rejecting.\n";
                     SDLNet_TCP_Close(newClient);
                 }
             }
 
-            int numReady = SDLNet_CheckSockets(socketSet, 50);
+            const int numReady = SDLNet_CheckSockets(socketSet, 0);
             if (numReady < 0) {
                 std::cerr << "[Server] SDLNet_CheckSockets failed: " << SDLNet_GetError() << "\n";
+
+                const char* error = SDLNet_GetError();
+                if (strstr(error, "invalid socket")) {
+                    std::cerr << "Invalid socket detected, removing it from the set." << "\n";
+                    // Remove the problematic socket from the set
+                    // Iterate through all sockets to find the invalid one
+                    for (auto it = sessions.begin(); it != sessions.end(); ) {
+                        TCPsocket clientSocket = it->getSocket();
+                        if (!SDLNet_SocketReady(clientSocket)) {
+                            // Remove the invalid socket from the set
+                            SDLNet_TCP_DelSocket(socketSet, clientSocket);
+                            SDLNet_TCP_Close(clientSocket);
+                            int nodeId = it->getNodeNumber();
+                            availableNodes.insert(it->getNodeNumber());
+
+                            // Remove the client from the list
+                            it = sessions.erase(it);
+                            std::cerr << "[Server] Removed invalid socket for Node #" << nodeId << "\n";
+                        } else {
+                            ++it;
+                        }
+                    }
+                } else {
+                    std::cerr << "Critical error:" << error << "\n";
+                    // Retry next iteration.
+                }
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
                 continue;
             }
 
-            for (auto it = clients.begin(); it != clients.end(); ) {
+            for (auto it = sessions.begin(); it != sessions.end();) {
                 TCPsocket sock = it->getSocket();
 
                 if (SDLNet_SocketReady(sock)) {
@@ -93,10 +134,12 @@ public:
                         std::cout << "[Server] Client node #" << nodeId << " disconnected.\n";
 
                         SDLNet_TCP_DelSocket(socketSet, sock);
-                        it = clients.erase(it);
+                        it = sessions.erase(it);
 
                         // Reclaim the node number
                         availableNodes.insert(nodeId);
+
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
                         continue;
                     }
 
@@ -114,11 +157,11 @@ public:
     void stop() {
         isRunning = false;
 
-        for (auto& session : clients) {
+        for (auto &session: sessions) {
             SDLNet_TCP_DelSocket(socketSet, session.getSocket());
             session.close();
         }
-        clients.clear();
+        sessions.clear();
         availableNodes.clear();
 
         if (serverSocket) {
@@ -133,19 +176,20 @@ public:
         std::cout << "[Server] Server stopped.\n";
     }
 
-    ~TcpServer() {
-        stop();
-    }
-
 private:
     TCPsocket serverSocket;
-    IPaddress serverIP;
+    IPaddress serverIP{};
     SDLNet_SocketSet socketSet;
-    std::vector<Session> clients;
-    std::set<int> availableNodes;
+    std::vector<Session> sessions;
+    std::set<Uint16> availableNodes;
     Uint16 port;
-    int maxClients;
+    Uint16 maxSessions;
     bool isRunning;
+
+    Config config;
+
+    SQLW::Database userDatabase;
+    SQLW::StderrLog databaseLog;
 };
 
 #endif

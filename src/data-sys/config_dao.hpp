@@ -8,7 +8,7 @@
 class Logging;
 
 class Config;
-typedef std::shared_ptr<Config> config_ptr;
+
 
 /**
  * @class ConfigDao
@@ -17,66 +17,28 @@ typedef std::shared_ptr<Config> config_ptr;
  * @file config_dao.hpp
  * @brief Handles Reading and Writing Config Class from XML
  */
-class ConfigDao
-{
-public:
+class ConfigDao {
 
-    ConfigDao(config_ptr config, const std::string &path);
+    public:
+    ConfigDao(Config &config, const std::string &path);
     ~ConfigDao();
 
-    /**
-     * @brief Check if the file exists and we need to create a new one.
-     * @return
-     */
     bool fileExists();
-
-    /**
-     * @brief Creates and Saves a newly Generated Configuration File.
-     * @param cfg
-     * @return
-     */
-    bool saveConfig(config_ptr cfg);
-
-    /**
-     * @brief Loads a Configuration file into the m_config stub for access.
-     * @return
-     */
+    bool saveConfig(Config &cfg);
     bool loadConfig();
-
-    /**
-     * @brief Validates settings for possible conflicts
-     * @return
-     */
     bool validation();
-
-    /**
-     * @brief Moves the Loaded config to the shared pointer.
-     * @param rhs
-     * @return
-     */
     void encode(const Config &rhs);
 
-    /**
-     * @brief Grab a const handle to the loaded configuration.
-     * @return
-     */
-    config_ptr getConfig() const
-    {
-        if(m_config)
-        {
-            return m_config;
-        }
-
-		return nullptr;
+    Config &getConfig() const {
+        return m_config;
     }
 
     Logging    &m_log; 
-    config_ptr  m_config;
+    Config     &m_config;
     std::string m_path;
     std::string m_filename;
     std::mutex  m;
 
 };
 
-
-#endif // DAO_CONFIG_HPP
+#endif

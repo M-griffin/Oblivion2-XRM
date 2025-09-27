@@ -1,644 +1,268 @@
 #include "telnet_decoder.hpp"
 
-#include <cstdio>
 #include <string>
 #include <fstream>
+#include <unordered_set>
 
 #include "telnet.hpp"
+#include "session.hpp"
 #include "logging.hpp"
-#include "async_io.hpp"
 
-
-TelnetDecoder::TelnetDecoder(async_io_ptr async_io)
-    : m_log(Logging::getInstance())
-    , m_async_io(async_io)
-    , m_naws_row(24)
-    , m_naws_col(80)
-    , m_term_type("undetected")
-    , m_is_state_active(true)
-    , m_is_binary(false)
-    , m_is_echo(false)
-    , m_is_sga(false)
-    , m_is_linemode(false)
-    , m_is_naws_detected(false)
-    , m_teloptStage(0)
-    , m_teloptCommand(0)
-    , m_currentOption(0)
-    , m_subnegoOption(0)
-{
-    m_reply_sequence.clear();
+TelnetDecoder::TelnetDecoder(Session &session)
+    : log(Logging::getInstance())
+      , session(session)
+      , nawsRow(24)
+      , nawsCol(80)
+      , termType("undetected")
+      , isBinary(false)
+      , isEcho(false)
+      , isSga(false)
+      , isLinemode(false)
+      , isNawsDetected(false)
+      , teloptStage(0)
+      , teloptCommand(0)
+      , currentOption(0)
+      , subnegoOption(0) {
+    replySequence.clear();
 }
 
-TelnetDecoder::~TelnetDecoder()
-{
-    m_log.write<Logging::DEBUG_LOG>("~TelnetDecoder()");
-    m_async_io.reset();
-    m_reply_sequence.clear();
+TelnetDecoder::~TelnetDecoder() {
+    log.write<Logging::DEBUG_LOG>("~TelnetDecoder()");
+    replySequence.clear();
 }
 
-/**
- * @brief Returns State of Session, If a Socket Error Occures we will shutdown.
- */
-bool TelnetDecoder::isCurrentStateActive() {
-    return m_is_state_active;
-}
-
-/**
- * @brief Sends IAC Sequence back to Users Client for Terminal Negotiation.
- * @param command
- * @param option
- */
-void TelnetDecoder::sendIACSequences(unsigned char command, int option)
-{
+void TelnetDecoder::sendIACSequences(unsigned char command, int option) {
     std::stringstream stm;
-    std::string       buf;
 
     stm << static_cast<char>(IAC);
     stm << command;
     stm << static_cast<char>(option);
-    buf = stm.str();
+    const std::string buf = stm.str();
     stm.clear();
-    deliver(buf);
-    
-    // Mark Sequence as Purshed then exclude senting it again.
-    if(!checkReply(option)) {
+    session.send(buf);
+
+    if (!checkReply(option)) {
         addReply(option);
     }
 }
 
-/**
- * @brief handles pending sequences waiting for reply responses
- * @param option
- * @return
- */
-bool TelnetDecoder::checkReply(const unsigned char &option)
-{
-    return m_reply_sequence.exists(option);
-}
-   
-void TelnetDecoder::addReply(const unsigned char &option)
-{
-    m_reply_sequence.push_back(option);
+bool TelnetDecoder::checkReply(const unsigned char &option) const {
+    return replySequence.find(option) != replySequence.end();
 }
 
-int TelnetDecoder::getTermRows() const
-{
-    return m_naws_row;
+void TelnetDecoder::addReply(const unsigned char &option) {
+    replySequence.insert(option);
 }
 
-int TelnetDecoder::getTermCols() const
-{
-    return m_naws_col;
+int TelnetDecoder::getTermRows() const {
+    return nawsRow;
 }
 
-void TelnetDecoder::setTermRows(int value)
-{
-    m_naws_row = value;
+int TelnetDecoder::getTermCols() const {
+    return nawsCol;
 }
 
-void TelnetDecoder::setTermCols(int value)
-{
-    m_naws_col = value;
+void TelnetDecoder::setTermRows(int value) {
+    nawsRow = value;
 }
 
-std::string TelnetDecoder::getTermType() const
-{
-    return m_term_type;
+void TelnetDecoder::setTermCols(int value) {
+    nawsCol = value;
 }
 
-/**
- * @brief Telnet Option Acknowledgment Reply
- * @param cmd
- * @return
- */
-unsigned char TelnetDecoder::telnetOptionAcknowledge(const unsigned char &cmd)
-{
-    switch(cmd)
-    {
-        case DO:
-            return WILL;
+std::string TelnetDecoder::getTermType() const {
+    return termType;
+}
 
-        case WILL:
-            return DO;
-
-        case DONT:
-            return WONT;
-
-        case WONT:
-            return DONT;
+unsigned char TelnetDecoder::telnetOptionAcknowledge(const unsigned char &command) {
+    switch (command) {
+        case DO: return WILL;
+        case WILL: return DO;
+        case DONT: return WONT;
+        case WONT: return DONT;
+        default: break;
     }
-
     return 0;
 }
 
-/**
- * @brief Handle Telnet Option Negotiation
- * @param cmd
- * @return
- */
-unsigned char TelnetDecoder::telnetOptionDeny(const unsigned char &cmd)
-{
-    switch(cmd)
-    {
-        case DO:
-            return WONT;
-
-        case WILL:
-            return DONT;
-
-        case DONT:
-            return WONT;
-
-        case WONT:
-            return DONT;
+unsigned char TelnetDecoder::telnetOptionDeny(const unsigned char &command) {
+    switch (command) {
+        case DO: return WONT;
+        case WILL: return DONT;
+        case DONT: return WONT;
+        case WONT: return DONT;
+        default: break;
     }
-
     return 0;
 }
 
-/**
- * @brief Decoded Sub-option Negotiation from Client.
- */
-void TelnetDecoder::decodeBuffer()
-{    
-    m_log.write<Logging::DEBUG_LOG>("decodeBuffer 240 - SE received");
+void TelnetDecoder::decodeBuffer() {
+    log.write<Logging::DEBUG_LOG>("decodeBuffer 240 - SE received");
 
-    // Now process the buffer per the options
-    switch(m_subnegoOption)
-    {
+    switch (subnegoOption) {
         case TELOPT_NAWS:
-        
-            for (std::string::size_type i = 0; i < data_sequence.size(); i++ )
-            {
-                // Validate First Set of Digits, then the Second Set so it's never cut off.
-                if (i == 1) 
-                {
-                    m_naws_col = (256 * (unsigned char)data_sequence[0]) + (unsigned char)data_sequence[1];
-                    
-                }
-                else if (i == 3)
-                {
-                    m_naws_row = (256 * (unsigned char)data_sequence[2]) + (unsigned char)data_sequence[3];                        
-                }
+            if (dataSequence.size() >= 4) {
+                nawsCol = ((unsigned char) dataSequence[0] << 8) | (unsigned char) dataSequence[1];
+                nawsRow = ((unsigned char) dataSequence[2] << 8) | (unsigned char) dataSequence[3];
+                log.write<Logging::DEBUG_LOG>("TELOPT_NAWS option", nawsCol, "x", nawsRow);
+                isNawsDetected = true;
             }
-
-            m_log.write<Logging::DEBUG_LOG>("TELOPT_NAWS option", m_naws_col, "x", m_naws_row);
-            m_is_naws_detected = true;
             break;
 
         case TELOPT_TTYPE:
-            m_term_type = data_sequence;
-            m_log.write<Logging::DEBUG_LOG>("TELOPT_TTYPE option", m_term_type);
+            termType = dataSequence;
+            log.write<Logging::DEBUG_LOG>("TELOPT_TTYPE option", termType);
             break;
 
         case TELOPT_NEW_ENVIRON:
-            // Add Variable Or Tokenize here!!
-            m_log.write<Logging::DEBUG_LOG>("TELOPT_NEW_ENVIRON data", data_sequence);
+            log.write<Logging::DEBUG_LOG>("TELOPT_NEW_ENVIRON data", dataSequence);
             break;
 
-        // Not used at this time.
         case TELOPT_LINEMODE:
-            // Add Variable Or Tokenize here!!
-            m_log.write<Logging::DEBUG_LOG>("TELOPT_LINEMODE data", data_sequence);
+            log.write<Logging::DEBUG_LOG>("TELOPT_LINEMODE data", dataSequence);
             break;
 
         default:
-            m_log.write<Logging::DEBUG_LOG>("Invalid option:", (int) m_subnegoOption, m_subnegoOption);
+            log.write<Logging::DEBUG_LOG>("Invalid option:", (int) subnegoOption, subnegoOption);
             break;
     }
 
-    m_teloptStage = 0;
-    m_subnegoOption = 0;
+    teloptStage = 0;
+    subnegoOption = 0;
 }
 
-/**
- * @brief Parse Telnet Commands/Options from Incoming Data.
- *        Also handles responses to clients
- * @param c
- * @return
- */
-unsigned char TelnetDecoder::telnetOptionParse(const unsigned char &c)
-{
-    
-    if (!m_is_state_active) 
-    {
-        return '\0';
+// Helper method to validate Telnet commands
+bool TelnetDecoder::isValidCommand(unsigned char command) {
+    return command == DO || command == DONT || command == WILL || command == WONT || command == SB;
+}
+
+// Helper method to handle DO/DONT commands
+void TelnetDecoder::handleDoDont(unsigned char command, unsigned char option) {
+    switch (option) {
+        case TELOPT_ECHO: isEcho = (command == DO);
+            break;
+        case TELOPT_BINARY: isBinary = (command == DO);
+            break;
+        case TELOPT_SGA: isSga = (command == DO);
+            break;
+        case TELOPT_LINEMODE: isLinemode = (command == DO);
+            break;
+        default:
+            sendIACSequences(telnetOptionDeny(command), option);
+            break;
     }
-    
-    // TEL-OPT Parser
-    switch(m_teloptStage)
-    {
-        // Stage 0: Find IAC Sequence Initiator
+}
+
+// Helper method to handle WILL/WONT commands
+void TelnetDecoder::handleWillWont(unsigned char command, unsigned char option) {
+    switch (option) {
+        case TELOPT_ECHO: isEcho = (command == WILL);
+            break;
+        case TELOPT_BINARY: isBinary = (command == WILL);
+            break;
+        case TELOPT_SGA: isSga = (command == WILL);
+            break;
+        case TELOPT_LINEMODE: isLinemode = (command == WILL);
+            break;
+        case TELOPT_TTYPE: sendTTYPERequest();
+            break;
+        default:
+            sendIACSequences(telnetOptionDeny(command), option);
+            break;
+    }
+}
+
+// Main Telnet option parsing method
+unsigned char TelnetDecoder::telnetOptionParse(const unsigned char &c) {
+    switch (teloptStage) {
         case 0:
-            if(c != IAC)
-            {
-                // Pass-through normal text data.
+            if (c != IAC) {
                 return c;
+            } else {
+                teloptStage++;
             }
-            else
-            {
-                // Start of command sequence. Move to next stage.
-                m_teloptStage++;
-            }
-
             break;
 
-        // Stage 1: Find Command
         case 1:
-
-            // Check if Binary Mode is ON, if we get double double IAC, pass through
-            if(c == IAC && m_is_binary)
-            {
-                // If were in Binary Mode, Than IAC IAC = IAC.
-                m_log.write<Logging::DEBUG_LOG>("Got double IAC BINARY");
-                m_teloptStage = 0;
+            if (c == IAC && isBinary) {
+                log.write<Logging::DEBUG_LOG>("Got double IAC BINARY");
+                teloptStage = 0;
                 return IAC;
-            }
-            else if(c == IAC)
-            {
-                // If were NOT in binary mode, (WINDOWS TELNET CONSOLE)
-                // Then IAC is sent as double IAC for single command starter!
-                m_log.write<Logging::DEBUG_LOG>("Got double IAC");
-                //m_teloptStage = 0;
+            } else if (c == IAC) {
+                log.write<Logging::DEBUG_LOG>("Got double IAC");
                 break;
             }
 
-            // Parse 2 Bytes Commands, No Responses Given.
-            switch(c)
-            {
-                // Most of these are pass through from LINE-MODE which is not used.
-                case GA:    //     249        /* you may reverse the line */
-                case EL:    //     248        /* erase the current line */
-                case EC:    //     247        /* erase the current character */
-                case AYT:   //     246        /* are you there */
-                case AO:    //     245        /* abort output--but let prog finish */
-                case IP:    //     244        /* interrupt process--permanently */
-                case BREAK: //     243        /* break */
-                case DM:    //     242        /* data mark--for connect. cleaning */
-                case NOP:   //     241        /* nop */
-                case EOR:   //     239        /* end of record (transparent mode) */
-                case ABORT: //     238        /* Abort process */
-                case SUSP:  //     237        /* Suspend process */
-                case xEOF:  //     236        /* End of file: EOF is already used... */
-                    // Pass Through commands that don't need Response.
-                    m_log.write<Logging::DEBUG_LOG>("[IAC]", (int)c, "PASS-THROUGH");
-                    m_teloptStage = 0;
-                    break;
-
-                // Handle Data Received from Client.
-                case SE:    //     240        /* end sub negotiation */
-                    m_log.write<Logging::DEBUG_LOG>("[IAC]", (int)c, "SE");
-                    decodeBuffer();
-                    data_sequence.clear();
-                    m_teloptStage = 0;
-                    break;
-
-                default:
-                    m_log.write<Logging::DEBUG_LOG>("[IAC]", (int)c, "MOVE to 3 BYTE");
-                    // Move to 3 Byte Commands
-                    m_teloptCommand = c;
-                    m_teloptStage++;
-                    break;
+            if (!isValidCommand(c)) {
+                log.write<Logging::DEBUG_LOG>("Invalid command:", (int) c);
+                teloptStage = 0;
+                break;
             }
 
+            teloptCommand = c;
+            teloptStage++;
             break;
 
-        // Stage 2: Parse Commands that need a Reply (3 Byte Sequences)
         case 2:
+            log.write<Logging::DEBUG_LOG>("[IAC]", (int) c, "STAGE 2");
 
-            m_log.write<Logging::DEBUG_LOG>("[IAC]", (int)c, "STAGE 2");
-
-            // Catch if were getting Invalid Option!.
-            if(TELCMD_OK(m_teloptCommand))
-            {
-                m_log.write<Logging::DEBUG_LOG>("[IAC]", (int)m_teloptCommand, (int)c);
-            }
-            else
-            {
-                // Hopefully won't get here!
-                m_log.write<Logging::DEBUG_LOG>("INVALID [IAC]", (int)m_teloptCommand, (int)c);
-                m_teloptStage = 0;
-                break;
-            }
-
-            switch(m_teloptCommand)
-            {
-                // DON'T, Only Valid Response is WONT
-                case DONT:
-
-                    // Handle Flags, if we received them shut it down.
-                    switch(c)
-                    {
-                        case TELOPT_ECHO:
-                            m_is_echo = false;
-                            break;
-
-                        case TELOPT_BINARY:
-                            m_is_binary = false;
-                            break;
-
-                        case TELOPT_SGA:
-                            m_is_sga = false;
-                            break;
-
-                        case TELOPT_LINEMODE:
-                            m_is_linemode = false;
-                            break;
-
-                        default:
-                            break;
-                    }
-
-                    m_log.write<Logging::DEBUG_LOG>("[IAC] RECEIVED DONT", (int)m_teloptCommand, (int)c);
-
-                    if(!checkReply(c))
-                    {
-                        m_log.write<Logging::DEBUG_LOG>("[IAC] RECEIVED DONT -> WONT", (int)m_teloptCommand, (int)c);
-                        sendIACSequences(telnetOptionAcknowledge(m_teloptCommand),c);
-                    }
-                    else
-                    {
-                        m_log.write<Logging::DEBUG_LOG>("[IAC] RECEIVED DONT -> REPLY", (int)m_teloptCommand, (int)c);
-                    }
-
-                    m_teloptStage = 0;
+            switch (teloptCommand) {
+                case DO: handleDoDont(DO, c);
                     break;
-
-                case DO: // Replies WILL / WON'T
-                    m_log.write<Logging::DEBUG_LOG>("[IAC] RECEIVED DO", (int)m_teloptCommand, (int)c);
-
-                    switch(c)
-                    {
-                        case TELOPT_ECHO:
-                            if(!checkReply(c))
-                            {
-                                m_log.write<Logging::DEBUG_LOG>("[IAC] DO TELOPT_ECHO", (int)m_teloptCommand, (int)c);
-                                sendIACSequences(telnetOptionDeny(m_teloptCommand),c);
-                            }
-                            else
-                            {
-                                m_log.write<Logging::DEBUG_LOG>("[IAC] DO TELOPT_ECHO REPLY", (int)m_teloptCommand, (int)c);
-                                m_is_echo = true;
-                            }
-
-                            break;
-
-                        case TELOPT_BINARY:
-                            if(!checkReply(c))
-                            {
-                                m_log.write<Logging::DEBUG_LOG>("[IAC] DO TELOPT_BINARY", (int)m_teloptCommand, (int)c);
-                                sendIACSequences(telnetOptionAcknowledge(m_teloptCommand),c);
-                            }
-                            else
-                            {
-                                m_log.write<Logging::DEBUG_LOG>("[IAC] DO TELOPT_BINARY REPLY", (int)m_teloptCommand, (int)c);
-                                m_is_binary = true;
-                            }
-
-                            break;
-
-                        case TELOPT_SGA:
-                            if(!checkReply(c))
-                            {
-                                m_log.write<Logging::DEBUG_LOG>("[IAC] DO TELOPT_SGA", (int)m_teloptCommand, (int)c);
-                                sendIACSequences(telnetOptionAcknowledge(m_teloptCommand),c);
-                            }
-                            else
-                            {
-                                m_log.write<Logging::DEBUG_LOG>("[IAC] DO TELOPT_SGA REPLY", (int)m_teloptCommand, (int)c);
-                                m_is_sga = true;
-                            }
-
-                            break;
-
-                        // Pass Through so we don't respond or keep looping.
-                        case TELOPT_TTYPE:
-                        case TELOPT_NAWS:
-                            break;
-
-                        case TELOPT_LINEMODE:
-                            if(!checkReply(c))
-                            {
-                                m_log.write<Logging::DEBUG_LOG>("[IAC] DO LINEMODE", (int)m_teloptCommand, (int)c);
-                                sendIACSequences(telnetOptionAcknowledge(m_teloptCommand),c);
-                            }
-                            else
-                            {
-                                m_log.write<Logging::DEBUG_LOG>("[IAC] DO LINEMODE REPLY", (int)m_teloptCommand, (int)c);
-                                m_is_linemode = true;
-                            }
-
-                            break;
-
-                        default:
-                            m_log.write<Logging::DEBUG_LOG>("[IAC] DO -> WONT", (int)m_teloptCommand, (int)c);
-                            sendIACSequences(telnetOptionDeny(m_teloptCommand),c);
-                            break;
-                    }
-
-                    m_teloptStage = 0;
+                case DONT: handleDoDont(DONT, c);
                     break;
-
-                // WILL means the Server Will DO IT!
-                // We reply Fine, do it!
-                case WILL: // Replies DO And DONT
-                    m_log.write<Logging::DEBUG_LOG>("[IAC] RECEIVED WILL", (int)m_teloptCommand, (int)c);
-
-                    // Don't response to WILL Requests.
-                    switch(c)
-                    {
-                        case TELOPT_ECHO:
-                            if(!checkReply(c))
-                            {
-                                m_log.write<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_ECHO", (int)m_teloptCommand, (int)c);
-                                sendIACSequences(telnetOptionAcknowledge(m_teloptCommand),c);
-                            }
-                            else
-                            {
-                                m_log.write<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_ECHO REPLY", (int)m_teloptCommand, (int)c);
-                                m_is_echo = true;
-                            }
-
-                            break;
-
-                        case TELOPT_BINARY:
-                            if(!checkReply(c))
-                            {
-                                m_log.write<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_BINARY", (int)m_teloptCommand, (int)c);
-                                sendIACSequences(telnetOptionAcknowledge(m_teloptCommand),c);
-                            }
-                            else
-                            {
-                                m_log.write<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_BINARY REPLY", (int)m_teloptCommand, (int)c);
-                                m_is_binary = true;
-                            }
-
-                            break;
-
-                        case TELOPT_SGA:
-                            if(!checkReply(c))
-                            {
-                                m_log.write<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_SGA", (int)m_teloptCommand, (int)c);
-                                sendIACSequences(telnetOptionAcknowledge(m_teloptCommand),c);
-                            }
-                            else
-                            {
-                                m_log.write<Logging::DEBUG_LOG>("[IAC] WILL TELOPT_SGA REPLY", (int)m_teloptCommand, (int)c);
-                                m_is_sga = true;
-                            }
-
-                            break;
-
-                        case TELOPT_TTYPE:
-                            // Ask for Terminal Type from Client!
-                            m_log.write<Logging::DEBUG_LOG>("Ask for TTYPE", (int)m_teloptCommand, (int)c);
-                            sendTTYPERequest();
-                            break;
-
-                        // Pass Through so we don't respond or keep looping.
-                        case TELOPT_NAWS:
-                            break;
-
-                        case TELOPT_NEW_ENVIRON:
-                            // Locks up Windows Telnet!!?!?!  Work this out later on.
-                            //sendENVRequest();
-                            //addReply(TELOPT_NEW_ENVIRON);
-                            break;
-
-                        case TELOPT_LINEMODE:
-                            if(!checkReply(c))
-                            {
-                                m_log.write<Logging::DEBUG_LOG>("[IAC] WILL LINEMODE", (int)m_teloptCommand, (int)c);
-                                sendIACSequences(telnetOptionAcknowledge(m_teloptCommand),c);
-                            }
-                            else
-                            {
-                                m_log.write<Logging::DEBUG_LOG>("[IAC] WILL LINEMODE REPLY", (int)m_teloptCommand, (int)c);
-                                m_is_linemode = true;
-                            }
-
-                            break;
-
-                        default :
-                            m_log.write<Logging::DEBUG_LOG>("[IAC] WILL -> DONT", (int)m_teloptCommand, (int)c);
-                            sendIACSequences(telnetOptionDeny(m_teloptCommand),c);
-                            break;
-                    }
-
-                    m_teloptStage = 0;
+                case WILL: handleWillWont(WILL, c);
                     break;
-
-                // WON'T, Only Valid Response is DONT
-                case WONT:
-
-                    // Handle Flags, if we received them shit it down.
-                    switch(c)
-                    {
-                        case TELOPT_ECHO:
-                            m_is_echo = false;
-                            break;
-
-                        case TELOPT_BINARY:
-                            m_is_binary = false;
-                            break;
-
-                        case TELOPT_SGA:
-                            m_is_sga = false;
-                            break;
-
-                        case TELOPT_LINEMODE:
-                            m_is_linemode = false;
-                            break;
-
-                        default:
-                            break;
-                    }
-
-                    if(!checkReply(c))
-                    {
-                        m_log.write<Logging::DEBUG_LOG>("[IAC] RECEIVED WONT", (int)m_teloptCommand, (int)c);
-                        sendIACSequences(telnetOptionAcknowledge(m_teloptCommand), c);
-                    }
-                    else
-                    {
-                        m_log.write<Logging::DEBUG_LOG>("[IAC] RECEIVED WONT REPLY", (int)m_teloptCommand, (int)c);
-                    }
-
-                    m_teloptStage = 0;
+                case WONT: handleWillWont(WONT, c);
                     break;
-
-                // Start of Sub Negotiations and Stages 3 - 4
-                case SB: // 250
-                    m_log.write<Logging::DEBUG_LOG>("[IAC] TELNET_STATE_SB", (int)m_teloptCommand, (int)c);
-
-                    // Setup the Option when we get SE
-                    // So we know how to process the buffer when it ends.
-                    m_subnegoOption = c;
-
-                    if(c == TELOPT_TTYPE)
-                    {
-                        m_currentOption = c;
-                        m_teloptStage = 3;
+                case SB:
+                    subnegoOption = c;
+                    if (c == TELOPT_TTYPE || c == TELOPT_NEW_ENVIRON) {
+                        currentOption = c;
+                        teloptStage = 3;
+                    } else if (c == TELOPT_NAWS) {
+                        currentOption = c;
+                        teloptStage = 5;
+                    } else if (c == TELOPT_LINEMODE) {
+                        currentOption = c;
+                        teloptStage = 7;
+                    } else {
+                        teloptStage = 0;
                     }
-                    else if(c == TELOPT_NEW_ENVIRON)
-                    {
-                        m_currentOption = c;
-                        m_teloptStage = 3;
-                    }
-                    else if(c == TELOPT_NAWS)
-                    {
-                        m_currentOption = c;
-                        m_teloptStage = 5;
-                    }
-                    else if(c == TELOPT_LINEMODE)
-                    {
-                        m_currentOption = c;
-                        m_teloptStage = 7;
-                    }
-                    else
-                    {
-                        m_log.write<Logging::DEBUG_LOG>("[IAC] TELNET_STATE_SB UNSUPPORTED", (int)m_teloptCommand, (int)c);
-                        // Invalid, reset back.
-                        m_teloptStage = 0;
-                    }
-
                     break;
-
                 default:
-                    // Options or Commands Not Parsed, RESET.
-                    m_log.write<Logging::DEBUG_LOG>("[IAC] INVALID 3 Options", (int)m_teloptCommand, (int)c);
-                    m_teloptStage = 0;
+                    teloptStage = 0;
                     break;
             }
-
             break;
 
+        // Handle subnegotiation stages (unchanged)
         case 3:
-            m_log.write<Logging::DEBUG_LOG>("--> STAGE 3", (int)c);
+            log.write<Logging::DEBUG_LOG>("--> STAGE 3", (int)c);
 
             //Options will be 1 After SB
-            switch(m_currentOption)
+            switch(currentOption)
             {
                 // IAC SB TTYPE TELQUAL_IS
                 case TELOPT_TTYPE:
                     if(c == TELQUAL_IS)
                     {
-                        m_log.write<Logging::DEBUG_LOG>("[IAC] TELQUAL_IS", (int)m_currentOption, (int)c);
-                        m_teloptStage = 4;
+                        log.write<Logging::DEBUG_LOG>("[IAC] TELQUAL_IS", (int)currentOption, (int)c);
+                        teloptStage = 4;
                     }
                     else
-                        m_teloptStage = 0;
+                        teloptStage = 0;
 
                     break;
 
                 case TELOPT_NEW_ENVIRON:
                     if(c == TELQUAL_IS)
                     {
-                        m_log.write<Logging::DEBUG_LOG>("[IAC] TELQUAL_IS", (int)m_currentOption, (int)c);
-                        m_teloptStage = 6;
+                        log.write<Logging::DEBUG_LOG>("[IAC] TELQUAL_IS", (int)currentOption, (int)c);
+                        teloptStage = 6;
                     }
                     else
-                        m_teloptStage = 0;
+                        teloptStage = 0;
 
                     break;
 
@@ -647,13 +271,13 @@ unsigned char TelnetDecoder::telnetOptionParse(const unsigned char &c)
                     //printf("\r\n [Stage 3 - unregistered stuff it] - %i, %i \r\n",opt, c);
                     if(c == SE)
                     {
-                        m_log.write<Logging::DEBUG_LOG>("[IAC] SB END", (int)m_currentOption, (int)c);
-                        m_teloptStage = 0;
+                        log.write<Logging::DEBUG_LOG>("[IAC] SB END", (int)currentOption, (int)c);
+                        teloptStage = 0;
                     }
                     else
                     {
                         // reset
-                        m_teloptStage = 0;
+                        teloptStage = 0;
                     }
 
                     break;
@@ -663,19 +287,19 @@ unsigned char TelnetDecoder::telnetOptionParse(const unsigned char &c)
 
         // Only Gets here on TTYPE Sub-Negotiation.
         case 4:
-            m_log.write<Logging::DEBUG_LOG>("--> STAGE 4 TTYPE", (int)c);
+            log.write<Logging::DEBUG_LOG>("--> STAGE 4 TTYPE", (int)c);
 
             if(c != IAC && c != SE)
             {
                 if(c == '\x00')
-                    data_sequence += '\0';
+                    dataSequence += '\0';
                 else
-                    data_sequence += static_cast<char>(c);
+                    dataSequence += static_cast<char>(c);
 
-                if(data_sequence.size() >= SB_MAXLEN)
+                if(dataSequence.size() >= SB_MAXLEN)
                 {
                     // Invalid Sequences,, just clear.
-                    data_sequence.clear();
+                    dataSequence.clear();
                 }
             }
 
@@ -683,7 +307,7 @@ unsigned char TelnetDecoder::telnetOptionParse(const unsigned char &c)
             if(c == IAC)
             {
                 // IAC then 240 to close sequence for TTYPE
-                m_teloptStage = 1;
+                teloptStage = 1;
             }
 
             /*
@@ -695,19 +319,19 @@ unsigned char TelnetDecoder::telnetOptionParse(const unsigned char &c)
             break;
 
         case 5:
-            m_log.write<Logging::DEBUG_LOG>("--> STAGE 5 NAWS", (int)c);
+            log.write<Logging::DEBUG_LOG>("--> STAGE 5 NAWS", (int)c);
 
             if(c != IAC && c != SE)
             {
                 if(c == '\x00')
-                    data_sequence += '\0';
+                    dataSequence += '\0';
                 else
-                    data_sequence += static_cast<char>(c);
+                    dataSequence += static_cast<char>(c);
 
-                if(data_sequence.size() >= SB_MAXLEN)
+                if(dataSequence.size() >= SB_MAXLEN)
                 {
                     // Invalid Sequences,, just clear.
-                    data_sequence.clear();
+                    dataSequence.clear();
                 }
             }
 
@@ -715,7 +339,7 @@ unsigned char TelnetDecoder::telnetOptionParse(const unsigned char &c)
             if(c == IAC)
             {
                 // IAC then 240 to close sequence for NAWS
-                m_teloptStage = 1;
+                teloptStage = 1;
             }
 
             /*
@@ -727,20 +351,20 @@ unsigned char TelnetDecoder::telnetOptionParse(const unsigned char &c)
             break;
 
         case 6:
-            m_log.write<Logging::DEBUG_LOG>("--> STAGE 5 TELOPT_NEW_ENVIRON", (int)c);
+            log.write<Logging::DEBUG_LOG>("--> STAGE 5 TELOPT_NEW_ENVIRON", (int)c);
 
             if(c != IAC && c != SE)
             {
                 if(c == '\x00')
-                    data_sequence += ' ';
+                    dataSequence += ' ';
                 else
-                    data_sequence += static_cast<char>(c);
+                    dataSequence += static_cast<char>(c);
 
-                if(data_sequence.size() >= SB_MAXLEN)
+                if(dataSequence.size() >= SB_MAXLEN)
                 {
                     // Invalid Sequences,, just clear.
-                    data_sequence.clear();
-                    m_teloptStage = 0;
+                    dataSequence.clear();
+                    teloptStage = 0;
                 }
             }
 
@@ -752,7 +376,7 @@ unsigned char TelnetDecoder::telnetOptionParse(const unsigned char &c)
             else if(c == SE)
             {
                 //data_sequence.clear();
-                m_teloptStage = 0;
+                teloptStage = 0;
             }
 
             break;
@@ -769,16 +393,16 @@ unsigned char TelnetDecoder::telnetOptionParse(const unsigned char &c)
             * and ignore double IAC!  they are Unicode chars.
             * then only look for IAC / 240 for SE to exit.
             */
-            m_log.write<Logging::DEBUG_LOG>("--> STAGE 5 TELOPT_LINEMODE", (int)c);
+            log.write<Logging::DEBUG_LOG>("--> STAGE 5 TELOPT_LINEMODE", (int)c);
 
             if(c != IAC && c != SE)
             {
-                data_sequence += c;
+                dataSequence += c;
 
-                if(data_sequence.size() >= SB_MAXLEN)
+                if(dataSequence.size() >= SB_MAXLEN)
                 {
                     // Invalid Sequences,, just clear.
-                    data_sequence.clear();
+                    dataSequence.clear();
                 }
             }
 
@@ -789,8 +413,8 @@ unsigned char TelnetDecoder::telnetOptionParse(const unsigned char &c)
             }
             else if(c == SE)
             {
-                m_teloptStage = 0;
-                data_sequence.erase();
+                teloptStage = 0;
+                dataSequence.erase();
                 // All Done, Now it's ok to turn off LINEMODE!
                 sendIACSequences(telnetOptionDeny(WONT), TELOPT_LINEMODE);
             }
@@ -798,114 +422,39 @@ unsigned char TelnetDecoder::telnetOptionParse(const unsigned char &c)
             break;
     }
 
-    // No no valid Data, Return null character which are ignored.
     return '\0';
 }
 
-
-/**
- * @brief handles callback after write() for errors checking.
- * @param error
- */
-void TelnetDecoder::handleWrite(const std::error_code& error, socket_handler_ptr)
-{
-    // Just log errors for now.
-    if(error)
-    {
-        Logging &log = Logging::getInstance();
-        log.write<Logging::ERROR_LOG>("telnet async_write error=", error.message(), __LINE__, __FILE__);
-        
-        // Let the session know that the user has most likely disconnected 
-        // or socket is no longer in connected.
-        m_is_state_active = false;
-    }    
-}
-
-/**
- * @brief delivers text data to client
- * @param msg
- */
-void TelnetDecoder::deliver(const std::string &string_msg)
-{
-    
-    // TODO: NOTE change this to queue up respones, then the session will call to retieve
-    // once it returns from parsing, then we don't have to pass sessions/async_io, less references.
-    if(string_msg.size() == 0 || !m_is_state_active)
-    {
-        return;
-    }
-    
-    try
-    {
-        async_io_ptr async_io = m_async_io.lock();
-        if(async_io && async_io->getSocketHandle()->isActive())
-        {            
-            async_io->asyncWrite(string_msg,
-                                     std::bind(
-                                         &TelnetDecoder::handleWrite,
-                                         shared_from_this(),
-                                         std::placeholders::_1,
-                                         std::placeholders::_2));
-        }
-    }
-    catch (std::exception &ex) 
-    {
-        m_log.write<Logging::ERROR_LOG>("TelnetDecoder::deliver Exception=", ex.what(), __LINE__, __FILE__);
-    }
-}
-
-/**
- * @brief Send Specific IAC TTYPE Message
- */
-void TelnetDecoder::sendTTYPERequest()
-{
+void TelnetDecoder::sendTTYPERequest() const {
     std::stringstream stm;
-    std::string       buf;
-
-    //IAC SB TTYPE SEND IAC SE
-    stm << static_cast<char>(IAC);
-    stm << static_cast<char>(SB);
-    stm << static_cast<char>(TELOPT_TTYPE);
-    stm << static_cast<char>(TELQUAL_SEND);
-    stm << static_cast<char>(IAC);
-    stm << static_cast<char>(SE);
-    buf = stm.str();    
+    stm << static_cast<char>(IAC) << static_cast<char>(SB)
+            << static_cast<char>(TELOPT_TTYPE) << static_cast<char>(TELQUAL_SEND)
+            << static_cast<char>(IAC) << static_cast<char>(SE);
+    const std::string buf = stm.str();
     stm.clear();
-    deliver(buf);
+    session.send(buf);
 }
 
-/**
- * @brief Handles TELOPT_NEW_ENVIRON Requests
- */
-void TelnetDecoder::sendENVRequest()
-{
+void TelnetDecoder::sendENVRequest() const {
     std::stringstream stm;
-    std::string       buf;
+    std::vector<std::string> vars = {
+        "USER", "TERM", "SHELL", "COLUMNS", "LINES",
+        "C_CTYPE", "XTERM_LOCALE", "DISPLAY", "SSH_CLIENT",
+        "SSH_CONNECTION", "SSH_TTY", "HOME", "HOSTNAME",
+        "PWD", "MAIL", "LANG", "PWD", "UID", "USER_ID",
+        "EDITOR", "LOGNAME", "SYSTEMTYPE"
+    };
 
-    // Loop through variables of possible responses.
-    // Not getting any Responses, copied from x/84.
-    std::vector<std::string> vars = { "USER", "TERM", "SHELL", "COLUMNS", "LINES",
-                                      "C_CTYPE", "XTERM_LOCALE", "DISPLAY", "SSH_CLIENT",
-                                      "SSH_CONNECTION", "SSH_TTY", "HOME", "HOSTNAME",
-                                      "PWD", "MAIL","LANG", "PWD", "UID", "USER_ID",
-                                      "EDITOR", "LOGNAME", "SYSTEMTYPE"
-                                    };
-    //IAC SB TTYPE SEND IAC SE
-    stm << static_cast<char>(IAC);
-    stm << static_cast<char>(SB);
-    stm << static_cast<char>(TELOPT_NEW_ENVIRON);
-    stm << static_cast<char>(TELQUAL_SEND);
+    stm << static_cast<char>(IAC) << static_cast<char>(SB)
+            << static_cast<char>(TELOPT_NEW_ENVIRON) << static_cast<char>(TELQUAL_SEND);
 
-    for(auto &v : vars)
-    {
-        stm << static_cast<char>(NEW_ENV_VAR);
-        stm << v.data();
+    for (auto &v: vars) {
+        stm << static_cast<char>(NEW_ENV_VAR) << v.data();
     }
 
-    stm << static_cast<char>(IAC);
-    stm << static_cast<char>(SE);
-    buf = stm.str();
+    stm << static_cast<char>(IAC) << static_cast<char>(SE);
+    const std::string buf = stm.str();
     stm.clear();
     vars.clear();
-    deliver(buf);
-} 
+    session.send(buf);
+}

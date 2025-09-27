@@ -4,5 +4,5 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "Oblivion2-XRM"
-authors = [{name = "Michael Griffin", email = "mrmisticismo@hotmail.com"}]
+authors = [{ name = "Michael Griffin", email = "mrmisticismo@hotmail.com" }]
 dynamic = ["version", "description"]

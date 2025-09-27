@@ -27,19 +27,17 @@
 #include "utf-cpp/utf8.h"
 
 ProcessorAnsi::ProcessorAnsi(int term_height, int term_width)
-    : ProcessorBase(term_height, term_width)
-{ 
+    : ProcessorBase(term_height, term_width) {
     m_log.write<Logging::DEBUG_LOG>("PROCESSOR_ANSI rows=", term_height, "cols=", term_width);
-    m_screen_buffer.reserve((m_number_lines * m_characters_per_line)+1);
-    m_screen_buffer.resize((m_number_lines * m_characters_per_line)+1);
+    m_screen_buffer.reserve((m_number_lines * m_characters_per_line) + 1);
+    m_screen_buffer.resize((m_number_lines * m_characters_per_line) + 1);
 }
 
-ProcessorAnsi::~ProcessorAnsi()
-{ 
+ProcessorAnsi::~ProcessorAnsi() {
     m_log.write<Logging::CONSOLE_LOG>("~ProcessorAnsi()");
-    
+
     m_screen_buffer.clear();
-    std::vector <ScreenPixel>().swap(m_screen_buffer);
+    std::vector<ScreenPixel>().swap(m_screen_buffer);
     m_pull_down_options.clear();
     std::map<int, ScreenPixel>().swap(m_pull_down_options);
     m_line_ending_map.clear();
@@ -50,18 +48,16 @@ ProcessorAnsi::~ProcessorAnsi()
 /**
  * @brief Buffer to String for Parsing
  */
-std::string ProcessorAnsi::screenBufferToString()
-{
+std::string ProcessorAnsi::screenBufferToString() {
     m_ansi_output.erase();
     m_ansi_output = "";
 
-    for(unsigned int i = 0; i < m_screen_buffer.size(); i++)
-    {
+    for (unsigned int i = 0; i < m_screen_buffer.size(); i++) {
         auto &buff = m_screen_buffer[i];
 
-        if(buff.char_sequence[0] == '\r')
-        { } //  character = "\x1b[40m\r\n";
-        else if(buff.char_sequence[0] == '\0')
+        if (buff.char_sequence[0] == '\r') {
+        } //  character = "\x1b[40m\r\n";
+        else if (buff.char_sequence[0] == '\0')
             m_ansi_output += " ";
         else
             m_ansi_output += buff.char_sequence;
@@ -74,8 +70,7 @@ std::string ProcessorAnsi::screenBufferToString()
 /**
  * @brief Test, displays screen buffer.
  */
-void ProcessorAnsi::screenBufferDisplayTest()
-{
+void ProcessorAnsi::screenBufferDisplayTest() {
     int attr = 0;
     int fore = 0;
     int back = 0;
@@ -84,26 +79,22 @@ void ProcessorAnsi::screenBufferDisplayTest()
     m_ansi_output = "";
     std::string character = "";
 
-    if(m_is_screen_cleared)
-    {
+    if (m_is_screen_cleared) {
         m_ansi_output.append("\x1b[1;1H\x1b[2J");
     }
 
-    for(unsigned int i = 0; i < m_screen_buffer.size(); i++)
-    {
+    for (unsigned int i = 0; i < m_screen_buffer.size(); i++) {
         auto &buff = m_screen_buffer[i];
         std::stringstream ss;
 
-        if(buff.x_position >= 1)
-        {
-            if(attr !=  buff.attribute ||
-                    fore != buff.foreground ||
-                    back != buff.background)
-            {
-                ss  << "\x1b["
-                    << buff.attribute << ";"
-                    << buff.foreground << ";"
-                    << buff.background << "m";
+        if (buff.x_position >= 1) {
+            if (attr != buff.attribute ||
+                fore != buff.foreground ||
+                back != buff.background) {
+                ss << "\x1b["
+                        << buff.attribute << ";"
+                        << buff.foreground << ";"
+                        << buff.background << "m";
 
                 m_ansi_output.append(ss.str());
 
@@ -116,17 +107,15 @@ void ProcessorAnsi::screenBufferDisplayTest()
             ss.ignore();
 
             // buff.c;
-            if(buff.char_sequence[0] == '\r')
-            { } //  character = "\x1b[40m\r\n";
-            else if(buff.char_sequence[0] == '\0')
+            if (buff.char_sequence[0] == '\r') {
+            } //  character = "\x1b[40m\r\n";
+            else if (buff.char_sequence[0] == '\0')
                 character = " ";
             else
                 character = buff.char_sequence;
 
             m_ansi_output.append(character);
-        }
-        else
-        {
+        } else {
             character = " ";
             m_ansi_output.append(character);
         }
@@ -143,27 +132,21 @@ void ProcessorAnsi::screenBufferDisplayTest()
  * @param clearScreen
  * @return
  */
-int ProcessorAnsi::getMCIOffSet(std::string mci_code)
-{
+int ProcessorAnsi::getMCIOffSet(std::string mci_code) {
     unsigned int max = (m_x_position + (m_y_position * m_characters_per_line));
 
-    for(unsigned int i = 0; i < m_screen_buffer.size(); i++)
-    {
-
+    for (unsigned int i = 0; i < m_screen_buffer.size(); i++) {
         // If buffer parse move past current cursor position
-        if((i + 1) >= max)
-        {
+        if ((i + 1) >= max) {
             break;
         }
 
         // Check for MCI Code, if it matches, return position.
-        if(i + 2 < max)
-        {
-            if(m_screen_buffer[i].char_sequence[0] == (unsigned char)mci_code[0] &&
-                    m_screen_buffer[i+1].char_sequence[0] == (unsigned char)mci_code[1] &&
-                    m_screen_buffer[i+2].char_sequence[0] == (unsigned char)mci_code[2])
-            {
-                return i+1;
+        if (i + 2 < max) {
+            if (m_screen_buffer[i].char_sequence[0] == (unsigned char) mci_code[0] &&
+                m_screen_buffer[i + 1].char_sequence[0] == (unsigned char) mci_code[1] &&
+                m_screen_buffer[i + 2].char_sequence[0] == (unsigned char) mci_code[2]) {
+                return i + 1;
             }
         }
     }
@@ -176,8 +159,7 @@ int ProcessorAnsi::getMCIOffSet(std::string mci_code)
  * NOTE, this can add a new line at the end of screen
  * Should exclude for BOTTOM Ansi Screens.
  */
-std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen)
-{
+std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen) {
     int attr = 0;
     int fore = 0;
     int back = 0;
@@ -189,35 +171,31 @@ std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen)
 
     std::string ansi_output = "";
 
-    if(clearScreen)
-    {
+    if (clearScreen) {
         ansi_output.append("\x1b[1;1H\x1b[2J");
     }
 
     int count = 1;
 
-    for(unsigned int i = 0; i < m_screen_buffer.size(); i++)
-    {
+    for (unsigned int i = 0; i < m_screen_buffer.size(); i++) {
         auto &buff = m_screen_buffer[i];
 
         // If buffer parse move past current cursor position
-        if(count >= (m_x_position + (m_y_position * m_characters_per_line)))
-        {
+        if (count >= (m_x_position + (m_y_position * m_characters_per_line))) {
             break;
         }
 
         std::stringstream ss;
 
-        if(attr !=  buff.attribute ||
-                fore != buff.foreground ||
-                back != buff.background)
-        {
-            ss  << "\x1b["
-                << buff.attribute << ";"
-                << buff.foreground << ";"
-                << buff.background << "m";
+        if (attr != buff.attribute ||
+            fore != buff.foreground ||
+            back != buff.background) {
+            ss << "\x1b["
+                    << buff.attribute << ";"
+                    << buff.foreground << ";"
+                    << buff.background << "m";
 
-            if(padding == 0)
+            if (padding == 0)
                 ansi_output.append(ss.str());
 
             attr = buff.attribute;
@@ -230,36 +208,29 @@ std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen)
 
         // Options and skip null non plotted characters by
         // moving the drawing position forward.
-        if(padding > 0 && buff.char_sequence[0] != '\0')
-        {
+        if (padding > 0 && buff.char_sequence[0] != '\0') {
             ansi_output += "\x1b[" + std::to_string(padding) + "C";
             // Get the Color change or first character after padding.
             ansi_output.append(ss.str());
             padding = 0;
         }
 
-        if(padding > 0 && (i > 0 && i % m_characters_per_line == 0))
-        {
+        if (padding > 0 && (i > 0 && i % m_characters_per_line == 0)) {
             ansi_output += "\x1b[" + std::to_string(padding) + "C";
             ansi_output.append(ss.str());
             padding = 0;
             ansi_output.append("\x1B[1D\r\n");
-        }
-        else if((i > 0 && i % m_characters_per_line == 0))
-        {
+        } else if ((i > 0 && i % m_characters_per_line == 0)) {
             ansi_output.append("\x1B[1D\r\n");
         }
 
-        if(buff.char_sequence[0] == '\r')
-        { } //  character = "\x1b[40m\r\n";
-        else if(buff.char_sequence[0] == '\0')
-        {
+        if (buff.char_sequence[0] == '\r') {
+        } //  character = "\x1b[40m\r\n";
+        else if (buff.char_sequence[0] == '\0') {
             ++padding;
             ++count;
             continue;
-        }
-        else
-        {
+        } else {
             ansi_output.append(buff.char_sequence);
         }
 
@@ -277,8 +248,7 @@ std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen)
  * @param pulldown_id
  * @return
  */
-std::string ProcessorAnsi::buildPullDownBars(int pulldown_id, bool active)
-{
+std::string ProcessorAnsi::buildPullDownBars(int pulldown_id, bool active) {
     std::string output = "";
     std::stringstream ss;
 
@@ -286,35 +256,31 @@ std::string ProcessorAnsi::buildPullDownBars(int pulldown_id, bool active)
     it = m_pull_down_options.find(pulldown_id);
 
     // If We have the pulldown ID
-    if(it != m_pull_down_options.end())
-    {
+    if (it != m_pull_down_options.end()) {
         // First Position
-        ss  << "\x1b["
-            << (it)->second.y_position
-            << ";"
-            << (it)->second.x_position
-            << "H";
+        ss << "\x1b["
+                << (it)->second.y_position
+                << ";"
+                << (it)->second.x_position
+                << "H";
 
         // Next Color Depending if it's the selected bar.
-        if(active)
-        {
+        if (active) {
             ss << "\x1b["
-               << (it)->second.selected_attribute
-               << ";"
-               << (it)->second.selected_foreground
-               << ";"
-               << (it)->second.selected_background
-               << "m";
-        }
-        else
-        {
+                    << (it)->second.selected_attribute
+                    << ";"
+                    << (it)->second.selected_foreground
+                    << ";"
+                    << (it)->second.selected_background
+                    << "m";
+        } else {
             ss << "\x1b["
-               << (it)->second.attribute
-               << ";"
-               << (it)->second.foreground
-               << ";"
-               << (it)->second.background
-               << "m";
+                    << (it)->second.attribute
+                    << ";"
+                    << (it)->second.foreground
+                    << ";"
+                    << (it)->second.background
+                    << "m";
         }
 
         output = ss.str();
@@ -330,8 +296,7 @@ std::string ProcessorAnsi::buildPullDownBars(int pulldown_id, bool active)
 /**
  * @brief // Clear Pull Down Bars once menu options are reset.
  */
-void ProcessorAnsi::clearPullDownBars()
-{
+void ProcessorAnsi::clearPullDownBars() {
     std::map<int, ScreenPixel>().swap(m_pull_down_options);
 }
 
@@ -340,8 +305,7 @@ void ProcessorAnsi::clearPullDownBars()
  * @brief Return the max rows used on the screen
  * @return
  */
-int ProcessorAnsi::getMaxRowsUsedOnScreen()
-{
+int ProcessorAnsi::getMaxRowsUsedOnScreen() {
     return m_max_y_position;
 }
 
@@ -349,8 +313,7 @@ int ProcessorAnsi::getMaxRowsUsedOnScreen()
 /**
  * @brief Parses through MCI Codes for Light bars and Char Parameters.
  */
-std::string ProcessorAnsi::screenBufferParse()
-{
+std::string ProcessorAnsi::screenBufferParse() {
     // Contains all matches found so we can iterate and replace
     // Without Multiple loops through the string.
     MapType my_matches;
@@ -367,9 +330,8 @@ std::string ProcessorAnsi::screenBufferParse()
 
     //std::cout << "exp: (\\|[0-9]{2}[%][0-9]{2}) " << std::endl;
     // Each Set of Codes for Expression Matches 1 set. will need more for char screens.
-    try
-    {
-        std::regex expr {"(\\|[0-9]{2}[%][0-9]{2})"};
+    try {
+        std::regex expr{"(\\|[0-9]{2}[%][0-9]{2})"};
 
         std::smatch matches;
         std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
@@ -378,8 +340,7 @@ std::string ProcessorAnsi::screenBufferParse()
 
         std::regex_constants::match_flag_type flags = std::regex_constants::match_default;
 
-        while(std::regex_search(start, end, matches, expr, flags))
-        {
+        while (std::regex_search(start, end, matches, expr, flags)) {
             // Found a match!
             /*
             std::cout << "Matched Sub '" << matches.str()
@@ -389,8 +350,7 @@ std::string ProcessorAnsi::screenBufferParse()
 
             // Avoid Infinite loop and make sure the existing
             // is not the same as the next!
-            if(start == matches[0].second)
-            {
+            if (start == matches[0].second) {
                 m_log.write<Logging::DEBUG_LOG>("[screenBufferParse] no matches!", __LINE__, __FILE__);
                 break;
             }
@@ -399,11 +359,9 @@ std::string ProcessorAnsi::screenBufferParse()
             start = matches[0].second;
 
             // Loop each match, and grab the starting position and length to replace.
-            for(size_t s = 1; s < matches.size(); ++s)
-            {
+            for (size_t s = 1; s < matches.size(); ++s) {
                 // Make sure the Match is true! otherwise skip.
-                if(matches[s].matched)
-                {
+                if (matches[s].matched) {
                     /*
                     offset = matches[s].first - ansi_string.begin();
                     length = matches[s].length();
@@ -418,8 +376,8 @@ std::string ProcessorAnsi::screenBufferParse()
                     // Add to Vector so we store each match.
                     my_matches.m_offset = matches[s].first - ansi_string.begin();
                     my_matches.m_length = matches[s].length();
-                    my_matches.m_match  = s;
-                    my_matches.m_code   = matches[s].str();
+                    my_matches.m_match = s;
+                    my_matches.m_code = matches[s].str();
 
                     // UTF-8. meed to use a utf8-distance to get actual char off-set to match
                     // screen buffer now vs. raw byte off-set.
@@ -433,9 +391,7 @@ std::string ProcessorAnsi::screenBufferParse()
                 }
             }
         }
-    }
-    catch(std::regex_error &ex)
-    {
+    } catch (std::regex_error &ex) {
         m_log.write<Logging::ERROR_LOG>("[screenBufferParse] regex=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
@@ -446,34 +402,29 @@ std::string ProcessorAnsi::screenBufferParse()
     // Clear Pulldown ID mapping.
     std::map<int, ScreenPixel>::iterator itr = m_pull_down_options.begin();
 
-    if(code_map.size() > 0)
-    {
-        while(itr != m_pull_down_options.end())
-        {
+    if (code_map.size() > 0) {
+        while (itr != m_pull_down_options.end()) {
             itr = m_pull_down_options.erase(itr);
         }
     }
 
-    while(code_map.size() > 0)
-    {
+    while (code_map.size() > 0) {
         // Loop Backwards to preserve string offsets on replacement.
         // Fastest to pop from back.
         my_matches = code_map.back();
         code_map.pop_back();
 
         // Handle parsing on expression match.
-        switch(my_matches.m_match)
-        {
+        switch (my_matches.m_match) {
             case 1:
-            // Then process and display the light bars.
+                // Then process and display the light bars.
             {
                 int pull_id = 0;
                 std::stringstream ss;
                 ss.str(my_matches.m_code.substr(1, 2));
                 ss >> pull_id;
 
-                if(ss.fail())
-                {
+                if (ss.fail()) {
                     ss.clear();
                     ss.ignore();
                     break;
@@ -481,13 +432,13 @@ std::string ProcessorAnsi::screenBufferParse()
 
                 // Grab the highlight color from the second sequence %##.
                 m_screen_buffer[my_matches.m_offset].selected_attribute =
-                    m_screen_buffer[my_matches.m_offset+3].attribute;
+                        m_screen_buffer[my_matches.m_offset + 3].attribute;
 
                 m_screen_buffer[my_matches.m_offset].selected_foreground =
-                    m_screen_buffer[my_matches.m_offset+3].foreground;
+                        m_screen_buffer[my_matches.m_offset + 3].foreground;
 
                 m_screen_buffer[my_matches.m_offset].selected_background =
-                    m_screen_buffer[my_matches.m_offset+3].background;
+                        m_screen_buffer[my_matches.m_offset + 3].background;
 
                 // tear out the y and x positions from the offset.
                 m_pull_down_options[pull_id] = m_screen_buffer[my_matches.m_offset];
@@ -512,18 +463,15 @@ std::string ProcessorAnsi::screenBufferParse()
  * @brief Plots Characters on the Screen into the Buffer.
  * @param c
  */
-void ProcessorAnsi::screenBufferSetGlyph(const std::string &char_sequence)
-{
+void ProcessorAnsi::screenBufferSetGlyph(const std::string &char_sequence) {
     // Keep track of the longest line in buffer for Centering screen.
-    if(m_x_position > m_max_x_position)
-    {
+    if (m_x_position > m_max_x_position) {
         m_max_x_position = m_x_position;
     }
 
     // catch screen screen scrolling here one shot.
     //if (m_y_position >= m_number_lines)
-    if(m_y_position > m_number_lines)
-    {
+    if (m_y_position > m_number_lines) {
         screenBufferScrollUp();
         //m_y_position = m_number_lines-1;
         m_y_position = m_number_lines;
@@ -536,28 +484,24 @@ void ProcessorAnsi::screenBufferSetGlyph(const std::string &char_sequence)
     screen_pixel.char_sequence = char_sequence;
     screen_pixel.x_position = m_x_position;
     screen_pixel.y_position = m_y_position;
-    screen_pixel.attribute  = m_attribute;
+    screen_pixel.attribute = m_attribute;
     screen_pixel.foreground = m_foreground_color;
     screen_pixel.background = m_background_color;
 
     // Setup current position in the screen buffer. 1 based for 0 based.
-    m_position = ((m_y_position-1) * m_characters_per_line) + (m_x_position-1);
+    m_position = ((m_y_position - 1) * m_characters_per_line) + (m_x_position - 1);
 
     // Add Sequence to Screen Buffer
-    try
-    {
-        if(m_position < (signed)m_screen_buffer.size())
-        {
+    try {
+        if (m_position < (signed) m_screen_buffer.size()) {
             m_screen_buffer.at(m_position) = screen_pixel;
+        } else {
+            m_log.write<Logging::ERROR_LOG>("[screenBufferSetGlyph] out of bounds pos=", m_x_position - 1, __LINE__,
+                                            __FILE__);
         }
-        else
-        {
-            m_log.write<Logging::ERROR_LOG>("[screenBufferSetGlyph] out of bounds pos=", m_x_position-1, __LINE__, __FILE__);
-        }
-    }
-    catch(std::exception &e)
-    {
-        m_log.write<Logging::ERROR_LOG>("[screenBufferSetGlyph] exceeds screen dimensions Exception=", e.what(), __LINE__, __FILE__);
+    } catch (std::exception &e) {
+        m_log.write<Logging::ERROR_LOG>("[screenBufferSetGlyph] exceeds screen dimensions Exception=", e.what(),
+                                        __LINE__, __FILE__);
     }
 
     // Clear for next sequences.
@@ -571,24 +515,19 @@ void ProcessorAnsi::screenBufferSetGlyph(const std::string &char_sequence)
     */
 
     // Move Cursor to next position after character insert.
-    if(m_x_position >= m_characters_per_line)
-    {
+    if (m_x_position >= m_characters_per_line) {
         // Move to next line
         m_x_position = 1;
         ++m_y_position;
-    }
-    else
-    {
+    } else {
         ++m_x_position;
     }
-
 }
 
 /*
  * Moves the Screen Buffer Up a line to match the internal SDL_Surface
  */
-void ProcessorAnsi::screenBufferScrollUp()
-{
+void ProcessorAnsi::screenBufferScrollUp() {
     //*** IMPORTANT (WIP), must add check for region scrolling only!
     //TheTerminal::Instance()->scrollRegionActive &&
     //                 y_position > TheTerminal::Instance()->bottomMargin))
@@ -598,13 +537,10 @@ void ProcessorAnsi::screenBufferScrollUp()
 
     // This remove the top line to scroll the screen up
     // And follow the SDL Surface!  later on add history for scroll back.
-    try
-    {
+    try {
         m_screen_buffer.erase(
             m_screen_buffer.begin(), m_screen_buffer.begin() + m_characters_per_line);
-    }
-    catch(std::exception &e)
-    {
+    } catch (std::exception &e) {
         m_log.write<Logging::ERROR_LOG>("[screenBufferScrollUp] Exception=", e.what(), __LINE__, __FILE__);
     }
 
@@ -615,9 +551,8 @@ void ProcessorAnsi::screenBufferScrollUp()
 /*
  * Clear Range of Screen Buffer for Erase Sequences.
  */
-void ProcessorAnsi::screenBufferClearRange(int start, int end)
-{
-    int startPosition = ((m_y_position-1) * m_characters_per_line) + (start);
+void ProcessorAnsi::screenBufferClearRange(int start, int end) {
+    int startPosition = ((m_y_position - 1) * m_characters_per_line) + (start);
     int endPosition = startPosition + (end - start);
 
     //std::cout << "start " << start << " end " << end
@@ -626,14 +561,10 @@ void ProcessorAnsi::screenBufferClearRange(int start, int end)
     // << std::endl;
 
     // Clear out entire line.
-    for(int i = startPosition; i < endPosition; i++)
-    {
-        try
-        {
+    for (int i = startPosition; i < endPosition; i++) {
+        try {
             m_screen_buffer[i].char_sequence = '\0';
-        }
-        catch(std::exception &e)
-        {
+        } catch (std::exception &e) {
             m_log.write<Logging::ERROR_LOG>("[screenBufferClearRange] Exception=", e.what(),
                                             "start=", start, "end=", end, __LINE__, __FILE__);
         }
@@ -643,8 +574,7 @@ void ProcessorAnsi::screenBufferClearRange(int start, int end)
 /**
  * @brief Clears the Buffer for Fresh Parsing.
  */
-void ProcessorAnsi::screenBufferClear()
-{
+void ProcessorAnsi::screenBufferClear() {
     // Allocate the Size
     m_screen_buffer.clear();
     m_screen_buffer.resize(m_number_lines * m_characters_per_line);
@@ -653,8 +583,7 @@ void ProcessorAnsi::screenBufferClear()
 /**
  * @brief Clears The Screen And Buffer
  */
-void ProcessorAnsi::clearScreen()
-{
+void ProcessorAnsi::clearScreen() {
     m_is_screen_cleared = true;
     screenBufferClear();
     m_x_position = 1;
@@ -666,24 +595,23 @@ void ProcessorAnsi::clearScreen()
  * @brief Parses screen data into the Screen Buffer.
  * @return
  */
-void ProcessorAnsi::parseTextToBuffer(char *buff)
-{
-    if(strlen(buff) == 0)
+void ProcessorAnsi::parseTextToBuffer(char *buff) {
+    if (strlen(buff) == 0)
         return;
 
     std::string esc_sequence = "";
 
-    int  param[10]             = {0};
-    int  p = 0, dig = 0;
+    int param[10] = {0};
+    int p = 0, dig = 0;
 
-    bool more_params           = false;
-    bool at_least_one_digit    = false;
-    bool first_param_implied   = false;
+    bool more_params = false;
+    bool at_least_one_digit = false;
+    bool first_param_implied = false;
 
     std::string incoming_data = std::string(
-                                    reinterpret_cast<const char *>(buff),
-                                    strlen((const char *)buff)
-                                );
+        reinterpret_cast<const char *>(buff),
+        strlen((const char *) buff)
+    );
 
     std::string::iterator it = incoming_data.begin();
     std::string::iterator line_end = incoming_data.end();
@@ -691,28 +619,23 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
     CommonIO common_io;
     LocalizedBuffer buffer;
 
-    while(it != line_end)
-    {
+    while (it != line_end) {
         common_io.getNextGlyph(buffer, it, line_end);
 
-        if(buffer.length == 1 && buffer.character[0] == '\x1b')
-        {
+        if (buffer.length == 1 && buffer.character[0] == '\x1b') {
             esc_sequence.erase();
             esc_sequence += buffer.character;
 
             common_io.getNextGlyph(buffer, it, line_end);
 
-            if(buffer.length == 0)
+            if (buffer.length == 0)
                 break;
 
             // grab the left bracket
-            if(buffer.length == 1 && buffer.character[0] == '?')
-            {
+            if (buffer.length == 1 && buffer.character[0] == '?') {
                 // Setup for ESC?7h or ESC?7l commands etc..
                 esc_sequence += buffer.character;
-            }
-            else if(buffer.length == 1 && buffer.character[0] == '[')
-            {
+            } else if (buffer.length == 1 && buffer.character[0] == '[') {
                 // Else Normal ESC Sequence, check parameters.
                 esc_sequence += buffer.character;
             }
@@ -729,33 +652,26 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
             first_param_implied = false;
             p = 0;
 
-            while(more_params == true)
-            {
+            while (more_params == true) {
                 at_least_one_digit = false;
                 common_io.getNextGlyph(buffer, it, line_end);
 
-                if(buffer.length == 0)
+                if (buffer.length == 0)
                     break;
 
-                for(dig = 0; dig < 3; dig++)
-                {
-                    if(buffer.length != 1 || !isdigit(buffer.character[0]))
+                for (dig = 0; dig < 3; dig++) {
+                    if (buffer.length != 1 || !isdigit(buffer.character[0]))
                         break;
 
                     at_least_one_digit = true;
 
                     // 3 digits at most (255) in a byte size decimal number */
-                    if(dig == 0)
-                    {
+                    if (dig == 0) {
                         param[p] = buffer.character[0] - '0';
-                    }
-                    else if(dig == 1)
-                    {
+                    } else if (dig == 1) {
                         param[p] *= 10;
                         param[p] += buffer.character[0] - '0';
-                    }
-                    else
-                    {
+                    } else {
                         param[p] *= 100;
                         param[p] += buffer.character[0] - '0';
                     }
@@ -768,53 +684,37 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
                 //   ESC[6C    p should = 1
                 //   ESC[1;1H  p should = 2
                 //   ESC[;79H  p should = 2
-                if(buffer.character[0] != '?')     // Skip Screen Wrap (The Draw)
+                if (buffer.character[0] != '?') // Skip Screen Wrap (The Draw)
                 {
-                    if((at_least_one_digit == true) &&
-                            (buffer.character[0] == ';'))
-                    {
+                    if ((at_least_one_digit == true) &&
+                        (buffer.character[0] == ';')) {
                         p++;
-                    }
-                    else if((!(at_least_one_digit == true)) &&
-                            (buffer.character[0] == ';'))
-                    {
+                    } else if ((!(at_least_one_digit == true)) &&
+                               (buffer.character[0] == ';')) {
                         p++;
                         first_param_implied = true;
-                    }
-                    else if(at_least_one_digit)
-                    {
+                    } else if (at_least_one_digit) {
                         p++;
                         more_params = false;
-                    }
-                    else
+                    } else
                         more_params = false;
                 }
 
                 esc_sequence += buffer.character;
-
             } // End While (more_params)
 
-            switch(buffer.character[0])
-            {
-
+            switch (buffer.character[0]) {
                 case CURSOR_POSITION:
                 case CURSOR_POSITION_ALT:
-                    if(p == 0)
-                    {
+                    if (p == 0) {
                         m_x_position = 1;
                         m_y_position = 1;
-                    }
-                    else if(p == 1)
-                    {
+                    } else if (p == 1) {
                         m_x_position = 1;
                         m_y_position = param[0];
-                    }
-                    else if(first_param_implied)
-                    {
+                    } else if (first_param_implied) {
                         m_x_position = param[1];
-                    }
-                    else
-                    {
+                    } else {
                         m_x_position = param[1];
                         m_y_position = param[0];
                     }
@@ -825,22 +725,16 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
 
                 case CURSOR_PREV_LIVE:
                 case CURSOR_UP:
-                    if(p == 0)
-                    {
-                        if(m_y_position > 1)
+                    if (p == 0) {
+                        if (m_y_position > 1)
                             --m_y_position;
-                    }
-                    else
-                    {
-                        if(param[0] > m_y_position)
-                        {
+                    } else {
+                        if (param[0] > m_y_position) {
                             m_y_position = 1;
-                        }
-                        else
-                        {
+                        } else {
                             m_y_position -= param[0];
 
-                            if(m_y_position < 1) m_y_position = 1;
+                            if (m_y_position < 1) m_y_position = 1;
                         }
                     }
 
@@ -849,23 +743,17 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
 
                 case CURSOR_NEXT_LINE:
                 case CURSOR_DOWN:
-                    if(p == 0)
-                    {
-                        if(m_y_position < m_number_lines)
+                    if (p == 0) {
+                        if (m_y_position < m_number_lines)
                             ++m_y_position;
-                    }
-                    else
-                    {
-                        if(param[0] > (m_number_lines) - m_y_position)
-                        {
+                    } else {
+                        if (param[0] > (m_number_lines) - m_y_position) {
                             //m_y_position = m_number_lines - 1;
                             m_y_position = m_number_lines;
-                        }
-                        else
-                        {
+                        } else {
                             m_y_position += param[0];
 
-                            if(m_y_position > m_number_lines) m_y_position = m_number_lines;
+                            if (m_y_position > m_number_lines) m_y_position = m_number_lines;
                         }
                     }
 
@@ -873,48 +761,34 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
                     break;
 
                 case CURSOR_FORWARD:
-                    if(p == 0)
-                    {
-                        if(m_x_position < m_characters_per_line)
+                    if (p == 0) {
+                        if (m_x_position < m_characters_per_line)
                             ++m_x_position;
-                    }
-                    else
-                    {
-                        if(param[0] > m_characters_per_line - m_x_position)
-                        {
+                    } else {
+                        if (param[0] > m_characters_per_line - m_x_position) {
                             m_x_position = m_characters_per_line;
-                        }
-                        else
-                        {
+                        } else {
                             m_x_position += param[0];
 
-                            if(m_x_position > m_characters_per_line) m_x_position = m_characters_per_line;
+                            if (m_x_position > m_characters_per_line) m_x_position = m_characters_per_line;
                         }
-
                     }
 
                     esc_sequence.clear();
                     break;
 
                 case CURSOR_BACKWARD:
-                    if(p == 0)
-                    {
-                        if(m_x_position > 1)
-                        {
+                    if (p == 0) {
+                        if (m_x_position > 1) {
                             --m_x_position;
                         }
-                    }
-                    else
-                    {
-                        if(param[0] > m_x_position)
-                        {
+                    } else {
+                        if (param[0] > m_x_position) {
                             m_x_position = 1;
-                        }
-                        else
-                        {
+                        } else {
                             m_x_position -= param[0];
 
-                            if(m_x_position < 1) m_x_position = 1;
+                            if (m_x_position < 1) m_x_position = 1;
                         }
                     }
 
@@ -940,7 +814,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
                     break;
 
                 case CURSOR_X_POSITION: // XTERM
-                    if(p == 0)
+                    if (p == 0)
                         m_x_position = 1;
                     else
                         m_x_position = param[0];
@@ -949,8 +823,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
                     break;
 
                 case ERASE_DISPLAY:
-                    if(param[0] == 2)
-                    {
+                    if (param[0] == 2) {
                         clearScreen();
                     }
 
@@ -971,19 +844,15 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
 
                     //position = ((y_position-1) * characters_per_line) + (x_position-1);
 
-                    if(p == 0)    // Change text attributes / All Attributes off
+                    if (p == 0) // Change text attributes / All Attributes off
                     {
                         m_attribute = 0;
                         m_foreground_color = FG_WHITE;
                         m_background_color = BG_BLACK;
-                    }
-                    else
-                    {
+                    } else {
                         //current_color = "\x1b[";
-                        for(int i = 0; i < p; i++)
-                        {
-                            switch(param[i])
-                            {
+                        for (int i = 0; i < p; i++) {
+                            switch (param[i]) {
                                 case 0: // All Attributes off
                                     m_attribute = 0;
                                     m_foreground_color = FG_WHITE;
@@ -1002,7 +871,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
                                     m_attribute = 3;
                                     break;
 
-                                case 4:	// UNDERSCORE
+                                case 4: // UNDERSCORE
                                     m_attribute = 4;
                                     break;
 
@@ -1114,10 +983,9 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
                                     m_background_color = BG_WHITE;
                                     break;
 
-                                default :
+                                default:
                                     m_attribute = param[i];
                                     break;
-
                             } // End Switch
                         } // End For
                     } // End Else
@@ -1127,18 +995,16 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
                 case RESET_MODE: // ?7h
                     esc_sequence.clear();
 
-                    if(param[0] == 7)
-                    {
+                    if (param[0] == 7) {
                         m_is_line_wrapping = false;
                     }
 
                     break;
 
-                case SET_MODE:  // ?7h  & 25 ?!?
+                case SET_MODE: // ?7h  & 25 ?!?
                     esc_sequence.clear();
 
-                    if(param[0] == 7)
-                    {
+                    if (param[0] == 7) {
                         m_is_line_wrapping = true;
                     }
 
@@ -1153,23 +1019,19 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
                     esc_sequence.clear();
                     // Rest are ignored.
                     break;
-
             } // End of Switch(c) Case Statements
-
         } // end of main escape sequence handler
-        else   // otherwise output character using current color */
+        else // otherwise output character using current color */
         {
-
             LocalizedBuffer nextBuffer;
 
             // Only Peak Next if were at CR.
-            if(buffer.character[0] == '\r')
+            if (buffer.character[0] == '\r')
                 common_io.peekNextGlyph(nextBuffer, it, line_end);
 
             // Handle New Line in ANSI Files properly.
-            if(buffer.length == 1 && nextBuffer.length == 1 &&
-                    buffer.character[0] == '\r' && nextBuffer.character[0] == '\n')
-            {
+            if (buffer.length == 1 && nextBuffer.length == 1 &&
+                buffer.character[0] == '\r' && nextBuffer.character[0] == '\n') {
                 *it++; // Increment to \n (2) char combo.
                 m_x_position = 1;
                 ++m_y_position;
@@ -1177,64 +1039,53 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
                 esc_sequence.erase();
 
                 // Set the Current Max Row Position.
-                if(m_max_y_position < m_y_position)
-                {
+                if (m_max_y_position < m_y_position) {
                     m_max_y_position = m_y_position;
                 }
 
                 // catch screen screen scrolling here one shot.
                 //if (m_y_position >= m_number_lines)
-                if(m_y_position > m_number_lines)
-                {
+                if (m_y_position > m_number_lines) {
                     screenBufferScrollUp();
                     //m_y_position = m_number_lines-1;
                     m_y_position = m_number_lines;
                 }
 
                 continue;
-            }
-            else if(buffer.length == 1 && buffer.character[0] == '\n')
-            {
+            } else if (buffer.length == 1 && buffer.character[0] == '\n') {
                 //m_x_position = 1;
                 ++m_y_position;
 
                 esc_sequence.erase();
 
                 // Set the Current Max Row Position.
-                if(m_max_y_position < m_y_position)
-                {
+                if (m_max_y_position < m_y_position) {
                     m_max_y_position = m_y_position;
                 }
 
                 // catch screen screen scrolling here one shot.
                 //if (m_y_position >= m_number_lines)
-                if(m_y_position > m_number_lines)
-                {
+                if (m_y_position > m_number_lines) {
                     screenBufferScrollUp();
                     //m_y_position = m_number_lines-1;
                     m_y_position = m_number_lines;
                 }
 
                 continue;
-            }
-
-            else if(buffer.length == 1 && buffer.character[0] == '\r')
-            {
+            } else if (buffer.length == 1 && buffer.character[0] == '\r') {
                 m_x_position = 1;
                 //++m_y_position;
 
                 esc_sequence.erase();
 
                 // Set the Current Max Row Position.
-                if(m_max_y_position < m_y_position)
-                {
+                if (m_max_y_position < m_y_position) {
                     m_max_y_position = m_y_position;
                 }
 
                 // catch screen screen scrolling here one shot.
                 //if (m_y_position >= m_number_lines)
-                if(m_y_position > m_number_lines)
-                {
+                if (m_y_position > m_number_lines) {
                     screenBufferScrollUp();
                     //m_y_position = m_number_lines-1;
                     m_y_position = m_number_lines;
@@ -1244,11 +1095,9 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
             }
 
             // Append Character to Screen Buffer.
-            if(buffer.character[0] != '\0' && buffer.length >= 1)
-            {
+            if (buffer.character[0] != '\0' && buffer.length >= 1) {
                 // Set the Current Max Row Position.
-                if(m_max_y_position < m_y_position)
-                {
+                if (m_max_y_position < m_y_position) {
                     m_max_y_position = m_y_position;
                 }
 
@@ -1257,11 +1106,10 @@ void ProcessorAnsi::parseTextToBuffer(char *buff)
 
             esc_sequence.erase();
         }
-    }   // end while !feof
+    } // end while !feof
 }
 
 
-std::map<int, int> ProcessorAnsi::getLineEndingMap() const
-{
+std::map<int, int> ProcessorAnsi::getLineEndingMap() const {
     return m_line_ending_map;
 }

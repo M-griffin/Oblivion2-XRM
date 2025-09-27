@@ -1,51 +1,44 @@
 #ifndef UUID_HPP
 #define UUID_HPP
 
-#include "encoding.hpp"
+#include <random>
+#include <sstream>
+#include <iomanip>
 
-extern "C"
-{
-#ifdef _WIN32
-// Winsock needed because Rpc includes windows.h.
-#include <winsock2.h>
-#include <Rpc.h>
-#else
-#include <uuid/uuid.h>
-#endif
-}
-
-#include <string>
-#include <cstring>
-
-
-
-class Uuid
-{
-
+class Uuid {
 public:
+    explicit Uuid() {
+    }
 
-    explicit Uuid() {}
-    ~Uuid() {}
+    ~Uuid() {
+    }
 
-    std::string createUuidString()
-    {
-#ifdef _WIN32
-        UUID uuid;
-        UuidCreate (&uuid);
+    std::string createUuidString() {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<uint32_t> dis(0, 0xFFFFFFFF);
 
-        unsigned char *id_string;
-        UuidToStringA(&uuid, &id_string);
+        uint32_t data[4];
+        for (int i = 0; i < 4; ++i) {
+            data[i] = dis(gen);
+        }
 
-        std::string uuid_string((char*)id_string);
-        RpcStringFreeA ( &id_string );
-#else
-        uuid_t uuid;
-        uuid_generate_random(uuid);
-        char uuid_string[37]={0};
-        uuid_unparse_lower(uuid, uuid_string);
-        uuid_clear(uuid);
-#endif
-        return std::string((char*)uuid_string);
+        std::stringstream ss;
+        ss << std::hex << std::setfill('0');
+
+        // 8-4-4-4-12 format
+        ss << std::setw(8) << (data[0])
+                << '-'
+                << std::setw(4) << ((data[1] >> 16) & 0xFFFF)
+                << '-'
+                << std::setw(4) << (((data[1] & 0xFFFF) & 0x0FFF) | 0x4000) // version 4
+                << '-'
+                << std::setw(4) << (((data[2] >> 16) & 0x0FFF) | 0x8000) // variant
+                << '-'
+                << std::setw(4) << (data[2] & 0xFFFF)
+                << std::setw(8) << (data[3]);
+
+        return ss.str();
     }
 };
 

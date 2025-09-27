@@ -6,7 +6,7 @@
 #include <exception>
 #include <cassert>
 
-#include "logging.hpp"
+#include "../logging.hpp"
 
 #include <yaml-cpp/yaml.h>
 

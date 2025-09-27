@@ -10,9 +10,8 @@
 
 #include "logging.hpp"
 
-MenuShell::MenuShell(session_ptr session_data)
-    : StateBase(session_data)
-    , MenuBase(session_data)
+MenuShell::MenuShell(Session &session)
+    : MenuBase(session)
     , m_log(Logging::getInstance())
 {
 }

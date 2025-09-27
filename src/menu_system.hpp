@@ -1,8 +1,6 @@
 #ifndef MENU_SYSTEM_HPP
 #define MENU_SYSTEM_HPP
 
-#include "state_base.hpp"
-
 #include <iostream>
 #include <memory>
 #include <stdint.h>
@@ -19,8 +17,6 @@
 class Logging;
 
 class Session;
-typedef std::shared_ptr<Session> session_ptr;
-
 
 /**
  * @class MenuSystem
@@ -29,22 +25,16 @@ typedef std::shared_ptr<Session> session_ptr;
  * @file menu_system.hpp
  * @brief Main Menu System State Handles Core Loop
  */
-class MenuSystem
-    : public StateBase
-    , public MenuBase
+class MenuSystem :
+    public MenuBase
 {
 public:
-    explicit MenuSystem(session_ptr session_data);
-    virtual ~MenuSystem() override;
+    explicit MenuSystem(Session &session);
+    ~MenuSystem();
 
-    virtual void update(const std::string &character_buffer, const bool &is_utf8) override;
-    virtual bool onEnter() override;
-    virtual bool onExit() override;
-
-    virtual std::string getStateID() const override
-    {
-        return m_stateID;
-    }
+    void update(const std::string &character_buffer, const bool &is_utf8) override;
+    bool onEnter() override;
+    bool onExit() override;
 
     Logging                  &m_log;
     static const std::string  m_stateID;
@@ -220,42 +210,42 @@ public:
     /**
      * @brief Exists and Shuts down the current module
      */
-    void startupModule(const module_ptr &module);
+    //void startupModule(const module_ptr &module);
 
     /**
      * @brief Starts up Logon Module
      */
-    void startupModulePreLogon();
+    //void startupModulePreLogon();
 
     /**
      * @brief Starts up Logon Module
      */
-    void startupModuleLogon();
+    //void startupModuleLogon();
 
     /**
      * @brief Starts up Signup Module
      */
-    void startupModuleSignup();
+    //void startupModuleSignup();
 
     /**
      * @brief Starts up Menu Editor
      */
-    void startupModuleMenuEditor();
+    //void startupModuleMenuEditor();
 
     /**
      * @brief Startup the User Editor Module
      */
-    void startupModuleUserEditor();
+    //void startupModuleUserEditor();
 
     /**
      * @brief Startup the Level Editor Module
      */
-    void startupModuleLevelEditor();
+    //void startupModuleLevelEditor();
 
     /**
      * @brief Startup the Full Screen Message Editor Module
      */
-    void startupModuleMessageEditor();
+    //void startupModuleMessageEditor();
 
     /**
      * @brief Handles Input for Login and PreLogin Sequences.

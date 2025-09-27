@@ -6,7 +6,7 @@
 #include "../model-sys/protocol.hpp"
 #include "../model-sys/access_level.hpp"
 #include "../model-app/oneliners.hpp"
-#include "../data-app/oneliners_dao.hpp"
+//#include "../data-app/oneliners_dao.hpp"
 
 // Needed for Initializing and checking users data is setup
 // On startup.
@@ -22,21 +22,16 @@
 #include "libSqliteWrapped.h"
 
 
-
-DbStartup::DbStartup()
-{
+DbStartup::DbStartup() {
 }
 
-DbStartup::~DbStartup()
-{
+DbStartup::~DbStartup() {
 }
 
 /**
  * @brief Setup for Database and Tables
  */
-bool DbStartup::initDatabaseTables()
-{
-
+bool DbStartup::initDatabaseTables() {
     // Setup Users Database name and path
     USERS_DATABASE = GLOBAL_DATA_PATH;
 
@@ -63,44 +58,38 @@ bool DbStartup::initDatabaseTables()
 
         // Verify if the security table exists.
         // Security must be present before user because of foreign key.
-        if(!security_dao.doesTableExist())
-        {
+        if (!security_dao.doesTableExist()) {
             log.write<Logging::CONSOLE_LOG>("doesn't exist (security table).");
 
             // Setup database Param, cache sizes etc..
-            if(!security_dao.firstTimeSetupParams())
-            {
+            if (!security_dao.firstTimeSetupParams()) {
                 log.write<Logging::ERROR_LOG>("unable to execute firstTimeSetupParams (security table).");
-                return(false);
+                return (false);
             }
 
             // Setup create users table and indexes.
-            if(!security_dao.createTable())
-            {
+            if (!security_dao.createTable()) {
                 log.write<Logging::ERROR_LOG>("unable to create (security table).");
-                return(false);
+                return (false);
             }
 
             log.write<Logging::CONSOLE_LOG>("security table created successfully.");
         }
 
         // Verify if the user table exists.
-        if(!user_dao.doesTableExist())
-        {
+        if (!user_dao.doesTableExist()) {
             log.write<Logging::CONSOLE_LOG>("doesn't exist (user table).");
 
             // Setup database Param, cache sizes etc..
-            if(!user_dao.firstTimeSetupParams())
-            {
+            if (!user_dao.firstTimeSetupParams()) {
                 log.write<Logging::ERROR_LOG>("unable to execute firstTimeSetupParams (user table).");
-                return(false);
+                return (false);
             }
 
             // Setup create users table and indexes.
-            if(!user_dao.createTable())
-            {
+            if (!user_dao.createTable()) {
                 log.write<Logging::ERROR_LOG>("unable to create (user table).");
-                return(false);
+                return (false);
             }
 
             log.write<Logging::CONSOLE_LOG>("user table created successfully.");
@@ -110,22 +99,19 @@ bool DbStartup::initDatabaseTables()
         SessionStatsDao session_stat_dao(user_database);
 
         // Verify if the user table exists.
-        if(!session_stat_dao.doesTableExist())
-        {
+        if (!session_stat_dao.doesTableExist()) {
             log.write<Logging::CONSOLE_LOG>("doesn't exist (session stats table).");
 
             // Setup database Param, cache sies etc..
-            if(!session_stat_dao.firstTimeSetupParams())
-            {
+            if (!session_stat_dao.firstTimeSetupParams()) {
                 log.write<Logging::ERROR_LOG>("unable to execute firstTimeSetupParams (session stats table).");
-                return(false);
+                return (false);
             }
 
             // Setup create users table and indexes.
-            if(!session_stat_dao.createTable())
-            {
+            if (!session_stat_dao.createTable()) {
                 log.write<Logging::ERROR_LOG>("unable to create (session stats table).");
-                return(false);
+                return (false);
             }
 
             log.write<Logging::CONSOLE_LOG>("session stats table created successfully.");
@@ -135,22 +121,19 @@ bool DbStartup::initDatabaseTables()
         AccessLevelDao access_dao(user_database);
 
         // Verify if the access_level table exists.
-        if(!access_dao.doesTableExist())
-        {
+        if (!access_dao.doesTableExist()) {
             log.write<Logging::CONSOLE_LOG>("doesn't exist (access_level table).");
 
             // Setup database Param, cache sizes etc..
-            if(!access_dao.firstTimeSetupParams())
-            {
+            if (!access_dao.firstTimeSetupParams()) {
                 log.write<Logging::ERROR_LOG>("unable to execute firstTimeSetupParams (access_level table).");
-                return(false);
+                return (false);
             }
 
             // Setup create users table and indexes.
-            if(!access_dao.createTable())
-            {
+            if (!access_dao.createTable()) {
                 log.write<Logging::ERROR_LOG>("unable to create (access_level table).");
-                return(false);
+                return (false);
             }
 
             log.write<Logging::CONSOLE_LOG>("access_level table created successfully.");
@@ -161,7 +144,7 @@ bool DbStartup::initDatabaseTables()
             // Set Initial Defaults for Not Validated Level
             // the reest are populated on Class Defaults.
             level->sName = "Not Validated";
-            level->sStartMenu ="top";
+            level->sStartMenu = "top";
             level->iLevel = 10;
             level->iTimeLimit = 120;
             level->bTimeLimit = true;
@@ -172,7 +155,7 @@ bool DbStartup::initDatabaseTables()
             level.reset();
             level = std::make_shared<AccessLevel>();
             level->sName = "Validated User";
-            level->sStartMenu ="top";
+            level->sStartMenu = "top";
             level->iLevel = 20;
             level->iTimeLimit = 1440;
             level->bTimeLimit = true;
@@ -183,7 +166,7 @@ bool DbStartup::initDatabaseTables()
             level.reset();
             level = std::make_shared<AccessLevel>();
             level->sName = "Sysop";
-            level->sStartMenu ="top";
+            level->sStartMenu = "top";
             level->iLevel = 255;
             level->iTimeLimit = 1440;
 
@@ -194,8 +177,7 @@ bool DbStartup::initDatabaseTables()
         protocols_ptr prots = std::make_shared<Protocols>();
         ProtocolDao protdb(prots, GLOBAL_DATA_PATH);
 
-        if(!protdb.fileExists())
-        {
+        if (!protdb.fileExists()) {
             log.write<Logging::CONSOLE_LOG>("Protocol configuration doesn't exist.");
 
             // Create Genric Protocol Entry to Test File Creation
@@ -210,22 +192,19 @@ bool DbStartup::initDatabaseTables()
 
         OnelinerDao oneLineDao(user_database);
 
-        if(!oneLineDao.doesTableExist())
-        {
+        if (!oneLineDao.doesTableExist()) {
             log.write<Logging::CONSOLE_LOG>("doesn't exist (oneliner table).");
 
             // Setup database Param, cache sizes etc..
-            if(!oneLineDao.firstTimeSetupParams())
-            {
+            if (!oneLineDao.firstTimeSetupParams()) {
                 log.write<Logging::ERROR_LOG>("unable to execute firstTimeSetupParams (oneliner table).");
-                return(false);
+                return (false);
             }
 
             // Setup create users table and indexes.
-            if(!oneLineDao.createTable())
-            {
+            if (!oneLineDao.createTable()) {
                 log.write<Logging::ERROR_LOG>("unable to create (oneliner table).");
-                return(false);
+                return (false);
             }
 
             log.write<Logging::CONSOLE_LOG>("oneliner table created successfully.");

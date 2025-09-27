@@ -6,9 +6,6 @@
 
 class Encrypt
 {
-
-private:
-
     #define SHA512_OUTPUT_BYTES 64
     #define ITERATION           1000
 
@@ -61,7 +58,5 @@ public:
     bool compare(std::string hash1, std::string hash2);
 
 };
-
-typedef std::shared_ptr<Encrypt> encrypt_ptr;
 
 #endif // ENCRYPTION_HPP

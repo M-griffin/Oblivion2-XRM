@@ -37,48 +37,42 @@
 #include "model-sys/structures.hpp"
 #include "model-sys/config.hpp"
 #include "data-sys/config_dao.hpp"
-#include "data-sys/db_startup.hpp"
+//#include "data-sys/db_startup.hpp"
 
-#include "communicator.hpp"
+//#include "communicator.hpp"
 #include "common_io.hpp"
 #include "logging.hpp"
 #include "tcp_server.hpp"
 
-std::string GLOBAL_BBS_PATH = "";
-std::string GLOBAL_DATA_PATH = "";
-std::string GLOBAL_MENU_PATH = "";
-std::string GLOBAL_MENU_PROMPT_PATH = "";
-std::string GLOBAL_TEXTFILE_PATH = "";
-std::string GLOBAL_SCRIPT_PATH = "";
-std::string GLOBAL_LOG_PATH = "";
-std::string USERS_DATABASE = "";
+std::string GLOBAL_BBS_PATH;
+std::string GLOBAL_DATA_PATH;
+std::string GLOBAL_MENU_PATH;
+std::string GLOBAL_MENU_PROMPT_PATH;
+std::string GLOBAL_TEXTFILE_PATH;
+std::string GLOBAL_SCRIPT_PATH;
+std::string GLOBAL_LOG_PATH;
+std::string USERS_DATABASE;
 
-
-std::string BUILD_INFO = "Oblivion/2 XRM-Server rev.2 build [00.00.153] Alpha Preview";
+std::string BUILD_INFO = "Oblivion/2 XRM-Server rev.3 build [00.00.00] Alpha Preview";
 
 /**
- * @brief Gracefull Shutdown Method.
+ * @brief Gracefully Shutdown Method.
  */
-void atExitFunction()
-{    
+void atExitFunction() {
     std::cout << std::endl << "XRM SHUTDOWN COMPLETED!" << std::endl;
 }
-
 
 /**
  * @brief Main Program Entrance.
  *        Not using Parameters at this time.  Enable lateron.
  * @return
  */
-auto main() -> int
-{
+auto main() -> int {
     // Setup Cleanup method when program exits.
     std::atexit(atExitFunction);
-    
-    Logging &m_log = Logging::getInstance();
-    m_log.write<Logging::CONSOLE_LOG>(BUILD_INFO);
 
-    {
+    Logging &m_log = Logging::getInstance();
+    m_log.write<Logging::CONSOLE_LOG>(BUILD_INFO); {
         CommonIO common;
         GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
     }
@@ -95,8 +89,7 @@ auto main() -> int
 #ifdef _WIN32
 
     // Create LOG Directory if it doesn't exist.
-    if(_mkdir(GLOBAL_LOG_PATH.c_str()) != 0 && errno != EEXIST)
-    {
+    if (_mkdir(GLOBAL_LOG_PATH.c_str()) != 0 && errno != EEXIST) {
         m_log.write<Logging::WARN_LOG>("Unable to create LOG folder=", GLOBAL_LOG_PATH);
     }
 
@@ -108,73 +101,52 @@ auto main() -> int
         m_log.write<Logging::WARN_LOG>("Unable to create LOG folder=", GLOBAL_LOG_PATH);
     }
 
-#endif  
+#endif
 
-    // Loading and saving default Configuration file to XML
-    {
-        config_ptr config = std::make_shared<Config>();
-        
-        if(!config)
-        {
-            m_log.write<Logging::ERROR_LOG>("Unable to allocate config object");
-            exit(1);
-        }
-
-        // Handle to Data Access Object,  at the moment were not using directories
-        // Setup in the config, everything is branched from the main path.
-        // Later on we'll check config for overrides only.
-        ConfigDao cfg(config, GLOBAL_BBS_PATH);
-
-        if(!cfg.fileExists())
-        {
-            cfg.saveConfig(config);
-        }
-
-        // Load Config and lets do some validation
-        cfg.loadConfig();
-
-        if(!cfg.validation())
-        {
-            m_log.write<Logging::ERROR_LOG>("Config Object validation failed!");
-            exit(1);
-        }
-
-        // All Good, Attached to Global Communicator Instance.
-        //Communicator::getInstance().attachConfiguration(config);
-        m_log.write<Logging::CONSOLE_LOG>("Starting up Oblivion/2 XRM-Server");
-    }
-    
     // Database Startup in it's own context.
     {
-        db_startup_ptr db = std::make_shared<DbStartup>();
-        bool db_startup = db->initDatabaseTables();
+        /*
+                DbStartup db;
+                bool db_startup = db.initDatabaseTables();
 
-        // Write all error logs and exit.
-        if(!db_startup)
+                // Write all error logs and exit.
+                if (!db_startup) {
+                    m_log.write<Logging::ERROR_LOG>("Database Startup failed, exiting...");
+                    exit(1);
+                }
+            }*/
+
+        // Isolate to code block for smart pointer deallocation.
         {
-            m_log.write<Logging::ERROR_LOG>("Database Startup failed, exiting...");
-            return 0;
+            Config config;
+            ConfigDao cfg(config, GLOBAL_BBS_PATH);
+
+            if (!cfg.fileExists()) {
+                cfg.saveConfig(config);
+            }
+
+            // Load Config and lets do some validation
+            cfg.loadConfig();
+
+            if (!cfg.validation()) {
+                m_log.write<Logging::ERROR_LOG>("Config Object validation failed!");
+                exit(1);
+            }
+
+            Uint16 maxClients = 10;
+            Logging::getInstance().setLoggingLevel(config.logging_level);
+
+            m_log.write<Logging::CONSOLE_LOG>("Starting up Oblivion/2 XRM-Server", "port", config.port_telnet,
+                "max_sessions", maxClients);
+
+            TcpServer server(config.port_telnet, maxClients);
+            if (server.start()) {
+                server.run();
+            } else {
+                m_log.write<Logging::ERROR_LOG>("TCP Startup failed, exiting...");
+            }
         }
+
+        exit(0);
     }
-
-    // Isolate to code block for smart pointer deallocation.
-    {
-//        int port = Communicator::getInstance().getConfiguration()->port_telnet;
-        int port = 6023;
-        int maxClients = 10;
-        //std::string logging_level = Communicator::getInstance().getConfiguration()->logging_level;
-        //Logging::getInstance().setLoggingLevel(logging_level);
-        TcpServer server(port, maxClients);
-        
-        if (server.start())
-        {
-            server.run();
-        }
-        else
-        {
-            m_log.write<Logging::ERROR_LOG>("TCP Startup failed, exiting...");
-        }
-    }
-
-    return 0;
 }

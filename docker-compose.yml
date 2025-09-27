@@ -9,4 +9,4 @@ services:
       context: .
       dockerfile: Dockerfile.linux-image.build
     ports:
-    - 6023:6023
+      - 6023:6023

@@ -1,1 +1,0 @@
-This folder contains initial data conversions for obv2 data fils to new xrm format.

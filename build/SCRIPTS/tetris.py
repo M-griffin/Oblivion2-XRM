@@ -2,6 +2,7 @@
 __author__ = 'Johannes Lundberg'
 __copyright__ = 'Copyright 2007-2013'
 __license__ = 'Public Domain'
+
 # Single player tetris, originally written for The Progressive (prsv), the
 # predecessor python bbs system of x/84.
 # Copyright (C) 2007-2013 Johannes Lundberg
@@ -13,14 +14,13 @@ from sys import stdin
 
 
 def main():
-    #from x84.bbs import getsession, getterminal, echo
-    #session, term = getsession(), getterminal()
-    #session.activity = 'playing tetris'
-
+    # from x84.bbs import getsession, getterminal, echo
+    # session, term = getsession(), getterminal()
+    # session.activity = 'playing tetris'
 
     while True:
         play()
-    
+
         # Testing the pyGetKey Functions
         bbs_io.pyPipe2Ansi('|CS|CR|11Tetris was ported in python from x/84 for Enthral BBS.')
         bbs_io.pyPipe2Ansi('|CR|07Thanks to x/84 for open code, check out |15telnet://1984.ws')
@@ -31,19 +31,18 @@ def main():
         while True:
             ch = bbs_io.pyGetKey()
             ch = chr(int(ch))
-        
-            if ch in ('y','Y'):
+
+            if ch in ('y', 'Y'):
                 break
-            elif ch in ('n','N'):
+            elif ch in ('n', 'N'):
                 return
-            
-    
+
     #    if score[0] > 0:
     #        register_score(session.user.handle, score)
     #    show_scores()
 
 
-#def register_score(handle, score):
+# def register_score(handle, score):
 #    from x84.bbs import DBProxy
 #    db = DBProxy('tetris')
 #    if not handle in db:
@@ -52,7 +51,7 @@ def main():
 #        db[handle] = score
 
 
-#def show_scores():
+# def show_scores():
 #    from x84.bbs import DBProxy, Pager, getterminal
 #    from x84.bbs import getch, echo, getsession, ini
 #    session, term = getsession(), getterminal()
@@ -133,9 +132,9 @@ def play():
     import time
     from random import randint
     import os
-    #from x84.bbs import getterminal, getch, from_cp437, AnsiWindow, syncterm_setfont
-    #from x84.bbs import echo as echo_unbuffered
-    #term = getterminal()
+    # from x84.bbs import getterminal, getch, from_cp437, AnsiWindow, syncterm_setfont
+    # from x84.bbs import echo as echo_unbuffered
+    # term = getterminal()
     field = []
     global charcache
     charcache = ''
@@ -312,6 +311,7 @@ def play():
             r.y1 = None
             r.x2 = None
             r.y2 = None
+
     rr = RectRedraw()
     for _ in range(field_height):
         field.append([0] * field_width)
@@ -319,46 +319,46 @@ def play():
     def echo(s):
         global charcache
         charcache += s
-    #assert term.height > (field_height + 1)
-    #echo_unbuffered(u''.join((
+
+    # assert term.height > (field_height + 1)
+    # echo_unbuffered(u''.join((
     #    u'\r\n\r\n',
     #    u'REAdY YOUR tERMiNAl %s ' % (term.bold_blue('(!)'),),
     #    u'\r\n\r\n',
     #    u'%s PRESS ANY kEY' % (term.bold_black('...'),),
-    #)))
-       
-    
-    #getch()
+    # )))
+
+    # getch()
     # set syncterm font to cp437
-    #if term.kind.startswith('ansi'):
+    # if term.kind.startswith('ansi'):
     #    echo_unbuffered(syncterm_setfont('cp437'))
-    #artfile = os.path.join(os.path.dirname(__file__), 'art', 'tetris.ans')
-    #echo_unbuffered(u'\r\n' * term.height)  # cls
-    #if os.path.exists(artfile):
+    # artfile = os.path.join(os.path.dirname(__file__), 'art', 'tetris.ans')
+    # echo_unbuffered(u'\r\n' * term.height)  # cls
+    # if os.path.exists(artfile):
     #    echo_unbuffered(from_cp437(open(artfile).read()).rstrip())
-    
+
     # Turn off the Cursor
-    bbs_io.pyPipe2Ansi('\x1b[?25l') 
-    
+    bbs_io.pyPipe2Ansi('\x1b[?25l')
+
     # Display Welcome Message
     bbs_io.pyPipe2Ansi('|CS|CR|CR|09REAdY YOUR tERMiNAl! |CR|CR|03PRESS ANY kEY')
 
     # get key from user, wait for input.
     bbs_io.pyGetKey()
-    
+
     # Clear the Screen First
     bbs_io.pyPipe2Ansi('|CS')
-    
+
     # Display ANSI screen .ans extension is assumed.
     bbs_io.pyAnsiPrintf('tetris')
 
     def gotoxy(x, y):
-        #echo(term.move(y, x))
-        echo('|XY%02d%02d' % (x+1, y+1))
+        # echo(term.move(y, x))
+        echo('|XY%02d%02d' % (x + 1, y + 1))
 
     def plotblock(color, lastcolor):
         if color:
-            #c = u'\u2588\u2588'  # '\xDB\xDB'
+            # c = u'\u2588\u2588'  # '\xDB\xDB'
             c = chr(219) + chr(219)
         else:  # both empty
             c = '  '
@@ -390,22 +390,22 @@ def play():
             for x in range(field_width):
                 color = field[y][x] + field[y + 1][x] * 8
                 if field[y][x] and field[y + 1][x]:
-                    #c = u'\u2588'  # '\xDB'
-                    #c = '_'
+                    # c = u'\u2588'  # '\xDB'
+                    # c = '_'
                     c = chr(219)
                     if field[y][x] == field[y + 1][x]:
                         color = color % 8
                     else:
-                        #c = u'\u2580'  # '\xDF'
-                        #c = '-'
+                        # c = u'\u2580'  # '\xDF'
+                        # c = '-'
                         c = chr(223)
                 elif field[y][x] and not field[y + 1][x]:
-                    #c = u'\u2580'  # '\xDF'
-                    #c = '+'
+                    # c = u'\u2580'  # '\xDF'
+                    # c = '+'
                     c = chr(223)
                 elif not field[y][x] and field[y + 1][x]:
-                    #c = u'\u2584'  # '\xDC'
-                    #c = '-'
+                    # c = u'\u2584'  # '\xDC'
+                    # c = '-'
                     c = chr(220)
                 else:  # both empty
                     c = ' '
@@ -426,16 +426,16 @@ def play():
                     echo('\x1b[0;' + fg + bg + 'm')
                     echo(c)
                     lastcolor = color
-        #echo(term.normal)
-        echo('|07|16') # reset background color
+        # echo(term.normal)
+        echo('|07|16')  # reset background color
 
     layoutcolor = [7, 2, 7, 6, 3, 6, 3]
     # p    = -1  # Current piece type
     nextpiece = randint(0, len(layout) - 1)
     p = randint(0, len(layout) - 1)
     p = 1
-    r = 0   # Current rotation
-    xpos = 4   # X position
+    r = 0  # Current rotation
+    xpos = 4  # X position
     # ypos = -2  # Y position
     ypos = -len(layout[p][0])
     level = 1
@@ -444,7 +444,7 @@ def play():
 
     def flush():
         global charcache
-        #echo_unbuffered(charcache)
+        # echo_unbuffered(charcache)
         bbs_io.pyPipe2Ansi(charcache)
         charcache = ''
 
@@ -502,8 +502,8 @@ def play():
             gotoxy(26, 18 + y)
             echo(' ' * 4)
 
-        #echo(term.color(layoutcolor[p]))
-        #echo('|04')
+        # echo(term.color(layoutcolor[p]))
+        # echo('|04')
         bbs_io.pyPipe2Ansi('|%02d' % (layoutcolor[p]))
 
         yoffset = int(len(layout[p][r][0]) < 4)
@@ -513,25 +513,25 @@ def play():
                 val = layout[p][r][y][x]
                 if val:
                     gotoxy(26 + x + xoffset, 18 + y + yoffset)
-                    #echo(u'\u2588\u2588')
-                    #echo('**')
+                    # echo(u'\u2588\u2588')
+                    # echo('**')
                     echo(chr(219))
                     echo(chr(219))
 
     def drawstats():
-        #echo(term.move(scorey1, scorex1) + '%d' % level)
-        #echo(term.move(scorey1 + 2, scorex1) + '%d' % lines)
-        #echo(term.move(scorey1 + 3, scorex1) + '%d' % score)
-        bbs_io.pyPipe2Ansi('|XY%02d%02d%d' % (scorex1, scorey1+1, level))
-        bbs_io.pyPipe2Ansi('|XY%02d%02d%d' % (scorex1, scorey1+3, lines))
-        bbs_io.pyPipe2Ansi('|XY%02d%02d%d' % (scorex1, scorey1+4, score))
+        # echo(term.move(scorey1, scorex1) + '%d' % level)
+        # echo(term.move(scorey1 + 2, scorex1) + '%d' % lines)
+        # echo(term.move(scorey1 + 3, scorex1) + '%d' % score)
+        bbs_io.pyPipe2Ansi('|XY%02d%02d%d' % (scorex1, scorey1 + 1, level))
+        bbs_io.pyPipe2Ansi('|XY%02d%02d%d' % (scorex1, scorey1 + 3, lines))
+        bbs_io.pyPipe2Ansi('|XY%02d%02d%d' % (scorex1, scorey1 + 4, score))
 
     drawstats()
     ticksize = 0.4
     nexttick = time.time() + ticksize
     showpiece(xpos, ypos, p, r)
     gotoxy(26, 17)
-    #echo(term.blue_reverse('next'))
+    # echo(term.blue_reverse('next'))
     echo('|09|17n|00|17ext|07|16')
     shownext(nextpiece)
 
@@ -550,9 +550,9 @@ def play():
         echo(buf)
         buf = ''
         flush()
-        #key = getch(slice + 0.01)
-        
-        if stdin in select([stdin], [], [], slice + 0.01)[0]:   
+        # key = getch(slice + 0.01)
+
+        if stdin in select([stdin], [], [], slice + 0.01)[0]:
             key = bbs_io.pyGetKey()
             if key != '':
                 # if we got an escape sequence, then reassign the key
@@ -560,11 +560,11 @@ def play():
                     # Get Extended Sequence
                     key = bbs_io.pyGetKeyExtended()
                 else:
-                    #translate int to char value.
+                    # translate int to char value.
                     key = chr(int(key))
-        else:        
+        else:
             key = ''
-        
+
         now = time.time()
         # hidepiece()
         if key is not None:
@@ -588,7 +588,7 @@ def play():
                         c += 1
                 if c:
                     nexttick = time.time() + ticksize
-        
+
         # New tick?
         if now > nexttick:
             nexttick += ticksize
@@ -598,28 +598,26 @@ def play():
             if not moved:
                 # Is the player dead?
                 if ypos <= -len(layout[p][0]):
-         
-                    # Full Redraw       
+                    # Full Redraw
                     bbs_io.pyPipe2Ansi('|XY3324|12!! |04gAME OVeR |12!!|07')
-                    
+
                     bbs_io.pyGetKey()
-                     
-                
-#                    death_win = AnsiWindow(height=6, width=40,
-#                                           yloc=fieldy1 + 10 / 2, xloc=fieldx1 - 11)
-#                    death_win.colors['border'] = term.bold_black
-#                    echo_unbuffered(death_win.clear() + death_win.border())
-#                    echo_unbuffered(
-#                        term.move(fieldy1 + 10 / 2 + 1, fieldx1 - 11))
-#                    echo_unbuffered((
-#                                    u'!! gAME OVeR!! Score was: %i' % (score,)).center(40))
-#                    echo_unbuffered(
-#                        term.move(fieldy1 + 10 / 2 + 3, fieldx1 - 11))
-#                    echo_unbuffered(u'press RETURN'.center(40))
-#                    while True:
-#                        inp = getch()
-#                        if inp in (u'\r', term.KEY_ENTER):
-#                            break
+
+                    #                    death_win = AnsiWindow(height=6, width=40,
+                    #                                           yloc=fieldy1 + 10 / 2, xloc=fieldx1 - 11)
+                    #                    death_win.colors['border'] = term.bold_black
+                    #                    echo_unbuffered(death_win.clear() + death_win.border())
+                    #                    echo_unbuffered(
+                    #                        term.move(fieldy1 + 10 / 2 + 1, fieldx1 - 11))
+                    #                    echo_unbuffered((
+                    #                                    u'!! gAME OVeR!! Score was: %i' % (score,)).center(40))
+                    #                    echo_unbuffered(
+                    #                        term.move(fieldy1 + 10 / 2 + 3, fieldx1 - 11))
+                    #                    echo_unbuffered(u'press RETURN'.center(40))
+                    #                    while True:
+                    #                        inp = getch()
+                    #                        if inp in (u'\r', term.KEY_ENTER):
+                    #                            break
                     return (score, level, lines)
 
                 # Any complete rows to remove?
@@ -658,16 +656,13 @@ def play():
                 showpiece(xpos, ypos, p, r)
                 shownext(nextpiece)
 
+
 # Start Main Loop
 main()
 
 # Turn cursor back on
 bbs_io.pyPipe2Ansi('\x1b[?25h')
-bbs_io.pyPipe2Ansi('|07|16')  
+bbs_io.pyPipe2Ansi('|07|16')
 
 # Garbage Collection to free memory
 gc.collect()
-
-
-
-

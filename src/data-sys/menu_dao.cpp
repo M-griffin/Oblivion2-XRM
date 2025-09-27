@@ -8,7 +8,7 @@
 #include <cassert>
 
 #include "../model-sys/menu.hpp"
-#include "logging.hpp"
+#include "../logging.hpp"
 
 // Setup the file version for the config file.
 const std::string Menu::FILE_VERSION = "1.0.1";
