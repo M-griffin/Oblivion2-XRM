@@ -4,7 +4,6 @@
 #include <fstream>
 #include <string>
 #include <algorithm>
-#include <mutex>
 #include <cassert>
 
 #include "../model-sys/menu.hpp"
@@ -13,18 +12,13 @@
 // Setup the file version for the config file.
 const std::string Menu::FILE_VERSION = "1.0.1";
 
-MenuDao::MenuDao(menu_ptr menu, const std::string &menu_name, const std::string &path)
+MenuDao::MenuDao(Menu &menu, const std::string &menu_name, const std::string &path)
     : m_log(Logging::getInstance())
     , m_menu(menu)
     , m_path(path)
     , m_filename(menu_name)
 {
 }
-
-MenuDao::~MenuDao()
-{
-}
-
 
 /**
  * @brief Helper, appends forward/backward slash to path
@@ -68,7 +62,7 @@ bool MenuDao::fileExists()
  * @param cfg
  * @return
  */
-bool MenuDao::saveMenu(menu_ptr menu)
+bool MenuDao::saveMenu(Menu &menu)
 {
     std::string path = m_path;
     pathSeperator(path);
@@ -81,20 +75,20 @@ bool MenuDao::saveMenu(menu_ptr menu)
     out << YAML::Flow;
 
     // Start Creating the Key/Value Output for the Menu File.
-    out << YAML::Key << "file_version" << YAML::Value << menu->file_version;
-    out << YAML::Key << "menu_name" << YAML::Value << menu->menu_name;
-    out << YAML::Key << "menu_password" << YAML::Value << menu->menu_password;
-    out << YAML::Key << "menu_fall_back" << YAML::Value << menu->menu_fall_back;
-    out << YAML::Key << "menu_help_file" << YAML::Value << menu->menu_help_file;
-    out << YAML::Key << "menu_acs_string" << YAML::Value << menu->menu_acs_string;
-    out << YAML::Key << "menu_prompt" << YAML::Value << menu->menu_prompt;
-    out << YAML::Key << "menu_title" << YAML::Value << menu->menu_title;
-    out << YAML::Key << "menu_pulldown_file" << YAML::Value << menu->menu_pulldown_file;
+    out << YAML::Key << "file_version" << YAML::Value << menu.file_version;
+    out << YAML::Key << "menu_name" << YAML::Value << menu.menu_name;
+    out << YAML::Key << "menu_password" << YAML::Value << menu.menu_password;
+    out << YAML::Key << "menu_fall_back" << YAML::Value << menu.menu_fall_back;
+    out << YAML::Key << "menu_help_file" << YAML::Value << menu.menu_help_file;
+    out << YAML::Key << "menu_acs_string" << YAML::Value << menu.menu_acs_string;
+    out << YAML::Key << "menu_prompt" << YAML::Value << menu.menu_prompt;
+    out << YAML::Key << "menu_title" << YAML::Value << menu.menu_title;
+    out << YAML::Key << "menu_pulldown_file" << YAML::Value << menu.menu_pulldown_file;
 
     // Loop and encode each menu option
-    for(unsigned int i = 0; i < menu->menu_options.size(); i++)
+    for(unsigned int i = 0; i < menu.menu_options.size(); i++)
     {
-        auto &opt = menu->menu_options[i];
+        auto &opt = menu.menu_options[i];
 
         out << YAML::Key << "menu_option";
         out << YAML::Value << YAML::BeginMap;
@@ -158,21 +152,21 @@ bool MenuDao::deleteMenu()
  */
 void MenuDao::encode(const Menu &rhs)
 {
-    m_menu->file_version        = rhs.file_version;
-    m_menu->menu_name           = rhs.menu_name;
-    m_menu->menu_password       = rhs.menu_password;
-    m_menu->menu_fall_back      = rhs.menu_fall_back;
-    m_menu->menu_help_file      = rhs.menu_help_file;
-    m_menu->menu_acs_string     = rhs.menu_acs_string;
-    m_menu->menu_prompt         = rhs.menu_prompt;
-    m_menu->menu_title          = rhs.menu_title;
-    m_menu->menu_pulldown_file  = rhs.menu_pulldown_file;
-    m_menu->menu_options        = rhs.menu_options;
+    m_menu.file_version        = rhs.file_version;
+    m_menu.menu_name           = rhs.menu_name;
+    m_menu.menu_password       = rhs.menu_password;
+    m_menu.menu_fall_back      = rhs.menu_fall_back;
+    m_menu.menu_help_file      = rhs.menu_help_file;
+    m_menu.menu_acs_string     = rhs.menu_acs_string;
+    m_menu.menu_prompt         = rhs.menu_prompt;
+    m_menu.menu_title          = rhs.menu_title;
+    m_menu.menu_pulldown_file  = rhs.menu_pulldown_file;
+    m_menu.menu_options        = rhs.menu_options;
 
     // Now Sort All Menu Options once they have been loaded.
     // Unfortunately YAML does not keep ordering properly.
     sort(
-        m_menu->menu_options.begin(), m_menu->menu_options.end(),
+        m_menu.menu_options.begin(), m_menu.menu_options.end(),
         [ ](const MenuOption& lhs, const MenuOption& rhs)
     {
         return lhs.index < rhs.index;

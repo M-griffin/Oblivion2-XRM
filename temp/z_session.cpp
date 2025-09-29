@@ -13,7 +13,7 @@
 #include "async_io.hpp"
 #include "socket_handler.hpp"
 #include "session_manager.hpp"
-#include "../src/telnet_decoder.hpp"
+#include "../src/telnet_session.hpp"
 #include "../src/menu_system.hpp"
 
 #include "../src/logging.hpp"
@@ -50,7 +50,7 @@ Session::Session(async_io_ptr my_async_io, session_manager_ptr my_session_manage
 {
     // Setup Shared Pointers
     m_state_manager = std::make_shared<StateManager>();
-    m_telnet_decoder = std::make_shared<TelnetDecoder>(my_async_io);
+    m_telnet_decoder = std::make_shared<TelnetSession>(my_async_io);
     m_user_record = std::make_shared<Users>();  
     
     if(m_async_io->isActive())

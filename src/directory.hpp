@@ -109,6 +109,4 @@ private:
     mutable std::mutex m;
 };
 
-typedef std::shared_ptr<Directory> directory_ptr;
-
-#endif // DIRECTORY_HPP
+#endif

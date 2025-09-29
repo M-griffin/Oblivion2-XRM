@@ -1,8 +1,6 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
-#include <memory>
-#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -160,31 +158,31 @@ public:
             case INFO_LOG:
                 details.push_back(INFO_LEVEL);
                 details.push_back(log_string);
-                writeOutYamlConsole(date_time, details);
+                writeOutConsole(date_time, details);
                 break;
 
             case DEBUG_LOG:
                 details.push_back(DEBUG_LEVEL);
                 details.push_back(log_string);
-                writeOutYamlConsole(date_time, details);
+                writeOutConsole(date_time, details);
                 break;
 
             case WARN_LOG:
                 details.push_back(WARN_LEVEL);
                 details.push_back(log_string);
-                writeOutYamlConsole(date_time, details);             
+                writeOutConsole(date_time, details);
                 break;
                 
             case ERROR_LOG:
                 details.push_back(ERROR_LEVEL);
                 details.push_back(log_string);
-                writeOutYamlConsole(date_time, details);             
+                writeOutConsole(date_time, details);
                 break;
 
             case CONSOLE_LOG:
                 details.push_back(CONSOLE_LEVEL);
                 details.push_back(log_string);
-                writeOutYamlConsole(date_time, details);
+                writeOutConsole(date_time, details);
                 break;
 
             default:
@@ -202,8 +200,12 @@ public:
      * @param date_time
      * @param details
      */
-    void writeOutYamlConsole(const std::string &date_time, std::vector<std::string> &details);
+    void writeOutConsole(const std::string &date_time, std::vector<std::string> &details);
 
+    Logging(const Logging&) = delete;             // Copy ctor
+    Logging(Logging&&) = delete;                  // Move ctor
+    Logging& operator=(const Logging&) = delete;  // Copy assignment
+    Logging& operator=(Logging&&) = delete;       // Move assignment
 
 private:
 
@@ -214,13 +216,7 @@ private:
      * @brief Constructor for the Singleton.
      * @return 
      */
-    
     explicit Logging();
-
-    Logging(const Logging&) = delete;             // Copy ctor
-    Logging(Logging&&) = delete;                  // Move ctor
-    Logging& operator=(const Logging&) = delete;  // Copy assignment
-    Logging& operator=(Logging&&) = delete;       // Move assignment
 
 };
 

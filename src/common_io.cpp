@@ -54,7 +54,7 @@ CommonIO::CommonIO()
     , m_is_new_getline(true)
     , m_is_new_leadoff(true)
 {
-    popuateInputSequenceMap();
+    populateInputSequenceMap();
 }
 
 CommonIO::~CommonIO()
@@ -71,7 +71,7 @@ CommonIO::~CommonIO()
 /**
  * @brief Setup a Static GLobal Map for Key Input that can be resued.
  */
-void CommonIO::popuateInputSequenceMap() 
+void CommonIO::populateInputSequenceMap()
 {
     if (INPUT_SEQUENCE_MAP.size() > 0) 
     {

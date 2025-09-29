@@ -1,9 +1,10 @@
 /**
- * Oblivion/2 XRM rev.2 (c) 2015-2023 Michael Griffin
+ * Oblivion/2 XRM (c) 2015-2025 Michael Griffin
  * A Telnet Server and BBS system modeled after Oblivion/2 bbs software.
  *
  * XRM = Extreme Remake!
  * Compiles under MingW32/64 g++ >= 5.1.0
+ * Now using CMAKE
  *
  * LIBS:
  * Sqlite3
@@ -17,16 +18,12 @@
  *
  * List All Exit Error Codes here.
  * Error Exit Codes (1) Unable to Load Configuration File.
- * Error Exit Codes (2) Unable to use Fallback IPv4 Acceptor (Accept Connections).
+ * Error Exit Codes (2) Unable to Startup Networking
  */
 
-#include <map>
 #include <string>
-#include <memory>
 #include <cstdlib>
 #include <iostream>
-#include <chrono>
-#include <exception>
 
 #ifndef _WIN32
 #include <sys/stat.h>
@@ -34,15 +31,23 @@
 #include <direct.h>
 #endif
 
+#ifdef _WIN32
+#include <winsock2.h>
+#include <windows.h>
+#else
+#include <csignal>
+#include <functional>
+#include <unordered_map>
+#endif
+
 #include "model-sys/structures.hpp"
 #include "model-sys/config.hpp"
 #include "data-sys/config_dao.hpp"
-//#include "data-sys/db_startup.hpp"
 
-//#include "communicator.hpp"
 #include "common_io.hpp"
 #include "logging.hpp"
 #include "tcp_server.hpp"
+#include "data-sys/db_startup.hpp"
 
 std::string GLOBAL_BBS_PATH;
 std::string GLOBAL_DATA_PATH;
@@ -53,7 +58,7 @@ std::string GLOBAL_SCRIPT_PATH;
 std::string GLOBAL_LOG_PATH;
 std::string USERS_DATABASE;
 
-std::string BUILD_INFO = "Oblivion/2 XRM-Server rev.3 build [00.00.00] Alpha Preview";
+std::string BUILD_INFO = "Oblivion/2 XRM-Server Rev.3 build [00.03.01] Alpha Preview";
 
 /**
  * @brief Gracefully Shutdown Method.
@@ -61,6 +66,77 @@ std::string BUILD_INFO = "Oblivion/2 XRM-Server rev.3 build [00.00.00] Alpha Pre
 void atExitFunction() {
     std::cout << std::endl << "XRM SHUTDOWN COMPLETED!" << std::endl;
 }
+
+#ifdef _WIN32
+// Windows requires a static callback
+static BOOL WINAPI CtrlHandler(DWORD ctrlType) {
+
+    std::cout << "\nSignal received: " << ctrlType << std::endl;
+
+    if (ctrlType == CTRL_C_EVENT) {
+        std::cout << "\n[CTRL+C] Graceful shutdown requested" << std::endl;
+        TCPServer::getInstance().stop();
+        std::exit(0);
+    }
+    if (ctrlType == CTRL_BREAK_EVENT) {
+        std::cout << "\n[CTRL+BREAK] Graceful shutdown requested" << std::endl;
+        TCPServer::getInstance().stop();
+        std::exit(0);
+    }
+    if (ctrlType == CTRL_CLOSE_EVENT) {
+        std::cout << "\n[CTRL+CLOSE] Graceful shutdown requested" << std::endl;
+        TCPServer::getInstance().stop();
+        std::exit(0);
+    }
+    if (ctrlType == CTRL_LOGOFF_EVENT) {
+        std::cout << "\n[CTRL+LOGOFF] Graceful shutdown requested" << std::endl;
+        TCPServer::getInstance().stop();
+        std::exit(0);
+    }
+    if (ctrlType == CTRL_SHUTDOWN_EVENT) {
+        std::cout << "\n[CTRL+SHUTDOWN] Graceful shutdown requested" << std::endl;
+        TCPServer::getInstance().stop();
+        std::exit(0);
+    }
+
+    return FALSE;
+}
+#endif
+
+bool setupSignalHandlers() {
+#ifdef _WIN32
+    if (!SetConsoleCtrlHandler(CtrlHandler, TRUE)) {
+        std::cerr << "[Server] Failed to set Windows CTRL+C handler" << std::endl;
+        return false;
+    }
+#else
+    // Linux/Unix: Use sigaction for reliable signal handling
+    struct sigaction sa {};
+    sa.sa_handler = [](int signal) {
+        if (signal == SIGINT || signal == SIGTERM) {
+            // Use a global pointer or static registry if truly needed
+            std::cout << "\n[SIGINT] Graceful shutdown requested" << std::endl;
+            TCPServer::getInstance().stop();
+            std::exit(0);
+        }
+    };
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+
+    if (sigaction(SIGINT, &sa, nullptr) < 0) {
+        std::cerr << "[Server] Failed to set SIGINT handler\n";
+        return false;
+    }
+
+    if (sigaction(SIGTERM, &sa, nullptr) < 0) {
+        std::cerr << "[Server] Failed to set SIGTERM handler\n";
+        return false;
+    }
+#endif
+    return true;
+}
+
+
 
 /**
  * @brief Main Program Entrance.
@@ -103,50 +179,54 @@ auto main() -> int {
 
 #endif
 
-    // Database Startup in it's own context.
+    // Database Startup in its own context.
     {
-        /*
-                DbStartup db;
-                bool db_startup = db.initDatabaseTables();
+        DBStartUp db;
+        bool db_startup = db.initDatabaseTables();
 
-                // Write all error logs and exit.
-                if (!db_startup) {
-                    m_log.write<Logging::ERROR_LOG>("Database Startup failed, exiting...");
-                    exit(1);
-                }
-            }*/
+        // Write all error logs and exit.
+        if (!db_startup) {
+            m_log.write<Logging::ERROR_LOG>("Database Startup failed, exiting...");
+            exit(1);
+        }
+    }
 
-        // Isolate to code block for smart pointer deallocation.
-        {
-            Config config;
-            ConfigDao cfg(config, GLOBAL_BBS_PATH);
 
-            if (!cfg.fileExists()) {
-                cfg.saveConfig(config);
-            }
+    // Isolate to code block for smart pointer deallocation.
+    {
+        Config config;
+        ConfigDao cfg(config, GLOBAL_BBS_PATH);
 
-            // Load Config and lets do some validation
-            cfg.loadConfig();
-
-            if (!cfg.validation()) {
-                m_log.write<Logging::ERROR_LOG>("Config Object validation failed!");
-                exit(1);
-            }
-
-            Uint16 maxClients = 10;
-            Logging::getInstance().setLoggingLevel(config.logging_level);
-
-            m_log.write<Logging::CONSOLE_LOG>("Starting up Oblivion/2 XRM-Server", "port", config.port_telnet,
-                "max_sessions", maxClients);
-
-            TcpServer server(config.port_telnet, maxClients);
-            if (server.start()) {
-                server.run();
-            } else {
-                m_log.write<Logging::ERROR_LOG>("TCP Startup failed, exiting...");
-            }
+        if (!cfg.fileExists()) {
+            cfg.saveConfig(config);
         }
 
-        exit(0);
+        // Load Config and lets do some validation
+        cfg.loadConfig();
+
+        if (!cfg.validation()) {
+            m_log.write<Logging::ERROR_LOG>("Config Object validation failed!");
+            exit(1);
+        }
+
+        Uint16 maxClients = 10;
+        Logging::getInstance().setLoggingLevel(config.logging_level);
+
+        m_log.write<Logging::CONSOLE_LOG>("Starting up XRM-Server", "port", config.port_telnet,
+            "max_sessions", maxClients);
+
+        if (!setupSignalHandlers()) {
+            m_log.write<Logging::ERROR_LOG>("XRM-Server Startup failed setting signal handlers, exiting...");
+        }
+
+        TCPServer &server = TCPServer::getInstance();
+        if (server.start(config.port_telnet, 10)) {
+            server.run(config);
+        } else {
+            m_log.write<Logging::ERROR_LOG>("XRM-Server Startup failed, exiting...");
+            exit(2);
+        }
     }
+
+    exit(0);
 }

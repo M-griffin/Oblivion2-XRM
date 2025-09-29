@@ -185,4 +185,4 @@ public:
     }
 };
 
-#endif // MENU_DATA_HPP
+#endif

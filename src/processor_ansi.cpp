@@ -26,7 +26,7 @@
 
 #include "utf-cpp/utf8.h"
 
-ProcessorAnsi::ProcessorAnsi(int term_height, int term_width)
+ProcessorAnsi::ProcessorAnsi(const int term_height, const int term_width)
     : ProcessorBase(term_height, term_width) {
     m_log.write<Logging::DEBUG_LOG>("PROCESSOR_ANSI rows=", term_height, "cols=", term_width);
     m_screen_buffer.reserve((m_number_lines * m_characters_per_line) + 1);
@@ -44,6 +44,12 @@ ProcessorAnsi::~ProcessorAnsi() {
     std::map<int, int>().swap(m_line_ending_map);
 }
 
+void ProcessorAnsi::resize(const int term_height, const int term_width) {
+    m_number_lines = term_height;
+    m_characters_per_line = term_width;
+    m_screen_buffer.reserve((m_number_lines * m_characters_per_line) + 1);
+    m_screen_buffer.resize((m_number_lines * m_characters_per_line) + 1);
+}
 
 /**
  * @brief Buffer to String for Parsing
@@ -132,7 +138,7 @@ void ProcessorAnsi::screenBufferDisplayTest() {
  * @param clearScreen
  * @return
  */
-int ProcessorAnsi::getMCIOffSet(std::string mci_code) {
+int ProcessorAnsi::getMCIOffSet(std::string mciCode) {
     unsigned int max = (m_x_position + (m_y_position * m_characters_per_line));
 
     for (unsigned int i = 0; i < m_screen_buffer.size(); i++) {
@@ -143,9 +149,9 @@ int ProcessorAnsi::getMCIOffSet(std::string mci_code) {
 
         // Check for MCI Code, if it matches, return position.
         if (i + 2 < max) {
-            if (m_screen_buffer[i].char_sequence[0] == (unsigned char) mci_code[0] &&
-                m_screen_buffer[i + 1].char_sequence[0] == (unsigned char) mci_code[1] &&
-                m_screen_buffer[i + 2].char_sequence[0] == (unsigned char) mci_code[2]) {
+            if (m_screen_buffer[i].char_sequence[0] == (unsigned char) mciCode[0] &&
+                m_screen_buffer[i + 1].char_sequence[0] == (unsigned char) mciCode[1] &&
+                m_screen_buffer[i + 2].char_sequence[0] == (unsigned char) mciCode[2]) {
                 return i + 1;
             }
         }
@@ -245,15 +251,14 @@ std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen) {
 
 /**
  * @brief Build the string for Light bar coors and colors.
- * @param pulldown_id
+ * @param pulldownId
+ * @param active
  * @return
  */
-std::string ProcessorAnsi::buildPullDownBars(int pulldown_id, bool active) {
+std::string ProcessorAnsi::buildPullDownBars(int pulldownId, bool active) {
     std::string output = "";
     std::stringstream ss;
-
-    std::map<int, ScreenPixel>::iterator it;
-    it = m_pull_down_options.find(pulldown_id);
+    const auto it = m_pull_down_options.find(pulldownId);
 
     // If We have the pulldown ID
     if (it != m_pull_down_options.end()) {
@@ -264,7 +269,7 @@ std::string ProcessorAnsi::buildPullDownBars(int pulldown_id, bool active) {
                 << (it)->second.x_position
                 << "H";
 
-        // Next Color Depending if it's the selected bar.
+        // Next Color Depending on if it's the selected bar.
         if (active) {
             ss << "\x1b["
                     << (it)->second.selected_attribute
@@ -392,7 +397,7 @@ std::string ProcessorAnsi::screenBufferParse() {
             }
         }
     } catch (std::regex_error &ex) {
-        m_log.write<Logging::ERROR_LOG>("[screenBufferParse] regex=", ex.what(), ex.code(), __LINE__, __FILE__);
+        //m_log.write<Logging::ERROR_LOG>("[screenBufferParse] regex=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
     // All Global MCI Codes likes standard screens and colors will
@@ -463,13 +468,13 @@ std::string ProcessorAnsi::screenBufferParse() {
  * @brief Plots Characters on the Screen into the Buffer.
  * @param c
  */
-void ProcessorAnsi::screenBufferSetGlyph(const std::string &char_sequence) {
+void ProcessorAnsi::screenBufferSetGlyph(const std::string &charSequence) {
     // Keep track of the longest line in buffer for Centering screen.
     if (m_x_position > m_max_x_position) {
         m_max_x_position = m_x_position;
     }
 
-    // catch screen screen scrolling here one shot.
+    // catch screen scrolling here one shot.
     //if (m_y_position >= m_number_lines)
     if (m_y_position > m_number_lines) {
         screenBufferScrollUp();
@@ -481,7 +486,7 @@ void ProcessorAnsi::screenBufferSetGlyph(const std::string &char_sequence) {
     }
 
     ScreenPixel screen_pixel;
-    screen_pixel.char_sequence = char_sequence;
+    screen_pixel.char_sequence = charSequence;
     screen_pixel.x_position = m_x_position;
     screen_pixel.y_position = m_y_position;
     screen_pixel.attribute = m_attribute;
@@ -599,7 +604,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
     if (strlen(buff) == 0)
         return;
 
-    std::string esc_sequence = "";
+    std::string escSequence = "";
 
     int param[10] = {0};
     int p = 0, dig = 0;
@@ -623,8 +628,8 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
         common_io.getNextGlyph(buffer, it, line_end);
 
         if (buffer.length == 1 && buffer.character[0] == '\x1b') {
-            esc_sequence.erase();
-            esc_sequence += buffer.character;
+            escSequence.erase();
+            escSequence += buffer.character;
 
             common_io.getNextGlyph(buffer, it, line_end);
 
@@ -634,10 +639,10 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
             // grab the left bracket
             if (buffer.length == 1 && buffer.character[0] == '?') {
                 // Setup for ESC?7h or ESC?7l commands etc..
-                esc_sequence += buffer.character;
+                escSequence += buffer.character;
             } else if (buffer.length == 1 && buffer.character[0] == '[') {
                 // Else Normal ESC Sequence, check parameters.
-                esc_sequence += buffer.character;
+                escSequence += buffer.character;
             }
 
             /*
@@ -676,7 +681,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                         param[p] += buffer.character[0] - '0';
                     }
 
-                    esc_sequence += buffer.character;
+                    escSequence += buffer.character;
                     common_io.getNextGlyph(buffer, it, line_end);
                 }
 
@@ -700,7 +705,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                         more_params = false;
                 }
 
-                esc_sequence += buffer.character;
+                escSequence += buffer.character;
             } // End While (more_params)
 
             switch (buffer.character[0]) {
@@ -720,7 +725,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                     }
 
                     //screen_buff.esc_sequence += esc_sequence;
-                    esc_sequence.clear();
+                    escSequence.clear();
                     break;
 
                 case CURSOR_PREV_LIVE:
@@ -738,7 +743,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                         }
                     }
 
-                    esc_sequence.clear();
+                    escSequence.clear();
                     break;
 
                 case CURSOR_NEXT_LINE:
@@ -757,7 +762,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                         }
                     }
 
-                    esc_sequence.clear();
+                    escSequence.clear();
                     break;
 
                 case CURSOR_FORWARD:
@@ -774,7 +779,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                         }
                     }
 
-                    esc_sequence.clear();
+                    escSequence.clear();
                     break;
 
                 case CURSOR_BACKWARD:
@@ -792,7 +797,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                         }
                     }
 
-                    esc_sequence.clear();
+                    escSequence.clear();
                     break;
 
                 case SAVE_CURSOR_POS:
@@ -801,7 +806,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                     m_saved_attribute = m_attribute;
                     m_saved_foreground = m_foreground_color;
                     m_saved_background = m_background_color;
-                    esc_sequence.clear();
+                    escSequence.clear();
                     break;
 
                 case RESTORE_CURSOR_POS:
@@ -810,7 +815,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                     m_attribute = m_saved_attribute;
                     m_foreground_color = m_saved_foreground;
                     m_background_color = m_saved_background;
-                    esc_sequence.clear();
+                    escSequence.clear();
                     break;
 
                 case CURSOR_X_POSITION: // XTERM
@@ -819,7 +824,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                     else
                         m_x_position = param[0];
 
-                    esc_sequence.clear();
+                    escSequence.clear();
                     break;
 
                 case ERASE_DISPLAY:
@@ -827,20 +832,20 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                         clearScreen();
                     }
 
-                    esc_sequence.clear();
+                    escSequence.clear();
                     break;
 
                 case ERASE_TO_EOL:
                     //clreol ();
                     //screen_buff.esc_sequence += esc_sequence;
-                    esc_sequence.clear();
+                    escSequence.clear();
                     break;
 
                 case SET_GRAPHICS_MODE:
                     // Rebuild ESC Sequences and Attach Character Position
                     // So when we draw out the ansi we can keep track
                     // Of what color everything is.
-                    esc_sequence.erase(); // Ignore ESC in color, we get that separately.
+                    escSequence.erase(); // Ignore ESC in color, we get that separately.
 
                     //position = ((y_position-1) * characters_per_line) + (x_position-1);
 
@@ -993,7 +998,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                     break;
 
                 case RESET_MODE: // ?7h
-                    esc_sequence.clear();
+                    escSequence.clear();
 
                     if (param[0] == 7) {
                         m_is_line_wrapping = false;
@@ -1002,7 +1007,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                     break;
 
                 case SET_MODE: // ?7h  & 25 ?!?
-                    esc_sequence.clear();
+                    escSequence.clear();
 
                     if (param[0] == 7) {
                         m_is_line_wrapping = true;
@@ -1011,12 +1016,12 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                     break;
 
                 case SET_KEYBOARD_STRINGS:
-                    esc_sequence.clear();
+                    escSequence.clear();
                     // Ignored!
                     break;
 
                 default:
-                    esc_sequence.clear();
+                    escSequence.clear();
                     // Rest are ignored.
                     break;
             } // End of Switch(c) Case Statements
@@ -1036,7 +1041,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                 m_x_position = 1;
                 ++m_y_position;
 
-                esc_sequence.erase();
+                escSequence.erase();
 
                 // Set the Current Max Row Position.
                 if (m_max_y_position < m_y_position) {
@@ -1056,7 +1061,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                 //m_x_position = 1;
                 ++m_y_position;
 
-                esc_sequence.erase();
+                escSequence.erase();
 
                 // Set the Current Max Row Position.
                 if (m_max_y_position < m_y_position) {
@@ -1076,7 +1081,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                 m_x_position = 1;
                 //++m_y_position;
 
-                esc_sequence.erase();
+                escSequence.erase();
 
                 // Set the Current Max Row Position.
                 if (m_max_y_position < m_y_position) {
@@ -1104,7 +1109,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                 screenBufferSetGlyph(buffer.character);
             }
 
-            esc_sequence.erase();
+            escSequence.erase();
         }
     } // end while !feof
 }

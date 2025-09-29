@@ -7,7 +7,7 @@
 #include <sstream>
 #include <memory>
 
-#include "session.hpp"
+#include "tcp_session.hpp"
 #include "common_io.hpp"
 #include "encoding.hpp"
 #include "logging.hpp"
@@ -16,45 +16,17 @@
 #include "utf-cpp/utf8.h"
 
 
-SessionIO::SessionIO()
+SessionIO::SessionIO(TCPSession &session, CommonIO &common_io)
     : m_log(Logging::getInstance())
-    , m_session_data(nullptr)
-    , m_common_io(nullptr)
-{
-    m_common_io = std::make_shared<CommonIO>();
-}
-
-SessionIO::SessionIO(session_ptr session_data)
-    : m_log(Logging::getInstance())
-    , m_session_data(session_data)
-    , m_common_io(nullptr)
-{
-    m_common_io = std::make_shared<CommonIO>();
-}
-
-SessionIO::SessionIO(session_ptr session_data, common_io_ptr common_io)
-    : m_log(Logging::getInstance())
-    , m_session_data(session_data)
+    , m_session(session)
     , m_common_io(common_io)
-{
-}
-
+{}
 
 SessionIO::~SessionIO()
 {
     m_log.write<Logging::DEBUG_LOG>("~SessionIO()");
     m_mapped_codes.clear();
     std::map<std::string, std::string>().swap(m_mapped_codes);
-    
-    // Conditional on Constructor. Check and Clear if used and not nullptr.
-    if (m_common_io)
-    {
-        m_common_io.reset();    
-    }
-    if (m_session_data)
-    {
-        m_session_data.reset();
-    }
 }
 
 /**
@@ -64,7 +36,7 @@ SessionIO::~SessionIO()
  */
 std::string SessionIO::getFSEKeyInput(const std::string &character_buffer)
 {    
-    std::string input = m_common_io->parseInput(character_buffer);
+    std::string input = m_common_io.parseInput(character_buffer);
 
     if(input.size() == 0)
     {
@@ -78,7 +50,7 @@ std::string SessionIO::getFSEKeyInput(const std::string &character_buffer)
 
     if(input[0] == '\x1b')
     {
-        escape_sequence = m_common_io->getFSEEscapeSequence();
+        escape_sequence = m_common_io.getFSEEscapeSequence();
 
         m_log.write<Logging::DEBUG_LOG>("FSE escape_sequence=", escape_sequence);
 
@@ -105,7 +77,7 @@ std::string SessionIO::getFSEKeyInput(const std::string &character_buffer)
  */
 std::string SessionIO::getKeyInput(const std::string &character_buffer)
 {
-    std::string input = m_common_io->parseInput(character_buffer);
+    std::string input = m_common_io.parseInput(character_buffer);
 
     if(input.size() == 0)
     {
@@ -119,7 +91,7 @@ std::string SessionIO::getKeyInput(const std::string &character_buffer)
 
     if(input[0] == '\x1b')
     {
-        escape_sequence = m_common_io->getEscapeSequence();
+        escape_sequence = m_common_io.getEscapeSequence();
 
         if(escape_sequence.size() == 0)
         {
@@ -166,7 +138,7 @@ void SessionIO::createInputField(std::string &field_name, int &len)
     }
 
     // Format Input Field, if color is enabled, otherwise just add Field Name like "Login: "
-    if(!m_session_data->m_is_use_ansi)
+    if(!m_session.getUseAnsi())
     {
         sprintf(formatted, "%s", (char *)field_name.c_str()); // Field Name
         field_name = formatted;
@@ -209,7 +181,7 @@ void SessionIO::createInputField(std::string &field_name, int &len)
     }
 
     // Override Foreground/Background Input Field Colors
-    // This is now for OBV/2 .. Not in Legacy.
+    // This is now for OBV/2 - Not in Legacy.
     position = field_name.find("|FB",0);
     m_log.write<Logging::DEBUG_LOG>("createInputField() |FB position=", position, "compare=", position+4, stringSize);
 
@@ -282,8 +254,8 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
                                      std::string leadoff,
                                      bool hidden)
 {
-    // Setup the leadoff, if it's first time, then print it out
-    // Other if empty or follow-up calls to inputfield field skip it!
+    // Set up the lead off, if it's first time, then print it out
+    // Other if empty or follow-up calls to input field field skip it!
     static bool is_leadoff = true;
 
     if(leadoff.size() == 0)
@@ -291,22 +263,22 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
         is_leadoff = false;
     }
 
-    // Display Leadoff of field.. ie.. 'Mail to: Mercyful Name'
+    // Display Lead off of field.. ie.. 'Mail to: Mercyful Name'
     // put the name in the field.
     if(is_leadoff)
     {
-        m_session_data->deliver(leadoff);
+        m_session.send(leadoff);
         is_leadoff = false;
     }
 
-    std::string string_data = m_common_io->getLine(character_buffer, length, leadoff, hidden);
+    std::string string_data = m_common_io.getLine(character_buffer, length, leadoff, hidden);
 
     if((signed)string_data.size() > 0)
     {
         // Check for ESC for Abort!
         if(string_data[0] == 27 && string_data.size() == 1)
         {
-            std::string esc_sequence = m_common_io->getEscapeSequence();
+            std::string esc_sequence = m_common_io.getEscapeSequence();
 
             if(esc_sequence.size() == 0 && character_buffer[0] == '\0')
             {
@@ -319,7 +291,7 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
         // Check for Completed Field Entry
         else if((string_data[0] == '\n' && string_data.size() == 1) || character_buffer[0] == '\n')
         {
-            result = m_common_io->getInputBuffer();
+            result = m_common_io.getInputBuffer();
             string_data.erase();
             is_leadoff = true;    // Reset for next run
             return "\n";
@@ -806,7 +778,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
                 if(result.size() != 0)
                 {
                     // Replace the Color, if not ansi then remove the color!
-                    if(m_session_data->m_is_use_ansi)
+                    if(m_session.getUseAnsi())
                     {
                         ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
                     }
@@ -1228,7 +1200,7 @@ std::string SessionIO::parseTextPrompt(const M_StringPair &prompt)
     std::string mci_code = "|PD";
 
     // If Description Flag is in Prompt, then replace code with Description
-    m_common_io->parseLocalMCI(text_prompt, mci_code, prompt.first);
+    m_common_io.parseLocalMCI(text_prompt, mci_code, prompt.first);
 
     // Return full mci code parsing on the new string.
     return pipe2ansi(text_prompt);

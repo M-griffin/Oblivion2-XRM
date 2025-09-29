@@ -1,14 +1,10 @@
 #ifndef MENU_PROMPT_HPP
 #define MENU_PROMPT_HPP
 
-#include <memory>
 #include <fstream>
 #include <string>
-#include <vector>
-#include <iostream>
 
 #include <yaml-cpp/yaml.h>
-
 
 /**
  * @class MenuPrompt
@@ -38,7 +34,7 @@ public:
         , data_line3("")
     { }
 
-    ~MenuPrompt() { }
+    ~MenuPrompt() = default;
 };
 
 
@@ -58,7 +54,7 @@ struct convert<MenuPrompt>
     /**
      * @brief Override for encoding the Menu Class
      *        This is not used as it makes the map on a single line!
-     *        Instead Key/Value is done in the ConfigDao on save.
+     *        Instead, Key/Value is done in the ConfigDao on save.
      * @param rhs
      * @return
      */
@@ -93,7 +89,4 @@ struct convert<MenuPrompt>
 };
 }
 
-typedef std::shared_ptr<MenuPrompt> menu_prompt_ptr;
-typedef std::weak_ptr<MenuPrompt> menu_prompt_wptr;
-
-#endif // MENU_HPP
+#endif

@@ -2,23 +2,15 @@
 #define SESSION_IO_HPP
 
 #include <vector>
-#include <memory>
 #include <string>
 #include <map>
 
+#include "common_io.hpp"
+#include "telnet_session.hpp"
 #include "model-sys/structures.hpp"
 
 class Logging;
-
-class Session;
-typedef std::shared_ptr<Session> session_ptr;
-
-class CommonIO;
-typedef std::shared_ptr<CommonIO> common_io_ptr;
-
-class Config;
-typedef std::shared_ptr<Config> config_ptr;
-
+class TCPSession;
 
 /**
  * @class SessionIO
@@ -27,16 +19,13 @@ typedef std::shared_ptr<Config> config_ptr;
  * @file session_io.hpp
  * @brief Higher Level I/O specific to Menu Interfaces
  */
-class SessionIO
-{
+class SessionIO {
 public:
-
     // Types for Text Prompt formatting to file.
     typedef std::pair<std::string, std::string> M_StringPair;
 
-    explicit SessionIO();
-    SessionIO(session_ptr session_data);
-    SessionIO(session_ptr session_data, common_io_ptr common_io);
+    SessionIO(TCPSession &session, CommonIO &common_io);
+
     ~SessionIO();
 
     /**
@@ -73,10 +62,10 @@ public:
     * @return
     */
     std::string getInputField(const std::string &character_buffer, // Input.
-                              std::string &result,      // Returned at [ENTER]
-                              int length = 30,          // Default 30 Bytes
+                              std::string &result, // Returned at [ENTER]
+                              int length = 30, // Default 30 Bytes
                               std::string leadoff = "", // Default None
-                              bool hidden = false);     // Default Not hidden
+                              bool hidden = false); // Default Not hidden
 
     /**
      * @brief Parses for ANSI Foreground Colors
@@ -137,7 +126,8 @@ public:
 
     /**
     * @brief Parsed Pipe Codes with 1 or 2 Digits
-    * @param pipe_code
+    * @param code
+    * @param value
     * @return
     */
     std::string parsePipeWithCharsDigits(const std::string &code, int value);
@@ -245,8 +235,7 @@ public:
 
     /**
      * @brief Stores Key (MCI Code) Value (String for Replacement) in Mapping
-     * @param key
-     * @param value
+     * @param prompt
      * @return
      */
     std::string parseTextPrompt(const M_StringPair &prompt);
@@ -254,7 +243,8 @@ public:
 
     /**
      * @brief Parses Text Prompt String Pair
-     * @param prompt
+     * @param key
+     * @param value
      * @return
      */
     void addMCIMapping(const std::string &key, const std::string &value);
@@ -272,16 +262,17 @@ public:
     int getMCIMappingCount();
 
     // Internal Methods
-    Logging                           &m_log;
-    session_ptr                        m_session_data; // SessionData
-    common_io_ptr                      m_common_io;    // CommonIO
+    Logging &m_log;
+    TCPSession &m_session;
+    CommonIO &m_common_io;
     std::map<std::string, std::string> m_mapped_codes; // MCI Code Translation for specific screens.
 
-    const std::string STD_EXPRESSION = {"([|]{1}[0-9]{2})|([|]{1}[X][Y][0-9]{4})|"
-                                        "([|]{1}[A-Z]{1,2}[0-9]{1,2})|([|]{1}[A-Z]{2})|"
-                                        "([%]{2}[\\w]+[.]{1}[\\w]{3})|([%]{1}[A-Z]{2})|"
-                                        "([%]{1}[0-9]{2})"
-                                       };
+    const std::string STD_EXPRESSION = {
+        "([|]{1}[0-9]{2})|([|]{1}[X][Y][0-9]{4})|"
+        "([|]{1}[A-Z]{1,2}[0-9]{1,2})|([|]{1}[A-Z]{2})|"
+        "([%]{2}[\\w]+[.]{1}[\\w]{3})|([%]{1}[A-Z]{2})|"
+        "([%]{1}[0-9]{2})"
+    };
 
     const std::string MID_EXPRESSION = {"([|]{1}[A-Z]{1}[0-9]{1,2})|([|]{1}[A-Z]{2})"};
 
@@ -290,8 +281,4 @@ public:
     const std::string FORMAT_EXPRESSION = {"([[]{1}[\\w\\W]+[]]{1})|([:]{1})"};
 };
 
-
-
-
-
-#endif // MENU_IO_HPP
+#endif

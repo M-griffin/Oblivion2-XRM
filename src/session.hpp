@@ -5,27 +5,34 @@
 
 #include "model-sys/config.hpp"
 #include "sdl2_net/SDL_net.hpp"
+#include "logging.hpp"
 
 class Session {
 public:
-    Session(TCPsocket socket, int nodeNumber, Config &config)
-        : m_socket{socket}, m_nodeNumber{nodeNumber}, m_active{true}, m_config(config) {
+    Session(TCPsocket socket, const int nodeNumber, Config &config)
+        : m_log(Logging::getInstance())
+          , m_socket{socket}
+          , m_nodeNumber{nodeNumber}
+          , m_active{true}
+          , m_config{config} {
     }
 
     // Non-copyable
     Session(const Session &) = delete;
+
     Session &operator=(const Session &) = delete;
 
     // Movable
     Session(Session &&other) noexcept
-        : m_socket{other.m_socket},
+        :  m_log(Logging::getInstance()),
+          m_socket{other.m_socket},
           m_nodeNumber{other.m_nodeNumber},
           m_active{other.m_active},
-          m_config{other.m_config}{
+          m_config{other.m_config} {
         other.m_socket = nullptr;
         other.m_nodeNumber = -1;
         other.m_active = false;
-        //other.m_config =  nullptr;
+        other.m_config = getConfig();
     }
 
     Session &operator=(Session &&other) noexcept {
@@ -39,7 +46,7 @@ public:
             other.m_socket = nullptr;
             other.m_nodeNumber = -1;
             other.m_active = false;
-            //other.m_config = nullptr;
+            other.m_config = getConfig();
         }
         return *this;
     }
@@ -52,6 +59,10 @@ public:
         return m_active;
     }
 
+    void setInActive() {
+        m_active = false;
+    }
+
     TCPsocket getSocket() const noexcept {
         return m_socket;
     }
@@ -60,11 +71,11 @@ public:
         return m_nodeNumber;
     }
 
-    Config &getConfig() const noexcept {
+    Config &getConfig() {
         return m_config;
     }
 
-    void setConfig(const Config &config) const noexcept {
+    void setConfig(const Config &config) {
         m_config = config;
     }
 
@@ -75,17 +86,20 @@ public:
         int received = SDLNet_TCP_Recv(m_socket, buffer, BUFFER_SIZE - 1);
         if (received <= 0) {
             m_active = false;
-            return {};
+            return std::string{};
         }
         buffer[received] = '\0';
-        return std::string(buffer);
+        return std::string{buffer};
     }
 
     // Sends a message. If send fails, marks session inactive.
     void send(const std::string &message) {
-        if (!m_active) return;
-        int sent = SDLNet_TCP_Send(m_socket, message.c_str(), message.length());
-        if (sent < static_cast<int>(message.length())) {
+        if (!m_active)
+            return;
+
+        const int length = static_cast<int>(message.length());
+        const int sent = SDLNet_TCP_Send(m_socket, message.c_str(), length);
+        if (sent < length) {
             m_active = false;
         }
     }
@@ -98,12 +112,16 @@ public:
         m_active = false;
     }
 
+    void hangup() {
+        m_active = false;
+    }
+
 private:
+    Logging &m_log;
     TCPsocket m_socket;
     int m_nodeNumber;
     bool m_active;
-
     Config &m_config;
 };
 
-#endif // SESSION_HPP
+#endif

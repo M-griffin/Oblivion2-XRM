@@ -1,22 +1,19 @@
 #ifndef DB_STARTUP_HPP
 #define DB_STARTUP_HPP
 
-
-#include <memory>
-
 /**
- * @class DbStartup
+ * @class DBStartUp
  * @author Michael Griffin
  * @date 18/05/2017
  * @file db_startup.hpp
  * @brief Handle DB Table Creation on Startup.
  */
-class DbStartup
+class DBStartUp
 {
 public:
 
-    explicit DbStartup();
-    ~DbStartup();
+    explicit DBStartUp() = default;
+    ~DBStartUp() = default;
 
     /**
      * @brief Setup for Database and Tables
@@ -25,6 +22,4 @@ public:
 
 };
 
-typedef std::shared_ptr<DbStartup> db_startup_ptr;
-
-#endif // DB_STARTUP_HPP
+#endif

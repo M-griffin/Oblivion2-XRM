@@ -90,7 +90,7 @@ Encoding::Encoding()
 
 
 /**
- * Windows apparently needs to use it's own WINAPI methods for Wide to Multi-bytes translations
+ * Windows apparently needs to use its own WINAPI methods for Wide to Multi-bytes translations
  * Where as Linux can do it with default c++ libs and setting the locale.
  *
  */

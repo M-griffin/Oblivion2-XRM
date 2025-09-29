@@ -1,14 +1,12 @@
 #ifndef MENU_PROMPT_DAO_HPP
 #define MENU_PROMPT_DAO_HPP
 
-#include <memory>
 #include <string>
 #include <mutex>
 
-class Logging;
+#include "../model-sys/menu_prompt.hpp"
 
-class MenuPrompt;
-typedef std::shared_ptr<MenuPrompt> menu_prompt_ptr;
+class Logging;
 
 
 /**
@@ -18,14 +16,13 @@ typedef std::shared_ptr<MenuPrompt> menu_prompt_ptr;
  * @file menu_dao.hpp
  * @brief Handles Reading and Writing a Menu Prompt from YAML Files
  */
-class MenuPromptDao
-{
+class MenuPromptDao {
 public:
-
-    MenuPromptDao(menu_prompt_ptr menu_prompt, 
-                  const std::string &menu_prompt_name, 
+    MenuPromptDao(MenuPrompt &menu_prompt,
+                  const std::string &menu_prompt_name,
                   const std::string &path);
-    ~MenuPromptDao();
+
+    ~MenuPromptDao() = default;
 
     /**
      * @brief Helper, appends forward/backward slash to path
@@ -44,7 +41,7 @@ public:
      * @param m_menu_prompt
      * @return
      */
-    bool saveMenuPrompt(menu_prompt_ptr m_menu_prompt);
+    bool saveMenuPrompt(MenuPrompt &m_menu_prompt);
 
     /**
      * @brief Loads a Menu file into the m_menu stub for access.
@@ -63,24 +60,15 @@ public:
      * @brief Grab a const handle to the loaded menu_prompt.
      * @return
      */
-    menu_prompt_ptr getMenuPrompt() const
-    {
-        if(m_menu_prompt)
-        {
-            return m_menu_prompt;
-        }
-
-		return nullptr;
+    MenuPrompt getMenuPrompt() const {
+        return m_menu_prompt;
     }
 
-    Logging         &m_log;
-    menu_prompt_ptr  m_menu_prompt;
-    std::string      m_path;
-    std::string      m_filename;
-    std::mutex       m;
-
+    Logging &m_log;
+    MenuPrompt m_menu_prompt;
+    std::string m_path;
+    std::string m_filename;
+    std::mutex m;
 };
 
-typedef std::shared_ptr<MenuPromptDao> menu_prompt_dao_ptr;
-
-#endif // MENU_PROMPT_DAO_HPP
+#endif

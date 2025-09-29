@@ -10,12 +10,6 @@
 
 #include "logging.hpp"
 
-Encrypt::Encrypt() {
-}
-
-Encrypt::~Encrypt() {
-}
-
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 
 /**

@@ -1,10 +1,8 @@
 #ifndef ENCODING_H
 #define ENCODING_H
 
-#include <iostream>
 #include <string>
 #include <mutex>
-#include <map>
 
 class Logging;
 
@@ -56,18 +54,18 @@ public:
      */
     std::string utf8Decode(const std::string &standard_string);
 
-private:
-
-    Logging               &m_log;
-    mutable std::mutex     m_encoding_mutex;
-
-    explicit Encoding();
-    
     Encoding(const Encoding&) = delete;             // Copy ctor
     Encoding(Encoding&&) = delete;                  // Move ctor
     Encoding& operator=(const Encoding&) = delete;  // Copy assignment
     Encoding& operator=(Encoding&&) = delete;       // Move assignment
 
+private:
+
+    Logging               &m_log;
+    mutable std::mutex     m_encoding_mutex;
+
+    // Singleton, So make Private
+    explicit Encoding();
 };
 
-#endif // ENCODING_H
+#endif

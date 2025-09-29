@@ -345,4 +345,4 @@ extern const char *enctype_names[];
 #define    ENCTYPE_NAME_OK(x)    ((unsigned int)(x) < ENCTYPE_CNT)
 #define    ENCTYPE_NAME(x)        enctype_names[x]
 
-#endif // TELNET_HPP
+#endif

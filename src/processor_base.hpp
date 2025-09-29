@@ -1,14 +1,7 @@
 #ifndef PROCESSOR_BASE_HPP
 #define PROCESSOR_BASE_HPP
 
-#include <iostream>
-#include <memory>
-#include <stdint.h>
 #include <string>
-#include <map>
-
-
-class ScreenPixel;
 class Logging;
 
 /**
@@ -23,57 +16,7 @@ class ProcessorBase
 public:
 
     ProcessorBase(int term_height, int term_width);
-    virtual ~ProcessorBase() 
-    { 
-    }
 
-    // Process Build strings from pull_down array.
-    virtual std::string buildPullDownBars(int pulldown_id, bool active) = 0;
-
-    // Clear Pull Down Bars once menu options are reset.
-    virtual void clearPullDownBars() = 0;
-
-    // Return the max rows used on the screen
-    virtual int getMaxRowsUsedOnScreen() = 0;
-
-    // Parses the Screen Buffer and Builds pulldown options
-    virtual std::string screenBufferParse() = 0;
-
-    // Converts the Screen Buffer to a single string for parsing.
-    virtual std::string screenBufferToString() = 0;
-
-    // For testing display the output of the buffer.
-    virtual void screenBufferDisplayTest() = 0;
-
-    /**
-     * @brief MCI Off-Set if Mid ANSI
-     * Used for Single Line ANSI Inserts to determine where special MCI Codes are located.
-     *
-     * @param clearScreen
-     * @return
-     */
-    virtual int getMCIOffSet(std::string mci_code) = 0;
-
-    /**
-     * @brief Takes buffer and displays parsed sequences
-     */
-    virtual std::string getScreenFromBuffer(bool clearScreen) = 0;
-
-
-    // Screen Buffer Modifiers
-    virtual void screenBufferSetGlyph(const std::string &char_sequence) = 0;
-    virtual void screenBufferScrollUp() = 0;
-    virtual void screenBufferClearRange(int start, int end) = 0;
-    virtual void screenBufferClear() = 0;
-
-    /**
-     * @brief Clears The Screen And Buffer
-     */
-    virtual void clearScreen() = 0;
-
-    // Process ANSI screen inserts into the Screen Buffer
-    virtual void parseTextToBuffer(char *buff) = 0;
-    
     Logging     &m_log; 
     std::string  m_ansi_output;
 
@@ -159,14 +102,7 @@ public:
         BG_CYAN            = 46,
         BG_WHITE           = 47
     };
-    
-    // Helpers
-    int getYPosition() const;
-    int getXPosition() const;
-    int getMaxLines() const;
 
 };
-
-typedef std::shared_ptr<ProcessorBase> process_base_ptr;
 
 #endif // PROCESSOR_BASE_HPP

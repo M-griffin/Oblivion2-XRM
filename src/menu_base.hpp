@@ -1,34 +1,20 @@
 #ifndef MENU_BASE_HPP
 #define MENU_BASE_HPP
 
-#include <memory>
 #include <functional>
 #include <vector>
 
-#include "model-sys/struct_compat.hpp"
+#include "common_io.hpp"
+#include "directory.hpp"
+#include "processor_ansi.hpp"
+#include "session_io.hpp"
+#include "tcp_session.hpp"
+
 #include "model-sys/structures.hpp"
 #include "model-sys/menu.hpp"
 #include "model-sys/menu_prompt.hpp"
 
-#include "data-sys/menu_dao.hpp"
-#include "data-sys/menu_prompt_dao.hpp"
-//#include "mods/mod_base.hpp"
-
 class Logging;
-
-class Config;
-typedef std::shared_ptr<Config> config_ptr;
-
-class Session;
-
-class SessionIO;
-typedef std::shared_ptr<SessionIO> session_io_ptr;
-
-class CommonIO;
-typedef std::shared_ptr<CommonIO> common_io_ptr;
-
-class Directory;
-typedef std::shared_ptr<Directory> directory_ptr;
 
 /**
  * @class MenuBase
@@ -39,7 +25,7 @@ typedef std::shared_ptr<Directory> directory_ptr;
  */
 class MenuBase {
 public:
-    explicit MenuBase(Session &session);
+    explicit MenuBase(TCPSession &session);
 
     ~MenuBase();
 
@@ -47,21 +33,23 @@ public:
     enum {
         MENU_INPUT,
         MENU_YESNO_BAR,
-        MODULE_PRELOGON_INPUT,
+        MODULE_PRE_LOGON_INPUT,
         MODULE_LOGON_INPUT,
         MODULE_INPUT,
         FORM_INPUT
     };
 
-    Logging &m_log;
-    Session &m_session;
+    Logging   &m_log;
+    TCPSession &m_session;
+    CommonIO  m_common_io;
+    SessionIO m_session_io;
+    Directory m_directory;
+    ProcessorAnsi m_ansi_process;
 
-    // This hold non-hotkey text passed through.
-    // If Hotkeys are turn off, we append and loop this until we hit a CRLF. or ENTER
-    common_io_ptr m_common_io; // CommonIO
-    session_io_ptr m_session_io; // SessionIO for Output parsing and MCI Codes etc.
-    config_ptr m_config; // Config
-    directory_ptr m_directory; // Directory File Lists.
+    // Internal Menu and Prompt Holders
+    Menu m_menu_info; // Menu Info
+    MenuPrompt m_menu_prompt; // Menu Prompt
+
     std::string m_line_buffer; // Buffer used for menu system and reading field data.
     bool m_use_hotkey; // Toggle for Single Hotkey or GetLine input. - Not used yet!
     std::string m_current_menu; // Name of current menu loaded.
@@ -70,10 +58,6 @@ public:
     std::string m_starting_menu; // Starting Menu, also used as Fallback.
     int m_input_index; // Menu Input Index, for Forwarding to current function.
 
-    menu_ptr m_menu_info; // Menu Info
-    menu_prompt_ptr m_menu_prompt; // Menu Prompt
-
-    //processor_ansi_ptr m_ansi_process; // Instance for AnsiProcess Methods
     unsigned int m_active_pulldownID; // Active Lightbar Position.
 
     // Flags
@@ -82,6 +66,7 @@ public:
     bool m_is_active_pulldown_menu; // If menu has active light bars to display.
     bool m_use_first_command_execution; // If menu executes firstcmd on entrance.
     bool m_logoff; // If logoff, stop loop execution on commands and exit.
+    bool m_is_active;
 
     // Holds all pulldown menu options.
     std::vector<MenuOption> m_loaded_pulldown_options;
@@ -100,16 +85,18 @@ public:
 
     void baseProcessAndDeliver(std::string data);
     void clearMenuPullDownOptions();
-    bool checkMenuAcsAccess(menu_ptr menu);
+    bool checkMenuAcsAccess(const Menu &menu);
     void checkMenuOptionsAcsAccess();
 
     void readInMenuData();
+
+    /*
     void writeOutMenuData();
     void readMenuOptions();
     void writeMenuOptions();
     void clearAllMenuPrompts();
     void readMenuAllPrompts();
-    void readMenuPrompts(int menu_index);
+    void readMenuPrompts(int menu_index);*/
 
     std::string setupYesNoMenuInput(const std::string &menu_prompt, std::vector<MapType> &code_map);
     std::string getDefaultColor();
@@ -122,7 +109,9 @@ public:
     std::string processGenericScreens();
 
     void loadInMenu(std::string menu_name);
-    void importMenu(menu_ptr menu_info);
+
+    void importMenu(Menu &menu_info);
+
     std::string buildLightBars();
     void redisplayMenuScreen();
     void executeFirstAndEachCommands();

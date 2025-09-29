@@ -13,26 +13,20 @@
 // Setup the file version for the config file.
 const std::string MenuPrompt::FILE_VERSION = "1.0.0";
 
-MenuPromptDao::MenuPromptDao(menu_prompt_ptr menu_prompt, 
-                             const std::string &menu_prompt_name, 
+MenuPromptDao::MenuPromptDao(MenuPrompt &menu_prompt,
+                             const std::string &menu_prompt_name,
                              const std::string &path)
     : m_log(Logging::getInstance())
-    , m_menu_prompt(menu_prompt)
-    , m_path(path)
-    , m_filename(menu_prompt_name)
-{
-}
-
-MenuPromptDao::~MenuPromptDao()
-{
+      , m_menu_prompt(menu_prompt)
+      , m_path(path)
+      , m_filename(menu_prompt_name) {
 }
 
 /**
  * @brief Helper, appends forward/backward slash to path
  * @param value
  */
-void MenuPromptDao::pathSeperator(std::string &value)
-{
+void MenuPromptDao::pathSeperator(std::string &value) {
 #ifdef _WIN32
     value.append("\\");
 #else
@@ -44,8 +38,7 @@ void MenuPromptDao::pathSeperator(std::string &value)
  * @brief Check if the file exists and we need to create a new one.
  * @return
  */
-bool MenuPromptDao::fileExists()
-{
+bool MenuPromptDao::fileExists() {
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
@@ -53,8 +46,7 @@ bool MenuPromptDao::fileExists()
 
     std::ifstream ifs(path);
 
-    if(!ifs.is_open())
-    {
+    if (!ifs.is_open()) {
         return false;
     }
 
@@ -67,8 +59,7 @@ bool MenuPromptDao::fileExists()
  * @param cfg
  * @return
  */
-bool MenuPromptDao::saveMenuPrompt(menu_prompt_ptr menu_prompt)
-{
+bool MenuPromptDao::saveMenuPrompt(MenuPrompt &menu_prompt) {
     /**
      * Note YAML always outputs UTF-8, so for menu prompts
      * We need to keep the CP437 char set, so we write out
@@ -82,17 +73,16 @@ bool MenuPromptDao::saveMenuPrompt(menu_prompt_ptr menu_prompt)
     // Setup file to Write out File.
     std::ofstream ofs(path);
 
-    if(!ofs.is_open())
-    {        
+    if (!ofs.is_open()) {
         m_log.write<Logging::ERROR_LOG>("Error, unable to write menu prompt=", path, __FILE__, __LINE__);
         return false;
     }
 
-    ofs << "file_version: \"" << menu_prompt->file_version << "\"" << std::endl;
-    ofs << "name: \"" << menu_prompt->name << "\"" << std::endl;
-    ofs << "data_line1: \"" << menu_prompt->data_line1 << "\"" << std::endl;
-    ofs << "data_line2: \"" << menu_prompt->data_line2 << "\"" << std::endl;
-    ofs << "data_line3: \"" << menu_prompt->data_line3 << "\"" << std::endl;
+    ofs << "file_version: \"" << menu_prompt.file_version << "\"" << std::endl;
+    ofs << "name: \"" << menu_prompt.name << "\"" << std::endl;
+    ofs << "data_line1: \"" << menu_prompt.data_line1 << "\"" << std::endl;
+    ofs << "data_line2: \"" << menu_prompt.data_line2 << "\"" << std::endl;
+    ofs << "data_line3: \"" << menu_prompt.data_line3 << "\"" << std::endl;
 
     ofs.close();
 
@@ -105,21 +95,19 @@ bool MenuPromptDao::saveMenuPrompt(menu_prompt_ptr menu_prompt)
  * @param rhs
  * @return
  */
-void MenuPromptDao::encode(const MenuPrompt &rhs)
-{
-    m_menu_prompt->file_version    = rhs.file_version;
-    m_menu_prompt->name            = rhs.name;
-    m_menu_prompt->data_line1      = rhs.data_line1;
-    m_menu_prompt->data_line2      = rhs.data_line2;
-    m_menu_prompt->data_line3      = rhs.data_line3;
+void MenuPromptDao::encode(const MenuPrompt &rhs) {
+    m_menu_prompt.file_version = rhs.file_version;
+    m_menu_prompt.name = rhs.name;
+    m_menu_prompt.data_line1 = rhs.data_line1;
+    m_menu_prompt.data_line2 = rhs.data_line2;
+    m_menu_prompt.data_line3 = rhs.data_line3;
 }
 
 /**
  * @brief Loads a Menu Prompt file into the m_menu_prompt stub for access.
  * @return
  */
-bool MenuPromptDao::loadMenuPrompt()
-{
+bool MenuPromptDao::loadMenuPrompt() {
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
@@ -128,12 +116,10 @@ bool MenuPromptDao::loadMenuPrompt()
     YAML::Node node;
 
     // Load the file into the class.
-    try
-    {
+    try {
         node = YAML::LoadFile(path);
 
-        if(node.size() == 0)
-        {
+        if (node.size() == 0) {
             m_log.write<Logging::ERROR_LOG>("YAML Node not found=", path, __FILE__, __LINE__);
             return false; //File Not Found?
         }
@@ -143,8 +129,7 @@ bool MenuPromptDao::loadMenuPrompt()
         // Validate File Version
         m_log.write<Logging::DEBUG_LOG>("MenuPrompt File Version=", file_version);
 
-        if(file_version != MenuPrompt::FILE_VERSION)
-        {
+        if (file_version != MenuPrompt::FILE_VERSION) {
             m_log.write<Logging::ERROR_LOG>("MenuPrompt File Version=", file_version,
                                             "Expected=", MenuPrompt::FILE_VERSION);
             return false;
@@ -152,15 +137,13 @@ bool MenuPromptDao::loadMenuPrompt()
 
         MenuPrompt m = node.as<MenuPrompt>();
         encode(m);
-    }
-    catch(YAML::Exception &ex)
-    {
+    } catch (YAML::Exception &ex) {
         m_log.write<Logging::ERROR_LOG>("YAML::LoadFile=", m_filename, "Exception=", ex.what(), __LINE__, __FILE__);
         return false;
     }
-    catch(std::exception &ex)
-    {
-        m_log.write<Logging::ERROR_LOG>("Unexpected YAML::LoadFile=", m_filename, "Exception=", ex.what(), __LINE__, __FILE__);
+    catch (std::exception &ex) {
+        m_log.write<Logging::ERROR_LOG>("Unexpected YAML::LoadFile=", m_filename, "Exception=", ex.what(), __LINE__,
+                                        __FILE__);
         return false;
     }
 

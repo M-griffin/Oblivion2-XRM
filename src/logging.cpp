@@ -136,27 +136,8 @@ void Logging::setUserInfo(int node_number)
  * @param date_time
  * @param details
  */
-void Logging::writeOutYamlConsole(const std::string &date_time, std::vector<std::string> &details)
-{        
-    /*  Overkill on logging yaml formated logs.
-    YAML::Emitter out;
-
-    out << YAML::BeginMap;
-    out << YAML::Flow;
-
-    out << YAML::Key << "LogDateTime" << YAML::Value << date_time;
-    out << YAML::Key << "Details";
-    out << YAML::Value << YAML::BeginSeq;
-
-    for(std::string &d : details)
-    {
-        out << d;
-    }
-
-    out << YAML::EndSeq;
-    out << YAML::EndMap;
-    */
-    
+void Logging::writeOutConsole(const std::string &date_time, std::vector<std::string> &details)
+{
     if (local_node_number > 0) 
     {
         std::cout << "Node " << local_node_number <<" | ";
@@ -172,5 +153,4 @@ void Logging::writeOutYamlConsole(const std::string &date_time, std::vector<std:
         std::cout << d << " | ";
     }
     std::cout << std::endl;
-    return;
 }    

@@ -1,9 +1,6 @@
 #include "processor_base.hpp"
 
 #include <string>
-#include <vector>
-#include <map>
-
 #include "logging.hpp"
 
 /**
@@ -29,28 +26,10 @@ ProcessorBase::ProcessorBase(int term_height, int term_width)
     , m_saved_cursor_y(1)
     , m_attribute(0)
     , m_saved_attribute(0)
-    , m_saved_foreground(FG_WHITE)
+    , m_saved_foreground(FG_DEFAULT)
     , m_saved_background(BG_BLACK)
-    , m_foreground_color(FG_WHITE)
+    , m_foreground_color(FG_DEFAULT)
     , m_background_color(BG_BLACK)
 {
 
 }
-
-
-// Helpers
-int ProcessorBase::getYPosition() const
-{
-    return m_y_position;
-}
-
-int ProcessorBase::getXPosition() const
-{
-    return m_x_position;
-}
-
-int ProcessorBase::getMaxLines() const
-{
-    return m_number_lines;
-}
-

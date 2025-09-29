@@ -6,21 +6,21 @@
 
 class DeadlineTimer {
 public:
-    DeadlineTimer(std::chrono::milliseconds delay, std::function<void()> callbackMethod)
-        : delay(delay), callbackMethod(callbackMethod), start(std::chrono::steady_clock::now()), triggered(false) {}
+    DeadlineTimer(const std::chrono::milliseconds delay, const std::function<void()> &callbackMethod)
+        : m_delay(delay), m_callbackMethod(callbackMethod), m_start(std::chrono::steady_clock::now()), m_triggered(false) {}
 
     void update() {
-        if (!triggered && std::chrono::steady_clock::now() - start >= delay) {
-            callbackMethod();
-            triggered = true;
+        if (!m_triggered && std::chrono::steady_clock::now() - m_start >= m_delay) {
+            m_callbackMethod();
+            m_triggered = true;
         }
     }
 
 private:
-    std::chrono::milliseconds delay;
-    std::function<void()> callbackMethod;
-    std::chrono::steady_clock::time_point start;
-    bool triggered;
+    std::chrono::milliseconds m_delay;
+    std::function<void()> m_callbackMethod;
+    std::chrono::steady_clock::time_point m_start;
+    bool m_triggered;
 };
 
-#endif // DEADLINE_TIMER_HPP
+#endif

@@ -21,24 +21,24 @@
 #include "mods/mod_message_editor.hpp"
 */
 
-#include "session.hpp"
+#include "tcp_session.hpp"
 #include "logging.hpp"
 
 const std::string MenuSystem::m_stateID = "MENU_SYSTEM";
 
-MenuSystem::MenuSystem(Session &session)
-    , MenuBase(session)
+MenuSystem::MenuSystem(TCPSession &session)
+    : MenuBase(session)
     , m_log(Logging::getInstance())
 {
     // [Vector] Setup std::function array with available options to pass input to.
-    m_menu_functions.push_back(std::bind(&MenuBase::menuInput, this, std::placeholders::_1, std::placeholders::_2));
-    m_menu_functions.push_back(std::bind(&MenuBase::menuYesNoBarInput, this, std::placeholders::_1, std::placeholders::_2));
-    m_menu_functions.push_back(std::bind(&MenuSystem::modulePreLogonInput, this, std::placeholders::_1, std::placeholders::_2));
-    m_menu_functions.push_back(std::bind(&MenuSystem::moduleLogonInput, this, std::placeholders::_1, std::placeholders::_2));
-    m_menu_functions.push_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
+    m_menu_functions.emplace_back(std::bind(&MenuBase::menuInput, this, std::placeholders::_1, std::placeholders::_2));
+    m_menu_functions.emplace_back(std::bind(&MenuBase::menuYesNoBarInput, this, std::placeholders::_1, std::placeholders::_2));
+    m_menu_functions.emplace_back(std::bind(&MenuSystem::modulePreLogonInput, this, std::placeholders::_1, std::placeholders::_2));
+    m_menu_functions.emplace_back(std::bind(&MenuSystem::moduleLogonInput, this, std::placeholders::_1, std::placeholders::_2));
+    m_menu_functions.emplace_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
 
     // [Vector] Setup Menu Option Calls for executing menu commands.
-    m_execute_callback.push_back(std::bind(&MenuSystem::menuOptionsCallback, this, std::placeholders::_1));
+    m_execute_callback.emplace_back(std::bind(&MenuSystem::menuOptionsCallback, this, std::placeholders::_1));
 
     // [Mapped] Setup Menu Command Functions
     m_menu_command_functions['-'] = std::bind(&MenuSystem::menuOptionsControlCommands, this, std::placeholders::_1);
@@ -94,7 +94,7 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
 bool MenuSystem::onEnter()
 {
     // Startup the Prelogon sequence
-    startupModulePreLogon();
+    //startupModulePreLogon();
     m_is_active = true;
     return true;
 }
@@ -285,8 +285,8 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
             }
             else
             {
-                m_log.write<Logging::DEBUG_LOG>("FallBack reset to menu_fall_back=", m_menu_info->menu_fall_back);
-                m_current_menu = m_menu_info->menu_fall_back;
+                m_log.write<Logging::DEBUG_LOG>("FallBack reset to menu_fall_back=", m_menu_info.menu_fall_back);
+                m_current_menu = m_menu_info.menu_fall_back;
             }
 
             loadAndStartupMenu();
@@ -445,7 +445,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
         // { Note: add 0 for random! }
         case 'S':
             m_log.write<Logging::DEBUG_LOG>("Executing startupModuleLogon()");
-            startupModuleLogon();
+            //startupModuleLogon();
             break;
 
         // Command Key: {T  {Research more how this is used!}
@@ -461,7 +461,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
         // Apply
         case 'A':
             m_log.write<Logging::DEBUG_LOG>("Executing startupModuleSignup()");
-            startupModuleSignup();
+            //startupModuleSignup();
             return true;
 
         // Check
@@ -473,7 +473,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
         {
             // Testing processes
             m_log.write<Logging::DEBUG_LOG>("Executing startupModuleMessageEditor()");
-            startupModuleMessageEditor();
+            //startupModuleMessageEditor();
             return true;
             /*
             #ifdef _WIN32
@@ -500,7 +500,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
             m_log.write<Logging::CONSOLE_LOG>("User Logoff()");
             // Base Class
             m_logoff = true;
-            getLockedSession()->disconnectUser();
+            m_session.hangup();
             break;
 
         // Drops into the BBS
@@ -534,13 +534,7 @@ bool MenuSystem::menuOptionsGlobalNewScanCommands(const MenuOption &option)
  */
 void MenuSystem::disconnectUser()
 {
-    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
-    session_ptr session = getLockedSession();
-    if (session) 
-    {
-        session->disconnectUser();
-    }
-    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
+    m_session.hangup();
 }
 
 /**
@@ -660,17 +654,17 @@ bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option)
     {
         case '#':  // Menu Editor
             m_log.write<Logging::DEBUG_LOG>("Executing startupModuleMenuEditor()");
-            startupModuleMenuEditor();
+            //startupModuleMenuEditor();
             break;
 
         case 'U': // User Editor
             m_log.write<Logging::DEBUG_LOG>("Executing startupModuleUserEditor()");
-            startupModuleUserEditor();
+            //startupModuleUserEditor();
             break;
 
         case 'Y': // Level Editor
             m_log.write<Logging::DEBUG_LOG>("Executing startupModuleLevelEditor()");
-            startupModuleLevelEditor();
+            //startupModuleLevelEditor();
             break;
 
         // Configuration Menu
@@ -935,9 +929,9 @@ void MenuSystem::startupExternalProcess(const std::string &cmdline)
 void MenuSystem::clearAllModules()
 {
     m_log.write<Logging::DEBUG_LOG>("Menu System: clearAllModules()");
-    if(m_module_stack.size() > 0)
+    //if(m_module_stack.size() > 0)
     {
-        std::vector<module_ptr>().swap(m_module_stack);
+        //std::vector<module_ptr>().swap(m_module_stack);
     }
 }
 
@@ -948,14 +942,14 @@ void MenuSystem::shutdownModule()
 {
     // Do module shutdown, only single modules are loaded
     // This makes it easy to allocate and kill on demand.
-    m_log.write<Logging::CONSOLE_LOG>("shutdownModule in MenuSystem() Module=", m_module_stack.back()->m_filename);
-    m_module_stack.back()->onExit();
-    m_module_stack.pop_back();
+    //m_log.write<Logging::CONSOLE_LOG>("shutdownModule in MenuSystem() Module=", m_module_stack.back()->m_filename);
+    //m_module_stack.back()->onExit();
+    //m_module_stack.pop_back();
 }
 
 /**
  * @brief Exists and Shuts down the current module
- */
+ *
 void MenuSystem::startupModule(const module_ptr &module)
 {
     m_log.write<Logging::CONSOLE_LOG>("StartupModule in MenuSystem() Module=", module->m_filename);
@@ -964,22 +958,20 @@ void MenuSystem::startupModule(const module_ptr &module)
     clearAllModules();
     module->onEnter();
     m_module_stack.push_back(module);
-}
+}*/
 
 /**
  * @brief Start up the Normal Login Process.
- */
+ *
 void MenuSystem::startupModulePreLogon()
 {
     // Setup the input processor
-    resetMenuInputIndex(MODULE_PRELOGON_INPUT);
+    resetMenuInputIndex(MODULE_PRE_LOGON_INPUT);
 
     // Allocate and Create
-    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     module_ptr module = std::make_shared<ModPreLogon>(
         getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
-    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 
     if(!module)
     {
@@ -988,22 +980,20 @@ void MenuSystem::startupModulePreLogon()
     }
 
     startupModule(module);
-}
+}*/
 
 /**
  * @brief Start up the Normal Login Process.
- */
+ *
 void MenuSystem::startupModuleLogon()
 {    
     // Setup the input processor
     resetMenuInputIndex(MODULE_LOGON_INPUT);
 
     // Allocate and Create
-    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     module_ptr module = std::make_shared<ModLogon>(
         getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
-    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 
     if(!module)
     {
@@ -1012,22 +1002,20 @@ void MenuSystem::startupModuleLogon()
     }
 
     startupModule(module);
-}
+}*/
 
 /**
  * @brief Starts up Signup Module
- */
+ *
 void MenuSystem::startupModuleSignup()
 {
     // Setup the input processor
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     module_ptr module = std::make_shared<ModSignup>(
         getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
-    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 
     if(!module)
     {
@@ -1036,11 +1024,11 @@ void MenuSystem::startupModuleSignup()
     }
 
     startupModule(module);
-}
+}*/
 
 /**
  * @brief Startup the Menu Editor Module
- */
+ *
 void MenuSystem::startupModuleMenuEditor()
 {
     // Setup the input processor
@@ -1058,22 +1046,20 @@ void MenuSystem::startupModuleMenuEditor()
     }
 
     startupModule(module);
-}
+}*/
 
 /**
  * @brief Startup the User Editor Module
- */
+ *
 void MenuSystem::startupModuleUserEditor()
 {
     // Setup the input processor
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     module_ptr module = std::make_shared<ModUserEditor>(
         getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
-    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 
     if(!module)
     {
@@ -1082,22 +1068,20 @@ void MenuSystem::startupModuleUserEditor()
     }
 
     startupModule(module);
-}
+}*/
 
 /**
  * @brief Startup the Level Editor Module
- */
+ *
 void MenuSystem::startupModuleLevelEditor()
 {
     // Setup the input processor
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     module_ptr module = std::make_shared<ModLevelEditor>(
         getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
-    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 
     if(!module)
     {
@@ -1106,22 +1090,20 @@ void MenuSystem::startupModuleLevelEditor()
     }
 
     startupModule(module);
-}
+}*/
 
 /**
  * @brief Startup the Full Screen Message Editor Module
- */
+ *
 void MenuSystem::startupModuleMessageEditor()
 {
     // Setup the input processor
     resetMenuInputIndex(MODULE_INPUT);
 
     // Allocate and Create
-    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
     module_ptr module = std::make_shared<ModMessageEditor>(
         getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
     );
-    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
 
     if(!module)
     {
@@ -1130,7 +1112,7 @@ void MenuSystem::startupModuleMessageEditor()
     }
 
     startupModule(module);
-}
+}*/
 
 
 /**
@@ -1141,6 +1123,7 @@ void MenuSystem::startupModuleMessageEditor()
  */
 void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8)
 {
+    /*
     // Make sure we have an allocated module before processing.
     if(m_module_stack.size() == 0 || character_buffer.size() == 0)
     {
@@ -1161,8 +1144,6 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
         shutdownModule();
         
         // Check if the current user has been logged in yet.
-        m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
-        session_ptr session = getLockedSession();
         if(session && session->m_is_session_authorized)
         {            
             // If Authorized, then we want to move to main! Startup menu should be TOP or
@@ -1194,8 +1175,7 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
         {
             loadAndStartupMenu();            
         }
-        m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
-    }
+    }*/
 }
 
 /**
@@ -1222,6 +1202,7 @@ void MenuSystem::moduleLogonInput(const std::string &character_buffer, const boo
  */
 void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is_utf8)
 {
+    /*
     // Make sure we have an allocated module before processing.
     if(m_module_stack.size() == 0 || character_buffer.size() == 0)
     {
@@ -1241,5 +1222,5 @@ void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is
 
         // Redisplay,  may need to startup() again, but menu data should still be active and loaded!
         redisplayMenuScreen();
-    }
+    }*/
 }

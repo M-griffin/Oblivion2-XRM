@@ -2,7 +2,6 @@
 #define MENU_SYSTEM_HPP
 
 #include <iostream>
-#include <memory>
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -16,7 +15,7 @@
 
 class Logging;
 
-class Session;
+class TCPSession;
 
 /**
  * @class MenuSystem
@@ -29,12 +28,12 @@ class MenuSystem :
     public MenuBase
 {
 public:
-    explicit MenuSystem(Session &session);
+    explicit MenuSystem(TCPSession &session);
     ~MenuSystem();
 
-    void update(const std::string &character_buffer, const bool &is_utf8) override;
-    bool onEnter() override;
-    bool onExit() override;
+    void update(const std::string &character_buffer, const bool &is_utf8);
+    bool onEnter();
+    bool onExit();
 
     Logging                  &m_log;
     static const std::string  m_stateID;
@@ -42,7 +41,6 @@ public:
 
     // handle to form interface.
     //form_manager_ptr          m_form_manager;
-
 
     // Dynamic Map of all Menu Option Command functions
     typedef std::function< bool(const MenuOption & option)> CommandFuncType;

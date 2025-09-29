@@ -1,15 +1,12 @@
 #ifndef MENU_DAO_HPP
 #define MENU_DAO_HPP
 
-#include <memory>
 #include <string>
 #include <mutex>
 
+#include "../model-sys/menu.hpp"
+
 class Logging;
-
-class Menu;
-typedef std::shared_ptr<Menu> menu_ptr;
-
 
  /**
   * @class MenuDao
@@ -22,8 +19,8 @@ class MenuDao
 {
 public:
 
-    MenuDao(menu_ptr menu, const std::string &menu_name, const std::string &path);
-    ~MenuDao();
+    explicit MenuDao(Menu &menu, const std::string &menu_name, const std::string &path);
+    ~MenuDao() = default;
 
     /**
      * @brief Helper, appends forward/backward slash to path
@@ -42,7 +39,7 @@ public:
      * @param menu
      * @return
      */
-    bool saveMenu(menu_ptr menu);
+    bool saveMenu(Menu &menu);
 
     /**
      * @brief Removes and Existing Menu from the directory.
@@ -68,21 +65,16 @@ public:
      * @brief Grab a const handle to the loaded menu.
      * @return
      */
-    menu_ptr getMenu() const
+    Menu &getMenu()
     {
-        if(m_menu)
-        {
-            return m_menu;
-        }
-
-		return nullptr;
+        return m_menu;
     }
 
     /**
      * @brief Override the Filename
      * @param menu_name
      */
-    void setFileName(std::string menu_name)
+    void setFileName(const std::string &menu_name)
     {
         m_filename = menu_name;
     }
@@ -93,14 +85,12 @@ public:
      */
     std::string getFileName() const { return m_filename; }
 
-    Logging    &m_log;
-    menu_ptr    m_menu;
+    Logging     &m_log;
+    Menu        &m_menu;
     std::string m_path;
     std::string m_filename;
     std::mutex  m;
 
 };
 
-typedef std::shared_ptr<MenuDao> menu_dao_ptr;
-
-#endif // MENU_DAO_HPP
+#endif

@@ -1,24 +1,14 @@
 #ifndef ACCESS_CONDITION_HPP
 #define ACCESS_CONDITION_HPP
 
-#include <iostream>
-#include <memory>
-#include <cstdint>
 #include <string>
 #include <vector>
-#include <map>
 
+#include "session_io.hpp"
 #include "model-sys/structures.hpp"
 
-class SessionIO;
-typedef std::shared_ptr<SessionIO> session_io_ptr;
-
 class Users;
-typedef std::shared_ptr<Users> user_ptr;
-
 class AccessLevel;
-typedef std::shared_ptr<AccessLevel> access_level_ptr;
-
 class Logging;
 
 /**
@@ -28,11 +18,11 @@ class Logging;
  * @file access_condition.hpp
  * @brief Access Condition System handles Security Level and Flags
  */
-class AccessCondition
-{
+class AccessCondition {
 public:
-    explicit AccessCondition();
-    ~AccessCondition();            
+    explicit AccessCondition(SessionIO &io);
+
+    ~AccessCondition();
 
     /**
      * @brief Toggle Bit Flag
@@ -40,7 +30,7 @@ public:
      * @param first_set
      * @param user
      */
-    void setFlagToggle(unsigned char flag, bool first_set, user_ptr user);
+    void setFlagToggle(unsigned char flag, bool first_set, Users &user);
 
     /**
      * @brief Toggle Bit Flag
@@ -48,7 +38,7 @@ public:
      * @param first_set
      * @param level
      */
-    void setFlagLevelToggle(unsigned char flag, bool first_set, access_level_ptr level);
+    void setFlagLevelToggle(unsigned char flag, bool first_set, AccessLevel &level);
 
     /**
      * @brief Set Bit Flag on
@@ -56,7 +46,7 @@ public:
      * @param first_set
      * @param user
      */
-    void setFlagOn(unsigned char flag, bool first_set, user_ptr user);
+    void setFlagOn(unsigned char flag, bool first_set, Users &user);
 
     /**
      * @brief Set Bit Flag off
@@ -64,7 +54,7 @@ public:
      * @param first_set
      * @param user
      */
-    void setFlagOff(unsigned char flag, bool first_set, user_ptr user);
+    void setFlagOff(unsigned char flag, bool first_set, Users &user);
 
     /**
      * @brief Test If Bit Flag is set
@@ -73,7 +63,7 @@ public:
      * @param user
      * @return
      */
-    bool checkAccessConditionFlag(unsigned char flag, bool first_set, user_ptr user);
+    bool checkAccessConditionFlag(unsigned char flag, bool first_set, Users &user);
 
     /**
      * @brief Sets a Default String of Bit flags On
@@ -81,7 +71,7 @@ public:
      * @param first_set
      * @param user
      */
-    void setAccessConditionsFlagsOn(std::string bitString, bool first_set, user_ptr user);
+    void setAccessConditionsFlagsOn(std::string bitString, bool first_set, Users &user);
 
     /**
      * @brief Sets a Default String of Bit flags Off
@@ -89,7 +79,7 @@ public:
      * @param first_set
      * @param user
      */
-    void setAccessConditionsFlagsOff(std::string bitString, bool first_set, user_ptr user);
+    void setAccessConditionsFlagsOff(std::string bitString, bool first_set, Users &user);
 
     /**
      * @brief Parse Code Map and Test Security and AR Flags.
@@ -97,7 +87,7 @@ public:
      * @param user
      * @return
      */
-    bool parseCodeMap(const std::vector<MapType> &code_map, user_ptr user);
+    bool parseCodeMap(const std::vector<MapType> &code_map, Users &user);
 
     /**
      * @brief Parse ASC Strings then test User Flags
@@ -112,7 +102,7 @@ public:
      * @param user
      * @return
      */
-    bool validateAcsString(const std::string &acs_string, user_ptr user);
+    bool validateAcsString(const std::string &acs_string, Users &user);
 
     /**
      * @brief Bit String to Printable String
@@ -122,8 +112,8 @@ public:
     std::string getAccessConditionFlagStringFromBits(int bits);
 
     // Using Session IO for Code Mapping
-    Logging        &m_log;
-    session_io_ptr  m_session_io;    
+    Logging &m_log;
+    SessionIO &m_session_io;
 
     // note update to security expressions
     // start with NOT s255 then test for s255
@@ -135,8 +125,6 @@ public:
         "([~]{1}[fF]{1}[A-Z]{1})|([fF]{1}[A-Z]{1})|"
         "([~]{1}[oO]{1}[A-Z]{1})|([oO]{1}[A-Z]{1})"
     };
-
-
 };
 
-#endif // ACCESS_CONDITION_HPP
+#endif

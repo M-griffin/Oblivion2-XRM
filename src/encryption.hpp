@@ -1,7 +1,6 @@
 #ifndef ENCRYPTION_HPP
 #define ENCRYPTION_HPP
 
-#include <memory>
 #include <string>
 
 class Encrypt
@@ -11,8 +10,8 @@ class Encrypt
 
 public:
 
-    explicit Encrypt();
-    ~Encrypt();
+    explicit Encrypt() = default;
+    ~Encrypt() = default;
 
     /**
      * @brief Unsigned Char to Hex
@@ -23,28 +22,28 @@ public:
 
     /**
      * @brief SHA1 password encryption
-     * @param password
+     * @param key
      * @param salt
      */
     std::string SHA1(std::string key, std::string salt);
 
     /**
      * @brief PKCS5_PBKDF2 password encryption
-     * @param password
+     * @param key
      * @param salt
      */
     std::string PKCS5_PBKDF2(std::string key, std::string salt);
 
     /**
      * @brief generate salt hash key
-     * @param password
+     * @param key
      * @param salt
      */
     std::string generate_salt(std::string key, std::string salt);
 
     /**
      * @brief generate password hash key
-     * @param password
+     * @param key
      * @param salt
      */
     std::string generate_password(std::string key, std::string salt);
@@ -59,4 +58,4 @@ public:
 
 };
 
-#endif // ENCRYPTION_HPP
+#endif

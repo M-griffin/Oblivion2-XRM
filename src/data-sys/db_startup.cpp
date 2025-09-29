@@ -6,32 +6,24 @@
 #include "../model-sys/protocol.hpp"
 #include "../model-sys/access_level.hpp"
 #include "../model-app/oneliners.hpp"
-//#include "../data-app/oneliners_dao.hpp"
 
 // Needed for Initializing and checking users data is setup
 // On startup.
 #include "session_stats_dao.hpp"
 #include "security_dao.hpp"
 #include "users_dao.hpp"
-#include "base_dao.hpp"
 #include "protocol_dao.hpp"
 #include "access_level_dao.hpp"
+#include "../data-app/oneliners_dao.hpp"
 
 #include "../logging.hpp"
 
 #include "libSqliteWrapped.h"
 
-
-DbStartup::DbStartup() {
-}
-
-DbStartup::~DbStartup() {
-}
-
 /**
  * @brief Setup for Database and Tables
  */
-bool DbStartup::initDatabaseTables() {
+bool DBStartUp::initDatabaseTables() {
     // Setup Users Database name and path
     USERS_DATABASE = GLOBAL_DATA_PATH;
 

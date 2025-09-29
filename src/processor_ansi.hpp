@@ -4,7 +4,6 @@
 #include "processor_base.hpp"
 
 #include <memory>
-#include <stdint.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -12,10 +11,10 @@
 #include "model-sys/screen_pixel.hpp"
 
 /**
- * @class AnsiProcessor
+ * @class ProcessorAnsi
  * @author Michael Griffin
  * @date 10/8/2015
- * @file ansi_processor.hpp
+ * @file processor_ansi.hpp
  * @brief Processes Screen data into a Screen Buffer
  */
 class ProcessorAnsi
@@ -24,27 +23,26 @@ class ProcessorAnsi
 public:
 
     ProcessorAnsi(int term_height, int term_width);
+    ~ProcessorAnsi();
 
-    virtual ~ProcessorAnsi() override;
+    void resize(int term_height, int term_width);
+    std::string buildPullDownBars(int pulldownId, bool active);
+    void clearPullDownBars();
 
-    virtual std::string buildPullDownBars(int pulldown_id, bool active) override;
-    virtual void clearPullDownBars() override;
-
-    virtual int getMaxRowsUsedOnScreen() override;
-    virtual std::string screenBufferParse() override;
-    virtual std::string screenBufferToString() override;
-    virtual void screenBufferDisplayTest() override;
-    virtual int getMCIOffSet(std::string mci_code) override;
-    virtual std::string getScreenFromBuffer(bool clearScreen) override;
-
+    int getMaxRowsUsedOnScreen();
+    std::string screenBufferParse();
+    std::string screenBufferToString();
+    void screenBufferDisplayTest();
+    int getMCIOffSet(std::string mci_code);
+    std::string getScreenFromBuffer(bool clearScreen);
 
     // Screen Buffer Modifiers
-    virtual void screenBufferSetGlyph(const std::string &char_sequence) override;
-    virtual void screenBufferScrollUp() override;
-    virtual void screenBufferClearRange(int start, int end) override;
-    virtual void screenBufferClear() override;
-    virtual void clearScreen() override;
-    virtual void parseTextToBuffer(char *buff) override;
+    void screenBufferSetGlyph(const std::string &charSequence);
+    void screenBufferScrollUp();
+    void screenBufferClearRange(int start, int end);
+    void screenBufferClear();
+    void clearScreen();
+    void parseTextToBuffer(char *buff);
     
     std::vector <ScreenPixel>  m_screen_buffer;
     std::map<int, ScreenPixel> m_pull_down_options;
@@ -53,7 +51,5 @@ public:
     std::map<int, int> getLineEndingMap() const;
 
 };
-
-typedef std::shared_ptr<ProcessorAnsi> processor_ansi_ptr;
 
 #endif // ANSI_PROCESSOR_HPP

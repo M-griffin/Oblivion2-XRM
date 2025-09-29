@@ -3,7 +3,6 @@
 
 #include "processor_base.hpp"
 
-#include <memory>
 #include <string>
 
 #include "model-sys/screen_pixel.hpp"
@@ -27,30 +26,30 @@ public:
     int m_line_number;
     bool m_is_double_backspace;
 
-    virtual ~ProcessorText() override;
+    ~ProcessorText();
     
-    virtual std::string buildPullDownBars(int pulldown_id, bool active) override;
-    virtual void clearPullDownBars() override;
+    std::string buildPullDownBars(int pulldown_id, bool active);
+    void clearPullDownBars();
 
-    virtual int getMaxRowsUsedOnScreen() override;
-    virtual std::string screenBufferParse() override;
-    virtual std::string screenBufferToString() override;
-    virtual void screenBufferDisplayTest() override;
-    virtual int getMCIOffSet(std::string mci_code) override;
-    virtual std::string getScreenFromBuffer(bool clearScreen) override;
+    int getMaxRowsUsedOnScreen();
+    std::string screenBufferParse();
+    std::string screenBufferToString();
+    void screenBufferDisplayTest();
+    int getMCIOffSet(std::string mci_code);
+    std::string getScreenFromBuffer(bool clearScreen);
     
     // Override for Testing Mesasge Box Redraw!
     std::string getScreenFromBuffer(bool clearScreen, int left_border);
 
 
     // Screen Buffer Modifiers
-    virtual void screenBufferSetGlyph(const std::string &char_sequence) override;
-    virtual void screenBufferScrollUp() override;
-    virtual void screenBufferClearRange(int start, int end) override;
-    virtual void screenBufferClear() override;
+    void screenBufferSetGlyph(const std::string &char_sequence);
+    void screenBufferScrollUp();
+    void screenBufferClearRange(int start, int end);
+    void screenBufferClear();
 
-    virtual void clearScreen() override;
-    virtual void parseTextToBuffer(char *buff) override;
+    void clearScreen();
+    void parseTextToBuffer(char *buff);
 
     int getCurrentLine() const
     {
@@ -98,7 +97,5 @@ public:
     std::map<int, int> getLineEndingMap() const;
 
 };
-
-typedef std::shared_ptr<ProcessorText> processor_text_ptr;
 
 #endif // PROCESSOR_TEXT_HPP

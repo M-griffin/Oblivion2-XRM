@@ -52,9 +52,9 @@ public:
     ~CommonIO();
     
     /**
-     * @brief Setup a Static GLobal Map for Key Input that can be resued.
+     * @brief Set up a Static GLobal Map for Key Input that can be resued.
      */
-    void popuateInputSequenceMap();
+    void populateInputSequenceMap();
 
     /**
      * @brief Retrieve Key Sequence by Value
