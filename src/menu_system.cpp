@@ -2,7 +2,6 @@
 
 #include <locale>
 #include <cassert>
-#include <memory>
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -21,21 +20,25 @@
 #include "mods/mod_message_editor.hpp"
 */
 
+#include "model-sys/context.hpp"
 #include "tcp_session.hpp"
 #include "logging.hpp"
 
 const std::string MenuSystem::m_stateID = "MENU_SYSTEM";
 
-MenuSystem::MenuSystem(TCPSession &session)
-    : MenuBase(session)
-    , m_log(Logging::getInstance())
-{
+MenuSystem::MenuSystem(Context &ctx)
+    : MenuBase(ctx)
+      , m_log(Logging::getInstance()) {
     // [Vector] Setup std::function array with available options to pass input to.
     m_menu_functions.emplace_back(std::bind(&MenuBase::menuInput, this, std::placeholders::_1, std::placeholders::_2));
-    m_menu_functions.emplace_back(std::bind(&MenuBase::menuYesNoBarInput, this, std::placeholders::_1, std::placeholders::_2));
-    m_menu_functions.emplace_back(std::bind(&MenuSystem::modulePreLogonInput, this, std::placeholders::_1, std::placeholders::_2));
-    m_menu_functions.emplace_back(std::bind(&MenuSystem::moduleLogonInput, this, std::placeholders::_1, std::placeholders::_2));
-    m_menu_functions.emplace_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1, std::placeholders::_2));
+    m_menu_functions.emplace_back(std::bind(&MenuBase::menuYesNoBarInput, this, std::placeholders::_1,
+                                            std::placeholders::_2));
+    m_menu_functions.emplace_back(std::bind(&MenuSystem::modulePreLogonInput, this, std::placeholders::_1,
+                                            std::placeholders::_2));
+    m_menu_functions.emplace_back(std::bind(&MenuSystem::moduleLogonInput, this, std::placeholders::_1,
+                                            std::placeholders::_2));
+    m_menu_functions.emplace_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1,
+                                            std::placeholders::_2));
 
     // [Vector] Setup Menu Option Calls for executing menu commands.
     m_execute_callback.emplace_back(std::bind(&MenuSystem::menuOptionsCallback, this, std::placeholders::_1));
@@ -44,29 +47,35 @@ MenuSystem::MenuSystem(TCPSession &session)
     m_menu_command_functions['-'] = std::bind(&MenuSystem::menuOptionsControlCommands, this, std::placeholders::_1);
     m_menu_command_functions['&'] = std::bind(&MenuSystem::menuOptionsMultiNodeCommands, this, std::placeholders::_1);
     m_menu_command_functions['{'] = std::bind(&MenuSystem::menuOptionsMatrixCommands, this, std::placeholders::_1);
-    m_menu_command_functions['!'] = std::bind(&MenuSystem::menuOptionsGlobalNewScanCommands, this, std::placeholders::_1);
+    m_menu_command_functions['!'] = std::bind(&MenuSystem::menuOptionsGlobalNewScanCommands, this,
+                                              std::placeholders::_1);
     m_menu_command_functions['['] = std::bind(&MenuSystem::menuOptionsMainMenuCommands, this, std::placeholders::_1);
     m_menu_command_functions['.'] = std::bind(&MenuSystem::menuOptionsDoorCommands, this, std::placeholders::_1);
     m_menu_command_functions['*'] = std::bind(&MenuSystem::menuOptionsSysopCommands, this, std::placeholders::_1);
-    m_menu_command_functions['^'] = std::bind(&MenuSystem::menuOptionsNewUserVotingCommands, this, std::placeholders::_1);
-    m_menu_command_functions['C'] = std::bind(&MenuSystem::menuOptionsConferenceEditorCommands, this, std::placeholders::_1);
+    m_menu_command_functions['^'] = std::bind(&MenuSystem::menuOptionsNewUserVotingCommands, this,
+                                              std::placeholders::_1);
+    m_menu_command_functions['C'] = std::bind(&MenuSystem::menuOptionsConferenceEditorCommands, this,
+                                              std::placeholders::_1);
     m_menu_command_functions['D'] = std::bind(&MenuSystem::menuOptionsDataAreaCommands, this, std::placeholders::_1);
     m_menu_command_functions['E'] = std::bind(&MenuSystem::menuOptionsEmailCommands, this, std::placeholders::_1);
     m_menu_command_functions['F'] = std::bind(&MenuSystem::menuOptionsFileCommands, this, std::placeholders::_1);
     m_menu_command_functions['J'] = std::bind(&MenuSystem::menuOptionsJoinConference, this, std::placeholders::_1);
     m_menu_command_functions['M'] = std::bind(&MenuSystem::menuOptionsMessageCommands, this, std::placeholders::_1);
     m_menu_command_functions['Q'] = std::bind(&MenuSystem::menuOptionsQWKMailCommands, this, std::placeholders::_1);
-    m_menu_command_functions['R'] = std::bind(&MenuSystem::menuOptionsTopTenListingCommands, this, std::placeholders::_1);
-    m_menu_command_functions['S'] = std::bind(&MenuSystem::menuOptionsMessageBaseSponsorCommands, this, std::placeholders::_1);
-    m_menu_command_functions['T'] = std::bind(&MenuSystem::menuOptionsFileBaseSponsorCommands, this, std::placeholders::_1);
+    m_menu_command_functions['R'] = std::bind(&MenuSystem::menuOptionsTopTenListingCommands, this,
+                                              std::placeholders::_1);
+    m_menu_command_functions['S'] = std::bind(&MenuSystem::menuOptionsMessageBaseSponsorCommands, this,
+                                              std::placeholders::_1);
+    m_menu_command_functions['T'] = std::bind(&MenuSystem::menuOptionsFileBaseSponsorCommands, this,
+                                              std::placeholders::_1);
     m_menu_command_functions['V'] = std::bind(&MenuSystem::menuOptionsVotingCommands, this, std::placeholders::_1);
-    m_menu_command_functions['+'] = std::bind(&MenuSystem::menuOptionsColorSettingCommands, this, std::placeholders::_1);
+    m_menu_command_functions['+'] =
+            std::bind(&MenuSystem::menuOptionsColorSettingCommands, this, std::placeholders::_1);
 }
 
-MenuSystem::~MenuSystem()
-{
+MenuSystem::~MenuSystem() {
     m_log.write<Logging::DEBUG_LOG>("~MenuSystem()");
-    
+
     // Clear All Menu Command Functions.
     m_menu_command_functions.clear();
     MappedCommandFunctions().swap(m_menu_command_functions);
@@ -75,10 +84,8 @@ MenuSystem::~MenuSystem()
 /**
  * @brief Handles Updates or Data Input from Client
  */
-void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8)
-{
-    if(!m_is_active)
-    {
+void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8) {
+    if (!m_is_active) {
         return;
     }
 
@@ -91,8 +98,7 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
  *        This is only called when switch to the state, not for menu instances.
  * @return
  */
-bool MenuSystem::onEnter()
-{
+bool MenuSystem::onEnter() {
     // Startup the Prelogon sequence
     //startupModulePreLogon();
     m_is_active = true;
@@ -103,8 +109,7 @@ bool MenuSystem::onEnter()
  * @brief Exit, close down, display screens to change over data.
  * @return
  */
-bool MenuSystem::onExit()
-{
+bool MenuSystem::onExit() {
     m_is_active = false;
     return true;
 }
@@ -113,13 +118,11 @@ bool MenuSystem::onExit()
  * @brief Control Commands
  * @param option
  */
-bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
-{   
+bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
     // Some of these options set actual flags for behavior.
     // In this case, we will need to parse for specific Control commands
     // and set Menu System Flags!
-    switch(option.command_key[1])
-    {
+    switch (option.command_key[1]) {
         // Turns on Pulldown Menu Re-entrance
         // This option returns to the selected option
         // when the user re-enters the pulldown menu.
@@ -264,8 +267,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
 
         // goto menu sets fallback current
         case '/':
-            if(m_current_menu.size() > 0)
-            {
+            if (m_current_menu.size() > 0) {
                 m_system_fallback.push_back(m_current_menu);
             }
 
@@ -276,15 +278,12 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
 
         // goes to fallback menu, sets fallback to previous fallback
         case '\\':
-            if(m_system_fallback.size() > 0)
-            {
+            if (m_system_fallback.size() > 0) {
                 m_current_menu = m_system_fallback.back();
                 m_log.write<Logging::DEBUG_LOG>("FallBack reset to current=", m_current_menu);
 
                 m_system_fallback.pop_back();
-            }
-            else
-            {
+            } else {
                 m_log.write<Logging::DEBUG_LOG>("FallBack reset to menu_fall_back=", m_menu_info.menu_fall_back);
                 m_current_menu = m_menu_info.menu_fall_back;
             }
@@ -295,8 +294,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
 
         // Goes to menu, sets fallback as starting menu
         case '^':
-            if(m_starting_menu.size() == 0)
-            {
+            if (m_starting_menu.size() == 0) {
                 m_starting_menu = m_current_menu;
             }
 
@@ -332,8 +330,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
 
         // Goes to the menu specified in the CString, does not exe firstcmd
         case '{':
-            if(m_starting_menu.size() == 0)
-            {
+            if (m_starting_menu.size() == 0) {
                 m_starting_menu = m_current_menu;
             }
 
@@ -419,10 +416,8 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
  * @brief MultiNode Commands
  * @param option
  */
-bool MenuSystem::menuOptionsMultiNodeCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsMultiNodeCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         default:
             return false;
     }
@@ -434,10 +429,8 @@ bool MenuSystem::menuOptionsMultiNodeCommands(const MenuOption &option)
  * @brief Matrix Commands
  * @param option
  */
-bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         // Logon
         // {Not Implemented yet!}
         //: When a CString is specified, PRELOGON.X, an
@@ -467,10 +460,9 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
         // Check
         case 'C':
             return false;
-        
+
         // Check
-        case 'E':
-        {
+        case 'E': {
             // Testing processes
             m_log.write<Logging::DEBUG_LOG>("Executing startupModuleMessageEditor()");
             //startupModuleMessageEditor();
@@ -500,7 +492,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
             m_log.write<Logging::CONSOLE_LOG>("User Logoff()");
             // Base Class
             m_logoff = true;
-            m_session.hangup();
+            m_ctx.base().hangup();
             break;
 
         // Drops into the BBS
@@ -518,10 +510,8 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option)
  * @brief Global New Scan Commands
  * @param option
  */
-bool MenuSystem::menuOptionsGlobalNewScanCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsGlobalNewScanCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         default:
             return false;
     }
@@ -532,19 +522,16 @@ bool MenuSystem::menuOptionsGlobalNewScanCommands(const MenuOption &option)
 /**
  * @brief Disconnect a user on the Session.
  */
-void MenuSystem::disconnectUser()
-{
-    m_session.hangup();
+void MenuSystem::disconnectUser() {
+    m_ctx.base().hangup();
 }
 
 /**
  * @brief Main Menu Commands
  * @param option
  */
-bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         // autosig
         case 'A':
             return false;
@@ -633,10 +620,8 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option)
  * @brief Door Commands
  * @param option
  */
-bool MenuSystem::menuOptionsDoorCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsDoorCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         default:
             return false;
     }
@@ -648,11 +633,9 @@ bool MenuSystem::menuOptionsDoorCommands(const MenuOption &option)
  * @brief Sysop Commands
  * @param option
  */
-bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
-        case '#':  // Menu Editor
+bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
+        case '#': // Menu Editor
             m_log.write<Logging::DEBUG_LOG>("Executing startupModuleMenuEditor()");
             //startupModuleMenuEditor();
             break;
@@ -682,10 +665,8 @@ bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option)
  * @brief New User Voting Commands
  * @param option
  */
-bool MenuSystem::menuOptionsNewUserVotingCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsNewUserVotingCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         default:
             return false;
     }
@@ -697,10 +678,8 @@ bool MenuSystem::menuOptionsNewUserVotingCommands(const MenuOption &option)
  * @brief Conference Editor Commands
  * @param option
  */
-bool MenuSystem::menuOptionsConferenceEditorCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsConferenceEditorCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         default:
             return false;
     }
@@ -712,10 +691,8 @@ bool MenuSystem::menuOptionsConferenceEditorCommands(const MenuOption &option)
  * @brief Data Area Commands
  * @param option
  */
-bool MenuSystem::menuOptionsDataAreaCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsDataAreaCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         default:
             return false;
     }
@@ -727,10 +704,8 @@ bool MenuSystem::menuOptionsDataAreaCommands(const MenuOption &option)
  * @brief Email Commands
  * @param option
  */
-bool MenuSystem::menuOptionsEmailCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsEmailCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         default:
             return false;
     }
@@ -742,10 +717,8 @@ bool MenuSystem::menuOptionsEmailCommands(const MenuOption &option)
  * @brief File Commands
  * @param option
  */
-bool MenuSystem::menuOptionsFileCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsFileCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         default:
             return false;
     }
@@ -757,10 +730,8 @@ bool MenuSystem::menuOptionsFileCommands(const MenuOption &option)
  * @brief Message Commands
  * @param option
  */
-bool MenuSystem::menuOptionsMessageCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsMessageCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         default:
             return false;
     }
@@ -772,10 +743,8 @@ bool MenuSystem::menuOptionsMessageCommands(const MenuOption &option)
  * @brief Join Conference Commands
  * @param option
  */
-bool MenuSystem::menuOptionsJoinConference(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsJoinConference(const MenuOption &option) {
+    switch (option.command_key[1]) {
         default:
             return false;
     }
@@ -787,10 +756,8 @@ bool MenuSystem::menuOptionsJoinConference(const MenuOption &option)
  * @brief QWK Mail Commands
  * @param option
  */
-bool MenuSystem::menuOptionsQWKMailCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsQWKMailCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         default:
             return false;
     }
@@ -802,10 +769,8 @@ bool MenuSystem::menuOptionsQWKMailCommands(const MenuOption &option)
  * @brief Top 10 Listing Commands
  * @param option
  */
-bool MenuSystem::menuOptionsTopTenListingCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsTopTenListingCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         default:
             return false;
     }
@@ -817,10 +782,8 @@ bool MenuSystem::menuOptionsTopTenListingCommands(const MenuOption &option)
  * @brief Message Base Sponsor Commands
  * @param option
  */
-bool MenuSystem::menuOptionsMessageBaseSponsorCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsMessageBaseSponsorCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         default:
             return false;
     }
@@ -832,10 +795,8 @@ bool MenuSystem::menuOptionsMessageBaseSponsorCommands(const MenuOption &option)
  * @brief File Base Sponsor Commands
  * @param option
  */
-bool MenuSystem::menuOptionsFileBaseSponsorCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsFileBaseSponsorCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         default:
             return false;
     }
@@ -847,10 +808,8 @@ bool MenuSystem::menuOptionsFileBaseSponsorCommands(const MenuOption &option)
  * @brief Voting Commands
  * @param option
  */
-bool MenuSystem::menuOptionsVotingCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsVotingCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         default:
             return false;
     }
@@ -862,10 +821,8 @@ bool MenuSystem::menuOptionsVotingCommands(const MenuOption &option)
  * @brief Color Setting Commands
  * @param option
  */
-bool MenuSystem::menuOptionsColorSettingCommands(const MenuOption &option)
-{
-    switch(option.command_key[1])
-    {
+bool MenuSystem::menuOptionsColorSettingCommands(const MenuOption &option) {
+    switch (option.command_key[1]) {
         default:
             return false;
     }
@@ -877,16 +834,14 @@ bool MenuSystem::menuOptionsColorSettingCommands(const MenuOption &option)
  * @brief Process Command Keys passed from menu selection (Callback)
  * @param option
  */
-bool MenuSystem::menuOptionsCallback(const MenuOption &option)
-{
+bool MenuSystem::menuOptionsCallback(const MenuOption &option) {
     /* Run through the case and switch over the new interface.
     std::string mnuOption = option.CKeys;
     std::string mnuString = option.CString;
     std::string mnuAccess = option.Acs; */
 
     // If Invalid then return
-    if(option.command_key.size() != 2)
-    {
+    if (option.command_key.size() != 2) {
         return false;
     }
 
@@ -896,8 +851,7 @@ bool MenuSystem::menuOptionsCallback(const MenuOption &option)
     // If valid then execute the related Menu Command Function
     idx = firstCommandKeyIndex.find(option.command_key[0], 0);
 
-    if(idx != std::string::npos)
-    {
+    if (idx != std::string::npos) {
         return m_menu_command_functions[option.command_key[0]](option);
     }
 
@@ -908,8 +862,7 @@ bool MenuSystem::menuOptionsCallback(const MenuOption &option)
  * @brief Resets the Menu Input Method in the Function Array
  * @param index
  */
-void MenuSystem::resetMenuInputIndex(int index)
-{
+void MenuSystem::resetMenuInputIndex(int index) {
     m_input_index = index;
 }
 
@@ -917,8 +870,7 @@ void MenuSystem::resetMenuInputIndex(int index)
  * @brief Startup External (Door / Script Process)
  * @param cmdline
  */
-void MenuSystem::startupExternalProcess(const std::string &cmdline)
-{
+void MenuSystem::startupExternalProcess(const std::string &cmdline) {
     m_log.write<Logging::CONSOLE_LOG>("Executing startExternalProcess()=", cmdline);
     //m_menu_session_data->startExternalProcess(cmdline);
 }
@@ -926,8 +878,7 @@ void MenuSystem::startupExternalProcess(const std::string &cmdline)
 /**
  * @brief Clears All Modules
  */
-void MenuSystem::clearAllModules()
-{
+void MenuSystem::clearAllModules() {
     m_log.write<Logging::DEBUG_LOG>("Menu System: clearAllModules()");
     //if(m_module_stack.size() > 0)
     {
@@ -938,8 +889,7 @@ void MenuSystem::clearAllModules()
 /**
  * @brief Exists and Shuts down the current module
  */
-void MenuSystem::shutdownModule()
-{
+void MenuSystem::shutdownModule() {
     // Do module shutdown, only single modules are loaded
     // This makes it easy to allocate and kill on demand.
     //m_log.write<Logging::CONSOLE_LOG>("shutdownModule in MenuSystem() Module=", m_module_stack.back()->m_filename);
@@ -953,7 +903,7 @@ void MenuSystem::shutdownModule()
 void MenuSystem::startupModule(const module_ptr &module)
 {
     m_log.write<Logging::CONSOLE_LOG>("StartupModule in MenuSystem() Module=", module->m_filename);
-    
+
     // First clear any left overs if they exist.
     clearAllModules();
     module->onEnter();
@@ -986,7 +936,7 @@ void MenuSystem::startupModulePreLogon()
  * @brief Start up the Normal Login Process.
  *
 void MenuSystem::startupModuleLogon()
-{    
+{
     // Setup the input processor
     resetMenuInputIndex(MODULE_LOGON_INPUT);
 
@@ -1121,8 +1071,7 @@ void MenuSystem::startupModuleMessageEditor()
  * @param character_buffer
  * @param is_utf8
  */
-void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8)
-{
+void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8) {
     /*
     // Make sure we have an allocated module before processing.
     if(m_module_stack.size() == 0 || character_buffer.size() == 0)
@@ -1139,22 +1088,22 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
     if(!m_module_stack.back()->m_is_active)
     {
         m_log.write<Logging::DEBUG_LOG>(
-            "*** !m_module_stack.back()->m_is_active - shutting down module: " 
+            "*** !m_module_stack.back()->m_is_active - shutting down module: "
             , m_module_stack.back()->m_filename);
         shutdownModule();
-        
+
         // Check if the current user has been logged in yet.
         if(session && session->m_is_session_authorized)
-        {            
+        {
             // If Authorized, then we want to move to main! Startup menu should be TOP or
             // Specified in Config file!  TODO
             m_log.write<Logging::DEBUG_LOG>("m_is_session_authorized");
 
             // TODO This should be individual users start menu!
-            if(m_config->starting_menu_name.size() > 0)
+            if(m_config.starting_menu_name.size() > 0)
             {
-                m_current_menu = m_config->starting_menu_name;
-                m_starting_menu = m_config->starting_menu_name;
+                m_current_menu = m_config.starting_menu_name;
+                m_starting_menu = m_config.starting_menu_name;
             }
             else
             {
@@ -1166,14 +1115,14 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
         else
         {
             m_log.write<Logging::DEBUG_LOG>("!m_is_session_authorized");
-            m_current_menu = "matrix";            
+            m_current_menu = "matrix";
         }
 
         m_log.write<Logging::DEBUG_LOG>("loadAndStartupMenu on initial login");
 
-        if (session) 
+        if (session)
         {
-            loadAndStartupMenu();            
+            loadAndStartupMenu();
         }
     }*/
 }
@@ -1182,8 +1131,7 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
  * @brief Handles parsing input for preLogon module
  *
  */
-void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8)
-{
+void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8) {
     handleLoginInputSystem(character_buffer, is_utf8);
 }
 
@@ -1191,8 +1139,7 @@ void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const 
  * @brief Handles parsing input for Logon module
  *
  */
-void MenuSystem::moduleLogonInput(const std::string &character_buffer, const bool &is_utf8)
-{
+void MenuSystem::moduleLogonInput(const std::string &character_buffer, const bool &is_utf8) {
     handleLoginInputSystem(character_buffer, is_utf8);
 }
 
@@ -1200,8 +1147,7 @@ void MenuSystem::moduleLogonInput(const std::string &character_buffer, const boo
  * @brief Handles parsing input for modules
  *
  */
-void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is_utf8)
-{
+void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is_utf8) {
     /*
     // Make sure we have an allocated module before processing.
     if(m_module_stack.size() == 0 || character_buffer.size() == 0)

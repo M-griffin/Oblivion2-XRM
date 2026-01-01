@@ -32,7 +32,7 @@ ModProtocolEditor::ModProtocolEditor(session_ptr session_data, config_ptr config
     //m_mod_functions.push_back(std::bind(&ModMenuEditor::logon, this, std::placeholders::_1));
 
     // Check of the Text Prompts exist.
-    m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
+    m_is_text_prompt_exist = m_text_prompts_dao.fileExists();
 
     if(!m_is_text_prompt_exist)
     {
@@ -40,7 +40,7 @@ ModProtocolEditor::ModProtocolEditor(session_ptr session_data, config_ptr config
     }
 
     // Loads all Text Prompts for current module
-    m_text_prompts_dao->readPrompts();
+    m_text_prompts_dao.readPrompts();
 }
 
 bool ModProtocolEditor::update(const std::string &, const bool &)

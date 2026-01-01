@@ -1,26 +1,14 @@
 #ifndef GROUPING_DAO_HPP
 #define GROUPING_DAO_HPP
 
-#include <memory>
 #include <vector>
 #include <functional>
 
 #include "../model-sys/grouping.hpp"
 #include "../data-sys/base_dao.hpp"
 
-// Forward Decelerations
-namespace SQLW
-{
-class Database;
-class Query;
-}
-
-// Handle to Database Queries
-typedef std::shared_ptr<SQLW::Query> query_ptr;
-
 // Base Dao Definition
 typedef BaseDao<Grouping> baseGroupingClass;
-
 
 /**
  * @class GroupingDao
@@ -30,13 +18,10 @@ typedef BaseDao<Grouping> baseGroupingClass;
  * @brief Data Access Objects for Conference Grouping
  */
 class GroupingDao
-    : public baseGroupingClass
-{
+        : public baseGroupingClass {
 public:
-
-    explicit GroupingDao(SQLW::Database &database)
-        : baseGroupingClass(database)
-    {
+    explicit GroupingDao(Database &database)
+        : baseGroupingClass(database) {
         // Setup Table name
         m_strTableName = "grouping";
 
@@ -44,33 +29,37 @@ public:
          * Pre Populate Static Queries one Time
          */
         m_cmdFirstTimeSetup =
-            "PRAGMA synchronous=Normal; "
-            "PRAGMA encoding=UTF-8; "
-            "PRAGMA foreign_keys=ON; "
-            "PRAGMA default_cache_size=10000; "
-            "PRAGMA cache_size=10000; ";
+                "PRAGMA synchronous=Normal; "
+                "PRAGMA encoding=UTF-8; "
+                "PRAGMA foreign_keys=ON; "
+                "PRAGMA default_cache_size=10000; "
+                "PRAGMA cache_size=10000; "
+                "PRAGMA journal_mode = WAL; "
+                "PRAGMA temp_store = MEMORY; "
+                "PRAGMA mmap_size = 268435456; ";
 
         // Check if Database Exists.
-        m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
+        m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName +
+                           "' COLLATE NOCASE;";
 
         // Create Table Query (SQLite Only for the moment)
         m_cmdCreateTable =
-            "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
-            "iId               INTEGER PRIMARY KEY, "
-            "iConferenceId     INTEGER NOT NULL, "
-            "iAreaId           INTEGER NOT NULL, "
-            "FOREIGN KEY(iConferenceId) REFERENCES Conference(iId) ON DELETE CASCADE "
-            "); ";
+                "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
+                "iId               INTEGER PRIMARY KEY, "
+                "iConferenceId     INTEGER NOT NULL, "
+                "iAreaId           INTEGER NOT NULL, "
+                "FOREIGN KEY(iConferenceId) REFERENCES Conference(iId) ON DELETE CASCADE "
+                "); ";
 
         m_cmdCreateIndex =
-            "CREATE INDEX IF NOT EXISTS grouping_idx "
-            "ON " + m_strTableName + " (iConferenceId); ";
+                "CREATE INDEX IF NOT EXISTS grouping_idx "
+                "ON " + m_strTableName + " (iConferenceId); ";
 
         // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
         m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
         m_cmdDropIndex = "DROP INDEX IF EXISTS grouping_idx; ";
 
-        // Setup the CallBack for Result Field Mapping
+        // Set up the CallBack for Result Field Mapping
         m_result_callback = std::bind(&GroupingDao::pullGroupingResult, this,
                                       std::placeholders::_1, std::placeholders::_2);
 
@@ -84,16 +73,7 @@ public:
                                       std::placeholders::_1, std::placeholders::_2);
     }
 
-    ~GroupingDao()
-    {
-    }
-
-
-    /**
-     * Base Dao Calls for generic Object Data Calls
-     * (Below This Point)
-     */
-
+    ~GroupingDao() = default;
 
     /**
      * @brief Check If Database Table Exists.
@@ -123,18 +103,18 @@ public:
      * @param obj
      * @return
      */
-    bool updateRecord(group_ptr obj);
+    bool updateRecord(Grouping &obj);
 
     /**
      * @brief Inserts a New Record in the database!
      * @param obj
      * @return
      */
-    long insertRecord(group_ptr obj);
+    long insertRecord(Grouping &obj);
 
     /**
      * @brief Deletes a MessageArea Record
-     * @param areaId
+     * @param id
      * @return
      */
     bool deleteRecord(long id);
@@ -144,13 +124,13 @@ public:
      * @param id
      * @return
      */
-    group_ptr getRecordById(long id);
+    Grouping getRecordById(long id);
 
     /**
      * @brief Retrieve All Records in a Table
      * @return
      */
-    std::vector<group_ptr> getAllRecords();
+    std::vector<Grouping> getAllRecords();
 
     /**
      * @brief Retrieve Count of All Records in a Table
@@ -168,24 +148,24 @@ public:
     /**
      * @brief Create Query String to Insert New Conference Record
      */
-    std::string insertGroupingQryString(std::string qry, group_ptr obj);
+    std::string insertGroupingQryString(std::string qry, Grouping &obj);
 
     /**
      * @brief Creates Query String to Update Existing Conference Record
      */
-    std::string updateGroupingQryString(std::string qry, group_ptr obj);
+    std::string updateGroupingQryString(std::string qry, Grouping &obj);
 
     /**
      * @brief Helper To populate Conference Record with Query Results.
      */
-    void pullGroupingResult(query_ptr qry, group_ptr obj);
+    void pullGroupingResult(Query &qry, Grouping &obj);
 
     /**
      * @brief This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
      * @param values
      */
-    void fillGroupingColumnValues(query_ptr qry, group_ptr obj,
-                                  std::vector< std::pair<std::string, std::string> > &values);
+    void fillGroupingColumnValues(Query &qry, Grouping &obj,
+                                  std::vector<std::pair<std::string, std::string> > &values);
 
 
     /**
@@ -199,11 +179,7 @@ public:
      * @param confId
      * @return
      */
-    std::vector<group_ptr> getAllGroupingsByConferenceId(long confId);
-
+    std::vector<Grouping> getAllGroupingsByConferenceId(long confId);
 };
 
-// Handle to Database Queries
-typedef std::shared_ptr<GroupingDao> group_dao_ptr;
-
-#endif // GROUPING_DAO_HPP
+#endif

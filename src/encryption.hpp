@@ -3,14 +3,13 @@
 
 #include <string>
 
-class Encrypt
-{
-    #define SHA512_OUTPUT_BYTES 64
-    #define ITERATION           1000
+class Encrypt {
+#define SHA512_OUTPUT_BYTES 64
+#define ITERATION           1000
 
 public:
-
     explicit Encrypt() = default;
+
     ~Encrypt() = default;
 
     /**
@@ -55,7 +54,6 @@ public:
      * @return
      */
     bool compare(std::string hash1, std::string hash2);
-
 };
 
 #endif

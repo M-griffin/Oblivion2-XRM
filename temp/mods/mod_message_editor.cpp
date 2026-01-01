@@ -45,7 +45,7 @@ ModMessageEditor::ModMessageEditor(session_ptr session_data, config_ptr config, 
     m_mod_functions.push_back(std::bind(&ModMessageEditor::editorInput, this, std::placeholders::_1));
 
     // Check of the Text Prompts exist.
-    m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
+    m_is_text_prompt_exist = m_text_prompts_dao.fileExists();
 
     if(!m_is_text_prompt_exist)
     {
@@ -53,7 +53,7 @@ ModMessageEditor::ModMessageEditor(session_ptr session_data, config_ptr config, 
     }
 
     // Loads all Text Prompts for current module
-    m_text_prompts_dao->readPrompts();
+    m_text_prompts_dao.readPrompts();
 }
 
 ModMessageEditor::~ModMessageEditor()
@@ -136,7 +136,7 @@ void ModMessageEditor::createTextPrompts()
         value[PROMPT_INPUT_TEXT]              = std::make_pair("User Editor Prompt", "|CR|03E|15/dit User |03D|15/elete User |03C|15/opy User |03F|15/ilter Users |03Q|15/uit : ");
         value[PROMPT_PAUSE]                   = std::make_pair("Pause Prompt", "|CR |03- |15Hit any key to continue or (|03a|15)bort listing |03-|15 |CR");
     */
-    m_text_prompts_dao->writeValue(value);
+    m_text_prompts_dao.writeValue(value);
 }
 
 /**
@@ -334,12 +334,12 @@ std::string ModMessageEditor::processMidTemplate(processor_ansi_ptr ansi_process
     scrubNewLinesChars(new_screen);
 
     // Clear All Mappings
-    m_session_io->clearAllMCIMapping();
-    m_session_io->addMCIMapping("|LT", "");
-    m_session_io->addMCIMapping("|RT", "");
+    m_session_io.clearAllMCIMapping();
+    m_session_io.addMCIMapping("|LT", "");
+    m_session_io.addMCIMapping("|RT", "");
 
     // Build a single code map that can be reused.
-    std::vector<MapType> code_map = m_session_io->pipe2genericCodeMap(new_screen);
+    std::vector<MapType> code_map = m_session_io.pipe2genericCodeMap(new_screen);
 
 
     // Load, then pull MCI off-sets on the screen for margins.
@@ -356,7 +356,7 @@ std::string ModMessageEditor::processMidTemplate(processor_ansi_ptr ansi_process
 
     // Remove Code Mappings from screen the sets up ansi screen
     ansi_process->clearScreen();
-    std::string output_screen = m_session_io->parseCodeMapGenerics(new_screen, code_map);
+    std::string output_screen = m_session_io.parseCodeMapGenerics(new_screen, code_map);
 
     ansi_process->parseTextToBuffer((char *)output_screen.c_str());
 
@@ -379,16 +379,16 @@ std::string ModMessageEditor::processMidTemplate(processor_ansi_ptr ansi_process
 void ModMessageEditor::setupEditor()
 {
     // NOTE Possible make these class instances, so we don't have to keep reloading.
-    std::string top_template = m_common_io->readinAnsi("FSESRT.ANS");
-    std::string mid_template = m_common_io->readinAnsi("FSEMID.ANS");
-    std::string bot_template = m_common_io->readinAnsi("FSEEND.ANS");
+    std::string top_template = m_common_io.readinAnsi("FSESRT.ANS");
+    std::string mid_template = m_common_io.readinAnsi("FSEMID.ANS");
+    std::string bot_template = m_common_io.readinAnsi("FSEEND.ANS");
 
     int term_rows = 0;
     int term_cols = 0;
     if (session_ptr session = getLockedSession())
     {
-        term_rows = session->m_telnet_decoder->getTermRows();
-        term_cols = session->m_telnet_decoder->getTermCols();
+        term_rows = session->getTelnet().getTermRows();
+        term_cols = session->getTelnet().getTermCols();
     }
 
     // Use a Local Ansi Parser for Parsing Menu Templates and determine boundaries.
@@ -450,7 +450,7 @@ void ModMessageEditor::displayTextBoxBuffer()
  */
 void ModMessageEditor::editorInput(const std::string &input)
 {
-    std::string result = m_session_io->getFSEKeyInput(input);
+    std::string result = m_session_io.getFSEKeyInput(input);
 
     if(result.size() == 0)
     {
@@ -471,7 +471,7 @@ void ModMessageEditor::editorInput(const std::string &input)
     else if(result[0] == '\x1b' && result.size() > 2)
     {
         // ESC SEQUENCE - check movement / arrow keys.
-        std::string escape_sequence = m_common_io->getEscapeSequence();        
+        std::string escape_sequence = m_common_io.getEscapeSequence();
         m_log.write<Logging::DEBUG_LOG>("ESC=", escape_sequence);
                 
         m_log.write<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 1] input result=", result);
@@ -494,7 +494,7 @@ void ModMessageEditor::editorInput(const std::string &input)
 
         if(result[0] == '\x1b')
         {
-            std::string escape_sequence = m_common_io->getEscapeSequence();
+            std::string escape_sequence = m_common_io.getEscapeSequence();
             std::cout << "ESC= " << escape_sequence << std::endl;
             m_log.write<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 2] input result=", static_cast<int>(escape_sequence[0]));
 
@@ -661,7 +661,7 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
     bool is_back_space_vt100 = false;
     if (session_ptr session = getLockedSession())
     {
-        is_back_space_vt100 = session->m_user_record->bBackSpaceVt100;
+        is_back_space_vt100 = session->m_user_record.bBackSpaceVt100;
     }
     else
     {

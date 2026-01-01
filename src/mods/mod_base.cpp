@@ -1,7 +1,6 @@
 #include "mod_base.hpp"
 
 #include <algorithm>
-#include <memory>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -15,69 +14,49 @@
 #include "../encoding.hpp"
 #include "../logging.hpp"
 #include "../common_io.hpp"
-//#include "../async_io.hpp"
+#include "../tcp_session.hpp"
 
-#include "libSqliteWrapped.h"
-
-ModBase::ModBase(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process, std::string filename,
-        common_io_ptr common_io, session_io_ptr session_io)
+ModBase::ModBase(TCPSession &session_data, Config &config, ProcessorAnsi &ansi_process, std::string &filename,
+                 CommonIO &common_io, SessionIO &session_io)
     : m_filename(filename)
-    , m_log(Logging::getInstance())
-    , m_session_data(session_data)
-    , m_config(config)    
-    , m_ansi_process(ansi_process)
-    , m_common_io(common_io)
-    , m_session_io(session_io)
-    , m_is_active(false)
-{    
+      , m_is_active(false)
+      , m_log(Logging::getInstance())
+      , m_session_data(session_data)
+      , m_config(config)
+      , m_ansi_process(ansi_process)
+      , m_common_io(common_io)
+      , m_session_io(session_io) {
     // Setup All Mods for Proper Node Logging by Session.
-    m_log.setUserInfo(session_data->m_node_number);
+    m_log.setUserInfo(session_data.getSession().getNodeNumber());
 }
 
-ModBase::~ModBase()
-{
-    m_log.write<Logging::DEBUG_LOG>("~ModBase()");
-    m_session_data.reset();
-    m_config.reset();
-    m_session_io.reset();
-    m_common_io.reset();
-    m_ansi_process.reset();    
-    m_filename.clear();
-    m_is_active = false;    
+ModBase::ModBase(ModBase &&other) noexcept
+    : m_filename(std::move(other.m_filename))
+      , m_is_active(other.m_is_active)
+      , m_log(other.m_log)
+      , m_session_data(other.m_session_data)
+      , m_config(other.m_config)
+      , m_ansi_process(other.m_ansi_process)
+      , m_common_io(other.m_common_io)
+      , m_session_io(other.m_session_io) {
+    // Nothing else to do, references are bound to the same objects as 'other'
 }
 
-/**
- * @brief Retrieve a Session Point to a Locked Session Object.
- */
-session_ptr ModBase::getLockedSession()
-{
-    if (session_ptr session = m_session_data.lock())
-    {
-        return session;
+ModBase &ModBase::operator=(ModBase &&other) noexcept {
+    if (this != &other) {
+        m_filename = std::move(other.m_filename);
+        m_is_active = other.m_is_active;
     }
-    else
-    {
-        m_log.write<Logging::ERROR_LOG>("Session Object Not Available");
-    }
-    
-    return nullptr;
+    return *this;
 }
 
-/**
- * @brief Retrieves User Database from Session.
- */
-SQLW::Database &ModBase::getUserDatabase()
-{
-    return getLockedSession()->m_user_database;
-}
 
 /**
  * @brief Translate Box Chars to UTF-8
  * @param enum_value
  */
-std::string ModBase::baseGetEncodedBoxChar(int enum_value)
-{
-    std::string char_value = std::string(1, static_cast<char>(enum_value));
+std::string ModBase::baseGetEncodedBoxChar(const int enum_value) const {
+    const auto char_value = std::string(1, static_cast<char>(enum_value));
     return Encoding::getInstance().utf8Encode(char_value);
 }
 
@@ -85,12 +64,10 @@ std::string ModBase::baseGetEncodedBoxChar(int enum_value)
  * @brief Translate Box Chars to UTF-8 with Default box Color
  * @param enum_value
  */
-std::string ModBase::baseGetEncodedBoxCharAndColor(int enum_value)
-{
-    std::string char_value = std::string(1, static_cast<char>(enum_value));
+std::string ModBase::baseGetEncodedBoxCharAndColor(const int enum_value) const {
+    const auto char_value = std::string(1, static_cast<char>(enum_value));
     return baseGetDefaultBoxColor() + Encoding::getInstance().utf8Encode(char_value);
 }
-
 
 /**
  * @brief Generic Border Screen used buy several interfaces for display.
@@ -99,64 +76,42 @@ std::string ModBase::baseGetEncodedBoxCharAndColor(int enum_value)
  * @param max_cols
  * @return
  */
-std::string ModBase::baseCreateBorderedDisplay(std::vector<std::string> result_set, int total_rows, int max_cols)
-{
+std::string ModBase::baseCreateBorderedDisplay(std::vector<std::string> result_set, const int total_rows,
+                                               const int max_cols) {
     // Vector or Menus, Loop through
-    std::vector<std::string>::iterator i = result_set.begin();
+    auto i = result_set.begin();
     std::string buffer = "";
 
-    for(int rows = 0; rows < total_rows; rows++)
-    {
+    for (int rows = 0; rows < total_rows; rows++) {
         buffer += "  "; // 3 Leading spaces per row.
 
-        for(int cols = 0; cols < max_cols; cols++)
-        {
+        for (int cols = 0; cols < max_cols; cols++) {
             // Top Row
-            if(rows == 0 && cols == 0)
-            {
+            if (rows == 0 && cols == 0) {
                 buffer += baseGetEncodedBoxCharAndColor(M_BORDER_TOP_LEFT);
-            }
-            else if(rows == 0 && cols == max_cols-1)
-            {
+            } else if (rows == 0 && cols == max_cols - 1) {
                 buffer += baseGetEncodedBoxCharAndColor(M_BORDER_TOP_RIGHT);
-            }
-            else if(rows == 0 && cols % (max_cols-1) == 0)
-            {
+            } else if (rows == 0 && cols % (max_cols - 1) == 0) {
                 buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID_TOP);
-            }
-            else if(rows == 0)
-            {
+            } else if (rows == 0) {
                 buffer += baseGetEncodedBoxCharAndColor(M_BORDER_ROW);
             }
 
             // Bottom Row
-            else if(rows == total_rows-1 && cols == 0)
-            {
+            else if (rows == total_rows - 1 && cols == 0) {
                 buffer += baseGetEncodedBoxCharAndColor(M_BORDER_BOT_LEFT);
-            }
-            else if(rows == total_rows-1 && cols == max_cols-1)
-            {
+            } else if (rows == total_rows - 1 && cols == max_cols - 1) {
                 buffer += baseGetEncodedBoxCharAndColor(M_BORDER_BOT_RIGHT);
-            }
-            else if(rows == total_rows-1 && cols % (max_cols-1) == 0)
-            {
+            } else if (rows == total_rows - 1 && cols % (max_cols - 1) == 0) {
                 buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID_BOT);
-            }
-            else if(rows == total_rows-1)
-            {
+            } else if (rows == total_rows - 1) {
                 buffer += baseGetEncodedBoxCharAndColor(M_BORDER_ROW);
-            }
-            else if(cols % (max_cols-1) == 0)
-            {
+            } else if (cols % (max_cols - 1) == 0) {
                 buffer += baseGetEncodedBoxCharAndColor(M_BORDER_MID);
-            }
-            else
-            {
+            } else {
                 // Here we insert the Menu name and pad through to 8 characters.
-                if(cols == 1)
-                {
-                    if(i != result_set.end())
-                    {
+                if (cols == 1) {
+                    if (i != result_set.end()) {
                         buffer += *i;
                         ++i;
                     }
@@ -176,12 +131,11 @@ std::string ModBase::baseCreateBorderedDisplay(std::vector<std::string> result_s
  * @brief Transform Strings to Uppercase with Locale
  * @param value
  */
-void ModBase::baseTransformToUpper(std::string &value)
-{
-    auto stringToUpper = std::bind1st(
-                             std::mem_fun(
-                                 &std::ctype<char>::toupper),
-                             &std::use_facet<std::ctype<char> >(std::locale()));
+void ModBase::baseTransformToUpper(std::string &value) {
+    const auto stringToUpper = std::bind1st(
+        std::mem_fun(
+            &std::ctype<char>::toupper),
+        &std::use_facet<std::ctype<char> >(std::locale()));
 
     transform(value.begin(), value.end(), value.begin(), stringToUpper);
 }
@@ -190,12 +144,11 @@ void ModBase::baseTransformToUpper(std::string &value)
  * @brief Transform Strings to Lowercase with Locale
  * @param value
  */
-void ModBase::baseTransformToLower(std::string &value)
-{
-    auto stringToLower = std::bind1st(
-                             std::mem_fun(
-                                 &std::ctype<char>::tolower),
-                             &std::use_facet<std::ctype<char> >(std::locale()));
+void ModBase::baseTransformToLower(std::string &value) {
+    const auto stringToLower = std::bind1st(
+        std::mem_fun(
+            &std::ctype<char>::tolower),
+        &std::use_facet<std::ctype<char> >(std::locale()));
 
     transform(value.begin(), value.end(), value.begin(), stringToLower);
 }
@@ -204,8 +157,7 @@ void ModBase::baseTransformToLower(std::string &value)
  * @brief Gets the Default Color Sequence
  * @return
  */
-std::string ModBase::baseGetDefaultColor()
-{
+std::string ModBase::baseGetDefaultColor() const {
     return m_session_io.pipeColors(m_config.default_color_regular);
 }
 
@@ -213,8 +165,7 @@ std::string ModBase::baseGetDefaultColor()
  * @brief Gets the Default Input Color Sequence
  * @return
  */
-std::string ModBase::baseGetDefaultInputColor()
-{
+std::string ModBase::baseGetDefaultInputColor() const {
     return m_session_io.pipeColors(m_config.default_color_input);
 }
 
@@ -222,8 +173,7 @@ std::string ModBase::baseGetDefaultInputColor()
  * @brief Gets the Default Input Color Sequence
  * @return
  */
-std::string ModBase::baseGetDefaultInverseColor()
-{
+std::string ModBase::baseGetDefaultInverseColor() const {
     return m_session_io.pipeColors(m_config.default_color_inverse);
 }
 
@@ -231,8 +181,7 @@ std::string ModBase::baseGetDefaultInverseColor()
  * @brief Gets the Default Box Color Sequence
  * @return
  */
-std::string ModBase::baseGetDefaultBoxColor()
-{
+std::string ModBase::baseGetDefaultBoxColor() const {
     return m_session_io.pipeColors(m_config.default_color_box);
 }
 
@@ -240,8 +189,7 @@ std::string ModBase::baseGetDefaultBoxColor()
  * @brief Gets the Default Prompt Color Sequence
  * @return
  */
-std::string ModBase::baseGetDefaultPromptColor()
-{
+std::string ModBase::baseGetDefaultPromptColor() const {
     return m_session_io.pipeColors(m_config.default_color_prompt);
 }
 
@@ -249,8 +197,7 @@ std::string ModBase::baseGetDefaultPromptColor()
  * @brief Gets the Default Stat Color Sequence
  * @return
  */
-std::string ModBase::baseGetDefaultStatColor()
-{
+std::string ModBase::baseGetDefaultStatColor() const {
     return m_session_io.pipeColors(m_config.default_color_stat);
 }
 
@@ -259,20 +206,13 @@ std::string ModBase::baseGetDefaultStatColor()
  *        Then delivering the data to the client
  * @param data
  */
-void ModBase::baseProcessAndDeliver(std::string &data)
-{
+void ModBase::baseProcessAndDeliver(std::string &data) const {
     // Clear out attributes on new strings no bleeding of colors.
     std::string output = "\x1b[0m" + baseGetDefaultColor();
-    output += std::move(data);
-    m_ansi_process->parseTextToBuffer((char *)output.c_str());
+    output += data;
+    m_ansi_process.parseTextToBuffer(const_cast<char *>(output.c_str()));
     output += baseGetDefaultInputColor();
-    
-    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
-    if(session_ptr session = getLockedSession())
-    {
-        session->deliver(output);
-    }
-    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
+    m_session_data.getSession().send(output);
 }
 
 /**
@@ -280,28 +220,20 @@ void ModBase::baseProcessAndDeliver(std::string &data)
  *        Then delivering the data to the client, Then Disconnect
  * @param data
  */
-void ModBase::baseProcessAndDeliverThenDisconnect(std::string &data)
-{
+void ModBase::baseProcessAndDeliverThenDisconnect(std::string &data) const {
     // Clear out attributes on new strings no bleeding of colors.
     std::string output = "\x1b[0m" + baseGetDefaultColor();
-    output += std::move(data);
-    m_ansi_process->parseTextToBuffer((char *)output.c_str());
-    output += baseGetDefaultInputColor();    
-    
-    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
-    if(session_ptr session = getLockedSession())
-    {
-        session->deliver(output, DISCONNECT_USER);
-    }
-    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
+    output += data;
+    m_ansi_process.parseTextToBuffer(const_cast<char *>(output.c_str()));
+    output += baseGetDefaultInputColor();
+    m_session_data.getSession().send(output, DISCONNECT_USER);
 }
 
 /**
  * @brief Deliver Output followed with New Line.
  * @param data
  */
-void ModBase::baseProcessAndDeliverNewLine(std::string &data)
-{
+void ModBase::baseProcessAndDeliverNewLine(std::string &data) const {
     data += "\r\n";
     baseProcessAndDeliver(data);
 }
@@ -309,8 +241,7 @@ void ModBase::baseProcessAndDeliverNewLine(std::string &data)
 /**
  * @brief Deliver NewLine for [ENTER] On Prompts.
  */
-void ModBase::baseProcessDeliverNewLine()
-{
+void ModBase::baseProcessDeliverNewLine() const {
     std::string data = "\r\n";
     baseProcessAndDeliver(data);
 }
@@ -318,82 +249,66 @@ void ModBase::baseProcessDeliverNewLine()
 /**
  * @brief Deliver Input for prompts (No Coloring Extras)
  */
-void ModBase::baseProcessDeliverInput(std::string &data)
-{
-    m_ansi_process->parseTextToBuffer((char *)data.c_str());
-    
-    if(session_ptr session = getLockedSession())
-    {
-        session->deliver(data);
-    }
+void ModBase::baseProcessDeliverInput(std::string &data) const {
+    m_ansi_process.parseTextToBuffer(const_cast<char *>(data.c_str()));
+    m_session_data.getSession().send(data);
 }
 
 /**
  * @brief Deliver Input for prompts Then Disconnect (No Coloring Extras)
  */
-void ModBase::baseProcessDeliverInputAndDisconnect(std::string &data)
-{
-    m_ansi_process->parseTextToBuffer((char *)data.c_str());
-    
-    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
-    if(session_ptr session = getLockedSession())
-    {
-        session->deliver(data, DISCONNECT_USER);
-    }
-    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
+void ModBase::baseProcessDeliverInputAndDisconnect(std::string &data) const {
+    m_ansi_process.parseTextToBuffer(const_cast<char *>(data.c_str()));
+    m_session_data.getSession().send(data, DISCONNECT_USER);
 }
 
 /**
  * @brief Pull and Display Prompts
  * @param prompt
+ * @param m_text_dao
+ * @param is_disconnect
  */
-void ModBase::baseDisplayPrompt(const std::string &prompt, text_prompts_dao_ptr m_text_dao, bool is_disconnect)
-{
+void ModBase::baseDisplayPrompt(const std::string &prompt, TextPromptsDao &m_text_dao, const bool is_disconnect) const {
     // Set Default String Color, Can be overridden with pipe colors in text prompt.
     std::string result = baseGetDefaultColor();
 
     // Parse Prompt for Input Color And Position Override.
     // If found, the colors of the MCI Codes should be used as the default color.
-    M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
-    std::string::size_type idx = prompt_set.second.find("%IN", 0);
+    M_StringPair prompt_set = m_text_dao.getPrompt(prompt);
+    const std::string::size_type idx = prompt_set.second.find("%IN", 0);
 
-    result += std::move(m_session_io.parseTextPrompt(prompt_set));
+    result += m_session_io.parseTextPrompt(prompt_set);
 
     // Not found, set default input color
-    if(idx == std::string::npos)
-    {
+    if (idx == std::string::npos) {
         result += baseGetDefaultInputColor();
     }
 
-    if (is_disconnect)
-    {
+    if (is_disconnect) {
         baseProcessAndDeliverThenDisconnect(result);
-    }
-    else
-    {
-        baseProcessAndDeliver(result);        
+    } else {
+        baseProcessAndDeliver(result);
     }
 }
 
 /**
  * @brief Pull and Return Display Prompt
  * @param prompt
+ * @param m_text_dao
  */
-std::string ModBase::baseGetDisplayPrompt(const std::string &prompt, text_prompts_dao_ptr m_text_dao)
-{
+std::string ModBase::baseGetDisplayPrompt(const std::string &prompt, TextPromptsDao &m_text_dao) const {
     // Set Default String Color, Can be overridden with pipe colors in text prompt.
     std::string result = baseGetDefaultColor();
 
     // Parse Prompt for Input Color And Position Override.
     // If found, the colors of the MCI Codes should be used as the default color.
-    M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
-    std::string::size_type idx = prompt_set.second.find("%IN", 0);
+    M_StringPair prompt_set = m_text_dao.getPrompt(prompt);
+    const std::string::size_type idx = prompt_set.second.find("%IN", 0);
 
-    result += std::move(m_session_io.parseTextPrompt(prompt_set));
+    result += m_session_io.parseTextPrompt(prompt_set);
 
     // Not found, set default input color
-    if(idx == std::string::npos)
-    {
+    if (idx == std::string::npos) {
         result += baseGetDefaultInputColor();
     }
 
@@ -403,53 +318,52 @@ std::string ModBase::baseGetDisplayPrompt(const std::string &prompt, text_prompt
 /**
  * @brief Pull and Return Raw Display Prompts
  * @param prompt
+ * @param m_text_dao
  */
-std::string ModBase::baseGetDisplayPromptRaw(const std::string &prompt, text_prompts_dao_ptr m_text_dao)
-{
+std::string ModBase::baseGetDisplayPromptRaw(const std::string &prompt, TextPromptsDao &m_text_dao) const {
     // Parse Prompt for Input Color And Position Override.
     // If found, the colors of the MCI Codes should be used as the default color.
-    M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
+    M_StringPair prompt_set = m_text_dao.getPrompt(prompt);
     return prompt_set.second;
 }
-
 
 /**
  * @brief Pull and Return Raw Display Prompts Parse Pipe Codes to ANSI
  * @param prompt
+ * @param m_text_dao
  */
-std::string ModBase::baseGetDisplayPromptPipeToAnsi(const std::string &prompt, text_prompts_dao_ptr m_text_dao)
-{
+std::string ModBase::baseGetDisplayPromptPipeToAnsi(const std::string &prompt, TextPromptsDao &m_text_dao) const {
     // Parse Prompt for Input Color And Position Override.
     // If found, the colors of the MCI Codes should be used as the default color.
-    M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
+    M_StringPair prompt_set = m_text_dao.getPrompt(prompt);
     return m_session_io.pipeColors(prompt_set.second);
 }
-
 
 /**
  * @brief Pull and Display Prompts, Replace MCI Code |OT
  * @param prompt
+ * @param m_text_dao
+ * @param mci_field
  */
-void ModBase::baseDisplayPromptMCI(const std::string &prompt, text_prompts_dao_ptr m_text_dao, std::string mci_field)
-{
+void ModBase::baseDisplayPromptMCI(const std::string &prompt, TextPromptsDao &m_text_dao,
+                                   const std::string &mci_field) const {
     // Set Default String Color, Can be overridden with pipe colors in text prompt.
     std::string result = baseGetDefaultColor();
 
     // Parse Prompt for Input Color And Position Override.
     // If found, the colors of the MCI Codes should be used as the default color.
-    M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
-    std::string::size_type idx  = prompt_set.second.find("%IN", 0);
+    M_StringPair prompt_set = m_text_dao.getPrompt(prompt);
+    const std::string::size_type idx = prompt_set.second.find("%IN", 0);
 
     // Parse and replace the MCI Code with the field value
-    std::string mci_code = "|OT";
+    const std::string mci_code = "|OT";
     m_common_io.parseLocalMCI(prompt_set.second, mci_code, mci_field);
 
     // Does pipe2ansi for colors etc..
-    result += std::move(m_session_io.parseTextPrompt(prompt_set));
+    result += m_session_io.parseTextPrompt(prompt_set);
 
     // Not found, set default input color
-    if(idx == std::string::npos)
-    {
+    if (idx == std::string::npos) {
         result += baseGetDefaultInputColor();
     }
 
@@ -459,57 +373,78 @@ void ModBase::baseDisplayPromptMCI(const std::string &prompt, text_prompts_dao_p
 /**
  * @brief Pull and Display Prompt with a following new line for info messages.
  * @param prompt
+ * @param m_text_dao
  */
-void ModBase::baseDisplayPromptAndNewLine(const std::string &prompt, text_prompts_dao_ptr m_text_dao)
-{
+void ModBase::baseDisplayPromptAndNewLine(const std::string &prompt, TextPromptsDao &m_text_dao) const {
     // Set Default String Color, Can be overridden with pipe colors in text prompt.
     std::string result = baseGetDefaultColor();
 
     // Parse Prompt for Input Color And Position Override.
     // If found, the colors of the MCI Codes should be used as the default color.
-    M_StringPair prompt_set = m_text_dao->getPrompt(prompt);
-    std::string::size_type idx = prompt_set.second.find("%IN", 0);
+    M_StringPair prompt_set = m_text_dao.getPrompt(prompt);
+    const std::string::size_type idx = prompt_set.second.find("%IN", 0);
 
     result += m_session_io.parseTextPrompt(prompt_set);
 
     // Not found, set default input color
-    if(idx == std::string::npos)
-    {
+    if (idx == std::string::npos) {
         result += baseGetDefaultInputColor();
     }
 
     // Add New Line.
     result += "\r\n";
-    
+
     baseProcessAndDeliver(result);
 }
 
 /**
  * @brief Move to End of Display then output
- * @param output
+ * @param prompt
  */
-void ModBase::moveToBottomAndDisplay(const std::string &prompt)
-{
+void ModBase::moveToBottomAndDisplay(const std::string &prompt) const {
     std::string output = "";
-    int screen_row = m_ansi_process->getMaxRowsUsedOnScreen();
+    const int screen_row = m_ansi_process.getMaxRowsUsedOnScreen();
 
     output += baseGetDefaultColor();
     output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
-    output += std::move(prompt);
+    output += prompt;
     baseProcessAndDeliver(output);
 }
 
 /**
  * @brief Move to End of Display then Setup Display for String
- * @param output
+ * @param prompt
  */
-std::string ModBase::moveStringToBottom(const std::string &prompt)
-{
+std::string ModBase::moveStringToBottom(const std::string &prompt) const {
     std::string output = "";
-    int screen_row = m_ansi_process->getMaxRowsUsedOnScreen();
+    const int screen_row = m_ansi_process.getMaxRowsUsedOnScreen();
 
     output += baseGetDefaultColor();
     output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
-    output += std::move(prompt);
+    output += prompt;
     return output;
+}
+
+/**
+ * Determine if the current module is active or has been shutdown
+ * @return
+ */
+bool ModBase::isModuleActive() const {
+    return m_is_active;
+}
+
+/**
+ * First Time Module Setup
+ * @return
+ */
+void ModBase::setModuleActive() {
+    m_is_active = true;
+}
+
+/**
+ * Deactivate Module for Cleanup.
+ * @return
+ */
+void ModBase::setModuleInActive() {
+    m_is_active = false;
 }

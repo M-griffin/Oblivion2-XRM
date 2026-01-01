@@ -50,7 +50,7 @@ ModLogon::ModLogon(session_ptr session_data, config_ptr config, processor_ansi_p
     m_mod_functions.push_back(std::bind(&ModLogon::passwordChange, this, std::placeholders::_1));
 
     // Check of the Text Prompts exist.
-    m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
+    m_is_text_prompt_exist = m_text_prompts_dao.fileExists();
 
     if(!m_is_text_prompt_exist)
     {
@@ -58,7 +58,7 @@ ModLogon::ModLogon(session_ptr session_data, config_ptr config, processor_ansi_p
     }
 
     // Loads all Text Prompts for current module
-    m_text_prompts_dao->readPrompts();
+    m_text_prompts_dao.readPrompts();
 }
 
 ModLogon::~ModLogon()
@@ -136,7 +136,7 @@ void ModLogon::createTextPrompts()
     value[PROMPT_INVALID_USERNAME]    = std::make_pair("Invalid Username", "|04Invalid Username! Try again.|CR");
     value[PROMPT_INVALID_PASSWORD]    = std::make_pair("Invalid Password", "|04Invalid Password! Try again.|CR");
 
-    m_text_prompts_dao->writeValue(value);
+    m_text_prompts_dao.writeValue(value);
 }
 
 /**
@@ -211,14 +211,14 @@ void ModLogon::setupLogon()
  */
 void ModLogon::displayUserNumber()
 {
-    M_StringPair prompt_set = m_text_prompts_dao->getPrompt(PROMPT_USERNUMBER);
+    M_StringPair prompt_set = m_text_prompts_dao.getPrompt(PROMPT_USERNUMBER);
 
     std::string mci_code = "|OT";
     std::string result = prompt_set.second;
     std::string user_number = std::to_string(m_logon_user->iId);
 
-    m_common_io->parseLocalMCI(result, mci_code, user_number);
-    result = m_session_io->pipe2ansi(result);
+    m_common_io.parseLocalMCI(result, mci_code, user_number);
+    result = m_session_io.pipe2ansi(result);
     result += "\r\n";
     baseProcessAndDeliver(result);
 }
@@ -269,7 +269,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
     users_dao_ptr user_data = std::make_shared<UsersDao>(getUserDatabase());
 
     // Check if a Digit, if so, lookup by userId.
-    if(m_common_io->isDigit(input))
+    if(m_common_io.isDigit(input))
     {
         long userId = 0;
         std::stringstream ss(input);
@@ -290,7 +290,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
     }
 
     // Pass through all (3) checks if they are all enabled.
-    if(m_config->use_handle)
+    if(m_config.use_handle)
     {
         m_logon_user = user_data->getUserByHandle(input);
 
@@ -301,7 +301,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
         }
     }
 
-    if(m_config->use_email)
+    if(m_config.use_email)
     {
         m_logon_user = user_data->getUserByEmail(input);
 
@@ -312,7 +312,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
         }
     }
 
-    if(m_config->use_real_name)
+    if(m_config.use_real_name)
     {
         m_logon_user = user_data->getUserByRealName(input);
 
@@ -333,7 +333,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
 bool ModLogon::logon(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io->getInputField(input, key, Config::sName_length);
+    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -366,9 +366,9 @@ bool ModLogon::logon(const std::string &input)
 
             // If max, then exit back to matrix.
             // NOTE Separate login/password attempts or change to login?
-            if(m_failure_attempts >= m_config->invalid_password_attempts)
+            if(m_failure_attempts >= m_config.invalid_password_attempts)
             {
-                //m_session_data->disconnectUser();
+                //m_session_data.disconnectUser();
                 m_is_active = false;
                 return false;
             }
@@ -446,7 +446,7 @@ bool ModLogon::password(const std::string &input)
 {
     std::string key = "";
     bool useHiddenOutput = true;
-    std::string result = m_session_io->getInputField(input, key, Config::sPassword_length, "", useHiddenOutput);
+    std::string result = m_session_io.getInputField(input, key, Config::sPassword_length, "", useHiddenOutput);
 
     // ESC was hit
     if(result == "aborted")
@@ -481,7 +481,7 @@ bool ModLogon::password(const std::string &input)
             ++m_failure_attempts;
 
             // If max, then exit back to matrix.
-            if(m_failure_attempts >= m_config->invalid_password_attempts)
+            if(m_failure_attempts >= m_config.invalid_password_attempts)
             {
                 m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
                 if (session_ptr session = getLockedSession())

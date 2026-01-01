@@ -1,7 +1,6 @@
 #ifndef STRUCTURES_HPP
 #define STRUCTURES_HPP
 
-
 #include <string>
 #include <map>
 
@@ -12,7 +11,7 @@ extern std::string GLOBAL_MENU_PROMPT_PATH;
 extern std::string GLOBAL_TEXTFILE_PATH;
 extern std::string GLOBAL_SCRIPT_PATH;
 extern std::string GLOBAL_LOG_PATH;
-extern std::string USERS_DATABASE;
+extern std::string CORE_DATABASE;
 extern std::string BUILD_INFO;
 
 /**
@@ -21,13 +20,11 @@ extern std::string BUILD_INFO;
 const std::string GLOBAL_PROMPT_PAUSE = "pause";
 
 
-
 /**
  * @brief List of interfaces for pipe2ansi conversion
  */
-enum
-{
-    STANDARD_MCI,   // Access to All Standard MCI Codes and PIPE Colors
+enum {
+    STANDARD_MCI, // Access to All Standard MCI Codes and PIPE Colors
     MENU_PROMPT_MCI // Access to Menu Prompt MCI Codes and PIPE Colors
     // WIP rest, ie Stat screens and others with unique codes.
 };
@@ -35,13 +32,12 @@ enum
 /**
  * @brief Saves All MCI and PIPE Matches with Offsets for replacement.
  */
-typedef struct MapType
-{
+typedef struct MapType {
     std::string::size_type m_offset;
     std::string::size_type m_length;
     std::string::size_type m_match;
-    std::string            m_code;
-    bool                   m_or;
+    std::string m_code;
+    bool m_or;
 } MapType;
 
 
@@ -134,4 +130,4 @@ typedef struct FidoMessage {
 } FidoMessage;
  */
 
-#endif // STRUCTURES_HPP
+#endif

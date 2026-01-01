@@ -12,20 +12,18 @@
 #include <thread>
 
 
-thread_local unsigned int local_node_number = 0; 
+thread_local unsigned int local_node_number = 0;
 
 Logging::Logging()
     : m_log_level(INFO_LOG)
-    , m_mutex()
-{
+      , m_mutex() {
 }
 
 /**
  * @brief Helper, appends forward/backward slash to path
  * @param value
  */
-void Logging::pathSeperator(std::string &value)
-{
+void Logging::pathSeperator(std::string &value) {
 #ifdef _WIN32
     value.append("\\");
 #else
@@ -37,8 +35,7 @@ void Logging::pathSeperator(std::string &value)
  * @brief Return number of Logs in Queue
  * @return
  */
-int Logging::getNumberOfLogEntries()
-{
+int Logging::getNumberOfLogEntries() {
     return 0; //m_log_entries.size();
 }
 
@@ -47,8 +44,7 @@ int Logging::getNumberOfLogEntries()
 * @param std_time
 * @return
 */
-std::string Logging::standardDateTimeToString(std::time_t std_time)
-{
+std::string Logging::standardDateTimeToString(std::time_t std_time) {
     std::ostringstream oss;
     oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d %H:%M:%S %z");
     std::string datetime_string = oss.str();
@@ -61,9 +57,8 @@ std::string Logging::standardDateTimeToString(std::time_t std_time)
  * @brief Current Time Stamp (LOCAL TIME)
  * @return
  */
-std::string Logging::getCurrentDateTime()
-{
-    std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+std::string Logging::getCurrentDateTime() {
+    const std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     return standardDateTimeToString(now);
 }
 
@@ -71,15 +66,14 @@ std::string Logging::getCurrentDateTime()
  * @brief Current Time Stamp (LOCAL TIME) - With MilliSeconds!
  * @return
  */
-std::string Logging::getCurrentDateTimeMillis()
-{
+std::string Logging::getCurrentDateTimeMillis() {
     // Millisecond are not native, we need to take (absoulte seconds - absolute millisonds) to get the left overs then append it.
     auto now = std::chrono::system_clock::now();
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) -
-      std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch());
+              std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch());
 
     std::ostringstream oss;
-    std::time_t localnow = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    const std::time_t localnow = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     oss << std::put_time(std::localtime(&localnow), "%Y-%m-%d %H:%M:%S.");
     oss << std::setfill('0') << std::setw(3) << ms.count();
     std::string datetime_string = oss.str();
@@ -92,19 +86,18 @@ std::string Logging::getCurrentDateTimeMillis()
  * @param log_level
  * @return
  */
-int Logging::getConfigurationLogState(const std::string &log_level)
-{
-    if(log_level == "INFO")
+int Logging::getConfigurationLogState(const std::string &log_level) {
+    if (log_level == "INFO")
         return 0;
-    else if(log_level == "DEBUG")
+    else if (log_level == "DEBUG")
         return 1;
-    else if(log_level == "WARN")
+    else if (log_level == "WARN")
         return 2;
-    else if(log_level == "ERROR")
+    else if (log_level == "ERROR")
         return 3;
-    else if(log_level == "CONSOLE")
+    else if (log_level == "CONSOLE")
         return 4;
-    else if(log_level == "ALL")
+    else if (log_level == "ALL")
         return 5;
     else
         // Default is Info
@@ -115,18 +108,16 @@ int Logging::getConfigurationLogState(const std::string &log_level)
  * @brief Set Logging Level From Configurations by String and Convert to Int Level.
  * @param log_level
  */
-void Logging::setLoggingLevel(std::string log_level) 
-{
+void Logging::setLoggingLevel(std::string log_level) {
     m_log_level = getConfigurationLogState(log_level);
 }
 
-    
+
 /**
  * @brief Set the Node Number for a Thread Local
  * @param node_number
  */
-void Logging::setUserInfo(int node_number)
-{
+void Logging::setUserInfo(int node_number) {
     local_node_number = node_number;
 }
 
@@ -136,21 +127,21 @@ void Logging::setUserInfo(int node_number)
  * @param date_time
  * @param details
  */
-void Logging::writeOutConsole(const std::string &date_time, std::vector<std::string> &details)
-{
-    if (local_node_number > 0) 
-    {
-        std::cout << "Node " << local_node_number <<" | ";
+void Logging::writeOutConsole(const std::string &date_time, std::vector<std::string> &details) {
+
+    if (details.empty()) {
+        return;
     }
-    else
-    {
+
+    if (local_node_number > 0) {
+        std::cout << "Node " << local_node_number << " | ";
+    } else {
         std::cout << "System | ";
     }
-    
+
     std::cout << date_time << " : ";
-    for(std::string &d : details)
-    {
+    for (std::string &d: details) {
         std::cout << d << " | ";
     }
     std::cout << std::endl;
-}    
+}

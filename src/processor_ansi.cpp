@@ -26,9 +26,8 @@
 
 #include "utf-cpp/utf8.h"
 
-ProcessorAnsi::ProcessorAnsi(const int term_height, const int term_width)
-    : ProcessorBase(term_height, term_width) {
-    m_log.write<Logging::DEBUG_LOG>("PROCESSOR_ANSI rows=", term_height, "cols=", term_width);
+ProcessorAnsi::ProcessorAnsi()
+    : ProcessorBase(24, 80) {
     m_screen_buffer.reserve((m_number_lines * m_characters_per_line) + 1);
     m_screen_buffer.resize((m_number_lines * m_characters_per_line) + 1);
 }

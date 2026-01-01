@@ -18,6 +18,7 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Available configurat
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_WIN32_EXECUTABLE FALSE)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Silence specific warnings if needed
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wno-unused-result -Wno-deprecated-declarations")

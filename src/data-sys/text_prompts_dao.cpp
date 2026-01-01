@@ -16,29 +16,50 @@ static bool is_version_displayed = false;
 // Global Cache of Loaded Text Prompts
 std::map<std::string, M_TextPrompt> TEXT_PROMPTS;
 
-TextPromptsDao::TextPromptsDao(std::string path, const std::string &filename)
+TextPromptsDao::TextPromptsDao(std::string &path, std::string &filename)
     : m_log(Logging::getInstance())
-    , m_path(path)
-    , m_filename(filename)
-    , m_is_loaded(false)
-{
+      , m_path(path)
+      , m_filename(filename)
+      , m_is_loaded(false) {
     m_log.write<Logging::CONSOLE_LOG>("TextPromptsDao path=", m_path, "filename=", m_filename);
 }
 
-TextPromptsDao::~TextPromptsDao()
-{
+TextPromptsDao::~TextPromptsDao() {
     m_log.write<Logging::CONSOLE_LOG>("~TextPromptsDao()");
-    m_is_loaded = false;    
-    //m_text_prompts.clear();    
+    m_is_loaded = false;
+    //m_text_prompts.clear();
     //std::map<std::string, std::pair<std::string, std::string> >().swap(m_text_prompts);
 }
+
+TextPromptsDao::TextPromptsDao(TextPromptsDao &&other) noexcept
+    : m_log(other.m_log) // reference must be initialized from other
+      , m_path(std::move(other.m_path))
+      , m_filename(std::move(other.m_filename))
+      , m_is_loaded(other.m_is_loaded) {
+    // Optionally reset other's members
+    other.m_is_loaded = false;
+}
+
+TextPromptsDao &TextPromptsDao::operator=(TextPromptsDao &&other) noexcept {
+    if (this != &other) {
+        // m_log is a reference, cannot be reassigned
+
+        m_path = std::move(other.m_path);
+        m_filename = std::move(other.m_filename);
+        m_is_loaded = other.m_is_loaded;
+
+        // Optionally reset other's members
+        other.m_is_loaded = false;
+    }
+    return *this;
+}
+
 
 /**
  * @brief Helper, appends forward/backward slash to path
  * @param value
  */
-void TextPromptsDao::pathSeperator(std::string &value)
-{
+void TextPromptsDao::pathSeperator(std::string &value) {
 #ifdef _WIN32
     value.append("\\");
 #else
@@ -50,16 +71,14 @@ void TextPromptsDao::pathSeperator(std::string &value)
  * @brief Check if the file exists and we need to create a new one.
  * @return
  */
-bool TextPromptsDao::fileExists()
-{
+bool TextPromptsDao::fileExists() {
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
 
     std::ifstream ifs(path);
 
-    if(!ifs.is_open())
-    {
+    if (!ifs.is_open()) {
         return false;
     }
 
@@ -71,16 +90,14 @@ bool TextPromptsDao::fileExists()
  * @brief Takes mapping of M_TextPrompt and writes out Key, (Value, Value).
  * @param value
  */
-void TextPromptsDao::writeValue(M_TextPrompt &value)
-{
+void TextPromptsDao::writeValue(M_TextPrompt &value) {
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
 
     std::ofstream ofs(path);
 
-    if(!ofs.is_open())
-    {
+    if (!ofs.is_open()) {
         m_log.write<Logging::ERROR_LOG>("Error, unable to write to=", path);
         return;
     }
@@ -95,10 +112,9 @@ void TextPromptsDao::writeValue(M_TextPrompt &value)
 
     out << YAML::Key << "file_version" << YAML::Value << FILE_VERSION;
 
-    for(auto it = value.begin(); it != value.end(); ++it)
-    {
-        out << YAML::Key << (*it).first;
-        out << YAML::Value << YAML::BeginSeq << (*it).second.first << (*it).second.second << YAML::EndSeq;
+    for (auto &it: value) {
+        out << YAML::Key << it.first;
+        out << YAML::Value << YAML::BeginSeq << it.second.first << it.second.second << YAML::EndSeq;
     }
 
     out << YAML::EndMap;
@@ -113,92 +129,78 @@ void TextPromptsDao::writeValue(M_TextPrompt &value)
  * @brief Read in the prompt file to the class.
  * @return
  */
-bool TextPromptsDao::readPrompts()
-{    
-    if (TEXT_PROMPTS[m_filename].empty())
-    {
+bool TextPromptsDao::readPrompts() {
+    if (TEXT_PROMPTS[m_filename].empty()) {
         std::cout << "TextPrompts Not Yet Loaded" << std::endl;
-    }
-    else
-    {
+    } else {
         std::cout << "TextPrompts are Cached" << std::endl;
         m_is_loaded = true;
         return m_is_loaded;
     }
-    
+
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
 
     // Load the file into the class.
-    try
-    {        
+    try {
         // Load file fresh.
         YAML::Node node = YAML::LoadFile(path);
 
-        if(node.size() == 0)
-        {
+        if (node.size() == 0) {
             m_log.write<Logging::ERROR_LOG>("TextPromptsDao Node size == 0", path);
             node.reset();
             return false;
         }
 
-        std::string file_version = node["file_version"].as<std::string>();
+        const auto file_version = node["file_version"].as<std::string>();
 
         // Validate File Version
-        if(!is_version_displayed)
-        {
+        if (!is_version_displayed) {
             m_log.write<Logging::CONSOLE_LOG>("Text Prompt File Version=", file_version);
             is_version_displayed = true;
         }
 
-        if(file_version != TextPromptsDao::FILE_VERSION)
-        {
-            m_log.write<Logging::ERROR_LOG>("Text Prompt Invalid File Version=", file_version, "Expected=", TextPromptsDao::FILE_VERSION);
+        if (file_version != TextPromptsDao::FILE_VERSION) {
+            m_log.write<Logging::ERROR_LOG>("Text Prompt Invalid File Version=", file_version, "Expected=",
+                                            TextPromptsDao::FILE_VERSION);
             node.reset();
-            return(false);
+            return (false);
         }
-        
+
         m_is_loaded = true;
-        
+
         cacheAllTextPrompts(node);
         node.reset();
-    }
-    catch(std::exception &ex)
-    {
+    } catch (std::exception &ex) {
         m_log.write<Logging::ERROR_LOG>("Exception YAML::readPrompts=", m_filename, ex.what());
-        return(false);
+        return (false);
     }
 
     return m_is_loaded;
 }
 
 /**
- * @brief Retrieves Desc, Text Pair of Text Prompt from yaml file.
+ * @brief Retrieves Desc, Text A Pair of Text Prompt from yaml file.
  * @param lookup
  * @return
  */
-M_StringPair TextPromptsDao::getPrompt(const std::string &lookup)
-{
-    M_StringPair temp;
-
-    if(!m_is_loaded || (TEXT_PROMPTS[m_filename].size() == 0))
-    {
+M_StringPair TextPromptsDao::getPrompt(const std::string &lookup) const {
+    if (!m_is_loaded || (TEXT_PROMPTS[m_filename].empty())) {
+        M_StringPair temp;
         std::cout << "Text Prompts Empty, returning Temp!, shouldn't get here! :)" << std::endl;
         return temp;
     }
-    
+
     return TEXT_PROMPTS[m_filename].at(lookup);
 }
 
 /**
  * @brief Testing, display all nodes loaded
  */
-void TextPromptsDao::displayAll()
-{
+void TextPromptsDao::displayAll() const {
     M_TextPrompt text_prompts = TEXT_PROMPTS[m_filename];
-    for(M_TextPrompt::const_iterator it = text_prompts.begin(); it != text_prompts.end(); ++it)
-    {            
+    for (M_TextPrompt::const_iterator it = text_prompts.begin(); it != text_prompts.end(); ++it) {
         std::string key = it->first;
         M_StringPair value = it->second;
 
@@ -207,32 +209,24 @@ void TextPromptsDao::displayAll()
 }
 
 /**
- * @brief Testing, cahce all records to a map instad of reloading and searching.
+ * @brief Testing, cache all records to a map instead of reloading and searching.
  */
-void TextPromptsDao::cacheAllTextPrompts(YAML::Node &node)
-{
-    try
-    {
+void TextPromptsDao::cacheAllTextPrompts(YAML::Node &node) const {
+    try {
         M_TextPrompt text_prompts;
-        for(YAML::const_iterator it = node.begin(); it != node.end(); ++it)
-        {            
+        for (YAML::const_iterator it = node.begin(); it != node.end(); ++it) {
             // The first Entry on All Text Prompts is the File Version which doesn't have a key/Value Pair, and is just a string value.
-            // Exclude This when pre-loading all propmpts.
-            if (it->first.as<std::string>() != "file_version")
-            {            
-                std::string key = it->first.as<std::string>();
-                M_StringPair value = it->second.as<M_StringPair>();
-                text_prompts[key] = value;                
+            // Exclude This when preloading all prompts.
+            if (it->first.as<std::string>() != "file_version") {
+                auto key = it->first.as<std::string>();
+                const auto value = it->second.as<M_StringPair>();
+                text_prompts[key] = value;
             }
         }
-        
-        // Cache all one loaded per filename
+
         TEXT_PROMPTS[m_filename] = text_prompts;
-    }
-    catch(std::exception &ex)
-    {
+    } catch (std::exception &ex) {
         m_log.write<Logging::ERROR_LOG>("Exception cacheAllTextPrompts YAML::readPrompts=", m_filename, ex.what());
         throw ex;
     }
 }
-

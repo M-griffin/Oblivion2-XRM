@@ -37,7 +37,7 @@ ModMessageReader::ModMessageReader(session_ptr session_data, config_ptr config, 
 
 
     // Check of the Text Prompts exist.
-    m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
+    m_is_text_prompt_exist = m_text_prompts_dao.fileExists();
 
     if(!m_is_text_prompt_exist)
     {
@@ -45,7 +45,7 @@ ModMessageReader::ModMessageReader(session_ptr session_data, config_ptr config, 
     }
 
     // Loads all Text Prompts for current module
-    m_text_prompts_dao->readPrompts();
+    m_text_prompts_dao.readPrompts();
 }
 
 bool ModMessageReader::update(const std::string &, const bool &)

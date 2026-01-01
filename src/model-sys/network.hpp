@@ -2,10 +2,6 @@
 #define NETWORK_HPP
 
 #include <string>
-#include <memory>
-
-class Network;
-typedef std::shared_ptr<Network> network_ptr;
 
 /**
  * @class Network
@@ -14,26 +10,21 @@ typedef std::shared_ptr<Network> network_ptr;
  * @file network.hpp
  * @brief Network Formats: Type - Fido, IP Address
  */
-class Network
-{
+class Network {
 public:
-
-    long        iId;
+    long iId;
     std::string sName;
     std::string sType;
     std::string sAddress;
 
     explicit Network()
         : iId(-1)
-        , sName("")
-        , sType("")
-        , sAddress("")
-    { }
+          , sName("")
+          , sType("")
+          , sAddress("") {
+    }
 
-    ~Network()
-    { }
-
+    ~Network() = default;
 };
 
-#endif // NETWORK_HPP
-
+#endif

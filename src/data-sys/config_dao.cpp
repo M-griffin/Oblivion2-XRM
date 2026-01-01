@@ -14,14 +14,12 @@ static bool is_version_displayed = false;
 
 ConfigDao::ConfigDao(Config &config, const std::string &path)
     : m_log(Logging::getInstance())
-    , m_config(config)
-    , m_path(path)
-    , m_filename("xrm_config.yaml")
-{
+      , m_config(config)
+      , m_path(path)
+      , m_filename("xrm_config.yaml") {
 }
 
-ConfigDao::~ConfigDao()
-{
+ConfigDao::~ConfigDao() {
 }
 
 
@@ -29,15 +27,13 @@ ConfigDao::~ConfigDao()
  * @brief Check if the file exists and we need to create a new one.
  * @return
  */
-bool ConfigDao::fileExists()
-{
+bool ConfigDao::fileExists() {
     std::string path = m_path;
     path.append(m_filename);
 
     std::ifstream ifs(path);
 
-    if(!ifs.is_open())
-    {
+    if (!ifs.is_open()) {
         return false;
     }
 
@@ -51,8 +47,7 @@ bool ConfigDao::fileExists()
  * @param cfg
  * @return
  */
-bool ConfigDao::saveConfig(Config &cfg)
-{
+bool ConfigDao::saveConfig(Config &cfg) {
     std::string path = m_path;
     path.append(m_filename);
 
@@ -181,8 +176,7 @@ bool ConfigDao::saveConfig(Config &cfg)
     // Setup file to Write out File.
     std::ofstream ofs(path);
 
-    if(!ofs.is_open())
-    {
+    if (!ofs.is_open()) {
         m_log.write<Logging::ERROR_LOG>("Error, unable to write to path=", path);
         return false;
     }
@@ -200,8 +194,7 @@ bool ConfigDao::saveConfig(Config &cfg)
  * @param rhs
  * @return
  */
-void ConfigDao::encode(const Config &rhs)
-{
+void ConfigDao::encode(const Config &rhs) {
     m_config.file_version = rhs.file_version;
     m_config.bbs_name_sysop = rhs.bbs_name_sysop;
     m_config.bbs_name = rhs.bbs_name;
@@ -318,45 +311,38 @@ void ConfigDao::encode(const Config &rhs)
     m_config.regexp_email_validation = rhs.regexp_email_validation;
     m_config.regexp_email_validation_msg = rhs.regexp_email_validation_msg;
     m_config.logging_level = rhs.logging_level;
-
 }
 
 /**
  * @brief Loads a Configuration file into the m_config stub for access.
  * @return
  */
-bool ConfigDao::loadConfig()
-{
+bool ConfigDao::loadConfig() {
     std::string path = m_path;
     path.append(m_filename);
 
-    YAML::Node node;
-
     // Load the file into the class.
-    try
-    {
+    try {
         // Load file fresh.
-        node = YAML::LoadFile(path);
+        YAML::Node node = YAML::LoadFile(path);
 
         // Testing Is on nodes always throws exceptions.
-        if(node.size() == 0)
-        {
+        if (node.size() == 0) {
             m_log.write<Logging::ERROR_LOG>("Error, ConfigDao Node size == 0");
             return false;
         }
 
-        std::string file_version = node["file_version"].as<std::string>();
+        const std::string file_version = node["file_version"].as<std::string>();
 
         // Validate File Version
-        if(!is_version_displayed)
-        {
+        if (!is_version_displayed) {
             m_log.write<Logging::CONSOLE_LOG>("Config File Version=", file_version);
             is_version_displayed = true;
         }
 
-        if(file_version != Config::FILE_VERSION)
-        {
-            m_log.write<Logging::ERROR_LOG>("Config File Version=", file_version, "Expected Version=", Config::FILE_VERSION);
+        if (file_version != Config::FILE_VERSION) {
+            m_log.write<Logging::ERROR_LOG>("Config File Version=", file_version, "Expected Version=",
+                                            Config::FILE_VERSION);
             return false;
         }
 
@@ -366,16 +352,13 @@ bool ConfigDao::loadConfig()
         // Moves the Loaded config to m_config
         //encode(c);
         m_config = node.as<Config>();
-    }
-    catch(YAML::Exception &ex)
-    {
+    } catch (YAML::Exception &ex) {
         m_log.write<Logging::ERROR_LOG>("YAML::LoadFile(xrm-config.yaml)", ex.what(), "Missing required field maybe.");
-        return(false);
+        return (false);
     }
-    catch(std::exception &ex)
-    {
+    catch (std::exception &ex) {
         m_log.write<Logging::ERROR_LOG>("YAML::LoadFile(xrm-config.yaml)", ex.what());
-        return(false);
+        return (false);
     }
 
     return true;
@@ -385,11 +368,9 @@ bool ConfigDao::loadConfig()
  * @brief Validates settings for possible conflicts
  * @return
  */
-bool ConfigDao::validation()
-{
+bool ConfigDao::validation() {
     // Check if Handle and Real Name are configured.
-    if(!m_config.use_handle && !m_config.use_real_name)
-    {
+    if (!m_config.use_handle && !m_config.use_real_name) {
         m_log.write<Logging::ERROR_LOG>("Config Validation - use_handle and use_real_name can't both be false.");
         return false;
     }

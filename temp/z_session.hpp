@@ -61,28 +61,28 @@ public:
             std::string clear_screen = "\x1b[1;1H\x1b[2J\x1b[0m";
             new_session->deliver(clear_screen);
 
-            new_session->m_telnet_decoder->sendIACSequences(DONT, TELOPT_OLD_ENVIRON);
+            new_session->getTelnet().sendIACSequences(DONT, TELOPT_OLD_ENVIRON);
 
-            new_session->m_telnet_decoder->sendIACSequences(DO, TELOPT_SGA);
-            new_session->m_telnet_decoder->addReply(TELOPT_SGA);
+            new_session->getTelnet().sendIACSequences(DO, TELOPT_SGA);
+            new_session->getTelnet().addReply(TELOPT_SGA);
 
-            new_session->m_telnet_decoder->sendIACSequences(WILL, TELOPT_ECHO);
-            new_session->m_telnet_decoder->addReply(TELOPT_ECHO);
+            new_session->getTelnet().sendIACSequences(WILL, TELOPT_ECHO);
+            new_session->getTelnet().addReply(TELOPT_ECHO);
 
-            new_session->m_telnet_decoder->sendIACSequences(WILL, TELOPT_SGA);
-            new_session->m_telnet_decoder->addReply(TELOPT_SGA);
+            new_session->getTelnet().sendIACSequences(WILL, TELOPT_SGA);
+            new_session->getTelnet().addReply(TELOPT_SGA);
 
-            new_session->m_telnet_decoder->sendIACSequences(WILL, TELOPT_BINARY);
-            new_session->m_telnet_decoder->addReply(TELOPT_BINARY);
+            new_session->getTelnet().sendIACSequences(WILL, TELOPT_BINARY);
+            new_session->getTelnet().addReply(TELOPT_BINARY);
 
-            new_session->m_telnet_decoder->sendIACSequences(DO, TELOPT_BINARY);
-            new_session->m_telnet_decoder->addReply(TELOPT_BINARY);
+            new_session->getTelnet().sendIACSequences(DO, TELOPT_BINARY);
+            new_session->getTelnet().addReply(TELOPT_BINARY);
 
-            new_session->m_telnet_decoder->sendIACSequences(DO, TELOPT_TTYPE);
-            new_session->m_telnet_decoder->addReply(TELOPT_TTYPE);
+            new_session->getTelnet().sendIACSequences(DO, TELOPT_TTYPE);
+            new_session->getTelnet().addReply(TELOPT_TTYPE);
 
-            new_session->m_telnet_decoder->sendIACSequences(DO, TELOPT_NAWS);
-            new_session->m_telnet_decoder->addReply(TELOPT_NAWS);
+            new_session->getTelnet().sendIACSequences(DO, TELOPT_NAWS);
+            new_session->getTelnet().addReply(TELOPT_NAWS);
 
             // Wait 1.5 Seconds for respones.
             new_session->startTelnetOptionNegoiation();

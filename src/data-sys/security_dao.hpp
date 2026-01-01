@@ -1,22 +1,11 @@
 #ifndef SECURITY_DAO_HPP
 #define SECURITY_DAO_HPP
 
-#include <memory>
 #include <vector>
 #include <functional>
 
 #include "../model-sys/security.hpp"
 #include "../data-sys/base_dao.hpp"
-
-// Forward Decelerations
-namespace SQLW
-{
-class Database;
-class Query;
-}
-
-// Handle to Database Queries
-typedef std::shared_ptr<SQLW::Query> query_ptr;
 
 // Base Dao Definition
 typedef BaseDao<Security> baseSecurityClass;
@@ -27,16 +16,13 @@ typedef BaseDao<Security> baseSecurityClass;
  * @date 8/21/2016
  * @file security_dao.hpp
  * @brief Handles Reading and Writing Security Class from Database
- *        Database Objects are Instantiated in the Session then passed to the DAO for work.
+ *         Objects are Instantiated in the Session then passed to the DAO for work.
  */
 class SecurityDao
-    : baseSecurityClass
-{
+        : baseSecurityClass {
 public:
-
-    explicit SecurityDao(SQLW::Database &database)
-        : baseSecurityClass(database)
-    {
+    explicit SecurityDao(Database &database)
+        : baseSecurityClass(database) {
         // Setup Table name
         m_strTableName = "security";
 
@@ -44,11 +30,14 @@ public:
          * Pre Populate Static Queries one Time
          */
         m_cmdFirstTimeSetup =
-            "PRAGMA synchronous=Normal; "
-            "PRAGMA encoding=UTF-8; "
-            "PRAGMA foreign_keys=ON; "
-            "PRAGMA default_cache_size=10000; "
-            "PRAGMA cache_size=10000; ";
+                "PRAGMA synchronous=Normal; "
+                "PRAGMA encoding=UTF-8; "
+                "PRAGMA foreign_keys=ON; "
+                "PRAGMA default_cache_size=10000; "
+                "PRAGMA cache_size=10000; "
+                "PRAGMA journal_mode = WAL; "
+                "PRAGMA temp_store = MEMORY; "
+                "PRAGMA mmap_size = 268435456; ";
 
         // Check if Database Exists.
         m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' "
@@ -56,13 +45,13 @@ public:
 
         // Crate Security Table Query (SQLite Only for the moment)
         m_cmdCreateTable =
-            "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
-            "iId                   INTEGER PRIMARY KEY, "
-            "sPasswordHash         TEXT NOT NULL, "
-            "sSaltHash             TEXT NOT NULL, "
-            "sChallengeQuestion    TEXT NOT NULL, "
-            "sChallengeAnswerHash  TEXT NOT NULL "
-            "); ";
+                "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
+                "iId                   INTEGER PRIMARY KEY, "
+                "sPasswordHash         TEXT NOT NULL, "
+                "sSaltHash             TEXT NOT NULL, "
+                "sChallengeQuestion    TEXT NOT NULL, "
+                "sChallengeAnswerHash  TEXT NOT NULL "
+                "); ";
 
         // Drops and cleanup security table.
         m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
@@ -81,16 +70,7 @@ public:
                                       std::placeholders::_1, std::placeholders::_2);
     }
 
-    ~SecurityDao()
-    {
-    }
-
-
-    /**
-     * Base Dao Calls for generic Object Data Calls
-     * (Below This Point)
-     */
-
+    ~SecurityDao() = default;
 
     /**
      * @brief Check If Database Table Exists.
@@ -120,18 +100,18 @@ public:
      * @param obj
      * @return
      */
-    bool updateRecord(security_ptr obj);
+    bool updateRecord(Security &obj);
 
     /**
      * @brief Inserts a New Record in the database!
      * @param obj
      * @return
      */
-    long insertRecord(security_ptr obj);
+    long insertRecord(Security &obj);
 
     /**
      * @brief Deletes a MessageArea Record
-     * @param areaId
+     * @param id
      * @return
      */
     bool deleteRecord(long id);
@@ -141,13 +121,13 @@ public:
      * @param id
      * @return
      */
-    security_ptr getRecordById(long id);
+    Security getRecordById(long id);
 
     /**
      * @brief Retrieve All Records in a Table
      * @return
      */
-    std::vector<security_ptr> getAllRecords();
+    std::vector<Security> getAllRecords();
 
     /**
      * @brief Retrieve Count of All Records in a Table
@@ -168,7 +148,7 @@ public:
      * @param obj
      * @return
      */
-    std::string insertSecurityQryString(std::string qry, security_ptr obj);
+    std::string insertSecurityQryString(std::string qry, Security &obj);
 
     /**
      * @brief (CallBack) Update Existing Record.
@@ -176,14 +156,14 @@ public:
      * @param obj
      * @return
      */
-    std::string updateSecurityQryString(std::string qry, security_ptr obj);
+    std::string updateSecurityQryString(std::string qry, Security &obj);
 
     /**
      * @brief (CallBack) Pulls results by FieldNames into their Class Variables.
      * @param qry
      * @param obj
      */
-    void pullSecurityResult(query_ptr qry, security_ptr obj);
+    void pullSecurityResult(Query &qry, Security &obj);
 
     /**
      * @brief (Callback) for Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
@@ -191,11 +171,9 @@ public:
      * @param obj
      * @param values
      */
-    void fillSecurityColumnValues(query_ptr qry, security_ptr obj, std::vector< std::pair<std::string, std::string> > &values);
-
+    void fillSecurityColumnValues(Query &qry, Security &obj,
+                                  std::vector<std::pair<std::string, std::string> > &values);
 };
 
-// Handle to Database Queries
-typedef std::shared_ptr<SecurityDao> security_dao_ptr;
+#endif
 
-#endif // USERS_DAO_HPP

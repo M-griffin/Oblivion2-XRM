@@ -20,7 +20,7 @@ class Directory {
 public:
     explicit Directory()
         : m_log(Logging::getInstance())
-        , m() // Mutex
+          , m() // Mutex
     {
     }
 

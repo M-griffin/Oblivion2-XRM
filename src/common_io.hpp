@@ -11,29 +11,45 @@
 class Logging;
 
 // Localized Buffer.
-typedef struct localized_buffer
-{
+typedef struct localized_buffer {
     std::string character;
-    uint8_t     length;
-    
+    uint8_t length;
+
     localized_buffer()
         : character("")
-        , length(0)
-    {
+          , length(0) {
     }
-    
-    ~localized_buffer()
-    {
+
+    ~localized_buffer() {
         character.erase();
         length = 0;
     }
 
-    void clear()
-    {
+    // Copy constructors
+    localized_buffer(localized_buffer &other) noexcept = delete;
+
+    localized_buffer &operator=(localized_buffer &other) noexcept = delete;
+
+    // Move constructors
+    localized_buffer(localized_buffer &&other) noexcept
+        : character(std::move(other.character))
+          , length(other.length) {
+        other.length = 0;
+    }
+
+    localized_buffer &operator=(localized_buffer &&other) noexcept {
+        if (this != &other) {
+            character = std::move(other.character);
+            length = other.length;
+            other.length = 0;
+        }
+        return *this;
+    }
+
+    void clear() {
         character.erase();
         length = 0;
     }
-
 } LocalizedBuffer;
 
 /**
@@ -43,14 +59,50 @@ typedef struct localized_buffer
  * @file common_io.hpp
  * @brief Low Level IO ASCII and UTF-8 Aware with locale support.
  */
-class CommonIO
-{
+class CommonIO {
+    Logging &m_log; // Logging Reference
+
+    std::string m_escape_sequence; // ParseInput
+    std::string m_string_buffer; // ParseInput
+    std::string m_incoming_data; // ParseInput
+    std::string m_line_buffer; // GetLine
+    int m_column_position; // GetLine
+    bool m_is_escape_sequence; // ParseInput
+    bool m_is_new_getline; // GetLine
+    bool m_is_new_leadoff; // GetLine
 
 public:
-
     explicit CommonIO();
+
     ~CommonIO();
-    
+
+    CommonIO(CommonIO &&other) noexcept
+        : m_log(other.m_log) // reference copied, not moved
+          , m_escape_sequence(std::move(other.m_escape_sequence))
+          , m_string_buffer(std::move(other.m_string_buffer))
+          , m_incoming_data(std::move(other.m_incoming_data))
+          , m_line_buffer(std::move(other.m_line_buffer))
+          , m_column_position(other.m_column_position)
+          , m_is_escape_sequence(other.m_is_escape_sequence)
+          , m_is_new_getline(other.m_is_new_getline)
+          , m_is_new_leadoff(other.m_is_new_leadoff) {
+    }
+
+    CommonIO &operator=(CommonIO &&other) noexcept {
+        if (this != &other) {
+            m_escape_sequence = std::move(other.m_escape_sequence);
+            m_string_buffer = std::move(other.m_string_buffer);
+            m_incoming_data = std::move(other.m_incoming_data);
+            m_line_buffer = std::move(other.m_line_buffer);
+
+            m_column_position = other.m_column_position;
+            m_is_escape_sequence = other.m_is_escape_sequence;
+            m_is_new_getline = other.m_is_new_getline;
+            m_is_new_leadoff = other.m_is_new_leadoff;
+        }
+        return *this;
+    }
+
     /**
      * @brief Set up a Static GLobal Map for Key Input that can be resued.
      */
@@ -108,6 +160,7 @@ public:
     std::string eraseString(const std::string &str,
                             std::string::size_type start_position,
                             std::string::size_type end_position = 0);
+
     /**
      * Right String Padding
      */
@@ -167,10 +220,10 @@ public:
      * @param hidden
      * @return
      */
-    std::string getLine(const std::string &line,    // Parsed Char input in
-                        int   length,               // Max Input Length of Field
+    std::string getLine(const std::string &line, // Parsed Char input in
+                        int length, // Max Input Length of Field
                         const std::string &leadoff, // Data to Display in Default Field {Optional}
-                        bool  hidden);              // If input is hidden or masked     {Optional}
+                        bool hidden); // If input is hidden or masked     {Optional}
 
     /**
      * @brief Converts Pascal Strings to C-Strings Also return std::string for conversions.
@@ -218,7 +271,7 @@ public:
      * @param delimiter
      * @return
      */
-    std::vector<std::string> splitString(const std::string& s, char delimiter);
+    std::vector<std::string> splitString(const std::string &s, char delimiter);
 
     /**
      * @brief Standard Time to Date String
@@ -276,15 +329,13 @@ public:
      * @return
      */
     template<class Element, class Container>
-    bool in_array(const Element & element, const Container & container)
-    {
+    bool in_array(const Element &element, const Container &container) {
         return std::find(std::begin(container), std::end(container), element)
                != std::end(container);
     }
 
     template<typename octet_type>
-    inline uint8_t mask8(octet_type oc)
-    {
+    inline uint8_t mask8(octet_type oc) {
         return static_cast<uint8_t>(0xff & oc);
     }
 
@@ -292,7 +343,7 @@ public:
      * @brief Parses screen data into the Screen Buffer.
      * @return
      */
-    void getNextGlyph(LocalizedBuffer &buffer, 
+    void getNextGlyph(LocalizedBuffer &buffer,
                       std::string::iterator &it,
                       const std::string::iterator &line_end);
 
@@ -300,29 +351,10 @@ public:
      * @brief Parses screen data into the Screen Buffer.
      * @return
      */
-    void peekNextGlyph(LocalizedBuffer &buffer, 
+    void peekNextGlyph(LocalizedBuffer &buffer,
                        std::string::iterator &it,
                        const std::string::iterator &line_end);
 
     void testUnicode(const std::string &incoming_data);
-
-private:
-
-    /**
-     * @brief Globals for Input Methods
-     * Unique per session so don't want these static.
-     */
-    Logging    &m_log;             // Logging Reference
-     
-    std::string m_escape_sequence; // ParseInput
-    std::string m_string_buffer;   // ParseInput
-    std::string m_incoming_data;   // ParseInput
-    std::string m_line_buffer;     // GetLine
-    int  m_column_position;        // GetLine
-    bool m_is_escape_sequence;     // ParseInput
-    bool m_is_new_getline;         // GetLine
-    bool m_is_new_leadoff;         // GetLine
-
-
 };
 #endif

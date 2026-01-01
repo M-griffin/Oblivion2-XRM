@@ -1,8 +1,6 @@
 #include "message_area_dao.hpp"
 
-#include <iostream>
 #include <string>
-
 #include <sqlite3.h>
 
 #include "../model-sys/message_area.hpp"
@@ -11,24 +9,17 @@
 #include "libSqliteWrapped.h"
 
 /**
- * Base Dao Calls for generic Object Data Calls
- * (Below This Point)
- */
-
-/**
  * @brief Check If Database Table Exists.
  * @return
  */
-bool MessageAreaDao::doesTableExist()
-{
+bool MessageAreaDao::doesTableExist() {
     return baseDoesTableExist();
 }
 
 /**
  * @brief Run Setup Params for SQL Database Table.
  */
-bool MessageAreaDao::firstTimeSetupParams()
-{
+bool MessageAreaDao::firstTimeSetupParams() {
     return baseFirstTimeSetupParams();
 }
 
@@ -36,8 +27,7 @@ bool MessageAreaDao::firstTimeSetupParams()
  * @brief Create Database Table
  * @return
  */
-bool MessageAreaDao::createTable()
-{
+bool MessageAreaDao::createTable() {
     return baseCreateTable();
 }
 
@@ -45,38 +35,34 @@ bool MessageAreaDao::createTable()
  * @brief Drop Database
  * @return
  */
-bool MessageAreaDao::dropTable()
-{
+bool MessageAreaDao::dropTable() {
     return baseDropTable();
 }
 
 /**
  * @brief Updates a Record in the database!
- * @param area
+ * @param obj
  * @return
  */
-bool MessageAreaDao::updateRecord(message_area_ptr obj)
-{
+bool MessageAreaDao::updateRecord(MessageArea &obj) {
     return baseUpdateRecord(obj);
 }
 
 /**
  * @brief Inserts a New Record in the database!
- * @param area
+ * @param obj
  * @return
  */
-long MessageAreaDao::insertRecord(message_area_ptr obj)
-{
+long MessageAreaDao::insertRecord(MessageArea &obj) {
     return baseInsertRecord(obj);
 }
 
 /**
  * @brief Deletes a Record
- * @param areaId
+ * @param id
  * @return
  */
-bool MessageAreaDao::deleteRecord(long id)
-{
+bool MessageAreaDao::deleteRecord(long id) {
     return baseDeleteRecord(id);
 }
 
@@ -85,8 +71,7 @@ bool MessageAreaDao::deleteRecord(long id)
  * @param id
  * @return
  */
-message_area_ptr MessageAreaDao::getRecordById(long id)
-{
+MessageArea MessageAreaDao::getRecordById(long id) {
     return baseGetRecordById(id);
 }
 
@@ -94,8 +79,7 @@ message_area_ptr MessageAreaDao::getRecordById(long id)
  * @brief Retrieve All Records in a Table
  * @return
  */
-std::vector<message_area_ptr> MessageAreaDao::getAllRecords()
-{
+std::vector<MessageArea> MessageAreaDao::getAllRecords() {
     return baseGetAllRecords();
 }
 
@@ -103,8 +87,7 @@ std::vector<message_area_ptr> MessageAreaDao::getAllRecords()
  * @brief Retrieve Count of All Records in a Table
  * @return
  */
-long MessageAreaDao::getRecordsCount()
-{
+long MessageAreaDao::getRecordsCount() {
     return baseGetRecordsCount();
 }
 
@@ -118,26 +101,25 @@ long MessageAreaDao::getRecordsCount()
  * @param qry
  * @param obj
  */
-void MessageAreaDao::pullMessageAreaResult(query_ptr qry, message_area_ptr obj)
-{
-    qry->getFieldByName("iId", obj->iId);
-    qry->getFieldByName("sName", obj->sName);
-    qry->getFieldByName("sAcsAccess", obj->sAcsAccess);
-    qry->getFieldByName("sAcsAccess", obj->sAcsAccess);
-    qry->getFieldByName("sAcsPost", obj->sAcsPost);
-    qry->getFieldByName("bAnonymous", obj->bAnonymous);
-    qry->getFieldByName("sSponsor", obj->sSponsor);
-    qry->getFieldByName("sOriginLine", obj->sOriginLine);
-    qry->getFieldByName("sFidoPath", obj->sFidoPath);
-    qry->getFieldByName("iNetworkId", obj->iNetworkId);
-    qry->getFieldByName("sQwkName", obj->sQwkName);
-    qry->getFieldByName("iMaxMessages", obj->iMaxMessages);
-    qry->getFieldByName("bRealName", obj->bRealName);
-    qry->getFieldByName("sLinkname", obj->sLinkname);
-    qry->getFieldByName("bRequired", obj->bRequired);
-    qry->getFieldByName("bPrivate", obj->bPrivate);
-    qry->getFieldByName("bNetmail", obj->bNetmail);
-    qry->getFieldByName("iSortOrder", obj->iSortOrder);
+void MessageAreaDao::pullMessageAreaResult(Query &qry, MessageArea &obj) {
+    qry.getFieldByName("iId", obj.iId);
+    qry.getFieldByName("sName", obj.sName);
+    qry.getFieldByName("sAcsAccess", obj.sAcsAccess);
+    qry.getFieldByName("sAcsAccess", obj.sAcsAccess);
+    qry.getFieldByName("sAcsPost", obj.sAcsPost);
+    qry.getFieldByName("bAnonymous", obj.bAnonymous);
+    qry.getFieldByName("sSponsor", obj.sSponsor);
+    qry.getFieldByName("sOriginLine", obj.sOriginLine);
+    qry.getFieldByName("sFidoPath", obj.sFidoPath);
+    qry.getFieldByName("iNetworkId", obj.iNetworkId);
+    qry.getFieldByName("sQwkName", obj.sQwkName);
+    qry.getFieldByName("iMaxMessages", obj.iMaxMessages);
+    qry.getFieldByName("bRealName", obj.bRealName);
+    qry.getFieldByName("sLinkname", obj.sLinkname);
+    qry.getFieldByName("bRequired", obj.bRequired);
+    qry.getFieldByName("bPrivate", obj.bPrivate);
+    qry.getFieldByName("bNetmail", obj.bNetmail);
+    qry.getFieldByName("iSortOrder", obj.iSortOrder);
 }
 
 /**
@@ -146,26 +128,25 @@ void MessageAreaDao::pullMessageAreaResult(query_ptr qry, message_area_ptr obj)
  * @param obj
  * @param values
  */
-void MessageAreaDao::fillMessageAreaColumnValues(query_ptr qry, message_area_ptr obj,
-        std::vector< std::pair<std::string, std::string> > &values)
-{
-    // values.push_back(qry->translateFieldName("iId", conf->iId));
-    values.push_back(qry->translateFieldName("sName", obj->sName));
-    values.push_back(qry->translateFieldName("sAcsAccess", obj->sAcsAccess));
-    values.push_back(qry->translateFieldName("sAcsPost", obj->sAcsPost));
-    values.push_back(qry->translateFieldName("bAnonymous", obj->bAnonymous));
-    values.push_back(qry->translateFieldName("sSponsor", obj->sSponsor));
-    values.push_back(qry->translateFieldName("sOriginLine", obj->sOriginLine));
-    values.push_back(qry->translateFieldName("sFidoPath", obj->sFidoPath));
-    values.push_back(qry->translateFieldName("iNetworkId", obj->iNetworkId));
-    values.push_back(qry->translateFieldName("sQwkName", obj->sQwkName));
-    values.push_back(qry->translateFieldName("iMaxMessages", obj->iMaxMessages));
-    values.push_back(qry->translateFieldName("bRealName", obj->bRealName));
-    values.push_back(qry->translateFieldName("sLinkname", obj->sLinkname));
-    values.push_back(qry->translateFieldName("bRequired", obj->bRequired));
-    values.push_back(qry->translateFieldName("bPrivate", obj->bPrivate));
-    values.push_back(qry->translateFieldName("bNetmail", obj->bNetmail));
-    values.push_back(qry->translateFieldName("iSortOrder", obj->iSortOrder));
+void MessageAreaDao::fillMessageAreaColumnValues(Query &qry, MessageArea &obj,
+                                                 std::vector<std::pair<std::string, std::string> > &values) {
+    // values.push_back(qry.translateFieldName("iId", conf->iId));
+    values.push_back(qry.translateFieldName("sName", obj.sName));
+    values.push_back(qry.translateFieldName("sAcsAccess", obj.sAcsAccess));
+    values.push_back(qry.translateFieldName("sAcsPost", obj.sAcsPost));
+    values.push_back(qry.translateFieldName("bAnonymous", obj.bAnonymous));
+    values.push_back(qry.translateFieldName("sSponsor", obj.sSponsor));
+    values.push_back(qry.translateFieldName("sOriginLine", obj.sOriginLine));
+    values.push_back(qry.translateFieldName("sFidoPath", obj.sFidoPath));
+    values.push_back(qry.translateFieldName("iNetworkId", obj.iNetworkId));
+    values.push_back(qry.translateFieldName("sQwkName", obj.sQwkName));
+    values.push_back(qry.translateFieldName("iMaxMessages", obj.iMaxMessages));
+    values.push_back(qry.translateFieldName("bRealName", obj.bRealName));
+    values.push_back(qry.translateFieldName("sLinkname", obj.sLinkname));
+    values.push_back(qry.translateFieldName("bRequired", obj.bRequired));
+    values.push_back(qry.translateFieldName("bPrivate", obj.bPrivate));
+    values.push_back(qry.translateFieldName("bNetmail", obj.bNetmail));
+    values.push_back(qry.translateFieldName("iSortOrder", obj.iSortOrder));
 }
 
 /**
@@ -174,27 +155,26 @@ void MessageAreaDao::fillMessageAreaColumnValues(query_ptr qry, message_area_ptr
  * @param obj
  * @return
  */
-std::string MessageAreaDao::insertMessageAreaQryString(std::string qry, message_area_ptr obj)
-{
+std::string MessageAreaDao::insertMessageAreaQryString(std::string qry, MessageArea &obj) {
     // Mprint statement to avoid injections.
     char *result = sqlite3_mprintf(qry.c_str(),
-                                         obj->sName.c_str(),
-                                         obj->sAcsAccess.c_str(),
-                                         obj->sAcsPost.c_str(),
-                                         obj->bAnonymous,
-                                         obj->sSponsor.c_str(),
-                                         obj->sOriginLine.c_str(),
-                                         obj->sFidoPath.c_str(),
-                                         obj->iNetworkId,
-                                         obj->sQwkName.c_str(),
-                                         obj->iMaxMessages,
-                                         obj->bRealName,
-                                         obj->sLinkname.c_str(),
-                                         obj->bRequired,
-                                         obj->bPrivate,
-                                         obj->bNetmail,
-                                         obj->iSortOrder
-                                        );
+                                   obj.sName.c_str(),
+                                   obj.sAcsAccess.c_str(),
+                                   obj.sAcsPost.c_str(),
+                                   obj.bAnonymous,
+                                   obj.sSponsor.c_str(),
+                                   obj.sOriginLine.c_str(),
+                                   obj.sFidoPath.c_str(),
+                                   obj.iNetworkId,
+                                   obj.sQwkName.c_str(),
+                                   obj.iMaxMessages,
+                                   obj.bRealName,
+                                   obj.sLinkname.c_str(),
+                                   obj.bRequired,
+                                   obj.bPrivate,
+                                   obj.bNetmail,
+                                   obj.iSortOrder
+    );
 
     std::string queryString(result);
     sqlite3_free(result);
@@ -207,28 +187,27 @@ std::string MessageAreaDao::insertMessageAreaQryString(std::string qry, message_
  * @param obj
  * @return
  */
-std::string MessageAreaDao::updateMessageAreaQryString(std::string qry, message_area_ptr obj)
-{
+std::string MessageAreaDao::updateMessageAreaQryString(std::string qry, MessageArea &obj) {
     // Mprint statement to avoid injections.
     char *result = sqlite3_mprintf(qry.c_str(),
-                                         obj->sName.c_str(),
-                                         obj->sAcsAccess.c_str(),
-                                         obj->sAcsPost.c_str(),
-                                         obj->bAnonymous,
-                                         obj->sSponsor.c_str(),
-                                         obj->sOriginLine.c_str(),
-                                         obj->sFidoPath.c_str(),
-                                         obj->iNetworkId,
-                                         obj->sQwkName.c_str(),
-                                         obj->iMaxMessages,
-                                         obj->bRealName,
-                                         obj->sLinkname.c_str(),
-                                         obj->bRequired,
-                                         obj->bPrivate,
-                                         obj->bNetmail,
-                                         obj->iSortOrder,
-                                         obj->iId
-                                        );
+                                   obj.sName.c_str(),
+                                   obj.sAcsAccess.c_str(),
+                                   obj.sAcsPost.c_str(),
+                                   obj.bAnonymous,
+                                   obj.sSponsor.c_str(),
+                                   obj.sOriginLine.c_str(),
+                                   obj.sFidoPath.c_str(),
+                                   obj.iNetworkId,
+                                   obj.sQwkName.c_str(),
+                                   obj.iMaxMessages,
+                                   obj.bRealName,
+                                   obj.sLinkname.c_str(),
+                                   obj.bRequired,
+                                   obj.bPrivate,
+                                   obj.bNetmail,
+                                   obj.iSortOrder,
+                                   obj.iId
+    );
 
     std::string queryString(result);
     sqlite3_free(result);
@@ -244,58 +223,50 @@ std::string MessageAreaDao::updateMessageAreaQryString(std::string qry, message_
 
 /**
  * @brief Return List of All MessageArea by ConferenceId
- * @param areas
+ * @param id
  * @return
  */
-std::vector<message_area_ptr> MessageAreaDao::getAllMessageAreasByConference(long id)
-{
+std::vector<MessageArea> MessageAreaDao::getAllMessageAreasByConference(long id) {
     Logging &log = Logging::getInstance();
-    message_area_ptr area = std::make_shared<MessageArea>();
-    std::vector<message_area_ptr> list;
+    std::vector<MessageArea> list;
 
     // Make Sure Database Reference is Connected
-    if(!m_database.isConnected())
-    {
+    if (!m_database.isConnected()) {
         log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
         return list;
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry = std::make_shared<SQLW::Query>(m_database);
+    Query qry(m_database);
 
-    if(!qry->isConnected())
-    {
-        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__, __LINE__);
+    if (!qry.isConnected()) {
+        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__,
+                                      __LINE__);
         return list;
     }
 
     // Build Query String
-    char *result = sqlite3_mprintf("SELECT a.* FROM %Q a, Grouping g WHERE g.iConferenceId = %ld AND a.iID = g.iMsgAreaId;", m_strTableName.c_str(), id);
-    std::string queryString(result);
+    char *result = sqlite3_mprintf(
+        "SELECT a.* FROM %Q a, Grouping g WHERE g.iConferenceId = %ld AND a.iID = g.iMsgAreaId;",
+        m_strTableName.c_str(), id);
+    const std::string queryString(result);
     sqlite3_free(result);
 
     // Execute Query.
-    if(qry->getResult(queryString))
-    {
-        long rows = qry->getNumRows();
+    if (qry.getResult(queryString)) {
+        const long rows = qry.getNumRows();
 
-        if(rows > 0)
-        {
-            while(qry->fetchRow())
-            {
-                area.reset();
-                area = std::make_shared<MessageArea>();
+        if (rows > 0) {
+            while (qry.fetchRow()) {
+                MessageArea area;
                 pullMessageAreaResult(qry, area);
                 list.push_back(area);
             }
+        } else {
+            log.write<Logging::ERROR_LOG>("Error, getAllMessageAreasByConference Returned Rows", rows, m_strTableName,
+                                          __FILE__, __LINE__);
         }
-        else
-        {
-            log.write<Logging::ERROR_LOG>("Error, getAllMessageAreasByConference Returned Rows", rows, m_strTableName, __FILE__, __LINE__);
-        }
-    }
-    else
-    {
+    } else {
         log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __FILE__, __LINE__);
     }
 

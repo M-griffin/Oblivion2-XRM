@@ -1,8 +1,6 @@
 #include "grouping_dao.hpp"
 
-#include <iostream>
 #include <string>
-
 #include <sqlite3.h>
 
 #include "../model-sys/grouping.hpp"
@@ -12,25 +10,17 @@
 
 
 /**
- * Base Dao Calls for generic Object Data Calls
- * (Below This Point)
- */
-
-
-/**
  * @brief Check If Database Table Exists.
  * @return
  */
-bool GroupingDao::doesTableExist()
-{
+bool GroupingDao::doesTableExist() {
     return baseDoesTableExist();
 }
 
 /**
  * @brief Run Setup Params for SQL Database Table.
  */
-bool GroupingDao::firstTimeSetupParams()
-{
+bool GroupingDao::firstTimeSetupParams() {
     return baseFirstTimeSetupParams();
 }
 
@@ -38,8 +28,7 @@ bool GroupingDao::firstTimeSetupParams()
  * @brief Create Database Table
  * @return
  */
-bool GroupingDao::createTable()
-{
+bool GroupingDao::createTable() {
     return baseCreateTable();
 }
 
@@ -47,38 +36,34 @@ bool GroupingDao::createTable()
  * @brief Drop Database
  * @return
  */
-bool GroupingDao::dropTable()
-{
+bool GroupingDao::dropTable() {
     return baseDropTable();
 }
 
 /**
  * @brief Updates a Record in the database!
- * @param area
+ * @param obj
  * @return
  */
-bool GroupingDao::updateRecord(group_ptr obj)
-{
+bool GroupingDao::updateRecord(Grouping &obj) {
     return baseUpdateRecord(obj);
 }
 
 /**
  * @brief Inserts a New Record in the database!
- * @param area
+ * @param obj
  * @return
  */
-long GroupingDao::insertRecord(group_ptr obj)
-{
+long GroupingDao::insertRecord(Grouping &obj) {
     return baseInsertRecord(obj);
 }
 
 /**
  * @brief Deletes a Record
- * @param areaId
+ * @param id
  * @return
  */
-bool GroupingDao::deleteRecord(long id)
-{
+bool GroupingDao::deleteRecord(const long id) {
     return baseDeleteRecord(id);
 }
 
@@ -87,8 +72,7 @@ bool GroupingDao::deleteRecord(long id)
  * @param id
  * @return
  */
-group_ptr GroupingDao::getRecordById(long id)
-{
+Grouping GroupingDao::getRecordById(const long id) {
     return baseGetRecordById(id);
 }
 
@@ -96,8 +80,7 @@ group_ptr GroupingDao::getRecordById(long id)
  * @brief Retrieve All Records in a Table
  * @return
  */
-std::vector<group_ptr> GroupingDao::getAllRecords()
-{
+std::vector<Grouping> GroupingDao::getAllRecords() {
     return baseGetAllRecords();
 }
 
@@ -105,8 +88,7 @@ std::vector<group_ptr> GroupingDao::getAllRecords()
  * @brief Retrieve Count of All Records in a Table
  * @return
  */
-long GroupingDao::getRecordsCount()
-{
+long GroupingDao::getRecordsCount() {
     return baseGetRecordsCount();
 }
 
@@ -122,11 +104,10 @@ long GroupingDao::getRecordsCount()
  * @param qry
  * @param obj
  */
-void GroupingDao::pullGroupingResult(query_ptr qry, group_ptr obj)
-{
-    qry->getFieldByName("iId", obj->iId);
-    qry->getFieldByName("iConferenceId", obj->iConferenceId);
-    qry->getFieldByName("iAreaId", obj->iAreaId);
+void GroupingDao::pullGroupingResult(Query &qry, Grouping &obj) {
+    qry.getFieldByName("iId", obj.iId);
+    qry.getFieldByName("iConferenceId", obj.iConferenceId);
+    qry.getFieldByName("iAreaId", obj.iAreaId);
 }
 
 /**
@@ -135,12 +116,11 @@ void GroupingDao::pullGroupingResult(query_ptr qry, group_ptr obj)
  * @param obj
  * @param values
  */
-void GroupingDao::fillGroupingColumnValues(query_ptr qry, group_ptr obj,
-        std::vector< std::pair<std::string, std::string> > &values)
-{
-    // values.push_back(qry->translateFieldName("iId", obj->iId));
-    values.push_back(qry->translateFieldName("iConferenceId", obj->iConferenceId));
-    values.push_back(qry->translateFieldName("iAreaId", obj->iAreaId));
+void GroupingDao::fillGroupingColumnValues(Query &qry, Grouping &obj,
+                                           std::vector<std::pair<std::string, std::string> > &values) {
+    // values.push_back(qry.translateFieldName("iId", obj.iId));
+    values.push_back(qry.translateFieldName("iConferenceId", obj.iConferenceId));
+    values.push_back(qry.translateFieldName("iAreaId", obj.iAreaId));
 }
 
 /**
@@ -149,13 +129,12 @@ void GroupingDao::fillGroupingColumnValues(query_ptr qry, group_ptr obj,
  * @param obj
  * @return
  */
-std::string GroupingDao::insertGroupingQryString(std::string qry, group_ptr obj)
-{
+std::string GroupingDao::insertGroupingQryString(std::string qry, Grouping &obj) {
     // Mprint statement to avoid injections.
     char *result = sqlite3_mprintf(qry.c_str(),
-                                         obj->iConferenceId,
-                                         obj->iAreaId
-                                        );
+                                   obj.iConferenceId,
+                                   obj.iAreaId
+    );
 
     std::string queryString(result);
     sqlite3_free(result);
@@ -168,14 +147,13 @@ std::string GroupingDao::insertGroupingQryString(std::string qry, group_ptr obj)
  * @param obj
  * @return
  */
-std::string GroupingDao::updateGroupingQryString(std::string qry, group_ptr obj)
-{
+std::string GroupingDao::updateGroupingQryString(std::string qry, Grouping &obj) {
     // Mprint statement to avoid injections.
     char *result = sqlite3_mprintf(qry.c_str(),
-                                         obj->iConferenceId,
-                                         obj->iAreaId,
-                                         obj->iId
-                                        );
+                                   obj.iConferenceId,
+                                   obj.iAreaId,
+                                   obj.iId
+    );
 
     std::string queryString(result);
     sqlite3_free(result);
@@ -193,55 +171,45 @@ std::string GroupingDao::updateGroupingQryString(std::string qry, group_ptr obj)
  * @param confId
  * @return
  */
-std::vector<group_ptr> GroupingDao::getAllGroupingsByConferenceId(long id)
-{
-    group_ptr group = std::make_shared<Grouping>();
-    std::vector<group_ptr> list;
+std::vector<Grouping> GroupingDao::getAllGroupingsByConferenceId(long id) {
+    std::vector<Grouping> list;
     Logging &log = Logging::getInstance();
 
     // Make Sure Database Reference is Connected
-    if(!m_database.isConnected())
-    {
+    if (!m_database.isConnected()) {
         log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
         return list;
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry = std::make_shared<SQLW::Query>(m_database);
+    Query qry(m_database);
 
-    if(!qry->isConnected())
-    {
-        log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__, __FILE__);
+    if (!qry.isConnected()) {
+        log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__,
+                                      __FILE__);
         return list;
     }
 
     // Build Query String
     char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE iConferenceId = %ld;", m_strTableName.c_str(), id);
-    std::string queryString(result);
+    const std::string queryString(result);
     sqlite3_free(result);
 
     // Execute Query.
-    if(qry->getResult(queryString))
-    {
-        long rows = qry->getNumRows();
+    if (qry.getResult(queryString)) {
+        const long rows = qry.getNumRows();
 
-        if(rows > 0)
-        {
-            while(qry->fetchRow())
-            {
-                group.reset();
-                group = std::make_shared<Grouping>();
+        if (rows > 0) {
+            while (qry.fetchRow()) {
+                Grouping group;
                 pullGroupingResult(qry, group);
                 list.push_back(group);
             }
+        } else {
+            log.write<Logging::ERROR_LOG>(m_strTableName, "Error, getAllGroupingsByConferenceId Returned Rows", rows,
+                                          __LINE__, __FILE__);
         }
-        else
-        {
-            log.write<Logging::ERROR_LOG>(m_strTableName, "Error, getAllGroupingsByConferenceId Returned Rows", rows, __LINE__, __FILE__);
-        }
-    }
-    else
-    {
+    } else {
         log.write<Logging::ERROR_LOG>(m_strTableName, "Error, getResult()", __LINE__, __FILE__);
     }
 

@@ -14,18 +14,16 @@ const std::string Menu::FILE_VERSION = "1.0.1";
 
 MenuDao::MenuDao(Menu &menu, const std::string &menu_name, const std::string &path)
     : m_log(Logging::getInstance())
-    , m_menu(menu)
-    , m_path(path)
-    , m_filename(menu_name)
-{
+      , m_menu(menu)
+      , m_path(path)
+      , m_filename(menu_name) {
 }
 
 /**
  * @brief Helper, appends forward/backward slash to path
  * @param value
  */
-void MenuDao::pathSeperator(std::string &value)
-{
+void MenuDao::pathSeperator(std::string &value) {
 #ifdef _WIN32
     value.append("\\");
 #else
@@ -38,8 +36,7 @@ void MenuDao::pathSeperator(std::string &value)
  * @brief Check if the file exists and we need to create a new one.
  * @return
  */
-bool MenuDao::fileExists()
-{
+bool MenuDao::fileExists() {
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
@@ -47,8 +44,7 @@ bool MenuDao::fileExists()
 
     std::ifstream ifs(path);
 
-    if(!ifs.is_open())
-    {
+    if (!ifs.is_open()) {
         return false;
     }
 
@@ -62,8 +58,7 @@ bool MenuDao::fileExists()
  * @param cfg
  * @return
  */
-bool MenuDao::saveMenu(Menu &menu)
-{
+bool MenuDao::saveMenu(Menu &menu) {
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
@@ -86,8 +81,7 @@ bool MenuDao::saveMenu(Menu &menu)
     out << YAML::Key << "menu_pulldown_file" << YAML::Value << menu.menu_pulldown_file;
 
     // Loop and encode each menu option
-    for(unsigned int i = 0; i < menu.menu_options.size(); i++)
-    {
+    for (unsigned int i = 0; i < menu.menu_options.size(); i++) {
         auto &opt = menu.menu_options[i];
 
         out << YAML::Key << "menu_option";
@@ -111,8 +105,7 @@ bool MenuDao::saveMenu(Menu &menu)
     // Setup file to Write out File.
     std::ofstream ofs(path);
 
-    if(!ofs.is_open())
-    {
+    if (!ofs.is_open()) {
         m_log.write<Logging::ERROR_LOG>("Error, unable to write to", path);
         return false;
     }
@@ -128,15 +121,13 @@ bool MenuDao::saveMenu(Menu &menu)
  * @param menu
  * @return
  */
-bool MenuDao::deleteMenu()
-{
+bool MenuDao::deleteMenu() {
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
     path.append(".yaml");
 
-    if(std::remove(path.c_str()) != 0)
-    {
+    if (std::remove(path.c_str()) != 0) {
         m_log.write<Logging::ERROR_LOG>("Error, removing menu file", path);
         return false;
     }
@@ -150,36 +141,32 @@ bool MenuDao::deleteMenu()
  * @param rhs
  * @return
  */
-void MenuDao::encode(const Menu &rhs)
-{
-    m_menu.file_version        = rhs.file_version;
-    m_menu.menu_name           = rhs.menu_name;
-    m_menu.menu_password       = rhs.menu_password;
-    m_menu.menu_fall_back      = rhs.menu_fall_back;
-    m_menu.menu_help_file      = rhs.menu_help_file;
-    m_menu.menu_acs_string     = rhs.menu_acs_string;
-    m_menu.menu_prompt         = rhs.menu_prompt;
-    m_menu.menu_title          = rhs.menu_title;
-    m_menu.menu_pulldown_file  = rhs.menu_pulldown_file;
-    m_menu.menu_options        = rhs.menu_options;
+void MenuDao::encode(const Menu &rhs) {
+    m_menu.file_version = rhs.file_version;
+    m_menu.menu_name = rhs.menu_name;
+    m_menu.menu_password = rhs.menu_password;
+    m_menu.menu_fall_back = rhs.menu_fall_back;
+    m_menu.menu_help_file = rhs.menu_help_file;
+    m_menu.menu_acs_string = rhs.menu_acs_string;
+    m_menu.menu_prompt = rhs.menu_prompt;
+    m_menu.menu_title = rhs.menu_title;
+    m_menu.menu_pulldown_file = rhs.menu_pulldown_file;
+    m_menu.menu_options = rhs.menu_options;
 
     // Now Sort All Menu Options once they have been loaded.
     // Unfortunately YAML does not keep ordering properly.
     sort(
         m_menu.menu_options.begin(), m_menu.menu_options.end(),
-        [ ](const MenuOption& lhs, const MenuOption& rhs)
-    {
-        return lhs.index < rhs.index;
-    });
-
+        [ ](const MenuOption &lhs, const MenuOption &rhs) {
+            return lhs.index < rhs.index;
+        });
 }
 
 /**
  * @brief Loads a Menu file into the m_menu stub for access.
  * @return
  */
-bool MenuDao::loadMenu()
-{
+bool MenuDao::loadMenu() {
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
@@ -188,14 +175,12 @@ bool MenuDao::loadMenu()
     YAML::Node node;
 
     // Load the file into the class.
-    try
-    {
+    try {
         // Load file fresh.
         node = YAML::LoadFile(path);
 
         // Testing Is on nodes always throws exceptions.
-        if(node.size() == 0)
-        {
+        if (node.size() == 0) {
             return false; //File Not Found?
         }
 
@@ -204,9 +189,9 @@ bool MenuDao::loadMenu()
         // Validate File Version
         m_log.write<Logging::DEBUG_LOG>("Menu File Version", file_version);
 
-        if(file_version != Menu::FILE_VERSION)
-        {
-            m_log.write<Logging::ERROR_LOG>("Menu File Version=", file_version, "Expected Version=", Menu::FILE_VERSION);
+        if (file_version != Menu::FILE_VERSION) {
+            m_log.write<Logging::ERROR_LOG>("Menu File Version=", file_version, "Expected Version=",
+                                            Menu::FILE_VERSION);
             return false;
         }
 
@@ -214,16 +199,14 @@ bool MenuDao::loadMenu()
 
         // Moves the Loaded config to m_config shared pointer.
         encode(m);
+    } catch (YAML::Exception &ex) {
+        m_log.write<Logging::ERROR_LOG>("YAML::LoadFile", m_filename + ".yaml", ex.what(),
+                                        "Missing required field maybe.");
+        return (false);
     }
-    catch(YAML::Exception &ex)
-    {
-        m_log.write<Logging::ERROR_LOG>("YAML::LoadFile", m_filename + ".yaml", ex.what(), "Missing required field maybe.");
-        return(false);
-    }
-    catch(std::exception &ex)
-    {
+    catch (std::exception &ex) {
         m_log.write<Logging::ERROR_LOG>("Unexpected YAML::LoadFile", m_filename + ".yaml", ex.what());
-        return(false);
+        return (false);
     }
 
     return true;

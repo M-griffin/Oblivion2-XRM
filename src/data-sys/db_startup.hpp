@@ -8,18 +8,16 @@
  * @file db_startup.hpp
  * @brief Handle DB Table Creation on Startup.
  */
-class DBStartUp
-{
+class DBStartUp {
 public:
-
     explicit DBStartUp() = default;
+
     ~DBStartUp() = default;
 
     /**
      * @brief Setup for Database and Tables
      */
     bool initDatabaseTables();
-
 };
 
 #endif

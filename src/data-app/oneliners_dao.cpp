@@ -1,8 +1,6 @@
 #include "oneliners_dao.hpp"
 
-#include <iostream>
 #include <string>
-
 #include <sqlite3.h>
 
 #include "../model-app/oneliners.hpp"
@@ -10,26 +8,18 @@
 
 #include "libSqliteWrapped.h"
 
-
-/**
- * Base Dao Calls for generic Object Data Calls
- * (Below This Point)
- */
-
 /**
  * @brief Check If Database Table Exists.
  * @return
  */
-bool OnelinerDao::doesTableExist()
-{
+bool OnelinerDao::doesTableExist() {
     return baseDoesTableExist();
 }
 
 /**
  * @brief Run Setup Params for SQL Database Table.
  */
-bool OnelinerDao::firstTimeSetupParams()
-{
+bool OnelinerDao::firstTimeSetupParams() {
     return baseFirstTimeSetupParams();
 }
 
@@ -37,8 +27,7 @@ bool OnelinerDao::firstTimeSetupParams()
  * @brief Create Database Table
  * @return
  */
-bool OnelinerDao::createTable()
-{
+bool OnelinerDao::createTable() {
     return baseCreateTable();
 }
 
@@ -46,38 +35,34 @@ bool OnelinerDao::createTable()
  * @brief Drop Database
  * @return
  */
-bool OnelinerDao::dropTable()
-{
+bool OnelinerDao::dropTable() {
     return baseDropTable();
 }
 
 /**
  * @brief Updates a Record in the database!
- * @param area
+ * @param obj
  * @return
  */
-bool OnelinerDao::updateRecord(oneliner_ptr obj)
-{
+bool OnelinerDao::updateRecord(Oneliners &obj) {
     return baseUpdateRecord(obj);
 }
 
 /**
  * @brief Inserts a New Record in the database!
- * @param area
+ * @param obj
  * @return
  */
-long OnelinerDao::insertRecord(oneliner_ptr obj)
-{
+long OnelinerDao::insertRecord(Oneliners &obj) {
     return baseInsertRecord(obj);
 }
 
 /**
  * @brief Deletes a Record
- * @param areaId
+ * @param id
  * @return
  */
-bool OnelinerDao::deleteRecord(long id)
-{
+bool OnelinerDao::deleteRecord(long id) {
     return baseDeleteRecord(id);
 }
 
@@ -86,8 +71,7 @@ bool OnelinerDao::deleteRecord(long id)
  * @param id
  * @return
  */
-oneliner_ptr OnelinerDao::getRecordById(long id)
-{
+Oneliners OnelinerDao::getRecordById(const long id) {
     return baseGetRecordById(id);
 }
 
@@ -95,8 +79,7 @@ oneliner_ptr OnelinerDao::getRecordById(long id)
  * @brief Retrieve All Records in a Table
  * @return
  */
-std::vector<oneliner_ptr> OnelinerDao::getAllRecords()
-{
+std::vector<Oneliners> OnelinerDao::getAllRecords() {
     return baseGetAllRecords();
 }
 
@@ -104,8 +87,7 @@ std::vector<oneliner_ptr> OnelinerDao::getAllRecords()
  * @brief Retrieve Count of All Records in a Table
  * @return
  */
-long OnelinerDao::getRecordsCount()
-{
+long OnelinerDao::getRecordsCount() {
     return baseGetRecordsCount();
 }
 
@@ -120,14 +102,13 @@ long OnelinerDao::getRecordsCount()
  * @param qry
  * @param obj
  */
-void OnelinerDao::pullOnelinerResult(query_ptr qry, oneliner_ptr obj)
-{
-    qry->getFieldByName("iId", obj->iId);
-    qry->getFieldByName("iUserId", obj->iUserId);
-    qry->getFieldByName("sText", obj->sText);
-    qry->getFieldByName("sUserName", obj->sUserName);
-    qry->getFieldByName("sUserInitials", obj->sUserInitials);
-    qry->getFieldByName("dtDatePosted", obj->dtDatePosted);
+void OnelinerDao::pullOnelinerResult(Query &qry, Oneliners &obj) {
+    qry.getFieldByName("iId", obj.iId);
+    qry.getFieldByName("iUserId", obj.iUserId);
+    qry.getFieldByName("sText", obj.sText);
+    qry.getFieldByName("sUserName", obj.sUserName);
+    qry.getFieldByName("sUserInitials", obj.sUserInitials);
+    qry.getFieldByName("dtDatePosted", obj.dtDatePosted);
 }
 
 /**
@@ -136,15 +117,14 @@ void OnelinerDao::pullOnelinerResult(query_ptr qry, oneliner_ptr obj)
  * @param obj
  * @param values
  */
-void OnelinerDao::fillOnelinerColumnValues(query_ptr qry, oneliner_ptr obj,
-        std::vector< std::pair<std::string, std::string> > &values)
-{
-    // values.push_back(qry->translateFieldName("iId", conf->iId));
-    values.push_back(qry->translateFieldName("iUserId", obj->iUserId));
-    values.push_back(qry->translateFieldName("sText", obj->sText));
-    values.push_back(qry->translateFieldName("sUserName", obj->sUserName));
-    values.push_back(qry->translateFieldName("sUserInitials", obj->sUserInitials));
-    values.push_back(qry->translateFieldName("dtDatePosted", obj->dtDatePosted));
+void OnelinerDao::fillOnelinerColumnValues(Query &qry, Oneliners &obj,
+                                           std::vector<std::pair<std::string, std::string> > &values) {
+    // values.push_back(qry.translateFieldName("iId", conf->iId));
+    values.push_back(qry.translateFieldName("iUserId", obj.iUserId));
+    values.push_back(qry.translateFieldName("sText", obj.sText));
+    values.push_back(qry.translateFieldName("sUserName", obj.sUserName));
+    values.push_back(qry.translateFieldName("sUserInitials", obj.sUserInitials));
+    values.push_back(qry.translateFieldName("dtDatePosted", obj.dtDatePosted));
 }
 
 /**
@@ -153,16 +133,15 @@ void OnelinerDao::fillOnelinerColumnValues(query_ptr qry, oneliner_ptr obj,
  * @param obj
  * @return
  */
-std::string OnelinerDao::insertOnelinerQryString(std::string qry, oneliner_ptr obj)
-{
+std::string OnelinerDao::insertOnelinerQryString(std::string qry, Oneliners &obj) {
     // Mprint statement to avoid injections.
     char *result = sqlite3_mprintf(qry.c_str(),
-                                         obj->iUserId,
-                                         obj->sText.c_str(),
-                                         obj->sUserName.c_str(),
-                                         obj->sUserInitials.c_str(),
-                                         obj->dtDatePosted
-                                        );
+                                   obj.iUserId,
+                                   obj.sText.c_str(),
+                                   obj.sUserName.c_str(),
+                                   obj.sUserInitials.c_str(),
+                                   obj.dtDatePosted
+    );
 
     std::string queryString(result);
     sqlite3_free(result);
@@ -175,17 +154,16 @@ std::string OnelinerDao::insertOnelinerQryString(std::string qry, oneliner_ptr o
  * @param obj
  * @return
  */
-std::string OnelinerDao::updateOnelinerQryString(std::string qry, oneliner_ptr obj)
-{
+std::string OnelinerDao::updateOnelinerQryString(std::string qry, Oneliners &obj) {
     // Mprint statement to avoid injections.
     char *result = sqlite3_mprintf(qry.c_str(),
-                                         obj->iUserId,
-                                         obj->sText.c_str(),
-                                         obj->sUserName.c_str(),
-                                         obj->sUserInitials.c_str(),
-                                         obj->dtDatePosted,
-                                         obj->iId
-                                        );
+                                   obj.iUserId,
+                                   obj.sText.c_str(),
+                                   obj.sUserName.c_str(),
+                                   obj.sUserInitials.c_str(),
+                                   obj.dtDatePosted,
+                                   obj.iId
+    );
 
     std::string queryString(result);
     sqlite3_free(result);
@@ -203,54 +181,42 @@ std::string OnelinerDao::updateOnelinerQryString(std::string qry, oneliner_ptr o
  * @brief Return All Records By User ID.
  * @return
  */
-std::vector<oneliner_ptr> OnelinerDao::getAllOnelinersByUserId(long userId)
-{
-    oneliner_ptr obj = std::make_shared<Oneliners>();
-    std::vector<oneliner_ptr> list;
+std::vector<Oneliners> OnelinerDao::getAllOnelinersByUserId(const long userId) {
+    std::vector<Oneliners> list;
 
     // Make Sure Database Reference is Connected
-    if(!m_database.isConnected())
-    {
+    if (!m_database.isConnected()) {
         m_log.write<Logging::ERROR_LOG>("Error, Database is not connected!", __FILE__, __LINE__);
         return list;
     }
 
     // Create Pointer and Connect Query Object to Database.
-    query_ptr qry = std::make_shared<SQLW::Query>(m_database);
+    Query qry(m_database);
 
-    if(!qry->isConnected())
-    {
+    if (!qry.isConnected()) {
         m_log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", __FILE__, __LINE__);
         return list;
     }
 
     // Build Query String
     char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE iUserId = %ld;", m_strTableName.c_str(), userId);
-    std::string queryString(result);
+    const std::string queryString(result);
     sqlite3_free(result);
 
     // Execute Query.
-    if(qry->getResult(queryString))
-    {
-        long rows = qry->getNumRows();
+    if (qry.getResult(queryString)) {
+        const long rows = qry.getNumRows();
 
-        if(rows > 0)
-        {
-            while(qry->fetchRow())
-            {
-                obj.reset();
-                obj = std::make_shared<Oneliners>();
+        if (rows > 0) {
+            while (qry.fetchRow()) {
+                Oneliners obj;
                 pullOnelinerResult(qry, obj);
                 list.push_back(obj);
             }
-        }
-        else
-        {
+        } else {
             m_log.write<Logging::ERROR_LOG>("Error, getAllOneliners Returned Rows=", rows, __FILE__, __LINE__);
         }
-    }
-    else
-    {
+    } else {
         m_log.write<Logging::ERROR_LOG>("Error, getResult()", __FILE__, __LINE__);
     }
 

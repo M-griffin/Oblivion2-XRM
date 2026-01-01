@@ -60,14 +60,14 @@ ModMessageBaseEditor::ModMessageBaseEditor(session_ptr session_data, config_ptr 
 
 
     // Check of the Text Prompts exist.
-    m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
+    m_is_text_prompt_exist = m_text_prompts_dao.fileExists();
     if (!m_is_text_prompt_exist)
     {
         createTextPrompts();
     }
 
     // Loads all Text Prompts for current module
-    m_text_prompts_dao->readPrompts();
+    m_text_prompts_dao.readPrompts();
 }
 
 /**
@@ -174,7 +174,7 @@ void ModMessageBaseEditor::createTextPrompts()
     value[DISPLAY_LEVEL_FIELDS_QUIT_SAVE]         = std::make_pair("Quit and Save", " |03(|11Q|03) |15Quit & Save          ");
     value[DISPLAY_LEVEL_FIELDS_QUIT_ABORT]        = std::make_pair("Quit without Save", " |03(|11X|03) |15Exit without Saving  ");
 
-    m_text_prompts_dao->writeValue(value);
+    m_text_prompts_dao.writeValue(value);
 }
 
 /**
@@ -280,7 +280,7 @@ void ModMessageBaseEditor::setupMenuEditor()
         std::vector<std::string>().swap(m_menu_display_list);
     }
 
-    m_menu_display_list = m_common_io->splitString(menu_display_output, '\n');
+    m_menu_display_list = m_common_io.splitString(menu_display_output, '\n');
     m_page = 0;
     displayCurrentPage(PROMPT_INPUT_TEXT);
 }
@@ -305,7 +305,7 @@ void ModMessageBaseEditor::setupMenuEditFields()
         std::vector<std::string>().swap(m_menu_display_list);
     }
 
-    m_menu_display_list = m_common_io->splitString(menu_display_output, '\n');
+    m_menu_display_list = m_common_io.splitString(menu_display_output, '\n');
     m_page = 0;
     displayCurrentEditPage(PROMPT_LEVEL_FIELD_INPUT_TEXT);
 }
@@ -329,7 +329,7 @@ void ModMessageBaseEditor::displayCurrentPage(const std::string &input_state)
 
     for(unsigned int i = (m_page*(m_rows_per_page-2)); i < m_menu_display_list.size(); i++)
     {
-        std::string display_line = m_session_io->pipe2ansi(m_menu_display_list[i]);
+        std::string display_line = m_session_io.pipe2ansi(m_menu_display_list[i]);
         display_line.append("\r\n");
         baseProcessAndDeliver(display_line);
 
@@ -380,7 +380,7 @@ void ModMessageBaseEditor::displayCurrentEditPage(const std::string &input_state
 {
     for(unsigned int i = 0; i < m_menu_display_list.size(); i++)
     {
-        std::string display_line = m_session_io->pipe2ansi(m_menu_display_list[i]);
+        std::string display_line = m_session_io.pipe2ansi(m_menu_display_list[i]);
         display_line.append("\r\n");
         baseProcessAndDeliver(display_line);
     }
@@ -451,7 +451,7 @@ void ModMessageBaseEditor::menuEditorDisplayPause(const std::string &)
 void ModMessageBaseEditor::menuEditorInput(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -517,7 +517,7 @@ void ModMessageBaseEditor::menuEditorInput(const std::string &input)
 void ModMessageBaseEditor::menuEditorMenuFieldInput(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -542,42 +542,42 @@ void ModMessageBaseEditor::menuEditorMenuFieldInput(const std::string &input)
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_MENU_FIELD);
                 displayPrompt(PROMPT_MENU_FIELD_TITLE);
-                m_session_io->getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_title);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_title);
                 break;
 
             case 'B': // Menu Password
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_MENU_FIELD);
                 displayPrompt(PROMPT_MENU_FIELD_PASSWORD);
-                m_session_io->getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_password);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_password);
                 break;
 
             case 'C': // Menu Password
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_MENU_FIELD);
                 displayPrompt(PROMPT_MENU_FIELD_FALLBACK);
-                m_session_io->getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_fall_back);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_fall_back);
                 break;
 
             case 'D': // Menu Help ID
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_MENU_FIELD);
                 displayPrompt(PROMPT_MENU_FIELD_HELP_ID);
-                m_session_io->getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_help_file);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_help_file);
                 break;
 
             case 'E': // Menu Name
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_MENU_FIELD);
                 displayPrompt(PROMPT_MENU_FIELD_NAME);
-                m_session_io->getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_name);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_name);
                 break;
 
             case 'F': // Menu Pulldown file
                 m_current_field = toupper(key[0]);
                 changeInputModule(MOD_MENU_FIELD);
                 displayPrompt(PROMPT_MENU_FIELD_PULLDOWN);
-                m_session_io->getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_pulldown_file);
+                m_session_io.getInputField("", key, Config::sName_length, m_loaded_level.back()->menu_pulldown_file);
                 break;
 
             case 'G': // View Generate Menu
@@ -630,7 +630,7 @@ void ModMessageBaseEditor::menuEditorMenuFieldInput(const std::string &input)
 void ModMessageBaseEditor::menuEditorMenuFieldHandler(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io->getInputField(input, key, Config::sName_length);
+    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -694,7 +694,7 @@ void ModMessageBaseEditor::menuEditorMenuFieldHandler(const std::string &input)
 void ModMessageBaseEditor::menuEditorMenuNameInput(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io->getInputField(input, key, Config::sName_length);
+    std::string result = m_session_io.getInputField(input, key, Config::sName_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -1185,7 +1185,7 @@ std::string ModMessageBaseEditor::displayMenuList()
                         {
                             // Strip Extension, then pad 8 characters.
                             menu_name = i->substr(0, i->size()-5);
-                            menu_name = m_common_io->rightPadding(menu_name, 8);
+                            menu_name = m_common_io.rightPadding(menu_name, 8);
 
                             baseTransformToUpper(menu_name);
 
@@ -1227,38 +1227,38 @@ std::string ModLevelEditor::displayMenuOptionList()
     {
         auto &m = current_menu->menu_options[i];
 
-        std::string option_string = m_common_io->rightPadding(std::to_string(m.index), 3);
+        std::string option_string = m_common_io.rightPadding(std::to_string(m.index), 3);
 
         // Toggled View will show commands strings, while default shows command key info.
         switch (m_mod_toggle_view_index)
         {
             case VIEW_DEFAULT:
-                option_string.append(baseGetDefaultColor() + m_common_io->rightPadding(m.menu_key, 9));
-                option_string.append(baseGetDefaultInputColor() + m_common_io->rightPadding(m.command_key, 4));
-                option_string.append(baseGetDefaultStatColor() + m_common_io->rightPadding(m.acs_string, 8));
+                option_string.append(baseGetDefaultColor() + m_common_io.rightPadding(m.menu_key, 9));
+                option_string.append(baseGetDefaultInputColor() + m_common_io.rightPadding(m.command_key, 4));
+                option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(m.acs_string, 8));
                 break;
 
             case VIEW_NAMES:
-                option_string.append(baseGetDefaultColor() + m_common_io->rightPadding(m.name, 21));
+                option_string.append(baseGetDefaultColor() + m_common_io.rightPadding(m.name, 21));
                 break;
 
             case VIEW_STRINGS:
-                option_string.append(baseGetDefaultColor() + m_common_io->rightPadding(m.command_string, 15));
-                option_string.append(baseGetDefaultInputColor() + m_common_io->rightPadding("", 1));
-                option_string.append(baseGetDefaultStatColor() + m_common_io->rightPadding(m_common_io->boolAlpha(m.hidden), 5));
+                option_string.append(baseGetDefaultColor() + m_common_io.rightPadding(m.command_string, 15));
+                option_string.append(baseGetDefaultInputColor() + m_common_io.rightPadding("", 1));
+                option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(m_common_io.boolAlpha(m.hidden), 5));
                 break;
 
             case VIEW_PULLDOWN:
-                option_string.append(baseGetDefaultColor() + m_common_io->rightPadding(m.menu_key, 9));
-                option_string.append(baseGetDefaultInputColor() + m_common_io->rightPadding(m.command_key, 4));
+                option_string.append(baseGetDefaultColor() + m_common_io.rightPadding(m.menu_key, 9));
+                option_string.append(baseGetDefaultInputColor() + m_common_io.rightPadding(m.command_key, 4));
 
                 if (m.pulldown_id > 0)
                 {
-                    option_string.append(baseGetDefaultStatColor() + m_common_io->rightPadding(std::to_string(m.pulldown_id), 8));
+                    option_string.append(baseGetDefaultStatColor() + m_common_io.rightPadding(std::to_string(m.pulldown_id), 8));
                 }
                 else
                 {
-                    option_string.append(m_common_io->rightPadding("", 8));
+                    option_string.append(m_common_io.rightPadding("", 8));
                 }
         }
 
@@ -1400,23 +1400,23 @@ std::string ModMessageBaseEditor::displayMenuEditScreen()
         // Build a string list of individual menu options, then loop to fit as many per screen!
         std::vector<std::string> result_set;
 
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_VERSION_ID) + baseGetDefaultStatColor() + m_common_io->rightPadding(current_menu->file_version, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_VERSION_ID) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->file_version, 48));
         result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_TITLE) + baseGetDefaultStatColor() + m_common_io->rightPadding(current_menu->menu_title, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_PASSWORD) + baseGetDefaultStatColor() + m_common_io->rightPadding(current_menu->menu_password, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_FALLBACK) + baseGetDefaultStatColor() + m_common_io->rightPadding(current_menu->menu_fall_back, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_HELP_ID) + baseGetDefaultStatColor() + m_common_io->rightPadding(current_menu->menu_help_file, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_NAME) + baseGetDefaultStatColor() + m_common_io->rightPadding(current_menu->menu_name, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_PULLDOWN_FILE) + baseGetDefaultStatColor() + m_common_io->rightPadding(current_menu->menu_pulldown_file, 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_VIEW_GENERIC) + baseGetDefaultStatColor() + m_common_io->rightPadding("", 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_EDIT_OPTIONS) + baseGetDefaultStatColor() + m_common_io->rightPadding("", 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_TITLE) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_title, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_PASSWORD) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_password, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_FALLBACK) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_fall_back, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_HELP_ID) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_help_file, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_NAME) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_name, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_PULLDOWN_FILE) + baseGetDefaultStatColor() + m_common_io.rightPadding(current_menu->menu_pulldown_file, 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_VIEW_GENERIC) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_EDIT_OPTIONS) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
         result_set.push_back(baseGetDefaultPromptColor() + " " + std::string(72, BORDER_ROW) + " ");
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_QUIT_SAVE) + baseGetDefaultStatColor() + m_common_io->rightPadding("", 48));
-        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_QUIT_ABORT) + baseGetDefaultStatColor() + m_common_io->rightPadding("", 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_QUIT_SAVE) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
+        result_set.push_back(getDisplayPromptRaw(DISPLAY_MENU_FIELDS_QUIT_ABORT) + baseGetDefaultStatColor() + m_common_io.rightPadding("", 48));
 
         // Not in use Yet, seems legacy only does ACS in option commands.
-        // option_string.append("Menu ACS           : " + m_common_io->rightPadding(current_menu->menu_acs_string, 35);
-        // option_string.append("Menu FormMenu      : " + m_common_io->rightPadding(current_menu->menu_form_menu, 8);
+        // option_string.append("Menu ACS           : " + m_common_io.rightPadding(current_menu->menu_acs_string, 35);
+        // option_string.append("Menu FormMenu      : " + m_common_io.rightPadding(current_menu->menu_form_menu, 8);
 
         // iterate through and print out
         int total_rows = result_set.size();

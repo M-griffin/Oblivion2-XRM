@@ -2,12 +2,7 @@
 #define ONELINERS_HPP
 
 #include <string>
-#include <memory>
-#include <ctime>
-
-
-class Oneliners;
-typedef std::shared_ptr<Oneliners> oneliner_ptr;
+#include <chrono>
 
 /**
  * @class Oneliners
@@ -16,20 +11,18 @@ typedef std::shared_ptr<Oneliners> oneliner_ptr;
  * @file oneliners.hpp
  * @brief OneLiners Model
  */
-class Oneliners
-{
+class Oneliners {
 public:
     explicit Oneliners()
         : iId(-1)
-        , iUserId(-1)
-        , sText("")
-        , sUserName("")
-        , sUserInitials("")
-        , dtDatePosted(0)
-    {}
+          , iUserId(-1)
+          , sText("")
+          , sUserName("")
+          , sUserInitials("")
+          , dtDatePosted(0) {
+    }
 
-    ~Oneliners()
-    {}
+    ~Oneliners() = default;
 
     long iId;
     long iUserId;
@@ -37,8 +30,6 @@ public:
     std::string sUserName;
     std::string sUserInitials;
     std::time_t dtDatePosted;
-
 };
 
-
-#endif // ONELINERS_HPP
+#endif

@@ -1,48 +1,43 @@
 #ifndef PROTOCOLS_HPP
 #define PROTOCOLS_HPP
 
-#include <yaml-cpp/yaml.h>
-
-#include <memory>
 #include <string>
 #include <vector>
+
+#include <yaml-cpp/yaml.h>
+
 
 /**
  * @class Protocol
  * @author Michael Griffin
  * @date 05/05/2017
- * @file protocols.hpp
+ * @file protocol.hpp
  * @brief Individual Protocol Entries
  */
-class Protocol
-{
+class Protocol {
 public:
-
     explicit Protocol()
         : protocol_name("")
-        , protocol_type("") // up/down.
-        , protocol_key("")
-        , protocol_path("")
-        , protocol_argument("")
-        , protocol_isBatch(false)
-        , protocol_hasDSZLog(false)
-    {
+          , protocol_type("") // up/down.
+          , protocol_key("")
+          , protocol_path("")
+          , protocol_argument("")
+          , protocol_isBatch(false)
+          , protocol_hasDSZLog(false) {
     }
 
     Protocol(const std::string &name, const std::string &type, const std::string &key,
-        const std::string &path, const std::string &argu, const bool &batch, const bool &dszlog)
+             const std::string &path, const std::string &argu, const bool &batch, const bool &dszlog)
         : protocol_name(name)
-        , protocol_type(type) // Up/Download.
-        , protocol_key(key)
-        , protocol_path(path)
-        , protocol_argument(argu)
-        , protocol_isBatch(batch)
-        , protocol_hasDSZLog(dszlog)
-    {
+          , protocol_type(type) // Up/Download.
+          , protocol_key(key)
+          , protocol_path(path)
+          , protocol_argument(argu)
+          , protocol_isBatch(batch)
+          , protocol_hasDSZLog(dszlog) {
     }
-    ~Protocol()
-    {
-    }
+
+    ~Protocol() = default;
 
     std::string protocol_name;
     std::string protocol_type;
@@ -60,31 +55,24 @@ public:
  * @file protocols.hpp
  * @brief Container for All Protocols
  */
-class Protocols
-{
+class Protocols {
 public:
-
     const static std::string FILE_VERSION;
 
     explicit Protocols()
-        : file_version(FILE_VERSION)
-    {
+        : file_version(FILE_VERSION) {
     }
 
-    ~Protocols()
-    {
-    }
+    ~Protocols() = default;
 
     std::string file_version;
     std::vector<Protocol> protocols;
 };
 
 // YAML Override namespace for encoding/decoding Class.
-namespace YAML
-{
+namespace YAML {
     template<>
-    struct convert<Protocol>
-    {
+    struct convert<Protocol> {
         /**
          * @brief Override for encoding the Class
          *        This is not used as it makes the map on a single line!
@@ -92,8 +80,7 @@ namespace YAML
          * @param rhs
          * @return
          */
-        static Node encode(const Protocol &rhs)
-        {
+        static Node encode(const Protocol &rhs) {
             Node node;
             node["protocol_name"] = rhs.protocol_name;
             node["protocol_type"] = rhs.protocol_type;
@@ -112,14 +99,13 @@ namespace YAML
          * @param rhs
          * @return
          */
-        static bool decode(const Node& node, Protocol& rhs)
-        {
-            rhs.protocol_name      = node["protocol_name"].as<std::string>();
-            rhs.protocol_type      = node["protocol_type"].as<std::string>();
-            rhs.protocol_key       = node["protocol_key"].as<std::string>();
-            rhs.protocol_path      = node["protocol_path"].as<std::string>();
-            rhs.protocol_argument  = node["protocol_argument"].as<std::string>();
-            rhs.protocol_isBatch   = node["protocol_isBatch"].as<bool>();
+        static bool decode(const Node &node, Protocol &rhs) {
+            rhs.protocol_name = node["protocol_name"].as<std::string>();
+            rhs.protocol_type = node["protocol_type"].as<std::string>();
+            rhs.protocol_key = node["protocol_key"].as<std::string>();
+            rhs.protocol_path = node["protocol_path"].as<std::string>();
+            rhs.protocol_argument = node["protocol_argument"].as<std::string>();
+            rhs.protocol_isBatch = node["protocol_isBatch"].as<bool>();
             rhs.protocol_hasDSZLog = node["protocol_hasDSZLog"].as<bool>();
 
             return true;
@@ -128,8 +114,7 @@ namespace YAML
 
 
     template<>
-    struct convert<Protocols>
-    {
+    struct convert<Protocols> {
         /**
          * @brief Override for encoding the Menu Class
          *        This is not used as it makes the map on a single line!
@@ -137,23 +122,21 @@ namespace YAML
          * @param rhs
          * @return
          */
-        static Node encode(const Protocols &rhs)
-        {
+        static Node encode(const Protocols &rhs) {
             Node node;
-            node["file_version"]           = rhs.file_version;
+            node["file_version"] = rhs.file_version;
 
             // Child Nodes for storying menu options.
             Node prot;
 
             // Loop and encode each menu option
-            for (auto &p : rhs.protocols)
-            {
-                prot["protocol_name"]      = p.protocol_name;
-                prot["protocol_type"]      = p.protocol_type;
-                prot["protocol_key"]       = p.protocol_key;
-                prot["protocol_path"]      = p.protocol_path;
-                prot["protocol_argument"]  = p.protocol_argument;
-                prot["protocol_isBatch"]   = p.protocol_isBatch;
+            for (auto &p: rhs.protocols) {
+                prot["protocol_name"] = p.protocol_name;
+                prot["protocol_type"] = p.protocol_type;
+                prot["protocol_key"] = p.protocol_key;
+                prot["protocol_path"] = p.protocol_path;
+                prot["protocol_argument"] = p.protocol_argument;
+                prot["protocol_isBatch"] = p.protocol_isBatch;
                 prot["protocol_hasDSZLog"] = p.protocol_hasDSZLog;
 
                 node["protocols"].push_back(prot);
@@ -168,19 +151,14 @@ namespace YAML
          * @param rhs
          * @return
          */
-        static bool decode(const Node& node, Protocols& rhs)
-        {
+        static bool decode(const Node &node, Protocols &rhs) {
             rhs.file_version = node["file_version"].as<std::string>();
 
             // Iterate through so we can get MAPS with the same key "access_levels".
-            std::string key = "";
-            for (YAML::const_iterator it = node.begin(); it != node.end(); ++it)
-            {
-                key.clear();
-                key = it->first.as<std::string>();
+            for (auto it = node.begin(); it != node.end(); ++it) {
+                auto key = it->first.as<std::string>();
 
-                if (key == "protocols")
-                {
+                if (key == "protocols") {
                     rhs.protocols.push_back(it->second.as<Protocol>());
                 }
             }
@@ -190,6 +168,4 @@ namespace YAML
     };
 }
 
-typedef std::shared_ptr<Protocols> protocols_ptr;
-
-#endif // PROTOCOLS_HPP
+#endif

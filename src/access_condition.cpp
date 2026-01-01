@@ -17,12 +17,10 @@
  */
 AccessCondition::AccessCondition(SessionIO &io)
     : m_log(Logging::getInstance())
-    , m_session_io(io)
-{
+      , m_session_io(io) {
 }
 
-AccessCondition::~AccessCondition()
-{ 
+AccessCondition::~AccessCondition() {
     m_log.write<Logging::DEBUG_LOG>("~AccessCondition()");
 }
 
@@ -32,23 +30,18 @@ AccessCondition::~AccessCondition()
  * @param first_set
  * @param user
  */
-void AccessCondition::setFlagToggle(unsigned char flag, bool first_set, Users &user)
-{
+void AccessCondition::setFlagToggle(unsigned char flag, bool first_set, Users &user) {
     int bit = toupper(flag);
     bit -= 65; // Handles A - Z
 
-    if(bit < 0 || bit > 25)
-    {        
+    if (bit < 0 || bit > 25) {
         m_log.write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
-    if(first_set)
-    {
+    if (first_set) {
         user.iControlFlags1 ^= 1 << bit;
-    }
-    else
-    {
+    } else {
         user.iControlFlags2 ^= 1 << bit;
     }
 }
@@ -59,23 +52,18 @@ void AccessCondition::setFlagToggle(unsigned char flag, bool first_set, Users &u
  * @param first_set
  * @param level
  */
-void AccessCondition::setFlagLevelToggle(unsigned char flag, bool first_set, AccessLevel &level)
-{
+void AccessCondition::setFlagLevelToggle(unsigned char flag, bool first_set, AccessLevel &level) {
     int bit = toupper(flag);
     bit -= 65; // Handles A - Z
 
-    if(bit < 0 || bit > 25)
-    {
+    if (bit < 0 || bit > 25) {
         m_log.write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
-    if(first_set)
-    {
+    if (first_set) {
         level.iARFlags1 ^= 1 << bit;
-    }
-    else
-    {
+    } else {
         level.iARFlags2 ^= 1 << bit;
     }
 }
@@ -86,23 +74,18 @@ void AccessCondition::setFlagLevelToggle(unsigned char flag, bool first_set, Acc
  * @param first_set
  * @param user
  */
-void AccessCondition::setFlagOn(unsigned char flag, bool first_set, Users &user)
-{
+void AccessCondition::setFlagOn(unsigned char flag, bool first_set, Users &user) {
     int bit = toupper(flag);
     bit -= 65; // Handles A - Z
 
-    if(bit < 0 || bit > 25)
-    {
+    if (bit < 0 || bit > 25) {
         m_log.write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
-    if(first_set)
-    {
+    if (first_set) {
         user.iControlFlags1 |= 1 << bit;
-    }
-    else
-    {
+    } else {
         user.iControlFlags2 |= 1 << bit;
     }
 }
@@ -113,23 +96,18 @@ void AccessCondition::setFlagOn(unsigned char flag, bool first_set, Users &user)
  * @param first_set
  * @param user
  */
-void AccessCondition::setFlagOff(unsigned char flag, bool first_set, Users &user)
-{
+void AccessCondition::setFlagOff(unsigned char flag, bool first_set, Users &user) {
     int bit = toupper(flag);
     bit -= 65; // Handles A - Z
 
-    if(bit < 0 || bit > 25)
-    {
+    if (bit < 0 || bit > 25) {
         m_log.write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
-    if(first_set)
-    {
+    if (first_set) {
         user.iControlFlags1 &= ~(1 << bit);
-    }
-    else
-    {
+    } else {
         user.iControlFlags2 &= ~(1 << bit);
     }
 }
@@ -141,19 +119,16 @@ void AccessCondition::setFlagOff(unsigned char flag, bool first_set, Users &user
  * @param user
  * @return
  */
-bool AccessCondition::checkAccessConditionFlag(unsigned char flag, bool first_set, Users &user)
-{
+bool AccessCondition::checkAccessConditionFlag(unsigned char flag, bool first_set, Users &user) {
     int bit = toupper(flag);
     bit -= 65; // Handles A - Z
 
-    if(bit < 0 || bit > 25)
-    {
+    if (bit < 0 || bit > 25) {
         m_log.write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return false;
     }
 
-    if(first_set)
-    {
+    if (first_set) {
         return (user.iControlFlags1 >> bit) & 1;
     }
 
@@ -166,11 +141,9 @@ bool AccessCondition::checkAccessConditionFlag(unsigned char flag, bool first_se
  * @param first_set
  * @param user
  */
-void AccessCondition::setAccessConditionsFlagsOn(std::string bitString, bool first_set, Users &user)
-{
-    for(char flag : bitString)
-    {
-        setFlagOn((unsigned char)flag, first_set, user);
+void AccessCondition::setAccessConditionsFlagsOn(std::string bitString, bool first_set, Users &user) {
+    for (char flag: bitString) {
+        setFlagOn((unsigned char) flag, first_set, user);
     }
 }
 
@@ -180,11 +153,9 @@ void AccessCondition::setAccessConditionsFlagsOn(std::string bitString, bool fir
  * @param first_set
  * @param user
  */
-void AccessCondition::setAccessConditionsFlagsOff(std::string bitString, bool first_set, Users &user)
-{
-    for(char flag : bitString)
-    {
-        setFlagOff((unsigned char)flag, first_set, user);
+void AccessCondition::setAccessConditionsFlagsOff(std::string bitString, bool first_set, Users &user) {
+    for (char flag: bitString) {
+        setFlagOff((unsigned char) flag, first_set, user);
     }
 }
 
@@ -194,8 +165,7 @@ void AccessCondition::setAccessConditionsFlagsOff(std::string bitString, bool fi
  * @param user
  * @return
  */
-bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, Users &user)
-{
+bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, Users &user) {
     bool condition = false;
     MapType my_matches;
 
@@ -206,33 +176,26 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, Users &
     // All Global MCI Codes likes standard screens and colors will
     // He handled here, then specific interfaces will break out below this.
     // Break out parsing on which pattern was matched.
-    while(code_mapping.size() > 0)
-    {
+    while (code_mapping.size() > 0) {
         // Loop Backwards to preserve string offsets on replacement.
         my_matches = code_mapping.back();
         code_mapping.pop_back();
 
-        switch(my_matches.m_match)
-        {
+        switch (my_matches.m_match) {
             case 1: // SL NOT
             {
                 std::stringstream ss;
                 ss << my_matches.m_code.substr(2);
                 int not_level = 0;
 
-                if(!(ss >> not_level))
-                {
+                if (!(ss >> not_level)) {
                     condition = false;
-                }
-                else if(not_level != user.iLevel)
-                {
+                } else if (not_level != user.iLevel) {
                     condition = true;
-                }
-                else
-                {
+                } else {
                     condition = false;
                 }
-                
+
                 ss.clear();
                 break;
             }
@@ -243,16 +206,11 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, Users &
                 ss << my_matches.m_code.substr(1);
                 int level = 0;
 
-                if(!(ss >> level))
-                {
+                if (!(ss >> level)) {
                     condition = false;
-                }
-                else if(level <= user.iLevel)
-                {
+                } else if (level <= user.iLevel) {
                     condition = true;
-                }
-                else
-                {
+                } else {
                     condition = false;
                 }
 
@@ -264,12 +222,9 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, Users &
             {
                 std::string not_flag = my_matches.m_code.substr(2);
 
-                if(!checkAccessConditionFlag(not_flag[0], true, user))
-                {
+                if (!checkAccessConditionFlag(not_flag[0], true, user)) {
                     condition = true;
-                }
-                else
-                {
+                } else {
                     condition = false;
                 }
 
@@ -280,12 +235,9 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, Users &
             {
                 std::string flag = my_matches.m_code.substr(1);
 
-                if(checkAccessConditionFlag(flag[0], true, user))
-                {
+                if (checkAccessConditionFlag(flag[0], true, user)) {
                     condition = true;
-                }
-                else
-                {
+                } else {
                     condition = false;
                 }
 
@@ -296,12 +248,9 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, Users &
             {
                 std::string not_flag = my_matches.m_code.substr(2);
 
-                if(!checkAccessConditionFlag(not_flag[0], false, user))
-                {
+                if (!checkAccessConditionFlag(not_flag[0], false, user)) {
                     condition = true;
-                }
-                else
-                {
+                } else {
                     condition = false;
                 }
 
@@ -312,12 +261,9 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, Users &
             {
                 std::string flag = my_matches.m_code.substr(1);
 
-                if(checkAccessConditionFlag(flag[0], false, user))
-                {
+                if (checkAccessConditionFlag(flag[0], false, user)) {
                     condition = true;
-                }
-                else
-                {
+                } else {
                     condition = false;
                 }
 
@@ -329,11 +275,9 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, Users &
         }
 
         // Check if any conditions fail
-        if(!condition)
-        {
+        if (!condition) {
             break;
         }
-
     }
 
     return condition;
@@ -344,14 +288,12 @@ bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, Users &
  * @param s
  * @param delimiter
  */
-std::vector<std::string> split(const std::string& s, char delimiter)
-{
+std::vector<std::string> split(const std::string &s, char delimiter) {
     std::vector<std::string> tokens;
     std::string token;
     std::istringstream tokenStream(s);
 
-    while(std::getline(tokenStream, token, delimiter))
-    {
+    while (std::getline(tokenStream, token, delimiter)) {
         tokens.push_back(token);
     }
 
@@ -363,8 +305,7 @@ std::vector<std::string> split(const std::string& s, char delimiter)
  * @param acs_string
  * @return
  */
-std::vector<MapType> AccessCondition::parseAcsString(const std::string &acs_string)
-{
+std::vector<MapType> AccessCondition::parseAcsString(const std::string &acs_string) {
     std::vector<MapType> code_map;
 
     // First split any OR statements.
@@ -372,21 +313,17 @@ std::vector<MapType> AccessCondition::parseAcsString(const std::string &acs_stri
 
     tokens = split(acs_string, '|');
 
-    if(tokens.size() > 1)
-    {
+    if (tokens.size() > 1) {
         // Then we have multiple 'OR' statements.
         // Only handles single STMT | STMT at this point.
         // Multiple OR statement should be surrounded with ( )
         // NOTE, at this time OR is not handled, just breaking up statements.
         // Or would need to be handled in the code mapping
-        for(std::string t : tokens)
-        {
+        for (std::string t: tokens) {
             std::vector<MapType> tmp = m_session_io.parseToCodeMap(t, ACS_EXPRESSION);
             code_map.insert(code_map.end(), tmp.begin(), tmp.end());
         }
-    }
-    else
-    {
+    } else {
         code_map = m_session_io.parseToCodeMap(acs_string, ACS_EXPRESSION);
     }
 
@@ -399,14 +336,12 @@ std::vector<MapType> AccessCondition::parseAcsString(const std::string &acs_stri
  * @param user
  * @return
  */
-bool AccessCondition::validateAcsString(const std::string &acs_string, Users &user)
-{
+bool AccessCondition::validateAcsString(const std::string &acs_string, Users &user) {
     std::vector<MapType> code_map;
     code_map = parseAcsString(acs_string);
 
     // Allow Access on empty string, meaning no security.
-    if(code_map.empty())
-    {
+    if (code_map.empty()) {
         return true;
     }
 
@@ -418,18 +353,13 @@ bool AccessCondition::validateAcsString(const std::string &acs_string, Users &us
  * @param bits
  * @return
  */
-std::string AccessCondition::getAccessConditionFlagStringFromBits(int bits)
-{
+std::string AccessCondition::getAccessConditionFlagStringFromBits(int bits) {
     std::string bit_string = "";
 
-    for(int i = 0; i < 26; i++)
-    {
-        if((bits >> i) & 1)
-        {
+    for (int i = 0; i < 26; i++) {
+        if ((bits >> i) & 1) {
             bit_string += static_cast<char>(i + 65);
-        }
-        else
-        {
+        } else {
             bit_string += '-';
         }
     }

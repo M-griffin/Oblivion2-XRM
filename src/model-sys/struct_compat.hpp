@@ -1,45 +1,42 @@
 #ifndef STRUCT_HPP
 #define STRUCT_HPP
 
-#include <cstdio>
-#include <string>
-#include <iostream>
-#include <stdint.h>
+#include <cstdint>
+
 /*
  * This file contains structs for OBV/2 v2.30 data files
  */
 
- /**
- * Note: Null terminated strings are 1 longer then pascal
- * Basic Pascal to C++ Type Translations.
- * These are setup for specific 8, 16 and 32 bit widths
- * to make cross platform and cpu compatible.
- */
-typedef int8_t LStr[81];    // 80
-typedef int8_t MStr[36];    // 35
-typedef int8_t SStr[16];    // 15
-typedef int8_t Str8[9];     // 8
+/**
+* Note: Null terminated strings are 1 longer then pascal
+* Basic Pascal to C++ Type Translations.
+* These are set up for specific 8, 16 and 32 bit widths
+* to make cross-platform and cpu compatible.
+*/
+typedef int8_t LStr[81]; // 80
+typedef int8_t MStr[36]; // 35
+typedef int8_t SStr[16]; // 15
+typedef int8_t Str8[9]; // 8
 
-                            // Range                       Bytes
-typedef int8_t   Char;      // -128 .. 127                 1
-typedef uint8_t  Byte;      // 0 .. 255	                   1
-typedef bool     Boolean;   // 0 .. 255	                   1
-typedef int8_t   ShortInt;  // -128 .. 127                 1
+// Range                       Bytes
+typedef int8_t Char; // -128 .. 127                 1
+typedef uint8_t Byte; // 0 .. 255	                   1
+typedef bool Boolean; // 0 .. 255	                   1
+typedef int8_t ShortInt; // -128 .. 127                 1
 
-typedef int16_t  Integer;   // -32768 .. 32767             2
-typedef uint16_t Word;      // 0 .. 65535	               2
+typedef int16_t Integer; // -32768 .. 32767             2
+typedef uint16_t Word; // 0 .. 65535	           2
 
-typedef int32_t  LongInt;   // -2147483648 .. 2147483647   4
-typedef uint32_t LongWord;  // 0 .. 4294967295             4
+typedef int32_t LongInt; // -2147483648 .. 2147483647   4
+typedef uint32_t LongWord; // 0 .. 4294967295             4
 
-// Undetermined length, much check String[0] for length.
-typedef int8_t  String[256];
+// Undetermined length, must check String[0] for length.
+typedef int8_t String[256];
 
-const   Byte MaxMesLines  = 150;
-const   Byte NumPrompts   = 205;
-const   Byte NumNodes     = 15;
-const   Byte NumLast      = 20;
-
+const Byte MaxMesLines = 150;
+const Byte NumPrompts = 205;
+const Byte NumNodes = 15;
+const Byte NumLast = 20;
 
 
 /**
@@ -49,10 +46,9 @@ const   Byte NumLast      = 20;
  * @brief Language File Text Prompts
  */
 #pragma pack(push, 1)
-typedef struct TextPrompt
-{
-    LStr    Desc;
-    String  Prompt; // Not determined length, might parse manually on String[0]
+typedef struct TextPrompt {
+    LStr Desc;
+    String Prompt; // Not determined length, might parse manually on String[0]
 } TextPrompt;
 #pragma pack(pop)
 
@@ -64,10 +60,9 @@ typedef struct TextPrompt
  * @brief Menu Prompt Record
  */
 #pragma pack(push, 1)
-typedef struct MenuPromptCompat
-{
-    MStr    Name;
-    LStr    Data[3];
+typedef struct MenuPromptCompat {
+    MStr Name;
+    LStr Data[3];
 } MenuPromptCompat;
 #pragma pack(pop)
 
@@ -79,19 +74,18 @@ typedef struct MenuPromptCompat
  * @brief BBS Statistics Record
  */
 #pragma pack(push, 1)
-typedef struct Statistics
-{
+typedef struct Statistics {
     LongInt TFiles,
             TPosts;
-    Word    SysopMail;
+    Word SysopMail;
     LongInt UserLastOn,
-            LastAtWFC[NumNodes];       // : Array[1..NumNodes] Of LongInt;
-    Word    NumBases;
-    Byte    PageStatus;
+            LastAtWFC[NumNodes]; // : Array[1..NumNodes] Of LongInt;
+    Word NumBases;
+    Byte PageStatus;
     LongInt LastPChange,
             TotalCalls,
-            TimeUsedToday[NumNodes];   // : Array[1..NumNodes] Of LongInt;
-    Word    CallsToday,
+            TimeUsedToday[NumNodes]; // : Array[1..NumNodes] Of LongInt;
+    Word CallsToday,
             FilesToday,
             PostsToday,
             NewUsersToday;
@@ -106,9 +100,8 @@ typedef struct Statistics
  * @brief Waiting For Callers Options
  */
 #pragma pack(push, 1)
-typedef struct WFCO
-{
-    SStr    Title,
+typedef struct WFCO {
+    SStr Title,
             BatchFile;
 } WFCO;
 #pragma pack(pop)
@@ -121,9 +114,9 @@ typedef struct WFCO
  * @brief Holds Back Container for Infoform Data.
  */
 #pragma pack(push, 1)
-typedef struct InfoformData  // :  Array[1..5] Of Record
+typedef struct InfoformData // :  Array[1..5] Of Record
 {
-    MStr    InfoName;
+    MStr InfoName;
     Boolean MandatoryInfoform;
 } InfoformData;
 #pragma pack(pop)
@@ -135,13 +128,12 @@ typedef struct InfoformData  // :  Array[1..5] Of Record
  * @brief BBS Configuration Record
  */
 #pragma pack(push, 1)
-typedef struct ConfigRec
-{
+typedef struct ConfigRec {
     // {Communication Info}
-    Word    Unused;
+    Word Unused;
 
     // {Directory Info}
-    LStr    BBSDir,
+    LStr BBSDir,
             TextDir,
             BoardDir,
             FilesDir,
@@ -154,39 +146,39 @@ typedef struct ConfigRec
             LogDir;
 
     // {Board Info}
-    MStr    SysopName,
+    MStr SysopName,
             BoardName;
 
     // {File Info}
-    Word    KForEachPoint;
+    Word KForEachPoint;
     Boolean AutoValidFiles,
             ExternalFileAreaListing,
             FRepeatMethod,
             CommissionFP;
-    Word    PercentCTU;
-    LStr    DSZLogName;
-    Word    PointsBackPC;
+    Word PercentCTU;
+    LStr DSZLogName;
+    Word PointsBackPC;
 
     // {ACS Flags}
-    MStr    PostAnon,
+    MStr PostAnon,
             SysopACS,
             MSysopACS,
             FSysopACS;
 
     // {EMail Info}
     Boolean AllowFileMail;
-    Word    DaysToKeepFM;
+    Word DaysToKeepFM;
 
     // {MultiNode Information}
     Boolean MultiNodeOp;
-    Word    NodeNumber;
+    Word NodeNumber;
 
     // {Message Area}
     Boolean ExternalBaseListing,
             MRepeatMethod;
 
     // {Color Config}
-    Byte    DefRegColor,
+    Byte DefRegColor,
             DefStatColor,
             DefPromptColor,
             DefInputColor,
@@ -194,8 +186,8 @@ typedef struct ConfigRec
             DefBoxColor;
 
     // {New User Configuration}
-    MStr    DefaultFlags;
-    Word    DefLevel,
+    MStr DefaultFlags;
+    Word DefLevel,
             DefFLevel,
             DefFilePoints,
             DefUDR,
@@ -205,100 +197,100 @@ typedef struct ConfigRec
             DefUpCPS,
             DefDnCPS,
             DefTimeLimit;
-    Word    NumMinsBeforeTimeOut;
-    Char    HiddenInputChar;
+    Word NumMinsBeforeTimeOut;
+    Char HiddenInputChar;
 
     // {Infoforms}
-    InfoformData Infoforms[5];  // :  Array[1..5] Of Record
+    InfoformData Infoforms[5]; // :  Array[1..5] Of Record
 
     Boolean Unused2;
-    MStr    SysPass,
+    MStr SysPass,
             System1Pass,
             NewUserPass;
-    Char    DescForm[46][8];    // : Array[1..8] Of String[45];
-    Word    NumExt,
+    Char DescForm[46][8]; // : Array[1..8] Of String[45];
+    Word NumExt,
             PercentTimeBack;
-    Word    Ports[NumNodes];    // : Array[1..NumNodes] Of Word;
-    LStr    InitStr[NumNodes],  // : Array[1..NumNodes] Of LStr;
+    Word Ports[NumNodes]; // : Array[1..NumNodes] Of Word;
+    LStr InitStr[NumNodes], // : Array[1..NumNodes] Of LStr;
             HangUpStr[NumNodes],
             OffHookStr[NumNodes],
             SendCarrierStr[NumNodes],
             ReceiveCarrierStr[NumNodes];
-    Word    DefBaud[NumNodes],  // : Array[1..NumNodes] Of Word;
+    Word DefBaud[NumNodes], // : Array[1..NumNodes] Of Word;
             MinBaud[NumNodes];
-    MStr    LockOutPass;
+    MStr LockOutPass;
     Boolean ManualAnswer[NumNodes]; // : Array[1..NumNodes] Of Boolean;
-    Word    DaysToSaveLog;
-    MStr    CanDoExec;
-    Word    ScrollLines,
+    Word DaysToSaveLog;
+    MStr CanDoExec;
+    Word ScrollLines,
             TotPTimes;
-    MStr    PostMand;
-    SStr    QWKName;
+    MStr PostMand;
+    SStr QWKName;
     Boolean UseBios,
             UseMaintain,
             KickOffNotV;
-    SStr    SMenu;
+    SStr SMenu;
     Boolean SysopAutologin,
             SLineOn,
             UseNuv;
-    Word    VotesToValid,
+    Word VotesToValid,
             VotesToDel;
-    MStr    DefUserNote,
+    MStr DefUserNote,
             ComSpecifying;
-    Word    MinKForUpload;
-    MStr    ValCode,
+    Word MinKForUpload;
+    MStr ValCode,
             DailyFlagChange,
             CallFlagChange;
     Boolean QWKCheckTL,
             UseCPS;
-    LStr    SwapDir;
-    Word    UserTransferLine;
+    LStr SwapDir;
+    Word UserTransferLine;
     Boolean LibraryDAAnsi,
             SearchAll;
-    MStr    FileMailACS,
+    MStr FileMailACS,
             TopTenACS,
             RRACS;
     Boolean UseULChecker;
-    Word    DayConstraint;
-    LStr    ScanCom;
-    SStr    BBSAd,
+    Word DayConstraint;
+    LStr ScanCom;
+    SStr BBSAd,
             CommentFN;
-    LStr    BadDir;
-    SStr    FilesList;
+    LStr BadDir;
+    SStr FilesList;
     Boolean CheckSpace,
             ClearLFOpts;
-    Char    TopTenC;
-    Word    OptsPerLine;
+    Char TopTenC;
+    Word OptsPerLine;
     Boolean ReadMenuForGeneric;
-    Word    DaysToAddFNuv;
+    Word DaysToAddFNuv;
     Boolean UseFileCatalog,
             FileCatalogLookup,
             ConfSearch,
             UseQuoteHeader,
             UseGreaterThanSign;
-    Word    NumLPNode;
+    Word NumLPNode;
     Boolean UseRip;
-    MStr    AskAvailabilityACS;
+    MStr AskAvailabilityACS;
     Boolean UsePrelogon,
             UseWelcome,
             SpecialLogin;
-    MStr    Special1ACS,       // {- Commands (Control)}
-            Special2ACS,       // {& Commands (Multinode)}
-            Special3ACS,       // {{ Commands (Matrix)}
-            Special4ACS,       // {. Commands (Doors)}
-            Special5ACS,       // {* Commands (Sysop)}
-            Special6ACS,       // {^ Commands (NUV)}
-            SpecialCACS,       // {C Commands (Conference Editor)}
-            SpecialDACS,       // {D Commands (Data Area Editor)}
-            SpecialEACS,       // {E Commands (Email)}
-            SpecialFACS,       // {F Commands (File)}
-            SpecialJACS,       // {J Commands (Jump Conference)}
-            SpecialMACS,       // {M Commands (Message Base)}
-            SpecialNACS,       // {N Commands (Singular Read)}
-            SpecialQACS,       // {Q Commands (QWK Menu)}
-            SpecialSACS,       // {S Commands (Message Base Sponsor)}
-            SpecialTACS,       // {T Commands (File Sponsor)}
-            SpecialVACS;       // {V Commands (Voting)}
+    MStr Special1ACS, // {- Commands (Control)}
+            Special2ACS, // {& Commands (Multinode)}
+            Special3ACS, // {{ Commands (Matrix)}
+            Special4ACS, // {. Commands (Doors)}
+            Special5ACS, // {* Commands (Sysop)}
+            Special6ACS, // {^ Commands (NUV)}
+            SpecialCACS, // {C Commands (Conference Editor)}
+            SpecialDACS, // {D Commands (Data Area Editor)}
+            SpecialEACS, // {E Commands (Email)}
+            SpecialFACS, // {F Commands (File)}
+            SpecialJACS, // {J Commands (Jump Conference)}
+            SpecialMACS, // {M Commands (Message Base)}
+            SpecialNACS, // {N Commands (Singular Read)}
+            SpecialQACS, // {Q Commands (QWK Menu)}
+            SpecialSACS, // {S Commands (Message Base Sponsor)}
+            SpecialTACS, // {T Commands (File Sponsor)}
+            SpecialVACS; // {V Commands (Voting)}
     Boolean AllowUseofGandIMesComs,
             HangUpAfterCalls,
             ExternalMesHelp,
@@ -308,25 +300,25 @@ typedef struct ConfigRec
             SwapToEMS,
             SwapToXMS,
             OpenCloseFDF;
-    Boolean Lockat1152[NumNodes],       // : Array[1..NumNodes] Of Boolean;
+    Boolean Lockat1152[NumNodes], // : Array[1..NumNodes] Of Boolean;
             WaitUntilFlushed[NumNodes], // : Array[1..NumNodes] Of Boolean;
             GiveUpTimeSlices;
-    LStr    MultiNodeDir;
+    LStr MultiNodeDir;
     Boolean InformUsers;
-    Word    ExtractPercentage;
+    Word ExtractPercentage;
     Boolean DoLogChat,
             RenameFiles,
             RunCopy,
             MultinodeFriendly,
             DontDoDevCheck;
-    Char    BaseAddresses[5][NumNodes]; // : Array[1..NumNodes] Of String[4];
-    Word    IrqNums[NumNodes];          // : Array[1..NumNodes] Of Word;
-    Boolean NewUserVotingInfoform[5];   // : Array[1..5] Of Boolean;
-    MStr    HiddenFilesACS,
+    Char BaseAddresses[5][NumNodes]; // : Array[1..NumNodes] Of String[4];
+    Word IrqNums[NumNodes]; // : Array[1..NumNodes] Of Word;
+    Boolean NewUserVotingInfoform[5]; // : Array[1..5] Of Boolean;
+    MStr HiddenFilesACS,
             ChangeDirACS;
-    LStr    IncPromptsDir;
+    LStr IncPromptsDir;
     Boolean InformLogoff;
-    WFCO    WFCOption[9];               // : Array[1..9] Of WFCO;
+    WFCO WFCOption[9]; // : Array[1..9] Of WFCO;
     Boolean UseWFCOpts,
             AutoValNewUsers;
 } ConfigRec;
@@ -342,10 +334,9 @@ enum FDesAttrType { Del, Reg, Last, FIDL };
  * @brief File Description
  */
 #pragma pack(push, 1)
-typedef struct FDescRec
-{
+typedef struct FDescRec {
     FDesAttrType Attr;
-    Char         FDes[46];
+    Char FDes[46];
 } FDescRec;
 #pragma pack(pop)
 
@@ -357,14 +348,13 @@ typedef struct FDescRec
  * @brief Email Message Record
  */
 #pragma pack(push, 1)
-typedef struct EMessageRec
-{
-    LStr    T[MaxMesLines];   // : Array[1..MaxMesLines] Of LStr;
+typedef struct EMessageRec {
+    LStr T[MaxMesLines]; // : Array[1..MaxMesLines] Of LStr;
     Integer Numlines;
-    MStr    SentBy;
-    MStr    SentTo;
+    MStr SentBy;
+    MStr SentTo;
     Boolean Anon;
-    MStr    Title;
+    MStr Title;
     Boolean AutoSigOn;
 } EMessageRec;
 #pragma pack(pop)
@@ -377,17 +367,16 @@ typedef struct EMessageRec
  * @brief User Record
  */
 #pragma pack(push, 1)
-typedef struct UserRec
-{
-    MStr    Handle,
+typedef struct UserRec {
+    MStr Handle,
             RealName,
             PhoneNum,
             Address,
             Location,
             Password,
             UserNote;
-    Str8    BirthDay;
-    Integer Infoforms[5];      // Array[1..5] Of Integer;
+    Str8 BirthDay;
+    Integer Infoforms[5]; // Array[1..5] Of Integer;
     Integer Level,
             Flevel;
     LongInt LastFiles,
@@ -398,9 +387,9 @@ typedef struct UserRec
             OFilePoints;
     LongInt UpK,
             DnK;
-    Byte    UDR,
+    Byte UDR,
             UDKR;
-    Word    DnKPerDay,
+    Word DnKPerDay,
             DnKToday,
             Uploads,
             Downloads,
@@ -408,7 +397,7 @@ typedef struct UserRec
             Calls,
             TimeLeft,
             TimeLimit;
-    Byte    RegColor,
+    Byte RegColor,
             PromptColor,
             InputColor,
             InverseColor,
@@ -423,52 +412,51 @@ typedef struct UserRec
     Boolean Ansi,
             Avatar,
             vt100;
-    Boolean FlConfig[10];      // : Array[1..10] Of Boolean;
-    Byte    NuvVotesYes,
+    Boolean FlConfig[10]; // : Array[1..10] Of Boolean;
+    Byte NuvVotesYes,
             NuvVotesNo;
-    Word    UVotingYes[30];    // : Array[1..30] Of Word;
-    Word    UVotingNo[30];     // : Array[1..30] Of Word;
+    Word UVotingYes[30]; // : Array[1..30] Of Word;
+    Word UVotingNo[30]; // : Array[1..30] Of Word;
     Integer ExtraMes;
-    Char    DefProto[6];       // : Array[1..6] Of Char;
+    Char DefProto[6]; // : Array[1..6] Of Char;
     LongInt PassChangeD;
-    Word    Reserved[182];     // : Array[0..181] Of Word;
+    Word Reserved[182]; // : Array[0..181] Of Word;
     LongInt LastRepDate;
     Boolean ScrollFL,
             Rip;
-    Word    CallsToday,
+    Word CallsToday,
             NewLevel,
             CSPassChange;
-    Byte    CurArchiver;
+    Byte CurArchiver;
     Boolean ReDisMes;
-    Boolean CFlags[26];        // : Array[1..26] Of Boolean;
-    Byte    Unused32[32];      // Fix for Set, Byte Array of 32!!
-    Word    AverageUpCPS,
+    Boolean CFlags[26]; // : Array[1..26] Of Boolean;
+    Byte Unused32[32]; // Fix for Set, Byte Array of 32!!
+    Word AverageUpCPS,
             AverageDnCPS;
     Boolean Wanted;
-    LStr    AutoSig[5];        // : Array[1..5] Of LStr;
+    LStr AutoSig[5]; // : Array[1..5] Of LStr;
     Boolean UseFSE;
-    Byte    HeaderType,
+    Byte HeaderType,
             LastMesConf,
             LastFileConf;
     Boolean ReplyReading;
-    Word    NetMailB;
+    Word NetMailB;
     Boolean AnsiAbort;
     LongInt ExpDate;
     Boolean IsMale;
     LongInt FirstOn;
     Boolean YesNoBars;
-    Word    HackAttempts;
-    Byte    VotingRec[35];     // : Array[1..35] Of Byte;
-    LStr    NUVComments[10];   // : Array[1..10] Of LStr;
-    Word    TimeBank;
-    Byte    PageLen;
+    Word HackAttempts;
+    Byte VotingRec[35]; // : Array[1..35] Of Byte;
+    LStr NUVComments[10]; // : Array[1..10] Of LStr;
+    Word TimeBank;
+    Byte PageLen;
     Boolean DoPause;
-    Word    TimeDesT;
+    Word TimeDesT;
     LongInt FilePoints;
-    SStr    UInfoN[5];         // : Array[1..5] Of SStr;
-    Boolean Flags2[26];        // : Array[1..26] Of Boolean;
-    Byte    Unused[84];        // : Array[1..84] Of Byte;
-
+    SStr UInfoN[5]; // : Array[1..5] Of SStr;
+    Boolean Flags2[26]; // : Array[1..26] Of Boolean;
+    Byte Unused[84]; // : Array[1..84] Of Byte;
 } UserRec;
 #pragma pack(pop)
 
@@ -479,15 +467,14 @@ typedef struct UserRec
  * @brief Menu Option Record
  */
 #pragma pack(push, 1)
-typedef struct MenuCompatOption
-{
-    MStr    Acs,
+typedef struct MenuCompatOption {
+    MStr Acs,
             OptName;
     Boolean Hidden;
-    Char    CKeys[3];
-    SStr    Keys;
-    MStr    CString;
-    Word    PulldownID;
+    Char CKeys[3];
+    SStr Keys;
+    MStr CString;
+    Word PulldownID;
 } MenuCompatOption;
 #pragma pack(pop)
 
@@ -498,16 +485,15 @@ typedef struct MenuCompatOption
  * @brief Menu Record
  */
 #pragma pack(push, 1)
-typedef struct MenuCompatInfo
-{
-    MStr    Name,
+typedef struct MenuCompatInfo {
+    MStr Name,
             Password;
-    SStr    FallBack,
+    SStr FallBack,
             HelpID;
-    MStr    ACS;
-    MStr    NameInPrompt;
-    MStr    MenuTitle;
-    MStr    PulldownFN;
+    MStr ACS;
+    MStr NameInPrompt;
+    MStr MenuTitle;
+    MStr PulldownFN;
 } MenuCompatInfo;
 #pragma pack(pop)
 
@@ -518,25 +504,24 @@ typedef struct MenuCompatInfo
  * @brief File Area Record
  */
 #pragma pack(push, 1)
-typedef struct FileArea
-{
-    MStr    Name,
+typedef struct FileArea {
+    MStr Name,
             UploadACS,
             DownloadACS,
             ListACS,
             AccessACS,
             Sponsor,
             Password;
-    SStr    AreaFName;
-    LStr    Path,
+    SStr AreaFName;
+    LStr Path,
             Reserved1,
             Reserved2,
             Reserved3;
-    Char    DefSort;
-    Byte    FileAreaMult;
+    Char DefSort;
+    Byte FileAreaMult;
     Boolean FreeArea,
             CopyFiles;
-    Byte    A5,
+    Byte A5,
             A6,
             A7;
 } FileArea;
@@ -549,26 +534,25 @@ typedef struct FileArea
  * @brief File Record
  */
 #pragma pack(push, 1)
-typedef struct FRecord
-{
-    SStr    FileName,
+typedef struct FRecord {
+    SStr FileName,
             Password;
-    MStr    SendTo,
+    MStr SendTo,
             Path,
             Uploader;
     LongInt WhenUp,
             WhenValid,
             LineSrt;
-    Char    FID[46];
-    Byte    DescLines;
+    Char FID[46];
+    Byte DescLines;
     Boolean NewF,
             ResumeLater;
     LongInt FileSize;
     Integer Points;
-    Byte    TimesDLed;
+    Byte TimesDLed;
     Boolean Offline,
             FreeFile;
-    Byte    Reserved[6]; //    : Array[1..6] Of Byte;
+    Byte Reserved[6]; //    : Array[1..6] Of Byte;
 } FRecord;
 #pragma pack(pop)
 
@@ -579,8 +563,7 @@ typedef struct FRecord
  * @brief Protocol Command Records
  */
 #pragma pack(push, 1)
-typedef struct ProtoRec
-{
+typedef struct ProtoRec {
     Char Key;
     Char Desc[31];
     Char ProgName[13];

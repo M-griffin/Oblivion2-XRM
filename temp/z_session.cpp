@@ -403,11 +403,11 @@ void Session::handleTeloptCodes()
         try
         {
             // Enter the Telnet_State and handle parsing options.
-            unsigned char ch = m_telnet_decoder->telnetOptionParse(c);
+            unsigned char ch = getTelnet().telnetOptionParse(c);
             
             // Disconnect and clean-up the session if there are connection issues
             // During Telnet Option Parsing and Sockets.
-            if (!m_telnet_decoder->isCurrentStateActive())
+            if (!getTelnet().isCurrentStateActive())
             {
                 session_manager_ptr session_manager = m_session_manager.lock();
                 if(!session_manager)

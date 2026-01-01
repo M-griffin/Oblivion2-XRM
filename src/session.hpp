@@ -24,7 +24,7 @@ public:
 
     // Movable
     Session(Session &&other) noexcept
-        :  m_log(Logging::getInstance()),
+        : m_log(Logging::getInstance()),
           m_socket{other.m_socket},
           m_nodeNumber{other.m_nodeNumber},
           m_active{other.m_active},
@@ -93,14 +93,14 @@ public:
     }
 
     // Sends a message. If send fails, marks session inactive.
-    void send(const std::string &message) {
+    void send(const std::string &message, const bool isDisconnection = false) {
         if (!m_active)
             return;
 
         const int length = static_cast<int>(message.length());
         const int sent = SDLNet_TCP_Send(m_socket, message.c_str(), length);
-        if (sent < length) {
-            m_active = false;
+        if (sent < length || isDisconnection) {
+            hangup();
         }
     }
 

@@ -8,13 +8,11 @@
  * @file menu_stats_dao.hpp
  * @brief Track Menu Traffic and Command Usage
  */
-class menu_stats_dao
-{
+class menu_stats_dao {
 public:
-
     explicit menu_stats_dao();
-    ~menu_stats_dao();
 
+    ~menu_stats_dao();
 };
 
 #endif // MENU_STATS_DAO_HPP

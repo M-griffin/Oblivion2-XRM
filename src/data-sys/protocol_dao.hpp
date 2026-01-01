@@ -1,12 +1,11 @@
 #ifndef PROTOCOL_DAO_HPP
 #define PROTOCOL_DAO_HPP
 
-#include <memory>
 #include <string>
 #include <mutex>
 
-class Protocols;
-typedef std::shared_ptr<Protocols> protocols_ptr;
+#include "../model-sys/protocol.hpp"
+
 
 /**
  * @class ProtocolDao
@@ -15,12 +14,10 @@ typedef std::shared_ptr<Protocols> protocols_ptr;
  * @file protocol_dao.hpp
  * @brief Handles Reading and Writing Protocols Class from XML
  */
-class ProtocolDao
-{
+class ProtocolDao {
 public:
-
-    ProtocolDao(protocols_ptr prots, std::string path);
-    ~ProtocolDao();
+    ProtocolDao(Protocols &prots, std::string path);
+    ~ProtocolDao() = default;
 
     /**
      * @brief Helper, appends forward/backward slash to path
@@ -36,10 +33,10 @@ public:
 
     /**
      * @brief Creates and Saves a newly Generated Configuration File.
-     * @param aco
+     * @param prots
      * @return
      */
-    bool saveConfig(protocols_ptr prots);
+    bool saveConfig(const Protocols &prots);
 
     /**
      * @brief Loads a Configuration file into the m_config stub for access.
@@ -58,23 +55,14 @@ public:
      * @brief Grab a const handle to the loaded configuration.
      * @return
      */
-    protocols_ptr getConfig() const
-    {
-        if(m_protocols)
-        {
-            return m_protocols;
-        }
-
-		return nullptr;
+    Protocols getConfig() const {
+       return m_protocols;
     }
 
-    protocols_ptr     m_protocols;
-    std::string       m_path;
-    std::string       m_filename;
-    std::mutex        m;
-
+    Protocols m_protocols;
+    std::string m_path;
+    std::string m_filename;
+    std::mutex m;
 };
 
-typedef std::shared_ptr<ProtocolDao> protocol_dao_ptr;
-
-#endif // PROTOCOL_DAO_HPP
+#endif

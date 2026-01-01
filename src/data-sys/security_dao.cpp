@@ -1,35 +1,24 @@
 #include "security_dao.hpp"
 
-#include <iostream>
 #include <string>
-
 #include <sqlite3.h>
 
 #include "../model-sys/security.hpp"
 
 #include "libSqliteWrapped.h"
 
-
-/**
- * Base Dao Calls for generic Object Data Calls
- * (Below This Point)
- */
-
-
 /**
  * @brief Check If Database Table Exists.
  * @return
  */
-bool SecurityDao::doesTableExist()
-{
+bool SecurityDao::doesTableExist() {
     return baseDoesTableExist();
 }
 
 /**
  * @brief Run Setup Params for SQL Database Table.
  */
-bool SecurityDao::firstTimeSetupParams()
-{
+bool SecurityDao::firstTimeSetupParams() {
     return baseFirstTimeSetupParams();
 }
 
@@ -37,8 +26,7 @@ bool SecurityDao::firstTimeSetupParams()
  * @brief Create Database Table
  * @return
  */
-bool SecurityDao::createTable()
-{
+bool SecurityDao::createTable() {
     return baseCreateTable();
 }
 
@@ -46,38 +34,34 @@ bool SecurityDao::createTable()
  * @brief Drop Database
  * @return
  */
-bool SecurityDao::dropTable()
-{
+bool SecurityDao::dropTable() {
     return baseDropTable();
 }
 
 /**
  * @brief Updates a Record in the database!
- * @param area
+ * @param obj
  * @return
  */
-bool SecurityDao::updateRecord(security_ptr obj)
-{
+bool SecurityDao::updateRecord(Security &obj) {
     return baseUpdateRecord(obj);
 }
 
 /**
  * @brief Inserts a New Record in the database!
- * @param area
+ * @param obj
  * @return
  */
-long SecurityDao::insertRecord(security_ptr obj)
-{
+long SecurityDao::insertRecord(Security &obj) {
     return baseInsertRecord(obj);
 }
 
 /**
  * @brief Deletes a Record
- * @param areaId
+ * @param id
  * @return
  */
-bool SecurityDao::deleteRecord(long id)
-{
+bool SecurityDao::deleteRecord(long id) {
     return baseDeleteRecord(id);
 }
 
@@ -86,8 +70,7 @@ bool SecurityDao::deleteRecord(long id)
  * @param id
  * @return
  */
-security_ptr SecurityDao::getRecordById(long id)
-{
+Security SecurityDao::getRecordById(long id) {
     return baseGetRecordById(id);
 }
 
@@ -95,8 +78,7 @@ security_ptr SecurityDao::getRecordById(long id)
  * @brief Retrieve All Records in a Table
  * @return
  */
-std::vector<security_ptr> SecurityDao::getAllRecords()
-{
+std::vector<Security> SecurityDao::getAllRecords() {
     return baseGetAllRecords();
 }
 
@@ -104,8 +86,7 @@ std::vector<security_ptr> SecurityDao::getAllRecords()
  * @brief Retrieve Count of All Records in a Table
  * @return
  */
-long SecurityDao::getRecordsCount()
-{
+long SecurityDao::getRecordsCount() {
     return baseGetRecordsCount();
 }
 
@@ -119,13 +100,12 @@ long SecurityDao::getRecordsCount()
 /**
  * @brief Pulls results by FieldNames into their Class Variables.
  */
-void SecurityDao::pullSecurityResult(query_ptr qry, security_ptr obj)
-{
-    qry->getFieldByName("iId", obj->iId);
-    qry->getFieldByName("sPasswordHash", obj->sPasswordHash);
-    qry->getFieldByName("sSaltHash", obj->sSaltHash);
-    qry->getFieldByName("sChallengeQuestion", obj->sChallengeQuestion);
-    qry->getFieldByName("sChallengeAnswerHash", obj->sChallengeAnswerHash);
+void SecurityDao::pullSecurityResult(Query &qry, Security &obj) {
+    qry.getFieldByName("iId", obj.iId);
+    qry.getFieldByName("sPasswordHash", obj.sPasswordHash);
+    qry.getFieldByName("sSaltHash", obj.sSaltHash);
+    qry.getFieldByName("sChallengeQuestion", obj.sChallengeQuestion);
+    qry.getFieldByName("sChallengeAnswerHash", obj.sChallengeAnswerHash);
 }
 
 /**
@@ -133,26 +113,25 @@ void SecurityDao::pullSecurityResult(query_ptr qry, security_ptr obj)
  *        This takes a pair, and translates to (Column, .. ) VALUES (%d, %Q,) for formatting
  * @param values
  */
-void SecurityDao::fillSecurityColumnValues(query_ptr qry, security_ptr obj, std::vector< std::pair<std::string, std::string> > &values)
-{
-    // values.push_back(qry->translateFieldName("iId", obj->iId));
-    values.push_back(qry->translateFieldName("sPasswordHash", obj->sPasswordHash));
-    values.push_back(qry->translateFieldName("sSaltHash", obj->sSaltHash));
-    values.push_back(qry->translateFieldName("sChallengeQuestion", obj->sChallengeQuestion));
-    values.push_back(qry->translateFieldName("sChallengeAnswerHash", obj->sChallengeAnswerHash));
+void SecurityDao::fillSecurityColumnValues(Query &qry, Security &obj,
+                                           std::vector<std::pair<std::string, std::string> > &values) {
+    // values.push_back(qry.translateFieldName("iId", obj.iId));
+    values.push_back(qry.translateFieldName("sPasswordHash", obj.sPasswordHash));
+    values.push_back(qry.translateFieldName("sSaltHash", obj.sSaltHash));
+    values.push_back(qry.translateFieldName("sChallengeQuestion", obj.sChallengeQuestion));
+    values.push_back(qry.translateFieldName("sChallengeAnswerHash", obj.sChallengeAnswerHash));
 }
 
 /**
  * @brief Create Security Record Insert Statement, returns query string
  */
-std::string SecurityDao::insertSecurityQryString(std::string qry, security_ptr obj)
-{
+std::string SecurityDao::insertSecurityQryString(std::string qry, Security &obj) {
     // Mprint statement to avoid injections.
     char *result = sqlite3_mprintf(qry.c_str(),
-        obj->sPasswordHash.c_str(),
-        obj->sSaltHash.c_str(),
-        obj->sChallengeQuestion.c_str(),
-        obj->sChallengeAnswerHash.c_str()
+                                   obj.sPasswordHash.c_str(),
+                                   obj.sSaltHash.c_str(),
+                                   obj.sChallengeQuestion.c_str(),
+                                   obj.sChallengeAnswerHash.c_str()
     );
 
     std::string queryString(result);
@@ -163,19 +142,17 @@ std::string SecurityDao::insertSecurityQryString(std::string qry, security_ptr o
 /**
  * @brief Update Existing Security Record.
  */
-std::string SecurityDao::updateSecurityQryString(std::string qry, security_ptr obj)
-{
+std::string SecurityDao::updateSecurityQryString(std::string qry, Security &obj) {
     // Mprint statement to avoid injections.
     char *result = sqlite3_mprintf(qry.c_str(),
-        obj->sPasswordHash.c_str(),
-        obj->sSaltHash.c_str(),
-        obj->sChallengeQuestion.c_str(),
-        obj->sChallengeAnswerHash.c_str(),
-        obj->iId
+                                   obj.sPasswordHash.c_str(),
+                                   obj.sSaltHash.c_str(),
+                                   obj.sChallengeQuestion.c_str(),
+                                   obj.sChallengeAnswerHash.c_str(),
+                                   obj.iId
     );
 
     std::string queryString(result);
     sqlite3_free(result);
     return queryString;
 }
-

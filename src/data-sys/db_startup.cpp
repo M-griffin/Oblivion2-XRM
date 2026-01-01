@@ -6,16 +6,15 @@
 #include "../model-sys/protocol.hpp"
 #include "../model-sys/access_level.hpp"
 #include "../model-app/oneliners.hpp"
+#include "../data-app/oneliners_dao.hpp"
 
-// Needed for Initializing and checking users data is setup
+// Needed for Initializing and checking users data is set up
 // On startup.
 #include "session_stats_dao.hpp"
 #include "security_dao.hpp"
 #include "users_dao.hpp"
 #include "protocol_dao.hpp"
 #include "access_level_dao.hpp"
-#include "../data-app/oneliners_dao.hpp"
-
 #include "../logging.hpp"
 
 #include "libSqliteWrapped.h"
@@ -25,22 +24,22 @@
  */
 bool DBStartUp::initDatabaseTables() {
     // Setup Users Database name and path
-    USERS_DATABASE = GLOBAL_DATA_PATH;
+    CORE_DATABASE = GLOBAL_DATA_PATH;
 
 #ifdef _WIN32
-    USERS_DATABASE.append("\\");
+    CORE_DATABASE.append("\\");
 #else
-    USERS_DATABASE.append("/");
+    CORE_DATABASE.append("/");
 #endif
 
-    USERS_DATABASE.append("xrm_users.sqlite3");
+    CORE_DATABASE.append("xrm_users.sqlite3");
 
     Logging &log = Logging::getInstance();
 
     // Setup isolated scope for smart pointers and clean up.
     {
         // Check and Setup users database if tables are not setup
-        SQLW::Database user_database(USERS_DATABASE);
+        SQLW::Database user_database(CORE_DATABASE);
 
         // Link to users dao for data access object
         UsersDao user_dao(user_database);
@@ -131,51 +130,49 @@ bool DBStartUp::initDatabaseTables() {
             log.write<Logging::CONSOLE_LOG>("access_level table created successfully.");
 
             // Check and Setup default Access Levels.
-            access_level_ptr level = std::make_shared<AccessLevel>();
+            AccessLevel level;
 
             // Set Initial Defaults for Not Validated Level
-            // the reest are populated on Class Defaults.
-            level->sName = "Not Validated";
-            level->sStartMenu = "top";
-            level->iLevel = 10;
-            level->iTimeLimit = 120;
-            level->bTimeLimit = true;
+            // then reset are populated on Class Defaults.
+            level.sName = "Not Validated";
+            level.sStartMenu = "top";
+            level.iLevel = 10;
+            level.iTimeLimit = 120;
+            level.bTimeLimit = true;
 
             access_dao.insertRecord(level);
 
             // Validated User
-            level.reset();
-            level = std::make_shared<AccessLevel>();
-            level->sName = "Validated User";
-            level->sStartMenu = "top";
-            level->iLevel = 20;
-            level->iTimeLimit = 1440;
-            level->bTimeLimit = true;
+            AccessLevel level2;
+            level2.sName = "Validated User";
+            level2.sStartMenu = "top";
+            level2.iLevel = 20;
+            level2.iTimeLimit = 1440;
+            level2.bTimeLimit = true;
 
-            access_dao.insertRecord(level);
+            access_dao.insertRecord(level2);
 
             // Administrator (time Limit false by default)
-            level.reset();
-            level = std::make_shared<AccessLevel>();
-            level->sName = "Sysop";
-            level->sStartMenu = "top";
-            level->iLevel = 255;
-            level->iTimeLimit = 1440;
+            AccessLevel level3;
+            level3.sName = "Sysop";
+            level3.sStartMenu = "top";
+            level3.iLevel = 255;
+            level3.iTimeLimit = 1440;
 
-            access_dao.insertRecord(level);
+            access_dao.insertRecord(level3);
         }
 
 
-        protocols_ptr prots = std::make_shared<Protocols>();
+        Protocols prots;
         ProtocolDao protdb(prots, GLOBAL_DATA_PATH);
 
         if (!protdb.fileExists()) {
             log.write<Logging::CONSOLE_LOG>("Protocol configuration doesn't exist.");
 
-            // Create Genric Protocol Entry to Test File Creation
+            // Create Genric Protocol Entry to Test File Creation (not yet tested.)
             Protocol p1("Sexyz", "D", "Z", "C:\\TESTPATH\\", "--Test", false, false);
 
-            prots->protocols.push_back(p1);
+            prots.protocols.push_back(p1);
             protdb.saveConfig(prots);
 
             log.write<Logging::CONSOLE_LOG>("Protocol configuration created successfully");
@@ -203,16 +200,18 @@ bool DBStartUp::initDatabaseTables() {
 
             // Insert a default record the first time the table
             // is created only.
-            oneliner_ptr one = std::make_shared<Oneliners>();
-            one->iUserId = 1;
-            one->sText = "Welcome to a new system running Oblivion/2 XRM";
-            one->sUserInitials = "MF";
-            one->sUserName = "Mercyful Fate";
+            Oneliners one;
+            one.iUserId = 1;
+            one.sText = "Welcome to a new system running Oblivion/2 XRM";
+            one.sUserInitials = "MF";
+            one.sUserName = "Mercyful Fate";
             //one->dtDatePosted
 
             oneLineDao.insertRecord(one);
         }
     }
+
+    log.write<Logging::CONSOLE_LOG>("Database Startup Check completed.");
 
     return true;
 }

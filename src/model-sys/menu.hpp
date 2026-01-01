@@ -96,7 +96,7 @@ namespace YAML {
         /**
          * @brief Override for encoding the Menu Class
          *        This is not used as it makes the map on a single line!
-         *        Instead Key/Value is done in the ConfigDao on save.
+         *        Instead, Key/Value is done in the ConfigDao on save.
          * @param rhs
          * @return
          */

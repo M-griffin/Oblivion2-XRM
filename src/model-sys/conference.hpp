@@ -1,11 +1,7 @@
 #ifndef CONFERENCE_HPP
 #define CONFERENCE_HPP
 
-#include <memory>
 #include <string>
-
-class Conference;
-typedef std::shared_ptr<Conference> conference_ptr;
 
 /**
  * @class Conference
@@ -14,28 +10,23 @@ typedef std::shared_ptr<Conference> conference_ptr;
  * @file conference.hpp
  * @brief Conference, Types Message, File, and/or Global
  */
-class Conference
-{
+class Conference {
 public:
-
-    long        iId;
+    long iId;
     std::string sName;
     std::string sType;
     std::string sACS;
-    long        iSortOrder;
+    long iSortOrder;
 
     explicit Conference()
         : iId(-1)
-        , sName("")
-        , sType("")
-        , sACS("")
-        , iSortOrder(-1)
-    { }
+          , sName("")
+          , sType("")
+          , sACS("")
+          , iSortOrder(-1) {
+    }
 
-    ~Conference()
-    { }
-
+    ~Conference() = default;
 };
 
-#endif // CONFERENCE_HPP
-
+#endif

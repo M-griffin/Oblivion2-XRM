@@ -45,22 +45,20 @@ std::map<std::string, std::string> INPUT_SEQUENCE_MAP;
 
 CommonIO::CommonIO()
     : m_log(Logging::getInstance())
-    , m_escape_sequence("")
-    , m_string_buffer("")
-    , m_incoming_data("")
-    , m_line_buffer("")
-    , m_column_position(0)
-    , m_is_escape_sequence(false)
-    , m_is_new_getline(true)
-    , m_is_new_leadoff(true)
-{
+      , m_escape_sequence("")
+      , m_string_buffer("")
+      , m_incoming_data("")
+      , m_line_buffer("")
+      , m_column_position(0)
+      , m_is_escape_sequence(false)
+      , m_is_new_getline(true)
+      , m_is_new_leadoff(true) {
     populateInputSequenceMap();
 }
 
-CommonIO::~CommonIO()
-{
+CommonIO::~CommonIO() {
     m_log.write<Logging::DEBUG_LOG>("~CommonIO()");
-    
+
     // Look at making this a single instance per session insetad of alocate on fly.    
     m_escape_sequence.erase();
     m_string_buffer.erase();
@@ -71,27 +69,25 @@ CommonIO::~CommonIO()
 /**
  * @brief Setup a Static GLobal Map for Key Input that can be resued.
  */
-void CommonIO::populateInputSequenceMap()
-{
-    if (INPUT_SEQUENCE_MAP.size() > 0) 
-    {
+void CommonIO::populateInputSequenceMap() {
+    if (INPUT_SEQUENCE_MAP.size() > 0) {
         return;
     }
-    
+
     // Arrow Keys, Hardware OA are translated to [A on the fly
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[A",    "up_arrow"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[B",    "dn_arrow"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[C",    "rt_arrow"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[D",    "lt_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[A", "up_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[B", "dn_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[C", "rt_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[D", "lt_arrow"));
 
     // Hardware Keys, or Num pad.
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("OA",    "up_arrow"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("OB",    "dn_arrow"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("OC",    "rt_arrow"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("OD",    "lt_arrow"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("OE",    "clear"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("OF",    "end"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("OH",    "home"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("OA", "up_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("OB", "dn_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("OC", "rt_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("OD", "lt_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("OE", "clear"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("OF", "end"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("OH", "home"));
 
     // Shift Arrow Keys
     INPUT_SEQUENCE_MAP.insert(std::make_pair("[1;2A", "shift_up_arrow"));
@@ -100,20 +96,20 @@ void CommonIO::populateInputSequenceMap()
     INPUT_SEQUENCE_MAP.insert(std::make_pair("[1;2D", "shift_lt_arrow"));
 
     // Shift TAB
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[Z",    "shift_tab"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[Z", "shift_tab"));
 
     // Function Keys ANSI
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[@",    "insert"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[H",    "home"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[K",    "end"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[F",    "end")); // = 0F
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[V",    "pg_up"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[U",    "pg_dn"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OP",   "f1"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OQ",   "f2"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OR",   "f3"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OS",   "f4"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OT",   "f5"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[@", "insert"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[H", "home"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[K", "end"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[F", "end")); // = 0F
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[V", "pg_up"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[U", "pg_dn"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OP", "f1"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OQ", "f2"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OR", "f3"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OS", "f4"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OT", "f5"));
     INPUT_SEQUENCE_MAP.insert(std::make_pair("[[17~", "f6"));
     INPUT_SEQUENCE_MAP.insert(std::make_pair("[[18~", "f7"));
     INPUT_SEQUENCE_MAP.insert(std::make_pair("[[19~", "f8"));
@@ -123,78 +119,78 @@ void CommonIO::populateInputSequenceMap()
     INPUT_SEQUENCE_MAP.insert(std::make_pair("[[24~", "f12"));
 
     // VT-100 Putty
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[1~",   "home"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[2~",   "insert"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[3~",   "del"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[4~",   "end"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[5~",   "pg_up"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[6~",   "pg_dn"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OU",   "f6"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OV",   "f7"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OW",   "f8"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OX",   "f9"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OY",   "f10"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OZ",   "f11"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[O[",   "f12"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[1~", "home"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[2~", "insert"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[3~", "del"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[4~", "end"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[5~", "pg_up"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[6~", "pg_dn"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OU", "f6"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OV", "f7"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OW", "f8"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OX", "f9"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OY", "f10"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[OZ", "f11"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[O[", "f12"));
 
     // Linux Console
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[A",   "f1"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[B",   "f2"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[C",   "f3"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[D",   "f4"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[E",   "f5"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[A", "f1"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[B", "f2"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[C", "f3"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[D", "f4"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[E", "f5"));
 
     // SCO
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[L",    "insert"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[I",    "pg_up"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[G",    "pg_dn"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[L", "insert"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[I", "pg_up"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[G", "pg_dn"));
 
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[M",   "f1"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[N",   "f2"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[O",   "f3"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[P",   "f4"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[Q",   "f5"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[R",   "f6"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[S",   "f7"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[T",   "f8"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[U",   "f9"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[V",   "f10"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[W",   "f11"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[X",   "f12"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[M", "f1"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[N", "f2"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[O", "f3"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[P", "f4"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[Q", "f5"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[R", "f6"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[S", "f7"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[T", "f8"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[U", "f9"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[V", "f10"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[W", "f11"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[[X", "f12"));
 
     // rxvt
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[7~",   "home"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[8~",   "end"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[7~", "home"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[8~", "end"));
 
     // Shift Arrow Keys
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[a",    "shift_up_arrow"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[b",    "shift_dn_arrow"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[c",    "shift_rt_arrow"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[d",    "shift_lt_arrow"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[e",    "shift_clear"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[a", "shift_up_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[b", "shift_dn_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[c", "shift_rt_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[d", "shift_lt_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[e", "shift_clear"));
 
     // Shift Function
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[2$",   "insert"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[3$",   "del"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[5$",   "pg_up"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[6$",   "pg_dn"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[7$",   "home"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[8$",   "end"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[2$", "insert"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[3$", "del"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[5$", "pg_up"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[6$", "pg_dn"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[7$", "home"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[8$", "end"));
 
     // Ctrl
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("Oa",    "ctrl_up_arrow"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("Ob",    "ctrl_dn_arrow"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("Oc",    "ctrl_rt_arrow"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("Od",    "ctrl_lt_arrow"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("Oe",    "ctrl_clear"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("Oa", "ctrl_up_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("Ob", "ctrl_dn_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("Oc", "ctrl_rt_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("Od", "ctrl_lt_arrow"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("Oe", "ctrl_clear"));
 
     // Shift Function
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[2^",   "ctrl_insert"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[3^",   "ctrl_del"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[5^",   "ctrl_pg_up"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[6^",   "ctrl_pg_dn"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[7^",   "ctrl_home"));
-    INPUT_SEQUENCE_MAP.insert(std::make_pair("[8^",   "ctrl_end"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[2^", "ctrl_insert"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[3^", "ctrl_del"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[5^", "ctrl_pg_up"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[6^", "ctrl_pg_dn"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[7^", "ctrl_home"));
+    INPUT_SEQUENCE_MAP.insert(std::make_pair("[8^", "ctrl_end"));
 }
 
 
@@ -202,14 +198,11 @@ void CommonIO::populateInputSequenceMap()
  * @brief Retrieve Key Sequence by Value
  * @param value
  */
-std::string CommonIO::getSequenceFromMap(const std::string &value)
-{
+std::string CommonIO::getSequenceFromMap(const std::string &value) {
     std::string key = "";
 
-    for(auto &i : INPUT_SEQUENCE_MAP)
-    {
-        if(i.second == value)
-        {
+    for (auto &i: INPUT_SEQUENCE_MAP) {
+        if (i.second == value) {
             key = "\x1b";
             key += i.first;
             break;
@@ -224,18 +217,16 @@ std::string CommonIO::getSequenceFromMap(const std::string &value)
  * This has only been tested in Windows, Linux, OSX.
  * @return
  */
-std::string CommonIO::getProgramPath(const std::string &program_name)
-{
+std::string CommonIO::getProgramPath(const std::string &program_name) {
     // NOTE This method can not use logging, called prior to configuration load.
     std::string program_path;
     std::string program = "/" + program_name;
 
     // First check for SYSTEM environmental variable:
     char *pPath;
-    pPath = std::getenv((char *)"OBV2");
+    pPath = std::getenv((char *) "OBV2");
 
-    if(pPath != nullptr)
-    {
+    if (pPath != nullptr) {
         m_log.write<Logging::CONSOLE_LOG>("Found OBV2 Environment Variable", pPath);
         program_path = pPath;
         pathAppend(program_path);
@@ -274,20 +265,18 @@ std::string CommonIO::getProgramPath(const std::string &program_name)
 #elif _WIN32
     char current_path[PATH_MAX];
 
-    int result = GetModuleFileName(NULL, current_path, PATH_MAX-1);
+    int result = GetModuleFileName(NULL, current_path, PATH_MAX - 1);
 
-    if(result == 0)
-    {
+    if (result == 0) {
         m_log.write<Logging::ERROR_LOG>("getProgramPath: Win32 Path empty!");
         throw std::runtime_error("GetProgramPath: Win32 Path");
     }
 
     program_path = current_path;
-    std::string::size_type position = program_path.rfind("\\", program_path.size()-1);
+    std::string::size_type position = program_path.rfind("\\", program_path.size() - 1);
 
-    if(position != std::string::npos)
-    {
-        program_path.erase(position+1);
+    if (position != std::string::npos) {
+        program_path.erase(position + 1);
     }
 
 #else
@@ -355,8 +344,7 @@ std::string CommonIO::getSystemHomeDirectory()
  * @param path
  * @return
  */
-void CommonIO::pathAppend(std::string &path)
-{
+void CommonIO::pathAppend(std::string &path) {
 #ifdef _WIN32
     path.append("\\");
 #else
@@ -369,12 +357,10 @@ void CommonIO::pathAppend(std::string &path)
  * @param str
  * @return
  */
-std::string::size_type CommonIO::numberOfChars(const std::string &str)
-{
+std::string::size_type CommonIO::numberOfChars(const std::string &str) {
     std::string::size_type number_characters = 0;
 
-    if(str.size() == 0)
-    {
+    if (str.size() == 0) {
         return number_characters;
     }
 
@@ -382,28 +368,22 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str)
     std::string::iterator it = string_builder.begin();
     std::string::iterator line_end = string_builder.end();
 
-    while(it != line_end)
-    {
-        int byte_value = static_cast<int>((uint8_t)*it);
+    while (it != line_end) {
+        int byte_value = static_cast<int>((uint8_t) *it);
 
-        if(byte_value < 128)
-        {
+        if (byte_value < 128) {
             *it++;
             ++number_characters;
-        }
-        else
-        {
-            try
-            {
+        } else {
+            try {
                 // Iterate quickly to next sequence.
                 utf8::next(it, line_end);
                 ++number_characters;
-            }
-            catch(utf8::exception &ex)
-            {
+            } catch (utf8::exception &ex) {
                 *it++;
                 ++number_characters;
-                m_log.write<Logging::ERROR_LOG>("[numberOfChars] UTF8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
+                m_log.write<Logging::ERROR_LOG>("[numberOfChars] UTF8 Parsing Exception=", ex.what(), __LINE__,
+                                                __FILE__);
             }
         }
     }
@@ -416,12 +396,10 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str)
  * @param str
  * @return
  */
-std::string CommonIO::leftTrim(const std::string &str)
-{
+std::string CommonIO::leftTrim(const std::string &str) {
     std::string new_string = str;
 
-    if(new_string.empty())
-    {
+    if (new_string.empty()) {
         return new_string;
     }
 
@@ -440,12 +418,10 @@ std::string CommonIO::leftTrim(const std::string &str)
  * @param str
  * @return
  */
-std::string CommonIO::rightTrim(const std::string &str)
-{
+std::string CommonIO::rightTrim(const std::string &str) {
     std::string new_string = str;
 
-    if(new_string.empty())
-    {
+    if (new_string.empty()) {
         return new_string;
     }
 
@@ -464,12 +440,10 @@ std::string CommonIO::rightTrim(const std::string &str)
  * @param str
  * @return
  */
-std::string CommonIO::trim(const std::string &str)
-{
+std::string CommonIO::trim(const std::string &str) {
     std::string new_string = str;
 
-    if(new_string.empty())
-    {
+    if (new_string.empty()) {
         return new_string;
     }
 
@@ -484,32 +458,26 @@ std::string CommonIO::trim(const std::string &str)
  */
 std::string CommonIO::eraseString(const std::string &str,
                                   std::string::size_type start_position,
-                                  std::string::size_type end_position)
-{
+                                  std::string::size_type end_position) {
     std::string new_string = str;
     std::string::size_type string_size = new_string.size();
 
     // 0 defaults to end of string.
     // Otherwise End Position is added for number of characters to remove.
-    if(end_position == 0)
-    {
+    if (end_position == 0) {
         end_position = string_size;
-    }
-    else
-    {
-        end_position = start_position + (end_position-1);
+    } else {
+        end_position = start_position + (end_position - 1);
 
         // Make sure we can never go past end of string!
-        if(end_position > string_size)
-        {
+        if (end_position > string_size) {
             end_position = string_size;
         }
     }
 
     std::string new_string_builder = "";
 
-    if(new_string.empty())
-    {
+    if (new_string.empty()) {
         m_log.write<Logging::DEBUG_LOG>("(Common::EraseString) string length == 0", __LINE__, __FILE__);
         return new_string;
     }
@@ -518,44 +486,34 @@ std::string CommonIO::eraseString(const std::string &str,
     std::string::iterator it = new_string.begin();
     std::string::iterator line_end = new_string.end();
 
-    while(it != line_end)
-    {
-        int byte_value = static_cast<int>((uint8_t)*it);
+    while (it != line_end) {
+        int byte_value = static_cast<int>((uint8_t) *it);
 
-        if(byte_value < 128)
-        {
-            if(char_count < start_position || char_count > end_position)
-            {
+        if (byte_value < 128) {
+            if (char_count < start_position || char_count > end_position) {
                 new_string_builder += std::string(1, *it);
             }
 
             *it++;
-        }
-        else
-        {
-            try
-            {
+        } else {
+            try {
                 uint32_t code_point = utf8::next(it, line_end);
 
-                if(char_count < start_position || char_count > end_position)
-                {
+                if (char_count < start_position || char_count > end_position) {
                     // This convert the uint32_t code point to char array
                     // So each sequence can be written as separate byte.
-                    unsigned char character[5] = {0,0,0,0,0};
+                    unsigned char character[5] = {0, 0, 0, 0, 0};
                     utf8::append(code_point, character);
 
-                    for(int i = 0; i < 5; i++)
-                    {
-                        if(character[i] != 0)
-                        {
+                    for (int i = 0; i < 5; i++) {
+                        if (character[i] != 0) {
                             new_string_builder += std::string(1, character[i]);
                         }
                     }
                 }
-            }
-            catch(utf8::exception &ex)
-            {
-                m_log.write<Logging::DEBUG_LOG>("(Common::EraseString) UTF8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
+            } catch (utf8::exception &ex) {
+                m_log.write<Logging::DEBUG_LOG>("(Common::EraseString) UTF8 Parsing Exception=", ex.what(), __LINE__,
+                                                __FILE__);
                 *it++;
             }
         }
@@ -572,21 +530,18 @@ std::string CommonIO::eraseString(const std::string &str,
  * @param space
  * @return
  */
-std::string CommonIO::rightPadding(const std::string &str, std::string::size_type space)   // Pad Right
+std::string CommonIO::rightPadding(const std::string &str, std::string::size_type space) // Pad Right
 {
     std::string padded_line = "";
     std::string new_string = str;
 
-    if(space == 0)
-    {
-        return new_string;        
+    if (space == 0) {
+        return new_string;
     }
 
     // If empty, return padded with spaces!
-    if(new_string.empty())
-    {
-        for(std::string::size_type i = 0; i < space; i++)
-        {
+    if (new_string.empty()) {
+        for (std::string::size_type i = 0; i < space; i++) {
             padded_line += ' ';
         }
 
@@ -596,14 +551,12 @@ std::string CommonIO::rightPadding(const std::string &str, std::string::size_typ
     std::string::size_type s = numberOfChars(new_string);
 
     // if Line > Space, Erase to match length
-    if(s > space)
-    {
+    if (s > space) {
         std::string erased = eraseString(new_string, space);
         return erased;
     }
 
-    for(std::string::size_type i = 0; i < (space-s); i++)
-    {
+    for (std::string::size_type i = 0; i < (space - s); i++) {
         padded_line += ' ';
     }
 
@@ -617,22 +570,18 @@ std::string CommonIO::rightPadding(const std::string &str, std::string::size_typ
  * @param space
  * @return
  */
-std::string CommonIO::leftPadding(const std::string &str, std::string::size_type space)
-{
+std::string CommonIO::leftPadding(const std::string &str, std::string::size_type space) {
     std::string new_string = str;
 
-    if(space == 0)
-    {
+    if (space == 0) {
         return new_string;
     }
 
     // If empty, return padded with spaces!
-    if(new_string.empty())
-    {
+    if (new_string.empty()) {
         std::string padded_line = "";
 
-        for(std::string::size_type i = 0; i < space; i++)
-        {
+        for (std::string::size_type i = 0; i < space; i++) {
             padded_line += ' ';
         }
 
@@ -642,14 +591,12 @@ std::string CommonIO::leftPadding(const std::string &str, std::string::size_type
     std::string::size_type s = numberOfChars(new_string);
 
     // if Line > Space, Erase to match length
-    if(s >= space)
-    {
-        std::string erased = eraseString(new_string, 0, s-space);
+    if (s >= space) {
+        std::string erased = eraseString(new_string, 0, s - space);
         return erased;
     }
 
-    for(std::string::size_type i = 0; i < (space-s); i++)
-    {
+    for (std::string::size_type i = 0; i < (space - s); i++) {
         new_string.insert(0, " ");
     }
 
@@ -662,19 +609,16 @@ std::string CommonIO::leftPadding(const std::string &str, std::string::size_type
  * @param term_width
  * @return
  */
-std::string CommonIO::centerPadding(const std::string &str, int term_width)
-{
+std::string CommonIO::centerPadding(const std::string &str, int term_width) {
     std::string new_string = str;
 
-    if(new_string.empty())
-    {
+    if (new_string.empty()) {
         return new_string;
     }
 
     std::string::size_type length = numberOfChars(new_string);
 
-    if(length == 0)
-    {
+    if (length == 0) {
         return new_string;
     }
 
@@ -685,17 +629,16 @@ std::string CommonIO::centerPadding(const std::string &str, int term_width)
     space -= length % 2;
 
     // Text larger then screen, then leave alone.
-    if(space <= 0) return new_string;
+    if (space <= 0) return new_string;
 
     std::string padded_line;
 
-    for(int i = 0; i < space; i++)
-    {
+    for (int i = 0; i < space; i++) {
         padded_line += ' ';
     }
 
     // Appending current data after Padding.
-    new_string.insert(0,padded_line);
+    new_string.insert(0, padded_line);
     return new_string;
 }
 
@@ -704,26 +647,22 @@ std::string CommonIO::centerPadding(const std::string &str, int term_width)
  * @param str
  * @return
  */
-std::string CommonIO::maskString(const std::string &str)
-{
+std::string CommonIO::maskString(const std::string &str) {
     std::string new_string = str;
 
-    if(new_string.empty())
-    {
+    if (new_string.empty()) {
         return new_string;
     }
 
     std::string::size_type string_size = numberOfChars(new_string);
 
-    if(string_size == 0)
-    {
+    if (string_size == 0) {
         return new_string;
     }
 
     new_string.erase();
 
-    for(std::string::size_type i = 0; i < string_size; i++)
-    {
+    for (std::string::size_type i = 0; i < string_size; i++) {
         // TODO Note, pull hidden input char from xrm_config.yaml here!
         new_string.append("*");
     }
@@ -736,18 +675,16 @@ std::string CommonIO::maskString(const std::string &str)
  * @param str
  * @return
  */
-bool CommonIO::isDigit(const std::string &str)
-{
+bool CommonIO::isDigit(const std::string &str) {
     // Later reference for
     // Better wide characters.
     // https://www.cs.helsinki.fi/group/boi2016/doc/cppreference/reference
     //     /en.cppreference.com/w/cpp/locale/isdigit.html
     std::string::size_type num_digits = std::count_if(str.begin(), str.end(),
-                                        [](unsigned char c)
-    {
-        return std::isdigit(c);
-    }
-                                                     );
+                                                      [](unsigned char c) {
+                                                          return std::isdigit(c);
+                                                      }
+    );
 
     return num_digits == str.size();
 }
@@ -756,11 +693,9 @@ bool CommonIO::isDigit(const std::string &str)
  * @brief Return the Input Full Screen Editor Escape Sequence Parsed.
  * @return
  */
-std::string CommonIO::getFSEEscapeSequence()
-{
+std::string CommonIO::getFSEEscapeSequence() {
     // Check if Sequences Exists, otherwise return blank.
-    if(INPUT_SEQUENCE_MAP.find(m_escape_sequence) != INPUT_SEQUENCE_MAP.end())
-    {
+    if (INPUT_SEQUENCE_MAP.find(m_escape_sequence) != INPUT_SEQUENCE_MAP.end()) {
         return INPUT_SEQUENCE_MAP[m_escape_sequence];
     }
 
@@ -771,11 +706,9 @@ std::string CommonIO::getFSEEscapeSequence()
  * @brief Return the Input Escape Sequence Parsed.
  * @return
  */
-std::string CommonIO::getEscapeSequence()
-{
+std::string CommonIO::getEscapeSequence() {
     // Check if Sequences Exists, otherwise return blank.
-    if(INPUT_SEQUENCE_MAP.find(m_escape_sequence) != INPUT_SEQUENCE_MAP.end())
-    {
+    if (INPUT_SEQUENCE_MAP.find(m_escape_sequence) != INPUT_SEQUENCE_MAP.end()) {
         return INPUT_SEQUENCE_MAP[m_escape_sequence];
     }
 
@@ -787,14 +720,12 @@ std::string CommonIO::getEscapeSequence()
  *        Sequences are handled 1 character at a time.
  * @return
  */
-std::string CommonIO::parseInput(const std::string &character_buffer)
-{
+std::string CommonIO::parseInput(const std::string &character_buffer) {
     int num = numberOfChars(character_buffer);
 
-    if((num == 0 || character_buffer[0] == '\x1b') &&
-            m_is_escape_sequence &&
-            m_string_buffer.size() == 1)
-    {
+    if ((num == 0 || character_buffer[0] == '\x1b') &&
+        m_is_escape_sequence &&
+        m_string_buffer.size() == 1) {
         // This a null after an ESC..
         m_is_escape_sequence = false;
         m_escape_sequence.erase();
@@ -803,33 +734,27 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
     }
     // Handle Single Char BS and DEL from Terminals
     // Depending on User Setting to handle Windows or Terminal - these get flipped.
-    else if(num == 1 && (character_buffer[0] == '\x7f' || character_buffer[0] == '\x08'))
-    {
+    else if (num == 1 && (character_buffer[0] == '\x7f' || character_buffer[0] == '\x08')) {
         m_is_escape_sequence = false;
         m_escape_sequence.erase();
         return character_buffer;
-    }
-    else if(num != 1)
-    {
-        m_log.write<Logging::ERROR_LOG>("This function expects single characters/glyphs=", character_buffer, __LINE__, __FILE__);
+    } else if (num != 1) {
+        m_log.write<Logging::ERROR_LOG>("This function expects single characters/glyphs=", character_buffer, __LINE__,
+                                        __FILE__);
         return "";
     }
 
     // Don't process concurrent multiple esc sequences.
     // if we get a second, return the first and check if we
     // are getting a single second ESC or start of Sequence.
-    if(character_buffer[0] == 27 && character_buffer.size() == 1)
-    {
-        if(!m_is_escape_sequence)
-        {
+    if (character_buffer[0] == 27 && character_buffer.size() == 1) {
+        if (!m_is_escape_sequence) {
             m_is_escape_sequence = true;
             m_escape_sequence.erase();
             m_string_buffer.erase();
             m_string_buffer = character_buffer;
             return "";
-        }
-        else
-        {
+        } else {
             // If we get here again and second char is another ESC,
             // to single the first key press!
             m_escape_sequence.erase();
@@ -843,12 +768,10 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
 
     // Check if were appending to current buffer or returning
     // Only appending if were in an Active ESC Sequence!
-    if(!m_string_buffer.empty())
-    {
+    if (!m_string_buffer.empty()) {
         // Check for Overflow, Input ESC Sequences Should
         // Be Short and Sweet, over 8 then lets kill it here!
-        if(m_string_buffer.size() >= 8)
-        {
+        if (m_string_buffer.size() >= 8) {
             m_is_escape_sequence = false;
             m_escape_sequence.erase();
             m_string_buffer.erase();
@@ -857,32 +780,25 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
 
         // Parse ESC Sequence for Match on bracket [ or O.
         // First Bracket overwrite the ESC in the buffer for easier matching.
-        if((character_buffer[0] == '[' && m_string_buffer[0] == '\x1b') ||
-                (character_buffer[0] == 0x4f && m_string_buffer[0] == '\x1b'))
-        {
+        if ((character_buffer[0] == '[' && m_string_buffer[0] == '\x1b') ||
+            (character_buffer[0] == 0x4f && m_string_buffer[0] == '\x1b')) {
             // Overwrite ESC and continue Sequence
             // No Need to Test for Esc in the Sequence Buffer, We'll
             // Test for everything following ESC.
             m_string_buffer.erase();
             m_string_buffer = character_buffer;
             return "";
-        }
-        else
-        {
-            switch(character_buffer[0])
-            {
+        } else {
+            switch (character_buffer[0]) {
                 case '\n': // Handle Bad Sequences with ENTER following
                     m_escape_sequence.erase();
                     return "\n";
 
                 case '[': // [[ Double Brackets F1 Keys.
-                    if(m_string_buffer == "[")
-                    {
+                    if (m_string_buffer == "[") {
                         m_string_buffer += character_buffer;
                         return "";
-                    }
-                    else if(m_string_buffer == "[O")
-                    {
+                    } else if (m_string_buffer == "[O") {
                         // case '[': // F12 = [O[
                         m_string_buffer += character_buffer;
                         m_escape_sequence = m_string_buffer;
@@ -913,8 +829,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                 // Only SCO F3 ends with [[O, otherwise it
                 // precedes in other sequences.
                 case 'O': // Precursor to Function Keys [OA etc..
-                    if(m_string_buffer == "[[")
-                    {
+                    if (m_string_buffer == "[[") {
                         // End of SCO Sequence
                         m_string_buffer += character_buffer;
                         m_escape_sequence = m_string_buffer;
@@ -977,7 +892,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                     m_string_buffer.erase();
                     return "\x1b";
 
-                default :
+                default:
                     // Not ESC Sequence.
                     // Done with loop.
                     //m_string_buffer += ' ';
@@ -990,16 +905,14 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
 
     // If ESC key received with no trailing sequence,
     // clear sequence buffer and just return ESC.
-    if(m_string_buffer.size() == 1 && m_string_buffer[0] == 27)
-    {
+    if (m_string_buffer.size() == 1 && m_string_buffer[0] == 27) {
         m_string_buffer.erase();
         return "\x1b";
     }
 
     // Translate ENTER Key, *NIX Terms send CR always test for LF.
     // CRLF is a newline on output only, input is either or.
-    if(character_buffer[0] == '\r')
-    {
+    if (character_buffer[0] == '\r') {
         return "\n";
     }
 
@@ -1010,8 +923,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
 * @brief Returns the InputFieldBuffer
 * @return
 */
-std::string CommonIO::getInputBuffer()
-{
+std::string CommonIO::getInputBuffer() {
     return m_line_buffer;
 }
 
@@ -1023,32 +935,29 @@ std::string CommonIO::getInputBuffer()
  * @param hidden
  * @return
  */
-std::string CommonIO::getLine(const std::string &line,    // Parsed Char input in
-                              int   length,               // Max Input Length of Field
+std::string CommonIO::getLine(const std::string &line, // Parsed Char input in
+                              int length, // Max Input Length of Field
                               const std::string &leadoff, // Data to Display in Default Field {Optional}
-                              bool  hidden)               // If input is hidden or masked     {Optional}
+                              bool hidden) // If input is hidden or masked     {Optional}
 {
-    std::string output_buffer = "";    // Used for Data to send back
+    std::string output_buffer = ""; // Used for Data to send back
     std::string character_buffer = ""; // Used for Data being processed.
 
     // Flag on when to reset buffer and position for next run.
-    if(m_is_new_getline)
-    {
+    if (m_is_new_getline) {
         m_is_new_getline = false;
         m_line_buffer.erase();
         m_column_position = 0;
     }
 
     // If were starting Off Input with a String already in buffer!  display it!
-    if(m_is_new_leadoff && leadoff.size() > 0)
-    {
+    if (m_is_new_leadoff && leadoff.size() > 0) {
         m_is_new_leadoff = false;
         m_column_position = leadoff.size();
         m_line_buffer += leadoff;
 
         // Trim if were past the length limit
-        if((signed)numberOfChars(m_line_buffer) > length)
-        {
+        if ((signed) numberOfChars(m_line_buffer) > length) {
             std::string temp = leftPadding(m_line_buffer, length);
             m_line_buffer = std::move(temp);
         }
@@ -1058,8 +967,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
     // Catch Aborts here!
     character_buffer = parseInput(line);
 
-    if(character_buffer.size() == 0 || character_buffer[0] == '\0')
-    {
+    if (character_buffer.size() == 0 || character_buffer[0] == '\0') {
         // No data or in mid ESC sequence
         // Need to wait for next character.
         return "\x1b"; // ""
@@ -1068,106 +976,86 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
     // If we got an ENTER CR/LF then were done!
     // Set the Flag, so on next call to method, we reset, not before
     // Otherwise we'll clear the buffer we just filled.  :)
-    if(character_buffer[0] == '\n')
-    {
+    if (character_buffer[0] == '\n') {
         m_is_new_getline = true;
         m_is_new_leadoff = true;
         return "\n";
     }
 
 
-    if(character_buffer[0] == 27)
-    {
+    if (character_buffer[0] == 27) {
         std::string sequence = getEscapeSequence();
 
-        if(sequence.size() == 0)
-        {
+        if (sequence.size() == 0) {
             return "\x1b";
-        }
-        else
-        {
+        } else {
             // Received DEL Escape Sequence.
-            if(sequence == "del")
-            {
-                if(m_line_buffer.size() > 0)
-                {
+            if (sequence == "del") {
+                if (m_line_buffer.size() > 0) {
                     m_log.write<Logging::DEBUG_LOG>("Received DEL ESC Sequence", __LINE__, __FILE__);
-                    std::string temp = eraseString(m_line_buffer, numberOfChars(m_line_buffer)-1, 1);
+                    std::string temp = eraseString(m_line_buffer, numberOfChars(m_line_buffer) - 1, 1);
                     m_line_buffer = std::move(temp);
                     m_column_position = m_line_buffer.size();
                     return "\x1b[D \x1b[D";
-                }
-                else
-                {
+                } else {
                     // Nothing to delete at beginning Skip.
-                    m_log.write<Logging::DEBUG_LOG>("Received DEL ESC Sequence beginning of line=", character_buffer, __LINE__, __FILE__);
+                    m_log.write<Logging::DEBUG_LOG>("Received DEL ESC Sequence beginning of line=", character_buffer,
+                                                    __LINE__, __FILE__);
                     return "empty";
                 }
-            }
-            else
-            {
+            } else {
                 // Unhandled sequence! Skip and return
-                m_log.write<Logging::DEBUG_LOG>("Received Unhandled ESC Sequence beginning=", character_buffer, __LINE__, __FILE__);
+                m_log.write<Logging::DEBUG_LOG>("Received Unhandled ESC Sequence beginning=", character_buffer,
+                                                __LINE__, __FILE__);
                 return "empty";
             }
         }
     }
     // CTRL Y - Clear Line
-    else if((int)character_buffer[0] == 25)
-    {
-        if(m_line_buffer.size() > 0)
-        {
+    else if ((int) character_buffer[0] == 25) {
+        if (m_line_buffer.size() > 0) {
             m_log.write<Logging::DEBUG_LOG>("Received CTRL+Y Sequence=", character_buffer, __LINE__, __FILE__);
 
-            for(int i = numberOfChars(m_line_buffer); i > 0; i--)
-            {
+            for (int i = numberOfChars(m_line_buffer); i > 0; i--) {
                 output_buffer += "\x1b[D \x1b[D";
             }
 
             m_line_buffer.erase();
             m_column_position = 0;
             return output_buffer;
-        }
-        else
-        {
+        } else {
             // At beginning of line, nothing to delete!
-            m_log.write<Logging::DEBUG_LOG>("Received CTRL+Y Sequence beginning of line=", character_buffer, __LINE__, __FILE__);
+            m_log.write<Logging::DEBUG_LOG>("Received CTRL+Y Sequence beginning of line=", character_buffer, __LINE__,
+                                            __FILE__);
             return "empty";
         }
     }
     // Handle BS and DEL as both Destructive Backspace on Fields
     // At this time, arrow keys are not setup to move through the string!
-    else if((int)character_buffer[0] == 0x08 || (int)character_buffer[0] == 0x7f || character_buffer[0] == '\b')
-    {
-        if(m_line_buffer.size() > 0)
-        {
+    else if ((int) character_buffer[0] == 0x08 || (int) character_buffer[0] == 0x7f || character_buffer[0] == '\b') {
+        if (m_line_buffer.size() > 0) {
             m_log.write<Logging::DEBUG_LOG>("Received backspace Sequence=", character_buffer, __LINE__, __FILE__);
-            std::string temp = eraseString(m_line_buffer, numberOfChars(m_line_buffer)-1, 1);
+            std::string temp = eraseString(m_line_buffer, numberOfChars(m_line_buffer) - 1, 1);
             m_line_buffer = std::move(temp);
-            m_column_position =  m_line_buffer.size();
+            m_column_position = m_line_buffer.size();
             return "\x1b[D \x1b[D";
-        }
-        else
-        {
+        } else {
             // At beginning of Line, nothing to delete.
-            m_log.write<Logging::DEBUG_LOG>("Received backspace Sequence beginning of line=", character_buffer, __LINE__, __FILE__);
+            m_log.write<Logging::DEBUG_LOG>("Received backspace Sequence beginning of line=", character_buffer,
+                                            __LINE__, __FILE__);
             return "empty";
         }
     }
 
     // Normal Input processing, ASCII and Unicode. Add new functions for size!
-    if(((signed)m_line_buffer.size() <= length) &&
-            ((signed)(character_buffer.size() + m_line_buffer.size()) <= length))
-    {
-        if(hidden)
-        {
+    if (((signed) m_line_buffer.size() <= length) &&
+        ((signed) (character_buffer.size() + m_line_buffer.size()) <= length)) {
+        if (hidden) {
             m_log.write<Logging::DEBUG_LOG>("hidden field input=", character_buffer, __LINE__, __FILE__);
             m_line_buffer += character_buffer;
             m_column_position = numberOfChars(m_line_buffer);
             return "*";
-        }
-        else
-        {
+        } else {
             m_log.write<Logging::DEBUG_LOG>("normal field input=", character_buffer, __LINE__, __FILE__);
             m_line_buffer += character_buffer;
             m_column_position = numberOfChars(m_line_buffer);
@@ -1183,23 +1071,19 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
  * @brief Converts Pascal Strings to C-Strings Also return std::string for conversions.
  * @param string
  */
-std::string CommonIO::PascalToCString(int8_t *string)
-{
-    if(string[0] == 0)
-    {
+std::string CommonIO::PascalToCString(int8_t *string) {
+    if (string[0] == 0) {
         return "";
     }
 
     std::string newstring = "";
 
-    for(auto i = 1; i <= string[0]; i++)
-    {
+    for (auto i = 1; i <= string[0]; i++) {
         newstring += string[i];
     }
 
-    for(auto i = 0; i < (signed)newstring.size(); i++)
-    {
-        *string = (int)newstring.at(i);
+    for (auto i = 0; i < (signed) newstring.size(); i++) {
+        *string = (int) newstring.at(i);
         ++string;
     }
 
@@ -1212,10 +1096,8 @@ std::string CommonIO::PascalToCString(int8_t *string)
  * @brief Converts Pascal Strings to C-Strings
  * @param string
  */
-void CommonIO::CStringToPascal(int8_t *string)
-{
-    if(string[0] == '\0')
-    {
+void CommonIO::CStringToPascal(int8_t *string) {
+    if (string[0] == '\0') {
         string[0] = 0;
         return;
     }
@@ -1225,18 +1107,16 @@ void CommonIO::CStringToPascal(int8_t *string)
     newstring[0] = length;
 
     // Pascal Strings can't be longer then 254 with first byte length.
-    if(length >= 255) length = 254;
+    if (length >= 255) length = 254;
 
-    for(auto i = 1; i <= length; i++)
-    {
+    for (auto i = 1; i <= length; i++) {
         newstring += string[i];
     }
 
     newstring += '\0';
 
-    for(auto i = 0; i < (signed)newstring.size(); i++)
-    {
-        *string = (int)newstring.at(i);
+    for (auto i = 0; i < (signed) newstring.size(); i++) {
+        *string = (int) newstring.at(i);
         ++string;
     }
 }
@@ -1246,10 +1126,8 @@ void CommonIO::CStringToPascal(int8_t *string)
  * @param value
  * @return
  */
-std::string CommonIO::boolAlpha(bool value)
-{
-    if(value)
-    {
+std::string CommonIO::boolAlpha(bool value) {
+    if (value) {
         return "True";
     }
 
@@ -1262,38 +1140,32 @@ std::string CommonIO::boolAlpha(bool value)
  * @param mcicode
  * @param replacement
  */
-void CommonIO::parseLocalMCI(std::string &AnsiString, const std::string &mcicode, const std::string &replacement)
-{
+void CommonIO::parseLocalMCI(std::string &AnsiString, const std::string &mcicode, const std::string &replacement) {
     std::string::size_type id1 = 0;
 
-    do
-    {
+    do {
         // Parse New Message's MCI Code
         id1 = AnsiString.find(mcicode, 0);
 
-        if(id1 != std::string::npos)
-        {
+        if (id1 != std::string::npos) {
             AnsiString.replace(id1, mcicode.size(), replacement);
             id1 = AnsiString.find(mcicode, 0);
         }
-    }
-    while(id1 != std::string::npos);
+    } while (id1 != std::string::npos);
 }
 
 /**
  * @brief Check if the file exists
  * @return
  */
-bool CommonIO::fileExists(const std::string &file_name)
-{
+bool CommonIO::fileExists(const std::string &file_name) {
     std::string path = GLOBAL_TEXTFILE_PATH;
     pathAppend(path);
     path += file_name;
 
     std::ifstream ifs(path);
 
-    if(!ifs.is_open())
-    {
+    if (!ifs.is_open()) {
         return false;
     }
 
@@ -1304,8 +1176,7 @@ bool CommonIO::fileExists(const std::string &file_name)
 /**
  * Reads in ANSI file into Buffer Only
  */
-std::string CommonIO::readinAnsi(const std::string &file_name)
-{
+std::string CommonIO::readinAnsi(const std::string &file_name) {
     std::string path = GLOBAL_TEXTFILE_PATH;
     pathAppend(path);
     path += file_name;
@@ -1316,21 +1187,17 @@ std::string CommonIO::readinAnsi(const std::string &file_name)
     FILE *fp;
     int c = 0;
 
-    if((fp = fopen(path.c_str(), "r+")) ==  NULL)
-    {
+    if ((fp = fopen(path.c_str(), "r+")) == NULL) {
         return "";
     }
 
-    do
-    {
+    do {
         c = getc(fp);
 
-        if(c != EOF)
-        {
+        if (c != EOF) {
             buff += c;
         }
-    }
-    while(c != EOF);
+    } while (c != EOF);
 
     fclose(fp);
 
@@ -1346,14 +1213,12 @@ std::string CommonIO::readinAnsi(const std::string &file_name)
 * @param delimiter
 * @return
 */
-std::vector<std::string> CommonIO::splitString(const std::string& s, char delimiter)
-{
+std::vector<std::string> CommonIO::splitString(const std::string &s, char delimiter) {
     std::vector<std::string> tokens;
     std::string token;
     std::istringstream tokenStream(s);
 
-    while(std::getline(tokenStream, token, delimiter))
-    {
+    while (std::getline(tokenStream, token, delimiter)) {
         tokens.push_back(token);
     }
 
@@ -1366,8 +1231,7 @@ std::vector<std::string> CommonIO::splitString(const std::string& s, char delimi
 * @param std_time
 * @return
 */
-std::string CommonIO::standardDateToString(std::time_t std_time)
-{
+std::string CommonIO::standardDateToString(std::time_t std_time) {
     std::ostringstream oss;
     oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d");
     std::string time_string = oss.str();
@@ -1380,8 +1244,7 @@ std::string CommonIO::standardDateToString(std::time_t std_time)
 * @param std_time
 * @return
 */
-std::string CommonIO::standardDateTimeToString(std::time_t std_time)
-{
+std::string CommonIO::standardDateTimeToString(std::time_t std_time) {
     std::ostringstream oss;
     oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d %H:%M:%S %z");
     std::string datetime_string = oss.str();
@@ -1394,8 +1257,7 @@ std::string CommonIO::standardDateTimeToString(std::time_t std_time)
 * @param date
 * @return
 */
-std::time_t CommonIO::stringToStandardDate(const std::string &date)
-{
+std::time_t CommonIO::stringToStandardDate(const std::string &date) {
     // Append Time For Dates, need formatting's
     std::string key = date;
     key += " 00:00:00";
@@ -1404,8 +1266,7 @@ std::time_t CommonIO::stringToStandardDate(const std::string &date)
     std::istringstream ss(key);
     ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
 
-    if(ss.fail())
-    {
+    if (ss.fail()) {
         ss.clear();
         return -1;
     }
@@ -1419,14 +1280,12 @@ std::time_t CommonIO::stringToStandardDate(const std::string &date)
 * @param date_time
 * @return
 */
-std::time_t CommonIO::stringToStandardDateTime(const std::string &date_time)
-{
+std::time_t CommonIO::stringToStandardDateTime(const std::string &date_time) {
     struct std::tm tm;
     std::istringstream ss(date_time);
     ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
 
-    if(ss.fail())
-    {
+    if (ss.fail()) {
         ss.clear();
         return -1;
     }
@@ -1440,15 +1299,13 @@ std::time_t CommonIO::stringToStandardDateTime(const std::string &date_time)
 * @param value
 * @return
 */
-long CommonIO::stringToLong(const std::string &value)
-{
+long CommonIO::stringToLong(const std::string &value) {
     long result_id = -1;
     std::stringstream ss(value);
     ss >> result_id;
 
     // check for Invalid Index.
-    if(ss.fail() || result_id < 0)
-    {        
+    if (ss.fail() || result_id < 0) {
         ss.ignore();
         result_id = -1;
     }
@@ -1462,15 +1319,13 @@ long CommonIO::stringToLong(const std::string &value)
 * @param value
 * @return
 */
-int CommonIO::stringToInt(const std::string &value)
-{
+int CommonIO::stringToInt(const std::string &value) {
     int result_id = -1;
     std::stringstream ss(value);
     ss >> result_id;
 
     // check for Invalid Index.
-    if(ss.fail() || result_id < 0)
-    {
+    if (ss.fail() || result_id < 0) {
         ss.ignore();
         result_id = -1;
     }
@@ -1484,12 +1339,11 @@ int CommonIO::stringToInt(const std::string &value)
 * @param value
 * @return
 */
-int CommonIO::stringToBool(const std::string &value)
-{
+int CommonIO::stringToBool(const std::string &value) {
     // Test if string starts with T or F instead of typing True/False
-    if(toupper(value[0]) == 'T')
+    if (toupper(value[0]) == 'T')
         return 1;
-    else if(toupper(value[0]) == 'F')
+    else if (toupper(value[0]) == 'F')
         return 0;
     else
         return -1;
@@ -1499,45 +1353,35 @@ int CommonIO::stringToBool(const std::string &value)
 * @brief Parses screen data into the Screen Buffer.
 * @return
 */
-void CommonIO::getNextGlyph(LocalizedBuffer &buffer, 
+void CommonIO::getNextGlyph(LocalizedBuffer &buffer,
                             std::string::iterator &it,
-                            const std::string::iterator &line_end)
-{
+                            const std::string::iterator &line_end) {
     buffer.clear();
 
-    if(it == line_end)
-    {
+    if (it == line_end) {
         return;
     }
 
-    int byte_value = static_cast<int>((uint8_t)*it);
+    int byte_value = static_cast<int>((uint8_t) *it);
 
-    if(byte_value < 128)
-    {
+    if (byte_value < 128) {
         buffer.character = std::string(1, *it);
         buffer.length = 1;
         *it++;
-    }
-    else
-    {
-        try
-        {
+    } else {
+        try {
             uint32_t code_point = utf8::next(it, line_end);
             unsigned char character[5] = {0, 0, 0, 0, 0};
             utf8::append(code_point, character);
 
-            for(int i = 0; i < 5; i++)
-            {
-                if(character[i] != 0)
-                {
+            for (int i = 0; i < 5; i++) {
+                if (character[i] != 0) {
                     buffer.character += std::string(1, character[i]);
                 }
             }
 
             buffer.length = buffer.character.size();
-        }
-        catch(utf8::exception &ex)
-        {
+        } catch (utf8::exception &ex) {
             m_log.write<Logging::ERROR_LOG>("[getNextGlyph] UTF8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
             (*it)++; // Bad, other iterate past it, otherwise stuck in endless loop.
         }
@@ -1548,45 +1392,35 @@ void CommonIO::getNextGlyph(LocalizedBuffer &buffer,
 * @brief Parses screen data into the Screen Buffer.
 * @return
 */
-void CommonIO::peekNextGlyph(LocalizedBuffer &buffer, 
+void CommonIO::peekNextGlyph(LocalizedBuffer &buffer,
                              std::string::iterator &it,
-                             const std::string::iterator &line_end)
-{
+                             const std::string::iterator &line_end) {
     buffer.clear();
 
-    if(it == line_end)
-    {
+    if (it == line_end) {
         return;
     }
 
-    int byte_value = static_cast<int>((uint8_t)*it);
+    int byte_value = static_cast<int>((uint8_t) *it);
 
-    if(byte_value < 128)
-    {
+    if (byte_value < 128) {
         buffer.character = std::string(1, *it);
         buffer.length = 1;
-    }
-    else
-    {
-        try
-        {
+    } else {
+        try {
             uint32_t code_point = utf8::next(it, line_end);
             unsigned char character[5] = {0, 0, 0, 0, 0};
             utf8::append(code_point, character);
 
-            for(int i = 0; i < 5; i++)
-            {
-                if(character[i] != 0)
-                {
+            for (int i = 0; i < 5; i++) {
+                if (character[i] != 0) {
                     buffer.character += std::string(1, character[i]);
                 }
             }
 
             buffer.length = buffer.character.size();
             (*it)--;
-        }
-        catch(utf8::exception &ex)
-        {            
+        } catch (utf8::exception &ex) {
             m_log.write<Logging::ERROR_LOG>("[peekNextGlyph] UTF8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
             (*it)++; // Bad, iterate past otherwise stuck in endless loop!
         }

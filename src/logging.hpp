@@ -13,27 +13,23 @@
  * @file logging.hpp
  * @brief Global Logging class
  */
-class Logging
-{
+class Logging {
 public:
-
     // States
-    static enum
-    {
+    static enum {
         INFO_LOG = 0,
         DEBUG_LOG = 1,
         WARN_LOG = 2,
         ERROR_LOG = 3,
         CONSOLE_LOG = 4,
         ALL_LOGS = 5
-
     } LOGGING_LEVELS;
 
     // Descriptions
     const std::string INFO_LEVEL = "Info";
     const std::string DEBUG_LEVEL = "Debug";
     const std::string WARN_LEVEL = "Warn";
-    const std::string ERROR_LEVEL = "Error";    
+    const std::string ERROR_LEVEL = "Error";
     const std::string CONSOLE_LEVEL = "Console";
     const std::string ALL_LEVELS = "All";
 
@@ -41,11 +37,10 @@ public:
      * @brief Creates Singleton Instance of Class
      * @return
      */
-    static Logging &getInstance()
-    {      
+    static Logging &getInstance() {
         static Logging instance;
         return instance;
-    }        
+    }
 
     /**
      * @brief Helper, appends forward/backward slash to path
@@ -72,7 +67,7 @@ public:
      * @return
      */
     std::string getCurrentDateTime();
-    
+
     /**
      * @brief Current Time Stamp (LOCAL TIME)
      * @return
@@ -85,13 +80,13 @@ public:
      * @return
      */
     int getConfigurationLogState(const std::string &log_level);
-    
+
     /**
      * @brief Set Logging Level From Configurations by String and Convert to Int Level.
      * @param log_level
      */
     void setLoggingLevel(std::string log_level);
-    
+
     /**
      * @brief Set the Node Number for a Thread Local
      * @param node_number
@@ -99,61 +94,55 @@ public:
     void setUserInfo(int node_number);
 
     template<int level>
-    std::string log()
-    {
+    std::string log() {
         return "";
     }
 
     template<int level, typename T>
-    std::string log(const T& t)
-    {
+    std::string log(const T &t) {
         std::ostringstream oss;
         oss << t;
         return oss.str();
     }
 
-    template<int level, typename T, typename ... Types>
-    std::string log(const T& first, Types ... rest)
-    {
+    template<int level, typename T, typename... Types>
+    std::string log(const T &first, Types... rest) {
         return log<level>(first) + " " + log<level>(rest...);
     }
 
-    template<int level, typename ... Types>
-    void write(Types ... rest)
-    {
+    template<int level, typename... Types>
+    void write(Types... rest) {
         // Thread Safety, since we have main look and worker thread.
         std::unique_lock<std::mutex> lock(m_mutex);
-        
+
         // Quick Case Statement, in Logging level, if were not logging anything
         // then return right away to save processing.
-        switch(level)
-        {
+        switch (level) {
             // Incoming Logging Level Filtering by Configuration
             case INFO_LOG:
-                if(m_log_level != INFO_LOG && m_log_level != ALL_LOGS)
+                if (m_log_level != INFO_LOG && m_log_level != ALL_LOGS)
                     return;
                 break;
 
             case DEBUG_LOG:
-                if(m_log_level != DEBUG_LOG && m_log_level != ALL_LOGS)
+                if (m_log_level != DEBUG_LOG && m_log_level != ALL_LOGS)
                     return;
                 break;
-                
+
             case WARN_LOG:
-                if(m_log_level != WARN_LOG && m_log_level != ALL_LOGS)
+                if (m_log_level != WARN_LOG && m_log_level != ALL_LOGS)
                     return;
                 break;
-                
+
             default:
                 break;
         }
 
         std::vector<std::string> details;
-        std::string date_time = getCurrentDateTimeMillis();
-        std::string log_string = log<level>(rest...);        
+        const std::string date_time = getCurrentDateTimeMillis();
+        std::string log_string = log<level>(rest...);
 
-        switch(level)
-        {
+        switch (level) {
             // Incoming Logging Level
             case INFO_LOG:
                 details.push_back(INFO_LEVEL);
@@ -172,7 +161,7 @@ public:
                 details.push_back(log_string);
                 writeOutConsole(date_time, details);
                 break;
-                
+
             case ERROR_LOG:
                 details.push_back(ERROR_LEVEL);
                 details.push_back(log_string);
@@ -191,7 +180,6 @@ public:
         }
 
         details.clear();
-
     }
 
 
@@ -202,22 +190,20 @@ public:
      */
     void writeOutConsole(const std::string &date_time, std::vector<std::string> &details);
 
-    Logging(const Logging&) = delete;             // Copy ctor
-    Logging(Logging&&) = delete;                  // Move ctor
-    Logging& operator=(const Logging&) = delete;  // Copy assignment
-    Logging& operator=(Logging&&) = delete;       // Move assignment
+    Logging(const Logging &) = delete; // Copy ctor
+    Logging(Logging &&) = delete; // Move ctor
+    Logging &operator=(const Logging &) = delete; // Copy assignment
+    Logging &operator=(Logging &&) = delete; // Move assignment
 
 private:
+    int m_log_level;
+    mutable std::mutex m_mutex;
 
-    int                    m_log_level;
-    mutable std::mutex     m_mutex;
-    
     /**
      * @brief Constructor for the Singleton.
      * @return 
      */
     explicit Logging();
-
 };
 
 

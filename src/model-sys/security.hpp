@@ -2,10 +2,7 @@
 #define SECURITY_HPP
 
 #include <string>
-#include <memory>
 
-class Security;
-typedef std::shared_ptr<Security> security_ptr;
 
 /**
  * @class Security
@@ -14,10 +11,8 @@ typedef std::shared_ptr<Security> security_ptr;
  * @file security.hpp
  * @brief Structure for holding users Password and Salt hashes
  */
-class Security
-{
+class Security {
 public:
-
     long iId;
     std::string sPasswordHash;
     std::string sSaltHash;
@@ -26,14 +21,14 @@ public:
 
     explicit Security()
         : iId(-1)
-        , sPasswordHash("")
-        , sSaltHash("")
-        , sChallengeQuestion("")
-        , sChallengeAnswerHash("")
-    { }
-    ~Security() { }
+          , sPasswordHash("")
+          , sSaltHash("")
+          , sChallengeQuestion("")
+          , sChallengeAnswerHash("") {
+    }
 
+    ~Security() = default;
 };
 
 
-#endif // SECURITY_HPP
+#endif

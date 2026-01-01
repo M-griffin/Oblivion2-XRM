@@ -6,7 +6,7 @@
 #include <map>
 
 #include "common_io.hpp"
-#include "telnet_session.hpp"
+#include "model-sys/config.hpp"
 #include "model-sys/structures.hpp"
 
 class Logging;
@@ -20,13 +20,51 @@ class TCPSession;
  * @brief Higher Level I/O specific to Menu Interfaces
  */
 class SessionIO {
+    Logging &m_log;
+    TCPSession &m_session;
+    CommonIO &m_common_io;
+    std::map<std::string, std::string> m_mapped_codes; // MCI Code Translation for specific screens.
+
+    const std::string STD_EXPRESSION = {
+        "([|]{1}[0-9]{2})|([|]{1}[X][Y][0-9]{4})|"
+        "([|]{1}[A-Z]{1,2}[0-9]{1,2})|([|]{1}[A-Z]{2})|"
+        "([%]{2}[\\w]+[.]{1}[\\w]{3})|([%]{1}[A-Z]{2})|"
+        "([%]{1}[0-9]{2})"
+    };
+
+    const std::string MID_EXPRESSION = {"([|]{1}[A-Z]{1}[0-9]{1,2})|([|]{1}[A-Z]{2})"};
+
+    const std::string PROMPT_EXPRESSION = {"([\\^]{1}[A-Z]{1})|([\\\\/=|@*:#)(]{1}$)"};
+
+    const std::string FORMAT_EXPRESSION = {"([[]{1}[\\w\\W]+[]]{1})|([:]{1})"};
+
 public:
     // Types for Text Prompt formatting to file.
     typedef std::pair<std::string, std::string> M_StringPair;
 
-    SessionIO(TCPSession &session, CommonIO &common_io);
+    explicit SessionIO(TCPSession &session, CommonIO &common);
 
     ~SessionIO();
+
+    // Copy constructors
+    SessionIO &operator=(SessionIO &) = delete;
+
+    SessionIO(const SessionIO &) = delete;
+
+    // Move Constructors
+    SessionIO(SessionIO &&other) noexcept
+        : m_log(other.m_log)
+          , m_session(other.m_session)
+          , m_common_io(other.m_common_io)
+          , m_mapped_codes(std::move(other.m_mapped_codes)) {
+    }
+
+    SessionIO &operator=(SessionIO &&other) noexcept {
+        if (this != &other) {
+            m_mapped_codes = std::move(other.m_mapped_codes);
+        }
+        return *this;
+    }
 
     /**
      * @brief Single Key Input For Full Screen Editor or Esc Sequences
@@ -91,37 +129,37 @@ public:
      * @brief Gets the Default Color Sequence
      * @return
      */
-    std::string getDefaultColor(config_ptr config);
+    std::string getDefaultColor(Config &config);
 
     /**
      * @brief Gets the Default Input Color Sequence
      * @return
      */
-    std::string getDefaultInputColor(config_ptr config);
+    std::string getDefaultInputColor(Config &config);
 
     /**
      * @brief Gets the Default Inverse Color Sequence
      * @return
      */
-    std::string getDefaultInverseColor(config_ptr config);
+    std::string getDefaultInverseColor(Config &config);
 
     /**
      * @brief Gets the Default Prompt Color Sequence
      * @return
      */
-    std::string getDefaultPromptColor(config_ptr config);
+    std::string getDefaultPromptColor(Config &config);
 
     /**
      * @brief Gets the Default stat Color Sequence
      * @return
      */
-    std::string getDefaultStatColor(config_ptr config);
+    std::string getDefaultStatColor(Config &config);
 
     /**
      * @brief Gets the Default box Color Sequence
      * @return
      */
-    std::string getDefaultBoxColor(config_ptr config);
+    std::string getDefaultBoxColor(Config &config);
 
 
     /**
@@ -209,21 +247,21 @@ public:
      * @param sequence
      * @return
      */
-    std::string parseFormatColorsBrackets(const std::string &sequence, config_ptr config);
+    std::string parseFormatColorsBrackets(const std::string &sequence, Config &config);
 
     /**
      * @brief Colorizes Colons to system theme colors
      * @param sequence
      * @return
      */
-    std::string parseFormatColorsColon(const std::string &sequence, config_ptr config);
+    std::string parseFormatColorsColon(const std::string &sequence, Config &config);
 
     /**
      * @brief Parses unformatted prompt text and adds colors to brackets and colon's.
      * @param sequence
      * @return
      */
-    std::string pipe2promptFormat(const std::string &sequence, config_ptr config);
+    std::string pipe2promptFormat(const std::string &sequence, Config &config);
 
     /**
      * @brief Checks a String if it matches the expression passed.
@@ -260,25 +298,6 @@ public:
      * @return
      */
     int getMCIMappingCount();
-
-    // Internal Methods
-    Logging &m_log;
-    TCPSession &m_session;
-    CommonIO &m_common_io;
-    std::map<std::string, std::string> m_mapped_codes; // MCI Code Translation for specific screens.
-
-    const std::string STD_EXPRESSION = {
-        "([|]{1}[0-9]{2})|([|]{1}[X][Y][0-9]{4})|"
-        "([|]{1}[A-Z]{1,2}[0-9]{1,2})|([|]{1}[A-Z]{2})|"
-        "([%]{2}[\\w]+[.]{1}[\\w]{3})|([%]{1}[A-Z]{2})|"
-        "([%]{1}[0-9]{2})"
-    };
-
-    const std::string MID_EXPRESSION = {"([|]{1}[A-Z]{1}[0-9]{1,2})|([|]{1}[A-Z]{2})"};
-
-    const std::string PROMPT_EXPRESSION = {"([\\^]{1}[A-Z]{1})|([\\\\/=|@*:#)(]{1}$)"};
-
-    const std::string FORMAT_EXPRESSION = {"([[]{1}[\\w\\W]+[]]{1})|([:]{1})"};
 };
 
 #endif

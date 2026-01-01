@@ -98,7 +98,7 @@ ModSignup::ModSignup(session_ptr session_data, config_ptr config, processor_ansi
     m_mod_functions.push_back(std::bind(&ModSignup::verifyAndSave, this, std::placeholders::_1));
 
     // Check of the Text Prompts exist.
-    m_is_text_prompt_exist = m_text_prompts_dao->fileExists();
+    m_is_text_prompt_exist = m_text_prompts_dao.fileExists();
 
     if(!m_is_text_prompt_exist)
     {
@@ -106,7 +106,7 @@ ModSignup::ModSignup(session_ptr session_data, config_ptr config, processor_ansi
     }
 
     // Loads all Text Prompts for current module
-    m_text_prompts_dao->readPrompts();
+    m_text_prompts_dao.readPrompts();
 }
 
 /**
@@ -213,7 +213,7 @@ void ModSignup::createTextPrompts()
     // New User Voting
     value[PROMPT_NEWUSER_VOTING]     = std::make_pair("New User Voting","|04New User Voting Active, |15Access will be granted once your account has been voted on.|CR");
 
-    m_text_prompts_dao->writeValue(value);
+    m_text_prompts_dao.writeValue(value);
 }
 
 /**
@@ -281,10 +281,10 @@ void ModSignup::displayPromptAndNewLine(const std::string &prompt)
 void ModSignup::setupNewUserPassword()
 {
     // Check if New User Password is enabled
-    if(m_config->use_newuser_password)
+    if(m_config.use_newuser_password)
     {
         // Kick back to Matrix if we exceed the number of attempts.
-        if(m_newuser_password_attempts >= m_config->invalid_newuser_password_attempts)
+        if(m_newuser_password_attempts >= m_config.invalid_newuser_password_attempts)
         {
             m_is_active = false;
             return;
@@ -304,7 +304,7 @@ void ModSignup::setupNewUserPassword()
  */
 void ModSignup::setupDisclaimer()
 {
-    if(m_config->use_disclaimer)
+    if(m_config.use_disclaimer)
     {
         displayPrompt(PROMPT_DISCLAIMER);
     }
@@ -320,7 +320,7 @@ void ModSignup::setupDisclaimer()
  */
 void ModSignup::setupHandle()
 {
-    if(m_config->use_handle)
+    if(m_config.use_handle)
     {
         displayPrompt(PROMPT_HANDLE);
     }
@@ -336,7 +336,7 @@ void ModSignup::setupHandle()
  */
 void ModSignup::setupRealName()
 {
-    if(m_config->use_real_name)
+    if(m_config.use_real_name)
     {
         displayPrompt(PROMPT_REAL_NAME);
     }
@@ -352,7 +352,7 @@ void ModSignup::setupRealName()
  */
 void ModSignup::setupAddress()
 {
-    if(m_config->use_address)
+    if(m_config.use_address)
     {
         displayPrompt(PROMPT_ADDRESS);
     }
@@ -368,7 +368,7 @@ void ModSignup::setupAddress()
  */
 void ModSignup::setupLocation()
 {
-    if(m_config->use_location)
+    if(m_config.use_location)
     {
         displayPrompt(PROMPT_LOCATION);
     }
@@ -384,7 +384,7 @@ void ModSignup::setupLocation()
  */
 void ModSignup::setupCountry()
 {
-    if(m_config->use_country)
+    if(m_config.use_country)
     {
         displayPrompt(PROMPT_COUNTRY);
     }
@@ -400,7 +400,7 @@ void ModSignup::setupCountry()
  */
 void ModSignup::setupEmail()
 {
-    if(m_config->use_email)
+    if(m_config.use_email)
     {
         displayPrompt(PROMPT_EMAIL);
     }
@@ -416,7 +416,7 @@ void ModSignup::setupEmail()
  */
 void ModSignup::setupUserNote()
 {
-    if(m_config->use_user_note)
+    if(m_config.use_user_note)
     {
         displayPrompt(PROMPT_USER_NOTE);
     }
@@ -432,7 +432,7 @@ void ModSignup::setupUserNote()
  */
 void ModSignup::setupBirthday()
 {
-    if(m_config->use_birthdate)
+    if(m_config.use_birthdate)
     {
         displayPrompt(PROMPT_BIRTH_DATE);
     }
@@ -448,7 +448,7 @@ void ModSignup::setupBirthday()
  */
 void ModSignup::setupGender()
 {
-    if(m_config->use_gender)
+    if(m_config.use_gender)
     {
         displayPrompt(PROMPT_GENDER);
     }
@@ -482,7 +482,7 @@ void ModSignup::setupVerifyPassword()
  */
 void ModSignup::setupChallengeQuestion()
 {
-    if(m_config->use_challenge_question)
+    if(m_config.use_challenge_question)
     {
         displayPrompt(PROMPT_CHALLENGE_QUESTION);
     }
@@ -498,7 +498,7 @@ void ModSignup::setupChallengeQuestion()
  */
 void ModSignup::setupChallengeAnswer()
 {
-    if(m_config->use_challenge_question)
+    if(m_config.use_challenge_question)
     {
         displayPrompt(PROMPT_CHALLENGE_ANSWER);
     }
@@ -514,7 +514,7 @@ void ModSignup::setupChallengeAnswer()
  */
 void ModSignup::setupVerifyChallengeAnswer()
 {
-    if(m_config->use_challenge_question)
+    if(m_config.use_challenge_question)
     {
         displayPrompt(PROMPT_VERIFY_ANSWER);
     }
@@ -530,7 +530,7 @@ void ModSignup::setupVerifyChallengeAnswer()
  */
 void ModSignup::setupYesNoBars()
 {
-    if(m_config->use_yesno_bars)
+    if(m_config.use_yesno_bars)
     {
         displayPrompt(PROMPT_YESNO_BARS);
     }
@@ -546,7 +546,7 @@ void ModSignup::setupYesNoBars()
  */
 void ModSignup::setupDoPause()
 {
-    if(m_config->use_pause)
+    if(m_config.use_pause)
     {
         displayPrompt(PROMPT_USE_PAUSE);
     }
@@ -562,7 +562,7 @@ void ModSignup::setupDoPause()
  */
 void ModSignup::setupClearOrScroll()
 {
-    if(m_config->use_clear_screen)
+    if(m_config.use_clear_screen)
     {
         displayPrompt(PROMPT_USE_CLEAR);
     }
@@ -578,7 +578,7 @@ void ModSignup::setupClearOrScroll()
  */
 void ModSignup::setupAnsiColor()
 {
-    if(m_config->use_ansi_color)
+    if(m_config.use_ansi_color)
     {
         displayPrompt(PROMPT_USE_ANSI_COLOR);
     }
@@ -594,7 +594,7 @@ void ModSignup::setupAnsiColor()
  */
 void ModSignup::setupBackSpace()
 {
-    if(m_config->use_backspace)
+    if(m_config.use_backspace)
     {
         displayPrompt(PROMPT_BACK_SPACE);
     }
@@ -627,7 +627,7 @@ bool ModSignup::fieldInputAndProcess(std::string input, int field_length, bool u
     std::function<bool(std::string &, std::string &)> function_pointer)
 {
     std::string key = "";
-    std::string result = m_session_io->getInputField(input, key, field_length, "", use_hidden_output);
+    std::string result = m_session_io.getInputField(input, key, field_length, "", use_hidden_output);
 
     // ESC was hit
     if(result == "aborted")
@@ -675,7 +675,7 @@ bool ModSignup::newUserPassword(const std::string &input)
         // Debug Logging
         m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
-        if(key.compare(m_config->password_newuser) == 0)
+        if(key.compare(m_config.password_newuser) == 0)
         {
             m_log.write<Logging::CONSOLE_LOG>("NewUserPassword Accepted", __LINE__, __FILE__);
             changeNextModule();
@@ -751,7 +751,7 @@ bool ModSignup::handle(const std::string &input)
 
         if(!search || search->iId == -1)
         {
-            m_user_record->sHandle = key;
+            m_user_record.sHandle = key;
             changeNextModule();
         }
         else
@@ -786,7 +786,7 @@ bool ModSignup::realName(const std::string &input)
 
         if(!search || search->iId == -1)
         {
-            m_user_record->sRealName = key;
+            m_user_record.sRealName = key;
             changeNextModule();
         }
         else
@@ -815,7 +815,7 @@ bool ModSignup::address(const std::string &input)
         // Debug Logging
         m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
-        m_user_record->sAddress = key;
+        m_user_record.sAddress = key;
         changeNextModule();
         return true;
     };
@@ -837,7 +837,7 @@ bool ModSignup::location(const std::string &input)
         // Debug Logging
         m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
-        m_user_record->sLocation = key;
+        m_user_record.sLocation = key;
         changeNextModule();
         return true;
     };
@@ -859,7 +859,7 @@ bool ModSignup::country(const std::string &input)
         // Debug Logging
         m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
-        m_user_record->sCountry = key;
+        m_user_record.sCountry = key;
         changeNextModule();
         return true;
     };
@@ -887,7 +887,7 @@ bool ModSignup::email(const std::string &input)
 
         if(!search || search->iId == -1)
         {
-            m_user_record->sEmail = key;
+            m_user_record.sEmail = key;
             changeNextModule();
         }
         else
@@ -916,7 +916,7 @@ bool ModSignup::userNote(const std::string &input)
         // Debug Logging
         m_log.write<Logging::DEBUG_LOG>("Current Input", input, __LINE__, __FILE__);
 
-        m_user_record->sUserNote = key;
+        m_user_record.sUserNote = key;
         changeNextModule();
         return true;
     };
@@ -939,7 +939,7 @@ bool ModSignup::birthday(const std::string &input)
 
         try
         {
-            std::regex date_regex { m_config->regexp_date_validation };
+            std::regex date_regex { m_config.regexp_date_validation };
             std::smatch str_matches;
 
             if(std::regex_match(key, str_matches, date_regex))
@@ -964,7 +964,7 @@ bool ModSignup::birthday(const std::string &input)
                 }
 
                 std::time_t const time = mktime(&tm);
-                m_user_record->dtBirthday = time;
+                m_user_record.dtBirthday = time;
                 changeNextModule();
             }
             else
@@ -1000,12 +1000,12 @@ bool ModSignup::gender(const std::string &input)
         // If ENTER Default to Yes, or Single Y is hit
         if((toupper(key[0]) == 'M' && key.size() == 1))
         {
-            m_user_record->sGender = key;
+            m_user_record.sGender = key;
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'F' && key.size() == 1)
         {
-            m_user_record->sGender = key;
+            m_user_record.sGender = key;
         }
         else
         {
@@ -1070,7 +1070,7 @@ bool ModSignup::verifyPassword(const std::string &input)
                 return false;
             }
 
-            std::string salt = encryption->generate_salt(m_user_record->sHandle, m_config->bbs_uuid);
+            std::string salt = encryption->generate_salt(m_user_record.sHandle, m_config.bbs_uuid);
             std::string password = encryption->generate_password(m_security_record->sPasswordHash, salt);
 
             if(salt.size() == 0 || password.size() == 0)
@@ -1206,7 +1206,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input)
 bool ModSignup::yesNoBars(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -1226,13 +1226,13 @@ bool ModSignup::yesNoBars(const std::string &input)
                 baseProcessDeliverInput(yes_prompt);
             }
 
-            m_user_record->bYesNoBars = true;
+            m_user_record.bYesNoBars = true;
             baseProcessDeliverNewLine();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
-            m_user_record->bYesNoBars = false;
+            m_user_record.bYesNoBars = false;
             baseProcessDeliverNewLine();
         }
         else
@@ -1265,7 +1265,7 @@ bool ModSignup::yesNoBars(const std::string &input)
 bool ModSignup::doPause(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -1285,13 +1285,13 @@ bool ModSignup::doPause(const std::string &input)
                 baseProcessDeliverInput(yes_prompt);
             }
 
-            m_user_record->bDoPause = true;
+            m_user_record.bDoPause = true;
             baseProcessDeliverNewLine();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
-            m_user_record->bDoPause = false;
+            m_user_record.bDoPause = false;
             baseProcessDeliverNewLine();
         }
         else
@@ -1324,7 +1324,7 @@ bool ModSignup::doPause(const std::string &input)
 bool ModSignup::clearOrScroll(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -1344,13 +1344,13 @@ bool ModSignup::clearOrScroll(const std::string &input)
                 baseProcessDeliverInput(yes_prompt);
             }
 
-            m_user_record->bClearOrScroll = true;
+            m_user_record.bClearOrScroll = true;
             baseProcessDeliverNewLine();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
-            m_user_record->bClearOrScroll = false;
+            m_user_record.bClearOrScroll = false;
             baseProcessDeliverNewLine();
         }
         else
@@ -1383,7 +1383,7 @@ bool ModSignup::clearOrScroll(const std::string &input)
 bool ModSignup::ansiColor(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -1403,13 +1403,13 @@ bool ModSignup::ansiColor(const std::string &input)
                 baseProcessDeliverInput(yes_prompt);
             }
 
-            m_user_record->bAnsi = true;
+            m_user_record.bAnsi = true;
             baseProcessDeliverNewLine();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'N' && key.size() == 1)
         {
-            m_user_record->bAnsi = false;
+            m_user_record.bAnsi = false;
             baseProcessDeliverNewLine();
         }
         else
@@ -1442,7 +1442,7 @@ bool ModSignup::ansiColor(const std::string &input)
 bool ModSignup::backSpace(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")
@@ -1468,13 +1468,13 @@ bool ModSignup::backSpace(const std::string &input)
         }
         else if(toupper(key[0]) == 'W' && key.size() == 1)
         {
-            m_user_record->bBackSpaceVt100 = false;
+            m_user_record.bBackSpaceVt100 = false;
             baseProcessDeliverNewLine();
         }
         // Else check for single N for No to default to ASCII no colors.
         else if(toupper(key[0]) == 'T' && key.size() == 1)
         {
-            m_user_record->bBackSpaceVt100 = true;
+            m_user_record.bBackSpaceVt100 = true;
             baseProcessDeliverNewLine();
         }
         else
@@ -1521,30 +1521,30 @@ void ModSignup::saveNewUserRecord()
     }
 
     // Save New User Record
-    m_user_record->iSecurityIndex = securityIndex;
+    m_user_record.iSecurityIndex = securityIndex;
 
     //time_t const t = (time_t)time(0);
     std::time_t tt = 0;
     std::time_t const result = std::time(&tt);
 
-    m_user_record->dtFirstOn = result;
-    m_user_record->dtPassChangeDate = result;
+    m_user_record.dtFirstOn = result;
+    m_user_record.dtPassChangeDate = result;
 
     // Set Default User Theme colors, pull from system defaults.
-    m_user_record->sRegColor = m_config->default_color_regular;
-    m_user_record->sPromptColor = m_config->default_color_prompt;
-    m_user_record->sInputColor = m_config->default_color_input;
-    m_user_record->sInverseColor = m_config->default_color_inverse;
-    m_user_record->sStatColor = m_config->default_color_stat;
-    m_user_record->sBoxColor = m_config->default_color_box;
+    m_user_record.sRegColor = m_config.default_color_regular;
+    m_user_record.sPromptColor = m_config.default_color_prompt;
+    m_user_record.sInputColor = m_config.default_color_input;
+    m_user_record.sInverseColor = m_config.default_color_inverse;
+    m_user_record.sStatColor = m_config.default_color_stat;
+    m_user_record.sBoxColor = m_config.default_color_box;
 
     // Check for User Auto Validation
-    if(m_config->use_auto_validate_users)
+    if(m_config.use_auto_validate_users)
     {
-        m_user_record->iLevel = m_config->default_level;
-        m_user_record->iFileLevel = m_config->default_file_level;
-        m_user_record->iMessageLevel = m_config->default_message_level;
-        m_user_record->iFilePoints = m_config->default_file_points;
+        m_user_record.iLevel = m_config.default_level;
+        m_user_record.iFileLevel = m_config.default_file_level;
+        m_user_record.iMessageLevel = m_config.default_message_level;
+        m_user_record.iFilePoints = m_config.default_file_points;
 
         // Also Add Default File points,, missing from user rec.
     }
@@ -1574,9 +1574,9 @@ void ModSignup::saveNewUserRecord()
 
         // Re-Read the Record Clean
         m_user_record = user_dao->getRecordById(userIndex);
-        m_user_record->iLevel = 255;
-        m_user_record->iFileLevel = 255;
-        m_user_record->iMessageLevel = 255;
+        m_user_record.iLevel = 255;
+        m_user_record.iFileLevel = 255;
+        m_user_record.iMessageLevel = 255;
 
         // Save Updates for Admin Access
         user_dao->updateRecord(m_user_record);
@@ -1589,7 +1589,7 @@ void ModSignup::saveNewUserRecord()
     // Display if user is validated or waiting validation.
     baseProcessDeliverNewLine();
 
-    if(m_config->use_auto_validate_users)
+    if(m_config.use_auto_validate_users)
     {
         displayPromptAndNewLine(PROMPT_AUTO_VALIDATION);
     }
@@ -1612,7 +1612,7 @@ void ModSignup::saveNewUserRecord()
 bool ModSignup::verifyAndSave(const std::string &input)
 {
     std::string key = "";
-    std::string result = m_session_io->getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_session_io.getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if(result == "aborted")

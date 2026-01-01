@@ -13,28 +13,25 @@ class Logging;
  * @file encoding.hpp
  * @brief Singleton Encoding Class to handle text conversions.
  */
-class Encoding
-{
+class Encoding {
 public:
-
     static const std::string ENCODING_TEXT_UTF8;
     static const std::string ENCODING_TEXT_CP437;
 
     static constexpr int ENCODE_CP437 = 0;
-    static constexpr int ENCODE_UTF8  = 1;
+    static constexpr int ENCODE_UTF8 = 1;
 
     /**
     * @brief Creates Singleton Instance of Class
     * @return
     */
-    static Encoding& getInstance()
-    {
+    static Encoding &getInstance() {
         static Encoding instance;
         return instance;
     }
-    
+
     // Multi-Byte to WIDE (UTF-8 to UTF-16)
-    std::wstring multibyte_to_wide(const char* mbstr);
+    std::wstring multibyte_to_wide(const char *mbstr);
 
     /**
      * @brief Used for printing multibyte (Unicode Translations)
@@ -54,15 +51,14 @@ public:
      */
     std::string utf8Decode(const std::string &standard_string);
 
-    Encoding(const Encoding&) = delete;             // Copy ctor
-    Encoding(Encoding&&) = delete;                  // Move ctor
-    Encoding& operator=(const Encoding&) = delete;  // Copy assignment
-    Encoding& operator=(Encoding&&) = delete;       // Move assignment
+    Encoding(const Encoding &) = delete; // Copy ctor
+    Encoding(Encoding &&) = delete; // Move ctor
+    Encoding &operator=(const Encoding &) = delete; // Copy assignment
+    Encoding &operator=(Encoding &&) = delete; // Move assignment
 
 private:
-
-    Logging               &m_log;
-    mutable std::mutex     m_encoding_mutex;
+    Logging &m_log;
+    mutable std::mutex m_encoding_mutex;
 
     // Singleton, So make Private
     explicit Encoding();

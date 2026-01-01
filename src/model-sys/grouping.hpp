@@ -1,11 +1,7 @@
 #ifndef GROUPING_HPP
 #define GROUPING_HPP
 
-#include <memory>
 #include <string>
-
-class Grouping;
-typedef std::shared_ptr<Grouping> group_ptr;
 
 /**
  * @class Grouping
@@ -14,24 +10,19 @@ typedef std::shared_ptr<Grouping> group_ptr;
  * @file grouping.hpp
  * @brief Conference Grouping, Links Msg/File Areas to Conferences
  */
-class Grouping
-{
+class Grouping {
 public:
-
-    long        iId;
-    long        iConferenceId;
-    long        iAreaId;
+    long iId;
+    long iConferenceId;
+    long iAreaId;
 
     explicit Grouping()
         : iId(-1)
-        , iConferenceId(-1)
-        , iAreaId(-1)
-    { }
+          , iConferenceId(-1)
+          , iAreaId(-1) {
+    }
 
-    ~Grouping()
-    { }
-
+    ~Grouping() = default;
 };
 
-#endif // GROUPING_HPP
-
+#endif

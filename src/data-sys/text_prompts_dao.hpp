@@ -1,9 +1,6 @@
 #ifndef TEXT_PROMPTS_DAO_HPP
 #define TEXT_PROMPTS_DAO_HPP
 
-#include <memory>
-#include <iostream>
-#include <fstream>
 #include <string>
 #include <map>
 
@@ -26,14 +23,22 @@ extern std::map<std::string, M_TextPrompt> TEXT_PROMPTS;
  * @file text_prompts_dao.hpp
  * @brief Serializes Text Prompts to .yaml files for Modules
  */
-class TextPromptsDao
-{
+class TextPromptsDao {
 public:
-
     static const std::string FILE_VERSION;
 
-    TextPromptsDao(std::string path, const std::string &filename);
+    TextPromptsDao(std::string &path, std::string &filename);
+
     ~TextPromptsDao();
+
+    // Disable copy semantics
+    TextPromptsDao(const TextPromptsDao &) = delete;
+
+    TextPromptsDao &operator=(const TextPromptsDao &) = delete;
+
+    TextPromptsDao(TextPromptsDao &&other) noexcept;
+
+    TextPromptsDao &operator=(TextPromptsDao &&other) noexcept;
 
     /**
      * @brief Check if the file exists and we need to create a new one.
@@ -53,7 +58,6 @@ public:
      */
     void writeValue(M_TextPrompt &value);
 
-
     /**
      * @brief Read in the prompt file to the class.
      * @return
@@ -61,29 +65,26 @@ public:
     bool readPrompts();
 
     /**
-     * @brief Retrieves Desc, Text Pair of Text Prompt from yaml file.
+     * @brief Retrieves Desc, Text A Pair of Text Prompt from yaml file.
      * @param lookup
      * @return
      */
-    M_StringPair getPrompt(const std::string &lookup);
+    M_StringPair getPrompt(const std::string &lookup) const;
 
     /**
      * @brief Testing, display all nodes in a file.
      */
-    void displayAll();
-    
+    void displayAll() const;
+
     /**
-     * @brief Testing, cahce all records to a map instad of reloading and searching.
+     * @brief Testing, cache all records to a map instead of reloading and searching.
      */
-    void cacheAllTextPrompts(YAML::Node &node);
+    void cacheAllTextPrompts(YAML::Node &node) const;
 
-    Logging     &m_log;
-    std::string  m_path;
-    std::string  m_filename;
-    bool         m_is_loaded;        
-
+    Logging &m_log;
+    std::string m_path;
+    std::string m_filename;
+    bool m_is_loaded;
 };
 
-typedef std::shared_ptr<TextPromptsDao> text_prompts_dao_ptr;
-
-#endif // TEXT_PROMPTS_DAO_HPP
+#endif

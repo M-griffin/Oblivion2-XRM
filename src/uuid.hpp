@@ -6,9 +6,9 @@
 #include <iomanip>
 
 class Uuid {
-
 public:
     explicit Uuid() = default;
+
     ~Uuid() = default;
 
     std::string createUuidString() {

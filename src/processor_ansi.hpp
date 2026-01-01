@@ -18,38 +18,63 @@
  * @brief Processes Screen data into a Screen Buffer
  */
 class ProcessorAnsi
-    : public ProcessorBase
-{
+        : public ProcessorBase {
 public:
+    explicit ProcessorAnsi();
 
-    ProcessorAnsi(int term_height, int term_width);
     ~ProcessorAnsi();
 
+    // Copy Constructors
+    ProcessorAnsi(const ProcessorAnsi &) = delete;
+
+    ProcessorAnsi &operator=(const ProcessorAnsi &) = delete;
+
+    // Move Constructors
+    ProcessorAnsi(ProcessorAnsi &&other) noexcept
+        : ProcessorBase(std::move(other)) // move base subobject
+          , m_screen_buffer(std::move(other.m_screen_buffer))
+          , m_pull_down_options(std::move(other.m_pull_down_options))
+          , m_line_ending_map(std::move(other.m_line_ending_map)) {
+    }
+
+    ProcessorAnsi &operator=(ProcessorAnsi &&) noexcept = default;
+
     void resize(int term_height, int term_width);
+
     std::string buildPullDownBars(int pulldownId, bool active);
+
     void clearPullDownBars();
 
     int getMaxRowsUsedOnScreen();
+
     std::string screenBufferParse();
+
     std::string screenBufferToString();
+
     void screenBufferDisplayTest();
+
     int getMCIOffSet(std::string mci_code);
+
     std::string getScreenFromBuffer(bool clearScreen);
 
     // Screen Buffer Modifiers
     void screenBufferSetGlyph(const std::string &charSequence);
-    void screenBufferScrollUp();
-    void screenBufferClearRange(int start, int end);
-    void screenBufferClear();
-    void clearScreen();
-    void parseTextToBuffer(char *buff);
-    
-    std::vector <ScreenPixel>  m_screen_buffer;
-    std::map<int, ScreenPixel> m_pull_down_options;
-    std::map<int, int>         m_line_ending_map;
-    
-    std::map<int, int> getLineEndingMap() const;
 
+    void screenBufferScrollUp();
+
+    void screenBufferClearRange(int start, int end);
+
+    void screenBufferClear();
+
+    void clearScreen();
+
+    void parseTextToBuffer(char *buff);
+
+    std::vector<ScreenPixel> m_screen_buffer;
+    std::map<int, ScreenPixel> m_pull_down_options;
+    std::map<int, int> m_line_ending_map;
+
+    std::map<int, int> getLineEndingMap() const;
 };
 
 #endif // ANSI_PROCESSOR_HPP

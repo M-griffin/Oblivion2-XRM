@@ -1,8 +1,6 @@
 #include "conference_dao.hpp"
 
-#include <iostream>
 #include <string>
-
 #include <sqlite3.h>
 
 #include "../model-sys/conference.hpp"
@@ -10,29 +8,18 @@
 
 #include "libSqliteWrapped.h"
 
-
-
-
-/**
- * Base Dao Calls for generic Object Data Calls
- * (Below This Point)
- */
-
-
 /**
  * @brief Check If Database Table Exists.
  * @return
  */
-bool ConferenceDao::doesTableExist()
-{
+bool ConferenceDao::doesTableExist() {
     return baseDoesTableExist();
 }
 
 /**
  * @brief Run Setup Params for SQL Database Table.
  */
-bool ConferenceDao::firstTimeSetupParams()
-{
+bool ConferenceDao::firstTimeSetupParams() {
     return baseFirstTimeSetupParams();
 }
 
@@ -40,8 +27,7 @@ bool ConferenceDao::firstTimeSetupParams()
  * @brief Create Database Table
  * @return
  */
-bool ConferenceDao::createTable()
-{
+bool ConferenceDao::createTable() {
     return baseCreateTable();
 }
 
@@ -49,38 +35,34 @@ bool ConferenceDao::createTable()
  * @brief Drop Database
  * @return
  */
-bool ConferenceDao::dropTable()
-{
+bool ConferenceDao::dropTable() {
     return baseDropTable();
 }
 
 /**
  * @brief Updates a Record in the database!
- * @param area
+ * @param obj
  * @return
  */
-bool ConferenceDao::updateRecord(conference_ptr obj)
-{
+bool ConferenceDao::updateRecord(Conference &obj) {
     return baseUpdateRecord(obj);
 }
 
 /**
  * @brief Inserts a New Record in the database!
- * @param area
+ * @param obj
  * @return
  */
-long ConferenceDao::insertRecord(conference_ptr obj)
-{
+long ConferenceDao::insertRecord(Conference &obj) {
     return baseInsertRecord(obj);
 }
 
 /**
  * @brief Deletes a Record
- * @param areaId
+ * @param id
  * @return
  */
-bool ConferenceDao::deleteRecord(long id)
-{
+bool ConferenceDao::deleteRecord(const long id) {
     return baseDeleteRecord(id);
 }
 
@@ -89,8 +71,7 @@ bool ConferenceDao::deleteRecord(long id)
  * @param id
  * @return
  */
-conference_ptr ConferenceDao::getRecordById(long id)
-{
+Conference ConferenceDao::getRecordById(const long id) {
     return baseGetRecordById(id);
 }
 
@@ -98,8 +79,7 @@ conference_ptr ConferenceDao::getRecordById(long id)
  * @brief Retrieve All Records in a Table
  * @return
  */
-std::vector<conference_ptr> ConferenceDao::getAllRecords()
-{
+std::vector<Conference> ConferenceDao::getAllRecords() {
     return baseGetAllRecords();
 }
 
@@ -107,8 +87,7 @@ std::vector<conference_ptr> ConferenceDao::getAllRecords()
  * @brief Retrieve Count of All Records in a Table
  * @return
  */
-long ConferenceDao::getRecordsCount()
-{
+long ConferenceDao::getRecordsCount() {
     return baseGetRecordsCount();
 }
 
@@ -124,13 +103,12 @@ long ConferenceDao::getRecordsCount()
  * @param qry
  * @param obj
  */
-void ConferenceDao::pullConferenceResult(query_ptr qry, conference_ptr obj)
-{
-    qry->getFieldByName("iId", obj->iId);
-    qry->getFieldByName("sName", obj->sName);
-    qry->getFieldByName("sType", obj->sType);
-    qry->getFieldByName("sACS", obj->sACS);
-    qry->getFieldByName("iSortOrder", obj->iSortOrder);
+void ConferenceDao::pullConferenceResult(Query &qry, Conference &obj) {
+    qry.getFieldByName("iId", obj.iId);
+    qry.getFieldByName("sName", obj.sName);
+    qry.getFieldByName("sType", obj.sType);
+    qry.getFieldByName("sACS", obj.sACS);
+    qry.getFieldByName("iSortOrder", obj.iSortOrder);
 }
 
 /**
@@ -139,14 +117,13 @@ void ConferenceDao::pullConferenceResult(query_ptr qry, conference_ptr obj)
  * @param obj
  * @param values
  */
-void ConferenceDao::fillConferenceColumnValues(query_ptr qry, conference_ptr obj,
-        std::vector< std::pair<std::string, std::string> > &values)
-{
+void ConferenceDao::fillConferenceColumnValues(Query &qry, Conference &obj,
+                                               std::vector<std::pair<std::string, std::string> > &values) {
     // values.push_back(qry->translateFieldName("iId", obj->iId));
-    values.push_back(qry->translateFieldName("sName", obj->sName));
-    values.push_back(qry->translateFieldName("sType", obj->sType));
-    values.push_back(qry->translateFieldName("sACS", obj->sACS));
-    values.push_back(qry->translateFieldName("iSortOrder", obj->iSortOrder));
+    values.push_back(qry.translateFieldName("sName", obj.sName));
+    values.push_back(qry.translateFieldName("sType", obj.sType));
+    values.push_back(qry.translateFieldName("sACS", obj.sACS));
+    values.push_back(qry.translateFieldName("iSortOrder", obj.iSortOrder));
 }
 
 /**
@@ -155,15 +132,14 @@ void ConferenceDao::fillConferenceColumnValues(query_ptr qry, conference_ptr obj
  * @param obj
  * @return
  */
-std::string ConferenceDao::insertConferenceQryString(std::string qry, conference_ptr obj)
-{
+std::string ConferenceDao::insertConferenceQryString(std::string qry, Conference &obj) {
     // Mprint statement to avoid injections.
     char *result = sqlite3_mprintf(qry.c_str(),
-                                         obj->sName.c_str(),
-                                         obj->sType.c_str(),
-                                         obj->sACS.c_str(),
-                                         obj->iSortOrder
-                                        );
+                                   obj.sName.c_str(),
+                                   obj.sType.c_str(),
+                                   obj.sACS.c_str(),
+                                   obj.iSortOrder
+    );
 
     std::string queryString(result);
     sqlite3_free(result);
@@ -176,16 +152,15 @@ std::string ConferenceDao::insertConferenceQryString(std::string qry, conference
  * @param obj
  * @return
  */
-std::string ConferenceDao::updateConferenceQryString(std::string qry, conference_ptr obj)
-{
+std::string ConferenceDao::updateConferenceQryString(std::string qry, Conference &obj) {
     // Mprint statement to avoid injections.
     char *result = sqlite3_mprintf(qry.c_str(),
-                                         obj->sName.c_str(),
-                                         obj->sType.c_str(),
-                                         obj->sACS.c_str(),
-                                         obj->iSortOrder,
-                                         obj->iId
-                                        );
+                                   obj.sName.c_str(),
+                                   obj.sType.c_str(),
+                                   obj.sACS.c_str(),
+                                   obj.iSortOrder,
+                                   obj.iId
+    );
 
     std::string queryString(result);
     sqlite3_free(result);
@@ -204,56 +179,46 @@ std::string ConferenceDao::updateConferenceQryString(std::string qry, conference
  * @param type
  * @return
  */
-std::vector<conference_ptr> ConferenceDao::getAllConferencesByType(std::string type)
-{
+std::vector<Conference> ConferenceDao::getAllConferencesByType(std::string type) {
     Logging &log = Logging::getInstance();
-    conference_ptr conf = std::make_shared<Conference>();
-    std::vector<conference_ptr> list;
+    std::vector<Conference> list;
 
     // Make Sure Database Reference is Connected
-    if(!m_database.isConnected())
-    {
+    if (!m_database.isConnected()) {
         log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
         return list;
     }
 
     // Create Pointer and Connect Query Object to Database.
-   query_ptr qry = std::make_shared<SQLW::Query>(m_database);
+    Query qry(m_database);
 
-    if(!qry->isConnected())
-    {
-        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__, __LINE__);
+    if (!qry.isConnected()) {
+        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__,
+                                      __LINE__);
         return list;
     }
 
     // Build Query String
     char *result = sqlite3_mprintf("SELECT * FROM %Q WHERE sType like %Q;", m_strTableName.c_str(), type.c_str());
-    std::string queryString(result);
+    const std::string queryString(result);
     sqlite3_free(result);
-    
-    
-    // Execute Query.
-    if(qry->getResult(queryString))
-    {
-        long rows = qry->getNumRows();
 
-        if(rows > 0)
-        {
-            while(qry->fetchRow())
-            {
-                conf.reset();
-                conf = std::make_shared<Conference>();
+
+    // Execute Query.
+    if (qry.getResult(queryString)) {
+        const long rows = qry.getNumRows();
+
+        if (rows > 0) {
+            while (qry.fetchRow()) {
+                Conference conf;
                 pullConferenceResult(qry, conf);
                 list.push_back(conf);
             }
+        } else {
+            log.write<Logging::ERROR_LOG>("Error, getAllConferencesByType Returned Rows=", rows, m_strTableName,
+                                          __FILE__, __LINE__);
         }
-        else
-        {
-            log.write<Logging::ERROR_LOG>("Error, getAllConferencesByType Returned Rows=", rows, m_strTableName, __FILE__, __LINE__);
-        }
-    }
-    else
-    {
+    } else {
         log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __FILE__, __LINE__);
     }
 
@@ -265,25 +230,22 @@ std::vector<conference_ptr> ConferenceDao::getAllConferencesByType(std::string t
  * @param type
  * @return
  */
-long ConferenceDao::getConferencesCountByType(std::string type)
-{
+long ConferenceDao::getConferencesCountByType(std::string type) {
     Logging &log = Logging::getInstance();
-    conference_ptr conf = std::make_shared<Conference>();
-    std::vector<conference_ptr> list;
+    std::vector<Conference> list;
 
     // Make Sure Database Reference is Connected
-    if(!m_database.isConnected())
-    {
+    if (!m_database.isConnected()) {
         log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
         return list.size();
     }
 
     // Create Pointer and Connect Query Object to Database.
-   query_ptr qry = std::make_shared<SQLW::Query>(m_database);
+    Query qry(m_database);
 
-    if(!qry->isConnected())
-    {
-        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__, __LINE__);
+    if (!qry.isConnected()) {
+        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__,
+                                      __LINE__);
         return list.size();
     }
 
@@ -293,27 +255,20 @@ long ConferenceDao::getConferencesCountByType(std::string type)
     sqlite3_free(result);
 
     // Execute Query.
-    if(qry->getResult(queryString))
-    {
-        long rows = qry->getNumRows();
+    if (qry.getResult(queryString)) {
+        const long rows = qry.getNumRows();
 
-        if(rows > 0)
-        {
-            while(qry->fetchRow())
-            {
-                conf.reset();
-                conf = std::make_shared<Conference>();
+        if (rows > 0) {
+            while (qry.fetchRow()) {
+                Conference conf;
                 pullConferenceResult(qry, conf);
                 list.push_back(conf);
             }
+        } else {
+            log.write<Logging::ERROR_LOG>("Error, getConferenceCount By Type Returned Rows=", rows, m_strTableName,
+                                          __FILE__, __LINE__);
         }
-        else
-        {
-            log.write<Logging::ERROR_LOG>("Error, getConferenceCount By Type Returned Rows=", rows, m_strTableName, __FILE__, __LINE__);
-        }
-    }
-    else
-    {
+    } else {
         log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __FILE__, __LINE__);
     }
 

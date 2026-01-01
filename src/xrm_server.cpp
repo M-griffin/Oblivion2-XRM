@@ -56,7 +56,7 @@ std::string GLOBAL_MENU_PROMPT_PATH;
 std::string GLOBAL_TEXTFILE_PATH;
 std::string GLOBAL_SCRIPT_PATH;
 std::string GLOBAL_LOG_PATH;
-std::string USERS_DATABASE;
+std::string CORE_DATABASE;
 
 std::string BUILD_INFO = "Oblivion/2 XRM-Server Rev.3 build [00.03.01] Alpha Preview";
 
@@ -70,7 +70,6 @@ void atExitFunction() {
 #ifdef _WIN32
 // Windows requires a static callback
 static BOOL WINAPI CtrlHandler(DWORD ctrlType) {
-
     std::cout << "\nSignal received: " << ctrlType << std::endl;
 
     if (ctrlType == CTRL_C_EVENT) {
@@ -106,7 +105,7 @@ static BOOL WINAPI CtrlHandler(DWORD ctrlType) {
 bool setupSignalHandlers() {
 #ifdef _WIN32
     if (!SetConsoleCtrlHandler(CtrlHandler, TRUE)) {
-        std::cerr << "[Server] Failed to set Windows CTRL+C handler" << std::endl;
+        std::cerr << "[Server] Failed to set Windows CTRL handler" << std::endl;
         return false;
     }
 #else
@@ -136,7 +135,10 @@ bool setupSignalHandlers() {
     return true;
 }
 
-
+void removeNewlines(std::string &s) {
+    s.erase(std::remove(s.begin(), s.end(), '\r'), s.end());
+    s.erase(std::remove(s.begin(), s.end(), '\n'), s.end());
+}
 
 /**
  * @brief Main Program Entrance.
@@ -151,7 +153,9 @@ auto main() -> int {
     m_log.write<Logging::CONSOLE_LOG>(BUILD_INFO); {
         CommonIO common;
         GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
+        removeNewlines(GLOBAL_BBS_PATH);
     }
+
     m_log.write<Logging::CONSOLE_LOG>("BBS HOME Directory Registered=", GLOBAL_BBS_PATH);
 
     // Setup System Folder Paths off main BBS Path.
@@ -179,6 +183,8 @@ auto main() -> int {
 
 #endif
 
+    m_log.write<Logging::CONSOLE_LOG>("Checking Database SQLite");
+
     // Database Startup in its own context.
     {
         DBStartUp db;
@@ -201,7 +207,7 @@ auto main() -> int {
             cfg.saveConfig(config);
         }
 
-        // Load Config and lets do some validation
+        // Load Config and let's do some validation
         cfg.loadConfig();
 
         if (!cfg.validation()) {
@@ -209,19 +215,20 @@ auto main() -> int {
             exit(1);
         }
 
-        Uint16 maxClients = 10;
+        const Uint16 maxSessions = 10;
         Logging::getInstance().setLoggingLevel(config.logging_level);
 
         m_log.write<Logging::CONSOLE_LOG>("Starting up XRM-Server", "port", config.port_telnet,
-            "max_sessions", maxClients);
+                                          "max_sessions", maxSessions);
 
         if (!setupSignalHandlers()) {
             m_log.write<Logging::ERROR_LOG>("XRM-Server Startup failed setting signal handlers, exiting...");
+            exit(2);
         }
 
         TCPServer &server = TCPServer::getInstance();
-        if (server.start(config.port_telnet, 10)) {
-            server.run(config);
+        if (server.start(config.port_telnet, maxSessions)) {
+            server.run(config, maxSessions);
         } else {
             m_log.write<Logging::ERROR_LOG>("XRM-Server Startup failed, exiting...");
             exit(2);

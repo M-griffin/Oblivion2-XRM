@@ -1,22 +1,11 @@
 #ifndef NETWORK_DAO_HPP
 #define NETWORK_DAO_HPP
 
-#include <memory>
 #include <vector>
 #include <functional>
 
 #include "../model-sys/network.hpp"
 #include "../data-sys/base_dao.hpp"
-
-// Forward Decelerations
-namespace SQLW
-{
-class Database;
-class Query;
-}
-
-// Handle to Database Queries
-typedef std::shared_ptr<SQLW::Query> query_ptr;
 
 // Base Dao Definition
 typedef BaseDao<Network> baseNetworkClass;
@@ -29,13 +18,10 @@ typedef BaseDao<Network> baseNetworkClass;
  * @brief Handles Message Fido and Internet Network Address
  */
 class NetworkDao
-    : public baseNetworkClass
-{
+        : public baseNetworkClass {
 public:
-
-    explicit NetworkDao(SQLW::Database &database)
-        : baseNetworkClass(database)
-    {
+    explicit NetworkDao(Database &database)
+        : baseNetworkClass(database) {
         // Setup Table name
         m_strTableName = "network";
 
@@ -43,46 +29,46 @@ public:
          * Pre Populate Static Queries one Time
          */
         m_cmdFirstTimeSetup =
-            "PRAGMA synchronous=Normal; "
-            "PRAGMA encoding=UTF-8; "
-            "PRAGMA foreign_keys=ON; "
-            "PRAGMA default_cache_size=10000; "
-            "PRAGMA cache_size=10000; ";
+                "PRAGMA synchronous=Normal; "
+                "PRAGMA encoding=UTF-8; "
+                "PRAGMA foreign_keys=ON; "
+                "PRAGMA default_cache_size=10000; "
+                "PRAGMA cache_size=10000; "
+                "PRAGMA journal_mode = WAL; "
+                "PRAGMA temp_store = MEMORY; "
+                "PRAGMA mmap_size = 268435456; ";
 
         // Check if Database Exists.
-        m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
+        m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName +
+                           "' COLLATE NOCASE;";
 
         // Create Table Query (SQLite Only for the moment)
         m_cmdCreateTable =
-            "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
-            "iId               INTEGER PRIMARY KEY, "
-            "sName             TEXT NOT NULL COLLATE NOCASE, "
-            "sType             TEXT NOT NULL COLLATE NOCASE, "
-            "sAddress          TEXT NOT NULL COLLATE NOCASE "
-            "); ";
+                "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
+                "iId               INTEGER PRIMARY KEY, "
+                "sName             TEXT NOT NULL COLLATE NOCASE, "
+                "sType             TEXT NOT NULL COLLATE NOCASE, "
+                "sAddress          TEXT NOT NULL COLLATE NOCASE "
+                "); ";
 
         // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
         m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
 
         // Setup the CallBack for Result Field Mapping
         m_result_callback = std::bind(&NetworkDao::pullNetworkResult, this,
-            std::placeholders::_1, std::placeholders::_2);
+                                      std::placeholders::_1, std::placeholders::_2);
 
         m_columns_callback = std::bind(&NetworkDao::fillNetworkColumnValues, this,
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+                                       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 
         m_insert_callback = std::bind(&NetworkDao::insertNetworkQryString, this,
-            std::placeholders::_1, std::placeholders::_2);
+                                      std::placeholders::_1, std::placeholders::_2);
 
         m_update_callback = std::bind(&NetworkDao::updateNetworkQryString, this,
-            std::placeholders::_1, std::placeholders::_2);
-
+                                      std::placeholders::_1, std::placeholders::_2);
     }
 
-    ~NetworkDao()
-    {
-    }
-
+    ~NetworkDao() = default;
 
     /**
      * Base Dao Calls for generic Object Data Calls
@@ -118,18 +104,18 @@ public:
      * @param obj
      * @return
      */
-    bool updateRecord(network_ptr obj);
+    bool updateRecord(Network &obj);
 
     /**
      * @brief Inserts a New Record in the database!
      * @param obj
      * @return
      */
-    long insertRecord(network_ptr obj);
+    long insertRecord(Network &obj);
 
     /**
      * @brief Deletes a MessageArea Record
-     * @param areaId
+     * @param id
      * @return
      */
     bool deleteRecord(long id);
@@ -139,13 +125,13 @@ public:
      * @param id
      * @return
      */
-    network_ptr getRecordById(long id);
+    Network getRecordById(long id);
 
     /**
      * @brief Retrieve All Records in a Table
      * @return
      */
-    std::vector<network_ptr> getAllRecords();
+    std::vector<Network> getAllRecords();
 
     /**
      * @brief Retrieve Count of All Records in a Table
@@ -166,7 +152,7 @@ public:
      * @param obj
      * @return
      */
-    std::string insertNetworkQryString(std::string qry, network_ptr obj);
+    std::string insertNetworkQryString(std::string qry, Network &obj);
 
     /**
      * @brief (CallBack) Update Existing Record.
@@ -174,14 +160,14 @@ public:
      * @param obj
      * @return
      */
-    std::string updateNetworkQryString(std::string qry, network_ptr obj);
+    std::string updateNetworkQryString(std::string qry, Network &obj);
 
     /**
      * @brief (CallBack) Pulls results by FieldNames into their Class Variables.
      * @param qry
      * @param obj
      */
-    void pullNetworkResult(query_ptr qry, network_ptr obj);
+    void pullNetworkResult(Query &qry, Network &obj);
 
     /**
      * @brief (Callback) for Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
@@ -189,12 +175,8 @@ public:
      * @param obj
      * @param values
      */
-    void fillNetworkColumnValues(query_ptr qry, network_ptr obj,
-        std::vector< std::pair<std::string, std::string> > &values);
-
+    void fillNetworkColumnValues(Query &qry, Network &obj,
+                                 std::vector<std::pair<std::string, std::string> > &values);
 };
 
-// Handle to Database Queries
-typedef std::shared_ptr<NetworkDao> network_dao_ptr;
-
-#endif // NETWORK_DAO_HPP
+#endif

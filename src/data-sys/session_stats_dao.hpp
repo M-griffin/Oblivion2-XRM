@@ -8,28 +8,15 @@
 #include "../model-sys/session_stats.hpp"
 #include "../data-sys/base_dao.hpp"
 
-// Forward Decelerations
-namespace SQLW
-{
-class Database;
-class Query;
-}
-
-// Handle to Database Queries
-typedef std::shared_ptr<SQLW::Query> query_ptr;
-
 // Base Dao Definition
 typedef BaseDao<SessionStats> baseSessionStatsClass;
 
 
 class SessionStatsDao
-    : public baseSessionStatsClass
-{
+        : public baseSessionStatsClass {
 public:
-
-    explicit SessionStatsDao(SQLW::Database &database)
-        : baseSessionStatsClass(database)
-    {
+    explicit SessionStatsDao(Database &database)
+        : baseSessionStatsClass(database) {
         // Setup Table name
         m_strTableName = "sessionstats";
 
@@ -37,43 +24,47 @@ public:
          * Pre Populate Static Queries one Time
          */
         m_cmdFirstTimeSetup =
-            "PRAGMA synchronous=Normal; "
-            "PRAGMA encoding=UTF-8; "
-            "PRAGMA foreign_keys=ON; "
-            "PRAGMA default_cache_size=10000; "
-            "PRAGMA cache_size=10000; ";
+                "PRAGMA synchronous=Normal; "
+                "PRAGMA encoding=UTF-8; "
+                "PRAGMA foreign_keys=ON; "
+                "PRAGMA default_cache_size=10000; "
+                "PRAGMA cache_size=10000; "
+                "PRAGMA journal_mode = WAL; "
+                "PRAGMA temp_store = MEMORY; "
+                "PRAGMA mmap_size = 268435456; ";
 
         // Check if Database Exists.
-        m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
+        m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName +
+                           "' COLLATE NOCASE;";
 
         // Create Users Table Query (SQLite Only for the moment)
         m_cmdCreateTable =
-            "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
-            "iId               INTEGER PRIMARY KEY, "
-            "iUserId           INTEGER NOT NULL, "
-            "sSessionType      TEXT NOT NULL COLLATE NOCASE, "
-            "sCodePage         TEXT NOT NULL COLLATE NOCASE, "
-            "sTerminal         TEXT NOT NULL COLLATE NOCASE, "
-            "sIPAddress        TEXT NOT NULL COLLATE NOCASE, "
-            "iTermWidth        INTEGER NOT NULL, "
-            "iTermHeight       INTEGER NOT NULL, "
-            "dtStartDate       DATETIME NOT NULL, "
-            "dtEndDate         DATETIME NOT NULL, "
-            "iInvalidAttempts  INTEGER NOT NULL, "
-            "bNewUser          BOOLEAN NOT NULL, "
-            "bLogonSuccess     BOOLEAN NOT NULL, "
-            "bHungup           BOOLEAN NOT NULL, "
-            "iMsgRead          INTEGER NOT NULL, "
-            "iMsgPost          INTEGER NOT NULL, "
-            "iFilesUl          INTEGER NOT NULL, "
-            "iFilesDl          INTEGER NOT NULL, "
-            "iFilesUlMb        INTEGER NOT NULL, "
-            "iFilesDlMb        INTEGER NOT NULL "
-            "); ";
+                "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
+                "iId               INTEGER PRIMARY KEY, "
+                "iUserId           INTEGER NOT NULL, "
+                "sSessionType      TEXT NOT NULL COLLATE NOCASE, "
+                "sCodePage         TEXT NOT NULL COLLATE NOCASE, "
+                "sTerminal         TEXT NOT NULL COLLATE NOCASE, "
+                "sIPAddress        TEXT NOT NULL COLLATE NOCASE, "
+                "iTermWidth        INTEGER NOT NULL, "
+                "iTermHeight       INTEGER NOT NULL, "
+                "dtStartDate       DATETIME NOT NULL, "
+                "dtEndDate         DATETIME NOT NULL, "
+                "iInvalidAttempts  INTEGER NOT NULL, "
+                "bNewUser          BOOLEAN NOT NULL, "
+                "bLogonSuccess     BOOLEAN NOT NULL, "
+                "bHungup           BOOLEAN NOT NULL, "
+                "iMsgRead          INTEGER NOT NULL, "
+                "iMsgPost          INTEGER NOT NULL, "
+                "iFilesUl          INTEGER NOT NULL, "
+                "iFilesDl          INTEGER NOT NULL, "
+                "iFilesUlMb        INTEGER NOT NULL, "
+                "iFilesDlMb        INTEGER NOT NULL "
+                "); ";
 
         m_cmdCreateIndex =
-            "CREATE INDEX IF NOT EXISTS session_stats_idx "
-            "ON " + m_strTableName + " (iUserId); ";
+                "CREATE INDEX IF NOT EXISTS session_stats_idx "
+                "ON " + m_strTableName + " (iUserId); ";
 
         // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
         m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
@@ -93,10 +84,7 @@ public:
                                       std::placeholders::_1, std::placeholders::_2);
     }
 
-    ~SessionStatsDao()
-    {
-    }
-
+    ~SessionStatsDao() = default;
 
     /**
      * Base Dao Calls for generic Object Data Calls
@@ -132,18 +120,18 @@ public:
      * @param obj
      * @return
      */
-    bool updateRecord(session_stats_ptr obj);
+    bool updateRecord(SessionStats &obj);
 
     /**
      * @brief Inserts a New Record in the database!
      * @param obj
      * @return
      */
-    long insertRecord(session_stats_ptr obj);
+    long insertRecord(SessionStats &obj);
 
     /**
      * @brief Deletes a MessageArea Record
-     * @param areaId
+     * @param id
      * @return
      */
     bool deleteRecord(long id);
@@ -153,13 +141,13 @@ public:
      * @param id
      * @return
      */
-    session_stats_ptr getRecordById(long id);
+    SessionStats getRecordById(long id);
 
     /**
      * @brief Retrieve All Records in a Table
      * @return
      */
-    std::vector<session_stats_ptr> getAllRecords();
+    std::vector<SessionStats> getAllRecords();
 
     /**
      * @brief Retrieve Count of All Records in a Table
@@ -180,7 +168,7 @@ public:
      * @param obj
      * @return
      */
-    std::string insertSessionStatsQryString(std::string qry, session_stats_ptr obj);
+    std::string insertSessionStatsQryString(std::string qry, SessionStats &obj);
 
     /**
      * @brief (CallBack) Update Existing Record.
@@ -188,14 +176,14 @@ public:
      * @param obj
      * @return
      */
-    std::string updateSessionStatsQryString(std::string qry, session_stats_ptr obj);
+    std::string updateSessionStatsQryString(std::string qry, SessionStats &obj);
 
     /**
      * @brief (CallBack) Pulls results by FieldNames into their Class Variables.
      * @param qry
      * @param obj
      */
-    void pullSessionStatsResult(query_ptr qry, session_stats_ptr obj);
+    void pullSessionStatsResult(Query &qry, SessionStats &obj);
 
     /**
      * @brief (Callback) for Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
@@ -203,7 +191,8 @@ public:
      * @param obj
      * @param values
      */
-    void fillSessionStatsColumnValues(query_ptr qry, session_stats_ptr obj, std::vector< std::pair<std::string, std::string> > &values);
+    void fillSessionStatsColumnValues(Query &qry, SessionStats &obj,
+                                      std::vector<std::pair<std::string, std::string> > &values);
 
 
     /**
@@ -216,23 +205,19 @@ public:
      * @brief Return List of Stats per user
      * @return
      */
-    std::vector<session_stats_ptr> getAllStatsPerUser(long userId);
+    std::vector<SessionStats> getAllStatsPerUser(long userId);
 
     /**
      * @brief Return List of Last 10 Valid Sessions.
      * @return
      */
-    std::vector<session_stats_ptr> getLast10CallerStats();
+    std::vector<SessionStats> getLast10CallerStats();
 
     /**
      * @brief Return List of All Connections Today
      * @return
      */
-    std::vector<session_stats_ptr> getTodaysCallerStats();
-
+    std::vector<SessionStats> getTodaysCallerStats();
 };
 
-// Handle to Database Queries
-typedef std::shared_ptr<SessionStatsDao> session_stats_dao_ptr;
-
-#endif // SESSION_STATS_DAO_HPP
+#endif

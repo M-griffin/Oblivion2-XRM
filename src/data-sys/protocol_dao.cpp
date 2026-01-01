@@ -3,7 +3,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <algorithm>
 #include <mutex>
 #include <cassert>
 
@@ -13,23 +12,17 @@
 // Setup the file version for the file.
 const std::string Protocols::FILE_VERSION = "1.0.0";
 
-ProtocolDao::ProtocolDao(protocols_ptr prot, std::string path)
+ProtocolDao::ProtocolDao(Protocols &prot, std::string path)
     : m_protocols(prot)
-    , m_path(path)
-    , m_filename("protocols")
-{
-}
-
-ProtocolDao::~ProtocolDao()
-{
+      , m_path(path)
+      , m_filename("protocols") {
 }
 
 /**
  * @brief Helper, appends forward/backward slash to path
  * @param value
  */
-void ProtocolDao::pathSeperator(std::string &value)
-{
+void ProtocolDao::pathSeperator(std::string &value) {
 #ifdef _WIN32
     value.append("\\");
 #else
@@ -41,8 +34,7 @@ void ProtocolDao::pathSeperator(std::string &value)
  * @brief Check if the file exists and we need to create a new one.
  * @return
  */
-bool ProtocolDao::fileExists()
-{
+bool ProtocolDao::fileExists() {
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
@@ -50,8 +42,7 @@ bool ProtocolDao::fileExists()
 
     std::ifstream ifs(path);
 
-    if(!ifs.is_open())
-    {
+    if (!ifs.is_open()) {
         return false;
     }
 
@@ -65,8 +56,7 @@ bool ProtocolDao::fileExists()
  * @param prot
  * @return
  */
-bool ProtocolDao::saveConfig(protocols_ptr prot)
-{
+bool ProtocolDao::saveConfig(const Protocols &prot) {
     Logging &log = Logging::getInstance();
     std::string path = m_path;
     pathSeperator(path);
@@ -80,12 +70,11 @@ bool ProtocolDao::saveConfig(protocols_ptr prot)
 
     // Start Creating the Key/Value Output for the Config File.
 
-    out << YAML::Key << "file_version" << YAML::Value << prot->file_version;
+    out << YAML::Key << "file_version" << YAML::Value << prot.file_version;
 
     // Loop and encode each menu option
-    for(unsigned int i = 0; i < prot->protocols.size(); i++)
-    {
-        auto &opt = prot->protocols[i];
+    for (unsigned int i = 0; i < prot.protocols.size(); i++) {
+        auto &opt = prot.protocols[i];
 
         out << YAML::Key << "protocols";
         out << YAML::Value << YAML::BeginMap;
@@ -105,8 +94,7 @@ bool ProtocolDao::saveConfig(protocols_ptr prot)
     // Setup file to Write out File.
     std::ofstream ofs(path);
 
-    if(!ofs.is_open())
-    {
+    if (!ofs.is_open()) {
         log.write<Logging::ERROR_LOG>("Error, unable to write to=", path, __LINE__, __FILE__);
         return false;
     }
@@ -123,27 +111,24 @@ bool ProtocolDao::saveConfig(protocols_ptr prot)
  * @param rhs
  * @return
  */
-void ProtocolDao::encode(const Protocols &rhs)
-{
-    m_protocols->file_version    = rhs.file_version;
-    m_protocols->protocols       = rhs.protocols;
+void ProtocolDao::encode(const Protocols &rhs) {
+    m_protocols.file_version = rhs.file_version;
+    m_protocols.protocols = rhs.protocols;
 
     // Now Sort All Protocols once they have been loaded.
     // Unfortunately YAML does not keep ordering in arrays properly.
     sort(
-        m_protocols->protocols.begin(), m_protocols->protocols.end(),
-        [ ](const Protocol& lhs, const Protocol& rhs)
-    {
-        return lhs.protocol_name < rhs.protocol_name;
-    });
+        m_protocols.protocols.begin(), m_protocols.protocols.end(),
+        [ ](const Protocol &lhs, const Protocol &rhs) {
+            return lhs.protocol_name < rhs.protocol_name;
+        });
 }
 
 /**
  * @brief Loads a Configuation file into the m_protocol stub for access.
  * @return
  */
-bool ProtocolDao::loadConfig()
-{
+bool ProtocolDao::loadConfig() {
     Logging &log = Logging::getInstance();
     std::string path = m_path;
     pathSeperator(path);
@@ -153,14 +138,12 @@ bool ProtocolDao::loadConfig()
     YAML::Node node;
 
     // Load the file into the class.
-    try
-    {
+    try {
         // Load file fresh.
         node = YAML::LoadFile(path);
 
         // Testing Is on nodes always throws exceptions.
-        if(node.size() == 0)
-        {
+        if (node.size() == 0) {
             return false; //File Not Found?
         }
 
@@ -169,9 +152,9 @@ bool ProtocolDao::loadConfig()
         // Validate File Version
         log.write<Logging::CONSOLE_LOG>("Protocols File Version=", file_version);
 
-        if(file_version != Protocols::FILE_VERSION)
-        {
-            log.write<Logging::ERROR_LOG>("Protocols File Version=", file_version, "Expected=", Protocols::FILE_VERSION, __LINE__, __FILE__);
+        if (file_version != Protocols::FILE_VERSION) {
+            log.write<Logging::ERROR_LOG>("Protocols File Version=", file_version, "Expected=", Protocols::FILE_VERSION,
+                                          __LINE__, __FILE__);
             return false;
         }
 
@@ -180,16 +163,13 @@ bool ProtocolDao::loadConfig()
 
         // Moves the Loaded config to m_config shared pointer.
         encode(prot);
-    }
-    catch(YAML::Exception &ex)
-    {
+    } catch (YAML::Exception &ex) {
         log.write<Logging::ERROR_LOG>("YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
-        return(false);
+        return (false);
     }
-    catch(std::exception &ex)
-    {
+    catch (std::exception &ex) {
         log.write<Logging::ERROR_LOG>("Unexpected YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
-        return(false);
+        return (false);
     }
 
     return true;

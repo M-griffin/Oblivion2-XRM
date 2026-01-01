@@ -1,7 +1,6 @@
 #ifndef MENU_PROMPT_HPP
 #define MENU_PROMPT_HPP
 
-#include <fstream>
 #include <string>
 
 #include <yaml-cpp/yaml.h>
@@ -13,11 +12,8 @@
  * @file menu_prompt.hpp
  * @brief XRM Menu Prompt Template for Yaml file format
  */
-class MenuPrompt
-{
-
+class MenuPrompt {
 public:
-
     static const std::string FILE_VERSION;
 
     std::string file_version;
@@ -28,65 +24,61 @@ public:
 
     explicit MenuPrompt()
         : file_version(FILE_VERSION)
-        , name("Menu Prompt Name")
-        , data_line1("")
-        , data_line2("")
-        , data_line3("")
-    { }
+          , name("Menu Prompt Name")
+          , data_line1("")
+          , data_line2("")
+          , data_line3("") {
+    }
 
     ~MenuPrompt() = default;
 };
 
 
 // YAML Override namespace for encoding/decoding Menu Class.
-namespace YAML
-{
-/**
- * @class convert
- * @author Michael Griffin
- * @date 16/11/2016
- * @file menu.hpp
- * @brief MenuPrompt convert for MenuPrompt Class
- */
-template<>
-struct convert<MenuPrompt>
-{
+namespace YAML {
     /**
-     * @brief Override for encoding the Menu Class
-     *        This is not used as it makes the map on a single line!
-     *        Instead, Key/Value is done in the ConfigDao on save.
-     * @param rhs
-     * @return
+     * @class convert
+     * @author Michael Griffin
+     * @date 16/11/2016
+     * @file menu.hpp
+     * @brief MenuPrompt convert for MenuPrompt Class
      */
-    static Node encode(const MenuPrompt &rhs)
-    {
-        Node node;
-        node["file_version"]     = rhs.file_version;
-        node["name"]             = rhs.name;
-        node["data_line1"]       = rhs.data_line1;
-        node["data_line2"]       = rhs.data_line2;
-        node["data_line3"]       = rhs.data_line3;
+    template<>
+    struct convert<MenuPrompt> {
+        /**
+         * @brief Override for encoding the Menu Class
+         *        This is not used as it makes the map on a single line!
+         *        Instead, Key/Value is done in the ConfigDao on save.
+         * @param rhs
+         * @return
+         */
+        static Node encode(const MenuPrompt &rhs) {
+            Node node;
+            node["file_version"] = rhs.file_version;
+            node["name"] = rhs.name;
+            node["data_line1"] = rhs.data_line1;
+            node["data_line2"] = rhs.data_line2;
+            node["data_line3"] = rhs.data_line3;
 
-        return node;
-    }
+            return node;
+        }
 
-    /**
-     * @brief Override for the Load from File, this read and populate the Menu Object.
-     * @param node
-     * @param rhs
-     * @return
-     */
-    static bool decode(const Node& node, MenuPrompt& rhs)
-    {
-        rhs.file_version    = node["file_version"] .as<std::string>();
-        rhs.name            = node["name"].as<std::string>();
-        rhs.data_line1      = node["data_line1"].as<std::string>();
-        rhs.data_line2      = node["data_line2"].as<std::string>();
-        rhs.data_line3      = node["data_line3"].as<std::string>();
+        /**
+         * @brief Override for the Load from File, this read and populate the Menu Object.
+         * @param node
+         * @param rhs
+         * @return
+         */
+        static bool decode(const Node &node, MenuPrompt &rhs) {
+            rhs.file_version = node["file_version"].as<std::string>();
+            rhs.name = node["name"].as<std::string>();
+            rhs.data_line1 = node["data_line1"].as<std::string>();
+            rhs.data_line2 = node["data_line2"].as<std::string>();
+            rhs.data_line3 = node["data_line3"].as<std::string>();
 
-        return true;
-    }
-};
+            return true;
+        }
+    };
 }
 
 #endif

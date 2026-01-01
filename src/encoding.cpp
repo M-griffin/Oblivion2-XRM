@@ -22,7 +22,7 @@
 #ifdef TARGET_OS_MAC
 const std::string Encoding::ENCODING_TEXT_UTF8  = "en_US.UTF-8";
 #else
-const std::string Encoding::ENCODING_TEXT_UTF8  = "en_US.utf8";
+const std::string Encoding::ENCODING_TEXT_UTF8 = "en_US.utf8";
 #endif
 const std::string Encoding::ENCODING_TEXT_CP437 = "CP437";
 
@@ -79,11 +79,9 @@ wchar_t CP437_TABLE[] =
 
 Encoding::Encoding()
     : m_log(Logging::getInstance())
-    , m_encoding_mutex()
-{
+      , m_encoding_mutex() {
     // Populate UCS to CP437 Translation Back Mapping.
-    for(unsigned int char_value = 0; char_value < 256; char_value++)
-    {
+    for (unsigned int char_value = 0; char_value < 256; char_value++) {
         map_wide_to_cp437.insert(std::make_pair(CP437_TABLE[char_value], char_value));
     }
 }
@@ -101,11 +99,10 @@ Encoding::Encoding()
  * @param mbstr
  * @return
  */
-std::wstring Encoding::multibyte_to_wide(const char* mbstr)
-{
+std::wstring Encoding::multibyte_to_wide(const char *mbstr) {
     int str_size = strlen(mbstr);
 
-    if(str_size == 0) return std::wstring();
+    if (str_size == 0) return std::wstring();
 
     int size_needed = MultiByteToWideChar(CP_UTF8, 0, &mbstr[0], str_size, NULL, 0);
     std::wstring wstrTo(size_needed, 0);
@@ -118,13 +115,12 @@ std::wstring Encoding::multibyte_to_wide(const char* mbstr)
  * @param wstr
  * @return
  */
-std::string Encoding::wide_to_multibyte(const std::wstring &wstr)
-{
-    if(wstr.empty()) return std::string();
+std::string Encoding::wide_to_multibyte(const std::wstring &wstr) {
+    if (wstr.empty()) return std::string();
 
-    int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int) wstr.size(), NULL, 0, NULL, NULL);
     std::string strTo(size_needed, 0);
-    WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+    WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int) wstr.size(), &strTo[0], size_needed, NULL, NULL);
     return strTo;
 }
 
@@ -241,22 +237,17 @@ std::string Encoding::wide_to_multibyte(const std::wstring &wide_string)
  * @brief Encode CP437 to UTF-8 Method
  * @param standard_string
  */
-std::string Encoding::utf8Encode(const std::string &standard_string)
-{
+std::string Encoding::utf8Encode(const std::string &standard_string) {
     std::string output = "";
     std::wstring wide_string = L"";
 
     // Loop and write out after translation to Unicode
-    for(std::string::size_type i = 0; i < standard_string.size(); i++)
-    {
+    for (std::string::size_type i = 0; i < standard_string.size(); i++) {
         int ascii_value = std::char_traits<char>().to_int_type(standard_string[i]);
 
-        if(ascii_value < 256)
-        {
+        if (ascii_value < 256) {
             wide_string += CP437_TABLE[ascii_value];
-        }
-        else
-        {
+        } else {
             m_log.write<Logging::ERROR_LOG>("Error, utf8Encode ascii_value=", ascii_value, __LINE__, __FILE__);
         }
     }
@@ -269,19 +260,15 @@ std::string Encoding::utf8Encode(const std::string &standard_string)
  * @brief Decode UTF-8 to CP437 Method
  * @param standard_string
  */
-std::string Encoding::utf8Decode(const std::string &standard_string)
-{
+std::string Encoding::utf8Decode(const std::string &standard_string) {
     std::string output = "";
     const std::wstring wide_string = multibyte_to_wide(standard_string.c_str());
     unsigned char c = '\0';
 
-    for(wchar_t usc_char : wide_string)
-    {
-        if(map_wide_to_cp437.find(usc_char) == map_wide_to_cp437.end())
-        {
+    for (wchar_t usc_char: wide_string) {
+        if (map_wide_to_cp437.find(usc_char) == map_wide_to_cp437.end()) {
             // Null Characters should be excluded,
-            if(usc_char == '\0')
-            {
+            if (usc_char == '\0') {
                 continue;
             }
 
@@ -290,12 +277,11 @@ std::string Encoding::utf8Decode(const std::string &standard_string)
             usc_string += usc_char;
             std::string utf8_data = wide_to_multibyte(usc_string);
 
-            m_log.write<Logging::DEBUG_LOG>("Warning, Invalid CP437 Conversion, convert glyph back to utf8=",  utf8_data, __LINE__, __FILE__);
+            m_log.write<Logging::DEBUG_LOG>("Warning, Invalid CP437 Conversion, convert glyph back to utf8=", utf8_data,
+                                            __LINE__, __FILE__);
             output += utf8_data;
-        }
-        else
-        {
-            c = map_wide_to_cp437.find(usc_char)->second;            
+        } else {
+            c = map_wide_to_cp437.find(usc_char)->second;
         }
 
         output += std::string(1, c);

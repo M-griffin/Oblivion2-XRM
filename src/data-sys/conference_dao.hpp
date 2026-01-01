@@ -1,22 +1,12 @@
 #ifndef CONFERENCE_DAO_HPP
 #define CONFERENCE_DAO_HPP
 
-#include <memory>
 #include <vector>
 #include <functional>
 
 #include "../model-sys/conference.hpp"
 #include "../data-sys/base_dao.hpp"
 
-// Forward Decelerations
-namespace SQLW
-{
-class Database;
-class Query;
-}
-
-// Handle to Database Queries
-typedef std::shared_ptr<SQLW::Query> query_ptr;
 
 // Base Dao Definition
 typedef BaseDao<Conference> baseConferenceClass;
@@ -25,17 +15,14 @@ typedef BaseDao<Conference> baseConferenceClass;
  * @class ConferenceDao
  * @author Michael Griffin
  * @date 03/05/2017
- * @file conference.hpp
+ * @file conference_dao.hpp
  * @brief Conference Data Access Object
  */
 class ConferenceDao
-    : public baseConferenceClass
-{
+        : public baseConferenceClass {
 public:
-
-    explicit ConferenceDao(SQLW::Database &database)
-        : baseConferenceClass(database)
-    {
+    explicit ConferenceDao(Database &database)
+        : baseConferenceClass(database) {
         // Setup Table name
         m_strTableName = "conference";
 
@@ -43,52 +30,53 @@ public:
          * Pre Populate Static Queries one Time
          */
         m_cmdFirstTimeSetup =
-            "PRAGMA synchronous=Normal; "
-            "PRAGMA encoding=UTF-8; "
-            "PRAGMA foreign_keys=ON; "
-            "PRAGMA default_cache_size=10000; "
-            "PRAGMA cache_size=10000; ";
+                "PRAGMA synchronous=Normal; "
+                "PRAGMA encoding=UTF-8; "
+                "PRAGMA foreign_keys=ON; "
+                "PRAGMA default_cache_size=10000; "
+                "PRAGMA cache_size=10000; "
+                "PRAGMA journal_mode = WAL; "
+                "PRAGMA temp_store = MEMORY; "
+                "PRAGMA mmap_size = 268435456; ";
 
         // Check if Database Exists.
-        m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName + "' COLLATE NOCASE;";
+        m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName +
+                           "' COLLATE NOCASE;";
 
         // Create Table Query (SQLite Only for the moment)
         m_cmdCreateTable =
-            "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
-            "iId               INTEGER PRIMARY KEY, "
-            "sName             TEXT NOT NULL COLLATE NOCASE, "
-            "sType             TEXT NOT NULL COLLATE NOCASE, "
-            "sACS              TEXT NOT NULL COLLATE NOCASE, "
-            "iSortOrder        INTEGER NOT NULL "
-            "); ";
+                "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
+                "iId               INTEGER PRIMARY KEY, "
+                "sName             TEXT NOT NULL COLLATE NOCASE, "
+                "sType             TEXT NOT NULL COLLATE NOCASE, "
+                "sACS              TEXT NOT NULL COLLATE NOCASE, "
+                "iSortOrder        INTEGER NOT NULL "
+                "); ";
 
         m_cmdCreateIndex =
-            "CREATE INDEX IF NOT EXISTS conference_idx "
-            "ON " + m_strTableName + " (sType COLLATE NOCASE); ";
+                "CREATE INDEX IF NOT EXISTS conference_idx "
+                "ON " + m_strTableName + " (sType COLLATE NOCASE); ";
 
         // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
         m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
 
         m_cmdDropIndex = "DROP INDEX IF EXISTS conference_idx; ";
 
-        // Setup the CallBack for Result Field Mapping
+        // Set up the CallBack for Result Field Mapping
         m_result_callback = std::bind(&ConferenceDao::pullConferenceResult, this,
-            std::placeholders::_1, std::placeholders::_2);
+                                      std::placeholders::_1, std::placeholders::_2);
 
         m_columns_callback = std::bind(&ConferenceDao::fillConferenceColumnValues, this,
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+                                       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 
         m_insert_callback = std::bind(&ConferenceDao::insertConferenceQryString, this,
-            std::placeholders::_1, std::placeholders::_2);
+                                      std::placeholders::_1, std::placeholders::_2);
 
         m_update_callback = std::bind(&ConferenceDao::updateConferenceQryString, this,
-            std::placeholders::_1, std::placeholders::_2);
+                                      std::placeholders::_1, std::placeholders::_2);
     }
 
-    ~ConferenceDao()
-    {
-    }
-
+    ~ConferenceDao() = default;
 
     /**
      * Base Dao Calls for generic Object Data Calls
@@ -124,18 +112,18 @@ public:
      * @param obj
      * @return
      */
-    bool updateRecord(conference_ptr obj);
+    bool updateRecord(Conference &obj);
 
     /**
      * @brief Inserts a New Record in the database!
      * @param obj
      * @return
      */
-    long insertRecord(conference_ptr obj);
+    long insertRecord(Conference &obj);
 
     /**
      * @brief Deletes a MessageArea Record
-     * @param areaId
+     * @param id
      * @return
      */
     bool deleteRecord(long id);
@@ -145,13 +133,13 @@ public:
      * @param id
      * @return
      */
-    conference_ptr getRecordById(long id);
+    Conference getRecordById(long id);
 
     /**
      * @brief Retrieve All Records in a Table
      * @return
      */
-    std::vector<conference_ptr> getAllRecords();
+    std::vector<Conference> getAllRecords();
 
     /**
      * @brief Retrieve Count of All Records in a Table
@@ -171,7 +159,7 @@ public:
      * @param qry
      * @param obj
      */
-    void pullConferenceResult(query_ptr qry, conference_ptr obj);
+    void pullConferenceResult(Query &qry, Conference &obj);
 
     /**
      * @brief (CallBack) Insert Statement translates to (Column, .. ) VALUES (%d, %Q,)
@@ -179,8 +167,8 @@ public:
      * @param obj
      * @param values
      */
-    void fillConferenceColumnValues(query_ptr qry, conference_ptr obj,
-        std::vector< std::pair<std::string, std::string> > &values);
+    void fillConferenceColumnValues(Query &qry, Conference &obj,
+                                    std::vector<std::pair<std::string, std::string> > &values);
 
     /**
      * @brief (Callback) Create Record Insert Statement, returns query string
@@ -188,7 +176,7 @@ public:
      * @param obj
      * @return
      */
-    std::string insertConferenceQryString(std::string qry, conference_ptr obj);
+    std::string insertConferenceQryString(std::string qry, Conference &obj);
 
     /**
      * @brief (CallBack) Update Existing Record.
@@ -196,7 +184,7 @@ public:
      * @param obj
      * @return
      */
-    std::string updateConferenceQryString(std::string qry, conference_ptr obj);
+    std::string updateConferenceQryString(std::string qry, Conference &obj);
 
 
     /**
@@ -210,7 +198,7 @@ public:
      * @param type
      * @return
      */
-    std::vector<conference_ptr> getAllConferencesByType(std::string type);
+    std::vector<Conference> getAllConferencesByType(std::string type);
 
     /**
      * @brief Return Count or Number of Existing Conferences by Type
@@ -218,10 +206,6 @@ public:
      * @return
      */
     long getConferencesCountByType(std::string type);
-
 };
 
-// Handle to Database Queries
-typedef std::shared_ptr<ConferenceDao> conference_dao_ptr;
-
-#endif // CONFERENCE__DAO_HPP
+#endif

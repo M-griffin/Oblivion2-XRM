@@ -1,10 +1,8 @@
 #ifndef MENU_STATS_HPP
 #define MENU_STATS_HPP
 
-#include <memory>
 #include <string>
-#include <ctime>
-
+#include <chrono>
 
 /**
  * @class MenuStats
@@ -13,26 +11,19 @@
  * @file menu_stats.hpp
  * @brief Menu Traffic and Command Usage (Anonymous)
  */
-class MenuStats
-{
+class MenuStats {
 public:
-
     explicit MenuStats()
         : iId(-1)
-        , sMenuName("")
-        , sCmdKey("")
-        , dtDateTime(0)
-    {
+          , sMenuName("")
+          , sCmdKey("")
+          , dtDateTime(0) {
     }
 
     long iId;
     std::string sMenuName;
     std::string sCmdKey;
     std::time_t dtDateTime;
-
 };
 
-
-typedef std::shared_ptr<MenuStats> menu_stats_ptr;
-
-#endif // MENU_STATS_HPP
+#endif
