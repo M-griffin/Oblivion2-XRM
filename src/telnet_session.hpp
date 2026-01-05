@@ -4,10 +4,14 @@
 #include <string>
 #include <utility>
 #include <unordered_set>
+#include <vector>
+#include <cstdint>
+
+using Byte = uint8_t;
+using ByteBuffer = std::vector<Byte>;
 
 class Logging;
 class Session;
-
 
 class TelnetSession {
 public:
@@ -96,21 +100,18 @@ public:
 
     TelnetSession &operator=(const TelnetSession &) = delete;
 
-    void sendIACSequences(unsigned char command, int option);
-
-    bool checkReply(const unsigned char &option) const;
-
-    void addReply(const unsigned char &option);
+    // Main Methods
+    bool isValidCommand(Byte command);
+    ByteBuffer telnetOptionParse(Byte byte);
+    Byte telnetOptionAcknowledge(Byte command);
+    Byte telnetOptionDeny(Byte command);
+    void sendIACSequences(Byte command, Byte option);
+    bool checkReply(Byte option);
+    void addReply(Byte option);
 
     void decodeBuffer();
-
-    static bool isValidCommand(unsigned char command);
-
-    void handleDoDont(unsigned char command, unsigned char option);
-
-    void handleWillWont(unsigned char command, unsigned char option);
-
-    unsigned char telnetOptionParse(const unsigned char &c);
+    void handleDoDont(Byte command, Byte option);
+    void handleWillWont(Byte command, Byte option);
 
     int getTermRows() const;
 
@@ -121,10 +122,6 @@ public:
     void setTermCols(int value);
 
     std::string getTermType() const;
-
-    static unsigned char telnetOptionAcknowledge(const unsigned char &command);
-
-    static unsigned char telnetOptionDeny(const unsigned char &command);
 
     void sendTTYPERequest();
 
@@ -151,11 +148,12 @@ private:
 
     int m_teloptStage;
     int m_teloptCommand;
-    unsigned char m_currentOption;
-    unsigned char m_subnegoOption;
 
-    std::unordered_set<int> m_replySequence;
-    std::string m_dataSequence;
+    Byte m_currentOption;
+    Byte m_subnegoOption;
+
+    std::unordered_set<Byte> m_replySequence;
+    ByteBuffer m_dataSequence;
 };
 
 #endif

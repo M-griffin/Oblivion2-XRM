@@ -6,16 +6,43 @@
 
 class DeadlineTimer {
 public:
-    DeadlineTimer(const std::chrono::milliseconds delay, const std::function<void()> &callbackMethod)
-        : m_delay(delay), m_callbackMethod(callbackMethod), m_start(std::chrono::steady_clock::now()),
-          m_triggered(false) {
+    DeadlineTimer()
+        : m_delay(std::chrono::milliseconds(0))
+          , m_callbackMethod(nullptr)
+          , m_start(std::chrono::steady_clock::now())
+          , m_triggered(false) {
     }
 
-    void update() {
-        if (!m_triggered && std::chrono::steady_clock::now() - m_start >= m_delay) {
+    DeadlineTimer(const std::chrono::milliseconds delay, const std::function<void()> &callbackMethod)
+        : m_delay(delay)
+          , m_callbackMethod(callbackMethod)
+          , m_start(std::chrono::steady_clock::now())
+          , m_triggered(false) {
+    }
+
+    bool isTriggered() {
+        if (m_triggered) {
+            return m_triggered;
+        }
+
+        if (std::chrono::steady_clock::now() - m_start >= m_delay) {
             m_callbackMethod();
             m_triggered = true;
         }
+
+        return m_triggered;
+    }
+
+    void start(const std::chrono::milliseconds delay, const std::function<void()> &callbackMethod) {
+        m_delay = delay;
+        m_callbackMethod = callbackMethod;
+        m_start = std::chrono::steady_clock::now();
+        m_triggered = false;
+    }
+
+    void cancel() {
+        m_delay = std::chrono::milliseconds(-0);
+        m_triggered = true;
     }
 
 private:

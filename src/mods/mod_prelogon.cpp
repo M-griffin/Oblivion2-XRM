@@ -574,8 +574,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
 
                 // Even though it's default, lets set it anyway
                 m_log.write<Logging::CONSOLE_LOG>("Encoding set to CP437");
-                m_session_data.m_encoding_text = Encoding::ENCODING_TEXT_CP437;
-                m_session_data.m_encoding = Encoding::ENCODE_CP437;
+                m_session_data.m_encoding = Encoding::TextEncoding::CP437;
             } else {
                 // Switch to Unicode Character Set.
                 message = "\x1b[0m" + m_session_io.pipeColors(blackColor);
@@ -588,8 +587,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
 
                 // Even though it's default, lets set it anyway
                 m_log.write<Logging::CONSOLE_LOG>("Encoding set to UTF-8");
-                m_session_data.m_encoding_text = Encoding::ENCODING_TEXT_UTF8;
-                m_session_data.m_encoding = Encoding::ENCODE_UTF8;
+                m_session_data.m_encoding = Encoding::TextEncoding::UTF8;
             }
 
             baseProcessAndDeliverNewLine(message);
@@ -615,8 +613,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
 
                 // Even though it's default, lets set it anyways/
                 m_log.write<Logging::CONSOLE_LOG>("Encoding set to UTF-8");
-                m_session_data.m_encoding_text = Encoding::ENCODING_TEXT_UTF8;
-                m_session_data.m_encoding = Encoding::ENCODE_UTF8;
+                m_session_data.m_encoding = Encoding::TextEncoding::UTF8;
             } else {
                 // Switch to ISO, then CP437 Character Set.
                 message = "\x1b[0m" + m_session_io.pipeColors(blackColor);
@@ -629,8 +626,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
 
                 // Even though it's default, lets set it anyways/
                 m_log.write<Logging::CONSOLE_LOG>("Encoding set to CP437");
-                m_session_data.m_encoding_text = Encoding::ENCODING_TEXT_CP437;
-                m_session_data.m_encoding = Encoding::ENCODE_CP437;
+                m_session_data.m_encoding = Encoding::TextEncoding::CP437;
             }
 
             baseProcessAndDeliverNewLine(message);
@@ -726,3 +722,27 @@ void ModPreLogon::emulationCompleted() {
         changeModule(MOD_ASK_ANSI_COLOR);
     }
 }
+
+
+/*
+
+if (sequence == "%G") {   // ESC % G
+    m_encoding = TextEncoding::UTF8;
+    return "";
+}
+
+if (sequence == "%@") {   // ESC % @
+    m_encoding = TextEncoding::ISO_8859_1;
+    return "";
+}
+
+if (sequence == "(0") {   // ESC ( 0
+    m_encoding = TextEncoding::CP437;
+    return "";
+}
+
+if (sequence == "(B") {   // ESC ( B
+    m_encoding = TextEncoding::ASCII;
+    return "";
+}
+*/

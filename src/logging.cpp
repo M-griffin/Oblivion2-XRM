@@ -141,7 +141,9 @@ void Logging::writeOutConsole(const std::string &date_time, std::vector<std::str
 
     std::cout << date_time << " : ";
     for (std::string &d: details) {
-        std::cout << d << " | ";
+        if (d.size() > 0) {
+            std::cout << d << " | ";
+        }
     }
     std::cout << std::endl;
 }

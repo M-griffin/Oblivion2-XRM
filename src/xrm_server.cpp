@@ -135,11 +135,6 @@ bool setupSignalHandlers() {
     return true;
 }
 
-void removeNewlines(std::string &s) {
-    s.erase(std::remove(s.begin(), s.end(), '\r'), s.end());
-    s.erase(std::remove(s.begin(), s.end(), '\n'), s.end());
-}
-
 /**
  * @brief Main Program Entrance.
  *        Not using Parameters at this time.  Enable lateron.
@@ -153,7 +148,6 @@ auto main() -> int {
     m_log.write<Logging::CONSOLE_LOG>(BUILD_INFO); {
         CommonIO common;
         GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
-        removeNewlines(GLOBAL_BBS_PATH);
     }
 
     m_log.write<Logging::CONSOLE_LOG>("BBS HOME Directory Registered=", GLOBAL_BBS_PATH);

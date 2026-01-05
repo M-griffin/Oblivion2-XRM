@@ -57,7 +57,10 @@ ModBase &ModBase::operator=(ModBase &&other) noexcept {
  */
 std::string ModBase::baseGetEncodedBoxChar(const int enum_value) const {
     const auto char_value = std::string(1, static_cast<char>(enum_value));
-    return Encoding::getInstance().utf8Encode(char_value);
+
+    // TODO Quick Hack, update later on
+    const Encoding encode;
+    return encode.utf8Encode(char_value);
 }
 
 /**
@@ -66,7 +69,10 @@ std::string ModBase::baseGetEncodedBoxChar(const int enum_value) const {
  */
 std::string ModBase::baseGetEncodedBoxCharAndColor(const int enum_value) const {
     const auto char_value = std::string(1, static_cast<char>(enum_value));
-    return baseGetDefaultBoxColor() + Encoding::getInstance().utf8Encode(char_value);
+
+    // TODO Quick Hack, update later on
+    const Encoding encode;
+    return baseGetDefaultBoxColor() + encode.utf8Encode(char_value);
 }
 
 /**

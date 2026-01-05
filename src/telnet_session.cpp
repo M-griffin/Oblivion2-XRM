@@ -28,32 +28,27 @@ TelnetSession::TelnetSession(Session &session)
 }
 
 TelnetSession::~TelnetSession() {
-    m_log.write<Logging::DEBUG_LOG>("~TelnetDecoder()");
+    m_log.write<Logging::CONSOLE_LOG>("~TelnetSession()");
     m_replySequence.clear();
 }
 
-void TelnetSession::sendIACSequences(const unsigned char command, const int option) {
+void TelnetSession::sendIACSequences(Byte command, Byte option) {
     // Don't send if we've already negotiated this option
     if (checkReply(option)) {
         return;
     }
 
-    std::stringstream stm;
-    stm << static_cast<char>(IAC);
-    stm << command;
-    stm << static_cast<char>(option);
-    const std::string buf = stm.str();
-    stm.clear();
-    m_session.send(buf);
+    ByteBuffer buf = {IAC, command, option};
+    m_session.send(buf); // Set to Bytes
 
     addReply(option);
 }
 
-bool TelnetSession::checkReply(const unsigned char &option) const {
+bool TelnetSession::checkReply(Byte option) {
     return m_replySequence.find(option) != m_replySequence.end();
 }
 
-void TelnetSession::addReply(const unsigned char &option) {
+void TelnetSession::addReply(Byte option) {
     m_replySequence.insert(option);
 }
 
@@ -85,7 +80,7 @@ bool TelnetSession::getUseAnsi() const {
     return m_isUseAnsi;
 }
 
-unsigned char TelnetSession::telnetOptionAcknowledge(const unsigned char &command) {
+Byte TelnetSession::telnetOptionAcknowledge(Byte command) {
     switch (command) {
         case DO: return WILL;
         case WILL: return DO;
@@ -96,7 +91,7 @@ unsigned char TelnetSession::telnetOptionAcknowledge(const unsigned char &comman
     return 0;
 }
 
-unsigned char TelnetSession::telnetOptionDeny(const unsigned char &command) {
+Byte TelnetSession::telnetOptionDeny(Byte command) {
     switch (command) {
         case DO: return WONT;
         case WILL: return DONT;
@@ -113,19 +108,26 @@ void TelnetSession::decodeBuffer() {
     switch (m_subnegoOption) {
         case TELOPT_NAWS:
             if (m_dataSequence.size() >= 4) {
-                m_nawsCol = (static_cast<unsigned char>(m_dataSequence[0]) << 8) | static_cast<unsigned char>(
-                                m_dataSequence[1]);
-                m_nawsRow = (static_cast<unsigned char>(m_dataSequence[2]) << 8) | static_cast<unsigned char>(
-                                m_dataSequence[3]);
+                m_nawsCol = (static_cast<uint16_t>(m_dataSequence[0]) << 8)
+                            | static_cast<uint16_t>(m_dataSequence[1]);
+
+                m_nawsRow = (static_cast<uint16_t>(m_dataSequence[2]) << 8)
+                            | static_cast<uint16_t>(m_dataSequence[3]);
+
                 m_log.write<Logging::DEBUG_LOG>("TELOPT_NAWS option", m_nawsCol, "x", m_nawsRow);
                 m_isNawsDetected = true;
             }
             break;
 
-        case TELOPT_TTYPE:
-            m_termType = m_dataSequence;
+        case TELOPT_TTYPE: {
+            std::string termType(
+                reinterpret_cast<const char *>(m_dataSequence.data()),
+                m_dataSequence.size()
+            );
+            m_termType = termType;
             m_log.write<Logging::DEBUG_LOG>("TELOPT_TTYPE option", m_termType);
             break;
+        }
 
         case TELOPT_NEW_ENVIRON:
             m_log.write<Logging::DEBUG_LOG>("TELOPT_NEW_ENVIRON data", m_dataSequence);
@@ -213,13 +215,9 @@ void TelnetSession::sendTTYPERequest() {
         return;
     }
 
-    std::stringstream stm;
-    stm << static_cast<char>(IAC) << static_cast<char>(SB)
-            << static_cast<char>(TELOPT_TTYPE) << static_cast<char>(TELQUAL_SEND)
-            << static_cast<char>(IAC) << static_cast<char>(SE);
-    const std::string buf = stm.str();
-    stm.clear();
+    ByteBuffer buf = {IAC, SB, TELOPT_TTYPE, TELQUAL_SEND, IAC, SE};
     m_session.send(buf);
+
     addReply(TELOPT_TTYPE);
 }
 
@@ -237,74 +235,80 @@ void TelnetSession::sendENVRequest() {
         "EDITOR", "LOGNAME", "SYSTEMTYPE"
     };
 
-    stm << static_cast<char>(IAC)
-            << static_cast<char>(SB)
-            << static_cast<char>(TELOPT_NEW_ENVIRON)
-            << static_cast<char>(TELQUAL_SEND);
+    stm << static_cast<uint8_t>(IAC)
+            << static_cast<uint8_t>(SB)
+            << static_cast<uint8_t>(TELOPT_NEW_ENVIRON)
+            << static_cast<uint8_t>(TELQUAL_SEND);
 
     for (auto &v: vars) {
-        stm << static_cast<char>(NEW_ENV_VAR) << v.data();
+        stm << static_cast<uint8_t>(NEW_ENV_VAR) << v.data();
     }
 
-    stm << static_cast<char>(IAC) << static_cast<char>(SE);
+    stm << static_cast<uint8_t>(IAC) << static_cast<uint8_t>(SE);
     const std::string buf = stm.str();
     stm.clear();
     vars.clear();
-    m_session.send(buf);
+
+    m_session.send(stm.str());
+
     addReply(TELOPT_NEW_ENVIRON);
 }
 
-unsigned char TelnetSession::telnetOptionParse(const unsigned char &c) {
+ByteBuffer TelnetSession::telnetOptionParse(Byte byte) {
+    ByteBuffer output;
+
     switch (m_teloptStage) {
         case 0:
-            if (c != IAC) {
-                return c;
+            if (byte != IAC) {
+                output.push_back(byte);
+                return output;
             }
             m_teloptStage++;
             break;
 
         case 1:
-            if (c == IAC && m_isBinary) {
+            if (byte == IAC && m_isBinary) {
                 m_log.write<Logging::DEBUG_LOG>("Got double IAC BINARY");
                 m_teloptStage = 0;
-                return IAC;
-            } else if (c == IAC) {
+                output.push_back(byte);
+                return output;
+            } else if (byte == IAC) {
                 m_log.write<Logging::DEBUG_LOG>("Got double IAC");
                 break;
             }
 
-            if (!isValidCommand(c)) {
-                m_log.write<Logging::DEBUG_LOG>("Invalid command:", static_cast<int>(c));
+            if (!isValidCommand(byte)) {
+                m_log.write<Logging::DEBUG_LOG>("Invalid command:", static_cast<int>(byte));
                 m_teloptStage = 0;
                 break;
             }
 
-            m_teloptCommand = c;
+            m_teloptCommand = byte;
             m_teloptStage++;
             break;
 
         case 2:
-            m_log.write<Logging::DEBUG_LOG>("[IAC]", static_cast<int>(c), "STAGE 2");
+            m_log.write<Logging::DEBUG_LOG>("[IAC]", static_cast<int>(byte), "STAGE 2");
 
             switch (m_teloptCommand) {
-                case DO: handleDoDont(DO, c);
+                case DO: handleDoDont(DO, byte);
                     break;
-                case DONT: handleDoDont(DONT, c);
+                case DONT: handleDoDont(DONT, byte);
                     break;
-                case WILL: handleWillWont(WILL, c);
+                case WILL: handleWillWont(WILL, byte);
                     break;
-                case WONT: handleWillWont(WONT, c);
+                case WONT: handleWillWont(WONT, byte);
                     break;
                 case SB:
-                    m_subnegoOption = c;
-                    if (c == TELOPT_TTYPE || c == TELOPT_NEW_ENVIRON) {
-                        m_currentOption = c;
+                    m_subnegoOption = byte;
+                    if (byte == TELOPT_TTYPE || byte == TELOPT_NEW_ENVIRON) {
+                        m_currentOption = byte;
                         m_teloptStage = 3;
-                    } else if (c == TELOPT_NAWS) {
-                        m_currentOption = c;
+                    } else if (byte == TELOPT_NAWS) {
+                        m_currentOption = byte;
                         m_teloptStage = 5;
-                    } else if (c == TELOPT_LINEMODE) {
-                        m_currentOption = c;
+                    } else if (byte == TELOPT_LINEMODE) {
+                        m_currentOption = byte;
                         m_teloptStage = 7;
                     } else {
                         m_teloptStage = 0;
@@ -317,13 +321,13 @@ unsigned char TelnetSession::telnetOptionParse(const unsigned char &c) {
             break;
 
         case 3:
-            m_log.write<Logging::DEBUG_LOG>("--> STAGE 3", static_cast<int>(c));
+            m_log.write<Logging::DEBUG_LOG>("--> STAGE 3", static_cast<int>(byte));
 
             switch (m_currentOption) {
                 case TELOPT_TTYPE:
-                    if (c == TELQUAL_IS) {
+                    if (byte == TELQUAL_IS) {
                         m_log.write<Logging::DEBUG_LOG>("[IAC] TELQUAL_IS", static_cast<int>(m_currentOption),
-                                                        static_cast<int>(c));
+                                                        static_cast<int>(byte));
                         m_teloptStage = 4;
                     } else {
                         m_teloptStage = 0;
@@ -331,9 +335,9 @@ unsigned char TelnetSession::telnetOptionParse(const unsigned char &c) {
                     break;
 
                 case TELOPT_NEW_ENVIRON:
-                    if (c == TELQUAL_IS) {
+                    if (byte == TELQUAL_IS) {
                         m_log.write<Logging::DEBUG_LOG>("[IAC] TELQUAL_IS", static_cast<int>(m_currentOption),
-                                                        static_cast<int>(c));
+                                                        static_cast<int>(byte));
                         m_teloptStage = 6;
                     } else {
                         m_teloptStage = 0;
@@ -341,9 +345,9 @@ unsigned char TelnetSession::telnetOptionParse(const unsigned char &c) {
                     break;
 
                 default:
-                    if (c == SE) {
+                    if (byte == SE) {
                         m_log.write<Logging::DEBUG_LOG>("[IAC] SB END", static_cast<int>(m_currentOption),
-                                                        static_cast<int>(c));
+                                                        static_cast<int>(byte));
                         m_teloptStage = 0;
                     } else {
                         m_teloptStage = 0;
@@ -353,57 +357,57 @@ unsigned char TelnetSession::telnetOptionParse(const unsigned char &c) {
             break;
 
         case 4:
-            m_log.write<Logging::DEBUG_LOG>("--> STAGE 4 TTYPE", static_cast<int>(c));
+            m_log.write<Logging::DEBUG_LOG>("--> STAGE 4 TTYPE", static_cast<int>(byte));
 
-            if (c != IAC && c != SE) {
-                if (c == '\x00')
-                    m_dataSequence += '\0';
+            if (byte != IAC && byte != SE) {
+                if (byte == '\x00')
+                    m_dataSequence.push_back('\0');
                 else
-                    m_dataSequence += static_cast<char>(c);
+                    m_dataSequence.push_back(byte);
 
                 if (m_dataSequence.size() >= SB_MAXLEN) {
                     m_dataSequence.clear();
                 }
             }
 
-            if (c == IAC) {
+            if (byte == IAC) {
                 m_teloptStage = 1;
-            } else if (c == SE) {
+            } else if (byte == SE) {
                 m_teloptStage = 0;
                 decodeBuffer();
             }
             break;
 
         case 5:
-            m_log.write<Logging::DEBUG_LOG>("--> STAGE 5 NAWS", static_cast<int>(c));
+            m_log.write<Logging::DEBUG_LOG>("--> STAGE 5 NAWS", static_cast<int>(byte));
 
-            if (c != IAC && c != SE) {
-                if (c == '\x00')
-                    m_dataSequence += '\0';
+            if (byte != IAC && byte != SE) {
+                if (byte == '\x00')
+                    m_dataSequence.push_back('\0');
                 else
-                    m_dataSequence += static_cast<char>(c);
+                    m_dataSequence.push_back(byte);
 
                 if (m_dataSequence.size() >= SB_MAXLEN) {
                     m_dataSequence.clear();
                 }
             }
 
-            if (c == IAC) {
+            if (byte == IAC) {
                 m_teloptStage = 1;
-            } else if (c == SE) {
+            } else if (byte == SE) {
                 m_teloptStage = 0;
                 decodeBuffer();
             }
             break;
 
         case 6:
-            m_log.write<Logging::DEBUG_LOG>("--> STAGE 6 TELOPT_NEW_ENVIRON", static_cast<int>(c));
+            m_log.write<Logging::DEBUG_LOG>("--> STAGE 6 TELOPT_NEW_ENVIRON", static_cast<int>(byte));
 
-            if (c != IAC && c != SE) {
-                if (c == '\x00')
-                    m_dataSequence += ' ';
+            if (byte != IAC && byte != SE) {
+                if (byte == '\x00')
+                    m_dataSequence.push_back(' ');
                 else
-                    m_dataSequence += static_cast<char>(c);
+                    m_dataSequence.push_back(byte);
 
                 if (m_dataSequence.size() >= SB_MAXLEN) {
                     m_dataSequence.clear();
@@ -411,30 +415,30 @@ unsigned char TelnetSession::telnetOptionParse(const unsigned char &c) {
                 }
             }
 
-            if (c == IAC) {
+            if (byte == IAC) {
                 m_teloptStage = 1;
-            } else if (c == SE) {
+            } else if (byte == SE) {
                 m_teloptStage = 0;
                 decodeBuffer();
             }
             break;
 
         case 7:
-            m_log.write<Logging::DEBUG_LOG>("--> STAGE 7 TELOPT_LINEMODE", static_cast<int>(c));
+            m_log.write<Logging::DEBUG_LOG>("--> STAGE 7 TELOPT_LINEMODE", static_cast<int>(byte));
 
-            if (c != IAC && c != SE) {
-                m_dataSequence += c;
+            if (byte != IAC && byte != SE) {
+                m_dataSequence.push_back(byte);
 
                 if (m_dataSequence.size() >= SB_MAXLEN) {
                     m_dataSequence.clear();
                 }
             }
 
-            if (c == IAC) {
+            if (byte == IAC) {
                 m_teloptStage = 1;
-            } else if (c == SE) {
+            } else if (byte == SE) {
                 m_teloptStage = 0;
-                m_dataSequence.erase();
+                m_dataSequence.clear();
                 sendIACSequences(telnetOptionDeny(WONT), TELOPT_LINEMODE);
             }
             break;
@@ -443,5 +447,5 @@ unsigned char TelnetSession::telnetOptionParse(const unsigned char &c) {
             break;
     }
 
-    return '\0';
+    return {};
 }

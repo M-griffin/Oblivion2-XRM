@@ -2,10 +2,14 @@
 #define SESSION_HPP
 
 #include <string>
+#include <vector>
 
 #include "model-sys/config.hpp"
 #include "sdl2_net/SDL_net.hpp"
 #include "logging.hpp"
+
+using Byte = uint8_t;
+using ByteBuffer = std::vector<Byte>;
 
 class Session {
 public:
@@ -52,6 +56,7 @@ public:
     }
 
     ~Session() {
+        m_log.write<Logging::CONSOLE_LOG>("~Session()");
         close();
     }
 
@@ -80,26 +85,76 @@ public:
     }
 
     // Receives a message from the socket. Returns empty string if failed.
+    /*
     std::string receive() {
         constexpr std::size_t BUFFER_SIZE = 512;
         char buffer[BUFFER_SIZE];
-        int received = SDLNet_TCP_Recv(m_socket, buffer, BUFFER_SIZE - 1);
+        const int received = SDLNet_TCP_Recv(m_socket, buffer, BUFFER_SIZE - 1);
         if (received <= 0) {
             m_active = false;
             return std::string{};
         }
         buffer[received] = '\0';
         return std::string{buffer};
+    }*/
+
+    // Receives a message from the socket. Returns empty string if failed.
+    ByteBuffer receive() {
+        constexpr std::size_t BUFFER_SIZE = 512;
+
+        ByteBuffer buffer;
+        buffer.resize(BUFFER_SIZE);
+
+        const int received = SDLNet_TCP_Recv(
+            m_socket,
+            buffer.data(),
+            static_cast<int>(buffer.size())
+        );
+
+        if (received <= 0) {
+            m_active = false;
+            return {};
+        }
+
+        buffer.resize(received);
+        return buffer;
     }
+
 
     // Sends a message. If send fails, marks session inactive.
     void send(const std::string &message, const bool isDisconnection = false) {
-        if (!m_active)
+        if (!m_active) {
             return;
+        }
+
+        /*
+        std::string outputBuffer = "";
+
+        // On Output, We have internal UTF8 now, translate to CP437
+        if(m_encoding == Encoding::ENCODE_CP437)
+        {
+            outputBuffer = Encoding::getInstance().utf8Decode(msg);
+        }
+        else
+        {
+            outputBuffer = msg;
+        }*/
 
         const int length = static_cast<int>(message.length());
         const int sent = SDLNet_TCP_Send(m_socket, message.c_str(), length);
         if (sent < length || isDisconnection) {
+            hangup();
+        }
+    }
+
+    void send(const ByteBuffer &bytes) {
+        if (!m_active) {
+            return;
+        }
+
+        const int length = static_cast<int>(bytes.size());
+        const int sent = SDLNet_TCP_Send(m_socket, bytes.data(), length);
+        if (sent < length) {
             hangup();
         }
     }

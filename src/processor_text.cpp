@@ -867,9 +867,8 @@ void ProcessorText::moveTabWidth() {
 /**
  * @brief Escape Sequence Parsing
  */
-void ProcessorText::escapeSequenceParsing(LocalizedBuffer &buffer,
-                                          std::string::iterator &it,
-                                          std::string::iterator &line_end) {
+void ProcessorText::escapeSequenceParsing(Utf8Glyph &buffer, std::string::const_iterator &it) {
+
     std::cout << "escapeSequenceParsing !! " << std::endl;
 
     CommonIO common_io;
@@ -882,25 +881,25 @@ void ProcessorText::escapeSequenceParsing(LocalizedBuffer &buffer,
     bool at_least_one_digit = false;
     bool first_param_implied = false;
 
-    if (it == line_end)
+    if (!common_io.peekGlyph(buffer.bytes, it, buffer))
         return;
 
-    if (buffer.length == 1 && buffer.character[0] == '\x1b') {
+    if (buffer.length == 1 && buffer.bytes[0] == '\x1b') {
         esc_sequence.erase();
-        esc_sequence += buffer.character;
+        esc_sequence += buffer.bytes;
 
-        common_io.getNextGlyph(buffer, it, line_end);
+        common_io.nextGlyph(buffer.bytes, it, buffer);
 
         if (buffer.length == 0)
             return;
 
         // grab the left bracket
-        if (buffer.length == 1 && buffer.character[0] == '?') {
+        if (buffer.length == 1 && buffer.bytes[0] == '?') {
             // Setup for ESC?7h or ESC?7l commands etc..
-            esc_sequence += buffer.character;
-        } else if (buffer.length == 1 && buffer.character[0] == '[') {
+            esc_sequence += buffer.bytes;
+        } else if (buffer.length == 1 && buffer.bytes[0] == '[') {
             // Else Normal ESC Sequence, check parameters.
-            esc_sequence += buffer.character;
+            esc_sequence += buffer.bytes;
         }
 
         more_params = true;
@@ -909,43 +908,43 @@ void ProcessorText::escapeSequenceParsing(LocalizedBuffer &buffer,
 
         while (more_params == true) {
             at_least_one_digit = false;
-            common_io.getNextGlyph(buffer, it, line_end);
+            common_io.nextGlyph(buffer.bytes, it, buffer);
 
             if (buffer.length == 0)
                 break;
 
             for (dig = 0; dig < 3; dig++) {
-                if (buffer.length != 1 || !isdigit(buffer.character[0]))
+                if (buffer.length != 1 || !isdigit(buffer.bytes[0]))
                     break;
 
                 at_least_one_digit = true;
 
                 // 3 digits at most (255) in a byte size decimal number */
                 if (dig == 0) {
-                    param[p] = buffer.character[0] - '0';
+                    param[p] = buffer.bytes[0] - '0';
                 } else if (dig == 1) {
                     param[p] *= 10;
-                    param[p] += buffer.character[0] - '0';
+                    param[p] += buffer.bytes[0] - '0';
                 } else {
                     param[p] *= 100;
-                    param[p] += buffer.character[0] - '0';
+                    param[p] += buffer.bytes[0] - '0';
                 }
 
-                esc_sequence += buffer.character;
-                common_io.getNextGlyph(buffer, it, line_end);
+                esc_sequence += buffer.bytes;
+                common_io.nextGlyph(buffer.bytes, it, buffer);
             }
 
             //   ESC[C     p should = 0
             //   ESC[6C    p should = 1
             //   ESC[1;1H  p should = 2
             //   ESC[;79H  p should = 2
-            if (buffer.character[0] != '?') // Skip Screen Wrap (The Draw)
+            if (buffer.bytes[0] != '?') // Skip Screen Wrap (The Draw)
             {
                 if ((at_least_one_digit == true) &&
-                    (buffer.character[0] == ';')) {
+                    (buffer.bytes[0] == ';')) {
                     p++;
                 } else if ((!(at_least_one_digit == true)) &&
-                           (buffer.character[0] == ';')) {
+                           (buffer.bytes[0] == ';')) {
                     p++;
                     first_param_implied = true;
                 } else if (at_least_one_digit) {
@@ -955,14 +954,14 @@ void ProcessorText::escapeSequenceParsing(LocalizedBuffer &buffer,
                     more_params = false;
             }
 
-            esc_sequence += buffer.character;
+            esc_sequence += buffer.bytes;
         } // End While (more_params)
 
         std::cout << "ESCAPE SEQUENCE: " << esc_sequence << std::endl;
-        std::cout << "buffer.character[0]: " << buffer.character[0] << std::endl;
+        std::cout << "buffer.character[0]: " << buffer.bytes[0] << std::endl;
         std::cout << "p: " << p << std::endl;
 
-        switch (buffer.character[0]) {
+        switch (buffer.bytes[0]) {
             case CURSOR_POSITION:
             case CURSOR_POSITION_ALT:
                 if (p == 0) {
@@ -1301,39 +1300,39 @@ void ProcessorText::parseTextToBuffer(char *buff) {
         strlen((const char *) buff)
     );
 
-    std::string::iterator it = incoming_data.begin();
-    std::string::iterator line_end = incoming_data.end();
+    std::string::const_iterator it = incoming_data.begin();
+    std::string::const_iterator line_end = incoming_data.end();
 
     CommonIO common_io;
-    LocalizedBuffer buffer;
+    Utf8Glyph buffer;
 
     while (it != line_end) {
-        common_io.getNextGlyph(buffer, it, line_end);
+        common_io.nextGlyph(buffer.bytes, it, buffer);
 
-        std::cout << "loop char <int>: " << static_cast<int>(buffer.character[0]) << std::endl;
+        std::cout << "loop char <int>: " << static_cast<int>(buffer.bytes[0]) << std::endl;
 
         // ESC Sequences
-        if (buffer.length == 1 && buffer.character[0] == '\x1b') {
+        if (buffer.length == 1 && buffer.bytes[0] == '\x1b') {
             // Most likely won't get ESC sequences here,
             // They are translated to key inputs prior to reaching here.
-            std::cout << "escapeSequenceParsing: " << buffer.character << std::endl;
-            escapeSequenceParsing(buffer, it, line_end);
+            std::cout << "escapeSequenceParsing: " << buffer.bytes << std::endl;
+            escapeSequenceParsing(buffer, it);
         }
         // Back Space
-        else if (buffer.character[0] == '\b') {
+        else if (buffer.bytes[0] == '\b') {
             moveBackSpace();
         }
         // Catch Tabs
-        else if (buffer.character[0] == '\t') {
+        else if (buffer.bytes[0] == '\t') {
             moveTabWidth();
-        } else if (buffer.length == 1 && buffer.character[0] == '\n') {
+        } else if (buffer.length == 1 && buffer.bytes[0] == '\n') {
             moveNewLine();
         }
         // Append Character to Screen Buffer.
-        else if (buffer.character[0] != '\0' && buffer.length >= 1) {
-            handleTextInput(buffer.character);
+        else if (buffer.bytes[0] != '\0' && buffer.length >= 1) {
+            handleTextInput(buffer.bytes);
         } else {
-            std::cout << "not handled charater sequence: " << static_cast<int>(buffer.character[0]) << std::endl;
+            std::cout << "not handled charater sequence: " << static_cast<int>(buffer.bytes[0]) << std::endl;
         }
 
         // End of Position Updates for movement.

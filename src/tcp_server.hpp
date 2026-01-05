@@ -43,15 +43,13 @@ public:
         return instance;
     }
 
-    TCPServer(const TCPServer &) = delete;
-
-    TCPServer(TCPServer &&) = delete;
-
-    TCPServer &operator=(const TCPServer &) = delete;
-
-    TCPServer &operator=(TCPServer &&) = delete;
-
     ~TCPServer() = default;
+
+    // Copy and Move Constructors.
+    TCPServer(const TCPServer &) = delete;
+    TCPServer(TCPServer &&) = delete;
+    TCPServer &operator=(const TCPServer &) = delete;
+    TCPServer &operator=(TCPServer &&) = delete;
 
     bool start(const Uint16 telnetPort, const Uint16 maxSessions) {
         for (int i = 1; i <= maxSessions; ++i) {
@@ -98,20 +96,20 @@ public:
             // Can check for Events to display to users etc... or execute.
 
             // Accept new clients
-            TCPsocket newClient = SDLNet_TCP_Accept(serverSocket);
-            if (newClient) {
+            TCPsocket newSocketSession = SDLNet_TCP_Accept(serverSocket);
+            if (newSocketSession) {
                 if (sessions.size() < static_cast<size_t>(maxSessions) && !availableNodes.empty()) {
                     int nodeId = *availableNodes.begin();
                     availableNodes.erase(nodeId);
 
-                    SDLNet_TCP_AddSocket(socketSet, newClient);
+                    SDLNet_TCP_AddSocket(socketSet, newSocketSession);
 
-                    sessions.emplace_back(newClient, nodeId, config);
+                    sessions.emplace_back(newSocketSession, nodeId, config);
                     std::cout << "[Server] New client connected! Node #" << nodeId
                             << ", Total: " << sessions.size() << "\n";
                 } else {
                     std::cerr << "[Server] Max clients reached or no available node IDs. Rejecting.\n";
-                    SDLNet_TCP_Close(newClient);
+                    SDLNet_TCP_Close(newSocketSession);
                 }
             }
 
@@ -126,12 +124,12 @@ public:
                     // Remove the problematic socket from the set
                     // Iterate through all sockets to find the invalid one
                     for (auto it = sessions.begin(); it != sessions.end();) {
-                        TCPsocket clientSocket = it->getSocket();
+                        auto clientSocket = it->getSocket();
                         if (!it->isActive() || !SDLNet_SocketReady(clientSocket)) {
                             // Remove the invalid socket from the set
                             SDLNet_TCP_DelSocket(socketSet, clientSocket);
                             SDLNet_TCP_Close(clientSocket);
-                            int nodeId = it->getNodeNumber();
+                            const int nodeId = it->getNodeNumber();
                             availableNodes.insert(it->getNodeNumber());
 
                             // Remove the client from the list
@@ -152,11 +150,11 @@ public:
 
             // Poll For Waiting Data
             for (auto it = sessions.begin(); it != sessions.end();) {
-                TCPsocket sock = it->getSocket();
+                auto sock = it->getSocket();
 
                 if (SDLNet_SocketReady(sock)) {
-                    std::string msg = it->receive();
-                    if (msg.empty()) {
+                    ByteBuffer bytes = it->receive();
+                    if (bytes.empty()) {
                         const int nodeId = it->getNodeNumber();
                         std::cout << "[Server] Client node #" << nodeId << " disconnected.\n";
 
@@ -170,9 +168,8 @@ public:
                         continue;
                     }
 
-                    //std::cout << "[Server][Node #" << it->getNodeNumber() << "] Received: " << msg << "\n";
-                    //it->send("Server received: " + msg);
-                    it->handleIncomingData(msg);
+                    // Incoming Data Passing to the specific Session
+                    it->handleIncomingData(bytes);
                 }
 
                 ++it;
@@ -211,6 +208,14 @@ public:
 
         SDLNet_Quit();
         std::cout << "[Server] Server stopped.\n";
+    }
+
+    /**
+     * Grab Instance of Global Database Object.
+     * @return
+     */
+    SQLW::Database &getDatabase() {
+        return coreDatabase;
     }
 };
 

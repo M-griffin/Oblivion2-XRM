@@ -22,7 +22,7 @@ SessionIO::SessionIO(TCPSession &session, CommonIO &common)
 }
 
 SessionIO::~SessionIO() {
-    m_log.write<Logging::DEBUG_LOG>("~SessionIO()");
+    m_log.write<Logging::CONSOLE_LOG>("~SessionIO()");
     m_mapped_codes.clear();
     std::map<std::string, std::string>().swap(m_mapped_codes);
 }
@@ -1062,8 +1062,10 @@ std::string SessionIO::pipe2promptFormat(const std::string &sequence, Config &co
  */
 bool SessionIO::checkRegex(const std::string &sequence, const std::string &expression) {
     // Create system default locale
-    std::setlocale(LC_ALL, Encoding::ENCODING_TEXT_UTF8.c_str());
-    std::cout.imbue(std::locale());
+
+    // Note shouldn't use locale, this for local app, and not session specific.
+    //std::setlocale(LC_ALL, Encoding::ENCODING_TEXT_UTF8.c_str());
+    //std::cout.imbue(std::locale());
 
     std::smatch match;
     bool result = false;

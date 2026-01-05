@@ -1,56 +1,23 @@
-#ifndef COMMONIO_HPP
-#define COMMONIO_HPP
+#ifndef COMMON_IO_HPP
+#define COMMON_IO_HPP
 
 #include <ctime>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <map>
-#include <stdint.h>
+#include <cstdint>
+
+#include "encoding.hpp"
 
 class Logging;
 
-// Localized Buffer.
-typedef struct localized_buffer {
-    std::string character;
-    uint8_t length;
+// Possible Replacement for Localized Buffer.
+typedef struct Utf8Glyph {
+    std::string bytes;   // UTF-8 bytes
+    std::size_t length;  // byte length (1–4)
 
-    localized_buffer()
-        : character("")
-          , length(0) {
-    }
-
-    ~localized_buffer() {
-        character.erase();
-        length = 0;
-    }
-
-    // Copy constructors
-    localized_buffer(localized_buffer &other) noexcept = delete;
-
-    localized_buffer &operator=(localized_buffer &other) noexcept = delete;
-
-    // Move constructors
-    localized_buffer(localized_buffer &&other) noexcept
-        : character(std::move(other.character))
-          , length(other.length) {
-        other.length = 0;
-    }
-
-    localized_buffer &operator=(localized_buffer &&other) noexcept {
-        if (this != &other) {
-            character = std::move(other.character);
-            length = other.length;
-            other.length = 0;
-        }
-        return *this;
-    }
-
-    void clear() {
-        character.erase();
-        length = 0;
-    }
-} LocalizedBuffer;
+    bool isAscii() const { return length == 1; }
+} Utf8Glyph;
 
 /**
  * @class CommonIO
@@ -70,6 +37,9 @@ class CommonIO {
     bool m_is_escape_sequence; // ParseInput
     bool m_is_new_getline; // GetLine
     bool m_is_new_leadoff; // GetLine
+
+    Encoding m_encode;
+    Encoding::TextEncoding m_encoding = Encoding::TextEncoding::ASCII;
 
 public:
     explicit CommonIO();
@@ -137,6 +107,7 @@ public:
      * This is for mixed ASCII And UTF-8 Strings.
      */
     std::string::size_type numberOfChars(const std::string &str);
+    std::string::size_type numberOfChars2(const std::string &str);
 
     /**
      * Left Trim White spaces (Front)
@@ -160,6 +131,10 @@ public:
     std::string eraseString(const std::string &str,
                             std::string::size_type start_position,
                             std::string::size_type end_position = 0);
+
+    std::string eraseString2(const std::string &str,
+                                  std::string::size_type start_position,
+                                  std::string::size_type count);
 
     /**
      * Right String Padding
@@ -339,22 +314,30 @@ public:
         return static_cast<uint8_t>(0xff & oc);
     }
 
-    /**
-     * @brief Parses screen data into the Screen Buffer.
-     * @return
-     */
-    void getNextGlyph(LocalizedBuffer &buffer,
-                      std::string::iterator &it,
-                      const std::string::iterator &line_end);
+    bool nextGlyph(const std::string& s,
+               std::string::const_iterator& it,
+               Utf8Glyph& glyph);
 
-    /**
-     * @brief Parses screen data into the Screen Buffer.
-     * @return
-     */
-    void peekNextGlyph(LocalizedBuffer &buffer,
-                       std::string::iterator &it,
-                       const std::string::iterator &line_end);
+    bool peekGlyph(const std::string& s,
+               std::string::const_iterator it,
+               Utf8Glyph& glyph);
 
-    void testUnicode(const std::string &incoming_data);
+    void onTcpReceive(const std::string& chunk);
+
+    bool decodeNextGlyph(const std::string& bytes,
+                 std::string::const_iterator& it,
+                 Encoding::TextEncoding encoding,
+                 Utf8Glyph& glyph);
+
+    // UTF8 Internal to CP437
+
+    void initCp437ReverseTable();
+
+    bool nextCodepoint(const std::string& utf8,
+                   std::string::const_iterator& it,
+                   uint32_t& cp);
+
+    std::string utf8ToCp437(const std::string& utf8);
+
 };
 #endif

@@ -4,6 +4,7 @@
 #include "processor_base.hpp"
 
 #include <string>
+#include <map>
 
 #include "model-sys/screen_pixel.hpp"
 #include "common_io.hpp"
@@ -101,9 +102,7 @@ public:
     void screenBufferScrollDown();
 
     // This could be shared.
-    void escapeSequenceParsing(LocalizedBuffer &buffer,
-                               std::string::iterator &it,
-                               std::string::iterator &line_end);
+    void escapeSequenceParsing(Utf8Glyph &buffer, std::string::const_iterator &it);
 
     std::vector<ScreenPixel> m_screen_buffer;
     std::map<int, ScreenPixel> m_pull_down_options;

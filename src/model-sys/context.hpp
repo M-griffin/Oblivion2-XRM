@@ -8,6 +8,7 @@
 #include "../session.hpp"
 #include "../session_io.hpp"
 #include "../telnet_session.hpp"
+#include "../state_manager.hpp"
 
 #include "config.hpp"
 #include "users.hpp"
@@ -27,6 +28,7 @@ struct Context {
     CommonIO *commonIO = nullptr;
     SessionIO *sessionIO = nullptr;
     Config *config = nullptr;
+    StateManager *state = nullptr;
 
     void bind(
         Session &bs,
@@ -35,7 +37,8 @@ struct Context {
         ProcessorAnsi &ap,
         CommonIO &cio,
         SessionIO &sio,
-        Config &cfg
+        Config &cfg,
+        StateManager &st
     ) {
         baseSession = &bs;
         telnetSession = &ts;
@@ -44,41 +47,47 @@ struct Context {
         commonIO = &cio;
         sessionIO = &sio;
         config = &cfg;
+        state = &st;
     }
 
-    Session &base() const {
+    Session &getBase() const {
         assert(baseSession);
         return *baseSession;
     }
 
-    TelnetSession &telnet() const {
+    TelnetSession &getTelnet() const {
         assert(telnetSession);
         return *telnetSession;
     }
 
-    Users &user() const {
+    Users &getUser() const {
         assert(userRec);
         return *userRec;
     }
 
-    ProcessorAnsi &ansi() const {
+    ProcessorAnsi &getAnsi() const {
         assert(ansiProcess);
         return *ansiProcess;
     }
 
-    CommonIO &common() const {
+    CommonIO &getCommonIO() const {
         assert(commonIO);
         return *commonIO;
     }
 
-    SessionIO &session() const {
+    SessionIO &getSessionIO() const {
         assert(sessionIO);
         return *sessionIO;
     }
 
-    Config &cfg() const {
+    Config &getCfg() const {
         assert(config);
         return *config;
+    }
+
+    StateManager &getState() const {
+        assert(state);
+        return *state;
     }
 };
 

@@ -148,9 +148,9 @@ int ProcessorAnsi::getMCIOffSet(std::string mciCode) {
 
         // Check for MCI Code, if it matches, return position.
         if (i + 2 < max) {
-            if (m_screen_buffer[i].char_sequence[0] == (unsigned char) mciCode[0] &&
-                m_screen_buffer[i + 1].char_sequence[0] == (unsigned char) mciCode[1] &&
-                m_screen_buffer[i + 2].char_sequence[0] == (unsigned char) mciCode[2]) {
+            if (m_screen_buffer[i].char_sequence[0] == static_cast<unsigned char>(mciCode[0]) &&
+                m_screen_buffer[i + 1].char_sequence[0] == static_cast<unsigned char>(mciCode[1]) &&
+                m_screen_buffer[i + 2].char_sequence[0] == static_cast<unsigned char>(mciCode[2])) {
                 return i + 1;
             }
         }
@@ -617,31 +617,31 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
         strlen((const char *) buff)
     );
 
-    std::string::iterator it = incoming_data.begin();
-    std::string::iterator line_end = incoming_data.end();
+    std::string::const_iterator it = incoming_data.begin();
+    std::string::const_iterator line_end = incoming_data.end();
 
     CommonIO common_io;
-    LocalizedBuffer buffer;
+    Utf8Glyph buffer;
 
     while (it != line_end) {
-        common_io.getNextGlyph(buffer, it, line_end);
+        common_io.nextGlyph(buffer.bytes, it, buffer);
 
-        if (buffer.length == 1 && buffer.character[0] == '\x1b') {
+        if (buffer.length == 1 && buffer.bytes[0] == '\x1b') {
             escSequence.erase();
-            escSequence += buffer.character;
+            escSequence += buffer.bytes;
 
-            common_io.getNextGlyph(buffer, it, line_end);
+            common_io.nextGlyph(buffer.bytes, it, buffer);
 
             if (buffer.length == 0)
                 break;
 
             // grab the left bracket
-            if (buffer.length == 1 && buffer.character[0] == '?') {
+            if (buffer.length == 1 && buffer.bytes[0] == '?') {
                 // Setup for ESC?7h or ESC?7l commands etc..
-                escSequence += buffer.character;
-            } else if (buffer.length == 1 && buffer.character[0] == '[') {
+                escSequence += buffer.bytes;
+            } else if (buffer.length == 1 && buffer.bytes[0] == '[') {
                 // Else Normal ESC Sequence, check parameters.
-                escSequence += buffer.character;
+                escSequence += buffer.bytes;
             }
 
             /*
@@ -658,43 +658,43 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
 
             while (more_params == true) {
                 at_least_one_digit = false;
-                common_io.getNextGlyph(buffer, it, line_end);
+                common_io.nextGlyph(buffer.bytes, it, buffer);
 
                 if (buffer.length == 0)
                     break;
 
                 for (dig = 0; dig < 3; dig++) {
-                    if (buffer.length != 1 || !isdigit(buffer.character[0]))
+                    if (buffer.length != 1 || !isdigit(buffer.bytes[0]))
                         break;
 
                     at_least_one_digit = true;
 
                     // 3 digits at most (255) in a byte size decimal number */
                     if (dig == 0) {
-                        param[p] = buffer.character[0] - '0';
+                        param[p] = buffer.bytes[0] - '0';
                     } else if (dig == 1) {
                         param[p] *= 10;
-                        param[p] += buffer.character[0] - '0';
+                        param[p] += buffer.bytes[0] - '0';
                     } else {
                         param[p] *= 100;
-                        param[p] += buffer.character[0] - '0';
+                        param[p] += buffer.bytes[0] - '0';
                     }
 
-                    escSequence += buffer.character;
-                    common_io.getNextGlyph(buffer, it, line_end);
+                    escSequence += buffer.bytes;
+                    common_io.nextGlyph(buffer.bytes, it, buffer);
                 }
 
                 //   ESC[C     p should = 0
                 //   ESC[6C    p should = 1
                 //   ESC[1;1H  p should = 2
                 //   ESC[;79H  p should = 2
-                if (buffer.character[0] != '?') // Skip Screen Wrap (The Draw)
+                if (buffer.bytes[0] != '?') // Skip Screen Wrap (The Draw)
                 {
                     if ((at_least_one_digit == true) &&
-                        (buffer.character[0] == ';')) {
+                        (buffer.bytes[0] == ';')) {
                         p++;
                     } else if ((!(at_least_one_digit == true)) &&
-                               (buffer.character[0] == ';')) {
+                               (buffer.bytes[0] == ';')) {
                         p++;
                         first_param_implied = true;
                     } else if (at_least_one_digit) {
@@ -704,10 +704,10 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                         more_params = false;
                 }
 
-                escSequence += buffer.character;
+                escSequence += buffer.bytes;
             } // End While (more_params)
 
-            switch (buffer.character[0]) {
+            switch (buffer.bytes[0]) {
                 case CURSOR_POSITION:
                 case CURSOR_POSITION_ALT:
                     if (p == 0) {
@@ -1027,15 +1027,15 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
         } // end of main escape sequence handler
         else // otherwise output character using current color */
         {
-            LocalizedBuffer nextBuffer;
+            Utf8Glyph nextBuffer;
 
             // Only Peak Next if were at CR.
-            if (buffer.character[0] == '\r')
-                common_io.peekNextGlyph(nextBuffer, it, line_end);
+            if (buffer.bytes[0] == '\r')
+                common_io.peekGlyph(buffer.bytes, it, buffer);
 
             // Handle New Line in ANSI Files properly.
             if (buffer.length == 1 && nextBuffer.length == 1 &&
-                buffer.character[0] == '\r' && nextBuffer.character[0] == '\n') {
+                buffer.bytes[0] == '\r' && nextBuffer.bytes[0] == '\n') {
                 *it++; // Increment to \n (2) char combo.
                 m_x_position = 1;
                 ++m_y_position;
@@ -1056,7 +1056,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                 }
 
                 continue;
-            } else if (buffer.length == 1 && buffer.character[0] == '\n') {
+            } else if (buffer.length == 1 && buffer.bytes[0] == '\n') {
                 //m_x_position = 1;
                 ++m_y_position;
 
@@ -1076,7 +1076,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                 }
 
                 continue;
-            } else if (buffer.length == 1 && buffer.character[0] == '\r') {
+            } else if (buffer.length == 1 && buffer.bytes[0] == '\r') {
                 m_x_position = 1;
                 //++m_y_position;
 
@@ -1099,13 +1099,13 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
             }
 
             // Append Character to Screen Buffer.
-            if (buffer.character[0] != '\0' && buffer.length >= 1) {
+            if (buffer.bytes[0] != '\0' && buffer.length >= 1) {
                 // Set the Current Max Row Position.
                 if (m_max_y_position < m_y_position) {
                     m_max_y_position = m_y_position;
                 }
 
-                screenBufferSetGlyph(buffer.character);
+                screenBufferSetGlyph(buffer.bytes);
             }
 
             escSequence.erase();

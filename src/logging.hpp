@@ -98,6 +98,15 @@ public:
         return "";
     }
 
+    template<int level>
+    std::string log(const std::vector<uint8_t> &t) {
+        std::string strData;
+        strData.insert(strData.end(), t.begin(), t.end());
+        std::ostringstream oss;
+        oss << strData;
+        return oss.str();
+    }
+
     template<int level, typename T>
     std::string log(const T &t) {
         std::ostringstream oss;

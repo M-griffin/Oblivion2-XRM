@@ -492,7 +492,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
             m_log.write<Logging::CONSOLE_LOG>("User Logoff()");
             // Base Class
             m_logoff = true;
-            m_ctx.base().hangup();
+            m_ctx.getBase().hangup();
             break;
 
         // Drops into the BBS
@@ -523,7 +523,7 @@ bool MenuSystem::menuOptionsGlobalNewScanCommands(const MenuOption &option) {
  * @brief Disconnect a user on the Session.
  */
 void MenuSystem::disconnectUser() {
-    m_ctx.base().hangup();
+    m_ctx.getBase().hangup();
 }
 
 /**

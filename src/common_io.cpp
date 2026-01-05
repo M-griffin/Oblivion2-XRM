@@ -34,6 +34,7 @@
 #include <sstream>
 #include <fstream>
 #include <regex>
+#include <unordered_map>
 
 #include "model-sys/structures.hpp"
 #include "encoding.hpp"
@@ -57,9 +58,9 @@ CommonIO::CommonIO()
 }
 
 CommonIO::~CommonIO() {
-    m_log.write<Logging::DEBUG_LOG>("~CommonIO()");
+    m_log.write<Logging::CONSOLE_LOG>("~CommonIO()");
 
-    // Look at making this a single instance per session insetad of alocate on fly.    
+    // Look at making this a single instance per session instead of a locate on fly.
     m_escape_sequence.erase();
     m_string_buffer.erase();
     m_incoming_data.erase();
@@ -67,10 +68,10 @@ CommonIO::~CommonIO() {
 }
 
 /**
- * @brief Setup a Static GLobal Map for Key Input that can be resued.
+ * @brief Set up a Static GLobal Map for Key Input that can be resued.
  */
 void CommonIO::populateInputSequenceMap() {
-    if (INPUT_SEQUENCE_MAP.size() > 0) {
+    if (!INPUT_SEQUENCE_MAP.empty()) {
         return;
     }
 
@@ -372,7 +373,7 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str) {
         int byte_value = static_cast<int>((uint8_t) *it);
 
         if (byte_value < 128) {
-            *it++;
+            ++it;
             ++number_characters;
         } else {
             try {
@@ -380,7 +381,7 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str) {
                 utf8::next(it, line_end);
                 ++number_characters;
             } catch (utf8::exception &ex) {
-                *it++;
+                ++it;
                 ++number_characters;
                 m_log.write<Logging::ERROR_LOG>("[numberOfChars] UTF8 Parsing Exception=", ex.what(), __LINE__,
                                                 __FILE__);
@@ -390,6 +391,30 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str) {
 
     return number_characters;
 }
+
+// Sugested Fix. but doesn't handle high ascii CP437 properly, we'll re-test.
+std::string::size_type CommonIO::numberOfChars2(const std::string &str) {
+    if (str.empty()) {
+        return 0;
+    }
+
+    std::string::size_type count = 0;
+    auto it = str.begin();
+    auto end = str.end();
+
+    while (it != end) {
+        try {
+            utf8::next(it, end); // advances correctly (1–4 bytes)
+        } catch (utf8::exception &) {
+            // Invalid UTF-8 byte: skip one byte to avoid infinite loop
+            ++it;
+        }
+        ++count;
+    }
+
+    return count;
+}
+
 
 /**
  * @brief Left Trim White spaces (Front)
@@ -494,7 +519,7 @@ std::string CommonIO::eraseString(const std::string &str,
                 new_string_builder += std::string(1, *it);
             }
 
-            *it++;
+            ++it;
         } else {
             try {
                 uint32_t code_point = utf8::next(it, line_end);
@@ -514,7 +539,7 @@ std::string CommonIO::eraseString(const std::string &str,
             } catch (utf8::exception &ex) {
                 m_log.write<Logging::DEBUG_LOG>("(Common::EraseString) UTF8 Parsing Exception=", ex.what(), __LINE__,
                                                 __FILE__);
-                *it++;
+                ++it;
             }
         }
 
@@ -522,6 +547,51 @@ std::string CommonIO::eraseString(const std::string &str,
     }
 
     return new_string_builder;
+}
+
+// suggested Fix / again can have issues with high acsii non-utf8, have to review.
+std::string CommonIO::eraseString2(const std::string &str,
+                                   std::string::size_type start_position,
+                                   std::string::size_type count) {
+    if (str.empty() || count == 0) {
+        return str;
+    }
+
+    auto it = str.begin();
+    auto end = str.end();
+
+    // Advance to start_position (character index)
+    std::string::size_type current = 0;
+    auto erase_begin = it;
+
+    while (it != end && current < start_position) {
+        try {
+            utf8::next(it, end);
+        } catch (...) {
+            ++it;
+        }
+        ++current;
+    }
+    erase_begin = it;
+
+    // Advance count characters
+    current = 0;
+    while (it != end && current < count) {
+        try {
+            utf8::next(it, end);
+        } catch (...) {
+            ++it;
+        }
+        ++current;
+    }
+    auto erase_end = it;
+
+    std::string result;
+    result.reserve(str.size());
+    result.append(str.begin(), erase_begin);
+    result.append(erase_end, str.end());
+
+    return result;
 }
 
 /**
@@ -1185,7 +1255,7 @@ std::string CommonIO::readinAnsi(const std::string &file_name) {
 
     std::string buff;
     FILE *fp;
-    int c = 0;
+    uint8_t c = 0;
 
     if ((fp = fopen(path.c_str(), "r+")) == NULL) {
         return "";
@@ -1202,9 +1272,11 @@ std::string CommonIO::readinAnsi(const std::string &file_name) {
     fclose(fp);
 
     // Normalize Line Ending for consistent display to users.
-    std::regex exp("(\\r\\n|\\r|\\n)+");
-    std::string fixed_newlines = std::regex_replace(buff, exp, "\r\n");
-    return Encoding::getInstance().utf8Encode(fixed_newlines);
+    const std::regex exp("(\\r\\n|\\r|\\n)+");
+    const std::string fixed_newlines = std::regex_replace(buff, exp, "\r\n");
+
+    // Update Encoding!!
+    return m_encode.utf8Encode(fixed_newlines);
 }
 
 /**
@@ -1343,86 +1415,154 @@ int CommonIO::stringToBool(const std::string &value) {
     // Test if string starts with T or F instead of typing True/False
     if (toupper(value[0]) == 'T')
         return 1;
-    else if (toupper(value[0]) == 'F')
+    if (toupper(value[0]) == 'F')
         return 0;
-    else
-        return -1;
+
+    return -1;
 }
 
-/**
-* @brief Parses screen data into the Screen Buffer.
-* @return
-*/
-void CommonIO::getNextGlyph(LocalizedBuffer &buffer,
-                            std::string::iterator &it,
-                            const std::string::iterator &line_end) {
-    buffer.clear();
+bool CommonIO::nextGlyph(const std::string &s,
+                         std::string::const_iterator &it,
+                         Utf8Glyph &glyph) {
+    glyph.bytes.clear();
+    glyph.length = 0;
 
-    if (it == line_end) {
-        return;
+    if (it == s.end()) {
+        return false;
     }
 
-    int byte_value = static_cast<int>((uint8_t) *it);
+    auto start = it;
 
-    if (byte_value < 128) {
-        buffer.character = std::string(1, *it);
-        buffer.length = 1;
-        *it++;
-    } else {
-        try {
-            uint32_t code_point = utf8::next(it, line_end);
-            unsigned char character[5] = {0, 0, 0, 0, 0};
-            utf8::append(code_point, character);
+    try {
+        utf8::next(it, s.end());
+    } catch (...) {
+        // Invalid byte: consume one byte
+        glyph.bytes.push_back(*it);
+        glyph.length = 1;
+        ++it;
+        return true;
+    }
 
-            for (int i = 0; i < 5; i++) {
-                if (character[i] != 0) {
-                    buffer.character += std::string(1, character[i]);
-                }
+    glyph.bytes.assign(start, it);
+    glyph.length = glyph.bytes.size();
+    return true;
+}
+
+bool CommonIO::peekGlyph(const std::string &s,
+                         std::string::const_iterator it,
+                         Utf8Glyph &glyph) {
+    return nextGlyph(s, it, glyph);
+}
+
+// General idea of a buffer for incomplete sequences.  review and incorperate for better sequence handling!
+void CommonIO::onTcpReceive(const std::string& chunk) {
+    std::string utf8_buffer; // temp!!
+
+    utf8_buffer.append(chunk);
+
+    auto it = utf8_buffer.begin();
+    auto end = utf8_buffer.end();
+    auto last_good = it;
+
+    try {
+        while (it != end) {
+            last_good = it;
+            utf8::next(it, end);
+            // Process complete glyph here if needed
+        }
+        // All valid
+        utf8_buffer.clear();
+    }
+    catch (utf8::not_enough_room&) {
+        // Partial UTF-8 sequence at end → keep it
+        utf8_buffer.erase(utf8_buffer.begin(), last_good);
+    }
+    catch (utf8::exception&) {
+        // Invalid UTF-8 byte → skip one byte
+        utf8_buffer.erase(utf8_buffer.begin());
+    }
+
+    // calling
+    /*
+    *Utf8Glyph g;
+    auto it = utf8_buffer.begin();
+
+    if (nextGlyph(utf8_buffer, it, g)) {
+    // safe single glyph
+    }
+    */
+}
+
+bool CommonIO::decodeNextGlyph(const std::string& bytes,
+                 std::string::const_iterator& it,
+                 Encoding::TextEncoding encoding,
+                 Utf8Glyph& glyph) {
+    glyph.bytes.clear();
+    glyph.length = 0;
+
+    if (it == bytes.end()) {
+        return false;
+    }
+
+    auto start = it;
+
+    switch (encoding) {
+        case Encoding::TextEncoding::UTF8:
+            try {
+                utf8::next(it, bytes.end());
+            } catch (...) {
+                // replacement char
+                ++it;
             }
+            break;
 
-            buffer.length = buffer.character.size();
-        } catch (utf8::exception &ex) {
-            m_log.write<Logging::ERROR_LOG>("[getNextGlyph] UTF8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
-            (*it)++; // Bad, other iterate past it, otherwise stuck in endless loop.
+        case Encoding::TextEncoding::ISO_8859_1:
+        case Encoding::TextEncoding::CP437:
+            ++it;
+            break;
+
+        default:
+            ++it;
+            break;;
+    }
+
+    glyph.bytes.assign(start, it);
+    glyph.length = glyph.bytes.size();
+    return true;
+}
+
+// These are in Encoding, we need to merge!!
+/*
+bool CommonIO::nextCodepoint(const std::string& utf8,
+                   std::string::const_iterator& it,
+                   uint32_t& cp) {
+    if (it == utf8.end()) return false;
+
+    try {
+        cp = utf8::next(it, utf8.end());
+    } catch (...) {
+        ++it;
+        cp = '?'; // replacement
+    }
+    return true;
+}
+
+std::string CommonIO::utf8ToCp437(const std::string& utf8) {
+    std::string out;
+    out.reserve(utf8.size());
+
+    auto it = utf8.begin();
+    uint32_t cp;
+
+    while (nextCodepoint(utf8, it, cp)) {
+        auto found = unicode_to_cp437.find(cp);
+        if (found != unicode_to_cp437.end()) {
+            out.push_back(static_cast<char>(found->second));
+        } else {
+            out.push_back('?'); // fallback
         }
     }
-}
 
-/**
-* @brief Parses screen data into the Screen Buffer.
-* @return
+    return out;
+}
 */
-void CommonIO::peekNextGlyph(LocalizedBuffer &buffer,
-                             std::string::iterator &it,
-                             const std::string::iterator &line_end) {
-    buffer.clear();
-
-    if (it == line_end) {
-        return;
-    }
-
-    int byte_value = static_cast<int>((uint8_t) *it);
-
-    if (byte_value < 128) {
-        buffer.character = std::string(1, *it);
-        buffer.length = 1;
-    } else {
-        try {
-            uint32_t code_point = utf8::next(it, line_end);
-            unsigned char character[5] = {0, 0, 0, 0, 0};
-            utf8::append(code_point, character);
-
-            for (int i = 0; i < 5; i++) {
-                if (character[i] != 0) {
-                    buffer.character += std::string(1, character[i]);
-                }
-            }
-
-            buffer.length = buffer.character.size();
-            (*it)--;
-        } catch (utf8::exception &ex) {
-            m_log.write<Logging::ERROR_LOG>("[peekNextGlyph] UTF8 Parsing Exception=", ex.what(), __LINE__, __FILE__);
-            (*it)++; // Bad, iterate past otherwise stuck in endless loop!
-        }
-    }
-}
