@@ -63,7 +63,7 @@ ModLogon::ModLogon(session_ptr session_data, config_ptr config, processor_ansi_p
 
 ModLogon::~ModLogon()
 {
-    m_log.write<Logging::DEBUG_LOG>("~ModLogon");
+    m_log.log(Logging::LogLevel::Debug, "~ModLogon");
     std::vector<std::function< void()> >().swap(m_setup_functions);
     std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
 }
@@ -354,12 +354,12 @@ bool ModLogon::logon(const std::string &input)
         // Check if users enter valid identifier.
         if(checkUserLogon(key))
         {
-            // TODO m_log.write<Logging::CONSOLE_LOG>("PROMPT_USERNAME=", m_logon_user->sHandle);
+            // TODO m_log.log(Logging::LogLevel::Console, "PROMPT_USERNAME=", m_logon_user->sHandle);
             changeNextModule();
         }
         else
         {
-            m_log.write<Logging::ERROR_LOG>("PROMPT_INVALID_USERNAME=", key);
+            m_log.log(Logging::LogLevel::Error, "PROMPT_INVALID_USERNAME=", key);
 
             displayPromptAndNewLine(PROMPT_INVALID_USERNAME);
             ++m_failure_attempts;
@@ -411,7 +411,7 @@ bool ModLogon::validate_password(const std::string &input)
 
     if(!security || security->iId == -1)
     {
-        m_log.write<Logging::ERROR_LOG>("Error, Security Index on user record not available=", m_logon_user->sHandle, __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Error, "Error, Security Index on user record not available=", m_logon_user->sHandle, __FILE__, __LINE__);
         return false;
     }
 
@@ -420,7 +420,7 @@ bool ModLogon::validate_password(const std::string &input)
 
     if(!encryption)
     {
-        m_log.write<Logging::ERROR_LOG>("Error, unable to allocate encryption (Password)=", m_logon_user->sHandle, __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Error, "Error, unable to allocate encryption (Password)=", m_logon_user->sHandle, __FILE__, __LINE__);
         return false;
     }
 
@@ -429,11 +429,11 @@ bool ModLogon::validate_password(const std::string &input)
 
     if(security->sPasswordHash.compare(password) == 0)
     {
-        m_log.write<Logging::CONSOLE_LOG>("Password Successful=", m_logon_user->sHandle);
+        m_log.log(Logging::LogLevel::Console, "Password Successful=", m_logon_user->sHandle);
         return true;
     }
 
-    m_log.write<Logging::ERROR_LOG>("Password Failure=", m_logon_user->sHandle);
+    m_log.log(Logging::LogLevel::Error, "Password Failure=", m_logon_user->sHandle);
     return false;
 }
 
@@ -466,13 +466,13 @@ bool ModLogon::password(const std::string &input)
         if(validate_password(key))
         {
             // Authorize and assign user to the session.
-            m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
+            m_log.log(Logging::LogLevel::Console, "Start Session Lock", __LINE__, __FILE__);
             if (session_ptr session = getLockedSession())
             {
                 session->m_is_session_authorized = true;
                 session->m_user_record = m_logon_user;
             }
-            m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
+            m_log.log(Logging::LogLevel::Console, "End Session Lock", __LINE__, __FILE__);
             m_is_active = false;
         }
         else
@@ -483,12 +483,12 @@ bool ModLogon::password(const std::string &input)
             // If max, then exit back to matrix.
             if(m_failure_attempts >= m_config.invalid_password_attempts)
             {
-                m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
+                m_log.log(Logging::LogLevel::Console, "Start Session Lock", __LINE__, __FILE__);
                 if (session_ptr session = getLockedSession())
                 {
                     session->disconnectUser();
                 }
-                m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
+                m_log.log(Logging::LogLevel::Console, "End Session Lock", __LINE__, __FILE__);
                 m_is_active = false;
                 return false;
             }

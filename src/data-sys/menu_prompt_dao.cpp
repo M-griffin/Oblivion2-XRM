@@ -74,7 +74,7 @@ bool MenuPromptDao::saveMenuPrompt(MenuPrompt &menu_prompt) {
     std::ofstream ofs(path);
 
     if (!ofs.is_open()) {
-        m_log.write<Logging::ERROR_LOG>("Error, unable to write menu prompt=", path, __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Error, "Error, unable to write menu prompt=", path, __FILE__, __LINE__);
         return false;
     }
 
@@ -120,17 +120,17 @@ bool MenuPromptDao::loadMenuPrompt() {
         node = YAML::LoadFile(path);
 
         if (node.size() == 0) {
-            m_log.write<Logging::ERROR_LOG>("YAML Node not found=", path, __FILE__, __LINE__);
+            m_log.log(Logging::LogLevel::Error, "YAML Node not found=", path, __FILE__, __LINE__);
             return false; //File Not Found?
         }
 
         std::string file_version = node["file_version"].as<std::string>();
 
         // Validate File Version
-        m_log.write<Logging::DEBUG_LOG>("MenuPrompt File Version=", file_version);
+        m_log.log(Logging::LogLevel::Debug, "MenuPrompt File Version=", file_version);
 
         if (file_version != MenuPrompt::FILE_VERSION) {
-            m_log.write<Logging::ERROR_LOG>("MenuPrompt File Version=", file_version,
+            m_log.log(Logging::LogLevel::Error, "MenuPrompt File Version=", file_version,
                                             "Expected=", MenuPrompt::FILE_VERSION);
             return false;
         }
@@ -138,11 +138,11 @@ bool MenuPromptDao::loadMenuPrompt() {
         MenuPrompt m = node.as<MenuPrompt>();
         encode(m);
     } catch (YAML::Exception &ex) {
-        m_log.write<Logging::ERROR_LOG>("YAML::LoadFile=", m_filename, "Exception=", ex.what(), __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "YAML::LoadFile=", m_filename, "Exception=", ex.what(), __LINE__, __FILE__);
         return false;
     }
     catch (std::exception &ex) {
-        m_log.write<Logging::ERROR_LOG>("Unexpected YAML::LoadFile=", m_filename, "Exception=", ex.what(), __LINE__,
+        m_log.log(Logging::LogLevel::Error, "Unexpected YAML::LoadFile=", m_filename, "Exception=", ex.what(), __LINE__,
                                         __FILE__);
         return false;
     }

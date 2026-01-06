@@ -379,7 +379,7 @@ void ModMenuEditor::setupMenuOptionEditor()
             break;
 
         default:
-            m_log.write<Logging::ERROR_LOG>("Error, Didn't add the view display to setupMenuOptionEditor", __FILE__, __LINE__);
+            m_log.log(Logging::LogLevel::Error, "Error, Didn't add the view display to setupMenuOptionEditor", __FILE__, __LINE__);
             break;
     }
 
@@ -497,7 +497,7 @@ void ModMenuEditor::displayCurrentPage(const std::string &input_state)
             break;
 
         default:
-            m_log.write<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentPage!!", __FILE__, __LINE__);
+            m_log.log(Logging::LogLevel::Error, "Error, forgot to add new STATE index displayCurrentPage!!", __FILE__, __LINE__);
             return;
     }
 
@@ -544,7 +544,7 @@ void ModMenuEditor::displayCurrentEditPage(const std::string &input_state)
             break;
 
         default:
-            m_log.write<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentEditPage!!", __FILE__, __LINE__);
+            m_log.log(Logging::LogLevel::Error, "Error, forgot to add new STATE index displayCurrentEditPage!!", __FILE__, __LINE__);
             return;
     }
 
@@ -1671,7 +1671,7 @@ void ModMenuEditor::copyExistingMenu(const std::string &menu_name)
     }
     else
     {
-        m_log.write<Logging::ERROR_LOG>("Source menu file doesn't exist=", m_current_menu, __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Error, "Source menu file doesn't exist=", m_current_menu, __FILE__, __LINE__);
         return;
     }
 
@@ -1684,7 +1684,7 @@ void ModMenuEditor::copyExistingMenu(const std::string &menu_name)
     }
     else
     {
-        m_log.write<Logging::ERROR_LOG>("Destination menu file already exist=", new_menu, __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Error, "Destination menu file already exist=", new_menu, __FILE__, __LINE__);
     }
 }
 
@@ -1731,11 +1731,11 @@ void ModMenuEditor::saveMenuChanges()
 
     if(mnu_source.saveMenu(m_loaded_menu.back()))
     {
-        m_log.write<Logging::DEBUG_LOG>("Menu Saved Successful=", m_current_menu, __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Debug, "Menu Saved Successful=", m_current_menu, __FILE__, __LINE__);
     }
     else
     {
-        m_log.write<Logging::ERROR_LOG>("Menu Save Failed=", m_current_menu, __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Error, "Menu Save Failed=", m_current_menu, __FILE__, __LINE__);
     }
 }
 
@@ -1803,7 +1803,7 @@ std::string ModMenuEditor::displayMenuList()
     // check result set, if no menu then return gracefully.
     if(result_set.size() == 0)
     {
-        m_log.write<Logging::CONSOLE_LOG>("No Menus .yaml files found", __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Console, "No Menus .yaml files found", __FILE__, __LINE__);
         return "No Menu Files found!";
     }
 
@@ -2163,9 +2163,9 @@ std::string ModMenuEditor::displayMenuOptionEditScreen()
  */
 void ModMenuEditor::displayGenericMenu()
 {
-    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
+    m_log.log(Logging::LogLevel::Console, "Start Session Lock", __LINE__, __FILE__);
     menu_base_ptr menu = std::make_shared<MenuBase>(getLockedSession());
-    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
+    m_log.log(Logging::LogLevel::Console, "End Session Lock", __LINE__, __FILE__);
     menu->importMenu(m_loaded_menu.back());
 
     std::string generic_screen = menu->processGenericScreens();

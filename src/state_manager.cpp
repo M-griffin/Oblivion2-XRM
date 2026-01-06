@@ -15,7 +15,7 @@ StateManager::StateManager()
 }
 
 StateManager::~StateManager() {
-    m_log.write<Logging::CONSOLE_LOG>("~StateManager()");
+    m_log.log(Logging::LogLevel::Console, "~StateManager()");
 }
 
 

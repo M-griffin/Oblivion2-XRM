@@ -1,149 +1,114 @@
 #include "logging.hpp"
 
-#include <memory>
 #include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
 #include <chrono>
 #include <ctime>
 #include <iomanip>
-#include <mutex>
-#include <thread>
 
 
-thread_local unsigned int local_node_number = 0;
+// Example Usage:
+/*
+Logging& log = Logging::getInstance();
+
+log.setLogLevelFromString("DEBUG");
+log.setNode(42);
+
+log.log(Logging::LogLevel::Info, "Server started on port", 8080);
+log.log(Logging::LogLevel::Debug, "Connection id:", 1234);
+log.log(Logging::LogLevel::Error, "Failed to open file");
+*/
+
+thread_local uint32_t local_node_number = 0;
+
+Logging& Logging::getInstance() {
+    static Logging instance;
+    return instance;
+}
 
 Logging::Logging()
-    : m_log_level(INFO_LOG)
-      , m_mutex() {
+    : m_logLevel(LogLevel::Info) {}
+
+void Logging::setLogLevel(LogLevel level) {
+    m_logLevel = level;
 }
 
-/**
- * @brief Helper, appends forward/backward slash to path
- * @param value
- */
-void Logging::pathSeperator(std::string &value) {
-#ifdef _WIN32
-    value.append("\\");
+void Logging::setLogLevelFromString(const std::string& level) {
+    if (level == "DEBUG") m_logLevel = LogLevel::Debug;
+    else if (level == "INFO") m_logLevel = LogLevel::Info;
+    else if (level == "WARN") m_logLevel = LogLevel::Warn;
+    else if (level == "ERROR") m_logLevel = LogLevel::Error;
+    else if (level == "CONSOLE") m_logLevel = LogLevel::Console;
+    else if (level == "ALL") m_logLevel = LogLevel::All;
+}
+
+void Logging::setNode(uint32_t node) {
+    local_node_number = node;
+}
+
+void Logging::append(std::ostringstream& oss,
+                     const std::vector<uint8_t>& data) const {
+    oss << "[";
+    for (size_t i = 0; i < data.size(); ++i) {
+        oss << std::hex << std::setw(2) << std::setfill('0')
+            << static_cast<int>(data[i]);
+        if (i + 1 < data.size())
+            oss << ' ';
+    }
+    oss << "]";
+    oss << std::dec;
+}
+
+bool Logging::shouldLog(LogLevel level) const {
+    if (m_logLevel == LogLevel::All)
+        return true;
+
+    return static_cast<uint8_t>(level) >= static_cast<uint8_t>(m_logLevel);
+}
+
+const char* Logging::levelToString(LogLevel level) const {
+    switch (level) {
+        case LogLevel::Debug:   return "Debug";
+        case LogLevel::Info:    return "Info";
+        case LogLevel::Warn:    return "Warn";
+        case LogLevel::Error:   return "Error";
+        case LogLevel::Console: return "Console";
+        case LogLevel::All:     return "All";
+        default:                return "Unknown";
+    }
+}
+
+std::string Logging::currentDateTimeMillis() const {
+    using namespace std::chrono;
+
+    auto now = system_clock::now();
+    auto ms = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
+
+    std::time_t t = system_clock::to_time_t(now);
+    std::tm tm;
+
+#if defined(_WIN32)
+    localtime_s(&tm, &t);
 #else
-    value.append("/");
+    localtime_r(&t, &tm);
 #endif
-}
-
-/**
- * @brief Return number of Logs in Queue
- * @return
- */
-int Logging::getNumberOfLogEntries() {
-    return 0; //m_log_entries.size();
-}
-
-/**
-* @brief Standard Time to Date/Time String
-* @param std_time
-* @return
-*/
-std::string Logging::standardDateTimeToString(std::time_t std_time) {
-    std::ostringstream oss;
-    oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d %H:%M:%S %z");
-    std::string datetime_string = oss.str();
-    oss.clear();
-    return datetime_string;
-}
-
-
-/**
- * @brief Current Time Stamp (LOCAL TIME)
- * @return
- */
-std::string Logging::getCurrentDateTime() {
-    const std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    return standardDateTimeToString(now);
-}
-
-/**
- * @brief Current Time Stamp (LOCAL TIME) - With MilliSeconds!
- * @return
- */
-std::string Logging::getCurrentDateTimeMillis() {
-    // Millisecond are not native, we need to take (absoulte seconds - absolute millisonds) to get the left overs then append it.
-    auto now = std::chrono::system_clock::now();
-    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) -
-              std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch());
 
     std::ostringstream oss;
-    const std::time_t localnow = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    oss << std::put_time(std::localtime(&localnow), "%Y-%m-%d %H:%M:%S.");
-    oss << std::setfill('0') << std::setw(3) << ms.count();
-    std::string datetime_string = oss.str();
-    oss.clear();
-    return datetime_string;
+    oss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S")
+        << '.'
+        << std::setw(3)
+        << std::setfill('0')
+        << ms.count();
+
+    return oss.str();
 }
 
-/**
- * @brief Configuration String to Int Log Level
- * @param log_level
- * @return
- */
-int Logging::getConfigurationLogState(const std::string &log_level) {
-    if (log_level == "INFO")
-        return 0;
-    else if (log_level == "DEBUG")
-        return 1;
-    else if (log_level == "WARN")
-        return 2;
-    else if (log_level == "ERROR")
-        return 3;
-    else if (log_level == "CONSOLE")
-        return 4;
-    else if (log_level == "ALL")
-        return 5;
-    else
-        // Default is Info
-        return 0;
-}
+void Logging::write(const std::string& message) const {
+    std::lock_guard<std::mutex> lock(m_mutex);
 
-/**
- * @brief Set Logging Level From Configurations by String and Convert to Int Level.
- * @param log_level
- */
-void Logging::setLoggingLevel(std::string log_level) {
-    m_log_level = getConfigurationLogState(log_level);
-}
-
-
-/**
- * @brief Set the Node Number for a Thread Local
- * @param node_number
- */
-void Logging::setUserInfo(int node_number) {
-    local_node_number = node_number;
-}
-
-
-/**
- * @brief Write out Log to console in YAML formatted output.
- * @param date_time
- * @param details
- */
-void Logging::writeOutConsole(const std::string &date_time, std::vector<std::string> &details) {
-
-    if (details.empty()) {
-        return;
-    }
-
-    if (local_node_number > 0) {
+    if (local_node_number > 0)
         std::cout << "Node " << local_node_number << " | ";
-    } else {
+    else
         std::cout << "System | ";
-    }
 
-    std::cout << date_time << " : ";
-    for (std::string &d: details) {
-        if (d.size() > 0) {
-            std::cout << d << " | ";
-        }
-    }
-    std::cout << std::endl;
+    std::cout << message << std::endl;
 }

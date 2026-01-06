@@ -320,7 +320,7 @@ void ModPreLogon::setupAskANSIColor() {
  * @brief Displays Terminal Detection after Emulation Detection.
  */
 void ModPreLogon::displayTerminalDetection() {
-    m_log.setUserInfo(m_session_data.getNodeNumber());
+    m_log.setNode(m_session_data.getNodeNumber());
 
     // Grab Detected Terminal, ANSI, XTERM, etc..
     displayPrompt(PROMPT_DETECT_TERMOPTS);
@@ -343,7 +343,7 @@ void ModPreLogon::displayTerminalDetection() {
         std::string result = prompt_term.second;
         const std::string term = m_session_data.getTelnet().getTermType();
 
-        m_log.write<Logging::CONSOLE_LOG>("Term Type=", term);
+        m_log.log(Logging::LogLevel::Console, "Term Type=", term);
 
         m_common_io.parseLocalMCI(result, mci_code, term);
         result = m_session_io.pipe2ansi(result);
@@ -355,13 +355,13 @@ void ModPreLogon::displayTerminalDetection() {
         std::string result = prompt_size.second;
         std::string term_size = "";
         if (m_x_position == 0 || m_y_position == 0) {
-            m_log.write<Logging::CONSOLE_LOG>("*** NAWS TermSize Detection!");
+            m_log.log(Logging::LogLevel::Console, "*** NAWS TermSize Detection!");
             // Make this Prompts for Customization!
             term_size = std::to_string(m_session_data.getTelnet().getTermCols());
             term_size.append("x");
             term_size.append(std::to_string(m_session_data.getTelnet().getTermRows()));
         } else {
-            m_log.write<Logging::CONSOLE_LOG>("*** ESC TermSize Detection!");
+            m_log.log(Logging::LogLevel::Console, "*** ESC TermSize Detection!");
             // Make this Prompts for Customization!
             term_size = std::to_string(m_x_position);
             term_size.append("x");
@@ -371,7 +371,7 @@ void ModPreLogon::displayTerminalDetection() {
             m_session_data.getTelnet().setTermRows(m_y_position);
         }
 
-        m_log.write<Logging::CONSOLE_LOG>("Term Size=", term_size);
+        m_log.log(Logging::LogLevel::Console, "Term Size=", term_size);
 
         m_common_io.parseLocalMCI(result, mci_code, term_size);
         result = m_session_io.pipe2ansi(result);
@@ -468,7 +468,7 @@ bool ModPreLogon::emulationDetection(const std::string &input) {
                 // Splunk String on : for X/Y Positions from Response
                 const std::vector<std::string> positions = m_common_io.splitString(m_esc_sequence, ';');
                 if (positions.size() > 1) {
-                    m_log.write<Logging::DEBUG_LOG>("X=", positions[1], "Y=", positions[0]);
+                    m_log.log(Logging::LogLevel::Debug, "X=", positions[1], "Y=", positions[0]);
                     m_x_position = m_common_io.stringToInt(positions[1]);
                     m_y_position = m_common_io.stringToInt(positions[0]);
                 }
@@ -501,7 +501,7 @@ bool ModPreLogon::askANSIColor(const std::string &input) {
                 baseProcessAndDeliverNewLine(yes_prompt);
             }
 
-            m_log.write<Logging::CONSOLE_LOG>("Ansi Selected");
+            m_log.log(Logging::LogLevel::Console, "Ansi Selected");
 
             m_session_data.m_is_use_ansi = true;
             displayPrompt(PROMPT_ANSI_SELECTED);
@@ -509,14 +509,14 @@ bool ModPreLogon::askANSIColor(const std::string &input) {
         }
         // Else check for single N for No to default to ASCII no colors.
         else if (toupper(key[0]) == 'N' && key.size() == 1) {
-            m_log.write<Logging::CONSOLE_LOG>("Ascii Selected");
+            m_log.log(Logging::LogLevel::Console, "Ascii Selected");
 
             baseProcessDeliverNewLine();
             displayPrompt(PROMPT_ASCII_SELECTED);
             m_session_data.m_is_use_ansi = false;
             displayTerminalDetection();
         } else {
-            m_log.write<Logging::CONSOLE_LOG>("Invalid Color selection ANSI/ASCII");
+            m_log.log(Logging::LogLevel::Console, "Invalid Color selection ANSI/ASCII");
             baseProcessDeliverNewLine();
             displayPrompt(PROMPT_USE_INVALID);
             redisplayModulePrompt();
@@ -573,7 +573,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
                 );
 
                 // Even though it's default, lets set it anyway
-                m_log.write<Logging::CONSOLE_LOG>("Encoding set to CP437");
+                m_log.log(Logging::LogLevel::Console, "Encoding set to CP437");
                 m_session_data.m_encoding = Encoding::TextEncoding::CP437;
             } else {
                 // Switch to Unicode Character Set.
@@ -586,7 +586,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
                 );
 
                 // Even though it's default, lets set it anyway
-                m_log.write<Logging::CONSOLE_LOG>("Encoding set to UTF-8");
+                m_log.log(Logging::LogLevel::Console, "Encoding set to UTF-8");
                 m_session_data.m_encoding = Encoding::TextEncoding::UTF8;
             }
 
@@ -612,7 +612,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
                 );
 
                 // Even though it's default, lets set it anyways/
-                m_log.write<Logging::CONSOLE_LOG>("Encoding set to UTF-8");
+                m_log.log(Logging::LogLevel::Console, "Encoding set to UTF-8");
                 m_session_data.m_encoding = Encoding::TextEncoding::UTF8;
             } else {
                 // Switch to ISO, then CP437 Character Set.
@@ -625,7 +625,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
                 );
 
                 // Even though it's default, lets set it anyways/
-                m_log.write<Logging::CONSOLE_LOG>("Encoding set to CP437");
+                m_log.log(Logging::LogLevel::Console, "Encoding set to CP437");
                 m_session_data.m_encoding = Encoding::TextEncoding::CP437;
             }
 
@@ -687,7 +687,7 @@ void ModPreLogon::handleHumanShieldTimer() {
  * @return
  */
 void ModPreLogon::humanShieldCompleted() {
-    m_log.setUserInfo(m_session_data.getNodeNumber());
+    m_log.setNode(m_session_data.getNodeNumber());
     if (m_is_human_shield) {
         // Move to Next Detection
         changeModule(MOD_DETECT_EMULATION);
@@ -697,7 +697,7 @@ void ModPreLogon::humanShieldCompleted() {
 
         // Disconnect User
         setModuleInActive();
-        m_log.write<Logging::CONSOLE_LOG>("Human Shield Failed, disconnecting!");
+        m_log.log(Logging::LogLevel::Console, "Human Shield Failed, disconnecting!");
     }
 }
 

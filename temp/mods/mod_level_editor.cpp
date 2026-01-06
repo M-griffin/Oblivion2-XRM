@@ -367,7 +367,7 @@ void ModLevelEditor::displayCurrentPage(const std::string& input_state)
             break;
 
         default:
-            m_log.write<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentPage!!", __LINE__, __FILE__);
+            m_log.log(Logging::LogLevel::Error, "Error, forgot to add new STATE index displayCurrentPage!!", __LINE__, __FILE__);
             return;
     }
 
@@ -410,7 +410,7 @@ void ModLevelEditor::displayCurrentEditPage(const std::string& input_state)
             break;
 
         default:
-            m_log.write<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentEditPage!!", __LINE__, __FILE__);
+            m_log.log(Logging::LogLevel::Error, "Error, forgot to add new STATE index displayCurrentEditPage!!", __LINE__, __FILE__);
             return;
     }
 
@@ -1058,7 +1058,7 @@ void ModLevelEditor::createNewLevel(int level_code)
 
     if(checkLevelExistsByLevel(level_code))
     {
-        m_log.write<Logging::ERROR_LOG>("Error, Destination level already exists=", level_code, __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "Error, Destination level already exists=", level_code, __LINE__, __FILE__);
         return;
     }
 
@@ -1067,7 +1067,7 @@ void ModLevelEditor::createNewLevel(int level_code)
 
     if(level_dao->insertRecord(new_level) < 0)
     {
-        m_log.write<Logging::ERROR_LOG>("Error, unable to insert new level=", level_code, __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "Error, unable to insert new level=", level_code, __LINE__, __FILE__);
     }
 }
 
@@ -1088,7 +1088,7 @@ void ModLevelEditor::deleteExistingLevel(int level_code)
 
     if(existing_level->iId == -1 || !level_dao->deleteRecord(existing_level->iId))
     {
-        m_log.write<Logging::ERROR_LOG>("Error, unable to delete existing level=", level_code, __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "Error, unable to delete existing level=", level_code, __LINE__, __FILE__);
     }
 
     level_dao->deleteRecord(existing_level->iId);
@@ -1111,7 +1111,7 @@ void ModLevelEditor::copyExistingLevel(int level_code)
 
     if(checkLevelExistsByLevel(level_code))
     {
-        m_log.write<Logging::ERROR_LOG>("Error, Destination level already exists=", level_code, __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "Error, Destination level already exists=", level_code, __LINE__, __FILE__);
         return;
     }
 
@@ -1121,7 +1121,7 @@ void ModLevelEditor::copyExistingLevel(int level_code)
 
     if(level_dao->insertRecord(existing_level) < 0)
     {
-        m_log.write<Logging::ERROR_LOG>("Error, unable to copy existing level=", m_current_level, "to=", level_code,__LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "Error, unable to copy existing level=", m_current_level, "to=", level_code,__LINE__, __FILE__);
     }
 }
 
@@ -1144,7 +1144,7 @@ void ModLevelEditor::saveLevelChanges()
 
     if(existing_level == nullptr || !level_dao->updateRecord(existing_level))
     {
-        m_log.write<Logging::ERROR_LOG>("Error, unable to update existing level=", m_current_level, __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "Error, unable to update existing level=", m_current_level, __LINE__, __FILE__);
         return;
     }
 
@@ -1321,7 +1321,7 @@ std::string ModLevelEditor::displayLevelEditScreen()
 
     if(current_level == nullptr)
     {
-        m_log.write<Logging::ERROR_LOG>("Error, Level Not Found=", m_current_level, __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "Error, Level Not Found=", m_current_level, __LINE__, __FILE__);
         return "Level Not Found: " + std::to_string(m_current_level);
     }
 

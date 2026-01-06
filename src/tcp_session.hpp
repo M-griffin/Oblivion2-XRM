@@ -162,7 +162,7 @@ public:
     TCPSession &operator=(const TCPSession &) = delete;
 
     ~TCPSession() {
-        m_log.write<Logging::CONSOLE_LOG>("~TCPSession()");
+        m_log.log(Logging::LogLevel::Console, "~TCPSession()");
     }
 
     // Accessors for the underlying sessions

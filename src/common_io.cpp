@@ -58,7 +58,7 @@ CommonIO::CommonIO()
 }
 
 CommonIO::~CommonIO() {
-    m_log.write<Logging::CONSOLE_LOG>("~CommonIO()");
+    m_log.log(Logging::LogLevel::Console, "~CommonIO()");
 
     // Look at making this a single instance per session instead of a locate on fly.
     m_escape_sequence.erase();
@@ -228,7 +228,7 @@ std::string CommonIO::getProgramPath(const std::string &program_name) {
     pPath = std::getenv((char *) "OBV2");
 
     if (pPath != nullptr) {
-        m_log.write<Logging::CONSOLE_LOG>("Found OBV2 Environment Variable", pPath);
+        m_log.log(Logging::LogLevel::Console, "Found OBV2 Environment Variable", pPath);
         program_path = pPath;
         pathAppend(program_path);
         return program_path;
@@ -241,7 +241,7 @@ std::string CommonIO::getProgramPath(const std::string &program_name) {
 
     if(_NSGetExecutablePath(current_path, &size) != 0)
     {
-        m_log.write<Logging::ERROR_LOG>("getProgramPath: OSX Path empty!");
+        m_log.log(Logging::LogLevel::Error, "getProgramPath: OSX Path empty!");
         throw std::runtime_error("getProgramPath: OSX Path");
     }
 
@@ -269,7 +269,7 @@ std::string CommonIO::getProgramPath(const std::string &program_name) {
     int result = GetModuleFileName(NULL, current_path, PATH_MAX - 1);
 
     if (result == 0) {
-        m_log.write<Logging::ERROR_LOG>("getProgramPath: Win32 Path empty!");
+        m_log.log(Logging::LogLevel::Error, "getProgramPath: Win32 Path empty!");
         throw std::runtime_error("GetProgramPath: Win32 Path");
     }
 
@@ -286,14 +286,14 @@ std::string CommonIO::getProgramPath(const std::string &program_name) {
 
     if(result < 0)
     {
-        m_log.write<Logging::ERROR_LOG>("getProgramPath: Linux Path empty!");
+        m_log.log(Logging::LogLevel::Error, "getProgramPath: Linux Path empty!");
         throw std::runtime_error("getProgramPath: Linux Path");
     }
 
     const char* t = " \t\n\r\f\v";
     program_path = exe_path;
 
-    m_log.write<Logging::DEBUG_LOG>("Original Path", program_path);
+    m_log.log(Logging::LogLevel::Debug, "Original Path", program_path);
     program_path = program_path.erase(program_path.find_last_not_of(t) + 1);
     program_path += "/";
 
@@ -328,7 +328,7 @@ std::string CommonIO::getSystemHomeDirectory()
 
         if(!homedir)
         {
-            m_log.write<Logging::DEBUG_LOG>("!WIN32, Unable to locate home directory");
+            m_log.log(Logging::LogLevel::Debug, "!WIN32, Unable to locate home directory");
             home_directory = "";
             return home_directory;
         }
@@ -383,7 +383,7 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str) {
             } catch (utf8::exception &ex) {
                 ++it;
                 ++number_characters;
-                m_log.write<Logging::ERROR_LOG>("[numberOfChars] UTF8 Parsing Exception=", ex.what(), __LINE__,
+                m_log.log(Logging::LogLevel::Error, "[numberOfChars] UTF8 Parsing Exception=", ex.what(), __LINE__,
                                                 __FILE__);
             }
         }
@@ -503,7 +503,7 @@ std::string CommonIO::eraseString(const std::string &str,
     std::string new_string_builder = "";
 
     if (new_string.empty()) {
-        m_log.write<Logging::DEBUG_LOG>("(Common::EraseString) string length == 0", __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Debug, "(Common::EraseString) string length == 0", __LINE__, __FILE__);
         return new_string;
     }
 
@@ -537,7 +537,7 @@ std::string CommonIO::eraseString(const std::string &str,
                     }
                 }
             } catch (utf8::exception &ex) {
-                m_log.write<Logging::DEBUG_LOG>("(Common::EraseString) UTF8 Parsing Exception=", ex.what(), __LINE__,
+                m_log.log(Logging::LogLevel::Debug, "(Common::EraseString) UTF8 Parsing Exception=", ex.what(), __LINE__,
                                                 __FILE__);
                 ++it;
             }
@@ -809,7 +809,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer) {
         m_escape_sequence.erase();
         return character_buffer;
     } else if (num != 1) {
-        m_log.write<Logging::ERROR_LOG>("This function expects single characters/glyphs=", character_buffer, __LINE__,
+        m_log.log(Logging::LogLevel::Error, "This function expects single characters/glyphs=", character_buffer, __LINE__,
                                         __FILE__);
         return "";
     }
@@ -1062,20 +1062,20 @@ std::string CommonIO::getLine(const std::string &line, // Parsed Char input in
             // Received DEL Escape Sequence.
             if (sequence == "del") {
                 if (m_line_buffer.size() > 0) {
-                    m_log.write<Logging::DEBUG_LOG>("Received DEL ESC Sequence", __LINE__, __FILE__);
+                    m_log.log(Logging::LogLevel::Debug, "Received DEL ESC Sequence", __LINE__, __FILE__);
                     std::string temp = eraseString(m_line_buffer, numberOfChars(m_line_buffer) - 1, 1);
                     m_line_buffer = std::move(temp);
                     m_column_position = m_line_buffer.size();
                     return "\x1b[D \x1b[D";
                 } else {
                     // Nothing to delete at beginning Skip.
-                    m_log.write<Logging::DEBUG_LOG>("Received DEL ESC Sequence beginning of line=", character_buffer,
+                    m_log.log(Logging::LogLevel::Debug, "Received DEL ESC Sequence beginning of line=", character_buffer,
                                                     __LINE__, __FILE__);
                     return "empty";
                 }
             } else {
                 // Unhandled sequence! Skip and return
-                m_log.write<Logging::DEBUG_LOG>("Received Unhandled ESC Sequence beginning=", character_buffer,
+                m_log.log(Logging::LogLevel::Debug, "Received Unhandled ESC Sequence beginning=", character_buffer,
                                                 __LINE__, __FILE__);
                 return "empty";
             }
@@ -1084,7 +1084,7 @@ std::string CommonIO::getLine(const std::string &line, // Parsed Char input in
     // CTRL Y - Clear Line
     else if ((int) character_buffer[0] == 25) {
         if (m_line_buffer.size() > 0) {
-            m_log.write<Logging::DEBUG_LOG>("Received CTRL+Y Sequence=", character_buffer, __LINE__, __FILE__);
+            m_log.log(Logging::LogLevel::Debug, "Received CTRL+Y Sequence=", character_buffer, __LINE__, __FILE__);
 
             for (int i = numberOfChars(m_line_buffer); i > 0; i--) {
                 output_buffer += "\x1b[D \x1b[D";
@@ -1095,7 +1095,7 @@ std::string CommonIO::getLine(const std::string &line, // Parsed Char input in
             return output_buffer;
         } else {
             // At beginning of line, nothing to delete!
-            m_log.write<Logging::DEBUG_LOG>("Received CTRL+Y Sequence beginning of line=", character_buffer, __LINE__,
+            m_log.log(Logging::LogLevel::Debug, "Received CTRL+Y Sequence beginning of line=", character_buffer, __LINE__,
                                             __FILE__);
             return "empty";
         }
@@ -1104,14 +1104,14 @@ std::string CommonIO::getLine(const std::string &line, // Parsed Char input in
     // At this time, arrow keys are not setup to move through the string!
     else if ((int) character_buffer[0] == 0x08 || (int) character_buffer[0] == 0x7f || character_buffer[0] == '\b') {
         if (m_line_buffer.size() > 0) {
-            m_log.write<Logging::DEBUG_LOG>("Received backspace Sequence=", character_buffer, __LINE__, __FILE__);
+            m_log.log(Logging::LogLevel::Debug, "Received backspace Sequence=", character_buffer, __LINE__, __FILE__);
             std::string temp = eraseString(m_line_buffer, numberOfChars(m_line_buffer) - 1, 1);
             m_line_buffer = std::move(temp);
             m_column_position = m_line_buffer.size();
             return "\x1b[D \x1b[D";
         } else {
             // At beginning of Line, nothing to delete.
-            m_log.write<Logging::DEBUG_LOG>("Received backspace Sequence beginning of line=", character_buffer,
+            m_log.log(Logging::LogLevel::Debug, "Received backspace Sequence beginning of line=", character_buffer,
                                             __LINE__, __FILE__);
             return "empty";
         }
@@ -1121,19 +1121,19 @@ std::string CommonIO::getLine(const std::string &line, // Parsed Char input in
     if (((signed) m_line_buffer.size() <= length) &&
         ((signed) (character_buffer.size() + m_line_buffer.size()) <= length)) {
         if (hidden) {
-            m_log.write<Logging::DEBUG_LOG>("hidden field input=", character_buffer, __LINE__, __FILE__);
+            m_log.log(Logging::LogLevel::Debug, "hidden field input=", character_buffer, __LINE__, __FILE__);
             m_line_buffer += character_buffer;
             m_column_position = numberOfChars(m_line_buffer);
             return "*";
         } else {
-            m_log.write<Logging::DEBUG_LOG>("normal field input=", character_buffer, __LINE__, __FILE__);
+            m_log.log(Logging::LogLevel::Debug, "normal field input=", character_buffer, __LINE__, __FILE__);
             m_line_buffer += character_buffer;
             m_column_position = numberOfChars(m_line_buffer);
             return character_buffer;
         }
     }
 
-    m_log.write<Logging::DEBUG_LOG>("Past the max length, nothing to add!", __LINE__, __FILE__);
+    m_log.log(Logging::LogLevel::Debug, "Past the max length, nothing to add!", __LINE__, __FILE__);
     return "empty";
 }
 
@@ -1251,7 +1251,7 @@ std::string CommonIO::readinAnsi(const std::string &file_name) {
     pathAppend(path);
     path += file_name;
 
-    m_log.write<Logging::DEBUG_LOG>("readinAnsi=", path);
+    m_log.log(Logging::LogLevel::Debug, "readinAnsi=", path);
 
     std::string buff;
     FILE *fp;

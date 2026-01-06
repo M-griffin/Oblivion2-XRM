@@ -22,7 +22,7 @@ SessionIO::SessionIO(TCPSession &session, CommonIO &common)
 }
 
 SessionIO::~SessionIO() {
-    m_log.write<Logging::CONSOLE_LOG>("~SessionIO()");
+    m_log.log(Logging::LogLevel::Console, "~SessionIO()");
     m_mapped_codes.clear();
     std::map<std::string, std::string>().swap(m_mapped_codes);
 }
@@ -38,7 +38,7 @@ std::string SessionIO::getFSEKeyInput(const std::string &character_buffer) {
     if (input.size() == 0) {
         // No Data received, could be in mid ESC sequence
         // Return for next key.
-        m_log.write<Logging::DEBUG_LOG>("getKeyInput Mid Escape");
+        m_log.log(Logging::LogLevel::Debug, "getKeyInput Mid Escape");
         return "";
     }
 
@@ -47,18 +47,18 @@ std::string SessionIO::getFSEKeyInput(const std::string &character_buffer) {
     if (input[0] == '\x1b') {
         escape_sequence = m_common_io.getFSEEscapeSequence();
 
-        m_log.write<Logging::DEBUG_LOG>("FSE escape_sequence=", escape_sequence);
+        m_log.log(Logging::LogLevel::Debug, "FSE escape_sequence=", escape_sequence);
 
         if (escape_sequence.size() == 0) {
-            m_log.write<Logging::DEBUG_LOG>("getKeyInput Single Escape");
+            m_log.log(Logging::LogLevel::Debug, "getKeyInput Single Escape");
             return "\x1b";
         } else {
-            m_log.write<Logging::DEBUG_LOG>("getKeyInput Translated Escape Sequence=", escape_sequence);
+            m_log.log(Logging::LogLevel::Debug, "getKeyInput Translated Escape Sequence=", escape_sequence);
             return (escape_sequence.insert(0, "\x1b"));
         }
     }
 
-    m_log.write<Logging::DEBUG_LOG>("getKeyInput Normal Input=", input);
+    m_log.log(Logging::LogLevel::Debug, "getKeyInput Normal Input=", input);
     return input;
 }
 
@@ -73,7 +73,7 @@ std::string SessionIO::getKeyInput(const std::string &character_buffer) {
     if (input.size() == 0) {
         // No Data received, could be in mid ESC sequence
         // Return for next key.
-        m_log.write<Logging::DEBUG_LOG>("getKeyInput Mid Escape");
+        m_log.log(Logging::LogLevel::Debug, "getKeyInput Mid Escape");
         return "";
     }
 
@@ -83,15 +83,15 @@ std::string SessionIO::getKeyInput(const std::string &character_buffer) {
         escape_sequence = m_common_io.getEscapeSequence();
 
         if (escape_sequence.size() == 0) {
-            m_log.write<Logging::DEBUG_LOG>("getKeyInput Single Escape");
+            m_log.log(Logging::LogLevel::Debug, "getKeyInput Single Escape");
             return "\x1b";
         } else {
-            m_log.write<Logging::DEBUG_LOG>("getKeyInput Translated Escape Sequence=", escape_sequence);
+            m_log.log(Logging::LogLevel::Debug, "getKeyInput Translated Escape Sequence=", escape_sequence);
             return (escape_sequence.insert(0, "\x1b"));
         }
     }
 
-    m_log.write<Logging::DEBUG_LOG>("getKeyInput Normal Input=", input);
+    m_log.log(Logging::LogLevel::Debug, "getKeyInput Normal Input=", input);
     return input;
 }
 
@@ -147,7 +147,7 @@ void SessionIO::createInputField(std::string &field_name, int &len) {
                 if ((signed) tempLength > 0 && (signed) tempLength <= len) {
                     len = tempLength;
                 } else {
-                    m_log.write<Logging::ERROR_LOG>("createInputField() Incorrect |FL field length=", tempLength,
+                    m_log.log(Logging::LogLevel::Error, "createInputField() Incorrect |FL field length=", tempLength,
                                                     "cannot exceed max size=", len);
                 }
             } else {
@@ -159,7 +159,7 @@ void SessionIO::createInputField(std::string &field_name, int &len) {
     // Override Foreground/Background Input Field Colors
     // This is now for OBV/2 - Not in Legacy.
     position = field_name.find("|FB", 0);
-    m_log.write<Logging::DEBUG_LOG>("createInputField() |FB position=", position, "compare=", position + 4, stringSize);
+    m_log.log(Logging::LogLevel::Debug, "createInputField() |FB position=", position, "compare=", position + 4, stringSize);
 
     if (position != std::string::npos) {
         // (Unit Test Notes)
@@ -260,12 +260,12 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
         }
         // Updates on Keypresses.
         else {
-            m_log.write<Logging::DEBUG_LOG>("getInputField() result=", result, "string_data=", string_data);
+            m_log.log(Logging::LogLevel::Debug, "getInputField() result=", result, "string_data=", string_data);
             return string_data;
         }
     }
 
-    m_log.write<Logging::DEBUG_LOG>("getInputField() result empty");
+    m_log.log(Logging::LogLevel::Debug, "getInputField() result empty");
     return "";
 }
 
@@ -672,7 +672,7 @@ std::string SessionIO::parsePipeWithChars(const std::string &pipe_code) {
  * @return
  */
 std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapType> &code_map) {
-    m_log.write<Logging::DEBUG_LOG>("[parseCodeMap]", __LINE__, __FILE__);
+    m_log.log(Logging::LogLevel::Debug, "[parseCodeMap]", __LINE__, __FILE__);
 
     std::string ansi_string = screen;
     MapType my_matches;
@@ -702,7 +702,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
         switch (my_matches.m_match) {
             case 1: // Pipe w/ 2 DIGIT Colors
             {
-                m_log.write<Logging::DEBUG_LOG>("Pipe w/ 2 DIGIT Colors |00");
+                m_log.log(Logging::LogLevel::Debug, "Pipe w/ 2 DIGIT Colors |00");
                 std::string result = pipeColors(my_matches.m_code);
 
                 if (result.size() != 0) {
@@ -720,7 +720,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 2: // Pipe w/ 2 Chars and 4 Digits // |XY0101
             {
-                m_log.write<Logging::DEBUG_LOG>("Pipe w/ 2 Chars and 4 Digits // |XY0101");
+                m_log.log(Logging::LogLevel::Debug, "Pipe w/ 2 Chars and 4 Digits // |XY0101");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "       ");
             }
@@ -728,7 +728,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 3: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
             {
-                m_log.write<Logging::DEBUG_LOG>("Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33");
+                m_log.log(Logging::LogLevel::Debug, "Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33");
                 std::string result = separatePipeWithCharsDigits(my_matches.m_code);
 
                 if (result.size() != 0) {
@@ -742,7 +742,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
                 // This one will need replacement in the string parsing
                 // Pass the original string because of |DE for delay!
             {
-                m_log.write<Logging::DEBUG_LOG>("Pipe w/ 2 CHARS // |AA");
+                m_log.log(Logging::LogLevel::Debug, "Pipe w/ 2 CHARS // |AA");
                 std::string result = parsePipeWithChars(my_matches.m_code);
 
                 if (result.size() != 0) {
@@ -756,7 +756,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 5: // %%FILENAME.EXT  get filenames for loading from string prompts
             {
-                m_log.write<Logging::DEBUG_LOG>("Replacing %%FILENAME.EXT codes");
+                m_log.log(Logging::LogLevel::Debug, "Replacing %%FILENAME.EXT codes");
                 std::string result = parseFilename(my_matches.m_code);
 
                 if (result.size() != 0) {
@@ -770,7 +770,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 6: // Percent w/ 2 CHARS
             {
-                m_log.write<Logging::DEBUG_LOG>("Percent w/ 2 CHARS");
+                m_log.log(Logging::LogLevel::Debug, "Percent w/ 2 CHARS");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
             }
@@ -780,7 +780,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
             {
                 // Were just removing them because they are processed.
                 // Now that first part of sequence |01 etc.. are processed!
-                m_log.write<Logging::DEBUG_LOG>("replacing %## codes");
+                m_log.log(Logging::LogLevel::Debug, "replacing %## codes");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
             }
@@ -807,7 +807,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
  * @return
  */
 std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std::vector<MapType> &code_map) {
-    m_log.write<Logging::DEBUG_LOG>("[parseCodeMapGenerics]", __LINE__, __FILE__);
+    m_log.log(Logging::LogLevel::Debug, "[parseCodeMapGenerics]", __LINE__, __FILE__);
 
     std::string ansi_string = screen;
     MapType my_matches;
@@ -831,12 +831,12 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
             it = m_mapped_codes.find(my_matches.m_code);
 
             if (it != m_mapped_codes.end()) {
-                m_log.write<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen found=", my_matches.m_code, it->second,
+                m_log.log(Logging::LogLevel::Debug, "[parseCodeMapGenerics] gen found=", my_matches.m_code, it->second,
                                                 __LINE__, __FILE__);
                 // If found, replace mci sequence with text
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, it->second);
             } else {
-                m_log.write<Logging::DEBUG_LOG>("[parseCodeMapGenerics] gen not found=", __LINE__, __FILE__);
+                m_log.log(Logging::LogLevel::Debug, "[parseCodeMapGenerics] gen not found=", __LINE__, __FILE__);
                 std::string remove_code = "";
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, remove_code);
             }
@@ -896,7 +896,7 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
             // Avoid Infinite loop and make sure the existing
             // is not the same as the next!
             if (start == matches[0].second) {
-                m_log.write<Logging::DEBUG_LOG>("[parseToCodeMap] no Code Maps Found", __LINE__, __FILE__);
+                m_log.log(Logging::LogLevel::Debug, "[parseToCodeMap] no Code Maps Found", __LINE__, __FILE__);
                 break;
             }
 
@@ -940,7 +940,7 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
             }
         }
     } catch (std::regex_error &ex) {
-        m_log.write<Logging::ERROR_LOG>("[parseToCodeMap] Exception=", ex.what(), ex.code(), __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "[parseToCodeMap] Exception=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
     return code_map;
@@ -1026,7 +1026,7 @@ std::string SessionIO::pipe2promptFormat(const std::string &sequence, Config &co
     // Loop codes and build MCI Parsing List
     for (unsigned int i = 0; i < code_map.size(); i++) {
         auto &map = code_map[i];
-        m_log.write<Logging::DEBUG_LOG>("[pipe2promptFormat] Menu Format Code=", map.m_code, __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Debug, "[pipe2promptFormat] Menu Format Code=", map.m_code, __LINE__, __FILE__);
 
         // Control Codes are in Group 2
         switch (map.m_match) {
@@ -1075,7 +1075,7 @@ bool SessionIO::checkRegex(const std::string &sequence, const std::string &expre
         std::regex regExpression(expression);
         result = std::regex_match(sequence, match, regExpression);
     } catch (std::regex_error &ex) {
-        m_log.write<Logging::ERROR_LOG>("[checkRegex] Expression=", expression, "Exception=", ex.what(), ex.code(),
+        m_log.log(Logging::LogLevel::Error, "[checkRegex] Expression=", expression, "Exception=", ex.what(), ex.code(),
                                         __LINE__, __FILE__);
     }
 

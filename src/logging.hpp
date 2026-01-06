@@ -1,219 +1,105 @@
-#ifndef LOGGING_H
-#define LOGGING_H
+#ifndef LOGGING_HPP
+#define LOGGING_HPP
 
-#include <sstream>
 #include <string>
-#include <vector>
+#include <sstream>
 #include <mutex>
+#include <cstdint>
+#include <vector>
+#include <iomanip>
+#include <type_traits>
+#include <utility>
 
-/**
- * @class Logging
- * @author Michael Griffin
- * @date 24/12/2018
- * @file logging.hpp
- * @brief Global Logging class
- */
 class Logging {
 public:
-    // States
-    static enum {
-        INFO_LOG = 0,
-        DEBUG_LOG = 1,
-        WARN_LOG = 2,
-        ERROR_LOG = 3,
-        CONSOLE_LOG = 4,
-        ALL_LOGS = 5
-    } LOGGING_LEVELS;
+    enum class LogLevel : uint8_t {
+        Debug = 0,
+        Info,
+        Warn,
+        Error,
+        Console,
+        All
+    };
 
-    // Descriptions
-    const std::string INFO_LEVEL = "Info";
-    const std::string DEBUG_LEVEL = "Debug";
-    const std::string WARN_LEVEL = "Warn";
-    const std::string ERROR_LEVEL = "Error";
-    const std::string CONSOLE_LEVEL = "Console";
-    const std::string ALL_LEVELS = "All";
+    static Logging& getInstance();
 
-    /**
-     * @brief Creates Singleton Instance of Class
-     * @return
-     */
-    static Logging &getInstance() {
-        static Logging instance;
-        return instance;
-    }
+    // Configuration
+    void setLogLevel(LogLevel level);
+    void setLogLevelFromString(const std::string& level);
+    void setNode(uint32_t node);
 
-    /**
-     * @brief Helper, appends forward/backward slash to path
-     * @param value
-     */
-    void pathSeperator(std::string &value);
+    // Logging API
+    template<typename... Args>
+    void log(LogLevel level, Args&&... args);
 
-    /**
-     * @brief Return number of Logs in Queue
-     * @return
-     */
-    int getNumberOfLogEntries();
+    // Deleted copy/move
+    Logging(const Logging&) = delete;
+    Logging& operator=(const Logging&) = delete;
+    Logging(Logging&&) = delete;
+    Logging& operator=(Logging&&) = delete;
 
-    /**
-    * @brief Standard Time to Date/Time String
-    * @param std_time
-    * @return
-    */
-    std::string standardDateTimeToString(std::time_t std_time);
+    template<typename T, typename = void>
+    struct is_streamable : std::false_type {};
 
-
-    /**
-     * @brief Current Time Stamp (LOCAL TIME)
-     * @return
-     */
-    std::string getCurrentDateTime();
-
-    /**
-     * @brief Current Time Stamp (LOCAL TIME)
-     * @return
-     */
-    std::string getCurrentDateTimeMillis();
-
-    /**
-     * @brief Configuration String to Int Log Level
-     * @param log_level
-     * @return
-     */
-    int getConfigurationLogState(const std::string &log_level);
-
-    /**
-     * @brief Set Logging Level From Configurations by String and Convert to Int Level.
-     * @param log_level
-     */
-    void setLoggingLevel(std::string log_level);
-
-    /**
-     * @brief Set the Node Number for a Thread Local
-     * @param node_number
-     */
-    void setUserInfo(int node_number);
-
-    template<int level>
-    std::string log() {
-        return "";
-    }
-
-    template<int level>
-    std::string log(const std::vector<uint8_t> &t) {
-        std::string strData;
-        strData.insert(strData.end(), t.begin(), t.end());
-        std::ostringstream oss;
-        oss << strData;
-        return oss.str();
-    }
-
-    template<int level, typename T>
-    std::string log(const T &t) {
-        std::ostringstream oss;
-        oss << t;
-        return oss.str();
-    }
-
-    template<int level, typename T, typename... Types>
-    std::string log(const T &first, Types... rest) {
-        return log<level>(first) + " " + log<level>(rest...);
-    }
-
-    template<int level, typename... Types>
-    void write(Types... rest) {
-        // Thread Safety, since we have main look and worker thread.
-        std::unique_lock<std::mutex> lock(m_mutex);
-
-        // Quick Case Statement, in Logging level, if were not logging anything
-        // then return right away to save processing.
-        switch (level) {
-            // Incoming Logging Level Filtering by Configuration
-            case INFO_LOG:
-                if (m_log_level != INFO_LOG && m_log_level != ALL_LOGS)
-                    return;
-                break;
-
-            case DEBUG_LOG:
-                if (m_log_level != DEBUG_LOG && m_log_level != ALL_LOGS)
-                    return;
-                break;
-
-            case WARN_LOG:
-                if (m_log_level != WARN_LOG && m_log_level != ALL_LOGS)
-                    return;
-                break;
-
-            default:
-                break;
-        }
-
-        std::vector<std::string> details;
-        const std::string date_time = getCurrentDateTimeMillis();
-        std::string log_string = log<level>(rest...);
-
-        switch (level) {
-            // Incoming Logging Level
-            case INFO_LOG:
-                details.push_back(INFO_LEVEL);
-                details.push_back(log_string);
-                writeOutConsole(date_time, details);
-                break;
-
-            case DEBUG_LOG:
-                details.push_back(DEBUG_LEVEL);
-                details.push_back(log_string);
-                writeOutConsole(date_time, details);
-                break;
-
-            case WARN_LOG:
-                details.push_back(WARN_LEVEL);
-                details.push_back(log_string);
-                writeOutConsole(date_time, details);
-                break;
-
-            case ERROR_LOG:
-                details.push_back(ERROR_LEVEL);
-                details.push_back(log_string);
-                writeOutConsole(date_time, details);
-                break;
-
-            case CONSOLE_LOG:
-                details.push_back(CONSOLE_LEVEL);
-                details.push_back(log_string);
-                writeOutConsole(date_time, details);
-                break;
-
-            default:
-                details.clear();
-                return;
-        }
-
-        details.clear();
-    }
-
-
-    /**
-     * @brief Write out Log to console in YAML formatted output.
-     * @param date_time
-     * @param details
-     */
-    void writeOutConsole(const std::string &date_time, std::vector<std::string> &details);
-
-    Logging(const Logging &) = delete; // Copy ctor
-    Logging(Logging &&) = delete; // Move ctor
-    Logging &operator=(const Logging &) = delete; // Copy assignment
-    Logging &operator=(Logging &&) = delete; // Move assignment
+    template<typename T>
+    struct is_streamable<
+        T,
+        decltype(void(std::declval<std::ostringstream&>() << std::declval<T>()))
+    > : std::true_type {};
 
 private:
-    int m_log_level;
-    mutable std::mutex m_mutex;
+    Logging();
 
-    /**
-     * @brief Constructor for the Singleton.
-     * @return 
-     */
-    explicit Logging();
+    // Helpers
+    bool shouldLog(LogLevel level) const;
+    std::string currentDateTimeMillis() const;
+    const char* levelToString(LogLevel level) const;
+
+    // 0️⃣ Base case (REQUIRED)
+    void append(std::ostringstream&) const {}
+
+    // 1️⃣ Byte buffer overload
+    void append(std::ostringstream& oss,
+                const std::vector<uint8_t>& data) const;
+
+    // 2️⃣ Streamable types only
+    template<typename T>
+    typename std::enable_if<is_streamable<T>::value>::type
+    append(std::ostringstream& oss, T&& value) const {
+        oss << std::forward<T>(value);
+    }
+
+    // 3️⃣ Variadic dispatcher
+    template<typename T, typename... Args>
+    void append(std::ostringstream& oss, T&& first, Args&&... rest) const {
+        append(oss, std::forward<T>(first));
+        if (sizeof...(rest) > 0) {
+            oss << ' ';
+        }
+        append(oss, std::forward<Args>(rest)...);
+    }
+
+    void write(const std::string& message) const;
+
+private:
+    LogLevel m_logLevel;
+    mutable std::mutex m_mutex;
 };
 
+template<typename... Args>
+void Logging::log(LogLevel level, Args&&... args) {
+    if (!shouldLog(level))
+        return;
 
-#endif // LOGGING_H
+    std::ostringstream oss;
+    oss << currentDateTimeMillis()
+        << " | "
+        << levelToString(level)
+        << " | ";
+
+    append(oss, std::forward<Args>(args)...);
+
+    write(oss.str());
+}
+
+#endif

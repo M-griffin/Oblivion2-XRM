@@ -25,7 +25,7 @@ public:
     }
 
     ~Directory() {
-        m_log.write<Logging::DEBUG_LOG>("~Directory()");
+        m_log.log(Logging::LogLevel::Debug, "~Directory()");
     }
 
     /**
@@ -65,7 +65,7 @@ public:
         });
 
         if (!local_directory_ptr) {
-            m_log.write<Logging::ERROR_LOG>("Error opening directory=", errno, dir, __LINE__, __FILE__);
+            m_log.log(Logging::LogLevel::Error, "Error opening directory=", errno, dir, __LINE__, __FILE__);
             return file_list;
         }
 

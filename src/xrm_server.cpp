@@ -145,12 +145,12 @@ auto main() -> int {
     std::atexit(atExitFunction);
 
     Logging &m_log = Logging::getInstance();
-    m_log.write<Logging::CONSOLE_LOG>(BUILD_INFO); {
+    m_log.log(Logging::LogLevel::Console, BUILD_INFO); {
         CommonIO common;
         GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
     }
 
-    m_log.write<Logging::CONSOLE_LOG>("BBS HOME Directory Registered=", GLOBAL_BBS_PATH);
+    m_log.log(Logging::LogLevel::Console, "BBS HOME Directory Registered=", GLOBAL_BBS_PATH);
 
     // Setup System Folder Paths off main BBS Path.
     GLOBAL_DATA_PATH = GLOBAL_BBS_PATH + "DATA";
@@ -164,7 +164,7 @@ auto main() -> int {
 
     // Create LOG Directory if it doesn't exist.
     if (_mkdir(GLOBAL_LOG_PATH.c_str()) != 0 && errno != EEXIST) {
-        m_log.write<Logging::WARN_LOG>("Unable to create LOG folder=", GLOBAL_LOG_PATH);
+        m_log.log(Logging::LogLevel::Warn, "Unable to create LOG folder=", GLOBAL_LOG_PATH);
     }
 
 #else
@@ -172,12 +172,12 @@ auto main() -> int {
     // Create LOG Directory if it doesn't exist.
     if(mkdir(GLOBAL_LOG_PATH.c_str(), 0770) == -1 && errno != EEXIST)
     {
-        m_log.write<Logging::WARN_LOG>("Unable to create LOG folder=", GLOBAL_LOG_PATH);
+        m_log.log(Logging::LogLevel::Warn, "Unable to create LOG folder=", GLOBAL_LOG_PATH);
     }
 
 #endif
 
-    m_log.write<Logging::CONSOLE_LOG>("Checking Database SQLite");
+    m_log.log(Logging::LogLevel::Console, "Checking Database SQLite");
 
     // Database Startup in its own context.
     {
@@ -186,7 +186,7 @@ auto main() -> int {
 
         // Write all error logs and exit.
         if (!db_startup) {
-            m_log.write<Logging::ERROR_LOG>("Database Startup failed, exiting...");
+            m_log.log(Logging::LogLevel::Error, "Database Startup failed, exiting...");
             exit(1);
         }
     }
@@ -205,18 +205,18 @@ auto main() -> int {
         cfg.loadConfig();
 
         if (!cfg.validation()) {
-            m_log.write<Logging::ERROR_LOG>("Config Object validation failed!");
+            m_log.log(Logging::LogLevel::Error, "Config Object validation failed!");
             exit(1);
         }
 
         const Uint16 maxSessions = 10;
-        Logging::getInstance().setLoggingLevel(config.logging_level);
+        Logging::getInstance().setLogLevelFromString(config.logging_level);
 
-        m_log.write<Logging::CONSOLE_LOG>("Starting up XRM-Server", "port", config.port_telnet,
+        m_log.log(Logging::LogLevel::Console, "Starting up XRM-Server", "port", config.port_telnet,
                                           "max_sessions", maxSessions);
 
         if (!setupSignalHandlers()) {
-            m_log.write<Logging::ERROR_LOG>("XRM-Server Startup failed setting signal handlers, exiting...");
+            m_log.log(Logging::LogLevel::Error, "XRM-Server Startup failed setting signal handlers, exiting...");
             exit(2);
         }
 
@@ -224,7 +224,7 @@ auto main() -> int {
         if (server.start(config.port_telnet, maxSessions)) {
             server.run(config, maxSessions);
         } else {
-            m_log.write<Logging::ERROR_LOG>("XRM-Server Startup failed, exiting...");
+            m_log.log(Logging::LogLevel::Error, "XRM-Server Startup failed, exiting...");
             exit(2);
         }
     }

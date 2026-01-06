@@ -59,7 +59,7 @@ public:
 
             if (stream == nullptr) {
                 Logging &log = Logging::getInstance();
-                log.write<Logging::ERROR_LOG>("Error writing file=", filename, __FILE__, __LINE__);
+                log.log(Logging::LogLevel::Info, "Error writing file=", filename, __FILE__, __LINE__);
                 return x;
             }
         }
@@ -91,11 +91,11 @@ public:
         if (stream == nullptr) {
             // Create File if it doesn't exist.
             Logging &log = Logging::getInstance();
-            log.write<Logging::ERROR_LOG>("Error Reading/creating file=", filename, __FILE__, __LINE__);
+            log.log(Logging::LogLevel::Info, "Error Reading/creating file=", filename, __FILE__, __LINE__);
             stream = fopen(path.c_str(), "wb");
 
             if (stream == nullptr) {
-                log.write<Logging::ERROR_LOG>("Error Reading file=", filename, __FILE__, __LINE__);
+                log.log(Logging::LogLevel::Info, "Error Reading file=", filename, __FILE__, __LINE__);
                 return x;
             }
         }

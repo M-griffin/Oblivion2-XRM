@@ -353,7 +353,7 @@ void ModFileAreaEditor::displayCurrentPage(const std::string &input_state)
             break;
 
         default:
-            m_log.write<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentPage!!", __FILE__, __LINE__);
+            m_log.log(Logging::LogLevel::Error, "Error, forgot to add new STATE index displayCurrentPage!!", __FILE__, __LINE__);
             return;
     }
 
@@ -396,7 +396,7 @@ void ModFileAreaEditor::displayCurrentEditPage(const std::string &input_state)
             break;
 
         default:
-            m_log.write<Logging::ERROR_LOG>("Error, forgot to add new STATE index displayCurrentEditPage!!", __FILE__, __LINE__);
+            m_log.log(Logging::LogLevel::Error, "Error, forgot to add new STATE index displayCurrentEditPage!!", __FILE__, __LINE__);
             return;
     }
 

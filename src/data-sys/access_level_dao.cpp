@@ -242,7 +242,7 @@ AccessLevel AccessLevelDao::getAccessLevelByLevel(long access_level) {
     AccessLevel level;
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected()) {
-        log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        log.log(Logging::LogLevel::Info, "Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return level;
     }
 
@@ -250,7 +250,7 @@ AccessLevel AccessLevelDao::getAccessLevelByLevel(long access_level) {
     Query qry(m_database);
 
     if (!qry.isConnected()) {
-        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__,
+        log.log(Logging::LogLevel::Info, "Error, Query has no connection to the database", m_strTableName, __LINE__,
                                       __FILE__);
         return level;
     }
@@ -269,11 +269,11 @@ AccessLevel AccessLevelDao::getAccessLevelByLevel(long access_level) {
             qry.fetchRow();
             pullAccessLevelResult(qry, level);
         } else {
-            log.write<Logging::ERROR_LOG>("Error, getAccessLevelByLevel Returned Rows=", rows, m_strTableName, __LINE__,
+            log.log(Logging::LogLevel::Info, "Error, getAccessLevelByLevel Returned Rows=", rows, m_strTableName, __LINE__,
                                           __FILE__);
         }
     } else {
-        log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        log.log(Logging::LogLevel::Info, "Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return level;

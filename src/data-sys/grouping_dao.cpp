@@ -177,7 +177,7 @@ std::vector<Grouping> GroupingDao::getAllGroupingsByConferenceId(long id) {
 
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected()) {
-        log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+        log.log(Logging::LogLevel::Info, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
         return list;
     }
 
@@ -185,7 +185,7 @@ std::vector<Grouping> GroupingDao::getAllGroupingsByConferenceId(long id) {
     Query qry(m_database);
 
     if (!qry.isConnected()) {
-        log.write<Logging::ERROR_LOG>(m_strTableName, "Error, Query has no connection to the database", __LINE__,
+        log.log(Logging::LogLevel::Info, m_strTableName, "Error, Query has no connection to the database", __LINE__,
                                       __FILE__);
         return list;
     }
@@ -206,11 +206,11 @@ std::vector<Grouping> GroupingDao::getAllGroupingsByConferenceId(long id) {
                 list.push_back(group);
             }
         } else {
-            log.write<Logging::ERROR_LOG>(m_strTableName, "Error, getAllGroupingsByConferenceId Returned Rows", rows,
+            log.log(Logging::LogLevel::Info, m_strTableName, "Error, getAllGroupingsByConferenceId Returned Rows", rows,
                                           __LINE__, __FILE__);
         }
     } else {
-        log.write<Logging::ERROR_LOG>(m_strTableName, "Error, getResult()", __LINE__, __FILE__);
+        log.log(Logging::LogLevel::Info, m_strTableName, "Error, getResult()", __LINE__, __FILE__);
     }
 
     return list;

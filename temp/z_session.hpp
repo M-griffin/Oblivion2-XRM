@@ -94,7 +94,7 @@ public:
         catch(std::exception &ex)
         {
             Logging &log = Logging::getInstance();
-            log.write<Logging::ERROR_LOG>("TelnetOptionNegoiation Exception=", ex.what(), __LINE__, __FILE__);            
+            log.log(Logging::LogLevel::Info, "TelnetOptionNegoiation Exception=", ex.what(), __LINE__, __FILE__);
         }
         
         return new_session;

@@ -58,7 +58,7 @@ ModMessageEditor::ModMessageEditor(session_ptr session_data, config_ptr config, 
 
 ModMessageEditor::~ModMessageEditor()
 {
-    m_log.write<Logging::CONSOLE_LOG>("~ModMessageEditor()");
+    m_log.log(Logging::LogLevel::Console, "~ModMessageEditor()");
     std::vector<std::function< void()> >().swap(m_setup_functions);
     std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
 }
@@ -407,7 +407,7 @@ void ModMessageEditor::setupEditor()
     // Rows uses between top / bot templates on current screen size.
     std::string mid_screen = processMidTemplate(ansi_process, mid_template);
     
-    m_log.write<Logging::DEBUG_LOG>("m_text_box_top=", m_text_box_top, "m_text_box_bottom=", m_text_box_bottom,
+    m_log.log(Logging::LogLevel::Debug, "m_text_box_top=", m_text_box_top, "m_text_box_bottom=", m_text_box_bottom,
                                     "m_text_box_left=", m_text_box_left, "m_text_box_right=", m_text_box_right);
 
     // Setup the Text Parser Init the Parser with template data.
@@ -418,7 +418,7 @@ void ModMessageEditor::setupEditor()
     m_text_box_height += 1;
     
 
-    m_log.write<Logging::DEBUG_LOG>("m_text_process - height=", m_text_box_height, "width=", m_text_box_width);
+    m_log.log(Logging::LogLevel::Debug, "m_text_process - height=", m_text_box_height, "width=", m_text_box_width);
     m_text_process = std::make_shared<ProcessorText>(m_text_box_height, m_text_box_width);
 
     // Next combine and output.. Move cursor to top left in box.
@@ -457,13 +457,13 @@ void ModMessageEditor::editorInput(const std::string &input)
         return;
     }
     
-    m_log.write<Logging::DEBUG_LOG>("result=", result, "input=", input);
+    m_log.log(Logging::LogLevel::Debug, "result=", result, "input=", input);
 
     if(result[0] == 13 || result[0] == 10)
     {
         // Translations for ENTER next line
         //input = "ENTER";
-        m_log.write<Logging::CONSOLE_LOG>("[editorInput] [ENTER HIT] input result=", result);
+        m_log.log(Logging::LogLevel::Console, "[editorInput] [ENTER HIT] input result=", result);
         //std::string output = "\r\n\x1b[" + std::to_string(m_text_box_left - 1) + "C";
 
         processTextInput(result, input);
@@ -472,16 +472,16 @@ void ModMessageEditor::editorInput(const std::string &input)
     {
         // ESC SEQUENCE - check movement / arrow keys.
         std::string escape_sequence = m_common_io.getEscapeSequence();
-        m_log.write<Logging::DEBUG_LOG>("ESC=", escape_sequence);
+        m_log.log(Logging::LogLevel::Debug, "ESC=", escape_sequence);
                 
-        m_log.write<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 1] input result=", result);
+        m_log.log(Logging::LogLevel::Console, "[editorInput] [ESC Sequence 1] input result=", result);
         processEscapedInput(result.substr(1), input);
     }
     else if(result[0] == '\x1b' && result.size() == 2 && result[1] == '\x1b')
     {
         // Check Single ESC KEY - command options
         //input = "ESC";  - quit for now
-        m_log.write<Logging::CONSOLE_LOG>("[editorInput] [ESC HIT!] input result=", result);
+        m_log.log(Logging::LogLevel::Console, "[editorInput] [ESC HIT!] input result=", result);
         
         // DEBUG TESTING, Display Buffer on ESC, Or Exit.
         //displayTextBoxBuffer();
@@ -490,13 +490,13 @@ void ModMessageEditor::editorInput(const std::string &input)
     else
     {
         // Handle Input Characters here and control chars.
-        m_log.write<Logging::CONSOLE_LOG>("[editorInput] [STDIO] input result=", result);
+        m_log.log(Logging::LogLevel::Console, "[editorInput] [STDIO] input result=", result);
 
         if(result[0] == '\x1b')
         {
             std::string escape_sequence = m_common_io.getEscapeSequence();
             std::cout << "ESC= " << escape_sequence << std::endl;
-            m_log.write<Logging::CONSOLE_LOG>("[editorInput] [ESC Sequence 2] input result=", static_cast<int>(escape_sequence[0]));
+            m_log.log(Logging::LogLevel::Console, "[editorInput] [ESC Sequence 2] input result=", static_cast<int>(escape_sequence[0]));
 
             // Hot Key Input, cutoff leading escape for control key.
             processEscapedInput(result.substr(1), input);
@@ -507,7 +507,7 @@ void ModMessageEditor::editorInput(const std::string &input)
         }
 
         for(char c : result)
-            m_log.write<Logging::CONSOLE_LOG>("[editorInput] [c HIT] input result=", static_cast<int>(c));
+            m_log.log(Logging::LogLevel::Console, "[editorInput] [c HIT] input result=", static_cast<int>(c));
 
         processTextInput(result, input);
     }
@@ -576,7 +576,7 @@ void ModMessageEditor::handleBackSpace(std::string &output)
 {
     /** Need to Write code to delete char or space and move everything left **/    
     int x_position = m_text_process->getXPosition();    
-    m_log.write<Logging::DEBUG_LOG>("handleBackSpace max_chars=", m_text_process->getMaxCharactersPerLine(), "x_pos=", x_position);
+    m_log.log(Logging::LogLevel::Debug, "handleBackSpace max_chars=", m_text_process->getMaxCharactersPerLine(), "x_pos=", x_position);
 
     std::string default_text_color = getDisplayPromptAnsi(DEFAULT_TEXT_COLORS);
     std::string backspace_color = getDisplayPromptAnsi(BACKSPACE_TEXT_COLORS);
@@ -594,7 +594,7 @@ void ModMessageEditor::handleBackSpace(std::string &output)
         // remove last character for cursor space.
         m_text_process->parseTextToBuffer((char *)"\b");
         
-        m_log.write<Logging::DEBUG_LOG>("handleBackSpaceAfter m_text_process->x_position=", 
+        m_log.log(Logging::LogLevel::Debug, "handleBackSpaceAfter m_text_process->x_position=",
             m_text_process->getXPosition(), "x_pos=", x_position);
         
         if(m_text_process->getXPosition() == m_text_process->getMaxCharactersPerLine()) {
@@ -612,7 +612,7 @@ void ModMessageEditor::handleDelete(std::string &output)
     /** Need to Write code to delete char or space and move everything left **/    
     int x_position = m_text_process->getXPosition();
     
-    m_log.write<Logging::DEBUG_LOG>("handleDelete max_chars=", m_text_process->getMaxCharactersPerLine(), "x_pos=", x_position);
+    m_log.log(Logging::LogLevel::Debug, "handleDelete max_chars=", m_text_process->getMaxCharactersPerLine(), "x_pos=", x_position);
 
     std::string default_text_color = getDisplayPromptAnsi(DEFAULT_TEXT_COLORS);
     std::string backspace_color = getDisplayPromptAnsi(BACKSPACE_TEXT_COLORS);
@@ -630,7 +630,7 @@ void ModMessageEditor::handleDelete(std::string &output)
         // remove last character for cursor space.
         m_text_process->parseTextToBuffer((char *)"\b");
         
-        m_log.write<Logging::DEBUG_LOG>("handleDelete m_text_process->x_position=", 
+        m_log.log(Logging::LogLevel::Debug, "handleDelete m_text_process->x_position=",
             m_text_process->getXPosition(), "x_pos=", x_position);
             
         if(m_text_process->getXPosition() == m_text_process->getMaxCharactersPerLine()) {
@@ -741,7 +741,7 @@ void ModMessageEditor::processTextInput(std::string result, std::string input)
         std::string default_text_color = getDisplayPromptAnsi(DEFAULT_TEXT_COLORS);
         std::string backspace_color = getDisplayPromptAnsi(BACKSPACE_TEXT_COLORS);
     
-        m_log.write<Logging::DEBUG_LOG>("isDoubleBackSpace max_chars=", m_text_process->getMaxCharactersPerLine());
+        m_log.log(Logging::LogLevel::Debug, "isDoubleBackSpace max_chars=", m_text_process->getMaxCharactersPerLine());
         
         if (m_text_process->getMaxCharactersPerLine() == m_text_process->getXPosition()) 
         {

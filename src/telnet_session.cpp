@@ -28,7 +28,7 @@ TelnetSession::TelnetSession(Session &session)
 }
 
 TelnetSession::~TelnetSession() {
-    m_log.write<Logging::CONSOLE_LOG>("~TelnetSession()");
+    m_log.log(Logging::LogLevel::Console, "~TelnetSession()");
     m_replySequence.clear();
 }
 
@@ -103,7 +103,7 @@ Byte TelnetSession::telnetOptionDeny(Byte command) {
 }
 
 void TelnetSession::decodeBuffer() {
-    m_log.write<Logging::DEBUG_LOG>("decodeBuffer 240 - SE received");
+    m_log.log(Logging::LogLevel::Debug, "decodeBuffer 240 - SE received");
 
     switch (m_subnegoOption) {
         case TELOPT_NAWS:
@@ -114,7 +114,7 @@ void TelnetSession::decodeBuffer() {
                 m_nawsRow = (static_cast<uint16_t>(m_dataSequence[2]) << 8)
                             | static_cast<uint16_t>(m_dataSequence[3]);
 
-                m_log.write<Logging::DEBUG_LOG>("TELOPT_NAWS option", m_nawsCol, "x", m_nawsRow);
+                m_log.log(Logging::LogLevel::Debug, "TELOPT_NAWS option", m_nawsCol, "x", m_nawsRow);
                 m_isNawsDetected = true;
             }
             break;
@@ -125,20 +125,20 @@ void TelnetSession::decodeBuffer() {
                 m_dataSequence.size()
             );
             m_termType = termType;
-            m_log.write<Logging::DEBUG_LOG>("TELOPT_TTYPE option", m_termType);
+            m_log.log(Logging::LogLevel::Debug, "TELOPT_TTYPE option", m_termType);
             break;
         }
 
         case TELOPT_NEW_ENVIRON:
-            m_log.write<Logging::DEBUG_LOG>("TELOPT_NEW_ENVIRON data", m_dataSequence);
+            m_log.log(Logging::LogLevel::Debug, "TELOPT_NEW_ENVIRON data", m_dataSequence);
             break;
 
         case TELOPT_LINEMODE:
-            m_log.write<Logging::DEBUG_LOG>("TELOPT_LINEMODE data", m_dataSequence);
+            m_log.log(Logging::LogLevel::Debug, "TELOPT_LINEMODE data", m_dataSequence);
             break;
 
         default:
-            m_log.write<Logging::DEBUG_LOG>("Invalid option:", static_cast<int>(m_subnegoOption), m_subnegoOption);
+            m_log.log(Logging::LogLevel::Debug, "Invalid option:", static_cast<int>(m_subnegoOption), m_subnegoOption);
             break;
     }
 
@@ -268,17 +268,17 @@ ByteBuffer TelnetSession::telnetOptionParse(Byte byte) {
 
         case 1:
             if (byte == IAC && m_isBinary) {
-                m_log.write<Logging::DEBUG_LOG>("Got double IAC BINARY");
+                m_log.log(Logging::LogLevel::Debug, "Got double IAC BINARY");
                 m_teloptStage = 0;
                 output.push_back(byte);
                 return output;
             } else if (byte == IAC) {
-                m_log.write<Logging::DEBUG_LOG>("Got double IAC");
+                m_log.log(Logging::LogLevel::Debug, "Got double IAC");
                 break;
             }
 
             if (!isValidCommand(byte)) {
-                m_log.write<Logging::DEBUG_LOG>("Invalid command:", static_cast<int>(byte));
+                m_log.log(Logging::LogLevel::Debug, "Invalid command:", static_cast<int>(byte));
                 m_teloptStage = 0;
                 break;
             }
@@ -288,7 +288,7 @@ ByteBuffer TelnetSession::telnetOptionParse(Byte byte) {
             break;
 
         case 2:
-            m_log.write<Logging::DEBUG_LOG>("[IAC]", static_cast<int>(byte), "STAGE 2");
+            m_log.log(Logging::LogLevel::Debug, "[IAC]", static_cast<int>(byte), "STAGE 2");
 
             switch (m_teloptCommand) {
                 case DO: handleDoDont(DO, byte);
@@ -321,12 +321,12 @@ ByteBuffer TelnetSession::telnetOptionParse(Byte byte) {
             break;
 
         case 3:
-            m_log.write<Logging::DEBUG_LOG>("--> STAGE 3", static_cast<int>(byte));
+            m_log.log(Logging::LogLevel::Debug, "--> STAGE 3", static_cast<int>(byte));
 
             switch (m_currentOption) {
                 case TELOPT_TTYPE:
                     if (byte == TELQUAL_IS) {
-                        m_log.write<Logging::DEBUG_LOG>("[IAC] TELQUAL_IS", static_cast<int>(m_currentOption),
+                        m_log.log(Logging::LogLevel::Debug, "[IAC] TELQUAL_IS", static_cast<int>(m_currentOption),
                                                         static_cast<int>(byte));
                         m_teloptStage = 4;
                     } else {
@@ -336,7 +336,7 @@ ByteBuffer TelnetSession::telnetOptionParse(Byte byte) {
 
                 case TELOPT_NEW_ENVIRON:
                     if (byte == TELQUAL_IS) {
-                        m_log.write<Logging::DEBUG_LOG>("[IAC] TELQUAL_IS", static_cast<int>(m_currentOption),
+                        m_log.log(Logging::LogLevel::Debug, "[IAC] TELQUAL_IS", static_cast<int>(m_currentOption),
                                                         static_cast<int>(byte));
                         m_teloptStage = 6;
                     } else {
@@ -346,7 +346,7 @@ ByteBuffer TelnetSession::telnetOptionParse(Byte byte) {
 
                 default:
                     if (byte == SE) {
-                        m_log.write<Logging::DEBUG_LOG>("[IAC] SB END", static_cast<int>(m_currentOption),
+                        m_log.log(Logging::LogLevel::Debug, "[IAC] SB END", static_cast<int>(m_currentOption),
                                                         static_cast<int>(byte));
                         m_teloptStage = 0;
                     } else {
@@ -357,7 +357,7 @@ ByteBuffer TelnetSession::telnetOptionParse(Byte byte) {
             break;
 
         case 4:
-            m_log.write<Logging::DEBUG_LOG>("--> STAGE 4 TTYPE", static_cast<int>(byte));
+            m_log.log(Logging::LogLevel::Debug, "--> STAGE 4 TTYPE", static_cast<int>(byte));
 
             if (byte != IAC && byte != SE) {
                 if (byte == '\x00')
@@ -379,7 +379,7 @@ ByteBuffer TelnetSession::telnetOptionParse(Byte byte) {
             break;
 
         case 5:
-            m_log.write<Logging::DEBUG_LOG>("--> STAGE 5 NAWS", static_cast<int>(byte));
+            m_log.log(Logging::LogLevel::Debug, "--> STAGE 5 NAWS", static_cast<int>(byte));
 
             if (byte != IAC && byte != SE) {
                 if (byte == '\x00')
@@ -401,7 +401,7 @@ ByteBuffer TelnetSession::telnetOptionParse(Byte byte) {
             break;
 
         case 6:
-            m_log.write<Logging::DEBUG_LOG>("--> STAGE 6 TELOPT_NEW_ENVIRON", static_cast<int>(byte));
+            m_log.log(Logging::LogLevel::Debug, "--> STAGE 6 TELOPT_NEW_ENVIRON", static_cast<int>(byte));
 
             if (byte != IAC && byte != SE) {
                 if (byte == '\x00')
@@ -424,7 +424,7 @@ ByteBuffer TelnetSession::telnetOptionParse(Byte byte) {
             break;
 
         case 7:
-            m_log.write<Logging::DEBUG_LOG>("--> STAGE 7 TELOPT_LINEMODE", static_cast<int>(byte));
+            m_log.log(Logging::LogLevel::Debug, "--> STAGE 7 TELOPT_LINEMODE", static_cast<int>(byte));
 
             if (byte != IAC && byte != SE) {
                 m_dataSequence.push_back(byte);

@@ -33,7 +33,7 @@ ProcessorAnsi::ProcessorAnsi()
 }
 
 ProcessorAnsi::~ProcessorAnsi() {
-    m_log.write<Logging::CONSOLE_LOG>("~ProcessorAnsi()");
+    m_log.log(Logging::LogLevel::Console, "~ProcessorAnsi()");
 
     m_screen_buffer.clear();
     std::vector<ScreenPixel>().swap(m_screen_buffer);
@@ -355,7 +355,7 @@ std::string ProcessorAnsi::screenBufferParse() {
             // Avoid Infinite loop and make sure the existing
             // is not the same as the next!
             if (start == matches[0].second) {
-                m_log.write<Logging::DEBUG_LOG>("[screenBufferParse] no matches!", __LINE__, __FILE__);
+                m_log.log(Logging::LogLevel::Debug, "[screenBufferParse] no matches!", __LINE__, __FILE__);
                 break;
             }
 
@@ -396,7 +396,7 @@ std::string ProcessorAnsi::screenBufferParse() {
             }
         }
     } catch (std::regex_error &ex) {
-        //m_log.write<Logging::ERROR_LOG>("[screenBufferParse] regex=", ex.what(), ex.code(), __LINE__, __FILE__);
+        //m_log.log(Logging::LogLevel::Error, "[screenBufferParse] regex=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
     // All Global MCI Codes likes standard screens and colors will
@@ -500,11 +500,11 @@ void ProcessorAnsi::screenBufferSetGlyph(const std::string &charSequence) {
         if (m_position < (signed) m_screen_buffer.size()) {
             m_screen_buffer.at(m_position) = screen_pixel;
         } else {
-            m_log.write<Logging::ERROR_LOG>("[screenBufferSetGlyph] out of bounds pos=", m_x_position - 1, __LINE__,
+            m_log.log(Logging::LogLevel::Error, "[screenBufferSetGlyph] out of bounds pos=", m_x_position - 1, __LINE__,
                                             __FILE__);
         }
     } catch (std::exception &e) {
-        m_log.write<Logging::ERROR_LOG>("[screenBufferSetGlyph] exceeds screen dimensions Exception=", e.what(),
+        m_log.log(Logging::LogLevel::Error, "[screenBufferSetGlyph] exceeds screen dimensions Exception=", e.what(),
                                         __LINE__, __FILE__);
     }
 
@@ -545,7 +545,7 @@ void ProcessorAnsi::screenBufferScrollUp() {
         m_screen_buffer.erase(
             m_screen_buffer.begin(), m_screen_buffer.begin() + m_characters_per_line);
     } catch (std::exception &e) {
-        m_log.write<Logging::ERROR_LOG>("[screenBufferScrollUp] Exception=", e.what(), __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "[screenBufferScrollUp] Exception=", e.what(), __LINE__, __FILE__);
     }
 
     // Readd The last Line back to the buffer.
@@ -569,7 +569,7 @@ void ProcessorAnsi::screenBufferClearRange(int start, int end) {
         try {
             m_screen_buffer[i].char_sequence = '\0';
         } catch (std::exception &e) {
-            m_log.write<Logging::ERROR_LOG>("[screenBufferClearRange] Exception=", e.what(),
+            m_log.log(Logging::LogLevel::Error, "[screenBufferClearRange] Exception=", e.what(),
                                             "start=", start, "end=", end, __LINE__, __FILE__);
         }
     }

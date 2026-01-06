@@ -377,7 +377,7 @@ Users UsersDao::getUserByHandle(std::string name) {
 
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected()) {
-        m_log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return user;
     }
 
@@ -385,7 +385,7 @@ Users UsersDao::getUserByHandle(std::string name) {
     Query qry(m_database);
 
     if (!qry.isConnected()) {
-        m_log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__,
+        m_log.log(Logging::LogLevel::Error, "Error, Query has no connection to the database", m_strTableName, __LINE__,
                                         __FILE__);
         return user;
     }
@@ -405,11 +405,11 @@ Users UsersDao::getUserByHandle(std::string name) {
             qry.fetchRow();
             pullUsersResult(qry, user);
         } else {
-            m_log.write<Logging::INFO_LOG>("NotFound, getUserByHandle Returned Rows=", rows, m_strTableName, __LINE__,
+            m_log.log(Logging::LogLevel::Info, "NotFound, getUserByHandle Returned Rows=", rows, m_strTableName, __LINE__,
                                            __FILE__);
         }
     } else {
-        m_log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return user;
@@ -424,7 +424,7 @@ Users UsersDao::getUserByRealName(std::string name) {
 
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected()) {
-        m_log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return user;
     }
 
@@ -432,7 +432,7 @@ Users UsersDao::getUserByRealName(std::string name) {
     Query qry(m_database);
 
     if (!qry.isConnected()) {
-        m_log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__,
+        m_log.log(Logging::LogLevel::Error, "Error, Query has no connection to the database", m_strTableName, __LINE__,
                                         __FILE__);
         return user;
     }
@@ -452,11 +452,11 @@ Users UsersDao::getUserByRealName(std::string name) {
             qry.fetchRow();
             pullUsersResult(qry, user);
         } else {
-            m_log.write<Logging::INFO_LOG>("Notfound, getUserByRealName Returned Rows", rows, m_strTableName, __LINE__,
+            m_log.log(Logging::LogLevel::Info, "Notfound, getUserByRealName Returned Rows", rows, m_strTableName, __LINE__,
                                            __FILE__);
         }
     } else {
-        m_log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return user;
@@ -471,7 +471,7 @@ Users UsersDao::getUserByEmail(std::string email) {
 
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected()) {
-        m_log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return user;
     }
 
@@ -479,7 +479,7 @@ Users UsersDao::getUserByEmail(std::string email) {
     Query qry(m_database);
 
     if (!qry.isConnected()) {
-        m_log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__,
+        m_log.log(Logging::LogLevel::Error, "Error, Query has no connection to the database", m_strTableName, __LINE__,
                                         __FILE__);
         return user;
     }
@@ -499,11 +499,11 @@ Users UsersDao::getUserByEmail(std::string email) {
             qry.fetchRow();
             pullUsersResult(qry, user);
         } else {
-            m_log.write<Logging::INFO_LOG>("Notfound, getUserByEmail Returned Rows=", rows, m_strTableName, __LINE__,
+            m_log.log(Logging::LogLevel::Info, "Notfound, getUserByEmail Returned Rows=", rows, m_strTableName, __LINE__,
                                            __FILE__);
         }
     } else {
-        m_log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return user;
@@ -518,7 +518,7 @@ std::vector<Users> UsersDao::getUsersByWildcard(std::string filter) {
 
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected()) {
-        m_log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -526,7 +526,7 @@ std::vector<Users> UsersDao::getUsersByWildcard(std::string filter) {
     Query qry(m_database);
 
     if (!qry.isConnected()) {
-        m_log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__,
+        m_log.log(Logging::LogLevel::Error, "Error, Query has no connection to the database", m_strTableName, __LINE__,
                                         __FILE__);
         return list;
     }
@@ -552,11 +552,11 @@ std::vector<Users> UsersDao::getUsersByWildcard(std::string filter) {
                 list.push_back(obj);
             }
         } else {
-            m_log.write<Logging::INFO_LOG>("Notfound, getUsersByWildcard Returned Rows=", rows, m_strTableName,
+            m_log.log(Logging::LogLevel::Info, "Notfound, getUsersByWildcard Returned Rows=", rows, m_strTableName,
                                            __LINE__, __FILE__);
         }
     } else {
-        m_log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return list;

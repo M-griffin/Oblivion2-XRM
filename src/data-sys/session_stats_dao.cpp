@@ -252,7 +252,7 @@ std::vector<SessionStats> SessionStatsDao::getAllStatsPerUser(long userId) {
 
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected()) {
-        log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        log.log(Logging::LogLevel::Info, "Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -260,7 +260,7 @@ std::vector<SessionStats> SessionStatsDao::getAllStatsPerUser(long userId) {
     Query qry(m_database);
 
     if (!qry.isConnected()) {
-        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__,
+        log.log(Logging::LogLevel::Info, "Error, Query has no connection to the database", m_strTableName, __LINE__,
                                       __FILE__);
         return list;
     }
@@ -281,11 +281,11 @@ std::vector<SessionStats> SessionStatsDao::getAllStatsPerUser(long userId) {
                 list.push_back(stat);
             }
         } else {
-            log.write<Logging::ERROR_LOG>("Error, getAllStatsPerUser Returned Rows=", rows, m_strTableName, __LINE__,
+            log.log(Logging::LogLevel::Info, "Error, getAllStatsPerUser Returned Rows=", rows, m_strTableName, __LINE__,
                                           __FILE__);
         }
     } else {
-        log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        log.log(Logging::LogLevel::Info, "Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return list;
@@ -301,7 +301,7 @@ std::vector<SessionStats> SessionStatsDao::getLast10CallerStats() {
 
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected()) {
-        log.write<Logging::ERROR_LOG>("Error, Database is not connected", m_strTableName, __LINE__, __FILE__);
+        log.log(Logging::LogLevel::Info, "Error, Database is not connected", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -309,7 +309,7 @@ std::vector<SessionStats> SessionStatsDao::getLast10CallerStats() {
     Query qry(m_database);
 
     if (!qry.isConnected()) {
-        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__,
+        log.log(Logging::LogLevel::Info, "Error, Query has no connection to the database", m_strTableName, __LINE__,
                                       __FILE__);
         return list;
     }
@@ -332,11 +332,11 @@ std::vector<SessionStats> SessionStatsDao::getLast10CallerStats() {
                 list.push_back(stat);
             }
         } else {
-            log.write<Logging::ERROR_LOG>("Error, getLast10CallerStats Returned Rows=", rows, m_strTableName, __LINE__,
+            log.log(Logging::LogLevel::Info, "Error, getLast10CallerStats Returned Rows=", rows, m_strTableName, __LINE__,
                                           __FILE__);
         }
     } else {
-        log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        log.log(Logging::LogLevel::Info, "Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return list;
@@ -352,7 +352,7 @@ std::vector<SessionStats> SessionStatsDao::getTodaysCallerStats() {
 
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected()) {
-        log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
+        log.log(Logging::LogLevel::Info, "Error, Database is not connected!", m_strTableName, __LINE__, __FILE__);
         return list;
     }
 
@@ -360,7 +360,7 @@ std::vector<SessionStats> SessionStatsDao::getTodaysCallerStats() {
     Query qry(m_database);
 
     if (!qry.isConnected()) {
-        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __LINE__,
+        log.log(Logging::LogLevel::Info, "Error, Query has no connection to the database", m_strTableName, __LINE__,
                                       __FILE__);
         return list;
     }
@@ -385,11 +385,11 @@ std::vector<SessionStats> SessionStatsDao::getTodaysCallerStats() {
                 list.push_back(stat);
             }
         } else {
-            log.write<Logging::ERROR_LOG>("Error, getTodaysCallerStats Returned Rows=", rows, m_strTableName, __LINE__,
+            log.log(Logging::LogLevel::Info, "Error, getTodaysCallerStats Returned Rows=", rows, m_strTableName, __LINE__,
                                           __FILE__);
         }
     } else {
-        log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __LINE__, __FILE__);
+        log.log(Logging::LogLevel::Info, "Error, getResult()", m_strTableName, __LINE__, __FILE__);
     }
 
     return list;

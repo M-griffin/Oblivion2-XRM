@@ -57,18 +57,18 @@ Session::Session(async_io_ptr my_async_io, session_manager_ptr my_session_manage
     {
         try
         {
-            m_log.write<Logging::DEBUG_LOG>("New Session Accepted", __LINE__, __FILE__);
+            m_log.log(Logging::LogLevel::Debug, "New Session Accepted", __LINE__, __FILE__);
         }
         catch(std::exception &ex)
         {
-            m_log.write<Logging::ERROR_LOG>("New Session Exception=", ex.what(), __LINE__, __FILE__);
+            m_log.log(Logging::LogLevel::Error, "New Session Exception=", ex.what(), __LINE__, __FILE__);
         }
     }
 }
 
 Session::~Session()
 {
-    m_log.write<Logging::INFO_LOG>("~Session() Closed.");
+    m_log.log(Logging::LogLevel::Info, "~Session() Closed.");
 
     // Free the menu system state and modules when session closes.
     m_state_manager->clean();
@@ -189,7 +189,7 @@ void Session::handleWrite(const std::error_code& error, socket_handler_ptr)
     
     if(error)
     {
-        m_log.write<Logging::ERROR_LOG>("Async_HandleWrite Error Session Closed() msg=", error.message());
+        m_log.log(Logging::LogLevel::Error, "Async_HandleWrite Error Session Closed() msg=", error.message());
         logoff();
     }    
 }
@@ -295,14 +295,14 @@ void Session::handleEscTimer()
 void Session::handleRead(const std::error_code& error, socket_handler_ptr)
 {
     m_log.setUserInfo(m_node_number);
-    m_log.write<Logging::DEBUG_LOG>("handleRead - After Incoming Data.", __FILE__, __LINE__);
+    m_log.log(Logging::LogLevel::Debug, "handleRead - After Incoming Data.", __FILE__, __LINE__);
 
-    m_log.write<Logging::CONSOLE_LOG>("Start SManager Lock", __LINE__, __FILE__);
+    m_log.log(Logging::LogLevel::Console, "Start SManager Lock", __LINE__, __FILE__);
     session_manager_ptr session_manager = m_session_manager.lock();
     if(!session_manager)
     {
-        m_log.write<Logging::ERROR_LOG>("handleRead - Unable to load session_manager", __FILE__, __LINE__);
-        m_log.write<Logging::CONSOLE_LOG>("End SManager Lock && No Session Manager", __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "handleRead - Unable to load session_manager", __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Console, "End SManager Lock && No Session Manager", __LINE__, __FILE__);
         return;
     }    
 
@@ -311,7 +311,7 @@ void Session::handleRead(const std::error_code& error, socket_handler_ptr)
         // Disconnect the session.
         m_is_leaving = true;        
         session_manager->leave(shared_from_this());
-        m_log.write<Logging::CONSOLE_LOG>("End SManager Lock", __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Console, "End SManager Lock", __LINE__, __FILE__);
         return;
     }
               
@@ -376,10 +376,10 @@ void Session::handleRead(const std::error_code& error, socket_handler_ptr)
     }
     else
     {
-        m_log.write<Logging::WARN_LOG>("handleRead - m_async_io no longer active");
+        m_log.log(Logging::LogLevel::Warn, "handleRead - m_async_io no longer active");
         logoff();
     }
-    m_log.write<Logging::CONSOLE_LOG>("END SManager Lock", __LINE__, __FILE__);
+    m_log.log(Logging::LogLevel::Console, "END SManager Lock", __LINE__, __FILE__);
 }
 
 /**
@@ -412,7 +412,7 @@ void Session::handleTeloptCodes()
                 session_manager_ptr session_manager = m_session_manager.lock();
                 if(!session_manager)
                 {
-                    m_log.write<Logging::ERROR_LOG>("handleRead - Unable to load session_manager", __FILE__, __LINE__);
+                    m_log.log(Logging::LogLevel::Error, "handleRead - Unable to load session_manager", __FILE__, __LINE__);
                     return;
                 }
                 
@@ -434,7 +434,7 @@ void Session::handleTeloptCodes()
         }    
         catch(std::exception& e)
         {
-            m_log.write<Logging::ERROR_LOG>("Exception telnet_process_char", e.what(), __LINE__, __FILE__);
+            m_log.log(Logging::LogLevel::Error, "Exception telnet_process_char", e.what(), __LINE__, __FILE__);
         }
     }
 
@@ -469,29 +469,29 @@ void Session::logoff()
     {
         try
         {
-            m_log.write<Logging::INFO_LOG>("m_async_io->getSocketHandle() is ACTIVE! -> INACTIVE", __LINE__, __FILE__);
+            m_log.log(Logging::LogLevel::Info, "m_async_io->getSocketHandle() is ACTIVE! -> INACTIVE", __LINE__, __FILE__);
             m_async_io->getSocketHandle()->setInactive();
             
         }
         catch(std::exception &e)
         {
             // Sometime this doesn't close when it's already existed, just extra checking here.            
-            m_log.write<Logging::ERROR_LOG>("Exception connection shutdown()", e.what(), __LINE__, __FILE__);
+            m_log.log(Logging::LogLevel::Error, "Exception connection shutdown()", e.what(), __LINE__, __FILE__);
         }
     }
     
-    m_log.write<Logging::CONSOLE_LOG>("Start SManager Lock", __LINE__, __FILE__);
+    m_log.log(Logging::LogLevel::Console, "Start SManager Lock", __LINE__, __FILE__);
     session_manager_ptr session_manager = m_session_manager.lock();
 
     if(session_manager)
     {
         m_is_leaving = true;
-        m_log.write<Logging::INFO_LOG>("Logoff Session Manager", __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Info, "Logoff Session Manager", __LINE__, __FILE__);
                 
         session_manager->leave(shared_from_this());            
         //session_manager.reset();        
     }
-    m_log.write<Logging::CONSOLE_LOG>("End SManager Lock", __LINE__, __FILE__);
+    m_log.log(Logging::LogLevel::Console, "End SManager Lock", __LINE__, __FILE__);
     
 }
 

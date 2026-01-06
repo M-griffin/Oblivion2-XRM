@@ -186,7 +186,7 @@ std::vector<Oneliners> OnelinerDao::getAllOnelinersByUserId(const long userId) {
 
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected()) {
-        m_log.write<Logging::ERROR_LOG>("Error, Database is not connected!", __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Error, "Error, Database is not connected!", __FILE__, __LINE__);
         return list;
     }
 
@@ -194,7 +194,7 @@ std::vector<Oneliners> OnelinerDao::getAllOnelinersByUserId(const long userId) {
     Query qry(m_database);
 
     if (!qry.isConnected()) {
-        m_log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Error, "Error, Query has no connection to the database", __FILE__, __LINE__);
         return list;
     }
 
@@ -214,10 +214,10 @@ std::vector<Oneliners> OnelinerDao::getAllOnelinersByUserId(const long userId) {
                 list.push_back(obj);
             }
         } else {
-            m_log.write<Logging::ERROR_LOG>("Error, getAllOneliners Returned Rows=", rows, __FILE__, __LINE__);
+            m_log.log(Logging::LogLevel::Error, "Error, getAllOneliners Returned Rows=", rows, __FILE__, __LINE__);
         }
     } else {
-        m_log.write<Logging::ERROR_LOG>("Error, getResult()", __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Error, "Error, getResult()", __FILE__, __LINE__);
     }
 
     return list;

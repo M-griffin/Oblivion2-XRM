@@ -56,7 +56,7 @@ public:
     }
 
     ~Session() {
-        m_log.write<Logging::CONSOLE_LOG>("~Session()");
+        m_log.log(Logging::LogLevel::Console, "~Session()");
         close();
     }
 

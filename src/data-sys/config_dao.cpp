@@ -177,7 +177,7 @@ bool ConfigDao::saveConfig(Config &cfg) {
     std::ofstream ofs(path);
 
     if (!ofs.is_open()) {
-        m_log.write<Logging::ERROR_LOG>("Error, unable to write to path=", path);
+        m_log.log(Logging::LogLevel::Error, "Error, unable to write to path=", path);
         return false;
     }
 
@@ -328,7 +328,7 @@ bool ConfigDao::loadConfig() {
 
         // Testing Is on nodes always throws exceptions.
         if (node.size() == 0) {
-            m_log.write<Logging::ERROR_LOG>("Error, ConfigDao Node size == 0");
+            m_log.log(Logging::LogLevel::Error, "Error, ConfigDao Node size == 0");
             return false;
         }
 
@@ -336,12 +336,12 @@ bool ConfigDao::loadConfig() {
 
         // Validate File Version
         if (!is_version_displayed) {
-            m_log.write<Logging::CONSOLE_LOG>("Config File Version=", file_version);
+            m_log.log(Logging::LogLevel::Console, "Config File Version=", file_version);
             is_version_displayed = true;
         }
 
         if (file_version != Config::FILE_VERSION) {
-            m_log.write<Logging::ERROR_LOG>("Config File Version=", file_version, "Expected Version=",
+            m_log.log(Logging::LogLevel::Error, "Config File Version=", file_version, "Expected Version=",
                                             Config::FILE_VERSION);
             return false;
         }
@@ -353,11 +353,11 @@ bool ConfigDao::loadConfig() {
         //encode(c);
         m_config = node.as<Config>();
     } catch (YAML::Exception &ex) {
-        m_log.write<Logging::ERROR_LOG>("YAML::LoadFile(xrm-config.yaml)", ex.what(), "Missing required field maybe.");
+        m_log.log(Logging::LogLevel::Error, "YAML::LoadFile(xrm-config.yaml)", ex.what(), "Missing required field maybe.");
         return (false);
     }
     catch (std::exception &ex) {
-        m_log.write<Logging::ERROR_LOG>("YAML::LoadFile(xrm-config.yaml)", ex.what());
+        m_log.log(Logging::LogLevel::Error, "YAML::LoadFile(xrm-config.yaml)", ex.what());
         return (false);
     }
 
@@ -371,7 +371,7 @@ bool ConfigDao::loadConfig() {
 bool ConfigDao::validation() {
     // Check if Handle and Real Name are configured.
     if (!m_config.use_handle && !m_config.use_real_name) {
-        m_log.write<Logging::ERROR_LOG>("Config Validation - use_handle and use_real_name can't both be false.");
+        m_log.log(Logging::LogLevel::Error, "Config Validation - use_handle and use_real_name can't both be false.");
         return false;
     }
 

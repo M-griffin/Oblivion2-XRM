@@ -21,7 +21,7 @@ AccessCondition::AccessCondition(SessionIO &io)
 }
 
 AccessCondition::~AccessCondition() {
-    m_log.write<Logging::DEBUG_LOG>("~AccessCondition()");
+    m_log.log(Logging::LogLevel::Debug, "~AccessCondition()");
 }
 
 /**
@@ -35,7 +35,7 @@ void AccessCondition::setFlagToggle(unsigned char flag, bool first_set, Users &u
     bit -= 65; // Handles A - Z
 
     if (bit < 0 || bit > 25) {
-        m_log.write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Error, "Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
@@ -57,7 +57,7 @@ void AccessCondition::setFlagLevelToggle(unsigned char flag, bool first_set, Acc
     bit -= 65; // Handles A - Z
 
     if (bit < 0 || bit > 25) {
-        m_log.write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Error, "Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
@@ -79,7 +79,7 @@ void AccessCondition::setFlagOn(unsigned char flag, bool first_set, Users &user)
     bit -= 65; // Handles A - Z
 
     if (bit < 0 || bit > 25) {
-        m_log.write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Error, "Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
@@ -101,7 +101,7 @@ void AccessCondition::setFlagOff(unsigned char flag, bool first_set, Users &user
     bit -= 65; // Handles A - Z
 
     if (bit < 0 || bit > 25) {
-        m_log.write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Error, "Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
@@ -124,7 +124,7 @@ bool AccessCondition::checkAccessConditionFlag(unsigned char flag, bool first_se
     bit -= 65; // Handles A - Z
 
     if (bit < 0 || bit > 25) {
-        m_log.write<Logging::ERROR_LOG>("Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        m_log.log(Logging::LogLevel::Error, "Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return false;
     }
 

@@ -27,7 +27,7 @@ ModBase::ModBase(TCPSession &session_data, Config &config, ProcessorAnsi &ansi_p
       , m_common_io(common_io)
       , m_session_io(session_io) {
     // Setup All Mods for Proper Node Logging by Session.
-    m_log.setUserInfo(session_data.getSession().getNodeNumber());
+    m_log.setNode(session_data.getSession().getNodeNumber());
 }
 
 ModBase::ModBase(ModBase &&other) noexcept

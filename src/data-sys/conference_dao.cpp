@@ -185,7 +185,7 @@ std::vector<Conference> ConferenceDao::getAllConferencesByType(std::string type)
 
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected()) {
-        log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
+        log.log(Logging::LogLevel::Info, "Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
         return list;
     }
 
@@ -193,7 +193,7 @@ std::vector<Conference> ConferenceDao::getAllConferencesByType(std::string type)
     Query qry(m_database);
 
     if (!qry.isConnected()) {
-        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__,
+        log.log(Logging::LogLevel::Info, "Error, Query has no connection to the database", m_strTableName, __FILE__,
                                       __LINE__);
         return list;
     }
@@ -215,11 +215,11 @@ std::vector<Conference> ConferenceDao::getAllConferencesByType(std::string type)
                 list.push_back(conf);
             }
         } else {
-            log.write<Logging::ERROR_LOG>("Error, getAllConferencesByType Returned Rows=", rows, m_strTableName,
+            log.log(Logging::LogLevel::Info, "Error, getAllConferencesByType Returned Rows=", rows, m_strTableName,
                                           __FILE__, __LINE__);
         }
     } else {
-        log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __FILE__, __LINE__);
+        log.log(Logging::LogLevel::Info, "Error, getResult()", m_strTableName, __FILE__, __LINE__);
     }
 
     return list;
@@ -236,7 +236,7 @@ long ConferenceDao::getConferencesCountByType(std::string type) {
 
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected()) {
-        log.write<Logging::ERROR_LOG>("Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
+        log.log(Logging::LogLevel::Info, "Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
         return list.size();
     }
 
@@ -244,7 +244,7 @@ long ConferenceDao::getConferencesCountByType(std::string type) {
     Query qry(m_database);
 
     if (!qry.isConnected()) {
-        log.write<Logging::ERROR_LOG>("Error, Query has no connection to the database", m_strTableName, __FILE__,
+        log.log(Logging::LogLevel::Info, "Error, Query has no connection to the database", m_strTableName, __FILE__,
                                       __LINE__);
         return list.size();
     }
@@ -265,11 +265,11 @@ long ConferenceDao::getConferencesCountByType(std::string type) {
                 list.push_back(conf);
             }
         } else {
-            log.write<Logging::ERROR_LOG>("Error, getConferenceCount By Type Returned Rows=", rows, m_strTableName,
+            log.log(Logging::LogLevel::Info, "Error, getConferenceCount By Type Returned Rows=", rows, m_strTableName,
                                           __FILE__, __LINE__);
         }
     } else {
-        log.write<Logging::ERROR_LOG>("Error, getResult()", m_strTableName, __FILE__, __LINE__);
+        log.log(Logging::LogLevel::Info, "Error, getResult()", m_strTableName, __FILE__, __LINE__);
     }
 
     return list.size();

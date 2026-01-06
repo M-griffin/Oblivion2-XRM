@@ -36,7 +36,7 @@ ModBase::ModBase(session_ptr session_data, config_ptr config, processor_ansi_ptr
 
 ModBase::~ModBase()
 {
-    m_log.write<Logging::DEBUG_LOG>("~ModBase()");
+    m_log.log(Logging::LogLevel::Debug, "~ModBase()");
     m_session_data.reset();
     m_config.reset();
     m_session_io.reset();
@@ -57,7 +57,7 @@ session_ptr ModBase::getLockedSession()
     }
     else
     {
-        m_log.write<Logging::ERROR_LOG>("Session Object Not Available");
+        m_log.log(Logging::LogLevel::Error, "Session Object Not Available");
     }
     
     return nullptr;
@@ -267,12 +267,12 @@ void ModBase::baseProcessAndDeliver(std::string &data)
     m_ansi_process->parseTextToBuffer((char *)output.c_str());
     output += baseGetDefaultInputColor();
     
-    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
+    m_log.log(Logging::LogLevel::Console, "Start Session Lock", __LINE__, __FILE__);
     if(session_ptr session = getLockedSession())
     {
         session->deliver(output);
     }
-    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
+    m_log.log(Logging::LogLevel::Console, "End Session Lock", __LINE__, __FILE__);
 }
 
 /**
@@ -288,12 +288,12 @@ void ModBase::baseProcessAndDeliverThenDisconnect(std::string &data)
     m_ansi_process->parseTextToBuffer((char *)output.c_str());
     output += baseGetDefaultInputColor();    
     
-    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
+    m_log.log(Logging::LogLevel::Console, "Start Session Lock", __LINE__, __FILE__);
     if(session_ptr session = getLockedSession())
     {
         session->deliver(output, DISCONNECT_USER);
     }
-    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
+    m_log.log(Logging::LogLevel::Console, "End Session Lock", __LINE__, __FILE__);
 }
 
 /**
@@ -335,12 +335,12 @@ void ModBase::baseProcessDeliverInputAndDisconnect(std::string &data)
 {
     m_ansi_process->parseTextToBuffer((char *)data.c_str());
     
-    m_log.write<Logging::CONSOLE_LOG>("Start Session Lock", __LINE__, __FILE__);
+    m_log.log(Logging::LogLevel::Console, "Start Session Lock", __LINE__, __FILE__);
     if(session_ptr session = getLockedSession())
     {
         session->deliver(data, DISCONNECT_USER);
     }
-    m_log.write<Logging::CONSOLE_LOG>("End Session Lock", __LINE__, __FILE__);
+    m_log.log(Logging::LogLevel::Console, "End Session Lock", __LINE__, __FILE__);
 }
 
 /**
