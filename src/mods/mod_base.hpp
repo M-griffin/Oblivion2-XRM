@@ -4,13 +4,8 @@
 #include <string>
 #include <vector>
 
-// Header Type Definitions
+struct Context;
 class Logging;
-class TCPSession;
-class SessionIO;
-class CommonIO;
-class ProcessorAnsi;
-class Config;
 class TextPromptsDao;
 
 /**
@@ -26,25 +21,17 @@ class ModBase {
 
 public:
     Logging &m_log;
-    TCPSession &m_session_data;
-    Config &m_config;
-    ProcessorAnsi &m_ansi_process;
-    CommonIO &m_common_io;
-    SessionIO &m_session_io;
+    Context &m_ctx;
 
-    ModBase(TCPSession &session_data, Config &config, ProcessorAnsi &ansi_process,
-            std::string &filename, CommonIO &common_io, SessionIO &session_io);
-
+    ModBase(Context ctx, std::string &filename);
     ~ModBase() = default;
 
     // Disable copy semantics
     ModBase(const ModBase &) = delete;
-
     ModBase &operator=(const ModBase &) = delete;
 
     // Move constructor
     ModBase(ModBase &&other) noexcept;
-
     ModBase &operator=(ModBase &&other) noexcept;
 
     const bool DISCONNECT_USER = true;

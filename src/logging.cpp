@@ -6,18 +6,6 @@
 #include <iomanip>
 
 
-// Example Usage:
-/*
-Logging& log = Logging::getInstance();
-
-log.setLogLevelFromString("DEBUG");
-log.setNode(42);
-
-log.log(Logging::LogLevel::Info, "Server started on port", 8080);
-log.log(Logging::LogLevel::Debug, "Connection id:", 1234);
-log.log(Logging::LogLevel::Error, "Failed to open file");
-*/
-
 thread_local uint32_t local_node_number = 0;
 
 Logging& Logging::getInstance() {
@@ -39,6 +27,8 @@ void Logging::setLogLevelFromString(const std::string& level) {
     else if (level == "ERROR") m_logLevel = LogLevel::Error;
     else if (level == "CONSOLE") m_logLevel = LogLevel::Console;
     else if (level == "ALL") m_logLevel = LogLevel::All;
+    // Default if not matching.
+    else m_logLevel = LogLevel::Info;
 }
 
 void Logging::setNode(uint32_t node) {

@@ -35,11 +35,6 @@ class TCPSession {
 
 public:
 
-    // TODO Move these to the Context !!
-    std::string m_encoding_text;
-    Encoding::TextEncoding m_encoding;
-    bool m_is_use_ansi;
-
     // Default constructor
     TCPSession(TCPsocket socket, const int nodeNumber, Config &config)
         : m_log(Logging::getInstance())
@@ -49,9 +44,7 @@ public:
           , m_ansi_process()
           , m_common_io()
           , m_session_io(*this, m_common_io)
-          , m_state_manager()
-          , m_encoding(Encoding::TextEncoding::CP437)
-          , m_is_use_ansi(false) {
+          , m_state_manager() {
         m_context.bind(
             m_baseSession,
             m_telnetSession,
@@ -110,10 +103,7 @@ public:
           , m_ansi_process(std::move(other.m_ansi_process))
           , m_common_io(std::move(other.m_common_io))
           , m_session_io(*this, m_common_io)
-          , m_state_manager(std::move(other.m_state_manager))
-          , m_encoding_text(std::move(other.m_encoding_text))
-          , m_encoding(other.m_encoding)
-          , m_is_use_ansi(other.m_is_use_ansi) {
+          , m_state_manager(std::move(other.m_state_manager)) {
         m_context.bind(
             m_baseSession,
             m_telnetSession,
@@ -148,10 +138,6 @@ public:
                 m_baseSession.getConfig(),
                 m_state_manager
             );
-
-            m_encoding_text = std::move(other.m_encoding_text);
-            m_encoding = other.m_encoding;
-            m_is_use_ansi = other.m_is_use_ansi;
         }
         return *this;
     }

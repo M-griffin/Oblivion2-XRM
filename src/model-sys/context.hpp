@@ -9,6 +9,7 @@
 #include "../session_io.hpp"
 #include "../telnet_session.hpp"
 #include "../state_manager.hpp"
+#include "../encoding.hpp"
 
 #include "config.hpp"
 #include "users.hpp"
@@ -29,6 +30,9 @@ struct Context {
     SessionIO *sessionIO = nullptr;
     Config *config = nullptr;
     StateManager *state = nullptr;
+
+    bool m_use_ansi = false;
+    Encoding::TextEncoding m_encoding = Encoding::TextEncoding::CP437;
 
     void bind(
         Session &bs,
@@ -88,6 +92,22 @@ struct Context {
     StateManager &getState() const {
         assert(state);
         return *state;
+    }
+
+    bool isAnsi() const {
+        return m_use_ansi;
+    }
+
+    void setAnsi(const bool use_ansi) {
+        m_use_ansi = use_ansi;
+    }
+
+    Encoding::TextEncoding getEncoding() const {
+        return m_encoding;
+    }
+
+    void setEncoding(const Encoding::TextEncoding value) {
+        m_encoding = value;
     }
 };
 

@@ -33,9 +33,10 @@ class ModPreLogon
     std::vector<std::function<void()> > m_setup_functions;
     std::vector<std::function<void(const std::string &)> > m_mod_functions;
 
+    void rebuildFunctionTables();
+
 public:
-    ModPreLogon(TCPSession &session_data, Config &config, ProcessorAnsi &ansi_process,
-                CommonIO &common_io, SessionIO &session_io);
+    ModPreLogon(Context &ctx);
 
     ~ModPreLogon();
 

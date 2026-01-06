@@ -15,30 +15,24 @@
 #include "../logging.hpp"
 #include "../common_io.hpp"
 #include "../tcp_session.hpp"
+#include "../utf-cpp/utf8.h"
 
-ModBase::ModBase(TCPSession &session_data, Config &config, ProcessorAnsi &ansi_process, std::string &filename,
-                 CommonIO &common_io, SessionIO &session_io)
+ModBase::ModBase(Context ctx, std::string &filename)
     : m_filename(filename)
-      , m_is_active(false)
-      , m_log(Logging::getInstance())
-      , m_session_data(session_data)
-      , m_config(config)
-      , m_ansi_process(ansi_process)
-      , m_common_io(common_io)
-      , m_session_io(session_io) {
+    , m_is_active(false)
+    , m_log(Logging::getInstance())
+    , m_ctx(ctx) {
+
     // Setup All Mods for Proper Node Logging by Session.
-    m_log.setNode(session_data.getSession().getNodeNumber());
+    m_log.setNode(ctx.getBase().getNodeNumber());
 }
 
 ModBase::ModBase(ModBase &&other) noexcept
     : m_filename(std::move(other.m_filename))
       , m_is_active(other.m_is_active)
       , m_log(other.m_log)
-      , m_session_data(other.m_session_data)
-      , m_config(other.m_config)
-      , m_ansi_process(other.m_ansi_process)
-      , m_common_io(other.m_common_io)
-      , m_session_io(other.m_session_io) {
+      , m_ctx(other.m_ctx) {
+
     // Nothing else to do, references are bound to the same objects as 'other'
 }
 
@@ -46,6 +40,7 @@ ModBase &ModBase::operator=(ModBase &&other) noexcept {
     if (this != &other) {
         m_filename = std::move(other.m_filename);
         m_is_active = other.m_is_active;
+        m_ctx = other.m_ctx;
     }
     return *this;
 }
@@ -138,25 +133,46 @@ std::string ModBase::baseCreateBorderedDisplay(std::vector<std::string> result_s
  * @param value
  */
 void ModBase::baseTransformToUpper(std::string &value) {
-    const auto stringToUpper = std::bind1st(
-        std::mem_fun(
-            &std::ctype<char>::toupper),
-        &std::use_facet<std::ctype<char> >(std::locale()));
+    std::string result;
+    result.reserve(value.size());
 
-    transform(value.begin(), value.end(), value.begin(), stringToUpper);
+    auto it = value.begin();
+    while (it != value.end()) {
+        uint32_t cp = utf8::next(it, value.end());
+
+        // ASCII range only
+        if (cp >= 'a' && cp <= 'z') {
+            cp -= 32;
+        }
+
+        utf8::append(cp, std::back_inserter(result));
+    }
+
+    value.swap(result);
 }
+
 
 /**
  * @brief Transform Strings to Lowercase with Locale
  * @param value
  */
 void ModBase::baseTransformToLower(std::string &value) {
-    const auto stringToLower = std::bind1st(
-        std::mem_fun(
-            &std::ctype<char>::tolower),
-        &std::use_facet<std::ctype<char> >(std::locale()));
+    std::string result;
+    result.reserve(value.size());
 
-    transform(value.begin(), value.end(), value.begin(), stringToLower);
+    auto it = value.begin();
+    while (it != value.end()) {
+        uint32_t cp = utf8::next(it, value.end());
+
+        // ASCII range only
+        if (cp >= 'A' && cp <= 'Z') {
+            cp += 32;
+        }
+
+        utf8::append(cp, std::back_inserter(result));
+    }
+
+    value.swap(result);
 }
 
 /**
@@ -164,7 +180,7 @@ void ModBase::baseTransformToLower(std::string &value) {
  * @return
  */
 std::string ModBase::baseGetDefaultColor() const {
-    return m_session_io.pipeColors(m_config.default_color_regular);
+    return m_ctx.getSessionIO().pipeColors(m_ctx.getCfg().default_color_regular);
 }
 
 /**
@@ -172,7 +188,7 @@ std::string ModBase::baseGetDefaultColor() const {
  * @return
  */
 std::string ModBase::baseGetDefaultInputColor() const {
-    return m_session_io.pipeColors(m_config.default_color_input);
+    return m_ctx.getSessionIO().pipeColors(m_ctx.getCfg().default_color_input);
 }
 
 /**
@@ -180,7 +196,7 @@ std::string ModBase::baseGetDefaultInputColor() const {
  * @return
  */
 std::string ModBase::baseGetDefaultInverseColor() const {
-    return m_session_io.pipeColors(m_config.default_color_inverse);
+    return m_ctx.getSessionIO().pipeColors(m_ctx.getCfg().default_color_inverse);
 }
 
 /**
@@ -188,7 +204,7 @@ std::string ModBase::baseGetDefaultInverseColor() const {
  * @return
  */
 std::string ModBase::baseGetDefaultBoxColor() const {
-    return m_session_io.pipeColors(m_config.default_color_box);
+    return m_ctx.getSessionIO().pipeColors(m_ctx.getCfg().default_color_box);
 }
 
 /**
@@ -196,7 +212,7 @@ std::string ModBase::baseGetDefaultBoxColor() const {
  * @return
  */
 std::string ModBase::baseGetDefaultPromptColor() const {
-    return m_session_io.pipeColors(m_config.default_color_prompt);
+    return m_ctx.getSessionIO().pipeColors(m_ctx.getCfg().default_color_prompt);
 }
 
 /**
@@ -204,7 +220,7 @@ std::string ModBase::baseGetDefaultPromptColor() const {
  * @return
  */
 std::string ModBase::baseGetDefaultStatColor() const {
-    return m_session_io.pipeColors(m_config.default_color_stat);
+    return m_ctx.getSessionIO().pipeColors(m_ctx.getCfg().default_color_stat);
 }
 
 /**
@@ -216,9 +232,9 @@ void ModBase::baseProcessAndDeliver(std::string &data) const {
     // Clear out attributes on new strings no bleeding of colors.
     std::string output = "\x1b[0m" + baseGetDefaultColor();
     output += data;
-    m_ansi_process.parseTextToBuffer(const_cast<char *>(output.c_str()));
+    m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(output.c_str()));
     output += baseGetDefaultInputColor();
-    m_session_data.getSession().send(output);
+    m_ctx.getBase().send(output);
 }
 
 /**
@@ -230,9 +246,9 @@ void ModBase::baseProcessAndDeliverThenDisconnect(std::string &data) const {
     // Clear out attributes on new strings no bleeding of colors.
     std::string output = "\x1b[0m" + baseGetDefaultColor();
     output += data;
-    m_ansi_process.parseTextToBuffer(const_cast<char *>(output.c_str()));
+    m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(output.c_str()));
     output += baseGetDefaultInputColor();
-    m_session_data.getSession().send(output, DISCONNECT_USER);
+    m_ctx.getBase().send(output, DISCONNECT_USER);
 }
 
 /**
@@ -256,16 +272,16 @@ void ModBase::baseProcessDeliverNewLine() const {
  * @brief Deliver Input for prompts (No Coloring Extras)
  */
 void ModBase::baseProcessDeliverInput(std::string &data) const {
-    m_ansi_process.parseTextToBuffer(const_cast<char *>(data.c_str()));
-    m_session_data.getSession().send(data);
+    m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(data.c_str()));
+    m_ctx.getBase().send(data);
 }
 
 /**
  * @brief Deliver Input for prompts Then Disconnect (No Coloring Extras)
  */
 void ModBase::baseProcessDeliverInputAndDisconnect(std::string &data) const {
-    m_ansi_process.parseTextToBuffer(const_cast<char *>(data.c_str()));
-    m_session_data.getSession().send(data, DISCONNECT_USER);
+    m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(data.c_str()));
+    m_ctx.getBase().send(data, DISCONNECT_USER);
 }
 
 /**
@@ -283,7 +299,7 @@ void ModBase::baseDisplayPrompt(const std::string &prompt, TextPromptsDao &m_tex
     M_StringPair prompt_set = m_text_dao.getPrompt(prompt);
     const std::string::size_type idx = prompt_set.second.find("%IN", 0);
 
-    result += m_session_io.parseTextPrompt(prompt_set);
+    result += m_ctx.getSessionIO().parseTextPrompt(prompt_set);
 
     // Not found, set default input color
     if (idx == std::string::npos) {
@@ -311,7 +327,7 @@ std::string ModBase::baseGetDisplayPrompt(const std::string &prompt, TextPrompts
     M_StringPair prompt_set = m_text_dao.getPrompt(prompt);
     const std::string::size_type idx = prompt_set.second.find("%IN", 0);
 
-    result += m_session_io.parseTextPrompt(prompt_set);
+    result += m_ctx.getSessionIO().parseTextPrompt(prompt_set);
 
     // Not found, set default input color
     if (idx == std::string::npos) {
@@ -342,7 +358,7 @@ std::string ModBase::baseGetDisplayPromptPipeToAnsi(const std::string &prompt, T
     // Parse Prompt for Input Color And Position Override.
     // If found, the colors of the MCI Codes should be used as the default color.
     M_StringPair prompt_set = m_text_dao.getPrompt(prompt);
-    return m_session_io.pipeColors(prompt_set.second);
+    return m_ctx.getSessionIO().pipeColors(prompt_set.second);
 }
 
 /**
@@ -363,10 +379,10 @@ void ModBase::baseDisplayPromptMCI(const std::string &prompt, TextPromptsDao &m_
 
     // Parse and replace the MCI Code with the field value
     const std::string mci_code = "|OT";
-    m_common_io.parseLocalMCI(prompt_set.second, mci_code, mci_field);
+    m_ctx.getCommonIO().parseLocalMCI(prompt_set.second, mci_code, mci_field);
 
     // Does pipe2ansi for colors etc..
-    result += m_session_io.parseTextPrompt(prompt_set);
+    result += m_ctx.getSessionIO().parseTextPrompt(prompt_set);
 
     // Not found, set default input color
     if (idx == std::string::npos) {
@@ -390,7 +406,7 @@ void ModBase::baseDisplayPromptAndNewLine(const std::string &prompt, TextPrompts
     M_StringPair prompt_set = m_text_dao.getPrompt(prompt);
     const std::string::size_type idx = prompt_set.second.find("%IN", 0);
 
-    result += m_session_io.parseTextPrompt(prompt_set);
+    result += m_ctx.getSessionIO().parseTextPrompt(prompt_set);
 
     // Not found, set default input color
     if (idx == std::string::npos) {
@@ -409,7 +425,7 @@ void ModBase::baseDisplayPromptAndNewLine(const std::string &prompt, TextPrompts
  */
 void ModBase::moveToBottomAndDisplay(const std::string &prompt) const {
     std::string output = "";
-    const int screen_row = m_ansi_process.getMaxRowsUsedOnScreen();
+    const int screen_row = m_ctx.getAnsi().getMaxRowsUsedOnScreen();
 
     output += baseGetDefaultColor();
     output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
@@ -423,7 +439,7 @@ void ModBase::moveToBottomAndDisplay(const std::string &prompt) const {
  */
 std::string ModBase::moveStringToBottom(const std::string &prompt) const {
     std::string output = "";
-    const int screen_row = m_ansi_process.getMaxRowsUsedOnScreen();
+    const int screen_row = m_ctx.getAnsi().getMaxRowsUsedOnScreen();
 
     output += baseGetDefaultColor();
     output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
