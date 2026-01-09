@@ -1,12 +1,13 @@
 #ifndef MOD_PRELOGON_HPP
 #define MOD_PRELOGON_HPP
 
-#include "mod_base.hpp"
-#include "../data-sys/text_prompts_dao.hpp"
-
 #include <string>
 #include <vector>
 #include <functional>
+
+#include "mod_base.hpp"
+#include "../data-sys/text_prompts_dao.hpp"
+#include "../deadline_timer.hpp"
 
 /**
  * @class ModPreLogon
@@ -17,6 +18,9 @@
  */
 class ModPreLogon
         : public ModBase {
+
+    static constexpr const char* MOD_FILENAME = "mod_prelogon.yaml";
+
     TextPromptsDao m_text_prompts_dao;
 
     int m_mod_function_index;
@@ -33,29 +37,30 @@ class ModPreLogon
     std::vector<std::function<void()> > m_setup_functions;
     std::vector<std::function<void(const std::string &)> > m_mod_functions;
 
-    void rebuildFunctionTables();
+    DeadlineTimer detectionTimer;
+    DeadlineTimer shieldTimer;
 
 public:
-    ModPreLogon(Context &ctx);
 
+    explicit ModPreLogon(Context &ctx);
     ~ModPreLogon();
 
     // Disable copy semantics
     ModPreLogon(const ModPreLogon &) = delete;
-
     ModPreLogon &operator=(const ModPreLogon &) = delete;
 
     // Move constructor
-    ModPreLogon(ModPreLogon &&other) noexcept;
-
-    ModPreLogon &operator=(ModPreLogon &&other) noexcept;
+    ModPreLogon(ModPreLogon &&other) = delete;
+    ModPreLogon &operator=(ModPreLogon &&other) = delete;
 
     // State Driven Methods
-    bool update(const std::string &character_buffer, const bool &) const;
+    bool update(const std::string &character_buffer, const bool &);
 
     bool onEnter();
 
     bool onExit();
+
+    bool pollTimers();
 
     // This matches the index for and key for setup -> mod_functions.push_back
     enum {
@@ -64,8 +69,6 @@ public:
         MOD_ASK_ANSI_COLOR,
         MOD_ASK_CODEPAGE
     };
-
-    std::string MOD_FILENAME = "mod_prelogon.yaml";
 
     // Create Prompt Constants, these are the keys for key/value lookup
     const std::string PROMPT_HUMAN_SHIELD = "human_shield";

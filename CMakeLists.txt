@@ -14,8 +14,8 @@ endif ()
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Available configurations" FORCE)
 
-# C++17 standard
-set(CMAKE_CXX_STANDARD 11)
+# C++17 standard eventually, Updated from 11 to 14.
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_WIN32_EXECUTABLE FALSE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -73,6 +73,9 @@ target_link_libraries(xrm-server PRIVATE OpenSSL::SSL)
 # Menu and Data Files (Conan)
 find_package(yaml-cpp REQUIRED)
 target_link_libraries(xrm-server PRIVATE yaml-cpp::yaml-cpp)
+
+find_package(utf8cpp REQUIRED)
+target_link_libraries(xrm-server PRIVATE utf8cpp)
 
 # SQLLite Include directories
 target_include_directories(xrm-server

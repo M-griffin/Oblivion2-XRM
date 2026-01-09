@@ -47,6 +47,22 @@ public:
     typedef std::function<bool(const MenuOption &option)> CommandFuncType;
     typedef std::map<char, CommandFuncType> MappedCommandFunctions;
 
+    // Function Bind Helper
+    template <typename T, typename Ret, typename... Args>
+    auto bind_member(T* obj, Ret (T::*fn)(Args...)) {
+        return [obj, fn](Args... args) -> Ret {
+            return (obj->*fn)(std::forward<Args>(args)...);
+        };
+    }
+
+    template <typename T, typename Ret, typename... Args>
+    auto bind_member(const T* obj, Ret (T::*fn)(Args...) const) {
+        return [obj, fn](Args... args) -> Ret {
+            return (obj->*fn)(std::forward<Args>(args)...);
+        };
+    }
+
+
     // Holds map of Menu Option Commands for quick lookup and execution
     MappedCommandFunctions m_menu_command_functions;
 

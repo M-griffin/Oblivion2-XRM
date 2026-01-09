@@ -1,5 +1,5 @@
 #include "encoding.hpp"
-#include "utf-cpp/utf8.h"
+#include <utf8.h>
 #include <functional>
 #include <regex>
 

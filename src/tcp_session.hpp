@@ -4,6 +4,9 @@
 #include <iostream>
 #include <utility>
 #include <functional>
+#include <string>
+#include <chrono>
+#include <experimental/optional>
 
 #include "common_io.hpp"
 #include "deadline_timer.hpp"
@@ -19,7 +22,6 @@
 
 #include "sdl2_net/SDL_net.hpp"
 
-
 class TCPSession {
     Logging &m_log;
     Session m_baseSession;
@@ -28,23 +30,27 @@ class TCPSession {
     ProcessorAnsi m_ansi_process;
     CommonIO m_common_io;
     SessionIO m_session_io;
-    StateManager m_state_manager;
 
-    // Context Of Shared Components Per Session.
     Context m_context;
+    std::experimental::optional<StateManager> m_state_manager;
+
+    // ESC handling
+    std::string m_escBuffer;      // current ESC sequence
+    bool m_escPending = false;    // one ESC waiting for resolution
+    DeadlineTimer m_escTimer;
 
 public:
-
-    // Default constructor
     TCPSession(TCPsocket socket, const int nodeNumber, Config &config)
-        : m_log(Logging::getInstance())
-          , m_baseSession(socket, nodeNumber, config)
-          , m_telnetSession(m_baseSession)
-          , m_userRec()
-          , m_ansi_process()
-          , m_common_io()
-          , m_session_io(*this, m_common_io)
-          , m_state_manager() {
+    : m_log(Logging::getInstance())
+    , m_baseSession(socket, nodeNumber, config)
+    , m_telnetSession(m_baseSession)
+    , m_userRec()
+    , m_ansi_process()
+    , m_common_io()
+    , m_session_io(*this, m_common_io)
+    , m_context() {
+
+        // Bind all necessary components
         m_context.bind(
             m_baseSession,
             m_telnetSession,
@@ -52,26 +58,29 @@ public:
             m_ansi_process,
             m_common_io,
             m_session_io,
-            m_baseSession.getConfig(),
-            m_state_manager
+            m_baseSession.getConfig()
         );
 
-        std::cout << "Sending Telnet Default Sequences on New Connection" << std::endl;
-
-        // On initial Session Connection,  setup and send TELNET Options to
-        // start the negotiation of client features.
-        // On initial connection, clear and home cursor
+        // Clear screen on connection
         const std::string clear_screen = "\x1b[1;1H\x1b[2J\x1b[0m";
         m_baseSession.send(clear_screen);
 
+        // ===============================
+        // Telnet Option Negotiation
+        // ===============================
+
+        // Tell client we won't use OLD_ENVIRON
         m_telnetSession.sendIACSequences(DONT, TELOPT_OLD_ENVIRON);
 
+        // Enable SGA (Suppress Go Ahead)
         m_telnetSession.sendIACSequences(DO, TELOPT_SGA);
         m_telnetSession.addReply(TELOPT_SGA);
 
+        // ECHO negotiation
         m_telnetSession.sendIACSequences(WILL, TELOPT_ECHO);
         m_telnetSession.addReply(TELOPT_ECHO);
 
+        // SGA, BINARY support
         m_telnetSession.sendIACSequences(WILL, TELOPT_SGA);
         m_telnetSession.addReply(TELOPT_SGA);
 
@@ -81,152 +90,132 @@ public:
         m_telnetSession.sendIACSequences(DO, TELOPT_BINARY);
         m_telnetSession.addReply(TELOPT_BINARY);
 
+        // Terminal Type (TTYPE)
         m_telnetSession.sendIACSequences(DO, TELOPT_TTYPE);
         m_telnetSession.addReply(TELOPT_TTYPE);
 
+        // Negotiate NAWS (window size)
         m_telnetSession.sendIACSequences(DO, TELOPT_NAWS);
         m_telnetSession.addReply(TELOPT_NAWS);
 
-        /*
-        m_termDetection.start(
-            std::chrono::milliseconds(2000),
-            std::bind(&TCPSession::detectionCompleted, this)
-        );*/
+        // Log constructor call
+        m_log.log(Logging::LogLevel::Console, "TCPSession() initialized with Telnet options negotiated");
     }
-
-    // Move constructor
-    TCPSession(TCPSession &&other) noexcept
-        : m_log(Logging::getInstance())
-          , m_baseSession(std::move(other.m_baseSession))
-          , m_telnetSession(std::move(other.m_telnetSession))
-          , m_userRec(std::move(other.m_userRec))
-          , m_ansi_process(std::move(other.m_ansi_process))
-          , m_common_io(std::move(other.m_common_io))
-          , m_session_io(*this, m_common_io)
-          , m_state_manager(std::move(other.m_state_manager)) {
-        m_context.bind(
-            m_baseSession,
-            m_telnetSession,
-            m_userRec,
-            m_ansi_process,
-            m_common_io,
-            m_session_io,
-            m_baseSession.getConfig(),
-            m_state_manager
-        );
-    }
-
-    // Move assignment operator
-    TCPSession &operator=(TCPSession &&other) noexcept {
-        if (this != &other) {
-            m_baseSession = std::move(other.m_baseSession);
-            m_userRec = std::move(other.m_userRec);
-            m_ansi_process = std::move(other.m_ansi_process);
-            m_common_io = std::move(other.m_common_io);
-
-            m_telnetSession = std::move(TelnetSession(m_baseSession));
-            m_session_io = SessionIO(*this, m_common_io);
-            m_state_manager = std::move(other.m_state_manager);
-
-            m_context.bind(
-                m_baseSession,
-                m_telnetSession,
-                m_userRec,
-                m_ansi_process,
-                m_common_io,
-                m_session_io,
-                m_baseSession.getConfig(),
-                m_state_manager
-            );
-        }
-        return *this;
-    }
-
-    // Copy Constructors
-    TCPSession(const TCPSession &) = delete;
-
-    TCPSession &operator=(const TCPSession &) = delete;
 
     ~TCPSession() {
         m_log.log(Logging::LogLevel::Console, "~TCPSession()");
+        m_escTimer.cancel();
+        m_state_manager = std::experimental::nullopt;
     }
 
-    // Accessors for the underlying sessions
+    TCPSession(TCPSession &&) = delete;
+    TCPSession &operator=(TCPSession &&) = delete;
+    TCPSession(const TCPSession &) = delete;
+    TCPSession &operator=(const TCPSession &) = delete;
+
     Session &getSession() { return m_baseSession; }
     TelnetSession &getTelnet() { return m_telnetSession; }
+    Users &getUserRec() { return m_userRec; }
+    Config &getConfig() { return m_baseSession.getConfig(); }
+    int getNodeNumber() const { return m_baseSession.getNodeNumber(); }
+    TCPsocket getSocket() const { return m_baseSession.getSocket(); }
+    bool isActive() const { return m_baseSession.isActive(); }
 
-    // Telnet Session Accessors
-    int getTermRows() const {
-        return m_telnetSession.getTermRows();
+    void hangup() { m_baseSession.hangup(); }
+    void send(const std::string &value) { m_baseSession.send(value); }
+    ByteBuffer receive() { return m_baseSession.receive(); }
+    void close() { return m_baseSession.close(); }
+
+    int getTermRows() const { return m_telnetSession.getTermRows(); }
+    int getTermCols() const { return m_telnetSession.getTermCols(); }
+    bool getUseAnsi() const { return m_telnetSession.getUseAnsi(); }
+
+    void startSession() {
+        m_state_manager.emplace(m_context);
+        m_state_manager->createPreLogon();
     }
 
-    int getTermCols() const {
-        return m_telnetSession.getTermCols();
+    void handleIncomingData(const ByteBuffer &msg) {
+        for (Byte incoming : msg) {
+            auto appBytes = m_telnetSession.telnetOptionParse(incoming);
+            for (Byte b : appBytes) {
+                handleIncomingByte(b);
+            }
+        }
     }
 
-    bool getUseAnsi() const {
-        return m_telnetSession.getUseAnsi();
+    void pollTimers() {
+        if (m_escPending) {
+            m_escTimer.isTriggered();
+        }
+        m_state_manager->pollTimers();
     }
 
-    Users &getUserRec() {
-        return m_userRec;
-    }
+private:
+    void handleIncomingByte(uint8_t byte) {
 
-    Config &getConfig() {
-        return m_baseSession.getConfig();
-    }
+        // =============================
+        // ESC received
+        // =============================
+        if (byte == 0x1b) {
 
-    int getNodeNumber() const {
-        return m_baseSession.getNodeNumber();
-    }
+            // Resolve previous ESC if still pending
+            if (m_escPending) {
+                m_escTimer.cancel();
+                m_state_manager->handleInput(std::string{ char(0x1b), '\0' });
+                m_escBuffer.clear();
+                m_escPending = false;
+            }
 
-    void hangup() {
-        m_baseSession.hangup();
-    }
+            // Start new ESC decision
+            m_escPending = true;
+            m_escBuffer.clear();
+            m_escBuffer.push_back(0x1b);
 
-    TCPsocket getSocket() const {
-        return m_baseSession.getSocket();
-    }
+            m_escTimer.start(std::chrono::milliseconds(25), [this]() {
+                m_state_manager->handleInput(std::string{ char(0x1b), '\0' });
+                m_escBuffer.clear();
+                m_escPending = false;
+            });
 
-    void send(const std::string &value) {
-        m_baseSession.send(value);
-    }
-
-    ByteBuffer receive() {
-        return m_baseSession.receive();
-    }
-
-    void close() {
-        return m_baseSession.close();
-    }
-
-    bool isActive() const {
-        return m_baseSession.isActive();
-    }
-
-    void handleIncomingData(ByteBuffer msg) {
-
-        std::string incomingData;
-
-        for (const Byte incoming : msg) {
-            auto bytes = m_telnetSession.telnetOptionParse(incoming);
-            incomingData.insert(incomingData.end(), bytes.begin(), bytes.end());
+            return;
         }
 
-        if (!incomingData.empty()) {
-            // Windows Console Telnet sends [CR\LF] for ENTER!
-            // Convert CR\LF to LF!
-            std::string::size_type id1 = 0;
-            do {
-                id1 = incomingData.find("\r\n", 0);
-                if (id1 != std::string::npos) {
-                    incomingData.erase(id1, 1);
-                    id1 = incomingData.find("\r\n", 0);
-                }
-            } while (id1 != std::string::npos);
+        // =============================
+        // ESC sequence continuation
+        // =============================
+        if (m_escPending) {
+            m_escBuffer.push_back(byte);
+
+            if (isEscSequenceComplete(m_escBuffer)) {
+                m_escTimer.cancel();
+                m_state_manager->handleInput(m_escBuffer);
+                m_escBuffer.clear();
+                m_escPending = false;
+            }
+            return;
         }
 
-        m_state_manager.handleInput(incomingData);
+        // =============================
+        // Normal input
+        // =============================
+        if (byte == '\n') {
+            m_state_manager->handleInput("\n");
+        } else if (byte != '\r') {
+            m_state_manager->handleInput(std::string(1, byte));
+        }
+    }
+
+    bool isEscSequenceComplete(const std::string &seq) {
+        if (seq.empty() || seq[0] != 0x1b) return true;
+        if (seq.size() == 1) return false;
+
+        const uint8_t second = seq[1];
+        if (second == '[' || second == 'O') {
+            const char last = seq.back();
+            return (last >= '@' && last <= '~');
+        }
+        return true;
     }
 };
 

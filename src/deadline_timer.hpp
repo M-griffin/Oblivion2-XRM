@@ -25,6 +25,11 @@ public:
             return m_triggered;
         }
 
+        // timer not armed or setup for call back.
+        if (!m_callbackMethod) {
+            return false;
+        }
+
         if (std::chrono::steady_clock::now() - m_start >= m_delay) {
             m_callbackMethod();
             m_triggered = true;
@@ -43,6 +48,7 @@ public:
     void cancel() {
         m_delay = std::chrono::milliseconds(-0);
         m_triggered = true;
+        m_callbackMethod = nullptr;
     }
 
 private:

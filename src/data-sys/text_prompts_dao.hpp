@@ -27,18 +27,15 @@ class TextPromptsDao {
 public:
     static const std::string FILE_VERSION;
 
-    TextPromptsDao(std::string &path, std::string &filename);
-
+    TextPromptsDao(const std::string &path, const std::string &filename);
     ~TextPromptsDao();
 
     // Disable copy semantics
     TextPromptsDao(const TextPromptsDao &) = delete;
-
     TextPromptsDao &operator=(const TextPromptsDao &) = delete;
 
-    TextPromptsDao(TextPromptsDao &&other) noexcept;
-
-    TextPromptsDao &operator=(TextPromptsDao &&other) noexcept;
+    TextPromptsDao(TextPromptsDao &&other) = delete;
+    TextPromptsDao &operator=(TextPromptsDao &&other) = delete;
 
     /**
      * @brief Check if the file exists and we need to create a new one.

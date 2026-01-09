@@ -1,7 +1,5 @@
 #include "mod_prelogon.hpp"
 
-#include <algorithm>
-#include <iostream>
 #include <string>
 #include <vector>
 #include <memory>
@@ -30,6 +28,7 @@ ModPreLogon::ModPreLogon(Context &ctx)
       , m_x_position(0)
       , m_y_position(0)
       , m_term_type("undetected") {
+
     m_setup_functions.emplace_back([this] { setupHumanShield(); });
     m_setup_functions.emplace_back([this] { setupEmulationDetection(); });
     m_setup_functions.emplace_back([this] { setupAskANSIColor(); });
@@ -43,6 +42,7 @@ ModPreLogon::ModPreLogon(Context &ctx)
         [this](const std::string &s) { return askANSIColor(s); });
     m_mod_functions.emplace_back(
         [this](const std::string &s) { return askCodePage(s); });
+
 
     m_is_text_prompt_exist = m_text_prompts_dao.fileExists();
     if (!m_is_text_prompt_exist) {
@@ -53,96 +53,37 @@ ModPreLogon::ModPreLogon(Context &ctx)
 }
 
 ModPreLogon::~ModPreLogon() {
+    detectionTimer.cancel();
+    shieldTimer.cancel();
     m_setup_functions.clear();
     m_mod_functions.clear();
-}
-
-void ModPreLogon::rebuildFunctionTables() {
-    m_setup_functions.clear();
-    m_mod_functions.clear();
-
-    m_setup_functions.emplace_back([this] { setupHumanShield(); });
-    m_setup_functions.emplace_back([this] { setupEmulationDetection(); });
-    m_setup_functions.emplace_back([this] { setupAskANSIColor(); });
-    m_setup_functions.emplace_back([this] { setupAskCodePage(); });
-
-    m_mod_functions.emplace_back(
-        [this](const std::string &s) { return humanShieldDetection(s); });
-    m_mod_functions.emplace_back(
-        [this](const std::string &s) { return emulationDetection(s); });
-    m_mod_functions.emplace_back(
-        [this](const std::string &s) { return askANSIColor(s); });
-    m_mod_functions.emplace_back(
-        [this](const std::string &s) { return askCodePage(s); });
-}
-
-// Move constructor
-ModPreLogon::ModPreLogon(ModPreLogon &&other) noexcept
-    : ModBase(std::move(other))
-      , m_text_prompts_dao(std::move(other.m_text_prompts_dao))
-      , m_mod_function_index(other.m_mod_function_index)
-      , m_is_text_prompt_exist(other.m_is_text_prompt_exist)
-      , m_is_esc_detected(other.m_is_esc_detected)
-      , m_is_human_shield(other.m_is_human_shield)
-      , m_input_buffer(std::move(other.m_input_buffer))
-      , m_x_position(other.m_x_position)
-      , m_y_position(other.m_y_position)
-      , m_term_type(std::move(other.m_term_type))
-      , m_esc_sequence(std::move(other.m_esc_sequence)) {
-    rebuildFunctionTables();
-
-    // Leave other in valid state
-    other.m_mod_function_index = 0;
-    other.m_is_text_prompt_exist = false;
-    other.m_is_esc_detected = false;
-    other.m_is_human_shield = false;
-    other.m_x_position = 0;
-    other.m_y_position = 0;
-}
-
-// Move assignment operator
-ModPreLogon &ModPreLogon::operator=(ModPreLogon &&other) noexcept {
-    if (this != &other) {
-        ModBase::operator=(std::move(other));
-
-        m_text_prompts_dao = std::move(other.m_text_prompts_dao);
-        m_mod_function_index = other.m_mod_function_index;
-        m_is_text_prompt_exist = other.m_is_text_prompt_exist;
-        m_is_esc_detected = other.m_is_esc_detected;
-        m_is_human_shield = other.m_is_human_shield;
-        m_input_buffer = std::move(other.m_input_buffer);
-        m_x_position = other.m_x_position;
-        m_y_position = other.m_y_position;
-        m_term_type = std::move(other.m_term_type);
-        m_esc_sequence = std::move(other.m_esc_sequence);
-
-        rebuildFunctionTables();
-
-        other.m_mod_function_index = 0;
-        other.m_is_text_prompt_exist = false;
-        other.m_is_esc_detected = false;
-        other.m_is_human_shield = false;
-        other.m_x_position = 0;
-        other.m_y_position = 0;
-    }
-    return *this;
 }
 
 /**
  * @brief Handles Updates or Data Input from Client
  * @return bool, not used anymore?!?
  */
-bool ModPreLogon::update(const std::string &character_buffer, const bool &) const {
+bool ModPreLogon::update(const std::string &character_buffer, const bool &) {
+
+    m_log.log(Logging::LogLevel::Console, "PreLogon update");
+
     // Make sure system is active, when system is done, success or fails
     // We change this is inactive to single the login process is completed.
-    if (!isModuleActive()) {
+    if (!m_is_active) {
+        m_log.log(Logging::LogLevel::Console, "PreLogon Module is Not Active");
         return false;
     }
 
+    // Check for Events from Input.
+    pollTimers();
+
     // Return True when were keeping module active / else false;
     if (character_buffer.empty()) {
+        m_log.log(Logging::LogLevel::Console, "PreLogon Buffer is Empty");
         return true;
     }
+
+    m_log.log(Logging::LogLevel::Console, "PreLogon Calling Mod function");
 
     // Process all incoming data straight to the input functions.
     m_mod_functions[m_mod_function_index](character_buffer);
@@ -155,6 +96,9 @@ bool ModPreLogon::update(const std::string &character_buffer, const bool &) cons
  * @return
  */
 bool ModPreLogon::onEnter() {
+
+    m_log.log(Logging::LogLevel::Console, "PreLogon onEnter");
+
     // On Initial Startup, setup user record with system colors for menu system
     // this is overwritten once the user logs in, otherwise the menu system
     // will use these defaults for theming.
@@ -166,13 +110,14 @@ bool ModPreLogon::onEnter() {
     m_ctx.getUser().sBoxColor = m_ctx.getCfg().default_color_box;
 
     // Setup Module Startup
-    setModuleActive();
+    m_is_active = true;
 
     // Grab ANSI Screen, display, if desired. logon.ans maybe?
     std::string prompt = "\x1b[?25h"; // Turn on Cursor.
     baseProcessAndDeliver(prompt);
 
     // Execute the initial setup index.
+    m_log.log(Logging::LogLevel::Console, "PreLogon Calling Setup");
     m_setup_functions[m_mod_function_index]();
 
     return true;
@@ -183,7 +128,19 @@ bool ModPreLogon::onEnter() {
  * @return
  */
 bool ModPreLogon::onExit() {
-    setModuleInActive();
+    m_log.log(Logging::LogLevel::Console, "PreLogon OnExit");
+    m_is_active = false;
+    return true;
+}
+
+bool ModPreLogon::pollTimers() {
+
+    // When either are triggered, they will execute a call back
+    // Otherwise they will just pass through.
+    detectionTimer.isTriggered();
+    shieldTimer.isTriggered();
+
+    // Don't need to check bools, probably remove.
     return true;
 }
 
@@ -191,6 +148,9 @@ bool ModPreLogon::onExit() {
  * @brief Create Default Text Prompts for module
  */
 void ModPreLogon::createTextPrompts() {
+
+    m_log.log(Logging::LogLevel::Console, "PreLogon Create Text Prompts");
+
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
 
@@ -227,6 +187,8 @@ void ModPreLogon::createTextPrompts() {
     value[PROMPT_UTF8_SELECTED] = std::make_pair("Selected UTF-8 Output Encoding", "|09Selected: |03UTF-8 Codepage.");
 
     m_text_prompts_dao.writeValue(value);
+
+    m_log.log(Logging::LogLevel::Console, "PreLogon Create Text Prompts - Done!");
 }
 
 /**
@@ -275,6 +237,9 @@ void ModPreLogon::displayPromptAndNewLine(const std::string &prompt) {
  * @return
  */
 void ModPreLogon::setupHumanShield() {
+
+    m_log.log(Logging::LogLevel::Console, "PreLogon setupHumanShield");
+
     // Display Detecting Emulation, not using display prompt because we need to append.
     std::string result = "|07" + m_ctx.getCommonIO().centerPadding(
                              BUILD_INFO, m_ctx.getTelnet().getTermCols()) + "\r\n";
@@ -297,6 +262,9 @@ void ModPreLogon::setupHumanShield() {
  * @return
  */
 void ModPreLogon::setupEmulationDetection() {
+
+    m_log.log(Logging::LogLevel::Console, "PreLogon setupEmulationDetection");
+
     // Deliver ANSI Location Sequence to Detect Emulation Response
     // Only detects if terminal handles ESC responses.
     // Windows Console Telnet will response it's at 259 y!
@@ -334,6 +302,9 @@ void ModPreLogon::setupAskANSIColor() {
  * @brief Displays Terminal Detection after Emulation Detection.
  */
 void ModPreLogon::displayTerminalDetection() {
+
+    m_log.log(Logging::LogLevel::Console, "PreLogon displayTerminalDetection");
+
     m_log.setNode(m_ctx.getBase().getNodeNumber());
 
     // Grab Detected Terminal, ANSI, XTERM, etc..
@@ -421,6 +392,9 @@ void ModPreLogon::setupAskCodePage() {
  * @return
  */
 bool ModPreLogon::humanShieldDetection(const std::string &input) {
+
+    m_log.log(Logging::LogLevel::Console, "PreLogon humanShieldDetection");
+
     constexpr bool result = false;
 
     if (!input.empty()) {
@@ -456,9 +430,12 @@ bool ModPreLogon::humanShieldDetection(const std::string &input) {
  * @return
  */
 bool ModPreLogon::emulationDetection(const std::string &input) {
+
+    m_log.log(Logging::LogLevel::Console, "PreLogon emulationDetection");
+
     bool result = false;
 
-    if (input.size() != 0) {
+    if (!input.empty()) {
         unsigned int ch = 0;
         ch = input[0];
 
@@ -483,7 +460,7 @@ bool ModPreLogon::emulationDetection(const std::string &input) {
                 // Splunk String on : for X/Y Positions from Response
                 const std::vector<std::string> positions = m_ctx.getCommonIO().splitString(m_esc_sequence, ';');
                 if (positions.size() > 1) {
-                    m_log.log(Logging::LogLevel::Debug, "X=", positions[1], "Y=", positions[0]);
+                    m_log.log(Logging::LogLevel::Console, "ESC Detect X=", positions[1], "Y=", positions[0]);
                     m_x_position = m_ctx.getCommonIO().stringToInt(positions[1]);
                     m_y_position = m_ctx.getCommonIO().stringToInt(positions[0]);
                 }
@@ -606,7 +583,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
             }
 
             baseProcessAndDeliverNewLine(message);
-            setModuleInActive();
+            m_is_active = false;
         }
         // Else check for single N for No to default to ASCII no colors.
         else if (toupper(key[0]) == 'N' && key.size() == 1) {
@@ -645,7 +622,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
             }
 
             baseProcessAndDeliverNewLine(message);
-            setModuleInActive();
+            m_is_active = false;
         } else {
             baseProcessDeliverNewLine();
             displayPrompt(PROMPT_USE_INVALID);
@@ -666,27 +643,28 @@ bool ModPreLogon::askCodePage(const std::string &input) {
  * @brief Start ESC Twice Timer
  */
 void ModPreLogon::startHumanShieldTimer() {
-    // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences responses
-    //m_deadline_timer->setWaitInMilliseconds(8000);
-    //m_deadline_timer->asyncWait(
-    //    std::bind(&ModPreLogon::handleHumanShieldTimer, shared_from_this())
-    //);
-    auto callback_function = std::bind(&ModPreLogon::handleHumanShieldTimer, this);
-    // m_ctx.getBase().m_async_io->asyncWait(4000, callback_function);
+
+    m_log.log(Logging::LogLevel::Console, "PreLogon startHumanShieldTimer (WIP)");
+
+    if (!shieldTimer.isTriggered()) {
+        shieldTimer.start(std::chrono::milliseconds(4000), [this]() {
+            handleHumanShieldTimer();
+        });
+    }
 }
 
 /**
  * @brief Start ANSI Detection timer
  */
 void ModPreLogon::startDetectionTimer() {
-    // Add Deadline Timer for 1.5 seconds for complete Telopt Sequences responses
-    //m_deadline_timer->setWaitInMilliseconds(1500);
-    //m_deadline_timer->asyncWait(
-    //    std::bind(&ModPreLogon::handleDetectionTimer, shared_from_this())
-    //);
 
-    auto callback_function = std::bind(&ModPreLogon::handleDetectionTimer, this);
-    //m_ctx.getBase().m_async_io->asyncWait(1500, callback_function);
+    m_log.log(Logging::LogLevel::Console, "PreLogon startDetectionTimer (WIP)");
+
+    if (!detectionTimer.isTriggered()) {
+        detectionTimer.start(std::chrono::milliseconds(1500), [this]() {
+            handleDetectionTimer();
+        });
+    }
 }
 
 /**
@@ -695,6 +673,7 @@ void ModPreLogon::startDetectionTimer() {
  */
 void ModPreLogon::handleHumanShieldTimer() {
     humanShieldCompleted();
+    shieldTimer.cancel();
 }
 
 /**
@@ -702,6 +681,9 @@ void ModPreLogon::handleHumanShieldTimer() {
  * @return
  */
 void ModPreLogon::humanShieldCompleted() {
+
+    m_log.log(Logging::LogLevel::Console, "PreLogon humanShieldCompleted (WIP)");
+
     m_log.setNode(m_ctx.getBase().getNodeNumber());
     if (m_is_human_shield) {
         // Move to Next Detection
@@ -711,8 +693,11 @@ void ModPreLogon::humanShieldCompleted() {
         displayPromptThenDisconnect(PROMPT_HUMAN_SHIELD_FAIL);
 
         // Disconnect User
-        setModuleInActive();
+        m_is_active = false;
         m_log.log(Logging::LogLevel::Console, "Human Shield Failed, disconnecting!");
+
+        // Can we just hang up here and clear the session.
+        m_ctx.getBase().hangup();
     }
 }
 
@@ -722,6 +707,7 @@ void ModPreLogon::humanShieldCompleted() {
 void ModPreLogon::handleDetectionTimer() {
     // Jump to Emulation completed.
     emulationCompleted();
+    detectionTimer.cancel();
 }
 
 /**

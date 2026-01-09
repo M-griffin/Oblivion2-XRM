@@ -4,9 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
-#include "../data-sys/text_prompts_dao.hpp"
-#include "../model-sys/config.hpp"
+#include <utf8.h>
 
 #include "../session.hpp"
 #include "../session_io.hpp"
@@ -15,36 +13,20 @@
 #include "../logging.hpp"
 #include "../common_io.hpp"
 #include "../tcp_session.hpp"
-#include "../utf-cpp/utf8.h"
 
-ModBase::ModBase(Context ctx, std::string &filename)
-    : m_filename(filename)
-    , m_is_active(false)
-    , m_log(Logging::getInstance())
-    , m_ctx(ctx) {
+#include "../model-sys/config.hpp"
+#include "../model-sys/context.hpp"
+#include "../data-sys/text_prompts_dao.hpp"
+
+ModBase::ModBase(Context &ctx, const std::string &filename)
+    : m_log(Logging::getInstance())
+    , m_ctx(ctx)
+    , m_filename(filename)
+    , m_is_active(false) {
 
     // Setup All Mods for Proper Node Logging by Session.
     m_log.setNode(ctx.getBase().getNodeNumber());
 }
-
-ModBase::ModBase(ModBase &&other) noexcept
-    : m_filename(std::move(other.m_filename))
-      , m_is_active(other.m_is_active)
-      , m_log(other.m_log)
-      , m_ctx(other.m_ctx) {
-
-    // Nothing else to do, references are bound to the same objects as 'other'
-}
-
-ModBase &ModBase::operator=(ModBase &&other) noexcept {
-    if (this != &other) {
-        m_filename = std::move(other.m_filename);
-        m_is_active = other.m_is_active;
-        m_ctx = other.m_ctx;
-    }
-    return *this;
-}
-
 
 /**
  * @brief Translate Box Chars to UTF-8
@@ -424,7 +406,7 @@ void ModBase::baseDisplayPromptAndNewLine(const std::string &prompt, TextPrompts
  * @param prompt
  */
 void ModBase::moveToBottomAndDisplay(const std::string &prompt) const {
-    std::string output = "";
+    std::string output;
     const int screen_row = m_ctx.getAnsi().getMaxRowsUsedOnScreen();
 
     output += baseGetDefaultColor();
@@ -438,7 +420,7 @@ void ModBase::moveToBottomAndDisplay(const std::string &prompt) const {
  * @param prompt
  */
 std::string ModBase::moveStringToBottom(const std::string &prompt) const {
-    std::string output = "";
+    std::string output;
     const int screen_row = m_ctx.getAnsi().getMaxRowsUsedOnScreen();
 
     output += baseGetDefaultColor();
@@ -447,26 +429,3 @@ std::string ModBase::moveStringToBottom(const std::string &prompt) const {
     return output;
 }
 
-/**
- * Determine if the current module is active or has been shutdown
- * @return
- */
-bool ModBase::isModuleActive() const {
-    return m_is_active;
-}
-
-/**
- * First Time Module Setup
- * @return
- */
-void ModBase::setModuleActive() {
-    m_is_active = true;
-}
-
-/**
- * Deactivate Module for Cleanup.
- * @return
- */
-void ModBase::setModuleInActive() {
-    m_is_active = false;
-}

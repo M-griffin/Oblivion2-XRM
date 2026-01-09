@@ -23,7 +23,7 @@
 #include "common_io.hpp"
 #include "logging.hpp"
 
-#include "utf-cpp/utf8.h"
+#include <utf8.h>
 
 ProcessorText::ProcessorText(int term_height, int term_width)
     : ProcessorBase(term_height, term_width)

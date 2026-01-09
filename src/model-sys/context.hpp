@@ -8,7 +8,6 @@
 #include "../session.hpp"
 #include "../session_io.hpp"
 #include "../telnet_session.hpp"
-#include "../state_manager.hpp"
 #include "../encoding.hpp"
 
 #include "config.hpp"
@@ -21,7 +20,13 @@
  * @file context.hpp
  * @brief Session Context For Passing Main Objects
  */
-struct Context {
+class Context {
+
+public:
+
+    explicit Context() = default;
+    ~Context() = default;
+
     Session *baseSession = nullptr;
     TelnetSession *telnetSession = nullptr;
     Users *userRec = nullptr;
@@ -29,7 +34,6 @@ struct Context {
     CommonIO *commonIO = nullptr;
     SessionIO *sessionIO = nullptr;
     Config *config = nullptr;
-    StateManager *state = nullptr;
 
     bool m_use_ansi = false;
     Encoding::TextEncoding m_encoding = Encoding::TextEncoding::CP437;
@@ -41,8 +45,7 @@ struct Context {
         ProcessorAnsi &ap,
         CommonIO &cio,
         SessionIO &sio,
-        Config &cfg,
-        StateManager &st
+        Config &cfg
     ) {
         baseSession = &bs;
         telnetSession = &ts;
@@ -51,7 +54,6 @@ struct Context {
         commonIO = &cio;
         sessionIO = &sio;
         config = &cfg;
-        state = &st;
     }
 
     Session &getBase() const {
@@ -87,11 +89,6 @@ struct Context {
     Config &getCfg() const {
         assert(config);
         return *config;
-    }
-
-    StateManager &getState() const {
-        assert(state);
-        return *state;
     }
 
     bool isAnsi() const {

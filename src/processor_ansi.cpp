@@ -24,7 +24,7 @@
 #include "common_io.hpp"
 #include "logging.hpp"
 
-#include "utf-cpp/utf8.h"
+#include <utf8.h>
 
 ProcessorAnsi::ProcessorAnsi()
     : ProcessorBase(24, 80) {

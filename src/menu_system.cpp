@@ -29,48 +29,40 @@ const std::string MenuSystem::m_stateID = "MENU_SYSTEM";
 MenuSystem::MenuSystem(Context &ctx)
     : MenuBase(ctx)
       , m_log(Logging::getInstance()) {
-    // [Vector] Setup std::function array with available options to pass input to.
-    m_menu_functions.emplace_back(std::bind(&MenuBase::menuInput, this, std::placeholders::_1, std::placeholders::_2));
-    m_menu_functions.emplace_back(std::bind(&MenuBase::menuYesNoBarInput, this, std::placeholders::_1,
-                                            std::placeholders::_2));
-    m_menu_functions.emplace_back(std::bind(&MenuSystem::modulePreLogonInput, this, std::placeholders::_1,
-                                            std::placeholders::_2));
-    m_menu_functions.emplace_back(std::bind(&MenuSystem::moduleLogonInput, this, std::placeholders::_1,
-                                            std::placeholders::_2));
-    m_menu_functions.emplace_back(std::bind(&MenuSystem::moduleInput, this, std::placeholders::_1,
-                                            std::placeholders::_2));
 
-    // [Vector] Setup Menu Option Calls for executing menu commands.
-    m_execute_callback.emplace_back(std::bind(&MenuSystem::menuOptionsCallback, this, std::placeholders::_1));
+    // Setup Menu Option Calls for executing menu commands.
+    m_execute_callback.emplace_back(bind_member(this, &MenuSystem::menuOptionsCallback));
 
-    // [Mapped] Setup Menu Command Functions
-    m_menu_command_functions['-'] = std::bind(&MenuSystem::menuOptionsControlCommands, this, std::placeholders::_1);
-    m_menu_command_functions['&'] = std::bind(&MenuSystem::menuOptionsMultiNodeCommands, this, std::placeholders::_1);
-    m_menu_command_functions['{'] = std::bind(&MenuSystem::menuOptionsMatrixCommands, this, std::placeholders::_1);
-    m_menu_command_functions['!'] = std::bind(&MenuSystem::menuOptionsGlobalNewScanCommands, this,
-                                              std::placeholders::_1);
-    m_menu_command_functions['['] = std::bind(&MenuSystem::menuOptionsMainMenuCommands, this, std::placeholders::_1);
-    m_menu_command_functions['.'] = std::bind(&MenuSystem::menuOptionsDoorCommands, this, std::placeholders::_1);
-    m_menu_command_functions['*'] = std::bind(&MenuSystem::menuOptionsSysopCommands, this, std::placeholders::_1);
-    m_menu_command_functions['^'] = std::bind(&MenuSystem::menuOptionsNewUserVotingCommands, this,
-                                              std::placeholders::_1);
-    m_menu_command_functions['C'] = std::bind(&MenuSystem::menuOptionsConferenceEditorCommands, this,
-                                              std::placeholders::_1);
-    m_menu_command_functions['D'] = std::bind(&MenuSystem::menuOptionsDataAreaCommands, this, std::placeholders::_1);
-    m_menu_command_functions['E'] = std::bind(&MenuSystem::menuOptionsEmailCommands, this, std::placeholders::_1);
-    m_menu_command_functions['F'] = std::bind(&MenuSystem::menuOptionsFileCommands, this, std::placeholders::_1);
-    m_menu_command_functions['J'] = std::bind(&MenuSystem::menuOptionsJoinConference, this, std::placeholders::_1);
-    m_menu_command_functions['M'] = std::bind(&MenuSystem::menuOptionsMessageCommands, this, std::placeholders::_1);
-    m_menu_command_functions['Q'] = std::bind(&MenuSystem::menuOptionsQWKMailCommands, this, std::placeholders::_1);
-    m_menu_command_functions['R'] = std::bind(&MenuSystem::menuOptionsTopTenListingCommands, this,
-                                              std::placeholders::_1);
-    m_menu_command_functions['S'] = std::bind(&MenuSystem::menuOptionsMessageBaseSponsorCommands, this,
-                                              std::placeholders::_1);
-    m_menu_command_functions['T'] = std::bind(&MenuSystem::menuOptionsFileBaseSponsorCommands, this,
-                                              std::placeholders::_1);
-    m_menu_command_functions['V'] = std::bind(&MenuSystem::menuOptionsVotingCommands, this, std::placeholders::_1);
-    m_menu_command_functions['+'] =
-            std::bind(&MenuSystem::menuOptionsColorSettingCommands, this, std::placeholders::_1);
+    // Menu Input Commands (Base Class)
+    m_menu_functions.emplace_back(bind_member(static_cast<MenuBase*>(this), &MenuBase::menuInput));
+    m_menu_functions.emplace_back(bind_member(static_cast<MenuBase*>(this), &MenuBase::menuYesNoBarInput));
+
+    // Menu Input Commands (System Class)
+    m_menu_functions.emplace_back(bind_member(this, &MenuSystem::modulePreLogonInput));
+    m_menu_functions.emplace_back(bind_member(this, &MenuSystem::moduleLogonInput));
+    m_menu_functions.emplace_back(bind_member(this, &MenuSystem::moduleInput));
+
+    // [Mapped] Menu Command Key Functions
+    m_menu_command_functions['-'] = bind_member(this, &MenuSystem::menuOptionsControlCommands);
+    m_menu_command_functions['&'] = bind_member(this, &MenuSystem::menuOptionsMultiNodeCommands);
+    m_menu_command_functions['{'] = bind_member(this, &MenuSystem::menuOptionsMatrixCommands);
+    m_menu_command_functions['!'] = bind_member(this, &MenuSystem::menuOptionsGlobalNewScanCommands);
+    m_menu_command_functions['['] = bind_member(this, &MenuSystem::menuOptionsMainMenuCommands);
+    m_menu_command_functions['.'] = bind_member(this, &MenuSystem::menuOptionsDoorCommands);
+    m_menu_command_functions['*'] = bind_member(this, &MenuSystem::menuOptionsSysopCommands);
+    m_menu_command_functions['^'] = bind_member(this, &MenuSystem::menuOptionsNewUserVotingCommands);
+    m_menu_command_functions['C'] = bind_member(this, &MenuSystem::menuOptionsConferenceEditorCommands);
+    m_menu_command_functions['D'] = bind_member(this, &MenuSystem::menuOptionsDataAreaCommands);
+    m_menu_command_functions['E'] = bind_member(this, &MenuSystem::menuOptionsEmailCommands);
+    m_menu_command_functions['F'] = bind_member(this, &MenuSystem::menuOptionsFileCommands);
+    m_menu_command_functions['J'] = bind_member(this, &MenuSystem::menuOptionsJoinConference);
+    m_menu_command_functions['M'] = bind_member(this, &MenuSystem::menuOptionsMessageCommands);
+    m_menu_command_functions['Q'] = bind_member(this, &MenuSystem::menuOptionsQWKMailCommands);
+    m_menu_command_functions['R'] = bind_member(this, &MenuSystem::menuOptionsTopTenListingCommands);
+    m_menu_command_functions['S'] = bind_member(this, &MenuSystem::menuOptionsMessageBaseSponsorCommands);
+    m_menu_command_functions['T'] = bind_member(this, &MenuSystem::menuOptionsFileBaseSponsorCommands);
+    m_menu_command_functions['V'] = bind_member(this, &MenuSystem::menuOptionsVotingCommands);
+    m_menu_command_functions['+'] = bind_member(this, &MenuSystem::menuOptionsColorSettingCommands);
 }
 
 MenuSystem::~MenuSystem() {
@@ -123,9 +115,9 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
     // In this case, we will need to parse for specific Control commands
     // and set Menu System Flags!
     switch (option.command_key[1]) {
-        // Turns on Pulldown Menu Re-entrance
+        // Turns on Pull down Menu Re-entrance
         // This option returns to the selected option
-        // when the user re-enters the pulldown menu.
+        // when the user re-enters the pull down menu.
         // This works ONLY if the command that the user
         // executed does not go to another menu.
 
@@ -135,7 +127,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
         case '\'':
             return false;
 
-        // Turns off Pulldown Menu Re-Entrance
+        // Turns off Pull down Menu Re-Entrance
         case '`':
             return false;
 
@@ -267,7 +259,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
 
         // goto menu sets fallback current
         case '/':
-            if (m_current_menu.size() > 0) {
+            if (!m_current_menu.empty()) {
                 m_system_fallback.push_back(m_current_menu);
             }
 
@@ -278,7 +270,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
 
         // goes to fallback menu, sets fallback to previous fallback
         case '\\':
-            if (m_system_fallback.size() > 0) {
+            if (!m_system_fallback.empty()) {
                 m_current_menu = m_system_fallback.back();
                 m_log.log(Logging::LogLevel::Debug, "FallBack reset to current=", m_current_menu);
 
@@ -294,7 +286,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
 
         // Goes to menu, sets fallback as starting menu
         case '^':
-            if (m_starting_menu.size() == 0) {
+            if (m_starting_menu.empty()) {
                 m_starting_menu = m_current_menu;
             }
 
@@ -330,7 +322,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
 
         // Goes to the menu specified in the CString, does not exe firstcmd
         case '{':
-            if (m_starting_menu.size() == 0) {
+            if (m_starting_menu.empty()) {
                 m_starting_menu = m_current_menu;
             }
 
@@ -540,7 +532,7 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option) {
         case 'C':
             return false;
 
-        // infoform
+        // info form
         case 'D':
             return false;
 

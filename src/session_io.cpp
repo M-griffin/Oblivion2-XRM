@@ -13,7 +13,7 @@
 
 #include "model-sys/config.hpp"
 
-#include "utf-cpp/utf8.h"
+#include <utf8.h>
 
 SessionIO::SessionIO(TCPSession &session, CommonIO &common)
     : m_log(Logging::getInstance())

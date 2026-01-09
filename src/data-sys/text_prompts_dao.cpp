@@ -16,11 +16,13 @@ static bool is_version_displayed = false;
 // Global Cache of Loaded Text Prompts
 std::map<std::string, M_TextPrompt> TEXT_PROMPTS;
 
-TextPromptsDao::TextPromptsDao(std::string &path, std::string &filename)
+TextPromptsDao::TextPromptsDao(const std::string &path, const std::string &filename)
     : m_log(Logging::getInstance())
       , m_path(path)
       , m_filename(filename)
       , m_is_loaded(false) {
+
+    std::cout << "TextPromptsDao" << std::endl;
     m_log.log(Logging::LogLevel::Console, "TextPromptsDao path=", m_path, "filename=", m_filename);
 }
 
@@ -30,30 +32,6 @@ TextPromptsDao::~TextPromptsDao() {
     //m_text_prompts.clear();
     //std::map<std::string, std::pair<std::string, std::string> >().swap(m_text_prompts);
 }
-
-TextPromptsDao::TextPromptsDao(TextPromptsDao &&other) noexcept
-    : m_log(other.m_log) // reference must be initialized from other
-      , m_path(std::move(other.m_path))
-      , m_filename(std::move(other.m_filename))
-      , m_is_loaded(other.m_is_loaded) {
-    // Optionally reset other's members
-    other.m_is_loaded = false;
-}
-
-TextPromptsDao &TextPromptsDao::operator=(TextPromptsDao &&other) noexcept {
-    if (this != &other) {
-        // m_log is a reference, cannot be reassigned
-
-        m_path = std::move(other.m_path);
-        m_filename = std::move(other.m_filename);
-        m_is_loaded = other.m_is_loaded;
-
-        // Optionally reset other's members
-        other.m_is_loaded = false;
-    }
-    return *this;
-}
-
 
 /**
  * @brief Helper, appends forward/backward slash to path

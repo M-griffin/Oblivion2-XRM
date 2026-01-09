@@ -40,7 +40,7 @@
 #include "encoding.hpp"
 #include "logging.hpp"
 
-#include "utf-cpp/utf8.h"
+#include <utf8.h>
 
 std::map<std::string, std::string> INPUT_SEQUENCE_MAP;
 

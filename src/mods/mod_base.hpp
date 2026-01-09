@@ -4,9 +4,11 @@
 #include <string>
 #include <vector>
 
-struct Context;
-class Logging;
-class TextPromptsDao;
+#include "../logging.hpp"
+
+#include "../model-sys/context.hpp"
+#include "../data-sys/text_prompts_dao.hpp"
+
 
 /**
  * @class ModBase
@@ -16,14 +18,14 @@ class TextPromptsDao;
  * @brief Base Class for Module System
  */
 class ModBase {
-    std::string m_filename;
-    bool m_is_active;
 
 public:
     Logging &m_log;
     Context &m_ctx;
+    std::string m_filename;
+    bool m_is_active;
 
-    ModBase(Context ctx, std::string &filename);
+    ModBase(Context &ctx, const std::string &filename);
     ~ModBase() = default;
 
     // Disable copy semantics
@@ -31,8 +33,8 @@ public:
     ModBase &operator=(const ModBase &) = delete;
 
     // Move constructor
-    ModBase(ModBase &&other) noexcept;
-    ModBase &operator=(ModBase &&other) noexcept;
+    ModBase(ModBase &&other) = delete;
+    ModBase &operator=(ModBase &&other) = delete;
 
     const bool DISCONNECT_USER = true;
 
@@ -210,23 +212,6 @@ public:
      */
     std::string moveStringToBottom(const std::string &prompt) const;
 
-    /**
-     * Determine if the current module is active or has been shutdown
-     * @return
-     */
-    bool isModuleActive() const;
-
-    /**
-     * First Time Module Setup
-     * @return
-     */
-    void setModuleActive();
-
-    /**
-     * Deactivate Module for Cleanup.
-     * @return
-     */
-    void setModuleInActive();
 };
 
 #endif
