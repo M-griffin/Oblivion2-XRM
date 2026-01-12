@@ -26,18 +26,11 @@ public:
 
     // Copy Constructors
     ProcessorAnsi(const ProcessorAnsi &) = delete;
-
     ProcessorAnsi &operator=(const ProcessorAnsi &) = delete;
 
     // Move Constructors
-    ProcessorAnsi(ProcessorAnsi &&other) noexcept
-        : ProcessorBase(std::move(other)) // move base subobject
-          , m_screen_buffer(std::move(other.m_screen_buffer))
-          , m_pull_down_options(std::move(other.m_pull_down_options))
-          , m_line_ending_map(std::move(other.m_line_ending_map)) {
-    }
-
-    ProcessorAnsi &operator=(ProcessorAnsi &&) noexcept = default;
+    ProcessorAnsi(ProcessorAnsi &&other) = delete;
+    ProcessorAnsi &operator=(ProcessorAnsi &&) = delete;
 
     void resize(int term_height, int term_width);
 

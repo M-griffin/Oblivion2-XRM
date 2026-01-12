@@ -2,7 +2,7 @@
 
 #include <locale>
 #include <cassert>
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <map>
@@ -19,6 +19,8 @@
 #include "mods/mod_level_editor.hpp"
 #include "mods/mod_message_editor.hpp"
 */
+
+#include "mods/mod_prelogon.hpp"
 
 #include "model-sys/context.hpp"
 #include "tcp_session.hpp"
@@ -484,7 +486,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
             m_log.log(Logging::LogLevel::Console, "User Logoff()");
             // Base Class
             m_logoff = true;
-            m_ctx.getBase().hangup();
+            m_ctx.getSessionWrite().hangup();
             break;
 
         // Drops into the BBS
@@ -515,7 +517,7 @@ bool MenuSystem::menuOptionsGlobalNewScanCommands(const MenuOption &option) {
  * @brief Disconnect a user on the Session.
  */
 void MenuSystem::disconnectUser() {
-    m_ctx.getBase().hangup();
+    m_ctx.getSessionWrite().hangup();
 }
 
 /**

@@ -26,8 +26,7 @@ ModPreLogon::ModPreLogon(Context &ctx)
       , m_is_esc_detected(false)
       , m_is_human_shield(false)
       , m_x_position(0)
-      , m_y_position(0)
-      , m_term_type("undetected") {
+      , m_y_position(0) {
 
     m_setup_functions.emplace_back([this] { setupHumanShield(); });
     m_setup_functions.emplace_back([this] { setupEmulationDetection(); });
@@ -65,8 +64,6 @@ ModPreLogon::~ModPreLogon() {
  */
 bool ModPreLogon::update(const std::string &character_buffer, const bool &) {
 
-    m_log.log(Logging::LogLevel::Console, "PreLogon update");
-
     // Make sure system is active, when system is done, success or fails
     // We change this is inactive to single the login process is completed.
     if (!m_is_active) {
@@ -82,8 +79,6 @@ bool ModPreLogon::update(const std::string &character_buffer, const bool &) {
         m_log.log(Logging::LogLevel::Console, "PreLogon Buffer is Empty");
         return true;
     }
-
-    m_log.log(Logging::LogLevel::Console, "PreLogon Calling Mod function");
 
     // Process all incoming data straight to the input functions.
     m_mod_functions[m_mod_function_index](character_buffer);
@@ -117,7 +112,6 @@ bool ModPreLogon::onEnter() {
     baseProcessAndDeliver(prompt);
 
     // Execute the initial setup index.
-    m_log.log(Logging::LogLevel::Console, "PreLogon Calling Setup");
     m_setup_functions[m_mod_function_index]();
 
     return true;
@@ -270,7 +264,7 @@ void ModPreLogon::setupEmulationDetection() {
     // Windows Console Telnet will response it's at 259 y!
     // Also use Session Deliver, we don't need to use internal screen buffer on detection.
     const std::string detection = "\x1b[40;30m\x1b[255B\x1b[255C\x1b[6n";
-    m_ctx.getBase().send(detection);
+    m_ctx.getSessionWrite().send(detection);
 
     std::string reset_position = "\x1b[1;1H\x1b[2J";
     baseProcessAndDeliver(reset_position);
@@ -304,8 +298,7 @@ void ModPreLogon::setupAskANSIColor() {
 void ModPreLogon::displayTerminalDetection() {
 
     m_log.log(Logging::LogLevel::Console, "PreLogon displayTerminalDetection");
-
-    m_log.setNode(m_ctx.getBase().getNodeNumber());
+    m_log.setNode(m_ctx.getSessionWrite().getNodeNumber());
 
     // Grab Detected Terminal, ANSI, XTERM, etc..
     displayPrompt(PROMPT_DETECT_TERMOPTS);
@@ -327,7 +320,6 @@ void ModPreLogon::displayTerminalDetection() {
     if (!prompt_term.second.empty()) {
         std::string result = prompt_term.second;
         const std::string term = m_ctx.getTelnet().getTermType();
-
         m_log.log(Logging::LogLevel::Console, "Term Type=", term);
 
         m_ctx.getCommonIO().parseLocalMCI(result, mci_code, term);
@@ -357,7 +349,6 @@ void ModPreLogon::displayTerminalDetection() {
         }
 
         m_log.log(Logging::LogLevel::Console, "Term Size=", term_size);
-
         m_ctx.getCommonIO().parseLocalMCI(result, mci_code, term_size);
         result = m_ctx.getSessionIO().pipe2ansi(result);
         baseProcessAndDeliver(result);
@@ -374,13 +365,17 @@ void ModPreLogon::displayTerminalDetection() {
  */
 void ModPreLogon::setupAskCodePage() {
     // Fill the local term type to work with.
-    m_term_type = m_ctx.getTelnet().getTermType();
+    std::string term_type = m_ctx.getTelnet().getTermType();
 
     // If ANSI terminal detected, or 'undetected', then default ENTER to set for CP437
     // Otherwise default to UTF-8 for Xterm etc.. and all other terminals.
-    if (m_term_type == "undetected" ||
-        m_term_type.find("ansi", 0) != std::string::npos ||
-        m_term_type.find("ANSI", 0) != std::string::npos) {
+    if (term_type == "undetected"
+        || term_type.find("ansi", 0) != std::string::npos
+        || term_type.find("ANSI", 0) != std::string::npos
+        || term_type.find("magi", 0) != std::string::npos
+        || term_type.find("MAGI", 0) != std::string::npos
+        || term_type.find("BBS", 0) != std::string::npos
+        || term_type.find("bbs", 0) != std::string::npos){
         displayPrompt(PROMPT_ASK_CP437);
     } else {
         displayPrompt(PROMPT_ASK_UTF8);
@@ -443,6 +438,7 @@ bool ModPreLogon::emulationDetection(const std::string &input) {
         // Parse the ESC[6n Response
         if (ch == 27) {
             m_is_esc_detected = true;
+            m_ctx.getSessionWrite().setAnsi(true);
         }
 
         // Check for sequence terminator.
@@ -452,8 +448,7 @@ bool ModPreLogon::emulationDetection(const std::string &input) {
             }
 
             if (toupper(ch) == 'R') {
-                m_ctx.setAnsi(true);
-                m_ctx.setAnsi(true);
+                m_ctx.getSessionWrite().setAnsi(true);
                 m_is_esc_detected = false;
 
                 // Parse out x/y position coordinates for Screen Size returned.
@@ -463,9 +458,13 @@ bool ModPreLogon::emulationDetection(const std::string &input) {
                     m_log.log(Logging::LogLevel::Console, "ESC Detect X=", positions[1], "Y=", positions[0]);
                     m_x_position = m_ctx.getCommonIO().stringToInt(positions[1]);
                     m_y_position = m_ctx.getCommonIO().stringToInt(positions[0]);
+
+                    // Set Term to Final ESC6N response vs NAWS. When detected, more accrate
+                    m_ctx.getTelnet().setTermCols(m_x_position);
+                    m_ctx.getTelnet().setTermRows(m_y_position);
                 }
             } else {
-                m_ctx.setAnsi(false);
+                m_ctx.getSessionWrite().setAnsi(false);
             }
         }
     }
@@ -495,7 +494,7 @@ bool ModPreLogon::askANSIColor(const std::string &input) {
 
             m_log.log(Logging::LogLevel::Console, "Ansi Selected");
 
-            m_ctx.setAnsi(true);
+            m_ctx.getSessionWrite().setAnsi(true);
             displayPrompt(PROMPT_ANSI_SELECTED);
             displayTerminalDetection();
         }
@@ -505,7 +504,7 @@ bool ModPreLogon::askANSIColor(const std::string &input) {
 
             baseProcessDeliverNewLine();
             displayPrompt(PROMPT_ASCII_SELECTED);
-            m_ctx.setAnsi(false);
+            m_ctx.getSessionWrite().setAnsi(false);
             displayTerminalDetection();
         } else {
             m_log.log(Logging::LogLevel::Console, "Invalid Color selection ANSI/ASCII");
@@ -532,33 +531,39 @@ bool ModPreLogon::askCodePage(const std::string &input) {
     const std::string blackColor = "|00";
     std::string key;
     std::string result = m_ctx.getSessionIO().getInputField(input, key, Config::sSingle_key_length);
+    std::string term_type = m_ctx.getTelnet().getTermType();
 
     // ESC was hit
     if (result == "aborted") {
+        m_log.log(Logging::LogLevel::Info, "ESC Was hit Aborted!");
         return false;
     }
 
     if (result[0] == '\n') {
         // If ENTER Default to Yes, or Single Y is hit
-        if (key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1)) {
+        if (key.empty() || (toupper(key[0]) == 'Y' && key.size() == 1)) {
             // Key == 0 on [ENTER] pressed alone.
-            if (key.size() == 0) {
+            if (key.empty()) {
                 // If ENTER, then display Yes as key press.
                 std::string yes_prompt = "Yes";
                 baseProcessAndDeliverNewLine(yes_prompt);
             }
 
             baseProcessDeliverNewLine();
+            std::string message;
 
-            std::string message = "";
+            if (term_type == "undetected"
+                 || term_type.find("ansi", 0) != std::string::npos
+                 || term_type.find("ANSI", 0) != std::string::npos
+                 || term_type.find("magi", 0) != std::string::npos
+                 || term_type.find("MAGI", 0) != std::string::npos
+                 || term_type.find("BBS", 0) != std::string::npos
+                 || term_type.find("bbs", 0) != std::string::npos){
 
-            if (m_term_type == "undetected" ||
-                m_term_type.find("ansi", 0) != std::string::npos ||
-                m_term_type.find("ANSI", 0) != std::string::npos) {
                 // Switch to ISO, then CP437 Character Set.
                 message = "\x1b[0m" + m_ctx.getSessionIO().pipeColors(blackColor);
                 message += "\x1b%@\x1b(U \r\n\x1b[A";
-                m_ctx.getBase().send(message);
+                m_ctx.getSessionWrite().send(message);
 
                 message = m_ctx.getSessionIO().parseTextPrompt(
                     m_text_prompts_dao.getPrompt(PROMPT_CP437_SELECTED)
@@ -566,12 +571,12 @@ bool ModPreLogon::askCodePage(const std::string &input) {
 
                 // Even though it's default, lets set it anyway
                 m_log.log(Logging::LogLevel::Console, "Encoding set to CP437");
-                m_ctx.m_encoding = Encoding::TextEncoding::CP437;
+                m_ctx.getSessionWrite().setEncoding(Encoding::TextEncoding::CP437);
             } else {
                 // Switch to Unicode Character Set.
                 message = "\x1b[0m" + m_ctx.getSessionIO().pipeColors(blackColor);
                 message += "\x1b%@\x1b%G \r\n\x1b[A";
-                m_ctx.getBase().send(message);
+                m_ctx.getSessionWrite().send(message);
 
                 message = m_ctx.getSessionIO().parseTextPrompt(
                     m_text_prompts_dao.getPrompt(PROMPT_UTF8_SELECTED)
@@ -579,7 +584,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
 
                 // Even though it's default, lets set it anyway
                 m_log.log(Logging::LogLevel::Console, "Encoding set to UTF-8");
-                m_ctx.m_encoding = Encoding::TextEncoding::UTF8;
+                m_ctx.getSessionWrite().setEncoding(Encoding::TextEncoding::UTF8);
             }
 
             baseProcessAndDeliverNewLine(message);
@@ -588,29 +593,33 @@ bool ModPreLogon::askCodePage(const std::string &input) {
         // Else check for single N for No to default to ASCII no colors.
         else if (toupper(key[0]) == 'N' && key.size() == 1) {
             baseProcessDeliverNewLine();
-
             std::string message;
 
-            if (m_term_type == "undetected" ||
-                m_term_type.find("ansi", 0) != std::string::npos ||
-                m_term_type.find("ANSI", 0) != std::string::npos) {
+            if (term_type == "undetected"
+                || term_type.find("ansi", 0) != std::string::npos
+                || term_type.find("ANSI", 0) != std::string::npos
+                || term_type.find("magi", 0) != std::string::npos
+                || term_type.find("MAGI", 0) != std::string::npos
+                || term_type.find("BBS", 0) != std::string::npos
+                || term_type.find("bbs", 0) != std::string::npos){
+
                 // Switch to Unicode Character Set.
                 message = "\x1b[0m" + m_ctx.getSessionIO().pipeColors(blackColor);
                 message += "\x1b%@\x1b%G \r\n\x1b[A";
-                m_ctx.getBase().send(message);
+                m_ctx.getSessionWrite().send(message);
 
                 message = m_ctx.getSessionIO().parseTextPrompt(
                     m_text_prompts_dao.getPrompt(PROMPT_UTF8_SELECTED)
                 );
 
-                // Even though it's default, lets set it anyways/
+                // Even though it's default, lets set it anyways
                 m_log.log(Logging::LogLevel::Console, "Encoding set to UTF-8");
-                m_ctx.m_encoding = Encoding::TextEncoding::UTF8;
+                m_ctx.getSessionWrite().setEncoding(Encoding::TextEncoding::UTF8);
             } else {
                 // Switch to ISO, then CP437 Character Set.
                 message = "\x1b[0m" + m_ctx.getSessionIO().pipeColors(blackColor);
                 message += "\x1b%@\x1b(U \r\n\x1b[A";
-                m_ctx.getBase().send(message);
+                m_ctx.getSessionWrite().send(message);
 
                 message = m_ctx.getSessionIO().parseTextPrompt(
                     m_text_prompts_dao.getPrompt(PROMPT_CP437_SELECTED)
@@ -618,10 +627,11 @@ bool ModPreLogon::askCodePage(const std::string &input) {
 
                 // Even though it's default, lets set it anyways
                 m_log.log(Logging::LogLevel::Console, "Encoding set to CP437");
-                m_ctx.m_encoding = Encoding::TextEncoding::CP437;
+                m_ctx.getSessionWrite().setEncoding(Encoding::TextEncoding::CP437);
             }
 
             baseProcessAndDeliverNewLine(message);
+            m_log.log(Logging::LogLevel::Console, "PreLogon Completed Encoding Select=",m_ctx.getSessionWrite().getEncoding() );
             m_is_active = false;
         } else {
             baseProcessDeliverNewLine();
@@ -643,9 +653,6 @@ bool ModPreLogon::askCodePage(const std::string &input) {
  * @brief Start ESC Twice Timer
  */
 void ModPreLogon::startHumanShieldTimer() {
-
-    m_log.log(Logging::LogLevel::Console, "PreLogon startHumanShieldTimer (WIP)");
-
     if (!shieldTimer.isTriggered()) {
         shieldTimer.start(std::chrono::milliseconds(4000), [this]() {
             handleHumanShieldTimer();
@@ -657,9 +664,6 @@ void ModPreLogon::startHumanShieldTimer() {
  * @brief Start ANSI Detection timer
  */
 void ModPreLogon::startDetectionTimer() {
-
-    m_log.log(Logging::LogLevel::Console, "PreLogon startDetectionTimer (WIP)");
-
     if (!detectionTimer.isTriggered()) {
         detectionTimer.start(std::chrono::milliseconds(1500), [this]() {
             handleDetectionTimer();
@@ -669,7 +673,6 @@ void ModPreLogon::startDetectionTimer() {
 
 /**
  * @brief Deadline Detection Timer ESC Twice
- * @param timer
  */
 void ModPreLogon::handleHumanShieldTimer() {
     humanShieldCompleted();
@@ -681,10 +684,7 @@ void ModPreLogon::handleHumanShieldTimer() {
  * @return
  */
 void ModPreLogon::humanShieldCompleted() {
-
-    m_log.log(Logging::LogLevel::Console, "PreLogon humanShieldCompleted (WIP)");
-
-    m_log.setNode(m_ctx.getBase().getNodeNumber());
+    m_log.setNode(m_ctx.getSessionWrite().getNodeNumber());
     if (m_is_human_shield) {
         // Move to Next Detection
         changeModule(MOD_DETECT_EMULATION);
@@ -697,7 +697,7 @@ void ModPreLogon::humanShieldCompleted() {
         m_log.log(Logging::LogLevel::Console, "Human Shield Failed, disconnecting!");
 
         // Can we just hang up here and clear the session.
-        m_ctx.getBase().hangup();
+        m_ctx.getSessionWrite().hangup();
     }
 }
 
@@ -715,7 +715,7 @@ void ModPreLogon::handleDetectionTimer() {
  * @return
  */
 void ModPreLogon::emulationCompleted() {
-    if (m_ctx.isAnsi()) {
+    if (m_ctx.getSessionWrite().isAnsi()) {
         displayPrompt(PROMPT_DETECTED_ANSI);
         displayTerminalDetection();
     } else {

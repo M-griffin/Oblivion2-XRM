@@ -8,11 +8,11 @@
 // Header Type Definitions
 class Logging;
 
-class Session;
-typedef std::shared_ptr<Session> session_ptr;
+class SocketService;
+typedef std::shared_ptr<SocketService> session_ptr;
 
-class Session;
-typedef std::weak_ptr<Session> session_wptr;
+class SocketService;
+typedef std::weak_ptr<SocketService> session_wptr;
 
 class SessionIO;
 typedef std::shared_ptr<SessionIO> session_io_ptr;

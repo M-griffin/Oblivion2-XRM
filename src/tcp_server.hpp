@@ -100,7 +100,7 @@ public:
                         availableNodes.erase(nodeId);
 
                         SDLNet_TCP_AddSocket(socketSet, client);
-                        sessions.emplace_back(client, nodeId, config);
+                        sessions.emplace_back(client, nodeId, config, coreDatabase);
                         sessions.back().startSession();
 
                         std::cout << "[Server] Client connected (Node "

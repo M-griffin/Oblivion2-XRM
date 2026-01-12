@@ -87,7 +87,7 @@ std::string MenuBase::lower_case(const std::string &string_sequence) {
  */
 void MenuBase::baseProcessAndDeliver(std::string data) {
     m_ctx.getAnsi().parseTextToBuffer((char *) data.c_str());
-    m_ctx.getBase().send(data);
+    m_ctx.getSessionWrite().send(data);
 }
 
 /**
@@ -493,12 +493,12 @@ std::string MenuBase::getDefaultInverseColor() {
 std::string MenuBase::parseMenuPromptString(const std::string &prompt_string) {
     // Color Sequences and NewLine
     m_ctx.getSessionIO().clearAllMCIMapping();
-    m_ctx.getSessionIO().addMCIMapping("^R", m_ctx.getBase().getConfig().default_color_regular);
-    m_ctx.getSessionIO().addMCIMapping("^S", m_ctx.getBase().getConfig().default_color_stat);
-    m_ctx.getSessionIO().addMCIMapping("^P", m_ctx.getBase().getConfig().default_color_prompt);
-    m_ctx.getSessionIO().addMCIMapping("^E", m_ctx.getBase().getConfig().default_color_input);
-    m_ctx.getSessionIO().addMCIMapping("^V", m_ctx.getBase().getConfig().default_color_inverse);
-    m_ctx.getSessionIO().addMCIMapping("^X", m_ctx.getBase().getConfig().default_color_box);
+    m_ctx.getSessionIO().addMCIMapping("^R", m_ctx.getCfg().default_color_regular);
+    m_ctx.getSessionIO().addMCIMapping("^S", m_ctx.getCfg().default_color_stat);
+    m_ctx.getSessionIO().addMCIMapping("^P", m_ctx.getCfg().default_color_prompt);
+    m_ctx.getSessionIO().addMCIMapping("^E", m_ctx.getCfg().default_color_input);
+    m_ctx.getSessionIO().addMCIMapping("^V", m_ctx.getCfg().default_color_inverse);
+    m_ctx.getSessionIO().addMCIMapping("^X", m_ctx.getCfg().default_color_box);
     m_ctx.getSessionIO().addMCIMapping("^M", "\r\n");
 
     /*
@@ -602,7 +602,7 @@ std::string MenuBase::loadMenuScreen() {
 
     // NOTES: check for themes here!!!
     // also  if (m_menu_session_data->m_is_use_ansi), if not ansi, then maybe no pull down, or light bars!
-    bool use_ansi = m_ctx.getTelnet().getUseAnsi();
+    bool use_ansi = m_ctx.getSessionWrite().isAnsi();
 
     if (m_menu_info.menu_pulldown_file.empty() || !use_ansi) {
         std::string screen_file = m_menu_info.menu_help_file;
@@ -795,7 +795,7 @@ std::string MenuBase::loadMenuPrompt() {
 
     record_id = m_ctx.getUser().iId;
     term_rows = m_ctx.getTelnet().getTermRows();
-    node_number = m_ctx.getBase().getNodeNumber();
+    node_number = m_ctx.getSessionWrite().getNodeNumber();
     prompt_name = m_ctx.getUser().sMenuPromptName;
 
     if (record_id != -1) {
@@ -916,7 +916,7 @@ void MenuBase::loadAndStartupMenu() {
 
     term_rows = m_ctx.getTelnet().getTermRows();
     term_cols = m_ctx.getTelnet().getTermCols();
-    use_ansi = m_ctx.getTelnet().getUseAnsi();
+    use_ansi = m_ctx.getSessionWrite().isAnsi();
 
     if (m_current_menu == "matrix") {
         m_log.log(Logging::LogLevel::Debug, "MATRIX MENU DETECTED - RESET ANSI TERM SIZE to Detection",
@@ -1246,7 +1246,7 @@ bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, 
 
                     m_log.log(Logging::LogLevel::Debug, "set stack_reassignment = true");
                     // Now assign the m.menu_key to the input, so on next loop, we hit any stacked commands!
-                    // If were in pulldown menu, and the first lightbar has stacked commands, then we need
+                    // If were in pull down menu, and the first lightbar has stacked commands, then we need
                     // to cycle through the remaining command's for stacked on light bars.
                     stack_reassignment = true;
                     ++executed;
@@ -1256,7 +1256,7 @@ bool MenuBase::handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, 
                 // Testing for Stack Reassignment on FeedBack Light bars
                 executeMenuOptions(m);
                 // Now assign the m.menu_key to the input, so on next loop, we hit any stacked commands!
-                // If were in pulldown menu, and the first lightbar has stacked commands, then we need
+                // If were in pull down menu, and the first lightbar has stacked commands, then we need
                 // to cycle through the remaining command's for stacked on light bars.
                 stack_reassignment = true;
                 ++executed;

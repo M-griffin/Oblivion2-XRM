@@ -27,10 +27,9 @@ class ModPreLogon
     bool m_is_text_prompt_exist;
     bool m_is_esc_detected;
     bool m_is_human_shield;
-    std::string m_input_buffer;
     int m_x_position;
     int m_y_position;
-    std::string m_term_type;
+    std::string m_input_buffer;
     std::string m_esc_sequence;
 
     // State Function Holders
@@ -145,12 +144,6 @@ public:
      * @return
      */
     void setupAskANSIColor();
-
-    /**
-     * @brief Displays Terminal Detection before Asking CodePage.
-     * @return
-     */
-    //void setupDisplayTerminalDetection();
 
     /**
      * @brief Displays Terminal Detection after Emulation Detection.

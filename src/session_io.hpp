@@ -10,7 +10,7 @@
 #include "model-sys/structures.hpp"
 
 class Logging;
-class TCPSession;
+class SessionWriter;
 
 /**
  * @class SessionIO
@@ -21,7 +21,7 @@ class TCPSession;
  */
 class SessionIO {
     Logging &m_log;
-    TCPSession &m_session;
+    SessionWriter &m_session;
     CommonIO &m_common_io;
     std::map<std::string, std::string> m_mapped_codes; // MCI Code Translation for specific screens.
 
@@ -42,7 +42,7 @@ public:
     // Types for Text Prompt formatting to file.
     typedef std::pair<std::string, std::string> M_StringPair;
 
-    explicit SessionIO(TCPSession &session, CommonIO &common);
+    explicit SessionIO(SessionWriter &session, CommonIO &common);
 
     ~SessionIO();
 

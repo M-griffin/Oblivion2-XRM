@@ -6,7 +6,7 @@
 #include <vector>
 #include <utf8.h>
 
-#include "../session.hpp"
+#include "../socket_service.hpp"
 #include "../session_io.hpp"
 #include "../processor_ansi.hpp"
 #include "../encoding.hpp"
@@ -25,7 +25,7 @@ ModBase::ModBase(Context &ctx, const std::string &filename)
     , m_is_active(false) {
 
     // Setup All Mods for Proper Node Logging by Session.
-    m_log.setNode(ctx.getBase().getNodeNumber());
+    m_log.setNode(ctx.getSessionWrite().getNodeNumber());
 }
 
 /**
@@ -216,7 +216,7 @@ void ModBase::baseProcessAndDeliver(std::string &data) const {
     output += data;
     m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(output.c_str()));
     output += baseGetDefaultInputColor();
-    m_ctx.getBase().send(output);
+    m_ctx.getSessionWrite().send(output);
 }
 
 /**
@@ -230,7 +230,7 @@ void ModBase::baseProcessAndDeliverThenDisconnect(std::string &data) const {
     output += data;
     m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(output.c_str()));
     output += baseGetDefaultInputColor();
-    m_ctx.getBase().send(output, DISCONNECT_USER);
+    m_ctx.getSessionWrite().send(output, DISCONNECT_USER);
 }
 
 /**
@@ -255,7 +255,7 @@ void ModBase::baseProcessDeliverNewLine() const {
  */
 void ModBase::baseProcessDeliverInput(std::string &data) const {
     m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(data.c_str()));
-    m_ctx.getBase().send(data);
+    m_ctx.getSessionWrite().send(data);
 }
 
 /**
@@ -263,7 +263,7 @@ void ModBase::baseProcessDeliverInput(std::string &data) const {
  */
 void ModBase::baseProcessDeliverInputAndDisconnect(std::string &data) const {
     m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(data.c_str()));
-    m_ctx.getBase().send(data, DISCONNECT_USER);
+    m_ctx.getSessionWrite().send(data, DISCONNECT_USER);
 }
 
 /**

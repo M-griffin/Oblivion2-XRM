@@ -29,8 +29,22 @@ void StateManager::setState(State newState) {
 }
 
 void StateManager::handleInput(const std::string &input) {
-    m_log.log(Logging::LogLevel::Console, "StateManager() handleInput");
-    inputHandlers.at(currentState)(input);
+    m_log.log(Logging::LogLevel::Console, "StateManager() handleInput=", input);
+
+    std::string result = std::string(input);
+    std::size_t id1 = 0;
+
+    // Convert CR\LF to LF!
+    do {
+        id1 = result.find("\r\n", 0);
+
+        if (id1 != std::string::npos) {
+            result.erase(id1, 1);
+            id1 = result.find("\r\n", 0);
+        }
+    } while (id1 != std::string::npos);
+
+    inputHandlers.at(currentState)(result);
 }
 
 // -------------------------
@@ -58,19 +72,19 @@ void StateManager::bindStateHandlers() {
                               inputPreLogon(input);
                           });
 
-    // LoggedIn
-    clearHandlers.emplace(State::LoggedIn,
-                          [this]() { clearLoggedIn(); });
+    // Menu System
+    clearHandlers.emplace(State::MenuSystem,
+                          [this]() { clearMenuSystem(); });
 
-    createHandlers.emplace(State::LoggedIn,
-                           [this]() { createLoggedIn(); });
+    createHandlers.emplace(State::MenuSystem,
+                           [this]() { createMenuSystem(); });
 
-    pollHandlers.emplace(State::LoggedIn,
-                         [this]() { pollLoggedIn(); });
+    pollHandlers.emplace(State::MenuSystem,
+                         [this]() { pollMenuSystem(); });
 
-    inputHandlers.emplace(State::LoggedIn,
+    inputHandlers.emplace(State::MenuSystem,
                           [this](const std::string &input) {
-                              inputLoggedIn(input);
+                              inputMenuSystem(input);
                           });
 
     // Runtime guarantee (debug)
@@ -82,10 +96,6 @@ void StateManager::bindStateHandlers() {
 
 // Timers, if they exist, roll up from TCPSession
 void StateManager::pollTimers() {
-    //m_log.log(Logging::LogLevel::Console, "TCP Session Poll Timers");
-
-    // Check if module has an active state timer that needs an update.
-    //m_escTimer.isTriggered();
     pollHandlers.at(currentState)();
 }
 
@@ -99,13 +109,10 @@ void StateManager::createPreLogon() {
     // Make Sure we cover any unexpected errors in Creating the Module.
     try {
         preLogonState.emplace(m_ctx);
-
-        m_log.log(Logging::LogLevel::Console, "StateManager() PreLogonState->onEnter()");
         preLogonState->onEnter();
-
-        m_log.log(Logging::LogLevel::Console, "StateManager() PreLogon Created!");
     } catch (std::exception &ex) {
         std::cout << "createPreLogon Exception: " << ex.what() << std::endl;
+        throw;
     }
 }
 
@@ -127,30 +134,61 @@ void StateManager::inputPreLogon(const std::string &input) {
     m_log.log(Logging::LogLevel::Console, "StateManager() inputPreLogon");
     if (preLogonState) {
         preLogonState->update(input, false);
-        m_log.log(Logging::LogLevel::Console, "StateManager() inputPreLogon Completed");
+
+        if (!preLogonState->m_is_active) {
+            m_log.log(Logging::LogLevel::Console, "StateManager() preLogonState is Inactive");
+            setState(State::MenuSystem);
+        }
     }
+
+
 }
 
 // -------------------------
 // LoggedIn
 // -------------------------
 
-void StateManager::createLoggedIn() {
-    loggedInState.emplace();
-    std::cout << "LoggedIn created\n";
+void StateManager::createMenuSystem() {
+
+    m_log.log(Logging::LogLevel::Console, "StateManager() createMenuSystem");
+
+    // Make Sure we cover any unexpected errors in Creating the Module.
+    try {
+        menuSystemState.emplace(m_ctx);
+        menuSystemState->onEnter();
+    } catch (std::exception &ex) {
+        std::cout << "createPMenuSystem Exception: " << ex.what() << std::endl;
+        throw;
+    }
+
+    std::cout << "MenuSystem created\n";
 }
 
-void StateManager::clearLoggedIn() {
-    loggedInState = std::experimental::nullopt; // .reset();
-    std::cout << "LoggedIn cleared\n";
+void StateManager::clearMenuSystem() {
+    if (menuSystemState) {
+        menuSystemState->onExit();
+        menuSystemState = std::experimental::nullopt; // .reset();
+    }
+    std::cout << "MenuSystem cleared\n";
 }
 
-void StateManager::pollLoggedIn() {
-    if (loggedInState) {
-
+void StateManager::pollMenuSystem() {
+    if (menuSystemState) {
+        // Not Polling Setup Module Specific for Now
     }
 }
 
-void StateManager::inputLoggedIn(const std::string &input) {
-    std::cout << "LoggedIn input: " << input << "\n";
+void StateManager::inputMenuSystem(const std::string &input) {
+    menuSystemState->update(input, false);
+
+    m_log.log(Logging::LogLevel::Console, "StateManager() inputMenuSystem");
+    if (menuSystemState) {
+        menuSystemState->update(input, false);
+
+        if (!menuSystemState->m_is_active) {
+            m_log.log(Logging::LogLevel::Console, "StateManager() MenuSystem is Inactive");
+            // setState(State::ModPreLogon);
+            // After here, it's a system logoff usually, but maybe we'll swtich to a chat state.
+        }
+    }
 }

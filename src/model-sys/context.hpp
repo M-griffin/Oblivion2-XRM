@@ -5,13 +5,14 @@
 
 #include "../common_io.hpp"
 #include "../processor_ansi.hpp"
-#include "../session.hpp"
+#include "../session_writer.hpp"
 #include "../session_io.hpp"
 #include "../telnet_session.hpp"
-#include "../encoding.hpp"
 
 #include "config.hpp"
 #include "users.hpp"
+
+#include "libSqliteWrapped.h"
 
 /**
  * @class Context
@@ -27,38 +28,38 @@ public:
     explicit Context() = default;
     ~Context() = default;
 
-    Session *baseSession = nullptr;
+    SessionWriter *sessionWriter = nullptr;
     TelnetSession *telnetSession = nullptr;
     Users *userRec = nullptr;
     ProcessorAnsi *ansiProcess = nullptr;
     CommonIO *commonIO = nullptr;
     SessionIO *sessionIO = nullptr;
     Config *config = nullptr;
-
-    bool m_use_ansi = false;
-    Encoding::TextEncoding m_encoding = Encoding::TextEncoding::CP437;
+    SQLW::Database *database = nullptr;
 
     void bind(
-        Session &bs,
+        SessionWriter &sw,
         TelnetSession &ts,
         Users &ur,
         ProcessorAnsi &ap,
         CommonIO &cio,
         SessionIO &sio,
-        Config &cfg
+        Config &cfg,
+        SQLW::Database &db
     ) {
-        baseSession = &bs;
+        sessionWriter = &sw;
         telnetSession = &ts;
         userRec = &ur;
         ansiProcess = &ap;
         commonIO = &cio;
         sessionIO = &sio;
         config = &cfg;
+        database = &db;
     }
 
-    Session &getBase() const {
-        assert(baseSession);
-        return *baseSession;
+    SessionWriter &getSessionWrite() const {
+        assert(sessionWriter);
+        return *sessionWriter;
     }
 
     TelnetSession &getTelnet() const {
@@ -91,21 +92,11 @@ public:
         return *config;
     }
 
-    bool isAnsi() const {
-        return m_use_ansi;
+    SQLW::Database &getDatabase() const {
+        assert(database);
+        return *database;
     }
 
-    void setAnsi(const bool use_ansi) {
-        m_use_ansi = use_ansi;
-    }
-
-    Encoding::TextEncoding getEncoding() const {
-        return m_encoding;
-    }
-
-    void setEncoding(const Encoding::TextEncoding value) {
-        m_encoding = value;
-    }
 };
 
 #endif

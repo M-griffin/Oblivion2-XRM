@@ -2,29 +2,24 @@
 #define TELNET_SESSION_HPP
 
 #include <string>
-#include <utility>
 #include <unordered_set>
 #include <vector>
 #include <cstdint>
-
-#include "telnet.hpp"  // needed for TELOPT_*, TELQUAL_*, IAC, DO, etc.
 
 using Byte = uint8_t;
 using ByteBuffer = std::vector<Byte>;
 
 class Logging;
-class Session;
+class SessionWriter;
 
 class TelnetSession {
 public:
-    explicit TelnetSession(Session &session);
+    explicit TelnetSession(SessionWriter &writer);
     ~TelnetSession();
 
     // Move constructor
-    TelnetSession(TelnetSession &&other) noexcept;
-
-    // Move assignment operator
-    TelnetSession &operator=(TelnetSession &&other) noexcept;
+    TelnetSession(TelnetSession &&other) = delete;
+    TelnetSession &operator=(TelnetSession &&other) = delete;
 
     // Delete copy constructor and copy assignment operator
     TelnetSession(const TelnetSession &) = delete;
@@ -50,7 +45,7 @@ public:
     bool checkReply(Byte option);
     void addReply(Byte option);
 
-    void decodeBuffer();
+    void decodeSubnegotiationBuffer();
     void handleDoDont(Byte command, Byte option);
     void handleWillWont(Byte command, Byte option);
     void handleSubnegotiation(Byte option, const ByteBuffer &data);
@@ -65,25 +60,20 @@ public:
     void sendTTYPERequest();
     void sendENVRequest();
 
-    void setUseAnsi(bool value);
-    bool getUseAnsi() const;
-
 private:
     Logging &m_log;
-    Session &m_session;
+    SessionWriter &m_sessionWrite;
 
     int m_nawsRow;
     int m_nawsCol;
-    std::string m_termType;
 
     bool m_isBinary;
     bool m_isEcho;
     bool m_isSga;
     bool m_isLinemode;
     bool m_isNawsDetected;
-    bool m_isUseAnsi;
-    bool m_isUtf8;
-    bool m_isCP437;
+
+    std::string m_termType;
 
     TelnetState m_teloptStage;
     Byte m_teloptCommand;

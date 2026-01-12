@@ -8,28 +8,35 @@
 #include <chrono>
 #include <experimental/optional>
 
+#include "model-sys/structures.hpp"
 #include "common_io.hpp"
 #include "deadline_timer.hpp"
+#include "libSqliteWrapped.h"
 #include "processor_ansi.hpp"
-#include "session.hpp"
+#include "socket_service.hpp"
 #include "session_io.hpp"
 #include "telnet.hpp"
 #include "telnet_session.hpp"
 #include "state_manager.hpp"
 #include "logging.hpp"
+#include "session_writer.hpp"
 #include "model-sys/users.hpp"
 #include "model-sys/context.hpp"
 
 #include "sdl2_net/SDL_net.hpp"
 
+#include "libSqliteWrapped.h"
+
 class TCPSession {
     Logging &m_log;
-    Session m_baseSession;
+    SocketService m_socketService;
+    SessionWriter m_session_writer;
     TelnetSession m_telnetSession;
     Users m_userRec;
     ProcessorAnsi m_ansi_process;
     CommonIO m_common_io;
     SessionIO m_session_io;
+    SQLW::Database &m_coreDatabase;
 
     Context m_context;
     std::experimental::optional<StateManager> m_state_manager;
@@ -40,30 +47,33 @@ class TCPSession {
     DeadlineTimer m_escTimer;
 
 public:
-    TCPSession(TCPsocket socket, const int nodeNumber, Config &config)
+    TCPSession(TCPsocket socket, const int nodeNumber, Config &config, SQLW::Database &coreDatabase)
     : m_log(Logging::getInstance())
-    , m_baseSession(socket, nodeNumber, config)
-    , m_telnetSession(m_baseSession)
+    , m_socketService(socket, nodeNumber, config)
+    , m_session_writer(m_socketService)
+    , m_telnetSession(m_session_writer)
     , m_userRec()
     , m_ansi_process()
     , m_common_io()
-    , m_session_io(*this, m_common_io)
+    , m_session_io(m_session_writer, m_common_io)
+    , m_coreDatabase(coreDatabase)
     , m_context() {
 
         // Bind all necessary components
         m_context.bind(
-            m_baseSession,
+            m_session_writer,
             m_telnetSession,
             m_userRec,
             m_ansi_process,
             m_common_io,
             m_session_io,
-            m_baseSession.getConfig()
+            m_socketService.getConfig(),
+            m_coreDatabase
         );
 
         // Clear screen on connection
         const std::string clear_screen = "\x1b[1;1H\x1b[2J\x1b[0m";
-        m_baseSession.send(clear_screen);
+        m_socketService.send(clear_screen);
 
         // ===============================
         // Telnet Option Negotiation
@@ -113,22 +123,21 @@ public:
     TCPSession(const TCPSession &) = delete;
     TCPSession &operator=(const TCPSession &) = delete;
 
-    Session &getSession() { return m_baseSession; }
+    SocketService &getSession() { return m_socketService; }
     TelnetSession &getTelnet() { return m_telnetSession; }
     Users &getUserRec() { return m_userRec; }
-    Config &getConfig() { return m_baseSession.getConfig(); }
-    int getNodeNumber() const { return m_baseSession.getNodeNumber(); }
-    TCPsocket getSocket() const { return m_baseSession.getSocket(); }
-    bool isActive() const { return m_baseSession.isActive(); }
+    Config &getConfig() { return m_socketService.getConfig(); }
+    int getNodeNumber() const { return m_socketService.getNodeNumber(); }
+    TCPsocket getSocket() const { return m_socketService.getSocket(); }
+    bool isActive() const { return m_socketService.isActive(); }
 
-    void hangup() { m_baseSession.hangup(); }
-    void send(const std::string &value) { m_baseSession.send(value); }
-    ByteBuffer receive() { return m_baseSession.receive(); }
-    void close() { return m_baseSession.close(); }
+    void hangup() { m_socketService.hangup(); }
+    void send(const std::string &value) { m_socketService.send(value); }
+    ByteBuffer receive() { return m_socketService.receive(); }
+    void close() { return m_socketService.close(); }
 
     int getTermRows() const { return m_telnetSession.getTermRows(); }
     int getTermCols() const { return m_telnetSession.getTermCols(); }
-    bool getUseAnsi() const { return m_telnetSession.getUseAnsi(); }
 
     void startSession() {
         m_state_manager.emplace(m_context);
@@ -196,14 +205,7 @@ private:
             return;
         }
 
-        // =============================
-        // Normal input
-        // =============================
-        if (byte == '\n') {
-            m_state_manager->handleInput("\n");
-        } else if (byte != '\r') {
-            m_state_manager->handleInput(std::string(1, byte));
-        }
+        m_state_manager->handleInput(std::string(1, byte));
     }
 
     bool isEscSequenceComplete(const std::string &seq) {

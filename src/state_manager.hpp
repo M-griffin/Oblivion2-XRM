@@ -10,31 +10,23 @@
 #include "model-sys/context.hpp"
 #include "mods/mod_prelogon.hpp"
 #include "logging.hpp"
+#include "menu_system.hpp"
 
 class StateManager {
 public:
     enum class State : uint8_t {
         ModPreLogon = 0,
-        LoggedIn,
+        MenuSystem,
         COUNT
     };
 
-    struct LoggedIn {
-        int userId = -1;
-    };
-
     explicit StateManager(Context &ctx);
-
     ~StateManager();
 
     // Non-copyable (states are runtime-owned)
     StateManager(const StateManager &) = delete;
-
     StateManager &operator=(const StateManager &) = delete;
-
-    // Movable
     StateManager(StateManager &&) = delete;
-
     StateManager &operator=(StateManager &&) = delete;
 
     void setState(State newState);
@@ -54,7 +46,7 @@ public:
 private:
     // State storage (SINGLE ownership)
     std::experimental::optional<ModPreLogon> preLogonState;
-    std::experimental::optional<LoggedIn> loggedInState;
+    std::experimental::optional<MenuSystem> menuSystemState;
 
     State currentState;
 
@@ -80,13 +72,13 @@ private:
     void inputPreLogon(const std::string &input);
 
     // LoggedIn
-    void createLoggedIn();
+    void createMenuSystem();
 
-    void clearLoggedIn();
+    void clearMenuSystem();
 
-    void pollLoggedIn();
+    void pollMenuSystem();
 
-    void inputLoggedIn(const std::string &input);
+    void inputMenuSystem(const std::string &input);
 
     // Compile-time guarantees
     static constexpr size_t StateCount =

@@ -11,9 +11,9 @@
 using Byte = uint8_t;
 using ByteBuffer = std::vector<Byte>;
 
-class Session {
+class SocketService {
 public:
-    Session(TCPsocket socket, const int nodeNumber, Config &config)
+    SocketService(TCPsocket socket, const int nodeNumber, Config &config)
         : m_log(Logging::getInstance())
           , m_socket(socket)
           , m_nodeNumber(nodeNumber)
@@ -21,11 +21,11 @@ public:
           , m_config(config) {}
 
     // Non-copyable
-    Session(const Session &) = delete;
-    Session &operator=(const Session &) = delete;
+    SocketService(const SocketService &) = delete;
+    SocketService &operator=(const SocketService &) = delete;
 
     // Movable
-    Session(Session &&other) noexcept
+    SocketService(SocketService &&other) noexcept
         : m_log(Logging::getInstance())
         , m_socket(other.m_socket)
         , m_nodeNumber(other.m_nodeNumber)
@@ -37,7 +37,7 @@ public:
         other.m_active = false;
     }
 
-    Session &operator=(Session &&other) noexcept {
+    SocketService &operator=(SocketService &&other) noexcept {
         if (this != &other) {
             close();
 
@@ -53,7 +53,7 @@ public:
         return *this;
     }
 
-    ~Session() {
+    ~SocketService() {
         m_log.log(Logging::LogLevel::Console, "~Session()");
         close();
     }
@@ -135,7 +135,7 @@ public:
         }
     }
 
-    void send(const ByteBuffer &bytes) {
+    void send(const ByteBuffer &bytes, bool isDisconnection = false) {
         if (!m_active || !m_socket) {
             return;
         }
@@ -147,7 +147,7 @@ public:
             length
         );
 
-        if (sent < length) {
+        if (sent < length || isDisconnection) {
             m_active = false;
         }
     }

@@ -1,25 +1,22 @@
 #include "telnet_session.hpp"
 #include "telnet.hpp"
-#include "session.hpp"
+#include "session_writer.hpp"
 #include "logging.hpp"
 
 #include <sstream>
 #include <cstring>
 
-TelnetSession::TelnetSession(Session &session)
+TelnetSession::TelnetSession(SessionWriter &writer)
     : m_log(Logging::getInstance())
-      , m_session(session)
+      , m_sessionWrite(writer)
       , m_nawsRow(24)
       , m_nawsCol(80)
-      , m_termType("undetected")
       , m_isBinary(false)
       , m_isEcho(false)
       , m_isSga(false)
       , m_isLinemode(false)
       , m_isNawsDetected(false)
-      , m_isUseAnsi(false)
-      , m_isUtf8(false)
-      , m_isCP437(true)
+      , m_termType("undetected")
       , m_teloptStage(DATA)
       , m_teloptCommand(0)
       , m_currentOption(0)
@@ -38,7 +35,7 @@ TelnetSession::~TelnetSession() {
 void TelnetSession::sendIACSequences(Byte command, Byte option) {
     if (checkReply(option)) return;
     ByteBuffer buf = {IAC, command, option};
-    m_session.send(buf);
+    m_sessionWrite.send(buf);
     addReply(option);
 }
 
@@ -57,8 +54,6 @@ void TelnetSession::setTermRows(int value) { m_nawsRow = value; }
 void TelnetSession::setTermCols(int value) { m_nawsCol = value; }
 
 std::string TelnetSession::getTermType() const { return m_termType; }
-void TelnetSession::setUseAnsi(bool value) { m_isUseAnsi = value; }
-bool TelnetSession::getUseAnsi() const { return m_isUseAnsi; }
 
 Byte TelnetSession::telnetOptionAcknowledge(Byte command) {
     switch (command) {
@@ -81,7 +76,7 @@ Byte TelnetSession::telnetOptionDeny(Byte command) {
 }
 
 // ====================== Decode Subnegotiation ======================
-void TelnetSession::decodeBuffer() {
+void TelnetSession::decodeSubnegotiationBuffer() {
     switch (m_subnegoOption) {
         case TELOPT_NAWS:
             if (m_dataSequence.size() >= 4) {
@@ -102,16 +97,6 @@ void TelnetSession::decodeBuffer() {
                 m_termType.assign(reinterpret_cast<const char *>(m_dataSequence.data()), m_dataSequence.size());
                 m_log.log(Logging::LogLevel::Info,
                           "Terminal type received: %s", m_termType.c_str());
-
-                // Detect ANSI support
-                m_isUseAnsi = (m_termType.find("ansi") != std::string::npos ||
-                               m_termType.find("xterm") != std::string::npos ||
-                               m_termType.find("vt") != std::string::npos);
-
-                // Detect UTF-8 vs CP437
-                m_isUtf8 = (m_termType.find("utf") != std::string::npos ||
-                            m_termType.find("UTF") != std::string::npos);
-                m_isCP437 = !m_isUtf8;
             } else {
                 m_log.log(Logging::LogLevel::Warn,
                           "TTYPE subnegotiation empty");
@@ -241,7 +226,7 @@ void TelnetSession::handleSubnegotiation(Byte option, const ByteBuffer &data) {
 // ====================== Requests ======================
 void TelnetSession::sendTTYPERequest() {
     ByteBuffer buf = {IAC, SB, TELOPT_TTYPE, TELQUAL_SEND, IAC, SE};
-    m_session.send(std::string(buf.begin(), buf.end()));
+    m_sessionWrite.send(std::string(buf.begin(), buf.end()));
     m_log.log(Logging::LogLevel::Info, "Sent TTYPE request to client");
 }
 
@@ -265,7 +250,7 @@ void TelnetSession::sendENVRequest() {
 
     stm << static_cast<uint8_t>(IAC) << static_cast<uint8_t>(SE);
     std::string buf = stm.str();
-    m_session.send(buf);
+    m_sessionWrite.send(buf);
     addReply(TELOPT_NEW_ENVIRON);
 
     m_log.log(Logging::LogLevel::Info, "Sent NEW_ENVIRON request");

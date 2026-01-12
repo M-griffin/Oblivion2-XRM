@@ -6,7 +6,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "tcp_session.hpp"
+#include "session_writer.hpp"
 #include "common_io.hpp"
 #include "encoding.hpp"
 #include "logging.hpp"
@@ -15,7 +15,7 @@
 
 #include <utf8.h>
 
-SessionIO::SessionIO(TCPSession &session, CommonIO &common)
+SessionIO::SessionIO(SessionWriter &session, CommonIO &common)
     : m_log(Logging::getInstance())
       , m_session(session)
       , m_common_io(common) {
@@ -35,21 +35,19 @@ SessionIO::~SessionIO() {
 std::string SessionIO::getFSEKeyInput(const std::string &character_buffer) {
     std::string input = m_common_io.parseInput(character_buffer);
 
-    if (input.size() == 0) {
-        // No Data received, could be in mid ESC sequence
+    if (input.empty()) {
+        // No Data received, could be in mid-ESC sequence
         // Return for next key.
         m_log.log(Logging::LogLevel::Debug, "getKeyInput Mid Escape");
         return "";
     }
 
-    std::string escape_sequence = "";
-
     if (input[0] == '\x1b') {
-        escape_sequence = m_common_io.getFSEEscapeSequence();
+        std::string escape_sequence = m_common_io.getFSEEscapeSequence();
 
         m_log.log(Logging::LogLevel::Debug, "FSE escape_sequence=", escape_sequence);
 
-        if (escape_sequence.size() == 0) {
+        if (escape_sequence.empty()) {
             m_log.log(Logging::LogLevel::Debug, "getKeyInput Single Escape");
             return "\x1b";
         } else {
@@ -70,19 +68,17 @@ std::string SessionIO::getFSEKeyInput(const std::string &character_buffer) {
 std::string SessionIO::getKeyInput(const std::string &character_buffer) {
     std::string input = m_common_io.parseInput(character_buffer);
 
-    if (input.size() == 0) {
+    if (input.empty()) {
         // No Data received, could be in mid ESC sequence
         // Return for next key.
         m_log.log(Logging::LogLevel::Debug, "getKeyInput Mid Escape");
         return "";
     }
 
-    std::string escape_sequence = "";
-
     if (input[0] == '\x1b') {
-        escape_sequence = m_common_io.getEscapeSequence();
+        std::string escape_sequence = m_common_io.getEscapeSequence();
 
-        if (escape_sequence.size() == 0) {
+        if (escape_sequence.empty()) {
             m_log.log(Logging::LogLevel::Debug, "getKeyInput Single Escape");
             return "\x1b";
         } else {
@@ -107,7 +103,6 @@ void SessionIO::createInputField(std::string &field_name, int &len) {
     char sTmp2[3] = {0};
 
     // Parse for Input String Modifiers
-    std::string::size_type tempLength = 0;
     std::string::size_type stringSize = 0;
     std::string::size_type position = 0;
 
@@ -121,8 +116,10 @@ void SessionIO::createInputField(std::string &field_name, int &len) {
         return;
     }
 
+    m_log.log(Logging::LogLevel::Info, "m_session.getUseAnsi()=", m_session.isAnsi());
+
     // Format Input Field, if color is enabled, otherwise just add Field Name like "Login: "
-    if (!m_session.getUseAnsi()) {
+    if (!m_session.isAnsi()) {
         sprintf(formatted, "%s", (char *) field_name.c_str()); // Field Name
         field_name = formatted;
         return;
@@ -139,16 +136,17 @@ void SessionIO::createInputField(std::string &field_name, int &len) {
             // Then we cut these out and erase!,  Otherwise
             // We only remove the |IN pipe sequence.
             if (isdigit(field_name[position + 3]) && isdigit(field_name[position + 4])) {
+                std::string::size_type tempLength = 0;
                 sTmp[0] = field_name[position + 3];
                 sTmp[1] = field_name[position + 4];
                 field_name.erase(position, 5);
                 tempLength = atoi(sTmp);
 
-                if ((signed) tempLength > 0 && (signed) tempLength <= len) {
+                if (static_cast<signed>(tempLength) > 0 && static_cast<signed>(tempLength) <= len) {
                     len = tempLength;
                 } else {
                     m_log.log(Logging::LogLevel::Error, "createInputField() Incorrect |FL field length=", tempLength,
-                                                    "cannot exceed max size=", len);
+                              "cannot exceed max size=", len);
                 }
             } else {
                 field_name.erase(position, 3);
@@ -159,7 +157,8 @@ void SessionIO::createInputField(std::string &field_name, int &len) {
     // Override Foreground/Background Input Field Colors
     // This is now for OBV/2 - Not in Legacy.
     position = field_name.find("|FB", 0);
-    m_log.log(Logging::LogLevel::Debug, "createInputField() |FB position=", position, "compare=", position + 4, stringSize);
+    m_log.log(Logging::LogLevel::Debug, "createInputField() |FB position=", position, "compare=", position + 4,
+              stringSize);
 
     if (position != std::string::npos) {
         // (Unit Test Notes)
@@ -200,7 +199,7 @@ void SessionIO::createInputField(std::string &field_name, int &len) {
 
     // Format the input field
     sprintf(formatted, "%s%s%s\x1b[%iD",
-            (char *) field_name.c_str(), // Field Name
+            const_cast<char *>(field_name.c_str()), // Field Name
             INPUT_COLOR, // Field Fg,Bg Color
             repeat.c_str(), // Padding length of Field
             len + 1); // Move back to starting position of field.
@@ -223,10 +222,10 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
                                      std::string leadoff,
                                      bool hidden) {
     // Set up the lead off, if it's first time, then print it out
-    // Other if empty or follow-up calls to input field field skip it!
+    // Other if empty or follow-up calls to input field skip it!
     static bool is_leadoff = true;
 
-    if (leadoff.size() == 0) {
+    if (leadoff.empty()) {
         is_leadoff = false;
     }
 
@@ -239,12 +238,12 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
 
     std::string string_data = m_common_io.getLine(character_buffer, length, leadoff, hidden);
 
-    if ((signed) string_data.size() > 0) {
+    if (static_cast<signed>(string_data.size()) > 0) {
         // Check for ESC for Abort!
         if (string_data[0] == 27 && string_data.size() == 1) {
             std::string esc_sequence = m_common_io.getEscapeSequence();
 
-            if (esc_sequence.size() == 0 && character_buffer[0] == '\0') {
+            if (esc_sequence.empty() && character_buffer[0] == '\0') {
                 is_leadoff = true; // Reset for next run
                 esc_sequence.erase();
                 string_data.erase();
@@ -276,7 +275,7 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
  * @param foreground
  */
 std::string SessionIO::pipeReplaceForeground(int foreground) {
-    std::string escape_sequence = "";
+    std::string escape_sequence;
 
     switch (foreground) {
         case 0:
@@ -356,7 +355,7 @@ std::string SessionIO::pipeReplaceForeground(int foreground) {
  * @param background
  */
 std::string SessionIO::pipeReplaceBackground(int background) {
-    std::string escape_sequence = "";
+    std::string escape_sequence;
 
     switch (background) {
         case 16:
@@ -411,7 +410,7 @@ std::string SessionIO::pipeReplaceBackground(int background) {
 std::string SessionIO::pipeColors(const std::string &color_string) {
     // Skip PIPE and grab next two digits.
     std::string str = color_string.substr(1);
-    std::string esc_sequence = "";
+    std::string esc_sequence;
 
     // String to Int
     std::istringstream ss(str);
@@ -428,14 +427,20 @@ std::string SessionIO::pipeColors(const std::string &color_string) {
 
     // Foreground Colors
     if (color_index >= 0 && color_index < 16) {
+        m_log.log(Logging::LogLevel::Info, "foreground color_index=", color_index);
         esc_sequence = pipeReplaceForeground(color_index);
+        m_log.log(Logging::LogLevel::Info, "foreground esc_sequence=", esc_sequence);
         return esc_sequence;
     }
     // Background Colors
     else if (color_index >= 16 && color_index < 24) {
+        m_log.log(Logging::LogLevel::Info, "background color_index=", color_index);
         esc_sequence = pipeReplaceBackground(color_index);
+        m_log.log(Logging::LogLevel::Info, "background esc_sequence=", esc_sequence);
         return esc_sequence;
     }
+
+    m_log.log(Logging::LogLevel::Info, "else esc_sequence=", esc_sequence);
 
     return esc_sequence;
 }
@@ -491,11 +496,12 @@ std::string SessionIO::getDefaultBoxColor(Config &config) {
 
 /**
  * @brief Parsed Pipe Codes with 1 or 2 Digits (Handle OBV/2 Legacy Movements)
- * @param pipe_code
+ * @param code
+ * @param value
  * @return
  */
 std::string SessionIO::parsePipeWithCharsDigits(const std::string &code, int value) {
-    std::string sequence = "";
+    std::string sequence;
 
     // Check Single letter Sequences
     if (code.size() == 1) {
@@ -603,7 +609,7 @@ std::string SessionIO::parseFilename(const std::string &pipe_code) {
     std::string str = pipe_code.substr(4);
     std::string buffer = common_io.readinAnsi(str);
 
-    if (buffer.size() > 0) {
+    if (!buffer.empty()) {
         return pipe2ansi(buffer);
     }
 
@@ -618,7 +624,7 @@ std::string SessionIO::parseFilename(const std::string &pipe_code) {
  */
 std::string SessionIO::parsePipeWithChars(const std::string &pipe_code) {
     // Strip PIPE and grab the Sequences
-    std::string esc_sequence = "";
+    std::string esc_sequence;
 
     // Make this more dynamic?!?
 
@@ -675,19 +681,18 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
     m_log.log(Logging::LogLevel::Debug, "[parseCodeMap]", __LINE__, __FILE__);
 
     std::string ansi_string = screen;
-    MapType my_matches;
 
     // All Global MCI Codes likes standard screens and colors will
     // He handled here, then specific interfaces will break out below this.
     // Break out parsing on which pattern was matched.
-    while (code_map.size() > 0) {
+    while (!code_map.empty()) {
         // Loop Backwards to preserve string offsets on replacement.
-        my_matches = code_map.back();
+        MapType my_matches = code_map.back();
         code_map.pop_back();
 
         // Check for Custom Screen Translation Mappings
         // If these exist, they take presidency over standard codes
-        if (m_mapped_codes.size() > 0) {
+        if (!m_mapped_codes.empty()) {
             std::map<std::string, std::string>::iterator it;
             it = m_mapped_codes.find(my_matches.m_code);
 
@@ -702,12 +707,12 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
         switch (my_matches.m_match) {
             case 1: // Pipe w/ 2 DIGIT Colors
             {
-                m_log.log(Logging::LogLevel::Debug, "Pipe w/ 2 DIGIT Colors |00");
+                m_log.log(Logging::LogLevel::Info, "Pipe w/ 2 DIGIT Colors |00", "Ansi?=", m_session.isAnsi());
                 std::string result = pipeColors(my_matches.m_code);
 
-                if (result.size() != 0) {
+                if (!result.empty()) {
                     // Replace the Color, if not ansi then remove the color!
-                    if (m_session.getUseAnsi()) {
+                    if (m_session.isAnsi()) {
                         ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
                     } else {
                         ansi_string.replace(my_matches.m_offset, my_matches.m_length, "");
@@ -720,7 +725,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 2: // Pipe w/ 2 Chars and 4 Digits // |XY0101
             {
-                m_log.log(Logging::LogLevel::Debug, "Pipe w/ 2 Chars and 4 Digits // |XY0101");
+                m_log.log(Logging::LogLevel::Info, "Pipe w/ 2 Chars and 4 Digits // |XY0101");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "       ");
             }
@@ -728,10 +733,11 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 3: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
             {
-                m_log.log(Logging::LogLevel::Debug, "Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33");
+                m_log.log(Logging::LogLevel::Info,
+                          "Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33");
                 std::string result = separatePipeWithCharsDigits(my_matches.m_code);
 
-                if (result.size() != 0) {
+                if (!result.empty()) {
                     // Replace the string
                     ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
                 }
@@ -742,10 +748,10 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
                 // This one will need replacement in the string parsing
                 // Pass the original string because of |DE for delay!
             {
-                m_log.log(Logging::LogLevel::Debug, "Pipe w/ 2 CHARS // |AA");
+                m_log.log(Logging::LogLevel::Info, "Pipe w/ 2 CHARS // |AA");
                 std::string result = parsePipeWithChars(my_matches.m_code);
 
-                if (result.size() != 0) {
+                if (!result.empty()) {
                     // Replace the string
                     ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
                 } else {
@@ -756,10 +762,10 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 5: // %%FILENAME.EXT  get filenames for loading from string prompts
             {
-                m_log.log(Logging::LogLevel::Debug, "Replacing %%FILENAME.EXT codes");
+                m_log.log(Logging::LogLevel::Info, "Replacing %%FILENAME.EXT codes");
                 std::string result = parseFilename(my_matches.m_code);
 
-                if (result.size() != 0) {
+                if (!result.empty()) {
                     ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
                 } else {
                     std::string s(my_matches.m_length, ' ');
@@ -770,7 +776,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 
             case 6: // Percent w/ 2 CHARS
             {
-                m_log.log(Logging::LogLevel::Debug, "Percent w/ 2 CHARS");
+                m_log.log(Logging::LogLevel::Info, "Percent w/ 2 CHARS");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
             }
@@ -780,7 +786,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
             {
                 // Were just removing them because they are processed.
                 // Now that first part of sequence |01 etc.. are processed!
-                m_log.log(Logging::LogLevel::Debug, "replacing %## codes");
+                m_log.log(Logging::LogLevel::Info, "replacing %## codes");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
             }
@@ -810,7 +816,6 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
     m_log.log(Logging::LogLevel::Debug, "[parseCodeMapGenerics]", __LINE__, __FILE__);
 
     std::string ansi_string = screen;
-    MapType my_matches;
 
     // Make a copy so the original is not modified.
     std::vector<MapType> code_mapping;
@@ -819,25 +824,25 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
     // All Global MCI Codes likes standard screens and colors will
     // He handled here, then specific interfaces will break out below this.
     // Break out parsing on which pattern was matched.
-    while (code_mapping.size() > 0) {
+    while (!code_mapping.empty()) {
         // Loop Backwards to preserve string offsets on replacement.
-        my_matches = code_mapping.back();
+        MapType my_matches = code_mapping.back();
         code_mapping.pop_back();
 
         // Check for Custom Screen Translation Mappings
         // If these exist, they take presidency over standard codes
-        if (m_mapped_codes.size() > 0) {
+        if (!m_mapped_codes.empty()) {
             std::map<std::string, std::string>::iterator it;
             it = m_mapped_codes.find(my_matches.m_code);
 
             if (it != m_mapped_codes.end()) {
                 m_log.log(Logging::LogLevel::Debug, "[parseCodeMapGenerics] gen found=", my_matches.m_code, it->second,
-                                                __LINE__, __FILE__);
+                          __LINE__, __FILE__);
                 // If found, replace mci sequence with text
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, it->second);
             } else {
                 m_log.log(Logging::LogLevel::Debug, "[parseCodeMapGenerics] gen not found=", __LINE__, __FILE__);
-                std::string remove_code = "";
+                std::string remove_code;
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, remove_code);
             }
         }
@@ -858,7 +863,6 @@ std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std
 std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, const std::string &expression) {
     // Contains all matches found so we can iterate and replace
     // Without Multiple loops through the string.
-    MapType my_matches;
     std::vector<MapType> code_map;
 
     // Make a copy that we can modify and process on.
@@ -877,6 +881,7 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
 
     //std::cout << "exp: " << expression << std::endl;
     try {
+        MapType my_matches;
         std::regex expr(expression);
         std::smatch matches;
         std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
@@ -953,7 +958,12 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
  */
 std::string SessionIO::pipe2ansi(const std::string &sequence) {
     std::vector<MapType> code_map = parseToCodeMap(sequence, STD_EXPRESSION);
-    return parseCodeMap(sequence, code_map);
+    // TEMP TRIAGE
+    m_log.log(Logging::LogLevel::Info, "pipe2ansi=", sequence);
+    std::string result = parseCodeMap(sequence, code_map);
+    m_log.log(Logging::LogLevel::Info, "pipe2ansi result=", result);
+    return result;
+    //return parseCodeMap(sequence, code_map);
 }
 
 /**
@@ -1015,11 +1025,12 @@ std::string SessionIO::parseFormatColorsColon(const std::string &sequence, Confi
 /**
  * @brief Parses unformatted prompt text and adds colors to brackets and colon's.
  * @param sequence
+ * @param config
  * @return
  */
 std::string SessionIO::pipe2promptFormat(const std::string &sequence, Config &config) {
     std::vector<MapType> code_map = pipe2promptFormatCodeMap(sequence);
-    std::string output = "";
+    std::string output;
     std::string key;
     std::string value;
 
@@ -1076,7 +1087,7 @@ bool SessionIO::checkRegex(const std::string &sequence, const std::string &expre
         result = std::regex_match(sequence, match, regExpression);
     } catch (std::regex_error &ex) {
         m_log.log(Logging::LogLevel::Error, "[checkRegex] Expression=", expression, "Exception=", ex.what(), ex.code(),
-                                        __LINE__, __FILE__);
+                  __LINE__, __FILE__);
     }
 
     return result;
@@ -1113,7 +1124,7 @@ void SessionIO::addMCIMapping(const std::string &key, const std::string &value) 
  * @brief Clears all mappings
  */
 void SessionIO::clearAllMCIMapping() {
-    if (m_mapped_codes.size() > 0) {
+    if (!m_mapped_codes.empty()) {
         m_mapped_codes.clear();
         std::map<std::string, std::string>().swap(m_mapped_codes);
     }

@@ -1,14 +1,11 @@
 #ifndef MENU_SYSTEM_HPP
 #define MENU_SYSTEM_HPP
 
-#include <iostream>
-#include <stdint.h>
 #include <string>
 #include <vector>
 #include <map>
 #include <functional>
 
-#include "model-sys/struct_compat.hpp"
 #include "model-sys/menu.hpp"
 #include "menu_base.hpp"
 
