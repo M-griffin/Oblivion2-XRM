@@ -40,23 +40,15 @@ MenuBase::MenuBase(Context &ctx)
 }
 
 MenuBase::~MenuBase() {
-    m_log.log(Logging::LogLevel::Debug, "~MenuBase()");
-
-    // Pop Functions off the stack.
+    m_log.log(Logging::LogLevel::Console, "~MenuBase()");
     m_menu_functions.clear();
-    std::vector<std::function<void(const std::string &, const bool &is_utf8)> >().swap(m_menu_functions);
     m_execute_callback.clear();
-    std::vector<std::function<bool(const MenuOption &)> >().swap(m_execute_callback);
-
-    // Pop off the stack to deallocate any active modules.
-    //m_module_stack.clear();
-    //std::vector<module_ptr>().swap(m_module_stack);
     m_loaded_pulldown_options.clear();
-    std::vector<MenuOption>().swap(m_loaded_pulldown_options);
 }
 
 /**
  * @brief Convert Strings to Uppercase with Locale
+ * TODO Change to COMMON IO VERSION!
  */
 std::string MenuBase::upper_case(const std::string &string_sequence) {
     std::string new_string;
@@ -70,6 +62,7 @@ std::string MenuBase::upper_case(const std::string &string_sequence) {
 
 /**
  * @brief Convert Strings to Uppercase with Locale
+ * TODO Change to COMMON IO VERSION!
  */
 std::string MenuBase::lower_case(const std::string &string_sequence) {
     std::string new_string;
@@ -168,10 +161,11 @@ void MenuBase::readInMenuData() {
             }
         } else {
             // Fallback is if user doesn't have access.  update this later on.
-            m_log.log(Logging::LogLevel::Warn, "Menu doesn't exist=", m_current_menu, "loading Fallback=", m_fallback_menu);
+            m_log.log(Logging::LogLevel::Warn, "Menu doesn't exist=", m_current_menu, "loading Fallback=",
+                      m_fallback_menu);
 
             if (!m_fallback_menu.empty()) {
-                m_log.log(Logging::LogLevel::Debug, "Loading fallback menu", m_fallback_menu, __LINE__, __FILE__);
+                m_log.log(Logging::LogLevel::Warn, "Loading fallback menu", m_fallback_menu, __LINE__, __FILE__);
                 m_current_menu = m_fallback_menu;
                 return readInMenuData();
             }
@@ -200,8 +194,8 @@ void MenuBase::loadInMenu(std::string menu_name) {
     readInMenuData();
 
     m_log.log(Logging::LogLevel::Debug, "Menu Name=", m_menu_info.menu_name, "Menu Pulldown=",
-                                    m_menu_info.menu_pulldown_file,
-                                    "Menu Helpfile=", m_menu_info.menu_help_file, "Fallback Menu=", m_fallback_menu);
+              m_menu_info.menu_pulldown_file,
+              "Menu Helpfile=", m_menu_info.menu_help_file, "Fallback Menu=", m_fallback_menu);
 }
 
 /**
@@ -358,7 +352,7 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen) {
 
     // Clear Code map.
     std::vector<MapType>().swap(code_map);
-    ansi_process.parseTextToBuffer((char *) output_screen.c_str());
+    ansi_process.parseTextToBuffer(const_cast<char *>(output_screen.c_str()));
 
     // Return with no clear screen, since this is a mid ansi.
     return ansi_process.getScreenFromBuffer(false);
@@ -428,7 +422,7 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
     yesNoBars.insert(0, display_prompt);
 
     // Parse the Screen to the Screen Buffer.
-    m_ctx.getAnsi().parseTextToBuffer((char *) yesNoBars.c_str());
+    m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(yesNoBars.c_str()));
 
     // Screen to String so it can be processed.
     m_ctx.getAnsi().screenBufferToString();
@@ -614,7 +608,7 @@ std::string MenuBase::loadMenuScreen() {
             screen_file.append(".ASC");
         }
 
-        // Make all screens uppercase, handle unicode names.
+        // Make all screens uppercase, handle Unicode names.
         screen_file = upper_case(screen_file);
 
         // if file doesn't exist, then use generic template
@@ -691,7 +685,7 @@ void MenuBase::redisplayMenuScreen() {
 
     if (m_is_active_pulldown_menu) {
         // Parse the Screen to the Screen Buffer.
-        m_ctx.getAnsi().parseTextToBuffer((char *) buffer.c_str());
+        m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(buffer.c_str()));
 
         // Screen to String so it can be processed.
         m_ctx.getAnsi().screenBufferToString();
@@ -844,7 +838,25 @@ std::string MenuBase::loadMenuPrompt() {
         // Parse Prompt for Menu Title here, let pip2ansi parse standard codes.
         m_ctx.getSessionIO().addMCIMapping("|MN", m_menu_info.menu_prompt);
         m_ctx.getSessionIO().addMCIMapping("|TL", "1440"); // Time Left {Not Implemented Yet}
-        m_ctx.getSessionIO().addMCIMapping("|TM", "Current Date/Time"); // Time Now  {Not Implemented Yet}
+
+        // Get current time
+        auto now = std::chrono::system_clock::now();
+        std::time_t t = std::chrono::system_clock::to_time_t(now);
+
+        // Convert to local time
+        std::tm tm{};
+#if defined(_WIN32)
+        localtime_s(&tm, &t);   // Windows
+#else
+        localtime_r(&t, &tm);   // Linux / macOS
+#endif
+
+        std::ostringstream oss;
+        oss << std::put_time(&tm, "%d/%m/%Y %I:%M %p");
+
+        m_ctx.getSessionIO().addMCIMapping("|TM", oss.str()); // Time Now
+        oss.clear();
+
         m_ctx.getSessionIO().addMCIMapping("|NN", std::to_string(node_number));
 
         // Legacy Note:
@@ -919,9 +931,9 @@ void MenuBase::loadAndStartupMenu() {
     use_ansi = m_ctx.getSessionWrite().isAnsi();
 
     if (m_current_menu == "matrix") {
-        m_log.log(Logging::LogLevel::Debug, "MATRIX MENU DETECTED - RESET ANSI TERM SIZE to Detection",
-                                        term_rows,
-                                        term_cols
+        m_log.log(Logging::LogLevel::Info, "MATRIX MENU DETECTED - RESET ANSI TERM SIZE to Detection",
+                  term_rows,
+                  term_cols
         );
         // First Menu Load, make sure we resize from terminal detection.  Later on Ongoing Detection Changes
         m_ctx.getAnsi().resize(term_rows, term_cols);

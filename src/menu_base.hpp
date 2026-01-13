@@ -32,7 +32,6 @@ public:
     enum {
         MENU_INPUT,
         MENU_YESNO_BAR,
-        MODULE_PRE_LOGON_INPUT,
         MODULE_LOGON_INPUT,
         MODULE_INPUT,
         FORM_INPUT

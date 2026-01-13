@@ -1,17 +1,19 @@
 #ifndef MENU_SYSTEM_HPP
 #define MENU_SYSTEM_HPP
 
+#include <unordered_map>
+#include <functional>
 #include <string>
 #include <vector>
 #include <map>
-#include <functional>
+#include <experimental/optional>
 
 #include "model-sys/menu.hpp"
 #include "menu_base.hpp"
+#include "mods/mod_logon.hpp"
 
-struct Context;
+class Context;
 class Logging;
-
 
 /**
  * @class MenuSystem
@@ -23,18 +25,22 @@ class Logging;
 class MenuSystem :
         public MenuBase {
 public:
-    explicit MenuSystem(Context &ctx);
 
+    enum class State : uint8_t {
+        MenuSystem = 0,
+        ModLogon,
+        COUNT
+    };
+
+    explicit MenuSystem(Context &ctx);
     ~MenuSystem();
 
     void update(const std::string &character_buffer, const bool &is_utf8);
-
     bool onEnter();
-
     bool onExit();
+    bool pollTimers();
 
     Logging &m_log;
-    static const std::string m_stateID;
     std::vector<std::string> m_system_fallback;
 
     // handle to form interface.
@@ -59,9 +65,28 @@ public:
         };
     }
 
+    std::experimental::optional<ModLogon> logonState;
+    State currentState;
+
+    // Type aliases
+    using StateHandler = std::function<void()>;
+    using InputHandler = std::function<void(const std::string &)>;
+
+    // Dispatch tables
+    std::unordered_map<State, StateHandler> clearHandlers;
+    std::unordered_map<State, StateHandler> createHandlers;
+    std::unordered_map<State, StateHandler> pollHandlers;
+    std::unordered_map<State, InputHandler> inputHandlers;
+
 
     // Holds map of Menu Option Commands for quick lookup and execution
     MappedCommandFunctions m_menu_command_functions;
+
+    // Setup Current State or Transitions
+    void setState(State newState);
+
+    // Binding
+    void bindStateHandlers();
 
     /**
      * @brief Control Commands
@@ -220,19 +245,9 @@ public:
     void shutdownModule();
 
     /**
-     * @brief Exists and Shuts down the current module
-     */
-    //void startupModule(const module_ptr &module);
-
-    /**
      * @brief Starts up Logon Module
      */
-    //void startupModulePreLogon();
-
-    /**
-     * @brief Starts up Logon Module
-     */
-    //void startupModuleLogon();
+    void startupModuleLogon();
 
     /**
      * @brief Starts up Signup Module
@@ -260,16 +275,11 @@ public:
     //void startupModuleMessageEditor();
 
     /**
-     * @brief Handles Input for Login and PreLogin Sequences.
+     * @brief Handles Input for Login Sequences.
      * @param character_buffer
      * @param is_utf8
      */
     void handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8);
-
-    /**
-     * @brief Handles parsing input for PreLogon current module.
-     */
-    void modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8);
 
     /**
      * @brief Handles parsing input for Logon current module.
@@ -280,6 +290,13 @@ public:
      * @brief Handles parsing input for current module.
      */
     void moduleInput(const std::string &character_buffer, const bool &is_utf8);
+
+    // Compile-time guarantees
+    static constexpr size_t StateCount =
+            static_cast<size_t>(State::COUNT);
+
+    static_assert(StateCount == 2,
+                  "MenuSystem: handler tables must be updated when adding states");
 };
 
 #endif // MENU_SYSTEM_HPP

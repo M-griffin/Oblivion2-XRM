@@ -11,7 +11,7 @@ class Context;
 
 
 /**
- * @class ModLogin
+ * @class ModLogon
  * @author Michael Griffin
  * @date 3/17/2016
  * @file mod_logon.hpp
@@ -95,7 +95,6 @@ public:
 
     /**
      * @brief Redisplay's the current module prompt.
-     * @param mod_function_index
      */
     void redisplayModulePrompt();
 
@@ -110,12 +109,6 @@ public:
      * @param prompt
      */
     void displayPromptAndNewLine(const std::string &prompt);
-
-    /**
-     * @brief Pre Logon Sequence
-     * @return
-     */
-    void setupPreLogon();
 
     /**
      * @brief Validates user Logon
@@ -159,12 +152,6 @@ public:
     void setupNewUserApplication();
 
 private:
-
-    /**
-     * @brief Pre Logon Sequence
-     * @return
-     */
-    bool preLogon(const std::string &input);
 
     /**
      * @brief Lookup user records Handle, Name, or Email

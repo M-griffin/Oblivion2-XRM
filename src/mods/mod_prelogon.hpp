@@ -54,11 +54,8 @@ public:
 
     // State Driven Methods
     bool update(const std::string &character_buffer, const bool &);
-
     bool onEnter();
-
     bool onExit();
-
     bool pollTimers();
 
     // This matches the index for and key for setup -> mod_functions.push_back

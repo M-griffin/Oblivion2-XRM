@@ -11,7 +11,6 @@
 #include "model-sys/config.hpp"
 
 /*
-#include "mods/mod_prelogon.hpp"
 #include "mods/mod_logon.hpp"
 #include "mods/mod_signup.hpp"
 #include "mods/mod_menu_editor.hpp"
@@ -20,27 +19,25 @@
 #include "mods/mod_message_editor.hpp"
 */
 
-#include "mods/mod_prelogon.hpp"
+#include "mods/mod_logon.hpp"
 
 #include "model-sys/context.hpp"
 #include "tcp_session.hpp"
 #include "logging.hpp"
 
-const std::string MenuSystem::m_stateID = "MENU_SYSTEM";
-
 MenuSystem::MenuSystem(Context &ctx)
     : MenuBase(ctx)
-      , m_log(Logging::getInstance()) {
+      , m_log(Logging::getInstance())
+      , currentState(State::MenuSystem) {
 
     // Setup Menu Option Calls for executing menu commands.
     m_execute_callback.emplace_back(bind_member(this, &MenuSystem::menuOptionsCallback));
 
-    // Menu Input Commands (Base Class)
+    // Menu Input Commands (Base Class) - goes directly to base class.
     m_menu_functions.emplace_back(bind_member(static_cast<MenuBase*>(this), &MenuBase::menuInput));
     m_menu_functions.emplace_back(bind_member(static_cast<MenuBase*>(this), &MenuBase::menuYesNoBarInput));
 
     // Menu Input Commands (System Class)
-    m_menu_functions.emplace_back(bind_member(this, &MenuSystem::modulePreLogonInput));
     m_menu_functions.emplace_back(bind_member(this, &MenuSystem::moduleLogonInput));
     m_menu_functions.emplace_back(bind_member(this, &MenuSystem::moduleInput));
 
@@ -83,7 +80,7 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
         return;
     }
 
-    // This simply passed through the input to the current system fuction were at.
+    // This simply passed through the input to the current system function were at.
     m_menu_functions[m_input_index](character_buffer, is_utf8);
 }
 
@@ -93,8 +90,6 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
  * @return
  */
 bool MenuSystem::onEnter() {
-    // Startup the Prelogon sequence
-    //startupModulePreLogon();
     m_is_active = true;
     return true;
 }
@@ -106,6 +101,60 @@ bool MenuSystem::onEnter() {
 bool MenuSystem::onExit() {
     m_is_active = false;
     return true;
+}
+
+bool MenuSystem::pollTimers() {
+    return true;
+}
+
+// For Modules
+void MenuSystem::bindStateHandlers() {
+    clearHandlers.clear();
+    createHandlers.clear();
+    inputHandlers.clear();
+    pollHandlers.clear();
+
+    // Menu System
+    clearHandlers.emplace(State::MenuSystem,
+                          [this]() { clearMenuSystem(); });
+
+    createHandlers.emplace(State::MenuSystem,
+                           [this]() { createMenuSystem(); });
+
+    pollHandlers.emplace(State::MenuSystem,
+                         [this]() { pollMenuSystem(); });
+
+    inputHandlers.emplace(State::MenuSystem,
+                          [this](const std::string &input) {
+                              inputMenuSystem(input);
+                          });
+
+    // Logon
+    clearHandlers.emplace(State::ModLogon,
+                          [this]() { clearPreLogon(); });
+
+    createHandlers.emplace(State::ModLogon,
+                           [this]() { createPreLogon(); });
+
+    pollHandlers.emplace(State::ModLogon,
+                         [this]() { pollPreLogon(); });
+
+    inputHandlers.emplace(State::ModLogon,
+                          [this](const std::string &input) {
+                              inputPreLogon(input);
+                          });
+
+    // Runtime guarantee (debug)
+    assert(clearHandlers.size() == StateCount);
+    assert(createHandlers.size() == StateCount);
+    assert(pollHandlers.size() == StateCount);
+    assert(inputHandlers.size() == StateCount);
+}
+
+void MenuSystem::setState(State newState) {
+    clearHandlers.at(currentState)();
+    currentState = newState;
+    createHandlers.at(currentState)();
 }
 
 /**
@@ -892,19 +941,6 @@ void MenuSystem::shutdownModule() {
 }
 
 /**
- * @brief Exists and Shuts down the current module
- *
-void MenuSystem::startupModule(const module_ptr &module)
-{
-    m_log.log(Logging::LogLevel::Console, "StartupModule in MenuSystem() Module=", module->m_filename);
-
-    // First clear any left overs if they exist.
-    clearAllModules();
-    module->onEnter();
-    m_module_stack.push_back(module);
-}*/
-
-/**
  * @brief Start up the Normal Login Process.
  *
 void MenuSystem::startupModulePreLogon()
@@ -928,7 +964,7 @@ void MenuSystem::startupModulePreLogon()
 
 /**
  * @brief Start up the Normal Login Process.
- *
+ */
 void MenuSystem::startupModuleLogon()
 {
     // Setup the input processor
@@ -946,7 +982,7 @@ void MenuSystem::startupModuleLogon()
     }
 
     startupModule(module);
-}*/
+}
 
 /**
  * @brief Starts up Signup Module
@@ -1061,12 +1097,12 @@ void MenuSystem::startupModuleMessageEditor()
 
 /**
  * @brief Handles Input for Login and PreLogin Sequences.
- *        On Login Falures kicks back out to the Matrix.
+ *        On Login Failures kicks back out to the Matrix.
  * @param character_buffer
  * @param is_utf8
  */
 void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8) {
-    /*
+
     // Make sure we have an allocated module before processing.
     if(m_module_stack.size() == 0 || character_buffer.size() == 0)
     {
@@ -1118,15 +1154,7 @@ void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, con
         {
             loadAndStartupMenu();
         }
-    }*/
-}
-
-/**
- * @brief Handles parsing input for preLogon module
- *
- */
-void MenuSystem::modulePreLogonInput(const std::string &character_buffer, const bool &is_utf8) {
-    handleLoginInputSystem(character_buffer, is_utf8);
+    }
 }
 
 /**
@@ -1139,10 +1167,10 @@ void MenuSystem::moduleLogonInput(const std::string &character_buffer, const boo
 
 /**
  * @brief Handles parsing input for modules
- *
+ * (Other Than Logon)
  */
 void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is_utf8) {
-    /*
+
     // Make sure we have an allocated module before processing.
     if(m_module_stack.size() == 0 || character_buffer.size() == 0)
     {
@@ -1162,5 +1190,5 @@ void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is
 
         // Redisplay,  may need to startup() again, but menu data should still be active and loaded!
         redisplayMenuScreen();
-    }*/
+    }
 }

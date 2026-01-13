@@ -29,7 +29,6 @@ ModLogon::ModLogon(Context &ctx)
       , m_mod_function_index(MOD_LOGON)
       , m_failure_attempts(0)
       , m_is_text_prompt_exist(false) {
-    // Push function pointers to the stack.
 
     m_setup_functions.emplace_back([this] { setupLogon(); });
     m_setup_functions.emplace_back([this] { setupPassword(); });
@@ -167,7 +166,6 @@ void ModLogon::changePreviousModule() {
 
 /**
  * @brief Redisplay's the current module prompt.
- * @param mod_function_index
  */
 void ModLogon::redisplayModulePrompt() {
     m_setup_functions[m_mod_function_index]();
@@ -249,7 +247,7 @@ void ModLogon::setupPasswordChange() {
  * @return
  */
 bool ModLogon::checkUserLogon(const std::string &input) {
-    // Check for user name and if is already exists!
+    // Check for username and if is already exists!
     UsersDao user_data = UsersDao(getUserDatabase());
 
     // Check if a Digit, if so, lookup by userId.
@@ -305,14 +303,15 @@ bool ModLogon::checkUserLogon(const std::string &input) {
  * @return
  */
 bool ModLogon::logon(const std::string &input) {
-    std::string key = "";
+    std::string key;
     std::string result = m_ctx.getSessionIO().getInputField(
         input, key, Config::sName_length);
 
     // ESC was hit
     if (result == "aborted") {
         return false;
-    } else if (result[0] == '\n') {
+    }
+    if (result[0] == '\n') {
         // Key == 0 on [ENTER] pressed alone. then invalid!
         if (key.size() == 0) {
             // Return and don't do anything.
@@ -334,7 +333,7 @@ bool ModLogon::logon(const std::string &input) {
             // If max, then exit back to matrix.
             // NOTE Separate login/password attempts or change to log in?
             if (m_failure_attempts >= m_ctx.getCfg().invalid_password_attempts) {
-                //m_session_data.disconnectUser();
+                m_ctx.getSessionWrite().hangup();
                 m_is_active = false;
                 return false;
             }
