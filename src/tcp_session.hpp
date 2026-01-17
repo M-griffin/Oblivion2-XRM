@@ -42,23 +42,22 @@ class TCPSession {
     std::experimental::optional<StateManager> m_state_manager;
 
     // ESC handling
-    std::string m_escBuffer;      // current ESC sequence
-    bool m_escPending = false;    // one ESC waiting for resolution
+    std::string m_escBuffer; // current ESC sequence
+    bool m_escPending = false; // one ESC waiting for resolution
     DeadlineTimer m_escTimer;
 
 public:
     TCPSession(TCPsocket socket, const int nodeNumber, Config &config, SQLW::Database &coreDatabase)
-    : m_log(Logging::getInstance())
-    , m_socketService(socket, nodeNumber, config)
-    , m_session_writer(m_socketService)
-    , m_telnetSession(m_session_writer)
-    , m_userRec()
-    , m_ansi_process()
-    , m_common_io()
-    , m_session_io(m_session_writer, m_common_io)
-    , m_coreDatabase(coreDatabase)
-    , m_context() {
-
+        : m_log(Logging::getInstance())
+          , m_socketService(socket, nodeNumber, config)
+          , m_session_writer(m_socketService)
+          , m_telnetSession(m_session_writer)
+          , m_userRec()
+          , m_ansi_process()
+          , m_common_io()
+          , m_session_io(m_session_writer, m_common_io)
+          , m_coreDatabase(coreDatabase)
+          , m_context() {
         // Bind all necessary components
         m_context.bind(
             m_session_writer,
@@ -75,19 +74,18 @@ public:
         const std::string clear_screen = "\x1b[1;1H\x1b[2J\x1b[0m";
         m_socketService.send(clear_screen);
 
-        // ===============================
-        // Telnet Option Negotiation
-        // ===============================
+        // Telnet Option Negotiation Start
 
         // Tell client we won't use OLD_ENVIRON
         m_telnetSession.sendIACSequences(DONT, TELOPT_OLD_ENVIRON);
+        m_telnetSession.sendIACSequences(DO, TELOPT_NEW_ENVIRON);
 
         // Enable SGA (Suppress Go Ahead)
         m_telnetSession.sendIACSequences(DO, TELOPT_SGA);
         m_telnetSession.addReply(TELOPT_SGA);
 
         // ECHO negotiation
-        m_telnetSession.sendIACSequences(WILL, TELOPT_ECHO);
+        m_telnetSession.sendIACSequences(DONT, TELOPT_ECHO);
         m_telnetSession.addReply(TELOPT_ECHO);
 
         // SGA, BINARY support
@@ -119,8 +117,11 @@ public:
     }
 
     TCPSession(TCPSession &&) = delete;
+
     TCPSession &operator=(TCPSession &&) = delete;
+
     TCPSession(const TCPSession &) = delete;
+
     TCPSession &operator=(const TCPSession &) = delete;
 
     SocketService &getSession() { return m_socketService; }
@@ -145,9 +146,9 @@ public:
     }
 
     void handleIncomingData(const ByteBuffer &msg) {
-        for (Byte incoming : msg) {
+        for (Byte incoming: msg) {
             auto appBytes = m_telnetSession.telnetOptionParse(incoming);
-            for (Byte b : appBytes) {
+            for (Byte b: appBytes) {
                 handleIncomingByte(b);
             }
         }
@@ -162,16 +163,12 @@ public:
 
 private:
     void handleIncomingByte(uint8_t byte) {
-
-        // =============================
         // ESC received
-        // =============================
         if (byte == 0x1b) {
-
             // Resolve previous ESC if still pending
             if (m_escPending) {
                 m_escTimer.cancel();
-                m_state_manager->handleInput(std::string{ char(0x1b), '\0' });
+                m_state_manager->handleInput(std::string{char(0x1b), '\0'});
                 m_escBuffer.clear();
                 m_escPending = false;
             }
@@ -182,7 +179,7 @@ private:
             m_escBuffer.push_back(0x1b);
 
             m_escTimer.start(std::chrono::milliseconds(25), [this]() {
-                m_state_manager->handleInput(std::string{ char(0x1b), '\0' });
+                m_state_manager->handleInput(std::string{char(0x1b), '\0'});
                 m_escBuffer.clear();
                 m_escPending = false;
             });
@@ -190,18 +187,22 @@ private:
             return;
         }
 
-        // =============================
-        // ESC sequence continuation
-        // =============================
         if (m_escPending) {
             m_escBuffer.push_back(byte);
 
             if (isEscSequenceComplete(m_escBuffer)) {
                 m_escTimer.cancel();
-                m_state_manager->handleInput(m_escBuffer);
+
+                // CSI handling (ESC [ ...)
+                if (m_escBuffer.size() >= 2 && m_escBuffer[1] == '[') {
+                    handleCSISequence(m_escBuffer);
+                    m_state_manager->handleInput(m_escBuffer);
+                }
+
                 m_escBuffer.clear();
                 m_escPending = false;
             }
+
             return;
         }
 
@@ -209,15 +210,55 @@ private:
     }
 
     bool isEscSequenceComplete(const std::string &seq) {
-        if (seq.empty() || seq[0] != 0x1b) return true;
-        if (seq.size() == 1) return false;
+        if (seq.empty() || seq[0] != 0x1b)
+            return true;
+
+        if (seq.size() == 1)
+            return false;
 
         const uint8_t second = seq[1];
+
+        // CSI
         if (second == '[' || second == 'O') {
-            const char last = seq.back();
-            return (last >= '@' && last <= '~');
+            if (seq.size() < 3)
+                return false;
+            uint8_t last = seq.back();
+            return last >= 0x40 && last <= 0x7E;
         }
+
+        // OSC / DCS / APC / PM
+        if (second == ']' || second == 'P' ||
+            second == '^' || second == '_') {
+            // BEL terminator
+            if (seq.back() == 0x07) {
+                return true;
+            }
+
+            // ESC
+            if (seq.size() >= 2 && seq[seq.size() - 2] == 0x1b && seq.back() == '\\') {
+                return true;
+            }
+
+            return false;
+        }
+
+        // 2-byte ESC sequence
         return true;
+    }
+
+    void handleCSISequence(const std::string &seq) {
+        // Cursor Position Report: ESC [ row ; col R
+        if (!seq.empty() && seq.back() == 'R') {
+            int row = 0;
+            int col = 0;
+            if (std::sscanf(seq.c_str(), "\x1b[%d;%dR", &row, &col) == 2) {
+                m_log.log(
+                    Logging::LogLevel::Info,
+                    "Received CPR: row=" + std::to_string(row) +
+                    " col=" + std::to_string(col)
+                );
+            }
+        }
     }
 };
 

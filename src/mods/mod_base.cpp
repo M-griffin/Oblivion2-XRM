@@ -111,53 +111,6 @@ std::string ModBase::baseCreateBorderedDisplay(std::vector<std::string> result_s
 }
 
 /**
- * @brief Transform Strings to Uppercase with Locale
- * @param value
- */
-void ModBase::baseTransformToUpper(std::string &value) {
-    std::string result;
-    result.reserve(value.size());
-
-    auto it = value.begin();
-    while (it != value.end()) {
-        uint32_t cp = utf8::next(it, value.end());
-
-        // ASCII range only
-        if (cp >= 'a' && cp <= 'z') {
-            cp -= 32;
-        }
-
-        utf8::append(cp, std::back_inserter(result));
-    }
-
-    value.swap(result);
-}
-
-
-/**
- * @brief Transform Strings to Lowercase with Locale
- * @param value
- */
-void ModBase::baseTransformToLower(std::string &value) {
-    std::string result;
-    result.reserve(value.size());
-
-    auto it = value.begin();
-    while (it != value.end()) {
-        uint32_t cp = utf8::next(it, value.end());
-
-        // ASCII range only
-        if (cp >= 'A' && cp <= 'Z') {
-            cp += 32;
-        }
-
-        utf8::append(cp, std::back_inserter(result));
-    }
-
-    value.swap(result);
-}
-
-/**
  * @brief Gets the Default Color Sequence
  * @return
  */

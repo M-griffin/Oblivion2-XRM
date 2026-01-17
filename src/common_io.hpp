@@ -238,7 +238,7 @@ public:
      * @param FileName
      * @return
      */
-    std::string readinAnsi(const std::string &file_name);
+    std::string readAnsi(const std::string &FileName);
 
     /**
      * @brief Split Strings by delimiter into Vector of Strings.
@@ -338,6 +338,10 @@ public:
                    uint32_t& cp);
 
     std::string utf8ToCp437(const std::string& utf8);
+
+    std::string toUpper(const std::string &value);
+
+    std::string toLower(const std::string &value);
 
 };
 #endif

@@ -72,18 +72,6 @@ public:
     std::string baseCreateBorderedDisplay(std::vector<std::string> result_set, int total_rows, int max_cols);
 
     /**
-     * @brief Transform Strings to Uppercase with Locale
-     * @param value
-     */
-    void baseTransformToUpper(std::string &value);
-
-    /**
-     * @brief Transform Strings to Lowercase with Locale
-     * @param value
-     */
-    void baseTransformToLower(std::string &value);
-
-    /**
      * @brief Gets the Default Color Sequence
      * @return
      */

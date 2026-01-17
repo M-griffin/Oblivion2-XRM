@@ -12,10 +12,10 @@
 #include "../model-sys/structures.hpp"
 #include "../model-sys/config.hpp"
 
+#include "../session_writer.hpp"
 #include "../encoding.hpp"
 #include "../logging.hpp"
 #include "../session_io.hpp"
-#include "../tcp_session.hpp"
 #include "../common_io.hpp"
 
 ModPreLogon::ModPreLogon(Context &ctx)

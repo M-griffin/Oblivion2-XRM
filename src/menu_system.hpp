@@ -32,6 +32,16 @@ public:
         COUNT
     };
 
+    std::string stateToString() const
+    {
+        switch (currentState)
+        {
+            case State::MenuSystem: return "MenuSystem";
+            case State::ModLogon:   return "ModLogon";
+            default:                return "Unknown";
+        }
+    }
+
     explicit MenuSystem(Context &ctx);
     ~MenuSystem();
 
@@ -221,9 +231,15 @@ public:
 
     /**
      * @brief Resets the Menu Input Method in the Function Array
-     * @param index
+     * @param newState
      */
-    void resetMenuInputIndex(int index);
+    void setMenuBaseState(BaseState newState);
+
+    /**
+     * @brief Retrieves Base Menu State
+     * @param
+     */
+    BaseState getMenuBaseState();
 
     /**
      * @brief Startup External (Door / Script Process)
@@ -233,21 +249,6 @@ public:
 
     // Each system will have it's own module that is allocated and pushed to the
     // m_module container to easily push and pop from the stack.
-
-    /**
-     * @brief Clears All Modules
-     */
-    void clearAllModules();
-
-    /**
-     * @brief Exists and Shuts down the current module
-     */
-    void shutdownModule();
-
-    /**
-     * @brief Starts up Logon Module
-     */
-    void startupModuleLogon();
 
     /**
      * @brief Starts up Signup Module
@@ -274,22 +275,22 @@ public:
      */
     //void startupModuleMessageEditor();
 
-    /**
-     * @brief Handles Input for Login Sequences.
-     * @param character_buffer
-     * @param is_utf8
-     */
-    void handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8);
 
-    /**
-     * @brief Handles parsing input for Logon current module.
-     */
-    void moduleLogonInput(const std::string &character_buffer, const bool &is_utf8);
+    // -------------------------
+    // Menu System
+    // -------------------------
+    void createMenuSystem();
+    void clearMenuSystem();
+    void pollMenuSystem();
+    void inputMenuSystem(const std::string &input);
 
-    /**
-     * @brief Handles parsing input for current module.
-     */
-    void moduleInput(const std::string &character_buffer, const bool &is_utf8);
+    // -------------------------
+    // Logon Module
+    // -------------------------
+    void createLogon();
+    void clearLogon();
+    void pollLogon();
+    void inputLogon(const std::string &input);
 
     // Compile-time guarantees
     static constexpr size_t StateCount =

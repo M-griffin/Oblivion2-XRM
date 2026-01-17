@@ -35,7 +35,7 @@ TelnetSession::~TelnetSession() {
 void TelnetSession::sendIACSequences(Byte command, Byte option) {
     if (checkReply(option)) return;
     ByteBuffer buf = {IAC, command, option};
-    m_sessionWrite.send(buf);
+    m_sessionWrite.sendRaw(buf);
     addReply(option);
 }
 
@@ -226,7 +226,7 @@ void TelnetSession::handleSubnegotiation(Byte option, const ByteBuffer &data) {
 // ====================== Requests ======================
 void TelnetSession::sendTTYPERequest() {
     ByteBuffer buf = {IAC, SB, TELOPT_TTYPE, TELQUAL_SEND, IAC, SE};
-    m_sessionWrite.send(std::string(buf.begin(), buf.end()));
+    m_sessionWrite.sendRaw(std::string(buf.begin(), buf.end()));
     m_log.log(Logging::LogLevel::Info, "Sent TTYPE request to client");
 }
 
@@ -250,7 +250,7 @@ void TelnetSession::sendENVRequest() {
 
     stm << static_cast<uint8_t>(IAC) << static_cast<uint8_t>(SE);
     std::string buf = stm.str();
-    m_sessionWrite.send(buf);
+    m_sessionWrite.sendRaw(buf);
     addReply(TELOPT_NEW_ENVIRON);
 
     m_log.log(Logging::LogLevel::Info, "Sent NEW_ENVIRON request");

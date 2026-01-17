@@ -384,7 +384,7 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str) {
                 ++it;
                 ++number_characters;
                 m_log.log(Logging::LogLevel::Error, "[numberOfChars] UTF8 Parsing Exception=", ex.what(), __LINE__,
-                                                __FILE__);
+                          __FILE__);
             }
         }
     }
@@ -537,8 +537,9 @@ std::string CommonIO::eraseString(const std::string &str,
                     }
                 }
             } catch (utf8::exception &ex) {
-                m_log.log(Logging::LogLevel::Debug, "(Common::EraseString) UTF8 Parsing Exception=", ex.what(), __LINE__,
-                                                __FILE__);
+                m_log.log(Logging::LogLevel::Debug, "(Common::EraseString) UTF8 Parsing Exception=", ex.what(),
+                          __LINE__,
+                          __FILE__);
                 ++it;
             }
         }
@@ -809,8 +810,8 @@ std::string CommonIO::parseInput(const std::string &character_buffer) {
         m_escape_sequence.erase();
         return character_buffer;
     } else if (num != 1) {
-        m_log.log(Logging::LogLevel::Error, "This function expects single characters/glyphs=", character_buffer, __LINE__,
-                                        __FILE__);
+        m_log.log(Logging::LogLevel::Error, "This function expects single characters/glyphs=",
+                  character_buffer, __LINE__, __FILE__);
         return "";
     }
 
@@ -1069,14 +1070,15 @@ std::string CommonIO::getLine(const std::string &line, // Parsed Char input in
                     return "\x1b[D \x1b[D";
                 } else {
                     // Nothing to delete at beginning Skip.
-                    m_log.log(Logging::LogLevel::Debug, "Received DEL ESC Sequence beginning of line=", character_buffer,
-                                                    __LINE__, __FILE__);
+                    m_log.log(Logging::LogLevel::Debug, "Received DEL ESC Sequence beginning of line=",
+                              character_buffer,
+                              __LINE__, __FILE__);
                     return "empty";
                 }
             } else {
                 // Unhandled sequence! Skip and return
                 m_log.log(Logging::LogLevel::Debug, "Received Unhandled ESC Sequence beginning=", character_buffer,
-                                                __LINE__, __FILE__);
+                          __LINE__, __FILE__);
                 return "empty";
             }
         }
@@ -1095,8 +1097,9 @@ std::string CommonIO::getLine(const std::string &line, // Parsed Char input in
             return output_buffer;
         } else {
             // At beginning of line, nothing to delete!
-            m_log.log(Logging::LogLevel::Debug, "Received CTRL+Y Sequence beginning of line=", character_buffer, __LINE__,
-                                            __FILE__);
+            m_log.log(Logging::LogLevel::Debug, "Received CTRL+Y Sequence beginning of line=", character_buffer,
+                      __LINE__,
+                      __FILE__);
             return "empty";
         }
     }
@@ -1112,7 +1115,7 @@ std::string CommonIO::getLine(const std::string &line, // Parsed Char input in
         } else {
             // At beginning of Line, nothing to delete.
             m_log.log(Logging::LogLevel::Debug, "Received backspace Sequence beginning of line=", character_buffer,
-                                            __LINE__, __FILE__);
+                      __LINE__, __FILE__);
             return "empty";
         }
     }
@@ -1246,18 +1249,19 @@ bool CommonIO::fileExists(const std::string &file_name) {
 /**
  * Reads in ANSI file into Buffer Only
  */
-std::string CommonIO::readinAnsi(const std::string &file_name) {
+std::string CommonIO::readAnsi(const std::string &fileName) {
     std::string path = GLOBAL_TEXTFILE_PATH;
     pathAppend(path);
-    path += file_name;
+    path += fileName;
 
-    m_log.log(Logging::LogLevel::Debug, "readinAnsi=", path);
+    m_log.log(Logging::LogLevel::Info, "readAnsi=", path);
 
     std::string buff;
     FILE *fp;
-    uint8_t c = 0;
+    int c = 0;
 
     if ((fp = fopen(path.c_str(), "r+")) == NULL) {
+        m_log.log(Logging::LogLevel::Error, "Unable to Open readAnsi=", path);
         return "";
     }
 
@@ -1455,7 +1459,7 @@ bool CommonIO::peekGlyph(const std::string &s,
 }
 
 // General idea of a buffer for incomplete sequences.  review and incorperate for better sequence handling!
-void CommonIO::onTcpReceive(const std::string& chunk) {
+void CommonIO::onTcpReceive(const std::string &chunk) {
     std::string utf8_buffer; // temp!!
 
     utf8_buffer.append(chunk);
@@ -1472,12 +1476,11 @@ void CommonIO::onTcpReceive(const std::string& chunk) {
         }
         // All valid
         utf8_buffer.clear();
-    }
-    catch (utf8::not_enough_room&) {
+    } catch (utf8::not_enough_room &) {
         // Partial UTF-8 sequence at end → keep it
         utf8_buffer.erase(utf8_buffer.begin(), last_good);
     }
-    catch (utf8::exception&) {
+    catch (utf8::exception &) {
         // Invalid UTF-8 byte → skip one byte
         utf8_buffer.erase(utf8_buffer.begin());
     }
@@ -1493,10 +1496,10 @@ void CommonIO::onTcpReceive(const std::string& chunk) {
     */
 }
 
-bool CommonIO::decodeNextGlyph(const std::string& bytes,
-                 std::string::const_iterator& it,
-                 Encoding::TextEncoding encoding,
-                 Utf8Glyph& glyph) {
+bool CommonIO::decodeNextGlyph(const std::string &bytes,
+                               std::string::const_iterator &it,
+                               Encoding::TextEncoding encoding,
+                               Utf8Glyph &glyph) {
     glyph.bytes.clear();
     glyph.length = 0;
 
@@ -1566,3 +1569,49 @@ std::string CommonIO::utf8ToCp437(const std::string& utf8) {
     return out;
 }
 */
+/**
+ * @brief Transform Strings to Uppercase with Locale
+ * @param value
+ */
+std::string CommonIO::toUpper(const std::string &value) {
+    std::string result;
+    result.reserve(value.size());
+
+    auto it = value.begin();
+    while (it != value.end()) {
+        uint32_t cp = utf8::next(it, value.end());
+
+        // ASCII range only
+        if (cp >= 'a' && cp <= 'z') {
+            cp -= 32;
+        }
+
+        utf8::append(cp, std::back_inserter(result));
+    }
+
+    return result;
+}
+
+
+/**
+ * @brief Transform Strings to Lowercase with Locale
+ * @param value
+ */
+std::string CommonIO::toLower(const std::string &value) {
+    std::string result;
+    result.reserve(value.size());
+
+    auto it = value.begin();
+    while (it != value.end()) {
+        uint32_t cp = utf8::next(it, value.end());
+
+        // ASCII range only
+        if (cp >= 'A' && cp <= 'Z') {
+            cp += 32;
+        }
+
+        utf8::append(cp, std::back_inserter(result));
+    }
+
+    return result;
+}

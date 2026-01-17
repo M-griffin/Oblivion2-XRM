@@ -248,7 +248,7 @@ void ModLogon::setupPasswordChange() {
  */
 bool ModLogon::checkUserLogon(const std::string &input) {
     // Check for username and if is already exists!
-    UsersDao user_data = UsersDao(getUserDatabase());
+    UsersDao user_data(m_ctx.getDatabase());
 
     // Check if a Digit, if so, lookup by userId.
     if (m_ctx.getCommonIO().isDigit(input)) {
@@ -396,7 +396,7 @@ bool ModLogon::validate_password(const std::string &input) {
  * @return
  */
 bool ModLogon::password(const std::string &input) {
-    std::string key = "";
+    std::string key;
     bool useHiddenOutput = true;
     std::string result = m_ctx.getSessionIO().getInputField(
         input, key, Config::sPassword_length, "", useHiddenOutput);
@@ -404,7 +404,9 @@ bool ModLogon::password(const std::string &input) {
     // ESC was hit
     if (result == "aborted") {
         return false;
-    } else if (result[0] == '\n') {
+    }
+
+    if (result[0] == '\n') {
         // If ENTER Default to Yes, or Single Y is hit
         if (key.size() == 0) {
             return false;
@@ -452,7 +454,7 @@ bool ModLogon::password(const std::string &input) {
 bool ModLogon::passwordQuestion(const std::string &input) {
     bool result = false;
 
-    if (input.size() != 0) {
+    if (!input.empty()) {
     }
 
     return result;
@@ -465,7 +467,7 @@ bool ModLogon::passwordQuestion(const std::string &input) {
 bool ModLogon::passwordAnswer(const std::string &input) {
     bool result = false;
 
-    if (input.size() != 0) {
+    if (!input.empty()) {
     }
 
     return result;
@@ -478,7 +480,7 @@ bool ModLogon::passwordAnswer(const std::string &input) {
 bool ModLogon::passwordChange(const std::string &input) {
     bool result = false;
 
-    if (input.size() != 0) {
+    if (!input.empty()) {
     }
 
     return result;

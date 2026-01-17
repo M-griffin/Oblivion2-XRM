@@ -11,7 +11,6 @@
 #include "model-sys/config.hpp"
 
 /*
-#include "mods/mod_logon.hpp"
 #include "mods/mod_signup.hpp"
 #include "mods/mod_menu_editor.hpp"
 #include "mods/mod_user_editor.hpp"
@@ -29,17 +28,8 @@ MenuSystem::MenuSystem(Context &ctx)
     : MenuBase(ctx)
       , m_log(Logging::getInstance())
       , currentState(State::MenuSystem) {
-
     // Setup Menu Option Calls for executing menu commands.
     m_execute_callback.emplace_back(bind_member(this, &MenuSystem::menuOptionsCallback));
-
-    // Menu Input Commands (Base Class) - goes directly to base class.
-    m_menu_functions.emplace_back(bind_member(static_cast<MenuBase*>(this), &MenuBase::menuInput));
-    m_menu_functions.emplace_back(bind_member(static_cast<MenuBase*>(this), &MenuBase::menuYesNoBarInput));
-
-    // Menu Input Commands (System Class)
-    m_menu_functions.emplace_back(bind_member(this, &MenuSystem::moduleLogonInput));
-    m_menu_functions.emplace_back(bind_member(this, &MenuSystem::moduleInput));
 
     // [Mapped] Menu Command Key Functions
     m_menu_command_functions['-'] = bind_member(this, &MenuSystem::menuOptionsControlCommands);
@@ -62,26 +52,37 @@ MenuSystem::MenuSystem(Context &ctx)
     m_menu_command_functions['T'] = bind_member(this, &MenuSystem::menuOptionsFileBaseSponsorCommands);
     m_menu_command_functions['V'] = bind_member(this, &MenuSystem::menuOptionsVotingCommands);
     m_menu_command_functions['+'] = bind_member(this, &MenuSystem::menuOptionsColorSettingCommands);
+
+    m_log.log(Logging::LogLevel::Console, "MenuSystem()");
+
+    // -------------------------------------------------
+    // STATE HANDLERS
+    // -------------------------------------------------
+    bindStateHandlers();
+
+    createHandlers.at(currentState)();
 }
 
 MenuSystem::~MenuSystem() {
-    m_log.log(Logging::LogLevel::Debug, "~MenuSystem()");
+    m_log.log(Logging::LogLevel::Console, "~MenuSystem()");
 
     // Clear All Menu Command Functions.
     m_menu_command_functions.clear();
-    MappedCommandFunctions().swap(m_menu_command_functions);
+    clearHandlers.clear();
+    createHandlers.clear();
+    inputHandlers.clear();
+    pollHandlers.clear();
 }
 
 /**
- * @brief Handles Updates or Data Input from Client
+ * @brief Handles Updates or Data Input from Client (StateManager)
  */
 void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8) {
     if (!m_is_active) {
         return;
     }
 
-    // This simply passed through the input to the current system function were at.
-    m_menu_functions[m_input_index](character_buffer, is_utf8);
+    inputHandlers.at(currentState)(character_buffer);
 }
 
 /**
@@ -91,6 +92,8 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
  */
 bool MenuSystem::onEnter() {
     m_is_active = true;
+    m_log.log(Logging::LogLevel::Console, "MenuSystem() - onEnter, state=", stateToString());
+
     return true;
 }
 
@@ -99,60 +102,88 @@ bool MenuSystem::onEnter() {
  * @return
  */
 bool MenuSystem::onExit() {
+    m_log.log(Logging::LogLevel::Console, "MenuSystem() - onExit, state=", stateToString());
     m_is_active = false;
     return true;
 }
 
 bool MenuSystem::pollTimers() {
+    std::cout << "Core MenuSystemPollTimers()" << std::endl;
+    if (!m_is_active) {
+        return true;
+    }
+
+    pollHandlers.at(currentState)();
+
+    std::cout << "~Core MenuSystemPollTimers()" << std::endl;
     return true;
 }
 
 // For Modules
 void MenuSystem::bindStateHandlers() {
+    m_log.log(Logging::LogLevel::Console, "bindStateHandlers()");
+
     clearHandlers.clear();
     createHandlers.clear();
     inputHandlers.clear();
     pollHandlers.clear();
 
-    // Menu System
-    clearHandlers.emplace(State::MenuSystem,
-                          [this]() { clearMenuSystem(); });
-
-    createHandlers.emplace(State::MenuSystem,
-                           [this]() { createMenuSystem(); });
-
-    pollHandlers.emplace(State::MenuSystem,
-                         [this]() { pollMenuSystem(); });
-
-    inputHandlers.emplace(State::MenuSystem,
-                          [this](const std::string &input) {
+    // MenuSystem - Core Menu System is always Running!, so it doesn't clear
+    // But we can switch to other states, then Menu System should Resume where it left off!
+    clearHandlers.emplace(State::MenuSystem, [this]() { clearMenuSystem(); });
+    createHandlers.emplace(State::MenuSystem, [this]() { createMenuSystem(); });
+    pollHandlers.emplace(State::MenuSystem, [this]() { pollMenuSystem(); });
+    inputHandlers.emplace(State::MenuSystem, [this](
+                      const std::string &input) {
                               inputMenuSystem(input);
                           });
 
     // Logon
-    clearHandlers.emplace(State::ModLogon,
-                          [this]() { clearPreLogon(); });
-
-    createHandlers.emplace(State::ModLogon,
-                           [this]() { createPreLogon(); });
-
-    pollHandlers.emplace(State::ModLogon,
-                         [this]() { pollPreLogon(); });
-
-    inputHandlers.emplace(State::ModLogon,
-                          [this](const std::string &input) {
-                              inputPreLogon(input);
+    clearHandlers.emplace(State::ModLogon, [this]() { clearLogon(); });
+    createHandlers.emplace(State::ModLogon, [this]() { createLogon(); });
+    pollHandlers.emplace(State::ModLogon, [this]() { pollLogon(); });
+    inputHandlers.emplace(State::ModLogon, [this](
+                      const std::string &input) {
+                              inputLogon(input);
                           });
 
-    // Runtime guarantee (debug)
+    // Runtime guarantee (debug) MenuSystem is Default State, not a Module Loaded.
     assert(clearHandlers.size() == StateCount);
     assert(createHandlers.size() == StateCount);
     assert(pollHandlers.size() == StateCount);
     assert(inputHandlers.size() == StateCount);
+
+    m_log.log(Logging::LogLevel::Console, "~bindStateHandlers()");
 }
 
+/**
+ * Set a new State and Call it's Handlers
+ * MenuSystem State is default always running, so we don't clear,
+ * We switch away then back and resume where it left off.
+ * @param newState
+ */
 void MenuSystem::setState(State newState) {
-    clearHandlers.at(currentState)();
+    if (!m_is_active) {
+        return;
+    }
+
+    // Menu System is not a Module, just a default state flowing input back to Menu Base.
+    if (newState == State::MenuSystem) {
+        clearHandlers.at(currentState)();
+        currentState = newState;
+        // MenuSystem has no create, just defaults to Menu Input.
+        return;
+    }
+
+    // Switch to Module, if Menu System, no clearing needed.
+    if (currentState != State::MenuSystem) {
+        clearHandlers.at(currentState)();
+        currentState = newState;
+        createHandlers.at(currentState)();
+        return;
+    }
+
+    // currentState == State::MenuSystem)
     currentState = newState;
     createHandlers.at(currentState)();
 }
@@ -314,7 +345,8 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
                 m_system_fallback.push_back(m_current_menu);
             }
 
-            m_current_menu = lower_case(option.command_string);
+            m_current_menu = m_ctx.getCommonIO().toLower(option.command_string);
+
             loadAndStartupMenu();
             m_use_first_command_execution = true;
             break;
@@ -343,7 +375,8 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
 
             m_log.log(Logging::LogLevel::Debug, "Set Fallback Starting Menu=", m_starting_menu);
             m_system_fallback.push_back(m_starting_menu);
-            m_current_menu = lower_case(option.command_string);
+            m_current_menu = m_ctx.getCommonIO().toLower(option.command_string);
+
             loadAndStartupMenu();
             m_use_first_command_execution = true;
             break;
@@ -378,8 +411,9 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
             }
 
             m_system_fallback.push_back(m_starting_menu);
-            m_current_menu = lower_case(option.command_string);
+            m_current_menu = m_ctx.getCommonIO().toLower(option.command_string);
             m_use_first_command_execution = false;
+
             loadAndStartupMenu();
             // TODO Add Flags to not run firstcmd!
             break;
@@ -388,6 +422,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
         case '}':
             m_current_menu = m_previous_menu;
             m_use_first_command_execution = false;
+
             loadAndStartupMenu();
             // TODO Add Flags to not run firstcmd!
             break;
@@ -902,11 +937,19 @@ bool MenuSystem::menuOptionsCallback(const MenuOption &option) {
 }
 
 /**
- * @brief Resets the Menu Input Method in the Function Array
- * @param index
+ * @brief Changes States in the MenuBase (Core) System
+ * @param newState
  */
-void MenuSystem::resetMenuInputIndex(int index) {
-    m_input_index = index;
+void MenuSystem::setMenuBaseState(BaseState newState) {
+    m_baseState = newState;
+}
+
+/**
+ * @brief Retrieves Base Menu State
+ * @param
+ */
+MenuBase::BaseState MenuSystem::getMenuBaseState() {
+    return m_baseState;
 }
 
 /**
@@ -916,72 +959,6 @@ void MenuSystem::resetMenuInputIndex(int index) {
 void MenuSystem::startupExternalProcess(const std::string &cmdline) {
     m_log.log(Logging::LogLevel::Console, "Executing startExternalProcess()=", cmdline);
     //m_menu_session_data->startExternalProcess(cmdline);
-}
-
-/**
- * @brief Clears All Modules
- */
-void MenuSystem::clearAllModules() {
-    m_log.log(Logging::LogLevel::Debug, "Menu System: clearAllModules()");
-    //if(m_module_stack.size() > 0)
-    {
-        //std::vector<module_ptr>().swap(m_module_stack);
-    }
-}
-
-/**
- * @brief Exists and Shuts down the current module
- */
-void MenuSystem::shutdownModule() {
-    // Do module shutdown, only single modules are loaded
-    // This makes it easy to allocate and kill on demand.
-    //m_log.log(Logging::LogLevel::Console, "shutdownModule in MenuSystem() Module=", m_module_stack.back()->m_filename);
-    //m_module_stack.back()->onExit();
-    //m_module_stack.pop_back();
-}
-
-/**
- * @brief Start up the Normal Login Process.
- *
-void MenuSystem::startupModulePreLogon()
-{
-    // Setup the input processor
-    resetMenuInputIndex(MODULE_PRE_LOGON_INPUT);
-
-    // Allocate and Create
-    module_ptr module = std::make_shared<ModPreLogon>(
-        getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
-    );
-
-    if(!module)
-    {
-        m_log.log(Logging::LogLevel::Error, "startupModulePreLogon Allocation Error");
-        return;
-    }
-
-    startupModule(module);
-}*/
-
-/**
- * @brief Start up the Normal Login Process.
- */
-void MenuSystem::startupModuleLogon()
-{
-    // Setup the input processor
-    resetMenuInputIndex(MODULE_LOGON_INPUT);
-
-    // Allocate and Create
-    module_ptr module = std::make_shared<ModLogon>(
-        getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
-    );
-
-    if(!module)
-    {
-        m_log.log(Logging::LogLevel::Error, "startupModuleLogon Allocation Error");
-        return;
-    }
-
-    startupModule(module);
 }
 
 /**
@@ -1095,100 +1072,133 @@ void MenuSystem::startupModuleMessageEditor()
 }*/
 
 
-/**
- * @brief Handles Input for Login and PreLogin Sequences.
- *        On Login Failures kicks back out to the Matrix.
- * @param character_buffer
- * @param is_utf8
- */
-void MenuSystem::handleLoginInputSystem(const std::string &character_buffer, const bool &is_utf8) {
+// -------------------------
+// Logon Module
+// -------------------------
 
-    // Make sure we have an allocated module before processing.
-    if(m_module_stack.size() == 0 || character_buffer.size() == 0)
-    {
+void MenuSystem::createMenuSystem() {
+    m_log.log(Logging::LogLevel::Console, "MenuSystem() createMenuSystem");
+    m_current_menu = "matrix";
+    loadAndStartupMenu();
+}
+
+void MenuSystem::clearMenuSystem() {
+    std::cout << "MenuSystem cleared (NOT USED)\n";
+}
+
+void MenuSystem::pollMenuSystem() {
+    // No Timbers Setup Yet,  This could be Rumors, Properties,
+    // Realtime Clock etc.. or Node Messages
+}
+
+void MenuSystem::inputMenuSystem(const std::string &input) {
+    m_log.log(Logging::LogLevel::Console, "MenuSystem() inputMenuSystem");
+
+    if (!m_is_active) {
         return;
     }
 
-    // Allocate and Create
-    m_module_stack.back()->update(character_buffer, is_utf8);
+    // Default, have to check if we need to detect and goto YesNo Bar For Prompts!!
+    // Note sure if this will detect it properly yet!
+    if (getMenuBaseState() == BaseState::MENU_INPUT) {
+        // Manages General Menu Input and Lightbar Menu HotKeys
+        menuInput(input, false);
+    } else {
+        // Manages Hotkey Input for Yes/No Menu Bar Prompts.
+        menuYesNoBarInput(input, false);
+    }
+}
 
-    m_log.log(Logging::LogLevel::Debug, "update - handleLoginInputSystem");
+// -------------------------
+// Logon Module
+// -------------------------
+
+void MenuSystem::createLogon() {
+    m_log.log(Logging::LogLevel::Console, "MenuSystem() createLogon");
+
+    // Make Sure we cover any unexpected errors in Creating the Module.
+    try {
+        logonState.emplace(m_ctx);
+        logonState->onEnter();
+    } catch (std::exception &ex) {
+        std::cout << "createLogon Exception: " << ex.what() << std::endl;
+        throw;
+    }
+}
+
+void MenuSystem::clearLogon() {
+    if (logonState) {
+        logonState->onExit();
+        logonState = std::experimental::nullopt; // .reset();
+    }
+    std::cout << "Logon cleared\n";
+}
+
+void MenuSystem::pollLogon() {
+    if (logonState) {
+        // No timers currently setup for Logon.
+        // logonState->pollTimers();
+    }
+}
+
+void MenuSystem::inputLogon(const std::string &input) {
+    m_log.log(Logging::LogLevel::Console, "MenuSystem() inputLogon");
+
+    if (logonState) {
+        logonState->update(input, false);
+    }
 
     // Finished modules processing.
-    if(!m_module_stack.back()->m_is_active)
-    {
-        m_log.log(Logging::LogLevel::Debug,
-            "*** !m_module_stack.back()->m_is_active - shutting down module: "
-            , m_module_stack.back()->m_filename);
-        shutdownModule();
+    if (!logonState->m_is_active) {
+        m_log.log(Logging::LogLevel::Info, "!LogonState->m_is_active - shutting down module: ");
+
+        if (!logonState->m_is_active) {
+            m_log.log(Logging::LogLevel::Console, "MenuSystem() logonState is Inactive");
+
+            // After Logon, we Move back to Menu System
+            setState(State::MenuSystem);
+
+            // Reset the Input back to the Menu System
+            setMenuBaseState(BaseState::MENU_INPUT);
+
+            // Redisplay,  may need to startup() again, but menu data should still be active and loaded!
+            // redisplayMenuScreen();
+        }
 
         // Check if the current user has been logged in yet.
-        if(session && session->m_is_session_authorized)
-        {
+        // And is Authorized to Continue In the system.
+        if (m_ctx.getSessionWrite().isAuthorized()) {
             // If Authorized, then we want to move to main! Startup menu should be TOP or
             // Specified in Config file!  TODO
-            m_log.log(Logging::LogLevel::Debug, "m_is_session_authorized");
+            m_log.log(Logging::LogLevel::Info, "m_is_session_authorized=", m_ctx.getSessionWrite().isAuthorized());
 
             // TODO This should be individual users start menu!
-            if(m_config.starting_menu_name.size() > 0)
-            {
-                m_current_menu = m_config.starting_menu_name;
-                m_starting_menu = m_config.starting_menu_name;
-            }
-            else
-            {
+            if (m_ctx.getCfg().starting_menu_name.size() > 0) {
+                m_current_menu = m_ctx.getCfg().starting_menu_name;
+                m_starting_menu = m_ctx.getCfg().starting_menu_name;
+            } else {
                 // Default to main if nothing is set in config file.
+                // Eg PreLogon, Welcome, top, any other menus.
                 m_current_menu = "main";
                 m_starting_menu = "main";
             }
-        }
-        else
-        {
+        } else {
             m_log.log(Logging::LogLevel::Debug, "!m_is_session_authorized");
             m_current_menu = "matrix";
         }
 
         m_log.log(Logging::LogLevel::Debug, "loadAndStartupMenu on initial login");
 
-        if (session)
-        {
+        if (m_ctx.getSessionWrite().isActive()) {
+            // After Logon, we Move back to Menu System
+            setState(State::MenuSystem);
+
+            // Reset the Input back to the Menu System
+            setMenuBaseState(BaseState::MENU_INPUT);
+
             loadAndStartupMenu();
+        } else {
+            m_is_active = false;
         }
-    }
-}
-
-/**
- * @brief Handles parsing input for Logon module
- *
- */
-void MenuSystem::moduleLogonInput(const std::string &character_buffer, const bool &is_utf8) {
-    handleLoginInputSystem(character_buffer, is_utf8);
-}
-
-/**
- * @brief Handles parsing input for modules
- * (Other Than Logon)
- */
-void MenuSystem::moduleInput(const std::string &character_buffer, const bool &is_utf8) {
-
-    // Make sure we have an allocated module before processing.
-    if(m_module_stack.size() == 0 || character_buffer.size() == 0)
-    {
-        return;
-    }
-
-    // Execute the modules update pass through input.
-    m_module_stack.back()->update(character_buffer, is_utf8);
-
-    // Finished modules processing.
-    if(!m_module_stack.back()->m_is_active)
-    {
-        shutdownModule();
-
-        // Reset the Input back to the Menu System
-        resetMenuInputIndex(MENU_INPUT);
-
-        // Redisplay,  may need to startup() again, but menu data should still be active and loaded!
-        redisplayMenuScreen();
     }
 }

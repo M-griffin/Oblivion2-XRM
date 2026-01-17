@@ -29,7 +29,7 @@ void StateManager::setState(State newState) {
 }
 
 void StateManager::handleInput(const std::string &input) {
-    m_log.log(Logging::LogLevel::Console, "StateManager() handleInput=", input);
+    m_log.log(Logging::LogLevel::Debug, "StateManager() handleInput=", input);
 
     std::string result = std::string(input);
     std::size_t id1 = 0;
@@ -44,7 +44,13 @@ void StateManager::handleInput(const std::string &input) {
         }
     } while (id1 != std::string::npos);
 
-    inputHandlers.at(currentState)(result);
+    // PUSH ONE CHARACTER AT A TIME
+    for (char ch : result) {
+        std::string oneChar(1, ch);
+        inputHandlers.at(currentState)(oneChar);
+    }
+
+    //inputHandlers.at(currentState)(result);
 }
 
 // -------------------------
@@ -140,12 +146,10 @@ void StateManager::inputPreLogon(const std::string &input) {
             setState(State::MenuSystem);
         }
     }
-
-
 }
 
 // -------------------------
-// LoggedIn
+// Menu System (Startup for Matrix, then Core System)
 // -------------------------
 
 void StateManager::createMenuSystem() {
@@ -156,8 +160,9 @@ void StateManager::createMenuSystem() {
     try {
         menuSystemState.emplace(m_ctx);
         menuSystemState->onEnter();
+
     } catch (std::exception &ex) {
-        std::cout << "createPMenuSystem Exception: " << ex.what() << std::endl;
+        std::cout << "createMenuSystem Exception: " << ex.what() << std::endl;
         throw;
     }
 
@@ -174,12 +179,11 @@ void StateManager::clearMenuSystem() {
 
 void StateManager::pollMenuSystem() {
     if (menuSystemState) {
-        // Not Polling Setup Module Specific for Now
+        menuSystemState->pollMenuSystem();
     }
 }
 
 void StateManager::inputMenuSystem(const std::string &input) {
-    menuSystemState->update(input, false);
 
     m_log.log(Logging::LogLevel::Console, "StateManager() inputMenuSystem");
     if (menuSystemState) {
@@ -189,6 +193,7 @@ void StateManager::inputMenuSystem(const std::string &input) {
             m_log.log(Logging::LogLevel::Console, "StateManager() MenuSystem is Inactive");
             // setState(State::ModPreLogon);
             // After here, it's a system logoff usually, but maybe we'll swtich to a chat state.
+            // but wouldn't want to shutdown and remove menu system!!
         }
     }
 }

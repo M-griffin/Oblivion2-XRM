@@ -12,7 +12,7 @@
 #include "model-sys/menu_prompt.hpp"
 #include "model-sys/context.hpp"
 
-struct Context;
+class Context;
 class Logging;
 
 /**
@@ -25,16 +25,12 @@ class Logging;
 class MenuBase {
 public:
     explicit MenuBase(Context &ctx);
-
     ~MenuBase();
 
     // This matches the index for menu_functions.push_back
-    enum {
-        MENU_INPUT,
-        MENU_YESNO_BAR,
-        MODULE_LOGON_INPUT,
-        MODULE_INPUT,
-        FORM_INPUT
+    enum class BaseState : uint8_t {
+        MENU_INPUT = 0,
+        MENU_YESNO_BAR
     };
 
     Logging &m_log;
@@ -49,9 +45,9 @@ public:
     bool m_use_hotkey; // Toggle for Single Hotkey or GetLine input. - Not used yet!
     std::string m_current_menu; // Name of current menu loaded.
     std::string m_previous_menu; // Name of Previous Menu for Gosub
-    std::string m_fallback_menu; // Fallback, this can set as a Global Fall Back and changed via menu command
+    std::string m_fallback_menu; // Fallback, this can set as a Global Fallback and changed via menu command
     std::string m_starting_menu; // Starting Menu, also used as Fallback.
-    int m_input_index; // Menu Input Index, for Forwarding to current function.
+    BaseState m_baseState; // Menu Input Index, for Forwarding to current function.
 
     unsigned int m_active_pulldownID; // Active Lightbar Position.
 
@@ -63,21 +59,11 @@ public:
     bool m_logoff; // If logoff, stop loop execution on commands and exit.
     bool m_is_active;
 
-    // Holds all pulldown menu options.
+    // Holds all pull down menu options.
     std::vector<MenuOption> m_loaded_pulldown_options;
-
-    // Dynamic Async Input Function Vector.
-    std::vector<std::function<void(const std::string &, const bool &is_utf8)> > m_menu_functions;
 
     // Handles Dynamic Menu Command Option Execution
     std::vector<std::function<bool(const MenuOption &)> > m_execute_callback;
-
-    // Handle Dynamic modules being executed.
-    //std::vector<module_ptr> m_module_stack;
-
-    std::string upper_case(const std::string &string_sequence);
-
-    std::string lower_case(const std::string &string_sequence);
 
     void baseProcessAndDeliver(std::string data);
 
@@ -88,14 +74,6 @@ public:
     void checkMenuOptionsAcsAccess();
 
     void readInMenuData();
-
-    /*
-    void writeOutMenuData();
-    void readMenuOptions();
-    void writeMenuOptions();
-    void clearAllMenuPrompts();
-    void readMenuAllPrompts();
-    void readMenuPrompts(int menu_index);*/
 
     std::string setupYesNoMenuInput(const std::string &menu_prompt, std::vector<MapType> &code_map);
 
@@ -141,7 +119,7 @@ public:
 
     bool handleLightbarSelection(const std::string &input);
 
-    bool handlePulldownHotKeys(const MenuOption &m, const bool &is_enter, bool &stack_reassignment);
+    bool handlePullDownHotKeys(const MenuOption &m, const bool &is_enter, bool &stack_reassignment);
 
     void executeEachCommands();
 
@@ -151,7 +129,7 @@ public:
 
     bool processMenuOptions(const std::string &input);
 
-    void handlePulldownInput(const std::string &character_buffer, const bool &is_utf8);
+    void handlePullDownInput(const std::string &character_buffer, const bool &is_utf8);
 
     void handleStandardInput(const std::string &character_buffer);
 

@@ -13,10 +13,32 @@ public:
     }
 
     void send(const std::string &v, const bool isDisconnected = false) {
+        if (m_encoding == Encoding::TextEncoding::CP437) {
+            const Encoding encode;
+            std::string result = encode.utf8Decode(v);
+            m_socketService.send(result, isDisconnected);
+            return;
+        }
+
         m_socketService.send(v, isDisconnected);
     }
 
     void send(const ByteBuffer &v, const bool isDisconnected = false) {
+        if (m_encoding == Encoding::TextEncoding::CP437) {
+            const Encoding encode;
+            std::string buffer = std::string(buffer.begin(), buffer.end());;
+            std::string result = encode.utf8Decode(buffer);
+            m_socketService.send(result, isDisconnected);
+            return;
+        }
+        m_socketService.send(v, isDisconnected);
+    }
+
+    void sendRaw(const std::string &v, const bool isDisconnected = false) {
+        m_socketService.send(v, isDisconnected);
+    }
+
+    void sendRaw(const ByteBuffer &v, const bool isDisconnected = false) {
         m_socketService.send(v, isDisconnected);
     }
 
@@ -50,6 +72,10 @@ public:
 
     void setAuthorized(const bool isAuthorized) {
         m_is_authorized = isAuthorized;
+    }
+
+    bool isActive() {
+        return m_socketService.isActive();
     }
 
 private:
