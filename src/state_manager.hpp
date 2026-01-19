@@ -4,8 +4,7 @@
 #include <unordered_map>
 #include <functional>
 #include <string>
-
-#include <experimental/optional>
+#include <optional>
 
 #include "model-sys/context.hpp"
 #include "mods/mod_prelogon.hpp"
@@ -22,8 +21,8 @@ public:
 
 private:
     // State storage (SINGLE ownership)
-    std::experimental::optional<ModPreLogon> preLogonState;
-    std::experimental::optional<MenuSystem> menuSystemState;
+    std::optional<ModPreLogon> preLogonState;
+    std::optional<MenuSystem> menuSystemState;
 
     State currentState;
     DeadlineTimer m_inactivityTimer;

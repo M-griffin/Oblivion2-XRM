@@ -14,11 +14,14 @@ endif ()
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Available configurations" FORCE)
 
-# C++17 standard eventually, Updated from 11 to 14.
-set(CMAKE_CXX_STANDARD 14)
+# C++17 standard eventually
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_WIN32_EXECUTABLE FALSE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Enable GTEST Unit Tests
+#enable_testing()
 
 # Silence specific warnings if needed
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wno-unused-result -Wno-deprecated-declarations")
@@ -76,6 +79,11 @@ target_link_libraries(xrm-server PRIVATE yaml-cpp::yaml-cpp)
 
 find_package(utf8cpp REQUIRED)
 target_link_libraries(xrm-server PRIVATE utf8cpp)
+
+# TESTING - WIP!  This is for TESTS Subfolder, not main project.
+#find_package(GTest REQUIRED)
+#target_link_libraries(xrm-server PRIVATE gtest::gtest)
+
 
 # SQLLite Include directories
 target_include_directories(xrm-server

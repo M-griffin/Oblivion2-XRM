@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <experimental/optional>
+#include <optional>
 
 #include "model-sys/menu.hpp"
 #include "menu_base.hpp"
@@ -75,7 +75,7 @@ public:
         };
     }
 
-    std::experimental::optional<ModLogon> logonState;
+    std::optional<ModLogon> logonState;
     State currentState;
 
     // Type aliases

@@ -6,7 +6,7 @@
 #include <functional>
 #include <string>
 #include <chrono>
-#include <experimental/optional>
+#include <optional>
 #include <utf8.h>
 
 #include "model-sys/structures.hpp"
@@ -39,7 +39,7 @@ class TCPSession {
     SQLW::Database &m_coreDatabase;
 
     Context m_context;
-    std::experimental::optional<StateManager> m_state_manager;
+    std::optional<StateManager> m_state_manager;
 
     // ESC handling
     std::string m_escBuffer;
@@ -116,7 +116,7 @@ public:
     ~TCPSession() {
         m_log.log(Logging::LogLevel::Console, "~TCPSession()");
         m_escTimer.cancel();
-        m_state_manager = std::experimental::nullopt;
+        m_state_manager.reset();
     }
 
     TCPSession(TCPSession &&) = delete;

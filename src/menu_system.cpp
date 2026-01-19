@@ -1129,7 +1129,7 @@ void MenuSystem::createLogon() {
 void MenuSystem::clearLogon() {
     if (logonState) {
         logonState->onExit();
-        logonState = std::experimental::nullopt; // .reset();
+        logonState.reset();
     }
     std::cout << "Logon cleared\n";
 }

@@ -1,7 +1,7 @@
 #include "state_manager.hpp"
 
 #include <iostream>
-#include <experimental/optional>
+#include <optional>
 #include <utf8.h>
 
 #include "model-sys/context.hpp"
@@ -145,7 +145,7 @@ void StateManager::createPreLogon() {
 void StateManager::clearPreLogon() {
     if (preLogonState) {
         preLogonState->onExit();
-        preLogonState = std::experimental::nullopt; // .reset();
+        preLogonState.reset();
     }
     std::cout << "PreLogon cleared\n";
 }
@@ -191,7 +191,7 @@ void StateManager::createMenuSystem() {
 void StateManager::clearMenuSystem() {
     if (menuSystemState) {
         menuSystemState->onExit();
-        menuSystemState = std::experimental::nullopt; // .reset();
+        menuSystemState.reset();
     }
     std::cout << "MenuSystem cleared\n";
 }
