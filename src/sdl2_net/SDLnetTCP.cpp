@@ -141,16 +141,45 @@ TCPsocket SDLNet_TCP_Open(IPaddress *ip)
 
 #ifdef TCP_NODELAY
     /* Set the nodelay TCP option for real-time games */
-    { int yes = 1;
-    setsockopt(sock->channel, IPPROTO_TCP, TCP_NODELAY, (char*)&yes, sizeof(yes));
+    {
+        int yes = 1;
+        setsockopt(sock->channel, IPPROTO_TCP, TCP_NODELAY, (char*)&yes, sizeof(yes));
     }
 #else
 #warning Building without TCP_NODELAY
 #endif /* TCP_NODELAY */
 
+    /* Set the keep alive TCP option for servers / chats - MG */
+    {
+        int yes = 1;
+        setsockopt(sock->channel, SOL_SOCKET, SO_KEEPALIVE, (char*)&yes, sizeof(yes));
 
-	{ int yes = 1;
-    setsockopt(sock->channel, IPPROTO_TCP, SO_KEEPALIVE, (char*)&yes, sizeof(yes));
+        /* Set custom timeouts so we don't wait 2 hours for a disconnect */
+        int idle = 60;     // Seconds before first probe
+        int interval = 10; // Seconds between subsequent probes
+        int count = 3;     // Number of failed probes before dropping
+
+#ifdef WIN32
+        /* Windows uses a specific struct and WSAIoctl */
+        struct tcp_keepalive settings;
+        settings.onoff = 1;
+        settings.keepalivetime = idle * 1000;      // Convert to millis
+        settings.keepaliveinterval = interval * 1000;
+        DWORD bytesReturned;
+        WSAIoctl(sock->channel, SIO_KEEPALIVE_VALS, &settings, sizeof(settings),
+                 NULL, 0, &bytesReturned, NULL, NULL);
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)
+        // macOS uses TCP_KEEPALIVE; Linux uses TCP_KEEPIDLE
+#ifdef __APPLE__
+#define TCP_IDLE_OPT TCP_KEEPALIVE
+#else
+#define TCP_IDLE_OPT TCP_KEEPIDLE
+#endif
+        /* Linux uses individual setsockopt calls */
+        setsockopt(sock->channel, IPPROTO_TCP, TCP_IDLE_OPT, (char*)&idle, sizeof(idle));
+        setsockopt(sock->channel, IPPROTO_TCP, TCP_KEEPINTVL, (char*)&interval, sizeof(interval));
+        setsockopt(sock->channel, IPPROTO_TCP, TCP_KEEPCNT, (char*)&count, sizeof(count));
+#endif
     }
 
     /* Fill in the channel host address */
@@ -213,6 +242,39 @@ TCPsocket SDLNet_TCP_Accept(TCPsocket server)
 
     sock->sflag = 0;
     sock->ready = 0;
+
+    /* Set the keep alive TCP option for servers / chats - MG */
+    {
+        int yes = 1;
+        setsockopt(sock->channel, SOL_SOCKET, SO_KEEPALIVE, (char*)&yes, sizeof(yes));
+
+        /* Set custom timeouts so we don't wait 2 hours for a disconnect */
+        int idle = 60;     // Seconds before first probe
+        int interval = 10; // Seconds between subsequent probes
+        int count = 3;     // Number of failed probes before dropping
+
+#ifdef WIN32
+        /* Windows uses a specific struct and WSAIoctl */
+        struct tcp_keepalive settings;
+        settings.onoff = 1;
+        settings.keepalivetime = idle * 1000;
+        settings.keepaliveinterval = interval * 1000;
+        DWORD bytesReturned;
+        WSAIoctl(sock->channel, SIO_KEEPALIVE_VALS, &settings, sizeof(settings),
+                 NULL, 0, &bytesReturned, NULL, NULL);
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)
+        // macOS uses TCP_KEEPALIVE; Linux / BSD uses TCP_KEEPIDLE
+#ifdef __APPLE__
+#define TCP_IDLE_OPT TCP_KEEPALIVE
+#else
+#define TCP_IDLE_OPT TCP_KEEPIDLE
+#endif
+        /* Linux uses individual setsockopt calls */
+        setsockopt(sock->channel, IPPROTO_TCP, TCP_IDLE_OPT, (char*)&idle, sizeof(idle));
+        setsockopt(sock->channel, IPPROTO_TCP, TCP_KEEPINTVL, (char*)&interval, sizeof(interval));
+        setsockopt(sock->channel, IPPROTO_TCP, TCP_KEEPCNT, (char*)&count, sizeof(count));
+#endif
+    }
 
     /* The socket is ready */
     return(sock);

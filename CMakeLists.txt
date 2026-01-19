@@ -1,5 +1,5 @@
 # Top-level CMakeLists.txt for the main project
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.25)
 project(xrm-server VERSION 1.0 LANGUAGES CXX)
 
 # Needed by Conan Package Manager

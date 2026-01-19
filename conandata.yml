@@ -2,6 +2,7 @@
 # To keep your changes, remove these comment lines, but the plugin won't be able to modify your requirements
 
 requirements:
+  - "gtest/1.17.0"
   - "utfcpp/4.0.5"
   - "yaml-cpp/0.8.0"
   - "openssl/3.5.2"
