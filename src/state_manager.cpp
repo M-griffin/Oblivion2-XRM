@@ -159,13 +159,15 @@ void StateManager::pollPreLogon() {
 void StateManager::inputPreLogon(const std::string &input) {
     m_log.log(Logging::LogLevel::Console, "StateManager() inputPreLogon");
     if (preLogonState) {
+
+        // Call Input First, we need to flow the input through,
+        // then check after is the state is completed.
+        preLogonState->update(input, false);
+
         if (!preLogonState->m_is_active) {
             m_log.log(Logging::LogLevel::Console, "StateManager() preLogonState is Completed.");
             setState(State::MenuSystem);
-            return;
         }
-
-        preLogonState->update(input, false);
     }
 }
 
@@ -205,11 +207,12 @@ void StateManager::pollMenuSystem() {
 void StateManager::inputMenuSystem(const std::string &input) {
     m_log.log(Logging::LogLevel::Console, "StateManager() inputMenuSystem");
     if (menuSystemState) {
+        // Call Input First, we need to flow the input through,
+        // then check after is the state is completed.
+        menuSystemState->update(input, false);
+
         if (!menuSystemState->m_is_active) {
             m_log.log(Logging::LogLevel::Console, "StateManager() MenuSystem is Inactive");
-            return;
         }
-
-        menuSystemState->update(input, false);
     }
 }
