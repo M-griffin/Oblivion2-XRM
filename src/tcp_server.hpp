@@ -5,7 +5,6 @@
 #include <list>
 #include <string>
 #include <thread>
-#include <chrono>
 #include <set>
 
 #include "model-sys/config.hpp"
@@ -28,7 +27,8 @@ class TCPServer {
     SQLW::StderrLog databaseLog;
 
     TCPServer()
-        : coreDatabase(CORE_DATABASE, &databaseLog) {}
+        : coreDatabase(CORE_DATABASE, &databaseLog) {
+    }
 
 public:
     static TCPServer &getInstance() {
@@ -38,6 +38,8 @@ public:
 
     TCPServer(const TCPServer &) = delete;
     TCPServer &operator=(const TCPServer &) = delete;
+    TCPServer(const TCPServer &&) = delete;
+    TCPServer &operator=(const TCPServer &&) = delete;
 
     bool start(const Uint16 telnetPort, const Uint16 maxSessions) {
         for (Uint16 i = 1; i <= maxSessions; ++i) {
@@ -75,27 +77,29 @@ public:
 
     void run(Config &config, const Uint16 maxSessions) {
         while (isRunning) {
+            // FIRST: Cleanup any already inactive sessions
+            for (auto it = sessions.begin(); it != sessions.end();) {
+                if (!it->isActive()) {
+                    cleanupSession(it);
+                } else {
+                    ++it;
+                }
+            }
 
-            // ---------------------------------------
             // Wait for socket activity
-            // ---------------------------------------
             const int ready = SDLNet_CheckSockets(socketSet, 10);
             if (ready < 0) {
                 std::cerr << "[Server] SDLNet_CheckSockets failed: "
-                          << SDLNet_GetError() << "\n";
+                        << SDLNet_GetError() << "\n";
                 rebuildSocketSet(maxSessions);
                 continue;
             }
 
-            // ---------------------------------------
             // Accept new clients (ONLY if ready)
-            // ---------------------------------------
             if (SDLNet_SocketReady(serverSocket)) {
                 TCPsocket client = SDLNet_TCP_Accept(serverSocket);
                 if (client) {
-                    if (!availableNodes.empty() &&
-                        sessions.size() < maxSessions) {
-
+                    if (!availableNodes.empty() && sessions.size() < maxSessions) {
                         Uint16 nodeId = *availableNodes.begin();
                         availableNodes.erase(nodeId);
 
@@ -104,17 +108,15 @@ public:
                         sessions.back().startSession();
 
                         std::cout << "[Server] Client connected (Node "
-                                  << nodeId << ")\n";
+                                << nodeId << ")\n";
                     } else {
                         SDLNet_TCP_Close(client);
                     }
                 }
             }
 
-            // ---------------------------------------
             // Handle sessions
-            // ---------------------------------------
-            for (auto it = sessions.begin(); it != sessions.end(); ) {
+            for (auto it = sessions.begin(); it != sessions.end();) {
                 auto &session = *it;
                 TCPsocket sock = session.getSocket();
 
@@ -125,13 +127,20 @@ public:
 
                 if (SDLNet_SocketReady(sock)) {
                     ByteBuffer data = session.receive();
+
+                    // TCP closed or error
                     if (data.empty()) {
+                        std::cout << "[Server] Client node " << session.getNodeNumber()
+                                << " disconnected (recv 0 or error)\n";
                         session.hangup();
                         cleanupSession(it);
                         continue;
                     }
+
+                    // Forward valid data to session for processing
                     session.handleIncomingData(data);
                 } else {
+                    // Poll timers for active session
                     session.pollTimers();
                 }
 
@@ -143,7 +152,8 @@ public:
     void stop() {
         isRunning = false;
 
-        for (auto &s : sessions) {
+        for (auto &s: sessions) {
+            s.hangup();
             SDLNet_TCP_DelSocket(socketSet, s.getSocket());
             s.close();
         }
@@ -169,16 +179,22 @@ public:
 
 private:
     void cleanupSession(std::list<TCPSession>::iterator &it) {
+        if (it == sessions.end()) {
+            return;
+        }
+
         Uint16 nodeId = it->getNodeNumber();
         TCPsocket sock = it->getSocket();
 
-        SDLNet_TCP_DelSocket(socketSet, sock);
-        it->close();
+        if (sock) {
+            SDLNet_TCP_DelSocket(socketSet, sock);
+            it->close();
+        }
 
         availableNodes.insert(nodeId);
         it = sessions.erase(it);
 
-        std::cout << "[Server] Client node " << nodeId << " disconnected\n";
+        std::cout << "[Server] Client node " << nodeId << " fully disconnected\n";
     }
 
     void rebuildSocketSet(Uint16 maxSessions) {
@@ -186,7 +202,7 @@ private:
         socketSet = SDLNet_AllocSocketSet(maxSessions + 1);
 
         SDLNet_TCP_AddSocket(socketSet, serverSocket);
-        for (auto &s : sessions) {
+        for (auto &s: sessions) {
             if (s.isActive()) {
                 SDLNet_TCP_AddSocket(socketSet, s.getSocket());
             }

@@ -29,6 +29,7 @@ typedef struct Utf8Glyph {
 class CommonIO {
     Logging &m_log; // Logging Reference
 
+    std::string m_utf8_rx_buffer; // buffer.
     std::string m_escape_sequence; // ParseInput
     std::string m_string_buffer; // ParseInput
     std::string m_incoming_data; // ParseInput

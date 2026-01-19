@@ -20,7 +20,27 @@ public:
         COUNT
     };
 
+private:
+    // State storage (SINGLE ownership)
+    std::experimental::optional<ModPreLogon> preLogonState;
+    std::experimental::optional<MenuSystem> menuSystemState;
+
+    State currentState;
+    DeadlineTimer m_inactivityTimer;
+
+    // Type aliases
+    using StateHandler = std::function<void()>;
+    using InputHandler = std::function<void(const std::string &)>;
+
+    // Dispatch tables
+    std::unordered_map<State, StateHandler> clearHandlers;
+    std::unordered_map<State, StateHandler> createHandlers;
+    std::unordered_map<State, StateHandler> pollHandlers;
+    std::unordered_map<State, InputHandler> inputHandlers;
+
+public:
     explicit StateManager(Context &ctx);
+
     ~StateManager();
 
     // Non-copyable (states are runtime-owned)
@@ -44,23 +64,6 @@ public:
     Context &m_ctx;
 
 private:
-    // State storage (SINGLE ownership)
-    std::experimental::optional<ModPreLogon> preLogonState;
-    std::experimental::optional<MenuSystem> menuSystemState;
-
-    State currentState;
-
-    // Type aliases
-    using StateHandler = std::function<void()>;
-    using InputHandler = std::function<void(const std::string &)>;
-
-    // Dispatch tables
-    std::unordered_map<State, StateHandler> clearHandlers;
-    std::unordered_map<State, StateHandler> createHandlers;
-    std::unordered_map<State, StateHandler> pollHandlers;
-    std::unordered_map<State, InputHandler> inputHandlers;
-
-
     // Binding
     void bindStateHandlers();
 
@@ -71,7 +74,7 @@ private:
 
     void inputPreLogon(const std::string &input);
 
-    // LoggedIn
+    // Core Menu System
     void createMenuSystem();
 
     void clearMenuSystem();

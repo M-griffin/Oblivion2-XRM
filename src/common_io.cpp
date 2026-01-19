@@ -359,37 +359,24 @@ void CommonIO::pathAppend(std::string &path) {
  * @return
  */
 std::string::size_type CommonIO::numberOfChars(const std::string &str) {
-    std::string::size_type number_characters = 0;
+    if (str.empty()) return 0;
 
-    if (str.size() == 0) {
-        return number_characters;
-    }
+    size_t count = 0;
+    auto it = str.begin();
+    auto end = str.end();
 
-    std::string string_builder = str;
-    std::string::iterator it = string_builder.begin();
-    std::string::iterator line_end = string_builder.end();
-
-    while (it != line_end) {
-        int byte_value = static_cast<int>((uint8_t) *it);
-
-        if (byte_value < 128) {
-            ++it;
-            ++number_characters;
-        } else {
-            try {
-                // Iterate quickly to next sequence.
-                utf8::next(it, line_end);
-                ++number_characters;
-            } catch (utf8::exception &ex) {
-                ++it;
-                ++number_characters;
-                m_log.log(Logging::LogLevel::Error, "[numberOfChars] UTF8 Parsing Exception=", ex.what(), __LINE__,
-                          __FILE__);
-            }
+    while (it != end) {
+        try {
+            utf8::next(it, end);
+        } catch (utf8::not_enough_room &) {
+            // STOP — incomplete UTF-8 at end
+            break;
+        } catch (utf8::exception &) {
+            ++it; // skip invalid byte
         }
+        ++count;
     }
-
-    return number_characters;
+    return count;
 }
 
 // Sugested Fix. but doesn't handle high ascii CP437 properly, we'll re-test.
@@ -1458,42 +1445,31 @@ bool CommonIO::peekGlyph(const std::string &s,
     return nextGlyph(s, it, glyph);
 }
 
-// General idea of a buffer for incomplete sequences.  review and incorperate for better sequence handling!
+// General idea of a buffer for incomplete sequences.
+// review and incorperate for better sequence handling!
 void CommonIO::onTcpReceive(const std::string &chunk) {
-    std::string utf8_buffer; // temp!!
+    m_utf8_rx_buffer.append(chunk);
 
-    utf8_buffer.append(chunk);
-
-    auto it = utf8_buffer.begin();
-    auto end = utf8_buffer.end();
+    auto it = m_utf8_rx_buffer.begin();
+    auto end = m_utf8_rx_buffer.end();
     auto last_good = it;
 
     try {
         while (it != end) {
             last_good = it;
             utf8::next(it, end);
-            // Process complete glyph here if needed
+            // process glyph here
         }
-        // All valid
-        utf8_buffer.clear();
-    } catch (utf8::not_enough_room &) {
-        // Partial UTF-8 sequence at end → keep it
-        utf8_buffer.erase(utf8_buffer.begin(), last_good);
+        m_utf8_rx_buffer.clear();
+    }
+    catch (utf8::not_enough_room &) {
+        // keep incomplete tail
+        m_utf8_rx_buffer.erase(m_utf8_rx_buffer.begin(), last_good);
     }
     catch (utf8::exception &) {
-        // Invalid UTF-8 byte → skip one byte
-        utf8_buffer.erase(utf8_buffer.begin());
+        // drop invalid byte
+        m_utf8_rx_buffer.erase(m_utf8_rx_buffer.begin());
     }
-
-    // calling
-    /*
-    *Utf8Glyph g;
-    auto it = utf8_buffer.begin();
-
-    if (nextGlyph(utf8_buffer, it, g)) {
-    // safe single glyph
-    }
-    */
 }
 
 bool CommonIO::decodeNextGlyph(const std::string &bytes,

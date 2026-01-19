@@ -12,55 +12,32 @@ using Byte = uint8_t;
 using ByteBuffer = std::vector<Byte>;
 
 class SocketService {
+    Logging &m_log;
+    TCPsocket m_socket;
+    int m_nodeNumber;
+    bool m_active;
+    Config &m_config;
+
+    ByteBuffer m_pendingBytes;
+
 public:
     SocketService(TCPsocket socket, const int nodeNumber, Config &config)
         : m_log(Logging::getInstance())
           , m_socket(socket)
           , m_nodeNumber(nodeNumber)
           , m_active(true)
-          , m_config(config) {}
+          , m_config(config) {
+    }
 
-    // Non-copyable
     SocketService(const SocketService &) = delete;
     SocketService &operator=(const SocketService &) = delete;
-
-    // Movable
-    SocketService(SocketService &&other) noexcept
-        : m_log(Logging::getInstance())
-        , m_socket(other.m_socket)
-        , m_nodeNumber(other.m_nodeNumber)
-        , m_active(other.m_active)
-        , m_config(other.m_config) {
-
-        other.m_socket = nullptr;
-        other.m_nodeNumber = -1;
-        other.m_active = false;
-    }
-
-    SocketService &operator=(SocketService &&other) noexcept {
-        if (this != &other) {
-            close();
-
-            m_socket = other.m_socket;
-            m_nodeNumber = other.m_nodeNumber;
-            m_active = other.m_active;
-            m_config = other.m_config;
-
-            other.m_socket = nullptr;
-            other.m_nodeNumber = -1;
-            other.m_active = false;
-        }
-        return *this;
-    }
+    SocketService(SocketService &&other) = delete;
+    SocketService &operator=(SocketService &&other) = delete;
 
     ~SocketService() {
         m_log.log(Logging::LogLevel::Console, "~Session()");
         close();
     }
-
-    // --------------------------------------------------
-    // State
-    // --------------------------------------------------
 
     bool isActive() const noexcept {
         return m_active;
@@ -93,7 +70,6 @@ public:
 
     // --------------------------------------------------
     // I/O
-    // --------------------------------------------------
 
     ByteBuffer receive() {
         if (!m_active || !m_socket) {
@@ -118,36 +94,46 @@ public:
         return buffer;
     }
 
-    void send(const std::string &message, bool isDisconnection = false) {
+    void send(const std::string &message, bool doDisconnection = false) {
         if (!m_active || !m_socket) {
             return;
         }
 
         const int length = static_cast<int>(message.size());
-        const int sent = SDLNet_TCP_Send(
-            m_socket,
-            message.data(),
-            length
-        );
+        size_t totalSent = 0;
+        while (totalSent < length) {
+            const int sent = SDLNet_TCP_Send(m_socket, message.data(), length);
+            if (sent <= 0) {
+                m_active = false;
+                break;
+            }
+            totalSent += sent;
+        }
 
-        if (sent < length || isDisconnection) {
+        // ex. logoff w/ ansi, display then disconnect user
+        if (doDisconnection) {
             m_active = false;
         }
     }
 
-    void send(const ByteBuffer &bytes, bool isDisconnection = false) {
+    void send(const ByteBuffer &bytes, bool doDisconnection = false) {
         if (!m_active || !m_socket) {
             return;
         }
 
         const int length = static_cast<int>(bytes.size());
-        const int sent = SDLNet_TCP_Send(
-            m_socket,
-            bytes.data(),
-            length
-        );
+        size_t totalSent = 0;
+        while (totalSent < length) {
+            const int sent = SDLNet_TCP_Send(m_socket, bytes.data(), length);
+            if (sent <= 0) {
+                m_active = false;
+                break;
+            }
+            totalSent += sent;
+        }
 
-        if (sent < length || isDisconnection) {
+        // ex. logoff w/ ansi, display then disconnect user
+        if (doDisconnection) {
             m_active = false;
         }
     }
@@ -163,13 +149,6 @@ public:
         }
         m_active = false;
     }
-
-private:
-    Logging &m_log;
-    TCPsocket m_socket;
-    int m_nodeNumber;
-    bool m_active;
-    Config &m_config;
 };
 
 #endif

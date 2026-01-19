@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <experimental/optional>
+#include <utf8.h>
 
 #include "model-sys/context.hpp"
 
@@ -11,6 +12,13 @@ StateManager::StateManager(Context &ctx)
       , currentState(State::ModPreLogon) {
     m_log.log(Logging::LogLevel::Console, "StateManager()");
     bindStateHandlers();
+
+    // Setup Inactivity timer, so no sessions can stay active indefinite.
+    // Make Configuration String / Prompt Later On
+    m_inactivityTimer.start(std::chrono::minutes(10), [this]() {
+        m_ctx.getSessionWrite().send("\r\nInactive for 10 minutes, disconnecting.");
+        m_ctx.getSessionWrite().hangup();
+    });
 }
 
 StateManager::~StateManager() {
@@ -31,26 +39,42 @@ void StateManager::setState(State newState) {
 void StateManager::handleInput(const std::string &input) {
     m_log.log(Logging::LogLevel::Debug, "StateManager() handleInput=", input);
 
-    std::string result = std::string(input);
-    std::size_t id1 = 0;
-
-    // Convert CR\LF to LF!
-    do {
-        id1 = result.find("\r\n", 0);
-
-        if (id1 != std::string::npos) {
-            result.erase(id1, 1);
-            id1 = result.find("\r\n", 0);
-        }
-    } while (id1 != std::string::npos);
-
-    // PUSH ONE CHARACTER AT A TIME
-    for (char ch : result) {
-        std::string oneChar(1, ch);
-        inputHandlers.at(currentState)(oneChar);
+    if (!m_ctx.sessionWriter->isActive()) {
+        return;
     }
 
-    //inputHandlers.at(currentState)(result);
+    // ReStart Inactivity timer on Input
+    m_inactivityTimer.start(std::chrono::minutes(10), [this]() {
+        // Make Configuration String / Prompt Later On
+        m_ctx.getSessionWrite().send("\r\nInactive for 10 minutes, disconnecting.");
+        m_ctx.getSessionWrite().hangup();
+    });
+
+    // Normalize CRLF → LF (ASCII-safe)
+    std::string normalized = input;
+    size_t pos;
+    while ((pos = normalized.find("\r\n")) != std::string::npos) {
+        normalized.erase(pos, 1);
+    }
+
+    // Split into UTF-8 glyphs
+    auto it = normalized.begin();
+    auto end = normalized.end();
+
+    while (it != end) {
+        auto glyph_start = it;
+
+        try {
+            utf8::next(it, end);
+        } catch (utf8::exception &) {
+            // Drop invalid byte and resync
+            ++it;
+            continue;
+        }
+
+        std::string glyph(glyph_start, it);
+        inputHandlers.at(currentState)(glyph);
+    }
 }
 
 // -------------------------
@@ -64,30 +88,18 @@ void StateManager::bindStateHandlers() {
     pollHandlers.clear();
 
     // PreLogon
-    clearHandlers.emplace(State::ModPreLogon,
-                          [this]() { clearPreLogon(); });
-
-    createHandlers.emplace(State::ModPreLogon,
-                           [this]() { createPreLogon(); });
-
-    pollHandlers.emplace(State::ModPreLogon,
-                         [this]() { pollPreLogon(); });
-
+    clearHandlers.emplace(State::ModPreLogon, [this]() { clearPreLogon(); });
+    createHandlers.emplace(State::ModPreLogon, [this]() { createPreLogon(); });
+    pollHandlers.emplace(State::ModPreLogon, [this]() { pollPreLogon(); });
     inputHandlers.emplace(State::ModPreLogon,
                           [this](const std::string &input) {
                               inputPreLogon(input);
                           });
 
     // Menu System
-    clearHandlers.emplace(State::MenuSystem,
-                          [this]() { clearMenuSystem(); });
-
-    createHandlers.emplace(State::MenuSystem,
-                           [this]() { createMenuSystem(); });
-
-    pollHandlers.emplace(State::MenuSystem,
-                         [this]() { pollMenuSystem(); });
-
+    clearHandlers.emplace(State::MenuSystem, [this]() { clearMenuSystem(); });
+    createHandlers.emplace(State::MenuSystem, [this]() { createMenuSystem(); });
+    pollHandlers.emplace(State::MenuSystem, [this]() { pollMenuSystem(); });
     inputHandlers.emplace(State::MenuSystem,
                           [this](const std::string &input) {
                               inputMenuSystem(input);
@@ -102,6 +114,14 @@ void StateManager::bindStateHandlers() {
 
 // Timers, if they exist, roll up from TCPSession
 void StateManager::pollTimers() {
+    if (!m_ctx.getSessionWrite().isActive()) {
+        return;
+    }
+
+    // Check for Inactivity
+    m_inactivityTimer.isTriggered();
+
+    // Check for other Active Timers, DownStream.
     pollHandlers.at(currentState)();
 }
 
@@ -139,12 +159,13 @@ void StateManager::pollPreLogon() {
 void StateManager::inputPreLogon(const std::string &input) {
     m_log.log(Logging::LogLevel::Console, "StateManager() inputPreLogon");
     if (preLogonState) {
-        preLogonState->update(input, false);
-
         if (!preLogonState->m_is_active) {
-            m_log.log(Logging::LogLevel::Console, "StateManager() preLogonState is Inactive");
+            m_log.log(Logging::LogLevel::Console, "StateManager() preLogonState is Completed.");
             setState(State::MenuSystem);
+            return;
         }
+
+        preLogonState->update(input, false);
     }
 }
 
@@ -153,14 +174,12 @@ void StateManager::inputPreLogon(const std::string &input) {
 // -------------------------
 
 void StateManager::createMenuSystem() {
-
     m_log.log(Logging::LogLevel::Console, "StateManager() createMenuSystem");
 
     // Make Sure we cover any unexpected errors in Creating the Module.
     try {
         menuSystemState.emplace(m_ctx);
         menuSystemState->onEnter();
-
     } catch (std::exception &ex) {
         std::cout << "createMenuSystem Exception: " << ex.what() << std::endl;
         throw;
@@ -184,16 +203,13 @@ void StateManager::pollMenuSystem() {
 }
 
 void StateManager::inputMenuSystem(const std::string &input) {
-
     m_log.log(Logging::LogLevel::Console, "StateManager() inputMenuSystem");
     if (menuSystemState) {
-        menuSystemState->update(input, false);
-
         if (!menuSystemState->m_is_active) {
             m_log.log(Logging::LogLevel::Console, "StateManager() MenuSystem is Inactive");
-            // setState(State::ModPreLogon);
-            // After here, it's a system logoff usually, but maybe we'll swtich to a chat state.
-            // but wouldn't want to shutdown and remove menu system!!
+            return;
         }
+
+        menuSystemState->update(input, false);
     }
 }

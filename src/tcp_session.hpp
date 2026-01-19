@@ -7,6 +7,7 @@
 #include <string>
 #include <chrono>
 #include <experimental/optional>
+#include <utf8.h>
 
 #include "model-sys/structures.hpp"
 #include "common_io.hpp"
@@ -25,9 +26,8 @@
 
 #include "sdl2_net/SDL_net.hpp"
 
-#include "libSqliteWrapped.h"
-
 class TCPSession {
+
     Logging &m_log;
     SocketService m_socketService;
     SessionWriter m_session_writer;
@@ -42,9 +42,12 @@ class TCPSession {
     std::experimental::optional<StateManager> m_state_manager;
 
     // ESC handling
-    std::string m_escBuffer; // current ESC sequence
-    bool m_escPending = false; // one ESC waiting for resolution
+    std::string m_escBuffer;
+    bool m_escPending = false;
     DeadlineTimer m_escTimer;
+
+    // UTF8 Handling
+    std::string m_utf8Buffer;
 
 public:
     TCPSession(TCPsocket socket, const int nodeNumber, Config &config, SQLW::Database &coreDatabase)
@@ -117,11 +120,8 @@ public:
     }
 
     TCPSession(TCPSession &&) = delete;
-
     TCPSession &operator=(TCPSession &&) = delete;
-
     TCPSession(const TCPSession &) = delete;
-
     TCPSession &operator=(const TCPSession &) = delete;
 
     SocketService &getSession() { return m_socketService; }
@@ -155,9 +155,14 @@ public:
     }
 
     void pollTimers() {
+        if (!m_socketService.isActive()) {
+            return;
+        }
+
         if (m_escPending) {
             m_escTimer.isTriggered();
         }
+
         m_state_manager->pollTimers();
     }
 
@@ -168,7 +173,7 @@ private:
             // Resolve previous ESC if still pending
             if (m_escPending) {
                 m_escTimer.cancel();
-                m_state_manager->handleInput(std::string{char(0x1b), '\0'});
+                m_state_manager->handleInput(std::string{static_cast<char>(0x1b), '\0'});
                 m_escBuffer.clear();
                 m_escPending = false;
             }
@@ -179,7 +184,7 @@ private:
             m_escBuffer.push_back(0x1b);
 
             m_escTimer.start(std::chrono::milliseconds(25), [this]() {
-                m_state_manager->handleInput(std::string{char(0x1b), '\0'});
+                m_state_manager->handleInput(std::string{static_cast<char>(0x1b), '\0'});
                 m_escBuffer.clear();
                 m_escPending = false;
             });
@@ -206,7 +211,34 @@ private:
             return;
         }
 
-        m_state_manager->handleInput(std::string(1, byte));
+        // After telnet + ANSI handling
+        m_utf8Buffer.push_back(static_cast<char>(byte));
+
+        auto it = m_utf8Buffer.begin();
+        auto end = m_utf8Buffer.end();
+        auto last_good = it;
+
+        try {
+            while (it != end) {
+                last_good = it;
+                utf8::next(it, end);
+            }
+
+            // All valid UTF-8
+            m_state_manager->handleInput(m_utf8Buffer);
+            m_utf8Buffer.clear();
+        }
+        catch (utf8::not_enough_room &) {
+            if (last_good != m_utf8Buffer.begin()) {
+                m_state_manager->handleInput(
+                    std::string(m_utf8Buffer.begin(), last_good)
+                );
+                m_utf8Buffer.erase(m_utf8Buffer.begin(), last_good);
+            }
+        }
+        catch (utf8::exception &) {
+            m_utf8Buffer.erase(m_utf8Buffer.begin());
+        }
     }
 
     bool isEscSequenceComplete(const std::string &seq) {
@@ -216,13 +248,15 @@ private:
         if (seq.size() == 1)
             return false;
 
-        const uint8_t second = seq[1];
+        const Byte second = seq[1];
 
         // CSI
         if (second == '[' || second == 'O') {
-            if (seq.size() < 3)
+            if (seq.size() < 3) {
                 return false;
-            uint8_t last = seq.back();
+            }
+
+            Byte last = seq.back();
             return last >= 0x40 && last <= 0x7E;
         }
 
