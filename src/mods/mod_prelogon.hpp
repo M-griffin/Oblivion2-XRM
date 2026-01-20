@@ -12,7 +12,6 @@
 /**
  * @class ModPreLogon
  * @author Michael Griffin
- * @date 3/17/2016
  * @file mod_prelogon.hpp
  * @brief System PreLogin Module
  */

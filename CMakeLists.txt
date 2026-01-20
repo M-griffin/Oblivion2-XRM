@@ -21,7 +21,8 @@ set(CMAKE_WIN32_EXECUTABLE FALSE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Enable GTEST Unit Tests
-#enable_testing()
+enable_testing()
+add_subdirectory(tests)
 
 # Silence specific warnings if needed
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wno-unused-result -Wno-deprecated-declarations")
