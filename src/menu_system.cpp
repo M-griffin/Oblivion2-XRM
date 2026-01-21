@@ -1,8 +1,6 @@
 #include "menu_system.hpp"
 
-#include <locale>
 #include <cassert>
-#include <cstdint>
 #include <string>
 #include <vector>
 #include <map>
@@ -19,6 +17,7 @@
 */
 
 #include "mods/mod_logon.hpp"
+#include "mods/mod_signup.hpp"
 
 #include "model-sys/context.hpp"
 #include "tcp_session.hpp"
@@ -93,7 +92,6 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
 bool MenuSystem::onEnter() {
     m_is_active = true;
     m_log.log(Logging::LogLevel::Console, "MenuSystem() - onEnter, state=", stateToString());
-
     return true;
 }
 
@@ -147,6 +145,15 @@ void MenuSystem::bindStateHandlers() {
                               inputLogon(input);
                           });
 
+    // Signup
+    clearHandlers.emplace(State::ModSignup, [this]() { clearSignup(); });
+    createHandlers.emplace(State::ModSignup, [this]() { createSignup(); });
+    pollHandlers.emplace(State::ModSignup, [this]() { pollSignup(); });
+    inputHandlers.emplace(State::ModSignup, [this](
+                      const std::string &input) {
+                              inputSignup(input);
+                          });
+
     // Runtime guarantee (debug) MenuSystem is Default State, not a Module Loaded.
     assert(clearHandlers.size() == StateCount);
     assert(createHandlers.size() == StateCount);
@@ -183,7 +190,7 @@ void MenuSystem::setState(State newState) {
         return;
     }
 
-    // currentState == State::MenuSystem)
+    // currentState == State::MenuSystem
     currentState = newState;
     createHandlers.at(currentState)();
 }
@@ -508,6 +515,9 @@ bool MenuSystem::menuOptionsMultiNodeCommands(const MenuOption &option) {
  * @param option
  */
 bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
+
+    m_log.log(Logging::LogLevel::Console, "Matrix CommandKey=", option.command_key);
+
     switch (option.command_key[1]) {
         // Logon
         // {Not Implemented yet!}
@@ -515,8 +525,8 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
         //: USERLOG.X, and SYSPASS.X will be displayed.
         // { Note: add 0 for random! }
         case 'S':
-            m_log.log(Logging::LogLevel::Debug, "Executing startupModuleLogon()");
-            //startupModuleLogon();
+            m_log.log(Logging::LogLevel::Info, "Executing startupModuleLogon()");
+            setState(State::ModLogon);
             break;
 
         // Command Key: {T  {Research more how this is used!}
@@ -531,8 +541,8 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
 
         // Apply
         case 'A':
-            m_log.log(Logging::LogLevel::Debug, "Executing startupModuleSignup()");
-            //startupModuleSignup();
+            m_log.log(Logging::LogLevel::Info, "Executing startupModuleSignup()");
+            setState(State::ModSignup);
             return true;
 
         // Check
@@ -962,28 +972,6 @@ void MenuSystem::startupExternalProcess(const std::string &cmdline) {
 }
 
 /**
- * @brief Starts up Signup Module
- *
-void MenuSystem::startupModuleSignup()
-{
-    // Setup the input processor
-    resetMenuInputIndex(MODULE_INPUT);
-
-    // Allocate and Create
-    module_ptr module = std::make_shared<ModSignup>(
-        getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
-    );
-
-    if(!module)
-    {
-        m_log.log(Logging::LogLevel::Error, "startupModuleSignup Allocation Error");
-        return;
-    }
-
-    startupModule(module);
-}*/
-
-/**
  * @brief Startup the Menu Editor Module
  *
 void MenuSystem::startupModuleMenuEditor()
@@ -1195,10 +1183,65 @@ void MenuSystem::inputLogon(const std::string &input) {
 
             // Reset the Input back to the Menu System
             setMenuBaseState(BaseState::MENU_INPUT);
-
             loadAndStartupMenu();
         } else {
             m_is_active = false;
+        }
+    }
+}
+
+// -------------------------
+// Signup Module
+// -------------------------
+
+void MenuSystem::createSignup() {
+    m_log.log(Logging::LogLevel::Console, "MenuSystem() createSignup");
+
+    // Make Sure we cover any unexpected errors in Creating the Module.
+    try {
+        signupState.emplace(m_ctx);
+        signupState->onEnter();
+    } catch (std::exception &ex) {
+        std::cout << "createSignup Exception: " << ex.what() << std::endl;
+        throw;
+    }
+}
+
+void MenuSystem::clearSignup() {
+    if (signupState) {
+        signupState->onExit();
+        signupState.reset();
+    }
+    std::cout << "Signup cleared\n";
+}
+
+void MenuSystem::pollSignup() {
+    if (signupState) {
+        // No timers currently setup for Logon.
+        // logonState->pollTimers();
+    }
+}
+
+void MenuSystem::inputSignup(const std::string &input) {
+    m_log.log(Logging::LogLevel::Console, "MenuSystem() inputSignup");
+
+    if (signupState) {
+        signupState->update(input, false);
+    }
+
+    // Finished modules processing.
+    if (!signupState->m_is_active) {
+        m_log.log(Logging::LogLevel::Info, "!signupState->m_is_active - shutting down module: ");
+
+        if (!signupState->m_is_active) {
+            m_log.log(Logging::LogLevel::Console, "MenuSystem() signupState is Inactive");
+
+            // After Signup, we Move back to Menu System
+            setState(State::MenuSystem);
+
+            // Reset the Input back to the Menu System
+            setMenuBaseState(BaseState::MENU_INPUT);
+            loadAndStartupMenu();
         }
     }
 }

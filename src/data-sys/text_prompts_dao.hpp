@@ -27,13 +27,17 @@ class TextPromptsDao {
 public:
     static const std::string FILE_VERSION;
 
+    Logging &m_log;
+    std::string m_path;
+    std::string m_filename;
+    bool m_is_loaded;
+
     TextPromptsDao(const std::string &path, const std::string &filename);
     ~TextPromptsDao();
 
     // Disable copy semantics
     TextPromptsDao(const TextPromptsDao &) = delete;
     TextPromptsDao &operator=(const TextPromptsDao &) = delete;
-
     TextPromptsDao(TextPromptsDao &&other) = delete;
     TextPromptsDao &operator=(TextPromptsDao &&other) = delete;
 
@@ -66,6 +70,7 @@ public:
      * @param lookup
      * @return
      */
+    [[nodiscard]]
     M_StringPair getPrompt(const std::string &lookup) const;
 
     /**
@@ -77,11 +82,6 @@ public:
      * @brief Testing, cache all records to a map instead of reloading and searching.
      */
     void cacheAllTextPrompts(YAML::Node &node) const;
-
-    Logging &m_log;
-    std::string m_path;
-    std::string m_filename;
-    bool m_is_loaded;
 };
 
 #endif

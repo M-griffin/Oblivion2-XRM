@@ -19,7 +19,6 @@ class ModPreLogon
         : public ModBase {
 
     static constexpr const char* MOD_FILENAME = "mod_prelogon.yaml";
-
     TextPromptsDao m_text_prompts_dao;
 
     int m_mod_function_index;
@@ -43,11 +42,8 @@ public:
     explicit ModPreLogon(Context &ctx);
     ~ModPreLogon();
 
-    // Disable copy semantics
     ModPreLogon(const ModPreLogon &) = delete;
     ModPreLogon &operator=(const ModPreLogon &) = delete;
-
-    // Move constructor
     ModPreLogon(ModPreLogon &&other) = delete;
     ModPreLogon &operator=(ModPreLogon &&other) = delete;
 

@@ -31,8 +31,6 @@ public:
     // Disable copy semantics
     ModBase(const ModBase &) = delete;
     ModBase &operator=(const ModBase &) = delete;
-
-    // Move constructor
     ModBase(ModBase &&other) = delete;
     ModBase &operator=(ModBase &&other) = delete;
 
@@ -54,12 +52,14 @@ public:
      * @brief Translate Box Chars to UTF-8
      * @param enum_value
      */
+    [[nodiscard]]
     std::string baseGetEncodedBoxChar(int enum_value) const;
 
     /**
      * @brief Translate Box Chars to UTF-8 with Default box Color
      * @param enum_value
      */
+    [[nodiscard]]
     std::string baseGetEncodedBoxCharAndColor(int enum_value) const;
 
     /**
@@ -69,42 +69,49 @@ public:
      * @param max_cols
      * @return
      */
+    [[nodiscard]]
     std::string baseCreateBorderedDisplay(std::vector<std::string> result_set, int total_rows, int max_cols);
 
     /**
      * @brief Gets the Default Color Sequence
      * @return
      */
+    [[nodiscard]]
     std::string baseGetDefaultColor() const;
 
     /**
      * @brief Gets the Default Input Color Sequence
      * @return
      */
+    [[nodiscard]]
     std::string baseGetDefaultInputColor() const;
 
     /**
      * @brief Gets the Default Input Color Sequence
      * @return
      */
+    [[nodiscard]]
     std::string baseGetDefaultInverseColor() const;
 
     /**
      * @brief Gets the Default Box Color Sequence
      * @return
      */
+    [[nodiscard]]
     std::string baseGetDefaultBoxColor() const;
 
     /**
      * @brief Gets the Default Prompt Color Sequence
      * @return
      */
+    [[nodiscard]]
     std::string baseGetDefaultPromptColor() const;
 
     /**
      * @brief Gets the Default Stat Color Sequence
      * @return
      */
+    [[nodiscard]]
     std::string baseGetDefaultStatColor() const;
 
     /**
@@ -198,6 +205,7 @@ public:
      * @brief Move to End of Display then Setup Display for String
      * @param prompt
      */
+    [[nodiscard]]
     std::string moveStringToBottom(const std::string &prompt) const;
 
 };

@@ -10,7 +10,10 @@
 
 #include "model-sys/menu.hpp"
 #include "menu_base.hpp"
+
+// Mods
 #include "mods/mod_logon.hpp"
+#include "mods/mod_signup.hpp"
 
 class Context;
 class Logging;
@@ -29,6 +32,7 @@ public:
     enum class State : uint8_t {
         MenuSystem = 0,
         ModLogon,
+        ModSignup,
         COUNT
     };
 
@@ -38,6 +42,7 @@ public:
         {
             case State::MenuSystem: return "MenuSystem";
             case State::ModLogon:   return "ModLogon";
+            case State::ModSignup:  return "ModSignup";
             default:                return "Unknown";
         }
     }
@@ -75,7 +80,11 @@ public:
         };
     }
 
+    // Module States
     std::optional<ModLogon> logonState;
+    std::optional<ModSignup> signupState;
+
+    // Pointer to Current Active State
     State currentState;
 
     // Type aliases
@@ -292,11 +301,19 @@ public:
     void pollLogon();
     void inputLogon(const std::string &input);
 
+    // -------------------------
+    // Signup Module
+    // -------------------------
+    void createSignup();
+    void clearSignup();
+    void pollSignup();
+    void inputSignup(const std::string &input);
+
     // Compile-time guarantees
     static constexpr size_t StateCount =
             static_cast<size_t>(State::COUNT);
 
-    static_assert(StateCount == 2,
+    static_assert(StateCount == 3,
                   "MenuSystem: handler tables must be updated when adding states");
 };
 

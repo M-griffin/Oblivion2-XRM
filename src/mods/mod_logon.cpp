@@ -29,7 +29,6 @@ ModLogon::ModLogon(Context &ctx)
       , m_mod_function_index(MOD_LOGON)
       , m_failure_attempts(0)
       , m_is_text_prompt_exist(false) {
-
     m_setup_functions.emplace_back([this] { setupLogon(); });
     m_setup_functions.emplace_back([this] { setupPassword(); });
     m_setup_functions.emplace_back([this] { setupPasswordQuestion(); });

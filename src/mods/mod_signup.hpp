@@ -23,19 +23,20 @@
 class ModSignup
         : public ModBase {
     static constexpr const char *MOD_FILENAME = "mod_signup.yaml";
-
-    // Function Input Vector.
-    std::vector<std::function<void()> > m_setup_functions;
-    std::vector<std::function<void(const std::string &)> > m_mod_functions;
+    TextPromptsDao m_text_prompts_dao;
 
     std::optional<MenuBase> m_menu_base;
-    TextPromptsDao m_text_prompts_dao;
+
     Users m_new_use_rec;
     Security m_security_record;
 
     int m_mod_function_index;
     bool m_is_text_prompt_exist;
     int m_newuser_password_attempts;
+
+    // Function Input Vector.
+    std::vector<std::function<void()> > m_setup_functions;
+    std::vector<std::function<void(const std::string &)> > m_mod_functions;
 
 public:
     explicit ModSignup(Context &ctx);
@@ -44,14 +45,13 @@ public:
     // Disable copy semantics
     ModSignup(const ModSignup &) = delete;
     ModSignup &operator=(const ModSignup &) = delete;
-
-    // Move constructor
     ModSignup(ModSignup &&other) = delete;
     ModSignup &operator=(ModSignup &&other) = delete;
 
     bool update(const std::string &character_buffer, const bool &);
     bool onEnter();
     bool onExit();
+    bool pollTimers();
 
     // This matches the index for mod_functions.push_back
     enum {

@@ -18,23 +18,22 @@ class Context;
  * @brief System Login Module
  */
 class ModLogon
-    : public ModBase
-{
+        : public ModBase {
+
     static constexpr const char* MOD_FILENAME = "mod_logon.yaml";
 
-    TextPromptsDao     m_text_prompts_dao;
-    Users              m_logon_user;
-    int                m_mod_function_index;
-    int                m_failure_attempts;
-    bool               m_is_text_prompt_exist;
+    TextPromptsDao m_text_prompts_dao;
+    Users m_logon_user;
+    int m_mod_function_index;
+    int m_failure_attempts;
+    bool m_is_text_prompt_exist;
 
     // Function Input Vector.
-    std::vector<std::function< void()> >                    m_setup_functions;
-    std::vector<std::function< void(const std::string &)> > m_mod_functions;
+    std::vector<std::function<void()> > m_setup_functions;
+    std::vector<std::function<void(const std::string &)> > m_mod_functions;
 
     // This matches the index for mod_functions.push_back
-    enum
-    {
+    enum {
         MOD_LOGON,
         MOD_PASSWORD,
         MOD_PASSWORD_QUESTION,
@@ -54,15 +53,12 @@ class ModLogon
     const std::string PROMPT_INVALID_PASSWORD = "invalid_password";
 
 public:
-
     explicit ModLogon(Context &ctx);
     ~ModLogon();
 
     // Disable copy semantics
     ModLogon(const ModLogon &) = delete;
     ModLogon &operator=(const ModLogon &) = delete;
-
-    // Move constructor
     ModLogon(ModLogon &&other) = delete;
     ModLogon &operator=(ModLogon &&other) = delete;
 
@@ -152,7 +148,6 @@ public:
     void setupNewUserApplication();
 
 private:
-
     /**
      * @brief Lookup user records Handle, Name, or Email
      * @return

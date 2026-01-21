@@ -209,7 +209,8 @@ auto main() -> int {
             exit(1);
         }
 
-        const Uint16 maxSessions = 10;
+        // TODO Setup from Config File!
+        const Uint16 maxSessions = 255;
         Logging::getInstance().setLogLevelFromString(config.logging_level);
 
         m_log.log(Logging::LogLevel::Console, "Starting up XRM-Server", "port", config.port_telnet,

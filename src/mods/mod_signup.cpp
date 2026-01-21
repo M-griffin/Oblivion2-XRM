@@ -32,7 +32,6 @@ ModSignup::ModSignup(Context &ctx)
       , m_mod_function_index(MOD_NUP)
       , m_is_text_prompt_exist(false)
       , m_newuser_password_attempts(0) {
-
     // Menu Base Is set up, but not used at this time, this I forgot is probably for YES / NO Lightbars.
     m_menu_base.emplace(m_ctx);
 
@@ -139,7 +138,7 @@ bool ModSignup::update(const std::string &character_buffer, const bool &) {
     }
 
     // Return True when were keeping module active / else false;
-    if (character_buffer.size() == 0) {
+    if (character_buffer.empty()) {
         return true;
     }
 
@@ -172,6 +171,11 @@ bool ModSignup::onEnter() {
  */
 bool ModSignup::onExit() {
     m_is_active = false;
+    return true;
+}
+
+bool ModSignup::pollTimers() {
+    // No timers in this module, just return;
     return true;
 }
 
