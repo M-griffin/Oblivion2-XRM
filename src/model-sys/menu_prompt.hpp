@@ -24,13 +24,15 @@ public:
 
     explicit MenuPrompt()
         : file_version(FILE_VERSION)
-          , name("Menu Prompt Name")
-          , data_line1("")
-          , data_line2("")
-          , data_line3("") {
+          , name("Menu Prompt Name") {
     }
 
     ~MenuPrompt() = default;
+
+    MenuPrompt(const MenuPrompt &) = default;
+    MenuPrompt &operator=(const MenuPrompt &) = default;
+    MenuPrompt(MenuPrompt &&other) = default;
+    MenuPrompt &operator=(MenuPrompt &&other) = default;
 };
 
 

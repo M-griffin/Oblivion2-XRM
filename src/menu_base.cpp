@@ -228,7 +228,7 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen) {
         m_ctx.getTelnet().getTermCols());
 
     std::string output_screen;
-    std::string new_screen = screen;
+    std::string new_screen(screen);
     std::string::size_type index = 0;
 
     while (index != std::string::npos) {
@@ -240,7 +240,6 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen) {
     }
 
     index = 0;
-
     while (index != std::string::npos) {
         index = new_screen.find("\n", index);
 
@@ -411,7 +410,8 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
     for (unsigned int i = 0; i < m_menu_info.menu_options.size(); i++) {
         auto &m = m_menu_info.menu_options[i];
 
-        // Default setup for Yes No with default to Yes!
+        // TODO Default setup for Yes No with default to Yes!
+        // Need to add to prompts file for customization!!
         if (i == 0) {
             m.pulldown_id = 1;
             m.name = "  Yes  ";
@@ -852,7 +852,7 @@ std::string MenuBase::loadMenuPrompt() {
 #endif
 
         std::ostringstream oss;
-        oss << std::put_time(&tm, "%d/%m/%Y %I:%M %p");
+        oss << std::put_time(&tm, "%m/%d/%Y %I:%M %p");
 
         m_ctx.getSessionIO().addMCIMapping("|TM", oss.str()); // Time Now
         oss.clear();

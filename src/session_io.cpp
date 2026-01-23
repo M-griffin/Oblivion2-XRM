@@ -680,7 +680,7 @@ std::string SessionIO::parsePipeWithChars(const std::string &pipe_code) {
 std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapType> &code_map) {
     m_log.log(Logging::LogLevel::Debug, "[parseCodeMap]", __LINE__, __FILE__);
 
-    std::string ansi_string = screen;
+    std::string ansi_string(screen);
 
     // All Global MCI Codes likes standard screens and colors will
     // He handled here, then specific interfaces will break out below this.
@@ -815,7 +815,7 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
 std::string SessionIO::parseCodeMapGenerics(const std::string &screen, const std::vector<MapType> &code_map) {
     m_log.log(Logging::LogLevel::Debug, "[parseCodeMapGenerics]", __LINE__, __FILE__);
 
-    std::string ansi_string = screen;
+    std::string ansi_string(screen);
 
     // Make a copy so the original is not modified.
     std::vector<MapType> code_mapping;
@@ -866,7 +866,7 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
     std::vector<MapType> code_map;
 
     // Make a copy that we can modify and process on.
-    std::string ansi_string = sequence;
+    std::string ansi_string(sequence);
 
     // MCI Code Groups 1 - 7
     /*
@@ -885,18 +885,20 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
         std::regex expr(expression);
         std::smatch matches;
         std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
-        //    std::string::size_type offset = 0;
-        //    std::string::size_type length = 0;
+
+        // Temp for Logging
+        std::string::size_type offset = 0;
+        std::string::size_type length = 0;
 
         std::regex_constants::match_flag_type flags = std::regex_constants::match_default;
 
         while (std::regex_search(start, end, matches, expr, flags)) {
             // Found a match!
-            /*
+
             std::cout << "Matched Sub '" << matches.str()
             		  << "' following ' " << matches.prefix().str()
             		  << "' preceding ' " << matches.suffix().str()
-            		  << std::endl;*/
+            		  << std::endl;
 
             // Avoid Infinite loop and make sure the existing
             // is not the same as the next!
@@ -913,15 +915,15 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
             for (size_t s = 1; s < matches.size(); ++s) {
                 // Make sure the Match is true! otherwise skip.
                 if (matches[s].matched) {
-                    //offset = matches[s].first - ansi_string.begin();
-                    //length = matches[s].length();
+                    offset = matches[s].first - ansi_string.begin();
+                    length = matches[s].length();
 
                     // Test output s registers which pattern matched, 1, 2, or 3!
-                    /*
+
                     std::cout << s << " :  Matched Sub 2" << matches[s].str()
                     		  << " at offset " << offset
                     		  << " of length " << length
-                    		  << std::endl;*/
+                    		  << std::endl;
 
                     // Add to Vector so we store each match.
                     my_matches.m_offset = matches[s].first - ansi_string.begin();
@@ -958,12 +960,8 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
  */
 std::string SessionIO::pipe2ansi(const std::string &sequence) {
     std::vector<MapType> code_map = parseToCodeMap(sequence, STD_EXPRESSION);
-    // TEMP TRIAGE
-    m_log.log(Logging::LogLevel::Info, "pipe2ansi=", sequence);
     std::string result = parseCodeMap(sequence, code_map);
-    m_log.log(Logging::LogLevel::Info, "pipe2ansi result=", result);
     return result;
-    //return parseCodeMap(sequence, code_map);
 }
 
 /**

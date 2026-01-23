@@ -63,7 +63,7 @@ std::string ModBase::baseCreateBorderedDisplay(std::vector<std::string> result_s
                                                const int max_cols) {
     // Vector or Menus, Loop through
     auto i = result_set.begin();
-    std::string buffer = "";
+    std::string buffer;
 
     for (int rows = 0; rows < total_rows; rows++) {
         buffer += "  "; // 3 Leading spaces per row.
@@ -222,16 +222,16 @@ void ModBase::baseProcessDeliverInputAndDisconnect(std::string &data) const {
 /**
  * @brief Pull and Display Prompts
  * @param prompt
- * @param m_text_dao
+ * @param text_dao
  * @param is_disconnect
  */
-void ModBase::baseDisplayPrompt(const std::string &prompt, TextPromptsDao &m_text_dao, const bool is_disconnect) const {
+void ModBase::baseDisplayPrompt(const std::string &prompt, TextPromptsDao &text_dao, const bool is_disconnect) const {
     // Set Default String Color, Can be overridden with pipe colors in text prompt.
     std::string result = baseGetDefaultColor();
 
     // Parse Prompt for Input Color And Position Override.
     // If found, the colors of the MCI Codes should be used as the default color.
-    M_StringPair prompt_set = m_text_dao.getPrompt(prompt);
+    M_StringPair prompt_set = text_dao.getPrompt(prompt);
     const std::string::size_type idx = prompt_set.second.find("%IN", 0);
 
     result += m_ctx.getSessionIO().parseTextPrompt(prompt_set);
@@ -251,15 +251,15 @@ void ModBase::baseDisplayPrompt(const std::string &prompt, TextPromptsDao &m_tex
 /**
  * @brief Pull and Return Display Prompt
  * @param prompt
- * @param m_text_dao
+ * @param text_dao
  */
-std::string ModBase::baseGetDisplayPrompt(const std::string &prompt, TextPromptsDao &m_text_dao) const {
+std::string ModBase::baseGetDisplayPrompt(const std::string &prompt, TextPromptsDao &text_dao) const {
     // Set Default String Color, Can be overridden with pipe colors in text prompt.
     std::string result = baseGetDefaultColor();
 
     // Parse Prompt for Input Color And Position Override.
     // If found, the colors of the MCI Codes should be used as the default color.
-    M_StringPair prompt_set = m_text_dao.getPrompt(prompt);
+    M_StringPair prompt_set = text_dao.getPrompt(prompt);
     const std::string::size_type idx = prompt_set.second.find("%IN", 0);
 
     result += m_ctx.getSessionIO().parseTextPrompt(prompt_set);
@@ -275,41 +275,41 @@ std::string ModBase::baseGetDisplayPrompt(const std::string &prompt, TextPrompts
 /**
  * @brief Pull and Return Raw Display Prompts
  * @param prompt
- * @param m_text_dao
+ * @param text_dao
  */
-std::string ModBase::baseGetDisplayPromptRaw(const std::string &prompt, TextPromptsDao &m_text_dao) const {
+std::string ModBase::baseGetDisplayPromptRaw(const std::string &prompt, TextPromptsDao &text_dao) const {
     // Parse Prompt for Input Color And Position Override.
     // If found, the colors of the MCI Codes should be used as the default color.
-    M_StringPair prompt_set = m_text_dao.getPrompt(prompt);
+    M_StringPair prompt_set = text_dao.getPrompt(prompt);
     return prompt_set.second;
 }
 
 /**
  * @brief Pull and Return Raw Display Prompts Parse Pipe Codes to ANSI
  * @param prompt
- * @param m_text_dao
+ * @param text_dao
  */
-std::string ModBase::baseGetDisplayPromptPipeToAnsi(const std::string &prompt, TextPromptsDao &m_text_dao) const {
+std::string ModBase::baseGetDisplayPromptPipeToAnsi(const std::string &prompt, TextPromptsDao &text_dao) const {
     // Parse Prompt for Input Color And Position Override.
     // If found, the colors of the MCI Codes should be used as the default color.
-    M_StringPair prompt_set = m_text_dao.getPrompt(prompt);
+    M_StringPair prompt_set = text_dao.getPrompt(prompt);
     return m_ctx.getSessionIO().pipeColors(prompt_set.second);
 }
 
 /**
  * @brief Pull and Display Prompts, Replace MCI Code |OT
  * @param prompt
- * @param m_text_dao
+ * @param text_dao
  * @param mci_field
  */
-void ModBase::baseDisplayPromptMCI(const std::string &prompt, TextPromptsDao &m_text_dao,
+void ModBase::baseDisplayPromptMCI(const std::string &prompt, TextPromptsDao &text_dao,
                                    const std::string &mci_field) const {
     // Set Default String Color, Can be overridden with pipe colors in text prompt.
     std::string result = baseGetDefaultColor();
 
     // Parse Prompt for Input Color And Position Override.
     // If found, the colors of the MCI Codes should be used as the default color.
-    M_StringPair prompt_set = m_text_dao.getPrompt(prompt);
+    M_StringPair prompt_set = text_dao.getPrompt(prompt);
     const std::string::size_type idx = prompt_set.second.find("%IN", 0);
 
     // Parse and replace the MCI Code with the field value
@@ -330,15 +330,15 @@ void ModBase::baseDisplayPromptMCI(const std::string &prompt, TextPromptsDao &m_
 /**
  * @brief Pull and Display Prompt with a following new line for info messages.
  * @param prompt
- * @param m_text_dao
+ * @param text_dao
  */
-void ModBase::baseDisplayPromptAndNewLine(const std::string &prompt, TextPromptsDao &m_text_dao) const {
+void ModBase::baseDisplayPromptAndNewLine(const std::string &prompt, TextPromptsDao &text_dao) const {
     // Set Default String Color, Can be overridden with pipe colors in text prompt.
     std::string result = baseGetDefaultColor();
 
     // Parse Prompt for Input Color And Position Override.
     // If found, the colors of the MCI Codes should be used as the default color.
-    M_StringPair prompt_set = m_text_dao.getPrompt(prompt);
+    M_StringPair prompt_set = text_dao.getPrompt(prompt);
     const std::string::size_type idx = prompt_set.second.find("%IN", 0);
 
     result += m_ctx.getSessionIO().parseTextPrompt(prompt_set);

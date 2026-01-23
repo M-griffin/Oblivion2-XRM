@@ -14,8 +14,8 @@
 const std::string MenuPrompt::FILE_VERSION = "1.0.0";
 
 MenuPromptDao::MenuPromptDao(MenuPrompt &menu_prompt,
-                             const std::string &menu_prompt_name,
-                             const std::string &path)
+                             std::string &menu_prompt_name,
+                             std::string &path)
     : m_log(Logging::getInstance())
       , m_menu_prompt(menu_prompt)
       , m_path(path)

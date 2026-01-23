@@ -17,10 +17,17 @@ class Logging;
  * @brief Handles Reading and Writing a Menu Prompt from YAML Files
  */
 class MenuPromptDao {
+
+    Logging &m_log;
+    MenuPrompt &m_menu_prompt;
+    std::string m_path;
+    std::string m_filename;
+    std::mutex m;
+
 public:
     MenuPromptDao(MenuPrompt &menu_prompt,
-                  const std::string &menu_prompt_name,
-                  const std::string &path);
+                  std::string &menu_prompt_name,
+                  std::string &path);
 
     ~MenuPromptDao() = default;
 
@@ -60,15 +67,11 @@ public:
      * @brief Grab a const handle to the loaded menu_prompt.
      * @return
      */
-    MenuPrompt getMenuPrompt() const {
+    [[nodiscard]]
+    MenuPrompt &getMenuPrompt() const {
         return m_menu_prompt;
     }
 
-    Logging &m_log;
-    MenuPrompt m_menu_prompt;
-    std::string m_path;
-    std::string m_filename;
-    std::mutex m;
 };
 
 #endif

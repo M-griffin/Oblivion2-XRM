@@ -33,11 +33,13 @@ Encoding::CharSet Encoding::detectEncoding(const std::string &data) {
 }
 
 // ANSI Escape Preserving Helper
+/*
+ *
 std::string Encoding::preserveAnsiConvert(
     const std::string &input,
     const std::function<std::string(const std::string &)> &converter) const {
     std::string output;
-    std::regex ansi_regex("\x1B\\[[0-9;]*[A-Za-z]");
+    std::regex ansi_regex("(\x1B\\[[0-9;]*[A-Za-z])");
     std::sregex_iterator iter(input.begin(), input.end(), ansi_regex);
     std::sregex_iterator end;
 
@@ -58,6 +60,60 @@ std::string Encoding::preserveAnsiConvert(
         output += converter(input.substr(last_pos));
 
     return output;
+}*/
+
+std::string Encoding::preserveAnsiConvert(
+    const std::string &input,
+    const std::function<std::string(const std::string &)> &converter) const
+{
+    std::string output;
+    std::string buffer; // printable text to convert
+
+    auto flushBuffer = [&]() {
+        if (!buffer.empty()) {
+            output += converter(buffer);
+            buffer.clear();
+        }
+    };
+
+    for (size_t i = 0; i < input.size(); ++i) {
+        unsigned char c = input[i];
+
+        // ANSI escape sequence
+        if (c == 0x1B && i + 1 < input.size() && input[i + 1] == '[') {
+            flushBuffer();
+
+            size_t start = i;
+            i += 2; // skip ESC [
+
+            while (i < input.size()) {
+                unsigned char ch = input[i];
+                // ANSI sequences end with A–Z or a–z
+                if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')) {
+                    ++i;
+                    break;
+                }
+                ++i;
+            }
+
+            output.append(input.substr(start, i - start));
+            --i;
+            continue;
+        }
+
+        // Control characters (C0 + DEL)
+        if (c < 0x20 || c == 0x7F) {
+            flushBuffer();
+            output.push_back(c);
+            continue;
+        }
+
+        // Printable byte → convert later
+        buffer.push_back(c);
+    }
+
+    flushBuffer();
+    return output;
 }
 
 // ==================== Conversions with ANSI Preservation ==================
@@ -66,7 +122,6 @@ std::string Encoding::cp437ToUtf8(const std::string &input) const {
         std::string out;
         for (unsigned char c: s)
             utf8::append(cp437ToUnicode[c], std::back_inserter(out));
-        //utf8::append(out, cp437ToUnicode[c]);
         return out;
     });
 }

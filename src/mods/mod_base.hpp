@@ -152,47 +152,47 @@ public:
     /**
      * @brief Pull and Display Prompts
      * @param prompt
-     * @param m_text_dao
+     * @param text_dao
      * @param is_disconnect
      */
-    void baseDisplayPrompt(const std::string &prompt, TextPromptsDao &m_text_dao, bool is_disconnect = false) const;
+    void baseDisplayPrompt(const std::string &prompt, TextPromptsDao &text_dao, bool is_disconnect = false) const;
 
     /**
      * @brief Pull and Return Display Prompt
      * @param prompt
-     * @param m_text_dao
+     * @param text_dao
      */
-    std::string baseGetDisplayPrompt(const std::string &prompt, TextPromptsDao &m_text_dao) const;
+    std::string baseGetDisplayPrompt(const std::string &prompt, TextPromptsDao &text_dao) const;
 
     /**
      * @brief Pull and Return Raw Display Prompts
      * @param prompt
-     * @param m_text_dao
+     * @param text_dao
      */
-    std::string baseGetDisplayPromptRaw(const std::string &prompt, TextPromptsDao &m_text_dao) const;
+    std::string baseGetDisplayPromptRaw(const std::string &prompt, TextPromptsDao &text_dao) const;
 
     /**
      * @brief Pull and Return Raw Display Prompts Parse Pipe Codes to ANSI
      * @param prompt
-     * @param m_text_dao
+     * @param text_dao
      */
-    std::string baseGetDisplayPromptPipeToAnsi(const std::string &prompt, TextPromptsDao &m_text_dao) const;
+    std::string baseGetDisplayPromptPipeToAnsi(const std::string &prompt, TextPromptsDao &text_dao) const;
 
     /**
      * @brief Pull and Display Prompts, Replace MCI Code |OT
      * @param prompt
-     * @param m_text_dao
+     * @param text_dao
      * @param mci_field
      */
-    void baseDisplayPromptMCI(const std::string &prompt, TextPromptsDao &m_text_dao,
+    void baseDisplayPromptMCI(const std::string &prompt, TextPromptsDao &text_dao,
                               const std::string &mci_field) const;
 
     /**
      * @brief Pull and Display Prompt with a following new line for info messages.
      * @param prompt
-     * @param m_text_dao
+     * @param text_dao
      */
-    void baseDisplayPromptAndNewLine(const std::string &prompt, TextPromptsDao &m_text_dao) const;
+    void baseDisplayPromptAndNewLine(const std::string &prompt, TextPromptsDao &text_dao) const;
 
     /**
      * @brief Move to End of Display then output
