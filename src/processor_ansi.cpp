@@ -21,7 +21,7 @@
 #include "model-sys/structures.hpp"
 #include "model-sys/screen_pixel.hpp"
 
-#include "common_io.hpp"
+#include "io_common.hpp"
 #include "logging.hpp"
 
 #include <utf8.h>
@@ -322,7 +322,7 @@ std::string ProcessorAnsi::screenBufferParse() {
     // Without Multiple loops through the string.
     MapType my_matches;
     std::vector<MapType> code_map;
-    CommonIO common_io;
+    IoCommon common_io;
 
     // To make parsing a little faster, pre-fill vector with 99,
     // So it's not allocating each insert.
@@ -620,7 +620,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
     std::string::const_iterator it = incoming_data.begin();
     std::string::const_iterator line_end = incoming_data.end();
 
-    CommonIO common_io;
+    IoCommon common_io;
     Utf8Glyph buffer;
 
     while (it != line_end) {

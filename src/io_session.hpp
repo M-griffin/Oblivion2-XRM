@@ -4,25 +4,35 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <utility>
+#include <cstddef>
 
-#include "common_io.hpp"
+#include "io_common.hpp"
+#include "io_input_handler.hpp"
+#include "io_pipes_colors.hpp"
+#include "model-sys/cell.hpp"
+
 #include "model-sys/config.hpp"
 #include "model-sys/structures.hpp"
 
 class Logging;
 class SessionWriter;
 
+
 /**
- * @class SessionIO
+ * @class IoSession
  * @author Michael Griffin
  * @date 9/21/2015
- * @file session_io.hpp
+ * @file io_session.hpp
  * @brief Higher Level I/O specific to Menu Interfaces
  */
-class SessionIO {
+class IoSession {
     Logging &m_log;
     SessionWriter &m_session;
-    CommonIO &m_common_io;
+    IoCommon &m_io_common;
+
+    IoInputHandler m_io_input_handler;
+    IoPipesAndColors m_pipes_and_colors;
     std::map<std::string, std::string> m_mapped_codes; // MCI Code Translation for specific screens.
 
     const std::string STD_EXPRESSION = {
@@ -33,72 +43,44 @@ class SessionIO {
     };
 
     const std::string MID_EXPRESSION = {"([|]{1}[A-Z]{1}[0-9]{1,2})|([|]{1}[A-Z]{2})"};
-
     const std::string PROMPT_EXPRESSION = {"([\\^]{1}[A-Z]{1})|([\\\\/=|@*:#)(]{1}$)"};
-
     const std::string FORMAT_EXPRESSION = {"([[]{1}[\\w\\W]+[]]{1})|([:]{1})"};
 
 public:
+    // Helpers
+    size_t utf8_width(const std::string &utf8_char);
+    int mk_wcwidth(wchar_t &ucs);
+
     // Types for Text Prompt formatting to file.
     typedef std::pair<std::string, std::string> M_StringPair;
 
-    explicit SessionIO(SessionWriter &session, CommonIO &common);
-
-    ~SessionIO();
+    explicit IoSession(SessionWriter &session, IoCommon &common);
+    ~IoSession();
 
     // Copy constructors
-    SessionIO &operator=(SessionIO &) = delete;
-
-    SessionIO(const SessionIO &) = delete;
+    IoSession &operator=(IoSession &) = delete;
+    IoSession(const IoSession &) = delete;
 
     // Move Constructors
-    SessionIO(SessionIO &&other) noexcept
+    IoSession(IoSession &&other) noexcept
         : m_log(other.m_log)
           , m_session(other.m_session)
-          , m_common_io(other.m_common_io)
+          , m_io_common(other.m_io_common)
+          , m_io_input_handler(other.m_io_input_handler)
           , m_mapped_codes(std::move(other.m_mapped_codes)) {
     }
 
-    SessionIO &operator=(SessionIO &&other) noexcept {
+    IoSession &operator=(IoSession &&other) noexcept {
         if (this != &other) {
             m_mapped_codes = std::move(other.m_mapped_codes);
         }
         return *this;
     }
 
-    /**
-     * @brief Single Key Input For Full Screen Editor or Esc Sequences
-     * @param character_buffer
-     * @return
-     */
+    // M_Io_Input_Handler
     std::string getFSEKeyInput(const std::string &character_buffer);
-
-    /**
-     * @brief Single Key Input or Esc Sequence parser.
-     *        Only Accepts single characters at a time then passes through.
-     *        Basically all input passes through till there is something to display
-     *        Nothing loop on input in these functions to keep async.
-     * @param character_buffer
-     * @return
-     */
     std::string getKeyInput(const std::string &character_buffer);
-
-    /**
-     * @brief Generates an input field with ANSI color background
-     * @param field_name
-     * @param len
-     */
     void createInputField(std::string &field_name, int &len);
-
-    /**
-    * @brief Input Field, returns output for keypresses, completed field returns in result
-    * @param character_buffer
-    * @param result
-    * @param length
-    * @param leadoff
-    * @param hidden
-    * @return
-    */
     std::string getInputField(const std::string &character_buffer, // Input.
                               std::string &result, // Returned at [ENTER]
                               int length = 30, // Default 30 Bytes
@@ -123,7 +105,6 @@ public:
      * @return
      */
     std::string pipeColors(const std::string &color_string);
-
 
     /**
      * @brief Gets the Default Color Sequence

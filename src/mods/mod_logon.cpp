@@ -18,10 +18,10 @@
 
 #include "../model-sys/context.hpp"
 
-#include "../session_io.hpp"
+#include "../io_session.hpp"
 #include "../encryption.hpp"
 #include "../logging.hpp"
-#include "../common_io.hpp"
+#include "../io_common.hpp"
 
 ModLogon::ModLogon(Context &ctx)
     : ModBase(ctx, MOD_FILENAME)
@@ -204,8 +204,8 @@ void ModLogon::displayUserNumber() {
     std::string result = prompt_set.second;
     const std::string user_number = std::to_string(m_logon_user.iId);
 
-    m_ctx.getCommonIO().parseLocalMCI(result, mci_code, user_number);
-    result = m_ctx.getSessionIO().pipe2ansi(result);
+    m_ctx.getIoCommon().parseLocalMCI(result, mci_code, user_number);
+    result = m_ctx.getIoSession().pipe2ansi(result);
     result += "\r\n";
     baseProcessAndDeliver(result);
 }
@@ -250,7 +250,7 @@ bool ModLogon::checkUserLogon(const std::string &input) {
     UsersDao user_data(m_ctx.getDatabase());
 
     // Check if a Digit, if so, lookup by userId.
-    if (m_ctx.getCommonIO().isDigit(input)) {
+    if (m_ctx.getIoCommon().isDigit(input)) {
         long userId = 0;
         std::stringstream ss(input);
         ss >> userId;
@@ -303,7 +303,7 @@ bool ModLogon::checkUserLogon(const std::string &input) {
  */
 bool ModLogon::logon(const std::string &input) {
     std::string key;
-    std::string result = m_ctx.getSessionIO().getInputField(
+    std::string result = m_ctx.getIoSession().getInputField(
         input, key, Config::sName_length);
 
     // ESC was hit
@@ -397,7 +397,7 @@ bool ModLogon::validate_password(const std::string &input) {
 bool ModLogon::password(const std::string &input) {
     std::string key;
     bool useHiddenOutput = true;
-    std::string result = m_ctx.getSessionIO().getInputField(
+    std::string result = m_ctx.getIoSession().getInputField(
         input, key, Config::sPassword_length, "", useHiddenOutput);
 
     // ESC was hit

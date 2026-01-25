@@ -3,10 +3,10 @@
 
 #include <cassert>
 
-#include "../common_io.hpp"
+#include "../io_common.hpp"
 #include "../processor_ansi.hpp"
 #include "../session_writer.hpp"
-#include "../session_io.hpp"
+#include "../io_session.hpp"
 #include "../telnet_session.hpp"
 
 #include "config.hpp"
@@ -32,8 +32,8 @@ public:
     TelnetSession *telnetSession = nullptr;
     Users *userRec = nullptr;
     ProcessorAnsi *ansiProcess = nullptr;
-    CommonIO *commonIO = nullptr;
-    SessionIO *sessionIO = nullptr;
+    IoCommon *ioCommon = nullptr;
+    IoSession *ioSession = nullptr;
     Config *config = nullptr;
     SQLW::Database *database = nullptr;
 
@@ -42,8 +42,8 @@ public:
         TelnetSession &ts,
         Users &ur,
         ProcessorAnsi &ap,
-        CommonIO &cio,
-        SessionIO &sio,
+        IoCommon &cio,
+        IoSession &sio,
         Config &cfg,
         SQLW::Database &db
     ) {
@@ -51,8 +51,8 @@ public:
         telnetSession = &ts;
         userRec = &ur;
         ansiProcess = &ap;
-        commonIO = &cio;
-        sessionIO = &sio;
+        ioCommon = &cio;
+        ioSession = &sio;
         config = &cfg;
         database = &db;
     }
@@ -77,14 +77,14 @@ public:
         return *ansiProcess;
     }
 
-    CommonIO &getCommonIO() const {
-        assert(commonIO);
-        return *commonIO;
+    IoCommon &getIoCommon() const {
+        assert(ioCommon);
+        return *ioCommon;
     }
 
-    SessionIO &getSessionIO() const {
-        assert(sessionIO);
-        return *sessionIO;
+    IoSession &getIoSession() const {
+        assert(ioSession);
+        return *ioSession;
     }
 
     Config &getCfg() const {

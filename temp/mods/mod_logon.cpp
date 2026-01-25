@@ -217,7 +217,7 @@ void ModLogon::displayUserNumber()
     std::string result = prompt_set.second;
     std::string user_number = std::to_string(m_logon_user->iId);
 
-    m_common_io.parseLocalMCI(result, mci_code, user_number);
+    m_io_common.parseLocalMCI(result, mci_code, user_number);
     result = m_session_io.pipe2ansi(result);
     result += "\r\n";
     baseProcessAndDeliver(result);
@@ -269,7 +269,7 @@ bool ModLogon::checkUserLogon(const std::string &input)
     users_dao_ptr user_data = std::make_shared<UsersDao>(getUserDatabase());
 
     // Check if a Digit, if so, lookup by userId.
-    if(m_common_io.isDigit(input))
+    if(m_io_common.isDigit(input))
     {
         long userId = 0;
         std::stringstream ss(input);

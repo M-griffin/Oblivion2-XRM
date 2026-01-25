@@ -1,4 +1,4 @@
-#include "common_io.hpp"
+#include "io_common.hpp"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -44,7 +44,7 @@
 
 std::map<std::string, std::string> INPUT_SEQUENCE_MAP;
 
-CommonIO::CommonIO()
+IoCommon::IoCommon()
     : m_log(Logging::getInstance())
       , m_escape_sequence("")
       , m_string_buffer("")
@@ -57,8 +57,8 @@ CommonIO::CommonIO()
     populateInputSequenceMap();
 }
 
-CommonIO::~CommonIO() {
-    m_log.log(Logging::LogLevel::Console, "~CommonIO()");
+IoCommon::~IoCommon() {
+    m_log.log(Logging::LogLevel::Console, "~IoCommon()");
 
     // Look at making this a single instance per session instead of a locate on fly.
     m_escape_sequence.erase();
@@ -70,7 +70,7 @@ CommonIO::~CommonIO() {
 /**
  * @brief Set up a Static GLobal Map for Key Input that can be resued.
  */
-void CommonIO::populateInputSequenceMap() {
+void IoCommon::populateInputSequenceMap() {
     if (!INPUT_SEQUENCE_MAP.empty()) {
         return;
     }
@@ -199,7 +199,7 @@ void CommonIO::populateInputSequenceMap() {
  * @brief Retrieve Key Sequence by Value
  * @param value
  */
-std::string CommonIO::getSequenceFromMap(const std::string &value) {
+std::string IoCommon::getSequenceFromMap(const std::string &value) {
     std::string key = "";
 
     for (auto &i: INPUT_SEQUENCE_MAP) {
@@ -218,7 +218,7 @@ std::string CommonIO::getSequenceFromMap(const std::string &value) {
  * This has only been tested in Windows, Linux, OSX.
  * @return
  */
-std::string CommonIO::getProgramPath(const std::string &program_name) {
+std::string IoCommon::getProgramPath(const std::string &program_name) {
     // NOTE This method can not use logging, called prior to configuration load.
     std::string program_path;
     std::string program = "/" + program_name;
@@ -345,7 +345,7 @@ std::string CommonIO::getSystemHomeDirectory()
  * @param path
  * @return
  */
-void CommonIO::pathAppend(std::string &path) {
+void IoCommon::pathAppend(std::string &path) {
 #ifdef _WIN32
     path.append("\\");
 #else
@@ -358,7 +358,7 @@ void CommonIO::pathAppend(std::string &path) {
  * @param str
  * @return
  */
-std::string::size_type CommonIO::numberOfChars(const std::string &str) {
+std::string::size_type IoCommon::numberOfChars(const std::string &str) {
     if (str.empty()) return 0;
 
     size_t count = 0;
@@ -380,7 +380,7 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str) {
 }
 
 // Sugested Fix. but doesn't handle high ascii CP437 properly, we'll re-test.
-std::string::size_type CommonIO::numberOfChars2(const std::string &str) {
+std::string::size_type IoCommon::numberOfChars2(const std::string &str) {
     if (str.empty()) {
         return 0;
     }
@@ -408,7 +408,7 @@ std::string::size_type CommonIO::numberOfChars2(const std::string &str) {
  * @param str
  * @return
  */
-std::string CommonIO::leftTrim(const std::string &str) {
+std::string IoCommon::leftTrim(const std::string &str) {
     std::string new_string = str;
 
     if (new_string.empty()) {
@@ -430,7 +430,7 @@ std::string CommonIO::leftTrim(const std::string &str) {
  * @param str
  * @return
  */
-std::string CommonIO::rightTrim(const std::string &str) {
+std::string IoCommon::rightTrim(const std::string &str) {
     std::string new_string = str;
 
     if (new_string.empty()) {
@@ -452,7 +452,7 @@ std::string CommonIO::rightTrim(const std::string &str) {
  * @param str
  * @return
  */
-std::string CommonIO::trim(const std::string &str) {
+std::string IoCommon::trim(const std::string &str) {
     std::string new_string = str;
 
     if (new_string.empty()) {
@@ -468,7 +468,7 @@ std::string CommonIO::trim(const std::string &str) {
  * @param start_position
  * @param end_position
  */
-std::string CommonIO::eraseString(const std::string &str,
+std::string IoCommon::eraseString(const std::string &str,
                                   std::string::size_type start_position,
                                   std::string::size_type end_position) {
     std::string new_string = str;
@@ -538,7 +538,7 @@ std::string CommonIO::eraseString(const std::string &str,
 }
 
 // suggested Fix / again can have issues with high acsii non-utf8, have to review.
-std::string CommonIO::eraseString2(const std::string &str,
+std::string IoCommon::eraseString2(const std::string &str,
                                    std::string::size_type start_position,
                                    std::string::size_type count) {
     if (str.empty() || count == 0) {
@@ -588,7 +588,7 @@ std::string CommonIO::eraseString2(const std::string &str,
  * @param space
  * @return
  */
-std::string CommonIO::rightPadding(const std::string &str, std::string::size_type space) // Pad Right
+std::string IoCommon::rightPadding(const std::string &str, std::string::size_type space) // Pad Right
 {
     std::string padded_line = "";
     std::string new_string = str;
@@ -628,7 +628,7 @@ std::string CommonIO::rightPadding(const std::string &str, std::string::size_typ
  * @param space
  * @return
  */
-std::string CommonIO::leftPadding(const std::string &str, std::string::size_type space) {
+std::string IoCommon::leftPadding(const std::string &str, std::string::size_type space) {
     std::string new_string = str;
 
     if (space == 0) {
@@ -667,7 +667,7 @@ std::string CommonIO::leftPadding(const std::string &str, std::string::size_type
  * @param term_width
  * @return
  */
-std::string CommonIO::centerPadding(const std::string &str, int term_width) {
+std::string IoCommon::centerPadding(const std::string &str, int term_width) {
     std::string new_string = str;
 
     if (new_string.empty()) {
@@ -705,7 +705,7 @@ std::string CommonIO::centerPadding(const std::string &str, int term_width) {
  * @param str
  * @return
  */
-std::string CommonIO::maskString(const std::string &str) {
+std::string IoCommon::maskString(const std::string &str) {
     std::string new_string = str;
 
     if (new_string.empty()) {
@@ -733,7 +733,7 @@ std::string CommonIO::maskString(const std::string &str) {
  * @param str
  * @return
  */
-bool CommonIO::isDigit(const std::string &str) {
+bool IoCommon::isDigit(const std::string &str) {
     // Later reference for
     // Better wide characters.
     // https://www.cs.helsinki.fi/group/boi2016/doc/cppreference/reference
@@ -751,7 +751,7 @@ bool CommonIO::isDigit(const std::string &str) {
  * @brief Return the Input Full Screen Editor Escape Sequence Parsed.
  * @return
  */
-std::string CommonIO::getFSEEscapeSequence() {
+std::string IoCommon::getFSEEscapeSequence() {
     // Check if Sequences Exists, otherwise return blank.
     if (INPUT_SEQUENCE_MAP.find(m_escape_sequence) != INPUT_SEQUENCE_MAP.end()) {
         return INPUT_SEQUENCE_MAP[m_escape_sequence];
@@ -764,7 +764,7 @@ std::string CommonIO::getFSEEscapeSequence() {
  * @brief Return the Input Escape Sequence Parsed.
  * @return
  */
-std::string CommonIO::getEscapeSequence() {
+std::string IoCommon::getEscapeSequence() {
     // Check if Sequences Exists, otherwise return blank.
     if (INPUT_SEQUENCE_MAP.find(m_escape_sequence) != INPUT_SEQUENCE_MAP.end()) {
         return INPUT_SEQUENCE_MAP[m_escape_sequence];
@@ -778,7 +778,7 @@ std::string CommonIO::getEscapeSequence() {
  *        Sequences are handled 1 character at a time.
  * @return
  */
-std::string CommonIO::parseInput(const std::string &character_buffer) {
+std::string IoCommon::parseInput(const std::string &character_buffer) {
     int num = numberOfChars(character_buffer);
 
     if ((num == 0 || character_buffer[0] == '\x1b') &&
@@ -981,7 +981,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer) {
 * @brief Returns the InputFieldBuffer
 * @return
 */
-std::string CommonIO::getInputBuffer() {
+std::string IoCommon::getInputBuffer() {
     return m_line_buffer;
 }
 
@@ -993,7 +993,7 @@ std::string CommonIO::getInputBuffer() {
  * @param hidden
  * @return
  */
-std::string CommonIO::getLine(const std::string &line, // Parsed Char input in
+std::string IoCommon::getLine(const std::string &line, // Parsed Char input in
                               int length, // Max Input Length of Field
                               const std::string &leadoff, // Data to Display in Default Field {Optional}
                               bool hidden) // If input is hidden or masked     {Optional}
@@ -1131,7 +1131,7 @@ std::string CommonIO::getLine(const std::string &line, // Parsed Char input in
  * @brief Converts Pascal Strings to C-Strings Also return std::string for conversions.
  * @param string
  */
-std::string CommonIO::PascalToCString(int8_t *string) {
+std::string IoCommon::PascalToCString(int8_t *string) {
     if (string[0] == 0) {
         return "";
     }
@@ -1156,7 +1156,7 @@ std::string CommonIO::PascalToCString(int8_t *string) {
  * @brief Converts Pascal Strings to C-Strings
  * @param string
  */
-void CommonIO::CStringToPascal(int8_t *string) {
+void IoCommon::CStringToPascal(int8_t *string) {
     if (string[0] == '\0') {
         string[0] = 0;
         return;
@@ -1186,7 +1186,7 @@ void CommonIO::CStringToPascal(int8_t *string) {
  * @param value
  * @return
  */
-std::string CommonIO::boolAlpha(bool value) {
+std::string IoCommon::boolAlpha(bool value) {
     if (value) {
         return "True";
     }
@@ -1200,7 +1200,7 @@ std::string CommonIO::boolAlpha(bool value) {
  * @param mcicode
  * @param replacement
  */
-void CommonIO::parseLocalMCI(std::string &AnsiString, const std::string &mcicode, const std::string &replacement) {
+void IoCommon::parseLocalMCI(std::string &AnsiString, const std::string &mcicode, const std::string &replacement) {
     std::string::size_type id1 = 0;
 
     do {
@@ -1218,7 +1218,7 @@ void CommonIO::parseLocalMCI(std::string &AnsiString, const std::string &mcicode
  * @brief Check if the file exists
  * @return
  */
-bool CommonIO::fileExists(const std::string &file_name) {
+bool IoCommon::fileExists(const std::string &file_name) {
     std::string path = GLOBAL_TEXTFILE_PATH;
     pathAppend(path);
     path += file_name;
@@ -1236,7 +1236,7 @@ bool CommonIO::fileExists(const std::string &file_name) {
 /**
  * Reads in ANSI file into Buffer Only
  */
-std::string CommonIO::readAnsi(const std::string &fileName) {
+std::string IoCommon::readAnsi(const std::string &fileName) {
     std::string path = GLOBAL_TEXTFILE_PATH;
     pathAppend(path);
     path += fileName;
@@ -1276,7 +1276,7 @@ std::string CommonIO::readAnsi(const std::string &fileName) {
 * @param delimiter
 * @return
 */
-std::vector<std::string> CommonIO::splitString(const std::string &s, char delimiter) {
+std::vector<std::string> IoCommon::splitString(const std::string &s, char delimiter) {
     std::vector<std::string> tokens;
     std::string token;
     std::istringstream tokenStream(s);
@@ -1294,7 +1294,7 @@ std::vector<std::string> CommonIO::splitString(const std::string &s, char delimi
 * @param std_time
 * @return
 */
-std::string CommonIO::standardDateToString(std::time_t std_time) {
+std::string IoCommon::standardDateToString(std::time_t std_time) {
     std::ostringstream oss;
     oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d");
     std::string time_string = oss.str();
@@ -1307,7 +1307,7 @@ std::string CommonIO::standardDateToString(std::time_t std_time) {
 * @param std_time
 * @return
 */
-std::string CommonIO::standardDateTimeToString(std::time_t std_time) {
+std::string IoCommon::standardDateTimeToString(std::time_t std_time) {
     std::ostringstream oss;
     oss << std::put_time(std::localtime(&std_time), "%Y-%m-%d %H:%M:%S %z");
     std::string datetime_string = oss.str();
@@ -1320,7 +1320,7 @@ std::string CommonIO::standardDateTimeToString(std::time_t std_time) {
 * @param date
 * @return
 */
-std::time_t CommonIO::stringToStandardDate(const std::string &date) {
+std::time_t IoCommon::stringToStandardDate(const std::string &date) {
     // Append Time For Dates, need formatting's
     std::string key = date;
     key += " 00:00:00";
@@ -1343,7 +1343,7 @@ std::time_t CommonIO::stringToStandardDate(const std::string &date) {
 * @param date_time
 * @return
 */
-std::time_t CommonIO::stringToStandardDateTime(const std::string &date_time) {
+std::time_t IoCommon::stringToStandardDateTime(const std::string &date_time) {
     struct std::tm tm;
     std::istringstream ss(date_time);
     ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
@@ -1362,7 +1362,7 @@ std::time_t CommonIO::stringToStandardDateTime(const std::string &date_time) {
 * @param value
 * @return
 */
-long CommonIO::stringToLong(const std::string &value) {
+long IoCommon::stringToLong(const std::string &value) {
     long result_id = -1;
     std::stringstream ss(value);
     ss >> result_id;
@@ -1382,7 +1382,7 @@ long CommonIO::stringToLong(const std::string &value) {
 * @param value
 * @return
 */
-int CommonIO::stringToInt(const std::string &value) {
+int IoCommon::stringToInt(const std::string &value) {
     int result_id = -1;
     std::stringstream ss(value);
     ss >> result_id;
@@ -1402,7 +1402,7 @@ int CommonIO::stringToInt(const std::string &value) {
 * @param value
 * @return
 */
-int CommonIO::stringToBool(const std::string &value) {
+int IoCommon::stringToBool(const std::string &value) {
     // Test if string starts with T or F instead of typing True/False
     if (toupper(value[0]) == 'T')
         return 1;
@@ -1412,7 +1412,7 @@ int CommonIO::stringToBool(const std::string &value) {
     return -1;
 }
 
-bool CommonIO::nextGlyph(const std::string &s,
+bool IoCommon::nextGlyph(const std::string &s,
                          std::string::const_iterator &it,
                          Utf8Glyph &glyph) {
     glyph.bytes.clear();
@@ -1439,7 +1439,7 @@ bool CommonIO::nextGlyph(const std::string &s,
     return true;
 }
 
-bool CommonIO::peekGlyph(const std::string &s,
+bool IoCommon::peekGlyph(const std::string &s,
                          std::string::const_iterator it,
                          Utf8Glyph &glyph) {
     return nextGlyph(s, it, glyph);
@@ -1447,7 +1447,7 @@ bool CommonIO::peekGlyph(const std::string &s,
 
 // General idea of a buffer for incomplete sequences.
 // review and incorperate for better sequence handling!
-void CommonIO::onTcpReceive(const std::string &chunk) {
+void IoCommon::onTcpReceive(const std::string &chunk) {
     m_utf8_rx_buffer.append(chunk);
 
     auto it = m_utf8_rx_buffer.begin();
@@ -1472,7 +1472,7 @@ void CommonIO::onTcpReceive(const std::string &chunk) {
     }
 }
 
-bool CommonIO::decodeNextGlyph(const std::string &bytes,
+bool IoCommon::decodeNextGlyph(const std::string &bytes,
                                std::string::const_iterator &it,
                                Encoding::TextEncoding encoding,
                                Utf8Glyph &glyph) {
@@ -1549,7 +1549,7 @@ std::string CommonIO::utf8ToCp437(const std::string& utf8) {
  * @brief Transform Strings to Uppercase with Locale
  * @param value
  */
-std::string CommonIO::toUpper(const std::string &value) {
+std::string IoCommon::toUpper(const std::string &value) {
     std::string result;
     result.reserve(value.size());
 
@@ -1573,7 +1573,7 @@ std::string CommonIO::toUpper(const std::string &value) {
  * @brief Transform Strings to Lowercase with Locale
  * @param value
  */
-std::string CommonIO::toLower(const std::string &value) {
+std::string IoCommon::toLower(const std::string &value) {
     std::string result;
     result.reserve(value.size());
 

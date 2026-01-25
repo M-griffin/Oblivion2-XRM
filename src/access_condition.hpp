@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "session_io.hpp"
+#include "io_session.hpp"
 #include "model-sys/structures.hpp"
 
 class Users;
@@ -20,7 +20,7 @@ class Logging;
  */
 class AccessCondition {
 public:
-    explicit AccessCondition(SessionIO &io);
+    explicit AccessCondition(IoSession &io);
 
     ~AccessCondition();
 
@@ -113,7 +113,7 @@ public:
 
     // Using Session IO for Code Mapping
     Logging &m_log;
-    SessionIO &m_session_io;
+    IoSession &m_session_io;
 
     // note update to security expressions
     // start with NOT s255 then test for s255

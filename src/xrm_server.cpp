@@ -44,7 +44,7 @@
 #include "model-sys/config.hpp"
 #include "data-sys/config_dao.hpp"
 
-#include "common_io.hpp"
+#include "io_common.hpp"
 #include "logging.hpp"
 #include "tcp_server.hpp"
 #include "data-sys/db_startup.hpp"
@@ -146,7 +146,7 @@ auto main() -> int {
 
     Logging &m_log = Logging::getInstance();
     m_log.log(Logging::LogLevel::Console, BUILD_INFO); {
-        CommonIO common;
+        IoCommon common;
         GLOBAL_BBS_PATH = common.getProgramPath("xrm-server");
     }
 

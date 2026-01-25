@@ -10,12 +10,12 @@
 #include <utf8.h>
 
 #include "model-sys/structures.hpp"
-#include "common_io.hpp"
+#include "io_common.hpp"
 #include "deadline_timer.hpp"
 #include "libSqliteWrapped.h"
 #include "processor_ansi.hpp"
 #include "socket_service.hpp"
-#include "session_io.hpp"
+#include "io_session.hpp"
 #include "telnet.hpp"
 #include "telnet_session.hpp"
 #include "state_manager.hpp"
@@ -34,8 +34,8 @@ class TCPSession {
     TelnetSession m_telnetSession;
     Users m_userRec;
     ProcessorAnsi m_ansi_process;
-    CommonIO m_common_io;
-    SessionIO m_session_io;
+    IoCommon m_io_common;
+    IoSession m_session_io;
     SQLW::Database &m_coreDatabase;
 
     Context m_context;
@@ -57,8 +57,8 @@ public:
           , m_telnetSession(m_session_writer)
           , m_userRec()
           , m_ansi_process()
-          , m_common_io()
-          , m_session_io(m_session_writer, m_common_io)
+          , m_io_common()
+          , m_session_io(m_session_writer, m_io_common)
           , m_coreDatabase(coreDatabase)
           , m_context() {
         // Bind all necessary components
@@ -67,7 +67,7 @@ public:
             m_telnetSession,
             m_userRec,
             m_ansi_process,
-            m_common_io,
+            m_io_common,
             m_session_io,
             m_socketService.getConfig(),
             m_coreDatabase

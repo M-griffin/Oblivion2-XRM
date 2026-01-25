@@ -15,8 +15,8 @@
 #include "../session_writer.hpp"
 #include "../encoding.hpp"
 #include "../logging.hpp"
-#include "../session_io.hpp"
-#include "../common_io.hpp"
+#include "../io_session.hpp"
+#include "../io_common.hpp"
 
 ModPreLogon::ModPreLogon(Context &ctx)
     : ModBase(ctx, MOD_FILENAME)
@@ -236,16 +236,16 @@ void ModPreLogon::setupHumanShield() {
     m_log.log(Logging::LogLevel::Console, "PreLogon setupHumanShield");
 
     // Display Detecting Emulation, not using display prompt because we need to append.
-    std::string result = "|07" + m_ctx.getCommonIO().centerPadding(
+    std::string result = "|07" + m_ctx.getIoCommon().centerPadding(
                              BUILD_INFO, m_ctx.getTelnet().getTermCols()) + "\r\n";
 
-    result += m_ctx.getSessionIO().parseTextPrompt(
+    result += m_ctx.getIoSession().parseTextPrompt(
         m_text_prompts_dao.getPrompt(PROMPT_HUMAN_SHIELD)
     );
 
     // If response is echoed back, make it black on black.
     result.append("|00");
-    std::string output = m_ctx.getSessionIO().pipe2ansi(result);
+    std::string output = m_ctx.getIoSession().pipe2ansi(result);
 
     baseProcessAndDeliver(output);
 
@@ -271,13 +271,13 @@ void ModPreLogon::setupEmulationDetection() {
     baseProcessAndDeliver(reset_position);
 
     // Display Detecting Emulation, not using display prompt because we need to append.
-    std::string result = m_ctx.getSessionIO().parseTextPrompt(
+    std::string result = m_ctx.getIoSession().parseTextPrompt(
         m_text_prompts_dao.getPrompt(PROMPT_DETECT_EMULATION)
     );
 
     // If response is echoed back, make it black on black.
     result.append("|00");
-    std::string output = m_ctx.getSessionIO().pipe2ansi(result);
+    std::string output = m_ctx.getIoSession().pipe2ansi(result);
 
     baseProcessAndDeliver(output);
 
@@ -323,8 +323,8 @@ void ModPreLogon::displayTerminalDetection() {
         const std::string term = m_ctx.getTelnet().getTermType();
         m_log.log(Logging::LogLevel::Console, "Term Type=", term);
 
-        m_ctx.getCommonIO().parseLocalMCI(result, mci_code, term);
-        result = m_ctx.getSessionIO().pipe2ansi(result);
+        m_ctx.getIoCommon().parseLocalMCI(result, mci_code, term);
+        result = m_ctx.getIoSession().pipe2ansi(result);
         baseProcessAndDeliver(result);
     }
 
@@ -350,8 +350,8 @@ void ModPreLogon::displayTerminalDetection() {
         }
 
         m_log.log(Logging::LogLevel::Console, "Term Size=", term_size);
-        m_ctx.getCommonIO().parseLocalMCI(result, mci_code, term_size);
-        result = m_ctx.getSessionIO().pipe2ansi(result);
+        m_ctx.getIoCommon().parseLocalMCI(result, mci_code, term_size);
+        result = m_ctx.getIoSession().pipe2ansi(result);
         baseProcessAndDeliver(result);
     }
 
@@ -458,11 +458,11 @@ bool ModPreLogon::emulationDetection(const std::string &input) {
 
                 // Parse out x/y position coordinates for Screen Size returned.
                 // Splunk String on : for X/Y Positions from Response
-                const std::vector<std::string> positions = m_ctx.getCommonIO().splitString(m_esc_sequence, ';');
+                const std::vector<std::string> positions = m_ctx.getIoCommon().splitString(m_esc_sequence, ';');
                 if (positions.size() > 1) {
                     m_log.log(Logging::LogLevel::Console, "ESC Detect X=", positions[1], "Y=", positions[0]);
-                    m_x_position = m_ctx.getCommonIO().stringToInt(positions[1]);
-                    m_y_position = m_ctx.getCommonIO().stringToInt(positions[0]);
+                    m_x_position = m_ctx.getIoCommon().stringToInt(positions[1]);
+                    m_y_position = m_ctx.getIoCommon().stringToInt(positions[0]);
 
                     // Set Term to Final ESC6N response vs NAWS. When detected, more accrate
                     m_ctx.getTelnet().setTermCols(m_x_position);
@@ -483,7 +483,7 @@ bool ModPreLogon::emulationDetection(const std::string &input) {
  */
 bool ModPreLogon::askANSIColor(const std::string &input) {
     std::string key;
-    std::string result = m_ctx.getSessionIO().getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_ctx.getIoSession().getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if (result == "aborted") {
@@ -535,7 +535,7 @@ bool ModPreLogon::askANSIColor(const std::string &input) {
 bool ModPreLogon::askCodePage(const std::string &input) {
     const std::string blackColor = "|00";
     std::string key;
-    std::string result = m_ctx.getSessionIO().getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_ctx.getIoSession().getInputField(input, key, Config::sSingle_key_length);
     std::string term_type = m_ctx.getTelnet().getTermType();
 
     // ESC was hit
@@ -566,11 +566,11 @@ bool ModPreLogon::askCodePage(const std::string &input) {
                  || term_type.find("bbs", 0) != std::string::npos){
 
                 // Switch to ISO, then CP437 Character Set.
-                message = "\x1b[0m" + m_ctx.getSessionIO().pipeColors(blackColor);
+                message = "\x1b[0m" + m_ctx.getIoSession().pipeColors(blackColor);
                 message += "\x1b%@\x1b(U \r\n\x1b[A";
                 m_ctx.getSessionWrite().send(message);
 
-                message = m_ctx.getSessionIO().parseTextPrompt(
+                message = m_ctx.getIoSession().parseTextPrompt(
                     m_text_prompts_dao.getPrompt(PROMPT_CP437_SELECTED)
                 );
 
@@ -579,11 +579,11 @@ bool ModPreLogon::askCodePage(const std::string &input) {
                 m_ctx.getSessionWrite().setEncoding(Encoding::TextEncoding::CP437);
             } else {
                 // Switch to Unicode Character Set.
-                message = "\x1b[0m" + m_ctx.getSessionIO().pipeColors(blackColor);
+                message = "\x1b[0m" + m_ctx.getIoSession().pipeColors(blackColor);
                 message += "\x1b%@\x1b%G \r\n\x1b[A";
                 m_ctx.getSessionWrite().send(message);
 
-                message = m_ctx.getSessionIO().parseTextPrompt(
+                message = m_ctx.getIoSession().parseTextPrompt(
                     m_text_prompts_dao.getPrompt(PROMPT_UTF8_SELECTED)
                 );
 
@@ -609,11 +609,11 @@ bool ModPreLogon::askCodePage(const std::string &input) {
                 || term_type.find("bbs", 0) != std::string::npos){
 
                 // Switch to Unicode Character Set.
-                message = "\x1b[0m" + m_ctx.getSessionIO().pipeColors(blackColor);
+                message = "\x1b[0m" + m_ctx.getIoSession().pipeColors(blackColor);
                 message += "\x1b%@\x1b%G \r\n\x1b[A";
                 m_ctx.getSessionWrite().send(message);
 
-                message = m_ctx.getSessionIO().parseTextPrompt(
+                message = m_ctx.getIoSession().parseTextPrompt(
                     m_text_prompts_dao.getPrompt(PROMPT_UTF8_SELECTED)
                 );
 
@@ -622,11 +622,11 @@ bool ModPreLogon::askCodePage(const std::string &input) {
                 m_ctx.getSessionWrite().setEncoding(Encoding::TextEncoding::UTF8);
             } else {
                 // Switch to ISO, then CP437 Character Set.
-                message = "\x1b[0m" + m_ctx.getSessionIO().pipeColors(blackColor);
+                message = "\x1b[0m" + m_ctx.getIoSession().pipeColors(blackColor);
                 message += "\x1b%@\x1b(U \r\n\x1b[A";
                 m_ctx.getSessionWrite().send(message);
 
-                message = m_ctx.getSessionIO().parseTextPrompt(
+                message = m_ctx.getIoSession().parseTextPrompt(
                     m_text_prompts_dao.getPrompt(PROMPT_CP437_SELECTED)
                 );
 

@@ -239,7 +239,7 @@ public:
     session_wptr        m_session_data;
     config_ptr          m_config;    
     processor_ansi_ptr  m_ansi_process;
-    common_io_ptr       m_common_io;
+    common_io_ptr       m_io_common;
     session_io_ptr      m_session_io;
     bool                m_is_active;    
 

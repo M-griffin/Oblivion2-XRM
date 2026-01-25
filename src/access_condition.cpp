@@ -8,14 +8,14 @@
 #include "model-sys/users.hpp"
 #include "model-sys/access_level.hpp"
 
-#include "session_io.hpp"
+#include "io_session.hpp"
 #include "logging.hpp"
 
 /**
  * @brief Class Constructor And Initialization
  * @return 
  */
-AccessCondition::AccessCondition(SessionIO &io)
+AccessCondition::AccessCondition(IoSession &io)
     : m_log(Logging::getInstance())
       , m_session_io(io) {
 }

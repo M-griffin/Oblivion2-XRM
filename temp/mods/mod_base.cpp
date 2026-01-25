@@ -26,7 +26,7 @@ ModBase::ModBase(session_ptr session_data, config_ptr config, processor_ansi_ptr
     , m_session_data(session_data)
     , m_config(config)    
     , m_ansi_process(ansi_process)
-    , m_common_io(common_io)
+    , m_io_common(common_io)
     , m_session_io(session_io)
     , m_is_active(false)
 {    
@@ -40,7 +40,7 @@ ModBase::~ModBase()
     m_session_data.reset();
     m_config.reset();
     m_session_io.reset();
-    m_common_io.reset();
+    m_io_common.reset();
     m_ansi_process.reset();    
     m_filename.clear();
     m_is_active = false;    
@@ -442,7 +442,7 @@ void ModBase::baseDisplayPromptMCI(const std::string &prompt, text_prompts_dao_p
 
     // Parse and replace the MCI Code with the field value
     std::string mci_code = "|OT";
-    m_common_io.parseLocalMCI(prompt_set.second, mci_code, mci_field);
+    m_io_common.parseLocalMCI(prompt_set.second, mci_code, mci_field);
 
     // Does pipe2ansi for colors etc..
     result += std::move(m_session_io.parseTextPrompt(prompt_set));

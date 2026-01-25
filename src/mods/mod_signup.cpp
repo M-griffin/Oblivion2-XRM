@@ -21,7 +21,7 @@
 #include "../data-sys/security_dao.hpp"
 #include "../data-sys/users_dao.hpp"
 
-#include "../session_io.hpp"
+#include "../io_session.hpp"
 #include "../encryption.hpp"
 #include "../logging.hpp"
 #include "../menu_base.hpp"
@@ -565,7 +565,7 @@ void ModSignup::setupVerifyAndSave() {
 bool ModSignup::fieldInputAndProcess(std::string input, int field_length, bool use_hidden_output,
                                      std::function<bool(std::string &, std::string &)> function_pointer) {
     std::string key = "";
-    std::string result = m_ctx.getSessionIO().getInputField(input, key, field_length, "", use_hidden_output);
+    std::string result = m_ctx.getIoSession().getInputField(input, key, field_length, "", use_hidden_output);
 
     // ESC was hit
     if (result == "aborted") {
@@ -1040,7 +1040,7 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input) {
  */
 bool ModSignup::yesNoBars(const std::string &input) {
     std::string key;
-    std::string result = m_ctx.getSessionIO().getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_ctx.getIoSession().getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if (result == "aborted") {
@@ -1087,7 +1087,7 @@ bool ModSignup::yesNoBars(const std::string &input) {
  */
 bool ModSignup::doPause(const std::string &input) {
     std::string key;
-    std::string result = m_ctx.getSessionIO().getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_ctx.getIoSession().getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if (result == "aborted") {
@@ -1134,7 +1134,7 @@ bool ModSignup::doPause(const std::string &input) {
  */
 bool ModSignup::clearOrScroll(const std::string &input) {
     std::string key = "";
-    std::string result = m_ctx.getSessionIO().getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_ctx.getIoSession().getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if (result == "aborted") {
@@ -1181,7 +1181,7 @@ bool ModSignup::clearOrScroll(const std::string &input) {
  */
 bool ModSignup::ansiColor(const std::string &input) {
     std::string key = "";
-    std::string result = m_ctx.getSessionIO().getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_ctx.getIoSession().getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if (result == "aborted") {
@@ -1228,7 +1228,7 @@ bool ModSignup::ansiColor(const std::string &input) {
  */
 bool ModSignup::backSpace(const std::string &input) {
     std::string key = "";
-    std::string result = m_ctx.getSessionIO().getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_ctx.getIoSession().getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if (result == "aborted") {
@@ -1376,7 +1376,7 @@ void ModSignup::saveNewUserRecord() {
  */
 bool ModSignup::verifyAndSave(const std::string &input) {
     std::string key = "";
-    std::string result = m_ctx.getSessionIO().getInputField(input, key, Config::sSingle_key_length);
+    std::string result = m_ctx.getIoSession().getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if (result == "aborted") {

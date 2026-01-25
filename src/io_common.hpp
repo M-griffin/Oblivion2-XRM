@@ -20,13 +20,13 @@ typedef struct Utf8Glyph {
 } Utf8Glyph;
 
 /**
- * @class CommonIO
+ * @class IoCommon
  * @author Michael Griffin
  * @date 9/21/2015
  * @file common_io.hpp
  * @brief Low Level IO ASCII and UTF-8 Aware with locale support.
  */
-class CommonIO {
+class IoCommon {
     Logging &m_log; // Logging Reference
 
     std::string m_utf8_rx_buffer; // buffer.
@@ -43,11 +43,11 @@ class CommonIO {
     Encoding::TextEncoding m_encoding = Encoding::TextEncoding::ASCII;
 
 public:
-    explicit CommonIO();
+    explicit IoCommon();
 
-    ~CommonIO();
+    ~IoCommon();
 
-    CommonIO(CommonIO &&other) noexcept
+    IoCommon(IoCommon &&other) noexcept
         : m_log(other.m_log) // reference copied, not moved
           , m_escape_sequence(std::move(other.m_escape_sequence))
           , m_string_buffer(std::move(other.m_string_buffer))
@@ -59,7 +59,7 @@ public:
           , m_is_new_leadoff(other.m_is_new_leadoff) {
     }
 
-    CommonIO &operator=(CommonIO &&other) noexcept {
+    IoCommon &operator=(IoCommon &&other) noexcept {
         if (this != &other) {
             m_escape_sequence = std::move(other.m_escape_sequence);
             m_string_buffer = std::move(other.m_string_buffer);

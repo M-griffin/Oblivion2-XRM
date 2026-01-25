@@ -7,15 +7,24 @@
 #include "encoding.hpp"
 
 class SessionWriter {
+
+    SocketService &m_socketService;
+
+    bool m_is_authorized;
+    bool m_use_ansi;
+    Encoding::TextEncoding m_encoding = Encoding::TextEncoding::CP437;
+
 public:
     explicit SessionWriter(SocketService &s)
-        : m_socketService(s) {
+        : m_socketService(s)
+        , m_is_authorized(false)
+        , m_use_ansi(false) {
     }
 
     void send(const std::string &v, const bool isDisconnected = false) {
         if (m_encoding == Encoding::TextEncoding::CP437) {
             const Encoding encode;
-            std::string result = encode.utf8Decode(v);
+            const std::string result = encode.utf8Decode(v);
             m_socketService.send(result, isDisconnected);
             return;
         }
@@ -27,7 +36,7 @@ public:
         if (m_encoding == Encoding::TextEncoding::CP437) {
             const Encoding encode;
             std::string buffer = std::string(buffer.begin(), buffer.end());;
-            std::string result = encode.utf8Decode(buffer);
+            const std::string result = encode.utf8Decode(buffer);
             m_socketService.send(result, isDisconnected);
             return;
         }
@@ -78,12 +87,6 @@ public:
         return m_socketService.isActive();
     }
 
-private:
-    SocketService &m_socketService;
-
-    bool m_is_authorized = false;
-    bool m_use_ansi = false;
-    Encoding::TextEncoding m_encoding = Encoding::TextEncoding::CP437;
 };
 
 #endif

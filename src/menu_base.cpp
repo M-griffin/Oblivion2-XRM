@@ -17,9 +17,9 @@
 #include "model-sys/context.hpp"
 #include "processor_ansi.hpp"
 #include "directory.hpp"
-#include "session_io.hpp"
+#include "io_session.hpp"
 #include "logging.hpp"
-#include "common_io.hpp"
+#include "io_common.hpp"
 #include "encoding.hpp"
 #include "tcp_session.hpp"
 
@@ -71,7 +71,7 @@ void MenuBase::clearMenuPullDownOptions() {
  * @return
  */
 bool MenuBase::checkMenuAcsAccess(const Menu &menu) {
-    AccessCondition acs(m_ctx.getSessionIO());
+    AccessCondition acs(m_ctx.getIoSession());
     return acs.validateAcsString(
         menu.menu_acs_string,
         m_ctx.getUser()
@@ -86,7 +86,7 @@ void MenuBase::checkMenuOptionsAcsAccess() {
     auto it = m_menu_info.menu_options.begin();
     auto end = m_menu_info.menu_options.end();
     std::vector<MenuOption> new_options;
-    AccessCondition acs(m_ctx.getSessionIO());
+    AccessCondition acs(m_ctx.getIoSession());
 
     for (; it != end; it++) {
         if (acs.validateAcsString(
@@ -249,10 +249,10 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen) {
     }
 
     // Clear All Mappings
-    m_ctx.getSessionIO().clearAllMCIMapping();
+    m_ctx.getIoSession().clearAllMCIMapping();
 
     // Build a single code map that can be reused.
-    std::vector<MapType> code_map = m_ctx.getSessionIO().pipe2genericCodeMap(new_screen);
+    std::vector<MapType> code_map = m_ctx.getIoSession().pipe2genericCodeMap(new_screen);
 
     // Loop the code map and determine the number of unique columns for parsing.
     int key_columns = 0;
@@ -302,16 +302,16 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen) {
             value = m.menu_key;
         }
 
-        m_ctx.getSessionIO().addMCIMapping(key, value);
+        m_ctx.getIoSession().addMCIMapping(key, value);
 
         // Build Key/Value for Menu Description
         key = "|D" + std::to_string(column);
         value = m.name;
-        m_ctx.getSessionIO().addMCIMapping(key, value);
+        m_ctx.getIoSession().addMCIMapping(key, value);
 
         if (column % key_columns == 0) {
             // Process template menu row and all columns added.
-            output_screen += m_ctx.getSessionIO().parseCodeMapGenerics(new_screen, code_map);
+            output_screen += m_ctx.getIoSession().parseCodeMapGenerics(new_screen, code_map);
             output_screen += "\x1b[D\r\n";
             column = 0;
         }
@@ -320,8 +320,8 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen) {
     }
 
     // Process any remaining not caught in offset.
-    if (m_ctx.getSessionIO().getMCIMappingCount() > 0) {
-        output_screen += m_ctx.getSessionIO().parseCodeMapGenerics(new_screen, code_map);
+    if (m_ctx.getIoSession().getMCIMappingCount() > 0) {
+        output_screen += m_ctx.getIoSession().parseCodeMapGenerics(new_screen, code_map);
         output_screen += "\x1b[D\r\n";
     }
 
@@ -338,9 +338,9 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen) {
  * @return
  */
 std::string MenuBase::processGenericScreens() {
-    std::string top_screen = m_ctx.getCommonIO().readAnsi("GENSRT.ANS");
-    std::string mid_screen = m_ctx.getCommonIO().readAnsi("GENMID.ANS");
-    std::string bot_screen = m_ctx.getCommonIO().readAnsi("GENEND.ANS");
+    std::string top_screen = m_ctx.getIoCommon().readAnsi("GENSRT.ANS");
+    std::string mid_screen = m_ctx.getIoCommon().readAnsi("GENMID.ANS");
+    std::string bot_screen = m_ctx.getIoCommon().readAnsi("GENEND.ANS");
     std::string screen_output;
 
     // Add the Top section of the template
@@ -382,12 +382,12 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
     clearMenuPullDownOptions();
 
     // Then feed though and return the updated string.
-    std::string prompt_string = m_ctx.getSessionIO().parseCodeMapGenerics(menu_prompt, code_map);
+    std::string prompt_string = m_ctx.getIoSession().parseCodeMapGenerics(menu_prompt, code_map);
     std::string display_prompt = moveStringToBottom(prompt_string);
 
     // Translate Pipe Coles to ESC Sequences prior to parsing to keep
     // String length calculations.
-    display_prompt = m_ctx.getSessionIO().pipe2ansi(display_prompt);
+    display_prompt = m_ctx.getIoSession().pipe2ansi(display_prompt);
 
     std::string yesNoBars = getDefaultColor() + "|01";
     yesNoBars += getDefaultInputColor() + getDefaultInverseColor() + "%01\x1b[0m";
@@ -437,7 +437,7 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
  * @return
  */
 std::string MenuBase::getDefaultColor() {
-    return m_ctx.getSessionIO().pipeColors(m_ctx.getUser().sRegColor);
+    return m_ctx.getIoSession().pipeColors(m_ctx.getUser().sRegColor);
 }
 
 /**
@@ -445,7 +445,7 @@ std::string MenuBase::getDefaultColor() {
  * @return
  */
 std::string MenuBase::getDefaultInputColor() {
-    return m_ctx.getSessionIO().pipeColors(m_ctx.getUser().sInputColor);
+    return m_ctx.getIoSession().pipeColors(m_ctx.getUser().sInputColor);
 }
 
 /**
@@ -453,7 +453,7 @@ std::string MenuBase::getDefaultInputColor() {
  * @return
  */
 std::string MenuBase::getDefaultInverseColor() {
-    return m_ctx.getSessionIO().pipeColors(m_ctx.getUser().sInverseColor);
+    return m_ctx.getIoSession().pipeColors(m_ctx.getUser().sInverseColor);
 }
 
 /**
@@ -464,14 +464,14 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string) {
     m_log.log(Logging::LogLevel::Info, "MenuBase() - parseMenuPromptString");
 
     // Color Sequences and NewLine
-    m_ctx.getSessionIO().clearAllMCIMapping();
-    m_ctx.getSessionIO().addMCIMapping("^R", m_ctx.getCfg().default_color_regular);
-    m_ctx.getSessionIO().addMCIMapping("^S", m_ctx.getCfg().default_color_stat);
-    m_ctx.getSessionIO().addMCIMapping("^P", m_ctx.getCfg().default_color_prompt);
-    m_ctx.getSessionIO().addMCIMapping("^E", m_ctx.getCfg().default_color_input);
-    m_ctx.getSessionIO().addMCIMapping("^V", m_ctx.getCfg().default_color_inverse);
-    m_ctx.getSessionIO().addMCIMapping("^X", m_ctx.getCfg().default_color_box);
-    m_ctx.getSessionIO().addMCIMapping("^M", "\r\n");
+    m_ctx.getIoSession().clearAllMCIMapping();
+    m_ctx.getIoSession().addMCIMapping("^R", m_ctx.getCfg().default_color_regular);
+    m_ctx.getIoSession().addMCIMapping("^S", m_ctx.getCfg().default_color_stat);
+    m_ctx.getIoSession().addMCIMapping("^P", m_ctx.getCfg().default_color_prompt);
+    m_ctx.getIoSession().addMCIMapping("^E", m_ctx.getCfg().default_color_input);
+    m_ctx.getIoSession().addMCIMapping("^V", m_ctx.getCfg().default_color_inverse);
+    m_ctx.getIoSession().addMCIMapping("^X", m_ctx.getCfg().default_color_box);
+    m_ctx.getIoSession().addMCIMapping("^M", "\r\n");
 
     /*
      * Notes from the Legacy Doc's.
@@ -524,7 +524,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string) {
 
     // Depending on the CodeMap return from the (2)nd group, which are the ending characters
     // We'll need to set up new menus on these features.
-    std::vector<MapType> code_map = m_ctx.getSessionIO().pipe2promptCodeMap(prompt_string);
+    std::vector<MapType> code_map = m_ctx.getIoSession().pipe2promptCodeMap(prompt_string);
     std::string output;
 
     // Loop codes and picked out ending control code.
@@ -591,12 +591,12 @@ std::string MenuBase::loadMenuScreen() {
         }
 
         // Make all screens uppercase, handle Unicode names.
-        screen_file = m_ctx.getCommonIO().toUpper(screen_file);
+        screen_file = m_ctx.getIoCommon().toUpper(screen_file);
 
         // if file doesn't exist, then use generic template
-        if (m_ctx.getCommonIO().fileExists(screen_file)) {
+        if (m_ctx.getIoCommon().fileExists(screen_file)) {
             m_log.log(Logging::LogLevel::Info, "MenuBase() - loadMenuScreen readinAnsi", screen_file);
-            screen_data = m_ctx.getCommonIO().readAnsi(screen_file);
+            screen_data = m_ctx.getIoCommon().readAnsi(screen_file);
         } else {
             // Load and use generic template.
             // These are GENTOP. GENMID, GENBOT.ANS
@@ -611,13 +611,13 @@ std::string MenuBase::loadMenuScreen() {
                   screen_file);
 
         // Screen File(s) are Uppercase.
-        screen_file = m_ctx.getCommonIO().toUpper(screen_file);
+        screen_file = m_ctx.getIoCommon().toUpper(screen_file);
 
         // Otherwise use the Pull down menu name from the menu.
         // if file doesn't exist, then use generic template
-        if (m_ctx.getCommonIO().fileExists(screen_file)) {
+        if (m_ctx.getIoCommon().fileExists(screen_file)) {
             m_log.log(Logging::LogLevel::Info, "MenuBase() - loadMenuScreen readinAnsi2", screen_file);
-            screen_data = m_ctx.getCommonIO().readAnsi(screen_file);
+            screen_data = m_ctx.getIoCommon().readAnsi(screen_file);
         } else {
             // Load and use generic template, fallback if file is missing.
             // These are GENTOP. GENMID, GENBOT.ANS
@@ -675,7 +675,7 @@ void MenuBase::redisplayMenuScreen() {
 
     // Read in the Menu ANSI
     std::string buffer = loadMenuScreen();
-    std::string output = m_ctx.getSessionIO().pipe2ansi(buffer);
+    std::string output = m_ctx.getIoSession().pipe2ansi(buffer);
 
     if (m_is_active_pulldown_menu) {
         // Parse the Screen to the Screen Buffer.
@@ -712,7 +712,7 @@ void MenuBase::executeFirstAndEachCommands() {
         auto &m = m_menu_info.menu_options[i];
 
         // Process all First Commands or commands that should run every action.
-        std::string new_key = m_ctx.getCommonIO().toUpper(m.menu_key);
+        std::string new_key = m_ctx.getIoCommon().toUpper(m.menu_key);
         m.menu_key = new_key;
 
         if (m.menu_key == "FIRSTCMD" || m.menu_key == "EACH") {
@@ -833,11 +833,11 @@ std::string MenuBase::loadMenuPrompt() {
         prompt_display += m_menu_prompt.data_line3;
 
         // Clear All Mappings
-        m_ctx.getSessionIO().clearAllMCIMapping();
+        m_ctx.getIoSession().clearAllMCIMapping();
 
         // Parse Prompt for Menu Title here, let pip2ansi parse standard codes.
-        m_ctx.getSessionIO().addMCIMapping("|MN", m_menu_info.menu_prompt);
-        m_ctx.getSessionIO().addMCIMapping("|TL", "1440"); // Time Left {Not Implemented Yet}
+        m_ctx.getIoSession().addMCIMapping("|MN", m_menu_info.menu_prompt);
+        m_ctx.getIoSession().addMCIMapping("|TL", "1440"); // Time Left {Not Implemented Yet}
 
         // Get current time
         auto now = std::chrono::system_clock::now();
@@ -854,19 +854,19 @@ std::string MenuBase::loadMenuPrompt() {
         std::ostringstream oss;
         oss << std::put_time(&tm, "%m/%d/%Y %I:%M %p");
 
-        m_ctx.getSessionIO().addMCIMapping("|TM", oss.str()); // Time Now
+        m_ctx.getIoSession().addMCIMapping("|TM", oss.str()); // Time Now
         oss.clear();
 
-        m_ctx.getSessionIO().addMCIMapping("|NN", std::to_string(node_number));
+        m_ctx.getIoSession().addMCIMapping("|NN", std::to_string(node_number));
 
         // Legacy Note:
         // SysOps may place %%filename.ext anywhere in the menu prompt
         // to display filename.ext from the prompts' directory. Use the
         // %MN code to display the Menu's Name in Prompt (in filename.ext).
         // Set the Prompts directory in the CONFIG.
-        m_ctx.getSessionIO().addMCIMapping("%MN", m_menu_info.menu_prompt);
+        m_ctx.getIoSession().addMCIMapping("%MN", m_menu_info.menu_prompt);
 
-        const std::string output = m_ctx.getSessionIO().pipe2ansi(prompt_display);
+        const std::string output = m_ctx.getIoSession().pipe2ansi(prompt_display);
 
         // TODO Quick Hack, need to streamline.
         const Encoding encode;
@@ -877,7 +877,7 @@ std::string MenuBase::loadMenuPrompt() {
     if (!m_menu_info.menu_prompt.empty()) {
         m_log.log(Logging::LogLevel::Debug, "Use Default Prompt String in Menu.");
         prompt = "\x1b[?25h"; // Turn on Cursor.
-        prompt += m_ctx.getSessionIO().pipe2ansi(m_menu_info.menu_prompt);
+        prompt += m_ctx.getIoSession().pipe2ansi(m_menu_info.menu_prompt);
     }
 
     // Otherwise Noting loads here, Pull down Menu with no prompt
@@ -992,7 +992,7 @@ void MenuBase::loadAndStartupMenu() {
     std::string buffer = loadMenuScreen();
 
     // Output has parsed out MCI codes, translations are then appended.
-    std::string output = m_ctx.getSessionIO().pipe2ansi(buffer);
+    std::string output = m_ctx.getIoSession().pipe2ansi(buffer);
 
     m_log.log(Logging::LogLevel::Info, "MenuBase - Cont. pipe2ansi=", output);
 
@@ -1103,7 +1103,7 @@ void MenuBase::lightbarUpdate(unsigned int previous_pulldown_id) {
 
     // Clear Attributes, then move back to menu prompt position.
     light_bars.append("\x1b[0m\x1b[u");
-    const std::string output = m_ctx.getSessionIO().pipe2ansi(light_bars);
+    const std::string output = m_ctx.getIoSession().pipe2ansi(light_bars);
     baseProcessAndDeliver(output);
 }
 
@@ -1166,13 +1166,13 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
     if (idx != std::string::npos && idx != 0) {
         // Match Strings to the same size.
         std::string key_match = key.substr(0, idx);
-        std::string input_match = input.substr(0, m_ctx.getCommonIO().numberOfChars(key_match));
+        std::string input_match = input.substr(0, m_ctx.getIoCommon().numberOfChars(key_match));
 
         m_log.log(Logging::LogLevel::Debug, "key_match=", key_match, "input_match=", input_match);
 
         // Normalize and upper case for testing key input
-        key_match = m_ctx.getCommonIO().toUpper(key_match);
-        input_match = m_ctx.getCommonIO().toUpper(input_match);
+        key_match = m_ctx.getIoCommon().toUpper(key_match);
+        input_match = m_ctx.getIoCommon().toUpper(input_match);
 
         // If we have a match, execute
         if (key_match == input_match) {
@@ -1193,8 +1193,8 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
     }
 
     // TODO Review for UTF-8 and extended languages.
-    std::string key_normalized = m_ctx.getCommonIO().toUpper(key);
-    std::string input_normalized = m_ctx.getCommonIO().toUpper(input);
+    std::string key_normalized = m_ctx.getIoCommon().toUpper(key);
+    std::string input_normalized = m_ctx.getIoCommon().toUpper(input);
 
     // Handle one to one matches.
     if (input_normalized.compare(key_normalized) == 0) {
@@ -1356,7 +1356,7 @@ bool MenuBase::processMenuOptions(const std::string &input) {
     bool stack_reassignment = false;
 
     // Uppercase all input to match on command/option keys
-    std::string input_text = m_ctx.getCommonIO().toUpper(input);
+    std::string input_text = m_ctx.getIoCommon().toUpper(input);
 
     // Check if ENTER was hit as a command!
     if (input_text == "ENTER") {
@@ -1503,7 +1503,7 @@ bool MenuBase::processMenuOptions(const std::string &input) {
  */
 void MenuBase::handlePullDownInput(const std::string &character_buffer, const bool &is_utf8) {
     // Get hotkey and lightbar input.
-    std::string result = m_ctx.getSessionIO().getKeyInput(character_buffer);
+    std::string result = m_ctx.getIoSession().getKeyInput(character_buffer);
     std::string input;
 
     if (result.empty()) {
@@ -1536,7 +1536,7 @@ void MenuBase::handleStandardInput(const std::string &character_buffer) {
 
     // Get LineInput and wait for ENTER.
     std::string key;
-    std::string result = m_ctx.getSessionIO().getInputField(character_buffer, key, Config::sMenuPrompt_length);
+    std::string result = m_ctx.getIoSession().getInputField(character_buffer, key, Config::sMenuPrompt_length);
 
     // ESC was hit, make this just clear the input text, or start over!
     if (result == "aborted") {
@@ -1557,7 +1557,7 @@ void MenuBase::handleStandardInput(const std::string &character_buffer) {
             // Clear Menu Field input Text, redraw prompt?
             std::string clear_input = "\x1b[0m";
 
-            for (std::string::size_type i = m_ctx.getCommonIO().numberOfChars(key); i > 0; i--) {
+            for (std::string::size_type i = m_ctx.getIoCommon().numberOfChars(key); i > 0; i--) {
                 clear_input += "\x1b[D \x1b[D";
             }
 

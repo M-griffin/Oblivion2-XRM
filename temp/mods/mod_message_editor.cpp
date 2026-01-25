@@ -379,9 +379,9 @@ std::string ModMessageEditor::processMidTemplate(processor_ansi_ptr ansi_process
 void ModMessageEditor::setupEditor()
 {
     // NOTE Possible make these class instances, so we don't have to keep reloading.
-    std::string top_template = m_common_io.readinAnsi("FSESRT.ANS");
-    std::string mid_template = m_common_io.readinAnsi("FSEMID.ANS");
-    std::string bot_template = m_common_io.readinAnsi("FSEEND.ANS");
+    std::string top_template = m_io_common.readinAnsi("FSESRT.ANS");
+    std::string mid_template = m_io_common.readinAnsi("FSEMID.ANS");
+    std::string bot_template = m_io_common.readinAnsi("FSEEND.ANS");
 
     int term_rows = 0;
     int term_cols = 0;
@@ -471,7 +471,7 @@ void ModMessageEditor::editorInput(const std::string &input)
     else if(result[0] == '\x1b' && result.size() > 2)
     {
         // ESC SEQUENCE - check movement / arrow keys.
-        std::string escape_sequence = m_common_io.getEscapeSequence();
+        std::string escape_sequence = m_io_common.getEscapeSequence();
         m_log.log(Logging::LogLevel::Debug, "ESC=", escape_sequence);
                 
         m_log.log(Logging::LogLevel::Console, "[editorInput] [ESC Sequence 1] input result=", result);
@@ -494,7 +494,7 @@ void ModMessageEditor::editorInput(const std::string &input)
 
         if(result[0] == '\x1b')
         {
-            std::string escape_sequence = m_common_io.getEscapeSequence();
+            std::string escape_sequence = m_io_common.getEscapeSequence();
             std::cout << "ESC= " << escape_sequence << std::endl;
             m_log.log(Logging::LogLevel::Console, "[editorInput] [ESC Sequence 2] input result=", static_cast<int>(escape_sequence[0]));
 

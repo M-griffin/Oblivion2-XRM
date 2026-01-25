@@ -352,7 +352,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
                 m_system_fallback.push_back(m_current_menu);
             }
 
-            m_current_menu = m_ctx.getCommonIO().toLower(option.command_string);
+            m_current_menu = m_ctx.getIoCommon().toLower(option.command_string);
 
             loadAndStartupMenu();
             m_use_first_command_execution = true;
@@ -382,7 +382,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
 
             m_log.log(Logging::LogLevel::Debug, "Set Fallback Starting Menu=", m_starting_menu);
             m_system_fallback.push_back(m_starting_menu);
-            m_current_menu = m_ctx.getCommonIO().toLower(option.command_string);
+            m_current_menu = m_ctx.getIoCommon().toLower(option.command_string);
 
             loadAndStartupMenu();
             m_use_first_command_execution = true;
@@ -418,7 +418,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
             }
 
             m_system_fallback.push_back(m_starting_menu);
-            m_current_menu = m_ctx.getCommonIO().toLower(option.command_string);
+            m_current_menu = m_ctx.getIoCommon().toLower(option.command_string);
             m_use_first_command_execution = false;
 
             loadAndStartupMenu();
@@ -981,7 +981,7 @@ void MenuSystem::startupModuleMenuEditor()
 
     // Allocate and Create
     module_ptr module = std::make_shared<ModMenuEditor>(
-        getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
+        getLockedSession(), m_config, m_ansi_process, m_io_common, m_session_io
     );
 
     if(!module)
@@ -1003,7 +1003,7 @@ void MenuSystem::startupModuleUserEditor()
 
     // Allocate and Create
     module_ptr module = std::make_shared<ModUserEditor>(
-        getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
+        getLockedSession(), m_config, m_ansi_process, m_io_common, m_session_io
     );
 
     if(!module)
@@ -1025,7 +1025,7 @@ void MenuSystem::startupModuleLevelEditor()
 
     // Allocate and Create
     module_ptr module = std::make_shared<ModLevelEditor>(
-        getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
+        getLockedSession(), m_config, m_ansi_process, m_io_common, m_session_io
     );
 
     if(!module)
@@ -1047,7 +1047,7 @@ void MenuSystem::startupModuleMessageEditor()
 
     // Allocate and Create
     module_ptr module = std::make_shared<ModMessageEditor>(
-        getLockedSession(), m_config, m_ansi_process, m_common_io, m_session_io
+        getLockedSession(), m_config, m_ansi_process, m_io_common, m_session_io
     );
 
     if(!module)

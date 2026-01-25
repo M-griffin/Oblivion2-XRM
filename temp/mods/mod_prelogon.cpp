@@ -232,7 +232,7 @@ void ModPreLogon::setupHumanShield()
     m_log.log(Logging::LogLevel::Console, "Start Session Lock", __LINE__, __FILE__);
     if (session_ptr session = getLockedSession()) 
     {
-        result = "|07" + m_common_io.centerPadding(BUILD_INFO, session->getTelnet().getTermCols()) + "\r\n";
+        result = "|07" + m_io_common.centerPadding(BUILD_INFO, session->getTelnet().getTermCols()) + "\r\n";
         result += m_session_io.parseTextPrompt(
                                  m_text_prompts_dao.getPrompt(PROMPT_HUMAN_SHIELD)
                              );
@@ -339,7 +339,7 @@ void ModPreLogon::displayTerminalDetection()
         std::string result = prompt_term.second;
         m_log.log(Logging::LogLevel::Console, "Term Type=", term_type);
 
-        m_common_io.parseLocalMCI(result, mci_code, term_type);
+        m_io_common.parseLocalMCI(result, mci_code, term_type);
         result = m_session_io.pipe2ansi(result);
         baseProcessAndDeliver(result);
     }
@@ -376,7 +376,7 @@ void ModPreLogon::displayTerminalDetection()
 
         m_log.log(Logging::LogLevel::Console, "Term Size=", term_size);
 
-        m_common_io.parseLocalMCI(result, mci_code, term_size);
+        m_io_common.parseLocalMCI(result, mci_code, term_size);
         result = m_session_io.pipe2ansi(result);
         baseProcessAndDeliver(result);
     }
@@ -503,12 +503,12 @@ bool ModPreLogon::emulationDetection(const std::string &input)
                 
                 // Parse out x/y position coordinates for Screen Size returned.
                 // Splunk String on : for X/Y Positions from Response
-                std::vector<std::string> positions = m_common_io.splitString(m_esc_sequence, ';');
+                std::vector<std::string> positions = m_io_common.splitString(m_esc_sequence, ';');
                 if (positions.size() > 1)
                 {
                     m_log.log(Logging::LogLevel::Debug, "X=", positions[1], "Y=", positions[0]);
-                    m_x_position = m_common_io.stringToInt(positions[1]);
-                    m_y_position = m_common_io.stringToInt(positions[0]);
+                    m_x_position = m_io_common.stringToInt(positions[1]);
+                    m_y_position = m_io_common.stringToInt(positions[0]);
                 }
             }
             else

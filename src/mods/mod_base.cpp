@@ -7,11 +7,11 @@
 #include <utf8.h>
 
 #include "../socket_service.hpp"
-#include "../session_io.hpp"
+#include "../io_session.hpp"
 #include "../processor_ansi.hpp"
 #include "../encoding.hpp"
 #include "../logging.hpp"
-#include "../common_io.hpp"
+#include "../io_common.hpp"
 #include "../tcp_session.hpp"
 
 #include "../model-sys/config.hpp"
@@ -115,7 +115,7 @@ std::string ModBase::baseCreateBorderedDisplay(std::vector<std::string> result_s
  * @return
  */
 std::string ModBase::baseGetDefaultColor() const {
-    return m_ctx.getSessionIO().pipeColors(m_ctx.getCfg().default_color_regular);
+    return m_ctx.getIoSession().pipeColors(m_ctx.getCfg().default_color_regular);
 }
 
 /**
@@ -123,7 +123,7 @@ std::string ModBase::baseGetDefaultColor() const {
  * @return
  */
 std::string ModBase::baseGetDefaultInputColor() const {
-    return m_ctx.getSessionIO().pipeColors(m_ctx.getCfg().default_color_input);
+    return m_ctx.getIoSession().pipeColors(m_ctx.getCfg().default_color_input);
 }
 
 /**
@@ -131,7 +131,7 @@ std::string ModBase::baseGetDefaultInputColor() const {
  * @return
  */
 std::string ModBase::baseGetDefaultInverseColor() const {
-    return m_ctx.getSessionIO().pipeColors(m_ctx.getCfg().default_color_inverse);
+    return m_ctx.getIoSession().pipeColors(m_ctx.getCfg().default_color_inverse);
 }
 
 /**
@@ -139,7 +139,7 @@ std::string ModBase::baseGetDefaultInverseColor() const {
  * @return
  */
 std::string ModBase::baseGetDefaultBoxColor() const {
-    return m_ctx.getSessionIO().pipeColors(m_ctx.getCfg().default_color_box);
+    return m_ctx.getIoSession().pipeColors(m_ctx.getCfg().default_color_box);
 }
 
 /**
@@ -147,7 +147,7 @@ std::string ModBase::baseGetDefaultBoxColor() const {
  * @return
  */
 std::string ModBase::baseGetDefaultPromptColor() const {
-    return m_ctx.getSessionIO().pipeColors(m_ctx.getCfg().default_color_prompt);
+    return m_ctx.getIoSession().pipeColors(m_ctx.getCfg().default_color_prompt);
 }
 
 /**
@@ -155,7 +155,7 @@ std::string ModBase::baseGetDefaultPromptColor() const {
  * @return
  */
 std::string ModBase::baseGetDefaultStatColor() const {
-    return m_ctx.getSessionIO().pipeColors(m_ctx.getCfg().default_color_stat);
+    return m_ctx.getIoSession().pipeColors(m_ctx.getCfg().default_color_stat);
 }
 
 /**
@@ -234,7 +234,7 @@ void ModBase::baseDisplayPrompt(const std::string &prompt, TextPromptsDao &text_
     M_StringPair prompt_set = text_dao.getPrompt(prompt);
     const std::string::size_type idx = prompt_set.second.find("%IN", 0);
 
-    result += m_ctx.getSessionIO().parseTextPrompt(prompt_set);
+    result += m_ctx.getIoSession().parseTextPrompt(prompt_set);
 
     // Not found, set default input color
     if (idx == std::string::npos) {
@@ -262,7 +262,7 @@ std::string ModBase::baseGetDisplayPrompt(const std::string &prompt, TextPrompts
     M_StringPair prompt_set = text_dao.getPrompt(prompt);
     const std::string::size_type idx = prompt_set.second.find("%IN", 0);
 
-    result += m_ctx.getSessionIO().parseTextPrompt(prompt_set);
+    result += m_ctx.getIoSession().parseTextPrompt(prompt_set);
 
     // Not found, set default input color
     if (idx == std::string::npos) {
@@ -293,7 +293,7 @@ std::string ModBase::baseGetDisplayPromptPipeToAnsi(const std::string &prompt, T
     // Parse Prompt for Input Color And Position Override.
     // If found, the colors of the MCI Codes should be used as the default color.
     M_StringPair prompt_set = text_dao.getPrompt(prompt);
-    return m_ctx.getSessionIO().pipeColors(prompt_set.second);
+    return m_ctx.getIoSession().pipeColors(prompt_set.second);
 }
 
 /**
@@ -314,10 +314,10 @@ void ModBase::baseDisplayPromptMCI(const std::string &prompt, TextPromptsDao &te
 
     // Parse and replace the MCI Code with the field value
     const std::string mci_code = "|OT";
-    m_ctx.getCommonIO().parseLocalMCI(prompt_set.second, mci_code, mci_field);
+    m_ctx.getIoCommon().parseLocalMCI(prompt_set.second, mci_code, mci_field);
 
     // Does pipe2ansi for colors etc..
-    result += m_ctx.getSessionIO().parseTextPrompt(prompt_set);
+    result += m_ctx.getIoSession().parseTextPrompt(prompt_set);
 
     // Not found, set default input color
     if (idx == std::string::npos) {
@@ -341,7 +341,7 @@ void ModBase::baseDisplayPromptAndNewLine(const std::string &prompt, TextPrompts
     M_StringPair prompt_set = text_dao.getPrompt(prompt);
     const std::string::size_type idx = prompt_set.second.find("%IN", 0);
 
-    result += m_ctx.getSessionIO().parseTextPrompt(prompt_set);
+    result += m_ctx.getIoSession().parseTextPrompt(prompt_set);
 
     // Not found, set default input color
     if (idx == std::string::npos) {
