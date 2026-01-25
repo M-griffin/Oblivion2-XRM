@@ -105,7 +105,7 @@ void IoInputHandler::createInputField(std::string &field_name, int &len) {
 
     // Format Input Field, if color is enabled, otherwise just add Field Name like "Login: "
     if (!m_session.isAnsi()) {
-        sprintf(formatted, "%s", (char *) field_name.c_str()); // Field Name
+        sprintf(formatted, "%s", const_cast<char *>(field_name.c_str())); // Field Name
         field_name = formatted;
         return;
     }

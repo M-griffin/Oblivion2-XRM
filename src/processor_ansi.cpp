@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <cctype>
 #include <cstring>
-#include <stdint.h>
+#include <cstdint>
 
 #include <regex>
 
@@ -28,7 +28,6 @@
 
 ProcessorAnsi::ProcessorAnsi()
     : ProcessorBase(24, 80) {
-    m_screen_buffer.reserve((m_number_lines * m_characters_per_line) + 1);
     m_screen_buffer.resize((m_number_lines * m_characters_per_line) + 1);
 }
 
@@ -36,17 +35,15 @@ ProcessorAnsi::~ProcessorAnsi() {
     m_log.log(Logging::LogLevel::Console, "~ProcessorAnsi()");
 
     m_screen_buffer.clear();
-    std::vector<ScreenPixel>().swap(m_screen_buffer);
     m_pull_down_options.clear();
-    std::map<int, ScreenPixel>().swap(m_pull_down_options);
     m_line_ending_map.clear();
-    std::map<int, int>().swap(m_line_ending_map);
 }
 
 void ProcessorAnsi::resize(const int term_height, const int term_width) {
     m_number_lines = term_height;
     m_characters_per_line = term_width;
-    m_screen_buffer.reserve((m_number_lines * m_characters_per_line) + 1);
+
+    m_screen_buffer.clear();
     m_screen_buffer.resize((m_number_lines * m_characters_per_line) + 1);
 }
 
@@ -80,14 +77,14 @@ void ProcessorAnsi::screenBufferDisplayTest() {
     int fore = 0;
     int back = 0;
 
-    m_ansi_output.erase();
-    m_ansi_output = "";
-    std::string character = "";
+    m_ansi_output.clear();
+    std::string character;
 
     if (m_is_screen_cleared) {
         m_ansi_output.append("\x1b[1;1H\x1b[2J");
     }
 
+    // TODO Remove String Stream, more expensive then appending.
     for (unsigned int i = 0; i < m_screen_buffer.size(); i++) {
         auto &buff = m_screen_buffer[i];
         std::stringstream ss;
@@ -174,8 +171,10 @@ std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen) {
     // and ESC[C to push the cursor forward without overwriting
     int padding = 0;
 
-    std::string ansi_output = "";
+    std::string ansi_output;
 
+    // TODO , need to get context in here, so we can determine
+    // TODO , scroll type, clear or scroll screen down!
     if (clearScreen) {
         ansi_output.append("\x1b[1;1H\x1b[2J");
     }
@@ -255,7 +254,7 @@ std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen) {
  * @return
  */
 std::string ProcessorAnsi::buildPullDownBars(int pulldownId, bool active) {
-    std::string output = "";
+    std::string output;
     std::stringstream ss;
     const auto it = m_pull_down_options.find(pulldownId);
 
@@ -304,7 +303,6 @@ void ProcessorAnsi::clearPullDownBars() {
     std::map<int, ScreenPixel>().swap(m_pull_down_options);
 }
 
-
 /**
  * @brief Return the max rows used on the screen
  * @return
@@ -326,7 +324,7 @@ std::string ProcessorAnsi::screenBufferParse() {
 
     // To make parsing a little faster, pre-fill vector with 99,
     // So it's not allocating each insert.
-    code_map.reserve(99);
+    //code_map.reserve(99);
     code_map.resize(99);
 
     // Make a copy that we can modify and process on.
@@ -396,7 +394,7 @@ std::string ProcessorAnsi::screenBufferParse() {
             }
         }
     } catch (std::regex_error &ex) {
-        //m_log.log(Logging::LogLevel::Error, "[screenBufferParse] regex=", ex.what(), ex.code(), __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "[screenBufferParse] regex=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
     // All Global MCI Codes likes standard screens and colors will
@@ -1031,12 +1029,12 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
 
             // Only Peak Next if were at CR.
             if (buffer.bytes[0] == '\r')
-                common_io.peekGlyph(buffer.bytes, it, buffer);
+                common_io.peekGlyph(buffer.bytes, it, nextBuffer);
 
             // Handle New Line in ANSI Files properly.
             if (buffer.length == 1 && nextBuffer.length == 1 &&
                 buffer.bytes[0] == '\r' && nextBuffer.bytes[0] == '\n') {
-                *it++; // Increment to \n (2) char combo.
+                ++it; // Increment to \n (2) char combo.
                 m_x_position = 1;
                 ++m_y_position;
 
