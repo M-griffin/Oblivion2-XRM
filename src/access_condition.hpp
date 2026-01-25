@@ -119,7 +119,7 @@ public:
     // start with NOT s255 then test for s255
     // start with all not, but all normal will get caught and never pass through.
     // separate expressions with | or. and ( )
-    const std::string ACS_EXPRESSION =
+    const std::regex ACS_EXPRESSION
     {
         "([~]{1}[sS]{1}\\d{1,3})|([sS]{1}\\d{1,3})|"
         "([~]{1}[fF]{1}[A-Z]{1})|([fF]{1}[A-Z]{1})|"
