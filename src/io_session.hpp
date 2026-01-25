@@ -82,13 +82,13 @@ public:
     std::string parsePipeWithChars(const std::string &pipe_code);
 
     std::string parseFilename(const std::string &pipe_code);
-    std::string parseCodeMap(const std::string &screen, std::vector<MapType> &code_map);
-    std::string parseCodeMapGenerics(const std::string &screen, const std::vector<MapType> &code_map);
-    std::vector<MapType> parseToCodeMap(const std::string &sequence, const std::regex &expression);
+    std::string parseCodeMap(const std::string &screen, std::vector<CodeMapType> &code_map);
+    std::string parseCodeMapGenerics(const std::string &screen, const std::vector<CodeMapType> &code_map);
+    std::vector<CodeMapType> parseToCodeMap(const std::string &sequence, const std::regex &expression);
     std::string pipe2ansi(const std::string &sequence);
-    std::vector<MapType> pipe2genericCodeMap(const std::string &sequence);
-    std::vector<MapType> pipe2promptCodeMap(const std::string &sequence);
-    std::vector<MapType> pipe2promptFormatCodeMap(const std::string &sequence);
+    std::vector<CodeMapType> pipe2genericCodeMap(const std::string &sequence);
+    std::vector<CodeMapType> pipe2promptCodeMap(const std::string &sequence);
+    std::vector<CodeMapType> pipe2promptFormatCodeMap(const std::string &sequence);
     std::string parseFormatColorsBrackets(const std::string &sequence, Config &config);
     std::string parseFormatColorsColon(const std::string &sequence, Config &config);
     std::string pipe2promptFormat(const std::string &sequence, Config &config);

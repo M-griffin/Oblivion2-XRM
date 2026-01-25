@@ -75,7 +75,7 @@ public:
 
     void readInMenuData();
 
-    std::string setupYesNoMenuInput(const std::string &menu_prompt, std::vector<MapType> &code_map);
+    std::string setupYesNoMenuInput(const std::string &menu_prompt, std::vector<CodeMapType> &code_map);
 
     std::string getDefaultColor();
 

@@ -252,7 +252,7 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen) {
     m_ctx.getIoSession().clearAllMCIMapping();
 
     // Build a single code map that can be reused.
-    std::vector<MapType> code_map = m_ctx.getIoSession().pipe2genericCodeMap(new_screen);
+    std::vector<CodeMapType> code_map = m_ctx.getIoSession().pipe2genericCodeMap(new_screen);
 
     // Loop the code map and determine the number of unique columns for parsing.
     int key_columns = 0;
@@ -326,7 +326,7 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen) {
     }
 
     // Clear Code map.
-    std::vector<MapType>().swap(code_map);
+    std::vector<CodeMapType>().swap(code_map);
     ansi_process.parseTextToBuffer(const_cast<char *>(output_screen.c_str()));
 
     // Return with no clear screen, since this is a mid ansi.
@@ -377,7 +377,7 @@ std::string MenuBase::processGenericScreens() {
 /**
  * @brief Setup light bar string, and return default display.
  */
-std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::vector<MapType> &code_map) {
+std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::vector<CodeMapType> &code_map) {
     m_baseState = BaseState::MENU_YESNO_BAR;
     clearMenuPullDownOptions();
 
@@ -524,7 +524,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string) {
 
     // Depending on the CodeMap return from the (2)nd group, which are the ending characters
     // We'll need to set up new menus on these features.
-    std::vector<MapType> code_map = m_ctx.getIoSession().pipe2promptCodeMap(prompt_string);
+    std::vector<CodeMapType> code_map = m_ctx.getIoSession().pipe2promptCodeMap(prompt_string);
     std::string output;
 
     // Loop codes and picked out ending control code.

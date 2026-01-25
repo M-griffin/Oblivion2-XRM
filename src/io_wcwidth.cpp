@@ -1,7 +1,7 @@
 #include "io_wcwidth.hpp"
 
 #include <string>
-#include <wchar.h>
+#include <cwchar>
 
 // Markus Kuhn wcwidth()
 static int bisearch(wchar_t ucs, const interval *table, int max) {

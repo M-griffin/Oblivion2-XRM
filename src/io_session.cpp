@@ -94,15 +94,15 @@ std::string IoSession::parseFilename(const std::string &pipe_code) {
     return m_io_code_mapping.parseFilename(pipe_code);
 }
 
-std::string IoSession::parseCodeMap(const std::string &screen, std::vector<MapType> &code_map) {
+std::string IoSession::parseCodeMap(const std::string &screen, std::vector<CodeMapType> &code_map) {
     return m_io_code_mapping.parseCodeMap(screen, code_map);
 }
 
-std::string IoSession::parseCodeMapGenerics(const std::string &screen, const std::vector<MapType> &code_map) {
+std::string IoSession::parseCodeMapGenerics(const std::string &screen, const std::vector<CodeMapType> &code_map) {
     return m_io_code_mapping.parseCodeMapGenerics(screen, code_map);
 }
 
-std::vector<MapType> IoSession::parseToCodeMap(const std::string &sequence, const std::regex &expression) {
+std::vector<CodeMapType> IoSession::parseToCodeMap(const std::string &sequence, const std::regex &expression) {
     return m_io_code_mapping.parseToCodeMap(sequence, expression);
 }
 
@@ -110,15 +110,15 @@ std::string IoSession::pipe2ansi(const std::string &sequence) {
     return m_io_code_mapping.pipe2ansi(sequence);
 }
 
-std::vector<MapType> IoSession::pipe2genericCodeMap(const std::string &sequence) {
+std::vector<CodeMapType> IoSession::pipe2genericCodeMap(const std::string &sequence) {
     return m_io_code_mapping.pipe2genericCodeMap(sequence);
 }
 
-std::vector<MapType> IoSession::pipe2promptCodeMap(const std::string &sequence) {
+std::vector<CodeMapType> IoSession::pipe2promptCodeMap(const std::string &sequence) {
     return m_io_code_mapping.pipe2promptCodeMap(sequence);
 }
 
-std::vector<MapType> IoSession::pipe2promptFormatCodeMap(const std::string &sequence) {
+std::vector<CodeMapType> IoSession::pipe2promptFormatCodeMap(const std::string &sequence) {
     return m_io_code_mapping.pipe2promptFormatCodeMap(sequence);
 }
 

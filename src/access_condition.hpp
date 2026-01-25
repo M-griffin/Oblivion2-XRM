@@ -87,14 +87,14 @@ public:
      * @param user
      * @return
      */
-    bool parseCodeMap(const std::vector<MapType> &code_map, Users &user);
+    bool parseCodeMap(const std::vector<CodeMapType> &code_map, Users &user);
 
     /**
      * @brief Parse ASC Strings then test User Flags
      * @param acs_string
      * @return
      */
-    std::vector<MapType> parseAcsString(const std::string &acs_string);
+    std::vector<CodeMapType> parseAcsString(const std::string &acs_string);
 
     /**
      * @brief Parses and Validates code map

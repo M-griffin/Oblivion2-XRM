@@ -165,12 +165,12 @@ void AccessCondition::setAccessConditionsFlagsOff(std::string bitString, bool fi
  * @param user
  * @return
  */
-bool AccessCondition::parseCodeMap(const std::vector<MapType> &code_map, Users &user) {
+bool AccessCondition::parseCodeMap(const std::vector<CodeMapType> &code_map, Users &user) {
     bool condition = false;
-    MapType my_matches;
+    CodeMapType my_matches;
 
     // Make a copy so the original is not modified.
-    std::vector<MapType> code_mapping;
+    std::vector<CodeMapType> code_mapping;
     code_mapping.assign(code_map.begin(), code_map.end());
 
     // All Global MCI Codes likes standard screens and colors will
@@ -305,8 +305,8 @@ std::vector<std::string> split(const std::string &s, char delimiter) {
  * @param acs_string
  * @return
  */
-std::vector<MapType> AccessCondition::parseAcsString(const std::string &acs_string) {
-    std::vector<MapType> code_map;
+std::vector<CodeMapType> AccessCondition::parseAcsString(const std::string &acs_string) {
+    std::vector<CodeMapType> code_map;
 
     // First split any OR statements.
     std::vector<std::string> tokens;
@@ -320,7 +320,7 @@ std::vector<MapType> AccessCondition::parseAcsString(const std::string &acs_stri
         // NOTE, at this time OR is not handled, just breaking up statements.
         // Or would need to be handled in the code mapping
         for (std::string t: tokens) {
-            std::vector<MapType> tmp = m_session_io.parseToCodeMap(t, ACS_EXPRESSION);
+            std::vector<CodeMapType> tmp = m_session_io.parseToCodeMap(t, ACS_EXPRESSION);
             code_map.insert(code_map.end(), tmp.begin(), tmp.end());
         }
     } else {
@@ -337,7 +337,7 @@ std::vector<MapType> AccessCondition::parseAcsString(const std::string &acs_stri
  * @return
  */
 bool AccessCondition::validateAcsString(const std::string &acs_string, Users &user) {
-    std::vector<MapType> code_map;
+    std::vector<CodeMapType> code_map;
     code_map = parseAcsString(acs_string);
 
     // Allow Access on empty string, meaning no security.

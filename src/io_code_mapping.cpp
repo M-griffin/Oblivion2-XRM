@@ -1,5 +1,11 @@
 #include "io_code_mapping.hpp"
 
+#include <string>
+#include <regex>
+#include <vector>
+
+#include "logging.hpp"
+
 std::string IoCodeMapping::parseFilename(const std::string &pipe_code) {
     // Strip %%DF and grab the 'Filename.ext
     IoCommon common_io;
@@ -19,7 +25,7 @@ std::string IoCodeMapping::parseFilename(const std::string &pipe_code) {
  * @param code_map
  * @return
  */
-std::string IoCodeMapping::parseCodeMap(const std::string &screen, std::vector<MapType> &code_map) {
+std::string IoCodeMapping::parseCodeMap(const std::string &screen, std::vector<CodeMapType> &code_map) {
     m_log.log(Logging::LogLevel::Debug, "[parseCodeMap]", __LINE__, __FILE__);
 
     std::string ansi_string(screen);
@@ -29,7 +35,7 @@ std::string IoCodeMapping::parseCodeMap(const std::string &screen, std::vector<M
     // Break out parsing on which pattern was matched.
     while (!code_map.empty()) {
         // Loop Backwards to preserve string offsets on replacement.
-        MapType my_matches = code_map.back();
+        CodeMapType my_matches = code_map.back();
         code_map.pop_back();
 
         // Check for Custom Screen Translation Mappings
@@ -141,7 +147,7 @@ std::string IoCodeMapping::parseCodeMap(const std::string &screen, std::vector<M
 
     // Clear Code map.
     code_map.clear();
-    std::vector<MapType>().swap(code_map);
+    std::vector<CodeMapType>().swap(code_map);
 
     // Clear Custom MCI Screen Translation Mappings
     clearAllMCIMapping();
@@ -154,13 +160,13 @@ std::string IoCodeMapping::parseCodeMap(const std::string &screen, std::vector<M
  * @param code_map
  * @return
  */
-std::string IoCodeMapping::parseCodeMapGenerics(const std::string &screen, const std::vector<MapType> &code_map) {
+std::string IoCodeMapping::parseCodeMapGenerics(const std::string &screen, const std::vector<CodeMapType> &code_map) {
     m_log.log(Logging::LogLevel::Debug, "[parseCodeMapGenerics]", __LINE__, __FILE__);
 
     std::string ansi_string(screen);
 
     // Make a copy so the original is not modified.
-    std::vector<MapType> code_mapping;
+    std::vector<CodeMapType> code_mapping;
     code_mapping.assign(code_map.begin(), code_map.end());
 
     // All Global MCI Codes likes standard screens and colors will
@@ -168,7 +174,7 @@ std::string IoCodeMapping::parseCodeMapGenerics(const std::string &screen, const
     // Break out parsing on which pattern was matched.
     while (!code_mapping.empty()) {
         // Loop Backwards to preserve string offsets on replacement.
-        MapType my_matches = code_mapping.back();
+        CodeMapType my_matches = code_mapping.back();
         code_mapping.pop_back();
 
         // Check for Custom Screen Translation Mappings
@@ -193,7 +199,7 @@ std::string IoCodeMapping::parseCodeMapGenerics(const std::string &screen, const
     // Clear MCI And Code Mappings
     clearAllMCIMapping();
     code_mapping.clear();
-    std::vector<MapType>().swap(code_mapping);
+    std::vector<CodeMapType>().swap(code_mapping);
     return ansi_string;
 }
 
@@ -203,10 +209,10 @@ std::string IoCodeMapping::parseCodeMapGenerics(const std::string &screen, const
  * @param expression
  * @return
  */
-std::vector<MapType> IoCodeMapping::parseToCodeMap(const std::string &sequence, const std::regex &expression) {
+std::vector<CodeMapType> IoCodeMapping::parseToCodeMap(const std::string &sequence, const std::regex &expression) {
     // Contains all matches found so we can iterate and replace
     // Without Multiple loops through the string.
-    std::vector<MapType> code_map;
+    std::vector<CodeMapType> code_map;
 
     // Make a copy that we can modify and process on.
     std::string ansi_string(sequence);
@@ -224,7 +230,7 @@ std::vector<MapType> IoCodeMapping::parseToCodeMap(const std::string &sequence, 
 
     //std::cout << "exp: " << expression << std::endl;
     try {
-        MapType my_matches;
+        CodeMapType my_matches;
         std::smatch matches;
         std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
 
@@ -258,10 +264,10 @@ std::vector<MapType> IoCodeMapping::parseToCodeMap(const std::string &sequence, 
                 // Make sure the Match is true! otherwise skip.
                 if (matches[s].matched) {
                     offset = matches[s].first - ansi_string.begin();
+
                     length = matches[s].length();
 
                     // Test output s registers which pattern matched, 1, 2, or 3!
-
                     std::cout << s << " :  Matched Sub 2" << matches[s].str()
                             << " at offset " << offset
                             << " of length " << length
@@ -290,7 +296,7 @@ std::vector<MapType> IoCodeMapping::parseToCodeMap(const std::string &sequence, 
  * @return
  */
 std::string IoCodeMapping::pipe2ansi(const std::string &sequence) {
-    std::vector<MapType> code_map = parseToCodeMap(sequence, STD_EXPRESSION);
+    std::vector<CodeMapType> code_map = parseToCodeMap(sequence, STD_EXPRESSION);
     std::string result = parseCodeMap(sequence, code_map);
     return result;
 }
@@ -300,8 +306,8 @@ std::string IoCodeMapping::pipe2ansi(const std::string &sequence) {
  * @param sequence
  * @return
  */
-std::vector<MapType> IoCodeMapping::pipe2genericCodeMap(const std::string &sequence) {
-    std::vector<MapType> code_map = parseToCodeMap(sequence, MID_EXPRESSION);
+std::vector<CodeMapType> IoCodeMapping::pipe2genericCodeMap(const std::string &sequence) {
+    std::vector<CodeMapType> code_map = parseToCodeMap(sequence, MID_EXPRESSION);
     return code_map;
 }
 
@@ -310,9 +316,9 @@ std::vector<MapType> IoCodeMapping::pipe2genericCodeMap(const std::string &seque
  * @param sequence
  * @return
  */
-std::vector<MapType> IoCodeMapping::pipe2promptCodeMap(const std::string &sequence) {
+std::vector<CodeMapType> IoCodeMapping::pipe2promptCodeMap(const std::string &sequence) {
     // This will handle parsing the sequence, and replacement
-    std::vector<MapType> code_map = parseToCodeMap(sequence, PROMPT_EXPRESSION);
+    std::vector<CodeMapType> code_map = parseToCodeMap(sequence, PROMPT_EXPRESSION);
     return code_map;
 }
 
@@ -321,9 +327,9 @@ std::vector<MapType> IoCodeMapping::pipe2promptCodeMap(const std::string &sequen
  * @param sequence
  * @return
  */
-std::vector<MapType> IoCodeMapping::pipe2promptFormatCodeMap(const std::string &sequence) {
+std::vector<CodeMapType> IoCodeMapping::pipe2promptFormatCodeMap(const std::string &sequence) {
     // This will handle parsing the sequence, and replacement
-    std::vector<MapType> code_map = parseToCodeMap(sequence, FORMAT_EXPRESSION);
+    std::vector<CodeMapType> code_map = parseToCodeMap(sequence, FORMAT_EXPRESSION);
     return code_map;
 }
 
@@ -336,7 +342,7 @@ std::vector<MapType> IoCodeMapping::pipe2promptFormatCodeMap(const std::string &
  * @return
  */
 std::string IoCodeMapping::pipe2promptFormat(const std::string &sequence, Config &config) {
-    std::vector<MapType> code_map = pipe2promptFormatCodeMap(sequence);
+    std::vector<CodeMapType> code_map = pipe2promptFormatCodeMap(sequence);
     std::string output;
     std::string key;
     std::string value;

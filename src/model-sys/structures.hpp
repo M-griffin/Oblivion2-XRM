@@ -32,13 +32,13 @@ enum {
 /**
  * @brief Saves All MCI and PIPE Matches with Offsets for replacement.
  */
-typedef struct MapType {
+typedef struct CodeMapType {
     std::string::size_type m_offset;
     std::string::size_type m_length;
     std::string::size_type m_match;
     std::string m_code;
     bool m_or;
-} MapType;
+} CodeMapType;
 
 
 // Parameterized ESC Sequences Translations.

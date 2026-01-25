@@ -320,8 +320,8 @@ int ProcessorAnsi::getMaxRowsUsedOnScreen() {
 std::string ProcessorAnsi::screenBufferParse() {
     // Contains all matches found so we can iterate and replace
     // Without Multiple loops through the string.
-    MapType my_matches;
-    std::vector<MapType> code_map;
+    CodeMapType my_matches;
+    std::vector<CodeMapType> code_map;
     IoCommon common_io;
 
     // To make parsing a little faster, pre-fill vector with 99,
@@ -459,7 +459,7 @@ std::string ProcessorAnsi::screenBufferParse() {
 
     // Clear Code map.
     code_map.clear();
-    std::vector<MapType>().swap(code_map);
+    std::vector<CodeMapType>().swap(code_map);
     return ansi_string;
 }
 
