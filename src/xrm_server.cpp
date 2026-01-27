@@ -42,7 +42,7 @@
 
 #include "model-sys/structures.hpp"
 #include "model-sys/config.hpp"
-#include "data-sys/config_dao.hpp"
+#include "data-sys/yml_config.hpp"
 
 #include "io_common.hpp"
 #include "logging.hpp"

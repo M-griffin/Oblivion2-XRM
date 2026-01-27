@@ -1,7 +1,7 @@
 #ifndef PROCESSOR_TEXT_HPP
 #define PROCESSOR_TEXT_HPP
 
-#include "processor_base.hpp"
+#include "screen_base.hpp"
 
 #include <string>
 #include <map>
@@ -17,7 +17,7 @@
  * @brief Processes Text or Message Text into Screen Buffer Data
  */
 class ProcessorText
-        : public ProcessorBase {
+        : public ScreenBase {
 public:
     ProcessorText(int term_height, int term_width);
 

@@ -6,7 +6,7 @@
 #include <functional>
 
 #include "mod_base.hpp"
-#include "../data-sys/text_prompts_dao.hpp"
+#include "../data-sys/yml_text_prompts.hpp"
 #include "../deadline_timer.hpp"
 
 /**

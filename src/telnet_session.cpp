@@ -1,5 +1,5 @@
 #include "telnet_session.hpp"
-#include "telnet.hpp"
+#include "model-sys/telnet.hpp"
 #include "session_writer.hpp"
 #include "logging.hpp"
 

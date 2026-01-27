@@ -8,7 +8,7 @@
 #include "model-sys/cell.hpp"
 
 #include "logging.hpp"
-#include "encoding.hpp"
+#include "io_encoding.hpp"
 #include "io_common.hpp"
 
 

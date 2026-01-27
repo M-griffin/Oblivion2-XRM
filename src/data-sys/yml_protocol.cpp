@@ -1,0 +1,176 @@
+#include "yml_protocol.hpp"
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <mutex>
+#include <cassert>
+
+#include "../model-sys/protocol.hpp"
+#include "../logging.hpp"
+
+// Setup the file version for the file.
+const std::string Protocols::FILE_VERSION = "1.0.0";
+
+ProtocolDao::ProtocolDao(Protocols &prot, std::string path)
+    : m_protocols(prot)
+      , m_path(path)
+      , m_filename("protocols") {
+}
+
+/**
+ * @brief Helper, appends forward/backward slash to path
+ * @param value
+ */
+void ProtocolDao::pathSeperator(std::string &value) {
+#ifdef _WIN32
+    value.append("\\");
+#else
+    value.append("/");
+#endif
+}
+
+/**
+ * @brief Check if the file exists and we need to create a new one.
+ * @return
+ */
+bool ProtocolDao::fileExists() {
+    std::string path = m_path;
+    pathSeperator(path);
+    path.append(m_filename);
+    path.append(".yaml");
+
+    std::ifstream ifs(path);
+
+    if (!ifs.is_open()) {
+        return false;
+    }
+
+    ifs.close();
+    return true;
+}
+
+
+/**
+ * @brief Creates and Saves a newly Generated Configuration File.
+ * @param prot
+ * @return
+ */
+bool ProtocolDao::saveConfig(const Protocols &prot) {
+    Logging &log = Logging::getInstance();
+    std::string path = m_path;
+    pathSeperator(path);
+    path.append(m_filename);
+    path.append(".yaml");
+
+    YAML::Emitter out;
+
+    out << YAML::BeginMap;
+    out << YAML::Flow;
+
+    // Start Creating the Key/Value Output for the Config File.
+
+    out << YAML::Key << "file_version" << YAML::Value << prot.file_version;
+
+    // Loop and encode each menu option
+    for (unsigned int i = 0; i < prot.protocols.size(); i++) {
+        auto &opt = prot.protocols[i];
+
+        out << YAML::Key << "protocols";
+        out << YAML::Value << YAML::BeginMap;
+        out << YAML::Key << "protocol_name" << YAML::Value << opt.protocol_name;
+        out << YAML::Key << "protocol_type" << YAML::Value << opt.protocol_type;
+        out << YAML::Key << "protocol_key" << YAML::Value << opt.protocol_key;
+        out << YAML::Key << "protocol_path" << YAML::Value << opt.protocol_path;
+        out << YAML::Key << "protocol_argument" << YAML::Value << opt.protocol_argument;
+        out << YAML::Key << "protocol_isBatch" << YAML::Value << opt.protocol_isBatch;
+        out << YAML::Key << "protocol_hasDSZLog" << YAML::Value << opt.protocol_hasDSZLog;
+        out << YAML::EndMap;
+    }
+
+    out << YAML::EndMap;
+
+
+    // Setup file to Write out File.
+    std::ofstream ofs(path);
+
+    if (!ofs.is_open()) {
+        log.log(Logging::LogLevel::Info, "Error, unable to write to=", path, __LINE__, __FILE__);
+        return false;
+    }
+
+    ofs << out.c_str();
+    ofs.close();
+    return true;
+}
+
+
+/**
+ * @brief Moves the Loaded config to the shared pointer.
+ *        This can probably be redone lateron with copy constructors..
+ * @param rhs
+ * @return
+ */
+void ProtocolDao::encode(const Protocols &rhs) {
+    m_protocols.file_version = rhs.file_version;
+    m_protocols.protocols = rhs.protocols;
+
+    // Now Sort All Protocols once they have been loaded.
+    // Unfortunately YAML does not keep ordering in arrays properly.
+    sort(
+        m_protocols.protocols.begin(), m_protocols.protocols.end(),
+        [ ](const Protocol &lhs, const Protocol &rhs) {
+            return lhs.protocol_name < rhs.protocol_name;
+        });
+}
+
+/**
+ * @brief Loads a Configuation file into the m_protocol stub for access.
+ * @return
+ */
+bool ProtocolDao::loadConfig() {
+    Logging &log = Logging::getInstance();
+    std::string path = m_path;
+    pathSeperator(path);
+    path.append(m_filename);
+    path.append(".yaml");
+
+    YAML::Node node;
+
+    // Load the file into the class.
+    try {
+        // Load file fresh.
+        node = YAML::LoadFile(path);
+
+        // Testing Is on nodes always throws exceptions.
+        if (node.size() == 0) {
+            return false; //File Not Found?
+        }
+
+        std::string file_version = node["file_version"].as<std::string>();
+
+        // Validate File Version
+        log.log(Logging::LogLevel::Console, "Protocols File Version=", file_version);
+
+        if (file_version != Protocols::FILE_VERSION) {
+            log.log(Logging::LogLevel::Info, "Protocols File Version=", file_version, "Expected=", Protocols::FILE_VERSION,
+                                          __LINE__, __FILE__);
+            return false;
+        }
+
+        // When doing node.as (all fields must be present on file)
+        Protocols prot = node.as<Protocols>();
+
+        // Moves the Loaded config to m_config shared pointer.
+        encode(prot);
+    } catch (YAML::Exception &ex) {
+        log.log(Logging::LogLevel::Info, "YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
+        return (false);
+    }
+    catch (std::exception &ex) {
+        log.log(Logging::LogLevel::Info, "Unexpected YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
+        return (false);
+    }
+
+    return true;
+}

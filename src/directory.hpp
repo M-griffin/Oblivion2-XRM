@@ -34,8 +34,8 @@ public:
      * @return
      */
     std::string getFileExtension(const std::string &value) {
-        std::string::size_type idx = value.rfind(".");
-        std::string extension = "";
+        const std::string::size_type idx = value.rfind('.');
+        std::string extension;
 
         if (idx != std::string::npos) {
             extension = value.substr(idx + 1);
@@ -49,18 +49,18 @@ public:
      * @param dir
      * @return
      */
-    std::vector<std::string> getAllFilesInDirectoryByExtension(const std::string &dir, std::string extension) {
+    std::vector<std::string> getAllFilesInDirectoryByExtension(const std::string &dir, const std::string& extension) {
         std::lock_guard<std::mutex> lock(m);
 
         // Check if were pulling by specific or all files with extensions.
         bool isAllExtensions = false;
 
-        if (extension.size() > 0) {
+        if (!extension.empty()) {
             isAllExtensions = true;
         }
 
         std::vector<std::string> file_list;
-        std::shared_ptr<DIR> local_directory_ptr(opendir(dir.c_str()), [](DIR *directory) {
+        const std::shared_ptr<DIR> local_directory_ptr(opendir(dir.c_str()), [](DIR *directory) {
             directory && closedir(directory);
         });
 
@@ -82,7 +82,7 @@ public:
                 if (isAllExtensions && file_ext == extension) {
                     // By Specific Extension
                     file_list.push_back(file_name);
-                } else if (!isAllExtensions && file_ext != "") {
+                } else if (!isAllExtensions && !file_ext.empty()) {
                     // By All Extensions (Skip folders and executables)
                     file_list.push_back(file_name);
                 }
@@ -98,7 +98,7 @@ public:
      * @param extension
      * @return
      */
-    std::vector<std::string> getFileListPerDirectory(std::string directory, std::string extension) {
+    std::vector<std::string> getFileListPerDirectory(const std::string& directory, const std::string& extension) {
         const auto &directory_path = directory;
         const auto &file_list = getAllFilesInDirectoryByExtension(directory_path, extension);
         return file_list;

@@ -6,15 +6,15 @@
 #include "../model-sys/protocol.hpp"
 #include "../model-sys/access_level.hpp"
 #include "../model-app/oneliners.hpp"
-#include "../data-app/oneliners_dao.hpp"
+#include "../data-app/dao_oneliners.hpp"
 
 // Needed for Initializing and checking users data is set up
 // On startup.
-#include "session_stats_dao.hpp"
-#include "security_dao.hpp"
-#include "users_dao.hpp"
-#include "protocol_dao.hpp"
-#include "access_level_dao.hpp"
+#include "dao_session_stats.hpp"
+#include "dao_security.hpp"
+#include "dao_users.hpp"
+#include "yml_protocol.hpp"
+#include "dao_access_level.hpp"
 #include "../logging.hpp"
 
 #include "libSqliteWrapped.h"

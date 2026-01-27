@@ -7,7 +7,7 @@
 #include <vector>
 #include <cstdint>
 
-#include "encoding.hpp"
+#include "io_encoding.hpp"
 
 class Logging;
 
@@ -39,8 +39,8 @@ class IoCommon {
     bool m_is_new_getline; // GetLine
     bool m_is_new_leadoff; // GetLine
 
-    Encoding m_encode;
-    Encoding::TextEncoding m_encoding = Encoding::TextEncoding::ASCII;
+    IoEncoding m_encode;
+    IoEncoding::TextEncoding m_encoding = IoEncoding::TextEncoding::ASCII;
 
 public:
     explicit IoCommon();
@@ -327,7 +327,7 @@ public:
 
     bool decodeNextGlyph(const std::string& bytes,
                  std::string::const_iterator& it,
-                 Encoding::TextEncoding encoding,
+                 IoEncoding::TextEncoding encoding,
                  Utf8Glyph& glyph);
 
     // UTF8 Internal to CP437

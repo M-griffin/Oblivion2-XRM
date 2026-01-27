@@ -11,7 +11,6 @@
 class DBStartUp {
 public:
     explicit DBStartUp() = default;
-
     ~DBStartUp() = default;
 
     /**

@@ -16,7 +16,7 @@
 #include "processor_ansi.hpp"
 #include "socket_service.hpp"
 #include "io_session.hpp"
-#include "telnet.hpp"
+#include "model-sys/telnet.hpp"
 #include "telnet_session.hpp"
 #include "state_manager.hpp"
 #include "logging.hpp"

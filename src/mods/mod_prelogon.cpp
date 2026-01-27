@@ -8,12 +8,12 @@
 
 #include "mod_base.hpp"
 
-#include "../data-sys/text_prompts_dao.hpp"
+#include "../data-sys/yml_text_prompts.hpp"
 #include "../model-sys/structures.hpp"
 #include "../model-sys/config.hpp"
 
 #include "../session_writer.hpp"
-#include "../encoding.hpp"
+#include "../io_encoding.hpp"
 #include "../logging.hpp"
 #include "../io_session.hpp"
 #include "../io_common.hpp"
@@ -576,7 +576,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
 
                 // Even though it's default, lets set it anyway
                 m_log.log(Logging::LogLevel::Console, "Encoding set to CP437");
-                m_ctx.getSessionWrite().setEncoding(Encoding::TextEncoding::CP437);
+                m_ctx.getSessionWrite().setEncoding(IoEncoding::TextEncoding::CP437);
             } else {
                 // Switch to Unicode Character Set.
                 message = "\x1b[0m" + m_ctx.getIoSession().pipeColors(blackColor);
@@ -589,7 +589,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
 
                 // Even though it's default, lets set it anyway
                 m_log.log(Logging::LogLevel::Console, "Encoding set to UTF-8");
-                m_ctx.getSessionWrite().setEncoding(Encoding::TextEncoding::UTF8);
+                m_ctx.getSessionWrite().setEncoding(IoEncoding::TextEncoding::UTF8);
             }
 
             baseProcessAndDeliverNewLine(message);
@@ -619,7 +619,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
 
                 // Even though it's default, lets set it anyways
                 m_log.log(Logging::LogLevel::Console, "Encoding set to UTF-8");
-                m_ctx.getSessionWrite().setEncoding(Encoding::TextEncoding::UTF8);
+                m_ctx.getSessionWrite().setEncoding(IoEncoding::TextEncoding::UTF8);
             } else {
                 // Switch to ISO, then CP437 Character Set.
                 message = "\x1b[0m" + m_ctx.getIoSession().pipeColors(blackColor);
@@ -632,7 +632,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
 
                 // Even though it's default, lets set it anyways
                 m_log.log(Logging::LogLevel::Console, "Encoding set to CP437");
-                m_ctx.getSessionWrite().setEncoding(Encoding::TextEncoding::CP437);
+                m_ctx.getSessionWrite().setEncoding(IoEncoding::TextEncoding::CP437);
             }
 
             baseProcessAndDeliverNewLine(message);

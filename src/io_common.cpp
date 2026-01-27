@@ -37,7 +37,7 @@
 #include <unordered_map>
 
 #include "model-sys/structures.hpp"
-#include "encoding.hpp"
+#include "io_encoding.hpp"
 #include "logging.hpp"
 
 #include <utf8.h>
@@ -1474,7 +1474,7 @@ void IoCommon::onTcpReceive(const std::string &chunk) {
 
 bool IoCommon::decodeNextGlyph(const std::string &bytes,
                                std::string::const_iterator &it,
-                               Encoding::TextEncoding encoding,
+                               IoEncoding::TextEncoding encoding,
                                Utf8Glyph &glyph) {
     glyph.bytes.clear();
     glyph.length = 0;
@@ -1486,7 +1486,7 @@ bool IoCommon::decodeNextGlyph(const std::string &bytes,
     auto start = it;
 
     switch (encoding) {
-        case Encoding::TextEncoding::UTF8:
+        case IoEncoding::TextEncoding::UTF8:
             try {
                 utf8::next(it, bytes.end());
             } catch (...) {
@@ -1495,8 +1495,8 @@ bool IoCommon::decodeNextGlyph(const std::string &bytes,
             }
             break;
 
-        case Encoding::TextEncoding::ISO_8859_1:
-        case Encoding::TextEncoding::CP437:
+        case IoEncoding::TextEncoding::ISO_8859_1:
+        case IoEncoding::TextEncoding::CP437:
             ++it;
             break;
 

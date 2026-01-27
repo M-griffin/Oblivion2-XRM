@@ -8,7 +8,7 @@
 #include "io_pipes_colors.hpp"
 #include "logging.hpp"
 #include "session_writer.hpp"
-#include "data-sys/text_prompts_dao.hpp"
+#include "data-sys/yml_text_prompts.hpp"
 #include "model-sys/structures.hpp"
 
 class IoCodeMapping {

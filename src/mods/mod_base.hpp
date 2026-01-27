@@ -7,7 +7,7 @@
 #include "../logging.hpp"
 
 #include "../model-sys/context.hpp"
-#include "../data-sys/text_prompts_dao.hpp"
+#include "../data-sys/yml_text_prompts.hpp"
 
 
 /**

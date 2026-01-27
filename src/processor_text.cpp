@@ -4,15 +4,10 @@
 #include <cstdlib>
 #include <cctype>
 #include <cstring>
-#include <stdint.h>
-
 #include <regex>
-
-// Unicode Output Encoding.
-#include <iostream> // cout
-#include <clocale>  // locale
-#include <cwchar>   // wchar_t wide characters
-#include <string>   // string and wstring
+#include <iostream>
+#include <cwchar>
+#include <string>
 #include <fstream>
 #include <vector>
 #include <sstream>
@@ -26,23 +21,19 @@
 #include <utf8.h>
 
 ProcessorText::ProcessorText(int term_height, int term_width)
-    : ProcessorBase(term_height, term_width)
+    : ScreenBase(term_height, term_width)
       , m_tab_width(4)
       , m_line_number(1)
       , m_is_double_backspace(false) {
     m_log.log(Logging::LogLevel::Debug, "PROCESSOR_TEXT rows=", term_height, "cols=", term_width);
-    m_screen_buffer.reserve((m_number_lines * m_characters_per_line) + 1);
     m_screen_buffer.resize((m_number_lines * m_characters_per_line) + 1);
 }
 
 ProcessorText::~ProcessorText() {
     m_log.log(Logging::LogLevel::Console, "~ProcessorText()");
     m_screen_buffer.clear();
-    std::vector<ScreenPixel>().swap(m_screen_buffer);
     m_pull_down_options.clear();
-    std::map<int, ScreenPixel>().swap(m_pull_down_options);
     m_line_ending_map.clear();
-    std::map<int, int>().swap(m_line_ending_map);
 }
 
 

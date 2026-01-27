@@ -4,19 +4,15 @@
 #include <cstdlib>
 #include <cctype>
 #include <cstring>
-#include <cstdint>
-
 #include <regex>
-
-// Unicode Output Encoding.
-#include <iostream> // cout
-#include <clocale>  // locale
-#include <cwchar>   // wchar_t wide characters
-#include <string>   // string and wstring
+#include <iostream>
+#include <cwchar>
+#include <string>
 #include <fstream>
 #include <vector>
 #include <sstream>
 #include <map>
+#include <utf8.h>
 
 #include "model-sys/structures.hpp"
 #include "model-sys/screen_pixel.hpp"
@@ -24,10 +20,8 @@
 #include "io_common.hpp"
 #include "logging.hpp"
 
-#include <utf8.h>
-
 ProcessorAnsi::ProcessorAnsi()
-    : ProcessorBase(24, 80) {
+    : ScreenBase(24, 80) {
     m_screen_buffer.resize((m_number_lines * m_characters_per_line) + 1);
 }
 
@@ -52,108 +46,18 @@ void ProcessorAnsi::resize(const int term_height, const int term_width) {
  */
 std::string ProcessorAnsi::screenBufferToString() {
     m_ansi_output.erase();
-    m_ansi_output = "";
-
     for (unsigned int i = 0; i < m_screen_buffer.size(); i++) {
         auto &buff = m_screen_buffer[i];
 
-        if (buff.char_sequence[0] == '\r') {
-        } //  character = "\x1b[40m\r\n";
-        else if (buff.char_sequence[0] == '\0')
+        if (buff.char_sequence.empty()) {
             m_ansi_output += " ";
-        else
+        }
+        else if (buff.char_sequence[0] != '\r') {
             m_ansi_output += buff.char_sequence;
+        }
     }
 
     return m_ansi_output;
-}
-
-
-/**
- * @brief Test, displays screen buffer.
- */
-void ProcessorAnsi::screenBufferDisplayTest() {
-    int attr = 0;
-    int fore = 0;
-    int back = 0;
-
-    m_ansi_output.clear();
-    std::string character;
-
-    if (m_is_screen_cleared) {
-        m_ansi_output.append("\x1b[1;1H\x1b[2J");
-    }
-
-    // TODO Remove String Stream, more expensive then appending.
-    for (unsigned int i = 0; i < m_screen_buffer.size(); i++) {
-        auto &buff = m_screen_buffer[i];
-        std::stringstream ss;
-
-        if (buff.x_position >= 1) {
-            if (attr != buff.attribute ||
-                fore != buff.foreground ||
-                back != buff.background) {
-                ss << "\x1b["
-                        << buff.attribute << ";"
-                        << buff.foreground << ";"
-                        << buff.background << "m";
-
-                m_ansi_output.append(ss.str());
-
-                attr = buff.attribute;
-                fore = buff.foreground;
-                back = buff.background;
-            }
-
-            ss.clear();
-            ss.ignore();
-
-            // buff.c;
-            if (buff.char_sequence[0] == '\r') {
-            } //  character = "\x1b[40m\r\n";
-            else if (buff.char_sequence[0] == '\0')
-                character = " ";
-            else
-                character = buff.char_sequence;
-
-            m_ansi_output.append(character);
-        } else {
-            character = " ";
-            m_ansi_output.append(character);
-        }
-    }
-
-    // Screen should always end with reset.
-    m_ansi_output.append("\x1b[0m");
-}
-
-/**
- * @brief MCI Off-Set if Mid ANSI
- * Used for Single Line ANSI Inserts to determine where special MCI Codes are located.
- *
- * @param clearScreen
- * @return
- */
-int ProcessorAnsi::getMCIOffSet(std::string mciCode) {
-    unsigned int max = (m_x_position + (m_y_position * m_characters_per_line));
-
-    for (unsigned int i = 0; i < m_screen_buffer.size(); i++) {
-        // If buffer parse move past current cursor position
-        if ((i + 1) >= max) {
-            break;
-        }
-
-        // Check for MCI Code, if it matches, return position.
-        if (i + 2 < max) {
-            if (m_screen_buffer[i].char_sequence[0] == static_cast<unsigned char>(mciCode[0]) &&
-                m_screen_buffer[i + 1].char_sequence[0] == static_cast<unsigned char>(mciCode[1]) &&
-                m_screen_buffer[i + 2].char_sequence[0] == static_cast<unsigned char>(mciCode[2])) {
-                return i + 1;
-            }
-        }
-    }
-
-    return 0;
 }
 
 /**
@@ -189,6 +93,7 @@ std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen) {
             break;
         }
 
+        // TODO remove String Stream and replace with just String.
         std::stringstream ss;
 
         if (attr != buff.attribute ||
@@ -246,7 +151,6 @@ std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen) {
     return ansi_output;
 }
 
-
 /**
  * @brief Build the string for Light bar coors and colors.
  * @param pulldownId
@@ -258,7 +162,7 @@ std::string ProcessorAnsi::buildPullDownBars(int pulldownId, bool active) {
     std::stringstream ss;
     const auto it = m_pull_down_options.find(pulldownId);
 
-    // If We have the pulldown ID
+    // If We have the pull down ID
     if (it != m_pull_down_options.end()) {
         // First Position
         ss << "\x1b["
@@ -300,7 +204,7 @@ std::string ProcessorAnsi::buildPullDownBars(int pulldownId, bool active) {
  * @brief // Clear Pull Down Bars once menu options are reset.
  */
 void ProcessorAnsi::clearPullDownBars() {
-    std::map<int, ScreenPixel>().swap(m_pull_down_options);
+    m_pull_down_options.clear();
 }
 
 /**
@@ -314,6 +218,7 @@ int ProcessorAnsi::getMaxRowsUsedOnScreen() {
 
 /**
  * @brief Parses through MCI Codes for Light bars and Char Parameters.
+ * TODO MOVE TO SESSION_IO
  */
 std::string ProcessorAnsi::screenBufferParse() {
     // Contains all matches found so we can iterate and replace
@@ -323,9 +228,8 @@ std::string ProcessorAnsi::screenBufferParse() {
     IoCommon common_io;
 
     // To make parsing a little faster, pre-fill vector with 99,
-    // So it's not allocating each insert.
-    //code_map.reserve(99);
-    code_map.resize(99);
+    code_map.clear();
+    code_map.reserve(99);
 
     // Make a copy that we can modify and process on.
     std::string ansi_string = m_ansi_output;
@@ -401,16 +305,16 @@ std::string ProcessorAnsi::screenBufferParse() {
     // He handled here, then specific interfaces will break out below this.
     // Break out parsing on which pattern was matched.
 
-    // Clear Pulldown ID mapping.
+    // Clear Pull down ID mapping.
     std::map<int, ScreenPixel>::iterator itr = m_pull_down_options.begin();
 
-    if (code_map.size() > 0) {
+    if (!code_map.empty()) {
         while (itr != m_pull_down_options.end()) {
             itr = m_pull_down_options.erase(itr);
         }
     }
 
-    while (code_map.size() > 0) {
+    while (!code_map.empty()) {
         // Loop Backwards to preserve string offsets on replacement.
         // Fastest to pop from back.
         my_matches = code_map.back();
@@ -432,18 +336,20 @@ std::string ProcessorAnsi::screenBufferParse() {
                     break;
                 }
 
-                // Grab the highlight color from the second sequence %##.
-                m_screen_buffer[my_matches.m_offset].selected_attribute =
-                        m_screen_buffer[my_matches.m_offset + 3].attribute;
+                if (my_matches.m_offset + 3 < m_screen_buffer.size()) {
+                    // Grab the highlight color from the second sequence %##.
+                    m_screen_buffer[my_matches.m_offset].selected_attribute =
+                            m_screen_buffer[my_matches.m_offset + 3].attribute;
 
-                m_screen_buffer[my_matches.m_offset].selected_foreground =
-                        m_screen_buffer[my_matches.m_offset + 3].foreground;
+                    m_screen_buffer[my_matches.m_offset].selected_foreground =
+                            m_screen_buffer[my_matches.m_offset + 3].foreground;
 
-                m_screen_buffer[my_matches.m_offset].selected_background =
-                        m_screen_buffer[my_matches.m_offset + 3].background;
+                    m_screen_buffer[my_matches.m_offset].selected_background =
+                            m_screen_buffer[my_matches.m_offset + 3].background;
 
-                // tear out the y and x positions from the offset.
-                m_pull_down_options[pull_id] = m_screen_buffer[my_matches.m_offset];
+                    // tear out the y and x positions from the offset.
+                    m_pull_down_options[pull_id] = m_screen_buffer[my_matches.m_offset];
+                }
 
                 ss.clear();
                 ss.ignore();
@@ -457,7 +363,6 @@ std::string ProcessorAnsi::screenBufferParse() {
 
     // Clear Code map.
     code_map.clear();
-    std::vector<CodeMapType>().swap(code_map);
     return ansi_string;
 }
 
@@ -495,7 +400,7 @@ void ProcessorAnsi::screenBufferSetGlyph(const std::string &charSequence) {
 
     // Add Sequence to Screen Buffer
     try {
-        if (m_position < (signed) m_screen_buffer.size()) {
+        if (m_position < static_cast<signed>(m_screen_buffer.size())) {
             m_screen_buffer.at(m_position) = screen_pixel;
         } else {
             m_log.log(Logging::LogLevel::Error, "[screenBufferSetGlyph] out of bounds pos=", m_x_position - 1, __LINE__,
@@ -505,16 +410,6 @@ void ProcessorAnsi::screenBufferSetGlyph(const std::string &charSequence) {
         m_log.log(Logging::LogLevel::Error, "[screenBufferSetGlyph] exceeds screen dimensions Exception=", e.what(),
                                         __LINE__, __FILE__);
     }
-
-    // Clear for next sequences.
-    /*
-    m_screen_pixel.char_sequence = '\0';
-    m_screen_pixel.x_position = 1;
-    m_screen_pixel.y_position = 1;
-    m_screen_pixel.attribute  = 0;
-    m_screen_pixel.foreground = FG_WHITE;
-    m_screen_pixel.background = BG_BLACK;
-    */
 
     // Move Cursor to next position after character insert.
     if (m_x_position >= m_characters_per_line) {
@@ -565,7 +460,7 @@ void ProcessorAnsi::screenBufferClearRange(int start, int end) {
     // Clear out entire line.
     for (int i = startPosition; i < endPosition; i++) {
         try {
-            m_screen_buffer[i].char_sequence = '\0';
+            m_screen_buffer[i].char_sequence.clear();
         } catch (std::exception &e) {
             m_log.log(Logging::LogLevel::Error, "[screenBufferClearRange] Exception=", e.what(),
                                             "start=", start, "end=", end, __LINE__, __FILE__);

@@ -10,8 +10,8 @@
 #include <cassert>
 
 #include "access_condition.hpp"
-#include "data-sys/menu_dao.hpp"
-#include "data-sys/menu_prompt_dao.hpp"
+#include "data-sys/yml_menu.hpp"
+#include "data-sys/yml_menu_prompt.hpp"
 #include "model-sys/config.hpp"
 #include "model-sys/users.hpp"
 #include "model-sys/context.hpp"
@@ -20,7 +20,7 @@
 #include "io_session.hpp"
 #include "logging.hpp"
 #include "io_common.hpp"
-#include "encoding.hpp"
+#include "io_encoding.hpp"
 #include "tcp_session.hpp"
 
 MenuBase::MenuBase(Context &ctx)
@@ -869,7 +869,7 @@ std::string MenuBase::loadMenuPrompt() {
         const std::string output = m_ctx.getIoSession().pipe2ansi(prompt_display);
 
         // TODO Quick Hack, need to streamline.
-        const Encoding encode;
+        const IoEncoding encode;
         return encode.utf8Encode(output);
     }
 

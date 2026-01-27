@@ -4,7 +4,7 @@
 #include <string>
 
 #include "socket_service.hpp"
-#include "encoding.hpp"
+#include "io_encoding.hpp"
 
 class SessionWriter {
 
@@ -12,7 +12,7 @@ class SessionWriter {
 
     bool m_is_authorized;
     bool m_use_ansi;
-    Encoding::TextEncoding m_encoding = Encoding::TextEncoding::CP437;
+    IoEncoding::TextEncoding m_encoding = IoEncoding::TextEncoding::CP437;
 
 public:
     explicit SessionWriter(SocketService &s)
@@ -22,8 +22,8 @@ public:
     }
 
     void send(const std::string &v, const bool isDisconnected = false) {
-        if (m_encoding == Encoding::TextEncoding::CP437) {
-            const Encoding encode;
+        if (m_encoding == IoEncoding::TextEncoding::CP437) {
+            const IoEncoding encode;
             const std::string result = encode.utf8Decode(v);
             m_socketService.send(result, isDisconnected);
             return;
@@ -33,8 +33,8 @@ public:
     }
 
     void send(const ByteBuffer &v, const bool isDisconnected = false) {
-        if (m_encoding == Encoding::TextEncoding::CP437) {
-            const Encoding encode;
+        if (m_encoding == IoEncoding::TextEncoding::CP437) {
+            const IoEncoding encode;
             std::string buffer = std::string(buffer.begin(), buffer.end());;
             const std::string result = encode.utf8Decode(buffer);
             m_socketService.send(result, isDisconnected);
@@ -59,11 +59,11 @@ public:
         m_use_ansi = use_ansi;
     }
 
-    Encoding::TextEncoding getEncoding() const {
+    IoEncoding::TextEncoding getEncoding() const {
         return m_encoding;
     }
 
-    void setEncoding(const Encoding::TextEncoding value) {
+    void setEncoding(const IoEncoding::TextEncoding value) {
         m_encoding = value;
     }
 

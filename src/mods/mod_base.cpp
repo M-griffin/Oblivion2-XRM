@@ -9,14 +9,14 @@
 #include "../socket_service.hpp"
 #include "../io_session.hpp"
 #include "../processor_ansi.hpp"
-#include "../encoding.hpp"
+#include "../io_encoding.hpp"
 #include "../logging.hpp"
 #include "../io_common.hpp"
 #include "../tcp_session.hpp"
 
 #include "../model-sys/config.hpp"
 #include "../model-sys/context.hpp"
-#include "../data-sys/text_prompts_dao.hpp"
+#include "../data-sys/yml_text_prompts.hpp"
 
 ModBase::ModBase(Context &ctx, const std::string &filename)
     : m_log(Logging::getInstance())
@@ -36,7 +36,7 @@ std::string ModBase::baseGetEncodedBoxChar(const int enum_value) const {
     const auto char_value = std::string(1, static_cast<char>(enum_value));
 
     // TODO Quick Hack, update later on
-    const Encoding encode;
+    const IoEncoding encode;
     return encode.utf8Encode(char_value);
 }
 
@@ -48,7 +48,7 @@ std::string ModBase::baseGetEncodedBoxCharAndColor(const int enum_value) const {
     const auto char_value = std::string(1, static_cast<char>(enum_value));
 
     // TODO Quick Hack, update later on
-    const Encoding encode;
+    const IoEncoding encode;
     return baseGetDefaultBoxColor() + encode.utf8Encode(char_value);
 }
 
