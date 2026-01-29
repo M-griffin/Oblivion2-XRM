@@ -39,11 +39,11 @@ public:
     typedef std::pair<std::string, std::string> M_StringPair;
 
     IoSession(SessionWriter &session, IoCommon &common)
-    : m_log(Logging::getInstance())
-      , m_session(session)
-      , m_io_common(common)
-      , m_io_input_handler(session, common)
-      , m_io_code_mapping(session, common) {
+        : m_log(Logging::getInstance())
+          , m_session(session)
+          , m_io_common(common)
+          , m_io_input_handler(session, common)
+          , m_io_code_mapping() {
     }
 
     ~IoSession() {
@@ -84,6 +84,7 @@ public:
     std::string parseFilename(const std::string &pipe_code);
     std::string parseCodeMap(const std::string &screen, std::vector<CodeMapType> &code_map);
     std::string parseCodeMapGenerics(const std::string &screen, const std::vector<CodeMapType> &code_map);
+    std::vector<CodeMapType> parseScreenBufferToCodeMap(const std::string &sequence, const std::regex &expression);
     std::vector<CodeMapType> parseToCodeMap(const std::string &sequence, const std::regex &expression);
     std::string pipe2ansi(const std::string &sequence);
     std::vector<CodeMapType> pipe2genericCodeMap(const std::string &sequence);

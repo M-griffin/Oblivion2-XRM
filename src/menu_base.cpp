@@ -740,7 +740,7 @@ std::vector<std::string> MenuBase::getListOfMenuPrompts() {
     // Sort Menu Prompt's in ascending order
     std::sort(result_set.begin(), result_set.end());
 
-    for (std::string s: result_set) {
+    for (std::string &s : result_set) {
         result_list.push_back(s.substr(0, s.size() - 5));
     }
 
@@ -866,23 +866,25 @@ std::string MenuBase::loadMenuPrompt() {
         // Set the Prompts directory in the CONFIG.
         m_ctx.getIoSession().addMCIMapping("%MN", m_menu_info.menu_prompt);
 
-        const std::string output = m_ctx.getIoSession().pipe2ansi(prompt_display);
-
-        // TODO Quick Hack, need to streamline.
+        // Encode Prompt First prior to passing to Pipe2Ansi/CodeMapping.
         const IoEncoding encode;
-        return encode.utf8Encode(output);
+        std::string encoded = encode.utf8Encode(prompt_display);
+        return m_ctx.getIoSession().pipe2ansi(encoded);
     }
 
     prompt = "";
     if (!m_menu_info.menu_prompt.empty()) {
         m_log.log(Logging::LogLevel::Debug, "Use Default Prompt String in Menu.");
-        prompt = "\x1b[?25h"; // Turn on Cursor.
-        prompt += m_ctx.getIoSession().pipe2ansi(m_menu_info.menu_prompt);
+        prompt = "\x1b[?25h" + m_menu_info.menu_prompt;
+
+        // Encode Prompt First prior to passing to Pipe2Ansi/CodeMapping.
+        const IoEncoding encode;
+        std::string encoded = encode.utf8Encode(prompt);
+        return m_ctx.getIoSession().pipe2ansi(encoded);
     }
 
     // Otherwise Noting loads here, Pull down Menu with no prompt
     // So only light bars display.
-
     return prompt;
 }
 

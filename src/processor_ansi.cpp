@@ -12,17 +12,17 @@
 #include <vector>
 #include <sstream>
 #include <map>
-#include <utf8.h>
 
 #include "model-sys/structures.hpp"
 #include "model-sys/screen_pixel.hpp"
 
 #include "io_common.hpp"
+#include "io_session.hpp"
 #include "logging.hpp"
 
 ProcessorAnsi::ProcessorAnsi()
     : ScreenBase(24, 80) {
-    m_screen_buffer.resize((m_number_lines * m_characters_per_line) + 1);
+    m_screen_buffer.resize(m_number_lines * m_characters_per_line);
 }
 
 ProcessorAnsi::~ProcessorAnsi() {
@@ -38,7 +38,7 @@ void ProcessorAnsi::resize(const int term_height, const int term_width) {
     m_characters_per_line = term_width;
 
     m_screen_buffer.clear();
-    m_screen_buffer.resize((m_number_lines * m_characters_per_line) + 1);
+    m_screen_buffer.resize(m_number_lines * m_characters_per_line);
 }
 
 /**
@@ -51,8 +51,7 @@ std::string ProcessorAnsi::screenBufferToString() {
 
         if (buff.char_sequence.empty()) {
             m_ansi_output += " ";
-        }
-        else if (buff.char_sequence[0] != '\r') {
+        } else if (buff.char_sequence[0] != '\r') {
             m_ansi_output += buff.char_sequence;
         }
     }
@@ -78,72 +77,67 @@ std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen) {
     std::string ansi_output;
 
     // TODO , need to get context in here, so we can determine
-    // TODO , scroll type, clear or scroll screen down!
+    // TODO , scroll type, clear or scroll screen down entire!
+    // NOTES: Clear screen doesn't leave scroll back buffer in terminals.
     if (clearScreen) {
         ansi_output.append("\x1b[1;1H\x1b[2J");
     }
 
-    int count = 1;
-
-    for (unsigned int i = 0; i < m_screen_buffer.size(); i++) {
+    size_t cursor_index = (m_y_position - 1) * m_characters_per_line + (m_x_position - 1);
+    for (size_t i = 0; i < cursor_index && i < m_screen_buffer.size(); ++i) {
         auto &buff = m_screen_buffer[i];
+        cursor_index = (m_y_position - 1) * m_characters_per_line + (m_x_position - 1);
 
-        // If buffer parse move past current cursor position
-        if (count >= (m_x_position + (m_y_position * m_characters_per_line))) {
-            break;
-        }
-
-        // TODO remove String Stream and replace with just String.
-        std::stringstream ss;
-
+        std::string out;
         if (attr != buff.attribute ||
             fore != buff.foreground ||
             back != buff.background) {
-            ss << "\x1b["
-                    << buff.attribute << ";"
-                    << buff.foreground << ";"
-                    << buff.background << "m";
+            out += "\x1b["
+                    + std::to_string(buff.attribute) + ";"
+                    + std::to_string(buff.foreground) + ";"
+                    + std::to_string(buff.background) + "m";
 
-            if (padding == 0)
-                ansi_output.append(ss.str());
+            if (padding == 0) {
+                ansi_output.append(out);
+            }
 
             attr = buff.attribute;
             fore = buff.foreground;
             back = buff.background;
         }
 
-        ss.clear();
-        ss.ignore();
-
-        // Options and skip null non plotted characters by
-        // moving the drawing position forward.
-        if (padding > 0 && buff.char_sequence[0] != '\0') {
+        // Options and skip empty characters by
+        // ANSI OPTIMIZE moving the drawing position forward.
+        // TODO, do we want to move forward, or put a space,
+        // Optimized, but if we're overdrawing, can leave artifacts!!
+        if (padding > 0 && !buff.char_sequence.empty()) {
             ansi_output += "\x1b[" + std::to_string(padding) + "C";
             // Get the Color change or first character after padding.
-            ansi_output.append(ss.str());
+            ansi_output.append(out);
             padding = 0;
         }
 
         if (padding > 0 && (i > 0 && i % m_characters_per_line == 0)) {
+            // Padding up to End Of Line
             ansi_output += "\x1b[" + std::to_string(padding) + "C";
-            ansi_output.append(ss.str());
+            ansi_output.append(out);
             padding = 0;
             ansi_output.append("\x1B[1D\r\n");
         } else if ((i > 0 && i % m_characters_per_line == 0)) {
+            // Normal Output Up to End of Line
             ansi_output.append("\x1B[1D\r\n");
         }
 
-        if (buff.char_sequence[0] == '\r') {
-        } //  character = "\x1b[40m\r\n";
-        else if (buff.char_sequence[0] == '\0') {
+        // TODO review, if we can use spaces instead of padding
+        // When it's not a clear screen, initial display not working.
+        if (buff.char_sequence.empty()) {
             ++padding;
-            ++count;
             continue;
-        } else {
-            ansi_output.append(buff.char_sequence);
         }
 
-        ++count;
+        if (buff.char_sequence[0] != '\r') {
+            ansi_output.append(buff.char_sequence);
+        }
     }
 
     // Screen should always end with reset.
@@ -153,48 +147,38 @@ std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen) {
 
 /**
  * @brief Build the string for Light bar coors and colors.
- * @param pulldownId
- * @param active
+ * @param pullDownId
+ * @param isSelected
  * @return
  */
-std::string ProcessorAnsi::buildPullDownBars(int pulldownId, bool active) {
+std::string ProcessorAnsi::buildPullDownBars(int pullDownId, bool isSelected) {
     std::string output;
-    std::stringstream ss;
-    const auto it = m_pull_down_options.find(pulldownId);
 
     // If We have the pull down ID
-    if (it != m_pull_down_options.end()) {
+    if (const auto it = m_pull_down_options.find(pullDownId); it != m_pull_down_options.end()) {
+        // TODO Add a flag here for Custom Hi/Low Strings to override ansi codes
+        // And use custom menu defined strings. Extra! Like Enthral.
+        // if new high/low bars are populated, it would override |01%01 in lightbar ansi's.
+        // most likely a new method needed, as this is only inserting colors in position.
+
         // First Position
-        ss << "\x1b["
-                << (it)->second.y_position
-                << ";"
-                << (it)->second.x_position
-                << "H";
+        output += "\x1b["
+                + std::to_string((it)->second.y_position) + ";"
+                + std::to_string((it)->second.x_position) + "H";
 
         // Next Color Depending on if it's the selected bar.
-        if (active) {
-            ss << "\x1b["
-                    << (it)->second.selected_attribute
-                    << ";"
-                    << (it)->second.selected_foreground
-                    << ";"
-                    << (it)->second.selected_background
-                    << "m";
+        if (isSelected) {
+            output += "\x1b["
+                    + std::to_string((it)->second.selected_attribute) + ";"
+                    + std::to_string((it)->second.selected_foreground) + ";"
+                    + std::to_string((it)->second.selected_background) + "m";
         } else {
-            ss << "\x1b["
-                    << (it)->second.attribute
-                    << ";"
-                    << (it)->second.foreground
-                    << ";"
-                    << (it)->second.background
-                    << "m";
+            output += "\x1b["
+                    + std::to_string((it)->second.attribute) + ";"
+                    + std::to_string((it)->second.foreground) + ";"
+                    + std::to_string((it)->second.background) + "m";
         }
-
-        output = ss.str();
     }
-
-    ss.clear();
-    ss.ignore();
 
     return output;
 }
@@ -215,91 +199,13 @@ int ProcessorAnsi::getMaxRowsUsedOnScreen() {
     return m_max_y_position;
 }
 
-
 /**
  * @brief Parses through MCI Codes for Light bars and Char Parameters.
- * TODO MOVE TO SESSION_IO
  */
 std::string ProcessorAnsi::screenBufferParse() {
-    // Contains all matches found so we can iterate and replace
-    // Without Multiple loops through the string.
-    CodeMapType my_matches;
-    std::vector<CodeMapType> code_map;
-    IoCommon common_io;
-
-    // To make parsing a little faster, pre-fill vector with 99,
-    code_map.clear();
-    code_map.reserve(99);
-
-    // Make a copy that we can modify and process on.
-    std::string ansi_string = m_ansi_output;
-
-    //std::cout << "exp: (\\|[0-9]{2}[%][0-9]{2}) " << std::endl;
-    // Each Set of Codes for Expression Matches 1 set. will need more for char screens.
-    try {
-        std::regex expr{"(\\|[0-9]{2}[%][0-9]{2})"};
-
-        std::smatch matches;
-        std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
-        //std::string::size_type offset = 0;
-        //std::string::size_type length = 0;
-
-        std::regex_constants::match_flag_type flags = std::regex_constants::match_default;
-
-        while (std::regex_search(start, end, matches, expr, flags)) {
-            // Found a match!
-            /*
-            std::cout << "Matched Sub '" << matches.str()
-                      << "' following ' " << matches.prefix().str()
-                      << "' preceding ' " << matches.suffix().str()
-                      << std::endl;*/
-
-            // Avoid Infinite loop and make sure the existing
-            // is not the same as the next!
-            if (start == matches[0].second) {
-                m_log.log(Logging::LogLevel::Debug, "[screenBufferParse] no matches!", __LINE__, __FILE__);
-                break;
-            }
-
-            // Since were replacing on the fly, we need to re-scan the screen for next code
-            start = matches[0].second;
-
-            // Loop each match, and grab the starting position and length to replace.
-            for (size_t s = 1; s < matches.size(); ++s) {
-                // Make sure the Match is true! otherwise skip.
-                if (matches[s].matched) {
-                    /*
-                    offset = matches[s].first - ansi_string.begin();
-                    length = matches[s].length();
-
-                    // Test output s registers which pattern matched, 1, 2, or 3!
-
-                    std::cout << s << " :  Matched Sub " << matches[s].str()
-                              << " at offset " << offset
-                              << " of length " << length
-                              << std::endl;
-                    */
-                    // Add to Vector so we store each match.
-                    my_matches.m_offset = matches[s].first - ansi_string.begin();
-                    my_matches.m_length = matches[s].length();
-                    my_matches.m_match = s;
-                    my_matches.m_code = matches[s].str();
-
-                    // UTF-8. meed to use a utf8-distance to get actual char off-set to match
-                    // screen buffer now vs. raw byte off-set.
-                    int match_off_set = my_matches.m_offset;
-                    auto new_it = ansi_string.begin() + match_off_set;
-                    int char_length = utf8::distance(ansi_string.begin(), new_it);
-
-                    my_matches.m_offset = char_length;
-
-                    code_map.push_back(std::move(my_matches));
-                }
-            }
-        }
-    } catch (std::regex_error &ex) {
-        m_log.log(Logging::LogLevel::Error, "[screenBufferParse] regex=", ex.what(), ex.code(), __LINE__, __FILE__);
-    }
+    IoCodeMapping codeMapping;
+    std::vector<CodeMapType> code_map = codeMapping.parseScreenBufferToCodeMap(
+        m_ansi_output, LIGHT_BAR_EXPRESSION);
 
     // All Global MCI Codes likes standard screens and colors will
     // He handled here, then specific interfaces will break out below this.
@@ -308,12 +214,16 @@ std::string ProcessorAnsi::screenBufferParse() {
     // Clear Pull down ID mapping.
     std::map<int, ScreenPixel>::iterator itr = m_pull_down_options.begin();
 
-    if (!code_map.empty()) {
-        while (itr != m_pull_down_options.end()) {
-            itr = m_pull_down_options.erase(itr);
-        }
+    if (code_map.empty()) {
+        return m_ansi_output;
     }
 
+    // Only Work With Pull Down Options for Display!
+    while (itr != m_pull_down_options.end()) {
+        itr = m_pull_down_options.erase(itr);
+    }
+
+    CodeMapType my_matches;
     while (!code_map.empty()) {
         // Loop Backwards to preserve string offsets on replacement.
         // Fastest to pop from back.
@@ -322,9 +232,8 @@ std::string ProcessorAnsi::screenBufferParse() {
 
         // Handle parsing on expression match.
         switch (my_matches.m_match) {
-            case 1:
-                // Then process and display the light bars.
-            {
+            // Setup Lightbars for Active and Inactive Display.
+            case 1: {
                 int pull_id = 0;
                 std::stringstream ss;
                 ss.str(my_matches.m_code.substr(1, 2));
@@ -363,7 +272,7 @@ std::string ProcessorAnsi::screenBufferParse() {
 
     // Clear Code map.
     code_map.clear();
-    return ansi_string;
+    return m_ansi_output;
 }
 
 /**
@@ -377,10 +286,8 @@ void ProcessorAnsi::screenBufferSetGlyph(const std::string &charSequence) {
     }
 
     // catch screen scrolling here one shot.
-    //if (m_y_position >= m_number_lines)
     if (m_y_position > m_number_lines) {
         screenBufferScrollUp();
-        //m_y_position = m_number_lines-1;
         m_y_position = m_number_lines;
 
         // Set the Current Max Row Position.
@@ -396,6 +303,7 @@ void ProcessorAnsi::screenBufferSetGlyph(const std::string &charSequence) {
     screen_pixel.background = m_background_color;
 
     // Setup current position in the screen buffer. 1 based for 0 based.
+    // X/Y ANSI Screen Coors are 1 Based, yet, Arrays are 0 Based.
     m_position = ((m_y_position - 1) * m_characters_per_line) + (m_x_position - 1);
 
     // Add Sequence to Screen Buffer
@@ -403,12 +311,12 @@ void ProcessorAnsi::screenBufferSetGlyph(const std::string &charSequence) {
         if (m_position < static_cast<signed>(m_screen_buffer.size())) {
             m_screen_buffer.at(m_position) = screen_pixel;
         } else {
-            m_log.log(Logging::LogLevel::Error, "[screenBufferSetGlyph] out of bounds pos=", m_x_position - 1, __LINE__,
-                                            __FILE__);
+            m_log.log(Logging::LogLevel::Error, "[screenBufferSetGlyph] out of bounds pos=",
+                      m_x_position - 1, __LINE__, __FILE__);
         }
     } catch (std::exception &e) {
-        m_log.log(Logging::LogLevel::Error, "[screenBufferSetGlyph] exceeds screen dimensions Exception=", e.what(),
-                                        __LINE__, __FILE__);
+        m_log.log(Logging::LogLevel::Error, "[screenBufferSetGlyph] exceeds screen dimensions Exception=",
+                  e.what(), __LINE__, __FILE__);
     }
 
     // Move Cursor to next position after character insert.
@@ -463,7 +371,7 @@ void ProcessorAnsi::screenBufferClearRange(int start, int end) {
             m_screen_buffer[i].char_sequence.clear();
         } catch (std::exception &e) {
             m_log.log(Logging::LogLevel::Error, "[screenBufferClearRange] Exception=", e.what(),
-                                            "start=", start, "end=", end, __LINE__, __FILE__);
+                      "start=", start, "end=", end, __LINE__, __FILE__);
         }
     }
 }
@@ -496,7 +404,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
     if (strlen(buff) == 0)
         return;
 
-    std::string escSequence = "";
+    std::string escSequence;
 
     int param[10] = {0};
     int p = 0, dig = 0;
@@ -523,18 +431,18 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
             escSequence.erase();
             escSequence += buffer.bytes;
 
+            // Move to next Glyph.
             common_io.nextGlyph(buffer.bytes, it, buffer);
-
-            if (buffer.length == 0)
+            if (buffer.length == 0) {
                 break;
+            }
 
             // grab the left bracket
-            if (buffer.length == 1 && buffer.bytes[0] == '?') {
-                // Setup for ESC?7h or ESC?7l commands etc..
-                escSequence += buffer.bytes;
-            } else if (buffer.length == 1 && buffer.bytes[0] == '[') {
-                // Else Normal ESC Sequence, check parameters.
-                escSequence += buffer.bytes;
+            if (buffer.length == 1) {
+                if (buffer.bytes[0] == '?' || buffer.bytes[0] == '[') {
+                    // Setup for ESC?7h or ESC?7l or ESC commands etc.
+                    escSequence += buffer.bytes;
+                }
             }
 
             /*

@@ -3,7 +3,9 @@
 #include <string>
 #include <regex>
 #include <vector>
+#include <utf8.h>
 
+#include "io_common.hpp"
 #include "logging.hpp"
 
 std::string IoCodeMapping::parseFilename(const std::string &pipe_code) {
@@ -25,7 +27,8 @@ std::string IoCodeMapping::parseFilename(const std::string &pipe_code) {
  * @param code_map
  * @return
  */
-std::string IoCodeMapping::parseCodeMap(const std::string &screen, std::vector<CodeMapType> &code_map) {
+std::string IoCodeMapping::parseCodeMap(
+        const std::string &screen, std::vector<CodeMapType> &code_map) {
     m_log.log(Logging::LogLevel::Debug, "[parseCodeMap]", __LINE__, __FILE__);
 
     std::string ansi_string(screen);
@@ -55,16 +58,13 @@ std::string IoCodeMapping::parseCodeMap(const std::string &screen, std::vector<C
         switch (my_matches.m_match) {
             case 1: // Pipe w/ 2 DIGIT Colors
             {
-                m_log.log(Logging::LogLevel::Info, "Pipe w/ 2 DIGIT Colors |00", "Ansi?=", m_session.isAnsi());
+                m_log.log(Logging::LogLevel::Info, "Pipe w/ 2 DIGIT Colors |00");
                 std::string result = m_io_pipes_and_colors.pipeColors(my_matches.m_code);
 
                 if (!result.empty()) {
                     // Replace the Color, if not ansi then remove the color!
-                    if (m_session.isAnsi()) {
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
-                    } else {
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, "");
-                    }
+                    ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
+
                 } else {
                     ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
                 }
@@ -204,6 +204,95 @@ std::string IoCodeMapping::parseCodeMapGenerics(const std::string &screen, const
 }
 
 /**
+ * Screen Buffer Parsing, used Mainly in Pull Down Menu Screens Like Matrix.ANS etc.
+ * @param sequence
+ * @param expression
+ * @return
+ */
+std::vector<CodeMapType> IoCodeMapping::parseScreenBufferToCodeMap(
+        const std::string &sequence, const std::regex &expression) {
+
+    // Contains all matches found so we can iterate and replace
+    // Without Multiple loops through the string.
+    CodeMapType my_matches;
+    std::vector<CodeMapType> code_map;
+
+    // To make parsing a little faster, pre-fill vector with 99,
+    code_map.clear();
+    code_map.reserve(99);
+
+    // Make a copy that we can modify and process on.
+    std::string ansi_string(sequence);
+
+    //std::cout << "exp: (\\|[0-9]{2}[%][0-9]{2}) " << std::endl;
+    // Each Set of Codes for Expression Matches 1 set. will need more for char screens.
+    try {
+
+        std::smatch matches;
+        std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
+        //std::string::size_type offset = 0;
+        //std::string::size_type length = 0;
+
+        std::regex_constants::match_flag_type flags = std::regex_constants::match_default;
+
+        while (std::regex_search(start, end, matches, expression, flags)) {
+            // Found a match!
+            /*
+            std::cout << "Matched Sub '" << matches.str()
+                      << "' following ' " << matches.prefix().str()
+                      << "' preceding ' " << matches.suffix().str()
+                      << std::endl;*/
+
+            // Avoid Infinite loop and make sure the existing
+            // is not the same as the next!
+            if (start == matches[0].second) {
+                m_log.log(Logging::LogLevel::Debug, "[screenBufferParse] no matches!", __LINE__, __FILE__);
+                break;
+            }
+
+            // Since were replacing on the fly, we need to re-scan the screen for next code
+            start = matches[0].second;
+
+            // Loop each match, and grab the starting position and length to replace.
+            for (size_t s = 1; s < matches.size(); ++s) {
+                // Make sure the Match is true! otherwise skip.
+                if (matches[s].matched) {
+                    /*
+                    offset = matches[s].first - ansi_string.begin();
+                    length = matches[s].length();
+
+                    // Test output s registers which pattern matched, 1, 2, or 3!
+
+                    std::cout << s << " :  Matched Sub " << matches[s].str()
+                              << " at offset " << offset
+                              << " of length " << length
+                              << std::endl;
+                    */
+                    // Add to Vector so we store each match.
+                    my_matches.m_offset = matches[s].first - ansi_string.begin();
+                    my_matches.m_length = matches[s].length();
+                    my_matches.m_match = s;
+                    my_matches.m_code = matches[s].str();
+
+                    // UTF-8. need to use utf8-distance to get actual char off-set to match
+                    // screen buffer now vs. raw byte off-set.
+                    const size_t match_off_set = my_matches.m_offset;
+                    auto new_it = ansi_string.begin() + match_off_set;
+                    size_t char_length = utf8::distance(ansi_string.begin(), new_it);
+                    my_matches.m_offset = char_length;
+
+                    code_map.push_back(std::move(my_matches));
+                }
+            }
+        }
+    } catch (std::regex_error &ex) {
+        m_log.log(Logging::LogLevel::Error, "[screenBufferParse] regex=", ex.what(), ex.code(), __LINE__, __FILE__);
+    }
+
+    return code_map;
+}
+
+/**
  * @brief Parses string and returns code mapping and positions per expression
  * @param sequence
  * @param expression
@@ -213,6 +302,10 @@ std::vector<CodeMapType> IoCodeMapping::parseToCodeMap(const std::string &sequen
     // Contains all matches found so we can iterate and replace
     // Without Multiple loops through the string.
     std::vector<CodeMapType> code_map;
+
+    // To make parsing a little faster, pre-fill vector with 99,
+    code_map.clear();
+    code_map.reserve(99);
 
     // Make a copy that we can modify and process on.
     std::string ansi_string(sequence);
@@ -278,6 +371,18 @@ std::vector<CodeMapType> IoCodeMapping::parseToCodeMap(const std::string &sequen
                     my_matches.m_length = matches[s].length();
                     my_matches.m_match = s;
                     my_matches.m_code = matches[s].str();
+
+                    // TODO Review more encoding, works in Ansi Parser for Lightbar Menu's.
+                    // But messes up matrix menu when this is , encoding twice maybe?
+
+                    // UTF-8. need to use utf8-distance to get actual char off-set to match
+                    // screen buffer now vs. raw byte off-set.
+                    /*
+                    const size_t match_off_set = my_matches.m_offset;
+                    auto new_it = ansi_string.begin() + match_off_set;
+                    size_t char_length = utf8::distance(ansi_string.begin(), new_it);
+                    my_matches.m_offset = char_length;
+                    */
 
                     code_map.push_back(std::move(my_matches));
                 }
@@ -410,7 +515,8 @@ std::string IoCodeMapping::parseTextPrompt(const M_StringPair &prompt) {
     std::string mci_code = "|PD";
 
     // If Description Flag is in Prompt, then replace code with Description
-    m_io_common.parseLocalMCI(text_prompt, mci_code, prompt.first);
+    IoCommon common_io;
+    common_io.parseLocalMCI(text_prompt, mci_code, prompt.first);
 
     // Return full mci code parsing on the new string.
     return pipe2ansi(text_prompt);

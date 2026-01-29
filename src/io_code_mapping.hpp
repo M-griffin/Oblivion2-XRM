@@ -4,7 +4,6 @@
 #include <string>
 #include <cwchar>
 
-#include "io_common.hpp"
 #include "io_pipes_colors.hpp"
 #include "logging.hpp"
 #include "session_writer.hpp"
@@ -14,8 +13,6 @@
 class IoCodeMapping {
 
     Logging &m_log;
-    SessionWriter &m_session;
-    IoCommon &m_io_common;
     IoPipesAndColors m_io_pipes_and_colors;
 
     std::map<std::string, std::string> m_mapped_codes; // MCI Code Translation for specific screens.
@@ -36,11 +33,8 @@ public:
     // Types for Text Prompt formatting to file.
     typedef std::pair<std::string, std::string> M_StringPair;
 
-    explicit IoCodeMapping(SessionWriter &session, IoCommon &common)
-        : m_log(Logging::getInstance())
-        , m_session(session)
-        , m_io_common(common) {
-
+    explicit IoCodeMapping()
+        : m_log(Logging::getInstance()) {
     }
 
     ~IoCodeMapping() {
@@ -56,6 +50,7 @@ public:
     std::string parseFilename(const std::string &pipe_code);
     std::string parseCodeMap(const std::string &screen, std::vector<CodeMapType> &code_map);
     std::string parseCodeMapGenerics(const std::string &screen, const std::vector<CodeMapType> &code_map);
+    std::vector<CodeMapType> parseScreenBufferToCodeMap(const std::string &sequence, const std::regex &expression);
     std::vector<CodeMapType> parseToCodeMap(const std::string &sequence, const std::regex &expression);
     std::string pipe2ansi(const std::string &sequence);
     std::vector<CodeMapType> pipe2genericCodeMap(const std::string &sequence);

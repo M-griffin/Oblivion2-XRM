@@ -9,7 +9,6 @@
 
 #include "model-sys/config.hpp"
 
-
 // Io_Input Handler
 std::string IoSession::getFSEKeyInput(const std::string &character_buffer) {
     return m_io_input_handler.getFSEKeyInput(character_buffer);
@@ -88,21 +87,27 @@ std::string IoSession::parseFormatColorsColon(const std::string &sequence, Confi
     return m_pipes_and_colors.parseFormatColorsColon(sequence, config);
 }
 
-
-// Code Maps for Ansi Screen Parsing.
 std::string IoSession::parseFilename(const std::string &pipe_code) {
     return m_io_code_mapping.parseFilename(pipe_code);
 }
 
-std::string IoSession::parseCodeMap(const std::string &screen, std::vector<CodeMapType> &code_map) {
+std::string IoSession::parseCodeMap(
+        const std::string &screen, std::vector<CodeMapType> &code_map) {
     return m_io_code_mapping.parseCodeMap(screen, code_map);
 }
 
-std::string IoSession::parseCodeMapGenerics(const std::string &screen, const std::vector<CodeMapType> &code_map) {
+std::string IoSession::parseCodeMapGenerics(
+        const std::string &screen, const std::vector<CodeMapType> &code_map) {
     return m_io_code_mapping.parseCodeMapGenerics(screen, code_map);
 }
 
-std::vector<CodeMapType> IoSession::parseToCodeMap(const std::string &sequence, const std::regex &expression) {
+std::vector<CodeMapType> IoSession::parseScreenBufferToCodeMap(
+        const std::string &sequence, const std::regex &expression) {
+    return m_io_code_mapping.parseScreenBufferToCodeMap(sequence, expression);
+}
+
+std::vector<CodeMapType> IoSession::parseToCodeMap(
+        const std::string &sequence, const std::regex &expression) {
     return m_io_code_mapping.parseToCodeMap(sequence, expression);
 }
 

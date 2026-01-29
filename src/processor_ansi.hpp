@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <regex>
 
 #include "model-sys/screen_pixel.hpp"
 
@@ -18,6 +19,9 @@
  */
 class ProcessorAnsi
         : public ScreenBase {
+
+    const std::regex LIGHT_BAR_EXPRESSION {"(\\|[0-9]{2}[%][0-9]{2})"};
+
 public:
     explicit ProcessorAnsi();
     ~ProcessorAnsi();
@@ -28,7 +32,7 @@ public:
     ProcessorAnsi &operator=(ProcessorAnsi &&) = delete;
 
     void resize(int term_height, int term_width);
-    std::string buildPullDownBars(int pulldownId, bool active);
+    std::string buildPullDownBars(int pullDownId, bool isSelected);
     void clearPullDownBars();
     int getMaxRowsUsedOnScreen();
     std::string screenBufferParse();
