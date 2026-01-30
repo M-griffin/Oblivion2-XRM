@@ -521,8 +521,8 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         // Logon
         // {Not Implemented yet!}
-        //: When a CString is specified, PRELOGON.X, an
-        //: USERLOG.X, and SYSPASS.X will be displayed.
+        // When a CString is specified, PRELOGON.X, an
+        // USERLOG.X, and SYSPASS.X will be displayed.
         // { Note: add 0 for random! }
         case 'S':
             m_log.log(Logging::LogLevel::Info, "Executing startupModuleLogon()");

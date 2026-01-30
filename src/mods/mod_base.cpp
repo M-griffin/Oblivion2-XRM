@@ -167,7 +167,7 @@ void ModBase::baseProcessAndDeliver(std::string &data) const {
     // Clear out attributes on new strings no bleeding of colors.
     std::string output = "\x1b[0m" + baseGetDefaultColor();
     output += data;
-    m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(output.c_str()));
+    m_ctx.getAnsi().parseTextToBuffer(output);
     output += baseGetDefaultInputColor();
     m_ctx.getSessionWrite().send(output);
 }
@@ -181,7 +181,7 @@ void ModBase::baseProcessAndDeliverThenDisconnect(std::string &data) const {
     // Clear out attributes on new strings no bleeding of colors.
     std::string output = "\x1b[0m" + baseGetDefaultColor();
     output += data;
-    m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(output.c_str()));
+    m_ctx.getAnsi().parseTextToBuffer(output);
     output += baseGetDefaultInputColor();
     m_ctx.getSessionWrite().send(output, DISCONNECT_USER);
 }
@@ -207,7 +207,7 @@ void ModBase::baseProcessDeliverNewLine() const {
  * @brief Deliver Input for prompts (No Coloring Extras)
  */
 void ModBase::baseProcessDeliverInput(std::string &data) const {
-    m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(data.c_str()));
+    m_ctx.getAnsi().parseTextToBuffer(data);
     m_ctx.getSessionWrite().send(data);
 }
 
@@ -215,7 +215,7 @@ void ModBase::baseProcessDeliverInput(std::string &data) const {
  * @brief Deliver Input for prompts Then Disconnect (No Coloring Extras)
  */
 void ModBase::baseProcessDeliverInputAndDisconnect(std::string &data) const {
-    m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(data.c_str()));
+    m_ctx.getAnsi().parseTextToBuffer(data);
     m_ctx.getSessionWrite().send(data, DISCONNECT_USER);
 }
 

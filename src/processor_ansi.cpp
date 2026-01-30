@@ -389,20 +389,25 @@ void ProcessorAnsi::screenBufferClear() {
  * @brief Clears The Screen And Buffer
  */
 void ProcessorAnsi::clearScreen() {
-    m_is_screen_cleared = true;
     screenBufferClear();
+    m_is_screen_cleared = true;
     m_x_position = 1;
     m_y_position = 1;
+    m_max_x_position = 1;
     m_max_y_position = 1;
+    m_attribute = 0;
+    m_foreground_color = FG_DEFAULT;
+    m_background_color = BG_BLACK;
 }
 
 /**
  * @brief Parses screen data into the Screen Buffer.
  * @return
  */
-void ProcessorAnsi::parseTextToBuffer(char *buff) {
-    if (strlen(buff) == 0)
+void ProcessorAnsi::parseTextToBuffer(const std::string &buff) {
+    if (buff.empty()) {
         return;
+    }
 
     std::string escSequence;
 
@@ -413,11 +418,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
     bool at_least_one_digit = false;
     bool first_param_implied = false;
 
-    std::string incoming_data = std::string(
-        reinterpret_cast<const char *>(buff),
-        strlen((const char *) buff)
-    );
-
+    std::string incoming_data(buff);
     std::string::const_iterator it = incoming_data.begin();
     std::string::const_iterator line_end = incoming_data.end();
 
@@ -652,7 +653,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                     if (p == 0) // Change text attributes / All Attributes off
                     {
                         m_attribute = 0;
-                        m_foreground_color = FG_WHITE;
+                        m_foreground_color = FG_DEFAULT;
                         m_background_color = BG_BLACK;
                     } else {
                         //current_color = "\x1b[";
@@ -660,7 +661,7 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
                             switch (param[i]) {
                                 case 0: // All Attributes off
                                     m_attribute = 0;
-                                    m_foreground_color = FG_WHITE;
+                                    m_foreground_color = FG_DEFAULT;
                                     m_background_color = BG_BLACK;
                                     break;
 
@@ -917,4 +918,8 @@ void ProcessorAnsi::parseTextToBuffer(char *buff) {
 
 std::map<int, int> ProcessorAnsi::getLineEndingMap() const {
     return m_line_ending_map;
+}
+
+int8_t ProcessorAnsi::getPullDownMenuSize() const {
+    return m_pull_down_options.size();
 }

@@ -45,7 +45,7 @@ public:
     void screenBufferClearRange(int start, int end);
     void screenBufferClear();
     void clearScreen();
-    void parseTextToBuffer(char *buff);
+    void parseTextToBuffer(const std::string &buff);
 
     std::vector<ScreenPixel> m_screen_buffer;
     std::map<int, ScreenPixel> m_pull_down_options;
@@ -53,6 +53,9 @@ public:
 
     [[nodiscard]]
     std::map<int, int> getLineEndingMap() const;
+
+    [[nodiscard]]
+    int8_t getPullDownMenuSize() const;
 };
 
 #endif

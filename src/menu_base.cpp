@@ -5,7 +5,6 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
-#include <functional>
 #include <random>
 #include <cassert>
 
@@ -51,7 +50,7 @@ MenuBase::~MenuBase() {
  */
 void MenuBase::baseProcessAndDeliver(std::string data) {
     m_log.log(Logging::LogLevel::Info, "MenuSystem() - baseProcessAndDeliver");
-    m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(data.c_str()));
+    m_ctx.getAnsi().parseTextToBuffer(data);
     m_ctx.getSessionWrite().send(data);
 }
 
@@ -59,8 +58,8 @@ void MenuBase::baseProcessAndDeliver(std::string data) {
  * @brief Clears out Loaded Pulldown options
  */
 void MenuBase::clearMenuPullDownOptions() {
-    while (!m_loaded_pulldown_options.empty()) {
-        m_loaded_pulldown_options.pop_back();
+    if (!m_loaded_pulldown_options.empty()) {
+        m_loaded_pulldown_options.clear();
     }
 
     m_ctx.getAnsi().clearPullDownBars();
@@ -124,14 +123,28 @@ void MenuBase::readInMenuData() {
         Menu pre_load_menu;
         MenuDao mnu(pre_load_menu, m_current_menu, GLOBAL_MENU_PATH);
 
+        static int depthFallback = 0;
         if (mnu.fileExists()) {
             mnu.loadMenu();
 
             // Check Menu Access if Valid, swap current with preloaded.
+            static int depthPrevious = 0;
+            depthFallback = 0;
             if (checkMenuAcsAccess(pre_load_menu)) {
                 // Can we assign or need to memcopy
                 m_menu_info = pre_load_menu;
                 checkMenuOptionsAcsAccess();
+                depthPrevious = 0;
+            }
+            else {
+                m_log.log(Logging::LogLevel::Warn, "Reverting to previous menu", revert, __LINE__, __FILE__);
+                m_current_menu = revert;
+
+                if (++depthPrevious > 8) {
+                    m_log.log(Logging::LogLevel::Error, "Menu previous menu recursion limit reached");
+                    depthPrevious = 0;
+                    assert(false);
+                }
             }
         } else {
             // Fallback is if user doesn't have access.  update this later on.
@@ -141,11 +154,19 @@ void MenuBase::readInMenuData() {
             if (!m_fallback_menu.empty()) {
                 m_log.log(Logging::LogLevel::Warn, "Loading fallback menu", m_fallback_menu, __LINE__, __FILE__);
                 m_current_menu = m_fallback_menu;
+
+                if (++depthFallback > 8) {
+                    m_log.log(Logging::LogLevel::Error, "Menu fallback menu recursion limit reached");
+                    depthFallback = 0;
+                    assert(false);
+                }
+
                 return readInMenuData();
             }
 
             // No menu to fallback or revert
             // Assert so were not in endless loop, something wrong, fix it!
+            m_log.log(Logging::LogLevel::Error, "fallback menu doesn't exist, fix it", m_fallback_menu, __LINE__, __FILE__);
             assert(false);
         }
     }
@@ -232,7 +253,7 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen) {
     std::string::size_type index = 0;
 
     while (index != std::string::npos) {
-        index = new_screen.find("\r", index);
+        index = new_screen.find('\r', index);
 
         if (index != std::string::npos) {
             new_screen.erase(index, 1);
@@ -241,7 +262,7 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen) {
 
     index = 0;
     while (index != std::string::npos) {
-        index = new_screen.find("\n", index);
+        index = new_screen.find('\n', index);
 
         if (index != std::string::npos) {
             new_screen.erase(index, 1);
@@ -327,7 +348,7 @@ std::string MenuBase::processMidGenericTemplate(const std::string &screen) {
 
     // Clear Code map.
     std::vector<CodeMapType>().swap(code_map);
-    ansi_process.parseTextToBuffer(const_cast<char *>(output_screen.c_str()));
+    ansi_process.parseTextToBuffer(output_screen);
 
     // Return with no clear screen, since this is a mid ansi.
     return ansi_process.getScreenFromBuffer(false);
@@ -368,7 +389,7 @@ std::string MenuBase::processGenericScreens() {
      */
 
     // |K? - key,  |D? - Description
-    //|K1 |D1   |K2  |D2  |K3  |D3 ...
+    //|K1 |D1   |K2 |D2  |K3 |D3 ...
     screen_output += processMidGenericTemplate(mid_screen);
     screen_output += bot_screen;
     return screen_output;
@@ -397,7 +418,7 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
     yesNoBars.insert(0, display_prompt);
 
     // Parse the Screen to the Screen Buffer.
-    m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(yesNoBars.c_str()));
+    m_ctx.getAnsi().parseTextToBuffer(yesNoBars);
 
     // Screen to String so it can be processed.
     m_ctx.getAnsi().screenBufferToString();
@@ -679,7 +700,7 @@ void MenuBase::redisplayMenuScreen() {
 
     if (m_is_active_pulldown_menu) {
         // Parse the Screen to the Screen Buffer.
-        m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(buffer.c_str()));
+        m_ctx.getAnsi().parseTextToBuffer(buffer);
 
         // Screen to String so it can be processed.
         m_ctx.getAnsi().screenBufferToString();
@@ -711,12 +732,9 @@ void MenuBase::executeFirstAndEachCommands() {
     for (unsigned int i = 0; i < m_menu_info.menu_options.size(); i++) {
         auto &m = m_menu_info.menu_options[i];
 
-        // Process all First Commands or commands that should run every action.
-        std::string new_key = m_ctx.getIoCommon().toUpper(m.menu_key);
-        m.menu_key = new_key;
-
         if (m.menu_key == "FIRSTCMD" || m.menu_key == "EACH") {
-            executeMenuOptions(m);
+            const bool executed = executeMenuOptions(m);
+            assert(!executed);
         }
     }
 
@@ -761,8 +779,7 @@ std::string MenuBase::getRandomMenuPrompt() {
     }
 
     //generator initialized with seed from time.
-    std::mt19937_64 generator{static_cast<unsigned int>(std::time(0))};
-
+    static std::mt19937_64 generator{static_cast<unsigned int>(std::time(0))};
     int set_size = result_set.size() - 1;
 
     //the range is inclusive, so this produces numbers in range [0, 10), same as before
@@ -1031,7 +1048,7 @@ void MenuBase::loadAndStartupMenu() {
             m_is_active_pulldown_menu = true;
 
             // Parse the Screen to the Screen Buffer.
-            m_ctx.getAnsi().parseTextToBuffer(const_cast<char *>(buffer.c_str()));
+            m_ctx.getAnsi().parseTextToBuffer(buffer);
 
             // Screen to String so it can be processed.
             m_ctx.getAnsi().screenBufferToString();
@@ -1111,17 +1128,16 @@ void MenuBase::lightbarUpdate(unsigned int previous_pulldown_id) {
 
 /**
  * @brief Process Command Keys passed from menu selection
- * @param input
+ * @param option
  */
 bool MenuBase::executeMenuOptions(const MenuOption &option) {
     // If Invalid then return
     if (m_execute_callback.empty() || option.command_key.size() != 2) {
-        m_log.log(Logging::LogLevel::Info, "~MenuBase() - executeMenuOptions isEmpty or Size !=2 on Command_Key");
+        m_log.log(Logging::LogLevel::Error, "~MenuBase() - executeMenuOptions isEmpty or Size !=2 on Command_Key");
         return false;
     }
 
-    // Execute Menu Option Commands per Callback
-    m_log.log(Logging::LogLevel::Info, "~MenuBase() - m_execute_callback.back()(command_key);", option.command_key,
+    m_log.log(Logging::LogLevel::Error, "~MenuBase() - m_execute_callback.back()(command_key);", option.command_key,
               "m_execute_callback size=", m_execute_callback.size());
     return m_execute_callback.back()(option);
 }
@@ -1218,7 +1234,7 @@ bool MenuBase::handleLightbarSelection(const std::string &input) {
     int previous_id = m_active_pulldownID;
 
     if (input == "RT_ARROW" || input == "DN_ARROW") {
-        if (m_active_pulldownID < m_ctx.getAnsi().m_pull_down_options.size()) {
+        if (m_active_pulldownID < m_ctx.getAnsi().getPullDownMenuSize()) {
             ++m_active_pulldownID;
         } else {
             m_active_pulldownID = 1;
@@ -1230,7 +1246,7 @@ bool MenuBase::handleLightbarSelection(const std::string &input) {
         if (m_active_pulldownID > 1) {
             --m_active_pulldownID;
         } else {
-            m_active_pulldownID = static_cast<signed>(m_ctx.getAnsi().m_pull_down_options.size());
+            m_active_pulldownID = static_cast<signed>(m_ctx.getAnsi().getPullDownMenuSize());
         }
 
         lightbarUpdate(previous_id);
@@ -1288,7 +1304,8 @@ bool MenuBase::handlePullDownHotKeys(const MenuOption &m, const bool &is_enter, 
 
                 /*
                 // Testing for Stack Reassignment on FeedBack Light bars
-                executeMenuOptions(m);
+                const bool success = executeMenuOptions(m);
+                assert(success)
                 // Now assign the m.menu_key to the input, so on next loop, we hit any stacked commands!
                 // If were in pull down menu, and the first lightbar has stacked commands, then we need
                 // to cycle through the remaining command's for stacked on light bars.
@@ -1336,7 +1353,8 @@ void MenuBase::executeEachCommands() {
             // Process, although should each be executed before, or after a menu command!
             // OR is each just on each load/reload of menu i think!!
             m_log.log(Logging::LogLevel::Debug, "FOUND EACH! EXECUTE=", m.command_key);
-            executeMenuOptions(m);
+            const bool executed = executeMenuOptions(m);
+            assert(!executed);
         }
     }
 }
@@ -1359,6 +1377,9 @@ bool MenuBase::processMenuOptions(const std::string &input) {
 
     // Uppercase all input to match on command/option keys
     std::string input_text = m_ctx.getIoCommon().toUpper(input);
+    if (input_text.empty()) {
+        return false;
+    }
 
     // Check if ENTER was hit as a command!
     if (input_text == "ENTER") {
@@ -1433,7 +1454,7 @@ bool MenuBase::processMenuOptions(const std::string &input) {
         // Check Input Keys on Both Pull down and Normal Menus
         // If the input matches the current key, or Enter is hit, then process it.
         else if (input_text.compare(m.menu_key) == 0 || (m_is_active_pulldown_menu && is_enter)) {
-            // Pulldown selection.
+            // Pull down selection.
             if (m_is_active_pulldown_menu) {
                 m_log.log(Logging::LogLevel::Debug, "handlePullDownHotKeys");
 
