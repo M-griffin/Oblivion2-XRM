@@ -8,7 +8,7 @@
 
 #include "../socket_service.hpp"
 #include "../io_session.hpp"
-#include "../processor_ansi.hpp"
+#include "../screen_ansi_proc.hpp"
 #include "../io_encoding.hpp"
 #include "../logging.hpp"
 #include "../io_common.hpp"
@@ -167,7 +167,7 @@ void ModBase::baseProcessAndDeliver(std::string &data) const {
     // Clear out attributes on new strings no bleeding of colors.
     std::string output = "\x1b[0m" + baseGetDefaultColor();
     output += data;
-    m_ctx.getAnsi().parseTextToBuffer(output);
+    m_ctx.getScreenAnsi().parseTextToBuffer(output);
     output += baseGetDefaultInputColor();
     m_ctx.getSessionWrite().send(output);
 }
@@ -181,7 +181,7 @@ void ModBase::baseProcessAndDeliverThenDisconnect(std::string &data) const {
     // Clear out attributes on new strings no bleeding of colors.
     std::string output = "\x1b[0m" + baseGetDefaultColor();
     output += data;
-    m_ctx.getAnsi().parseTextToBuffer(output);
+    m_ctx.getScreenAnsi().parseTextToBuffer(output);
     output += baseGetDefaultInputColor();
     m_ctx.getSessionWrite().send(output, DISCONNECT_USER);
 }
@@ -207,7 +207,7 @@ void ModBase::baseProcessDeliverNewLine() const {
  * @brief Deliver Input for prompts (No Coloring Extras)
  */
 void ModBase::baseProcessDeliverInput(std::string &data) const {
-    m_ctx.getAnsi().parseTextToBuffer(data);
+    m_ctx.getScreenAnsi().parseTextToBuffer(data);
     m_ctx.getSessionWrite().send(data);
 }
 
@@ -215,7 +215,7 @@ void ModBase::baseProcessDeliverInput(std::string &data) const {
  * @brief Deliver Input for prompts Then Disconnect (No Coloring Extras)
  */
 void ModBase::baseProcessDeliverInputAndDisconnect(std::string &data) const {
-    m_ctx.getAnsi().parseTextToBuffer(data);
+    m_ctx.getScreenAnsi().parseTextToBuffer(data);
     m_ctx.getSessionWrite().send(data, DISCONNECT_USER);
 }
 
@@ -360,7 +360,7 @@ void ModBase::baseDisplayPromptAndNewLine(const std::string &prompt, TextPrompts
  */
 void ModBase::moveToBottomAndDisplay(const std::string &prompt) const {
     std::string output;
-    const int screen_row = m_ctx.getAnsi().getMaxRowsUsedOnScreen();
+    const int screen_row = m_ctx.getScreenAnsi().getMaxRowsUsedOnScreen();
 
     output += baseGetDefaultColor();
     output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
@@ -374,7 +374,7 @@ void ModBase::moveToBottomAndDisplay(const std::string &prompt) const {
  */
 std::string ModBase::moveStringToBottom(const std::string &prompt) const {
     std::string output;
-    const int screen_row = m_ctx.getAnsi().getMaxRowsUsedOnScreen();
+    const int screen_row = m_ctx.getScreenAnsi().getMaxRowsUsedOnScreen();
 
     output += baseGetDefaultColor();
     output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";

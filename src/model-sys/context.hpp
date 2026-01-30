@@ -4,7 +4,7 @@
 #include <cassert>
 
 #include "../io_common.hpp"
-#include "../processor_ansi.hpp"
+#include "../screen_ansi_proc.hpp"
 #include "../session_writer.hpp"
 #include "../io_session.hpp"
 #include "../telnet_session.hpp"
@@ -31,7 +31,7 @@ public:
     SessionWriter *sessionWriter = nullptr;
     TelnetSession *telnetSession = nullptr;
     Users *userRec = nullptr;
-    ProcessorAnsi *ansiProcess = nullptr;
+    ScreenAnsiProc *screenAnsi = nullptr;
     IoCommon *ioCommon = nullptr;
     IoSession *ioSession = nullptr;
     Config *config = nullptr;
@@ -41,7 +41,7 @@ public:
         SessionWriter &sw,
         TelnetSession &ts,
         Users &ur,
-        ProcessorAnsi &ap,
+        ScreenAnsiProc &ap,
         IoCommon &cio,
         IoSession &sio,
         Config &cfg,
@@ -50,7 +50,7 @@ public:
         sessionWriter = &sw;
         telnetSession = &ts;
         userRec = &ur;
-        ansiProcess = &ap;
+        screenAnsi = &ap;
         ioCommon = &cio;
         ioSession = &sio;
         config = &cfg;
@@ -72,9 +72,9 @@ public:
         return *userRec;
     }
 
-    ProcessorAnsi &getAnsi() const {
-        assert(ansiProcess);
-        return *ansiProcess;
+    ScreenAnsiProc &getScreenAnsi() const {
+        assert(screenAnsi);
+        return *screenAnsi;
     }
 
     IoCommon &getIoCommon() const {

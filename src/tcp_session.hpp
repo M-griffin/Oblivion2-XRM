@@ -13,7 +13,7 @@
 #include "io_common.hpp"
 #include "deadline_timer.hpp"
 #include "libSqliteWrapped.h"
-#include "processor_ansi.hpp"
+#include "screen_ansi_proc.hpp"
 #include "socket_service.hpp"
 #include "io_session.hpp"
 #include "model-sys/telnet.hpp"
@@ -33,7 +33,7 @@ class TCPSession {
     SessionWriter m_session_writer;
     TelnetSession m_telnetSession;
     Users m_userRec;
-    ProcessorAnsi m_ansi_process;
+    ScreenAnsiProc m_ansi_process;
     IoCommon m_io_common;
     IoSession m_session_io;
     SQLW::Database &m_coreDatabase;

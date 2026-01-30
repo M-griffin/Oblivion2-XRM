@@ -1,4 +1,4 @@
-#include "processor_ansi.hpp"
+#include "screen_ansi_proc.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -20,20 +20,20 @@
 #include "io_session.hpp"
 #include "logging.hpp"
 
-ProcessorAnsi::ProcessorAnsi()
+ScreenAnsiProc::ScreenAnsiProc()
     : ScreenBase(24, 80) {
     m_screen_buffer.resize(m_number_lines * m_characters_per_line);
 }
 
-ProcessorAnsi::~ProcessorAnsi() {
-    m_log.log(Logging::LogLevel::Console, "~ProcessorAnsi()");
+ScreenAnsiProc::~ScreenAnsiProc() {
+    m_log.log(Logging::LogLevel::Console, "~ScreenAnsiProc()");
 
     m_screen_buffer.clear();
     m_pull_down_options.clear();
     m_line_ending_map.clear();
 }
 
-void ProcessorAnsi::resize(const int term_height, const int term_width) {
+void ScreenAnsiProc::resize(const int term_height, const int term_width) {
     m_number_lines = term_height;
     m_characters_per_line = term_width;
 
@@ -44,7 +44,7 @@ void ProcessorAnsi::resize(const int term_height, const int term_width) {
 /**
  * @brief Buffer to String for Parsing
  */
-std::string ProcessorAnsi::screenBufferToString() {
+std::string ScreenAnsiProc::screenBufferToString() {
     m_ansi_output.erase();
     for (unsigned int i = 0; i < m_screen_buffer.size(); i++) {
         auto &buff = m_screen_buffer[i];
@@ -64,7 +64,7 @@ std::string ProcessorAnsi::screenBufferToString() {
  * NOTE, this can add a new line at the end of screen
  * Should exclude for BOTTOM Ansi Screens.
  */
-std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen) {
+std::string ScreenAnsiProc::getScreenFromBuffer(bool clearScreen) {
     int attr = 0;
     int fore = 0;
     int back = 0;
@@ -151,7 +151,7 @@ std::string ProcessorAnsi::getScreenFromBuffer(bool clearScreen) {
  * @param isSelected
  * @return
  */
-std::string ProcessorAnsi::buildPullDownBars(int pullDownId, bool isSelected) {
+std::string ScreenAnsiProc::buildPullDownBars(int pullDownId, bool isSelected) {
     std::string output;
 
     // If We have the pull down ID
@@ -187,7 +187,7 @@ std::string ProcessorAnsi::buildPullDownBars(int pullDownId, bool isSelected) {
 /**
  * @brief // Clear Pull Down Bars once menu options are reset.
  */
-void ProcessorAnsi::clearPullDownBars() {
+void ScreenAnsiProc::clearPullDownBars() {
     m_pull_down_options.clear();
 }
 
@@ -195,14 +195,14 @@ void ProcessorAnsi::clearPullDownBars() {
  * @brief Return the max rows used on the screen
  * @return
  */
-int ProcessorAnsi::getMaxRowsUsedOnScreen() {
+int ScreenAnsiProc::getMaxRowsUsedOnScreen() {
     return m_max_y_position;
 }
 
 /**
  * @brief Parses through MCI Codes for Light bars and Char Parameters.
  */
-std::string ProcessorAnsi::screenBufferParse() {
+std::string ScreenAnsiProc::screenBufferParse() {
     IoCodeMapping codeMapping;
     std::vector<CodeMapType> code_map = codeMapping.parseScreenBufferToCodeMap(
         m_ansi_output, LIGHT_BAR_EXPRESSION);
@@ -279,7 +279,7 @@ std::string ProcessorAnsi::screenBufferParse() {
  * @brief Plots Characters on the Screen into the Buffer.
  * @param c
  */
-void ProcessorAnsi::screenBufferSetGlyph(const std::string &charSequence) {
+void ScreenAnsiProc::screenBufferSetGlyph(const std::string &charSequence) {
     // Keep track of the longest line in buffer for Centering screen.
     if (m_x_position > m_max_x_position) {
         m_max_x_position = m_x_position;
@@ -332,7 +332,7 @@ void ProcessorAnsi::screenBufferSetGlyph(const std::string &charSequence) {
 /*
  * Moves the Screen Buffer Up a line to match the internal SDL_Surface
  */
-void ProcessorAnsi::screenBufferScrollUp() {
+void ScreenAnsiProc::screenBufferScrollUp() {
     //*** IMPORTANT (WIP), must add check for region scrolling only!
     //TheTerminal::Instance()->scrollRegionActive &&
     //                 y_position > TheTerminal::Instance()->bottomMargin))
@@ -356,7 +356,7 @@ void ProcessorAnsi::screenBufferScrollUp() {
 /*
  * Clear Range of Screen Buffer for Erase Sequences.
  */
-void ProcessorAnsi::screenBufferClearRange(int start, int end) {
+void ScreenAnsiProc::screenBufferClearRange(int start, int end) {
     int startPosition = ((m_y_position - 1) * m_characters_per_line) + (start);
     int endPosition = startPosition + (end - start);
 
@@ -379,7 +379,7 @@ void ProcessorAnsi::screenBufferClearRange(int start, int end) {
 /**
  * @brief Clears the Buffer for Fresh Parsing.
  */
-void ProcessorAnsi::screenBufferClear() {
+void ScreenAnsiProc::screenBufferClear() {
     // Allocate the Size
     m_screen_buffer.clear();
     m_screen_buffer.resize(m_number_lines * m_characters_per_line);
@@ -388,7 +388,7 @@ void ProcessorAnsi::screenBufferClear() {
 /**
  * @brief Clears The Screen And Buffer
  */
-void ProcessorAnsi::clearScreen() {
+void ScreenAnsiProc::clearScreen() {
     screenBufferClear();
     m_is_screen_cleared = true;
     m_x_position = 1;
@@ -404,7 +404,7 @@ void ProcessorAnsi::clearScreen() {
  * @brief Parses screen data into the Screen Buffer.
  * @return
  */
-void ProcessorAnsi::parseTextToBuffer(const std::string &buff) {
+void ScreenAnsiProc::parseTextToBuffer(const std::string &buff) {
     if (buff.empty()) {
         return;
     }
@@ -916,10 +916,10 @@ void ProcessorAnsi::parseTextToBuffer(const std::string &buff) {
 }
 
 
-std::map<int, int> ProcessorAnsi::getLineEndingMap() const {
+std::map<int, int> ScreenAnsiProc::getLineEndingMap() const {
     return m_line_ending_map;
 }
 
-int8_t ProcessorAnsi::getPullDownMenuSize() const {
+int8_t ScreenAnsiProc::getPullDownMenuSize() const {
     return m_pull_down_options.size();
 }

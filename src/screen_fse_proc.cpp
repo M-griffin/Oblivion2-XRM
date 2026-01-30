@@ -1,4 +1,4 @@
-#include "processor_text.hpp"
+#include "screen_fse_proc.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -20,7 +20,7 @@
 
 #include <utf8.h>
 
-ProcessorText::ProcessorText(int term_height, int term_width)
+ScreenFseProc::ScreenFseProc(int term_height, int term_width)
     : ScreenBase(term_height, term_width)
       , m_tab_width(4)
       , m_line_number(1)
@@ -29,8 +29,8 @@ ProcessorText::ProcessorText(int term_height, int term_width)
     m_screen_buffer.resize((m_number_lines * m_characters_per_line) + 1);
 }
 
-ProcessorText::~ProcessorText() {
-    m_log.log(Logging::LogLevel::Console, "~ProcessorText()");
+ScreenFseProc::~ScreenFseProc() {
+    m_log.log(Logging::LogLevel::Console, "~ScreenFseProc()");
     m_screen_buffer.clear();
     m_pull_down_options.clear();
     m_line_ending_map.clear();
@@ -40,7 +40,7 @@ ProcessorText::~ProcessorText() {
 /**
  * @brief Buffer to String for Parsing
  */
-std::string ProcessorText::screenBufferToString() {
+std::string ScreenFseProc::screenBufferToString() {
     m_ansi_output.erase();
     m_ansi_output = "";
 
@@ -61,7 +61,7 @@ std::string ProcessorText::screenBufferToString() {
 /**
  * @brief Test, displays screen buffer.
  */
-void ProcessorText::screenBufferDisplayTest() {
+void ScreenFseProc::screenBufferDisplayTest() {
     int attr = 0;
     int fore = 0;
     int back = 0;
@@ -123,7 +123,7 @@ void ProcessorText::screenBufferDisplayTest() {
  * @param clearScreen
  * @return
  */
-int ProcessorText::getMCIOffSet(std::string mci_code) {
+int ScreenFseProc::getMCIOffSet(std::string mci_code) {
     unsigned int max = (m_x_position + (m_y_position * m_characters_per_line));
 
     for (unsigned int i = 0; i < m_screen_buffer.size(); i++) {
@@ -146,7 +146,7 @@ int ProcessorText::getMCIOffSet(std::string mci_code) {
 }
 
 // placeholder
-std::string ProcessorText::getScreenFromBuffer(bool) {
+std::string ScreenFseProc::getScreenFromBuffer(bool) {
     return "";
 }
 
@@ -157,7 +157,7 @@ std::string ProcessorText::getScreenFromBuffer(bool) {
  *
  * Also Manage Template Spacing on New Lines
  */
-std::string ProcessorText::getScreenFromBuffer(bool clearScreen, int left_border) {
+std::string ScreenFseProc::getScreenFromBuffer(bool clearScreen, int left_border) {
     int attr = 0;
     int fore = 0;
     int back = 0;
@@ -249,7 +249,7 @@ std::string ProcessorText::getScreenFromBuffer(bool clearScreen, int left_border
  * @param pulldown_id
  * @return
  */
-std::string ProcessorText::buildPullDownBars(int pulldown_id, bool active) {
+std::string ScreenFseProc::buildPullDownBars(int pulldown_id, bool active) {
     std::string output = "";
     std::stringstream ss;
 
@@ -296,7 +296,7 @@ std::string ProcessorText::buildPullDownBars(int pulldown_id, bool active) {
 /**
  * @brief // Clear Pull Down Bars once menu options are reset.
  */
-void ProcessorText::clearPullDownBars() {
+void ScreenFseProc::clearPullDownBars() {
     std::map<int, ScreenPixel>().swap(m_pull_down_options);
 }
 
@@ -304,14 +304,14 @@ void ProcessorText::clearPullDownBars() {
  * @brief Return the max rows used on the screen
  * @return
  */
-int ProcessorText::getMaxRowsUsedOnScreen() {
+int ScreenFseProc::getMaxRowsUsedOnScreen() {
     return m_max_y_position;
 }
 
 /**
  * @brief Parses through MCI Codes for Lightbars and Char Parameters.
  */
-std::string ProcessorText::screenBufferParse() {
+std::string ScreenFseProc::screenBufferParse() {
     // Contains all matches found so we can iterate and reaplace
     // Without Multiple loops through the string.
     CodeMapType my_matches;
@@ -440,7 +440,7 @@ std::string ProcessorText::screenBufferParse() {
  * @brief Text Handler pre-positioning prior to storing character
  * @param char_sequence
  */
-void ProcessorText::handleTextInput(const std::string &char_sequence) {
+void ScreenFseProc::handleTextInput(const std::string &char_sequence) {
     // Set the Current Max Row Position.
     if (m_max_y_position < m_y_position) {
         m_max_y_position = m_y_position;
@@ -497,7 +497,7 @@ void ProcessorText::handleTextInput(const std::string &char_sequence) {
  * @brief Plots Characters on the Screen into the Buffer.
  * @param char_sequence
  */
-void ProcessorText::screenBufferSetGlyph(const std::string &char_sequence) {
+void ScreenFseProc::screenBufferSetGlyph(const std::string &char_sequence) {
     ScreenPixel screen_pixel;
     screen_pixel.char_sequence = char_sequence;
     screen_pixel.x_position = m_x_position;
@@ -539,7 +539,7 @@ void ProcessorText::screenBufferSetGlyph(const std::string &char_sequence) {
 /**
  * @brief Moves the Screen Buffer Up a line to match the internal SDL_Surface
  */
-void ProcessorText::screenBufferScrollUp() {
+void ScreenFseProc::screenBufferScrollUp() {
     // Screen Buffer is continious, scroll up
     // Buffer and re-display on screen
 }
@@ -547,7 +547,7 @@ void ProcessorText::screenBufferScrollUp() {
 /**
  * @brief Moves the Screen Buffer Up a line to match the internal SDL_Surface
  */
-void ProcessorText::screenBufferScrollDown() {
+void ScreenFseProc::screenBufferScrollDown() {
     // Screen Buffer is continious, scroll down
     // Buffer and re-display on screen
 }
@@ -555,7 +555,7 @@ void ProcessorText::screenBufferScrollDown() {
 /*
  * Clear Range of Screen Buffer for Erase Sequences.
  */
-void ProcessorText::screenBufferClearRange(int start, int end) {
+void ScreenFseProc::screenBufferClearRange(int start, int end) {
     int startPosition = ((m_y_position - 1) * m_characters_per_line) + (start);
     int endPosition = startPosition + (end - start);
 
@@ -573,7 +573,7 @@ void ProcessorText::screenBufferClearRange(int start, int end) {
 /**
  * @brief Clears the Buffer for Fresh Parsing.
  */
-void ProcessorText::screenBufferClear() {
+void ScreenFseProc::screenBufferClear() {
     // Allocate the Size
     m_screen_buffer.clear();
     m_screen_buffer.resize(m_number_lines * m_characters_per_line);
@@ -582,7 +582,7 @@ void ProcessorText::screenBufferClear() {
 /**
  * @brief Clears The Screen And Buffer
  */
-void ProcessorText::clearScreen() {
+void ScreenFseProc::clearScreen() {
     std::cout << "ProcessorT clearScreen" << std::endl;
 
     m_is_screen_cleared = true;
@@ -598,7 +598,7 @@ void ProcessorText::clearScreen() {
 /**
  * @brief Move to Start of the current line
  */
-void ProcessorText::moveHomePosition() {
+void ScreenFseProc::moveHomePosition() {
     std::cout << "ProcessorT moveHomePosition" << std::endl;
 
     m_x_position = 1;
@@ -607,7 +607,7 @@ void ProcessorText::moveHomePosition() {
 /**
  * @brief Move End of the current line (Not 100%) WIP.
  */
-void ProcessorText::moveEndPosition() {
+void ScreenFseProc::moveEndPosition() {
     std::cout << "ProcessorT moveEndPosition" << std::endl;
 
     m_x_position = m_line_ending_map[m_line_number];
@@ -620,7 +620,7 @@ void ProcessorText::moveEndPosition() {
 /**
  * @brief Handle FORWARD chacter movements
  */
-void ProcessorText::moveNextXPosition() {
+void ScreenFseProc::moveNextXPosition() {
     std::cout << "ProcessorT moveNextXPosition" << std::endl;
 
     if (m_x_position < m_characters_per_line)
@@ -630,7 +630,7 @@ void ProcessorText::moveNextXPosition() {
 /**
  * @brief Handle DOWN character movements
  */
-void ProcessorText::moveNextYPosition() {
+void ScreenFseProc::moveNextYPosition() {
     std::cout << "ProcessorT moveNextYPosition" << std::endl;
 
     if (m_y_position < m_number_lines)
@@ -643,7 +643,7 @@ void ProcessorText::moveNextYPosition() {
 /**
  * @brief Handle BACKWARDS chacters movements
  */
-void ProcessorText::movePreviousXPosition() {
+void ScreenFseProc::movePreviousXPosition() {
     std::cout << "ProcessorT movePreviousXPosition" << std::endl;
 
     if (m_x_position > 1)
@@ -653,7 +653,7 @@ void ProcessorText::movePreviousXPosition() {
 /**
  * @brief Handle UP character movements
  */
-void ProcessorText::movePreviousYPosition() {
+void ScreenFseProc::movePreviousYPosition() {
     std::cout << "ProcessorT movePreviousYPosition" << std::endl;
 
     if (m_y_position > 1)
@@ -666,7 +666,7 @@ void ProcessorText::movePreviousYPosition() {
 /**
  * @brief Move to Next Line.
  */
-void ProcessorText::moveNewLine() {
+void ScreenFseProc::moveNewLine() {
     std::cout << "ProcessorT moveNewLine" << std::endl;
 
     m_x_position = 1;
@@ -688,7 +688,7 @@ void ProcessorText::moveNewLine() {
 /**
  * @brief Handle Descructive Backspace
  */
-void ProcessorText::moveBackSpace() {
+void ScreenFseProc::moveBackSpace() {
     std::cout << "ProcessorT moveBackSpace" << std::endl;
 
     // Backspace or Delete, the entire lines loses a char.
@@ -765,7 +765,7 @@ void ProcessorText::moveBackSpace() {
 /**
  * @brief Handle Destructive Delete key
  */
-void ProcessorText::moveDelete() {
+void ScreenFseProc::moveDelete() {
     // TODO Started on Delete, just copied Backspace for reference!!
 
 
@@ -845,7 +845,7 @@ void ProcessorText::moveDelete() {
 /**
  * @brief Move Tab Width = 4 Spaces if Available.
  */
-void ProcessorText::moveTabWidth() {
+void ScreenFseProc::moveTabWidth() {
     std::cout << "ProcessorT moveTabWidth" << std::endl;
 
 
@@ -858,7 +858,7 @@ void ProcessorText::moveTabWidth() {
 /**
  * @brief Escape Sequence Parsing
  */
-void ProcessorText::escapeSequenceParsing(Utf8Glyph &buffer, std::string::const_iterator &it) {
+void ScreenFseProc::escapeSequenceParsing(Utf8Glyph &buffer, std::string::const_iterator &it) {
 
     std::cout << "escapeSequenceParsing !! " << std::endl;
 
@@ -1281,7 +1281,7 @@ void ProcessorText::escapeSequenceParsing(Utf8Glyph &buffer, std::string::const_
  * @brief Parses screen data into the Screen Buffer.
  * @return
  */
-void ProcessorText::parseTextToBuffer(char *buff) {
+void ScreenFseProc::parseTextToBuffer(char *buff) {
     if (strlen(buff) == 0) {
         return;
     }
@@ -1330,6 +1330,6 @@ void ProcessorText::parseTextToBuffer(char *buff) {
     }
 }
 
-std::map<int, int> ProcessorText::getLineEndingMap() const {
+std::map<int, int> ScreenFseProc::getLineEndingMap() const {
     return m_line_ending_map;
 }

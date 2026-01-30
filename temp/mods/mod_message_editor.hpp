@@ -9,8 +9,8 @@
 #include <functional>
 #include <vector>
 
-class ProcessorText;
-typedef std::shared_ptr<ProcessorText> processor_text_ptr;
+class ScreenFseProc;
+typedef std::shared_ptr<ScreenFseProc> processor_text_ptr;
 
 /**
  * @class ModMessageEditor

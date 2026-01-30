@@ -14,7 +14,7 @@
 #include "model-sys/config.hpp"
 #include "model-sys/users.hpp"
 #include "model-sys/context.hpp"
-#include "processor_ansi.hpp"
+#include "screen_ansi_proc.hpp"
 #include "directory.hpp"
 #include "io_session.hpp"
 #include "logging.hpp"
@@ -50,7 +50,7 @@ MenuBase::~MenuBase() {
  */
 void MenuBase::baseProcessAndDeliver(std::string data) {
     m_log.log(Logging::LogLevel::Info, "MenuSystem() - baseProcessAndDeliver");
-    m_ctx.getAnsi().parseTextToBuffer(data);
+    m_ctx.getScreenAnsi().parseTextToBuffer(data);
     m_ctx.getSessionWrite().send(data);
 }
 
@@ -62,7 +62,7 @@ void MenuBase::clearMenuPullDownOptions() {
         m_loaded_pulldown_options.clear();
     }
 
-    m_ctx.getAnsi().clearPullDownBars();
+    m_ctx.getScreenAnsi().clearPullDownBars();
 }
 
 /**
@@ -243,7 +243,7 @@ std::string MenuBase::processTopGenericTemplate(const std::string &screen) {
  */
 std::string MenuBase::processMidGenericTemplate(const std::string &screen) {
     // Use a Local Ansi Parser for Parsing Menu Template with Mid.
-    ProcessorAnsi ansi_process;
+    ScreenAnsiProc ansi_process;
     ansi_process.resize(
         m_ctx.getTelnet().getTermRows(),
         m_ctx.getTelnet().getTermCols());
@@ -418,14 +418,14 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
     yesNoBars.insert(0, display_prompt);
 
     // Parse the Screen to the Screen Buffer.
-    m_ctx.getAnsi().parseTextToBuffer(yesNoBars);
+    m_ctx.getScreenAnsi().parseTextToBuffer(yesNoBars);
 
     // Screen to String so it can be processed.
-    m_ctx.getAnsi().screenBufferToString();
+    m_ctx.getScreenAnsi().screenBufferToString();
 
     // Process buffer for PullDown Codes.
     // only if we want result, ignore.., result just for testing at this time!
-    std::string result = m_ctx.getAnsi().screenBufferParse();
+    std::string result = m_ctx.getScreenAnsi().screenBufferParse();
 
     // Update Light bars, by default they have no names for YES/NO/Continue prompts.
     for (unsigned int i = 0; i < m_menu_info.menu_options.size(); i++) {
@@ -674,7 +674,7 @@ std::string MenuBase::buildLightBars() {
 
         if (m.pulldown_id > 0) {
             // Parse for X/Y Position and colors
-            light_bars.append(m_ctx.getAnsi().buildPullDownBars(m.pulldown_id, active_lightbar));
+            light_bars.append(m_ctx.getScreenAnsi().buildPullDownBars(m.pulldown_id, active_lightbar));
             active_lightbar = false;
 
             // Add the Option Description
@@ -700,14 +700,14 @@ void MenuBase::redisplayMenuScreen() {
 
     if (m_is_active_pulldown_menu) {
         // Parse the Screen to the Screen Buffer.
-        m_ctx.getAnsi().parseTextToBuffer(buffer);
+        m_ctx.getScreenAnsi().parseTextToBuffer(buffer);
 
         // Screen to String so it can be processed.
-        m_ctx.getAnsi().screenBufferToString();
+        m_ctx.getScreenAnsi().screenBufferToString();
 
         // Process buffer for PullDown Codes.
         // only if we want result, ignore.., result just for testing at this time!
-        std::string result = m_ctx.getAnsi().screenBufferParse();
+        std::string result = m_ctx.getScreenAnsi().screenBufferParse();
 
         // Now Build the Light bars with Hidden Cursor.
         std::string light_bars = "\x1b[?25l";
@@ -826,7 +826,7 @@ std::string MenuBase::loadMenuPrompt() {
     if (!m_is_active_pulldown_menu && is_loaded) {
         std::string prompt_display;
         // Used Screen Rows is not reliable across menu's, need to look into this more!
-        //int screen_rows = m_ctx.getAnsi().getMaxRowsUsedOnScreen();
+        //int screen_rows = m_ctx.getScreenAnsi().getMaxRowsUsedOnScreen();
 
         // For Now use defaults when Term height is 24 (Default) or 25 and greater
         // Usually menu's themselves are not going to be higher 25
@@ -911,7 +911,7 @@ std::string MenuBase::loadMenuPrompt() {
  */
 void MenuBase::moveToBottomAndDisplay(const std::string &prompt) {
     std::string output;
-    const int screen_row = m_ctx.getAnsi().getMaxRowsUsedOnScreen();
+    const int screen_row = m_ctx.getScreenAnsi().getMaxRowsUsedOnScreen();
 
     output += getDefaultColor();
     output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
@@ -925,7 +925,7 @@ void MenuBase::moveToBottomAndDisplay(const std::string &prompt) {
  */
 std::string MenuBase::moveStringToBottom(const std::string &prompt) {
     std::string output;
-    int screen_row = m_ctx.getAnsi().getMaxRowsUsedOnScreen();
+    int screen_row = m_ctx.getScreenAnsi().getMaxRowsUsedOnScreen();
 
     output += getDefaultColor();
     output += "\x1b[" + std::to_string(screen_row) + ";1H\r\n";
@@ -958,7 +958,7 @@ void MenuBase::loadAndStartupMenu() {
                   term_cols
         );
         // First Menu Load, make sure we resize from terminal detection.  Later on Ongoing Detection Changes
-        m_ctx.getAnsi().resize(term_rows, term_cols);
+        m_ctx.getScreenAnsi().resize(term_rows, term_cols);
     }
 
     // 1. Make sure the Input is set to the
@@ -1048,13 +1048,13 @@ void MenuBase::loadAndStartupMenu() {
             m_is_active_pulldown_menu = true;
 
             // Parse the Screen to the Screen Buffer.
-            m_ctx.getAnsi().parseTextToBuffer(buffer);
+            m_ctx.getScreenAnsi().parseTextToBuffer(buffer);
 
             // Screen to String so it can be processed.
-            m_ctx.getAnsi().screenBufferToString();
+            m_ctx.getScreenAnsi().screenBufferToString();
 
             // Process buffer for PullDown Codes. results for TESTING, are discarded.
-            std::string result = m_ctx.getAnsi().screenBufferParse();
+            std::string result = m_ctx.getScreenAnsi().screenBufferParse();
 
             // Now Build the Light bars
             const std::string light_bars = buildLightBars();
@@ -1093,7 +1093,7 @@ void MenuBase::lightbarUpdate(unsigned int previous_pulldown_id) {
     // Moved to Next Item
     // Turn off Previous Bar
     light_bars.append("\x1b[s"); // Save Cursor Position for prompt.
-    light_bars.append(m_ctx.getAnsi().buildPullDownBars(previous_pulldown_id, false));
+    light_bars.append(m_ctx.getScreenAnsi().buildPullDownBars(previous_pulldown_id, false));
 
     // Grab Previous
     for (unsigned int i = 0; i < m_loaded_pulldown_options.size(); i++) {
@@ -1108,7 +1108,7 @@ void MenuBase::lightbarUpdate(unsigned int previous_pulldown_id) {
     light_bars.append("\x1b[0m");
 
     // Turn on Current Bar
-    light_bars.append(m_ctx.getAnsi().buildPullDownBars(m_active_pulldownID, true));
+    light_bars.append(m_ctx.getScreenAnsi().buildPullDownBars(m_active_pulldownID, true));
 
     // Grab Current or new selection
     for (unsigned int i = 0; i < m_loaded_pulldown_options.size(); i++) {
@@ -1234,7 +1234,7 @@ bool MenuBase::handleLightbarSelection(const std::string &input) {
     int previous_id = m_active_pulldownID;
 
     if (input == "RT_ARROW" || input == "DN_ARROW") {
-        if (m_active_pulldownID < m_ctx.getAnsi().getPullDownMenuSize()) {
+        if (m_active_pulldownID < m_ctx.getScreenAnsi().getPullDownMenuSize()) {
             ++m_active_pulldownID;
         } else {
             m_active_pulldownID = 1;
@@ -1246,7 +1246,7 @@ bool MenuBase::handleLightbarSelection(const std::string &input) {
         if (m_active_pulldownID > 1) {
             --m_active_pulldownID;
         } else {
-            m_active_pulldownID = static_cast<signed>(m_ctx.getAnsi().getPullDownMenuSize());
+            m_active_pulldownID = static_cast<signed>(m_ctx.getScreenAnsi().getPullDownMenuSize());
         }
 
         lightbarUpdate(previous_id);

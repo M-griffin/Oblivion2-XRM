@@ -11,25 +11,25 @@
 #include "model-sys/screen_pixel.hpp"
 
 /**
- * @class ProcessorAnsi
+ * @class ScreenAnsiProc
  * @author Michael Griffin
  * @date 10/8/2015
- * @file processor_ansi.hpp
+ * @file screen_ansi_proc.hpp
  * @brief Processes Screen data into a Screen Buffer
  */
-class ProcessorAnsi
+class ScreenAnsiProc
         : public ScreenBase {
 
     const std::regex LIGHT_BAR_EXPRESSION {"(\\|[0-9]{2}[%][0-9]{2})"};
 
 public:
-    explicit ProcessorAnsi();
-    ~ProcessorAnsi();
+    explicit ScreenAnsiProc();
+    ~ScreenAnsiProc();
 
-    ProcessorAnsi(const ProcessorAnsi &) = delete;
-    ProcessorAnsi &operator=(const ProcessorAnsi &) = delete;
-    ProcessorAnsi(ProcessorAnsi &&other) = delete;
-    ProcessorAnsi &operator=(ProcessorAnsi &&) = delete;
+    ScreenAnsiProc(const ScreenAnsiProc &) = delete;
+    ScreenAnsiProc &operator=(const ScreenAnsiProc &) = delete;
+    ScreenAnsiProc(ScreenAnsiProc &&other) = delete;
+    ScreenAnsiProc &operator=(ScreenAnsiProc &&) = delete;
 
     void resize(int term_height, int term_width);
     std::string buildPullDownBars(int pullDownId, bool isSelected);

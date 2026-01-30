@@ -10,22 +10,22 @@
 #include "io_common.hpp"
 
 /**
- * @class ProcessorText
+ * @class ScreenFseProc
  * @author Michael Griffin
  * @date 01/13/2019
- * @file processor_text.hpp
+ * @file screen_fse_proc.hpp
  * @brief Processes Text or Message Text into Screen Buffer Data
  */
-class ProcessorText
+class ScreenFseProc
         : public ScreenBase {
 public:
-    ProcessorText(int term_height, int term_width);
+    ScreenFseProc(int term_height, int term_width);
 
     int m_tab_width;
     int m_line_number;
     bool m_is_double_backspace;
 
-    ~ProcessorText();
+    ~ScreenFseProc();
 
     std::string buildPullDownBars(int pulldown_id, bool active);
 

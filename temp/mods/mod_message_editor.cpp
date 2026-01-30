@@ -419,7 +419,7 @@ void ModMessageEditor::setupEditor()
     
 
     m_log.log(Logging::LogLevel::Debug, "m_text_process - height=", m_text_box_height, "width=", m_text_box_width);
-    m_text_process = std::make_shared<ProcessorText>(m_text_box_height, m_text_box_width);
+    m_text_process = std::make_shared<ScreenFseProc>(m_text_box_height, m_text_box_width);
 
     // Next combine and output.. Move cursor to top left in box.
     m_screen_template = top_screen + mid_screen + bot_screen;
