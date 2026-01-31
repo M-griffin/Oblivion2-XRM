@@ -1,6 +1,5 @@
 #include "screen_base.hpp"
 
-#include <string>
 #include "logging.hpp"
 
 /**
@@ -11,7 +10,6 @@
  */
 ScreenBase::ScreenBase(const int term_height, const int term_width)
     : m_log(Logging::getInstance())
-      , m_ansi_output("")
       , m_is_screen_cleared(false)
       , m_is_line_wrapping(false)
       , m_position(0)

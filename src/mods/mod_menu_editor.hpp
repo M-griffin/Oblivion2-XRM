@@ -20,36 +20,36 @@
  * @brief Menu Editor
  */
 class ModMenuEditor
-    : public ModBase
-{
+        : public ModBase {
+
+    static constexpr const char *MOD_FILENAME = "mod_menu_editor.yaml";
 
     // Function Input Vector.
-    std::vector<std::function< void()> >                    m_setup_functions;
-    std::vector<std::function< void(const std::string &)> > m_mod_functions;
-    std::vector<std::string>                                m_menu_display_list;
-    std::vector<Menu>                                       m_loaded_menu;
+    std::vector<std::function<void()> > m_setup_functions;
+    std::vector<std::function<void(const std::string &)> > m_mod_functions;
+    std::vector<std::string> m_menu_display_list;
+    std::vector<Menu> m_loaded_menu;
 
-    TextPromptsDao         m_text_prompts_dao;
-    Directory              m_directory;
+    TextPromptsDao m_text_prompts_dao;
+    Directory m_directory;
 
-    unsigned int           m_mod_setup_index;
-    unsigned int           m_mod_function_index;
-    unsigned int           m_mod_menu_state_index;
-    unsigned int           m_mod_toggle_view_index;
-    unsigned int           m_max_toggled_view_index;
+    unsigned int m_mod_setup_index;
+    unsigned int m_mod_function_index;
+    unsigned int m_mod_menu_state_index;
+    unsigned int m_mod_toggle_view_index;
+    unsigned int m_max_toggled_view_index;
 
-    bool                   m_is_text_prompt_exist;
-    unsigned int           m_page;
-    unsigned int           m_rows_per_page;
-    std::string            m_current_menu;
-    unsigned int           m_current_option;
-    unsigned int           m_current_field;
+    bool m_is_text_prompt_exist;
+    unsigned int m_page;
+    unsigned int m_rows_per_page;
+    std::string m_current_menu;
+    unsigned int m_current_option;
+    unsigned int m_current_field;
 
 public:
     explicit ModMenuEditor(Context &ctx);
 
-    ~ModMenuEditor()
-    {
+    ~ModMenuEditor() {
         m_setup_functions.clear();
         m_mod_functions.clear();
         m_loaded_menu.clear();
@@ -60,49 +60,45 @@ public:
     bool onExit();
 
     // Setup Module Index
-    enum
-    {
-        MOD_DISPLAY_MENU              = 0,
-        MOD_DISPLAY_MENU_OPTIONS      = 1,
-        MOD_DISPLAY_MENU_EDIT         = 2,
+    enum {
+        MOD_DISPLAY_MENU = 0,
+        MOD_DISPLAY_MENU_OPTIONS = 1,
+        MOD_DISPLAY_MENU_EDIT = 2,
         MOD_DISPLAY_MENU_OPTIONS_EDIT = 3
     };
 
     // Input Module Index
-    enum
-    {
-        MOD_MENU_INPUT              = 0, // Menu Parser
-        MOD_PAUSE                   = 1, // Pauses on display of menus/options
-        MOD_MENU_NAME               = 2, // Menu Name Handler
-        MOD_MENU_OPTION_INPUT       = 3, // Menu Option Parser
-        MOD_MENU_OPTION             = 4, // Option Index Handler
-        MOD_MENU_FIELD_INPUT        = 5, // Menu Field Parser
-        MOD_MENU_FIELD              = 6, // Menu Field Handler
+    enum {
+        MOD_MENU_INPUT = 0, // Menu Parser
+        MOD_PAUSE = 1, // Pauses on display of menus/options
+        MOD_MENU_NAME = 2, // Menu Name Handler
+        MOD_MENU_OPTION_INPUT = 3, // Menu Option Parser
+        MOD_MENU_OPTION = 4, // Option Index Handler
+        MOD_MENU_FIELD_INPUT = 5, // Menu Field Parser
+        MOD_MENU_FIELD = 6, // Menu Field Handler
         MOD_MENU_OPTION_FIELD_INPUT = 7, // Menu Option Field Parser
-        MOD_MENU_OPTION_FIELD       = 8, // Menu Option Field Handler
-        MOD_DISPLAY_PAUSE           = 9  // Display Pause for View Generic Menu
+        MOD_MENU_OPTION_FIELD = 8, // Menu Option Field Handler
+        MOD_DISPLAY_PAUSE = 9 // Display Pause for View Generic Menu
     };
 
     // Input Menu State Index
     // Used for both Menus and Options.
-    enum
-    {
-        MENU_ADD       = 0,
-        MENU_CHANGE    = 1,
-        MENU_DELETE    = 2,
+    enum {
+        MENU_ADD = 0,
+        MENU_CHANGE = 1,
+        MENU_DELETE = 2,
         MENU_COPY_FROM = 3,
-        MENU_COPY_TO   = 4,
+        MENU_COPY_TO = 4,
         MENU_MOVE_FROM = 5,
-        MENU_MOVE_TO   = 6
+        MENU_MOVE_TO = 6
     };
 
     // Menu Option Toggled View State
     // Lets so switch the views to see other command information.
-    enum
-    {
-        VIEW_DEFAULT  = 0,
-        VIEW_NAMES    = 1,
-        VIEW_STRINGS  = 2,
+    enum {
+        VIEW_DEFAULT = 0,
+        VIEW_NAMES = 1,
+        VIEW_STRINGS = 2,
         VIEW_PULLDOWN = 3
     };
 
@@ -128,7 +124,7 @@ public:
     const std::string PROMPT_MENU_FIELD_TITLE = "menu_field_title";
     const std::string PROMPT_MENU_FIELD_PASSWORD = "menu_field_password";
     const std::string PROMPT_MENU_FIELD_FALLBACK = "menu_field_fallback";
-    const std::string PROMPT_MENU_FIELD_HELP_ID  = "menu_field_help_id";
+    const std::string PROMPT_MENU_FIELD_HELP_ID = "menu_field_help_id";
     const std::string PROMPT_MENU_FIELD_NAME = "menu_field_name";
     const std::string PROMPT_MENU_FIELD_PULLDOWN = "menu_field_pulldown";
 
@@ -296,7 +292,7 @@ public:
 
     /**
      * @brief Check if the menu option exists in the current listing
-     * @param menu_option
+     * @param option_index
      */
     bool checkMenuOptionExists(unsigned int option_index);
 
@@ -461,7 +457,6 @@ public:
      * @return
      */
     void displayGenericMenu();
-
 };
 
 #endif

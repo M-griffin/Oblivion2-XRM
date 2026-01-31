@@ -55,7 +55,10 @@ public:
     std::map<int, int> getLineEndingMap() const;
 
     [[nodiscard]]
-    int8_t getPullDownMenuSize() const;
+    int getPullDownMenuSize() const;
+
+    [[nodiscard]]
+    int getMaxLines() const;
 };
 
 #endif

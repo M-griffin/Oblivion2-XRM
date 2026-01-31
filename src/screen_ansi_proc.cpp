@@ -920,6 +920,10 @@ std::map<int, int> ScreenAnsiProc::getLineEndingMap() const {
     return m_line_ending_map;
 }
 
-int8_t ScreenAnsiProc::getPullDownMenuSize() const {
+int ScreenAnsiProc::getPullDownMenuSize() const {
     return m_pull_down_options.size();
+}
+
+int ScreenAnsiProc::getMaxLines() const {
+    return m_number_lines;
 }
