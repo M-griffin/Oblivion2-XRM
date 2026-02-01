@@ -33,9 +33,51 @@ public:
         MENU_YESNO_BAR
     };
 
+    enum class MenuJumpMode {
+        Normal,
+        PushCurrent,
+        PushStarting,
+        KeepFallback,
+        PopFallback,
+        SkipFirstCmd,
+        PreviousNoFirst
+    };
+
+    std::string MenuJumpModeToString(MenuJumpMode mode) const
+    {
+        switch (mode)
+        {
+            case MenuJumpMode::Normal: return "Normal";
+            case MenuJumpMode::PushCurrent:   return "PushCurrent";
+            case MenuJumpMode::PushStarting:  return "PushStarting";
+            case MenuJumpMode::KeepFallback:  return "KeepFallback";
+            case MenuJumpMode::PopFallback:  return "PopFallback";
+            case MenuJumpMode::SkipFirstCmd:  return "SkipFirstCmd";
+            case MenuJumpMode::PreviousNoFirst:  return "PreviousNoFirst";
+            default:                return "Unknown";
+        }
+    }
+
+    struct ExecContext {
+        std::deque<MenuOption> commandQueue;   // chained commands
+        std::string wildcardBuffer;            // captured from *
+        std::string lastInput;                 // for &
+        bool executingChain = false;
+        bool suppressPrompt = false;
+    };
+
+    struct FirstCmdState {
+        bool executed = false;
+    };
+
     Logging &m_log;
     Context &m_ctx;
     Directory m_directory;
+    ExecContext m_execContext;
+    FirstCmdState m_firstCmdState;
+    bool m_suppressFirstCmdOnce = false;
+
+    std::deque<std::string> m_menuStack;
 
     // Internal Menu and Prompt Holders
     Menu m_menu_info; // Menu Info
@@ -45,7 +87,6 @@ public:
     bool m_use_hotkey; // Toggle for Single Hotkey or GetLine input. - Not used yet!
     std::string m_current_menu; // Name of current menu loaded.
     std::string m_previous_menu; // Name of Previous Menu for Gosub
-    std::string m_fallback_menu; // Fallback, this can set as a Global Fallback and changed via menu command
     std::string m_starting_menu; // Starting Menu, also used as Fallback.
     BaseState m_baseState; // Menu Input Index, for Forwarding to current function.
 
@@ -55,7 +96,6 @@ public:
     bool m_fail_flag; // If menu or Option fails, kick off the fail flag.
     bool m_pulldown_reentrace_flag; // If menu or Option fails, kick off the fail flag.
     bool m_is_active_pulldown_menu; // If menu has active light bars to display.
-    bool m_use_first_command_execution; // If menu executes firstcmd on entrance.
     bool m_logoff; // If logoff, stop loop execution on commands and exit.
     bool m_is_active;
 
@@ -73,7 +113,11 @@ public:
 
     void checkMenuOptionsAcsAccess();
 
+    void requestMenuJump(const std::string& menu, MenuJumpMode mode);
+
     void readInMenuData();
+
+    std::string resolveFallbackMenu();
 
     std::string setupYesNoMenuInput(const std::string &menu_prompt, std::vector<CodeMapType> &code_map);
 
@@ -101,7 +145,11 @@ public:
 
     void redisplayMenuScreen();
 
-    void executeFirstAndEachCommands();
+    void enqueueChainedCommands(const MenuOption& opt);
+
+    bool executeWithAcs(const MenuOption& opt);
+
+    void executeFirstCmds();
 
     std::string loadMenuPrompt();
 
@@ -121,8 +169,6 @@ public:
 
     bool handlePullDownHotKeys(const MenuOption &m, const bool &is_enter, bool &stack_reassignment);
 
-    void executeEachCommands();
-
     std::vector<std::string> getListOfMenuPrompts();
 
     std::string getRandomMenuPrompt();
@@ -136,6 +182,10 @@ public:
     void menuInput(const std::string &character_buffer, const bool &is_utf8);
 
     void menuYesNoBarInput(const std::string &character_buffer, const bool &is_utf8);
+
+private:
+
+    void executeEachCommands();
 };
 
 #endif

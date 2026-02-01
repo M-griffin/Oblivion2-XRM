@@ -14,6 +14,7 @@
 // Mods
 #include "mods/mod_logon.hpp"
 #include "mods/mod_signup.hpp"
+#include "mods/mod_menu_editor.hpp"
 
 class Context;
 class Logging;
@@ -33,6 +34,7 @@ public:
         MenuSystem = 0,
         ModLogon,
         ModSignup,
+        ModMenuEditor,
         COUNT
     };
 
@@ -43,6 +45,7 @@ public:
             case State::MenuSystem: return "MenuSystem";
             case State::ModLogon:   return "ModLogon";
             case State::ModSignup:  return "ModSignup";
+            case State::ModMenuEditor:  return "ModMenuEditor";
             default:                return "Unknown";
         }
     }
@@ -56,7 +59,6 @@ public:
     bool pollTimers();
 
     Logging &m_log;
-    std::vector<std::string> m_system_fallback;
 
     // handle to form interface.
     //form_manager_ptr          m_form_manager;
@@ -83,6 +85,7 @@ public:
     // Module States
     std::optional<ModLogon> logonState;
     std::optional<ModSignup> signupState;
+    std::optional<ModMenuEditor> menuEditorState;
 
     // Pointer to Current Active State
     State currentState;
@@ -256,34 +259,6 @@ public:
      */
     void startupExternalProcess(const std::string &cmdline);
 
-    // Each system will have it's own module that is allocated and pushed to the
-    // m_module container to easily push and pop from the stack.
-
-    /**
-     * @brief Starts up Signup Module
-     */
-    //void startupModuleSignup();
-
-    /**
-     * @brief Starts up Menu Editor
-     */
-    //void startupModuleMenuEditor();
-
-    /**
-     * @brief Startup the User Editor Module
-     */
-    //void startupModuleUserEditor();
-
-    /**
-     * @brief Startup the Level Editor Module
-     */
-    //void startupModuleLevelEditor();
-
-    /**
-     * @brief Startup the Full Screen Message Editor Module
-     */
-    //void startupModuleMessageEditor();
-
 
     // -------------------------
     // Menu System
@@ -309,12 +284,20 @@ public:
     void pollSignup();
     void inputSignup(const std::string &input);
 
+    // -------------------------
+    // MenuEditor Module
+    // -------------------------
+    void createMenuEditor();
+    void clearMenuEditor();
+    void pollMenuEditor();
+    void inputMenuEditor(const std::string &input);
+
     // Compile-time guarantees
     static constexpr size_t StateCount =
             static_cast<size_t>(State::COUNT);
 
-    static_assert(StateCount == 3,
+    static_assert(StateCount == 4,
                   "MenuSystem: handler tables must be updated when adding states");
 };
 
-#endif // MENU_SYSTEM_HPP
+#endif

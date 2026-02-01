@@ -10,7 +10,6 @@
 
 /*
 #include "mods/mod_signup.hpp"
-#include "mods/mod_menu_editor.hpp"
 #include "mods/mod_user_editor.hpp"
 #include "mods/mod_level_editor.hpp"
 #include "mods/mod_message_editor.hpp"
@@ -18,6 +17,7 @@
 
 #include "mods/mod_logon.hpp"
 #include "mods/mod_signup.hpp"
+#include "mods/mod_menu_editor.hpp"
 
 #include "model-sys/context.hpp"
 #include "tcp_session.hpp"
@@ -152,6 +152,15 @@ void MenuSystem::bindStateHandlers() {
     inputHandlers.emplace(State::ModSignup, [this](
                       const std::string &input) {
                               inputSignup(input);
+                          });
+
+    // MenuEditor
+    clearHandlers.emplace(State::ModMenuEditor, [this]() { clearMenuEditor(); });
+    createHandlers.emplace(State::ModMenuEditor, [this]() { createMenuEditor(); });
+    pollHandlers.emplace(State::ModMenuEditor, [this]() { pollMenuEditor(); });
+    inputHandlers.emplace(State::ModMenuEditor, [this](
+                      const std::string &input) {
+                              inputMenuEditor(input);
                           });
 
     // Runtime guarantee (debug) MenuSystem is Default State, not a Module Loaded.
@@ -348,44 +357,17 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
 
         // goto menu sets fallback current
         case '/':
-            if (!m_current_menu.empty()) {
-                m_system_fallback.push_back(m_current_menu);
-            }
-
-            m_current_menu = m_ctx.getIoCommon().toLower(option.command_string);
-
-            loadAndStartupMenu();
-            m_use_first_command_execution = true;
+            requestMenuJump(option.command_string, MenuJumpMode::PushCurrent);
             break;
 
         // goes to fallback menu, sets fallback to previous fallback
         case '\\':
-            if (!m_system_fallback.empty()) {
-                m_current_menu = m_system_fallback.back();
-                m_log.log(Logging::LogLevel::Debug, "FallBack reset to current=", m_current_menu);
-
-                m_system_fallback.pop_back();
-            } else {
-                m_log.log(Logging::LogLevel::Debug, "FallBack reset to menu_fall_back=", m_menu_info.menu_fall_back);
-                m_current_menu = m_menu_info.menu_fall_back;
-            }
-
-            loadAndStartupMenu();
-            m_use_first_command_execution = true;
+            requestMenuJump("", MenuJumpMode::PopFallback);
             break;
 
         // Goes to menu, sets fallback as starting menu
         case '^':
-            if (m_starting_menu.empty()) {
-                m_starting_menu = m_current_menu;
-            }
-
-            m_log.log(Logging::LogLevel::Debug, "Set Fallback Starting Menu=", m_starting_menu);
-            m_system_fallback.push_back(m_starting_menu);
-            m_current_menu = m_ctx.getIoCommon().toLower(option.command_string);
-
-            loadAndStartupMenu();
-            m_use_first_command_execution = true;
+            requestMenuJump(option.command_string, MenuJumpMode::PushStarting);
             break;
 
         // END
@@ -413,25 +395,12 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
 
         // Goes to the menu specified in the CString, does not exe firstcmd
         case '{':
-            if (m_starting_menu.empty()) {
-                m_starting_menu = m_current_menu;
-            }
-
-            m_system_fallback.push_back(m_starting_menu);
-            m_current_menu = m_ctx.getIoCommon().toLower(option.command_string);
-            m_use_first_command_execution = false;
-
-            loadAndStartupMenu();
-            // TODO Add Flags to not run firstcmd!
+            requestMenuJump(option.command_string, MenuJumpMode::SkipFirstCmd);
             break;
 
         // Drops to Previous Menu, does not exe firstcmd
         case '}':
-            m_current_menu = m_previous_menu;
-            m_use_first_command_execution = false;
-
-            loadAndStartupMenu();
-            // TODO Add Flags to not run firstcmd!
+            requestMenuJump("", MenuJumpMode::PreviousNoFirst);
             break;
 
         // Toggles locking of output to the modem.
@@ -444,11 +413,14 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
 
         // Goes to a menu keeping the current fallback menu does firstcmd
         case '$':
-            return false;
+            requestMenuJump(option.command_string, MenuJumpMode::PushCurrent);
+            break;
 
         // Goes to a menu keeping the current fallback menu doesn't firstcmd
         case '%':
-            return false;
+            // TODO Update to new CurrentNoFirst
+            requestMenuJump(option.command_string, MenuJumpMode::SkipFirstCmd);
+            break;
 
         // Displays and gets input in same format as prompt
         case '-':
@@ -1067,7 +1039,9 @@ void MenuSystem::startupModuleMessageEditor()
 void MenuSystem::createMenuSystem() {
     m_log.log(Logging::LogLevel::Console, "MenuSystem() createMenuSystem");
     m_current_menu = "matrix";
-    loadAndStartupMenu();
+    m_starting_menu = "matrix";
+    requestMenuJump(m_current_menu, MenuJumpMode::Normal);
+    //loadAndStartupMenu();
 }
 
 void MenuSystem::clearMenuSystem() {
@@ -1178,12 +1152,18 @@ void MenuSystem::inputLogon(const std::string &input) {
         m_log.log(Logging::LogLevel::Debug, "loadAndStartupMenu on initial login");
 
         if (m_ctx.getSessionWrite().isActive()) {
-            // After Logon, we Move back to Menu System
+            // After Successful Logon, we Move back to Menu System
             setState(State::MenuSystem);
 
             // Reset the Input back to the Menu System
             setMenuBaseState(BaseState::MENU_INPUT);
-            loadAndStartupMenu();
+
+            if (m_ctx.getSessionWrite().isAuthorized()) {
+                requestMenuJump(m_current_menu, MenuJumpMode::PushStarting);
+            }
+            else {
+                redisplayMenuScreen();
+            }
         } else {
             m_is_active = false;
         }
@@ -1241,7 +1221,63 @@ void MenuSystem::inputSignup(const std::string &input) {
 
             // Reset the Input back to the Menu System
             setMenuBaseState(BaseState::MENU_INPUT);
-            loadAndStartupMenu();
+            redisplayMenuScreen();
+        }
+    }
+}
+
+// -------------------------
+// Menu Editor Module
+// -------------------------
+
+void MenuSystem::createMenuEditor() {
+    m_log.log(Logging::LogLevel::Console, "MenuSystem() createMenuEditor");
+
+    // Make Sure we cover any unexpected errors in Creating the Module.
+    try {
+        menuEditorState.emplace(m_ctx);
+        menuEditorState->onEnter();
+    } catch (std::exception &ex) {
+        std::cout << "createMenuEditor Exception: " << ex.what() << std::endl;
+        throw;
+    }
+}
+
+void MenuSystem::clearMenuEditor() {
+    if (menuEditorState) {
+        menuEditorState->onExit();
+        menuEditorState.reset();
+    }
+    std::cout << "MenuEditor cleared\n";
+}
+
+void MenuSystem::pollMenuEditor() {
+    if (menuEditorState) {
+        // No timers currently setup for Logon.
+        // logonState->pollTimers();
+    }
+}
+
+void MenuSystem::inputMenuEditor(const std::string &input) {
+    m_log.log(Logging::LogLevel::Console, "MenuSystem() inputMenuEditor");
+
+    if (menuEditorState) {
+        menuEditorState->update(input, false);
+    }
+
+    // Finished modules processing.
+    if (!menuEditorState->m_is_active) {
+        m_log.log(Logging::LogLevel::Info, "!menuEditorState->m_is_active - shutting down module: ");
+
+        if (!menuEditorState->m_is_active) {
+            m_log.log(Logging::LogLevel::Console, "MenuSystem() menuEditorState is Inactive");
+
+            // After Signup, we Move back to Menu System
+            setState(State::MenuSystem);
+
+            // Reset the Input back to the Menu System
+            setMenuBaseState(BaseState::MENU_INPUT);
+            redisplayMenuScreen();
         }
     }
 }
