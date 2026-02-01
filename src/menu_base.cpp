@@ -108,6 +108,11 @@ void MenuBase::requestMenuJump(const std::string& targetMenu, MenuJumpMode mode)
     m_log.log(Logging::LogLevel::Info, "MenuBase() - requestMenuJump", targetMenu, MenuJumpModeToString(mode));
     std::string menu = m_ctx.getIoCommon().toLower(targetMenu);
 
+    // Abort current execution cycle
+    m_execContext.commandQueue.clear();
+    m_execContext.executingChain = false;
+    m_execContext.suppressPrompt = true;
+
     // PREVIOUS MENU HANDLING
     if (mode == MenuJumpMode::PreviousNoFirst) {
         if (!m_previous_menu.empty()) {
@@ -134,9 +139,11 @@ void MenuBase::requestMenuJump(const std::string& targetMenu, MenuJumpMode mode)
             break;
 
         case MenuJumpMode::PushStarting:
-            if (m_starting_menu.empty()) {
-                m_starting_menu = m_current_menu;
-            }
+            //if (m_starting_menu.empty()) {
+            //    m_starting_menu = m_current_menu;
+            //}
+            // Starting Menu should be immutable, and stick to main, or top etc.
+            // once logon is completed.
             m_menuStack.push_back(m_starting_menu);
             break;
 
@@ -154,6 +161,7 @@ void MenuBase::requestMenuJump(const std::string& targetMenu, MenuJumpMode mode)
     // RESET EXEC CONTEXT
     m_execContext.commandQueue.clear();
     m_execContext.executingChain = false;
+    m_execContext.suppressPrompt = true;
 
     // SWITCH MENU
     m_current_menu = menu;
@@ -263,11 +271,6 @@ std::string MenuBase::resolveFallbackMenu() {
 
     m_log.log(Logging::LogLevel::Info, "MenuBase() - resolveFallbackMenu");
 
-    if (!m_menu_info.menu_fall_back.empty()) {
-        m_log.log(Logging::LogLevel::Info, "MenuBase() - resolveFallbackMenu=", m_menu_info.menu_fall_back);
-        return m_menu_info.menu_fall_back;
-    }
-
     if (!m_menuStack.empty()) {
         std::string prev = m_menuStack.back();
         m_menuStack.pop_back();
@@ -275,8 +278,13 @@ std::string MenuBase::resolveFallbackMenu() {
         return prev;
     }
 
+    if (!m_menu_info.menu_fall_back.empty()) {
+        m_log.log(Logging::LogLevel::Info, "MenuBase() - resolveFallbackMenu=", m_menu_info.menu_fall_back);
+        return m_menu_info.menu_fall_back;
+    }
+
     m_log.log(Logging::LogLevel::Info, "MenuBase() - resolveFallbackMenu empty!");
-    return "";
+    return m_starting_menu;
 }
 
 /**
@@ -825,6 +833,10 @@ bool MenuBase::executeWithAcs(const MenuOption& opt) {
 void MenuBase::redisplayMenuScreen() {
     m_log.log(Logging::LogLevel::Info, "MenuBase() - redisplayMenuScreen");
 
+    if (m_execContext.suppressPrompt) {
+        return;
+    }
+
     // Read in the Menu ANSI
     std::string buffer = loadMenuScreen();
     std::string output = m_ctx.getIoSession().pipe2ansi(buffer);
@@ -1225,13 +1237,11 @@ void MenuBase::loadAndStartupMenu() {
     m_log.log(Logging::LogLevel::Debug, "MenuBase - baseProcessAndDeliver Screen with Prompt=", output);
     baseProcessAndDeliver(output);
 
-    // guarded internally
-    if (!m_suppressFirstCmdOnce && !m_firstCmdState.executed) {
+    if (!m_suppressFirstCmdOnce) {
         executeFirstCmds();
     }
-
-    m_firstCmdState.executed = true;
     m_suppressFirstCmdOnce = false;
+
 }
 
 /**
@@ -1660,19 +1670,6 @@ bool MenuBase::processMenuOptions(const std::string &input) {
         }
     }
 
-    // Check for Change Menu before this point, if we changed the menu
-    // Then do not re-execute menu commands for previous menu
-    // Each New Menu Load does handle this the first time.
-
-    // AFTER chained commands
-    if (current_menu == m_current_menu && !m_logoff) {
-        executeEachCommands();
-    }
-    else {
-        // Menu Changed, exit and leave startup to next menu.
-        return true;
-    }
-
     // Handled Chained Commands when exist.
     while (!m_execContext.commandQueue.empty()) {
         MenuOption next = m_execContext.commandQueue.front();
@@ -1689,6 +1686,18 @@ bool MenuBase::processMenuOptions(const std::string &input) {
             m_execContext.commandQueue.clear();
             return false;
         }
+    }
+
+    // AFTER chained commands
+    if (current_menu == m_current_menu && !m_logoff) {
+        // After executing option and chained commands
+        if (!m_execContext.suppressPrompt) {
+            executeEachCommands();
+        }
+    }
+    else {
+        // Menu Changed, exit and leave startup to next menu.
+        return true;
     }
 
     // Track Executed Commands, If we didn't execute anything
@@ -1794,6 +1803,11 @@ void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf
     } else {
         m_log.log(Logging::LogLevel::Debug, "MenuBase() - handleStandardInput");
         handleStandardInput(character_buffer);
+    }
+
+    if (m_execContext.suppressPrompt) {
+        // Do NOT redisplay prompt/menu - reset.
+        m_execContext.suppressPrompt = false;
     }
 }
 

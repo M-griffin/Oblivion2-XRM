@@ -25,6 +25,7 @@ class Logging;
 class MenuBase {
 public:
     explicit MenuBase(Context &ctx);
+
     ~MenuBase();
 
     // This matches the index for menu_functions.push_back
@@ -43,25 +44,23 @@ public:
         PreviousNoFirst
     };
 
-    std::string MenuJumpModeToString(MenuJumpMode mode) const
-    {
-        switch (mode)
-        {
+    std::string MenuJumpModeToString(MenuJumpMode mode) const {
+        switch (mode) {
             case MenuJumpMode::Normal: return "Normal";
-            case MenuJumpMode::PushCurrent:   return "PushCurrent";
-            case MenuJumpMode::PushStarting:  return "PushStarting";
-            case MenuJumpMode::KeepFallback:  return "KeepFallback";
-            case MenuJumpMode::PopFallback:  return "PopFallback";
-            case MenuJumpMode::SkipFirstCmd:  return "SkipFirstCmd";
-            case MenuJumpMode::PreviousNoFirst:  return "PreviousNoFirst";
-            default:                return "Unknown";
+            case MenuJumpMode::PushCurrent: return "PushCurrent";
+            case MenuJumpMode::PushStarting: return "PushStarting";
+            case MenuJumpMode::KeepFallback: return "KeepFallback";
+            case MenuJumpMode::PopFallback: return "PopFallback";
+            case MenuJumpMode::SkipFirstCmd: return "SkipFirstCmd";
+            case MenuJumpMode::PreviousNoFirst: return "PreviousNoFirst";
+            default: return "Unknown";
         }
     }
 
     struct ExecContext {
-        std::deque<MenuOption> commandQueue;   // chained commands
-        std::string wildcardBuffer;            // captured from *
-        std::string lastInput;                 // for &
+        std::deque<MenuOption> commandQueue; // chained commands
+        std::string wildcardBuffer; // captured from *
+        std::string lastInput; // for &
         bool executingChain = false;
         bool suppressPrompt = false;
     };
@@ -113,7 +112,7 @@ public:
 
     void checkMenuOptionsAcsAccess();
 
-    void requestMenuJump(const std::string& menu, MenuJumpMode mode);
+    void requestMenuJump(const std::string &menu, MenuJumpMode mode);
 
     void readInMenuData();
 
@@ -145,9 +144,9 @@ public:
 
     void redisplayMenuScreen();
 
-    void enqueueChainedCommands(const MenuOption& opt);
+    void enqueueChainedCommands(const MenuOption &opt);
 
-    bool executeWithAcs(const MenuOption& opt);
+    bool executeWithAcs(const MenuOption &opt);
 
     void executeFirstCmds();
 
@@ -184,7 +183,6 @@ public:
     void menuYesNoBarInput(const std::string &character_buffer, const bool &is_utf8);
 
 private:
-
     void executeEachCommands();
 };
 
