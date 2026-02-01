@@ -58,7 +58,7 @@ std::string IoCodeMapping::parseCodeMap(
         switch (my_matches.m_match) {
             case 1: // Pipe w/ 2 DIGIT Colors
             {
-                m_log.log(Logging::LogLevel::Info, "Pipe w/ 2 DIGIT Colors |00");
+                m_log.log(Logging::LogLevel::Debug, "Pipe w/ 2 DIGIT Colors |00");
                 std::string result = m_io_pipes_and_colors.pipeColors(my_matches.m_code);
 
                 if (!result.empty()) {
@@ -73,7 +73,7 @@ std::string IoCodeMapping::parseCodeMap(
 
             case 2: // Pipe w/ 2 Chars and 4 Digits // |XY0101
             {
-                m_log.log(Logging::LogLevel::Info, "Pipe w/ 2 Chars and 4 Digits // |XY0101");
+                m_log.log(Logging::LogLevel::Debug, "Pipe w/ 2 Chars and 4 Digits // |XY0101");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "       ");
             }
@@ -81,7 +81,7 @@ std::string IoCodeMapping::parseCodeMap(
 
             case 3: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
             {
-                m_log.log(Logging::LogLevel::Info,
+                m_log.log(Logging::LogLevel::Debug,
                           "Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33");
                 std::string result = m_io_pipes_and_colors.separatePipeWithCharsDigits(my_matches.m_code);
 
@@ -96,7 +96,7 @@ std::string IoCodeMapping::parseCodeMap(
                 // This one will need replacement in the string parsing
                 // Pass the original string because of |DE for delay!
             {
-                m_log.log(Logging::LogLevel::Info, "Pipe w/ 2 CHARS // |AA");
+                m_log.log(Logging::LogLevel::Debug, "Pipe w/ 2 CHARS // |AA");
                 std::string result = m_io_pipes_and_colors.parsePipeWithChars(my_matches.m_code);
 
                 if (!result.empty()) {
@@ -110,7 +110,7 @@ std::string IoCodeMapping::parseCodeMap(
 
             case 5: // %%FILENAME.EXT  get filenames for loading from string prompts
             {
-                m_log.log(Logging::LogLevel::Info, "Replacing %%FILENAME.EXT codes");
+                m_log.log(Logging::LogLevel::Debug, "Replacing %%FILENAME.EXT codes");
                 std::string result = parseFilename(my_matches.m_code);
 
                 if (!result.empty()) {
@@ -124,7 +124,7 @@ std::string IoCodeMapping::parseCodeMap(
 
             case 6: // Percent w/ 2 CHARS
             {
-                m_log.log(Logging::LogLevel::Info, "Percent w/ 2 CHARS");
+                m_log.log(Logging::LogLevel::Debug, "Percent w/ 2 CHARS");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
             }
@@ -134,7 +134,7 @@ std::string IoCodeMapping::parseCodeMap(
             {
                 // Were just removing them because they are processed.
                 // Now that first part of sequence |01 etc.. are processed!
-                m_log.log(Logging::LogLevel::Info, "replacing %## codes");
+                m_log.log(Logging::LogLevel::Debug, "replacing %## codes");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
             }
@@ -336,10 +336,10 @@ std::vector<CodeMapType> IoCodeMapping::parseToCodeMap(const std::string &sequen
         while (std::regex_search(start, end, matches, expression, flags)) {
             // Found a match!
 
-            std::cout << "Matched Sub '" << matches.str()
+            /*std::cout << "Matched Sub '" << matches.str()
                     << "' following ' " << matches.prefix().str()
                     << "' preceding ' " << matches.suffix().str()
-                    << std::endl;
+                    << std::endl;*/
 
             // Avoid Infinite loop and make sure the existing
             // is not the same as the next!
@@ -361,10 +361,10 @@ std::vector<CodeMapType> IoCodeMapping::parseToCodeMap(const std::string &sequen
                     length = matches[s].length();
 
                     // Test output s registers which pattern matched, 1, 2, or 3!
-                    std::cout << s << " :  Matched Sub 2" << matches[s].str()
+                    /*std::cout << s << " :  Matched Sub 2" << matches[s].str()
                             << " at offset " << offset
                             << " of length " << length
-                            << std::endl;
+                            << std::endl;*/
 
                     // Add to Vector so we store each match.
                     my_matches.m_offset = matches[s].first - ansi_string.begin();

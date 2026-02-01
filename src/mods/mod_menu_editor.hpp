@@ -48,7 +48,6 @@ class ModMenuEditor
 
 public:
     explicit ModMenuEditor(Context &ctx);
-
     ~ModMenuEditor() {
         m_setup_functions.clear();
         m_mod_functions.clear();
@@ -58,6 +57,7 @@ public:
     bool update(const std::string &character_buffer, const bool &);
     bool onEnter();
     bool onExit();
+    bool pollTimers();
 
     // Setup Module Index
     enum {

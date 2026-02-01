@@ -101,7 +101,7 @@ void IoInputHandler::createInputField(std::string &field_name, int &len) {
         return;
     }
 
-    m_log.log(Logging::LogLevel::Info, "m_session.getUseAnsi()=", m_session.isAnsi());
+    m_log.log(Logging::LogLevel::Debug, "m_session.getUseAnsi()=", m_session.isAnsi());
 
     // Format Input Field, if color is enabled, otherwise just add Field Name like "Login: "
     if (!m_session.isAnsi()) {

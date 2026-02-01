@@ -1241,7 +1241,7 @@ std::string IoCommon::readAnsi(const std::string &fileName) {
     pathAppend(path);
     path += fileName;
 
-    m_log.log(Logging::LogLevel::Info, "readAnsi=", path);
+    m_log.log(Logging::LogLevel::Debug, "readAnsi=", path);
 
     std::string buff;
     FILE *fp;

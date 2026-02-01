@@ -287,7 +287,7 @@ private:
             int col = 0;
             if (std::sscanf(seq.c_str(), "\x1b[%d;%dR", &row, &col) == 2) {
                 m_log.log(
-                    Logging::LogLevel::Info,
+                    Logging::LogLevel::Debug,
                     "Received CPR: row=" + std::to_string(row) +
                     " col=" + std::to_string(col)
                 );

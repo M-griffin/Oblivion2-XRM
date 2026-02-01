@@ -84,7 +84,7 @@ void TelnetSession::decodeSubnegotiationBuffer() {
                 m_nawsRow = (uint16_t(m_dataSequence[2]) << 8) | uint16_t(m_dataSequence[3]);
                 m_isNawsDetected = true;
 
-                m_log.log(Logging::LogLevel::Info,
+                m_log.log(Logging::LogLevel::Debug,
                           "NAWS detected: cols=%d, rows=%d", m_nawsCol, m_nawsRow);
             } else {
                 m_log.log(Logging::LogLevel::Warn,
@@ -95,7 +95,7 @@ void TelnetSession::decodeSubnegotiationBuffer() {
         case TELOPT_TTYPE:
             if (!m_dataSequence.empty()) {
                 m_termType.assign(reinterpret_cast<const char *>(m_dataSequence.data()), m_dataSequence.size());
-                m_log.log(Logging::LogLevel::Info,
+                m_log.log(Logging::LogLevel::Debug,
                           "Terminal type received: %s", m_termType.c_str());
             } else {
                 m_log.log(Logging::LogLevel::Warn,
@@ -104,7 +104,7 @@ void TelnetSession::decodeSubnegotiationBuffer() {
             break;
 
         case TELOPT_NEW_ENVIRON:
-            m_log.log(Logging::LogLevel::Info,
+            m_log.log(Logging::LogLevel::Debug,
                       "New ENVIRON subnegotiation received, length=%zu", m_dataSequence.size());
             break;
 

@@ -129,6 +129,15 @@ bool ModMenuEditor::onExit() {
 }
 
 /**
+ * Polling for Deadline Timers if any exist.
+ * @return
+ */
+bool ModMenuEditor::pollTimers() {
+    // No timers in this module, just return;
+    return true;
+}
+
+/**
  * @brief Create Default Text Prompts for module
  */
 void ModMenuEditor::createTextPrompts() {
