@@ -80,7 +80,7 @@ bool MenuBase::checkMenuAcsAccess(const Menu &menu) {
  * @brief Validates if user has access to menu options
  * @return
  */
-void MenuBase::checkMenuOptionsAcsAccess() {
+void MenuBase::buildMenuOptionsFromAcs() {
     auto it = m_menu_info.menu_options.begin();
     auto end = m_menu_info.menu_options.end();
     std::vector<MenuOption> new_options;
@@ -104,7 +104,7 @@ void MenuBase::checkMenuOptionsAcsAccess() {
 // menu parameter ignored for:
 //  - PopFallback
 //  - PreviousNoFirst
-void MenuBase::requestMenuJump(const std::string& targetMenu, MenuJumpMode mode) {
+void MenuBase::requestMenuJump(const std::string &targetMenu, MenuJumpMode mode) {
     m_log.log(Logging::LogLevel::Info, "MenuBase() - requestMenuJump", targetMenu, MenuJumpModeToString(mode));
     std::string menu = m_ctx.getIoCommon().toLower(targetMenu);
 
@@ -182,19 +182,18 @@ void MenuBase::readInMenuData() {
         MenuDao dao(candidate, m_current_menu, GLOBAL_MENU_PATH);
 
         m_log.log(Logging::LogLevel::Debug,
-            "Attempting to load menu:", m_current_menu);
+                  "Attempting to load menu:", m_current_menu);
 
         // Menu file exists?
         if (!dao.fileExists()) {
             m_log.log(Logging::LogLevel::Warn,
-                "Menu file missing:", m_current_menu);
+                      "Menu file missing:", m_current_menu);
 
             std::string fallback = resolveFallbackMenu();
             if (fallback.empty()) {
                 m_log.log(Logging::LogLevel::Error,
-                    "No fallback menu available");
+                          "No fallback menu available");
                 assert(false);
-                return;
             }
 
             m_current_menu = fallback;
@@ -207,14 +206,13 @@ void MenuBase::readInMenuData() {
         // ACS check
         if (!checkMenuAcsAccess(candidate)) {
             m_log.log(Logging::LogLevel::Warn,
-                "Menu ACS denied:", m_current_menu);
+                      "Menu ACS denied:", m_current_menu);
 
             std::string fallback = resolveFallbackMenu();
             if (fallback.empty()) {
                 m_log.log(Logging::LogLevel::Error,
-                    "No fallback menu after ACS failure");
+                          "No fallback menu after ACS failure");
                 assert(false);
-                return;
             }
 
             m_current_menu = fallback;
@@ -223,17 +221,17 @@ void MenuBase::readInMenuData() {
 
         // SUCCESS
         m_menu_info = candidate;
-        checkMenuOptionsAcsAccess();
+        buildMenuOptionsFromAcs();
 
         m_log.log(Logging::LogLevel::Info,
-            "Menu loaded successfully:", m_menu_info.menu_name);
+                  "Menu loaded successfully:", m_menu_info.menu_name);
 
         return;
     }
 
     // Safety net
     m_log.log(Logging::LogLevel::Error,
-        "Menu resolution exceeded maximum attempts");
+              "Menu resolution exceeded maximum attempts");
     assert(false);
 }
 
@@ -248,18 +246,8 @@ void MenuBase::loadInMenu(std::string menu_name) {
         m_menuStack.pop_front();
     }
 
-    /*
-    if (!m_current_menu.empty()) {
-        m_menuStack.push_back(m_current_menu);
-    }
-
-    m_previous_menu = m_current_menu;
-    m_current_menu = menu_name;
-    */
-
     m_fail_flag = false;
     readInMenuData();
-
 }
 
 // Precedence:
@@ -268,7 +256,6 @@ void MenuBase::loadInMenu(std::string menu_name) {
 // 3. m_starting_menu
 // 4. hard fallback (matrix/main)
 std::string MenuBase::resolveFallbackMenu() {
-
     m_log.log(Logging::LogLevel::Info, "MenuBase() - resolveFallbackMenu");
 
     if (!m_menuStack.empty()) {
@@ -299,9 +286,7 @@ void MenuBase::importMenu(Menu &menu_info) {
 
     // Remove Options the users might not have access to
     // ie Sysop Commands
-    checkMenuOptionsAcsAccess();
-
-    // Now we need to process custom screens from module menu
+    buildMenuOptionsFromAcs();
 }
 
 /**
@@ -571,6 +556,138 @@ std::string MenuBase::getDefaultInverseColor() {
     return m_ctx.getIoSession().pipeColors(m_ctx.getUser().sInverseColor);
 }
 
+// NEW FLOW - WIP Combine and break out Menu Startup to manager a bit easier.
+
+/*
+ *Loads menu file,
+ *parses options,
+ *FIRSTCMD chain,
+ *ACS
+*/
+void MenuBase::loadMenuDefinition(const std::string &menuName) {
+
+    m_log.log(Logging::LogLevel::Info, "MenuBase() - loadMenuDefinition=", menuName);
+
+    // Default PullDown ID, reset.
+    m_active_pulldownID = 0;
+
+    // Reset on First Load.
+    m_is_active_pulldown_menu = false;
+
+    // Load the Menu Clears All Structs.
+    m_firstCmdState = {};
+
+    if (m_menuStack.size() >= 5) {
+        m_menuStack.pop_front();
+    }
+
+    m_fail_flag = false;
+
+    m_log.log(Logging::LogLevel::Debug, "MenuBase() - readInMenuData");
+
+    clearMenuPullDownOptions();
+
+    constexpr int MAX_ATTEMPTS = 5;
+    int attempts = 0;
+
+    while (attempts++ < MAX_ATTEMPTS) {
+        Menu candidate;
+        MenuDao dao(candidate, m_current_menu, GLOBAL_MENU_PATH);
+
+        m_log.log(Logging::LogLevel::Debug,
+                  "Attempting to load menu:", m_current_menu);
+
+        // Menu file exists?
+        if (!dao.fileExists()) {
+            m_log.log(Logging::LogLevel::Warn,
+                      "Menu file missing:", m_current_menu);
+
+            std::string fallback = resolveFallbackMenu();
+            if (fallback.empty()) {
+                m_log.log(Logging::LogLevel::Error,
+                          "No fallback menu available");
+                assert(false);
+            }
+
+            m_current_menu = fallback;
+            continue;
+        }
+
+        // Load menu
+        dao.loadMenu();
+
+        // ACS check
+        if (!checkMenuAcsAccess(candidate)) {
+            m_log.log(Logging::LogLevel::Warn,
+                      "Menu ACS denied:", m_current_menu);
+
+            std::string fallback = resolveFallbackMenu();
+            if (fallback.empty()) {
+                m_log.log(Logging::LogLevel::Error,
+                          "No fallback menu after ACS failure");
+                assert(false);
+            }
+
+            m_current_menu = fallback;
+            continue;
+        }
+
+        // SUCCESS
+        m_menu_info = candidate;
+        buildMenuOptionsFromAcs();
+
+        m_log.log(Logging::LogLevel::Info,
+                  "Menu loaded successfully:", m_menu_info.menu_name);
+
+        return;
+    }
+
+    // Safety net
+    m_log.log(Logging::LogLevel::Error,
+              "Menu resolution exceeded maximum attempts");
+    assert(false);
+}
+
+
+/* Handles:
+fallback logic
+previous menu
+pulldown reset
+firstcmd suppression
+*/
+void MenuBase::prepareMenuState(MenuLoadReason reason) {
+
+    /*
+    *case MenuLoadReason::Initial: return "Initial";
+    case MenuLoadReason::Jump: return "Jump";
+    case MenuLoadReason::Redisplay: return "Redisplay";
+    */
+
+
+
+}
+
+void MenuBase::enterMenu(const std::string &menuName, MenuLoadReason reason, bool isExecuteFirstCmds) {
+
+    // 1. Make sure the Input is setup for Menu, when we jump to a menu.
+    m_baseState = BaseState::MENU_INPUT;
+
+    // 2. Load Menu
+    loadMenuDefinition(menuName);
+
+    // 3 Setup the Specific Menu State
+    prepareMenuState(reason);
+
+    // 4 Read and Parse Menu and Prompts for Display.
+    //renderMenu(reason != MenuLoadReason::Redisplay);
+
+    if (isExecuteFirstCmds) {
+        executeFirstCmds();
+    }
+}
+
+
+
 /**
  * @brief Builds the menu prompt as a question String
  * @return
@@ -781,8 +898,8 @@ std::string MenuBase::buildLightBars() {
     return light_bars;
 }
 
-void MenuBase::enqueueChainedCommands(const MenuOption& opt) {
-    const std::string& cmd = opt.command_key;
+void MenuBase::enqueueChainedCommands(const MenuOption &opt) {
+    const std::string &cmd = opt.command_key;
 
     auto pos = cmd.find(';');
     if (pos == std::string::npos) {
@@ -796,7 +913,7 @@ void MenuBase::enqueueChainedCommands(const MenuOption& opt) {
     std::string token;
 
     m_log.log(Logging::LogLevel::Info, "m_execContext.commandQueue B4 size=",
-        m_execContext.commandQueue.size());
+              m_execContext.commandQueue.size());
 
     while (std::getline(ss, token, ';')) {
         MenuOption chained = opt;
@@ -806,10 +923,10 @@ void MenuBase::enqueueChainedCommands(const MenuOption& opt) {
     }
 
     m_log.log(Logging::LogLevel::Info, "m_execContext.commandQueue AF size=",
-        m_execContext.commandQueue.size());
+              m_execContext.commandQueue.size());
 }
 
-bool MenuBase::executeWithAcs(const MenuOption& opt) {
+bool MenuBase::executeWithAcs(const MenuOption &opt) {
     m_log.log(Logging::LogLevel::Info, "MenuBase() - executeWithAcs");
     AccessCondition acs(m_ctx.getIoSession());
     if (!acs.validateAcsString(opt.acs_string, m_ctx.getUser())) {
@@ -873,7 +990,7 @@ void MenuBase::executeFirstCmds() {
         return;
     }
 
-    for (const auto& opt : m_menu_info.menu_options) {
+    for (const auto &opt: m_menu_info.menu_options) {
         if (opt.menu_key != "FIRSTCMD") {
             continue;
         }
@@ -885,7 +1002,7 @@ void MenuBase::executeFirstCmds() {
         }
 
         m_log.log(Logging::LogLevel::Info,
-            "Executing FIRSTCMD:", opt.command_key);
+                  "Executing FIRSTCMD:", opt.command_key);
 
         executeWithAcs(opt);
 
@@ -916,7 +1033,7 @@ std::vector<std::string> MenuBase::getListOfMenuPrompts() {
     // Sort Menu Prompt's in ascending order
     std::sort(result_set.begin(), result_set.end());
 
-    for (std::string &s : result_set) {
+    for (std::string &s: result_set) {
         result_list.push_back(s.substr(0, s.size() - 5));
     }
 
@@ -1096,25 +1213,11 @@ std::string MenuBase::moveStringToBottom(const std::string &prompt) {
  */
 void MenuBase::loadAndStartupMenu() {
     m_log.log(Logging::LogLevel::Info, "MenuBase() - loadAndStartupMenu=", m_current_menu);
+
     // Check Configuration here, use SpecialLogin (Matrix Menu)
     // Then load it, otherwise jump to Entering UserID / P
 
-    int term_rows = 0;
-    int term_cols = 0;
-    bool use_ansi = false;
-
-    term_rows = m_ctx.getTelnet().getTermRows();
-    term_cols = m_ctx.getTelnet().getTermCols();
-    use_ansi = m_ctx.getSessionWrite().isAnsi();
-
-    if (m_current_menu == "matrix") {
-        m_log.log(Logging::LogLevel::Info, "MATRIX MENU DETECTED - RESET ANSI TERM SIZE to Detection",
-                  term_rows,
-                  term_cols
-        );
-        // First Menu Load, make sure we resize from terminal detection.  Later on Ongoing Detection Changes
-        m_ctx.getScreenAnsi().resize(term_rows, term_cols);
-    }
+    bool use_ansi = m_ctx.getSessionWrite().isAnsi();
 
     // 1. Make sure the Input is set to the
     m_baseState = BaseState::MENU_INPUT;
@@ -1127,6 +1230,8 @@ void MenuBase::loadAndStartupMenu() {
     m_firstCmdState = {};
     loadInMenu(m_current_menu);
 
+
+    // new break
     // Reset fail state, prompt suppression, etc.
     m_fail_flag = false;
     m_execContext.suppressPrompt = false;
@@ -1241,7 +1346,6 @@ void MenuBase::loadAndStartupMenu() {
         executeFirstCmds();
     }
     m_suppressFirstCmdOnce = false;
-
 }
 
 /**
@@ -1502,7 +1606,6 @@ bool MenuBase::handlePullDownHotKeys(const MenuOption &m, const bool &is_enter, 
  * @brief Handles Re-running EACH command re-executed after each refresh
  */
 void MenuBase::executeEachCommands() {
-
     m_log.log(Logging::LogLevel::Info, "MenuBase() - executeEachCommands");
 
     // Then do not loop and execute this!
@@ -1670,7 +1773,7 @@ bool MenuBase::processMenuOptions(const std::string &input) {
         }
     }
 
-    // Handled Chained Commands when exist.
+    // Handled Chained Commands when they exist.
     while (!m_execContext.commandQueue.empty()) {
         MenuOption next = m_execContext.commandQueue.front();
         m_execContext.commandQueue.pop_front();
@@ -1694,8 +1797,7 @@ bool MenuBase::processMenuOptions(const std::string &input) {
         if (!m_execContext.suppressPrompt) {
             executeEachCommands();
         }
-    }
-    else {
+    } else {
         // Menu Changed, exit and leave startup to next menu.
         return true;
     }
@@ -1742,11 +1844,11 @@ void MenuBase::handlePullDownInput(const std::string &character_buffer, const bo
 }
 
 /**
- * @brief Handle Input Specific to Pull Down Menus
+ * @brief Handle Input Specific to Input Fields.
  * @param character_buffer
  */
-void MenuBase::handleStandardInput(const std::string &character_buffer) {
-    m_log.log(Logging::LogLevel::Info, "MenuBase() - handleStandardInput=", character_buffer);
+void MenuBase::handleFieldInput(const std::string &character_buffer) {
+    m_log.log(Logging::LogLevel::Info, "MenuBase() - handleFieldInput=", character_buffer);
 
     // Get LineInput and wait for ENTER.
     std::string key;
@@ -1794,15 +1896,15 @@ void MenuBase::handleStandardInput(const std::string &character_buffer) {
  */
 void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf8) {
     m_log.log(Logging::LogLevel::Info, "MenuBase() - menuInput=", character_buffer,
-        "m_is_active_pulldown_menu=", m_is_active_pulldown_menu);
+              "m_is_active_pulldown_menu=", m_is_active_pulldown_menu);
 
     // If were in lightbar mode, then we are using hotkeys.
     if (m_is_active_pulldown_menu) {
         m_log.log(Logging::LogLevel::Debug, "MenuBase() - handlePullDownInput");
         handlePullDownInput(character_buffer, is_utf8);
     } else {
-        m_log.log(Logging::LogLevel::Debug, "MenuBase() - handleStandardInput");
-        handleStandardInput(character_buffer);
+        m_log.log(Logging::LogLevel::Debug, "MenuBase() - handleFieldInput");
+        handleFieldInput(character_buffer);
     }
 
     if (m_execContext.suppressPrompt) {

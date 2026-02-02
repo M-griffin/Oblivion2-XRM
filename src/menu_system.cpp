@@ -28,29 +28,29 @@ MenuSystem::MenuSystem(Context &ctx)
       , m_log(Logging::getInstance())
       , currentState(State::MenuSystem) {
     // Setup Menu Option Calls for executing menu commands.
-    m_execute_callback.emplace_back(bind_member(this, &MenuSystem::menuOptionsCallback));
+    m_execute_callback.emplace_back(bind_member(this, menuOptionsCallback));
 
     // [Mapped] Menu Command Key Functions
-    m_menu_command_functions['-'] = bind_member(this, &MenuSystem::menuOptionsControlCommands);
-    m_menu_command_functions['&'] = bind_member(this, &MenuSystem::menuOptionsMultiNodeCommands);
-    m_menu_command_functions['{'] = bind_member(this, &MenuSystem::menuOptionsMatrixCommands);
-    m_menu_command_functions['!'] = bind_member(this, &MenuSystem::menuOptionsGlobalNewScanCommands);
-    m_menu_command_functions['['] = bind_member(this, &MenuSystem::menuOptionsMainMenuCommands);
-    m_menu_command_functions['.'] = bind_member(this, &MenuSystem::menuOptionsDoorCommands);
-    m_menu_command_functions['*'] = bind_member(this, &MenuSystem::menuOptionsSysopCommands);
-    m_menu_command_functions['^'] = bind_member(this, &MenuSystem::menuOptionsNewUserVotingCommands);
-    m_menu_command_functions['C'] = bind_member(this, &MenuSystem::menuOptionsConferenceEditorCommands);
-    m_menu_command_functions['D'] = bind_member(this, &MenuSystem::menuOptionsDataAreaCommands);
-    m_menu_command_functions['E'] = bind_member(this, &MenuSystem::menuOptionsEmailCommands);
-    m_menu_command_functions['F'] = bind_member(this, &MenuSystem::menuOptionsFileCommands);
-    m_menu_command_functions['J'] = bind_member(this, &MenuSystem::menuOptionsJoinConference);
-    m_menu_command_functions['M'] = bind_member(this, &MenuSystem::menuOptionsMessageCommands);
-    m_menu_command_functions['Q'] = bind_member(this, &MenuSystem::menuOptionsQWKMailCommands);
-    m_menu_command_functions['R'] = bind_member(this, &MenuSystem::menuOptionsTopTenListingCommands);
-    m_menu_command_functions['S'] = bind_member(this, &MenuSystem::menuOptionsMessageBaseSponsorCommands);
-    m_menu_command_functions['T'] = bind_member(this, &MenuSystem::menuOptionsFileBaseSponsorCommands);
-    m_menu_command_functions['V'] = bind_member(this, &MenuSystem::menuOptionsVotingCommands);
-    m_menu_command_functions['+'] = bind_member(this, &MenuSystem::menuOptionsColorSettingCommands);
+    m_menu_command_functions['-'] = bind_member(this, menuOptionsControlCommands);
+    m_menu_command_functions['&'] = bind_member(this, menuOptionsMultiNodeCommands);
+    m_menu_command_functions['{'] = bind_member(this, menuOptionsMatrixCommands);
+    m_menu_command_functions['!'] = bind_member(this, menuOptionsGlobalNewScanCommands);
+    m_menu_command_functions['['] = bind_member(this, menuOptionsMainMenuCommands);
+    m_menu_command_functions['.'] = bind_member(this, menuOptionsDoorCommands);
+    m_menu_command_functions['*'] = bind_member(this, menuOptionsSysopCommands);
+    m_menu_command_functions['^'] = bind_member(this, menuOptionsNewUserVotingCommands);
+    m_menu_command_functions['C'] = bind_member(this, menuOptionsConferenceEditorCommands);
+    m_menu_command_functions['D'] = bind_member(this, menuOptionsDataAreaCommands);
+    m_menu_command_functions['E'] = bind_member(this, menuOptionsEmailCommands);
+    m_menu_command_functions['F'] = bind_member(this, menuOptionsFileCommands);
+    m_menu_command_functions['J'] = bind_member(this, menuOptionsJoinConference);
+    m_menu_command_functions['M'] = bind_member(this, menuOptionsMessageCommands);
+    m_menu_command_functions['Q'] = bind_member(this, menuOptionsQWKMailCommands);
+    m_menu_command_functions['R'] = bind_member(this, menuOptionsTopTenListingCommands);
+    m_menu_command_functions['S'] = bind_member(this, menuOptionsMessageBaseSponsorCommands);
+    m_menu_command_functions['T'] = bind_member(this, menuOptionsFileBaseSponsorCommands);
+    m_menu_command_functions['V'] = bind_member(this, menuOptionsVotingCommands);
+    m_menu_command_functions['+'] = bind_member(this, menuOptionsColorSettingCommands);
 
     m_log.log(Logging::LogLevel::Console, "MenuSystem()");
 
@@ -121,6 +121,7 @@ bool MenuSystem::pollTimers() {
 void MenuSystem::bindStateHandlers() {
     m_log.log(Logging::LogLevel::Console, "bindStateHandlers()");
 
+    // Should rewrite these to use virtual classes again and single object.
     clearHandlers.clear();
     createHandlers.clear();
     inputHandlers.clear();
@@ -1033,15 +1034,29 @@ void MenuSystem::startupModuleMessageEditor()
 
 
 // -------------------------
-// Logon Module
+// Menu System Setup
 // -------------------------
 
 void MenuSystem::createMenuSystem() {
     m_log.log(Logging::LogLevel::Console, "MenuSystem() createMenuSystem");
     m_current_menu = "matrix";
     m_starting_menu = "matrix";
+
+    int term_rows = 0;
+    int term_cols = 0;
+
+    term_rows = m_ctx.getTelnet().getTermRows();
+    term_cols = m_ctx.getTelnet().getTermCols();
+
+    m_log.log(Logging::LogLevel::Info, "MATRIX MENU SETUP - RESET ANSI TERM SIZE to Detection",
+              term_rows,
+              term_cols
+    );
+    // First Menu Load, make sure we resize from terminal detection.  Later on Ongoing Detection Changes
+    m_ctx.getScreenAnsi().resize(term_rows, term_cols);
+
     requestMenuJump(m_current_menu, MenuJumpMode::Normal);
-    //loadAndStartupMenu();
+
 }
 
 void MenuSystem::clearMenuSystem() {

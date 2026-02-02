@@ -28,6 +28,21 @@ public:
 
     ~MenuBase();
 
+    enum class MenuLoadReason {
+        Initial,
+        Jump,
+        Redisplay
+    };
+
+    std::string MenuLoadReasonToString(MenuLoadReason mode) const {
+        switch (mode) {
+            case MenuLoadReason::Initial: return "Initial";
+            case MenuLoadReason::Jump: return "Jump";
+            case MenuLoadReason::Redisplay: return "Redisplay";
+            default: return "Unknown";
+        }
+    }
+
     // This matches the index for menu_functions.push_back
     enum class BaseState : uint8_t {
         MENU_INPUT = 0,
@@ -110,7 +125,7 @@ public:
 
     bool checkMenuAcsAccess(const Menu &menu);
 
-    void checkMenuOptionsAcsAccess();
+    void buildMenuOptionsFromAcs();
 
     void requestMenuJump(const std::string &menu, MenuJumpMode mode);
 
@@ -125,6 +140,12 @@ public:
     std::string getDefaultInputColor();
 
     std::string getDefaultInverseColor();
+
+    void loadMenuDefinition(const std::string &menuName);
+
+    void prepareMenuState(MenuLoadReason reason);
+
+    void enterMenu(const std::string& menuName, MenuLoadReason reason, bool isExecuteFirstCmds);
 
     std::string parseMenuPromptString(const std::string &prompt_string);
 
@@ -176,7 +197,7 @@ public:
 
     void handlePullDownInput(const std::string &character_buffer, const bool &is_utf8);
 
-    void handleStandardInput(const std::string &character_buffer);
+    void handleFieldInput(const std::string &character_buffer);
 
     void menuInput(const std::string &character_buffer, const bool &is_utf8);
 
