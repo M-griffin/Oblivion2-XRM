@@ -110,8 +110,19 @@ void MenuBase::requestMenuJump(const std::string &targetMenu, MenuJumpMode mode)
 
     // Abort current execution cycle
     m_execContext.commandQueue.clear();
+    m_execContext.commandQueue.shrink_to_fit();
+
     m_execContext.executingChain = false;
     m_execContext.suppressPrompt = true;
+
+    bool executeFirstCmds = true;
+
+    // FIRSTCMD SUPPRESSION
+    if (mode == MenuJumpMode::SkipFirstCmd ||
+        mode == MenuJumpMode::PreviousNoFirst) {
+        m_suppressFirstCmdOnce = true;
+        executeFirstCmds = false;
+    }
 
     // PREVIOUS MENU HANDLING
     if (mode == MenuJumpMode::PreviousNoFirst) {
@@ -121,13 +132,6 @@ void MenuBase::requestMenuJump(const std::string &targetMenu, MenuJumpMode mode)
             // Defensive fallback
             menu = resolveFallbackMenu();
         }
-
-        m_suppressFirstCmdOnce = true;
-    }
-
-    // FIRSTCMD SUPPRESSION
-    if (mode == MenuJumpMode::SkipFirstCmd) {
-        m_suppressFirstCmdOnce = true;
     }
 
     // FALLBACK STACK HANDLING
@@ -139,9 +143,11 @@ void MenuBase::requestMenuJump(const std::string &targetMenu, MenuJumpMode mode)
             break;
 
         case MenuJumpMode::PushStarting:
-            //if (m_starting_menu.empty()) {
-            //    m_starting_menu = m_current_menu;
-            //}
+            // Only set the Starting Menu the first time if Empty.
+            if (m_starting_menu.empty()) {
+                m_starting_menu = m_current_menu;
+            }
+
             // Starting Menu should be immutable, and stick to main, or top etc.
             // once logon is completed.
             m_menuStack.push_back(m_starting_menu);
@@ -160,94 +166,27 @@ void MenuBase::requestMenuJump(const std::string &targetMenu, MenuJumpMode mode)
 
     // RESET EXEC CONTEXT
     m_execContext.commandQueue.clear();
+    m_execContext.commandQueue.shrink_to_fit();
+
     m_execContext.executingChain = false;
     m_execContext.suppressPrompt = true;
 
     // SWITCH MENU
     m_current_menu = menu;
 
-    loadAndStartupMenu();
-}
-
-void MenuBase::readInMenuData() {
-    m_log.log(Logging::LogLevel::Debug, "MenuBase() - readInMenuData");
-
-    clearMenuPullDownOptions();
-
-    constexpr int MAX_ATTEMPTS = 5;
-    int attempts = 0;
-
-    while (attempts++ < MAX_ATTEMPTS) {
-        Menu candidate;
-        MenuDao dao(candidate, m_current_menu, GLOBAL_MENU_PATH);
-
-        m_log.log(Logging::LogLevel::Debug,
-                  "Attempting to load menu:", m_current_menu);
-
-        // Menu file exists?
-        if (!dao.fileExists()) {
-            m_log.log(Logging::LogLevel::Warn,
-                      "Menu file missing:", m_current_menu);
-
-            std::string fallback = resolveFallbackMenu();
-            if (fallback.empty()) {
-                m_log.log(Logging::LogLevel::Error,
-                          "No fallback menu available");
-                assert(false);
-            }
-
-            m_current_menu = fallback;
-            continue;
-        }
-
-        // Load menu
-        dao.loadMenu();
-
-        // ACS check
-        if (!checkMenuAcsAccess(candidate)) {
-            m_log.log(Logging::LogLevel::Warn,
-                      "Menu ACS denied:", m_current_menu);
-
-            std::string fallback = resolveFallbackMenu();
-            if (fallback.empty()) {
-                m_log.log(Logging::LogLevel::Error,
-                          "No fallback menu after ACS failure");
-                assert(false);
-            }
-
-            m_current_menu = fallback;
-            continue;
-        }
-
-        // SUCCESS
-        m_menu_info = candidate;
-        buildMenuOptionsFromAcs();
-
-        m_log.log(Logging::LogLevel::Info,
-                  "Menu loaded successfully:", m_menu_info.menu_name);
-
-        return;
-    }
-
-    // Safety net
-    m_log.log(Logging::LogLevel::Error,
-              "Menu resolution exceeded maximum attempts");
-    assert(false);
-}
-
-
-/**
- * @brief Load a menu handling.
- */
-void MenuBase::loadInMenu(std::string menu_name) {
-    m_log.log(Logging::LogLevel::Info, "MenuBase() - Loading Menu=", menu_name);
-
-    if (m_menuStack.size() >= 5) {
-        m_menuStack.pop_front();
-    }
-
+    // Setup State and Stack.
+    m_firstCmdState = {};
     m_fail_flag = false;
-    readInMenuData();
+    if (m_menuStack.size() >= 5) m_menuStack.pop_front();
+
+    m_previous_menu = m_current_menu;
+    m_current_menu = menu;
+
+    enterMenu(
+        m_current_menu,
+        MenuLoadReason::Jump,
+        executeFirstCmds
+    );
 }
 
 // Precedence:
@@ -271,22 +210,15 @@ std::string MenuBase::resolveFallbackMenu() {
     }
 
     m_log.log(Logging::LogLevel::Info, "MenuBase() - resolveFallbackMenu empty!");
-    return m_starting_menu;
-}
+    if (!m_starting_menu.empty()) {
+        return m_starting_menu;
+    }
 
-/**
- * @brief Imports Menu from Modules into the system container.
- */
-void MenuBase::importMenu(Menu &menu_info) {
-    m_log.log(Logging::LogLevel::Info, "MenuBase() - importMenu");
+    // Hard Reset to Matrix or Main Menu
+    if (!m_ctx.getSessionWrite().isAuthorized())
+        return "matrix";
 
-    clearMenuPullDownOptions();
-    m_menu_info = menu_info;
-    m_current_menu = m_menu_info.menu_name;
-
-    // Remove Options the users might not have access to
-    // ie Sysop Commands
-    buildMenuOptionsFromAcs();
+    return "main";
 }
 
 /**
@@ -565,7 +497,6 @@ std::string MenuBase::getDefaultInverseColor() {
  *ACS
 */
 void MenuBase::loadMenuDefinition(const std::string &menuName) {
-
     m_log.log(Logging::LogLevel::Info, "MenuBase() - loadMenuDefinition=", menuName);
 
     // Default PullDown ID, reset.
@@ -573,15 +504,6 @@ void MenuBase::loadMenuDefinition(const std::string &menuName) {
 
     // Reset on First Load.
     m_is_active_pulldown_menu = false;
-
-    // Load the Menu Clears All Structs.
-    m_firstCmdState = {};
-
-    if (m_menuStack.size() >= 5) {
-        m_menuStack.pop_front();
-    }
-
-    m_fail_flag = false;
 
     m_log.log(Logging::LogLevel::Debug, "MenuBase() - readInMenuData");
 
@@ -656,36 +578,165 @@ pulldown reset
 firstcmd suppression
 */
 void MenuBase::prepareMenuState(MenuLoadReason reason) {
+    m_fail_flag = false;
+    m_pulldown_reentrace_flag = false;
+    m_is_active_pulldown_menu = false;
+    m_active_pulldownID = 0;
 
-    /*
-    *case MenuLoadReason::Initial: return "Initial";
-    case MenuLoadReason::Jump: return "Jump";
-    case MenuLoadReason::Redisplay: return "Redisplay";
-    */
+    m_execContext.executingChain = false;
+    m_execContext.commandQueue.clear();
 
+    if (reason == MenuLoadReason::Initial ||
+        reason == MenuLoadReason::Jump) {
+        m_firstCmdState.executed = false;
+    }
 
+    if (m_suppressFirstCmdOnce) {
+        m_firstCmdState.executed = true;
+        m_suppressFirstCmdOnce = false;
+    }
 
-}
-
-void MenuBase::enterMenu(const std::string &menuName, MenuLoadReason reason, bool isExecuteFirstCmds) {
-
-    // 1. Make sure the Input is setup for Menu, when we jump to a menu.
-    m_baseState = BaseState::MENU_INPUT;
-
-    // 2. Load Menu
-    loadMenuDefinition(menuName);
-
-    // 3 Setup the Specific Menu State
-    prepareMenuState(reason);
-
-    // 4 Read and Parse Menu and Prompts for Display.
-    //renderMenu(reason != MenuLoadReason::Redisplay);
-
-    if (isExecuteFirstCmds) {
-        executeFirstCmds();
+    // On Re-Display don't change state, or execute.
+    if (reason == MenuLoadReason::Redisplay) {
+        m_firstCmdState.executed = true;
+        m_suppressFirstCmdOnce = true;
     }
 }
 
+void MenuBase::enterMenu(const std::string &menuName, MenuLoadReason reason, bool isExecuteFirstCmds) {
+    m_log.log(Logging::LogLevel::Info,
+              "enterMenu menu={} reason={}",
+              menuName, MenuLoadReasonToString(reason));
+
+    m_baseState = BaseState::MENU_INPUT;
+
+    loadMenuDefinition(menuName);
+    prepareMenuState(reason);
+
+    if (m_menu_info.menu_options.empty()) {
+        m_log.log(Logging::LogLevel::Error,
+                  "Menu has no menu_options", m_current_menu);
+        return;
+    }
+
+    if (handleSpecialPulldownModes()) {
+        return;
+    }
+
+    std::string raw_buffer = loadMenuScreen();
+    std::string output = m_ctx.getIoSession().pipe2ansi(raw_buffer);
+
+    setupPulldownsAndLightbars(raw_buffer, output);
+
+    output += loadMenuPrompt();
+    baseProcessAndDeliver(output);
+
+    if (isExecuteFirstCmds && !m_suppressFirstCmdOnce) {
+        executeFirstCmds();
+    }
+    m_suppressFirstCmdOnce = false;
+}
+
+bool MenuBase::handleSpecialPulldownModes() {
+    // N = Yes / No prompt
+    if (m_menu_info.menu_pulldown_file.size() == 1 &&
+        toupper(m_menu_info.menu_pulldown_file[0]) == 'N') {
+        baseProcessAndDeliver(
+            parseMenuPromptString(m_menu_info.menu_prompt)
+        );
+
+        m_is_active_pulldown_menu = true;
+
+        if (!m_suppressFirstCmdOnce && !m_firstCmdState.executed) {
+            executeFirstCmds();
+        }
+
+        m_firstCmdState.executed = true;
+        m_suppressFirstCmdOnce = false;
+        return true;
+    }
+
+    // ::X logic can live here later
+    return false;
+}
+
+void MenuBase::setupPulldownsAndLightbars(const std::string &raw_buffer, std::string &output) {
+    if (m_menu_info.menu_pulldown_file.empty() ||
+        !m_ctx.getSessionWrite().isAnsi()) {
+        m_is_active_pulldown_menu = false;
+        return;
+    }
+
+    std::vector<int> pull_down_ids;
+    m_loaded_pulldown_options.clear();
+
+    for (auto &opt: m_menu_info.menu_options) {
+        if (opt.pulldown_id > 0) {
+            pull_down_ids.push_back(opt.pulldown_id);
+            m_loaded_pulldown_options.push_back(opt);
+        }
+    }
+
+    if (pull_down_ids.empty()) {
+        m_is_active_pulldown_menu = false;
+        return;
+    }
+
+    m_active_pulldownID =
+            *std::min_element(pull_down_ids.begin(), pull_down_ids.end());
+
+    m_is_active_pulldown_menu = true;
+
+    // Hide cursor
+    output += "\x1b[?25l";
+
+    // Parse screen for pull-down anchors
+    m_ctx.getScreenAnsi().parseTextToBuffer(raw_buffer);
+    m_ctx.getScreenAnsi().screenBufferToString();
+    m_ctx.getScreenAnsi().screenBufferParse();
+
+    output += buildLightBars();
+}
+
+/**
+ * @brief Reparses and display current menu system.
+ * Mainly Used for Lightbar menu retun to redraw without reloading everything!
+ * or refresh on invalid key presses
+ */
+void MenuBase::redisplayMenuScreen() {
+    m_log.log(Logging::LogLevel::Info, "MenuBase() - redisplayMenuScreen");
+
+    // Read in the Menu ANSI
+    std::string buffer = loadMenuScreen();
+    std::string output = m_ctx.getIoSession().pipe2ansi(buffer);
+
+    if (m_is_active_pulldown_menu) {
+        // Parse the Screen to the Screen Buffer.
+        m_ctx.getScreenAnsi().parseTextToBuffer(buffer);
+
+        // Screen to String so it can be processed.
+        m_ctx.getScreenAnsi().screenBufferToString();
+
+        // Process buffer for PullDown Codes.
+        // only if we want result, ignore.., result just for testing at this time!
+        std::string result = m_ctx.getScreenAnsi().screenBufferParse();
+
+        // Now Build the Light bars with Hidden Cursor.
+        std::string light_bars = "\x1b[?25l";
+        light_bars += buildLightBars();
+
+        // add and write out.
+        output.append(light_bars);
+    }
+
+    // Load the Menu prompt
+    // Only skip prompt
+    if (!m_execContext.suppressPrompt) {
+        output += loadMenuPrompt();
+    }
+
+    baseProcessAndDeliver(output);
+}
 
 
 /**
@@ -795,6 +846,7 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string) {
     // Then we feed it through again to handle colors replacements.
     return output;
 }
+
 
 /**
  * @brief Decides which Screen is loaded then returns as string.
@@ -942,44 +994,6 @@ bool MenuBase::executeWithAcs(const MenuOption &opt) {
 
     m_log.log(Logging::LogLevel::Info, "MenuBase() - enqueueChainedCommands completed.");
     return true;
-}
-
-/**
- * @brief Re parses and display current menu system.
- */
-void MenuBase::redisplayMenuScreen() {
-    m_log.log(Logging::LogLevel::Info, "MenuBase() - redisplayMenuScreen");
-
-    if (m_execContext.suppressPrompt) {
-        return;
-    }
-
-    // Read in the Menu ANSI
-    std::string buffer = loadMenuScreen();
-    std::string output = m_ctx.getIoSession().pipe2ansi(buffer);
-
-    if (m_is_active_pulldown_menu) {
-        // Parse the Screen to the Screen Buffer.
-        m_ctx.getScreenAnsi().parseTextToBuffer(buffer);
-
-        // Screen to String so it can be processed.
-        m_ctx.getScreenAnsi().screenBufferToString();
-
-        // Process buffer for PullDown Codes.
-        // only if we want result, ignore.., result just for testing at this time!
-        std::string result = m_ctx.getScreenAnsi().screenBufferParse();
-
-        // Now Build the Light bars with Hidden Cursor.
-        std::string light_bars = "\x1b[?25l";
-        light_bars += buildLightBars();
-
-        // add and write out.
-        output.append(light_bars);
-    }
-
-    // Load the Menu prompt
-    output += loadMenuPrompt();
-    baseProcessAndDeliver(output);
 }
 
 void MenuBase::executeFirstCmds() {
@@ -1208,145 +1222,6 @@ std::string MenuBase::moveStringToBottom(const std::string &prompt) {
     return output;
 }
 
-/**
- * @brief Startup And load the Menu File
- */
-void MenuBase::loadAndStartupMenu() {
-    m_log.log(Logging::LogLevel::Info, "MenuBase() - loadAndStartupMenu=", m_current_menu);
-
-    // Check Configuration here, use SpecialLogin (Matrix Menu)
-    // Then load it, otherwise jump to Entering UserID / P
-
-    bool use_ansi = m_ctx.getSessionWrite().isAnsi();
-
-    // 1. Make sure the Input is set to the
-    m_baseState = BaseState::MENU_INPUT;
-    m_active_pulldownID = 0;
-
-    // Reset on First Load.
-    m_is_active_pulldown_menu = false;
-
-    // Load the Menu Clears All Structs.
-    m_firstCmdState = {};
-    loadInMenu(m_current_menu);
-
-
-    // new break
-    // Reset fail state, prompt suppression, etc.
-    m_fail_flag = false;
-    m_execContext.suppressPrompt = false;
-
-    // Validate menu options loaded.
-    if (m_menu_info.menu_options.empty()) {
-        m_log.log(Logging::LogLevel::Error, "Menu has no menu_options", m_current_menu);
-        return;
-    }
-
-    // Pull down filename can have (2) customization
-    // N = single prompt string with Y/N light bar prompts, used in goodbye, feedback, new scan menus.
-    // ::X
-    // Where X is a letter in the alphabet. Randomly picks a
-    // letter from A to X, and will act as if the user pressed
-    // that key.  For Random Matrix's.. or menu commands!
-
-    // First Lets implement N with ^ color codes for local theme colors.
-    if (m_menu_info.menu_pulldown_file.size() == 1 && toupper(m_menu_info.menu_pulldown_file[0]) == 'N') {
-        m_log.log(Logging::LogLevel::Info,
-                  "MenuBase - baseProcessAndDeliver single prompt string with Y/N light bar prompts", m_current_menu);
-        baseProcessAndDeliver(parseMenuPromptString(m_menu_info.menu_prompt));
-        m_is_active_pulldown_menu = true;
-
-        // guarded internally
-        if (!m_suppressFirstCmdOnce && !m_firstCmdState.executed) {
-            executeFirstCmds();
-        }
-
-        m_firstCmdState.executed = true;
-        m_suppressFirstCmdOnce = false;
-
-        m_log.log(Logging::LogLevel::Info, "MenuBase - Execute Each Command then Return");
-        return;
-    }
-
-    m_log.log(Logging::LogLevel::Info, "MenuBase - Cont.", m_current_menu);
-
-    //if (MenuInfo clear the screen etc.. feature to add! )
-    //m_menu_session_data->deliver("\x1b[2J\x1b[1;1H");
-
-    // Finally parse the ansi screen and remove pipes
-    // Read in the Menu ANSI
-    std::string buffer = loadMenuScreen();
-
-    // Output has parsed out MCI codes, translations are then appended.
-    std::string output = m_ctx.getIoSession().pipe2ansi(buffer);
-
-    m_log.log(Logging::LogLevel::Debug, "MenuBase - Cont. pipe2ansi=", output);
-
-    // If we have a pull down ansi, then setup pull down
-    if (!m_menu_info.menu_pulldown_file.empty()) {
-        // Get Pull down menu commands, Load all from menu options (disk)
-        std::vector<int> pull_down_ids;
-
-        for (unsigned int i = 0; i < m_menu_info.menu_options.size(); i++) {
-            auto &m = m_menu_info.menu_options[i];
-
-            if (m.pulldown_id > 0 && use_ansi) {
-                pull_down_ids.push_back(m.pulldown_id);
-
-                // Get Actual Options with Descriptions for Light bars.
-                m_loaded_pulldown_options.push_back(m);
-            }
-        }
-
-        // Set the lowest pull down ID as Active
-        if (!pull_down_ids.empty()) {
-            const auto id = std::min_element(pull_down_ids.begin(), pull_down_ids.end());
-            m_active_pulldownID = *id;
-        }
-
-        // If active pull_down id's found, mark as active pull down menu.
-        if (!pull_down_ids.empty() && use_ansi) {
-            m_log.log(Logging::LogLevel::Info, "MenuBase - Lightbars", output);
-
-            // Hide Cursor on light bars
-            output += "\x1b[?25l";
-
-            // m_menu_info.PulldownFN
-            m_is_active_pulldown_menu = true;
-
-            // Parse the Screen to the Screen Buffer.
-            m_ctx.getScreenAnsi().parseTextToBuffer(buffer);
-
-            // Screen to String so it can be processed.
-            m_ctx.getScreenAnsi().screenBufferToString();
-
-            // Process buffer for PullDown Codes. results for TESTING, are discarded.
-            std::string result = m_ctx.getScreenAnsi().screenBufferParse();
-
-            // Now Build the Light bars
-            const std::string light_bars = buildLightBars();
-
-            m_log.log(Logging::LogLevel::Info, "MenuBase - Lightbars append=", light_bars);
-            // add and write out.
-            output.append(light_bars);
-        } else {
-            m_is_active_pulldown_menu = false;
-        }
-    } else {
-        m_is_active_pulldown_menu = false;
-    }
-
-    // Loads the users selected menu prompt
-    output += loadMenuPrompt();
-
-    m_log.log(Logging::LogLevel::Debug, "MenuBase - baseProcessAndDeliver Screen with Prompt=", output);
-    baseProcessAndDeliver(output);
-
-    if (!m_suppressFirstCmdOnce) {
-        executeFirstCmds();
-    }
-    m_suppressFirstCmdOnce = false;
-}
 
 /**
  * @brief Updates current and next light bar positions.
@@ -1787,6 +1662,7 @@ bool MenuBase::processMenuOptions(const std::string &input) {
         // Menu changed or logoff → stop chain
         if (m_logoff) {
             m_execContext.commandQueue.clear();
+            m_execContext.commandQueue.shrink_to_fit();
             return false;
         }
     }

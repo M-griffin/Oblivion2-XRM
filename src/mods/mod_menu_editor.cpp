@@ -92,7 +92,7 @@ bool ModMenuEditor::update(const std::string &character_buffer, const bool &) {
     }
 
     // Return True when were keeping module active / else false;
-    if (character_buffer.size() == 0) {
+    if (character_buffer.empty()) {
         return true;
     }
 
@@ -373,7 +373,7 @@ void ModMenuEditor::setupMenuEditor() {
     // So we know when to pause in large listing, or use pagination.
     std::string menu_display_output = displayMenuList();
 
-    if (m_menu_display_list.size() > 0) {
+    if (!m_menu_display_list.empty()) {
         // Clear Out list if anything already exists.
         std::vector<std::string>().swap(m_menu_display_list);
     }
@@ -392,7 +392,7 @@ void ModMenuEditor::setupMenuOptionEditor() {
     display_name = m_ctx.getIoCommon().toUpper(display_name);
     displayPromptMCI(PROMPT_OPTION_HEADER, display_name);
 
-    std::string view_name = "";
+    std::string view_name;
 
     switch (m_mod_toggle_view_index) {
         case VIEW_DEFAULT:
@@ -423,7 +423,7 @@ void ModMenuEditor::setupMenuOptionEditor() {
     // So we know when to pause in large listing, or use pagination.
     std::string menu_display_output = displayMenuOptionList();
 
-    if (m_menu_display_list.size() > 0) {
+    if (!m_menu_display_list.empty()) {
         // Clear Out list if anything already exists.
         std::vector<std::string>().swap(m_menu_display_list);
     }
@@ -447,7 +447,7 @@ void ModMenuEditor::setupMenuEditFields() {
     // So we know when to pause in large listing, or use pagination.
     std::string menu_display_output = displayMenuEditScreen();
 
-    if (m_menu_display_list.size() > 0) {
+    if (!m_menu_display_list.empty()) {
         // Clear Out list if anything already exists.
         std::vector<std::string>().swap(m_menu_display_list);
     }
@@ -470,7 +470,7 @@ void ModMenuEditor::setupMenuOptionEditFields() {
     // So we know when to pause in large listing, or use pagination.
     std::string menu_display_output = displayMenuOptionEditScreen();
 
-    if (m_menu_display_list.size() > 0) {
+    if (!m_menu_display_list.empty()) {
         // Clear Out list if anything already exists.
         std::vector<std::string>().swap(m_menu_display_list);
     }
@@ -578,7 +578,7 @@ void ModMenuEditor::displayCurrentEditPage(const std::string &input_state) {
  * @param input
  */
 void ModMenuEditor::menuEditorPausedInput(const std::string &input) {
-    std::string current_state_input = "";
+    std::string current_state_input;
     int current_module_input = 0;
 
     switch (m_mod_setup_index) {
@@ -870,7 +870,6 @@ void ModMenuEditor::menuEditorMenuFieldInput(const std::string &input) {
  * @param input
  */
 void ModMenuEditor::menuEditorMenuOptionFieldInput(const std::string &input) {
-
     if (input.empty()) {
         return;
     }
@@ -1691,7 +1690,7 @@ std::string ModMenuEditor::displayMenuList() {
             m_directory.getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
 
     // check result set, if no menu then return gracefully.
-    if (result_set.size() == 0) {
+    if (result_set.empty()) {
         m_log.log(Logging::LogLevel::Console, "No Menus .yaml files found", __FILE__, __LINE__);
         return "No Menu Files found!";
     }
@@ -1715,7 +1714,7 @@ std::string ModMenuEditor::displayMenuList() {
     // Vector or Menus, Loop through
     std::vector<std::string>::iterator i = result_set.begin();
     std::string menu_name;
-    std::string buffer = "";
+    std::string buffer;
 
     for (int rows = 0; rows < total_rows; rows++) {
         buffer += "   "; // 3 Leading spaces per row.
@@ -1838,7 +1837,7 @@ std::string ModMenuEditor::displayMenuOptionList() {
 
     // Vector or Menus, Loop through
     std::vector<std::string>::iterator i = result_set.begin();
-    std::string buffer = "";
+    std::string buffer;
 
     for (int rows = 0; rows < total_rows; rows++) {
         buffer += "  "; // 3 Leading spaces per row.
@@ -1897,7 +1896,7 @@ std::string ModMenuEditor::displayMenuEditScreen() {
     // Create Menu Pointer then load the menu into it.
     Menu current_menu;
 
-    if (m_loaded_menu.size() == 0) {
+    if (m_loaded_menu.empty()) {
         // First load the Source Menu [m_current_menu] file name
         MenuDao mnu_source(current_menu, m_current_menu, GLOBAL_MENU_PATH);
 
@@ -2037,12 +2036,21 @@ std::string ModMenuEditor::displayMenuOptionEditScreen() {
 
 /**
  * @brief Displays a generic Menu of the current Menu and Options
+ * Changes would all have to be saved for accurate preview?
  * @return
  */
 void ModMenuEditor::displayGenericMenu() {
-    MenuBase menu(m_ctx);
-    menu.importMenu(m_loaded_menu.back());
 
-    std::string generic_screen = menu.processGenericScreens();
-    baseProcessAndDeliver(generic_screen);
+    // In it's own Menu Instance
+    MenuBase menu(m_ctx);
+
+    // Jump to And Display Menu with Prompt to see full menu in action!
+    // Ignore First Command execution, as we only want to see the menu displayed!
+    menu.requestMenuJump(
+        m_loaded_menu.back().menu_name,
+        MenuBase::MenuJumpMode::SkipFirstCmd
+    );
+
+    //std::string generic_screen = menu.processGenericScreens();
+    //baseProcessAndDeliver(generic_screen);
 }

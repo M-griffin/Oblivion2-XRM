@@ -129,8 +129,6 @@ public:
 
     void requestMenuJump(const std::string &menu, MenuJumpMode mode);
 
-    void readInMenuData();
-
     std::string resolveFallbackMenu();
 
     std::string setupYesNoMenuInput(const std::string &menu_prompt, std::vector<CodeMapType> &code_map);
@@ -145,7 +143,11 @@ public:
 
     void prepareMenuState(MenuLoadReason reason);
 
-    void enterMenu(const std::string& menuName, MenuLoadReason reason, bool isExecuteFirstCmds);
+    void enterMenu(const std::string &menuName, MenuLoadReason reason, bool isExecuteFirstCmds);
+
+    bool handleSpecialPulldownModes();
+
+    void setupPulldownsAndLightbars(const std::string &raw_buffer, std::string &output);
 
     std::string parseMenuPromptString(const std::string &prompt_string);
 
@@ -156,10 +158,6 @@ public:
     std::string processMidGenericTemplate(const std::string &screen);
 
     std::string processGenericScreens();
-
-    void loadInMenu(std::string menu_name);
-
-    void importMenu(Menu &menu_info);
 
     std::string buildLightBars();
 
@@ -176,8 +174,6 @@ public:
     void moveToBottomAndDisplay(const std::string &prompt);
 
     std::string moveStringToBottom(const std::string &prompt);
-
-    void loadAndStartupMenu();
 
     void lightbarUpdate(unsigned int previous_pulldown_id);
 
