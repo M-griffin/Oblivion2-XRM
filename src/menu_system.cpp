@@ -25,7 +25,6 @@
 
 MenuSystem::MenuSystem(Context &ctx)
     : MenuBase(ctx)
-      , m_log(Logging::getInstance())
       , currentState(State::MenuSystem) {
     // Setup Menu Option Calls for executing menu commands.
     m_execute_callback.emplace_back(bind_member(this, menuOptionsCallback));
@@ -203,6 +202,29 @@ void MenuSystem::setState(State newState) {
     // currentState == State::MenuSystem
     currentState = newState;
     createHandlers.at(currentState)();
+}
+
+// New Manager Chained Execution Calls
+// Allow for Pauses, is more of a resueable script.
+ChainResult MenuSystem::executeChainedCommand(
+        const MenuOption &option,
+        CommandChainContext &ctx) {
+
+    if (option.command_key.size() != 2) {
+        return ChainResult::Continue;
+    }
+
+    char key = option.command_key[0];
+    auto it = m_menu_command_functions.find(key);
+
+    if (it == m_menu_command_functions.end()) {
+        return ChainResult::Continue;
+    }
+
+    return it->second(option)
+        ? ChainResult::Continue
+        : ChainResult::Continue;
+
 }
 
 /**

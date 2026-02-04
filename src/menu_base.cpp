@@ -22,9 +22,12 @@
 #include "io_encoding.hpp"
 #include "tcp_session.hpp"
 
+#include "menu_system.hpp"
+
 MenuBase::MenuBase(Context &ctx)
     : m_log(Logging::getInstance())
       , m_ctx(ctx)
+      , m_cmdChainExecutor(*static_cast<MenuSystem*>(this))
       , m_use_hotkey(false)
       , m_baseState(BaseState::MENU_INPUT)
       , m_active_pulldownID(0)
@@ -34,6 +37,13 @@ MenuBase::MenuBase(Context &ctx)
       , m_logoff(false)
       , m_is_active(false) {
     m_log.log(Logging::LogLevel::Console, "MenuBase()");
+
+#ifdef DEBUG_MENU_CHAIN
+#define CHAIN_TRACE(...) m_log.log(Logging::LogLevel::Info, __VA_ARGS__)
+#else
+#define CHAIN_TRACE(...)
+#endif
+
 }
 
 MenuBase::~MenuBase() {

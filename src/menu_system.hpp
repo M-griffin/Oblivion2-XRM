@@ -4,7 +4,6 @@
 #include <unordered_map>
 #include <functional>
 #include <string>
-#include <vector>
 #include <map>
 #include <optional>
 
@@ -58,8 +57,6 @@ public:
     bool onExit();
     bool pollTimers();
 
-    Logging &m_log;
-
     // handle to form interface.
     //form_manager_ptr          m_form_manager;
 
@@ -109,6 +106,10 @@ public:
 
     // Binding
     void bindStateHandlers();
+
+    ChainResult executeChainedCommand(
+        const MenuOption &option,
+        CommandChainContext &ctx);
 
     /**
      * @brief Control Commands

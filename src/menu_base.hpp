@@ -12,8 +12,11 @@
 #include "model-sys/menu_prompt.hpp"
 #include "model-sys/context.hpp"
 
+#include "command_chain_executor.hpp"
+
 class Context;
 class Logging;
+
 
 /**
  * @class MenuBase
@@ -25,7 +28,6 @@ class Logging;
 class MenuBase {
 public:
     explicit MenuBase(Context &ctx);
-
     ~MenuBase();
 
     enum class MenuLoadReason {
@@ -72,16 +74,16 @@ public:
         }
     }
 
+    struct FirstCmdState {
+        bool executed = false;
+    };
+
     struct ExecContext {
         std::deque<MenuOption> commandQueue; // chained commands
         std::string wildcardBuffer; // captured from *
         std::string lastInput; // for &
         bool executingChain = false;
         bool suppressPrompt = false;
-    };
-
-    struct FirstCmdState {
-        bool executed = false;
     };
 
     Logging &m_log;
@@ -91,8 +93,14 @@ public:
     FirstCmdState m_firstCmdState;
     bool m_suppressFirstCmdOnce = false;
 
+    // Old
     std::deque<std::string> m_menuStack;
 
+    // New
+protected:
+    CommandChainExecutor m_cmdChainExecutor;
+
+public:
     // Internal Menu and Prompt Holders
     Menu m_menu_info; // Menu Info
     MenuPrompt m_menu_prompt; // Menu Prompt
