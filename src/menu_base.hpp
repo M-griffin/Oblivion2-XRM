@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <optional>
 
 #include "directory.hpp"
 
@@ -12,7 +13,7 @@
 #include "model-sys/menu_prompt.hpp"
 #include "model-sys/context.hpp"
 
-#include "command_chain_executor.hpp"
+#include "menu_cmd_chain.hpp"
 
 class Context;
 class Logging;
@@ -86,6 +87,11 @@ public:
         bool suppressPrompt = false;
     };
 
+    // New
+    struct CommandChain {
+        std::vector<MenuOption> commands;
+    };
+
     Logging &m_log;
     Context &m_ctx;
     Directory m_directory;
@@ -97,6 +103,7 @@ public:
     std::deque<std::string> m_menuStack;
 
     // New
+    std::optional<CommandChain> m_firstCmdChain;
 protected:
     CommandChainExecutor m_cmdChainExecutor;
 
@@ -134,6 +141,8 @@ public:
     bool checkMenuAcsAccess(const Menu &menu);
 
     void buildMenuOptionsFromAcs();
+
+    void buildMenuFirstCmdOptionsFromAcs();
 
     void requestMenuJump(const std::string &menu, MenuJumpMode mode);
 

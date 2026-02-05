@@ -5,8 +5,15 @@
 #include <vector>
 
 #include "model-sys/menu.hpp"
+#include "logging.hpp"
 
 class MenuSystem;
+
+#ifdef DEBUG_MENU_CHAIN
+#define CHAIN_TRACE(...) Logging::getInstance().log(Logging::LogLevel::Info, __VA_ARGS__)
+#else
+#define CHAIN_TRACE(...)
+#endif
 
 enum class ChainResult {
     Continue,
@@ -32,7 +39,7 @@ public:
 
     void start(std::vector<MenuOption> chain);
 
-    void resultWithInput(const std::string &input);
+    void resumeWithInput(const std::string &input);
 
     [[nodiscard]]
     bool isActive() const;

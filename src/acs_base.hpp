@@ -7,22 +7,25 @@
 #include "io_session.hpp"
 #include "model-sys/structures.hpp"
 
+struct AcsCodeMapType;
+struct AcsNode;
 class Users;
 class AccessLevel;
 class Logging;
 
+
 /**
- * @class AccessCondition
+ * @class AcsBase
  * @author Michael Griffin
  * @date 17/03/2017
  * @file access_condition.hpp
  * @brief Access Condition System handles Security Level and Flags
  */
-class AccessCondition {
+class AcsBase {
 public:
-    explicit AccessCondition(IoSession &io);
+    explicit AcsBase(IoSession &io);
 
-    ~AccessCondition();
+    ~AcsBase();
 
     /**
      * @brief Toggle Bit Flag
@@ -82,21 +85,6 @@ public:
     void setAccessConditionsFlagsOff(std::string bitString, bool first_set, Users &user);
 
     /**
-     * @brief Parse Code Map and Test Security and AR Flags.
-     * @param code_map
-     * @param user
-     * @return
-     */
-    bool parseCodeMap(const std::vector<CodeMapType> &code_map, Users &user);
-
-    /**
-     * @brief Parse ASC Strings then test User Flags
-     * @param acs_string
-     * @return
-     */
-    std::vector<CodeMapType> parseAcsString(const std::string &acs_string);
-
-    /**
      * @brief Parses and Validates code map
      * @param acs_string
      * @param user
@@ -111,20 +99,16 @@ public:
      */
     std::string getAccessConditionFlagStringFromBits(int bits);
 
+    bool evalAcs(const AcsNode &node, Users &user);
+
+    int parseNumber(const std::string &s, size_t start = 1);
+
+    bool evalCondition(const AcsCodeMapType &cond, Users &user);
+
     // Using Session IO for Code Mapping
     Logging &m_log;
     IoSession &m_session_io;
 
-    // note update to security expressions
-    // start with NOT s255 then test for s255
-    // start with all not, but all normal will get caught and never pass through.
-    // separate expressions with | or. and ( )
-    const std::regex ACS_EXPRESSION
-    {
-        "([~]{1}[sS]{1}\\d{1,3})|([sS]{1}\\d{1,3})|"
-        "([~]{1}[fF]{1}[A-Z]{1})|([fF]{1}[A-Z]{1})|"
-        "([~]{1}[oO]{1}[A-Z]{1})|([oO]{1}[A-Z]{1})"
-    };
 };
 
 #endif

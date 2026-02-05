@@ -1,5 +1,7 @@
 #include "menu_base.hpp"
 
+#define DEBUG_MENU_CHAIN
+
 #include <locale>
 #include <string>
 #include <vector>
@@ -8,7 +10,7 @@
 #include <random>
 #include <cassert>
 
-#include "access_condition.hpp"
+#include "acs_base.hpp"
 #include "data-sys/yml_menu.hpp"
 #include "data-sys/yml_menu_prompt.hpp"
 #include "model-sys/config.hpp"
@@ -27,7 +29,7 @@
 MenuBase::MenuBase(Context &ctx)
     : m_log(Logging::getInstance())
       , m_ctx(ctx)
-      , m_cmdChainExecutor(*static_cast<MenuSystem*>(this))
+      , m_cmdChainExecutor(*static_cast<MenuSystem *>(this))
       , m_use_hotkey(false)
       , m_baseState(BaseState::MENU_INPUT)
       , m_active_pulldownID(0)
@@ -37,13 +39,6 @@ MenuBase::MenuBase(Context &ctx)
       , m_logoff(false)
       , m_is_active(false) {
     m_log.log(Logging::LogLevel::Console, "MenuBase()");
-
-#ifdef DEBUG_MENU_CHAIN
-#define CHAIN_TRACE(...) m_log.log(Logging::LogLevel::Info, __VA_ARGS__)
-#else
-#define CHAIN_TRACE(...)
-#endif
-
 }
 
 MenuBase::~MenuBase() {
@@ -79,7 +74,7 @@ void MenuBase::clearMenuPullDownOptions() {
  * @return
  */
 bool MenuBase::checkMenuAcsAccess(const Menu &menu) {
-    AccessCondition acs(m_ctx.getIoSession());
+    AcsBase acs(m_ctx.getIoSession());
     return acs.validateAcsString(
         menu.menu_acs_string,
         m_ctx.getUser()
@@ -94,7 +89,7 @@ void MenuBase::buildMenuOptionsFromAcs() {
     auto it = m_menu_info.menu_options.begin();
     auto end = m_menu_info.menu_options.end();
     std::vector<MenuOption> new_options;
-    AccessCondition acs(m_ctx.getIoSession());
+    AcsBase acs(m_ctx.getIoSession());
 
     for (; it != end; it++) {
         if (acs.validateAcsString(
@@ -102,6 +97,35 @@ void MenuBase::buildMenuOptionsFromAcs() {
             m_ctx.getUser())) {
             new_options.push_back(*it);
         }
+    }
+
+    // Swap Validated Options with Existing.
+    m_menu_info.menu_options.swap(new_options);
+
+    new_options.clear();
+    new_options.shrink_to_fit();
+}
+
+/**
+ * @brief Validates if user has access to FIRSTCMD menu options
+ * @return
+ */
+void MenuBase::buildMenuFirstCmdOptionsFromAcs() {
+    auto it = m_menu_info.menu_options.begin();
+    auto end = m_menu_info.menu_options.end();
+    std::vector<MenuOption> new_options;
+    AcsBase acs(m_ctx.getIoSession());
+
+    for (; it != end; it++) {
+        if ((*it).menu_key == "FIRSTCMD")
+            if (acs.validateAcsString(
+                (*it).acs_string,
+                m_ctx.getUser())) {
+                m_firstCmdChain.emplace();
+                m_firstCmdChain->commands.emplace_back(*it);
+
+                new_options.push_back(*it);
+            }
     }
 
     // Swap Validated Options with Existing.
@@ -568,6 +592,9 @@ void MenuBase::loadMenuDefinition(const std::string &menuName) {
         m_menu_info = candidate;
         buildMenuOptionsFromAcs();
 
+        // Setup First Commands for ChainExecution
+        buildMenuFirstCmdOptionsFromAcs();
+
         m_log.log(Logging::LogLevel::Info,
                   "Menu loaded successfully:", m_menu_info.menu_name);
 
@@ -629,6 +656,7 @@ void MenuBase::enterMenu(const std::string &menuName, MenuLoadReason reason, boo
         return;
     }
 
+    // Handle Menu Rendering Below Here, Pull Down And/Or Generic Templates.
     if (handleSpecialPulldownModes()) {
         return;
     }
@@ -642,13 +670,16 @@ void MenuBase::enterMenu(const std::string &menuName, MenuLoadReason reason, boo
     baseProcessAndDeliver(output);
 
     if (isExecuteFirstCmds && !m_suppressFirstCmdOnce) {
-        executeFirstCmds();
+        // executeFirstCmds(); {deprecated}
+        if (m_firstCmdChain) {
+            m_cmdChainExecutor.start(m_firstCmdChain->commands);
+        }
     }
     m_suppressFirstCmdOnce = false;
 }
 
 bool MenuBase::handleSpecialPulldownModes() {
-    // N = Yes / No prompt
+    // N = [Yes / No] lightbar prompt
     if (m_menu_info.menu_pulldown_file.size() == 1 &&
         toupper(m_menu_info.menu_pulldown_file[0]) == 'N') {
         baseProcessAndDeliver(
@@ -990,7 +1021,7 @@ void MenuBase::enqueueChainedCommands(const MenuOption &opt) {
 
 bool MenuBase::executeWithAcs(const MenuOption &opt) {
     m_log.log(Logging::LogLevel::Info, "MenuBase() - executeWithAcs");
-    AccessCondition acs(m_ctx.getIoSession());
+    AcsBase acs(m_ctx.getIoSession());
     if (!acs.validateAcsString(opt.acs_string, m_ctx.getUser())) {
         return false;
     }
@@ -1019,7 +1050,7 @@ void MenuBase::executeFirstCmds() {
             continue;
         }
 
-        AccessCondition acs(m_ctx.getIoSession());
+        AcsBase acs(m_ctx.getIoSession());
         if (!acs.validateAcsString(opt.acs_string, m_ctx.getUser())) {
             m_log.log(Logging::LogLevel::Info, "MenuBase() - executeFirstCmds !acs");
             continue;
@@ -1526,7 +1557,7 @@ bool MenuBase::processMenuOptions(const std::string &input) {
     }
 
     // For checking if the menu has changed from an executed option
-    std::string current_menu = m_current_menu;
+    std::string current_menu(m_current_menu);
 
     // For lightbar [ENTER] Selections, stuff with menu key for stacked commands
     // On light bars so any following menu options are executed in order.
@@ -1783,6 +1814,45 @@ void MenuBase::handleFieldInput(const std::string &character_buffer) {
 void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf8) {
     m_log.log(Logging::LogLevel::Info, "MenuBase() - menuInput=", character_buffer,
               "m_is_active_pulldown_menu=", m_is_active_pulldown_menu);
+
+    // Switch for Chained Input
+    if (m_cmdChainExecutor.isActive()) {
+        // On Expected Data only!!
+
+        // WIP TODO LEFT OFF
+        /*
+        // Get LineInput and wait for ENTER.
+        std::string key;
+        std::string result = m_ctx.getIoSession().getInputField(character_buffer, key, Config::sMenuPrompt_length);
+
+        // ESC was hit, make this just clear the input text, or start over!
+        if (result == "aborted") {
+            // No change on ESC or could cancel
+            m_cmdChainExecutor.resumeWithInput("");
+            return;
+        }
+
+        if (result.empty() || result[0] == '\n') {
+            // Key == 0 on [ENTER] pressed alone. then invalid!
+            // TODO, might have menu keys with ENTER, update this lateron!!
+            if (key.empty()) {
+                // Return and don't do anything.
+                return;
+            }
+
+            // On [ENTER] With Data
+            m_cmdChainExecutor.resumeWithInput(key);
+        } else {
+            // Send back the single input received to show client key presses.
+            // Only if return data shows a processed key returned.
+            if (result != "empty") {
+                std::string output = getDefaultInputColor();
+                output.append(result);
+                baseProcessAndDeliver(output);
+        }
+        */
+    }
+
 
     // If were in lightbar mode, then we are using hotkeys.
     if (m_is_active_pulldown_menu) {
