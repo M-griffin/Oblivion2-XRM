@@ -6,7 +6,7 @@
 
 #include <yaml-cpp/yaml.h>
 
-class Logging;
+class UtilLog;
 
 // Types for Text Prompt formatting to file.
 typedef std::pair<std::string, std::string> M_StringPair;
@@ -27,7 +27,7 @@ class TextPromptsDao {
 public:
     static const std::string FILE_VERSION;
 
-    Logging &m_log;
+    UtilLog &m_log;
     std::string m_path;
     std::string m_filename;
     bool m_is_loaded;

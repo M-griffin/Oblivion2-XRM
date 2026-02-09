@@ -8,7 +8,7 @@
 
 #include "model-sys/context.hpp"
 #include "mods/mod_prelogon.hpp"
-#include "logging.hpp"
+#include "util_log.hpp"
 #include "menu_system.hpp"
 
 class StateManager {
@@ -25,7 +25,7 @@ private:
     std::optional<MenuSystem> menuSystemState;
 
     State currentState;
-    DeadlineTimer m_inactivityTimer;
+    StateTimer m_inactivityTimer;
 
     // Type aliases
     using StateHandler = std::function<void()>;
@@ -59,7 +59,7 @@ public:
     void pollTimers();
 
     // Core members
-    Logging &m_log;
+    UtilLog &m_log;
     Context &m_ctx;
 
 private:

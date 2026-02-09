@@ -4,7 +4,7 @@
 #include <sqlite3.h>
 
 #include "../model-sys/grouping.hpp"
-#include "../logging.hpp"
+#include "../util_log.hpp"
 
 #include "libSqliteWrapped.h"
 
@@ -173,11 +173,11 @@ std::string GroupingDao::updateGroupingQryString(std::string qry, Grouping &obj)
  */
 std::vector<Grouping> GroupingDao::getAllGroupingsByConferenceId(long id) {
     std::vector<Grouping> list;
-    Logging &log = Logging::getInstance();
+    UtilLog &log = UtilLog::getInstance();
 
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected()) {
-        log.log(Logging::LogLevel::Info, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+        log.log(UtilLog::LogLevel::Info, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
         return list;
     }
 
@@ -185,7 +185,7 @@ std::vector<Grouping> GroupingDao::getAllGroupingsByConferenceId(long id) {
     Query qry(m_database);
 
     if (!qry.isConnected()) {
-        log.log(Logging::LogLevel::Info, m_strTableName, "Error, Query has no connection to the database", __LINE__,
+        log.log(UtilLog::LogLevel::Info, m_strTableName, "Error, Query has no connection to the database", __LINE__,
                                       __FILE__);
         return list;
     }
@@ -206,11 +206,11 @@ std::vector<Grouping> GroupingDao::getAllGroupingsByConferenceId(long id) {
                 list.push_back(group);
             }
         } else {
-            log.log(Logging::LogLevel::Info, m_strTableName, "Error, getAllGroupingsByConferenceId Returned Rows", rows,
+            log.log(UtilLog::LogLevel::Info, m_strTableName, "Error, getAllGroupingsByConferenceId Returned Rows", rows,
                                           __LINE__, __FILE__);
         }
     } else {
-        log.log(Logging::LogLevel::Info, m_strTableName, "Error, getResult()", __LINE__, __FILE__);
+        log.log(UtilLog::LogLevel::Info, m_strTableName, "Error, getResult()", __LINE__, __FILE__);
     }
 
     return list;

@@ -1,13 +1,13 @@
-#include "telnet_session.hpp"
+#include "tcp_telnet.hpp"
 #include "model-sys/telnet.hpp"
-#include "session_writer.hpp"
-#include "logging.hpp"
+#include "tcp_session_wrapper.hpp"
+#include "util_log.hpp"
 
 #include <sstream>
 #include <cstring>
 
-TelnetSession::TelnetSession(SessionWriter &writer)
-    : m_log(Logging::getInstance())
+TcpTelnet::TcpTelnet(TcpSessionWrapper &writer)
+    : m_log(UtilLog::getInstance())
       , m_sessionWrite(writer)
       , m_nawsRow(24)
       , m_nawsCol(80)
@@ -21,18 +21,18 @@ TelnetSession::TelnetSession(SessionWriter &writer)
       , m_teloptCommand(0)
       , m_currentOption(0)
       , m_subnegoOption(0) {
-    m_log.log(Logging::LogLevel::Console, "TelnetSession()");
+    m_log.log(UtilLog::LogLevel::Console, "TcpTelnet()");
     m_replySequence.clear();
     m_dataSequence.clear();
 }
 
-TelnetSession::~TelnetSession() {
-    m_log.log(Logging::LogLevel::Console, "~TelnetSession()");
+TcpTelnet::~TcpTelnet() {
+    m_log.log(UtilLog::LogLevel::Console, "~TcpTelnet()");
     m_replySequence.clear();
     m_dataSequence.clear();
 }
 
-void TelnetSession::sendIACSequences(Byte command, Byte option) {
+void TcpTelnet::sendIACSequences(Byte command, Byte option) {
     if (checkReply(option)) return;
     ByteBuffer buf = {IAC, command, option};
     m_sessionWrite.sendRaw(buf);
@@ -40,22 +40,22 @@ void TelnetSession::sendIACSequences(Byte command, Byte option) {
 }
 
 // Check if we already responded to this option
-bool TelnetSession::checkReply(Byte option) {
+bool TcpTelnet::checkReply(Byte option) {
     return m_replySequence.find(option) != m_replySequence.end();
 }
 
-void TelnetSession::addReply(Byte option) {
+void TcpTelnet::addReply(Byte option) {
     m_replySequence.insert(option);
 }
 
-int TelnetSession::getTermRows() const { return m_nawsRow; }
-int TelnetSession::getTermCols() const { return m_nawsCol; }
-void TelnetSession::setTermRows(int value) { m_nawsRow = value; }
-void TelnetSession::setTermCols(int value) { m_nawsCol = value; }
+int TcpTelnet::getTermRows() const { return m_nawsRow; }
+int TcpTelnet::getTermCols() const { return m_nawsCol; }
+void TcpTelnet::setTermRows(int value) { m_nawsRow = value; }
+void TcpTelnet::setTermCols(int value) { m_nawsCol = value; }
 
-std::string TelnetSession::getTermType() const { return m_termType; }
+std::string TcpTelnet::getTermType() const { return m_termType; }
 
-Byte TelnetSession::telnetOptionAcknowledge(Byte command) {
+Byte TcpTelnet::telnetOptionAcknowledge(Byte command) {
     switch (command) {
         case DO: return WILL;
         case DONT: return WONT;
@@ -65,7 +65,7 @@ Byte TelnetSession::telnetOptionAcknowledge(Byte command) {
     }
 }
 
-Byte TelnetSession::telnetOptionDeny(Byte command) {
+Byte TcpTelnet::telnetOptionDeny(Byte command) {
     switch (command) {
         case DO: return WONT;
         case DONT: return WONT;
@@ -76,7 +76,7 @@ Byte TelnetSession::telnetOptionDeny(Byte command) {
 }
 
 // ====================== Decode Subnegotiation ======================
-void TelnetSession::decodeSubnegotiationBuffer() {
+void TcpTelnet::decodeSubnegotiationBuffer() {
     switch (m_subnegoOption) {
         case TELOPT_NAWS:
             if (m_dataSequence.size() >= 4) {
@@ -84,10 +84,10 @@ void TelnetSession::decodeSubnegotiationBuffer() {
                 m_nawsRow = (uint16_t(m_dataSequence[2]) << 8) | uint16_t(m_dataSequence[3]);
                 m_isNawsDetected = true;
 
-                m_log.log(Logging::LogLevel::Debug,
+                m_log.log(UtilLog::LogLevel::Debug,
                           "NAWS detected: cols=%d, rows=%d", m_nawsCol, m_nawsRow);
             } else {
-                m_log.log(Logging::LogLevel::Warn,
+                m_log.log(UtilLog::LogLevel::Warn,
                           "NAWS subnegotiation too short, length=%zu", m_dataSequence.size());
             }
             break;
@@ -95,21 +95,21 @@ void TelnetSession::decodeSubnegotiationBuffer() {
         case TELOPT_TTYPE:
             if (!m_dataSequence.empty()) {
                 m_termType.assign(reinterpret_cast<const char *>(m_dataSequence.data()), m_dataSequence.size());
-                m_log.log(Logging::LogLevel::Debug,
+                m_log.log(UtilLog::LogLevel::Debug,
                           "Terminal type received: %s", m_termType.c_str());
             } else {
-                m_log.log(Logging::LogLevel::Warn,
+                m_log.log(UtilLog::LogLevel::Warn,
                           "TTYPE subnegotiation empty");
             }
             break;
 
         case TELOPT_NEW_ENVIRON:
-            m_log.log(Logging::LogLevel::Debug,
+            m_log.log(UtilLog::LogLevel::Debug,
                       "New ENVIRON subnegotiation received, length=%zu", m_dataSequence.size());
             break;
 
         default:
-            m_log.log(Logging::LogLevel::Info,
+            m_log.log(UtilLog::LogLevel::Info,
                       "Unhandled subnegotiation: option=%d, length=%zu", m_subnegoOption, m_dataSequence.size());
             break;
     }
@@ -119,47 +119,47 @@ void TelnetSession::decodeSubnegotiationBuffer() {
 }
 
 // ====================== Telnet Option Handlers ======================
-bool TelnetSession::isValidCommand(Byte command) {
+bool TcpTelnet::isValidCommand(Byte command) {
     return command == DO || command == DONT || command == WILL || command == WONT || command == SB;
 }
 
-void TelnetSession::handleDoDont(Byte command, Byte option) {
+void TcpTelnet::handleDoDont(Byte command, Byte option) {
     if (command == DO) {
-        m_log.log(Logging::LogLevel::Info, "DO received for option %d", option);
+        m_log.log(UtilLog::LogLevel::Info, "DO received for option %d", option);
         handleWillWont(WILL, option); // server WILL to comply
     } else if (command == DONT) {
-        m_log.log(Logging::LogLevel::Info, "DONT received for option %d", option);
+        m_log.log(UtilLog::LogLevel::Info, "DONT received for option %d", option);
         handleWillWont(WONT, option); // server WONT to comply
     } else if (command == WILL) {
-        m_log.log(Logging::LogLevel::Info, "WILL received for option %d", option);
+        m_log.log(UtilLog::LogLevel::Info, "WILL received for option %d", option);
         handleWillWont(WILL, option);
     } else if (command == WONT) {
-        m_log.log(Logging::LogLevel::Info, "WONT received for option %d", option);
+        m_log.log(UtilLog::LogLevel::Info, "WONT received for option %d", option);
         handleWillWont(WONT, option);
     }
 }
 
-void TelnetSession::handleWillWont(Byte command, Byte option) {
+void TcpTelnet::handleWillWont(Byte command, Byte option) {
     switch (option) {
         case TELOPT_NAWS:
             if (command == WILL) {
                 m_isNawsDetected = true;
-                m_log.log(Logging::LogLevel::Info,
+                m_log.log(UtilLog::LogLevel::Info,
                           "NAWS detected from client, accepting window size.");
                 sendIACSequences(DO, TELOPT_NAWS);
                 addReply(TELOPT_NAWS);
             } else if (command == WONT) {
                 m_isNawsDetected = false;
-                m_log.log(Logging::LogLevel::Info, "Client WONT NAWS");
+                m_log.log(UtilLog::LogLevel::Info, "Client WONT NAWS");
             }
             break;
 
         case TELOPT_TTYPE:
             if (command == WILL) {
-                m_log.log(Logging::LogLevel::Info, "TTYPE WILL received, sending request");
+                m_log.log(UtilLog::LogLevel::Info, "TTYPE WILL received, sending request");
                 sendTTYPERequest();
             } else if (command == WONT) {
-                m_log.log(Logging::LogLevel::Info, "Client WONT TTYPE");
+                m_log.log(UtilLog::LogLevel::Info, "Client WONT TTYPE");
             }
             break;
 
@@ -170,11 +170,11 @@ void TelnetSession::handleWillWont(Byte command, Byte option) {
             if (command == WILL) {
                 sendIACSequences(DO, option);
                 addReply(option);
-                m_log.log(Logging::LogLevel::Info, "Accepted WILL for option %d", option);
+                m_log.log(UtilLog::LogLevel::Info, "Accepted WILL for option %d", option);
             } else if (command == WONT) {
                 sendIACSequences(DONT, option);
                 addReply(option);
-                m_log.log(Logging::LogLevel::Info, "Client WONT option %d", option);
+                m_log.log(UtilLog::LogLevel::Info, "Client WONT option %d", option);
             }
             break;
 
@@ -182,16 +182,16 @@ void TelnetSession::handleWillWont(Byte command, Byte option) {
             // Reject unknown options
             if (command == WILL) {
                 sendIACSequences(DONT, option);
-                m_log.log(Logging::LogLevel::Info, "Rejected WILL option %d", option);
+                m_log.log(UtilLog::LogLevel::Info, "Rejected WILL option %d", option);
             } else if (command == WONT) {
                 sendIACSequences(DO, option);
-                m_log.log(Logging::LogLevel::Info, "Rejected WONT option %d", option);
+                m_log.log(UtilLog::LogLevel::Info, "Rejected WONT option %d", option);
             }
             break;
     }
 }
 
-void TelnetSession::handleSubnegotiation(Byte option, const ByteBuffer &data) {
+void TcpTelnet::handleSubnegotiation(Byte option, const ByteBuffer &data) {
     switch (option) {
         case TELOPT_NAWS:
             if (data.size() >= 4) {
@@ -199,10 +199,10 @@ void TelnetSession::handleSubnegotiation(Byte option, const ByteBuffer &data) {
                 int rows = (data[2] << 8) | data[3];
                 setTermCols(cols);
                 setTermRows(rows);
-                m_log.log(Logging::LogLevel::Info,
+                m_log.log(UtilLog::LogLevel::Info,
                           "NAWS received: cols=%d, rows=%d", cols, rows);
             } else {
-                m_log.log(Logging::LogLevel::Warn, "NAWS subnegotiation too short");
+                m_log.log(UtilLog::LogLevel::Warn, "NAWS subnegotiation too short");
             }
             break;
 
@@ -210,13 +210,13 @@ void TelnetSession::handleSubnegotiation(Byte option, const ByteBuffer &data) {
             if (!data.empty() && data[0] == TELQUAL_IS) {
                 std::string ttype(data.begin() + 1, data.end());
                 m_termType = ttype;
-                m_log.log(Logging::LogLevel::Info,
+                m_log.log(UtilLog::LogLevel::Info,
                           "TTYPE received: %s", ttype.c_str());
             }
             break;
 
         default:
-            m_log.log(Logging::LogLevel::Info,
+            m_log.log(UtilLog::LogLevel::Info,
                       "Unhandled subnegotiation for option %d, length %zu",
                       option, data.size());
             break;
@@ -224,13 +224,13 @@ void TelnetSession::handleSubnegotiation(Byte option, const ByteBuffer &data) {
 }
 
 // ====================== Requests ======================
-void TelnetSession::sendTTYPERequest() {
+void TcpTelnet::sendTTYPERequest() {
     ByteBuffer buf = {IAC, SB, TELOPT_TTYPE, TELQUAL_SEND, IAC, SE};
     m_sessionWrite.sendRaw(std::string(buf.begin(), buf.end()));
-    m_log.log(Logging::LogLevel::Info, "Sent TTYPE request to client");
+    m_log.log(UtilLog::LogLevel::Info, "Sent TTYPE request to client");
 }
 
-void TelnetSession::sendENVRequest() {
+void TcpTelnet::sendENVRequest() {
     if (checkReply(TELOPT_NEW_ENVIRON)) return;
 
     std::stringstream stm;
@@ -253,11 +253,11 @@ void TelnetSession::sendENVRequest() {
     m_sessionWrite.sendRaw(buf);
     addReply(TELOPT_NEW_ENVIRON);
 
-    m_log.log(Logging::LogLevel::Info, "Sent NEW_ENVIRON request");
+    m_log.log(UtilLog::LogLevel::Info, "Sent NEW_ENVIRON request");
 }
 
 // ====================== Main Parser ======================
-ByteBuffer TelnetSession::telnetOptionParse(Byte byte) {
+ByteBuffer TcpTelnet::telnetOptionParse(Byte byte) {
     ByteBuffer appBytes;
 
     switch (m_teloptStage) {
@@ -287,11 +287,11 @@ ByteBuffer TelnetSession::telnetOptionParse(Byte byte) {
                     break;
                 case SE:
                     // Unexpected SE
-                    m_log.log(Logging::LogLevel::Warn, "Unexpected IAC SE");
+                    m_log.log(UtilLog::LogLevel::Warn, "Unexpected IAC SE");
                     m_teloptStage = DATA;
                     break;
                 default:
-                    m_log.log(Logging::LogLevel::Info,
+                    m_log.log(UtilLog::LogLevel::Info,
                               "Received IAC unknown command: %d", byte);
                     m_teloptStage = DATA;
                     break;
@@ -307,7 +307,7 @@ ByteBuffer TelnetSession::telnetOptionParse(Byte byte) {
             m_currentOption = byte;
             m_dataSequence.clear();
             m_teloptStage = SB_DATA;
-            m_log.log(Logging::LogLevel::Info,
+            m_log.log(UtilLog::LogLevel::Info,
                       "Subnegotiation started for option %d", m_currentOption);
             break;
 
@@ -328,7 +328,7 @@ ByteBuffer TelnetSession::telnetOptionParse(Byte byte) {
                 m_dataSequence.push_back(IAC); // escaped IAC
                 m_teloptStage = SB_DATA;
             } else {
-                m_log.log(Logging::LogLevel::Warn,
+                m_log.log(UtilLog::LogLevel::Warn,
                           "Unexpected byte after IAC in SB: %d", byte);
                 m_teloptStage = DATA;
             }

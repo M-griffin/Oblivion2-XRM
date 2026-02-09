@@ -1,632 +1,332 @@
 /**
- *	Query.cpp
- *
- * Rewritten / author: 2016-02-19 / mrmisticismo@hotmail.com
- * Published / author: 2005-08-12 / grymse@alhem.net
- * Copyright (C) 2015-2019  Michael Griffin
+ * Refactoring / author: 2026-02-06 / mrmisticismo@hotmail.com
+ * Rewritten   / author: 2016-02-19 / mrmisticismo@hotmail.com
+ * Published   / author: 2005-08-12 / grymse@alhem.net
+ * Copyright (C) 2015-2026  Michael Griffin
  * Copyright (C) 2001-2006  Anders Hedstrom
  * This program is made available under the terms of the GNU GPL.
  */
 
-#ifdef _WIN32
-//#pragma warning(disable:4786)
-#endif
-
-#include <sqlite3.h>
+#include "../include/Query.h"
 
 #include <iostream>
+#include <sqlite3.h>
 #include <string>
-#include <map>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <exception>
+#include <memory>
 
-#include "../include/Database.h"
-#include "../include/Query.h"
-namespace SQLW
-{
-Query::Query(Database& dbin)
-    : m_db(dbin)
-    , odb(dbin.addDatabasePool())
-    , res(nullptr)
-    , row(false)
-    , rowcount(0)
-    , m_tmpstr("")
-    , m_last_query("")
-    , cache_rc(0)
-    , cache_rc_valid(false)
-    , m_row_count(0)
-    , m_num_cols(0)
-{
-}
-
-Query::Query(Database& dbin,const std::string& sql)
-    : m_db(dbin)
-    , odb(dbin.addDatabasePool())
-    , res(nullptr)
-    , row(false)
-    , rowcount(0)
-    , m_tmpstr("")
-    , m_last_query("")
-    , cache_rc(0)
-    , cache_rc_valid(false)
-    , m_row_count(0)
-    , m_num_cols(0)
-{
-    execute(sql);
-}
-
-
-Query::~Query()
-{
-    if(res)
-    {
-        //GetDatabase().error(*this, "sqlite3_finalize in destructor");
-        sqlite3_finalize(res);
+namespace SQLW {
+    Query::Query(Database &db, std::shared_ptr<SQLiteConnection> txnConn)
+        : m_db(db),
+          m_rowCount(0),
+          m_numCols(0),
+          m_rowValid(false) {
     }
 
-    res = nullptr;
-    row = false;
-    cache_rc_valid = false;
-
-    if(odb)
-    {
-        m_db.freeDatabasePool(odb);
+    Query::Query(Database &db, const std::string &sql)
+        : Query(db) {
+        getResult(sql);
     }
 
-    std::map<std::string, int>().swap(m_nmap);
-
-    /*
-    if(odb && res)
-    {
-        sqlite3_finalize(res);
-        res = nullptr;
-        row = false;
-        cache_rc_valid = false;
-    }
-    // clear column names
-    std::map<std::string, int>().swap(m_nmap);*/
-
-}
-
-Database& Query::getDatabase() const
-{
-    return m_db;
-}
-
-/*
-The sqlite3_finalize() routine deallocates a prepared SQL statement.
-All prepared statements must be finalized before the database can be closed.
-*/
-bool Query::execute(const std::string& sql)
-{
-    // query, no result
-    m_last_query = sql;
-
-    if(odb && res)
-    {
-        getDatabase().databaseError(*this, "execute: query busy");
+    Query::~Query() {
+        m_stmt.reset();
+        m_colMap.clear();
     }
 
-    if(odb && !res)
-    {
-        const char *s = nullptr;
-        int rc = sqlite3_prepare_v2(odb->db, sql.c_str(), sql.size(), &res, &s);
+    bool Query::isConnected() {
+        return m_db.connection() != nullptr;
+    }
 
-        if(rc != SQLITE_OK)
-        {
-            getDatabase().databaseError(*this, "execute: prepare query failed");
-            return false;
-        }
+    std::unique_ptr<PreparedStatement> Query::prepare(const std::string &sql) {
+        sqlite3 *db = m_txnConn
+                          ? m_txnConn->get()
+                          : m_db.connection();
 
-        if(!res)
-        {
-            getDatabase().databaseError(*this, "execute: query failed");
-            return false;
-        }
+        return std::make_unique<PreparedStatement>(db, sql);
+    }
 
-        rc = sqlite3_step(res); // execute
-        sqlite3_finalize(res);  // deallocate statement
-        res = nullptr;
+    bool Query::execute(const std::string &sql) {
+        m_lastQuery = sql;
 
-        switch(rc)
-        {
-            case SQLITE_BUSY:
-                getDatabase().databaseError(*this, "execute: database busy");
+        try {
+            m_stmt = prepare(sql);
+            int rc = m_stmt->step();
+            if (rc != SQLITE_DONE) {
+                queryError("execute failed");
                 return false;
-
-            case SQLITE_DONE:
-            case SQLITE_ROW:
-                return true;
-
-            case SQLITE_ERROR:
-                getDatabase().databaseError(*this, sqlite3_errmsg(odb->db));
-                return false;
-
-            case SQLITE_MISUSE:
-                getDatabase().databaseError(*this, "execute: database misuse");
-                return false;
-        }
-
-        getDatabase().databaseError(*this, "execute: unknown result code");
-    }
-
-    return false;
-}
-
-// methods using db specific api calls
-sqlite3_stmt *Query::getResult(const std::string& sql)
-{
-    // query, result
-    m_last_query = sql;
-
-    if(odb && res)
-    {
-        getDatabase().databaseError(*this, "get_result: query busy");
-    }
-
-    if(odb && !res)
-    {
-        const char *s = nullptr;
-        int rc = sqlite3_prepare_v2(odb->db, sql.c_str(), sql.size(), &res, &s);
-
-        if(rc != SQLITE_OK)
-        {
-            getDatabase().databaseError(*this, "get_result: prepare query failed");
-            return nullptr;
-        }
-
-        if(!res)
-        {
-            getDatabase().databaseError(*this, "get_result: query failed");
-            return nullptr;
-        }
-
-        // get column names from result
-        {
-            int i = 0;
-
-            // Don't require Free Result, do this automatically before running new queries!
-            std::map<std::string, int>().swap(m_nmap);
-
-            do
-            {
-                const char *p = sqlite3_column_name(res, i);
-
-                if(!p)
-                    break;
-
-                //m_nmap[p] = ++i;
-                m_nmap.insert(std::make_pair(p, ++i));
             }
-            while(true);
-
-            m_num_cols = i;
+            return true;
+        } catch (...) {
+            queryError("execute threw exception");
+            return false;
         }
-        cache_rc = sqlite3_step(res);
-        cache_rc_valid = true;
-        m_row_count = (cache_rc == SQLITE_ROW) ? 1 : 0;
     }
 
-    return res;
-}
+    bool Query::getResult(const std::string &sql) {
+        m_lastQuery = sql;
+        m_rowCount = 0;
+        m_rowValid = false;
 
-void Query::freeResult()
-{
-    if(odb && res)
-    {
-        sqlite3_finalize(res);
-    }
-
-    // Always reset anyways!
-    res = nullptr;
-    row = false;
-    cache_rc_valid = false;
-
-    std::map<std::string,int>().swap(m_nmap);
-}
-
-bool Query::fetchRow()
-{
-    rowcount = 0;
-    row = false;
-
-    if(odb && res)
-    {
-        int rc = cache_rc_valid ? cache_rc : sqlite3_step(res); // execute
-        cache_rc_valid = false;
-
-        switch(rc)
-        {
-            case SQLITE_BUSY:
-                getDatabase().databaseError(*this, "execute: database busy");
-                return false;
-
-            case SQLITE_DONE:
-                return false;
-
-            case SQLITE_ROW:
-                row = true;
-                return true;
-
-            case SQLITE_ERROR:
-                getDatabase().databaseError(*this, sqlite3_errmsg(odb -> db));
-                return false;
-
-            case SQLITE_MISUSE:
-                getDatabase().databaseError(*this, "execute: database misuse");
-                return false;
+        m_stmt = prepare(sql);
+        if (!m_stmt) {
+            queryError("step called on null statement");
+            return false;
         }
 
-        getDatabase().databaseError(*this, "execute: unknown result code");
-    }
+        int rc = m_stmt->step();
 
-    return false;
-}
+        // Build column map lazily if not done yet
+        if (m_colMap.empty()) {
+            int nCols = m_stmt->getNumColumns();
+            for (int i = 0; i < nCols; ++i) {
+                m_colMap[m_stmt->getColumnName(i)] = i;
+            }
+        }
 
-/*
- * Get the last Inserted Row ID for Primary Key Tables.
- */
-sqlite_int64 Query::getInsertId()
-{
-    if(odb)
-    {
-        return sqlite3_last_insert_rowid(odb->db);
-    }
-    else
-    {
-        return 0;
-    }
-}
-
-long Query::getNumRows()
-{
-    return odb && res ? m_row_count : 0;
-}
-
-int Query::getNumCols()
-{
-    return m_num_cols;
-}
-
-bool Query::isNull(int x)
-{
-    if(odb && res && row)
-    {
-        if(sqlite3_column_type(res, x) == SQLITE_NULL)
-        {
+        if (rc == SQLITE_ROW) {
+            m_rowValid = true;
+            m_rowCount = 1;
             return true;
         }
-    }
 
-    return false;
-}
-
-const char *Query::getString(const std::string& x)
-{
-    int index = m_nmap[x] - 1;
-
-    if(index >= 0)
-    {
-        return getString(index);
-    }
-
-    queryError("Column name lookup failure: " + x);
-    return "";
-}
-
-const char *Query::getString(int x)
-{
-    if(odb && res && row && x < sqlite3_column_count(res))
-    {
-        const unsigned char *tmp = sqlite3_column_text(res, x);
-        return tmp ? (const char *)tmp : "";
-    }
-
-    return "";
-}
-
-const char *Query::getString()
-{
-    return getString(rowcount++);
-}
-
-double Query::getNumber(const std::string& x)
-{
-    int index = m_nmap[x] - 1;
-
-    if(index >= 0)
-    {
-        return getNumber(index);
-    }
-
-    queryError("Column name lookup failure: " + x);
-    return 0;
-}
-
-double Query::getNumber(int x)
-{
-    if(odb && res && row)
-    {
-        return sqlite3_column_double(res, x);
-    }
-
-    return 0;
-}
-
-long Query::getValue(const std::string& x)
-{
-    int index = m_nmap[x] - 1;
-
-    if(index >= 0)
-    {
-        return getValue(index);
-    }
-
-    queryError("Column name lookup failure: " + x);
-    return 0;
-}
-
-long Query::getValue(int x)
-{
-    if(odb && res && row)
-    {
-        return sqlite3_column_int(res, x);
-    }
-
-    return 0;
-}
-
-double Query::getNumber()
-{
-    return getNumber(rowcount++);
-}
-
-
-long Query::getValue()
-{
-    return getValue(rowcount++);
-}
-
-
-unsigned long Query::getUnsignedValue(const std::string& x)
-{
-    int index = m_nmap[x] - 1;
-
-    if(index >= 0)
-    {
-        return getUnsignedValue(index);
-    }
-
-    queryError("Column name lookup failure: " + x);
-    return 0;
-}
-
-unsigned long Query::getUnsignedValue(int x)
-{
-    unsigned long l = 0;
-
-    if(odb && res && row)
-    {
-        l = sqlite3_column_int(res, x);
-    }
-
-    return l;
-}
-
-unsigned long Query::getUnsignedValue()
-{
-    return getUnsignedValue(rowcount++);
-}
-
-
-int64_t Query::getBigInt(const std::string& x)
-{
-    int index = m_nmap[x] - 1;
-
-    if(index >= 0)
-    {
-        return getBigInt(index);
-    }
-
-    queryError("Column name lookup failure: " + x);
-    return 0;
-}
-
-int64_t Query::getBigInt(int x)
-{
-    if(odb && res && row)
-    {
-        return sqlite3_column_int64(res, x);
-    }
-
-    return 0;
-}
-
-int64_t Query::getBigInt()
-{
-    return getBigInt(rowcount++);
-}
-
-uint64_t Query::getUnsignedBitInt(const std::string& x)
-{
-    int index = m_nmap[x] - 1;
-
-    if(index >= 0)
-    {
-        return getUnsignedBitInt(index);
-    }
-
-    queryError("Column name lookup failure: " + x);
-    return 0;
-}
-
-uint64_t Query::getUnsignedBitInt(int x)
-{
-    uint64_t l = 0;
-
-    if(odb && res && row)
-    {
-        l = sqlite3_column_int64(res, x);
-    }
-
-    return l;
-}
-
-uint64_t Query::getUnsignedBitInt()
-{
-    return getUnsignedBitInt(rowcount++);
-}
-
-double Query::exeGetResultDouble(const std::string& sql)
-{
-    double l = 0;
-
-    if(getResult(sql))
-    {
-        if(fetchRow())
-        {
-            l = getNumber();
+        if (rc == SQLITE_DONE) {
+            m_rowValid = false;
+            m_rowCount = 0;
+            return true;
         }
 
-        freeResult();
+        queryError("getResult failed");
+        return false;
     }
 
-    return l;
-}
+    bool Query::fetchRow() {
+        if (!m_stmt)
+            return false;
 
-long Query::exeGetResultLong(const std::string& sql)
-{
-    long l = 0;
+        int rc = m_stmt->step();
 
-    if(getResult(sql))
-    {
-        if(fetchRow())
-        {
-            l = getValue();
+        if (rc == SQLITE_ROW) {
+            m_rowValid = true;
+            ++m_rowCount;
+            return true;
         }
 
-        freeResult();
-    }
-
-    return l;
-}
-
-const char *Query::exeGetCharString(const std::string& sql)
-{
-    m_tmpstr = "";
-
-    if(getResult(sql))
-    {
-        if(fetchRow())
-        {
-            m_tmpstr = getString();
+        if (rc == SQLITE_DONE) {
+            m_rowValid = false;
+            return true;
         }
 
-        freeResult();
+        queryError("fetchRow failed");
+        m_rowValid = false;
+        return false;
     }
 
-    return m_tmpstr.c_str(); // %! changed from 1.0 which didn't return nullptr on failed query
-}
-
-const std::string& Query::getLastQuery()
-{
-    return m_last_query;
-}
-
-std::string Query::getError()
-{
-    if(odb)
-    {
-        return sqlite3_errmsg(odb->db);
+    void Query::buildColumnMap() {
+        if (!m_stmt) return;
+        m_colMap.clear();
+        m_numCols = m_stmt->getNumColumns();
+        for (int i = 0; i < m_numCols; ++i) {
+            m_colMap[m_stmt->getColumnName(i)] = i;
+        }
     }
 
-    return "";
-}
-
-int Query::getErrorCode()
-{
-    if(odb)
-    {
-        return sqlite3_errcode(odb->db);
+    const char *Query::getString(int index) {
+        return m_stmt ? m_stmt->getString(index) : "";
     }
 
-    return 0;
-}
-
-bool Query::isConnected()
-{
-    return odb ? true : false;
-}
-
-void Query::queryError(const std::string& msg)
-{
-    getDatabase().databaseError(*this, msg);
-}
-
-/**
- * Create a new Transaction
- */
-bool Query::executeTransaction(const std::vector<std::string> &statements)
-{
-    bool result = false;
-    char *errorMsg = 0;
-
-    if(!odb)
-    {
-        return result;
+    const char *Query::getString(const std::string &name) {
+        auto it = m_colMap.find(name);
+        return it != m_colMap.end() ? getString(it->second) : "";
     }
 
-    //Start a transaction with: sqlite3_exec(db, "BEGIN", 0, 0, 0);
-    int rc = sqlite3_exec(odb->db, "BEGIN;", 0, 0, 0);
-
-    if(rc != SQLITE_OK)
-    {
-        queryError("BEGIN Transaction Failed.");
-        // queryError("BEGIN Transaction Failed. ");
-        return result;
+    double Query::getNumber(int index) {
+        return m_stmt ? m_stmt->getNumber(index) : 0.0;
     }
 
-    for(std::string::size_type i = 0; i < statements.size(); i++)
-    {
-        // Execute Statement
-        rc = sqlite3_exec(odb->db, statements[i].c_str(), nullptr, 0, &errorMsg);
+    double Query::getNumber(const std::string &name) {
+        auto it = m_colMap.find(name);
+        return it != m_colMap.end() ? getNumber(it->second) : 0.0;
+    }
 
-        if(rc != SQLITE_OK)
-        {
-            queryError("Statement in Transaction Failed");
-            queryError(errorMsg);
+    long Query::getValue(int index) {
+        return m_stmt ? m_stmt->getValue(index) : 0;
+    }
 
-            sqlite3_free(errorMsg);
+    long Query::getValue(const std::string &name) {
+        auto it = m_colMap.find(name);
+        return it != m_colMap.end() ? getValue(it->second) : 0;
+    }
 
-            // rollback all update/insert to sqlite
-            rc = sqlite3_exec(odb->db, "ROLLBACK;", 0, 0, 0);
+    sqlite_int64 Query::getInsertId() const {
+        return sqlite3_last_insert_rowid(m_db.connection());
+    }
 
-            if(rc != SQLITE_OK)
-            {
-                queryError("Unable to Rollback Transaction.");
+    int Query::getNumCols() const {
+        return m_numCols;
+    }
+
+    long Query::getNumRows() const {
+        return m_rowCount;
+    }
+
+    bool Query::isNull(int index) {
+        return m_stmt ? m_stmt->isNull(index) : true;
+    }
+
+    bool Query::isNull(const std::string &name) {
+        if (!m_stmt) return true;
+        int idx = m_stmt->getColumnIndex(name);
+        return idx < 0 || m_stmt->isNull(idx);
+    }
+
+    const std::string &Query::getLastQuery() const {
+        return m_lastQuery;
+    }
+
+    std::string Query::getError() const {
+        return m_db.getError();
+    }
+
+    int Query::getErrorCode() const {
+        return m_db.getErrorCode();
+    }
+
+    void Query::queryError(const std::string &msg) {
+        if (m_db.m_errhandler) {
+            m_db.m_errhandler->databaseError(m_db, *this, msg);
+        }
+    }
+
+    bool Query::executeTransaction(const std::vector<std::string> &statements) {
+        if (statements.empty()) return true;
+
+        // Start transaction
+        std::unique_ptr<Transaction> transaction = m_db.beginTransaction();
+        if (!transaction) {
+            std::cout << "executeTransaction - Failed to begin transaction" << std::endl;
+            queryError("Failed to begin transaction");
+            return false;
+        }
+
+        try {
+            for (size_t i = 0; i < statements.size(); ++i) {
+                const auto &sql = statements[i];
+
+                // Prepare and execute statement in a local scope to ensure destruction
+                {
+                    std::unique_ptr<PreparedStatement> stmt = prepare(sql);
+                    if (!stmt) {
+                        queryError("Failed to prepare statement: " + sql +
+                                   " | SQLite error: " + m_db.getError());
+                        std::cout << "executeTransaction - Failed to prepare statement, msg: " << m_db.getError() <<
+                                std::endl;
+                        transaction->rollback();
+                        return false;
+                    }
+
+                    int rc = stmt->step();
+                    if (rc != SQLITE_DONE) {
+                        queryError("Failed to execute statement: " + sql +
+                                   " | rc=" + std::to_string(rc) +
+                                   " | SQLite error: " + m_db.getError());
+                        std::cout << "executeTransaction - Failed to execute statement:, msg: " << m_db.getError() <<
+                                std::endl;
+                        transaction->rollback();
+                        return false;
+                    }
+
+                    // stmt goes out of scope here, automatically finalized
+                }
             }
 
-
-            return result;
+            // Commit transaction after all statements succeed
+            transaction->commit();
+            return true;
+        } catch (const std::exception &e) {
+            queryError(std::string("Transaction exception: ") + e.what());
+            std::cout << "executeTransaction - Transaction exception:, msg: " << e.what() << std::endl;
+            transaction->rollback();
+            return false;
+        } catch (...) {
+            queryError("Unknown exception in executeTransaction");
+            std::cout << "executeTransaction - Unknown exception:, msg: " << std::endl;
+            transaction->rollback();
+            return false;
         }
     }
 
-    //Commit a transaction with: sqlite3_exec(db, "COMMIT", 0, 0, 0);
-    rc = sqlite3_exec(odb->db, "COMMIT;", 0, 0, 0);
 
-    if(rc != SQLITE_OK)
-    {
-        queryError("COMMIT Transaction Failed.");
-        return result;
-    }
-    else
-    {
-        result = true;
+    /* ================= FIELD VALUE EXTRACTION ================= */
+
+    void Query::getFieldValue(uint32_t &v, int index) {
+        v = static_cast<uint32_t>(sqlite3_column_int(m_stmt->stmt(), index));
     }
 
-    return result;
-}
+    void Query::getFieldValue(int &v, int index) {
+        v = sqlite3_column_int(m_stmt->stmt(), index);
+    }
 
+    void Query::getFieldValue(long &v, int index) {
+        v = static_cast<long>(sqlite3_column_int64(m_stmt->stmt(), index));
+    }
+
+    void Query::getFieldValue(long long &v, int index) {
+        v = sqlite3_column_int64(m_stmt->stmt(), index);
+    }
+
+    void Query::getFieldValue(double &v, int index) {
+        v = sqlite3_column_double(m_stmt->stmt(), index);
+    }
+
+    void Query::getFieldValue(float &v, int index) {
+        v = static_cast<float>(sqlite3_column_double(m_stmt->stmt(), index));
+    }
+
+    void Query::getFieldValue(long double &v, int index) {
+        v = static_cast<long double>(sqlite3_column_double(m_stmt->stmt(), index));
+    }
+
+    void Query::getFieldValue(std::string &v, int index) {
+        const char *txt =
+                reinterpret_cast<const char *>(sqlite3_column_text(m_stmt->stmt(), index));
+        v = txt ? txt : "";
+    }
+
+    void Query::getFieldValue(char &v, int index) {
+        const char *txt =
+                reinterpret_cast<const char *>(sqlite3_column_text(m_stmt->stmt(), index));
+        v = (txt && *txt) ? txt[0] : '\0';
+    }
+
+    const char *Query::getFieldValue(char *, int index) {
+        return reinterpret_cast<const char *>(
+            sqlite3_column_text(m_stmt->stmt(), index));
+    }
+
+    void Query::getFieldValue(bool &v, int index) {
+        v = sqlite3_column_int(m_stmt->stmt(), index) != 0;
+    }
+
+    void Query::getFieldValue(std::vector<std::uint8_t> &out, int index) {
+        const void *data = sqlite3_column_blob(m_stmt->stmt(), index);
+        int size = sqlite3_column_bytes(m_stmt->stmt(), index);
+
+        out.clear();
+        if (data && size > 0) {
+            const std::uint8_t *ptr = static_cast<const std::uint8_t *>(data);
+            out.assign(ptr, ptr + size);
+        }
+    }
+
+    /* ================= FIELD TYPE TRANSLATION ================= */
+
+    std::string Query::getFieldType(float &) { return "%f"; }
+    std::string Query::getFieldType(double &) { return "%f"; }
+    std::string Query::getFieldType(long long &) { return "%llu"; }
+    std::string Query::getFieldType(char &) { return "%Q"; }
+    std::string Query::getFieldType(bool &) { return "%d"; }
+    std::string Query::getFieldType(char *) { return "%Q"; }
+    std::string Query::getFieldType(std::string &) { return "%Q"; }
+    std::string Query::getFieldType(long &) { return "%ld"; }
+    std::string Query::getFieldType(int &) { return "%d"; }
+    std::string Query::getFieldType(uint32_t &) { return "%d"; }
 } // namespace SQLW

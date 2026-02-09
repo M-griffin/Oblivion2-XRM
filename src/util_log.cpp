@@ -1,4 +1,4 @@
-#include "logging.hpp"
+#include "util_log.hpp"
 
 #include <iostream>
 #include <chrono>
@@ -8,19 +8,19 @@
 
 thread_local uint32_t local_node_number = 0;
 
-Logging& Logging::getInstance() {
-    static Logging instance;
+UtilLog& UtilLog::getInstance() {
+    static UtilLog instance;
     return instance;
 }
 
-Logging::Logging()
+UtilLog::UtilLog()
     : m_logLevel(LogLevel::Info) {}
 
-void Logging::setLogLevel(LogLevel level) {
+void UtilLog::setLogLevel(LogLevel level) {
     m_logLevel = level;
 }
 
-void Logging::setLogLevelFromString(const std::string& level) {
+void UtilLog::setLogLevelFromString(const std::string& level) {
     if (level == "DEBUG") m_logLevel = LogLevel::Debug;
     else if (level == "INFO") m_logLevel = LogLevel::Info;
     else if (level == "WARN") m_logLevel = LogLevel::Warn;
@@ -31,11 +31,11 @@ void Logging::setLogLevelFromString(const std::string& level) {
     else m_logLevel = LogLevel::Info;
 }
 
-void Logging::setNode(uint32_t node) {
+void UtilLog::setNode(uint32_t node) {
     local_node_number = node;
 }
 
-void Logging::append(std::ostringstream& oss,
+void UtilLog::append(std::ostringstream& oss,
                      const std::vector<uint8_t>& data) const {
     oss << "[";
     for (size_t i = 0; i < data.size(); ++i) {
@@ -48,14 +48,14 @@ void Logging::append(std::ostringstream& oss,
     oss << std::dec;
 }
 
-bool Logging::shouldLog(LogLevel level) const {
+bool UtilLog::shouldLog(LogLevel level) const {
     if (m_logLevel == LogLevel::All)
         return true;
 
     return static_cast<uint8_t>(level) >= static_cast<uint8_t>(m_logLevel);
 }
 
-const char* Logging::levelToString(LogLevel level) const {
+const char* UtilLog::levelToString(LogLevel level) const {
     switch (level) {
         case LogLevel::Debug:   return "Debug";
         case LogLevel::Info:    return "Info";
@@ -67,7 +67,7 @@ const char* Logging::levelToString(LogLevel level) const {
     }
 }
 
-std::string Logging::currentDateTimeMillis() const {
+std::string UtilLog::currentDateTimeMillis() const {
     using namespace std::chrono;
 
     auto now = system_clock::now();
@@ -92,7 +92,7 @@ std::string Logging::currentDateTimeMillis() const {
     return oss.str();
 }
 
-void Logging::write(const std::string& message) const {
+void UtilLog::write(const std::string& message) const {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     if (local_node_number > 0)

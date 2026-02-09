@@ -4,7 +4,7 @@
 #include <sqlite3.h>
 
 #include "../model-sys/message_area.hpp"
-#include "../logging.hpp"
+#include "../util_log.hpp"
 
 #include "libSqliteWrapped.h"
 
@@ -227,12 +227,12 @@ std::string MessageAreaDao::updateMessageAreaQryString(std::string qry, MessageA
  * @return
  */
 std::vector<MessageArea> MessageAreaDao::getAllMessageAreasByConference(long id) {
-    Logging &log = Logging::getInstance();
+    UtilLog &log = UtilLog::getInstance();
     std::vector<MessageArea> list;
 
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected()) {
-        log.log(Logging::LogLevel::Info, "Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
+        log.log(UtilLog::LogLevel::Info, "Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
         return list;
     }
 
@@ -240,7 +240,7 @@ std::vector<MessageArea> MessageAreaDao::getAllMessageAreasByConference(long id)
     Query qry(m_database);
 
     if (!qry.isConnected()) {
-        log.log(Logging::LogLevel::Info, "Error, Query has no connection to the database", m_strTableName, __FILE__,
+        log.log(UtilLog::LogLevel::Info, "Error, Query has no connection to the database", m_strTableName, __FILE__,
                                       __LINE__);
         return list;
     }
@@ -263,11 +263,11 @@ std::vector<MessageArea> MessageAreaDao::getAllMessageAreasByConference(long id)
                 list.push_back(area);
             }
         } else {
-            log.log(Logging::LogLevel::Info, "Error, getAllMessageAreasByConference Returned Rows", rows, m_strTableName,
+            log.log(UtilLog::LogLevel::Info, "Error, getAllMessageAreasByConference Returned Rows", rows, m_strTableName,
                                           __FILE__, __LINE__);
         }
     } else {
-        log.log(Logging::LogLevel::Info, "Error, getResult()", m_strTableName, __FILE__, __LINE__);
+        log.log(UtilLog::LogLevel::Info, "Error, getResult()", m_strTableName, __FILE__, __LINE__);
     }
 
     return list;

@@ -16,7 +16,7 @@
 #include "mods/mod_menu_editor.hpp"
 
 class Context;
-class Logging;
+class UtilLog;
 
 /**
  * @class MenuSystem

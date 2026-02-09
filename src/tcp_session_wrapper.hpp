@@ -3,20 +3,20 @@
 
 #include <string>
 
-#include "socket_service.hpp"
+#include "tcp_socket_base.hpp"
 #include "io_encoding.hpp"
 
-class SessionWriter {
+class TcpSessionWrapper {
 
-    SocketService &m_socketService;
+    TcpSocketBase &m_socketBase;
 
     bool m_is_authorized;
     bool m_use_ansi;
     IoEncoding::TextEncoding m_encoding = IoEncoding::TextEncoding::CP437;
 
 public:
-    explicit SessionWriter(SocketService &s)
-        : m_socketService(s)
+    explicit TcpSessionWrapper(TcpSocketBase &s)
+        : m_socketBase(s)
         , m_is_authorized(false)
         , m_use_ansi(false) {
     }
@@ -25,11 +25,11 @@ public:
         if (m_encoding == IoEncoding::TextEncoding::CP437) {
             const IoEncoding encode;
             const std::string result = encode.utf8Decode(v);
-            m_socketService.send(result, isDisconnected);
+            m_socketBase.send(result, isDisconnected);
             return;
         }
 
-        m_socketService.send(v, isDisconnected);
+        m_socketBase.send(v, isDisconnected);
     }
 
     void send(const ByteBuffer &v, const bool isDisconnected = false) {
@@ -37,20 +37,21 @@ public:
             const IoEncoding encode;
             std::string buffer = std::string(buffer.begin(), buffer.end());;
             const std::string result = encode.utf8Decode(buffer);
-            m_socketService.send(result, isDisconnected);
+            m_socketBase.send(result, isDisconnected);
             return;
         }
-        m_socketService.send(v, isDisconnected);
+        m_socketBase.send(v, isDisconnected);
     }
 
     void sendRaw(const std::string &v, const bool isDisconnected = false) {
-        m_socketService.send(v, isDisconnected);
+        m_socketBase.send(v, isDisconnected);
     }
 
     void sendRaw(const ByteBuffer &v, const bool isDisconnected = false) {
-        m_socketService.send(v, isDisconnected);
+        m_socketBase.send(v, isDisconnected);
     }
 
+    [[nodiscard]]
     bool isAnsi() const {
         return m_use_ansi;
     }
@@ -59,6 +60,7 @@ public:
         m_use_ansi = use_ansi;
     }
 
+    [[nodiscard]]
     IoEncoding::TextEncoding getEncoding() const {
         return m_encoding;
     }
@@ -67,14 +69,16 @@ public:
         m_encoding = value;
     }
 
+    [[nodiscard]]
     int getNodeNumber() const {
-        return m_socketService.getNodeNumber();
+        return m_socketBase.getNodeNumber();
     }
 
     void hangup() {
-        m_socketService.hangup();
+        m_socketBase.hangup();
     }
 
+    [[nodiscard]]
     bool isAuthorized() const {
         return m_is_authorized;
     }
@@ -84,7 +88,7 @@ public:
     }
 
     bool isActive() {
-        return m_socketService.isActive();
+        return m_socketBase.isActive();
     }
 
 };

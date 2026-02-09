@@ -23,20 +23,7 @@ public:
     explicit MessageAreaDao(Database &database)
         : baseMessageAreaClass(database) {
         // Setup Table name
-        m_strTableName = "messagearea";
-
-        /**
-         * Pre Populate Static Queries one Time
-         */
-        m_cmdFirstTimeSetup =
-                "PRAGMA synchronous=Normal; "
-                "PRAGMA encoding=UTF-8; "
-                "PRAGMA foreign_keys=ON; "
-                "PRAGMA default_cache_size=10000; "
-                "PRAGMA cache_size=10000; "
-                "PRAGMA journal_mode = WAL; "
-                "PRAGMA temp_store = MEMORY; "
-                "PRAGMA mmap_size = 268435456; ";
+        m_strTableName = "MessageArea";
 
         // Check if Database Exists.
         m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName +

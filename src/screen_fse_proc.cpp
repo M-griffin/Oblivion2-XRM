@@ -16,7 +16,7 @@
 #include "model-sys/screen_pixel.hpp"
 
 #include "io_common.hpp"
-#include "logging.hpp"
+#include "util_log.hpp"
 
 #include <utf8.h>
 
@@ -25,12 +25,12 @@ ScreenFseProc::ScreenFseProc(int term_height, int term_width)
       , m_tab_width(4)
       , m_line_number(1)
       , m_is_double_backspace(false) {
-    m_log.log(Logging::LogLevel::Debug, "PROCESSOR_TEXT rows=", term_height, "cols=", term_width);
+    m_log.log(UtilLog::LogLevel::Debug, "PROCESSOR_TEXT rows=", term_height, "cols=", term_width);
     m_screen_buffer.resize((m_number_lines * m_characters_per_line) + 1);
 }
 
 ScreenFseProc::~ScreenFseProc() {
-    m_log.log(Logging::LogLevel::Console, "~ScreenFseProc()");
+    m_log.log(UtilLog::LogLevel::Console, "~ScreenFseProc()");
     m_screen_buffer.clear();
     m_pull_down_options.clear();
     m_line_ending_map.clear();
@@ -340,7 +340,7 @@ std::string ScreenFseProc::screenBufferParse() {
             // Avoid Infinite loop and make sure the existing
             // is not the same as the next!
             if (start == matches[0].second) {
-                m_log.log(Logging::LogLevel::Debug, "[screenBufferParse] no matches!", __LINE__, __FILE__);
+                m_log.log(UtilLog::LogLevel::Debug, "[screenBufferParse] no matches!", __LINE__, __FILE__);
                 break;
             }
 
@@ -369,7 +369,7 @@ std::string ScreenFseProc::screenBufferParse() {
             }
         }
     } catch (std::regex_error &ex) {
-        m_log.log(Logging::LogLevel::Error, "[screenBufferParse] regex=", ex.what(), ex.code(), __LINE__, __FILE__);
+        m_log.log(UtilLog::LogLevel::Error, "[screenBufferParse] regex=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
     // All Global MCI Codes likes standard screens and colors will
@@ -527,11 +527,11 @@ void ScreenFseProc::screenBufferSetGlyph(const std::string &char_sequence) {
             std::cout << "Screen Buffer RB: " << m_screen_buffer[m_position].char_sequence << ", current screen: " <<
                     screenBufferToString() << std::endl;
         } else {
-            m_log.log(Logging::LogLevel::Error, "[screenBufferSetGlyph] out of bounds pos=",
+            m_log.log(UtilLog::LogLevel::Error, "[screenBufferSetGlyph] out of bounds pos=",
                                             m_x_position - 1, __LINE__, __FILE__);
         }
     } catch (std::exception &e) {
-        m_log.log(Logging::LogLevel::Error, "[screenBufferSetGlyph] exceeds screen dimensions Exception=", e.what(),
+        m_log.log(UtilLog::LogLevel::Error, "[screenBufferSetGlyph] exceeds screen dimensions Exception=", e.what(),
                                         __LINE__, __FILE__);
     }
 }
@@ -564,7 +564,7 @@ void ScreenFseProc::screenBufferClearRange(int start, int end) {
         try {
             m_screen_buffer[i].char_sequence = '\0';
         } catch (std::exception &e) {
-            m_log.log(Logging::LogLevel::Error, "[screenBufferClearRange] Exception=", e.what(),
+            m_log.log(UtilLog::LogLevel::Error, "[screenBufferClearRange] Exception=", e.what(),
                                             "start=", start, "end=", end, __LINE__, __FILE__);
         }
     }

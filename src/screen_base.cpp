@@ -1,6 +1,6 @@
 #include "screen_base.hpp"
 
-#include "logging.hpp"
+#include "util_log.hpp"
 
 /**
  * @brief ProcessorBase Constructor
@@ -9,7 +9,7 @@
  * @return
  */
 ScreenBase::ScreenBase(const int term_height, const int term_width)
-    : m_log(Logging::getInstance())
+    : m_log(UtilLog::getInstance())
       , m_is_screen_cleared(false)
       , m_is_line_wrapping(false)
       , m_position(0)

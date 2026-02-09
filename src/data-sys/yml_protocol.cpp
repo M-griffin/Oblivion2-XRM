@@ -7,7 +7,7 @@
 #include <cassert>
 
 #include "../model-sys/protocol.hpp"
-#include "../logging.hpp"
+#include "../util_log.hpp"
 
 // Setup the file version for the file.
 const std::string Protocols::FILE_VERSION = "1.0.0";
@@ -57,7 +57,7 @@ bool ProtocolDao::fileExists() {
  * @return
  */
 bool ProtocolDao::saveConfig(const Protocols &prot) {
-    Logging &log = Logging::getInstance();
+    UtilLog &log = UtilLog::getInstance();
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
@@ -95,7 +95,7 @@ bool ProtocolDao::saveConfig(const Protocols &prot) {
     std::ofstream ofs(path);
 
     if (!ofs.is_open()) {
-        log.log(Logging::LogLevel::Info, "Error, unable to write to=", path, __LINE__, __FILE__);
+        log.log(UtilLog::LogLevel::Info, "Error, unable to write to=", path, __LINE__, __FILE__);
         return false;
     }
 
@@ -129,7 +129,7 @@ void ProtocolDao::encode(const Protocols &rhs) {
  * @return
  */
 bool ProtocolDao::loadConfig() {
-    Logging &log = Logging::getInstance();
+    UtilLog &log = UtilLog::getInstance();
     std::string path = m_path;
     pathSeperator(path);
     path.append(m_filename);
@@ -150,10 +150,10 @@ bool ProtocolDao::loadConfig() {
         std::string file_version = node["file_version"].as<std::string>();
 
         // Validate File Version
-        log.log(Logging::LogLevel::Console, "Protocols File Version=", file_version);
+        log.log(UtilLog::LogLevel::Console, "Protocols File Version=", file_version);
 
         if (file_version != Protocols::FILE_VERSION) {
-            log.log(Logging::LogLevel::Info, "Protocols File Version=", file_version, "Expected=", Protocols::FILE_VERSION,
+            log.log(UtilLog::LogLevel::Info, "Protocols File Version=", file_version, "Expected=", Protocols::FILE_VERSION,
                                           __LINE__, __FILE__);
             return false;
         }
@@ -164,11 +164,11 @@ bool ProtocolDao::loadConfig() {
         // Moves the Loaded config to m_config shared pointer.
         encode(prot);
     } catch (YAML::Exception &ex) {
-        log.log(Logging::LogLevel::Info, "YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
+        log.log(UtilLog::LogLevel::Info, "YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
         return (false);
     }
     catch (std::exception &ex) {
-        log.log(Logging::LogLevel::Info, "Unexpected YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
+        log.log(UtilLog::LogLevel::Info, "Unexpected YAML::LoadFile(protocols.yaml)", ex.what(), __LINE__, __FILE__);
         return (false);
     }
 

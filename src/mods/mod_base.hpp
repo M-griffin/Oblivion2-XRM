@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "../logging.hpp"
+#include "../util_log.hpp"
 
 #include "../model-sys/context.hpp"
 #include "../data-sys/yml_text_prompts.hpp"
@@ -20,7 +20,7 @@
 class ModBase {
 
 public:
-    Logging &m_log;
+    UtilLog &m_log;
     Context &m_ctx;
     std::string m_filename;
     bool m_is_active;

@@ -4,16 +4,16 @@
 #include <chrono>
 #include <functional>
 
-class DeadlineTimer {
+class StateTimer {
 public:
-    DeadlineTimer()
+    StateTimer()
         : m_delay(std::chrono::milliseconds(0))
           , m_callbackMethod(nullptr)
           , m_start(std::chrono::steady_clock::now())
           , m_triggered(false) {
     }
 
-    DeadlineTimer(const std::chrono::milliseconds delay, const std::function<void()> &callbackMethod)
+    StateTimer(const std::chrono::milliseconds delay, const std::function<void()> &callbackMethod)
         : m_delay(delay)
           , m_callbackMethod(callbackMethod)
           , m_start(std::chrono::steady_clock::now())

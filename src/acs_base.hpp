@@ -2,29 +2,26 @@
 #define ACCESS_CONDITION_HPP
 
 #include <string>
-#include <vector>
 
 #include "io_session.hpp"
-#include "model-sys/structures.hpp"
 
 struct AcsCodeMapType;
 struct AcsNode;
 class Users;
 class AccessLevel;
-class Logging;
+class UtilLog;
 
 
 /**
  * @class AcsBase
  * @author Michael Griffin
  * @date 17/03/2017
- * @file access_condition.hpp
+ * @file acs_base.hpp
  * @brief Access Condition System handles Security Level and Flags
  */
 class AcsBase {
 public:
-    explicit AcsBase(IoSession &io);
-
+    explicit AcsBase();
     ~AcsBase();
 
     /**
@@ -66,7 +63,7 @@ public:
      * @param user
      * @return
      */
-    bool checkAccessConditionFlag(unsigned char flag, bool first_set, Users &user);
+    bool checkAcsFlag(unsigned char flag, bool first_set, Users &user);
 
     /**
      * @brief Sets a Default String of Bit flags On
@@ -74,7 +71,7 @@ public:
      * @param first_set
      * @param user
      */
-    void setAccessConditionsFlagsOn(std::string bitString, bool first_set, Users &user);
+    void setAcsFlagsOn(const std::string& bitString, bool first_set, Users &user);
 
     /**
      * @brief Sets a Default String of Bit flags Off
@@ -82,7 +79,7 @@ public:
      * @param first_set
      * @param user
      */
-    void setAccessConditionsFlagsOff(std::string bitString, bool first_set, Users &user);
+    void setAcsFlagsOff(const std::string& bitString, bool first_set, Users &user);
 
     /**
      * @brief Parses and Validates code map
@@ -97,7 +94,7 @@ public:
      * @param bits
      * @return
      */
-    std::string getAccessConditionFlagStringFromBits(int bits);
+    std::string getAcsFlagsFromBits(int bits);
 
     bool evalAcs(const AcsNode &node, Users &user);
 
@@ -106,8 +103,7 @@ public:
     bool evalCondition(const AcsCodeMapType &cond, Users &user);
 
     // Using Session IO for Code Mapping
-    Logging &m_log;
-    IoSession &m_session_io;
+    UtilLog &m_log;
 
 };
 

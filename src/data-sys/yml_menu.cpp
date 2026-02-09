@@ -7,13 +7,13 @@
 #include <cassert>
 
 #include "../model-sys/menu.hpp"
-#include "../logging.hpp"
+#include "../util_log.hpp"
 
 // Setup the file version for the config file.
 const std::string Menu::FILE_VERSION = "1.0.1";
 
 MenuDao::MenuDao(Menu &menu, const std::string &menu_name, const std::string &path)
-    : m_log(Logging::getInstance())
+    : m_log(UtilLog::getInstance())
       , m_menu(menu)
       , m_path(path)
       , m_filename(menu_name) {
@@ -106,7 +106,7 @@ bool MenuDao::saveMenu(Menu &menu) {
     std::ofstream ofs(path);
 
     if (!ofs.is_open()) {
-        m_log.log(Logging::LogLevel::Error, "Error, unable to write to", path);
+        m_log.log(UtilLog::LogLevel::Error, "Error, unable to write to", path);
         return false;
     }
 
@@ -128,7 +128,7 @@ bool MenuDao::deleteMenu() {
     path.append(".yaml");
 
     if (std::remove(path.c_str()) != 0) {
-        m_log.log(Logging::LogLevel::Error, "Error, removing menu file", path);
+        m_log.log(UtilLog::LogLevel::Error, "Error, removing menu file", path);
         return false;
     }
 
@@ -187,10 +187,10 @@ bool MenuDao::loadMenu() {
         std::string file_version = node["file_version"].as<std::string>();
 
         // Validate File Version
-        m_log.log(Logging::LogLevel::Debug, "Menu File Version", file_version);
+        m_log.log(UtilLog::LogLevel::Debug, "Menu File Version", file_version);
 
         if (file_version != Menu::FILE_VERSION) {
-            m_log.log(Logging::LogLevel::Error, "Menu File Version=", file_version, "Expected Version=",
+            m_log.log(UtilLog::LogLevel::Error, "Menu File Version=", file_version, "Expected Version=",
                                             Menu::FILE_VERSION);
             return false;
         }
@@ -200,12 +200,12 @@ bool MenuDao::loadMenu() {
         // Moves the Loaded config to m_config shared pointer.
         encode(m);
     } catch (YAML::Exception &ex) {
-        m_log.log(Logging::LogLevel::Error, "YAML::LoadFile", m_filename + ".yaml", ex.what(),
+        m_log.log(UtilLog::LogLevel::Error, "YAML::LoadFile", m_filename + ".yaml", ex.what(),
                                         "Missing required field maybe.");
         return (false);
     }
     catch (std::exception &ex) {
-        m_log.log(Logging::LogLevel::Error, "Unexpected YAML::LoadFile", m_filename + ".yaml", ex.what());
+        m_log.log(UtilLog::LogLevel::Error, "Unexpected YAML::LoadFile", m_filename + ".yaml", ex.what());
         return (false);
     }
 

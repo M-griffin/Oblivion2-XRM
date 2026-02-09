@@ -5,14 +5,14 @@
 #include <cwchar>
 
 #include "io_pipes_colors.hpp"
-#include "logging.hpp"
-#include "session_writer.hpp"
+#include "util_log.hpp"
+#include "tcp_session_wrapper.hpp"
 #include "data-sys/yml_text_prompts.hpp"
 #include "model-sys/structures.hpp"
 
 class IoCodeMapping {
 
-    Logging &m_log;
+    UtilLog &m_log;
     IoPipesAndColors m_io_pipes_and_colors;
 
     std::map<std::string, std::string> m_mapped_codes; // MCI Code Translation for specific screens.
@@ -34,11 +34,11 @@ public:
     typedef std::pair<std::string, std::string> M_StringPair;
 
     explicit IoCodeMapping()
-        : m_log(Logging::getInstance()) {
+        : m_log(UtilLog::getInstance()) {
     }
 
     ~IoCodeMapping() {
-        m_log.log(Logging::LogLevel::Console, "~IoCodeMapping()");
+        m_log.log(UtilLog::LogLevel::Console, "~IoCodeMapping()");
         m_mapped_codes.clear();
     }
 

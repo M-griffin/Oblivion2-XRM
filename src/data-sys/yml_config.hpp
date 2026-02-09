@@ -4,7 +4,7 @@
 #include <string>
 #include <mutex>
 
-class Logging;
+class UtilLog;
 class Config;
 
 /**
@@ -29,7 +29,7 @@ public:
         return m_config;
     }
 
-    Logging &m_log;
+    UtilLog &m_log;
     Config &m_config;
     std::string m_path;
     std::string m_filename;

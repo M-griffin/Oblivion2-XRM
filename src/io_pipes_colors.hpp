@@ -3,21 +3,21 @@
 
 #include <string>
 
-#include "logging.hpp"
+#include "util_log.hpp"
 
 class Config;
 
 class IoPipesAndColors {
 
-    Logging &m_log;
+    UtilLog &m_log;
 
 public:
     explicit IoPipesAndColors()
-        : m_log(Logging::getInstance()) {
+        : m_log(UtilLog::getInstance()) {
     }
 
     ~IoPipesAndColors() {
-        m_log.log(Logging::LogLevel::Console, "~IoPipesAndColors()");
+        m_log.log(UtilLog::LogLevel::Console, "~IoPipesAndColors()");
     }
 
     IoPipesAndColors(const IoPipesAndColors &other) = default;

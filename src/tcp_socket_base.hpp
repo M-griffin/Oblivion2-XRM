@@ -6,13 +6,13 @@
 
 #include "model-sys/config.hpp"
 #include "sdl2_net/SDL_net.hpp"
-#include "logging.hpp"
+#include "util_log.hpp"
 
 using Byte = uint8_t;
 using ByteBuffer = std::vector<Byte>;
 
-class SocketService {
-    Logging &m_log;
+class TcpSocketBase {
+    UtilLog &m_log;
     TCPsocket m_socket;
     int m_nodeNumber;
     bool m_active;
@@ -21,21 +21,21 @@ class SocketService {
     ByteBuffer m_pendingBytes;
 
 public:
-    SocketService(TCPsocket socket, const int nodeNumber, Config &config)
-        : m_log(Logging::getInstance())
+    TcpSocketBase(TCPsocket socket, const int nodeNumber, Config &config)
+        : m_log(UtilLog::getInstance())
           , m_socket(socket)
           , m_nodeNumber(nodeNumber)
           , m_active(true)
           , m_config(config) {
     }
 
-    SocketService(const SocketService &) = delete;
-    SocketService &operator=(const SocketService &) = delete;
-    SocketService(SocketService &&other) = delete;
-    SocketService &operator=(SocketService &&other) = delete;
+    TcpSocketBase(const TcpSocketBase &) = delete;
+    TcpSocketBase &operator=(const TcpSocketBase &) = delete;
+    TcpSocketBase(TcpSocketBase &&other) = delete;
+    TcpSocketBase &operator=(TcpSocketBase &&other) = delete;
 
-    ~SocketService() {
-        m_log.log(Logging::LogLevel::Console, "~Session()");
+    ~TcpSocketBase() {
+        m_log.log(UtilLog::LogLevel::Console, "~Session()");
         close();
     }
 
@@ -48,7 +48,7 @@ public:
         if (!m_active) {
             return;
         }
-        m_log.log(Logging::LogLevel::Console, "Session hangup requested");
+        m_log.log(UtilLog::LogLevel::Console, "Session hangup requested");
         m_active = false;
     }
 

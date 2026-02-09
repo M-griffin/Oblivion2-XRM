@@ -9,21 +9,21 @@
 using Byte = uint8_t;
 using ByteBuffer = std::vector<Byte>;
 
-class Logging;
-class SessionWriter;
+class UtilLog;
+class TcpSessionWrapper;
 
-class TelnetSession {
+class TcpTelnet {
 public:
-    explicit TelnetSession(SessionWriter &writer);
-    ~TelnetSession();
+    explicit TcpTelnet(TcpSessionWrapper &writer);
+    ~TcpTelnet();
 
     // Move constructor
-    TelnetSession(TelnetSession &&other) = delete;
-    TelnetSession &operator=(TelnetSession &&other) = delete;
+    TcpTelnet(TcpTelnet &&other) = delete;
+    TcpTelnet &operator=(TcpTelnet &&other) = delete;
 
     // Delete copy constructor and copy assignment operator
-    TelnetSession(const TelnetSession &) = delete;
-    TelnetSession &operator=(const TelnetSession &) = delete;
+    TcpTelnet(const TcpTelnet &) = delete;
+    TcpTelnet &operator=(const TcpTelnet &) = delete;
 
     // Telnet parsing state
     enum TelnetState {
@@ -38,31 +38,44 @@ public:
 
     // Main Methods
     bool isValidCommand(Byte command);
+
     ByteBuffer telnetOptionParse(Byte byte);
+
     Byte telnetOptionAcknowledge(Byte command);
+
     Byte telnetOptionDeny(Byte command);
+
     void sendIACSequences(Byte command, Byte option);
+
     bool checkReply(Byte option);
+
     void addReply(Byte option);
 
     void decodeSubnegotiationBuffer();
+
     void handleDoDont(Byte command, Byte option);
+
     void handleWillWont(Byte command, Byte option);
+
     void handleSubnegotiation(Byte option, const ByteBuffer &data);
 
     int getTermRows() const;
+
     int getTermCols() const;
+
     void setTermRows(int value);
+
     void setTermCols(int value);
 
     std::string getTermType() const;
 
     void sendTTYPERequest();
+
     void sendENVRequest();
 
 private:
-    Logging &m_log;
-    SessionWriter &m_sessionWrite;
+    UtilLog &m_log;
+    TcpSessionWrapper &m_sessionWrite;
 
     int m_nawsRow;
     int m_nawsCol;

@@ -140,10 +140,10 @@ std::string IoEncoding::utf8ToCp437(const std::string &input) const {
                     out.push_back(found->second);
                 else {
                     out.push_back('?');
-                    m_log.log(Logging::LogLevel::Debug, "Unmapped Unicode in CP437", cp);
+                    m_log.log(UtilLog::LogLevel::Debug, "Unmapped Unicode in CP437", cp);
                 }
             }
-        } catch (...) { m_log.log(Logging::LogLevel::Error, "UTF8->CP437 conversion failed"); }
+        } catch (...) { m_log.log(UtilLog::LogLevel::Error, "UTF8->CP437 conversion failed"); }
         return out;
     });
 }

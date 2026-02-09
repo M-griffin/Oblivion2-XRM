@@ -4,7 +4,7 @@
 #include <sqlite3.h>
 
 #include "../model-sys/conference.hpp"
-#include "../logging.hpp"
+#include "../util_log.hpp"
 
 #include "libSqliteWrapped.h"
 
@@ -180,12 +180,12 @@ std::string ConferenceDao::updateConferenceQryString(std::string qry, Conference
  * @return
  */
 std::vector<Conference> ConferenceDao::getAllConferencesByType(std::string type) {
-    Logging &log = Logging::getInstance();
+    UtilLog &log = UtilLog::getInstance();
     std::vector<Conference> list;
 
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected()) {
-        log.log(Logging::LogLevel::Info, "Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
+        log.log(UtilLog::LogLevel::Info, "Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
         return list;
     }
 
@@ -193,7 +193,7 @@ std::vector<Conference> ConferenceDao::getAllConferencesByType(std::string type)
     Query qry(m_database);
 
     if (!qry.isConnected()) {
-        log.log(Logging::LogLevel::Info, "Error, Query has no connection to the database", m_strTableName, __FILE__,
+        log.log(UtilLog::LogLevel::Info, "Error, Query has no connection to the database", m_strTableName, __FILE__,
                                       __LINE__);
         return list;
     }
@@ -215,11 +215,11 @@ std::vector<Conference> ConferenceDao::getAllConferencesByType(std::string type)
                 list.push_back(conf);
             }
         } else {
-            log.log(Logging::LogLevel::Info, "Error, getAllConferencesByType Returned Rows=", rows, m_strTableName,
+            log.log(UtilLog::LogLevel::Info, "Error, getAllConferencesByType Returned Rows=", rows, m_strTableName,
                                           __FILE__, __LINE__);
         }
     } else {
-        log.log(Logging::LogLevel::Info, "Error, getResult()", m_strTableName, __FILE__, __LINE__);
+        log.log(UtilLog::LogLevel::Info, "Error, getResult()", m_strTableName, __FILE__, __LINE__);
     }
 
     return list;
@@ -231,12 +231,12 @@ std::vector<Conference> ConferenceDao::getAllConferencesByType(std::string type)
  * @return
  */
 long ConferenceDao::getConferencesCountByType(std::string type) {
-    Logging &log = Logging::getInstance();
+    UtilLog &log = UtilLog::getInstance();
     std::vector<Conference> list;
 
     // Make Sure Database Reference is Connected
     if (!m_database.isConnected()) {
-        log.log(Logging::LogLevel::Info, "Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
+        log.log(UtilLog::LogLevel::Info, "Error, Database is not connected!", m_strTableName, __FILE__, __LINE__);
         return list.size();
     }
 
@@ -244,7 +244,7 @@ long ConferenceDao::getConferencesCountByType(std::string type) {
     Query qry(m_database);
 
     if (!qry.isConnected()) {
-        log.log(Logging::LogLevel::Info, "Error, Query has no connection to the database", m_strTableName, __FILE__,
+        log.log(UtilLog::LogLevel::Info, "Error, Query has no connection to the database", m_strTableName, __FILE__,
                                       __LINE__);
         return list.size();
     }
@@ -265,11 +265,11 @@ long ConferenceDao::getConferencesCountByType(std::string type) {
                 list.push_back(conf);
             }
         } else {
-            log.log(Logging::LogLevel::Info, "Error, getConferenceCount By Type Returned Rows=", rows, m_strTableName,
+            log.log(UtilLog::LogLevel::Info, "Error, getConferenceCount By Type Returned Rows=", rows, m_strTableName,
                                           __FILE__, __LINE__);
         }
     } else {
-        log.log(Logging::LogLevel::Info, "Error, getResult()", m_strTableName, __FILE__, __LINE__);
+        log.log(UtilLog::LogLevel::Info, "Error, getResult()", m_strTableName, __FILE__, __LINE__);
     }
 
     return list.size();

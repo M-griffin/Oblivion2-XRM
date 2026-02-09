@@ -5,25 +5,25 @@
 #include <cwchar>
 
 #include "io_common.hpp"
-#include "logging.hpp"
-#include "session_writer.hpp"
+#include "util_log.hpp"
+#include "tcp_session_wrapper.hpp"
 
 class IoInputHandler {
 
-    Logging &m_log;
-    SessionWriter &m_session;
+    UtilLog &m_log;
+    TcpSessionWrapper &m_session;
     IoCommon &m_io_common;
 
 public:
-    explicit IoInputHandler(SessionWriter &session, IoCommon &common)
-        : m_log(Logging::getInstance())
+    explicit IoInputHandler(TcpSessionWrapper &session, IoCommon &common)
+        : m_log(UtilLog::getInstance())
         , m_session(session)
         , m_io_common(common) {
 
     }
 
     ~IoInputHandler() {
-        m_log.log(Logging::LogLevel::Console, "~IoInputHandler()");
+        m_log.log(UtilLog::LogLevel::Console, "~IoInputHandler()");
     }
 
     IoInputHandler(const IoInputHandler &other) = default;

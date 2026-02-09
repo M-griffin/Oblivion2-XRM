@@ -22,8 +22,8 @@
 #include "../data-sys/dao_users.hpp"
 
 #include "../io_session.hpp"
-#include "../encryption.hpp"
-#include "../logging.hpp"
+#include "../util_encrypt.hpp"
+#include "../util_log.hpp"
 #include "../menu_base.hpp"
 
 ModSignup::ModSignup(Context &ctx)
@@ -600,14 +600,14 @@ bool ModSignup::newUserPassword(const std::string &input) {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
     (std::string &input, std::string &key) {
-        // Debug Logging
-        m_log.log(Logging::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
+        // Debug UtilLog
+        m_log.log(UtilLog::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
 
         if (key.compare(m_ctx.getCfg().password_newuser) == 0) {
-            m_log.log(Logging::LogLevel::Console, "NewUserPassword Accepted", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Console, "NewUserPassword Accepted", __LINE__, __FILE__);
             changeNextModule();
         } else {
-            m_log.log(Logging::LogLevel::Console, "Error, Incorrect NewUserPassword!", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Console, "Error, Incorrect NewUserPassword!", __LINE__, __FILE__);
             ++m_newuser_password_attempts;
             displayPromptAndNewLine(PROMPT_PASS_INVALID);
             redisplayModulePrompt();
@@ -627,8 +627,8 @@ bool ModSignup::disclaimer(const std::string &input) {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
     (std::string &input, std::string &key) {
-        // Debug Logging
-        m_log.log(Logging::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
+        // Debug UtilLog
+        m_log.log(UtilLog::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
 
         // If ENTER Default to Yes, or Single Y is hit
         if (toupper(key[0]) == 'Y' && key.size() == 1) {
@@ -657,8 +657,8 @@ bool ModSignup::handle(const std::string &input) {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
     (std::string &input, std::string &key) {
-        // Debug Logging
-        m_log.log(Logging::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
+        // Debug UtilLog
+        m_log.log(UtilLog::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
 
         // Check for user name and if is already exists!
         UsersDao user_data(m_ctx.getDatabase());
@@ -686,8 +686,8 @@ bool ModSignup::realName(const std::string &input) {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
     (std::string &input, std::string &key) {
-        // Debug Logging
-        m_log.log(Logging::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
+        // Debug UtilLog
+        m_log.log(UtilLog::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
 
         // Check for real name and if is already exists!
         UsersDao user_data(m_ctx.getDatabase());
@@ -715,8 +715,8 @@ bool ModSignup::address(const std::string &input) {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
     (std::string &input, std::string &key) {
-        // Debug Logging
-        m_log.log(Logging::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
+        // Debug UtilLog
+        m_log.log(UtilLog::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
 
         m_new_use_rec.sAddress = key;
         changeNextModule();
@@ -734,8 +734,8 @@ bool ModSignup::location(const std::string &input) {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
     (std::string &input, std::string &key) {
-        // Debug Logging
-        m_log.log(Logging::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
+        // Debug UtilLog
+        m_log.log(UtilLog::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
 
         m_new_use_rec.sLocation = key;
         changeNextModule();
@@ -753,8 +753,8 @@ bool ModSignup::country(const std::string &input) {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
     (std::string &input, std::string &key) {
-        // Debug Logging
-        m_log.log(Logging::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
+        // Debug UtilLog
+        m_log.log(UtilLog::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
 
         m_new_use_rec.sCountry = key;
         changeNextModule();
@@ -772,8 +772,8 @@ bool ModSignup::email(const std::string &input) {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
     (std::string &input, std::string &key) {
-        // Debug Logging
-        m_log.log(Logging::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
+        // Debug UtilLog
+        m_log.log(UtilLog::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
 
         // Test if email already exists.
         UsersDao user_data(m_ctx.getDatabase());
@@ -801,8 +801,8 @@ bool ModSignup::userNote(const std::string &input) {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
     (std::string &input, std::string &key) {
-        // Debug Logging
-        m_log.log(Logging::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
+        // Debug UtilLog
+        m_log.log(UtilLog::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
 
         m_new_use_rec.sUserNote = key;
         changeNextModule();
@@ -820,8 +820,8 @@ bool ModSignup::birthday(const std::string &input) {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
     (std::string &input, std::string &key) {
-        // Debug Logging
-        m_log.log(Logging::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
+        // Debug UtilLog
+        m_log.log(UtilLog::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
 
         try {
             std::regex date_regex{m_ctx.getCfg().regexp_date_validation};
@@ -854,7 +854,7 @@ bool ModSignup::birthday(const std::string &input) {
                 redisplayModulePrompt();
             }
         } catch (std::regex_error &ex) {
-            m_log.log(Logging::LogLevel::Error, "Error, regex date error=", ex.what(), ex.code(), __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Error, "Error, regex date error=", ex.what(), ex.code(), __LINE__, __FILE__);
         }
 
         return true;
@@ -871,8 +871,8 @@ bool ModSignup::gender(const std::string &input) {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
     (std::string &input, std::string &key) {
-        // Debug Logging
-        m_log.log(Logging::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
+        // Debug UtilLog
+        m_log.log(UtilLog::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
 
         // If ENTER Default to Yes, or Single Y is hit
         if ((toupper(key[0]) == 'M' && key.size() == 1)) {
@@ -902,8 +902,8 @@ bool ModSignup::password(const std::string &input) {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
     (std::string &input, std::string &key) {
-        // Debug Logging
-        m_log.log(Logging::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
+        // Debug UtilLog
+        m_log.log(UtilLog::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
 
         m_security_record.sPasswordHash = key;
         changeNextModule();
@@ -921,19 +921,19 @@ bool ModSignup::verifyPassword(const std::string &input) {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
     (std::string &input, std::string &key) {
-        // Debug Logging
-        m_log.log(Logging::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
+        // Debug UtilLog
+        m_log.log(UtilLog::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
 
         // compare password to previous, then encrypt if they match
         // otherwise fail back if they don't and ask again.
         if (m_security_record.sPasswordHash.compare(key) == 0) {
             // Load pointer to encrypt methods.
-            Encrypt encryption;
-            std::string salt = encryption.generate_salt(m_new_use_rec.sHandle, m_ctx.getCfg().bbs_uuid);
-            std::string password = encryption.generate_password(m_security_record.sPasswordHash, salt);
+            UtilEncrypt encryption;
+            std::string salt = encryption.generateSalt(m_new_use_rec.sHandle, m_ctx.getCfg().bbs_uuid);
+            std::string password = encryption.generateHashString(m_security_record.sPasswordHash, salt);
 
             if (salt.size() == 0 || password.size() == 0) {
-                m_log.log(Logging::LogLevel::Error, "Error, Salt or Password were empty", __LINE__, __FILE__);
+                m_log.log(UtilLog::LogLevel::Error, "Error, Salt or Password were empty", __LINE__, __FILE__);
                 assert(false);
             }
 
@@ -942,7 +942,7 @@ bool ModSignup::verifyPassword(const std::string &input) {
             m_security_record.sPasswordHash = password;
             changeNextModule();
         } else {
-            m_log.log(Logging::LogLevel::Info, "Password Verify Failed.", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Info, "Password Verify Failed.", __LINE__, __FILE__);
             m_security_record.sPasswordHash = "";
             displayPromptAndNewLine(PROMPT_PASS_INVALID);
             changePreviousModule();
@@ -962,8 +962,8 @@ bool ModSignup::challengeQuestion(const std::string &input) {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
     (std::string &input, std::string &key) {
-        // Debug Logging
-        m_log.log(Logging::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
+        // Debug UtilLog
+        m_log.log(UtilLog::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
 
         // Set the Password and verify it matches on next module.
         m_security_record.sChallengeQuestion = key;
@@ -982,8 +982,8 @@ bool ModSignup::challengeAnswer(const std::string &input) {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
     (std::string &input, std::string &key) {
-        // Debug Logging
-        m_log.log(Logging::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
+        // Debug UtilLog
+        m_log.log(UtilLog::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
 
         m_security_record.sChallengeAnswerHash = key;
         changeNextModule();
@@ -1001,28 +1001,28 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input) {
     // Create a STD Function Lambda to pass and be executed in the STD IO Method.
     std::function<bool(std::string &, std::string &)> lambda_function = [this]
     (std::string &input, std::string &key) {
-        // Debug Logging
-        m_log.log(Logging::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
+        // Debug UtilLog
+        m_log.log(UtilLog::LogLevel::Debug, "Current Input", input, __LINE__, __FILE__);
 
         // compare password to previous, then encrypt if they match
         // otherwise fail back if they don't and ask again.
         if (m_security_record.sChallengeAnswerHash.compare(key) == 0) {
-            Encrypt encryption;
-            std::string password = encryption.generate_password(
+            UtilEncrypt encryption;
+            std::string password = encryption.generateHashString(
                 m_security_record.sChallengeAnswerHash,
                 m_security_record.sSaltHash
             );
 
             if (password.size() == 0) {
                 // Error from encryption method.
-                m_log.log(Logging::LogLevel::Error, "Error, ChallengeAnswer was empty", __LINE__, __FILE__);
+                m_log.log(UtilLog::LogLevel::Error, "Error, ChallengeAnswer was empty", __LINE__, __FILE__);
                 return false;
             }
 
             m_security_record.sChallengeAnswerHash = password;
             changeNextModule();
         } else {
-            m_log.log(Logging::LogLevel::Error, "Error, ChallengeAnswer verify failed.", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Error, "Error, ChallengeAnswer verify failed.", __LINE__, __FILE__);
             m_security_record.sChallengeAnswerHash = "";
             displayPromptAndNewLine(PROMPT_PASS_INVALID);
             changePreviousModule();
@@ -1285,7 +1285,7 @@ void ModSignup::saveNewUserRecord() {
     long securityIndex = security_dao.insertRecord(m_security_record);
 
     if (securityIndex < 0) {
-        m_log.log(Logging::LogLevel::Error, "Error, unable to insert new user record", __LINE__, __FILE__);
+        m_log.log(UtilLog::LogLevel::Error, "Error, unable to insert new user record", __LINE__, __FILE__);
         displayPrompt(PROMPT_NOT_SAVED);
         m_is_active = false;
         return;
@@ -1320,14 +1320,14 @@ void ModSignup::saveNewUserRecord() {
     }
 
     long userIndex = user_dao.insertRecord(m_new_use_rec);
-    m_log.log(Logging::LogLevel::Info, "New User Index saved", userIndex);
+    m_log.log(UtilLog::LogLevel::Info, "New User Index saved", userIndex);
 
     if (userIndex < 0) {
-        m_log.log(Logging::LogLevel::Error, "Error, unable to insert new user record", __LINE__, __FILE__);
+        m_log.log(UtilLog::LogLevel::Error, "Error, unable to insert new user record", __LINE__, __FILE__);
 
         // Remove Security Record if unable to create user record.
         if (!security_dao.deleteRecord(securityIndex)) {
-            m_log.log(Logging::LogLevel::Error, "Error, unable to remove security record.", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Error, "Error, unable to remove security record.", __LINE__, __FILE__);
         }
 
         baseProcessDeliverNewLine();
@@ -1338,7 +1338,7 @@ void ModSignup::saveNewUserRecord() {
 
     // If First User Created, Then Update Security Level to Sysop.
     if (userIndex == 1) {
-        m_log.log(Logging::LogLevel::Info, "Updating First Created User to SysOp/Admin");
+        m_log.log(UtilLog::LogLevel::Info, "Updating First Created User to SysOp/Admin");
 
         // Re-Read the Record Clean
         m_new_use_rec = user_dao.getRecordById(userIndex);

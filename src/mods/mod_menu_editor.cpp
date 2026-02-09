@@ -13,10 +13,10 @@
 #include "../screen_ansi_proc.hpp"
 #include "../io_session.hpp"
 #include "../io_common.hpp"
-#include "../session_writer.hpp"
-#include "../directory.hpp"
+#include "../tcp_session_wrapper.hpp"
+#include "../util_dir.hpp"
 #include "../menu_base.hpp"
-#include "../logging.hpp"
+#include "../util_log.hpp"
 #include "../io_encoding.hpp"
 
 
@@ -412,7 +412,7 @@ void ModMenuEditor::setupMenuOptionEditor() {
             break;
 
         default:
-            m_log.log(Logging::LogLevel::Error, "Error, Didn't add the view display to setupMenuOptionEditor", __FILE__,
+            m_log.log(UtilLog::LogLevel::Error, "Error, Didn't add the view display to setupMenuOptionEditor", __FILE__,
                       __LINE__);
             break;
     }
@@ -522,7 +522,7 @@ void ModMenuEditor::displayCurrentPage(const std::string &input_state) {
             break;
 
         default:
-            m_log.log(Logging::LogLevel::Error, "Error, forgot to add new STATE index displayCurrentPage!!", __FILE__,
+            m_log.log(UtilLog::LogLevel::Error, "Error, forgot to add new STATE index displayCurrentPage!!", __FILE__,
                       __LINE__);
             return;
     }
@@ -564,7 +564,7 @@ void ModMenuEditor::displayCurrentEditPage(const std::string &input_state) {
             break;
 
         default:
-            m_log.log(Logging::LogLevel::Error, "Error, forgot to add new STATE index displayCurrentEditPage!!",
+            m_log.log(UtilLog::LogLevel::Error, "Error, forgot to add new STATE index displayCurrentEditPage!!",
                       __FILE__, __LINE__);
             return;
     }
@@ -1579,7 +1579,7 @@ void ModMenuEditor::copyExistingMenu(const std::string &menu_name) {
     if (mnu_source.fileExists()) {
         mnu_source.loadMenu();
     } else {
-        m_log.log(Logging::LogLevel::Error, "Source menu file doesn't exist=", m_current_menu, __FILE__, __LINE__);
+        m_log.log(UtilLog::LogLevel::Error, "Source menu file doesn't exist=", m_current_menu, __FILE__, __LINE__);
         return;
     }
 
@@ -1589,7 +1589,7 @@ void ModMenuEditor::copyExistingMenu(const std::string &menu_name) {
     if (!mnu_destination.fileExists()) {
         mnu_destination.saveMenu(new_menu);
     } else {
-        m_log.log(Logging::LogLevel::Error, "Destination menu file already exist=", new_menu, __FILE__, __LINE__);
+        m_log.log(UtilLog::LogLevel::Error, "Destination menu file already exist=", new_menu, __FILE__, __LINE__);
     }
 }
 
@@ -1630,9 +1630,9 @@ void ModMenuEditor::saveMenuChanges() {
     MenuDao mnu_source(m_loaded_menu.back(), m_current_menu, GLOBAL_MENU_PATH);
 
     if (mnu_source.saveMenu(m_loaded_menu.back())) {
-        m_log.log(Logging::LogLevel::Debug, "Menu Saved Successful=", m_current_menu, __FILE__, __LINE__);
+        m_log.log(UtilLog::LogLevel::Debug, "Menu Saved Successful=", m_current_menu, __FILE__, __LINE__);
     } else {
-        m_log.log(Logging::LogLevel::Error, "Menu Save Failed=", m_current_menu, __FILE__, __LINE__);
+        m_log.log(UtilLog::LogLevel::Error, "Menu Save Failed=", m_current_menu, __FILE__, __LINE__);
     }
 }
 
@@ -1641,8 +1641,8 @@ void ModMenuEditor::saveMenuChanges() {
  * @param menu_name
  */
 bool ModMenuEditor::checkMenuExists(std::string menu_name) {
-    std::vector<std::string> result_set =
-            m_directory.getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
+    std::vector<std::filesystem::path> result_set =
+            m_directory.listCaseInsensitive(GLOBAL_MENU_PATH, "yaml");
 
     // Append the extension to match the directory files.
     menu_name.append(".yaml");
@@ -1650,7 +1650,7 @@ bool ModMenuEditor::checkMenuExists(std::string menu_name) {
 
     // Case Insensitive Search for Menu name, with transformation to lower case
     for (std::string::size_type i = 0; i < result_set.size(); i++) {
-        std::string name = result_set[i];
+        std::string name = result_set[i].stem().string();
         name = m_ctx.getIoCommon().toLower(name);
         if (name == menu_name)
             return true;
@@ -1686,12 +1686,12 @@ bool ModMenuEditor::checkMenuOptionExists(unsigned int option_index) {
  * @return
  */
 std::string ModMenuEditor::displayMenuList() {
-    std::vector<std::string> result_set =
-            m_directory.getFileListPerDirectory(GLOBAL_MENU_PATH, "yaml");
+    std::vector<std::filesystem::path> result_set =
+            m_directory.listCaseInsensitive(GLOBAL_MENU_PATH, "yaml");
 
     // check result set, if no menu then return gracefully.
     if (result_set.empty()) {
-        m_log.log(Logging::LogLevel::Console, "No Menus .yaml files found", __FILE__, __LINE__);
+        m_log.log(UtilLog::LogLevel::Console, "No Menus .yaml files found", __FILE__, __LINE__);
         return "No Menu Files found!";
     }
 
@@ -1712,8 +1712,7 @@ std::string ModMenuEditor::displayMenuList() {
     int max_cols = 73; // out of 80
 
     // Vector or Menus, Loop through
-    std::vector<std::string>::iterator i = result_set.begin();
-    std::string menu_name;
+    std::vector<std::filesystem::path>::iterator i = result_set.begin();
     std::string buffer;
 
     for (int rows = 0; rows < total_rows; rows++) {
@@ -1747,8 +1746,8 @@ std::string ModMenuEditor::displayMenuList() {
                 if (cols % 10 == 0 || cols == 1) {
                     if (i != result_set.end()) {
                         // Strip Extension, then pad 8 characters.
-                        menu_name = i->substr(0, i->size() - 5);
-                        menu_name = m_ctx.getIoCommon().rightPadding(menu_name, 8);
+                        std::string menu_name = m_ctx.getIoCommon().rightPadding(
+                            i->stem().string(), 8);
 
                         m_ctx.getIoCommon().toUpper(menu_name);
 

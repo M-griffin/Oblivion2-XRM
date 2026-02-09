@@ -6,7 +6,7 @@
 
 #include "../model-sys/menu.hpp"
 
-class Logging;
+class UtilLog;
 
 /**
  * @class MenuDao
@@ -81,7 +81,7 @@ public:
      */
     std::string getFileName() const { return m_filename; }
 
-    Logging &m_log;
+    UtilLog &m_log;
     Menu &m_menu;
     std::string m_path;
     std::string m_filename;

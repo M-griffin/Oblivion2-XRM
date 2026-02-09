@@ -6,7 +6,7 @@
 #include <exception>
 #include <cassert>
 
-#include "../logging.hpp"
+#include "../util_log.hpp"
 
 #include <yaml-cpp/yaml.h>
 
@@ -17,17 +17,17 @@ static bool is_version_displayed = false;
 std::map<std::string, M_TextPrompt> TEXT_PROMPTS;
 
 TextPromptsDao::TextPromptsDao(const std::string &path, const std::string &filename)
-    : m_log(Logging::getInstance())
+    : m_log(UtilLog::getInstance())
       , m_path(path)
       , m_filename(filename)
       , m_is_loaded(false) {
 
     std::cout << "TextPromptsDao" << std::endl;
-    m_log.log(Logging::LogLevel::Console, "TextPromptsDao path=", m_path, "filename=", m_filename);
+    m_log.log(UtilLog::LogLevel::Console, "TextPromptsDao path=", m_path, "filename=", m_filename);
 }
 
 TextPromptsDao::~TextPromptsDao() {
-    m_log.log(Logging::LogLevel::Console, "~TextPromptsDao()");
+    m_log.log(UtilLog::LogLevel::Console, "~TextPromptsDao()");
     m_is_loaded = false;
     //m_text_prompts.clear();
     //std::map<std::string, std::pair<std::string, std::string> >().swap(m_text_prompts);
@@ -76,7 +76,7 @@ void TextPromptsDao::writeValue(M_TextPrompt &value) {
     std::ofstream ofs(path);
 
     if (!ofs.is_open()) {
-        m_log.log(Logging::LogLevel::Error, "Error, unable to write to=", path);
+        m_log.log(UtilLog::LogLevel::Error, "Error, unable to write to=", path);
         return;
     }
 
@@ -126,7 +126,7 @@ bool TextPromptsDao::readPrompts() {
         YAML::Node node = YAML::LoadFile(path);
 
         if (node.size() == 0) {
-            m_log.log(Logging::LogLevel::Error, "TextPromptsDao Node size == 0", path);
+            m_log.log(UtilLog::LogLevel::Error, "TextPromptsDao Node size == 0", path);
             node.reset();
             return false;
         }
@@ -135,12 +135,12 @@ bool TextPromptsDao::readPrompts() {
 
         // Validate File Version
         if (!is_version_displayed) {
-            m_log.log(Logging::LogLevel::Console, "Text Prompt File Version=", file_version);
+            m_log.log(UtilLog::LogLevel::Console, "Text Prompt File Version=", file_version);
             is_version_displayed = true;
         }
 
         if (file_version != TextPromptsDao::FILE_VERSION) {
-            m_log.log(Logging::LogLevel::Error, "Text Prompt Invalid File Version=", file_version, "Expected=",
+            m_log.log(UtilLog::LogLevel::Error, "Text Prompt Invalid File Version=", file_version, "Expected=",
                                             TextPromptsDao::FILE_VERSION);
             node.reset();
             return (false);
@@ -151,7 +151,7 @@ bool TextPromptsDao::readPrompts() {
         cacheAllTextPrompts(node);
         node.reset();
     } catch (std::exception &ex) {
-        m_log.log(Logging::LogLevel::Error, "Exception YAML::readPrompts=", m_filename, ex.what());
+        m_log.log(UtilLog::LogLevel::Error, "Exception YAML::readPrompts=", m_filename, ex.what());
         return (false);
     }
 
@@ -204,7 +204,7 @@ void TextPromptsDao::cacheAllTextPrompts(YAML::Node &node) const {
 
         TEXT_PROMPTS[m_filename] = text_prompts;
     } catch (std::exception &ex) {
-        m_log.log(Logging::LogLevel::Error, "Exception cacheAllTextPrompts YAML::readPrompts=", m_filename, ex.what());
+        m_log.log(UtilLog::LogLevel::Error, "Exception cacheAllTextPrompts YAML::readPrompts=", m_filename, ex.what());
         throw ex;
     }
 }

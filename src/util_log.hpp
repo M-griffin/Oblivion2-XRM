@@ -10,7 +10,7 @@
 #include <type_traits>
 #include <utility>
 
-class Logging {
+class UtilLog {
 public:
     enum class LogLevel : uint8_t {
         Debug = 0,
@@ -21,22 +21,22 @@ public:
         All
     };
 
-    static Logging& getInstance();
+    static UtilLog& getInstance();
 
     // Configuration
     void setLogLevel(LogLevel level);
     void setLogLevelFromString(const std::string& level);
     void setNode(uint32_t node);
 
-    // Logging API
+    // UtilLog API
     template<typename... Args>
     void log(LogLevel level, Args&&... args);
 
     // Deleted copy/move
-    Logging(const Logging&) = delete;
-    Logging& operator=(const Logging&) = delete;
-    Logging(Logging&&) = delete;
-    Logging& operator=(Logging&&) = delete;
+    UtilLog(const UtilLog&) = delete;
+    UtilLog& operator=(const UtilLog&) = delete;
+    UtilLog(UtilLog&&) = delete;
+    UtilLog& operator=(UtilLog&&) = delete;
 
     template<typename T, typename = void>
     struct is_streamable : std::false_type {};
@@ -48,7 +48,7 @@ public:
     > : std::true_type {};
 
 private:
-    Logging();
+    UtilLog();
 
     // Helpers
     bool shouldLog(LogLevel level) const;
@@ -87,7 +87,7 @@ private:
 };
 
 template<typename... Args>
-void Logging::log(LogLevel level, Args&&... args) {
+void UtilLog::log(LogLevel level, Args&&... args) {
     if (!shouldLog(level))
         return;
 

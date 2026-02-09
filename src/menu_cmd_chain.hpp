@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "model-sys/menu.hpp"
-#include "logging.hpp"
+#include "util_log.hpp"
 
 class MenuSystem;
 

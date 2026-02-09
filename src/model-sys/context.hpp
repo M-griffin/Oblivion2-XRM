@@ -5,9 +5,9 @@
 
 #include "../io_common.hpp"
 #include "../screen_ansi_proc.hpp"
-#include "../session_writer.hpp"
+#include "../tcp_session_wrapper.hpp"
 #include "../io_session.hpp"
-#include "../telnet_session.hpp"
+#include "../tcp_telnet.hpp"
 
 #include "config.hpp"
 #include "users.hpp"
@@ -28,8 +28,8 @@ public:
     explicit Context() = default;
     ~Context() = default;
 
-    SessionWriter *sessionWriter = nullptr;
-    TelnetSession *telnetSession = nullptr;
+    TcpSessionWrapper *sessionWriter = nullptr;
+    TcpTelnet *telnetSession = nullptr;
     Users *userRec = nullptr;
     ScreenAnsiProc *screenAnsi = nullptr;
     IoCommon *ioCommon = nullptr;
@@ -38,8 +38,8 @@ public:
     SQLW::Database *database = nullptr;
 
     void bind(
-        SessionWriter &sw,
-        TelnetSession &ts,
+        TcpSessionWrapper &sw,
+        TcpTelnet &ts,
         Users &ur,
         ScreenAnsiProc &ap,
         IoCommon &cio,
@@ -57,12 +57,12 @@ public:
         database = &db;
     }
 
-    SessionWriter &getSessionWrite() const {
+    TcpSessionWrapper &getSessionWrite() const {
         assert(sessionWriter);
         return *sessionWriter;
     }
 
-    TelnetSession &getTelnet() const {
+    TcpTelnet &getTelnet() const {
         assert(telnetSession);
         return *telnetSession;
     }

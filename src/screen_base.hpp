@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "logging.hpp"
+#include "util_log.hpp"
 
 /**
  * @class ScreenBase
@@ -16,7 +16,7 @@ class ScreenBase {
 public:
     ScreenBase(int term_height, int term_width);
 
-    Logging &m_log;
+    UtilLog &m_log;
     std::string m_ansi_output;
 
     bool m_is_screen_cleared;
@@ -131,7 +131,7 @@ public:
 
     ScreenBase &operator=(ScreenBase &&other) noexcept {
         if (this != &other) {
-            // Create a NEW Logging instance
+            // Create a NEW UtilLog instance
             m_ansi_output = std::move(other.m_ansi_output);
             m_is_screen_cleared = other.m_is_screen_cleared;
             m_is_line_wrapping = other.m_is_line_wrapping;

@@ -18,7 +18,7 @@
 
 #include "io_common.hpp"
 #include "io_session.hpp"
-#include "logging.hpp"
+#include "util_log.hpp"
 
 ScreenAnsiProc::ScreenAnsiProc()
     : ScreenBase(24, 80) {
@@ -26,7 +26,7 @@ ScreenAnsiProc::ScreenAnsiProc()
 }
 
 ScreenAnsiProc::~ScreenAnsiProc() {
-    m_log.log(Logging::LogLevel::Console, "~ScreenAnsiProc()");
+    m_log.log(UtilLog::LogLevel::Console, "~ScreenAnsiProc()");
 
     m_screen_buffer.clear();
     m_pull_down_options.clear();
@@ -311,11 +311,11 @@ void ScreenAnsiProc::screenBufferSetGlyph(const std::string &charSequence) {
         if (m_position < static_cast<signed>(m_screen_buffer.size())) {
             m_screen_buffer.at(m_position) = screen_pixel;
         } else {
-            m_log.log(Logging::LogLevel::Error, "[screenBufferSetGlyph] out of bounds pos=",
+            m_log.log(UtilLog::LogLevel::Error, "[screenBufferSetGlyph] out of bounds pos=",
                       m_x_position - 1, __LINE__, __FILE__);
         }
     } catch (std::exception &e) {
-        m_log.log(Logging::LogLevel::Error, "[screenBufferSetGlyph] exceeds screen dimensions Exception=",
+        m_log.log(UtilLog::LogLevel::Error, "[screenBufferSetGlyph] exceeds screen dimensions Exception=",
                   e.what(), __LINE__, __FILE__);
     }
 
@@ -346,7 +346,7 @@ void ScreenAnsiProc::screenBufferScrollUp() {
         m_screen_buffer.erase(
             m_screen_buffer.begin(), m_screen_buffer.begin() + m_characters_per_line);
     } catch (std::exception &e) {
-        m_log.log(Logging::LogLevel::Error, "[screenBufferScrollUp] Exception=", e.what(), __LINE__, __FILE__);
+        m_log.log(UtilLog::LogLevel::Error, "[screenBufferScrollUp] Exception=", e.what(), __LINE__, __FILE__);
     }
 
     // Readd The last Line back to the buffer.
@@ -370,7 +370,7 @@ void ScreenAnsiProc::screenBufferClearRange(int start, int end) {
         try {
             m_screen_buffer[i].char_sequence.clear();
         } catch (std::exception &e) {
-            m_log.log(Logging::LogLevel::Error, "[screenBufferClearRange] Exception=", e.what(),
+            m_log.log(UtilLog::LogLevel::Error, "[screenBufferClearRange] Exception=", e.what(),
                       "start=", start, "end=", end, __LINE__, __FILE__);
         }
     }

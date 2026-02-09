@@ -9,7 +9,7 @@
 
 #include "io_encoding.hpp"
 
-class Logging;
+class UtilLog;
 
 // Possible Replacement for Localized Buffer.
 typedef struct Utf8Glyph {
@@ -27,7 +27,7 @@ typedef struct Utf8Glyph {
  * @brief Low Level IO ASCII and UTF-8 Aware with locale support.
  */
 class IoCommon {
-    Logging &m_log; // Logging Reference
+    UtilLog &m_log; // UtilLog Reference
 
     std::string m_utf8_rx_buffer; // buffer.
     std::string m_escape_sequence; // ParseInput

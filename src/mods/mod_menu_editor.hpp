@@ -10,7 +10,7 @@
 #include "../model-sys/context.hpp"
 #include "../model-sys/menu.hpp"
 #include "../data-sys/yml_text_prompts.hpp"
-#include "../directory.hpp"
+#include "../util_dir.hpp"
 
 /**
  * @class ModMenuEditor
@@ -31,7 +31,7 @@ class ModMenuEditor
     std::vector<Menu> m_loaded_menu;
 
     TextPromptsDao m_text_prompts_dao;
-    Directory m_directory;
+    UtilDir m_directory;
 
     unsigned int m_mod_setup_index;
     unsigned int m_mod_function_index;

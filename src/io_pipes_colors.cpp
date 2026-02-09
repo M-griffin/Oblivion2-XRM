@@ -133,20 +133,20 @@ std::string IoPipesAndColors::pipeColors(const std::string &color_string) {
 
     // Foreground Colors
     if (color_index >= 0 && color_index < 16) {
-        m_log.log(Logging::LogLevel::Debug, "foreground color_index=", color_index);
+        m_log.log(UtilLog::LogLevel::Debug, "foreground color_index=", color_index);
         esc_sequence = pipeReplaceForeground(color_index);
-        m_log.log(Logging::LogLevel::Debug, "foreground esc_sequence=", esc_sequence);
+        m_log.log(UtilLog::LogLevel::Debug, "foreground esc_sequence=", esc_sequence);
         return esc_sequence;
     }
     // Background Colors
     if (color_index >= 16 && color_index < 24) {
-        m_log.log(Logging::LogLevel::Debug, "background color_index=", color_index);
+        m_log.log(UtilLog::LogLevel::Debug, "background color_index=", color_index);
         esc_sequence = pipeReplaceBackground(color_index);
-        m_log.log(Logging::LogLevel::Debug, "background esc_sequence=", esc_sequence);
+        m_log.log(UtilLog::LogLevel::Debug, "background esc_sequence=", esc_sequence);
         return esc_sequence;
     }
 
-    m_log.log(Logging::LogLevel::Debug, "else esc_sequence=", esc_sequence);
+    m_log.log(UtilLog::LogLevel::Debug, "else esc_sequence=", esc_sequence);
 
     return esc_sequence;
 }

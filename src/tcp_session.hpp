@@ -11,16 +11,16 @@
 
 #include "model-sys/structures.hpp"
 #include "io_common.hpp"
-#include "deadline_timer.hpp"
+#include "state_timer.hpp"
 #include "libSqliteWrapped.h"
 #include "screen_ansi_proc.hpp"
-#include "socket_service.hpp"
+#include "tcp_socket_base.hpp"
 #include "io_session.hpp"
 #include "model-sys/telnet.hpp"
-#include "telnet_session.hpp"
+#include "tcp_telnet.hpp"
 #include "state_manager.hpp"
-#include "logging.hpp"
-#include "session_writer.hpp"
+#include "util_log.hpp"
+#include "tcp_session_wrapper.hpp"
 #include "model-sys/users.hpp"
 #include "model-sys/context.hpp"
 
@@ -28,10 +28,10 @@
 
 class TCPSession {
 
-    Logging &m_log;
-    SocketService m_socketService;
-    SessionWriter m_session_writer;
-    TelnetSession m_telnetSession;
+    UtilLog &m_log;
+    TcpSocketBase m_socketService;
+    TcpSessionWrapper m_session_writer;
+    TcpTelnet m_telnetSession;
     Users m_userRec;
     ScreenAnsiProc m_ansi_process;
     IoCommon m_io_common;
@@ -44,14 +44,14 @@ class TCPSession {
     // ESC handling
     std::string m_escBuffer;
     bool m_escPending = false;
-    DeadlineTimer m_escTimer;
+    StateTimer m_escTimer;
 
     // UTF8 Handling
     std::string m_utf8Buffer;
 
 public:
     TCPSession(TCPsocket socket, const int nodeNumber, Config &config, SQLW::Database &coreDatabase)
-        : m_log(Logging::getInstance())
+        : m_log(UtilLog::getInstance())
           , m_socketService(socket, nodeNumber, config)
           , m_session_writer(m_socketService)
           , m_telnetSession(m_session_writer)
@@ -110,11 +110,11 @@ public:
         m_telnetSession.addReply(TELOPT_NAWS);
 
         // Log constructor call
-        m_log.log(Logging::LogLevel::Console, "TCPSession() initialized with Telnet options negotiated");
+        m_log.log(UtilLog::LogLevel::Console, "TCPSession() initialized with Telnet options negotiated");
     }
 
     ~TCPSession() {
-        m_log.log(Logging::LogLevel::Console, "~TCPSession()");
+        m_log.log(UtilLog::LogLevel::Console, "~TCPSession()");
         m_escTimer.cancel();
         m_state_manager.reset();
     }
@@ -124,8 +124,8 @@ public:
     TCPSession(const TCPSession &) = delete;
     TCPSession &operator=(const TCPSession &) = delete;
 
-    SocketService &getSession() { return m_socketService; }
-    TelnetSession &getTelnet() { return m_telnetSession; }
+    TcpSocketBase &getSession() { return m_socketService; }
+    TcpTelnet &getTelnet() { return m_telnetSession; }
     Users &getUserRec() { return m_userRec; }
     Config &getConfig() { return m_socketService.getConfig(); }
     int getNodeNumber() const { return m_socketService.getNodeNumber(); }
@@ -287,7 +287,7 @@ private:
             int col = 0;
             if (std::sscanf(seq.c_str(), "\x1b[%d;%dR", &row, &col) == 2) {
                 m_log.log(
-                    Logging::LogLevel::Debug,
+                    UtilLog::LogLevel::Debug,
                     "Received CPR: row=" + std::to_string(row) +
                     " col=" + std::to_string(col)
                 );

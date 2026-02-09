@@ -7,10 +7,10 @@
 #include "model-sys/context.hpp"
 
 StateManager::StateManager(Context &ctx)
-    : m_log(Logging::getInstance())
+    : m_log(UtilLog::getInstance())
       , m_ctx(ctx)
       , currentState(State::ModPreLogon) {
-    m_log.log(Logging::LogLevel::Console, "StateManager()");
+    m_log.log(UtilLog::LogLevel::Console, "StateManager()");
     bindStateHandlers();
 
     // Setup Inactivity timer, so no sessions can stay active indefinite.
@@ -22,7 +22,7 @@ StateManager::StateManager(Context &ctx)
 }
 
 StateManager::~StateManager() {
-    m_log.log(Logging::LogLevel::Console, "~StateManager()");
+    m_log.log(UtilLog::LogLevel::Console, "~StateManager()");
     clearHandlers.at(currentState)();
 }
 
@@ -37,7 +37,7 @@ void StateManager::setState(State newState) {
 }
 
 void StateManager::handleInput(const std::string &input) {
-    m_log.log(Logging::LogLevel::Debug, "StateManager() handleInput=", input);
+    m_log.log(UtilLog::LogLevel::Debug, "StateManager() handleInput=", input);
 
     if (!m_ctx.sessionWriter->isActive()) {
         return;
@@ -130,7 +130,7 @@ void StateManager::pollTimers() {
 // -------------------------
 
 void StateManager::createPreLogon() {
-    m_log.log(Logging::LogLevel::Console, "StateManager() createPreLogon");
+    m_log.log(UtilLog::LogLevel::Console, "StateManager() createPreLogon");
 
     // Make Sure we cover any unexpected errors in Creating the Module.
     try {
@@ -157,7 +157,7 @@ void StateManager::pollPreLogon() {
 }
 
 void StateManager::inputPreLogon(const std::string &input) {
-    m_log.log(Logging::LogLevel::Console, "StateManager() inputPreLogon");
+    m_log.log(UtilLog::LogLevel::Console, "StateManager() inputPreLogon");
     if (preLogonState) {
 
         // Call Input First, we need to flow the input through,
@@ -165,7 +165,7 @@ void StateManager::inputPreLogon(const std::string &input) {
         preLogonState->update(input, false);
 
         if (!preLogonState->m_is_active) {
-            m_log.log(Logging::LogLevel::Console, "StateManager() preLogonState is Completed.");
+            m_log.log(UtilLog::LogLevel::Console, "StateManager() preLogonState is Completed.");
             setState(State::MenuSystem);
         }
     }
@@ -176,7 +176,7 @@ void StateManager::inputPreLogon(const std::string &input) {
 // -------------------------
 
 void StateManager::createMenuSystem() {
-    m_log.log(Logging::LogLevel::Console, "StateManager() createMenuSystem");
+    m_log.log(UtilLog::LogLevel::Console, "StateManager() createMenuSystem");
 
     // Make Sure we cover any unexpected errors in Creating the Module.
     try {
@@ -205,14 +205,14 @@ void StateManager::pollMenuSystem() {
 }
 
 void StateManager::inputMenuSystem(const std::string &input) {
-    m_log.log(Logging::LogLevel::Console, "StateManager() inputMenuSystem");
+    m_log.log(UtilLog::LogLevel::Console, "StateManager() inputMenuSystem");
     if (menuSystemState) {
         // Call Input First, we need to flow the input through,
         // then check after is the state is completed.
         menuSystemState->update(input, false);
 
         if (!menuSystemState->m_is_active) {
-            m_log.log(Logging::LogLevel::Console, "StateManager() MenuSystem is Inactive");
+            m_log.log(UtilLog::LogLevel::Console, "StateManager() MenuSystem is Inactive");
         }
     }
 }

@@ -5,11 +5,11 @@
 #include <sstream>
 #include <iomanip>
 
-class Uuid {
+class UtilUuid {
 public:
-    explicit Uuid() = default;
+    explicit UtilUuid() = default;
 
-    ~Uuid() = default;
+    ~UtilUuid() = default;
 
     std::string createUuidString() {
         std::random_device rd;

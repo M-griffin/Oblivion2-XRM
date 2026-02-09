@@ -12,9 +12,9 @@
 #include "../model-sys/structures.hpp"
 #include "../model-sys/config.hpp"
 
-#include "../session_writer.hpp"
+#include "../tcp_session_wrapper.hpp"
 #include "../io_encoding.hpp"
-#include "../logging.hpp"
+#include "../util_log.hpp"
 #include "../io_session.hpp"
 #include "../io_common.hpp"
 
@@ -67,7 +67,7 @@ bool ModPreLogon::update(const std::string &character_buffer, const bool &) {
     // Make sure system is active, when system is done, success or fails
     // We change this is inactive to single the login process is completed.
     if (!m_is_active) {
-        m_log.log(Logging::LogLevel::Console, "PreLogon Module is Not Active");
+        m_log.log(UtilLog::LogLevel::Console, "PreLogon Module is Not Active");
         return false;
     }
 
@@ -76,7 +76,7 @@ bool ModPreLogon::update(const std::string &character_buffer, const bool &) {
 
     // Return True when were keeping module active / else false;
     if (character_buffer.empty()) {
-        m_log.log(Logging::LogLevel::Console, "PreLogon Buffer is Empty");
+        m_log.log(UtilLog::LogLevel::Console, "PreLogon Buffer is Empty");
         return true;
     }
 
@@ -92,7 +92,7 @@ bool ModPreLogon::update(const std::string &character_buffer, const bool &) {
  */
 bool ModPreLogon::onEnter() {
 
-    m_log.log(Logging::LogLevel::Console, "PreLogon onEnter");
+    m_log.log(UtilLog::LogLevel::Console, "PreLogon onEnter");
 
     // On Initial Startup, setup user record with system colors for menu system
     // this is overwritten once the user logs in, otherwise the menu system
@@ -122,7 +122,7 @@ bool ModPreLogon::onEnter() {
  * @return
  */
 bool ModPreLogon::onExit() {
-    m_log.log(Logging::LogLevel::Console, "PreLogon OnExit");
+    m_log.log(UtilLog::LogLevel::Console, "PreLogon OnExit");
     m_is_active = false;
     return true;
 }
@@ -143,7 +143,7 @@ bool ModPreLogon::pollTimers() {
  */
 void ModPreLogon::createTextPrompts() {
 
-    m_log.log(Logging::LogLevel::Console, "PreLogon Create Text Prompts");
+    m_log.log(UtilLog::LogLevel::Console, "PreLogon Create Text Prompts");
 
     // Create Mapping to pass for file creation (default values)
     M_TextPrompt value;
@@ -183,7 +183,7 @@ void ModPreLogon::createTextPrompts() {
 
     m_text_prompts_dao.writeValue(value);
 
-    m_log.log(Logging::LogLevel::Console, "PreLogon Create Text Prompts - Done!");
+    m_log.log(UtilLog::LogLevel::Console, "PreLogon Create Text Prompts - Done!");
 }
 
 /**
@@ -233,7 +233,7 @@ void ModPreLogon::displayPromptAndNewLine(const std::string &prompt) {
  */
 void ModPreLogon::setupHumanShield() {
 
-    m_log.log(Logging::LogLevel::Console, "PreLogon setupHumanShield");
+    m_log.log(UtilLog::LogLevel::Console, "PreLogon setupHumanShield");
 
     // Display Detecting Emulation, not using display prompt because we need to append.
     std::string result = "|07" + m_ctx.getIoCommon().centerPadding(
@@ -258,7 +258,7 @@ void ModPreLogon::setupHumanShield() {
  */
 void ModPreLogon::setupEmulationDetection() {
 
-    m_log.log(Logging::LogLevel::Console, "PreLogon setupEmulationDetection");
+    m_log.log(UtilLog::LogLevel::Console, "PreLogon setupEmulationDetection");
 
     // Deliver ANSI Location Sequence to Detect Emulation Response
     // Only detects if terminal handles ESC responses.
@@ -298,7 +298,7 @@ void ModPreLogon::setupAskANSIColor() {
  */
 void ModPreLogon::displayTerminalDetection() {
 
-    m_log.log(Logging::LogLevel::Console, "PreLogon displayTerminalDetection");
+    m_log.log(UtilLog::LogLevel::Console, "PreLogon displayTerminalDetection");
     m_log.setNode(m_ctx.getSessionWrite().getNodeNumber());
 
     // Grab Detected Terminal, ANSI, XTERM, etc..
@@ -321,7 +321,7 @@ void ModPreLogon::displayTerminalDetection() {
     if (!prompt_term.second.empty()) {
         std::string result = prompt_term.second;
         const std::string term = m_ctx.getTelnet().getTermType();
-        m_log.log(Logging::LogLevel::Console, "Term Type=", term);
+        m_log.log(UtilLog::LogLevel::Console, "Term Type=", term);
 
         m_ctx.getIoCommon().parseLocalMCI(result, mci_code, term);
         result = m_ctx.getIoSession().pipe2ansi(result);
@@ -333,13 +333,13 @@ void ModPreLogon::displayTerminalDetection() {
         std::string result = prompt_size.second;
         std::string term_size;
         if (m_x_position == 0 || m_y_position == 0) {
-            m_log.log(Logging::LogLevel::Console, "*** NAWS TermSize Detection!");
+            m_log.log(UtilLog::LogLevel::Console, "*** NAWS TermSize Detection!");
             // Make this Prompts for Customization!
             term_size = std::to_string(m_ctx.getTelnet().getTermCols());
             term_size.append("x");
             term_size.append(std::to_string(m_ctx.getTelnet().getTermRows()));
         } else {
-            m_log.log(Logging::LogLevel::Console, "*** ESC TermSize Detection!");
+            m_log.log(UtilLog::LogLevel::Console, "*** ESC TermSize Detection!");
             // Make this Prompts for Customization!
             term_size = std::to_string(m_x_position);
             term_size.append("x");
@@ -349,7 +349,7 @@ void ModPreLogon::displayTerminalDetection() {
             m_ctx.getTelnet().setTermRows(m_y_position);
         }
 
-        m_log.log(Logging::LogLevel::Console, "Term Size=", term_size);
+        m_log.log(UtilLog::LogLevel::Console, "Term Size=", term_size);
         m_ctx.getIoCommon().parseLocalMCI(result, mci_code, term_size);
         result = m_ctx.getIoSession().pipe2ansi(result);
         baseProcessAndDeliver(result);
@@ -389,7 +389,7 @@ void ModPreLogon::setupAskCodePage() {
  */
 bool ModPreLogon::humanShieldDetection(const std::string &input) {
 
-    m_log.log(Logging::LogLevel::Console, "PreLogon humanShieldDetection");
+    m_log.log(UtilLog::LogLevel::Console, "PreLogon humanShieldDetection");
 
     constexpr bool result = false;
 
@@ -431,7 +431,7 @@ bool ModPreLogon::humanShieldDetection(const std::string &input) {
  */
 bool ModPreLogon::emulationDetection(const std::string &input) {
 
-    m_log.log(Logging::LogLevel::Console, "PreLogon emulationDetection");
+    m_log.log(UtilLog::LogLevel::Console, "PreLogon emulationDetection");
 
     bool result = false;
 
@@ -460,7 +460,7 @@ bool ModPreLogon::emulationDetection(const std::string &input) {
                 // Splunk String on : for X/Y Positions from Response
                 const std::vector<std::string> positions = m_ctx.getIoCommon().splitString(m_esc_sequence, ';');
                 if (positions.size() > 1) {
-                    m_log.log(Logging::LogLevel::Console, "ESC Detect X=", positions[1], "Y=", positions[0]);
+                    m_log.log(UtilLog::LogLevel::Console, "ESC Detect X=", positions[1], "Y=", positions[0]);
                     m_x_position = m_ctx.getIoCommon().stringToInt(positions[1]);
                     m_y_position = m_ctx.getIoCommon().stringToInt(positions[0]);
 
@@ -497,7 +497,7 @@ bool ModPreLogon::askANSIColor(const std::string &input) {
                 baseProcessAndDeliverNewLine(yes_prompt);
             }
 
-            m_log.log(Logging::LogLevel::Console, "Ansi Selected");
+            m_log.log(UtilLog::LogLevel::Console, "Ansi Selected");
 
             m_ctx.getSessionWrite().setAnsi(true);
             displayPrompt(PROMPT_ANSI_SELECTED);
@@ -505,14 +505,14 @@ bool ModPreLogon::askANSIColor(const std::string &input) {
         }
         // Else check for single N for No to default to ASCII no colors.
         else if (toupper(key[0]) == 'N' && key.size() == 1) {
-            m_log.log(Logging::LogLevel::Console, "Ascii Selected");
+            m_log.log(UtilLog::LogLevel::Console, "Ascii Selected");
 
             baseProcessDeliverNewLine();
             displayPrompt(PROMPT_ASCII_SELECTED);
             m_ctx.getSessionWrite().setAnsi(false);
             displayTerminalDetection();
         } else {
-            m_log.log(Logging::LogLevel::Console, "Invalid Color selection ANSI/ASCII");
+            m_log.log(UtilLog::LogLevel::Console, "Invalid Color selection ANSI/ASCII");
             baseProcessDeliverNewLine();
             displayPrompt(PROMPT_USE_INVALID);
             redisplayModulePrompt();
@@ -540,7 +540,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
 
     // ESC was hit
     if (result == "aborted") {
-        m_log.log(Logging::LogLevel::Info, "ESC Was hit Aborted!");
+        m_log.log(UtilLog::LogLevel::Info, "ESC Was hit Aborted!");
         return false;
     }
 
@@ -575,7 +575,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
                 );
 
                 // Even though it's default, lets set it anyway
-                m_log.log(Logging::LogLevel::Console, "Encoding set to CP437");
+                m_log.log(UtilLog::LogLevel::Console, "Encoding set to CP437");
                 m_ctx.getSessionWrite().setEncoding(IoEncoding::TextEncoding::CP437);
             } else {
                 // Switch to Unicode Character Set.
@@ -588,7 +588,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
                 );
 
                 // Even though it's default, lets set it anyway
-                m_log.log(Logging::LogLevel::Console, "Encoding set to UTF-8");
+                m_log.log(UtilLog::LogLevel::Console, "Encoding set to UTF-8");
                 m_ctx.getSessionWrite().setEncoding(IoEncoding::TextEncoding::UTF8);
             }
 
@@ -618,7 +618,7 @@ bool ModPreLogon::askCodePage(const std::string &input) {
                 );
 
                 // Even though it's default, lets set it anyways
-                m_log.log(Logging::LogLevel::Console, "Encoding set to UTF-8");
+                m_log.log(UtilLog::LogLevel::Console, "Encoding set to UTF-8");
                 m_ctx.getSessionWrite().setEncoding(IoEncoding::TextEncoding::UTF8);
             } else {
                 // Switch to ISO, then CP437 Character Set.
@@ -631,12 +631,12 @@ bool ModPreLogon::askCodePage(const std::string &input) {
                 );
 
                 // Even though it's default, lets set it anyways
-                m_log.log(Logging::LogLevel::Console, "Encoding set to CP437");
+                m_log.log(UtilLog::LogLevel::Console, "Encoding set to CP437");
                 m_ctx.getSessionWrite().setEncoding(IoEncoding::TextEncoding::CP437);
             }
 
             baseProcessAndDeliverNewLine(message);
-            m_log.log(Logging::LogLevel::Console, "PreLogon Completed Encoding Select=",m_ctx.getSessionWrite().getEncoding() );
+            m_log.log(UtilLog::LogLevel::Console, "PreLogon Completed Encoding Select=",m_ctx.getSessionWrite().getEncoding() );
             m_is_active = false;
         } else {
             baseProcessDeliverNewLine();
@@ -699,7 +699,7 @@ void ModPreLogon::humanShieldCompleted() {
 
         // Disconnect User
         m_is_active = false;
-        m_log.log(Logging::LogLevel::Console, "Human Shield Failed, disconnecting!");
+        m_log.log(UtilLog::LogLevel::Console, "Human Shield Failed, disconnecting!");
 
         // Can we just hang up here and clear the session.
         m_ctx.getSessionWrite().hangup();

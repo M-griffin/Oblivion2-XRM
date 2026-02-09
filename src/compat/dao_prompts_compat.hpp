@@ -4,13 +4,13 @@
 #include <string>
 
 #include "../model-sys/structures.hpp"
-#include "../logging.hpp"
+#include "../util_log.hpp"
 
 /**
  * @class PromptDao
  * @author Michael Griffin
  * @date 3/18/2016
- * @file prompts_compat_dao.hpp
+ * @file dao_prompts_compat.hpp
  * @brief Holds Binary functions for reading MENUPROMPTS.DAT Original OBV/2
  */
 class PromptDao {
@@ -58,8 +58,8 @@ public:
             stream = fopen(path.c_str(), "wb");
 
             if (stream == nullptr) {
-                Logging &log = Logging::getInstance();
-                log.log(Logging::LogLevel::Info, "Error writing file=", filename, __FILE__, __LINE__);
+                UtilLog &log = UtilLog::getInstance();
+                log.log(UtilLog::LogLevel::Info, "Error writing file=", filename, __FILE__, __LINE__);
                 return x;
             }
         }
@@ -90,12 +90,12 @@ public:
 
         if (stream == nullptr) {
             // Create File if it doesn't exist.
-            Logging &log = Logging::getInstance();
-            log.log(Logging::LogLevel::Info, "Error Reading/creating file=", filename, __FILE__, __LINE__);
+            UtilLog &log = UtilLog::getInstance();
+            log.log(UtilLog::LogLevel::Info, "Error Reading/creating file=", filename, __FILE__, __LINE__);
             stream = fopen(path.c_str(), "wb");
 
             if (stream == nullptr) {
-                log.log(Logging::LogLevel::Info, "Error Reading file=", filename, __FILE__, __LINE__);
+                log.log(UtilLog::LogLevel::Info, "Error Reading file=", filename, __FILE__, __LINE__);
                 return x;
             }
         }

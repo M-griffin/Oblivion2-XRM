@@ -13,8 +13,8 @@
 #include "model-sys/config.hpp"
 #include "model-sys/structures.hpp"
 
-#include "session_writer.hpp"
-#include "logging.hpp"
+#include "tcp_session_wrapper.hpp"
+#include "util_log.hpp"
 
 
 /**
@@ -25,8 +25,8 @@
  * @brief Higher Level I/O specific to Menu Interfaces
  */
 class IoSession {
-    Logging &m_log;
-    SessionWriter &m_session;
+    UtilLog &m_log;
+    TcpSessionWrapper &m_session;
     IoCommon &m_io_common;
 
     IoInputHandler m_io_input_handler;
@@ -38,8 +38,8 @@ public:
     // Types for Text Prompt formatting to file.
     typedef std::pair<std::string, std::string> M_StringPair;
 
-    IoSession(SessionWriter &session, IoCommon &common)
-        : m_log(Logging::getInstance())
+    IoSession(TcpSessionWrapper &session, IoCommon &common)
+        : m_log(UtilLog::getInstance())
           , m_session(session)
           , m_io_common(common)
           , m_io_input_handler(session, common)
@@ -47,7 +47,7 @@ public:
     }
 
     ~IoSession() {
-        m_log.log(Logging::LogLevel::Console, "~IoSession()");
+        m_log.log(UtilLog::LogLevel::Console, "~IoSession()");
     }
 
     // Copy constructors

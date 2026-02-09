@@ -24,20 +24,7 @@ public:
     explicit OnelinerDao(Database &database)
         : baseOnelinerClass(database) {
         // Setup Table name
-        m_strTableName = "oneliner";
-
-        /**
-         * Pre Populate Static Queries one Time
-         */
-        m_cmdFirstTimeSetup =
-                "PRAGMA synchronous=Normal; "
-                "PRAGMA encoding=UTF-8; "
-                "PRAGMA foreign_keys=ON; "
-                "PRAGMA default_cache_size=10000; "
-                "PRAGMA cache_size=10000; "
-                "PRAGMA journal_mode = WAL; "
-                "PRAGMA temp_store = MEMORY; "
-                "PRAGMA mmap_size = 268435456; ";
+        m_strTableName = "Oneliner";
 
         // Check if Database Exists.
         m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName +
@@ -52,7 +39,7 @@ public:
                 "sUserName         TEXT NOT NULL COLLATE NOCASE, "
                 "sUserInitials     TEXT NOT NULL COLLATE NOCASE, "
                 "dtDatePosted      DATETIME DEFAULT CURRENT_TIMESTAMP, "
-                "FOREIGN KEY(iUserId) REFERENCES User(iId) ON DELETE CASCADE "
+                "FOREIGN KEY(iUserId) REFERENCES UserRecord(iId) ON DELETE CASCADE "
                 "); ";
 
         // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)

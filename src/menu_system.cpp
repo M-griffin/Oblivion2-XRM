@@ -21,7 +21,7 @@
 
 #include "model-sys/context.hpp"
 #include "tcp_session.hpp"
-#include "logging.hpp"
+#include "util_log.hpp"
 
 MenuSystem::MenuSystem(Context &ctx)
     : MenuBase(ctx)
@@ -51,7 +51,7 @@ MenuSystem::MenuSystem(Context &ctx)
     m_menu_command_functions['V'] = bind_member(this, menuOptionsVotingCommands);
     m_menu_command_functions['+'] = bind_member(this, menuOptionsColorSettingCommands);
 
-    m_log.log(Logging::LogLevel::Console, "MenuSystem()");
+    m_log.log(UtilLog::LogLevel::Console, "MenuSystem()");
 
     // -------------------------------------------------
     // STATE HANDLERS
@@ -62,7 +62,7 @@ MenuSystem::MenuSystem(Context &ctx)
 }
 
 MenuSystem::~MenuSystem() {
-    m_log.log(Logging::LogLevel::Console, "~MenuSystem()");
+    m_log.log(UtilLog::LogLevel::Console, "~MenuSystem()");
 
     // Clear All Menu Command Functions.
     m_menu_command_functions.clear();
@@ -90,7 +90,7 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
  */
 bool MenuSystem::onEnter() {
     m_is_active = true;
-    m_log.log(Logging::LogLevel::Console, "MenuSystem() - onEnter, state=", stateToString());
+    m_log.log(UtilLog::LogLevel::Console, "MenuSystem() - onEnter, state=", stateToString());
     return true;
 }
 
@@ -99,7 +99,7 @@ bool MenuSystem::onEnter() {
  * @return
  */
 bool MenuSystem::onExit() {
-    m_log.log(Logging::LogLevel::Console, "MenuSystem() - onExit, state=", stateToString());
+    m_log.log(UtilLog::LogLevel::Console, "MenuSystem() - onExit, state=", stateToString());
     m_is_active = false;
     return true;
 }
@@ -118,7 +118,7 @@ bool MenuSystem::pollTimers() {
 
 // For Modules
 void MenuSystem::bindStateHandlers() {
-    m_log.log(Logging::LogLevel::Console, "bindStateHandlers()");
+    m_log.log(UtilLog::LogLevel::Console, "bindStateHandlers()");
 
     // Should rewrite these to use virtual classes again and single object.
     clearHandlers.clear();
@@ -169,7 +169,7 @@ void MenuSystem::bindStateHandlers() {
     assert(pollHandlers.size() == StateCount);
     assert(inputHandlers.size() == StateCount);
 
-    m_log.log(Logging::LogLevel::Console, "~bindStateHandlers()");
+    m_log.log(UtilLog::LogLevel::Console, "~bindStateHandlers()");
 }
 
 /**
@@ -511,7 +511,7 @@ bool MenuSystem::menuOptionsMultiNodeCommands(const MenuOption &option) {
  */
 bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
 
-    m_log.log(Logging::LogLevel::Console, "Matrix CommandKey=", option.command_key);
+    m_log.log(UtilLog::LogLevel::Console, "Matrix CommandKey=", option.command_key);
 
     switch (option.command_key[1]) {
         // Logon
@@ -520,7 +520,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
         // USERLOG.X, and SYSPASS.X will be displayed.
         // { Note: add 0 for random! }
         case 'S':
-            m_log.log(Logging::LogLevel::Info, "Executing startupModuleLogon()");
+            m_log.log(UtilLog::LogLevel::Info, "Executing startupModuleLogon()");
             setState(State::ModLogon);
             break;
 
@@ -536,7 +536,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
 
         // Apply
         case 'A':
-            m_log.log(Logging::LogLevel::Info, "Executing startupModuleSignup()");
+            m_log.log(UtilLog::LogLevel::Info, "Executing startupModuleSignup()");
             setState(State::ModSignup);
             return true;
 
@@ -547,7 +547,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
         // Check
         case 'E': {
             // Testing processes
-            m_log.log(Logging::LogLevel::Debug, "Executing startupModuleMessageEditor()");
+            m_log.log(UtilLog::LogLevel::Debug, "Executing startupModuleMessageEditor()");
             //startupModuleMessageEditor();
             return true;
             /*
@@ -572,7 +572,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
 
         // Logoff
         case 'G':
-            m_log.log(Logging::LogLevel::Console, "User Logoff()");
+            m_log.log(UtilLog::LogLevel::Console, "User Logoff()");
             // Base Class
             m_logoff = true;
             m_ctx.getSessionWrite().hangup();
@@ -633,7 +633,7 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option) {
 
         // Logoff
         case 'G':
-            m_log.log(Logging::LogLevel::Debug, "Logoff()");
+            m_log.log(UtilLog::LogLevel::Debug, "Logoff()");
             // Add Logoff ANSI Display here.
             // Base Class
             m_logoff = true;
@@ -642,7 +642,7 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option) {
 
         // logoff without ansi
         case 'H':
-            m_log.log(Logging::LogLevel::Debug, "Logoff() Without ANSI");
+            m_log.log(UtilLog::LogLevel::Debug, "Logoff() Without ANSI");
             // Base Class
             m_logoff = true;
             disconnectUser();
@@ -719,17 +719,17 @@ bool MenuSystem::menuOptionsDoorCommands(const MenuOption &option) {
 bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         case '#': // Menu Editor
-            m_log.log(Logging::LogLevel::Debug, "Executing startupModuleMenuEditor()");
+            m_log.log(UtilLog::LogLevel::Debug, "Executing startupModuleMenuEditor()");
             //startupModuleMenuEditor();
             break;
 
         case 'U': // User Editor
-            m_log.log(Logging::LogLevel::Debug, "Executing startupModuleUserEditor()");
+            m_log.log(UtilLog::LogLevel::Debug, "Executing startupModuleUserEditor()");
             //startupModuleUserEditor();
             break;
 
         case 'Y': // Level Editor
-            m_log.log(Logging::LogLevel::Debug, "Executing startupModuleLevelEditor()");
+            m_log.log(UtilLog::LogLevel::Debug, "Executing startupModuleLevelEditor()");
             //startupModuleLevelEditor();
             break;
 
@@ -962,7 +962,7 @@ MenuBase::BaseState MenuSystem::getMenuBaseState() {
  * @param cmdline
  */
 void MenuSystem::startupExternalProcess(const std::string &cmdline) {
-    m_log.log(Logging::LogLevel::Console, "Executing startExternalProcess()=", cmdline);
+    m_log.log(UtilLog::LogLevel::Console, "Executing startExternalProcess()=", cmdline);
     //m_menu_session_data->startExternalProcess(cmdline);
 }
 
@@ -981,7 +981,7 @@ void MenuSystem::startupModuleMenuEditor()
 
     if(!module)
     {
-        m_log.log(Logging::LogLevel::Error, "startupModuleMenuEditor Allocation Error");
+        m_log.log(UtilLog::LogLevel::Error, "startupModuleMenuEditor Allocation Error");
         return;
     }
 
@@ -1003,7 +1003,7 @@ void MenuSystem::startupModuleUserEditor()
 
     if(!module)
     {
-        m_log.log(Logging::LogLevel::Error, "startupModuleUserEditor Allocation Error");
+        m_log.log(UtilLog::LogLevel::Error, "startupModuleUserEditor Allocation Error");
         return;
     }
 
@@ -1025,7 +1025,7 @@ void MenuSystem::startupModuleLevelEditor()
 
     if(!module)
     {
-        m_log.log(Logging::LogLevel::Error, "startupModuleLevelEditor Allocation Error");
+        m_log.log(UtilLog::LogLevel::Error, "startupModuleLevelEditor Allocation Error");
         return;
     }
 
@@ -1047,7 +1047,7 @@ void MenuSystem::startupModuleMessageEditor()
 
     if(!module)
     {
-        m_log.log(Logging::LogLevel::Error, "startupModuleMessageEditor Allocation Error");
+        m_log.log(UtilLog::LogLevel::Error, "startupModuleMessageEditor Allocation Error");
         return;
     }
 
@@ -1060,7 +1060,7 @@ void MenuSystem::startupModuleMessageEditor()
 // -------------------------
 
 void MenuSystem::createMenuSystem() {
-    m_log.log(Logging::LogLevel::Console, "MenuSystem() createMenuSystem");
+    m_log.log(UtilLog::LogLevel::Console, "MenuSystem() createMenuSystem");
     m_current_menu = "matrix";
     m_starting_menu = "matrix";
 
@@ -1070,7 +1070,7 @@ void MenuSystem::createMenuSystem() {
     term_rows = m_ctx.getTelnet().getTermRows();
     term_cols = m_ctx.getTelnet().getTermCols();
 
-    m_log.log(Logging::LogLevel::Info, "MATRIX MENU SETUP - RESET ANSI TERM SIZE to Detection",
+    m_log.log(UtilLog::LogLevel::Info, "MATRIX MENU SETUP - RESET ANSI TERM SIZE to Detection",
               term_rows,
               term_cols
     );
@@ -1091,7 +1091,7 @@ void MenuSystem::pollMenuSystem() {
 }
 
 void MenuSystem::inputMenuSystem(const std::string &input) {
-    m_log.log(Logging::LogLevel::Console, "MenuSystem() inputMenuSystem");
+    m_log.log(UtilLog::LogLevel::Console, "MenuSystem() inputMenuSystem");
 
     if (!m_is_active) {
         return;
@@ -1113,7 +1113,7 @@ void MenuSystem::inputMenuSystem(const std::string &input) {
 // -------------------------
 
 void MenuSystem::createLogon() {
-    m_log.log(Logging::LogLevel::Console, "MenuSystem() createLogon");
+    m_log.log(UtilLog::LogLevel::Console, "MenuSystem() createLogon");
 
     // Make Sure we cover any unexpected errors in Creating the Module.
     try {
@@ -1141,7 +1141,7 @@ void MenuSystem::pollLogon() {
 }
 
 void MenuSystem::inputLogon(const std::string &input) {
-    m_log.log(Logging::LogLevel::Console, "MenuSystem() inputLogon");
+    m_log.log(UtilLog::LogLevel::Console, "MenuSystem() inputLogon");
 
     if (logonState) {
         logonState->update(input, false);
@@ -1149,10 +1149,10 @@ void MenuSystem::inputLogon(const std::string &input) {
 
     // Finished modules processing.
     if (!logonState->m_is_active) {
-        m_log.log(Logging::LogLevel::Info, "!LogonState->m_is_active - shutting down module: ");
+        m_log.log(UtilLog::LogLevel::Info, "!LogonState->m_is_active - shutting down module: ");
 
         if (!logonState->m_is_active) {
-            m_log.log(Logging::LogLevel::Console, "MenuSystem() logonState is Inactive");
+            m_log.log(UtilLog::LogLevel::Console, "MenuSystem() logonState is Inactive");
 
             // After Logon, we Move back to Menu System
             setState(State::MenuSystem);
@@ -1169,7 +1169,7 @@ void MenuSystem::inputLogon(const std::string &input) {
         if (m_ctx.getSessionWrite().isAuthorized()) {
             // If Authorized, then we want to move to main! Startup menu should be TOP or
             // Specified in Config file!  TODO
-            m_log.log(Logging::LogLevel::Info, "m_is_session_authorized=", m_ctx.getSessionWrite().isAuthorized());
+            m_log.log(UtilLog::LogLevel::Info, "m_is_session_authorized=", m_ctx.getSessionWrite().isAuthorized());
 
             // TODO This should be individual users start menu!
             if (m_ctx.getCfg().starting_menu_name.size() > 0) {
@@ -1182,11 +1182,11 @@ void MenuSystem::inputLogon(const std::string &input) {
                 m_starting_menu = "main";
             }
         } else {
-            m_log.log(Logging::LogLevel::Debug, "!m_is_session_authorized");
+            m_log.log(UtilLog::LogLevel::Debug, "!m_is_session_authorized");
             m_current_menu = "matrix";
         }
 
-        m_log.log(Logging::LogLevel::Debug, "loadAndStartupMenu on initial login");
+        m_log.log(UtilLog::LogLevel::Debug, "loadAndStartupMenu on initial login");
 
         if (m_ctx.getSessionWrite().isActive()) {
             // After Successful Logon, we Move back to Menu System
@@ -1212,7 +1212,7 @@ void MenuSystem::inputLogon(const std::string &input) {
 // -------------------------
 
 void MenuSystem::createSignup() {
-    m_log.log(Logging::LogLevel::Console, "MenuSystem() createSignup");
+    m_log.log(UtilLog::LogLevel::Console, "MenuSystem() createSignup");
 
     // Make Sure we cover any unexpected errors in Creating the Module.
     try {
@@ -1240,7 +1240,7 @@ void MenuSystem::pollSignup() {
 }
 
 void MenuSystem::inputSignup(const std::string &input) {
-    m_log.log(Logging::LogLevel::Console, "MenuSystem() inputSignup");
+    m_log.log(UtilLog::LogLevel::Console, "MenuSystem() inputSignup");
 
     if (signupState) {
         signupState->update(input, false);
@@ -1248,10 +1248,10 @@ void MenuSystem::inputSignup(const std::string &input) {
 
     // Finished modules processing.
     if (!signupState->m_is_active) {
-        m_log.log(Logging::LogLevel::Info, "!signupState->m_is_active - shutting down module: ");
+        m_log.log(UtilLog::LogLevel::Info, "!signupState->m_is_active - shutting down module: ");
 
         if (!signupState->m_is_active) {
-            m_log.log(Logging::LogLevel::Console, "MenuSystem() signupState is Inactive");
+            m_log.log(UtilLog::LogLevel::Console, "MenuSystem() signupState is Inactive");
 
             // After Signup, we Move back to Menu System
             setState(State::MenuSystem);
@@ -1268,7 +1268,7 @@ void MenuSystem::inputSignup(const std::string &input) {
 // -------------------------
 
 void MenuSystem::createMenuEditor() {
-    m_log.log(Logging::LogLevel::Console, "MenuSystem() createMenuEditor");
+    m_log.log(UtilLog::LogLevel::Console, "MenuSystem() createMenuEditor");
 
     // Make Sure we cover any unexpected errors in Creating the Module.
     try {
@@ -1296,7 +1296,7 @@ void MenuSystem::pollMenuEditor() {
 }
 
 void MenuSystem::inputMenuEditor(const std::string &input) {
-    m_log.log(Logging::LogLevel::Console, "MenuSystem() inputMenuEditor");
+    m_log.log(UtilLog::LogLevel::Console, "MenuSystem() inputMenuEditor");
 
     if (menuEditorState) {
         menuEditorState->update(input, false);
@@ -1304,10 +1304,10 @@ void MenuSystem::inputMenuEditor(const std::string &input) {
 
     // Finished modules processing.
     if (!menuEditorState->m_is_active) {
-        m_log.log(Logging::LogLevel::Info, "!menuEditorState->m_is_active - shutting down module: ");
+        m_log.log(UtilLog::LogLevel::Info, "!menuEditorState->m_is_active - shutting down module: ");
 
         if (!menuEditorState->m_is_active) {
-            m_log.log(Logging::LogLevel::Console, "MenuSystem() menuEditorState is Inactive");
+            m_log.log(UtilLog::LogLevel::Console, "MenuSystem() menuEditorState is Inactive");
 
             // After Signup, we Move back to Menu System
             setState(State::MenuSystem);

@@ -11,7 +11,7 @@
  * @class MenuCompatDao
  * @author Michael Griffin
  * @date 10/6/2015
- * @file menu_compat_dao.hpp
+ * @file dao_menu_compat.hpp
  * @brief Holds Binary functions for reading .MNU Data Files. Original OBV/2
  */
 class MenuCompatDao {

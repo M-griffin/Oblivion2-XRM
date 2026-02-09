@@ -6,7 +6,7 @@
 #include <functional>
 #include <optional>
 
-#include "directory.hpp"
+#include "util_dir.hpp"
 
 #include "model-sys/structures.hpp"
 #include "model-sys/menu.hpp"
@@ -16,7 +16,7 @@
 #include "menu_cmd_chain.hpp"
 
 class Context;
-class Logging;
+class UtilLog;
 
 
 /**
@@ -92,9 +92,9 @@ public:
         std::vector<MenuOption> commands;
     };
 
-    Logging &m_log;
+    UtilLog &m_log;
     Context &m_ctx;
-    Directory m_directory;
+    UtilDir m_directory;
     ExecContext m_execContext;
     FirstCmdState m_firstCmdState;
     bool m_suppressFirstCmdOnce = false;

@@ -6,7 +6,7 @@
 #include <utf8.h>
 
 #include "io_common.hpp"
-#include "logging.hpp"
+#include "util_log.hpp"
 
 std::string IoCodeMapping::parseFilename(const std::string &pipe_code) {
     // Strip %%DF and grab the 'Filename.ext
@@ -29,7 +29,7 @@ std::string IoCodeMapping::parseFilename(const std::string &pipe_code) {
  */
 std::string IoCodeMapping::parseCodeMap(
         const std::string &screen, std::vector<CodeMapType> &code_map) {
-    m_log.log(Logging::LogLevel::Debug, "[parseCodeMap]", __LINE__, __FILE__);
+    m_log.log(UtilLog::LogLevel::Debug, "[parseCodeMap]", __LINE__, __FILE__);
 
     std::string ansi_string(screen);
 
@@ -58,7 +58,7 @@ std::string IoCodeMapping::parseCodeMap(
         switch (my_matches.m_match) {
             case 1: // Pipe w/ 2 DIGIT Colors
             {
-                m_log.log(Logging::LogLevel::Debug, "Pipe w/ 2 DIGIT Colors |00");
+                m_log.log(UtilLog::LogLevel::Debug, "Pipe w/ 2 DIGIT Colors |00");
                 std::string result = m_io_pipes_and_colors.pipeColors(my_matches.m_code);
 
                 if (!result.empty()) {
@@ -73,7 +73,7 @@ std::string IoCodeMapping::parseCodeMap(
 
             case 2: // Pipe w/ 2 Chars and 4 Digits // |XY0101
             {
-                m_log.log(Logging::LogLevel::Debug, "Pipe w/ 2 Chars and 4 Digits // |XY0101");
+                m_log.log(UtilLog::LogLevel::Debug, "Pipe w/ 2 Chars and 4 Digits // |XY0101");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "       ");
             }
@@ -81,7 +81,7 @@ std::string IoCodeMapping::parseCodeMap(
 
             case 3: // Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS
             {
-                m_log.log(Logging::LogLevel::Debug,
+                m_log.log(UtilLog::LogLevel::Debug,
                           "Pipe w/ 1 or 2 CHARS followed by 1 or 2 DIGITS // |A1 A22  AA2  AA33");
                 std::string result = m_io_pipes_and_colors.separatePipeWithCharsDigits(my_matches.m_code);
 
@@ -96,7 +96,7 @@ std::string IoCodeMapping::parseCodeMap(
                 // This one will need replacement in the string parsing
                 // Pass the original string because of |DE for delay!
             {
-                m_log.log(Logging::LogLevel::Debug, "Pipe w/ 2 CHARS // |AA");
+                m_log.log(UtilLog::LogLevel::Debug, "Pipe w/ 2 CHARS // |AA");
                 std::string result = m_io_pipes_and_colors.parsePipeWithChars(my_matches.m_code);
 
                 if (!result.empty()) {
@@ -110,7 +110,7 @@ std::string IoCodeMapping::parseCodeMap(
 
             case 5: // %%FILENAME.EXT  get filenames for loading from string prompts
             {
-                m_log.log(Logging::LogLevel::Debug, "Replacing %%FILENAME.EXT codes");
+                m_log.log(UtilLog::LogLevel::Debug, "Replacing %%FILENAME.EXT codes");
                 std::string result = parseFilename(my_matches.m_code);
 
                 if (!result.empty()) {
@@ -124,7 +124,7 @@ std::string IoCodeMapping::parseCodeMap(
 
             case 6: // Percent w/ 2 CHARS
             {
-                m_log.log(Logging::LogLevel::Debug, "Percent w/ 2 CHARS");
+                m_log.log(UtilLog::LogLevel::Debug, "Percent w/ 2 CHARS");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
             }
@@ -134,7 +134,7 @@ std::string IoCodeMapping::parseCodeMap(
             {
                 // Were just removing them because they are processed.
                 // Now that first part of sequence |01 etc.. are processed!
-                m_log.log(Logging::LogLevel::Debug, "replacing %## codes");
+                m_log.log(UtilLog::LogLevel::Debug, "replacing %## codes");
                 // Remove for now, haven't gotten this far!
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, "   ");
             }
@@ -161,7 +161,7 @@ std::string IoCodeMapping::parseCodeMap(
  * @return
  */
 std::string IoCodeMapping::parseCodeMapGenerics(const std::string &screen, const std::vector<CodeMapType> &code_map) {
-    m_log.log(Logging::LogLevel::Debug, "[parseCodeMapGenerics]", __LINE__, __FILE__);
+    m_log.log(UtilLog::LogLevel::Debug, "[parseCodeMapGenerics]", __LINE__, __FILE__);
 
     std::string ansi_string(screen);
 
@@ -184,12 +184,12 @@ std::string IoCodeMapping::parseCodeMapGenerics(const std::string &screen, const
             it = m_mapped_codes.find(my_matches.m_code);
 
             if (it != m_mapped_codes.end()) {
-                m_log.log(Logging::LogLevel::Debug, "[parseCodeMapGenerics] gen found=", my_matches.m_code, it->second,
+                m_log.log(UtilLog::LogLevel::Debug, "[parseCodeMapGenerics] gen found=", my_matches.m_code, it->second,
                           __LINE__, __FILE__);
                 // If found, replace mci sequence with text
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, it->second);
             } else {
-                m_log.log(Logging::LogLevel::Debug, "[parseCodeMapGenerics] gen not found=", __LINE__, __FILE__);
+                m_log.log(UtilLog::LogLevel::Debug, "[parseCodeMapGenerics] gen not found=", __LINE__, __FILE__);
                 std::string remove_code;
                 ansi_string.replace(my_matches.m_offset, my_matches.m_length, remove_code);
             }
@@ -246,7 +246,7 @@ std::vector<CodeMapType> IoCodeMapping::parseScreenBufferToCodeMap(
             // Avoid Infinite loop and make sure the existing
             // is not the same as the next!
             if (start == matches[0].second) {
-                m_log.log(Logging::LogLevel::Debug, "[screenBufferParse] no matches!", __LINE__, __FILE__);
+                m_log.log(UtilLog::LogLevel::Debug, "[screenBufferParse] no matches!", __LINE__, __FILE__);
                 break;
             }
 
@@ -286,7 +286,7 @@ std::vector<CodeMapType> IoCodeMapping::parseScreenBufferToCodeMap(
             }
         }
     } catch (std::regex_error &ex) {
-        m_log.log(Logging::LogLevel::Error, "[screenBufferParse] regex=", ex.what(), ex.code(), __LINE__, __FILE__);
+        m_log.log(UtilLog::LogLevel::Error, "[screenBufferParse] regex=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
     return code_map;
@@ -327,7 +327,7 @@ std::vector<CodeMapType> IoCodeMapping::parseToCodeMap(const std::string &sequen
         std::smatch matches;
         std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
 
-        // Temp for Logging
+        // Temp for UtilLog
         std::string::size_type offset = 0;
         std::string::size_type length = 0;
 
@@ -344,7 +344,7 @@ std::vector<CodeMapType> IoCodeMapping::parseToCodeMap(const std::string &sequen
             // Avoid Infinite loop and make sure the existing
             // is not the same as the next!
             if (start == matches[0].second) {
-                m_log.log(Logging::LogLevel::Debug, "[parseToCodeMap] no Code Maps Found", __LINE__, __FILE__);
+                m_log.log(UtilLog::LogLevel::Debug, "[parseToCodeMap] no Code Maps Found", __LINE__, __FILE__);
                 break;
             }
 
@@ -389,7 +389,7 @@ std::vector<CodeMapType> IoCodeMapping::parseToCodeMap(const std::string &sequen
             }
         }
     } catch (std::regex_error &ex) {
-        m_log.log(Logging::LogLevel::Error, "[parseToCodeMap] Exception=", ex.what(), ex.code(), __LINE__, __FILE__);
+        m_log.log(UtilLog::LogLevel::Error, "[parseToCodeMap] Exception=", ex.what(), ex.code(), __LINE__, __FILE__);
     }
 
     return code_map;
@@ -455,7 +455,7 @@ std::string IoCodeMapping::pipe2promptFormat(const std::string &sequence, Config
     // Loop codes and build MCI Parsing List
     for (unsigned int i = 0; i < code_map.size(); i++) {
         auto &map = code_map[i];
-        m_log.log(Logging::LogLevel::Debug, "[pipe2promptFormat] Menu Format Code=", map.m_code, __LINE__, __FILE__);
+        m_log.log(UtilLog::LogLevel::Debug, "[pipe2promptFormat] Menu Format Code=", map.m_code, __LINE__, __FILE__);
 
         // Control Codes are in Group 2
         switch (map.m_match) {
@@ -497,7 +497,7 @@ bool IoCodeMapping::checkRegex(const std::string &sequence, const std::regex &ex
     try {
         result = std::regex_match(sequence, match, expression);
     } catch (std::regex_error &ex) {
-        m_log.log(Logging::LogLevel::Error, "[checkRegex], Exception=", ex.what(), ex.code(),
+        m_log.log(UtilLog::LogLevel::Error, "[checkRegex], Exception=", ex.what(), ex.code(),
                   __LINE__, __FILE__);
     }
 

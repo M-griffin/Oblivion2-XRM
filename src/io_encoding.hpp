@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <mutex>
 #include <regex>
-#include "logging.hpp"
+#include "util_log.hpp"
 
 class IoEncoding
 {
@@ -87,7 +87,7 @@ private:
 
     std::unordered_map<char32_t, uint8_t> unicodeToCp437;
     mutable std::mutex m_mutex;
-    Logging& m_log = Logging::getInstance();
+    UtilLog& m_log = UtilLog::getInstance();
 };
 
 #endif

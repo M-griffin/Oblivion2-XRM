@@ -7,7 +7,7 @@
 
 #include "model-sys/cell.hpp"
 
-#include "logging.hpp"
+#include "util_log.hpp"
 #include "io_encoding.hpp"
 #include "io_common.hpp"
 
@@ -23,25 +23,25 @@ std::string IoInputHandler::getFSEKeyInput(const std::string &character_buffer) 
     if (input.empty()) {
         // No Data received, could be in mid-ESC sequence
         // Return for next key.
-        m_log.log(Logging::LogLevel::Debug, "getKeyInput Mid Escape");
+        m_log.log(UtilLog::LogLevel::Debug, "getKeyInput Mid Escape");
         return "";
     }
 
     if (input[0] == '\x1b') {
         std::string escape_sequence = m_io_common.getFSEEscapeSequence();
 
-        m_log.log(Logging::LogLevel::Debug, "FSE escape_sequence=", escape_sequence);
+        m_log.log(UtilLog::LogLevel::Debug, "FSE escape_sequence=", escape_sequence);
 
         if (escape_sequence.empty()) {
-            m_log.log(Logging::LogLevel::Debug, "getKeyInput Single Escape");
+            m_log.log(UtilLog::LogLevel::Debug, "getKeyInput Single Escape");
             return "\x1b";
         } else {
-            m_log.log(Logging::LogLevel::Debug, "getKeyInput Translated Escape Sequence=", escape_sequence);
+            m_log.log(UtilLog::LogLevel::Debug, "getKeyInput Translated Escape Sequence=", escape_sequence);
             return (escape_sequence.insert(0, "\x1b"));
         }
     }
 
-    m_log.log(Logging::LogLevel::Debug, "getKeyInput Normal Input=", input);
+    m_log.log(UtilLog::LogLevel::Debug, "getKeyInput Normal Input=", input);
     return input;
 }
 
@@ -56,7 +56,7 @@ std::string IoInputHandler::getKeyInput(const std::string &character_buffer) {
     if (input.empty()) {
         // No Data received, could be in mid ESC sequence
         // Return for next key.
-        m_log.log(Logging::LogLevel::Debug, "getKeyInput Mid Escape");
+        m_log.log(UtilLog::LogLevel::Debug, "getKeyInput Mid Escape");
         return "";
     }
 
@@ -64,15 +64,15 @@ std::string IoInputHandler::getKeyInput(const std::string &character_buffer) {
         std::string escape_sequence = m_io_common.getEscapeSequence();
 
         if (escape_sequence.empty()) {
-            m_log.log(Logging::LogLevel::Debug, "getKeyInput Single Escape");
+            m_log.log(UtilLog::LogLevel::Debug, "getKeyInput Single Escape");
             return "\x1b";
         } else {
-            m_log.log(Logging::LogLevel::Debug, "getKeyInput Translated Escape Sequence=", escape_sequence);
+            m_log.log(UtilLog::LogLevel::Debug, "getKeyInput Translated Escape Sequence=", escape_sequence);
             return (escape_sequence.insert(0, "\x1b"));
         }
     }
 
-    m_log.log(Logging::LogLevel::Debug, "getKeyInput Normal Input=", input);
+    m_log.log(UtilLog::LogLevel::Debug, "getKeyInput Normal Input=", input);
     return input;
 }
 
@@ -101,7 +101,7 @@ void IoInputHandler::createInputField(std::string &field_name, int &len) {
         return;
     }
 
-    m_log.log(Logging::LogLevel::Debug, "m_session.getUseAnsi()=", m_session.isAnsi());
+    m_log.log(UtilLog::LogLevel::Debug, "m_session.getUseAnsi()=", m_session.isAnsi());
 
     // Format Input Field, if color is enabled, otherwise just add Field Name like "Login: "
     if (!m_session.isAnsi()) {
@@ -130,7 +130,7 @@ void IoInputHandler::createInputField(std::string &field_name, int &len) {
                 if (static_cast<signed>(tempLength) > 0 && static_cast<signed>(tempLength) <= len) {
                     len = tempLength;
                 } else {
-                    m_log.log(Logging::LogLevel::Error, "createInputField() Incorrect |FL field length=", tempLength,
+                    m_log.log(UtilLog::LogLevel::Error, "createInputField() Incorrect |FL field length=", tempLength,
                               "cannot exceed max size=", len);
                 }
             } else {
@@ -142,7 +142,7 @@ void IoInputHandler::createInputField(std::string &field_name, int &len) {
     // Override Foreground/Background Input Field Colors
     // This is now for OBV/2 - Not in Legacy.
     position = field_name.find("|FB", 0);
-    m_log.log(Logging::LogLevel::Debug, "createInputField() |FB position=", position, "compare=", position + 4,
+    m_log.log(UtilLog::LogLevel::Debug, "createInputField() |FB position=", position, "compare=", position + 4,
               stringSize);
 
     if (position != std::string::npos) {
@@ -244,11 +244,11 @@ std::string IoInputHandler::getInputField(const std::string &character_buffer,
         }
         // Updates on Keypresses.
         else {
-            m_log.log(Logging::LogLevel::Debug, "getInputField() result=", result, "string_data=", string_data);
+            m_log.log(UtilLog::LogLevel::Debug, "getInputField() result=", result, "string_data=", string_data);
             return string_data;
         }
     }
 
-    m_log.log(Logging::LogLevel::Debug, "getInputField() result empty");
+    m_log.log(UtilLog::LogLevel::Debug, "getInputField() result empty");
     return "";
 }

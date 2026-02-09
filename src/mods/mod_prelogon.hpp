@@ -7,7 +7,7 @@
 
 #include "mod_base.hpp"
 #include "../data-sys/yml_text_prompts.hpp"
-#include "../deadline_timer.hpp"
+#include "../state_timer.hpp"
 
 /**
  * @class ModPreLogon
@@ -34,8 +34,8 @@ class ModPreLogon
     std::vector<std::function<void()> > m_setup_functions;
     std::vector<std::function<void(const std::string &)> > m_mod_functions;
 
-    DeadlineTimer detectionTimer;
-    DeadlineTimer shieldTimer;
+    StateTimer detectionTimer;
+    StateTimer shieldTimer;
 
 public:
 

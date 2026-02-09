@@ -18,20 +18,7 @@ public:
     explicit SessionStatsDao(Database &database)
         : baseSessionStatsClass(database) {
         // Setup Table name
-        m_strTableName = "sessionstats";
-
-        /**
-         * Pre Populate Static Queries one Time
-         */
-        m_cmdFirstTimeSetup =
-                "PRAGMA synchronous=Normal; "
-                "PRAGMA encoding=UTF-8; "
-                "PRAGMA foreign_keys=ON; "
-                "PRAGMA default_cache_size=10000; "
-                "PRAGMA cache_size=10000; "
-                "PRAGMA journal_mode = WAL; "
-                "PRAGMA temp_store = MEMORY; "
-                "PRAGMA mmap_size = 268435456; ";
+        m_strTableName = "SessionStats";
 
         // Check if Database Exists.
         m_cmdTableExists = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + m_strTableName +
@@ -63,12 +50,12 @@ public:
                 "); ";
 
         m_cmdCreateIndex =
-                "CREATE INDEX IF NOT EXISTS session_stats_idx "
+                "CREATE INDEX IF NOT EXISTS Session_Stats_Idx "
                 "ON " + m_strTableName + " (iUserId); ";
 
         // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
         m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";
-        m_cmdDropIndex = "DROP INDEX IF EXISTS session_stats_idx; ";
+        m_cmdDropIndex = "DROP INDEX IF EXISTS Session_Stats_Idx; ";
 
         // Setup the CallBack for Result Field Mapping
         m_result_callback = std::bind(&SessionStatsDao::pullSessionStatsResult, this,

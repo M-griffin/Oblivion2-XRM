@@ -11,7 +11,7 @@
 
 #include <sqlite3.h>
 
-#include "../logging.hpp"
+#include "../util_log.hpp"
 #include "libSqliteWrapped.h"
 
 
@@ -31,15 +31,15 @@ template<class T>
 class BaseDao {
 public:
     explicit BaseDao(Database &database)
-        : m_log(Logging::getInstance())
+        : m_log(UtilLog::getInstance())
           , m_database(database) {
     }
 
     ~BaseDao() {
-        m_log.log(Logging::LogLevel::Debug, "~BaseDao()");
+        m_log.log(UtilLog::LogLevel::Debug, "~BaseDao()");
     }
 
-    Logging &m_log;
+    UtilLog &m_log;
 
     // Handle to Database
     Database &m_database;
@@ -69,35 +69,42 @@ public:
     bool baseDoesTableExist() {
         bool result = false;
 
+        m_log.log(UtilLog::LogLevel::Console, m_strTableName, "isConnected");
+
         // Make Sure Database Reference is Connected
         if (!m_database.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
+        m_log.log(UtilLog::LogLevel::Console, m_strTableName, "Query Create");
         // Create Pointer and Connect Query Object to Database.
         Query qry(m_database);
 
+        m_log.log(UtilLog::LogLevel::Console, m_strTableName, "Query isConnected");
         if (!qry.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
                                             __FILE__);
             return result;
         }
 
         // Execute and get result.
+        m_log.log(UtilLog::LogLevel::Console, m_strTableName, "Query getResult m_cmdTableExists");
         if (qry.getResult(m_cmdTableExists)) {
+
+            m_log.log(UtilLog::LogLevel::Console, m_strTableName, "Query getNumRows");
             const long rows = qry.getNumRows();
 
             if (rows > 0) {
-                m_log.log(Logging::LogLevel::Debug, m_strTableName, "Table Exists!", __LINE__, __FILE__);
+                m_log.log(UtilLog::LogLevel::Debug, m_strTableName, "Table Exists!", __LINE__, __FILE__);
                 result = true;
             } else {
                 // No rows the table doesn't exist!
-                m_log.log(Logging::LogLevel::Debug, m_strTableName, "table doesn't exist returned rows", rows, __LINE__,
+                m_log.log(UtilLog::LogLevel::Debug, m_strTableName, "table doesn't exist returned rows", rows, __LINE__,
                                                 __FILE__);
             }
         } else {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "baseDoesTableExist getResult()", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "baseDoesTableExist getResult()", __LINE__, __FILE__);
         }
 
         return result;
@@ -107,26 +114,10 @@ public:
      * @brief Run Setup Params for SQL Database.
      */
     bool baseFirstTimeSetupParams() {
-        bool result = false;
 
-        // Make Sure Database Reference is Connected
-        if (!m_database.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
-            return result;
-        }
-
-        // Create Pointer and Connect Query Object to Database.
-        Query qry(m_database);
-
-        if (!qry.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
-                                            __FILE__);
-            return result;
-        }
-
-        // Execute Statement.
-        result = qry.execute(m_cmdFirstTimeSetup);
-        return result;
+        // TODO Remove this, no longer needed!
+        // PRAGMA are handled in core SQLite, not needed here!
+        return true;
     }
 
     /**
@@ -137,7 +128,7 @@ public:
 
         // Make Sure Database Reference is Connected
         if (!m_database.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -145,7 +136,7 @@ public:
         Query qry(m_database);
 
         if (!qry.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
                                             __FILE__);
             return result;
         }
@@ -171,7 +162,7 @@ public:
 
         // Make Sure Database Reference is Connected
         if (!m_database.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -179,7 +170,7 @@ public:
         Query qry(m_database);
 
         if (!qry.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
                                             __FILE__);
             return result;
         }
@@ -318,7 +309,7 @@ public:
 
         // Make Sure Database Reference is Connected
         if (!m_database.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -326,7 +317,7 @@ public:
         Query qry(m_database);
 
         if (!qry.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
                                             __FILE__);
             return result;
         }
@@ -353,7 +344,7 @@ public:
 
         // Make Sure Database Reference is Connected
         if (!m_database.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return result;
         }
 
@@ -361,7 +352,7 @@ public:
         Query qry(m_database);
 
         if (!qry.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
                                             __FILE__);
             return result;
         }
@@ -392,7 +383,7 @@ public:
 
         // Make Sure Database Reference is Connected
         if (!m_database.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return results;
         }
 
@@ -400,7 +391,7 @@ public:
         Query qry(m_database);
 
         if (!qry.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
                                             __FILE__);
             return results;
         }
@@ -428,7 +419,7 @@ public:
 
         // Make Sure Database Reference is Connected
         if (!m_database.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return obj;
         }
 
@@ -436,7 +427,7 @@ public:
         Query qry(m_database);
 
         if (!qry.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
                                             __FILE__);
             return obj;
         }
@@ -454,11 +445,11 @@ public:
                 qry.fetchRow();
                 basePullResult(qry, obj);
             } else {
-                m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, getRecordById Returned Rows", rows, __LINE__,
+                m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, getRecordById Returned Rows", rows, __LINE__,
                                                 __FILE__);
             }
         } else {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, getRecordById getResult()", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, getRecordById getResult()", __LINE__, __FILE__);
         }
 
         return obj;
@@ -473,7 +464,7 @@ public:
 
         // Make Sure Database Reference is Connected
         if (!m_database.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return list;
         }
 
@@ -481,7 +472,7 @@ public:
         Query qry(m_database);
 
         if (!qry.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
                                             __FILE__);
             return list;
         }
@@ -502,11 +493,11 @@ public:
                     list.push_back(obj);
                 }
             } else {
-                m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, baseGetAllRecords Returned Rows", rows,
+                m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, baseGetAllRecords Returned Rows", rows,
                                                 __LINE__, __FILE__);
             }
         } else {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, baseGetAllRecords getResult()", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, baseGetAllRecords getResult()", __LINE__, __FILE__);
         }
 
         return list;
@@ -521,7 +512,7 @@ public:
 
         // Make Sure Database Reference is Connected
         if (!m_database.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Database is not connected!", __LINE__, __FILE__);
             return list.size();
         }
 
@@ -529,7 +520,7 @@ public:
         Query qry(m_database);
 
         if (!qry.isConnected()) {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, Query has no connection to the database", __LINE__,
                                             __FILE__);
             return list.size();
         }
@@ -550,11 +541,11 @@ public:
                     list.push_back(obj);
                 }
             } else {
-                m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, baseGetRecordsCount Returned Rows", rows,
+                m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, baseGetRecordsCount Returned Rows", rows,
                                                 __LINE__, __FILE__);
             }
         } else {
-            m_log.log(Logging::LogLevel::Error, m_strTableName, "Error, baseGetRecordsCount getResult()", __LINE__,
+            m_log.log(UtilLog::LogLevel::Error, m_strTableName, "Error, baseGetRecordsCount getResult()", __LINE__,
                                             __FILE__);
         }
 

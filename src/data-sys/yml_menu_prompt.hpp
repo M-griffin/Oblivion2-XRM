@@ -6,7 +6,7 @@
 
 #include "../model-sys/menu_prompt.hpp"
 
-class Logging;
+class UtilLog;
 
 
 /**
@@ -18,7 +18,7 @@ class Logging;
  */
 class MenuPromptDao {
 
-    Logging &m_log;
+    UtilLog &m_log;
     MenuPrompt &m_menu_prompt;
     std::string m_path;
     std::string m_filename;

@@ -10,37 +10,36 @@
 #include "model-sys/access_level.hpp"
 
 #include "io_session.hpp"
-#include "logging.hpp"
+#include "util_log.hpp"
 
 /**
  * @brief Class Constructor And Initialization
  * @return 
  */
-AcsBase::AcsBase(IoSession &io)
-    : m_log(Logging::getInstance())
-      , m_session_io(io) {
+AcsBase::AcsBase()
+    : m_log(UtilLog::getInstance()) {
 }
 
 AcsBase::~AcsBase() {
-    m_log.log(Logging::LogLevel::Debug, "~AcsBase()");
+    m_log.log(UtilLog::LogLevel::Debug, "~AcsBase()");
 }
 
 /**
  * @brief Toggle Bit Flag
  * @param flag
- * @param first_set
+ * @param firstSet
  * @param user
  */
-void AcsBase::setFlagToggle(unsigned char flag, bool first_set, Users &user) {
+void AcsBase::setFlagToggle(unsigned char flag, bool firstSet, Users &user) {
     int bit = toupper(flag);
     bit -= 65; // Handles A - Z
 
     if (bit < 0 || bit > 25) {
-        m_log.log(Logging::LogLevel::Error, "Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        m_log.log(UtilLog::LogLevel::Error, "Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
-    if (first_set) {
+    if (firstSet) {
         user.iControlFlags1 ^= 1 << bit;
     } else {
         user.iControlFlags2 ^= 1 << bit;
@@ -50,19 +49,19 @@ void AcsBase::setFlagToggle(unsigned char flag, bool first_set, Users &user) {
 /**
  * @brief Toggle Bit Flag
  * @param flag
- * @param first_set
+ * @param firstSet
  * @param level
  */
-void AcsBase::setFlagLevelToggle(unsigned char flag, bool first_set, AccessLevel &level) {
+void AcsBase::setFlagLevelToggle(unsigned char flag, bool firstSet, AccessLevel &level) {
     int bit = toupper(flag);
     bit -= 65; // Handles A - Z
 
     if (bit < 0 || bit > 25) {
-        m_log.log(Logging::LogLevel::Error, "Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        m_log.log(UtilLog::LogLevel::Error, "Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
-    if (first_set) {
+    if (firstSet) {
         level.iARFlags1 ^= 1 << bit;
     } else {
         level.iARFlags2 ^= 1 << bit;
@@ -72,19 +71,19 @@ void AcsBase::setFlagLevelToggle(unsigned char flag, bool first_set, AccessLevel
 /**
  * @brief Set Bit Flag on
  * @param flag
- * @param first_set
+ * @param firstSet
  * @param user
  */
-void AcsBase::setFlagOn(unsigned char flag, bool first_set, Users &user) {
+void AcsBase::setFlagOn(unsigned char flag, bool firstSet, Users &user) {
     int bit = toupper(flag);
     bit -= 65; // Handles A - Z
 
     if (bit < 0 || bit > 25) {
-        m_log.log(Logging::LogLevel::Error, "Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        m_log.log(UtilLog::LogLevel::Error, "Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
-    if (first_set) {
+    if (firstSet) {
         user.iControlFlags1 |= 1 << bit;
     } else {
         user.iControlFlags2 |= 1 << bit;
@@ -94,19 +93,19 @@ void AcsBase::setFlagOn(unsigned char flag, bool first_set, Users &user) {
 /**
  * @brief Set Bit Flag off
  * @param flag
- * @param first_set
+ * @param firstSet
  * @param user
  */
-void AcsBase::setFlagOff(unsigned char flag, bool first_set, Users &user) {
+void AcsBase::setFlagOff(unsigned char flag, bool firstSet, Users &user) {
     int bit = toupper(flag);
     bit -= 65; // Handles A - Z
 
     if (bit < 0 || bit > 25) {
-        m_log.log(Logging::LogLevel::Error, "Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        m_log.log(UtilLog::LogLevel::Error, "Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return;
     }
 
-    if (first_set) {
+    if (firstSet) {
         user.iControlFlags1 &= ~(1 << bit);
     } else {
         user.iControlFlags2 &= ~(1 << bit);
@@ -116,20 +115,20 @@ void AcsBase::setFlagOff(unsigned char flag, bool first_set, Users &user) {
 /**
  * @brief Test If Bit Flag is set
  * @param flag
- * @param first_set
+ * @param firstSet
  * @param user
  * @return
  */
-bool AcsBase::checkAccessConditionFlag(unsigned char flag, bool first_set, Users &user) {
+bool AcsBase::checkAcsFlag(unsigned char flag, bool firstSet, Users &user) {
     int bit = toupper(flag);
     bit -= 65; // Handles A - Z
 
     if (bit < 0 || bit > 25) {
-        m_log.log(Logging::LogLevel::Error, "Error, Invalid bit flag=", bit, __FILE__, __LINE__);
+        m_log.log(UtilLog::LogLevel::Error, "Error, Invalid bit flag=", bit, __FILE__, __LINE__);
         return false;
     }
 
-    if (first_set) {
+    if (firstSet) {
         return (user.iControlFlags1 >> bit) & 1;
     }
 
@@ -139,24 +138,24 @@ bool AcsBase::checkAccessConditionFlag(unsigned char flag, bool first_set, Users
 /**
  * @brief Sets a Default String of Bit flags On
  * @param bitString
- * @param first_set
+ * @param firstSet
  * @param user
  */
-void AcsBase::setAccessConditionsFlagsOn(std::string bitString, bool first_set, Users &user) {
+void AcsBase::setAcsFlagsOn(const std::string &bitString, bool firstSet, Users &user) {
     for (char flag: bitString) {
-        setFlagOn(static_cast<unsigned char>(flag), first_set, user);
+        setFlagOn(static_cast<unsigned char>(flag), firstSet, user);
     }
 }
 
 /**
  * @brief Sets a Default String of Bit flags Off
  * @param bitString
- * @param first_set
+ * @param firstSet
  * @param user
  */
-void AcsBase::setAccessConditionsFlagsOff(std::string bitString, bool first_set, Users &user) {
+void AcsBase::setAcsFlagsOff(const std::string &bitString, bool firstSet, Users &user) {
     for (char flag: bitString) {
-        setFlagOff(static_cast<unsigned char>(flag), first_set, user);
+        setFlagOff(static_cast<unsigned char>(flag), firstSet, user);
     }
 }
 
@@ -179,16 +178,16 @@ std::vector<std::string> split(const std::string &s, char delimiter) {
 
 /**
  * @brief Parses and Validates code map
- * @param acs_string
+ * @param acsString
  * @param user
  * @return
  */
-bool AcsBase::validateAcsString(const std::string &acs_string, Users &user) {
-    if (acs_string.empty()) {
+bool AcsBase::validateAcsString(const std::string &acsString, Users &user) {
+    if (acsString.empty()) {
         return true;
     }
 
-    AcsParser parser(acs_string);
+    AcsParser parser(acsString);
     AcsNode tree = parser.parse();
     return evalAcs(tree, user);
 }
@@ -198,23 +197,24 @@ bool AcsBase::validateAcsString(const std::string &acs_string, Users &user) {
  * @param bits
  * @return
  */
-std::string AcsBase::getAccessConditionFlagStringFromBits(int bits) {
-    std::string bit_string;
+std::string AcsBase::getAcsFlagsFromBits(int bits) {
+    std::string bitString;
 
     for (int i = 0; i < 26; i++) {
         if ((bits >> i) & 1) {
-            bit_string += static_cast<char>(i + 65);
+            bitString += static_cast<char>(i + 65);
         } else {
-            bit_string += '-';
+            bitString += '-';
         }
     }
 
-    return bit_string;
+    return bitString;
 }
 
 int AcsBase::parseNumber(const std::string &s, size_t start) {
-    if (start >= s.size())
+    if (start >= s.size()) {
         return 0;
+    }
 
     try {
         return std::stoi(s.substr(start));
@@ -223,111 +223,54 @@ int AcsBase::parseNumber(const std::string &s, size_t start) {
     }
 }
 
-bool AcsBase::evalCondition(const AcsCodeMapType &cond, Users &user) {
-    const std::string &code = cond.code;
-    char op = std::toupper(code[0]);
+bool AcsBase::evalCondition(const AcsCodeMapType &c, Users &user) {
+    switch (c.op) {
+        case 'S':
+            return user.iLevel >= c.number;
 
-    switch (op) {
-        // --------------------------
-        // Security level
-        // --------------------------
-        case 'S': {
-            int level = parseNumber(code);
-            return user.iLevel >= level;
-        }
-
-        // --------------------------
-        // AR flags (set 1)
-        // --------------------------
         case 'F': {
-            char flag = std::toupper(code[1]);
-            int bit = flag - 'A';
-            if (bit < 0 || bit > 25) return false;
-            return (user.iControlFlags1 >> bit) & 1;
+            int bit = c.flag - 'A';
+            return bit >= 0 && bit < 26 &&
+                   ((user.iControlFlags1 >> bit) & 1);
         }
 
-        // --------------------------
-        // AR flags (set 2)
-        // --------------------------
         case 'O': {
-            char flag = std::toupper(code[1]);
-            int bit = flag - 'A';
-            if (bit < 0 || bit > 25) return false;
-            return (user.iControlFlags2 >> bit) & 1;
+            int bit = c.flag - 'A';
+            return bit >= 0 && bit < 26 &&
+                   ((user.iControlFlags2 >> bit) & 1);
         }
 
-        // --------------------------
-        // Calls today
-        // --------------------------
-        case 'E': {
-            int v = parseNumber(code);
-            //return user.callsToday >= v;
+        // User Specific Condition Checks.
+        case 'A':
             return false; // TODO Implement
-        }
+        //return user.age >= c.number;
 
-        // --------------------------
-        // Total calls
-        // --------------------------
-        case 'Q': {
-            int v = parseNumber(code);
-            //return user.calls >= v;
+        case 'Q':
             return false; // TODO Implement
-        }
+        //return user.calls >= c.number;
 
-        // --------------------------
-        // User number
-        // --------------------------
-        case 'U': {
-            int v = parseNumber(code);
-            //return user.id == v;
+        case 'E':
             return false; // TODO Implement
-        }
+        //return user.callsToday >= c.number;
 
-        // --------------------------
-        // Age
-        // --------------------------
-        case 'A': {
-            int v = parseNumber(code);
-            //return user.age >= v;
+        case 'U':
             return false; // TODO Implement
-        }
+        //return user.id == c.number;
 
-        // --------------------------
-        // File points
-        // --------------------------
-        case 'P': {
-            int v = parseNumber(code);
-            //return user.filePoints >= v;
+        case 'P':
             return false; // TODO Implement
-        }
+        //return user.filePoints >= c.number;
 
-        // --------------------------
-        // Posts/calls ratio
-        // --------------------------
-        case '*': {
+        case '*':
             return false; // TODO Implement
-            /*
-            if (user.calls == 0) return true;
-            double ratio = double(user.posts) / double(user.calls);
-            return ratio >= user.curPostCallRatio;
-            */
-        }
+        //if (user.calls == 0) return true;
+        //return (double)user.posts / user.calls >= user.curPostCallRatio;
 
-        // --------------------------
-        // Upload/download ratio
-        // --------------------------
-        case '@': {
-            // return false; // TODO Implement
-            /*
-            if (user.downloads == 0) return true;
-            double ratio = double(user.uploads) / double(user.downloads);
-            return ratio >= user.curUpDownRatio;
-            */
-        }
+        case '@':
+            return false; // TODO Implement
+        //if (user.downloads == 0) return true;
+        //return (double)user.uploads / user.downloads >= user.curUpDownRatio;
 
-        // --------------------------
-        // Unknown token
-        // --------------------------
         default:
             return false;
     }

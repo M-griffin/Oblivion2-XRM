@@ -19,8 +19,8 @@
 #include "../model-sys/context.hpp"
 
 #include "../io_session.hpp"
-#include "../encryption.hpp"
-#include "../logging.hpp"
+#include "../util_encrypt.hpp"
+#include "../util_log.hpp"
 #include "../io_common.hpp"
 
 ModLogon::ModLogon(Context &ctx)
@@ -58,7 +58,7 @@ ModLogon::ModLogon(Context &ctx)
 }
 
 ModLogon::~ModLogon() {
-    m_log.log(Logging::LogLevel::Console, "~ModLogon");
+    m_log.log(UtilLog::LogLevel::Console, "~ModLogon");
     m_setup_functions.clear();
     m_mod_functions.clear();
 }
@@ -321,10 +321,10 @@ bool ModLogon::logon(const std::string &input) {
 
         // Check if users enter valid identifier.
         if (checkUserLogon(key)) {
-            // TODO m_log.log(Logging::LogLevel::Console, "PROMPT_USERNAME=", m_logon_user.sHandle);
+            // TODO m_log.log(UtilLog::LogLevel::Console, "PROMPT_USERNAME=", m_logon_user.sHandle);
             changeNextModule();
         } else {
-            m_log.log(Logging::LogLevel::Error, "PROMPT_INVALID_USERNAME=", key);
+            m_log.log(UtilLog::LogLevel::Error, "PROMPT_INVALID_USERNAME=", key);
 
             displayPromptAndNewLine(PROMPT_INVALID_USERNAME);
             ++m_failure_attempts;
@@ -369,23 +369,23 @@ bool ModLogon::validate_password(const std::string &input) {
     Security security = securityDao.getRecordById(m_logon_user.iSecurityIndex);
 
     if (security.iId == -1) {
-        m_log.log(Logging::LogLevel::Error, "Error, Security Index on user record not available=", m_logon_user.sHandle,
+        m_log.log(UtilLog::LogLevel::Error, "Error, Security Index on user record not available=", m_logon_user.sHandle,
                   __FILE__, __LINE__);
         return false;
     }
 
     // Generate Encrypted password from incoming string.
-    Encrypt encryption;
+    UtilEncrypt encryption;
 
     // Compare case-sensitive hash with generated hash string.
-    std::string password = encryption.generate_password(input, security.sSaltHash);
+    std::string password = encryption.generateHashString(input, security.sSaltHash);
 
     if (security.sPasswordHash.compare(password) == 0) {
-        m_log.log(Logging::LogLevel::Console, "Password Successful=", m_logon_user.sHandle);
+        m_log.log(UtilLog::LogLevel::Console, "Password Successful=", m_logon_user.sHandle);
         return true;
     }
 
-    m_log.log(Logging::LogLevel::Error, "Password Failure=", m_logon_user.sHandle);
+    m_log.log(UtilLog::LogLevel::Error, "Password Failure=", m_logon_user.sHandle);
     return false;
 }
 
@@ -420,7 +420,7 @@ bool ModLogon::password(const std::string &input) {
             // Update the User Context with Move Assignment.
             m_ctx.getUser() = std::move(m_logon_user);
 
-            m_log.log(Logging::LogLevel::Info, "User is Authorized=", m_ctx.getUser().sHandle);
+            m_log.log(UtilLog::LogLevel::Info, "User is Authorized=", m_ctx.getUser().sHandle);
             m_is_active = false;
         } else {
             displayPromptAndNewLine(PROMPT_INVALID_PASSWORD);

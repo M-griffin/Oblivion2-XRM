@@ -6,11 +6,11 @@
 #include <vector>
 #include <utf8.h>
 
-#include "../socket_service.hpp"
+#include "../tcp_socket_base.hpp"
 #include "../io_session.hpp"
 #include "../screen_ansi_proc.hpp"
 #include "../io_encoding.hpp"
-#include "../logging.hpp"
+#include "../util_log.hpp"
 #include "../io_common.hpp"
 #include "../tcp_session.hpp"
 
@@ -19,12 +19,12 @@
 #include "../data-sys/yml_text_prompts.hpp"
 
 ModBase::ModBase(Context &ctx, const std::string &filename)
-    : m_log(Logging::getInstance())
+    : m_log(UtilLog::getInstance())
     , m_ctx(ctx)
     , m_filename(filename)
     , m_is_active(false) {
 
-    // Setup All Mods for Proper Node Logging by Session.
+    // Setup All Mods for Proper Node UtilLog by Session.
     m_log.setNode(ctx.getSessionWrite().getNodeNumber());
 }
 
