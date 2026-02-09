@@ -143,7 +143,7 @@ namespace SQLW {
                 }
                 txn->commit();
             } catch (...) {
-                // Transaction RAII will rollback if not committed
+                // Transaction RAII will roll back if not committed
                 throw; // rethrow for the future
             }
         });
@@ -174,10 +174,83 @@ namespace SQLW {
         return connection() ? sqlite3_errcode(connection()) : 0;
     }
 
+    std::string Database::getDatabasePath() const {
+        return m_dbPath;
+    }
 
     /**
-     * SQL Lite Connection (ThreadLocal)  Not used at the moment.
-     * Most likely not an issues!!
+     * Session Database "InMemory" Wrapper
+     */
+    SessionDatabase::SessionDatabase(Database& coreDb, IError* err)
+        : m_sessionDb(":memory:", err)
+        , m_coreDb(coreDb)
+        , m_corePath(coreDb.getDatabasePath())
+    {
+    }
+
+    SessionDatabase::~SessionDatabase() {
+        // safe even if not attached
+        detachCore();
+    }
+
+    Database& SessionDatabase::db() {
+        return m_sessionDb;
+    }
+
+    bool SessionDatabase::attachCore() {
+        if (m_attached)
+            return true;
+
+        std::ostringstream sql;
+        sql << "ATTACH DATABASE '" << m_corePath << "' AS core;";
+
+        try {
+            m_sessionDb.execute(sql.str());
+            m_attached = true;
+            return true;
+        } catch (...) {
+            return false;
+        }
+    }
+
+    void SessionDatabase::detachCore() {
+        if (!m_attached)
+            return;
+
+        try {
+            m_sessionDb.execute("DETACH DATABASE core;");
+        } catch (...) {
+            // ignore — memory DB is dying anyway
+        }
+
+        m_attached = false;
+    }
+
+    bool SessionDatabase::createSchema(std::string &sql) {
+        try {
+            m_sessionDb.execute(sql);
+            return true;
+        } catch (...) {
+            return false;
+        }
+    }
+
+    // WIP Placeholder, load user data from Core to Session Database
+    bool SessionDatabase::loadData(std::string &sql) {
+
+        std::ostringstream sqlStream;
+        sqlStream << sql;
+
+        try {
+            m_sessionDb.execute(sqlStream.str());
+            return true;
+        } catch (...) {
+            return false;
+        }
+    }
+
+    /**
+     * SQL Lite Connection
      */
     SQLiteConnection::SQLiteConnection(const std::string &path)
         : m_path(path), m_opened(std::chrono::steady_clock::now()) {
@@ -194,7 +267,6 @@ namespace SQLW {
 
     void SQLiteConnection::applyDefaults() {
         if (sqlite3_busy_timeout(m_db, 5000) != SQLITE_OK) {
-            std::cout << "ExceptionMsg=Failed to set busy timeout for async calls" << std::endl;
             throw std::runtime_error("Failed to set busy timeout");
         }
 
@@ -203,7 +275,6 @@ namespace SQLW {
         if (sqlite3_exec(m_db, "PRAGMA journal_mode=WAL;", nullptr, nullptr, &err) != SQLITE_OK) {
             std::string msg = err ? err : "Failed to set journal_mode";
             sqlite3_free(err);
-            std::cout << "ExceptionMsg=Failed to set journal_mode" << msg << std::endl;
             throw std::runtime_error(msg);
         }
 
@@ -211,21 +282,18 @@ namespace SQLW {
         if (sqlite3_exec(m_db, "PRAGMA synchronous=NORMAL;", nullptr, nullptr, &err) != SQLITE_OK) {
             std::string msg = err ? err : "Failed to set synchronous";
             sqlite3_free(err);
-            std::cout << "ExceptionMsg=Failed to set synchronous" << msg << std::endl;
             throw std::runtime_error(msg);
         }
 
         if (sqlite3_exec(m_db, "PRAGMA temp_store=MEMORY;", nullptr, nullptr, &err) != SQLITE_OK) {
             std::string msg = err ? err : "Failed to set temp_store";
             sqlite3_free(err);
-            std::cout << "ExceptionMsg=temp_store=MEMORY" << msg << std::endl;
             throw std::runtime_error(msg);
         }
 
         if (sqlite3_exec(m_db, "PRAGMA foreign_keys=ON;", nullptr, nullptr, &err) != SQLITE_OK) {
             std::string msg = err ? err : "Failed to set foreign_keys";
             sqlite3_free(err);
-            std::cout << "ExceptionMsg=foreign_keys" << msg << std::endl;
             throw std::runtime_error(msg);
         }
 
@@ -240,21 +308,18 @@ namespace SQLW {
         if (sqlite3_exec(m_db, "PRAGMA default_cache_size=10000;", nullptr, nullptr, &err) != SQLITE_OK) {
             std::string msg = err ? err : "Failed to set default_cache_size";
             sqlite3_free(err);
-            std::cout << "ExceptionMsg=Failed to set default_cache_size" << msg << std::endl;
             throw std::runtime_error(msg);
         }
 
         if (sqlite3_exec(m_db, "PRAGMA cache_size=10000;", nullptr, nullptr, &err) != SQLITE_OK) {
             std::string msg = err ? err : "Failed to set cache_size";
             sqlite3_free(err);
-            std::cout << "ExceptionMsg=Failed to set cache_size" << msg << std::endl;
             throw std::runtime_error(msg);
         }
 
         if (sqlite3_exec(m_db, "PRAGMA mmap_size = 268435456;", nullptr, nullptr, &err) != SQLITE_OK) {
             std::string msg = err ? err : "Failed to set mmap_size";
             sqlite3_free(err);
-            std::cout << "ExceptionMsg=Failed to set mmap_size" << msg << std::endl;
 
             // Non-Fatal Errors, some older SQLite, network filesystems, Windows FAT
             //throw std::runtime_error(msg);

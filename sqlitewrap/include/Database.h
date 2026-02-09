@@ -109,6 +109,8 @@ namespace SQLW {
 
         int getErrorCode();
 
+        std::string getDatabasePath() const;
+
     private:
         friend class Transaction; // for m_pool access
         friend class Query;       // for m_errhandler access
@@ -120,6 +122,33 @@ namespace SQLW {
         IError *m_errhandler{nullptr};
     };
 
+    /**
+     * SQL Session "InMemory" Database Wrapper
+     */
+    class SessionDatabase {
+    public:
+        explicit SessionDatabase(Database& coreDb, IError* err = nullptr);
+        ~SessionDatabase();
+
+        // Initialize session DB for a user
+        bool initializeForUser(int userId);
+
+        // Access the session database
+        Database& db();
+
+    private:
+        Database m_sessionDb;
+        Database& m_coreDb;
+
+        std::string m_corePath;
+        bool m_attached{false};
+
+        bool attachCore();
+        void detachCore();
+
+        bool createSchema(std::string &sql);
+        bool loadData(std::string &sql) ;
+    };
 
 
     /**

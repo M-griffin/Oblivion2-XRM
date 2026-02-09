@@ -1,7 +1,13 @@
 Change Log Update (00.03.1)
-* 2025-12-12
-+ Large refactoring efforts, ground up removal of smart pointers and boost type logic
-
+* 2025-12-12 - 2026-02-08+
++ Revision 3 Work Started: Modernization and Large refactoring efforts, ground up removal of smart pointers and boost type logic
++ SqliteWrapped Modernization
++ Cleanup of complicated Abstraction and Async coding that makes everything hard to follow
+  This is initially to cleanup and reduce issues that are not traceable while we refactor, some things might return later on.
++ Core Menu System rewrites, add in more features for command chaining, FIRSTCMD driven execution with input and validation.
++ ACS rewrite to handle better grouping.
++ ReadTheDoc's changed their format, and the existing docs no longer take updates, will need to blow it away and rebuild
+  in the latest format as time permits.
 
 Change Log Update (00.00.152)
 * 2023-11-23
