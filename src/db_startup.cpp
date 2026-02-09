@@ -2,20 +2,20 @@
 
 #include <cassert>
 
-#include "../model-sys/structures.hpp"
-#include "../model-sys/protocol.hpp"
-#include "../model-sys/access_level.hpp"
-#include "../model-app/oneliners.hpp"
-#include "../data-app/dao_oneliners.hpp"
+#include "model-sys/structures.hpp"
+#include "model-sys/protocol.hpp"
+#include "model-sys/access_level.hpp"
+#include "model-app/oneliners.hpp"
+#include "data-app/dao_oneliners.hpp"
 
 // Needed for Initializing and checking users data is set up
 // On startup.
-#include "dao_session_stats.hpp"
-#include "dao_security.hpp"
-#include "dao_users.hpp"
-#include "yml_protocol.hpp"
-#include "dao_access_level.hpp"
-#include "../util_log.hpp"
+#include "data-sys/dao_session_stats.hpp"
+#include "data-sys/dao_security.hpp"
+#include "data-sys/dao_users.hpp"
+#include "data-sys/yml_protocol.hpp"
+#include "data-sys/dao_access_level.hpp"
+#include "util_log.hpp"
 
 #include "libSqliteWrapped.h"
 

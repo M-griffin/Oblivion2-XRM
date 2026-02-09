@@ -1078,7 +1078,7 @@ void MenuBase::executeFirstCmds() {
 std::vector<std::string> MenuBase::getListOfMenuPrompts() {
 
     std::vector<std::filesystem::path> result_set =
-            m_directory.listCaseInsensitive(GLOBAL_MENU_PATH, "yaml");
+            UtilDir::listCaseInsensitive(GLOBAL_MENU_PATH, "yaml");
 
     std::vector<std::string> result_list;
 
@@ -1112,7 +1112,7 @@ std::string MenuBase::getRandomMenuPrompt() {
     }
 
     //generator initialized with seed from time.
-    static std::mt19937_64 generator{static_cast<unsigned int>(std::time(0))};
+    static std::mt19937_64 generator{static_cast<unsigned int>(std::time(nullptr))};
     int set_size = result_set.size() - 1;
 
     //the range is inclusive, so this produces numbers in range [0, 10), same as before

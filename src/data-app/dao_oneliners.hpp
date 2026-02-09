@@ -39,8 +39,10 @@ public:
                 "sUserName         TEXT NOT NULL COLLATE NOCASE, "
                 "sUserInitials     TEXT NOT NULL COLLATE NOCASE, "
                 "dtDatePosted      DATETIME DEFAULT CURRENT_TIMESTAMP, "
-                "FOREIGN KEY(iUserId) REFERENCES UserRecord(iId) ON DELETE CASCADE "
                 "); ";
+                // Add this back once we create default sysop record and can link it properly.
+                //"FOREIGN KEY(iUserId) REFERENCES UserRecord(iId) ON DELETE CASCADE "
+
 
         // CREATE INDEX `IDX_testtbl_Name` ON `testtbl` (`Name` COLLATE UTF8CI)
         m_cmdDropTable = "DROP TABLE IF EXISTS " + m_strTableName + "; ";

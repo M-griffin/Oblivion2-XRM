@@ -63,13 +63,6 @@ MenuSystem::MenuSystem(Context &ctx)
 
 MenuSystem::~MenuSystem() {
     m_log.log(UtilLog::LogLevel::Console, "~MenuSystem()");
-
-    // Clear All Menu Command Functions.
-    m_menu_command_functions.clear();
-    clearHandlers.clear();
-    createHandlers.clear();
-    inputHandlers.clear();
-    pollHandlers.clear();
 }
 
 /**
@@ -206,6 +199,7 @@ void MenuSystem::setState(State newState) {
 
 // New Manager Chained Execution Calls
 // Allow for Pauses, is more of a resueable script.
+// TODO , Input options need to be wired up for ChainResult::WaitingForInput!!
 ChainResult MenuSystem::executeChainedCommand(
         const MenuOption &option,
         CommandChainContext &ctx) {
@@ -933,9 +927,11 @@ bool MenuSystem::menuOptionsCallback(const MenuOption &option) {
 
     // If valid then execute the related Menu Command Function
     idx = firstCommandKeyIndex.find(option.command_key[0], 0);
-
     if (idx != std::string::npos) {
-        return m_menu_command_functions[option.command_key[0]](option);
+        auto it = m_menu_command_functions.find(option.command_key[0]);
+        if (it != m_menu_command_functions.end()) {
+            return it->second(option);
+        }
     }
 
     return false;
@@ -1062,7 +1058,7 @@ void MenuSystem::startupModuleMessageEditor()
 void MenuSystem::createMenuSystem() {
     m_log.log(UtilLog::LogLevel::Console, "MenuSystem() createMenuSystem");
     m_current_menu = "matrix";
-    m_starting_menu = "matrix";
+    //m_starting_menu = "matrix";
 
     int term_rows = 0;
     int term_cols = 0;
@@ -1094,6 +1090,45 @@ void MenuSystem::inputMenuSystem(const std::string &input) {
     m_log.log(UtilLog::LogLevel::Console, "MenuSystem() inputMenuSystem");
 
     if (!m_is_active) {
+        return;
+    }
+
+    // Chained Commands always execute first.
+    if (m_cmdChainExecutor.isActive()) {
+
+        // Parse input here for ENTER or end of field input though.
+        // Get LineInput and wait for ENTER.
+        std::string key;
+        std::string result = m_ctx.getIoSession().getInputField(input, key, Config::sMenuPrompt_length);
+
+        // ESC was hit abort the input and resume.
+        if (result == "aborted") {
+            m_cmdChainExecutor.resumeWithInput("");
+            return;
+        }
+
+        if (result.empty() || result[0] == '\n') {
+            // Key == 0 on [ENTER] pressed alone. then invalid!
+            // TODO, might have menu keys with ENTER, update this lateron!!
+            if (key.empty()) {
+                // Return and don't do anything.
+                return;
+            }
+
+            m_cmdChainExecutor.resumeWithInput(key);
+            return;
+
+        } else {
+            // Send back the single input received to show client key presses.
+            // Only if return data shows a processed key returned.
+            if (result != "empty") {
+                std::string output = getDefaultInputColor();
+                output.append(result);
+                baseProcessAndDeliver(output);
+            }
+        }
+
+        // Still in input Field State, not ended yet.
         return;
     }
 

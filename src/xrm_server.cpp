@@ -47,7 +47,7 @@
 #include "io_common.hpp"
 #include "util_log.hpp"
 #include "tcp_server.hpp"
-#include "data-sys/db_startup.hpp"
+#include "db_startup.hpp"
 
 std::string GLOBAL_BBS_PATH;
 std::string GLOBAL_DATA_PATH;
