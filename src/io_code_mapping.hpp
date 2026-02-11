@@ -15,7 +15,7 @@ class IoCodeMapping {
     UtilLog &m_log;
     IoPipesAndColors m_io_pipes_and_colors;
 
-    std::map<std::string, std::string> m_mapped_codes; // MCI Code Translation for specific screens.
+    std::map<std::string, std::string> m_mapped_codes;
 
     const std::regex STD_EXPRESSION {
         "([|]{1}[0-9]{2})|([|]{1}[X][Y][0-9]{4})|"

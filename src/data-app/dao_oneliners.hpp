@@ -38,7 +38,7 @@ public:
                 "sText             TEXT NOT NULL COLLATE NOCASE, "
                 "sUserName         TEXT NOT NULL COLLATE NOCASE, "
                 "sUserInitials     TEXT NOT NULL COLLATE NOCASE, "
-                "dtDatePosted      DATETIME DEFAULT CURRENT_TIMESTAMP, "
+                "dtDatePosted      DATETIME DEFAULT CURRENT_TIMESTAMP "
                 "); ";
                 // Add this back once we create default sysop record and can link it properly.
                 //"FOREIGN KEY(iUserId) REFERENCES UserRecord(iId) ON DELETE CASCADE "

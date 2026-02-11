@@ -23,7 +23,7 @@ typedef struct Utf8Glyph {
  * @class IoCommon
  * @author Michael Griffin
  * @date 9/21/2015
- * @file common_io.hpp
+ * @file io_common.hpp
  * @brief Low Level IO ASCII and UTF-8 Aware with locale support.
  */
 class IoCommon {
@@ -47,6 +47,12 @@ public:
 
     ~IoCommon();
 
+    IoCommon(IoCommon &other) = delete;
+    IoCommon &operator=(IoCommon &other) = delete;
+    IoCommon(IoCommon &&other) = delete;
+    IoCommon &operator=(IoCommon &&other) = delete;
+
+    /**
     IoCommon(IoCommon &&other) noexcept
         : m_log(other.m_log) // reference copied, not moved
           , m_escape_sequence(std::move(other.m_escape_sequence))
@@ -72,63 +78,20 @@ public:
             m_is_new_leadoff = other.m_is_new_leadoff;
         }
         return *this;
-    }
+    }*/
 
-    /**
-     * @brief Set up a Static GLobal Map for Key Input that can be resued.
-     */
     void populateInputSequenceMap();
-
-    /**
-     * @brief Retrieve Key Sequence by Value
-     * @param value
-     */
     std::string getSequenceFromMap(const std::string &value);
-
-    /* This function will read the OS specific functions
-     * To Determine where the executable is located.
-     * This has only been tested in Windows, Linux, OSX.
-     */
     std::string getProgramPath(const std::string &program_name);
-
-    /**
-     * Get The BBS System Users HOME directory
-     */
-    std::string getSystemHomeDirectory();
-
-    /**
-     * @brief Appends Path Separator depending on environment.
-     * @param path
-     * @return
-     */
     void pathAppend(std::string &path);
 
-    /**
-     * String Length counting actual characters not bytes
-     * This is for mixed ASCII And UTF-8 Strings.
-     */
     std::string::size_type numberOfChars(const std::string &str);
     std::string::size_type numberOfChars2(const std::string &str);
 
-    /**
-     * Left Trim White spaces (Front)
-     */
     std::string leftTrim(const std::string &str);
-
-    /**
-     * Right Trim White spaces (Back)
-     */
     std::string rightTrim(const std::string &str);
-
-    /**
-     * Trim White spaces from both ends
-     */
     std::string trim(const std::string &str);
 
-    /**
-     * UTF-8 Aware
-     * Removes All Characters Between Start and End Positions.
-     */
     std::string eraseString(const std::string &str,
                             std::string::size_type start_position,
                             std::string::size_type end_position = 0);
@@ -137,173 +100,36 @@ public:
                                   std::string::size_type start_position,
                                   std::string::size_type count);
 
-    /**
-     * Right String Padding
-     */
     std::string rightPadding(const std::string &str, std::string::size_type space);
-
-    /**
-     * Left String Padding
-     */
     std::string leftPadding(const std::string &str, std::string::size_type space);
-
-    /**
-     * Center String Padding
-     * Note: Need to add ANSI / PIPE parsing!
-     */
     std::string centerPadding(const std::string &str, int term_width);
-
-    /**
-     * Mask String
-     */
     std::string maskString(const std::string &str);
-
-    /**
-     * Check Digit or Numbers in String
-     * This is for mixed ASCII And UTF-8 Strings.
-     */
     bool isDigit(const std::string &str);
 
-    /**
-     * @brief Return the Input Full Screen Editor Escape Sequence Parsed.
-     * @return
-     */
     std::string getFSEEscapeSequence();
-
-    /**
-    * @brief Return the Escape Sequence
-    * @return
-    */
     std::string getEscapeSequence();
-
-    /**
-     * @brief Parses Input and breaks out ESC Sequences.
-     * @return
-     */
     std::string parseInput(const std::string &character_buffer);
-
-    /**
-    * @brief Returns the InputFieldBuffer
-    * @return
-    */
     std::string getInputBuffer();
-
-    /**
-     * @brief Returns processing of InputField until NL is received.
-     * @param line
-     * @param length
-     * @param leadoff
-     * @param hidden
-     * @return
-     */
     std::string getLine(const std::string &line, // Parsed Char input in
                         int length, // Max Input Length of Field
                         const std::string &leadoff, // Data to Display in Default Field {Optional}
                         bool hidden); // If input is hidden or masked     {Optional}
 
-    /**
-     * @brief Converts Pascal Strings to C-Strings Also return std::string for conversions.
-     * @param string
-     */
     std::string PascalToCString(int8_t *string);
-
-    /**
-     * @brief Converts C-Strings to Pascal Strings
-     * @param string
-     */
     void CStringToPascal(int8_t *string);
-
-    /**
-    * @brief Helper Method to display bool as string.
-    * @param value
-    * @return
-    */
     std::string boolAlpha(bool value);
-
-    /**
-     * @brief Parse / Replace MCI String from given string.
-     * @param AnsiString
-     * @param mcicode
-     * @param replacement
-     */
     void parseLocalMCI(std::string &AnsiString, const std::string &mcicode, const std::string &replacement);
-
-    /**
-     * @brief Check if the file exists
-     * @return
-     */
     bool fileExists(const std::string &file_name);
-
-    /**
-     * @brief Reads in Ansi file into Buffer Only
-     * @param FileName
-     * @return
-     */
     std::string readAnsi(const std::string &FileName);
-
-    /**
-     * @brief Split Strings by delimiter into Vector of Strings.
-     * @param s
-     * @param delimiter
-     * @return
-     */
     std::vector<std::string> splitString(const std::string &s, char delimiter);
-
-    /**
-     * @brief Standard Time to Date String
-     * @param std_time
-     * @return
-     */
     std::string standardDateToString(std::time_t std_time);
-
-    /**
-     * @brief Standard Time to Date/Time String
-     * @param std_time
-     * @return
-     */
     std::string standardDateTimeToString(std::time_t std_time);
-
-    /**
-     * @brief String to Date Format
-     * @param date
-     * @return
-     */
     std::time_t stringToStandardDate(const std::string &date);
-
-    /**
-     * @brief String to Date/Time Format
-     * @param date_time
-     * @return
-     */
     std::time_t stringToStandardDateTime(const std::string &date_time);
-
-    /**
-     * @brief Converts std::strings to Long values
-     * @param value
-     * @return
-     */
     long stringToLong(const std::string &value);
-
-    /**
-     * @brief Converts std::strings to Int values
-     * @param value
-     * @return
-     */
     int stringToInt(const std::string &value);
-
-    /**
-     * @brief Tests first char of string for starting T/F returns int with -1 for invalid
-     * @param value
-     * @return
-     */
     int stringToBool(const std::string &value);
 
-    /**
-     * @brief Template search quick find
-     * @param element
-     * @param container
-     * @return
-     */
     template<class Element, class Container>
     bool in_array(const Element &element, const Container &container) {
         return std::find(std::begin(container), std::end(container), element)
@@ -331,17 +157,13 @@ public:
                  Utf8Glyph& glyph);
 
     // UTF8 Internal to CP437
-
     void initCp437ReverseTable();
-
     bool nextCodepoint(const std::string& utf8,
                    std::string::const_iterator& it,
                    uint32_t& cp);
 
     std::string utf8ToCp437(const std::string& utf8);
-
     std::string toUpper(const std::string &value);
-
     std::string toLower(const std::string &value);
 
 };

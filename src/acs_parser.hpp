@@ -125,17 +125,13 @@ private:
 
         cond.op = std::toupper(text[0]);
 
-        // -------------------------
         // Flag-based operators
-        // -------------------------
         if ((cond.op == 'F' || cond.op == 'O') && text.size() >= 2) {
             cond.flag = std::toupper(text[1]);
             return cond;
         }
 
-        // -------------------------
         // Numeric operators
-        // -------------------------
         if (text.size() > 1 && std::isdigit(text[1])) {
             try {
                 cond.number = std::stoi(text.substr(1));
@@ -145,9 +141,7 @@ private:
             return cond;
         }
 
-        // -------------------------
         // Single-char operators (* @ # etc)
-        // -------------------------
         return cond;
     }
 };
