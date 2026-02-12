@@ -50,7 +50,7 @@ std::vector<std::string> UtilDir::listFiles(const std::filesystem::path &directo
 }
 
 std::vector<std::filesystem::path> UtilDir::listWithFullPath(const std::filesystem::path &directory,
-                                                                  const std::string &extension) {
+                                                             const std::string &extension) {
     std::vector<std::filesystem::path> files;
 
     if (!std::filesystem::exists(directory) ||
@@ -74,7 +74,7 @@ std::vector<std::filesystem::path> UtilDir::listWithFullPath(const std::filesyst
 }
 
 std::vector<std::filesystem::path> UtilDir::listCaseInsensitive(const std::filesystem::path &directory,
-                                                                     const std::string &extension) {
+                                                                const std::string &extension) {
     std::vector<std::filesystem::path> files;
 
     if (!std::filesystem::exists(directory) ||
@@ -98,7 +98,7 @@ std::vector<std::filesystem::path> UtilDir::listCaseInsensitive(const std::files
 }
 
 std::vector<std::filesystem::path> UtilDir::listRecursive(const std::filesystem::path &directory,
-                                                               const std::string &extension) {
+                                                          const std::string &extension) {
     std::vector<std::filesystem::path> files;
 
     if (!std::filesystem::exists(directory) ||
@@ -123,7 +123,7 @@ std::vector<std::filesystem::path> UtilDir::listRecursive(const std::filesystem:
 }
 
 std::vector<std::filesystem::path> UtilDir::listRecursiveWithSymlinks(const std::filesystem::path &directory,
-                                                                           const std::string &extension) {
+                                                                      const std::string &extension) {
     std::vector<std::filesystem::path> files;
 
     if (!std::filesystem::exists(directory) ||
@@ -150,8 +150,8 @@ std::vector<std::filesystem::path> UtilDir::listRecursiveWithSymlinks(const std:
 }
 
 std::vector<std::filesystem::path> UtilDir::listNoThrow(const std::filesystem::path &directory,
-                                                             const std::string &extension,
-                                                             std::error_code &ec) {
+                                                        const std::string &extension,
+                                                        std::error_code &ec) {
     std::vector<std::filesystem::path> files;
 
     ec.clear();

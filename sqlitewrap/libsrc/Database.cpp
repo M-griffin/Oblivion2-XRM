@@ -354,6 +354,10 @@ namespace SQLW {
         m_committed = true;
     }
 
+    std::shared_ptr<SQLiteConnection> Transaction::getConnection() {
+        return m_conn;
+    }
+
     /**
      * Prepared Statement
      */
@@ -370,7 +374,9 @@ namespace SQLW {
     }
 
     PreparedStatement::~PreparedStatement() {
-        if (m_stmt) sqlite3_finalize(m_stmt);
+        if (m_stmt) {
+            sqlite3_finalize(m_stmt);
+        }
     }
 
 

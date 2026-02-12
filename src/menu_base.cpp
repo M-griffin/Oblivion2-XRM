@@ -33,7 +33,7 @@ MenuBase::MenuBase(Context &ctx)
       , m_use_hotkey(false)
       , m_baseState(BaseState::MENU_INPUT)
       , m_active_pulldownID(0)
-      , m_fail_flag(false)
+      //, m_fail_flag(false)
       , m_pulldown_reentrace_flag(false)
       , m_is_active_pulldown_menu(false)
       , m_logoff(false)
@@ -64,6 +64,7 @@ void MenuBase::baseProcessAndDeliver(std::string data) {
 void MenuBase::clearMenuPullDownOptions() {
     if (!m_loaded_pulldown_options.empty()) {
         m_loaded_pulldown_options.clear();
+        m_loaded_pulldown_options.shrink_to_fit();
     }
 
     m_ctx.getScreenAnsi().clearPullDownBars();
@@ -129,7 +130,7 @@ void MenuBase::buildMenuFirstCmdOptionsFromAcs() {
     }
 
     // Swap Validated Options with Existing.
-    m_menu_info.menu_options = new_options;
+    //m_menu_info.menu_options = new_options;
 
     new_options.clear();
     new_options.shrink_to_fit();
@@ -141,13 +142,6 @@ void MenuBase::buildMenuFirstCmdOptionsFromAcs() {
 void MenuBase::requestMenuJump(const std::string &targetMenu, MenuJumpMode mode) {
     m_log.log(UtilLog::LogLevel::Info, "MenuBase() - requestMenuJump", targetMenu, MenuJumpModeToString(mode));
     std::string menu = m_ctx.getIoCommon().toLower(targetMenu);
-
-    // Abort current execution cycle
-    m_execContext.commandQueue.clear();
-    m_execContext.commandQueue.shrink_to_fit();
-
-    m_execContext.executingChain = false;
-    m_execContext.suppressPrompt = true;
 
     bool executeFirstCmds = true;
 
@@ -167,6 +161,9 @@ void MenuBase::requestMenuJump(const std::string &targetMenu, MenuJumpMode mode)
             menu = resolveFallbackMenu();
         }
     }
+
+    m_pendingMenuName = menu;
+    m_pendingMenuJump = true;
 
     // FALLBACK STACK HANDLING
     switch (mode) {
@@ -198,29 +195,22 @@ void MenuBase::requestMenuJump(const std::string &targetMenu, MenuJumpMode mode)
     // TRACK PREVIOUS
     m_previous_menu = m_current_menu;
 
-    // RESET EXEC CONTEXT
-    m_execContext.commandQueue.clear();
-    m_execContext.commandQueue.shrink_to_fit();
-
-    m_execContext.executingChain = false;
-    m_execContext.suppressPrompt = true;
-
     // SWITCH MENU
     m_current_menu = menu;
 
     // Setup State and Stack.
     m_firstCmdState = {};
-    m_fail_flag = false;
     if (m_menuStack.size() >= 5) m_menuStack.pop_front();
 
     m_previous_menu = m_current_menu;
     m_current_menu = menu;
 
-    enterMenu(
-        m_current_menu,
-        MenuLoadReason::Jump,
-        executeFirstCmds
-    );
+    if (m_pendingMenuJump) {
+        enterMenu(m_pendingMenuName,
+                  MenuLoadReason::Jump,
+                  executeFirstCmds);
+        m_pendingMenuJump = false;
+    }
 }
 
 // Precedence:
@@ -615,14 +605,14 @@ pulldown reset
 firstcmd suppression
 */
 void MenuBase::prepareMenuState(MenuLoadReason reason) {
-    m_fail_flag = false;
+
     m_pulldown_reentrace_flag = false;
     m_is_active_pulldown_menu = false;
     m_active_pulldownID = 0;
+    m_loaded_pulldown_options.clear();
+    m_loaded_pulldown_options.shrink_to_fit();
 
-    m_execContext.executingChain = false;
-    m_execContext.commandQueue.clear();
-
+    // Reset FIRSTCMD execution on menu entry
     if (reason == MenuLoadReason::Initial ||
         reason == MenuLoadReason::Jump) {
         m_firstCmdState.executed = false;
@@ -669,8 +659,7 @@ void MenuBase::enterMenu(const std::string &menuName, MenuLoadReason reason, boo
     output += loadMenuPrompt();
     baseProcessAndDeliver(output);
 
-    if (isExecuteFirstCmds && !m_suppressFirstCmdOnce) {
-        // executeFirstCmds(); {deprecated}
+    if (isExecuteFirstCmds && !m_suppressFirstCmdOnce ) {
         if (m_firstCmdChain) {
             m_cmdChainExecutor.start(m_firstCmdChain->commands);
         }
@@ -679,6 +668,7 @@ void MenuBase::enterMenu(const std::string &menuName, MenuLoadReason reason, boo
 }
 
 bool MenuBase::handleSpecialPulldownModes() {
+
     // N = [Yes / No] lightbar prompt
     if (m_menu_info.menu_pulldown_file.size() == 1 &&
         toupper(m_menu_info.menu_pulldown_file[0]) == 'N') {
@@ -689,7 +679,7 @@ bool MenuBase::handleSpecialPulldownModes() {
         m_is_active_pulldown_menu = true;
 
         if (!m_suppressFirstCmdOnce && !m_firstCmdState.executed) {
-            executeFirstCmds();
+            m_cmdChainExecutor.start(m_firstCmdChain->commands);
         }
 
         m_firstCmdState.executed = true;
@@ -704,9 +694,15 @@ bool MenuBase::handleSpecialPulldownModes() {
 void MenuBase::setupPulldownsAndLightbars(const std::string &raw_buffer, std::string &output) {
     if (m_menu_info.menu_pulldown_file.empty() ||
         !m_ctx.getSessionWrite().isAnsi()) {
+
+        m_log.log(UtilLog::LogLevel::Info, "setupPulldownsAndLightbars isEmpty?", m_menu_info.menu_pulldown_file.empty(),
+            "isAnsi?", m_ctx.getSessionWrite().isAnsi());
+
         m_is_active_pulldown_menu = false;
         return;
     }
+
+    m_is_active_pulldown_menu = true;
 
     std::vector<int> pull_down_ids;
     m_loaded_pulldown_options.clear();
@@ -725,8 +721,6 @@ void MenuBase::setupPulldownsAndLightbars(const std::string &raw_buffer, std::st
 
     m_active_pulldownID =
             *std::min_element(pull_down_ids.begin(), pull_down_ids.end());
-
-    m_is_active_pulldown_menu = true;
 
     // Hide cursor
     output += "\x1b[?25l";
@@ -772,8 +766,18 @@ void MenuBase::redisplayMenuScreen() {
 
     // Load the Menu prompt
     // Only skip prompt
-    if (!m_execContext.suppressPrompt) {
-        output += loadMenuPrompt();
+
+    if (!m_cmdChainExecutor.isActive()) {
+        if (m_cmdChainExecutor.isWaiting()) {
+            auto &ctx = m_cmdChainExecutor.context();
+
+            if (!ctx.suppressPrompt) {
+
+                // Execute Each Command is supposed to be done prior to the prompt Pascal?
+                executeEachCommands();
+                output += loadMenuPrompt();
+            }
+        }
     }
 
     baseProcessAndDeliver(output);
@@ -992,31 +996,26 @@ std::string MenuBase::buildLightBars() {
 }
 
 void MenuBase::enqueueChainedCommands(const MenuOption &opt) {
-    const std::string &cmd = opt.command_key;
-
-    auto pos = cmd.find(';');
+    auto pos = opt.command_key.find(';');
     if (pos == std::string::npos) {
         return;
     }
 
-    // First command executes now, remainder are queued
-    std::string remainder = cmd.substr(pos + 1);
-
-    std::stringstream ss(remainder);
+    CommandChainContext ctx;
+    std::stringstream ss(opt.command_key);
     std::string token;
 
-    m_log.log(UtilLog::LogLevel::Info, "m_execContext.commandQueue B4 size=",
-              m_execContext.commandQueue.size());
-
     while (std::getline(ss, token, ';')) {
+        if (token.empty()) continue;
+
         MenuOption chained = opt;
         chained.command_key = token;
-        m_log.log(UtilLog::LogLevel::Info, "m_execContext.commandQueue token=", token);
-        m_execContext.commandQueue.push_back(chained);
+        ctx.chain.emplace_back(std::move(chained));
     }
 
-    m_log.log(UtilLog::LogLevel::Info, "m_execContext.commandQueue AF size=",
-              m_execContext.commandQueue.size());
+    if (!ctx.chain.empty()) {
+        m_cmdChainExecutor.start(std::move(ctx.chain));
+    }
 }
 
 bool MenuBase::executeWithAcs(const MenuOption &opt) {
@@ -1037,6 +1036,7 @@ bool MenuBase::executeWithAcs(const MenuOption &opt) {
     return true;
 }
 
+/*
 void MenuBase::executeFirstCmds() {
     m_log.log(UtilLog::LogLevel::Info, "MenuBase() - executeFirstCmds");
     // OUTER short-circuit (per menu)
@@ -1069,7 +1069,7 @@ void MenuBase::executeFirstCmds() {
     }
 
     m_log.log(UtilLog::LogLevel::Info, "MenuBase() - executeFirstCmds completed");
-}
+}*/
 
 /**
  * @brief Parse Menu Prompt Folder and pull Random Menu Prompt
@@ -1078,7 +1078,7 @@ void MenuBase::executeFirstCmds() {
 std::vector<std::string> MenuBase::getListOfMenuPrompts() {
 
     std::vector<std::filesystem::path> result_set =
-            UtilDir::listCaseInsensitive(GLOBAL_MENU_PATH, "yaml");
+            UtilDir::listCaseInsensitive(GLOBAL_MENU_PROMPT_PATH, ".yaml");
 
     std::vector<std::string> result_list;
 
@@ -1525,7 +1525,7 @@ bool MenuBase::handlePullDownHotKeys(const MenuOption &m, const bool &is_enter, 
  * @brief Handles Re-running EACH command re-executed after each refresh
  */
 void MenuBase::executeEachCommands() {
-    m_log.log(UtilLog::LogLevel::Info, "MenuBase() - executeEachCommands");
+    m_log.log(UtilLog::LogLevel::Info, "*** MenuBase() - executeEachCommands");
 
     // Then do not loop and execute this!
     // Get Pull down menu commands, Load all from menu options (disk)
@@ -1538,7 +1538,7 @@ void MenuBase::executeEachCommands() {
             // Process, although should each be executed before, or after a menu command!
             // OR is each just on each load/reload of menu i think!!
             m_log.log(UtilLog::LogLevel::Debug, "FOUND EACH! EXECUTE=", m.command_key);
-            const bool executed = executeWithAcs(m);
+            bool executed = executeWithAcs(m);
             //assert(!executed);
         }
     }
@@ -1692,36 +1692,6 @@ bool MenuBase::processMenuOptions(const std::string &input) {
         }
     }
 
-    // Handled Chained Commands when they exist.
-    while (!m_execContext.commandQueue.empty()) {
-        MenuOption next = m_execContext.commandQueue.front();
-        m_execContext.commandQueue.pop_front();
-
-        if (!executeWithAcs(next)) {
-            break;
-        }
-
-        ++executed;
-
-        // Menu changed or logoff → stop chain
-        if (m_logoff) {
-            m_execContext.commandQueue.clear();
-            m_execContext.commandQueue.shrink_to_fit();
-            return false;
-        }
-    }
-
-    // AFTER chained commands
-    if (current_menu == m_current_menu && !m_logoff) {
-        // After executing option and chained commands
-        if (!m_execContext.suppressPrompt) {
-            executeEachCommands();
-        }
-    } else {
-        // Menu Changed, exit and leave startup to next menu.
-        return true;
-    }
-
     // Track Executed Commands, If we didn't execute anything
     // By user input_text, then clear the menu prompt input field
     if (executed > 0) {
@@ -1740,10 +1710,35 @@ void MenuBase::handlePullDownInput(const std::string &character_buffer, const bo
     std::string result = m_ctx.getIoSession().getKeyInput(character_buffer);
     std::string input;
 
+    if (m_cmdChainExecutor.isActive()) {
+        // Only resume if the chain is waiting
+        if (m_cmdChainExecutor.isWaiting()) {
+            if (result.empty()) {
+                return;
+            }
+            if (result[0] == 13 || result[0] == 10) {
+                // Menu Translations for ENTER
+                input = "ENTER";
+            } else if (result[0] == '\x1b' && result.size() > 2 && !is_utf8) {
+                // ESC SEQUENCE
+                input = result;
+            } else if (result[0] == '\x1b' && result.size() == 1) {
+                // Check Single ESC KEY
+                input = "ESC";
+            } else {
+                // Hot Key Input.
+                input = result;
+            }
+
+            m_cmdChainExecutor.resumeWithInput(input);
+            return;
+        }
+    }
+
+
     if (result.empty()) {
         return;
     }
-
     if (result[0] == 13 || result[0] == 10) {
         // Menu Translations for ENTER
         input = "ENTER";
@@ -1773,6 +1768,36 @@ void MenuBase::handleFieldInput(const std::string &character_buffer) {
     // Get LineInput and wait for ENTER.
     std::string key;
     std::string result = m_ctx.getIoSession().getInputField(character_buffer, key, Config::sMenuPrompt_length);
+
+    if (m_cmdChainExecutor.isActive()) {
+        if (m_cmdChainExecutor.isWaiting()) {
+            // ESC was hit, make this just clear the input text, or start over!
+            if (result == "aborted") {
+            } else if (result.empty() || result[0] == '\n') {
+                // Key == 0 on [ENTER] pressed alone. then invalid!
+                // TODO, might have menu keys with ENTER, update this lateron!!
+                if (key.empty()) {
+                    // Return and don't do anything.
+                    return;
+                }
+
+                // Process incoming String from Menu Input up to ENTER.
+                // If no commands were processed, erase all prompt text
+                m_cmdChainExecutor.resumeWithInput(character_buffer);
+            } else {
+                // Send back the single input received to show client key presses.
+                // Only if return data shows a processed key returned.
+                if (result != "empty") {
+                    std::string output = getDefaultInputColor();
+                    output.append(result);
+                    baseProcessAndDeliver(output);
+                }
+            }
+            return;
+        }
+    }
+
+    // Else Normal Field Input
 
     // ESC was hit, make this just clear the input text, or start over!
     if (result == "aborted") {
@@ -1818,44 +1843,45 @@ void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf
     m_log.log(UtilLog::LogLevel::Info, "MenuBase() - menuInput=", character_buffer,
               "m_is_active_pulldown_menu=", m_is_active_pulldown_menu);
 
-    // Switch for Chained Input
+    // If a command chain is active, it owns input
     if (m_cmdChainExecutor.isActive()) {
-        // On Expected Data only!!
+        // Only resume if the chain is waiting
+        if (m_cmdChainExecutor.isWaiting()) {
+            // Parse input here for ENTER or end of field input though.
+            // Get LineInput and wait for ENTER.
+            std::string key;
+            std::string result = m_ctx.getIoSession().getInputField(character_buffer, key, Config::sMenuPrompt_length);
 
-        // WIP TODO LEFT OFF
-        /*
-        // Get LineInput and wait for ENTER.
-        std::string key;
-        std::string result = m_ctx.getIoSession().getInputField(character_buffer, key, Config::sMenuPrompt_length);
-
-        // ESC was hit, make this just clear the input text, or start over!
-        if (result == "aborted") {
-            // No change on ESC or could cancel
-            m_cmdChainExecutor.resumeWithInput("");
-            return;
-        }
-
-        if (result.empty() || result[0] == '\n') {
-            // Key == 0 on [ENTER] pressed alone. then invalid!
-            // TODO, might have menu keys with ENTER, update this lateron!!
-            if (key.empty()) {
-                // Return and don't do anything.
+            // ESC was hit abort the input and resume.
+            if (result == "aborted") {
+                m_cmdChainExecutor.resumeWithInput("");
                 return;
             }
 
-            // On [ENTER] With Data
-            m_cmdChainExecutor.resumeWithInput(key);
-        } else {
-            // Send back the single input received to show client key presses.
-            // Only if return data shows a processed key returned.
-            if (result != "empty") {
-                std::string output = getDefaultInputColor();
-                output.append(result);
-                baseProcessAndDeliver(output);
-        }
-        */
-    }
+            if (result.empty() || result[0] == '\n') {
+                // Key == 0 on [ENTER] pressed alone. then invalid!
+                // TODO, might have menu keys with ENTER, update this lateron!!
+                if (key.empty()) {
+                    // Return and don't do anything.
+                    return;
+                }
 
+                m_cmdChainExecutor.resumeWithInput(key);
+                return;
+            } else {
+                // Send back the single input received to show client key presses.
+                // Only if return data shows a processed key returned.
+                if (result != "empty") {
+                    std::string output = getDefaultInputColor();
+                    output.append(result);
+                    baseProcessAndDeliver(output);
+                }
+            }
+
+            // Still in input Field State, not ended yet.
+            return;
+        }
+    }
 
     // If were in lightbar mode, then we are using hotkeys.
     if (m_is_active_pulldown_menu) {
@@ -1864,11 +1890,6 @@ void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf
     } else {
         m_log.log(UtilLog::LogLevel::Debug, "MenuBase() - handleFieldInput");
         handleFieldInput(character_buffer);
-    }
-
-    if (m_execContext.suppressPrompt) {
-        // Do NOT redisplay prompt/menu - reset.
-        m_execContext.suppressPrompt = false;
     }
 }
 

@@ -130,7 +130,7 @@ namespace SQLW {
         explicit SessionDatabase(Database& coreDb, IError* err = nullptr);
         ~SessionDatabase();
 
-        // Initialize session DB for a user
+        // Initialize session DB for a user - InMemory
         bool initializeForUser(int userId);
 
         // Access the session database
@@ -182,6 +182,8 @@ namespace SQLW {
         void commit();
 
         void rollback();
+
+        std::shared_ptr<SQLiteConnection> getConnection();
 
     private:
         Database &m_db;

@@ -312,7 +312,7 @@ bool ModLogon::logon(const std::string &input) {
     }
     if (result[0] == '\n') {
         // Key == 0 on [ENTER] pressed alone. then invalid!
-        if (key.size() == 0) {
+        if (key.empty()) {
             // Return and don't do anything.
             return false;
         }

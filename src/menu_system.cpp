@@ -201,24 +201,67 @@ void MenuSystem::setState(State newState) {
 // Allow for Pauses, is more of a resueable script.
 // TODO , Input options need to be wired up for ChainResult::WaitingForInput!!
 ChainResult MenuSystem::executeChainedCommand(
-        const MenuOption &option,
-        CommandChainContext &ctx) {
+    const MenuOption &option,
+    CommandChainContext &ctx)
+{
+    std::string cmd(option.command_key); // 2-char key
 
-    if (option.command_key.size() != 2) {
-        return ChainResult::Continue;
+    // ----------------------------
+    // Input-waiting commands
+    // ----------------------------
+    if ((cmd[0] == 'F' && cmd[1] == 'D') || // FIELD
+        (cmd[0] == 'I' && cmd[1] == 'N') || // INPUT
+        (cmd[0] == 'L' && cmd[1] == 'I') || // LINEINPUT
+        (cmd[0] == 'Y' && cmd[1] == 'N') || // YESNO
+        (cmd[0] == 'L' && cmd[1] == 'B') || // LIGHTBAR
+        (cmd[0] == 'P' && cmd[1] == 'A'))   // PAUSE
+    {
+        ctx.waitingForInput = true;
+        ctx.suppressPrompt = true;
+        return ChainResult::WaitingForInput;
     }
 
-    char key = option.command_key[0];
-    auto it = m_menu_command_functions.find(key);
-
-    if (it == m_menu_command_functions.end()) {
-        return ChainResult::Continue;
+    // ----------------------------
+    // Menu transition commands
+    // ----------------------------
+    if ((cmd[0] == 'G' && cmd[1] == 'O') || // GOTO
+        (cmd[0] == 'G' && cmd[1] == 'S') || // GOSUB
+        (cmd[0] == 'R' && cmd[1] == 'T') || // RETURN
+        (cmd[0] == 'P' && cmd[1] == 'R') || // PREVIOUS
+        (cmd[0] == 'S' && cmd[1] == 'T'))   // START
+    {
+        ctx.suppressPrompt = true;
+        return ChainResult::ReloadMenu;
     }
 
-    return it->second(option)
-        ? ChainResult::Continue
-        : ChainResult::Continue;
+    // ----------------------------
+    // Hard exit commands
+    // ----------------------------
+    if ((cmd[0] == 'L' && cmd[1] == 'O') || // LOGOFF
+        (cmd[0] == 'D' && cmd[1] == 'C') || // DISCONNECT
+        (cmd[0] == 'E' && cmd[1] == 'X') || // EXIT
+        (cmd[0] == 'Q' && cmd[1] == 'U'))   // QUIT
+    {
+        ctx.suppressPrompt = true;
+        return ChainResult::ExitSystem;
+    }
 
+    // ----------------------------
+    // Normal execution
+    // ----------------------------
+    bool success = menuOptionsCallback(option);
+
+    if (!success) {
+        ctx.failFlag = true;
+        if (ctx.abort_on_fail) {
+            return ChainResult::AbortChain;
+        }
+        if (!ctx.skip_on_fail) {
+            return ChainResult::AbortChain; // Pascal treats failed mandatory commands as abort
+        }
+    }
+
+    return ChainResult::Continue;
 }
 
 /**
@@ -504,7 +547,6 @@ bool MenuSystem::menuOptionsMultiNodeCommands(const MenuOption &option) {
  * @param option
  */
 bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
-
     m_log.log(UtilLog::LogLevel::Console, "Matrix CommandKey=", option.command_key);
 
     switch (option.command_key[1]) {
@@ -962,95 +1004,6 @@ void MenuSystem::startupExternalProcess(const std::string &cmdline) {
     //m_menu_session_data->startExternalProcess(cmdline);
 }
 
-/**
- * @brief Startup the Menu Editor Module
- *
-void MenuSystem::startupModuleMenuEditor()
-{
-    // Setup the input processor
-    resetMenuInputIndex(MODULE_INPUT);
-
-    // Allocate and Create
-    module_ptr module = std::make_shared<ModMenuEditor>(
-        getLockedSession(), m_config, m_ansi_process, m_io_common, m_session_io
-    );
-
-    if(!module)
-    {
-        m_log.log(UtilLog::LogLevel::Error, "startupModuleMenuEditor Allocation Error");
-        return;
-    }
-
-    startupModule(module);
-}*/
-
-/**
- * @brief Startup the User Editor Module
- *
-void MenuSystem::startupModuleUserEditor()
-{
-    // Setup the input processor
-    resetMenuInputIndex(MODULE_INPUT);
-
-    // Allocate and Create
-    module_ptr module = std::make_shared<ModUserEditor>(
-        getLockedSession(), m_config, m_ansi_process, m_io_common, m_session_io
-    );
-
-    if(!module)
-    {
-        m_log.log(UtilLog::LogLevel::Error, "startupModuleUserEditor Allocation Error");
-        return;
-    }
-
-    startupModule(module);
-}*/
-
-/**
- * @brief Startup the Level Editor Module
- *
-void MenuSystem::startupModuleLevelEditor()
-{
-    // Setup the input processor
-    resetMenuInputIndex(MODULE_INPUT);
-
-    // Allocate and Create
-    module_ptr module = std::make_shared<ModLevelEditor>(
-        getLockedSession(), m_config, m_ansi_process, m_io_common, m_session_io
-    );
-
-    if(!module)
-    {
-        m_log.log(UtilLog::LogLevel::Error, "startupModuleLevelEditor Allocation Error");
-        return;
-    }
-
-    startupModule(module);
-}*/
-
-/**
- * @brief Startup the Full Screen Message Editor Module
- *
-void MenuSystem::startupModuleMessageEditor()
-{
-    // Setup the input processor
-    resetMenuInputIndex(MODULE_INPUT);
-
-    // Allocate and Create
-    module_ptr module = std::make_shared<ModMessageEditor>(
-        getLockedSession(), m_config, m_ansi_process, m_io_common, m_session_io
-    );
-
-    if(!module)
-    {
-        m_log.log(UtilLog::LogLevel::Error, "startupModuleMessageEditor Allocation Error");
-        return;
-    }
-
-    startupModule(module);
-}*/
-
-
 // -------------------------
 // Menu System Setup
 // -------------------------
@@ -1074,7 +1027,6 @@ void MenuSystem::createMenuSystem() {
     m_ctx.getScreenAnsi().resize(term_rows, term_cols);
 
     requestMenuJump(m_current_menu, MenuJumpMode::Normal);
-
 }
 
 void MenuSystem::clearMenuSystem() {
@@ -1090,45 +1042,6 @@ void MenuSystem::inputMenuSystem(const std::string &input) {
     m_log.log(UtilLog::LogLevel::Console, "MenuSystem() inputMenuSystem");
 
     if (!m_is_active) {
-        return;
-    }
-
-    // Chained Commands always execute first.
-    if (m_cmdChainExecutor.isActive()) {
-
-        // Parse input here for ENTER or end of field input though.
-        // Get LineInput and wait for ENTER.
-        std::string key;
-        std::string result = m_ctx.getIoSession().getInputField(input, key, Config::sMenuPrompt_length);
-
-        // ESC was hit abort the input and resume.
-        if (result == "aborted") {
-            m_cmdChainExecutor.resumeWithInput("");
-            return;
-        }
-
-        if (result.empty() || result[0] == '\n') {
-            // Key == 0 on [ENTER] pressed alone. then invalid!
-            // TODO, might have menu keys with ENTER, update this lateron!!
-            if (key.empty()) {
-                // Return and don't do anything.
-                return;
-            }
-
-            m_cmdChainExecutor.resumeWithInput(key);
-            return;
-
-        } else {
-            // Send back the single input received to show client key presses.
-            // Only if return data shows a processed key returned.
-            if (result != "empty") {
-                std::string output = getDefaultInputColor();
-                output.append(result);
-                baseProcessAndDeliver(output);
-            }
-        }
-
-        // Still in input Field State, not ended yet.
         return;
     }
 
@@ -1232,8 +1145,7 @@ void MenuSystem::inputLogon(const std::string &input) {
 
             if (m_ctx.getSessionWrite().isAuthorized()) {
                 requestMenuJump(m_current_menu, MenuJumpMode::PushStarting);
-            }
-            else {
+            } else {
                 redisplayMenuScreen();
             }
         } else {

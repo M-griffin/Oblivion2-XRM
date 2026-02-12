@@ -90,6 +90,8 @@ namespace SQLW {
         int m_numCols;
         bool m_rowValid;
         std::string m_lastQuery;
+        int  m_cache_rc;       ///< Cached result after call to get_result()
+        bool m_cache_rc_valid; ///< Indicates cache_rc is valid
 
         void buildColumnMap();
 

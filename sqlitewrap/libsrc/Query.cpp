@@ -17,9 +17,12 @@
 namespace SQLW {
     Query::Query(Database &db, std::shared_ptr<SQLiteConnection> txnConn)
         : m_db(db),
+          m_txnConn(std::move(txnConn)),
           m_rowCount(0),
           m_numCols(0),
-          m_rowValid(false) {
+          m_rowValid(false),
+          m_cache_rc(0),
+          m_cache_rc_valid(false) {
     }
 
     Query::Query(Database &db, const std::string &sql)
@@ -72,7 +75,9 @@ namespace SQLW {
             return false;
         }
 
-        int rc = m_stmt->step();
+        // Cache the first row so we can loop easily when valid.
+        m_cache_rc = m_stmt->step();
+        m_cache_rc_valid = true;
 
         // Build column map lazily if not done yet
         if (m_colMap.empty()) {
@@ -82,13 +87,13 @@ namespace SQLW {
             }
         }
 
-        if (rc == SQLITE_ROW) {
+        if (m_cache_rc == SQLITE_ROW) {
             m_rowValid = true;
             m_rowCount = 1;
             return true;
         }
 
-        if (rc == SQLITE_DONE) {
+        if (m_cache_rc == SQLITE_DONE) {
             m_rowValid = false;
             m_rowCount = 0;
             return true;
@@ -99,10 +104,12 @@ namespace SQLW {
     }
 
     bool Query::fetchRow() {
-        if (!m_stmt)
+        if (!m_stmt) {
             return false;
+        }
 
-        int rc = m_stmt->step();
+        int rc = m_cache_rc_valid ? m_cache_rc : m_stmt->step();
+        m_cache_rc_valid = false;
 
         if (rc == SQLITE_ROW) {
             m_rowValid = true;
@@ -111,8 +118,7 @@ namespace SQLW {
         }
 
         if (rc == SQLITE_DONE) {
-            m_rowValid = false;
-            return true;
+            return false;
         }
 
         queryError("fetchRow failed");
@@ -157,7 +163,12 @@ namespace SQLW {
     }
 
     sqlite_int64 Query::getInsertId() const {
-        return sqlite3_last_insert_rowid(m_db.connection());
+
+        sqlite3* db = m_txnConn ? m_txnConn->get() : m_stmt
+            ? sqlite3_db_handle(m_stmt->stmt())
+            : nullptr;
+
+        return sqlite3_last_insert_rowid(db);
     }
 
     int Query::getNumCols() const {
@@ -200,7 +211,10 @@ namespace SQLW {
         if (statements.empty()) return true;
 
         // Start transaction
-        std::unique_ptr<Transaction> transaction = m_db.beginTransaction();
+        //std::unique_ptr<Transaction> transaction = m_db.beginTransaction();
+        auto transaction = m_db.beginTransaction();
+        m_txnConn = transaction->getConnection(); // you must expose this
+
         if (!transaction) {
             std::cout << "executeTransaction - Failed to begin transaction" << std::endl;
             queryError("Failed to begin transaction");
@@ -219,7 +233,7 @@ namespace SQLW {
                                    " | SQLite error: " + m_db.getError());
                         std::cout << "executeTransaction - Failed to prepare statement, msg: " << m_db.getError() <<
                                 std::endl;
-                        transaction->rollback();
+                        // transaction->rollback(); in Destructor.
                         return false;
                     }
 
@@ -230,7 +244,7 @@ namespace SQLW {
                                    " | SQLite error: " + m_db.getError());
                         std::cout << "executeTransaction - Failed to execute statement:, msg: " << m_db.getError() <<
                                 std::endl;
-                        transaction->rollback();
+                        // transaction->rollback(); in Destructor.
                         return false;
                     }
 
@@ -244,12 +258,12 @@ namespace SQLW {
         } catch (const std::exception &e) {
             queryError(std::string("Transaction exception: ") + e.what());
             std::cout << "executeTransaction - Transaction exception:, msg: " << e.what() << std::endl;
-            transaction->rollback();
+            // transaction->rollback(); in Destructor.
             return false;
         } catch (...) {
             queryError("Unknown exception in executeTransaction");
             std::cout << "executeTransaction - Unknown exception:, msg: " << std::endl;
-            transaction->rollback();
+            // transaction->rollback(); in Destructor.
             return false;
         }
     }

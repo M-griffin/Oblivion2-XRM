@@ -79,15 +79,6 @@ public:
         bool executed = false;
     };
 
-    struct ExecContext {
-        std::deque<MenuOption> commandQueue; // chained commands
-        std::string wildcardBuffer; // captured from *
-        std::string lastInput; // for &
-        bool executingChain = false;
-        bool suppressPrompt = false;
-    };
-
-    // New
     struct CommandChain {
         std::vector<MenuOption> commands;
     };
@@ -95,11 +86,11 @@ public:
     UtilLog &m_log;
     Context &m_ctx;
     UtilDir m_directory;
-    ExecContext m_execContext;
+
     FirstCmdState m_firstCmdState;
     bool m_suppressFirstCmdOnce = false;
 
-    // Old
+    // Handles Stack of Current and Fallback menus.
     std::deque<std::string> m_menuStack;
 
     // New
@@ -122,11 +113,14 @@ public:
     unsigned int m_active_pulldownID; // Active Lightbar Position.
 
     // Flags
-    bool m_fail_flag; // If menu or Option fails, kick off the fail flag.
+    //bool m_fail_flag; // If menu or Option fails, kick off the fail flag.
     bool m_pulldown_reentrace_flag; // If menu or Option fails, kick off the fail flag.
     bool m_is_active_pulldown_menu; // If menu has active light bars to display.
     bool m_logoff; // If logoff, stop loop execution on commands and exit.
     bool m_is_active;
+
+    bool m_pendingMenuJump = false;
+    std::string m_pendingMenuName;
 
     // Holds all pull down menu options.
     std::vector<MenuOption> m_loaded_pulldown_options;
@@ -184,7 +178,9 @@ public:
 
     bool executeWithAcs(const MenuOption &opt);
 
+    /*
     void executeFirstCmds();
+    */
 
     std::string loadMenuPrompt();
 
@@ -205,6 +201,8 @@ public:
     std::vector<std::string> getListOfMenuPrompts();
 
     std::string getRandomMenuPrompt();
+
+    void startMenuOptionExecution(const MenuOption &option);
 
     bool processMenuOptions(const std::string &input);
 
