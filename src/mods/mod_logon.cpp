@@ -376,11 +376,7 @@ bool ModLogon::validate_password(const std::string &input) {
 
     // Generate Encrypted password from incoming string.
     UtilEncrypt encryption;
-
-    // Compare case-sensitive hash with generated hash string.
-    std::string password = encryption.generateHashString(input, security.sSaltHash);
-
-    if (security.sPasswordHash.compare(password) == 0) {
+    if (encryption.compare(security.sPasswordHash, input)) {
         m_log.log(UtilLog::LogLevel::Console, "Password Successful=", m_logon_user.sHandle);
         return true;
     }

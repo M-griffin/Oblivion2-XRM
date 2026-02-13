@@ -564,16 +564,18 @@ void ModSignup::setupVerifyAndSave() {
  */
 bool ModSignup::fieldInputAndProcess(std::string input, int field_length, bool use_hidden_output,
                                      std::function<bool(std::string &, std::string &)> function_pointer) {
-    std::string key = "";
+    std::string key;
     std::string result = m_ctx.getIoSession().getInputField(input, key, field_length, "", use_hidden_output);
 
     // ESC was hit
     if (result == "aborted") {
         m_is_active = false;
         return false;
-    } else if (result[0] == '\n') {
+    }
+
+    if (result[0] == '\n') {
         // Key == 0 on [ENTER] pressed alone. then invalid!
-        if (key.size() == 0) {
+        if (key.empty()) {
             return false;
         }
 
@@ -581,12 +583,12 @@ bool ModSignup::fieldInputAndProcess(std::string input, int field_length, bool u
 
         // Execution Lambda Function Passed in. Test if it can use the log, or we need to pass
         return function_pointer(input, key);
-    } else {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if (result != "empty") {
-            baseProcessDeliverInput(result);
-        }
+    }
+
+    // Send back the single input received to show client key presses.
+    // Only if return data shows a processed key returned.
+    if (result != "empty") {
+        baseProcessDeliverInput(result);
     }
 
     return true;
@@ -929,17 +931,15 @@ bool ModSignup::verifyPassword(const std::string &input) {
         if (m_security_record.sPasswordHash.compare(key) == 0) {
             // Load pointer to encrypt methods.
             UtilEncrypt encryption;
-            std::string salt = encryption.generateSalt(m_new_use_rec.sHandle, m_ctx.getCfg().bbs_uuid);
-            std::string password = encryption.generateHashString(m_security_record.sPasswordHash, salt);
+            std::string passwordHash = encryption.generateHashString(m_security_record.sPasswordHash);
 
-            if (salt.size() == 0 || password.size() == 0) {
+            if (passwordHash.empty()) {
                 m_log.log(UtilLog::LogLevel::Error, "Error, Salt or Password were empty", __LINE__, __FILE__);
                 assert(false);
             }
 
-            // setup the salt and password.
-            m_security_record.sSaltHash = salt;
-            m_security_record.sPasswordHash = password;
+            // setup password hash.
+            m_security_record.sPasswordHash = passwordHash;
             changeNextModule();
         } else {
             m_log.log(UtilLog::LogLevel::Info, "Password Verify Failed.", __LINE__, __FILE__);
@@ -1009,11 +1009,10 @@ bool ModSignup::verifyChallengeAnswer(const std::string &input) {
         if (m_security_record.sChallengeAnswerHash.compare(key) == 0) {
             UtilEncrypt encryption;
             std::string password = encryption.generateHashString(
-                m_security_record.sChallengeAnswerHash,
-                m_security_record.sSaltHash
+                m_security_record.sChallengeAnswerHash
             );
 
-            if (password.size() == 0) {
+            if (password.empty()) {
                 // Error from encryption method.
                 m_log.log(UtilLog::LogLevel::Error, "Error, ChallengeAnswer was empty", __LINE__, __FILE__);
                 return false;
@@ -1048,9 +1047,9 @@ bool ModSignup::yesNoBars(const std::string &input) {
         return false;
     } else if (result[0] == '\n') {
         // If ENTER Default to Yes, or Single Y is hit
-        if (key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1)) {
+        if (key.empty() || (toupper(key[0]) == 'Y' && key.size() == 1)) {
             // Key == 0 on [ENTER] pressed alone.
-            if (key.size() == 0) {
+            if (key.empty()) {
                 std::string yes_prompt = "Yes";
                 baseProcessDeliverInput(yes_prompt);
             }
@@ -1093,11 +1092,13 @@ bool ModSignup::doPause(const std::string &input) {
     if (result == "aborted") {
         m_is_active = false;
         return false;
-    } else if (result[0] == '\n') {
+    }
+
+    if (result[0] == '\n') {
         // If ENTER Default to Yes, or Single Y is hit
-        if (key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1)) {
+        if (key.empty() || (toupper(key[0]) == 'Y' && key.size() == 1)) {
             // Key == 0 on [ENTER] pressed alone.
-            if (key.size() == 0) {
+            if (key.empty()) {
                 std::string yes_prompt = "Yes";
                 baseProcessDeliverInput(yes_prompt);
             }
@@ -1133,18 +1134,20 @@ bool ModSignup::doPause(const std::string &input) {
  * @return
  */
 bool ModSignup::clearOrScroll(const std::string &input) {
-    std::string key = "";
+    std::string key;
     std::string result = m_ctx.getIoSession().getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if (result == "aborted") {
         m_is_active = false;
         return false;
-    } else if (result[0] == '\n') {
+    }
+
+    if (result[0] == '\n') {
         // If ENTER Default to Yes, or Single Y is hit
-        if (key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1)) {
+        if (key.empty() || (toupper(key[0]) == 'Y' && key.size() == 1)) {
             // Key == 0 on [ENTER] pressed alone.
-            if (key.size() == 0) {
+            if (key.empty()) {
                 std::string yes_prompt = "Yes";
                 baseProcessDeliverInput(yes_prompt);
             }
@@ -1180,18 +1183,20 @@ bool ModSignup::clearOrScroll(const std::string &input) {
  * @return
  */
 bool ModSignup::ansiColor(const std::string &input) {
-    std::string key = "";
+    std::string key;
     std::string result = m_ctx.getIoSession().getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if (result == "aborted") {
         m_is_active = false;
         return false;
-    } else if (result[0] == '\n') {
+    }
+
+    if (result[0] == '\n') {
         // If ENTER Default to Yes, or Single Y is hit
-        if (key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1)) {
+        if (key.empty() || (toupper(key[0]) == 'Y' && key.size() == 1)) {
             // Key == 0 on [ENTER] pressed alone.
-            if (key.size() == 0) {
+            if (key.empty()) {
                 std::string yes_prompt = "Yes";
                 baseProcessDeliverInput(yes_prompt);
             }
@@ -1227,16 +1232,18 @@ bool ModSignup::ansiColor(const std::string &input) {
  * @return
  */
 bool ModSignup::backSpace(const std::string &input) {
-    std::string key = "";
+    std::string key;
     std::string result = m_ctx.getIoSession().getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if (result == "aborted") {
         m_is_active = false;
         return false;
-    } else if (result[0] == '\n') {
+    }
+
+    if (result[0] == '\n') {
         // If ENTER Default to Yes, or Single Y is hit
-        if (key.size() == 0) {
+        if (key.empty()) {
             baseProcessDeliverNewLine();
             // Key == 0 on [ENTER] pressed alone.
             std::string detection_prompt = "- Detection WIP, Select W or T.";
@@ -1246,7 +1253,8 @@ bool ModSignup::backSpace(const std::string &input) {
             // Start Backspace Detection here!
             redisplayModulePrompt();
             return true;
-        } else if (toupper(key[0]) == 'W' && key.size() == 1) {
+        }
+        if (toupper(key[0]) == 'W' && key.size() == 1) {
             m_new_use_rec.bBackSpaceVt100 = false;
             baseProcessDeliverNewLine();
         }
@@ -1366,7 +1374,6 @@ void ModSignup::saveNewUserRecord() {
     }
 
     m_is_active = false;
-    return;
 }
 
 
@@ -1375,18 +1382,20 @@ void ModSignup::saveNewUserRecord() {
  * @return
  */
 bool ModSignup::verifyAndSave(const std::string &input) {
-    std::string key = "";
+    std::string key;
     std::string result = m_ctx.getIoSession().getInputField(input, key, Config::sSingle_key_length);
 
     // ESC was hit
     if (result == "aborted") {
         m_is_active = false;
         return false;
-    } else if (result[0] == '\n') {
+    }
+
+    if (result[0] == '\n') {
         // If ENTER Default to Yes, or Single Y is hit
-        if (key.size() == 0 || (toupper(key[0]) == 'Y' && key.size() == 1)) {
+        if (key.empty() || (toupper(key[0]) == 'Y' && key.size() == 1)) {
             // Key == 0 on [ENTER] pressed alone.
-            if (key.size() == 0) {
+            if (key.empty()) {
                 std::string yes_prompt = "Yes";
                 baseProcessDeliverInput(yes_prompt);
             }
@@ -1397,23 +1406,23 @@ bool ModSignup::verifyAndSave(const std::string &input) {
             return false;
         }
         // Else check for single N for No to default to ASCII no colors.
-        else if (toupper(key[0]) == 'N' && key.size() == 1) {
+        if (toupper(key[0]) == 'N' && key.size() == 1) {
             // Abort and Return;
             m_is_active = false;
             baseProcessDeliverNewLine();
             return false;
-        } else {
-            baseProcessDeliverNewLine();
-            displayPromptAndNewLine(PROMPT_TEXT_INVALID);
-            redisplayModulePrompt();
-            return true;
         }
-    } else {
-        // Send back the single input received to show client key presses.
-        // Only if return data shows a processed key returned.
-        if (result != "empty") {
-            baseProcessDeliverInput(result);
-        }
+
+        baseProcessDeliverNewLine();
+        displayPromptAndNewLine(PROMPT_TEXT_INVALID);
+        redisplayModulePrompt();
+        return true;
+
+    }
+    // Send back the single input received to show client key presses.
+    // Only if return data shows a processed key returned.
+    if (result != "empty") {
+        baseProcessDeliverInput(result);
     }
 
     return true;

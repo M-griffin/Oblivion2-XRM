@@ -15,14 +15,12 @@ class Security {
 public:
     long iId;
     std::string sPasswordHash;
-    std::string sSaltHash;
     std::string sChallengeQuestion;
     std::string sChallengeAnswerHash;
 
     explicit Security()
         : iId(-1)
           , sPasswordHash("")
-          , sSaltHash("")
           , sChallengeQuestion("")
           , sChallengeAnswerHash("") {
     }

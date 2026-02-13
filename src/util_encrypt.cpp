@@ -33,11 +33,8 @@ namespace {
     }
 } // Namespace
 
-std::string UtilEncrypt::encrypt(const std::string &key, const std::string &) {
-    return generateHashString(key, "");
-}
 
-std::string UtilEncrypt::generateSalt(const std::string &, const std::string &) {
+std::string UtilEncrypt::generateSalt() {
     unsigned char salt[SALT_BYTES];
 
     if (RAND_bytes(salt, sizeof(salt)) != 1) {
@@ -72,9 +69,8 @@ std::string UtilEncrypt::Pkcs5Pbkdf2(const std::string &key,
     return oss.str();
 }
 
-std::string UtilEncrypt::generateHashString(const std::string &key,
-                                            const std::string &) {
-    std::string saltHex = generateSalt("", "");
+std::string UtilEncrypt::generateHashString(const std::string &key) {
+    std::string saltHex = generateSalt();
     return Pkcs5Pbkdf2(key, saltHex);
 }
 

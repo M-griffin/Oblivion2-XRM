@@ -14,7 +14,7 @@ using baseSecurityClass = BaseDao<Security>;
  * @class SecurityDao
  * @author Michael Griffin
  * @date 8/21/2016
- * @file security_dao.hpp
+ * @file dao_security.hpp
  * @brief Handles Reading and Writing Security Class from Database
  *         Objects are Instantiated in the Session then passed to the DAO for work.
  */
@@ -35,7 +35,6 @@ public:
                 "CREATE TABLE IF NOT EXISTS " + m_strTableName + " ( "
                 "iId                   INTEGER PRIMARY KEY, "
                 "sPasswordHash         TEXT NOT NULL, "
-                "sSaltHash             TEXT NOT NULL, "
                 "sChallengeQuestion    TEXT NOT NULL, "
                 "sChallengeAnswerHash  TEXT NOT NULL "
                 "); ";

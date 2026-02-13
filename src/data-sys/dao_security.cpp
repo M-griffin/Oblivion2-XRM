@@ -103,7 +103,6 @@ long SecurityDao::getRecordsCount() {
 void SecurityDao::pullSecurityResult(Query &qry, Security &obj) {
     qry.getFieldByName("iId", obj.iId);
     qry.getFieldByName("sPasswordHash", obj.sPasswordHash);
-    qry.getFieldByName("sSaltHash", obj.sSaltHash);
     qry.getFieldByName("sChallengeQuestion", obj.sChallengeQuestion);
     qry.getFieldByName("sChallengeAnswerHash", obj.sChallengeAnswerHash);
 }
@@ -117,7 +116,6 @@ void SecurityDao::fillSecurityColumnValues(Query &qry, Security &obj,
                                            std::vector<std::pair<std::string, std::string> > &values) {
     // values.push_back(qry.translateFieldName("iId", obj.iId));
     values.push_back(qry.translateFieldName("sPasswordHash", obj.sPasswordHash));
-    values.push_back(qry.translateFieldName("sSaltHash", obj.sSaltHash));
     values.push_back(qry.translateFieldName("sChallengeQuestion", obj.sChallengeQuestion));
     values.push_back(qry.translateFieldName("sChallengeAnswerHash", obj.sChallengeAnswerHash));
 }
@@ -129,7 +127,6 @@ std::string SecurityDao::insertSecurityQryString(std::string qry, Security &obj)
     // Mprint statement to avoid injections.
     char *result = sqlite3_mprintf(qry.c_str(),
                                    obj.sPasswordHash.c_str(),
-                                   obj.sSaltHash.c_str(),
                                    obj.sChallengeQuestion.c_str(),
                                    obj.sChallengeAnswerHash.c_str()
     );
@@ -146,7 +143,6 @@ std::string SecurityDao::updateSecurityQryString(std::string qry, Security &obj)
     // Mprint statement to avoid injections.
     char *result = sqlite3_mprintf(qry.c_str(),
                                    obj.sPasswordHash.c_str(),
-                                   obj.sSaltHash.c_str(),
                                    obj.sChallengeQuestion.c_str(),
                                    obj.sChallengeAnswerHash.c_str(),
                                    obj.iId
