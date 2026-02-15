@@ -6,27 +6,89 @@
 #include "menu_system.hpp"
 
 
+#include "menu_cmd_chain.hpp"
+#include "menu_system.hpp"
+
 CommandChainExecutor::CommandChainExecutor(MenuSystem &ms)
-    : m_menuSystem(ms) {}
+    : m_menuSystem(ms) {
+}
+
+void CommandChainExecutor::start(std::deque<MenuOption> chain) {
+    clear();
+    m_ctx.executionCounter = 0;
+    for (auto &opt: chain)
+        m_ctx.queue.push_back(std::move(opt));
+
+    execute();
+}
 
 void CommandChainExecutor::start(std::vector<MenuOption> chain) {
-    m_ctx = CommandChainContext{};
-    m_ctx.chain = std::move(chain);
+    clear();
+    m_ctx.executionCounter = 0;
+    for (auto &opt: chain)
+        m_ctx.queue.push_back(std::move(opt));
+
     execute();
 }
 
 void CommandChainExecutor::resumeWithInput(const std::string &input) {
-    m_ctx.lastInput = input;
-    m_ctx.waitingForInput = false;
-    execute();
+
+
+    // Parse input here for ENTER or end of field input though.
+    // Get LineInput and wait for ENTER.
+    std::string key;
+    std::string result = m_menuSystem.m_ctx.getIoSession().getInputField(
+        input, key, Config::sMenuPrompt_length);
+
+    // ESC was hit abort the input and resume.
+    if (result == "aborted") {
+        m_ctx.lastInput = "";
+        m_ctx.waitingForInput = false;
+        m_ctx.suppressPrompt = false;
+
+        // complete remaining chain.
+        execute();
+        return;
+    }
+
+    if (result.empty() || result[0] == '\n') {
+        // Key == 0 on [ENTER] pressed alone. then invalid!
+
+        // Actual Input completed from FieldInput, Passback to execution.
+        m_ctx.waitingForInput = false;
+        m_ctx.suppressPrompt = false;
+        m_ctx.lastInput = key;
+        execute();
+        return;
+    }
+
+    // Send back the single input received to show client key presses.
+    // Only if return data shows a processed key returned.
+    if (result != "empty") {
+        std::string output = m_menuSystem.getDefaultInputColor();
+        output.append(result);
+        m_menuSystem.baseProcessAndDeliver(output);
+    }
 }
 
 bool CommandChainExecutor::isActive() const {
-    return m_ctx.index < m_ctx.chain.size();
+    return !m_ctx.queue.empty();
 }
 
 bool CommandChainExecutor::isWaiting() const {
     return m_ctx.waitingForInput;
+}
+
+void CommandChainExecutor::injectFront(const MenuOption &opt) {
+    m_ctx.queue.push_front(opt);
+}
+
+void CommandChainExecutor::injectBack(const MenuOption &opt) {
+    m_ctx.queue.push_back(opt);
+}
+
+void CommandChainExecutor::clear() {
+    m_ctx = CommandChainContext{};
 }
 
 CommandChainContext &CommandChainExecutor::context() {
@@ -34,31 +96,40 @@ CommandChainContext &CommandChainExecutor::context() {
 }
 
 void CommandChainExecutor::execute() {
-    while (m_ctx.index < m_ctx.chain.size()) {
-        auto &opt = m_ctx.chain[m_ctx.index];
-
-        // Skip if previous failure and this option opts out
-        if (m_ctx.failFlag && m_ctx.skip_on_fail) {
-            ++m_ctx.index;
-            continue;
+    while (!m_ctx.queue.empty()) {
+        if (m_ctx.executionCounter++ > MAX_CHAIN_EXECUTIONS) {
+            // Safety guard
+            clear();
+            return;
         }
+
+        MenuOption opt = m_ctx.queue.front();
+        m_ctx.queue.pop_front();
 
         ChainResult result =
-            m_menuSystem.executeChainedCommand(opt, m_ctx);
+                m_menuSystem.executeChainedCommand(opt, m_ctx);
 
-        if (result == ChainResult::WaitingForInput) {
-            m_ctx.waitingForInput = true;
-            m_ctx.suppressPrompt = true;
-            return;
+        switch (result) {
+            case ChainResult::Continue:
+                break;
+
+            case ChainResult::WaitingForInput:
+                m_ctx.waitingForInput = true;
+                m_ctx.suppressPrompt = true;
+                return;
+
+            case ChainResult::AbortChain:
+                clear();
+                return;
+
+            case ChainResult::ReloadMenu:
+                m_menuSystem.reloadMenu();
+                break;
+
+            case ChainResult::ExitSystem:
+                clear();
+                m_menuSystem.disconnectUser();
+                return;
         }
-
-        if (result == ChainResult::AbortChain ||
-            result == ChainResult::ReloadMenu ||
-            result == ChainResult::ExitSystem) {
-            return;
-            }
-
-        ++m_ctx.index;
     }
 }
-

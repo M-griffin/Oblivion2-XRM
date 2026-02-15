@@ -2,83 +2,66 @@
 #define COMMAND_CHAIN_EXECUTOR_HPP
 
 #include <string>
+#include <deque>
 #include <vector>
 
 #include "model-sys/menu.hpp"
 #include "util_log.hpp"
 
-class MenuSystem;
-
 #ifdef DEBUG_MENU_CHAIN
-#define CHAIN_TRACE(...) Logging::getInstance().log(Logging::LogLevel::Info, __VA_ARGS__)
+#define CHAIN_TRACE(...) UtilLog::getInstance().log(UtilLog::LogLevel::Info, __VA_ARGS__)
 #else
 #define CHAIN_TRACE(...)
 #endif
 
-/*
+class MenuSystem;
+
 enum class ChainResult {
     Continue,
     WaitingForInput,
-    Done
-};*/
+    AbortChain,
+    ReloadMenu,
+    ExitSystem
+};
 
-/*
 struct CommandChainContext {
-    std::vector<MenuOption> chain;
-    size_t index = 0;
+    std::deque<MenuOption> queue;  // dynamic injection queue
+
+    std::string wildcardBuffer;
+    std::string lastInput;
 
     bool waitingForInput = false;
-    bool failFlag = false;
     bool suppressPrompt = false;
 
-    std::string inputBuffer;
-    std::string inputExpected;
-    std::string wildcardBuffer; // captured from *
-    std::string lastInput; // for &
-};*/
-
-enum class ChainResult {
-    Continue,          // move to next command
-    WaitingForInput,   // pause chain, await user input
-    AbortChain,        // stop chain, return to menu
-    ReloadMenu,        // stop chain, reload menu
-    ExitSystem         // logoff / disconnect
+    size_t executionCounter = 0;   // infinite loop guard
 };
-
-struct CommandChainContext {
-    std::vector<MenuOption> chain;   // immutable command list
-    size_t index = 0;                // current execution index
-
-    std::string wildcardBuffer;      // replaces ExecContext::wildcardBuffer
-    std::string lastInput;            // replaces ExecContext::lastInput
-
-    bool waitingForInput = false;     // replaces implicit pause semantics
-    bool suppressPrompt = false;      // carried forward explicitly
-    bool failFlag = false;            // replaces scattered fail logic
-    bool skip_on_fail = false;
-    bool abort_on_fail = false;
-};
-
-class MenuSystem;
 
 class CommandChainExecutor {
 public:
     explicit CommandChainExecutor(MenuSystem &ms);
 
+    void start(std::deque<MenuOption> chain);
     void start(std::vector<MenuOption> chain);
     void resumeWithInput(const std::string &input);
 
     bool isActive() const;
     bool isWaiting() const;
 
-    void execute();
+    void injectFront(const MenuOption &opt);
+    void injectBack(const MenuOption &opt);
+
+    void clear();
 
     CommandChainContext &context();
 
+    void execute();
+
 private:
+
     MenuSystem &m_menuSystem;
     CommandChainContext m_ctx;
-};
 
+    static constexpr size_t MAX_CHAIN_EXECUTIONS = 1024;
+};
 
 #endif

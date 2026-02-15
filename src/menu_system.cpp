@@ -23,6 +23,7 @@
 #include "tcp_session.hpp"
 #include "util_log.hpp"
 
+
 MenuSystem::MenuSystem(Context &ctx)
     : MenuBase(ctx)
       , currentState(State::MenuSystem) {
@@ -73,7 +74,19 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
         return;
     }
 
+    if (m_cmdChainExecutor.isWaiting()) {
+        m_cmdChainExecutor.resumeWithInput(character_buffer);
+        return;
+    }
+
+    if (m_cmdChainExecutor.isActive()) {
+        return;
+    }
+
     inputHandlers.at(currentState)(character_buffer);
+
+    // Handle Any Menu Transitions.
+    commitTransitions();
 }
 
 /**
@@ -84,6 +97,9 @@ void MenuSystem::update(const std::string &character_buffer, const bool &is_utf8
 bool MenuSystem::onEnter() {
     m_is_active = true;
     m_log.log(UtilLog::LogLevel::Console, "MenuSystem() - onEnter, state=", stateToString());
+
+    // Handle Any Menu Transitions.
+    commitTransitions();
     return true;
 }
 
@@ -94,6 +110,9 @@ bool MenuSystem::onEnter() {
 bool MenuSystem::onExit() {
     m_log.log(UtilLog::LogLevel::Console, "MenuSystem() - onExit, state=", stateToString());
     m_is_active = false;
+
+    // Handle Any Menu Transitions.
+    commitTransitions();
     return true;
 }
 
@@ -103,7 +122,18 @@ bool MenuSystem::pollTimers() {
         return true;
     }
 
-    pollHandlers.at(currentState)();
+    if (m_cmdChainExecutor.isActive()) {
+        if (!m_cmdChainExecutor.isWaiting()) {
+            m_failFlag = false;
+            m_cmdChainExecutor.execute();
+        }
+    }
+    else {
+        pollHandlers.at(currentState)();
+    }
+
+    // Handle Any Menu Transitions.
+    commitTransitions();
 
     std::cout << "~Core MenuSystemPollTimers()" << std::endl;
     return true;
@@ -197,68 +227,92 @@ void MenuSystem::setState(State newState) {
     createHandlers.at(currentState)();
 }
 
+void MenuSystem::reloadMenu() {
+    enterMenu(m_current_menu, MenuLoadReason::Redisplay);
+}
+
 // New Manager Chained Execution Calls
-// Allow for Pauses, is more of a resueable script.
-// TODO , Input options need to be wired up for ChainResult::WaitingForInput!!
 ChainResult MenuSystem::executeChainedCommand(
     const MenuOption &option,
     CommandChainContext &ctx)
 {
-    std::string cmd(option.command_key); // 2-char key
+    // ------------------------------------
+    // 1. Validate opcode length
+    // ------------------------------------
+    if (option.command_key.size() != 2)
+        return ChainResult::Continue;
 
-    // ----------------------------
-    // Input-waiting commands
-    // ----------------------------
-    if ((cmd[0] == 'F' && cmd[1] == 'D') || // FIELD
-        (cmd[0] == 'I' && cmd[1] == 'N') || // INPUT
-        (cmd[0] == 'L' && cmd[1] == 'I') || // LINEINPUT
-        (cmd[0] == 'Y' && cmd[1] == 'N') || // YESNO
-        (cmd[0] == 'L' && cmd[1] == 'B') || // LIGHTBAR
-        (cmd[0] == 'P' && cmd[1] == 'A'))   // PAUSE
+    const char prefix = option.command_key[0];
+    const char opcode = option.command_key[1];
+
+    std::string cstring = option.command_string;
+
+    // ------------------------------------
+    // 2. Wildcard substitution (*)
+    // ------------------------------------
+    if (cstring == "*")
+        cstring = ctx.wildcardBuffer;
+
+    // ------------------------------------
+    // 3. Last input substitution (&)
+    // ------------------------------------
+    if (cstring == "&")
+        cstring = ctx.lastInput;
+
+    // ------------------------------------
+    // 4. Dispatch by prefix
+    // ------------------------------------
+    auto it = m_menu_command_functions.find(prefix);
+    if (it == m_menu_command_functions.end())
+        return ChainResult::Continue;
+
+    bool success = it->second(option);
+
+    // ------------------------------------
+    // 5. FailFlag semantics
+    // ------------------------------------
+    if (!success)
+        m_failFlag = true;
+
+    // ------------------------------------
+    // 6. Menu transition opcodes
+    // ------------------------------------
+    if (prefix == '-')
     {
-        ctx.waitingForInput = true;
-        ctx.suppressPrompt = true;
-        return ChainResult::WaitingForInput;
+        switch (opcode)
+        {
+            case '/':  // GoForward
+            case '\\': // GoBackward
+            case '^':  // PushStarting
+            case '{':  // SkipFirstCmd
+            case '}':  // PreviousNoFirst
+            case '$':  // PushCurrent
+            case '%':  // CurrentNoFirst
+                ctx.suppressPrompt = true;
+                return ChainResult::ReloadMenu;
+
+            default:
+                break;
+        }
     }
 
-    // ----------------------------
-    // Menu transition commands
-    // ----------------------------
-    if ((cmd[0] == 'G' && cmd[1] == 'O') || // GOTO
-        (cmd[0] == 'G' && cmd[1] == 'S') || // GOSUB
-        (cmd[0] == 'R' && cmd[1] == 'T') || // RETURN
-        (cmd[0] == 'P' && cmd[1] == 'R') || // PREVIOUS
-        (cmd[0] == 'S' && cmd[1] == 'T'))   // START
-    {
-        ctx.suppressPrompt = true;
-        return ChainResult::ReloadMenu;
-    }
-
-    // ----------------------------
-    // Hard exit commands
-    // ----------------------------
-    if ((cmd[0] == 'L' && cmd[1] == 'O') || // LOGOFF
-        (cmd[0] == 'D' && cmd[1] == 'C') || // DISCONNECT
-        (cmd[0] == 'E' && cmd[1] == 'X') || // EXIT
-        (cmd[0] == 'Q' && cmd[1] == 'U'))   // QUIT
+    // ------------------------------------
+    // 7. Matrix hard exits ({G logoff)
+    // ------------------------------------
+    if (prefix == '{' && opcode == 'G')
     {
         ctx.suppressPrompt = true;
         return ChainResult::ExitSystem;
     }
 
-    // ----------------------------
-    // Normal execution
-    // ----------------------------
-    bool success = menuOptionsCallback(option);
-
-    if (!success) {
-        ctx.failFlag = true;
-        if (ctx.abort_on_fail) {
-            return ChainResult::AbortChain;
-        }
-        if (!ctx.skip_on_fail) {
-            return ChainResult::AbortChain; // Pascal treats failed mandatory commands as abort
-        }
+    // ------------------------------------
+    // 8. Input waiting commands
+    // ------------------------------------
+    if (prefix == '-' && (opcode == 'H' || opcode == 'I' || opcode == '-'))
+    {
+        ctx.waitingForInput = true;
+        ctx.suppressPrompt = true;
+        return ChainResult::WaitingForInput;
     }
 
     return ChainResult::Continue;
@@ -443,15 +497,15 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
         // Door (external) Error level (input) return into input variable
         // Like external mod doing password or
         case '&':
-            return false;
+            break;
 
         // Hit Enter Prompt
         case '(':
-            return false;
+            break;
 
         // Changes to infoform set in cstring
         case ')':
-            return false;
+            break;
 
         // Goes to the menu specified in the CString, does not exe firstcmd
         case '{':
@@ -465,11 +519,11 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
 
         // Toggles locking of output to the modem.
         case ':':
-            return false;
+            break;
 
         // Toggles locking of input from the modem.
         case ';':
-            return false;
+            break;
 
         // Goes to a menu keeping the current fallback menu does firstcmd
         case '$':
@@ -484,43 +538,43 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
 
         // Displays and gets input in same format as prompt
         case '-':
-            return false;
+            break;
 
         // Sets Time left to value found in CString.
         case '#':
-            return false;
+            break;
 
         // Displays current menu prompt using CString name in prompt
         case '!':
-            return false;
+            break;
 
         // Sends the file specified in the CString.
         case '.':
-            return false;
+            break;
 
         //  Displays Prompt String
         case '<':
-            return false;
+            break;
 
         // Sets Chat Reason in Status Bar to Value in cstring
         case '~':
-            return false;
+            break;
 
         // Sets the number of lines scrolled to 0. Stop screen pausing.
         case '"':
-            return false;
+            break;
 
         // Sets Screen Pausing (variable toggled in config)
         case '1':
-            return false;
+            break;
 
         // Suspends Screen Pausing until next textfile
         case '2':
-            return false;
+            break;
 
         // Sets starting Option in a pulldown Menu PullDown ID
         case ',':
-            return false;
+            break;
 
         default:
             return false;
@@ -536,7 +590,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option) {
 bool MenuSystem::menuOptionsMultiNodeCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         default:
-            return false;
+            break;
     }
 
     return true;
@@ -568,24 +622,24 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
         //     : matrix without actually logging onto to the
         //     : board.
         case 'T':
-            return false;
+            break;
 
         // Apply
         case 'A':
             m_log.log(UtilLog::LogLevel::Info, "Executing startupModuleSignup()");
             setState(State::ModSignup);
-            return true;
+            break;
 
         // Check
         case 'C':
-            return false;
+            break;
 
         // Check
         case 'E': {
             // Testing processes
             m_log.log(UtilLog::LogLevel::Debug, "Executing startupModuleMessageEditor()");
             //startupModuleMessageEditor();
-            return true;
+            break;
             /*
             #ifdef _WIN32
             std::string cmdline = "C:\\windows\\system32\\cmd.exe";
@@ -600,11 +654,11 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
 
         // Feedback
         case 'F':
-            return false;
+            break;
 
         // Chat
         case 'P':
-            return false;
+            break;
 
         // Logoff
         case 'G':
@@ -616,7 +670,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
 
         // Drops into the BBS
         case 'X':
-            return false;
+            break;
 
         default:
             return false;
@@ -632,7 +686,7 @@ bool MenuSystem::menuOptionsMatrixCommands(const MenuOption &option) {
 bool MenuSystem::menuOptionsGlobalNewScanCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         default:
-            return false;
+            break;
     }
 
     return true;
@@ -653,19 +707,19 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         // autosig
         case 'A':
-            return false;
+            break;
 
         // page sysop
         case 'C':
-            return false;
+            break;
 
         // info form
         case 'D':
-            return false;
+            break;
 
         // Fill out info form to file
         case 'F':
-            return false;
+            break;
 
         // Logoff
         case 'G':
@@ -686,47 +740,47 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option) {
 
         // Fill out info form
         case 'I':
-            return false;
+            break;
 
         // User Configuration
         case 'K':
-            return false;
+            break;
 
         // Lists Users
         case 'L':
-            return false;
+            break;
 
         // System Stats
         case 'S':
-            return false;
+            break;
 
         // Time Bank
         case 'U':
-            return false;
+            break;
 
         // View Daily Log
         case 'V':
-            return false;
+            break;
 
         // Last Callers
         case 'W':
-            return false;
+            break;
 
         // Transfer to user
         case 'X':
-            return false;
+            break;
 
         // user stats
         case 'Y':
-            return false;
+            break;
 
         // change password
         case '+':
-            return false;
+            break;
 
         // force use to change password
         case '-':
-            return false;
+            break;
 
         default:
             return false;
@@ -742,7 +796,7 @@ bool MenuSystem::menuOptionsMainMenuCommands(const MenuOption &option) {
 bool MenuSystem::menuOptionsDoorCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         default:
-            return false;
+            break;
     }
 
     return true;
@@ -787,7 +841,7 @@ bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option) {
 bool MenuSystem::menuOptionsNewUserVotingCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         default:
-            return false;
+            break;
     }
 
     return true;
@@ -800,7 +854,7 @@ bool MenuSystem::menuOptionsNewUserVotingCommands(const MenuOption &option) {
 bool MenuSystem::menuOptionsConferenceEditorCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         default:
-            return false;
+            break;
     }
 
     return true;
@@ -813,7 +867,7 @@ bool MenuSystem::menuOptionsConferenceEditorCommands(const MenuOption &option) {
 bool MenuSystem::menuOptionsDataAreaCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         default:
-            return false;
+            break;
     }
 
     return true;
@@ -826,7 +880,7 @@ bool MenuSystem::menuOptionsDataAreaCommands(const MenuOption &option) {
 bool MenuSystem::menuOptionsEmailCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         default:
-            return false;
+            break;
     }
 
     return true;
@@ -839,7 +893,7 @@ bool MenuSystem::menuOptionsEmailCommands(const MenuOption &option) {
 bool MenuSystem::menuOptionsFileCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         default:
-            return false;
+            break;
     }
 
     return true;
@@ -852,7 +906,7 @@ bool MenuSystem::menuOptionsFileCommands(const MenuOption &option) {
 bool MenuSystem::menuOptionsMessageCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         default:
-            return false;
+            break;
     }
 
     return true;
@@ -865,7 +919,7 @@ bool MenuSystem::menuOptionsMessageCommands(const MenuOption &option) {
 bool MenuSystem::menuOptionsJoinConference(const MenuOption &option) {
     switch (option.command_key[1]) {
         default:
-            return false;
+            break;
     }
 
     return true;
@@ -878,7 +932,7 @@ bool MenuSystem::menuOptionsJoinConference(const MenuOption &option) {
 bool MenuSystem::menuOptionsQWKMailCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         default:
-            return false;
+            break;
     }
 
     return true;
@@ -891,7 +945,7 @@ bool MenuSystem::menuOptionsQWKMailCommands(const MenuOption &option) {
 bool MenuSystem::menuOptionsTopTenListingCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         default:
-            return false;
+            break;
     }
 
     return true;
@@ -904,7 +958,7 @@ bool MenuSystem::menuOptionsTopTenListingCommands(const MenuOption &option) {
 bool MenuSystem::menuOptionsMessageBaseSponsorCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         default:
-            return false;
+            break;
     }
 
     return true;
@@ -917,7 +971,7 @@ bool MenuSystem::menuOptionsMessageBaseSponsorCommands(const MenuOption &option)
 bool MenuSystem::menuOptionsFileBaseSponsorCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         default:
-            return false;
+            break;
     }
 
     return true;
@@ -930,7 +984,7 @@ bool MenuSystem::menuOptionsFileBaseSponsorCommands(const MenuOption &option) {
 bool MenuSystem::menuOptionsVotingCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         default:
-            return false;
+            break;
     }
 
     return true;
@@ -943,7 +997,7 @@ bool MenuSystem::menuOptionsVotingCommands(const MenuOption &option) {
 bool MenuSystem::menuOptionsColorSettingCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         default:
-            return false;
+            break;
     }
 
     return true;
@@ -954,29 +1008,17 @@ bool MenuSystem::menuOptionsColorSettingCommands(const MenuOption &option) {
  * @param option
  */
 bool MenuSystem::menuOptionsCallback(const MenuOption &option) {
-    /* Run through the case and switch over the new interface.
-    std::string mnuOption = option.CKeys;
-    std::string mnuString = option.CString;
-    std::string mnuAccess = option.Acs; */
 
-    // If Invalid then return
-    if (option.command_key.size() != 2) {
+    if (option.command_key.size() != 2)
         return false;
-    }
 
-    std::string firstCommandKeyIndex = "-&{![.*^CDEFJMQRSTV+";
-    std::string::size_type idx = 0;
+    char prefix = option.command_key[0];
 
-    // If valid then execute the related Menu Command Function
-    idx = firstCommandKeyIndex.find(option.command_key[0], 0);
-    if (idx != std::string::npos) {
-        auto it = m_menu_command_functions.find(option.command_key[0]);
-        if (it != m_menu_command_functions.end()) {
-            return it->second(option);
-        }
-    }
+    auto it = m_menu_command_functions.find(prefix);
+    if (it == m_menu_command_functions.end())
+        return false;
 
-    return false;
+    return it->second(option);
 }
 
 /**
@@ -1008,6 +1050,19 @@ void MenuSystem::startupExternalProcess(const std::string &cmdline) {
 // Menu System Setup
 // -------------------------
 
+void MenuSystem::commitTransitions() {
+
+    if (m_pendingMenuJump) {
+        m_cmdChainExecutor.clear();
+        m_pendingMenuJump = false;
+
+        enterMenu(
+            m_pendingMenuName,
+            MenuLoadReason::Jump
+        );
+    }
+}
+
 void MenuSystem::createMenuSystem() {
     m_log.log(UtilLog::LogLevel::Console, "MenuSystem() createMenuSystem");
     m_current_menu = "matrix";
@@ -1036,6 +1091,9 @@ void MenuSystem::clearMenuSystem() {
 void MenuSystem::pollMenuSystem() {
     // No Timbers Setup Yet,  This could be Rumors, Properties,
     // Realtime Clock etc.. or Node Messages
+
+
+
 }
 
 void MenuSystem::inputMenuSystem(const std::string &input) {
@@ -1146,7 +1204,8 @@ void MenuSystem::inputLogon(const std::string &input) {
             if (m_ctx.getSessionWrite().isAuthorized()) {
                 requestMenuJump(m_current_menu, MenuJumpMode::PushStarting);
             } else {
-                redisplayMenuScreen();
+                //redisplayMenuScreen();
+                requestMenuJump(m_current_menu, MenuJumpMode::PushCurrent);
             }
         } else {
             m_is_active = false;

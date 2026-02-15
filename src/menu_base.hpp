@@ -75,10 +75,6 @@ public:
         }
     }
 
-    struct FirstCmdState {
-        bool executed = false;
-    };
-
     struct CommandChain {
         std::vector<MenuOption> commands;
     };
@@ -87,14 +83,9 @@ public:
     Context &m_ctx;
     UtilDir m_directory;
 
-    FirstCmdState m_firstCmdState;
-    bool m_suppressFirstCmdOnce = false;
-
     // Handles Stack of Current and Fallback menus.
     std::deque<std::string> m_menuStack;
 
-    // New
-    std::optional<CommandChain> m_firstCmdChain;
 protected:
     CommandChainExecutor m_cmdChainExecutor;
 
@@ -118,9 +109,11 @@ public:
     bool m_is_active_pulldown_menu; // If menu has active light bars to display.
     bool m_logoff; // If logoff, stop loop execution on commands and exit.
     bool m_is_active;
+    bool m_failFlag;
+    bool m_pendingMenuJump;
 
-    bool m_pendingMenuJump = false;
     std::string m_pendingMenuName;
+    MenuJumpMode m_pendingJumpMode;
 
     // Holds all pull down menu options.
     std::vector<MenuOption> m_loaded_pulldown_options;
@@ -136,7 +129,7 @@ public:
 
     void buildMenuOptionsFromAcs();
 
-    void buildMenuFirstCmdOptionsFromAcs();
+    void injectFirstCommands();
 
     void requestMenuJump(const std::string &menu, MenuJumpMode mode);
 
@@ -152,9 +145,11 @@ public:
 
     void loadMenuDefinition(const std::string &menuName);
 
+    bool shouldExecuteFirst(MenuLoadReason reason);
+
     void prepareMenuState(MenuLoadReason reason);
 
-    void enterMenu(const std::string &menuName, MenuLoadReason reason, bool isExecuteFirstCmds);
+    void enterMenu(const std::string &menuName, MenuLoadReason reason);
 
     bool handleSpecialPulldownModes();
 
@@ -173,8 +168,6 @@ public:
     std::string buildLightBars();
 
     void redisplayMenuScreen();
-
-    void enqueueChainedCommands(const MenuOption &opt);
 
     bool executeWithAcs(const MenuOption &opt);
 
@@ -201,8 +194,6 @@ public:
     std::vector<std::string> getListOfMenuPrompts();
 
     std::string getRandomMenuPrompt();
-
-    void startMenuOptionExecution(const MenuOption &option);
 
     bool processMenuOptions(const std::string &input);
 
