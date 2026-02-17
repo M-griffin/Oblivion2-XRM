@@ -171,10 +171,6 @@ public:
 
     bool executeWithAcs(const MenuOption &opt);
 
-    /*
-    void executeFirstCmds();
-    */
-
     std::string loadMenuPrompt();
 
     void moveToBottomAndDisplay(const std::string &prompt);
@@ -182,6 +178,8 @@ public:
     std::string moveStringToBottom(const std::string &prompt);
 
     void lightbarUpdate(unsigned int previous_pulldown_id);
+
+    bool handleLightbarNavigation(const std::string &input);
 
     bool executeMenuOptions(const MenuOption &option);
 
@@ -205,6 +203,7 @@ public:
 
     void menuYesNoBarInput(const std::string &character_buffer, const bool &is_utf8);
 
+    std::deque<MenuOption> buildEachCommands();
 private:
     void executeEachCommands();
 };

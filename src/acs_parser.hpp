@@ -116,6 +116,63 @@ private:
         return AcsNode{AcsNodeType::Condition, cond, {}};
     }
 
+    /**
+     * @brief Parses numbers from a string starting at a specific index.
+     * Stops at the first non-digit character.
+     */
+    int parseNumber(const std::string &s, size_t start) {
+        if (start >= s.size()) return 0;
+
+        std::string numPart;
+        for (size_t i = start; i < s.size(); ++i) {
+            if (std::isdigit(s[i])) {
+                numPart += s[i];
+            } else {
+                // Stop at first non-digit (e.g., "S50FA" stops at 'F')
+                break;
+            }
+        }
+
+        if (numPart.empty()) return 0;
+
+        try {
+            return std::stoi(numPart);
+        } catch (...) {
+            return 0;
+        }
+    }
+
+    AcsCodeMapType parseCondition(const std::string &text) {
+        AcsCodeMapType cond;
+        cond.raw = text;
+
+        if (text.empty()) return cond;
+
+        cond.op = std::toupper(text[0]);
+
+        // 1. Handle specialized Sysop/Co-Sysop symbols (no numbers expected)
+        if (text.size() == 1 && !std::isalnum(text[0])) {
+            cond.number = 0;
+            return cond;
+        }
+
+        // 2. Handle Flag-based (FA, OZ)
+        if ((cond.op == 'F' || cond.op == 'O') && text.size() >= 2) {
+            cond.flag = std::toupper(text[1]);
+            return cond;
+        }
+
+        // 3. Handle Numeric (S50, U1, Q100)
+        // We check if the character after the OpCode is a digit
+        if (text.size() > 1 && std::isdigit(text[1])) {
+            cond.number = parseNumber(text, 1);
+            return cond;
+        }
+
+        return cond;
+    }
+
+    /*
     AcsCodeMapType parseCondition(const std::string &text) {
         AcsCodeMapType cond;
         cond.raw = text;
@@ -143,7 +200,7 @@ private:
 
         // Single-char operators (* @ # etc)
         return cond;
-    }
+    }*/
 };
 
 

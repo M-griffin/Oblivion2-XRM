@@ -103,11 +103,17 @@ void CommandChainExecutor::execute() {
             return;
         }
 
+        m_menuSystem.m_failFlag = false;
         MenuOption opt = m_ctx.queue.front();
         m_ctx.queue.pop_front();
 
         ChainResult result =
                 m_menuSystem.executeChainedCommand(opt, m_ctx);
+
+        if (m_menuSystem.m_pendingMenuJump) {
+            clear();
+            return;
+        }
 
         switch (result) {
             case ChainResult::Continue:
@@ -123,8 +129,10 @@ void CommandChainExecutor::execute() {
                 return;
 
             case ChainResult::ReloadMenu:
-                m_menuSystem.reloadMenu();
-                break;
+                //m_menuSystem.reloadMenu();
+                //break;
+                clear();          // stop chain immediately
+                return;           // exit execute()
 
             case ChainResult::ExitSystem:
                 clear();

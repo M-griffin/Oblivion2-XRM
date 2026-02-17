@@ -227,7 +227,33 @@ void MenuSystem::setState(State newState) {
     createHandlers.at(currentState)();
 }
 
+void MenuSystem::redisplayCurrentMenu() {
+    // Safety: If a jump is pending, we do NOT redisplay the old menu
+    if (m_pendingMenuJump) {
+        CHAIN_TRACE("Redisplay skipped due to pending menu jump");
+        return;
+    }
+
+    // Reset fail flag for Pascal parity
+    m_failFlag = false;
+
+    // Prepare a temporary command chain for EACH commands only
+    std::deque<MenuOption> eachChain = buildEachCommands();
+
+    if (!eachChain.empty()) {
+        CHAIN_TRACE("Executing EACH commands for redisplay");
+        // Use a local CommandChainExecutor so we do not affect existing chains
+        CommandChainExecutor tempExecutor(*this);
+        tempExecutor.start(std::move(eachChain));
+    }
+
+    // Deliver the menu display output
+    // We assume displayMenu() only prints/repaints current menu
+    redisplayMenuScreen();
+}
+
 void MenuSystem::reloadMenu() {
+    m_failFlag = false;
     enterMenu(m_current_menu, MenuLoadReason::Redisplay);
 }
 
@@ -247,6 +273,7 @@ ChainResult MenuSystem::executeChainedCommand(
 
     std::string cstring = option.command_string;
 
+
     // ------------------------------------
     // 2. Wildcard substitution (*)
     // ------------------------------------
@@ -262,11 +289,16 @@ ChainResult MenuSystem::executeChainedCommand(
     // ------------------------------------
     // 4. Dispatch by prefix
     // ------------------------------------
+
+    // Minimual Fix for mutations.
+    MenuOption resolvedOption = option;
+    resolvedOption.command_string = cstring;
+
     auto it = m_menu_command_functions.find(prefix);
     if (it == m_menu_command_functions.end())
         return ChainResult::Continue;
 
-    bool success = it->second(option);
+    bool success = it->second(resolvedOption);
 
     // ------------------------------------
     // 5. FailFlag semantics
@@ -1050,16 +1082,29 @@ void MenuSystem::startupExternalProcess(const std::string &cmdline) {
 // Menu System Setup
 // -------------------------
 
-void MenuSystem::commitTransitions() {
+void MenuSystem::commitTransitions()
+{
+    while (m_pendingMenuJump)
+    {
+        std::string nextMenu = m_pendingMenuName;
+        auto jumpMode = m_pendingJumpMode;
 
-    if (m_pendingMenuJump) {
-        m_cmdChainExecutor.clear();
+        // consume jump
+        m_failFlag = false;
         m_pendingMenuJump = false;
+        m_pendingJumpMode = MenuJumpMode::Normal;
 
-        enterMenu(
-            m_pendingMenuName,
-            MenuLoadReason::Jump
-        );
+        // abort any running chain
+        m_cmdChainExecutor.clear();
+
+        m_previous_menu = m_current_menu;
+        m_current_menu = nextMenu;
+
+        enterMenu(nextMenu, MenuLoadReason::Jump);
+
+        // IMPORTANT:
+        // If enterMenu injects FIRSTCMD and that FIRSTCMD
+        // triggers another jump, the loop repeats immediately.
     }
 }
 
@@ -1091,9 +1136,6 @@ void MenuSystem::clearMenuSystem() {
 void MenuSystem::pollMenuSystem() {
     // No Timbers Setup Yet,  This could be Rumors, Properties,
     // Realtime Clock etc.. or Node Messages
-
-
-
 }
 
 void MenuSystem::inputMenuSystem(const std::string &input) {
@@ -1103,6 +1145,10 @@ void MenuSystem::inputMenuSystem(const std::string &input) {
         return;
     }
 
+    // Should handle All Input going forward, menu bars and yes/no bars with std input.
+    menuInput(input, false);
+
+    /*
     // Default, have to check if we need to detect and goto YesNo Bar For Prompts!!
     // Note sure if this will detect it properly yet!
     if (getMenuBaseState() == BaseState::MENU_INPUT) {
@@ -1111,7 +1157,7 @@ void MenuSystem::inputMenuSystem(const std::string &input) {
     } else {
         // Manages Hotkey Input for Yes/No Menu Bar Prompts.
         menuYesNoBarInput(input, false);
-    }
+    }*/
 }
 
 // -------------------------
@@ -1205,7 +1251,8 @@ void MenuSystem::inputLogon(const std::string &input) {
                 requestMenuJump(m_current_menu, MenuJumpMode::PushStarting);
             } else {
                 //redisplayMenuScreen();
-                requestMenuJump(m_current_menu, MenuJumpMode::PushCurrent);
+                //requestMenuJump(m_current_menu, MenuJumpMode::PushCurrent);
+                redisplayCurrentMenu();
             }
         } else {
             m_is_active = false;
@@ -1264,7 +1311,8 @@ void MenuSystem::inputSignup(const std::string &input) {
 
             // Reset the Input back to the Menu System
             setMenuBaseState(BaseState::MENU_INPUT);
-            redisplayMenuScreen();
+            //redisplayMenuScreen();
+            redisplayCurrentMenu();
         }
     }
 }
@@ -1320,7 +1368,8 @@ void MenuSystem::inputMenuEditor(const std::string &input) {
 
             // Reset the Input back to the Menu System
             setMenuBaseState(BaseState::MENU_INPUT);
-            redisplayMenuScreen();
+            //redisplayMenuScreen();
+            redisplayCurrentMenu();
         }
     }
 }

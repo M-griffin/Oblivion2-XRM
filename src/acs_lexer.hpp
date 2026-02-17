@@ -47,6 +47,12 @@ public:
             return {TokenType::RParen, ")"};
         }
 
+        // Recognize special symbols as Identifiers/Conditions
+        if (c == '=' || c == '\'' || c == '\"' || c == '!' || c == '*' || c == '@') {
+            pos++;
+            return {TokenType::Identifier, std::string(1, c)};
+        }
+
         // Identifier: S50, FA, Q100, etc.
         if (std::isalpha(c)) {
             size_t start = pos++;

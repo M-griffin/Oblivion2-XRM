@@ -65,10 +65,16 @@ void MenuBase::clearMenuPullDownOptions() {
 
 bool MenuBase::checkMenuAcsAccess(const Menu &menu) {
     AcsBase acs;
-    return acs.validateAcsString(
+    bool result = acs.validateAcsString(
         menu.menu_acs_string,
         m_ctx.getUser()
     );
+
+    if (!result) {
+        m_failFlag = true;
+    }
+
+    return result;
 }
 
 void MenuBase::buildMenuOptionsFromAcs() {
@@ -90,15 +96,22 @@ void MenuBase::buildMenuOptionsFromAcs() {
 }
 
 void MenuBase::injectFirstCommands() {
-    std::vector<MenuOption> first;
 
-    for (auto &m: m_menu_info.menu_options) {
-        if (m.menu_key == "FIRSTCMD")
-            first.push_back(m);
+    m_failFlag = false;
+    std::vector<MenuOption> first;
+    AcsBase acs;
+
+    for (auto &m : m_menu_info.menu_options) {
+        if (m.menu_key == "FIRSTCMD") {
+            if (acs.validateAcsString(m.acs_string, m_ctx.getUser())) {
+                first.push_back(m);
+            }
+        }
     }
 
-    if (!first.empty() && !m_cmdChainExecutor.isActive())
+    if (!first.empty() && !m_cmdChainExecutor.isActive()) {
         m_cmdChainExecutor.start(first);
+    }
 }
 
 void MenuBase::requestMenuJump(const std::string &targetMenu, MenuJumpMode mode) {
@@ -148,10 +161,10 @@ void MenuBase::requestMenuJump(const std::string &targetMenu, MenuJumpMode mode)
     }
 
     // TRACK PREVIOUS
-    m_previous_menu = m_current_menu;
+    //m_previous_menu = m_current_menu;
 
     // SWITCH MENU
-    m_current_menu = menu;
+    //m_current_menu = menu;
 
     // Setup State and Stack.
     if (m_menuStack.size() >= 5) m_menuStack.pop_front();
@@ -397,9 +410,12 @@ std::string MenuBase::setupYesNoMenuInput(const std::string &menu_prompt, std::v
         if (i == 0) {
             m.pulldown_id = 1;
             m.name = "  Yes  ";
-        } else {
+        } else if (i == 1) {
             m.pulldown_id = 2;
             m.name = "  No  ";
+        } else {
+            m.pulldown_id = 3;
+            m.name = "  quit  ";
         }
 
         m_loaded_pulldown_options.push_back(m);
@@ -466,7 +482,9 @@ void MenuBase::loadMenuDefinition(const std::string &menuName) {
         }
 
         // Load menu
-        dao.loadMenu();
+        if (!dao.loadMenu()) {
+            m_failFlag = true;
+        }
 
         // ACS check
         if (!checkMenuAcsAccess(candidate)) {
@@ -512,16 +530,6 @@ void MenuBase::prepareMenuState(MenuLoadReason reason) {
     m_loaded_pulldown_options.clear();
     m_loaded_pulldown_options.shrink_to_fit();
 
-    // Reset FIRSTCMD execution on menu entry
-    // TODO, No longer setting flags,
-    if (reason == MenuLoadReason::Initial ||
-        reason == MenuLoadReason::Jump) {
-    }
-
-    // On Re-Display don't change state, or execute.
-    // TODO, No longer setting flags,
-    if (reason == MenuLoadReason::Redisplay) {
-    }
 }
 
 bool MenuBase::shouldExecuteFirst(MenuLoadReason reason) {
@@ -560,6 +568,7 @@ void MenuBase::enterMenu(const std::string &menuName, MenuLoadReason reason) {
     }
 
     if (shouldExecuteFirst(reason)) {
+        // Injects and Executes First Commands.
         injectFirstCommands();
 
         if (m_cmdChainExecutor.isActive())
@@ -571,11 +580,16 @@ void MenuBase::enterMenu(const std::string &menuName, MenuLoadReason reason) {
         return;
     }
 
+    // If first command execution resulted in jumping to new menu,
+    // then we want to skip display, and return for transition.
+    if (m_pendingMenuJump) {
+        return;
+    }
+
     std::string raw_buffer = loadMenuScreen();
     std::string output = m_ctx.getIoSession().pipe2ansi(raw_buffer);
 
     setupPulldownsAndLightbars(raw_buffer, output);
-
     baseProcessAndDeliver(output);
 
     if (reason != MenuLoadReason::Redisplay) {
@@ -649,7 +663,12 @@ void MenuBase::setupPulldownsAndLightbars(const std::string &raw_buffer, std::st
 }
 
 void MenuBase::redisplayMenuScreen() {
-    m_log.log(UtilLog::LogLevel::Info, "MenuBase() - redisplayMenuScreen");
+    m_log.log(UtilLog::LogLevel::Info, "MenuBase() - redisplayMenuScreen", "chain Active=",m_cmdChainExecutor.isActive());
+
+    // If we are in a chain, supress re-display.
+    if (m_cmdChainExecutor.isActive() || m_cmdChainExecutor.isWaiting())
+        return;
+
 
     // Read in the Menu ANSI
     std::string buffer = loadMenuScreen();
@@ -763,19 +782,38 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string) {
         // Control Codes are in Group 2
         if (map.m_match == 2) {
             switch (map.m_code[0]) {
+
                 case '\\':
-                    m_active_pulldownID = 2; // NO Default
+                    m_active_pulldownID = 1; // Default to YES
                     output = setupYesNoMenuInput(prompt_string, code_map);
                     match_found = true;
                     break;
 
                 case '/':
-                    m_active_pulldownID = 1; // YES Default
+                    m_active_pulldownID = 2; // Default to NO
                     output = setupYesNoMenuInput(prompt_string, code_map);
                     match_found = true;
                     break;
 
-                // Handle yes /no /continue
+                case '=':
+                    m_active_pulldownID = 1; // Yes/No/Quit - Default Yes
+                    output = setupYesNoMenuInput(prompt_string, code_map);
+                    match_found = true;
+                    break;
+
+                case '|':
+                    m_active_pulldownID = 2; // Yes/No/Quit - Default No
+                    output = setupYesNoMenuInput(prompt_string, code_map);
+                    match_found = true;
+                    break;
+
+                case '@':
+                    m_active_pulldownID = 3; // Yes/No/Quit - Default Quit
+                    output = setupYesNoMenuInput(prompt_string, code_map);
+                    match_found = true;
+                    break;
+
+                // Handle yes /no /quit
                 default:
                     break;
             }
@@ -885,10 +923,12 @@ std::string MenuBase::buildLightBars() {
     return light_bars;
 }
 
+/*
 bool MenuBase::executeWithAcs(const MenuOption &opt) {
     m_log.log(UtilLog::LogLevel::Info, "MenuBase() - executeWithAcs");
     AcsBase acs;
     if (!acs.validateAcsString(opt.acs_string, m_ctx.getUser())) {
+        m_failFlag = true; // Pascal parity: trying a restricted command sets fail flag
         return false;
     }
 
@@ -924,6 +964,53 @@ bool MenuBase::executeWithAcs(const MenuOption &opt) {
 
     m_log.log(UtilLog::LogLevel::Info, "MenuBase() - enqueueChainedCommands completed.");
     return true;
+}*/
+
+bool MenuBase::executeWithAcs(const MenuOption &opt) {
+    m_log.log(UtilLog::LogLevel::Info, "MenuBase() - executeWithAcs");
+    AcsBase acs;
+
+    // 1. Check Access First
+    if (!acs.validateAcsString(opt.acs_string, m_ctx.getUser())) {
+        m_failFlag = true;
+        return false;
+    }
+
+    // 2. Parity Check: Is this a multi-command action string?
+    // Example: opt.command_key = " *U", opt.command_string = "5; -/MAIN"
+    // We need to split the command_string if it contains semicolons.
+    if (opt.command_string.find(';') != std::string::npos) {
+        std::vector<MenuOption> chain;
+        std::stringstream ss(opt.command_string);
+        std::string segment;
+
+        while (std::getline(ss, segment, ';')) {
+            if (segment.empty()) continue;
+
+            MenuOption chainedOpt = opt;
+
+            // Logic Parity: In Pascal, only the first command in a chain
+            // usually kept the original OpCode. Subsequent segments
+            // might be full standalone commands (e.g., "-/MAIN").
+            if (segment.size() >= 2 && (segment[0] == '-' || segment[0] == '*' || segment[0] == '/')) {
+                // This segment looks like a full Command Key + String pair
+                chainedOpt.command_key = segment.substr(0, 2);
+                chainedOpt.command_string = (segment.size() > 2) ? segment.substr(2) : "";
+            } else {
+                // This segment is just a new argument for the original OpCode
+                chainedOpt.command_string = segment;
+            }
+            chain.push_back(chainedOpt);
+        }
+
+        // Start the queue-based execution
+        m_cmdChainExecutor.start(chain);
+        return true;
+    }
+
+    // 3. Single command execution
+    m_failFlag = false;
+    return executeMenuOptions(opt);
 }
 
 std::vector<std::string> MenuBase::getListOfMenuPrompts() {
@@ -1151,6 +1238,7 @@ bool MenuBase::executeMenuOptions(const MenuOption &option) {
     // If Invalid then return
     if (m_execute_callback.empty() || option.command_key.size() != 2) {
         m_log.log(UtilLog::LogLevel::Error, "~MenuBase() - executeMenuOptions isEmpty or Size !=2 on Command_Key");
+        m_failFlag = true;
         return false;
     }
 
@@ -1179,7 +1267,7 @@ bool MenuBase::handleStandardMenuInput(const std::string &input, const std::stri
      * on yes/ no..  yes executes then does * to return,, n just returns on *
      */
 
-    m_log.log(UtilLog::LogLevel::Info, "STANDARD INPUT=", input, "KEY=", key);
+    //m_log.log(UtilLog::LogLevel::Info, "STANDARD INPUT=", input, "KEY=", key);
 
     // Check for wildcard command input.
     std::string::size_type idx = key.find("*", 0);
@@ -1339,7 +1427,25 @@ bool MenuBase::handlePullDownHotKeys(const MenuOption &m, const bool &is_enter, 
     return false;
 }
 
+std::deque<MenuOption> MenuBase::buildEachCommands() {
+
+    std::deque<MenuOption> commands;
+    if (m_menu_info.menu_options.empty())
+        return commands;
+
+
+    for (const auto &cmd: m_menu_info.menu_options) {
+        if (cmd.menu_key != "EACH") {
+            continue;
+        }
+        commands.emplace_back(cmd);
+    }
+
+    return commands;
+}
+
 void MenuBase::executeEachCommands() {
+
     if (m_menu_info.menu_options.empty())
         return;
 
@@ -1370,6 +1476,123 @@ void MenuBase::executeEachCommands() {
     }
 }
 
+/* Temp
+bool MenuBase::processMenuOptions(const std::string &input) {
+    m_log.log(UtilLog::LogLevel::Debug, "MenuBase::processMenuOptions input=", input);
+
+    if (input.empty() && !m_use_hotkey) {
+        return false;
+    }
+
+    // 1. Normalize search input (Pascal BBSes were generally case-insensitive)
+    std::string searchInput = m_ctx.getIoCommon().toUpper(input);
+    MenuOption* localWildcard = nullptr;
+
+    // 2. SEARCH LOCAL MENU (Current Context)
+    for (auto &opt : m_menu_info.menu_options) {
+        // Skip system flags
+        if (opt.menu_key == "FIRSTCMD" || opt.menu_key == "EACH") continue;
+
+        std::string menuKey = m_ctx.getIoCommon().toUpper(opt.menu_key);
+
+        // Exact Match Found
+        if (menuKey == searchInput) {
+            m_log.log(UtilLog::LogLevel::Info, "Local Match Found:", menuKey);
+            // Parity: Store the triggering input for '*' substitution in command strings
+            m_cmdChainExecutor.context().wildcardBuffer = input;
+            return executeWithAcs(opt);
+        }
+
+        // Identify if this menu has a wildcard catch-all
+        if (menuKey == "*" && !localWildcard) {
+            localWildcard = &opt;
+        }
+    }
+
+    // 3. SEARCH GLOBAL MENU (Legacy Fallback)
+    // Most Pascal engines checked a GLOBAL.MNU for keys like 'G' (Good-bye)
+    Menu globalMenu;
+    MenuDao globalDao(globalMenu, "global", GLOBAL_MENU_PATH);
+    MenuOption* globalWildcard = nullptr;
+
+    if (globalDao.fileExists()) {
+        globalDao.loadMenu();
+        for (auto &opt : globalMenu.menu_options) {
+            if (opt.menu_key == "FIRSTCMD" || opt.menu_key == "EACH") continue;
+
+            std::string menuKey = m_ctx.getIoCommon().toUpper(opt.menu_key);
+
+            if (menuKey == searchInput) {
+                m_log.log(UtilLog::LogLevel::Info, "Global Match Found:", menuKey);
+                m_cmdChainExecutor.context().wildcardBuffer = input;
+                return executeWithAcs(opt);
+            }
+
+            if (menuKey == "*" && !globalWildcard) {
+                globalWildcard = &opt;
+            }
+        }
+    }
+
+    // 4. WILDCARD EXECUTION (Priority: Local then Global)
+    if (localWildcard) {
+        m_log.log(UtilLog::LogLevel::Info, "Executing Local Wildcard for:", input);
+        m_cmdChainExecutor.context().wildcardBuffer = input;
+        return executeWithAcs(*localWildcard);
+    }
+
+    if (globalWildcard) {
+        m_log.log(UtilLog::LogLevel::Info, "Executing Global Wildcard for:", input);
+        m_cmdChainExecutor.context().wildcardBuffer = input;
+        return executeWithAcs(*globalWildcard);
+    }
+
+    // 5. NO MATCH (Fail State)
+    m_log.log(UtilLog::LogLevel::Warn, "No match for command:", input);
+    m_failFlag = true;
+    m_line_buffer.clear();
+
+    return false;
+}*/
+
+bool MenuBase::handleLightbarNavigation(const std::string &input) {
+    if (m_loaded_pulldown_options.empty()) return false;
+
+    // Standard ANSI Arrow Keys: Up [A, Down [B, Right [C, Left [D
+    // We also handle Tab (\t) for parity with some Pascal systems.
+    bool moveForward = (input == "\x1b[C" || input == "\x1b[B" || input == "\t");
+    bool moveBackward = (input == "\x1b[D" || input == "\x1b[A");
+
+    if (!moveForward && !moveBackward) return false;
+
+    // Collect all unique IDs and sort them to ensure we jump in order
+    std::vector<int> ids;
+    for (const auto& opt : m_loaded_pulldown_options) {
+        if (std::find(ids.begin(), ids.end(), opt.pulldown_id) == ids.end()) {
+            ids.push_back(opt.pulldown_id);
+        }
+    }
+    std::sort(ids.begin(), ids.end());
+
+    // Find current position in the ID list
+    auto it = std::find(ids.begin(), ids.end(), m_active_pulldownID);
+
+    if (moveForward) {
+        if (it != ids.end() && std::next(it) != ids.end()) {
+            m_active_pulldownID = *std::next(it);
+        } else {
+            m_active_pulldownID = ids.front(); // Wrap around to first
+        }
+    } else if (moveBackward) {
+        if (it != ids.begin() && it != ids.end()) {
+            m_active_pulldownID = *std::prev(it);
+        } else {
+            m_active_pulldownID = ids.back(); // Wrap around to last
+        }
+    }
+
+    return true;
+}
 
 bool MenuBase::processMenuOptions(const std::string &input) {
     bool is_enter = false;
@@ -1406,6 +1629,7 @@ bool MenuBase::processMenuOptions(const std::string &input) {
 
     // Check for loaded menu commands.
     // Get Pull down menu commands, Load all from menu options (disk)
+    // TODO review if light bar are pulled and if we need to loop and push each one to handleStandardInput!?!
     for (unsigned int i = 0; i < m_menu_info.menu_options.size(); i++) {
         auto &m = m_menu_info.menu_options[i];
 
@@ -1436,12 +1660,14 @@ bool MenuBase::processMenuOptions(const std::string &input) {
                     // Before executing ACS command
                     std::string command_to_execute = m.menu_key;
 
+                    // LIGHTBAR INPUT, Wouldn't have Input Substitution!
+                    /*
                     // Handle '&' substitution with user input
                     size_t amp_idx = command_to_execute.find('&');
                     if (amp_idx != std::string::npos) {
                         // Replace & with input string (after key prefix, if any)
                         command_to_execute.replace(amp_idx, 1, input_text);
-                    }
+                    }*/
 
                     if (executeWithAcs(m)) {
                         ++executed;
@@ -1465,12 +1691,13 @@ bool MenuBase::processMenuOptions(const std::string &input) {
                     // Before executing ACS command
                     std::string command_to_execute = m.menu_key;
 
+                    /* Lightbars, should use substitution here?
                     // Handle '&' substitution with user input
                     size_t amp_idx = command_to_execute.find('&');
                     if (amp_idx != std::string::npos) {
                         // Replace & with input string (after key prefix, if any)
                         command_to_execute.replace(amp_idx, 1, input_text);
-                    }
+                    }*/
 
                     if (executeWithAcs(m)) {
                         ++executed;
@@ -1670,8 +1897,32 @@ void MenuBase::menuInput(const std::string &character_buffer, const bool &is_utf
               "m_is_active_pulldown_menu=", m_is_active_pulldown_menu);
 
     // If were in lightbar mode, then we are using hotkeys.
-    if (m_is_active_pulldown_menu) {
+    if (m_is_active_pulldown_menu || m_baseState == BaseState::MENU_YESNO_BAR) {
+
+        // Handle Arrows/Home/End to change m_active_pulldownID
+        if (handleLightbarNavigation(character_buffer)) {
+            // Re-render only the lightbars, not the whole screen
+            baseProcessAndDeliver(buildLightBars());
+            return;
+        }
+
+        // Handle ENTER Hot Keys.
+        if (character_buffer == "\r" || character_buffer == "\n") {
+            auto it = std::find_if(m_loaded_pulldown_options.begin(),
+                                   m_loaded_pulldown_options.end(),
+                [this](const MenuOption& m) {
+                    return m.pulldown_id == m_active_pulldownID;
+                });
+
+            // This handles the semicolon chain internally
+            if (it != m_loaded_pulldown_options.end()) {
+                executeWithAcs(*it);
+            }
+            return;
+        }
+
         m_log.log(UtilLog::LogLevel::Debug, "MenuBase() - handlePullDownInput");
+        // might not be needed anymore?
         handlePullDownInput(character_buffer, is_utf8);
     } else {
         m_log.log(UtilLog::LogLevel::Debug, "MenuBase() - handleFieldInput");

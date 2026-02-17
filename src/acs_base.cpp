@@ -225,13 +225,25 @@ int AcsBase::parseNumber(const std::string &s, size_t start) {
 
 bool AcsBase::evalCondition(const AcsCodeMapType &c, Users &user) {
     switch (c.op) {
+
+        // --- Shorthands ---
+        case '=': // The "Is Sysop" shorthand
+            return user.iLevel == 255;
+
+        case '\'': // The "Is Co-Sysop" shorthand
+            // Often check for Level 255 OR a specific bit flag like 'A' on set 1
+            return user.iLevel >= 250 || ((user.iControlFlags1 >> 0) & 1);
+
+        case '!': // Not Equals (if applicable)
+            return user.iLevel != c.number;
+
+        // --- Standard Opcodes ---
         case 'S':
             return user.iLevel >= c.number;
 
         case 'F': {
             int bit = c.flag - 'A';
-            return bit >= 0 && bit < 26 &&
-                   ((user.iControlFlags1 >> bit) & 1);
+            return bit >= 0 && bit < 26 && ((user.iControlFlags1 >> bit) & 1);
         }
 
         case 'O': {

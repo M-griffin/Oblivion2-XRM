@@ -102,6 +102,8 @@ public:
 
     void bindStateHandlers();
 
+    void redisplayCurrentMenu();
+
     void reloadMenu();
 
     ChainResult executeChainedCommand(
