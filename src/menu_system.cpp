@@ -127,8 +127,7 @@ bool MenuSystem::pollTimers() {
             m_failFlag = false;
             m_cmdChainExecutor.execute();
         }
-    }
-    else {
+    } else {
         pollHandlers.at(currentState)();
     }
 
@@ -260,8 +259,7 @@ void MenuSystem::reloadMenu() {
 // New Manager Chained Execution Calls
 ChainResult MenuSystem::executeChainedCommand(
     const MenuOption &option,
-    CommandChainContext &ctx)
-{
+    CommandChainContext &ctx) {
     // ------------------------------------
     // 1. Validate opcode length
     // ------------------------------------
@@ -309,17 +307,15 @@ ChainResult MenuSystem::executeChainedCommand(
     // ------------------------------------
     // 6. Menu transition opcodes
     // ------------------------------------
-    if (prefix == '-')
-    {
-        switch (opcode)
-        {
-            case '/':  // GoForward
+    if (prefix == '-') {
+        switch (opcode) {
+            case '/': // GoForward
             case '\\': // GoBackward
-            case '^':  // PushStarting
-            case '{':  // SkipFirstCmd
-            case '}':  // PreviousNoFirst
-            case '$':  // PushCurrent
-            case '%':  // CurrentNoFirst
+            case '^': // PushStarting
+            case '{': // SkipFirstCmd
+            case '}': // PreviousNoFirst
+            case '$': // PushCurrent
+            case '%': // CurrentNoFirst
                 ctx.suppressPrompt = true;
                 return ChainResult::ReloadMenu;
 
@@ -331,8 +327,7 @@ ChainResult MenuSystem::executeChainedCommand(
     // ------------------------------------
     // 7. Matrix hard exits ({G logoff)
     // ------------------------------------
-    if (prefix == '{' && opcode == 'G')
-    {
+    if (prefix == '{' && opcode == 'G') {
         ctx.suppressPrompt = true;
         return ChainResult::ExitSystem;
     }
@@ -340,8 +335,7 @@ ChainResult MenuSystem::executeChainedCommand(
     // ------------------------------------
     // 8. Input waiting commands
     // ------------------------------------
-    if (prefix == '-' && (opcode == 'H' || opcode == 'I' || opcode == '-'))
-    {
+    if (prefix == '-' && (opcode == 'H' || opcode == 'I' || opcode == '-')) {
         ctx.waitingForInput = true;
         ctx.suppressPrompt = true;
         return ChainResult::WaitingForInput;
@@ -842,6 +836,9 @@ bool MenuSystem::menuOptionsSysopCommands(const MenuOption &option) {
     switch (option.command_key[1]) {
         case '#': // Menu Editor
             m_log.log(UtilLog::LogLevel::Debug, "Executing startupModuleMenuEditor()");
+            setState(State::ModMenuEditor);
+            // Reset the Input back to the Menu System
+            setMenuBaseState(BaseState::MENU_INPUT);
             //startupModuleMenuEditor();
             break;
 
@@ -1040,7 +1037,6 @@ bool MenuSystem::menuOptionsColorSettingCommands(const MenuOption &option) {
  * @param option
  */
 bool MenuSystem::menuOptionsCallback(const MenuOption &option) {
-
     if (option.command_key.size() != 2)
         return false;
 
@@ -1082,10 +1078,8 @@ void MenuSystem::startupExternalProcess(const std::string &cmdline) {
 // Menu System Setup
 // -------------------------
 
-void MenuSystem::commitTransitions()
-{
-    while (m_pendingMenuJump)
-    {
+void MenuSystem::commitTransitions() {
+    while (m_pendingMenuJump) {
         std::string nextMenu = m_pendingMenuName;
         auto jumpMode = m_pendingJumpMode;
 

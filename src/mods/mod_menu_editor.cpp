@@ -1642,10 +1642,10 @@ void ModMenuEditor::saveMenuChanges() {
  */
 bool ModMenuEditor::checkMenuExists(std::string menu_name) {
     std::vector<std::filesystem::path> result_set =
-            m_directory.listCaseInsensitive(GLOBAL_MENU_PATH, "yaml");
+            m_directory.listCaseInsensitive(GLOBAL_MENU_PATH, ".yaml");
 
     // Append the extension to match the directory files.
-    menu_name.append(".yaml");
+    //menu_name.append(".yaml");
     menu_name = m_ctx.getIoCommon().toLower(menu_name);
 
     // Case Insensitive Search for Menu name, with transformation to lower case
@@ -1687,7 +1687,7 @@ bool ModMenuEditor::checkMenuOptionExists(unsigned int option_index) {
  */
 std::string ModMenuEditor::displayMenuList() {
     std::vector<std::filesystem::path> result_set =
-            m_directory.listCaseInsensitive(GLOBAL_MENU_PATH, "yaml");
+            m_directory.listCaseInsensitive(GLOBAL_MENU_PATH, ".yaml");
 
     // check result set, if no menu then return gracefully.
     if (result_set.empty()) {
@@ -2035,21 +2035,11 @@ std::string ModMenuEditor::displayMenuOptionEditScreen() {
 
 /**
  * @brief Displays a generic Menu of the current Menu and Options
- * Changes would all have to be saved for accurate preview?
+ * Side Loads Menu, Currently uses Default Template, and Random Prompt
+ * We might want to add Theme selection later on to test other Templates.
  * @return
  */
 void ModMenuEditor::displayGenericMenu() {
-
-    // In it's own Menu Instance
     MenuBase menu(m_ctx);
-
-    // Jump to And Display Menu with Prompt to see full menu in action!
-    // Ignore First Command execution, as we only want to see the menu displayed!
-    menu.requestMenuJump(
-        m_loaded_menu.back().menu_name,
-        MenuBase::MenuJumpMode::SkipFirstCmd
-    );
-
-    //std::string generic_screen = menu.processGenericScreens();
-    //baseProcessAndDeliver(generic_screen);
+    menu.reviewMenu(m_current_menu, m_loaded_menu.back(), MenuBase::MenuLoadReason::Redisplay);
 }

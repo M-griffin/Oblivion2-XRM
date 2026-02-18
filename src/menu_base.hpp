@@ -145,11 +145,15 @@ public:
 
     void loadMenuDefinition(const std::string &menuName);
 
+    void reviewMenuDefinition(const std::string &menuName, Menu &candidate);
+
     bool shouldExecuteFirst(MenuLoadReason reason);
 
     void prepareMenuState(MenuLoadReason reason);
 
     void enterMenu(const std::string &menuName, MenuLoadReason reason);
+
+    void reviewMenu(const std::string &menuName, Menu &candidate, MenuLoadReason reason);
 
     bool handleSpecialPulldownModes();
 

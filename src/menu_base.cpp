@@ -460,15 +460,15 @@ void MenuBase::loadMenuDefinition(const std::string &menuName) {
 
     while (attempts++ < MAX_ATTEMPTS) {
         Menu candidate;
-        MenuDao dao(candidate, m_current_menu, GLOBAL_MENU_PATH);
+        MenuDao dao(candidate, menuName, GLOBAL_MENU_PATH);
 
         m_log.log(UtilLog::LogLevel::Debug,
-                  "Attempting to load menu:", m_current_menu);
+                  "Attempting to load menu:", menuName);
 
         // Menu file exists?
         if (!dao.fileExists()) {
             m_log.log(UtilLog::LogLevel::Warn,
-                      "Menu file missing:", m_current_menu);
+                      "Menu file missing:", menuName);
 
             std::string fallback = resolveFallbackMenu();
             if (fallback.empty()) {
@@ -505,6 +505,66 @@ void MenuBase::loadMenuDefinition(const std::string &menuName) {
         // SUCCESS
         m_menu_info = candidate;
         buildMenuOptionsFromAcs();
+
+        // On Success, Make sure we set the proper Loaded.
+        m_current_menu = m_menu_info.menu_name;
+
+        m_log.log(UtilLog::LogLevel::Info,
+                  "Menu loaded successfully:", m_menu_info.menu_name);
+
+        return;
+    }
+
+    // Safety net
+    m_log.log(UtilLog::LogLevel::Error,
+              "Menu resolution exceeded maximum attempts ", menuName);
+    assert(false);
+}
+
+void MenuBase::reviewMenuDefinition(const std::string &menuName, Menu &candidate) {
+    m_log.log(UtilLog::LogLevel::Info, "MenuBase() - reviewMenuDefinition=", menuName);
+
+    // Default PullDown ID, reset.
+    m_active_pulldownID = 0;
+
+    // Reset on First Load.
+    m_is_active_pulldown_menu = false;
+
+    m_log.log(UtilLog::LogLevel::Debug, "MenuBase() - readInMenuData");
+
+    clearMenuPullDownOptions();
+
+    constexpr int MAX_ATTEMPTS = 5;
+    int attempts = 0;
+
+    // If access issues rollback to fallback as would normally.
+    while (attempts++ < MAX_ATTEMPTS) {
+
+        m_log.log(UtilLog::LogLevel::Debug,
+                  "Attempting to review menu:", menuName);
+
+        // ACS check
+        if (!checkMenuAcsAccess(candidate)) {
+            m_log.log(UtilLog::LogLevel::Warn,
+                      "Menu ACS denied:", menuName);
+
+            std::string fallback = resolveFallbackMenu();
+            if (fallback.empty()) {
+                m_log.log(UtilLog::LogLevel::Error,
+                          "No fallback menu after ACS failure");
+                assert(false);
+            }
+
+            m_current_menu = fallback;
+            continue;
+        }
+
+        // SUCCESS
+        m_menu_info = candidate;
+        buildMenuOptionsFromAcs();
+
+        // On Success, Make sure we set the proper Loaded.
+        m_current_menu = m_menu_info.menu_name;
 
         m_log.log(UtilLog::LogLevel::Info,
                   "Menu loaded successfully:", m_menu_info.menu_name);
@@ -592,6 +652,60 @@ void MenuBase::enterMenu(const std::string &menuName, MenuLoadReason reason) {
     setupPulldownsAndLightbars(raw_buffer, output);
     baseProcessAndDeliver(output);
 
+    if (reason != MenuLoadReason::Redisplay) {
+        executeEachCommands();
+    }
+
+    if (!m_cmdChainExecutor.isActive()) {
+        output.clear();
+        output = loadMenuPrompt();
+        baseProcessAndDeliver(output);
+    }
+}
+
+void MenuBase::reviewMenu(const std::string &menuName, Menu &candidate, MenuLoadReason reason) {
+    m_log.log(UtilLog::LogLevel::Info,
+              "displayMenu menu={} reason={}",
+              menuName, MenuLoadReasonToString(reason));
+
+    m_pendingMenuJump = false;
+    m_baseState = BaseState::MENU_INPUT;
+
+    reviewMenuDefinition(menuName, candidate);
+    prepareMenuState(reason);
+
+    if (m_menu_info.menu_options.empty()) {
+        m_log.log(UtilLog::LogLevel::Error,
+                  "Menu has no menu_options", m_current_menu);
+        return;
+    }
+
+    if (shouldExecuteFirst(reason)) {
+        // Injects and Executes First Commands.
+        injectFirstCommands();
+
+        if (m_cmdChainExecutor.isActive())
+            return;
+    }
+
+    // Handle Menu Rendering Below Here, Pull Down And/Or Generic Templates.
+    if (handleSpecialPulldownModes()) {
+        return;
+    }
+
+    // If first command execution resulted in jumping to new menu,
+    // then we want to skip display, and return for transition.
+    if (m_pendingMenuJump) {
+        return;
+    }
+
+    std::string raw_buffer = loadMenuScreen();
+    std::string output = m_ctx.getIoSession().pipe2ansi(raw_buffer);
+
+    setupPulldownsAndLightbars(raw_buffer, output);
+    baseProcessAndDeliver(output);
+
+    // Maybe we want to execute on Preview of Menu?!?? No for now.
     if (reason != MenuLoadReason::Redisplay) {
         executeEachCommands();
     }
