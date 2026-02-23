@@ -160,12 +160,6 @@ void MenuBase::requestMenuJump(const std::string &targetMenu, MenuJumpMode mode)
             break;
     }
 
-    // TRACK PREVIOUS
-    //m_previous_menu = m_current_menu;
-
-    // SWITCH MENU
-    //m_current_menu = menu;
-
     // Setup State and Stack.
     if (m_menuStack.size() >= 5) m_menuStack.pop_front();
 
@@ -356,15 +350,6 @@ std::string MenuBase::processGenericScreens() {
 
     screen_output += processTopGenericTemplate(top_screen);
 
-    /**
-     * According to the ANSI 3.64-1979 standard esc[;xxH should go
-     * to XXth column in first row, however Oblivion/2 interprets
-     * the code differently in middle repeat ansis (and only middle
-     * in the repeat ansis).  Instead of going to XXth column in
-     * first row, it will go to XXth column in current row, thus
-     * making repeat ANSIs possible.
-     */
-
     // |K? - key,  |D? - Description
     //|K1 |D1   |K2 |D2  |K3 |D3 ...
     screen_output += processMidGenericTemplate(mid_screen);
@@ -442,8 +427,10 @@ std::string MenuBase::getDefaultInverseColor() {
     return m_ctx.getIoSession().pipeColors(m_ctx.getUser().sInverseColor);
 }
 
-void MenuBase::loadMenuDefinition(const std::string &menuName) {
-    m_log.log(UtilLog::LogLevel::Info, "MenuBase() - loadMenuDefinition=", menuName);
+void MenuBase::loadMenuDefinition(const std::string &) {
+
+    // Note, Incoming Menu Name is not used, goes by m_current_menu.
+    m_log.log(UtilLog::LogLevel::Info, "MenuBase() - loadMenuDefinition=", m_current_menu);
 
     // Default PullDown ID, reset.
     m_active_pulldownID = 0;
@@ -460,15 +447,15 @@ void MenuBase::loadMenuDefinition(const std::string &menuName) {
 
     while (attempts++ < MAX_ATTEMPTS) {
         Menu candidate;
-        MenuDao dao(candidate, menuName, GLOBAL_MENU_PATH);
+        MenuDao dao(candidate, m_current_menu, GLOBAL_MENU_PATH);
 
         m_log.log(UtilLog::LogLevel::Debug,
-                  "Attempting to load menu:", menuName);
+                  "Attempting to load menu:", m_current_menu);
 
         // Menu file exists?
         if (!dao.fileExists()) {
             m_log.log(UtilLog::LogLevel::Warn,
-                      "Menu file missing:", menuName);
+                      "Menu file missing:", m_current_menu);
 
             std::string fallback = resolveFallbackMenu();
             if (fallback.empty()) {
@@ -506,22 +493,22 @@ void MenuBase::loadMenuDefinition(const std::string &menuName) {
         m_menu_info = candidate;
         buildMenuOptionsFromAcs();
 
-        // On Success, Make sure we set the proper Loaded.
-        m_current_menu = m_menu_info.menu_name;
-
         m_log.log(UtilLog::LogLevel::Info,
                   "Menu loaded successfully:", m_menu_info.menu_name);
 
         return;
     }
 
+    // TODO FIXME : change menu coming in, from current menu, now doesn't work correctly.
     // Safety net
     m_log.log(UtilLog::LogLevel::Error,
-              "Menu resolution exceeded maximum attempts ", menuName);
+              "Menu resolution exceeded maximum attempts ", m_current_menu);
     assert(false);
 }
 
 void MenuBase::reviewMenuDefinition(const std::string &menuName, Menu &candidate) {
+
+    // Unlike Load Definition, this is from Menu Editor, so passed in Menu name is accurate.
     m_log.log(UtilLog::LogLevel::Info, "MenuBase() - reviewMenuDefinition=", menuName);
 
     // Default PullDown ID, reset.
@@ -833,59 +820,10 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string) {
     m_ctx.getIoSession().addMCIMapping("^X", m_ctx.getCfg().default_color_box);
     m_ctx.getIoSession().addMCIMapping("^M", "\r\n");
 
-    /*
-     * Notes from the Legacy Doc's.
-     *
-     * Side Note, looks like legacy does some extra newlines before displaying
-     * these prompt, or clears screen,  double check and compare!!
-     *
-    N
-        Writes the Name (menu prompt string) in the Prompt alone
-
-          May Contain:
-
-              ^R - Regular Color      ^S - Status Color
-              ^P - Prompt Color       ^E - Input Color
-              ^V - Inverse Color      ^X - Box Color
-              ^M - Goes down a line
-
-          Using The Following To End:
-              / Yes/No Bar Prompt beginning with No
-              \ Yes/No Bar Prompt beginning with Yes
-              = Yes/No/Quit Bar Prompt Beginning with Yes
-              | Yes/No/Quit Bar Prompt Beginning with No
-              @ Yes/No/Quit Bar Prompt Beginning with Quit
-              * Inputs String
-              : Inputs String with a : in a different color
-              # Hotkey without Echo
-              ) Hotkey with Echo
-              ( Sets the string equal to the Input Question
-                variable set with -I, -J, or -M
-
-      You can use the following characters in the keys of a menu
-      using a name in prompt ending with a # or ).
-
-      All pipe codes are also applicable in this prompt.
-
-          This command is used to make menus that ask questions,
-      create hotkey type menus, or get input from users.
-
-      Bx
-        Does Bar selection menu with x number of columns
-
-      R
-        Uses a one-line bar menu. When creating command stacks,
-        make sure to only put a description on the first option in
-        the stack, otherwise your whole command stack will appear
-        on this menu. Also, make sure that all options don't exceed
-        80 column, as this is a ONE line bar menu. If your options
-        exceed the 80 column limit, use the bar menus.
-    */
-
-    // Depending on the CodeMap return from the (2)nd group, which are the ending characters
-    // We'll need to set up new menus on these features.
     std::vector<CodeMapType> code_map = m_ctx.getIoSession().pipe2promptCodeMap(prompt_string);
-    std::string output;
+    std::string output(prompt_string);
+
+    output = m_ctx.getIoSession().parseCodeMapGenerics(output, code_map);
 
     // Loop codes and picked out ending control code.
     bool match_found = false;
@@ -899,31 +837,31 @@ std::string MenuBase::parseMenuPromptString(const std::string &prompt_string) {
 
                 case '\\':
                     m_active_pulldownID = 1; // Default to YES
-                    output = setupYesNoMenuInput(prompt_string, code_map);
+                    output = setupYesNoMenuInput(output, code_map);
                     match_found = true;
                     break;
 
                 case '/':
                     m_active_pulldownID = 2; // Default to NO
-                    output = setupYesNoMenuInput(prompt_string, code_map);
+                    output = setupYesNoMenuInput(output, code_map);
                     match_found = true;
                     break;
 
                 case '=':
                     m_active_pulldownID = 1; // Yes/No/Quit - Default Yes
-                    output = setupYesNoMenuInput(prompt_string, code_map);
+                    output = setupYesNoMenuInput(output, code_map);
                     match_found = true;
                     break;
 
                 case '|':
                     m_active_pulldownID = 2; // Yes/No/Quit - Default No
-                    output = setupYesNoMenuInput(prompt_string, code_map);
+                    output = setupYesNoMenuInput(output, code_map);
                     match_found = true;
                     break;
 
                 case '@':
                     m_active_pulldownID = 3; // Yes/No/Quit - Default Quit
-                    output = setupYesNoMenuInput(prompt_string, code_map);
+                    output = setupYesNoMenuInput(output, code_map);
                     match_found = true;
                     break;
 
@@ -1036,49 +974,6 @@ std::string MenuBase::buildLightBars() {
 
     return light_bars;
 }
-
-/*
-bool MenuBase::executeWithAcs(const MenuOption &opt) {
-    m_log.log(UtilLog::LogLevel::Info, "MenuBase() - executeWithAcs");
-    AcsBase acs;
-    if (!acs.validateAcsString(opt.acs_string, m_ctx.getUser())) {
-        m_failFlag = true; // Pascal parity: trying a restricted command sets fail flag
-        return false;
-    }
-
-    m_log.log(UtilLog::LogLevel::Info, "MenuBase() - enqueueChainedCommands", opt.command_key, opt.command_string);
-    std::stringstream ss(opt.command_key);
-
-    std::string testChain(opt.command_key);
-    if (testChain.find(';', 0) == std::string::npos) {
-        m_failFlag = false;
-        if (executeMenuOptions(opt)) {
-            return true;
-        }
-        return false;
-    }
-
-    std::stringstream strs(opt.command_key);
-    std::string token;
-    std::vector<MenuOption> chain;
-    while (std::getline(strs, token, ';')) {
-        if (token.empty()) {
-            continue;
-        }
-
-        MenuOption chained = opt;
-        chained.command_key = token;
-        chain.emplace_back(chained);
-    }
-
-    if (!m_cmdChainExecutor.isActive()) {
-        m_failFlag = false;
-        m_cmdChainExecutor.start(chain);
-    }
-
-    m_log.log(UtilLog::LogLevel::Info, "MenuBase() - enqueueChainedCommands completed.");
-    return true;
-}*/
 
 bool MenuBase::executeWithAcs(const MenuOption &opt) {
     m_log.log(UtilLog::LogLevel::Info, "MenuBase() - executeWithAcs");
@@ -1206,22 +1101,21 @@ std::string MenuBase::loadMenuPrompt() {
         // Usually menu's themselves are not going to be higher 25
         // Properly can also overwrite and have MCU position Codes in them.
 
-        int prompt_lines = 0;
+        int prompt_lines = 0; // with rumors for now, till we update each commands. otherwise 0
         if (!m_menu_prompt.data_line1.empty()) ++prompt_lines;
         if (!m_menu_prompt.data_line2.empty()) ++prompt_lines;
         if (!m_menu_prompt.data_line3.empty()) ++prompt_lines;
 
         // Default ANSI row start: 1 above menu or terminal rows minus prompt
-        int start_row = std::max(1, term_rows - prompt_lines - 1);
+        //int start_row = std::max(1, term_rows - prompt_lines - 1);
+        //prompt_display = "\x1b[?25h\x1b[" + std::to_string(start_row) + ";1H";
 
-        prompt_display = "\x1b[?25h\x1b[" + std::to_string(start_row) + ";1H";
 
-        /*
         if (term_rows == 24) {
             prompt_display = "\x1b[?25h\x1b[21;1H";
         } else if (term_rows > 24) {
             prompt_display = "\x1b[?25h\x1b[22;1H";
-        }*/
+        }
 
         //prompt_display = "\x1b[?25h\x1b[" + std::to_string(screen_rows) + ";1H\r\n";
         prompt_display += getDefaultColor();
@@ -1364,25 +1258,6 @@ bool MenuBase::executeMenuOptions(const MenuOption &option) {
 }
 
 bool MenuBase::handleStandardMenuInput(const std::string &input, const std::string &key) {
-    /**
-     * There is wild carding for menu commands:
-     * If you set the Key to X*, then you can put * in the
-     * Cstring and that will put what follows the X in the
-     * Cstring. This is advisable for such cases as file
-     * conference jumping such as J* with would do JM with a
-     * Cstring of * so one could J1,J2, etc.
-     *
-     * Also a possibility for CString is & in which is set to the
-     * input_text gotten with -I, -J, or set with -*.
-     *
-     *
-     * Note 2, * can also be used as a wild card alone for stacked
-     * commands to always run after any input.. for like return to a menu
-     * on yes/ no..  yes executes then does * to return,, n just returns on *
-     */
-
-    //m_log.log(UtilLog::LogLevel::Info, "STANDARD INPUT=", input, "KEY=", key);
-
     // Check for wildcard command input.
     std::string::size_type idx = key.find("*", 0);
 
@@ -1504,17 +1379,6 @@ bool MenuBase::handlePullDownHotKeys(const MenuOption &m, const bool &is_enter, 
                     stack_reassignment = true;
                     ++executed;
                 }
-
-                /*
-                // Testing for Stack Reassignment on FeedBack Light bars
-                const bool success = executeWithAcs(m);
-                assert(success)
-                // Now assign the m.menu_key to the input, so on next loop, we hit any stacked commands!
-                // If were in pull down menu, and the first lightbar has stacked commands, then we need
-                // to cycle through the remaining command's for stacked on light bars.
-                stack_reassignment = true;
-                ++executed;
-                */
             }
         }
     } else {
@@ -1527,10 +1391,8 @@ bool MenuBase::handlePullDownHotKeys(const MenuOption &m, const bool &is_enter, 
             if (current_menu != m_current_menu || m_logoff) {
                 return false;
             }
-
             ++executed;
         }
-
         // More testing here.. executeWithAcs( ... );
     }
 
@@ -1542,7 +1404,6 @@ bool MenuBase::handlePullDownHotKeys(const MenuOption &m, const bool &is_enter, 
 }
 
 std::deque<MenuOption> MenuBase::buildEachCommands() {
-
     std::deque<MenuOption> commands;
     if (m_menu_info.menu_options.empty())
         return commands;
@@ -1559,7 +1420,6 @@ std::deque<MenuOption> MenuBase::buildEachCommands() {
 }
 
 void MenuBase::executeEachCommands() {
-
     if (m_menu_info.menu_options.empty())
         return;
 
@@ -1589,85 +1449,6 @@ void MenuBase::executeEachCommands() {
         }
     }
 }
-
-/* Temp
-bool MenuBase::processMenuOptions(const std::string &input) {
-    m_log.log(UtilLog::LogLevel::Debug, "MenuBase::processMenuOptions input=", input);
-
-    if (input.empty() && !m_use_hotkey) {
-        return false;
-    }
-
-    // 1. Normalize search input (Pascal BBSes were generally case-insensitive)
-    std::string searchInput = m_ctx.getIoCommon().toUpper(input);
-    MenuOption* localWildcard = nullptr;
-
-    // 2. SEARCH LOCAL MENU (Current Context)
-    for (auto &opt : m_menu_info.menu_options) {
-        // Skip system flags
-        if (opt.menu_key == "FIRSTCMD" || opt.menu_key == "EACH") continue;
-
-        std::string menuKey = m_ctx.getIoCommon().toUpper(opt.menu_key);
-
-        // Exact Match Found
-        if (menuKey == searchInput) {
-            m_log.log(UtilLog::LogLevel::Info, "Local Match Found:", menuKey);
-            // Parity: Store the triggering input for '*' substitution in command strings
-            m_cmdChainExecutor.context().wildcardBuffer = input;
-            return executeWithAcs(opt);
-        }
-
-        // Identify if this menu has a wildcard catch-all
-        if (menuKey == "*" && !localWildcard) {
-            localWildcard = &opt;
-        }
-    }
-
-    // 3. SEARCH GLOBAL MENU (Legacy Fallback)
-    // Most Pascal engines checked a GLOBAL.MNU for keys like 'G' (Good-bye)
-    Menu globalMenu;
-    MenuDao globalDao(globalMenu, "global", GLOBAL_MENU_PATH);
-    MenuOption* globalWildcard = nullptr;
-
-    if (globalDao.fileExists()) {
-        globalDao.loadMenu();
-        for (auto &opt : globalMenu.menu_options) {
-            if (opt.menu_key == "FIRSTCMD" || opt.menu_key == "EACH") continue;
-
-            std::string menuKey = m_ctx.getIoCommon().toUpper(opt.menu_key);
-
-            if (menuKey == searchInput) {
-                m_log.log(UtilLog::LogLevel::Info, "Global Match Found:", menuKey);
-                m_cmdChainExecutor.context().wildcardBuffer = input;
-                return executeWithAcs(opt);
-            }
-
-            if (menuKey == "*" && !globalWildcard) {
-                globalWildcard = &opt;
-            }
-        }
-    }
-
-    // 4. WILDCARD EXECUTION (Priority: Local then Global)
-    if (localWildcard) {
-        m_log.log(UtilLog::LogLevel::Info, "Executing Local Wildcard for:", input);
-        m_cmdChainExecutor.context().wildcardBuffer = input;
-        return executeWithAcs(*localWildcard);
-    }
-
-    if (globalWildcard) {
-        m_log.log(UtilLog::LogLevel::Info, "Executing Global Wildcard for:", input);
-        m_cmdChainExecutor.context().wildcardBuffer = input;
-        return executeWithAcs(*globalWildcard);
-    }
-
-    // 5. NO MATCH (Fail State)
-    m_log.log(UtilLog::LogLevel::Warn, "No match for command:", input);
-    m_failFlag = true;
-    m_line_buffer.clear();
-
-    return false;
-}*/
 
 bool MenuBase::handleLightbarNavigation(const std::string &input) {
     if (m_loaded_pulldown_options.empty()) return false;
@@ -1774,15 +1555,6 @@ bool MenuBase::processMenuOptions(const std::string &input) {
                     // Before executing ACS command
                     std::string command_to_execute = m.menu_key;
 
-                    // LIGHTBAR INPUT, Wouldn't have Input Substitution!
-                    /*
-                    // Handle '&' substitution with user input
-                    size_t amp_idx = command_to_execute.find('&');
-                    if (amp_idx != std::string::npos) {
-                        // Replace & with input string (after key prefix, if any)
-                        command_to_execute.replace(amp_idx, 1, input_text);
-                    }*/
-
                     if (executeWithAcs(m)) {
                         ++executed;
                     }
@@ -1804,14 +1576,6 @@ bool MenuBase::processMenuOptions(const std::string &input) {
 
                     // Before executing ACS command
                     std::string command_to_execute = m.menu_key;
-
-                    /* Lightbars, should use substitution here?
-                    // Handle '&' substitution with user input
-                    size_t amp_idx = command_to_execute.find('&');
-                    if (amp_idx != std::string::npos) {
-                        // Replace & with input string (after key prefix, if any)
-                        command_to_execute.replace(amp_idx, 1, input_text);
-                    }*/
 
                     if (executeWithAcs(m)) {
                         ++executed;

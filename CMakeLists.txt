@@ -36,25 +36,72 @@ endif ()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Define root source directory and main executable source files
-file(GLOB MAIN_SOURCES "src/*.cpp" "src/**/*.cpp")
-file(GLOB MAIN_HEADERS "src/*.hpp" "src/**/*.hpp" "src/**/*.h")
+file(GLOB MAIN_SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp"
+        "${PROJECT_SOURCE_DIR}/src/**/*.cpp")
+file(GLOB MAIN_HEADERS "${PROJECT_SOURCE_DIR}/src/*.hpp"
+        "${PROJECT_SOURCE_DIR}/src/**/*.hpp"
+        "${PROJECT_SOURCE_DIR}/src/**/*.h")
+
+# ----------------------------------------------------------------------
+#  Gather production source files
+# ----------------------------------------------------------------------
+file(GLOB_RECURSE ALL_SRC_FILES
+        "${PROJECT_SOURCE_DIR}/src/*.cpp"
+        "${PROJECT_SOURCE_DIR}/src/**/*.cpp")
+
+message(STATUS "ALL_SRC_FILES = ${ALL_SRC_FILES}")
+
+# ----------------------------------------------------------------------
+#  Remove the file that contains the program entry point (main)
+#  Adjust the pattern if your entry point has a different name.
+# ----------------------------------------------------------------------
+list(FILTER ALL_SRC_FILES EXCLUDE REGEX
+        "${PROJECT_SOURCE_DIR}/src/xrm_server.cpp")   # <-- change if needed
+
+#list(REMOVE_ITEM ALL_SRC_FILES "${PROJECT_SOURCE_DIR}/src/xrm-server.cpp")
+message(STATUS "ALL_SRC_FILES (Exclude) = ${ALL_SRC_FILES}")
+
+# ----------------------------------------------------------------------
+#  1️⃣  Build the static library that holds the *core* code
+# ----------------------------------------------------------------------
+add_library(xrm-lib STATIC ${ALL_SRC_FILES})
+target_compile_definitions(xrm-lib PRIVATE -DWITHOUT_SDL)
+target_link_libraries(xrm-lib
+        PRIVATE iphlpapi wsock32 ws2_32
+        PRIVATE SQLite::SQLite3
+        PRIVATE OpenSSL::SSL
+        PRIVATE yaml-cpp::yaml-cpp
+        PRIVATE utf8cpp)
+target_link_options(xrm-lib PRIVATE -static)
+
+if (CMAKE_BUILD_TYPE MATCHES "Debug")
+    target_link_libraries(xrm-lib PRIVATE
+            "${PROJECT_SOURCE_DIR}/sqlitewrap/cmake-build-debug/lib/libSqliteWrapped.a")
+else()
+    target_link_libraries(xrm-lib PRIVATE
+            "${PROJECT_SOURCE_DIR}/sqlitewrap/cmake-build-release/lib/libSqliteWrapped.a")
+endif()
+
+set(SERVER_SRC "${PROJECT_SOURCE_DIR}/src/xrm_server.cpp")   # <-- file that has int main()
 
 # Win32 Specific Compiler Flags
 if (WIN32)
-    add_executable(xrm-server ${MAIN_SOURCES})
+    add_executable(xrm-server ${SERVER_SRC})
+    target_link_libraries(xrm-server PRIVATE xrm-lib)
+
     # Force static linking
-
     target_link_options(xrm-server PRIVATE -static)
-
     set_property(TARGET xrm-server PROPERTY WIN32_EXECUTABLE False)
-
     target_link_options(xrm-server PRIVATE
             PRIVATE "-Wl,--subsystem,console"
     )
 
 else ()
-    add_executable(xrm-server ${MAIN_SOURCES})
+    add_executable(xrm-server ${SERVER_SRC})
+    target_link_libraries(xrm-server PRIVATE xrm-lib)
 endif ()
+
+
 
 # PreProcessors -D Statements
 target_compile_definitions(xrm-server PRIVATE -DWITHOUT_SDL)
@@ -80,10 +127,6 @@ target_link_libraries(xrm-server PRIVATE yaml-cpp::yaml-cpp)
 
 find_package(utf8cpp REQUIRED)
 target_link_libraries(xrm-server PRIVATE utf8cpp)
-
-# TESTING - WIP!  This is for TESTS Subfolder, not main project.
-#find_package(GTest REQUIRED)
-#target_link_libraries(xrm-server PRIVATE gtest::gtest)
 
 
 # SQLLite Include directories

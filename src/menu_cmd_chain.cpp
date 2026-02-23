@@ -1,13 +1,11 @@
 #include <string>
 #include <vector>
 
-#include "model-sys/menu.hpp"
-
-#include "menu_system.hpp"
-
-
 #include "menu_cmd_chain.hpp"
+
+#include "model-sys/menu.hpp"
 #include "menu_system.hpp"
+
 
 CommandChainExecutor::CommandChainExecutor(MenuSystem &ms)
     : m_menuSystem(ms) {
