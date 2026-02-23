@@ -64,6 +64,11 @@ message(STATUS "ALL_SRC_FILES (Exclude) = ${ALL_SRC_FILES}")
 # ----------------------------------------------------------------------
 #  1️⃣  Build the static library that holds the *core* code
 # ----------------------------------------------------------------------
+find_package(Sqlite3 REQUIRED)
+find_package(OpenSSL REQUIRED)
+find_package(yaml-cpp REQUIRED)
+find_package(utf8cpp REQUIRED)
+
 add_library(xrm-lib STATIC ${ALL_SRC_FILES})
 target_compile_definitions(xrm-lib PRIVATE -DWITHOUT_SDL)
 target_link_libraries(xrm-lib
@@ -74,60 +79,29 @@ target_link_libraries(xrm-lib
         PRIVATE utf8cpp)
 target_link_options(xrm-lib PRIVATE -static)
 
-if (CMAKE_BUILD_TYPE MATCHES "Debug")
-    target_link_libraries(xrm-lib PRIVATE
-            "${PROJECT_SOURCE_DIR}/sqlitewrap/cmake-build-debug/lib/libSqliteWrapped.a")
-else()
-    target_link_libraries(xrm-lib PRIVATE
-            "${PROJECT_SOURCE_DIR}/sqlitewrap/cmake-build-release/lib/libSqliteWrapped.a")
-endif()
+# Setup Main() Method for Executable vs. Lib file.
+set(SERVER_SRC "${PROJECT_SOURCE_DIR}/src/xrm_server.cpp")
+add_executable(xrm-server ${SERVER_SRC})
+target_link_libraries(xrm-server PRIVATE xrm-lib)
 
-set(SERVER_SRC "${PROJECT_SOURCE_DIR}/src/xrm_server.cpp")   # <-- file that has int main()
+# PreProcessors -D Statements
+target_compile_definitions(xrm-server PRIVATE -DWITHOUT_SDL)
+target_link_libraries(xrm-server
+        PRIVATE iphlpapi wsock32 ws2_32
+        PRIVATE SQLite::SQLite3
+        PRIVATE OpenSSL::SSL
+        PRIVATE yaml-cpp::yaml-cpp
+        PRIVATE utf8cpp)
+target_link_options(xrm-server PRIVATE -static)
 
 # Win32 Specific Compiler Flags
 if (WIN32)
-    add_executable(xrm-server ${SERVER_SRC})
-    target_link_libraries(xrm-server PRIVATE xrm-lib)
-
-    # Force static linking
-    target_link_options(xrm-server PRIVATE -static)
+    # Force static linking and disable Debug Console forced in Windows.
     set_property(TARGET xrm-server PROPERTY WIN32_EXECUTABLE False)
     target_link_options(xrm-server PRIVATE
             PRIVATE "-Wl,--subsystem,console"
     )
-
-else ()
-    add_executable(xrm-server ${SERVER_SRC})
-    target_link_libraries(xrm-server PRIVATE xrm-lib)
 endif ()
-
-
-
-# PreProcessors -D Statements
-target_compile_definitions(xrm-server PRIVATE -DWITHOUT_SDL)
-
-# target_link_libraries(xrm-server PRIVATE pthreads)
-
-# Default Win Sockets Libs for SDL2_NET
-target_link_libraries(xrm-server PRIVATE iphlpapi)
-target_link_libraries(xrm-server PRIVATE wsock32)
-target_link_libraries(xrm-server PRIVATE ws2_32)
-
-# Find SQLite3 (Conan)
-find_package(Sqlite3 REQUIRED)
-target_link_libraries(xrm-server PRIVATE SQLite::SQLite3)
-
-# Encryption Algos (Conan)
-find_package(OpenSSL REQUIRED)
-target_link_libraries(xrm-server PRIVATE OpenSSL::SSL)
-
-# Menu and Data Files (Conan)
-find_package(yaml-cpp REQUIRED)
-target_link_libraries(xrm-server PRIVATE yaml-cpp::yaml-cpp)
-
-find_package(utf8cpp REQUIRED)
-target_link_libraries(xrm-server PRIVATE utf8cpp)
-
 
 # SQLLite Include directories
 target_include_directories(xrm-server
