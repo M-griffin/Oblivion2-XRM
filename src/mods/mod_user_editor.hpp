@@ -3,17 +3,14 @@
 
 #include "mod_base.hpp"
 
-#include <iostream>
 #include <string>
-#include <memory>
 #include <functional>
 #include <vector>
 
-class Directory;
-typedef std::shared_ptr<Directory> directory_ptr;
+#include "../data-sys/yml_text_prompts.hpp"
+#include "../util_dir.hpp"
 
-class Users;
-typedef std::shared_ptr<Users> user_ptr;
+class Context;
 
 /**
  * @class ModUserEditor
@@ -23,52 +20,71 @@ typedef std::shared_ptr<Users> user_ptr;
  * @brief User Editor
  */
 class ModUserEditor
-    : public ModBase
-{
+        : public ModBase {
+    static constexpr const char *MOD_FILENAME = "mod_user_editor.yaml";
+
+    std::vector<std::function<void()> > m_setup_functions;
+    std::vector<std::function<void(const std::string &)> > m_mod_functions;
+    std::vector<Users> m_users_listing;
+    std::vector<std::string> m_user_display_list;
+    std::vector<Users> m_loaded_user;
+
+    TextPromptsDao m_text_prompts_dao;
+    UtilDir m_directory;
+
+    unsigned int m_mod_setup_index;
+    unsigned int m_mod_function_index;
+    unsigned int m_mod_user_state_index;
+
+    bool m_is_text_prompt_exist;
+    unsigned int m_page;
+    unsigned int m_rows_per_page;
+
+    unsigned long m_current_user_id;
+    unsigned int m_current_field;
+    std::string m_wildcard_filter;
+    unsigned long m_user_array_position;
+
 public:
-    ModUserEditor(session_ptr session_data, config_ptr config, processor_ansi_ptr ansi_process,
-        common_io_ptr common_io, session_io_ptr session_io);
+    explicit ModUserEditor(Context &ctx);
+    ~ModUserEditor() = default;
 
-    virtual ~ModUserEditor() override
-    {
-        std::vector<std::function< void()> >().swap(m_setup_functions);
-        std::vector<std::function< void(const std::string &)> >().swap(m_mod_functions);
-        std::vector<user_ptr>().swap(m_users_listing);
-        std::vector<user_ptr>().swap(m_loaded_user);
-    }
+    // Disable copy semantics
+    ModUserEditor(const ModUserEditor &) = delete;
+    ModUserEditor &operator=(const ModUserEditor &) = delete;
+    ModUserEditor(ModUserEditor &&other) = delete;
+    ModUserEditor &operator=(ModUserEditor &&other) = delete;
 
-    virtual bool update(const std::string &character_buffer, const bool &) override;
-    virtual bool onEnter() override;
-    virtual bool onExit() override;
+    bool update(const std::string &character_buffer, const bool &);
+    bool onEnter();
+    bool onExit();
+    bool pollTimers();
 
     // Setup Methods
-    enum
-    {
-        MOD_DISPLAY_USER_LIST   = 0,
+    enum {
+        MOD_DISPLAY_USER_LIST = 0,
         MOD_DISPLAY_USER_FIELDS = 1,
         MOD_DISPLAY_USER_EXTENDED_FIELDS = 2
     };
 
     // Input Module Index
-    enum
-    {
-        MOD_USER_INPUT                = 0, // User List Input Parser
-        MOD_PAUSE                     = 1, // Pauses on display of menus/options
-        MOD_USER_NAME                 = 2, // User Name Input Handler
-        MOD_USER_FIELD_INPUT          = 3, // Selecting Individual User Fields.
-        MOD_USER_FIELD                = 4, // Updates Current Field
+    enum {
+        MOD_USER_INPUT = 0, // User List Input Parser
+        MOD_PAUSE = 1, // Pauses on display of menus/options
+        MOD_USER_NAME = 2, // User Name Input Handler
+        MOD_USER_FIELD_INPUT = 3, // Selecting Individual User Fields.
+        MOD_USER_FIELD = 4, // Updates Current Field
         MOD_USER_EXTENDED_FIELD_INPUT = 5, // Selecting Individual Extended User Fields.
-        MOD_USER_EXTENDED_FIELD       = 6  // Updates Current Extended Field
+        MOD_USER_EXTENDED_FIELD = 6 // Updates Current Extended Field
     };
 
     // Input Menu State Index
     // Used for both Menus and Options.
-    enum
-    {
-        USER_CHANGE    = 0,
-        USER_DELETE    = 1,
-        USER_COPY      = 2,
-        USER_FILTER    = 3
+    enum {
+        USER_CHANGE = 0,
+        USER_DELETE = 1,
+        USER_COPY = 2,
+        USER_FILTER = 3
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
@@ -369,19 +385,19 @@ public:
      * @brief Updates an existing password index.
      * @param key_value
      */
-    void updateExistingPassword(std::string key_value);
+    void updateExistingPassword(const std::string &key_value);
 
     /**
      * @brief Updates an existing Challenge Answer
      * @param key_value
      */
-    void updateExistingChallengeAnswer(std::string key_value);
+    void updateExistingChallengeAnswer(const std::string &key_value);
 
     /**
      * @brief Updates an existing Challenge Question
      * @param key_value
      */
-    void updateExistingChallengeQuestion(std::string key_value);
+    void updateExistingChallengeQuestion(const std::string &key_value);
 
     /**
      * @brief Handles Extended Field Updates for User Data
@@ -412,33 +428,7 @@ public:
      * @param input_state
      */
     void displayCurrentEditPage(const std::string &input_state);
-
-private:
-
-    // Function Input Vector.
-    std::vector<std::function< void()> >                    m_setup_functions;
-    std::vector<std::function< void(const std::string &)> > m_mod_functions;
-    std::vector<user_ptr>                                   m_users_listing;
-    std::vector<std::string>                                m_user_display_list;
-    std::vector<user_ptr>                                   m_loaded_user;
-
-    text_prompts_dao_ptr   m_text_prompts_dao;
-    directory_ptr          m_directory;
-
-    unsigned int           m_mod_setup_index;
-    unsigned int           m_mod_function_index;
-    unsigned int           m_mod_user_state_index;
-
-    bool                   m_is_text_prompt_exist;
-    unsigned int           m_page;
-    unsigned int           m_rows_per_page;
-
-    unsigned long          m_current_user_id;
-    unsigned int           m_current_field;
-    std::string            m_wildcard_filter;
-    unsigned long          m_user_array_position;    
-
 };
 
 
-#endif // MOD_USER_EDITOR_HPP
+#endif

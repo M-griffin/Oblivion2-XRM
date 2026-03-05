@@ -38,8 +38,7 @@ class ModLogon
         MOD_PASSWORD,
         MOD_PASSWORD_QUESTION,
         MOD_PASSWORD_ANSWER,
-        MOD_CHANGE_PASSWORD,
-        MOD_NEW_USER
+        MOD_CHANGE_PASSWORD
     };
 
     // Create Prompt Constants, these are the keys for key/value lookup
@@ -141,12 +140,6 @@ public:
      */
     void setupPasswordChange();
 
-    /**
-     * @brief Creates New User Account
-     * @return
-     */
-    void setupNewUserApplication();
-
 private:
     /**
      * @brief Lookup user records Handle, Name, or Email
@@ -190,12 +183,6 @@ private:
      * @return
      */
     bool passwordChange(const std::string &input);
-
-    /**
-     * @brief Creation of new user account
-     * @return
-     */
-    bool newUserApplication(const std::string &input);
 };
 
 #endif // MOD_LOGON_HPP
