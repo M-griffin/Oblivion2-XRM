@@ -190,7 +190,7 @@ bool MenuSystem::menuOptionsControlCommands(const MenuOption &option)
         case 'L':
             return false;
 
-        // Display files from current stat screen library
+        // Display files from current menu library
         case 'O':
             return false;
 
